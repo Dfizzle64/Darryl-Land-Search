@@ -1,7 +1,16 @@
 import { NextResponse } from "next/server";
-import { loadFixtureMeta, loadZoningConfig } from "@/lib/data/loadFixtures";
+import { loadFixtureMeta, loadFluConfig, loadZoningConfig } from "@/lib/data/loadFixtures";
 
 export async function GET() {
-  const [zoningConfig, meta] = await Promise.all([loadZoningConfig(), loadFixtureMeta()]);
-  return NextResponse.json({ zoningConfig, meta, dataSource: process.env.DATA_SOURCE ?? "fixture" });
+  const [zoningConfig, fluConfig, meta] = await Promise.all([
+    loadZoningConfig(),
+    loadFluConfig(),
+    loadFixtureMeta(),
+  ]);
+  return NextResponse.json({
+    zoningConfig,
+    fluConfig,
+    meta,
+    dataSource: process.env.DATA_SOURCE ?? "fixture",
+  });
 }

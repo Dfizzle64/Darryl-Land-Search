@@ -1,5 +1,11 @@
 export type IncomeGeography = "tract" | "blockGroup";
 
+export type LandUseFilter = "off" | "zoning" | "flu" | "either" | "both";
+
+export type DistrictStatus = "permitted" | "conditional" | "maybe" | "not-mf";
+
+export type CoverageLevel = "verified" | "partial" | "unverified";
+
 export type MailingAddress = {
   line1: string | null;
   line2: string | null;
@@ -37,6 +43,13 @@ export type NearestRoad = {
   distanceMeters: number | null;
 };
 
+export type FluInfo = {
+  code: string | null;
+  label: string | null;
+  jurisdiction: string | null;
+  source: string | null;
+};
+
 export type ParcelProperties = {
   id: string;
   parcelId: string;
@@ -59,6 +72,7 @@ export type ParcelProperties = {
   incomeTract: IncomeInfo | null;
   incomeBlockGroup: IncomeInfo | null;
   nearestRoad: NearestRoad | null;
+  flu: FluInfo | null;
   source: string;
 };
 
@@ -69,17 +83,23 @@ export type ParcelCollection = GeoJSON.FeatureCollection<
   ParcelProperties
 >;
 
-export type TrafficFeature = GeoJSON.Feature<GeoJSON.LineString, {
-  aadt: number | null;
-  year: number | null;
-  roadwayId: string | null;
-  from: string | null;
-  to: string | null;
-}>;
+export type TrafficFeature = GeoJSON.Feature<
+  GeoJSON.LineString,
+  {
+    aadt: number | null;
+    year: number | null;
+    roadwayId: string | null;
+    from: string | null;
+    to: string | null;
+  }
+>;
 
 export type FilterState = {
-  multifamilyZoningOnly: boolean;
+  landUseFilter: LandUseFilter;
   includePlannedDevelopment: boolean;
+  includeConditionalZoning: boolean;
+  minAcreage: number;
+  includeUnknownAcreage: boolean;
   minIncome: number;
   incomeGeography: IncomeGeography;
   includeUnknownIncome: boolean;
@@ -91,27 +111,75 @@ export type ZoningToken = {
   token: string;
   label: string;
   jurisdictions?: string[];
+  status?: DistrictStatus;
   why: string;
+  sourceUrl?: string;
+  aliases?: string[];
+};
+
+export type CodeSource = {
+  label: string;
+  url: string;
+};
+
+export type ZoningJurisdiction = {
+  code: string;
+  name: string;
+  coverage: CoverageLevel;
+  coverageNote?: string;
+  codeSource?: CodeSource;
+  districts: ZoningToken[];
 };
 
 export type ZoningConfig = {
   version: number;
   county: string;
+  updatedAt: string;
   notes: string;
+  sources?: CodeSource[];
+  jurisdictions: ZoningJurisdiction[];
   multifamilyTokens: ZoningToken[];
   plannedDevelopmentTokens: ZoningToken[];
   notAllowedExamples: string[];
 };
 
+export type FluCategory = {
+  code: string;
+  jurisdiction: string;
+  label: string;
+  allowsMultifamily: boolean;
+  status: "yes" | "maybe" | "no";
+  maxDensityDuAc?: number | null;
+  why: string;
+  sourceUrl?: string;
+};
+
+export type FluConfig = {
+  version: number;
+  updatedAt: string;
+  notes: string;
+  sources: CodeSource[];
+  categories: FluCategory[];
+};
+
 export const DEFAULT_FILTERS: FilterState = {
-  multifamilyZoningOnly: true,
+  landUseFilter: "zoning",
   includePlannedDevelopment: true,
+  includeConditionalZoning: false,
+  minAcreage: 0,
+  includeUnknownAcreage: true,
   minIncome: 0,
   incomeGeography: "tract",
   includeUnknownIncome: true,
   minAadt: 0,
   includeUnknownAadt: true,
 };
+
+export const ACREAGE_SLIDER = {
+  min: 0,
+  max: 25,
+  step: 0.25,
+} as const;
 
 export const ORANGE_COUNTY_BOUNDS: [[number, number], [number, number]] = [
   [-81.66, 28.34],

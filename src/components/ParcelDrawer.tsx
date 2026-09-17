@@ -12,13 +12,16 @@ import {
   ocpaParcelUrl,
   sunbizSearchUrl,
 } from "@/lib/format";
-import type { IncomeGeography, ParcelFeature, ZoningConfig } from "@/lib/types";
+import { describeFluMatch } from "@/lib/flu";
+import type { FluConfig, IncomeGeography, ParcelFeature, ZoningConfig } from "@/lib/types";
 import { describeZoningMatch } from "@/lib/zoning";
 
 type ParcelDrawerProps = {
   parcel: ParcelFeature | null;
   zoningConfig: ZoningConfig;
+  fluConfig: FluConfig;
   includePlannedDevelopment: boolean;
+  includeConditionalZoning: boolean;
   incomeGeography: IncomeGeography;
   onClose: () => void;
 };
@@ -35,7 +38,9 @@ function Field({ label, value }: { label: string; value: string | null | undefin
 export function ParcelDrawer({
   parcel,
   zoningConfig,
+  fluConfig,
   includePlannedDevelopment,
+  includeConditionalZoning,
   incomeGeography,
   onClose,
 }: ParcelDrawerProps) {
@@ -44,8 +49,8 @@ export function ParcelDrawer({
       <aside className="hidden w-[24rem] shrink-0 border-l border-white/10 bg-ink-900/80 p-5 lg:block">
         <p className="font-display text-2xl text-white">Parcel details</p>
         <p className="mt-2 text-sm leading-relaxed text-ink-300">
-          Click a parcel on the map to see owner, sale, tax, mailing, and public search links. Emails and phone numbers
-          are not inferred.
+          Click a parcel on the map to see acreage, zoning, Future Land Use, owner, sale, tax, mailing, and public
+          search links. Emails and phone numbers are not inferred.
         </p>
       </aside>
     );
@@ -57,10 +62,15 @@ export function ParcelDrawer({
     properties.zoningDistrict,
     zoningConfig,
     includePlannedDevelopment,
+    includeConditionalZoning,
   );
+  const flu = describeFluMatch(properties.flu, fluConfig);
   const income = incomeGeography === "tract" ? properties.incomeTract : properties.incomeBlockGroup;
   const mailing = formatMailing(properties.mailingAddress);
   const entity = isEntityOwner(properties.ownerName) || isEntityOwner(properties.ownerName2);
+  const fluLine = properties.flu?.code
+    ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
+    : null;
 
   return (
     <aside className="drawer-scroll absolute inset-x-0 bottom-0 z-20 max-h-[70vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-5 shadow-2xl lg:static lg:z-0 lg:max-h-none lg:w-[24rem] lg:shrink-0 lg:rounded-none lg:border-l lg:border-t-0 lg:shadow-none">
@@ -82,8 +92,9 @@ export function ParcelDrawer({
       <dl className="mt-5 grid grid-cols-2 gap-4">
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
-        <Field label="Zoning" value={properties.zoningCode} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
+        <Field label="Zoning" value={properties.zoningCode} />
+        <Field label="Future Land Use" value={fluLine} />
         <Field label="Last sale" value={formatSale(properties.lastSale)} />
         <Field label="Qualified sale" value={properties.lastSale.qualified} />
         <Field label="Market value" value={formatUsd(properties.tax.marketValue)} />
@@ -93,8 +104,12 @@ export function ParcelDrawer({
       </dl>
 
       <div className="mt-5 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
-        <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Why this zoning match</p>
+        <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Zoning</p>
         <p className="mt-1 text-ink-100">{zoning.reason}</p>
+      </div>
+      <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
+        <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Future Land Use</p>
+        <p className="mt-1 text-ink-100">{flu.reason}</p>
       </div>
 
       <div className="mt-4 space-y-3">

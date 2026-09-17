@@ -9,7 +9,9 @@
     "start": "next start --hostname 0.0.0.0 --port 3000",
     "lint": "next lint",
     "test": "vitest run",
-    "seed": "python3 scripts/seed_fixtures.py"
+    "seed": "python3 scripts/seed_fixtures.py && python3 scripts/join_flu.py && python3 scripts/seed_zoning.py",
+    "seed:flu": "python3 scripts/join_flu.py",
+    "seed:zoning": "python3 scripts/seed_zoning.py"
   },
   "dependencies": {
     "maplibre-gl": "^5.7.1",

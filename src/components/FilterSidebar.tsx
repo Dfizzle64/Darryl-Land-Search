@@ -1,13 +1,16 @@
 "use client";
 
-import { DEFAULT_FILTERS, type FilterState, type ZoningConfig } from "@/lib/types";
+import { ZoningKnowledgePanel } from "./ZoningKnowledgePanel";
+import { ACREAGE_SLIDER, DEFAULT_FILTERS, type FilterState, type FluConfig, type LandUseFilter, type ZoningConfig } from "@/lib/types";
 
 type FilterSidebarProps = {
   filters: FilterState;
   onChange: (next: FilterState) => void;
   zoningConfig: ZoningConfig;
+  fluConfig: FluConfig;
   matchedCount: number;
   totalCount: number;
+  fluJoinedCount: number | null;
   showExcluded: boolean;
   onShowExcluded: (value: boolean) => void;
   showTraffic: boolean;
@@ -44,12 +47,22 @@ function Toggle({
   );
 }
 
+const LAND_USE_OPTIONS: { value: LandUseFilter; label: string; hint: string }[] = [
+  { value: "off", label: "Off", hint: "Ignore zoning and FLU; still apply acreage, income, and traffic." },
+  { value: "zoning", label: "Current MF zoning", hint: "By-right multifamily districts in the knowledge base. PD and conditional are separate toggles." },
+  { value: "flu", label: "FLU allows multifamily / higher density", hint: "Future Land Use supports MF even if current zoning does not. Orlando + unincorporated county are joined; other cities may be unknown." },
+  { value: "either", label: "Either zoning or FLU", hint: "Keep a parcel if current MF zoning or MF-supportive FLU matches." },
+  { value: "both", label: "Both zoning and FLU", hint: "Require current MF zoning and MF-supportive FLU." },
+];
+
 export function FilterSidebar({
   filters,
   onChange,
   zoningConfig,
+  fluConfig,
   matchedCount,
   totalCount,
+  fluJoinedCount,
   showExcluded,
   onShowExcluded,
   showTraffic,
@@ -89,30 +102,67 @@ export function FilterSidebar({
         </section>
 
         <section className="mt-5 space-y-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Zoning</h2>
-          <Toggle
-            label="Multifamily zoning only"
-            checked={filters.multifamilyZoningOnly}
-            onChange={(multifamilyZoningOnly) => onChange({ ...filters, multifamilyZoningOnly })}
-            hint="Uses the configurable district list in data/zoning-config.json"
-          />
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Land use</h2>
+          <fieldset className="space-y-2">
+            <legend className="sr-only">Zoning and Future Land Use mode</legend>
+            {LAND_USE_OPTIONS.map((option) => (
+              <label key={option.value} className="flex cursor-pointer items-start gap-2 rounded-xl border border-white/5 bg-ink-950/30 px-2 py-2">
+                <input
+                  type="radio"
+                  className="mt-1 accent-moss-400"
+                  name="land-use-filter"
+                  checked={filters.landUseFilter === option.value}
+                  onChange={() => onChange({ ...filters, landUseFilter: option.value })}
+                />
+                <span>
+                  <span className="block text-sm text-white">{option.label}</span>
+                  <span className="mt-0.5 block text-xs text-ink-500">{option.hint}</span>
+                </span>
+              </label>
+            ))}
+          </fieldset>
           <Toggle
             label="Include planned development"
             checked={filters.includePlannedDevelopment}
             onChange={(includePlannedDevelopment) => onChange({ ...filters, includePlannedDevelopment })}
-            hint="PD / PUD can allow multifamily, but entitlements are site-specific"
+            hint="PD / PUD / PURD is maybe — entitlements are site-specific"
           />
-          <details className="rounded-xl border border-white/10 bg-ink-950/40 px-3 py-2 text-xs text-ink-300">
-            <summary className="cursor-pointer text-ink-100">Allowed district codes</summary>
-            <ul className="mt-2 space-y-1">
-              {zoningConfig.multifamilyTokens.map((token) => (
-                <li key={token.token}>
-                  <span className="text-clay-400">{token.token}</span> — {token.label}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-2 text-ink-500">{zoningConfig.notes}</p>
-          </details>
+          <Toggle
+            label="Include conditional zoning"
+            checked={filters.includeConditionalZoning}
+            onChange={(includeConditionalZoning) => onChange({ ...filters, includeConditionalZoning })}
+            hint="Live Local commercial/industrial, limited multiplex, some mixed-use overlays"
+          />
+        </section>
+
+        <section className="mt-5 space-y-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Minimum acreage</h2>
+          <label className="block text-sm">
+            Parcel acreage (OCPA)
+            <input
+              type="range"
+              min={ACREAGE_SLIDER.min}
+              max={ACREAGE_SLIDER.max}
+              step={ACREAGE_SLIDER.step}
+              value={Math.min(filters.minAcreage, ACREAGE_SLIDER.max)}
+              onChange={(event) => onChange({ ...filters, minAcreage: Number(event.target.value) })}
+              className="mt-2 w-full accent-clay-400"
+            />
+            <span className="mt-1 block text-ink-300">
+              {filters.minAcreage === 0
+                ? "No minimum"
+                : `${filters.minAcreage.toLocaleString("en-US", { maximumFractionDigits: 2 })} ac+`}
+            </span>
+          </label>
+          <p className="text-xs text-ink-500">
+            Slider runs 0–{ACREAGE_SLIDER.max} acres. Larger parcels still match any threshold at or below{" "}
+            {ACREAGE_SLIDER.max} ac. This sample is biased toward large lots.
+          </p>
+          <Toggle
+            label="Include unknown acreage"
+            checked={filters.includeUnknownAcreage}
+            onChange={(includeUnknownAcreage) => onChange({ ...filters, includeUnknownAcreage })}
+          />
         </section>
 
         <section className="mt-5 space-y-3">
@@ -192,9 +242,17 @@ export function FilterSidebar({
           />
         </section>
 
+        <ZoningKnowledgePanel
+          zoningConfig={zoningConfig}
+          fluConfig={fluConfig}
+          fluJoinedCount={fluJoinedCount}
+          parcelCount={totalCount}
+        />
+
         <p className="mt-6 text-[11px] leading-relaxed text-ink-500">
-          Fixture snapshot {generatedAt ?? "unknown"}. Owner, sale, and tax fields come from the Orange County Property
-          Appraiser public GIS layer. Income is ACS median household income. AADT is the nearest FDOT count segment.
+          Fixture snapshot {generatedAt ?? "unknown"}. Owner, sale, tax, and acreage come from the Orange County
+          Property Appraiser public GIS layer. FLU is joined from Orange County and Orlando open data. Income is ACS
+          median household income. AADT is the nearest FDOT count segment.
         </p>
       </aside>
     </>

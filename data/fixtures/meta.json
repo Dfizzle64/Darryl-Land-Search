@@ -10,12 +10,21 @@
   "sources": {
     "parcels": "https://vgispublic.ocpafl.org/server/rest/services/Webmap/PARCEL/MapServer/4",
     "aadt": "https://gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0",
-    "income": "https://api.censusreporter.org/1.0/data/show/latest"
+    "income": "https://api.censusreporter.org/1.0/data/show/latest",
+    "fluOrangeCounty": "https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/21",
+    "fluOrlando": "https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/83"
   },
   "notes": [
     "Parcel attributes and polygons come from the public OCPA ArcGIS FeatureServer.",
     "AADT is the nearest FDOT Orange County segment to the parcel centroid.",
     "Income is ACS median household income (B19013) assigned by point-in-polygon.",
-    "This is a geographically mixed sample, not a complete county extract."
-  ]
+    "This is a geographically mixed sample, not a complete county extract.",
+    "FLU is joined by parcel centroid to OC layer 21 and Orlando layer 83. Other municipal FLU is a known gap."
+  ],
+  "fluJoinedAt": "2026-09-17T03:18:11Z",
+  "fluJoinedCount": 372,
+  "fluGaps": {
+    "no-hit": 76,
+    "county-city-placeholder": 11
+  }
 }

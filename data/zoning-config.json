@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "county": "Orange County, FL",
+  "notes": "OCPA stores zoning as JURISDICTION-DISTRICT/overlays, e.g. ORL-R-3B/T/AN. Matching uses the base district after the jurisdiction prefix and before overlay suffixes. Edit this file to change what the multifamily toggle treats as allowed.",
+  "multifamilyTokens": [
+    {
+      "token": "R-3",
+      "label": "Multiple-family dwelling",
+      "jurisdictions": ["ORG", "APK", "OCO", "WG", "WP", "EDG", "EVL"],
+      "why": "Orange County Code Ch. 38 R-3 Multiple-Family Dwelling District; municipal R-3 equivalents."
+    },
+    {
+      "token": "U-R-3",
+      "label": "University residential (multifamily)",
+      "jurisdictions": ["ORG"],
+      "why": "Orange County U-R-3 University Residential District, four or more dwelling units."
+    },
+    {
+      "token": "UR-3",
+      "label": "University residential (alt. spelling)",
+      "jurisdictions": ["ORG"],
+      "why": "Alternate punctuation of U-R-3 seen in some GIS extracts."
+    },
+    {
+      "token": "R-3A",
+      "label": "Orlando multifamily R-3A",
+      "jurisdictions": ["ORL"],
+      "why": "City of Orlando Ch. 58 Part 2E R-3A development district."
+    },
+    {
+      "token": "R-3B",
+      "label": "Orlando multifamily R-3B",
+      "jurisdictions": ["ORL"],
+      "why": "City of Orlando Ch. 58 Part 2E R-3B development district."
+    },
+    {
+      "token": "R-3C",
+      "label": "Orlando multifamily R-3C",
+      "jurisdictions": ["ORL"],
+      "why": "City of Orlando Ch. 58 Part 2E R-3C development district."
+    },
+    {
+      "token": "R-3D",
+      "label": "Orlando multifamily R-3D",
+      "jurisdictions": ["ORL"],
+      "why": "City of Orlando Ch. 58 Part 2E R-3D development district."
+    },
+    {
+      "token": "MXD-1",
+      "label": "Orlando mixed-use 1",
+      "jurisdictions": ["ORL"],
+      "why": "City of Orlando mixed-use districts that permit residential including multiplex."
+    },
+    {
+      "token": "MXD-2",
+      "label": "Orlando mixed-use 2",
+      "jurisdictions": ["ORL"],
+      "why": "City of Orlando mixed-use districts that permit residential including multiplex."
+    },
+    {
+      "token": "MIXED",
+      "label": "Mixed-use (municipal GIS label)",
+      "jurisdictions": ["BAY", "LBV", "APK", "ORG"],
+      "why": "OCPA mixed-use labels used in Bay Lake, Lake Buena Vista, and some other jurisdictions."
+    },
+    {
+      "token": "AC-1",
+      "label": "Orlando Activity Center 1",
+      "jurisdictions": ["ORL"],
+      "why": "Downtown/activity-center districts intended for high-intensity mixed use including residential."
+    },
+    {
+      "token": "AC-2",
+      "label": "Orlando Activity Center 2",
+      "jurisdictions": ["ORL"],
+      "why": "Downtown/activity-center districts intended for high-intensity mixed use including residential."
+    },
+    {
+      "token": "AC-3",
+      "label": "Orlando Activity Center 3",
+      "jurisdictions": ["ORL"],
+      "why": "Downtown/activity-center districts intended for high-intensity mixed use including residential."
+    },
+    {
+      "token": "AC-3A",
+      "label": "Orlando Activity Center 3A",
+      "jurisdictions": ["ORL"],
+      "why": "Activity-center subdistrict that allows high-density residential as part of mixed use."
+    },
+    {
+      "token": "AC-N",
+      "label": "Orlando Activity Center North",
+      "jurisdictions": ["ORL"],
+      "why": "Activity-center subdistrict that allows high-density residential as part of mixed use."
+    },
+    {
+      "token": "RM",
+      "label": "Residential multifamily (legacy GIS code)",
+      "jurisdictions": ["ORG"],
+      "why": "Appears on some OCPA extracts as a multifamily residential code."
+    }
+  ],
+  "plannedDevelopmentTokens": [
+    {
+      "token": "P-D",
+      "label": "Planned Development",
+      "why": "PD zoning may allow multifamily under a site-specific ordinance. Confirm the PD regulating plan before treating a site as entitled."
+    },
+    {
+      "token": "PD",
+      "label": "Planned Development (alt.)",
+      "why": "Alternate GIS spelling of Planned Development."
+    },
+    {
+      "token": "PUD",
+      "label": "Planned Unit Development",
+      "why": "Municipal PUD labels; entitlements are site-specific."
+    }
+  ],
+  "notAllowedExamples": [
+    "R-1 / R-1A / R-1AA / R-CE — single-family",
+    "R-2 — typically one- and two-family, not 4+ multifamily",
+    "C-1 / C-2 / P-O — commercial / office unless a mixed-use overlay is present",
+    "ORL-P — City of Orlando public-use district"
+  ]
+}

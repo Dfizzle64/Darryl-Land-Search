@@ -3,10 +3,10 @@
 import {
   comptrollerRecordsUrl,
   formatAcres,
-  formatDate,
   formatMailing,
   formatNumber,
   formatRoadLabel,
+  formatSale,
   formatUsd,
   isEntityOwner,
   ocpaParcelUrl,
@@ -84,7 +84,7 @@ export function ParcelDrawer({
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Zoning" value={properties.zoningCode} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
-        <Field label="Last sale" value={`${formatDate(properties.lastSale.date)}\n${formatUsd(properties.lastSale.price)}`} />
+        <Field label="Last sale" value={formatSale(properties.lastSale)} />
         <Field label="Qualified sale" value={properties.lastSale.qualified} />
         <Field label="Market value" value={formatUsd(properties.tax.marketValue)} />
         <Field label="Assessed value" value={formatUsd(properties.tax.assessedValue)} />

@@ -1,6 +1,6 @@
 "use client";
 
-import type { FilterState, ZoningConfig } from "@/lib/types";
+import { DEFAULT_FILTERS, type FilterState, type ZoningConfig } from "@/lib/types";
 
 type FilterSidebarProps = {
   filters: FilterState;
@@ -79,6 +79,13 @@ export function FilterSidebar({
           <p className="text-xs uppercase tracking-[0.16em] text-ink-500">Results</p>
           <p className="mt-1 font-display text-3xl text-white">{matchedCount.toLocaleString()}</p>
           <p className="text-xs text-ink-500">matching {totalCount.toLocaleString()} sample parcels</p>
+          <button
+            type="button"
+            className="mt-3 text-xs text-clay-400 underline-offset-2 hover:underline"
+            onClick={() => onChange({ ...DEFAULT_FILTERS })}
+          >
+            Reset filters
+          </button>
         </section>
 
         <section className="mt-5 space-y-3">

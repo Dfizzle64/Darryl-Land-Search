@@ -43,6 +43,14 @@ export function formatDate(value: string | null | undefined): string {
   return `${month}/${day}/${year}`;
 }
 
+export function formatSale(sale: { date: string | null; price: number | null }): string {
+  if (!sale.date && (sale.price == null || sale.price <= 0)) return "Not available";
+  const date = sale.date ? formatDate(sale.date) : null;
+  const price = sale.price != null && sale.price > 0 ? formatUsd(sale.price) : null;
+  if (date && price) return `${date}\n${price}`;
+  return date ?? price ?? "Not available";
+}
+
 export function formatMailing(address: {
   line1: string | null;
   line2: string | null;

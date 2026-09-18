@@ -2,9 +2,10 @@
 """Download a geographically mixed Orange County, FL pilot dataset.
 
 Sources (public, no commercial parcel vendors):
-  - OCPA parcel FeatureServer (owner, sale, tax, zoning, geometry)
+  - OCPA parcel FeatureServer (owner, sale, tax, zoning, acreage, geometry)
   - FDOT AADT FeatureServer (nearest major-road traffic)
   - Census Reporter ACS 5-year B19013 (median household income)
+  - Orange County + Orlando Future Land Use (joined by scripts/join_flu.py after this seed)
 """
 
 from __future__ import annotations
@@ -522,6 +523,7 @@ def main() -> None:
                     "incomeTract": tract,
                     "incomeBlockGroup": block_group,
                     "nearestRoad": traffic,
+                    "flu": None,
                     "source": "ocpa-webmap-parcels-fixture",
                 },
             }
@@ -594,6 +596,7 @@ def main() -> None:
             "Parcel attributes and polygons come from the public OCPA ArcGIS FeatureServer.",
             "AADT is the nearest FDOT Orange County segment to the parcel centroid.",
             "Income is ACS median household income (B19013) assigned by point-in-polygon.",
+            "FLU is joined afterward by npm run seed:flu (OC layer 21 + Orlando layer 83).",
             "This is a geographically mixed sample, not a complete county extract.",
         ],
     }
@@ -606,6 +609,7 @@ def main() -> None:
     )
     (OUT / "meta.json").write_text(json.dumps(meta, indent=2))
     print(json.dumps({"parcels": len(parcel_features), "skipped": skipped, "aadt": len(roads), "overlay": len(traffic_features)}, indent=2))
+    print("Next: python3 scripts/join_flu.py && python3 scripts/seed_zoning.py")
 
 
 if __name__ == "__main__":

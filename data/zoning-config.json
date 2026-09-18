@@ -1,126 +1,619 @@
 {
-  "version": 1,
+  "version": 2,
   "county": "Orange County, FL",
-  "notes": "OCPA stores zoning as JURISDICTION-DISTRICT/overlays, e.g. ORL-R-3B/T/AN. Matching uses the base district after the jurisdiction prefix and before overlay suffixes. Edit this file to change what the multifamily toggle treats as allowed.",
-  "multifamilyTokens": [
+  "updatedAt": "2026-09-17",
+  "notes": "OCPA stores zoning as JURISDICTION-DISTRICT/overlays, e.g. ORL-R-3B/T/AN. Matching uses the jurisdiction prefix plus the base district (before overlay suffixes). Edit this file to change what counts as multifamily-capable; do not hard-code a second list in the app. PD/PUD is always maybe — site-specific. Conditional districts (Live Local commercial/industrial, some mixed-use overlays) are off by default and gated by the conditional toggle.",
+  "sources": [
     {
-      "token": "R-3",
-      "label": "Multiple-family dwelling",
-      "jurisdictions": ["ORG", "APK", "OCO", "WG", "WP", "EDG", "EVL"],
-      "why": "Orange County Code Ch. 38 R-3 Multiple-Family Dwelling District; municipal R-3 equivalents."
+      "label": "Orange County Code Ch. 38 Zoning (Municode)",
+      "url": "https://library.municode.com/fl/orange_county/codes/code_of_ordinances?nodeId=PTIIICICO_CH38ZO"
     },
     {
-      "token": "U-R-3",
-      "label": "University residential (multifamily)",
-      "jurisdictions": ["ORG"],
-      "why": "Orange County U-R-3 University Residential District, four or more dwelling units."
+      "label": "Orange County Sec. 38-77 use table / Sec. 38-79 conditions",
+      "url": "https://www.orangecountyfl.net/PermitsLicenses/ZoningDivision.aspx"
     },
     {
-      "token": "UR-3",
-      "label": "University residential (alt. spelling)",
-      "jurisdictions": ["ORG"],
-      "why": "Alternate punctuation of U-R-3 seen in some GIS extracts."
+      "label": "City of Orlando Ch. 58 Zoning (Municode)",
+      "url": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS"
     },
     {
-      "token": "R-3A",
-      "label": "Orlando multifamily R-3A",
-      "jurisdictions": ["ORL"],
-      "why": "City of Orlando Ch. 58 Part 2E R-3A development district."
+      "label": "City of Apopka Land Development Code Art. 3",
+      "url": "https://library.municode.com/fl/apopka/codes/code_of_ordinances?nodeId=PTIIILADECO_ART3ZODI_S3.3REBAZODI"
     },
     {
-      "token": "R-3B",
-      "label": "Orlando multifamily R-3B",
-      "jurisdictions": ["ORL"],
-      "why": "City of Orlando Ch. 58 Part 2E R-3B development district."
+      "label": "City of Ocoee Land Development Code Art. V",
+      "url": "https://library.municode.com/fl/ocoee/codes/land_development_code?nodeId=ARTVLAUSDEREZO_S5-18BURESU"
     },
     {
-      "token": "R-3C",
-      "label": "Orlando multifamily R-3C",
-      "jurisdictions": ["ORL"],
-      "why": "City of Orlando Ch. 58 Part 2E R-3C development district."
+      "label": "City of Maitland Land Development Code Art. 3",
+      "url": "https://library.municode.com/fl/maitland/codes/land_development_code?nodeId=PTIILADECO_ART3ZODI_S3.2REDI_3.2.1GEPUREDI"
     },
     {
-      "token": "R-3D",
-      "label": "Orlando multifamily R-3D",
-      "jurisdictions": ["ORL"],
-      "why": "City of Orlando Ch. 58 Part 2E R-3D development district."
+      "label": "City of Edgewood Ch. 134 Zoning",
+      "url": "https://library.municode.com/fl/edgewood/codes/code_of_ordinances?nodeId=PTIICOOR_CH134ZO_ARTIVDIRE_DIV5MUMIDWDI"
     },
     {
-      "token": "MXD-1",
-      "label": "Orlando mixed-use 1",
-      "jurisdictions": ["ORL"],
-      "why": "City of Orlando mixed-use districts that permit residential including multiplex."
+      "label": "City of Winter Park Ch. 58 Zoning",
+      "url": "https://library.municode.com/fl/winter_park/codes/code_of_ordinances?nodeId=TITVLADECO_CH58ZO"
     },
     {
-      "token": "MXD-2",
-      "label": "Orlando mixed-use 2",
-      "jurisdictions": ["ORL"],
-      "why": "City of Orlando mixed-use districts that permit residential including multiplex."
-    },
-    {
-      "token": "MIXED",
-      "label": "Mixed-use (municipal GIS label)",
-      "jurisdictions": ["BAY", "LBV", "APK", "ORG"],
-      "why": "OCPA mixed-use labels used in Bay Lake, Lake Buena Vista, and some other jurisdictions."
-    },
-    {
-      "token": "AC-1",
-      "label": "Orlando Activity Center 1",
-      "jurisdictions": ["ORL"],
-      "why": "Downtown/activity-center districts intended for high-intensity mixed use including residential."
-    },
-    {
-      "token": "AC-2",
-      "label": "Orlando Activity Center 2",
-      "jurisdictions": ["ORL"],
-      "why": "Downtown/activity-center districts intended for high-intensity mixed use including residential."
-    },
-    {
-      "token": "AC-3",
-      "label": "Orlando Activity Center 3",
-      "jurisdictions": ["ORL"],
-      "why": "Downtown/activity-center districts intended for high-intensity mixed use including residential."
-    },
-    {
-      "token": "AC-3A",
-      "label": "Orlando Activity Center 3A",
-      "jurisdictions": ["ORL"],
-      "why": "Activity-center subdistrict that allows high-density residential as part of mixed use."
-    },
-    {
-      "token": "AC-N",
-      "label": "Orlando Activity Center North",
-      "jurisdictions": ["ORL"],
-      "why": "Activity-center subdistrict that allows high-density residential as part of mixed use."
-    },
-    {
-      "token": "RM",
-      "label": "Residential multifamily (legacy GIS code)",
-      "jurisdictions": ["ORG"],
-      "why": "Appears on some OCPA extracts as a multifamily residential code."
+      "label": "City of Winter Garden Ch. 118 Zoning",
+      "url": "https://library.municode.com/fl/winter_garden/codes/code_of_ordinances?nodeId=PTIIILADECO_CH118ZO"
     }
   ],
+  "jurisdictions": [
+    {
+      "code": "ORG",
+      "name": "Orange County (unincorporated)",
+      "coverage": "verified",
+      "coverageNote": "Use table Sec. 38-77 and district divisions in Ch. 38 reviewed for 4+ multifamily. Horizon West form-based districts (NR/NC/NAC) are included from the same table.",
+      "codeSource": {
+        "label": "Orange County Code Ch. 38",
+        "url": "https://library.municode.com/fl/orange_county/codes/code_of_ordinances?nodeId=PTIIICICO_CH38ZO"
+      },
+      "districts": [
+        {
+          "token": "R-3",
+          "label": "Multiple-Family Dwelling",
+          "status": "permitted",
+          "aliases": ["RSTD R-3"],
+          "why": "Ch. 38 Div. 10 R-3 Multiple-Family Dwelling District; Sec. 38-77 lists “Multifamily w/ customary accessory uses” as P. Four or more units: 15,000 sq ft min (Sec. 38-1501). Restricted GIS label RSTD R-3 is treated as R-3 with overlay limits — confirm the restriction.",
+          "sourceUrl": "https://library.municode.com/fl/orange_county/codes/code_of_ordinances?nodeId=PTIIICICO_CH38ZO"
+        },
+        {
+          "token": "U-R-3",
+          "label": "University Residential",
+          "status": "permitted",
+          "aliases": ["UR-3"],
+          "why": "Ch. 38 Div. 11 UR-3 University Residential. Sec. 38-77 multifamily is P. Site standards for four or more dwelling units in Sec. 38-1501.",
+          "sourceUrl": "https://library.municode.com/fl/orange_county/codes/code_of_ordinances?nodeId=PTIIICICO_CH38ZO"
+        },
+        {
+          "token": "R-2",
+          "label": "Residential District (includes multifamily in the use table)",
+          "status": "permitted",
+          "why": "Non-obvious: Sec. 38-77 lists multifamily as a permitted use (P) in R-2, not only R-3. R-2 is also a consistent zoning district for MDR/MHDR/HDR on the county FLU/zoning correlation table. Confirm height/special-exception rules (one-story vs. taller near single-family).",
+          "sourceUrl": "https://library.municode.com/fl/orange_county/codes/code_of_ordinances?nodeId=PTIIICICO_CH38ZO"
+        },
+        {
+          "token": "R-L-D",
+          "label": "Residential Low-Density",
+          "status": "conditional",
+          "why": "Sec. 38-77 shows multifamily as 124 P in R-L-D (permitted with conditions 1 and 24). Condition 24 ties multifamily to F.S. § 125.01055 (Live Local Act). Not a by-right garden-apartment district.",
+          "sourceUrl": "https://library.municode.com/fl/orange_county/codes/code_of_ordinances?nodeId=PTIIICICO_CH38ZO"
+        },
+        {
+          "token": "NR",
+          "label": "Neighborhood Residential (form-based)",
+          "status": "permitted",
+          "why": "Sec. 38-77 lists multifamily as P in NR. Paired with NR FLU (20 du/ac).",
+          "sourceUrl": "https://library.municode.com/fl/orange_county/codes/code_of_ordinances?nodeId=PTIIICICO_CH38ZO"
+        },
+        {
+          "token": "NC",
+          "label": "Neighborhood Center (form-based)",
+          "status": "conditional",
+          "why": "Sec. 38-77 lists multifamily as 24 P in NC (Live Local / condition 24). NC FLU allows 40 du/ac. Treated as conditional, not by-right R-3 equivalent.",
+          "sourceUrl": "https://library.municode.com/fl/orange_county/codes/code_of_ordinances?nodeId=PTIIICICO_CH38ZO"
+        },
+        {
+          "token": "NAC",
+          "label": "Neighborhood Activity Corridor",
+          "status": "conditional",
+          "why": "Sec. 38-77 lists multifamily as 24 P in NAC. NAC FLU allows 25 du/ac.",
+          "sourceUrl": "https://library.municode.com/fl/orange_county/codes/code_of_ordinances?nodeId=PTIIICICO_CH38ZO"
+        },
+        {
+          "token": "C-1",
+          "label": "Retail Commercial (Live Local path)",
+          "status": "conditional",
+          "why": "Sec. 38-77 marks multifamily 24 P in C-1. Sec. 38-79(24) requires compliance with F.S. § 125.01055 (Live Local Act) — not a conventional by-right apartment district. Turn on “include conditional zoning” to see these sites.",
+          "sourceUrl": "https://www.orangecountyfl.net/PermitsLicenses/ZoningDivision.aspx"
+        },
+        {
+          "token": "C-2",
+          "label": "General Commercial (Live Local path)",
+          "status": "conditional",
+          "why": "Sec. 38-77: multifamily 24 P in C-2, subject to Sec. 38-79(24) / Live Local Act.",
+          "sourceUrl": "https://www.orangecountyfl.net/PermitsLicenses/ZoningDivision.aspx"
+        },
+        {
+          "token": "C-3",
+          "label": "Wholesale Commercial (Live Local path)",
+          "status": "conditional",
+          "why": "Sec. 38-77: multifamily 24 P in C-3, subject to Sec. 38-79(24) / Live Local Act.",
+          "sourceUrl": "https://www.orangecountyfl.net/PermitsLicenses/ZoningDivision.aspx"
+        },
+        {
+          "token": "I-1",
+          "label": "Restricted Industrial (Live Local path)",
+          "status": "conditional",
+          "aliases": ["I-1A", "I-5", "IND-1"],
+          "why": "Sec. 38-77: multifamily 24 P in I-1A and I-1/I-5. Industrial flex / Live Local — not by-right MF. OCPA sometimes labels these IND-*.",
+          "sourceUrl": "https://www.orangecountyfl.net/PermitsLicenses/ZoningDivision.aspx"
+        },
+        {
+          "token": "IND-2",
+          "label": "Industrial park (OCPA label for I-2/I-3)",
+          "status": "conditional",
+          "aliases": ["IND-3", "I-2", "I-3"],
+          "why": "OCPA GIS uses IND-2/IND-3 for Ch. 38 I-2/I-3. Sec. 38-77: multifamily 24 P. Conditional / Live Local, not conventional MF zoning.",
+          "sourceUrl": "https://www.orangecountyfl.net/PermitsLicenses/ZoningDivision.aspx"
+        },
+        {
+          "token": "IND-4",
+          "label": "Industrial (OCPA label for I-4)",
+          "status": "conditional",
+          "aliases": ["I-4"],
+          "why": "Sec. 38-77: multifamily 24 P in I-4, subject to condition 24 / Live Local.",
+          "sourceUrl": "https://www.orangecountyfl.net/PermitsLicenses/ZoningDivision.aspx"
+        },
+        {
+          "token": "MIXED",
+          "label": "Mixed-use (OCPA GIS label)",
+          "status": "conditional",
+          "why": "Appears on some unincorporated OCPA extracts. Not a Ch. 38 base district name. Treat as mixed-use capable of residential only after confirming the ordinance or PD; not invented as a loophole.",
+          "sourceUrl": "https://library.municode.com/fl/orange_county/codes/code_of_ordinances?nodeId=PTIIICICO_CH38ZO"
+        },
+        {
+          "token": "RM",
+          "label": "Residential multifamily (legacy GIS code)",
+          "status": "permitted",
+          "why": "Legacy OCPA multifamily label when present. Confirm against current Ch. 38 mapping.",
+          "sourceUrl": "https://library.municode.com/fl/orange_county/codes/code_of_ordinances?nodeId=PTIIICICO_CH38ZO"
+        }
+      ]
+    },
+    {
+      "code": "ORL",
+      "name": "City of Orlando",
+      "coverage": "verified",
+      "coverageNote": "Ch. 58 district purposes and the published allowable-use table (Fig. 2A.LDC) reviewed for R-3A–D, MXD, AC, and multiplex rules in Part 3H. Office multiplex (O-1/O-2) is documented as conditional 3–8 units, not 4+ apartments by right.",
+      "codeSource": {
+        "label": "Orlando Code Ch. 58",
+        "url": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS"
+      },
+      "districts": [
+        {
+          "token": "R-3A",
+          "label": "Multifamily development district R-3A",
+          "status": "permitted",
+          "why": "Ch. 58 Part 2E R-3A–R-3D development districts. City defines larger multifamily as apartment product in these districts.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS_PT2DIRE_2EDEDI"
+        },
+        {
+          "token": "R-3B",
+          "label": "Multifamily development district R-3B",
+          "status": "permitted",
+          "why": "Ch. 58 Part 2E. Also listed in Part 3H multiplex (3–8 units) alongside larger multifamily.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS_PT2DIRE_2EDEDI"
+        },
+        {
+          "token": "R-3C",
+          "label": "Multifamily development district R-3C",
+          "status": "permitted",
+          "why": "Ch. 58 Part 2E R-3C development district.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS_PT2DIRE_2EDEDI"
+        },
+        {
+          "token": "R-3D",
+          "label": "Multifamily development district R-3D",
+          "status": "permitted",
+          "why": "Ch. 58 Part 2E R-3D development district.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS_PT2DIRE_2EDEDI"
+        },
+        {
+          "token": "MXD-1",
+          "label": "Mixed-use development 1",
+          "status": "permitted",
+          "why": "Ch. 58 mixed-development districts; allowable-use table includes residential / multiplex in MXD-1.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS"
+        },
+        {
+          "token": "MXD-2",
+          "label": "Mixed-use development 2",
+          "status": "permitted",
+          "why": "Ch. 58 mixed-development districts; allowable-use table includes residential / multiplex in MXD-2.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS"
+        },
+        {
+          "token": "AC-N",
+          "label": "Neighborhood Activity Center",
+          "status": "permitted",
+          "why": "Ch. 58 Part 2O: AC-N is for concentrated neighborhood-serving commercial, office, residential, recreational and cultural facilities. Mixed use including residential is encouraged.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS_PT2DIRE_2OACCEDI"
+        },
+        {
+          "token": "AC-1",
+          "label": "Community Activity Center",
+          "status": "permitted",
+          "why": "Ch. 58 Part 2O AC-1 Community Activity Center — mixed use including residential at community scale.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS_PT2DIRE_2OACCEDI"
+        },
+        {
+          "token": "AC-2",
+          "label": "Urban Activity Center",
+          "status": "permitted",
+          "why": "Ch. 58 Part 2O AC-2 intended for concentrated residential, commercial, office, industrial, recreational and cultural facilities at urban intensity.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS_PT2DIRE_2OACCEDI"
+        },
+        {
+          "token": "AC-3",
+          "label": "Metropolitan Activity Center",
+          "status": "permitted",
+          "why": "Ch. 58 Part 2O AC-3 metropolitan mixed use including residential at the highest intensities outside downtown. Mixture of land uses is specifically intended.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS_PT2DIRE_2OACCEDI"
+        },
+        {
+          "token": "AC-3A",
+          "label": "Metropolitan Activity Center 3A",
+          "status": "permitted",
+          "why": "Activity-center subdistrict used with AC-3; high-density residential as part of mixed use.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS_PT2DIRE_2OACCEDI"
+        },
+        {
+          "token": "MU-1",
+          "label": "Mixed use 1",
+          "status": "permitted",
+          "why": "Listed on Orlando Fig. 2A.LDC allowable-use table with residential categories. Confirm the current table footnote for 4+ apartments vs. multiplex.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS"
+        },
+        {
+          "token": "MU-2",
+          "label": "Mixed use 2",
+          "status": "permitted",
+          "why": "Listed on Orlando Fig. 2A.LDC allowable-use table with residential categories.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS"
+        },
+        {
+          "token": "O-1",
+          "label": "Office 1 (multiplex 3–8, not large apartments)",
+          "status": "conditional",
+          "why": "Ch. 58 Part 3H multiplex (3–8 dwelling units) applies in O-1. This is small-scale multiplex, not a by-right 4+ apartment campus. Included only when conditional zoning is on.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS"
+        },
+        {
+          "token": "O-2",
+          "label": "Office 2 (multiplex 3–8, not large apartments)",
+          "status": "conditional",
+          "why": "Ch. 58 Part 3H multiplex (3–8 dwelling units) applies in O-2. Conditional / limited residential, not AC-scale MF.",
+          "sourceUrl": "https://library.municode.com/fl/orlando/codes/code_of_ordinances?nodeId=TITIICICO_CH58ZODIUS"
+        }
+      ]
+    },
+    {
+      "code": "APK",
+      "name": "City of Apopka",
+      "coverage": "verified",
+      "coverageNote": "Article 3 district purpose statements reviewed. Article 4 use table not fully reproduced here; districts whose purpose expressly allows multifamily are included.",
+      "codeSource": {
+        "label": "Apopka LDC Article 3",
+        "url": "https://library.municode.com/fl/apopka/codes/code_of_ordinances?nodeId=PTIIILADECO_ART3ZODI_S3.3REBAZODI"
+      },
+      "districts": [
+        {
+          "token": "RMF",
+          "label": "Residential Multi-Family",
+          "status": "permitted",
+          "aliases": ["R-MF"],
+          "why": "Art. 3.3.7 RMF purpose: primarily accommodate small- and medium-scale multifamily, plus townhomes and two-family.",
+          "sourceUrl": "https://library.municode.com/fl/apopka/codes/code_of_ordinances?nodeId=PTIIILADECO_ART3ZODI_S3.3REBAZODI"
+        },
+        {
+          "token": "RMU",
+          "label": "Residential Mixed-Use",
+          "status": "permitted",
+          "why": "Art. 3.3.8 RMU purpose: medium-density residential plus mixed-use; vertical residential over ground-floor nonresidential is encouraged.",
+          "sourceUrl": "https://library.municode.com/fl/apopka/codes/code_of_ordinances?nodeId=PTIIILADECO_ART3ZODI_S3.3REBAZODI"
+        },
+        {
+          "token": "C-C",
+          "label": "Community Commercial (MF over commercial)",
+          "status": "conditional",
+          "why": "Non-obvious: C-C purpose allows multi-family dwellings above ground-level commercial and office. Not a standalone RMF district.",
+          "sourceUrl": "https://library.municode.com/fl/apopka/codes/code_of_ordinances?nodeId=PTIIILADECO_ART3ZODI_S3.3REBAZODI"
+        },
+        {
+          "token": "C-R",
+          "label": "Regional Commercial (includes standalone MF)",
+          "status": "conditional",
+          "why": "Non-obvious: C-R purpose allows moderate-density stand-alone townhome and multi-family development plus mixed-use.",
+          "sourceUrl": "https://library.municode.com/fl/apopka/codes/code_of_ordinances?nodeId=PTIIILADECO_ART3ZODI_S3.3REBAZODI"
+        },
+        {
+          "token": "C-COR",
+          "label": "Corridor Commercial",
+          "status": "conditional",
+          "why": "C-COR purpose allows moderate-density townhome and multi-family dwellings and mixed-use along corridors.",
+          "sourceUrl": "https://library.municode.com/fl/apopka/codes/code_of_ordinances?nodeId=PTIIILADECO_ART3ZODI_S3.3REBAZODI"
+        },
+        {
+          "token": "MU-D",
+          "label": "Downtown Mixed-Use",
+          "status": "permitted",
+          "why": "MU-D downtown purpose lists multi-family and townhome dwellings among allowed uses.",
+          "sourceUrl": "https://library.municode.com/fl/apopka/codes/code_of_ordinances?nodeId=PTIIILADECO_ART3ZODI_S3.3REBAZODI"
+        },
+        {
+          "token": "MU-ES-GT",
+          "label": "Mixed-Use East Shore Gateway",
+          "status": "permitted",
+          "why": "MU-ES-GT purpose expressly permits a range of uses including multi-family.",
+          "sourceUrl": "https://library.municode.com/fl/apopka/codes/code_of_ordinances?nodeId=PTIIILADECO_ART3ZODI_S3.3REBAZODI"
+        },
+        {
+          "token": "MU-ES-RTE",
+          "label": "Mixed-Use East Shore Research/Tech/Education",
+          "status": "conditional",
+          "why": "Industrial-flex mixed district: purpose states multifamily and townhomes are allowed alongside light industrial / office / R&D. Confirm Article 4 use table for 4+ apartments.",
+          "sourceUrl": "https://library.municode.com/fl/apopka/codes/code_of_ordinances?nodeId=PTIIILADECO_ART3ZODI_S3.3REBAZODI"
+        },
+        {
+          "token": "MU-ES-NM",
+          "label": "Mixed-Use East Shore New Market",
+          "status": "permitted",
+          "why": "Village-center subdistrict supporting a mix of retail, office, and residential.",
+          "sourceUrl": "https://library.municode.com/fl/apopka/codes/code_of_ordinances?nodeId=PTIIILADECO_ART3ZODI_S3.3REBAZODI"
+        },
+        {
+          "token": "MIXED",
+          "label": "Mixed-use (OCPA GIS label)",
+          "status": "conditional",
+          "aliases": ["MIXED-EC"],
+          "why": "OCPA MIXED / MIXED-EC labels in Apopka. MIXED-EC is not a named Article 3 district; do not assume employment-center mixed equals apartments. Confirm the official zoning map.",
+          "sourceUrl": "https://library.municode.com/fl/apopka/codes/code_of_ordinances?nodeId=PTIIILADECO_ART3ZODI_S3.3REBAZODI"
+        },
+        {
+          "token": "R-3",
+          "label": "Legacy R-3 (if still mapped in OCPA)",
+          "status": "permitted",
+          "why": "Older OCPA extracts used R-3 for Apopka multifamily. Current LDC uses RMF. Keep the token so legacy GIS codes still match."
+        }
+      ]
+    },
+    {
+      "code": "OCO",
+      "name": "City of Ocoee",
+      "coverage": "verified",
+      "coverageNote": "Table 5-1 permitted uses: Dwelling, Multi-family is P only in R-3. Mixed-use is a special exception in several commercial districts via PUD — not treated as by-right MF.",
+      "codeSource": {
+        "label": "Ocoee LDC Article V",
+        "url": "https://library.municode.com/fl/ocoee/codes/land_development_code?nodeId=ARTVLAUSDEREZO_S5-18BURESU"
+      },
+      "districts": [
+        {
+          "token": "R-3",
+          "label": "Multiple-Family Dwelling",
+          "status": "permitted",
+          "why": "Sec. 5-3(7) R-3 Multiple-family Dwelling District; Table 5-1 “Dwelling, Multi-family” is P only in R-3. Dimensional standards include 5+ family buildings.",
+          "sourceUrl": "https://library.municode.com/fl/ocoee/codes/land_development_code?nodeId=ARTVLAUSDEREZO_S5-18BURESU"
+        }
+      ]
+    },
+    {
+      "code": "WG",
+      "name": "City of Winter Garden",
+      "coverage": "partial",
+      "coverageNote": "R-3 Multifamily Residential district is confirmed (Ch. 118 Div. 6). R-4 and R-5 exist in the code; their full use tables were not independently verified in this pass, so they are not treated as MF loopholes.",
+      "codeSource": {
+        "label": "Winter Garden Ch. 118 Zoning",
+        "url": "https://library.municode.com/fl/winter_garden/codes/code_of_ordinances?nodeId=PTIIILADECO_CH118ZO"
+      },
+      "districts": [
+        {
+          "token": "R-3",
+          "label": "Multifamily Residential",
+          "status": "permitted",
+          "why": "Ch. 118 Division 6 R-3 Multifamily Residential District (permitted principal uses and structures in Sec. 118-437).",
+          "sourceUrl": "https://library.municode.com/fl/winter_garden/codes/code_of_ordinances?nodeId=PTIIILADECO_CH118ZO"
+        }
+      ]
+    },
+    {
+      "code": "WP",
+      "name": "City of Winter Park",
+      "coverage": "verified",
+      "coverageNote": "R-3 medium-density multiple-family and R-4 high-density multifamily are in Ch. 58. R-4 is limited to lots that were zoned R-4 before Jan 1, 2007 and is not newly assigned.",
+      "codeSource": {
+        "label": "Winter Park Ch. 58 Zoning",
+        "url": "https://library.municode.com/fl/winter_park/codes/code_of_ordinances?nodeId=TITVLADECO_CH58ZO"
+      },
+      "districts": [
+        {
+          "token": "R-3",
+          "label": "Medium-density multiple-family",
+          "status": "permitted",
+          "why": "Sec. 58-67 Medium density multiple-family residential R-3. Multifamily complex minimum site 15,000 sq ft; third stories generally need conditional use except in the CBD geographic area.",
+          "sourceUrl": "https://library.municode.com/fl/winter_park/codes/code_of_ordinances?nodeId=TITVLADECO_CH58ZO"
+        },
+        {
+          "token": "R-4",
+          "label": "High-density multifamily (legacy map only)",
+          "status": "conditional",
+          "why": "Sec. 58-68 Multifamily (high density R-4). Intended for multifamily but may not be newly assigned to lots that were not R-4 before January 1, 2007. Density caps have been amended downward — confirm the current section.",
+          "sourceUrl": "https://library.municode.com/fl/winter_park/codes/code_of_ordinances?nodeId=TITVLADECO_CH58ZO"
+        }
+      ]
+    },
+    {
+      "code": "MTL",
+      "name": "City of Maitland",
+      "coverage": "verified",
+      "coverageNote": "R-MF, MX, and DM purpose statements expressly include multifamily. Sample OCPA codes also include GAP (Government, Arts and Parks) which is not MF.",
+      "codeSource": {
+        "label": "Maitland LDC Article 3",
+        "url": "https://library.municode.com/fl/maitland/codes/land_development_code?nodeId=PTIILADECO_ART3ZODI_S3.2REDI_3.2.1GEPUREDI"
+      },
+      "districts": [
+        {
+          "token": "R-MF",
+          "label": "Residential Multifamily",
+          "status": "permitted",
+          "aliases": ["RMF"],
+          "why": "Sec. 3.2.7 R-MF: lands that support multifamily residential of moderate to high density.",
+          "sourceUrl": "https://library.municode.com/fl/maitland/codes/land_development_code?nodeId=PTIILADECO_ART3ZODI_S3.2REDI_3.2.1GEPUREDI"
+        },
+        {
+          "token": "MX",
+          "label": "Mixed Multifamily and Office",
+          "status": "permitted",
+          "why": "Sec. 3.3.3 MX Mixed Multifamily District: moderate-density residential including multifamily plus compatible office/retail.",
+          "sourceUrl": "https://library.municode.com/fl/maitland/codes/land_development_code?nodeId=PTIILADECO_ART3ZODI_S3.2REDI_3.2.1GEPUREDI"
+        },
+        {
+          "token": "DM",
+          "label": "Downtown Maitland",
+          "status": "permitted",
+          "aliases": ["DM-E", "DM-EDGE"],
+          "why": "Sec. 3.3.5 DM purpose lists multifamily and townhome dwellings among allowed downtown mixed uses. DM-E/Edge is a lower-intensity edge subdistrict — still mixed-use, confirm the use table.",
+          "sourceUrl": "https://library.municode.com/fl/maitland/codes/land_development_code?nodeId=PTIILADECO_ART3ZODI_S3.2REDI_3.2.1GEPUREDI"
+        }
+      ]
+    },
+    {
+      "code": "EDG",
+      "name": "City of Edgewood",
+      "coverage": "partial",
+      "coverageNote": "R-3 Multiple-Family Dwelling District exists (Ch. 134 Art. IV Div. 5). Full use table beyond the district division was not independently verified in this pass. No Edgewood parcels are in the v1 sample.",
+      "codeSource": {
+        "label": "Edgewood Ch. 134 Zoning",
+        "url": "https://library.municode.com/fl/edgewood/codes/code_of_ordinances?nodeId=PTIICOOR_CH134ZO_ARTIVDIRE_DIV5MUMIDWDI"
+      },
+      "districts": [
+        {
+          "token": "R-3",
+          "label": "Multiple-Family Dwelling",
+          "status": "permitted",
+          "why": "Ch. 134 Art. IV Division 5 R-3 Multiple-Family Dwelling District.",
+          "sourceUrl": "https://library.municode.com/fl/edgewood/codes/code_of_ordinances?nodeId=PTIICOOR_CH134ZO_ARTIVDIRE_DIV5MUMIDWDI"
+        }
+      ]
+    },
+    {
+      "code": "EVL",
+      "name": "Town of Eatonville",
+      "coverage": "partial",
+      "coverageNote": "Town LDC draft/amendment materials include Division 4 R-3 Multiple-Family Residential and a high-density mixed office-commercial overlay. A fully adopted, current use table was not verified end-to-end in this pass.",
+      "codeSource": {
+        "label": "Eatonville LDC amendment materials (R-3 division)",
+        "url": "https://www.townofeatonville.org/"
+      },
+      "districts": [
+        {
+          "token": "R-3",
+          "label": "Multiple-Family Residential",
+          "status": "permitted",
+          "why": "Town LDC materials include Division 4 R-3 Multiple-Family Residential District. Confirm the adopted code copy before relying on entitlements.",
+          "sourceUrl": "https://library.municode.com/fl/eatonville"
+        }
+      ]
+    },
+    {
+      "code": "BI",
+      "name": "City of Belle Isle",
+      "coverage": "unverified",
+      "coverageNote": "Public use table for 4+ multifamily was not independently verified in this pass. Sample includes an I-2 parcel. Do not invent commercial/industrial residential loopholes.",
+      "codeSource": {
+        "label": "City of Belle Isle (seek current LDC)",
+        "url": "https://www.belleislefl.gov/"
+      },
+      "districts": []
+    },
+    {
+      "code": "BAY",
+      "name": "City of Bay Lake (RCID / CFTOD)",
+      "coverage": "partial",
+      "coverageNote": "OCPA maps these Disney-administered lands as MIXED. Districts are not Orange County Ch. 38. Entitlements are RCID/CFTOD and development-of-regional-impact / PD style — site-specific.",
+      "codeSource": {
+        "label": "Central Florida Tourism Oversight District",
+        "url": "https://www.oversightdistrict.org/"
+      },
+      "districts": [
+        {
+          "token": "MIXED",
+          "label": "Mixed-use (OCPA / RCID GIS label)",
+          "status": "maybe",
+          "why": "Bay Lake OCPA zoning label MIXED. Not a published municipal R-3 district. Maybe — confirm the RCID/CFTOD land-use plan and any development order. Not treated as by-right county multifamily."
+        }
+      ]
+    },
+    {
+      "code": "LBV",
+      "name": "City of Lake Buena Vista (RCID / CFTOD)",
+      "coverage": "partial",
+      "coverageNote": "Same as Bay Lake: OCPA MIXED on Disney-administered land. Site-specific, not Ch. 38 R-3.",
+      "codeSource": {
+        "label": "Central Florida Tourism Oversight District",
+        "url": "https://www.oversightdistrict.org/"
+      },
+      "districts": [
+        {
+          "token": "MIXED",
+          "label": "Mixed-use (OCPA / RCID GIS label)",
+          "status": "maybe",
+          "why": "Lake Buena Vista OCPA zoning label MIXED. Maybe — RCID/CFTOD plan and development order control."
+        }
+      ]
+    },
+    {
+      "code": "OAK",
+      "name": "Town of Oakland",
+      "coverage": "unverified",
+      "coverageNote": "Full use table not independently verified. Sample has R-1 and C-1 only. No MF district token is invented.",
+      "codeSource": {
+        "label": "Town of Oakland",
+        "url": "https://www.oaklandfl.gov/"
+      },
+      "districts": []
+    },
+    {
+      "code": "WND",
+      "name": "Town of Windermere",
+      "coverage": "unverified",
+      "coverageNote": "Windermere is predominantly low-density residential. A complete 4+ multifamily use table was not verified. Sample has REC (recreation). No MF loophole is invented.",
+      "codeSource": {
+        "label": "Town of Windermere",
+        "url": "https://www.town.windermere.fl.us/"
+      },
+      "districts": []
+    }
+  ],
+  "multifamilyTokens": [],
   "plannedDevelopmentTokens": [
     {
       "token": "P-D",
       "label": "Planned Development",
-      "why": "PD zoning may allow multifamily under a site-specific ordinance. Confirm the PD regulating plan before treating a site as entitled."
+      "status": "maybe",
+      "why": "Maybe — site-specific. PD zoning may allow multifamily only if the PD ordinance / regulating plan lists it. Confirm the adopted PD before treating a site as entitled."
     },
     {
       "token": "PD",
-      "label": "Planned Development (alt.)",
-      "why": "Alternate GIS spelling of Planned Development."
+      "label": "Planned Development (alt. GIS spelling)",
+      "status": "maybe",
+      "why": "Maybe — site-specific. Alternate OCPA spelling of Planned Development."
     },
     {
       "token": "PUD",
       "label": "Planned Unit Development",
-      "why": "Municipal PUD labels; entitlements are site-specific."
+      "status": "maybe",
+      "aliases": ["PURD", "PUD-COMM", "PUD-MD", "PCD"],
+      "why": "Maybe — site-specific. Municipal PUD / PURD / PCD labels; entitlements live in the development order, not the base-district use table."
+    },
+    {
+      "token": "U-V",
+      "label": "Urban Village",
+      "status": "maybe",
+      "why": "Orange County U-V Urban Village. Housing mix is in the village / PD plan. Maybe — site-specific."
     }
   ],
   "notAllowedExamples": [
-    "R-1 / R-1A / R-1AA / R-CE — single-family",
-    "R-2 — typically one- and two-family, not 4+ multifamily",
-    "C-1 / C-2 / P-O — commercial / office unless a mixed-use overlay is present",
-    "ORL-P — City of Orlando public-use district"
+    "R-1 / R-1A / R-1AA / R-1AAA / R-CE — single-family (do not treat as 4+ multifamily)",
+    "R-T / MHP — mobile home parks, not apartment districts",
+    "P-O — professional office in unincorporated county (Sec. 38-77 does not list multifamily as P in P-O)",
+    "ORL-P — City of Orlando public-use district (token P must not match P-D)",
+    "ORL-H — hospital district; not treated as MF",
+    "APK-PR / WP-PR / WND-REC — parks/recreation",
+    "MTL-GAP — Government, Arts and Parks",
+    "Belle Isle I-2 / Oakland C-1 — no verified MF use table in this pass"
   ]
 }

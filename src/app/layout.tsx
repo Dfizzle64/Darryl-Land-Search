@@ -17,7 +17,7 @@ const display = Fraunces({
 export const metadata: Metadata = {
   title: "Orange County multifamily site search",
   description:
-    "Pilot map of Orange County, Florida parcels with multifamily zoning, ACS income, and FDOT AADT filters.",
+    "Pilot map of Orange County, Florida parcels with acreage, multifamily zoning, Future Land Use, ACS income, and FDOT AADT filters.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -1,0 +1,555 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-17",
+  "notes": "Future Land Use (FLU) categories treated as multifamily-supportive or higher-density. GIS codes come from Orange County Open Data layer 21 (unincorporated + annexed parcels still on county FLU) and Orlando Open Data layer 83. Municipal FLU besides Orlando is not in these public layers; those parcels stay unknown unless a city GIS feed is added. This file is the matching source of truth — edit here, not in the app.",
+  "sources": [
+    {
+      "label": "Orange County Future Land Use GIS",
+      "url": "https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/21"
+    },
+    {
+      "label": "Orlando Future Land Use GIS",
+      "url": "https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/83"
+    },
+    {
+      "label": "Orange County Future Land Use and Zoning Correlation (Jan 2021)",
+      "url": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/FutureLandUseandZoningCorrelation-January2021-CERT.pdf"
+    },
+    {
+      "label": "Orange County Planning and Zoning Quick Reference Guide",
+      "url": "https://www.ocfl.net/Portals/0/resource%20library/planning%20-%20development/Planning%20and%20Zoning%20Quick%20Reference%20Guide.pdf"
+    },
+    {
+      "label": "City of Orlando Future Land Use legend",
+      "url": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    }
+  ],
+  "categories": [
+    {
+      "code": "LM",
+      "jurisdiction": "ORG",
+      "label": "Low-Medium Density Residential (LMDR)",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 10,
+      "why": "County correlation table: LMDR up to 10 du/ac + workforce housing bonus. Can support townhouse / small multifamily; not high-rise.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/FutureLandUseandZoningCorrelation-January2021-CERT.pdf"
+    },
+    {
+      "code": "MD",
+      "jurisdiction": "ORG",
+      "label": "Medium Density Residential (MDR)",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 20,
+      "why": "County correlation: MDR 20 du/ac + workforce housing bonus; consistent zoning includes R-2, R-3, UR-3, PD, U-V. GIS code MD.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/FutureLandUseandZoningCorrelation-January2021-CERT.pdf"
+    },
+    {
+      "code": "MHDR",
+      "jurisdiction": "ORG",
+      "label": "Medium-High Density Residential",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 35,
+      "why": "Comprehensive Plan / correlation table: MHDR 35 du/ac + workforce housing bonus; consistent zoning R-2, R-3, UR-3, PD, U-V. Present as a GIS LAND_USE value even though some layer legends only draw MD and HD.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/FutureLandUseandZoningCorrelation-January2021-CERT.pdf"
+    },
+    {
+      "code": "HD",
+      "jurisdiction": "ORG",
+      "label": "High Density Residential (HDR)",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 50,
+      "why": "County correlation: HDR 50 du/ac + workforce housing bonus; consistent zoning R-2, R-3, UR-3, PD, U-V. GIS code HD.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/FutureLandUseandZoningCorrelation-January2021-CERT.pdf"
+    },
+    {
+      "code": "NR",
+      "jurisdiction": "ORG",
+      "label": "Neighborhood Residential",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 20,
+      "why": "County correlation: NR 20 du/ac / 0.4 FAR; paired with NR zoning. Intended for neighborhood-scale housing including attached product.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/Planning%20and%20Zoning%20Quick%20Reference%20Guide.pdf"
+    },
+    {
+      "code": "NAC",
+      "jurisdiction": "ORG",
+      "label": "Neighborhood Activity Corridor",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 25,
+      "why": "County correlation: NAC 25 du/ac / 1.0 FAR. Mixed corridor that includes residential density.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/Planning%20and%20Zoning%20Quick%20Reference%20Guide.pdf"
+    },
+    {
+      "code": "NC",
+      "jurisdiction": "ORG",
+      "label": "Neighborhood Center",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 40,
+      "why": "County correlation: NC 40 du/ac / 2.0 FAR. Mixed neighborhood-center designation.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/Planning%20and%20Zoning%20Quick%20Reference%20Guide.pdf"
+    },
+    {
+      "code": "ACR",
+      "jurisdiction": "ORG",
+      "label": "Activity Center Residential (I-Drive)",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 30,
+      "why": "I-Drive Activity Center Residential. Densities follow the I-Drive Element / Strategic Development Plan rather than the standard MDR/HDR table; typically PD-implemented.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/Planning%20and%20Zoning%20Quick%20Reference%20Guide.pdf"
+    },
+    {
+      "code": "ACMU",
+      "jurisdiction": "ORG",
+      "label": "Activity Center Mixed Use (I-Drive)",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 30,
+      "why": "I-Drive Activity Center Mixed Use. Residential is contemplated; confirm the I-Drive Element and any PD for site density.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/Planning%20and%20Zoning%20Quick%20Reference%20Guide.pdf"
+    },
+    {
+      "code": "TND",
+      "jurisdiction": "ORG",
+      "label": "Traditional Neighborhood (Avalon Park)",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": null,
+      "why": "TND is the Avalon Park traditional neighborhood designation, implemented through PD. Includes mixed housing types; site density is plan-specific.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/Planning%20and%20Zoning%20Quick%20Reference%20Guide.pdf"
+    },
+    {
+      "code": "CVC",
+      "jurisdiction": "ORG",
+      "label": "Community Village Center",
+      "allowsMultifamily": true,
+      "status": "maybe",
+      "maxDensityDuAc": null,
+      "why": "Four Corners CVC; county notes new CVC requests closed after Sept 2009. Mixed village-center; entitlements are existing-plan specific.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/Planning%20and%20Zoning%20Quick%20Reference%20Guide.pdf"
+    },
+    {
+      "code": "V",
+      "jurisdiction": "ORG",
+      "label": "Village (Horizon West)",
+      "allowsMultifamily": true,
+      "status": "maybe",
+      "maxDensityDuAc": null,
+      "why": "Horizon West Village FLU. Densities and housing mix are in the adopted village land-use plan / PD, not a countywide du/ac cap. Treat as site-specific.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/Planning%20and%20Zoning%20Quick%20Reference%20Guide.pdf"
+    },
+    {
+      "code": "PD",
+      "jurisdiction": "ORG",
+      "label": "Planned Development (FLU)",
+      "allowsMultifamily": true,
+      "status": "maybe",
+      "maxDensityDuAc": null,
+      "why": "PD on the FLUM is not a density entitlement by itself. Policies FLU8.1.2 / FLU8.1.4 and the PD ordinance control. Maybe — site-specific.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/FutureLandUseandZoningCorrelation-January2021-CERT.pdf"
+    },
+    {
+      "code": "LD",
+      "jurisdiction": "ORG",
+      "label": "Low Density Residential (LDR)",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": 4,
+      "why": "LDR 4 du/ac. Correlation is single-family districts (R-1 series, R-CE, R-T-1/2, R-L-D). Not treated as multifamily-supportive.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/FutureLandUseandZoningCorrelation-January2021-CERT.pdf"
+    },
+    {
+      "code": "R",
+      "jurisdiction": "ORG",
+      "label": "Rural / Agricultural",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": 0.1,
+      "why": "Rural/agricultural FLU. Not multifamily-supportive.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/Planning%20and%20Zoning%20Quick%20Reference%20Guide.pdf"
+    },
+    {
+      "code": "1/1",
+      "jurisdiction": "ORG",
+      "label": "Rural Settlement 1/1",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": 1,
+      "why": "Rural Settlement 1 du/ac. Not multifamily-supportive."
+    },
+    {
+      "code": "1/2",
+      "jurisdiction": "ORG",
+      "label": "Rural Settlement 1/2",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": 0.5,
+      "why": "Rural Settlement 1 du / 2 ac. Not multifamily-supportive."
+    },
+    {
+      "code": "1/5",
+      "jurisdiction": "ORG",
+      "label": "Rural Settlement 1/5",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": 0.2,
+      "why": "Rural Settlement 1 du / 5 ac. Not multifamily-supportive."
+    },
+    {
+      "code": "RSLD",
+      "jurisdiction": "ORG",
+      "label": "Rural Settlement Low Density",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": 2,
+      "why": "Rural Settlement Low Density (about 2 du/ac per the county quick-reference guide). Not treated as multifamily-supportive."
+    },
+    {
+      "code": "O",
+      "jurisdiction": "ORG",
+      "label": "Office",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "County Office FLU correlates with office zoning, not residential density. Live Local Act reviews are a zoning-path issue, not this FLU category."
+    },
+    {
+      "code": "C",
+      "jurisdiction": "ORG",
+      "label": "Commercial",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "County Commercial FLU is not a residential designation. Do not treat commercial FLUM as a rezoning-to-apartments green light."
+    },
+    {
+      "code": "I",
+      "jurisdiction": "ORG",
+      "label": "Industrial",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Industrial FLU. Not treated as multifamily-supportive."
+    },
+    {
+      "code": "IN",
+      "jurisdiction": "ORG",
+      "label": "Institutional",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Institutional FLU."
+    },
+    {
+      "code": "E",
+      "jurisdiction": "ORG",
+      "label": "Education",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Education FLU."
+    },
+    {
+      "code": "P/R",
+      "jurisdiction": "ORG",
+      "label": "Parks / Recreation",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Parks and recreation / open space."
+    },
+    {
+      "code": "PRES",
+      "jurisdiction": "ORG",
+      "label": "Preservation",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Preservation."
+    },
+    {
+      "code": "WB",
+      "jurisdiction": "ORG",
+      "label": "Water Body",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Water body."
+    },
+    {
+      "code": "IW",
+      "jurisdiction": "ORG",
+      "label": "Innovation Way",
+      "allowsMultifamily": true,
+      "status": "maybe",
+      "maxDensityDuAc": null,
+      "why": "Innovation Way overlay on the county FLUM. Mixed-use and employment-center policies apply; residential density is plan/PD specific. Maybe — do not treat as by-right MDR.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/Planning%20and%20Zoning%20Quick%20Reference%20Guide.pdf"
+    },
+    {
+      "code": "LP",
+      "jurisdiction": "ORG",
+      "label": "Lake Pickett",
+      "allowsMultifamily": false,
+      "status": "maybe",
+      "maxDensityDuAc": null,
+      "why": "Lake Pickett overlay. Not treated as a countywide multifamily FLU. Confirm the Lake Pickett adopted policies before assuming apartments.",
+      "sourceUrl": "https://www.orangecountyfl.net/Portals/0/resource%20library/planning%20-%20development/Planning%20and%20Zoning%20Quick%20Reference%20Guide.pdf"
+    },
+    {
+      "code": "City",
+      "jurisdiction": "ORG",
+      "label": "Municipal (county layer placeholder)",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "County GIS code for land inside a city. Not a FLU category. The join script prefers Orlando layer 83 when that point hits; other cities remain unknown."
+    },
+    {
+      "code": "RES-MED",
+      "jurisdiction": "ORL",
+      "label": "Residential, Medium Intensity",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 30,
+      "why": "Orlando GMP: Residential Medium Intensity min 12 / max 30 du/ac. Multifamily-supportive.",
+      "sourceUrl": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "code": "RES-HIGH",
+      "jurisdiction": "ORL",
+      "label": "Residential, High Intensity",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 200,
+      "why": "Orlando GMP: Residential High Intensity min 30 / max 200 du/ac.",
+      "sourceUrl": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "code": "RES-MED/RES-PRO",
+      "jurisdiction": "ORL",
+      "label": "Residential Medium / Resource Protection",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 30,
+      "why": "Same medium-intensity residential FLU with a resource-protection overlay. Overlay may limit the buildable envelope; density category still contemplates MF."
+    },
+    {
+      "code": "RES-HIGH/RES-PRO",
+      "jurisdiction": "ORL",
+      "label": "Residential High / Resource Protection",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 200,
+      "why": "High-intensity residential FLU with resource-protection overlay."
+    },
+    {
+      "code": "MUC-MED",
+      "jurisdiction": "ORL",
+      "label": "Mixed Use Corridor, Medium Intensity",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 30,
+      "why": "Orlando GMP: MUC-Medium min 15 / max 30 du/ac. Mixed-use corridor including residential.",
+      "sourceUrl": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "code": "MUC-HIGH",
+      "jurisdiction": "ORL",
+      "label": "Mixed Use Corridor, High Intensity",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 200,
+      "why": "Orlando GMP: MUC-High min 30 / max 200 du/ac.",
+      "sourceUrl": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "code": "MUC-MED/RES-PRO",
+      "jurisdiction": "ORL",
+      "label": "Mixed Use Corridor Medium / Resource Protection",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 30,
+      "why": "MUC-Medium with resource-protection overlay."
+    },
+    {
+      "code": "MU-ND",
+      "jurisdiction": "ORL",
+      "label": "Mixed Use / Neighborhood Development",
+      "allowsMultifamily": true,
+      "status": "maybe",
+      "maxDensityDuAc": 12,
+      "why": "Orlando GMP: MU-ND max 12 du/ac. Mixed neighborhood; can include small attached product but is not a high-density MF designation.",
+      "sourceUrl": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "code": "MU-ND/RES-PRO",
+      "jurisdiction": "ORL",
+      "label": "Mixed Use / Neighborhood Development / Resource Protection",
+      "allowsMultifamily": true,
+      "status": "maybe",
+      "maxDensityDuAc": 12,
+      "why": "MU-ND with resource-protection overlay; max still 12 du/ac."
+    },
+    {
+      "code": "NEIGH-AC",
+      "jurisdiction": "ORL",
+      "label": "Neighborhood Activity Center",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 30,
+      "why": "Orlando GMP: Neighborhood Activity Center min 15 / max 30 du/ac. Activity centers are mixed-use including residential. Implemented in part by AC-N zoning.",
+      "sourceUrl": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "code": "COMM-AC",
+      "jurisdiction": "ORL",
+      "label": "Community Activity Center",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 40,
+      "why": "Orlando GMP: Community Activity Center min 20 / max 40 du/ac. AC-1 zoning implements this category.",
+      "sourceUrl": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "code": "UR-AC",
+      "jurisdiction": "ORL",
+      "label": "Urban Activity Center",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 100,
+      "why": "Orlando GMP: Urban Activity Center min 30 / max 100 du/ac. AC-2 zoning.",
+      "sourceUrl": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "code": "MET-AC",
+      "jurisdiction": "ORL",
+      "label": "Metropolitan Activity Center",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 200,
+      "why": "Orlando GMP: Metropolitan Activity Center min 30 / max 200 du/ac. AC-3 / AC-3A zoning.",
+      "sourceUrl": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "code": "DT-AC",
+      "jurisdiction": "ORL",
+      "label": "Downtown Activity Center",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 200,
+      "why": "Orlando GMP: Downtown Activity Center min 75 / max 200 du/ac / 4.0 FAR.",
+      "sourceUrl": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "code": "URB-VIL",
+      "jurisdiction": "ORL",
+      "label": "Urban Village",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": null,
+      "why": "Urban Village FLU supports mixed residential. Confirm the village regulating plan for density.",
+      "sourceUrl": "https://www.orlando.gov/files/sharedassets/public/v/1/departments/edv/city-planning/gmp-chapter-2-complete-3-10-2025-draft.pdf"
+    },
+    {
+      "code": "OFFICE-MED",
+      "jurisdiction": "ORL",
+      "label": "Office, Medium Intensity",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 40,
+      "why": "Orlando FLU legend lists Office Medium max 40 du/ac (min 12). Residential is contemplated alongside office; still confirm zoning (O-2 / multiplex rules in Ch. 58 Part 3H).",
+      "sourceUrl": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "code": "OFFICE-HIGH",
+      "jurisdiction": "ORL",
+      "label": "Office, High Intensity",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 200,
+      "why": "Orlando FLU legend lists Office High max 200 du/ac (min 30). Residential density is on the FLUM; zoning must still allow the product.",
+      "sourceUrl": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "code": "OFFICE-LOW",
+      "jurisdiction": "ORL",
+      "label": "Office, Low Intensity",
+      "allowsMultifamily": false,
+      "status": "maybe",
+      "maxDensityDuAc": null,
+      "why": "Office Low is not listed with a residential density band in the public legend used for this pass. Not treated as MF-supportive by default."
+    },
+    {
+      "code": "RES-LOW",
+      "jurisdiction": "ORL",
+      "label": "Residential, Low Intensity",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": 12,
+      "why": "Orlando GMP: Residential Low max 12 du/ac, no minimum. Typically single-family / low-intensity neighborhoods. Not treated as multifamily-supportive FLU.",
+      "sourceUrl": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "code": "RES-LOW/RES-PRO",
+      "jurisdiction": "ORL",
+      "label": "Residential Low / Resource Protection",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": 12,
+      "why": "Low-intensity residential with resource-protection overlay."
+    },
+    {
+      "code": "INDUST",
+      "jurisdiction": "ORL",
+      "label": "Industrial",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Industrial FLU. Not treated as MF-supportive without a site-specific policy. Do not assume Live Local from FLU alone."
+    },
+    {
+      "code": "CONSERV",
+      "jurisdiction": "ORL",
+      "label": "Conservation",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Conservation."
+    },
+    {
+      "code": "PUB-REC-INST",
+      "jurisdiction": "ORL",
+      "label": "Public / Recreational and Institutional",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Public, recreational, and institutional."
+    },
+    {
+      "code": "AIR-HIGH",
+      "jurisdiction": "ORL",
+      "label": "Airport Support District, High Intensity",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Airport support. Not treated as residential FLU."
+    },
+    {
+      "code": "AIR-MED",
+      "jurisdiction": "ORL",
+      "label": "Airport Support District, Medium Intensity",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Airport support. Not treated as residential FLU."
+    }
+  ]
+}

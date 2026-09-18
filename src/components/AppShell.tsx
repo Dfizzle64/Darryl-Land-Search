@@ -4,17 +4,18 @@ import { useEffect, useMemo, useState } from "react";
 import { FilterSidebar } from "./FilterSidebar";
 import { ParcelDrawer } from "./ParcelDrawer";
 import { SiteMap } from "./SiteMap";
-import { filterParcels } from "@/lib/filters";
-import { DEFAULT_FILTERS, type FilterState, type ParcelCollection, type ZoningConfig } from "@/lib/types";
+import { emptyStateHint, filterParcels } from "@/lib/filters";
+import { DEFAULT_FILTERS, type FilterState, type FluConfig, type ParcelCollection, type ZoningConfig } from "@/lib/types";
 
 type AppShellProps = {
   parcels: ParcelCollection;
   traffic: GeoJSON.FeatureCollection<GeoJSON.LineString>;
   zoningConfig: ZoningConfig;
+  fluConfig: FluConfig;
   meta: Record<string, unknown>;
 };
 
-export function AppShell({ parcels, traffic, zoningConfig, meta }: AppShellProps) {
+export function AppShell({ parcels, traffic, zoningConfig, fluConfig, meta }: AppShellProps) {
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -24,11 +25,17 @@ export function AppShell({ parcels, traffic, zoningConfig, meta }: AppShellProps
   const [error] = useState<string | null>(null);
 
   const matched = useMemo(
-    () => filterParcels(parcels.features, filters, zoningConfig),
-    [parcels.features, filters, zoningConfig],
+    () => filterParcels(parcels.features, filters, zoningConfig, fluConfig),
+    [parcels.features, filters, zoningConfig, fluConfig],
   );
   const matchedIds = useMemo(() => new Set(matched.map((feature) => feature.properties.id)), [matched]);
   const selected = parcels.features.find((feature) => feature.properties.id === selectedId) ?? null;
+  const fluUnknownCount = useMemo(
+    () => parcels.features.filter((feature) => !feature.properties.flu?.code).length,
+    [parcels.features],
+  );
+  const fluJoinedCount = typeof meta.fluJoinedCount === "number" ? meta.fluJoinedCount : parcels.features.length - fluUnknownCount;
+  const hint = emptyStateHint(filters, matched.length, fluUnknownCount);
 
   useEffect(() => {
     if (selectedId && !matchedIds.has(selectedId) && !showExcluded) {
@@ -67,8 +74,10 @@ export function AppShell({ parcels, traffic, zoningConfig, meta }: AppShellProps
           filters={filters}
           onChange={setFilters}
           zoningConfig={zoningConfig}
+          fluConfig={fluConfig}
           matchedCount={matched.length}
           totalCount={parcels.features.length}
+          fluJoinedCount={fluJoinedCount}
           showExcluded={showExcluded}
           onShowExcluded={setShowExcluded}
           showTraffic={showTraffic}
@@ -89,13 +98,11 @@ export function AppShell({ parcels, traffic, zoningConfig, meta }: AppShellProps
             onSelect={setSelectedId}
             onHover={setHoveredId}
           />
-          {matched.length === 0 ? (
+          {hint ? (
             <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center px-4">
               <div className="pointer-events-auto max-w-md rounded-2xl border border-white/10 bg-ink-900/95 px-4 py-3 text-sm shadow-2xl">
                 <p className="font-medium text-white">No parcels match these filters</p>
-                <p className="mt-1 text-ink-300">
-                  Lower the income or AADT thresholds, include planned development, or turn off multifamily-only.
-                </p>
+                <p className="mt-1 text-ink-300">{hint}</p>
               </div>
             </div>
           ) : null}
@@ -103,7 +110,9 @@ export function AppShell({ parcels, traffic, zoningConfig, meta }: AppShellProps
         <ParcelDrawer
           parcel={selected}
           zoningConfig={zoningConfig}
+          fluConfig={fluConfig}
           includePlannedDevelopment={filters.includePlannedDevelopment}
+          includeConditionalZoning={filters.includeConditionalZoning}
           incomeGeography={filters.incomeGeography}
           onClose={() => setSelectedId(null)}
         />

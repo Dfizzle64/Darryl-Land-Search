@@ -3,12 +3,19 @@
 import maplibregl, { type Map as MapLibreMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
+import { BasemapToggle } from "./BasemapToggle";
+import {
+  STREET_STYLE_CANDIDATES,
+  addSatelliteSourceAndLayer,
+  applyBasemap,
+  excludedFillPaint,
+  excludedLinePaint,
+  parcelFillPaint,
+  parcelLinePaint,
+  trafficLinePaint,
+  type BasemapMode,
+} from "@/lib/basemap";
 import { ORANGE_COUNTY_BOUNDS, ORANGE_COUNTY_CENTER, type ParcelCollection } from "@/lib/types";
-
-const STYLE_CANDIDATES = [
-  "https://tiles.openfreemap.org/styles/dark",
-  "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
-];
 
 type SiteMapProps = {
   parcels: ParcelCollection;
@@ -21,6 +28,47 @@ type SiteMapProps = {
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
 };
+
+function addOverlayLayers(
+  map: MapLibreMap,
+  parcels: ParcelCollection,
+  traffic: GeoJSON.FeatureCollection<GeoJSON.LineString>,
+  mode: BasemapMode,
+) {
+  map.addSource("parcels", { type: "geojson", data: parcels, promoteId: "id" });
+  map.addSource("traffic", { type: "geojson", data: traffic });
+
+  map.addLayer({
+    id: "traffic-line",
+    type: "line",
+    source: "traffic",
+    paint: trafficLinePaint(mode),
+  });
+  map.addLayer({
+    id: "parcels-fill-excluded",
+    type: "fill",
+    source: "parcels",
+    paint: excludedFillPaint(mode),
+  });
+  map.addLayer({
+    id: "parcels-line-excluded",
+    type: "line",
+    source: "parcels",
+    paint: excludedLinePaint(mode),
+  });
+  map.addLayer({
+    id: "parcels-fill",
+    type: "fill",
+    source: "parcels",
+    paint: parcelFillPaint(mode),
+  });
+  map.addLayer({
+    id: "parcels-line",
+    type: "line",
+    source: "parcels",
+    paint: parcelLinePaint(mode),
+  });
+}
 
 export function SiteMap({
   parcels,
@@ -37,8 +85,11 @@ export function SiteMap({
   const mapRef = useRef<MapLibreMap | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState("Loading Orange County map…");
+  const [basemap, setBasemap] = useState<BasemapMode>("streets");
   const callbacksRef = useRef({ onSelect, onHover });
   callbacksRef.current = { onSelect, onHover };
+  const basemapRef = useRef(basemap);
+  basemapRef.current = basemap;
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -46,13 +97,14 @@ export function SiteMap({
 
     const start = async () => {
       let lastError: unknown;
-      for (const style of STYLE_CANDIDATES) {
+      for (const style of STREET_STYLE_CANDIDATES) {
         try {
           const map = new maplibregl.Map({
             container: containerRef.current!,
             style,
             center: ORANGE_COUNTY_CENTER,
             zoom: 9.4,
+            attributionControl: { compact: true },
           });
           map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), "bottom-right");
           map.fitBounds(ORANGE_COUNTY_BOUNDS, { padding: 48, duration: 0 });
@@ -67,71 +119,9 @@ export function SiteMap({
             map.remove();
             return;
           }
-          map.addSource("parcels", { type: "geojson", data: parcels, promoteId: "id" });
-          map.addSource("traffic", { type: "geojson", data: traffic });
-
-          map.addLayer({
-            id: "traffic-line",
-            type: "line",
-            source: "traffic",
-            paint: {
-              "line-color": "#d7a36a",
-              "line-width": ["interpolate", ["linear"], ["zoom"], 8, 0.6, 14, 2.4],
-              "line-opacity": 0.55,
-            },
-          });
-          map.addLayer({
-            id: "parcels-fill-excluded",
-            type: "fill",
-            source: "parcels",
-            paint: { "fill-color": "#6b7c8d", "fill-opacity": 0.08 },
-          });
-          map.addLayer({
-            id: "parcels-line-excluded",
-            type: "line",
-            source: "parcels",
-            paint: { "line-color": "#6b7c8d", "line-width": 0.6, "line-opacity": 0.35 },
-          });
-          map.addLayer({
-            id: "parcels-fill",
-            type: "fill",
-            source: "parcels",
-            paint: {
-              "fill-color": [
-                "case",
-                ["boolean", ["feature-state", "selected"], false],
-                "#f0c27a",
-                ["boolean", ["feature-state", "hover"], false],
-                "#8fd4b5",
-                "#3f9d74",
-              ],
-              "fill-opacity": [
-                "case",
-                ["boolean", ["feature-state", "selected"], false],
-                0.78,
-                0.52,
-              ],
-            },
-          });
-          map.addLayer({
-            id: "parcels-line",
-            type: "line",
-            source: "parcels",
-            paint: {
-              "line-color": [
-                "case",
-                ["boolean", ["feature-state", "selected"], false],
-                "#f8e1b5",
-                "#b7e3cf",
-              ],
-              "line-width": [
-                "case",
-                ["boolean", ["feature-state", "selected"], false],
-                2.4,
-                1,
-              ],
-            },
-          });
+          addOverlayLayers(map, parcels, traffic, basemapRef.current);
+          addSatelliteSourceAndLayer(map);
+          applyBasemap(map, basemapRef.current);
 
           const interactive = ["parcels-fill", "parcels-fill-excluded"];
           map.on("click", interactive, (event) => {
@@ -184,6 +174,13 @@ export function SiteMap({
     map.setLayoutProperty("traffic-line", "visibility", showTraffic ? "visible" : "none");
   }, [matchedIds, showExcluded, showTraffic, status]);
 
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready") return;
+    applyBasemap(map, basemap);
+    map.setLayoutProperty("traffic-line", "visibility", showTraffic ? "visible" : "none");
+  }, [basemap, showTraffic, status]);
+
   const previousHover = useRef<string | null>(null);
   const previousSelected = useRef<string | null>(null);
 
@@ -223,6 +220,7 @@ export function SiteMap({
   return (
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
+      {status === "ready" ? <BasemapToggle value={basemap} onChange={setBasemap} /> : null}
       {status !== "ready" ? (
         <div className="absolute inset-0 flex items-center justify-center bg-ink-950/80">
           <div className="rounded-2xl border border-white/10 bg-ink-900 px-5 py-4 text-sm">

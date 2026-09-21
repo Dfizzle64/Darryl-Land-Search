@@ -10,21 +10,30 @@ import {
   applyBasemap,
   excludedFillPaint,
   excludedLinePaint,
+  ozFillPaint,
+  ozLinePaint,
   parcelFillPaint,
   parcelLinePaint,
   trafficLinePaint,
   type BasemapMode,
 } from "@/lib/basemap";
-import { ORANGE_COUNTY_BOUNDS, ORANGE_COUNTY_CENTER, type ParcelCollection } from "@/lib/types";
+import {
+  ORANGE_COUNTY_BOUNDS,
+  ORANGE_COUNTY_CENTER,
+  type OpportunityZoneCollection,
+  type ParcelCollection,
+} from "@/lib/types";
 
 type SiteMapProps = {
   parcels: ParcelCollection;
   traffic: GeoJSON.FeatureCollection<GeoJSON.LineString>;
+  opportunityZones: OpportunityZoneCollection;
   matchedIds: Set<string>;
   selectedId: string | null;
   hoveredId: string | null;
   showExcluded: boolean;
   showTraffic: boolean;
+  showOz: boolean;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
 };
@@ -33,11 +42,27 @@ function addOverlayLayers(
   map: MapLibreMap,
   parcels: ParcelCollection,
   traffic: GeoJSON.FeatureCollection<GeoJSON.LineString>,
+  opportunityZones: OpportunityZoneCollection,
   mode: BasemapMode,
 ) {
+  map.addSource("opportunity-zones", { type: "geojson", data: opportunityZones });
   map.addSource("parcels", { type: "geojson", data: parcels, promoteId: "id" });
   map.addSource("traffic", { type: "geojson", data: traffic });
 
+  map.addLayer({
+    id: "oz-fill",
+    type: "fill",
+    source: "opportunity-zones",
+    layout: { visibility: "none" },
+    paint: ozFillPaint(mode),
+  });
+  map.addLayer({
+    id: "oz-line",
+    type: "line",
+    source: "opportunity-zones",
+    layout: { visibility: "none" },
+    paint: ozLinePaint(mode),
+  });
   map.addLayer({
     id: "traffic-line",
     type: "line",
@@ -73,11 +98,13 @@ function addOverlayLayers(
 export function SiteMap({
   parcels,
   traffic,
+  opportunityZones,
   matchedIds,
   selectedId,
   hoveredId,
   showExcluded,
   showTraffic,
+  showOz,
   onSelect,
   onHover,
 }: SiteMapProps) {
@@ -119,7 +146,7 @@ export function SiteMap({
             map.remove();
             return;
           }
-          addOverlayLayers(map, parcels, traffic, basemapRef.current);
+          addOverlayLayers(map, parcels, traffic, opportunityZones, basemapRef.current);
           addSatelliteSourceAndLayer(map);
           applyBasemap(map, basemapRef.current);
 
@@ -158,7 +185,7 @@ export function SiteMap({
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, [parcels, traffic]);
+  }, [parcels, traffic, opportunityZones]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -172,14 +199,18 @@ export function SiteMap({
     map.setFilter("parcels-fill-excluded", showExcluded ? excludedFilter : ["==", ["get", "id"], "__none__"]);
     map.setFilter("parcels-line-excluded", showExcluded ? excludedFilter : ["==", ["get", "id"], "__none__"]);
     map.setLayoutProperty("traffic-line", "visibility", showTraffic ? "visible" : "none");
-  }, [matchedIds, showExcluded, showTraffic, status]);
+    map.setLayoutProperty("oz-fill", "visibility", showOz ? "visible" : "none");
+    map.setLayoutProperty("oz-line", "visibility", showOz ? "visible" : "none");
+  }, [matchedIds, showExcluded, showTraffic, showOz, status]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map || status !== "ready") return;
     applyBasemap(map, basemap);
     map.setLayoutProperty("traffic-line", "visibility", showTraffic ? "visible" : "none");
-  }, [basemap, showTraffic, status]);
+    map.setLayoutProperty("oz-fill", "visibility", showOz ? "visible" : "none");
+    map.setLayoutProperty("oz-line", "visibility", showOz ? "visible" : "none");
+  }, [basemap, showTraffic, showOz, status]);
 
   const previousHover = useRef<string | null>(null);
   const previousSelected = useRef<string | null>(null);
@@ -221,6 +252,12 @@ export function SiteMap({
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
       {status === "ready" ? <BasemapToggle value={basemap} onChange={setBasemap} /> : null}
+      {status === "ready" && showOz ? (
+        <div className="pointer-events-none absolute bottom-3 left-3 z-10 rounded-lg border border-white/10 bg-ink-900/90 px-2 py-1.5 text-[10px] text-ink-300 sm:bottom-4 sm:left-4">
+          <span className="mr-1.5 inline-block h-2 w-2 rounded-sm bg-[#c9a227]" />
+          Opportunity Zones (HUD/Treasury QOZ)
+        </div>
+      ) : null}
       {status !== "ready" ? (
         <div className="absolute inset-0 flex items-center justify-center bg-ink-950/80">
           <div className="rounded-2xl border border-white/10 bg-ink-900 px-5 py-4 text-sm">

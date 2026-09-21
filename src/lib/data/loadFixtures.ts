@@ -1,7 +1,13 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { flattenMultifamilyTokens } from "../zoning";
-import type { FluConfig, ParcelCollection, TrafficFeature, ZoningConfig } from "../types";
+import type {
+  FluConfig,
+  OpportunityZoneCollection,
+  ParcelCollection,
+  TrafficFeature,
+  ZoningConfig,
+} from "../types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -27,6 +33,9 @@ export async function loadParcelCollection(): Promise<ParcelCollection> {
     if (!("flu" in feature.properties) || feature.properties.flu === undefined) {
       feature.properties.flu = null;
     }
+    if (!("opportunityZone" in feature.properties) || feature.properties.opportunityZone === undefined) {
+      feature.properties.opportunityZone = null;
+    }
   }
   return collection;
 }
@@ -44,6 +53,11 @@ export async function loadZoningConfig(): Promise<ZoningConfig> {
 export async function loadFluConfig(): Promise<FluConfig> {
   const raw = await readFile(path.join(DATA_DIR, "flu-config.json"), "utf8");
   return JSON.parse(raw) as FluConfig;
+}
+
+export async function loadOpportunityZones(): Promise<OpportunityZoneCollection> {
+  const raw = await readFile(path.join(DATA_DIR, "fixtures/opportunity-zones.geojson"), "utf8");
+  return JSON.parse(raw) as OpportunityZoneCollection;
 }
 
 export async function loadFixtureMeta(): Promise<Record<string, unknown>> {

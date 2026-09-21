@@ -6,6 +6,7 @@ Sources (public, no commercial parcel vendors):
   - FDOT AADT FeatureServer (nearest major-road traffic)
   - Census Reporter ACS 5-year B19013 (median household income)
   - Orange County + Orlando Future Land Use (joined by scripts/join_flu.py after this seed)
+  - HUD/Treasury Opportunity Zones (joined by scripts/join_oz.py after FLU)
 """
 
 from __future__ import annotations

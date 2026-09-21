@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterParcels } from "../lib/filters";
+import { describeRezoningCandidate, filterParcels, isRezoningCandidate } from "../lib/filters";
 import { fluAllowsMultifamily } from "../lib/flu";
 import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "../lib/types";
 import { parseZoningCode, zoningAllowsMultifamily } from "../lib/zoning";
@@ -119,6 +119,7 @@ function feature(partial: Partial<ParcelFeature["properties"]>): ParcelFeature {
         distanceMeters: 100,
       },
       flu: { code: "RES-MED", label: "Residential Medium", jurisdiction: "ORL", source: "test" },
+      opportunityZone: { inOpportunityZone: false, tractGeoid: null, tractName: null, source: "test" },
       source: "test",
       ...partial,
     },
@@ -129,6 +130,7 @@ const baseFilters: FilterState = {
   landUseFilter: "zoning",
   includePlannedDevelopment: true,
   includeConditionalZoning: false,
+  ozFilter: "either",
   minAcreage: 0,
   includeUnknownAcreage: true,
   minIncome: 0,
@@ -286,5 +288,82 @@ describe("filterParcels", () => {
     ];
     expect(filterParcels(parcels, { ...baseFilters, landUseFilter: "flu" }, config, fluConfig)).toHaveLength(0);
     expect(filterParcels(parcels, { ...baseFilters, landUseFilter: "off" }, config, fluConfig)).toHaveLength(1);
+  });
+
+  it("keeps only parcels that are not currently MF-capable in non-mf mode", () => {
+    const parcels = [
+      feature({ id: "mf", parcelId: "mf" }),
+      feature({
+        id: "sf",
+        parcelId: "sf",
+        zoningCode: "ORG-R-1A",
+        zoningDistrict: "R-1A",
+        jurisdictionPrefix: "ORG",
+      }),
+    ];
+    expect(filterParcels(parcels, { ...baseFilters, landUseFilter: "non-mf" }, config, fluConfig).map((item) => item.properties.id)).toEqual([
+      "sf",
+    ]);
+  });
+
+  it("treats rezoning candidates as FLU-yes and zoning-not-MF, and skips missing FLU", () => {
+    const parcels = [
+      feature({
+        id: "candidate",
+        parcelId: "candidate",
+        zoningCode: "ORG-R-1A",
+        zoningDistrict: "R-1A",
+        jurisdictionPrefix: "ORG",
+        flu: { code: "MD", label: "Medium Density Residential", jurisdiction: "ORG", source: "test" },
+      }),
+      feature({
+        id: "already-mf",
+        parcelId: "already-mf",
+      }),
+      feature({
+        id: "gap",
+        parcelId: "gap",
+        zoningCode: "ORG-R-1",
+        zoningDistrict: "R-1",
+        jurisdictionPrefix: "ORG",
+        flu: null,
+      }),
+      feature({
+        id: "flu-no",
+        parcelId: "flu-no",
+        zoningCode: "ORG-R-1",
+        zoningDistrict: "R-1",
+        jurisdictionPrefix: "ORG",
+        flu: { code: "LD", label: "Low Density Residential", jurisdiction: "ORG", source: "test" },
+      }),
+    ];
+    const rezoning = filterParcels(parcels, { ...baseFilters, landUseFilter: "rezoning" }, config, fluConfig);
+    expect(rezoning.map((item) => item.properties.id)).toEqual(["candidate"]);
+    expect(isRezoningCandidate(parcels[0], baseFilters, config, fluConfig)).toBe(true);
+    expect(isRezoningCandidate(parcels[2], baseFilters, config, fluConfig)).toBe(false);
+    expect(describeRezoningCandidate(parcels[2], baseFilters, config, fluConfig).reason).toMatch(/not joined/i);
+  });
+
+  it("filters Opportunity Zone in / out / either", () => {
+    const parcels = [
+      feature({
+        id: "in-oz",
+        parcelId: "in-oz",
+        opportunityZone: {
+          inOpportunityZone: true,
+          tractGeoid: "12095017600",
+          tractName: "Census tract 176",
+          source: "test",
+        },
+      }),
+      feature({ id: "out-oz", parcelId: "out-oz" }),
+    ];
+    expect(filterParcels(parcels, { ...baseFilters, ozFilter: "in" }, config, fluConfig).map((item) => item.properties.id)).toEqual([
+      "in-oz",
+    ]);
+    expect(filterParcels(parcels, { ...baseFilters, ozFilter: "out" }, config, fluConfig).map((item) => item.properties.id)).toEqual([
+      "out-oz",
+    ]);
+    expect(filterParcels(parcels, { ...baseFilters, ozFilter: "either" }, config, fluConfig)).toHaveLength(2);
   });
 });

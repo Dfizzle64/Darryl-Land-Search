@@ -1,7 +1,7 @@
 "use client";
 
 import { ZoningKnowledgePanel } from "./ZoningKnowledgePanel";
-import { ACREAGE_SLIDER, DEFAULT_FILTERS, type FilterState, type FluConfig, type LandUseFilter, type ZoningConfig } from "@/lib/types";
+import { ACREAGE_SLIDER, DEFAULT_FILTERS, type FilterState, type FluConfig, type LandUseFilter, type OzFilter, type ZoningConfig } from "@/lib/types";
 
 type FilterSidebarProps = {
   filters: FilterState;
@@ -15,6 +15,8 @@ type FilterSidebarProps = {
   onShowExcluded: (value: boolean) => void;
   showTraffic: boolean;
   onShowTraffic: (value: boolean) => void;
+  showOz: boolean;
+  onShowOz: (value: boolean) => void;
   open: boolean;
   onClose: () => void;
   meta: Record<string, unknown>;
@@ -48,11 +50,47 @@ function Toggle({
 }
 
 const LAND_USE_OPTIONS: { value: LandUseFilter; label: string; hint: string }[] = [
-  { value: "off", label: "Off", hint: "Ignore zoning and FLU; still apply acreage, income, and traffic." },
-  { value: "zoning", label: "Current MF zoning", hint: "By-right multifamily districts in the knowledge base. PD and conditional are separate toggles." },
-  { value: "flu", label: "FLU allows multifamily / higher density", hint: "Future Land Use supports MF even if current zoning does not. Orlando + unincorporated county are joined; other cities may be unknown." },
-  { value: "either", label: "Either zoning or FLU", hint: "Keep a parcel if current MF zoning or MF-supportive FLU matches." },
-  { value: "both", label: "Both zoning and FLU", hint: "Require current MF zoning and MF-supportive FLU." },
+  {
+    value: "zoning",
+    label: "Multifamily-capable",
+    hint: "Current zoning is by-right multifamily in the knowledge base. PD and conditional are separate toggles.",
+  },
+  {
+    value: "off",
+    label: "All parcels",
+    hint: "Ignore zoning and FLU; still apply acreage, income, traffic, and Opportunity Zone filters.",
+  },
+  {
+    value: "non-mf",
+    label: "Non-multifamily zoning",
+    hint: "Currently NOT MF-capable. Use this as a zoning-only rezoning hunt — FLU is not required.",
+  },
+  {
+    value: "rezoning",
+    label: "Rezoning candidates",
+    hint: "FLU supports multifamily / higher density, but current zoning is not MF-capable. Missing FLU is omitted, not guessed.",
+  },
+  {
+    value: "flu",
+    label: "FLU allows multifamily / higher density",
+    hint: "Future Land Use supports MF even if current zoning does not. Orlando + unincorporated county are joined; other cities may be unknown.",
+  },
+  {
+    value: "either",
+    label: "Either zoning or FLU",
+    hint: "Keep a parcel if current MF zoning or MF-supportive FLU matches.",
+  },
+  {
+    value: "both",
+    label: "Both zoning and FLU",
+    hint: "Require current MF zoning and MF-supportive FLU.",
+  },
+];
+
+const OZ_OPTIONS: { value: OzFilter; label: string; hint: string }[] = [
+  { value: "either", label: "Either", hint: "Do not filter by Opportunity Zone." },
+  { value: "in", label: "In Opportunity Zone", hint: "Parcel centroid is inside a HUD/Treasury QOZ tract." },
+  { value: "out", label: "Not in Opportunity Zone", hint: "Centroid is outside the county’s QOZ tracts." },
 ];
 
 export function FilterSidebar({
@@ -67,6 +105,8 @@ export function FilterSidebar({
   onShowExcluded,
   showTraffic,
   onShowTraffic,
+  showOz,
+  onShowOz,
   open,
   onClose,
   meta,
@@ -132,6 +172,34 @@ export function FilterSidebar({
             checked={filters.includeConditionalZoning}
             onChange={(includeConditionalZoning) => onChange({ ...filters, includeConditionalZoning })}
             hint="Live Local commercial/industrial, limited multiplex, some mixed-use overlays"
+          />
+        </section>
+
+        <section className="mt-5 space-y-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Opportunity Zones</h2>
+          <fieldset className="space-y-2">
+            <legend className="sr-only">Opportunity Zone filter</legend>
+            {OZ_OPTIONS.map((option) => (
+              <label key={option.value} className="flex cursor-pointer items-start gap-2 rounded-xl border border-white/5 bg-ink-950/30 px-2 py-2">
+                <input
+                  type="radio"
+                  className="mt-1 accent-moss-400"
+                  name="oz-filter"
+                  checked={filters.ozFilter === option.value}
+                  onChange={() => onChange({ ...filters, ozFilter: option.value })}
+                />
+                <span>
+                  <span className="block text-sm text-white">{option.label}</span>
+                  <span className="mt-0.5 block text-xs text-ink-500">{option.hint}</span>
+                </span>
+              </label>
+            ))}
+          </fieldset>
+          <Toggle
+            label="Show Opportunity Zone overlay"
+            checked={showOz}
+            onChange={onShowOz}
+            hint="HUD/Treasury QOZ tracts (2010 geography). Gold fill on the map."
           />
         </section>
 
@@ -251,8 +319,9 @@ export function FilterSidebar({
 
         <p className="mt-6 text-[11px] leading-relaxed text-ink-500">
           Fixture snapshot {generatedAt ?? "unknown"}. Owner, sale, tax, and acreage come from the Orange County
-          Property Appraiser public GIS layer. FLU is joined from Orange County and Orlando open data. Income is ACS
-          median household income. AADT is the nearest FDOT count segment.
+          Property Appraiser public GIS layer. FLU is joined from Orange County and Orlando open data. Opportunity
+          Zones are HUD/Treasury QOZ polygons joined by centroid. Income is ACS median household income. AADT is the
+          nearest FDOT count segment.
         </p>
       </aside>
     </>

@@ -5,6 +5,8 @@ import {
   OVERLAY_LAYER_IDS,
   excludedFillPaint,
   excludedLinePaint,
+  ozFillPaint,
+  ozLinePaint,
   parcelFillPaint,
   parcelLinePaint,
   trafficLinePaint,
@@ -22,6 +24,8 @@ describe("basemap helpers", () => {
 
   it("keeps overlay layer ids so a style swap can leave parcels and traffic in place", () => {
     expect(OVERLAY_LAYER_IDS).toEqual([
+      "oz-fill",
+      "oz-line",
       "traffic-line",
       "parcels-fill-excluded",
       "parcels-line-excluded",
@@ -43,6 +47,12 @@ describe("basemap helpers", () => {
     );
     expect(Number(trafficLinePaint("satellite")["line-opacity"])).toBeGreaterThan(
       Number(trafficLinePaint("streets")["line-opacity"]),
+    );
+    expect(Number(ozFillPaint("satellite")["fill-opacity"])).toBeGreaterThan(
+      Number(ozFillPaint("streets")["fill-opacity"]),
+    );
+    expect(Number(ozLinePaint("satellite")["line-opacity"])).toBeGreaterThan(
+      Number(ozLinePaint("streets")["line-opacity"]),
     );
   });
 });

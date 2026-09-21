@@ -1,6 +1,9 @@
 export type IncomeGeography = "tract" | "blockGroup";
 
-export type LandUseFilter = "off" | "zoning" | "flu" | "either" | "both";
+/** Zoning / FLU search modes. `zoning` is the historical MF-capable default. */
+export type LandUseFilter = "off" | "zoning" | "non-mf" | "flu" | "rezoning" | "either" | "both";
+
+export type OzFilter = "either" | "in" | "out";
 
 export type DistrictStatus = "permitted" | "conditional" | "maybe" | "not-mf";
 
@@ -50,6 +53,31 @@ export type FluInfo = {
   source: string | null;
 };
 
+export type OpportunityZoneInfo = {
+  inOpportunityZone: boolean;
+  tractGeoid: string | null;
+  tractName: string | null;
+  source: string | null;
+};
+
+export type OpportunityZoneProperties = {
+  id: string;
+  tractGeoid: string;
+  tract: string | null;
+  name: string | null;
+  rural: boolean | null;
+};
+
+export type OpportunityZoneFeature = GeoJSON.Feature<
+  GeoJSON.Polygon | GeoJSON.MultiPolygon,
+  OpportunityZoneProperties
+>;
+
+export type OpportunityZoneCollection = GeoJSON.FeatureCollection<
+  GeoJSON.Polygon | GeoJSON.MultiPolygon,
+  OpportunityZoneProperties
+>;
+
 export type ParcelProperties = {
   id: string;
   parcelId: string;
@@ -73,6 +101,7 @@ export type ParcelProperties = {
   incomeBlockGroup: IncomeInfo | null;
   nearestRoad: NearestRoad | null;
   flu: FluInfo | null;
+  opportunityZone: OpportunityZoneInfo | null;
   source: string;
 };
 
@@ -98,6 +127,7 @@ export type FilterState = {
   landUseFilter: LandUseFilter;
   includePlannedDevelopment: boolean;
   includeConditionalZoning: boolean;
+  ozFilter: OzFilter;
   minAcreage: number;
   includeUnknownAcreage: boolean;
   minIncome: number;
@@ -166,6 +196,7 @@ export const DEFAULT_FILTERS: FilterState = {
   landUseFilter: "zoning",
   includePlannedDevelopment: true,
   includeConditionalZoning: false,
+  ozFilter: "either",
   minAcreage: 0,
   includeUnknownAcreage: true,
   minIncome: 0,
@@ -174,6 +205,18 @@ export const DEFAULT_FILTERS: FilterState = {
   minAadt: 0,
   includeUnknownAadt: true,
 };
+
+export const LAND_USE_FILTERS: LandUseFilter[] = [
+  "zoning",
+  "off",
+  "non-mf",
+  "rezoning",
+  "flu",
+  "either",
+  "both",
+];
+
+export const OZ_FILTERS: OzFilter[] = ["either", "in", "out"];
 
 export const ACREAGE_SLIDER = {
   min: 0,

@@ -6,10 +6,12 @@ These JSON files are the **source of truth** for what the map treats as multifam
 | --- | --- |
 | `data/zoning-config.json` | Per-jurisdiction zoning knowledge base (OCPA prefixes, districts, citations, PD/PUD) |
 | `data/flu-config.json` | Future Land Use codes → MF-supportive / maybe / no |
-| `data/fixtures/parcels.geojson` | Sample parcels, including joined `flu` objects |
+| `data/fixtures/parcels.geojson` | Sample parcels, including joined `flu` and `opportunityZone` objects |
+| `data/fixtures/opportunity-zones.geojson` | Orange County HUD/Treasury QOZ tract polygons (map overlay) |
+| `data/fixtures/oz-lookup.json` | Generated parcel → OZ join audit |
 | `data/fixtures/zoning-coverage.json` | Generated coverage report (observed GIS codes vs knowledge files) |
 
-The browser never calls an LLM. Refresh is an offline scripted pass (`npm run seed:zoning`, `npm run seed:flu`).
+The browser never calls an LLM. Refresh is an offline scripted pass (`npm run seed:zoning`, `npm run seed:flu`, `npm run seed:oz`).
 
 ## Zoning config shape
 
@@ -76,8 +78,9 @@ Matching rules (implemented in `src/lib/zoning.ts`):
 ## How to refresh
 
 ```bash
-npm run seed           # parcels + income + AADT, then FLU join, then coverage report
+npm run seed           # parcels + income + AADT, then FLU join, then OZ join, then coverage report
 npm run seed:flu       # re-join FLU onto the existing parcel fixture (network)
+npm run seed:oz        # re-join HUD/Treasury QOZ polygons onto parcels (network)
 npm run seed:zoning    # coverage report only; does not scrape Municode
 ```
 
@@ -86,7 +89,7 @@ After a code amendment:
 1. Update the relevant jurisdiction in `zoning-config.json` (token, status, `why` citation).
 2. Update `flu-config.json` if GIS codes or density policy changed.
 3. Set `updatedAt`.
-4. Run `npm run seed:zoning` (and `seed:flu` if polygons may have moved).
+4. Run `npm run seed:zoning` (and `seed:flu` / `seed:oz` if polygons may have moved).
 5. Run `npm test`.
 
 Do not require a live model in the app to “research zoning.” That is this file plus a future agent/script run.

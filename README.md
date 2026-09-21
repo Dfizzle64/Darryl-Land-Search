@@ -1,6 +1,6 @@
 # Orange County multifamily site search (pilot)
 
-Interactive map of **Orange County, Florida** parcels for multifamily site selection. Filter by **minimum acreage**, **current zoning**, **Future Land Use (FLU)**, Census ACS median household income, and nearby FDOT Average Annual Daily Traffic (AADT). Click a parcel for owner, sale, tax, mailing address, zoning + FLU explanations, and public search links.
+Interactive map of **Orange County, Florida** parcels for multifamily site selection. Filter by **minimum acreage**, **zoning mode** (multifamily-capable, all parcels, non-MF, rezoning candidates, FLU), **Opportunity Zones**, Census ACS median household income, and nearby FDOT Average Annual Daily Traffic (AADT). A ranked **sites** list scores matches. Click a row or parcel for owner, sale, tax, mailing address, zoning + FLU + OZ explanations, and public search links.
 
 This is a v2 pass on the Orange County pilot: public data only, no paid parcel vendors, no scraped emails or phone numbers.
 
@@ -16,10 +16,11 @@ Open [http://localhost:3000](http://localhost:3000).
 Other scripts:
 
 ```bash
-npm test             # acreage / zoning / FLU unit tests
+npm test             # acreage / zoning / FLU / OZ / scoring unit tests
 npm run build        # production build
-npm run seed         # parcels + income + AADT, then FLU join, then zoning coverage
+npm run seed         # parcels + income + AADT, then FLU join, then OZ join, then zoning coverage
 npm run seed:flu     # re-join FLU onto the existing parcel fixture
+npm run seed:oz      # refresh HUD/Treasury Opportunity Zone polygons and parcel join
 npm run seed:zoning  # refresh coverage report vs knowledge JSON (no LLM)
 ```
 
@@ -28,12 +29,14 @@ No API keys are required for the default fixture mode. Copy `.env.example` to `.
 ## What you can do
 
 - Set a **minimum acreage** (OCPA `ACREAGE`). The slider is 0–25 acres; larger sites still match any threshold at or below 25. Acreage is shown in the parcel drawer.
-- Choose a **land-use mode**: current MF zoning, FLU allows multifamily / higher density, either, both, or off.
+- Choose a **land-use mode**: multifamily-capable zoning (default), all parcels, non-multifamily zoning, rezoning candidates (FLU yes / zoning no), FLU allows multifamily, either, or both.
+- Filter **Opportunity Zones**: In OZ / Not in OZ / Either, and toggle a gold QOZ tract overlay.
 - Include **planned development / PUD** (always labeled maybe — site-specific).
 - Include **conditional zoning** (Live Local commercial/industrial, limited multiplex, some mixed-use overlays). Off by default so C-2 warehouses do not flood the map.
 - Set a **minimum median household income** (tract or block group) and **minimum AADT**.
+- Browse a **ranked sites list** (score 0–100) that stays in sync with filters. Click a row to open the drawer and fly the map.
 - Open **Zoning knowledge** in the sidebar: jurisdictions covered, district explanations, citations, last-updated date. This is an offline JSON knowledge base, not a live model call.
-- Switch the map between **Streets** (OpenFreeMap dark / Carto Dark Matter fallback) and **Satellite** (Esri World Imagery). The toggle is a map control; parcel filters, selection, and camera stay put. Satellite imagery is a public Esri tile service and needs no API key.
+- Switch the map between **Streets** (OpenFreeMap dark / Carto Dark Matter fallback) and **Satellite** (Esri World Imagery). The toggle is a map control; parcel filters, selection, OZ overlay, and camera stay put. Satellite imagery is a public Esri tile service and needs no API key.
 
 The bundled sample is **459 parcels** spread across Orange County (Orlando, unincorporated county, Winter Park, Ocoee, Winter Garden, Apopka, and others). It is large enough to exercise filters, not a complete cadastral extract.
 
@@ -42,22 +45,45 @@ The bundled sample is **459 parcels** spread across Orange County (Orlando, unin
 1. **Acreage.** OCPA parcel `ACREAGE`. Unknown acreage can be kept or dropped (the sample has acreage on every parcel).
 2. **Zoning.** OCPA stores codes like `ORL-R-3B/T/AN`. The app parses the jurisdiction prefix (`ORL`) and base district (`R-3B`), then matches **that jurisdiction’s** districts in `data/zoning-config.json`. County `R-3` does not silently match Orlando `R-3A` unless Orlando lists it. Token `P-D` does **not** match Orlando public-use `P`.
 3. **FLU.** Parcel centroids are joined to [Orange County Future Land Use](https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/21) and [Orlando Future Land Use](https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/83). `data/flu-config.json` decides which GIS codes are MF-supportive. Overlay suffixes such as `/RES-PRO` fall back to the base code.
-4. **Income.** ACS median household income (B19013) by tract or block group.
-5. **AADT.** Nearest FDOT Orange County count segment.
+4. **Opportunity Zones.** Parcel centroids are tested against HUD/Treasury Qualified Opportunity Zone polygons (2010 Census tracts), not ACS 2020 tract IDs. Filter In / Not in / Either. The overlay is the county’s 24 QOZ tracts.
+5. **Income.** ACS median household income (B19013) by tract or block group.
+6. **AADT.** Nearest FDOT Orange County count segment.
 
-Filters run in the browser against the loaded GeoJSON so the map updates immediately. `/api/parcels` applies the same logic server-side (`landUse`, `minAcres`, `cond`, `pd`, …).
+Filters run in the browser against the loaded GeoJSON so the map and ranked list update immediately. `/api/parcels` applies the same logic server-side (`landUse`, `oz`, `minAcres`, `cond`, `pd`, …).
 
 ### Land-use modes
 
+The app is no longer MF-zoning-only. Modes:
+
 | Mode | Keeps a parcel when |
 | --- | --- |
-| Current MF zoning (default) | District is `permitted` in the knowledge base, or PD if that toggle is on, or conditional if that toggle is on |
+| Multifamily-capable (default) | District is `permitted` in the knowledge base, or PD if that toggle is on, or conditional if that toggle is on |
+| All parcels | Ignore zoning and FLU; still apply acreage, income, traffic, and OZ |
+| Non-multifamily zoning | Current zoning is **not** MF-capable (zoning-only rezoning hunt). Missing/unknown districts count as not MF-capable |
+| Rezoning candidates | Joined FLU supports multifamily / higher density **and** current zoning is not MF-capable. Missing FLU is **not** a candidate |
 | FLU allows MF / higher density | Joined FLU category has `allowsMultifamily: true` |
 | Either | Zoning match **or** FLU match |
 | Both | Zoning match **and** FLU match |
-| Off | No zoning/FLU filter |
 
-FLU-only mode does **not** treat missing FLU as a match. Other municipalities besides Orlando often have no joined FLU — that is an honest gap, not an empty county.
+FLU-only and rezoning modes do **not** treat missing FLU as a match. Other municipalities besides Orlando often have no joined FLU — that is an honest gap, not an empty county. The rezoning list shows a banner with the count of parcels that cannot be classified.
+
+### Ranked site list
+
+Matching parcels are scored 0–100 and listed (desktop overlay from the `xl` breakpoint; **Sites** sheet/button below that). Clicking a row selects the parcel, opens the drawer, and flies the map to the centroid.
+
+**Formula.** `score = 100 × Σ (weightᵢ × componentᵢ)` with default weights:
+
+| Component | Weight | What 1.0 means |
+| --- | --- | --- |
+| Acreage | 0.28 | At least ~8 acres above the active minimum (or 8 acres when there is no minimum) |
+| Income | 0.22 | About $40k above the income minimum (or ~$80k when there is no minimum) |
+| AADT | 0.18 | About 25k vehicles/day above the AADT minimum (or 15k when there is no minimum) |
+| Zoning / FLU fit | 0.22 | Permitted MF + supportive FLU. Rezoning candidates (FLU yes, zoning no) get a high fit score so they surface in All-parcels mode |
+| Opportunity Zone | 0.10 | Centroid in a QOZ. Dropped (weights renormalized) when the OZ filter is **Not in OZ**, because every remaining row would get a constant zero |
+
+Unknown acreage / income / AADT (when included) score 0.35 on that component. Ties break by acreage, then parcel id. This is a screen, not an appraisal.
+
+Chips on each row are that component’s contribution to the 0–100 total (so they roughly sum to the score).
 
 ## Zoning knowledge base
 
@@ -97,7 +123,24 @@ Product decisions:
 - County GIS does not have a separate **MHDR** code; plan text MHDR (35 du/ac) is noted in the MDR/HDR `why` fields.
 - **Innovation Way (`IW`)** is maybe / plan-specific. **Lake Pickett (`LP`)** is not treated as MF-supportive.
 
-In this sample, FLU joined on **372 / 459** parcels. There are parcels with MF-supportive FLU and non-MF current zoning — use land-use mode **FLU allows multifamily / higher density** or **Either**.
+In this sample, FLU joined on **372 / 459** parcels. There are parcels with MF-supportive FLU and non-MF current zoning — use land-use mode **Rezoning candidates**, **FLU allows multifamily / higher density**, or **Either**.
+
+## Opportunity Zones
+
+Qualified Opportunity Zones are **2010 Census tracts** nominated by the state and certified by the U.S. Treasury (IRC §§ 1400Z-1 / 1400Z-2). They are **not** the same geography as ACS 2020 tracts used for income.
+
+| Piece | Source |
+| --- | --- |
+| Overlay polygons | [HUD GIS Opportunity Zones](https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Opportunity_Zones/FeatureServer/13) filtered to Florida `STATE='12'` and Orange County `COUNTY='095'` (24 tracts). Fallback: [Orange County Public_Dynamic / 61](https://ocgis4.ocfl.net/arcgis/rest/services/Public_Dynamic/MapServer/61) |
+| Parcel flag | Centroid-in-polygon against those 2010 QOZ polygons (`npm run seed:oz`) |
+
+The app runs offline from `data/fixtures/opportunity-zones.geojson` plus `opportunityZone` on each parcel. In this sample **26 / 459** parcels fall in a QOZ; the overlay still draws all 24 county tracts. The drawer shows yes/no and the 2010 tract GEOID when inside a zone.
+
+Product decisions:
+
+- Join by geometry, never by ACS 2020 `incomeTract.geoid`.
+- Overlay is off by default so it does not fight parcel fills; the Streets / Satellite toggle does not drop it.
+- “Not in OZ” requires a successful join that returned false, not a missing property.
 
 ## Data sources
 
@@ -108,6 +151,7 @@ In this sample, FLU joined on **372 / 459** parcels. There are parcels with MF-s
 | Orlando FLU | Orange County open data (city layer) | [Orlando Future Land Use](https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/83) |
 | Zoning polygons (reference) | Orange County open data | [Unincorporated zoning](https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/51), [Orlando zoning](https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/82) |
 | Median household income | ACS 5-year B19013 via [Census Reporter](https://api.censusreporter.org) (fixtures). Live Census Bureau API is optional. | County FIPS `12095` |
+| Opportunity Zones | HUD GIS QOZ polygons (Treasury-certified 2010 tracts), Orange County subset | [Opportunity_Zones layer 13](https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Opportunity_Zones/FeatureServer/13); county mirror [Public_Dynamic / 61](https://ocgis4.ocfl.net/arcgis/rest/services/Public_Dynamic/MapServer/61) |
 | AADT | Florida DOT Traffic Characteristics Inventory | [`RCI_Layers` AADT](https://gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0) (`COUNTY='Orange'`) |
 | Streets basemap | OpenFreeMap (Carto Dark Matter fallback) | Free vector tiles, no key |
 | Satellite basemap | Esri World Imagery | Public XYZ tiles at `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}` — no API key. Attribution: *Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community* (shown on the map when Satellite is selected, and in MapLibre’s attribution control). |
@@ -133,6 +177,7 @@ OCPA_PARCELS_URL=https://vgispublic.ocpafl.org/server/rest/services/Webmap/PARCE
 FDOT_AADT_URL=https://gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0/query
 OC_FLU_URL=https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/21/query
 ORL_FLU_URL=https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/83/query
+HUD_OZ_URL=https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Opportunity_Zones/FeatureServer/13/query
 ```
 
 - **Census Bureau ACS** now redirects unauthenticated `api.census.gov` calls to a “Missing Key” page. Sign up at [Census API key signup](https://api.census.gov/data/key_signup.html) and set `CENSUS_API_KEY` when you replace Census Reporter with a first-party live income adapter.
@@ -146,7 +191,8 @@ ORL_FLU_URL=https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServe
 - Sentinel sale dates around 1900 are treated as “not available”.
 - Zoning match is GIS-code based, not a substitute for a zoning opinion or PD regulating plan.
 - FLU is centroid-joined, not a full polygon overlay. A parcel that straddles two FLU polygons gets one code.
-- Municipal FLU besides Orlando is not in the public layers used here (Winter Park, Ocoee, Winter Garden, Apopka, Maitland, etc.). FLU-only mode will omit those parcels rather than guess.
+- Municipal FLU besides Orlando is not in the public layers used here (Winter Park, Ocoee, Winter Garden, Apopka, Maitland, etc.). FLU-only and rezoning-candidate modes omit those parcels rather than guess.
+- Opportunity Zone flags use 2010 QOZ polygons; ACS income still uses 2020 vintage tracts. Do not expect GEOIDs to match.
 - Belle Isle, Oakland, and Windermere zoning use tables were not independently verified; district lists are empty on purpose.
 - Winter Garden R-4 / R-5 exist in code but were not verified as multifamily in this pass.
 - AADT is nearest FDOT **state-count** segment, not local-road counts. Some parcels sit far from a counted road.
@@ -159,8 +205,9 @@ TypeScript, Next.js 15 App Router, MapLibre GL, Tailwind CSS. Data layer is fixt
 
 ## Product decisions
 
-- Desktop-first map + filter sidebar + parcel drawer; filters collapse to a sheet on small screens. The Streets / Satellite control sits at the top-left of the map so it stays clear of the mobile filter button, zoom controls, and the bottom parcel sheet.
-- Default filters: current MF zoning, planned development included, conditional zoning off, no acreage/income/AADT minimum, unknown values included — so first load still shows a useful candidate set.
+- Desktop-first map + filter sidebar + ranked sites overlay (`xl+`) + parcel drawer; filters collapse to a sheet on small screens and the sites list is a **Sites** sheet. The Streets / Satellite control sits at the top-left of the map so it stays clear of the mobile filter button, zoom controls, and the bottom parcel sheet.
+- Default filters: multifamily-capable zoning, planned development included, conditional zoning off, OZ either, no acreage/income/AADT minimum, unknown values included — so first load still shows a useful candidate set.
 - Acreage slider caps at 25 ac because a linear slider to Disney-scale tracts would be unusable as a *minimum*.
-- Honest empty/loading/error states rather than fake completeness, including when FLU data is missing.
+- Honest empty/loading/error states rather than fake completeness, including when FLU data is missing for rezoning candidates.
 - Orange County + municipal codes are both in the knowledge base because OCPA parcels span both. Unverified cities stay empty rather than copied from the county table.
+- Existing apartments / airport “don’t demolish” constraints are out of scope for this pass.

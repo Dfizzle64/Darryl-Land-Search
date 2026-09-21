@@ -1,13 +1,20 @@
 import { AppShell } from "@/components/AppShell";
 import { getParcelProvider } from "@/lib/data/adapters";
-import { loadFixtureMeta, loadFluConfig, loadTrafficCollection, loadZoningConfig } from "@/lib/data/loadFixtures";
+import {
+  loadFixtureMeta,
+  loadFluConfig,
+  loadOpportunityZones,
+  loadTrafficCollection,
+  loadZoningConfig,
+} from "@/lib/data/loadFixtures";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [parcels, traffic, zoningConfig, fluConfig, meta] = await Promise.all([
+  const [parcels, traffic, opportunityZones, zoningConfig, fluConfig, meta] = await Promise.all([
     getParcelProvider().listParcels(),
     loadTrafficCollection(),
+    loadOpportunityZones(),
     loadZoningConfig(),
     loadFluConfig(),
     loadFixtureMeta(),
@@ -17,6 +24,7 @@ export default async function HomePage() {
     <AppShell
       parcels={parcels}
       traffic={traffic}
+      opportunityZones={opportunityZones}
       zoningConfig={zoningConfig}
       fluConfig={fluConfig}
       meta={meta}

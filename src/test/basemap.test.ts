@@ -43,6 +43,8 @@ describe("basemap helpers", () => {
       "parcels-line-excluded",
       "parcels-fill",
       "parcels-line",
+      "aoi-fill",
+      "aoi-line",
     ]);
   });
 

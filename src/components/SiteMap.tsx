@@ -1,9 +1,11 @@
 "use client";
 
-import maplibregl, { type GeoJSONSource, type Map as MapLibreMap } from "maplibre-gl";
+import maplibregl, { type GeoJSONSource, type Map as MapLibreMap, type MapMouseEvent, type MapTouchEvent } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
+import { aoiFeatureCollection, normalizeBbox, type AoiLock } from "@/lib/aoi";
 import { BasemapToggle } from "./BasemapToggle";
+import { AoiControls } from "./AoiControls";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import {
   STREET_STYLE_CANDIDATES,
@@ -62,6 +64,10 @@ type SiteMapProps = {
   onHover: (id: string | null) => void;
   onSelectTract: (geoid: string) => void;
   onViewportIdle?: (bbox: [number, number, number, number], zoom: number) => void;
+  aoi?: AoiLock | null;
+  aoiMatchedCount?: number;
+  aoiTruncated?: boolean;
+  onAoiChange?: (aoi: AoiLock | null) => void;
 };
 
 function geoidMatch(geoids: string[]): maplibregl.FilterSpecification {
@@ -204,6 +210,23 @@ function addOverlayLayers(
     source: "parcels",
     paint: parcelLinePaint(mode),
   });
+  map.addSource("aoi", { type: "geojson", data: aoiFeatureCollection(null) });
+  map.addLayer({
+    id: "aoi-fill",
+    type: "fill",
+    source: "aoi",
+    paint: { "fill-color": "#e7b07a", "fill-opacity": 0.1 },
+  });
+  map.addLayer({
+    id: "aoi-line",
+    type: "line",
+    source: "aoi",
+    paint: {
+      "line-color": "#f0c27a",
+      "line-width": 2.25,
+      "line-dasharray": [1.5, 1],
+    },
+  });
 }
 
 export function SiteMap({
@@ -238,14 +261,23 @@ export function SiteMap({
   onHover,
   onSelectTract,
   onViewportIdle,
+  aoi = null,
+  aoiMatchedCount = 0,
+  aoiTruncated = false,
+  onAoiChange,
 }: SiteMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState("Loading map…");
   const [basemap, setBasemap] = useState<BasemapMode>("streets");
-  const callbacksRef = useRef({ onSelect, onHover, onSelectTract, onViewportIdle });
-  callbacksRef.current = { onSelect, onHover, onSelectTract, onViewportIdle };
+  const [drawing, setDrawing] = useState(false);
+  const callbacksRef = useRef({ onSelect, onHover, onSelectTract, onViewportIdle, onAoiChange });
+  callbacksRef.current = { onSelect, onHover, onSelectTract, onViewportIdle, onAoiChange };
+  const drawingRef = useRef(drawing);
+  drawingRef.current = drawing;
+  const aoiRef = useRef(aoi);
+  aoiRef.current = aoi;
   const basemapRef = useRef(basemap);
   basemapRef.current = basemap;
   const boundsRef = useRef(bounds);
@@ -288,11 +320,13 @@ export function SiteMap({
 
           const interactive = ["parcels-fill", "parcels-fill-excluded"];
           map.on("click", interactive, (event) => {
+            if (drawingRef.current) return;
             const id = event.features?.[0]?.properties?.id;
             if (typeof id === "string") callbacksRef.current.onSelect(id);
           });
           const tractLayers = ["mf-priority-a-fill", "mf-priority-b-fill", "rural-fill", "rural-pins", "oz2-fill"];
           map.on("click", tractLayers, (event) => {
+            if (drawingRef.current) return;
             const parcelHit = map.queryRenderedFeatures(event.point, { layers: interactive });
             if (parcelHit.length > 0) return;
             const props = event.features?.[0]?.properties;
@@ -301,15 +335,18 @@ export function SiteMap({
             if (rural && typeof geoid === "string") callbacksRef.current.onSelectTract(geoid);
           });
           map.on("mousemove", interactive, (event) => {
+            if (drawingRef.current) return;
             map.getCanvas().style.cursor = "pointer";
             const id = event.features?.[0]?.properties?.id;
             callbacksRef.current.onHover(typeof id === "string" ? id : null);
           });
           map.on("mouseleave", interactive, () => {
+            if (drawingRef.current) return;
             map.getCanvas().style.cursor = "";
             callbacksRef.current.onHover(null);
           });
           const emitViewport = () => {
+            if (drawingRef.current || aoiRef.current) return;
             const cb = callbacksRef.current.onViewportIdle;
             if (!cb) return;
             const b = map.getBounds();
@@ -354,6 +391,147 @@ export function SiteMap({
       (source as GeoJSONSource).setData(parcels);
     }
   }, [parcels, status]);
+
+  useEffect(() => {
+    if (!showParcels && drawing) setDrawing(false);
+  }, [showParcels, drawing]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready" || drawing) return;
+    const source = map.getSource("aoi");
+    if (source?.type === "geojson") {
+      (source as GeoJSONSource).setData(aoiFeatureCollection(aoi?.bbox ?? null));
+    }
+  }, [aoi, drawing, status]);
+
+  const hadAoi = useRef(false);
+  useEffect(() => {
+    const wasLocked = hadAoi.current;
+    hadAoi.current = Boolean(aoi);
+    if (!wasLocked || aoi || status !== "ready") return;
+    const map = mapRef.current;
+    if (!map) return;
+    const boundsNow = map.getBounds();
+    callbacksRef.current.onViewportIdle?.(
+      [boundsNow.getWest(), boundsNow.getSouth(), boundsNow.getEast(), boundsNow.getNorth()],
+      map.getZoom(),
+    );
+  }, [aoi, status]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready" || !drawing) return;
+
+    map.dragPan.disable();
+    map.boxZoom.disable();
+    map.doubleClickZoom.disable();
+    map.scrollZoom.disable();
+    map.touchZoomRotate.disable();
+    const canvas = map.getCanvas();
+    canvas.style.cursor = "crosshair";
+
+    let origin: { lng: number; lat: number } | null = null;
+    let last: { lng: number; lat: number } | null = null;
+
+    const preview = (lng: number, lat: number) => {
+      if (!origin) return;
+      last = { lng, lat };
+      const bbox = normalizeBbox(origin.lng, origin.lat, lng, lat);
+      const source = map.getSource("aoi");
+      if (source?.type === "geojson") {
+        (source as GeoJSONSource).setData(aoiFeatureCollection(bbox));
+      }
+    };
+
+    const finish = (lng: number, lat: number) => {
+      if (!origin) return;
+      const start = origin;
+      origin = null;
+      const bbox = normalizeBbox(start.lng, start.lat, lng, lat);
+      if (!bbox) {
+        const source = map.getSource("aoi");
+        if (source?.type === "geojson") {
+          (source as GeoJSONSource).setData(aoiFeatureCollection(aoiRef.current?.bbox ?? null));
+        }
+        return;
+      }
+      callbacksRef.current.onAoiChange?.({ bbox, source: "draw" });
+      setDrawing(false);
+    };
+
+    const onMouseDown = (event: MapMouseEvent) => {
+      event.preventDefault();
+      origin = { lng: event.lngLat.lng, lat: event.lngLat.lat };
+      last = origin;
+    };
+    const onMouseMove = (event: MapMouseEvent) => {
+      if (!origin) return;
+      preview(event.lngLat.lng, event.lngLat.lat);
+    };
+    const onMouseUp = (event: MapMouseEvent) => {
+      finish(event.lngLat.lng, event.lngLat.lat);
+    };
+    const onWindowMouseUp = (event: MouseEvent) => {
+      if (!origin || !last) return;
+      if (event.target === canvas) return;
+      const target = event.target;
+      if (target instanceof Element && target.closest("[data-aoi-controls]")) {
+        origin = null;
+        const source = map.getSource("aoi");
+        if (source?.type === "geojson") {
+          (source as GeoJSONSource).setData(aoiFeatureCollection(aoiRef.current?.bbox ?? null));
+        }
+        return;
+      }
+      finish(last.lng, last.lat);
+    };
+    const onTouchStart = (event: MapTouchEvent) => {
+      if (event.originalEvent.touches.length !== 1) return;
+      event.preventDefault();
+      origin = { lng: event.lngLat.lng, lat: event.lngLat.lat };
+    };
+    const onTouchMove = (event: MapTouchEvent) => {
+      if (!origin) return;
+      preview(event.lngLat.lng, event.lngLat.lat);
+    };
+    const onTouchEnd = (event: MapTouchEvent) => {
+      finish(event.lngLat.lng, event.lngLat.lat);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setDrawing(false);
+    };
+
+    map.on("mousedown", onMouseDown);
+    map.on("mousemove", onMouseMove);
+    map.on("mouseup", onMouseUp);
+    map.on("touchstart", onTouchStart);
+    map.on("touchmove", onTouchMove);
+    map.on("touchend", onTouchEnd);
+    window.addEventListener("mouseup", onWindowMouseUp);
+    window.addEventListener("keydown", onKey);
+
+    return () => {
+      map.off("mousedown", onMouseDown);
+      map.off("mousemove", onMouseMove);
+      map.off("mouseup", onMouseUp);
+      map.off("touchstart", onTouchStart);
+      map.off("touchmove", onTouchMove);
+      map.off("touchend", onTouchEnd);
+      window.removeEventListener("mouseup", onWindowMouseUp);
+      window.removeEventListener("keydown", onKey);
+      try {
+        map.dragPan.enable();
+        map.boxZoom.enable();
+        map.doubleClickZoom.enable();
+        map.scrollZoom.enable();
+        map.touchZoomRotate.enable();
+        canvas.style.cursor = "";
+      } catch {
+        // Map already removed.
+      }
+    };
+  }, [drawing, status]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -521,13 +699,43 @@ export function SiteMap({
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
       {status === "ready" ? <BasemapToggle value={basemap} onChange={setBasemap} /> : null}
+      {status === "ready" && showParcels ? (
+        <AoiControls
+          drawing={drawing}
+          aoi={aoi}
+          matchedCount={aoiMatchedCount}
+          truncated={aoiTruncated}
+          loading={parcelsLoading && Boolean(aoi)}
+          onDraw={() => setDrawing(true)}
+          onCancelDraw={() => setDrawing(false)}
+          onClear={() => {
+            setDrawing(false);
+            onAoiChange?.(null);
+          }}
+          onLockView={() => {
+            const map = mapRef.current;
+            if (!map) return;
+            const camera = map.getBounds();
+            const bbox = normalizeBbox(camera.getWest(), camera.getSouth(), camera.getEast(), camera.getNorth());
+            if (!bbox) return;
+            setDrawing(false);
+            onAoiChange?.({ bbox, source: "bounds" });
+          }}
+        />
+      ) : null}
       {status === "ready" && (showOz || showOz2 || showParcels) ? (
         <div className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[20rem] space-y-1 rounded-lg border border-white/10 bg-ink-900/90 px-2 py-1.5 text-[10px] leading-snug text-ink-300 sm:bottom-4 sm:left-4">
+          {aoi ? (
+            <p>
+              <span className="mr-1.5 inline-block h-2 w-3 border border-dashed border-clay-400 align-middle" />
+              Area of interest
+            </p>
+          ) : null}
           {showParcels ? (
             <p>
               <span className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle bg-moss-400" />
               Parcels (matched)
-              {parcelsLoading ? " · refreshing viewport…" : ""}
+              {parcelsLoading ? (aoi ? " · loading AOI…" : " · refreshing viewport…") : aoi ? " · AOI locked" : ""}
             </p>
           ) : null}
           {showOz2 ? (

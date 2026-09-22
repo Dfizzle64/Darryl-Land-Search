@@ -17,6 +17,55 @@ export function comptrollerRecordsUrl(): string {
   return "https://or.occompt.com/recorder/web/";
 }
 
+const DEFAULT_APPRAISER_URLS: Record<string, string> = {
+  "12009": "https://www.bcpao.us/PropertySearch/#/nav/Search",
+  "12069": "https://www.lakecopropappr.com/",
+  "12083": "https://www.pa.marion.fl.us/",
+  "12095": "https://ocpaweb.ocpafl.org/site/parcelsearch",
+  "12097": "https://www.property-appraiser.org/",
+  "12105": "https://www.polkpa.org/",
+  "12117": "https://www.scpafl.org/",
+  "12119": "https://www.sumterpa.com/",
+  "12127": "https://vcpa.vcgov.org/",
+};
+
+export function parcelAppraiserUrl(options: {
+  parcelId: string;
+  countyFips?: string | null;
+  appraiserUrl?: string | null;
+}): { href: string; label: string } {
+  const fips = options.countyFips ?? null;
+  if (fips === "12095" || (!fips && !options.appraiserUrl)) {
+    return {
+      href: ocpaParcelUrl(options.parcelId),
+      label: "Open in Orange County Property Appraiser",
+    };
+  }
+  const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);
+  const countyLabel =
+    fips === "12009"
+      ? "Brevard"
+      : fips === "12069"
+        ? "Lake"
+        : fips === "12083"
+          ? "Marion"
+          : fips === "12097"
+            ? "Osceola"
+            : fips === "12105"
+              ? "Polk"
+              : fips === "12117"
+                ? "Seminole"
+                : fips === "12119"
+                  ? "Sumter"
+                  : fips === "12127"
+                    ? "Volusia"
+                    : "county";
+  return {
+    href,
+    label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,
+  };
+}
+
 export function formatUsd(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) return "Not available";
   return new Intl.NumberFormat("en-US", {

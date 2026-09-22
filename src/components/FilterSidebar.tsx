@@ -25,6 +25,7 @@ type FilterSidebarProps = {
   onClose: () => void;
   meta: Record<string, unknown>;
   orangePilot: boolean;
+  orlandoParcels: boolean;
   market: MarketId;
   tractCount: number;
   parcelNote: string;
@@ -143,6 +144,7 @@ export function FilterSidebar({
   onClose,
   meta,
   orangePilot,
+  orlandoParcels,
   market,
   tractCount,
   parcelNote,
@@ -171,11 +173,13 @@ export function FilterSidebar({
         <section className="rounded-2xl border border-white/10 bg-ink-800/70 p-3">
           <p className="text-xs uppercase tracking-[0.16em] text-ink-500">Results</p>
           <p className="mt-1 font-display text-3xl text-white">{matchedCount.toLocaleString()}</p>
-          <p className="text-xs text-ink-500">matching {totalCount.toLocaleString()} sample parcels</p>
+          <p className="text-xs text-ink-500">
+            matching {totalCount.toLocaleString()} {orlandoParcels ? "loaded parcels" : "sample parcels"}
+          </p>
           <button
             type="button"
             className="mt-3 text-xs text-clay-400 underline-offset-2 hover:underline"
-            onClick={() => onChange({ ...DEFAULT_FILTERS })}
+            onClick={() => onChange({ ...DEFAULT_FILTERS, landUseFilter: orlandoParcels ? "off" : DEFAULT_FILTERS.landUseFilter })}
           >
             Reset filters
           </button>
@@ -191,10 +195,16 @@ export function FilterSidebar({
             <SouthCarolinaStatusNote note={statusHelp} className="text-xs leading-relaxed text-ink-300" />
           ) : null}
           <p className="text-xs leading-relaxed text-ink-500">{parcelNote}</p>
-          {!orangePilot ? (
+          {orlandoParcels && !orangePilot ? (
             <p className="text-xs leading-relaxed text-ink-300">
-              Acreage, zoning, income, and traffic filters apply to the Orange County parcel sample. Switch the market
-              back to Orlando and choose Orange County to use that pilot.
+              Zoning and FLU knowledge is Orange County–first. Outside Orange, prefer All parcels — missing zoning is
+              treated honestly, not guessed.
+            </p>
+          ) : null}
+          {!orlandoParcels ? (
+            <p className="text-xs leading-relaxed text-ink-300">
+              Parcel polygons for this market are not seeded yet. Switch to Orlando to browse the nine-county shed
+              extract.
             </p>
           ) : null}
           {onPriorityView && priorityView && priorityCounts ? (
@@ -275,7 +285,7 @@ export function FilterSidebar({
         <section className="mt-5 space-y-3">
           <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Minimum acreage</h2>
           <label className="block text-sm">
-            Parcel acreage (OCPA)
+            Parcel acreage
             <input
               type="range"
               min={ACREAGE_SLIDER.min}
@@ -293,7 +303,7 @@ export function FilterSidebar({
           </label>
           <p className="text-xs text-ink-500">
             Slider runs 0–{ACREAGE_SLIDER.max} acres. Larger parcels still match any threshold at or below{" "}
-            {ACREAGE_SLIDER.max} ac. This sample is biased toward large lots.
+            {ACREAGE_SLIDER.max} ac. Orlando shed fixtures favor ≥1 acre windows around rural tracts.
           </p>
           <Toggle
             label="Include unknown acreage"
@@ -387,12 +397,12 @@ export function FilterSidebar({
         />
 
         <p className="mt-6 text-[11px] leading-relaxed text-ink-500">
-          Fixture snapshot {generatedAt ?? "unknown"}. Owner, sale, tax, and acreage come from the Orange County
-          Property Appraiser public GIS layer. FLU is joined from Orange County and Orlando open data. Opportunity
-          Zones shown in copper with a dashed outline are current designated QOZs in that pilot. Rural tracts in the
-          seven markets are Rev. Proc. 2026-14 nomination eligibility — Eligible (rural) — not designated. Orange is
-          rural-eligible; amber, in Orange County only, is eligible and not rural. {SHED_CAVEAT} Income is ACS median
-          household income. AADT is the nearest FDOT count segment.
+          Fixture snapshot {generatedAt ?? "unknown"}. Orlando shed parcels are partitioned public GIS extracts (DOH
+          EHWATER / Orange County Property Appraiser). Zoning and FLU joins are richest for Orange County; other counties
+          degrade when a field is missing. Opportunity Zones shown in copper with a dashed outline are current designated
+          QOZs in the Orange pilot. Rural tracts in the seven markets are Rev. Proc. 2026-14 nomination eligibility —
+          Eligible (rural) — not designated. Orange is rural-eligible; amber, in Orange County only, is eligible and not
+          rural. {SHED_CAVEAT} Income and AADT joins are Orange-pilot first.
         </p>
       </aside>
     </>

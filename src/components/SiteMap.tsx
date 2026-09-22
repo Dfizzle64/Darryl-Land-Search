@@ -45,7 +45,9 @@ type SiteMapProps = {
   showTraffic: boolean;
   showOz: boolean;
   showOz2: boolean;
+  showParcels: boolean;
   showOrangePilot: boolean;
+  parcelsLoading?: boolean;
   market: MarketId;
   county: string | null;
   countyState: string | null;
@@ -59,6 +61,7 @@ type SiteMapProps = {
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   onSelectTract: (geoid: string) => void;
+  onViewportIdle?: (bbox: [number, number, number, number], zoom: number) => void;
 };
 
 function geoidMatch(geoids: string[]): maplibregl.FilterSpecification {
@@ -218,7 +221,9 @@ export function SiteMap({
   showTraffic,
   showOz,
   showOz2,
+  showParcels,
   showOrangePilot,
+  parcelsLoading = false,
   market,
   county,
   countyState,
@@ -232,20 +237,22 @@ export function SiteMap({
   onSelect,
   onHover,
   onSelectTract,
+  onViewportIdle,
 }: SiteMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState("Loading map…");
   const [basemap, setBasemap] = useState<BasemapMode>("streets");
-  const callbacksRef = useRef({ onSelect, onHover, onSelectTract });
-  callbacksRef.current = { onSelect, onHover, onSelectTract };
+  const callbacksRef = useRef({ onSelect, onHover, onSelectTract, onViewportIdle });
+  callbacksRef.current = { onSelect, onHover, onSelectTract, onViewportIdle };
   const basemapRef = useRef(basemap);
   basemapRef.current = basemap;
   const boundsRef = useRef(bounds);
   boundsRef.current = bounds;
   const ruralPinsRef = useRef(ruralPins);
   ruralPinsRef.current = ruralPins;
+  const idleTimer = useRef<number | null>(null);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -302,6 +309,15 @@ export function SiteMap({
             map.getCanvas().style.cursor = "";
             callbacksRef.current.onHover(null);
           });
+          map.on("moveend", () => {
+            if (idleTimer.current) window.clearTimeout(idleTimer.current);
+            idleTimer.current = window.setTimeout(() => {
+              const cb = callbacksRef.current.onViewportIdle;
+              if (!cb) return;
+              const b = map.getBounds();
+              cb([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], map.getZoom());
+            }, 450);
+          });
 
           mapRef.current = map;
           setStatus("ready");
@@ -320,11 +336,22 @@ export function SiteMap({
     void start();
     return () => {
       cancelled = true;
+      if (idleTimer.current) window.clearTimeout(idleTimer.current);
       mapRef.current?.remove();
       mapRef.current = null;
     };
-    // Pins update through setData. Keeping them out of this effect avoids remounting the map.
-  }, [parcels, traffic, opportunityZones, oz2Tracts, ruralTracts]);
+    // Parcels / pins update through setData — remounting the map on every viewport refresh freezes the UI.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally omit parcels; see setData effect below
+  }, [traffic, opportunityZones, oz2Tracts, ruralTracts]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready") return;
+    const source = map.getSource("parcels");
+    if (source?.type === "geojson") {
+      (source as GeoJSONSource).setData(parcels);
+    }
+  }, [parcels, status]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -334,10 +361,10 @@ export function SiteMap({
       ids.length === 0 ? ["==", ["get", "id"], "__none__"] : ["in", ["get", "id"], ["literal", ids]];
     const excludedFilter: maplibregl.FilterSpecification = ["!", matchedFilter];
     const none: maplibregl.FilterSpecification = ["==", ["get", "id"], "__none__"];
-    map.setFilter("parcels-fill", showOrangePilot ? matchedFilter : none);
-    map.setFilter("parcels-line", showOrangePilot ? matchedFilter : none);
-    map.setFilter("parcels-fill-excluded", showOrangePilot && showExcluded ? excludedFilter : none);
-    map.setFilter("parcels-line-excluded", showOrangePilot && showExcluded ? excludedFilter : none);
+    map.setFilter("parcels-fill", showParcels ? matchedFilter : none);
+    map.setFilter("parcels-line", showParcels ? matchedFilter : none);
+    map.setFilter("parcels-fill-excluded", showParcels && showExcluded ? excludedFilter : none);
+    map.setFilter("parcels-line-excluded", showParcels && showExcluded ? excludedFilter : none);
     map.setLayoutProperty("traffic-line", "visibility", showOrangePilot && showTraffic ? "visible" : "none");
     map.setLayoutProperty("oz-fill", "visibility", showOrangePilot && showOz ? "visible" : "none");
     map.setLayoutProperty("oz-line", "visibility", showOrangePilot && showOz ? "visible" : "none");
@@ -373,6 +400,7 @@ export function SiteMap({
     showTraffic,
     showOz,
     showOz2,
+    showParcels,
     showOrangePilot,
     ozFilter,
     market,
@@ -490,8 +518,15 @@ export function SiteMap({
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
       {status === "ready" ? <BasemapToggle value={basemap} onChange={setBasemap} /> : null}
-      {status === "ready" && (showOz || showOz2) ? (
+      {status === "ready" && (showOz || showOz2 || showParcels) ? (
         <div className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[20rem] space-y-1 rounded-lg border border-white/10 bg-ink-900/90 px-2 py-1.5 text-[10px] leading-snug text-ink-300 sm:bottom-4 sm:left-4">
+          {showParcels ? (
+            <p>
+              <span className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle bg-moss-400" />
+              Parcels (matched)
+              {parcelsLoading ? " · refreshing viewport…" : ""}
+            </p>
+          ) : null}
           {showOz2 ? (
             <>
               <p>

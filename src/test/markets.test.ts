@@ -104,6 +104,12 @@ describe("seven-market rural OZ 2.0 pack", () => {
     expect(showOrangeCountyPilot("Atlanta", null, null)).toBe(false);
   });
 
+  it("documents Orlando shed parcels beyond the Orange sample", () => {
+    expect(catalog.parcelNote.toLowerCase()).toContain("brevard");
+    expect(catalog.parcelNote.toLowerCase()).toContain("volusia");
+    expect(catalog.parcelNote.toLowerCase()).not.toContain("parcel extract is orange county only");
+  });
+
   it("joins every GEOID to a 2020 tract polygon tagged rural and not designated", () => {
     const collection = JSON.parse(
       readFileSync("data/fixtures/oz2-rural-markets.geojson", "utf8"),

@@ -259,6 +259,11 @@ export type OpportunityZoneCollection = GeoJSON.FeatureCollection<
 export type ParcelProperties = {
   id: string;
   parcelId: string;
+  /** Five-digit county FIPS when known (Orlando shed partitions). */
+  countyFips?: string | null;
+  countyName?: string | null;
+  state?: string | null;
+  marketIds?: MarketId[];
   situsAddress: string | null;
   situsCity: string | null;
   situsZip: string | null;
@@ -281,7 +286,35 @@ export type ParcelProperties = {
   flu: FluInfo | null;
   opportunityZone: OpportunityZoneInfo | null;
   oz2Eligibility: Oz2EligibilityInfo | null;
+  /** County property appraiser / parcel search landing page when known. */
+  appraiserUrl?: string | null;
+  /** Honest per-county gaps (no zoning, etc.). */
+  dataGaps?: string[];
   source: string;
+};
+
+export type BBox = [west: number, south: number, east: number, north: number];
+
+export type OrlandoParcelCountyMeta = {
+  name: string;
+  fips: string;
+  featureCount: number;
+  ruralEligibleParcelCount: number;
+  source: string;
+  queryUrl: string;
+  gaps: string[];
+  path: string;
+};
+
+export type OrlandoParcelsMeta = {
+  generatedAt: string;
+  market: "Orlando";
+  parcelCount: number;
+  perCountyCap: number;
+  minAcres: number;
+  sourcesDoc: string;
+  notes: string[];
+  counties: OrlandoParcelCountyMeta[];
 };
 
 export type ParcelFeature = GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.MultiPolygon, ParcelProperties>;

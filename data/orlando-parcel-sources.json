@@ -1,0 +1,209 @@
+{
+  "market": "Orlando",
+  "state": "Florida",
+  "generatedFor": "Orlando ~90-minute drive shed (approximate county ring)",
+  "architecture": {
+    "fixtures": "Partitioned GeoJSON under data/fixtures/orlando-parcels/{fips}.geojson — filtered demo subset (acreage + rural-tract windows), not a multi-GB county dump.",
+    "runtime": "GET /api/parcels?market=Orlando&bbox=w,s,e,n loads intersecting fixture features. Optional source=live queries public ArcGIS by viewport (zoom-aware).",
+    "refresh": "npm run seed:parcels:orlando"
+  },
+  "primaryStack": {
+    "name": "Florida DOH EHWATER parcels (FDOR NAL attributes)",
+    "url": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer",
+    "notes": "Official public GIS joined to Florida DOR Name-Address-Legal tax-roll attributes. No zoning polygons. Acreage derived from LND_SQFOOT when present."
+  },
+  "fieldMapping": {
+    "id": "PARCEL_ID (prefixed with county FIPS)",
+    "parcelId": "PARCEL_ID",
+    "ownerName": "OWN_NAME",
+    "situsAddress": "PHY_ADDR1",
+    "situsCity": "PHY_CITY",
+    "situsZip": "PHY_ZIPCD",
+    "acreage": "LND_SQFOOT / 43560",
+    "dorCode": "DOR_UC",
+    "lastSale.price": "SALE_PRC1",
+    "lastSale.date": "SALE_YR1 + SALE_MO1",
+    "lastSale.qualified": "QUAL_CD1",
+    "tax.marketValue": "JV",
+    "tax.assessedValue": "AV_SD",
+    "tax.taxableValue": "TV_SD",
+    "mailingAddress": "OWN_ADDR1/2, OWN_CITY, OWN_STATE, OWN_ZIPCD",
+    "zoning": "null on DOH layer — degrade gracefully",
+    "flu": "null except Orange County OCPA pilot join"
+  },
+  "counties": [
+    {
+      "name": "Brevard",
+      "fips": "12009",
+      "dohLayerId": 4,
+      "status": "active",
+      "preferredSource": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/4/query",
+      "appraiserSearchUrl": "https://www.bcpao.us/PropertySearch/#/nav/Search",
+      "alternateSources": [
+        {
+          "name": "Brevard County Property Appraiser MapServer",
+          "url": "https://www.bcpao.us/arcgis/rest/services/Brevard_Detailed_Dynamic/MapServer/26",
+          "status": "blocked-403-from-this-environment",
+          "notes": "Official parcel layer exists but returned HTTP 403 here; DOH layer used instead."
+        }
+      ],
+      "gaps": ["No zoning on DOH extract", "BCPAO live endpoint may require allowlisted clients"]
+    },
+    {
+      "name": "Lake",
+      "fips": "12069",
+      "dohLayerId": 33,
+      "status": "active",
+      "preferredSource": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/33/query",
+      "appraiserSearchUrl": "https://www.lakecopropappr.com/",
+      "alternateSources": [
+        {
+          "name": "Lake County Open Data Tax Parcels",
+          "url": "https://gis.lakecountyfl.gov/lakegis/rest/services/OpenData/OpenData1/FeatureServer/12",
+          "status": "usable",
+          "notes": "Richer owner/sale fields; seed prefers DOH for shed-wide consistency."
+        }
+      ],
+      "gaps": ["No zoning on DOH extract"]
+    },
+    {
+      "name": "Marion",
+      "fips": "12083",
+      "dohLayerId": 40,
+      "status": "active",
+      "preferredSource": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/40/query",
+      "appraiserSearchUrl": "https://www.pa.marion.fl.us/",
+      "alternateSources": [
+        {
+          "name": "Marion County ParcelsAndSubdivisions",
+          "url": "https://gis.marionfl.org/public/rest/services/General/ParcelsAndSubdivisions/MapServer/0",
+          "status": "usable",
+          "notes": "Includes ZONE1/ZONE2/ZONE3; not wired into seed yet."
+        }
+      ],
+      "gaps": ["Zoning available on county MapServer but not joined in demo fixtures"]
+    },
+    {
+      "name": "Orange",
+      "fips": "12095",
+      "dohLayerId": 47,
+      "status": "active",
+      "preferredSource": "ocpa-webmap",
+      "queryUrl": "https://vgispublic.ocpafl.org/server/rest/services/Webmap/PARCEL/MapServer/4/query",
+      "appraiserSearchUrl": "https://ocpaweb.ocpafl.org/site/parcelsearch",
+      "alternateSources": [
+        {
+          "name": "DOH EHWATER Orange",
+          "url": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/47",
+          "status": "usable",
+          "notes": "Used for live viewport fills; OCPA remaining the zoning/FLU-rich pilot fixture."
+        }
+      ],
+      "gaps": ["Municipal FLU besides Orlando still incomplete on the OCPA pilot"]
+    },
+    {
+      "name": "Osceola",
+      "fips": "12097",
+      "dohLayerId": 48,
+      "status": "active",
+      "preferredSource": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/48/query",
+      "appraiserSearchUrl": "https://www.property-appraiser.org/",
+      "alternateSources": [
+        {
+          "name": "City of St Cloud Referenced Parcels",
+          "url": "https://arcgisweb.stcloud.org/arcgis/rest/services/Referenced_Layers/Parcels/MapServer/42",
+          "status": "partial-city-only",
+          "notes": "Has Zone1/sale/owner but is St Cloud–centric, not full county."
+        },
+        {
+          "name": "ECFRPC Basemap Osceola Parcels",
+          "url": "https://gis.ecfrpc.org/arcgis/rest/services/Basemap/MapServer/6",
+          "status": "geometry-only",
+          "notes": "PARCELNO only — insufficient attributes."
+        }
+      ],
+      "gaps": ["No county-wide zoning in fixtures"]
+    },
+    {
+      "name": "Polk",
+      "fips": "12105",
+      "dohLayerId": 52,
+      "status": "active",
+      "preferredSource": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/52/query",
+      "appraiserSearchUrl": "https://www.polkpa.org/",
+      "alternateSources": [
+        {
+          "name": "ArcGIS Online Polk_County_Parcels",
+          "url": "https://services7.arcgis.com/1PZmkk2mSW5b055Q/ArcGIS/rest/services/Polk_County_Parcels/FeatureServer/0",
+          "status": "rejected-wrong-state",
+          "notes": "Public AGOL item labeled Polk but geometries land in Minnesota (~45°N). Do not use."
+        }
+      ],
+      "gaps": ["No zoning on DOH extract"]
+    },
+    {
+      "name": "Seminole",
+      "fips": "12117",
+      "dohLayerId": 58,
+      "status": "active",
+      "preferredSource": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/58/query",
+      "appraiserSearchUrl": "https://www.scpafl.org/",
+      "alternateSources": [
+        {
+          "name": "Seminole County Parcels (PW Zoning AGO)",
+          "url": "https://services1.arcgis.com/v0YMSb0ovdJoIQKg/arcgis/rest/services/PW_Zoning_Landuse_Query_AGO/FeatureServer/2",
+          "status": "usable-limited-fields",
+          "notes": "Has OWNER/GIS_ACRES/situs fragments; no sale/tax depth."
+        }
+      ],
+      "gaps": ["No rural-eligible OZ 2.0 tracts in Seminole; parcels still load for market completeness"]
+    },
+    {
+      "name": "Sumter",
+      "fips": "12119",
+      "dohLayerId": 59,
+      "status": "active",
+      "preferredSource": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/59/query",
+      "appraiserSearchUrl": "https://www.sumterpa.com/",
+      "alternateSources": [
+        {
+          "name": "Sumter County Development Services Parcels",
+          "url": "https://gis.sumtercountyfl.gov/sumtergis/rest/services/DevelopmentServices/Development_Services_Base/MapServer/3",
+          "status": "usable",
+          "notes": "Owner/physical address/acres; used as secondary check."
+        },
+        {
+          "name": "SWFWMD Sumter County Parcels",
+          "url": "https://www25.swfwmd.state.fl.us/arcgis12/rest/services/BaseVector/parcel_search/MapServer/16",
+          "status": "usable"
+        }
+      ],
+      "gaps": ["No zoning on DOH extract"]
+    },
+    {
+      "name": "Volusia",
+      "fips": "12127",
+      "dohLayerId": 63,
+      "status": "active",
+      "preferredSource": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/63/query",
+      "appraiserSearchUrl": "https://vcpa.vcgov.org/",
+      "alternateSources": [
+        {
+          "name": "Volusia Open Data Parcel Ownership",
+          "url": "https://maps5.vcgov.org/arcgis/rest/services/Open_Data/Open_Data_3/FeatureServer/34",
+          "status": "usable",
+          "notes": "Rich owner/sale/just-value attributes."
+        }
+      ],
+      "gaps": ["No zoning on DOH extract"]
+    }
+  ]
+}

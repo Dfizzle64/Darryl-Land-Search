@@ -19,6 +19,8 @@ export const SATELLITE_SOURCE_ID = "basemap-satellite";
 export const SATELLITE_LAYER_ID = "basemap-satellite";
 
 export const OVERLAY_LAYER_IDS = [
+  "oz2-fill",
+  "oz2-line",
   "oz-fill",
   "oz-line",
   "traffic-line",
@@ -106,6 +108,25 @@ export function ozLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecificati
     : { "line-color": "#e4c36a", "line-width": 1.2, "line-opacity": 0.75 };
 }
 
+export function oz2FillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
+  const rural = mode === "satellite" ? "#5ee0a0" : "#3dbe86";
+  const other = mode === "satellite" ? "#9ec1ff" : "#5b8def";
+  return {
+    "fill-color": ["case", ["==", ["get", "rural"], true], rural, other],
+    "fill-opacity": mode === "satellite" ? 0.3 : 0.22,
+  };
+}
+
+export function oz2LinePaint(mode: BasemapMode): NonNullable<LineLayerSpecification["paint"]> {
+  const rural = mode === "satellite" ? "#e8fff3" : "#c8f5de";
+  const other = mode === "satellite" ? "#e4eeff" : "#d5e4ff";
+  return {
+    "line-color": ["case", ["==", ["get", "rural"], true], rural, other],
+    "line-width": ["case", ["==", ["get", "rural"], true], mode === "satellite" ? 2.8 : 2.4, mode === "satellite" ? 1.3 : 1],
+    "line-opacity": mode === "satellite" ? 0.95 : 0.85,
+  };
+}
+
 export function addSatelliteSourceAndLayer(map: MapLibreMap) {
   if (!map.getSource(SATELLITE_SOURCE_ID)) {
     map.addSource(SATELLITE_SOURCE_ID, {
@@ -159,4 +180,6 @@ export function applyBasemap(map: MapLibreMap, mode: BasemapMode) {
   setPaint(map, "traffic-line", trafficLinePaint(mode));
   setPaint(map, "oz-fill", ozFillPaint(mode));
   setPaint(map, "oz-line", ozLinePaint(mode));
+  setPaint(map, "oz2-fill", oz2FillPaint(mode));
+  setPaint(map, "oz2-line", oz2LinePaint(mode));
 }

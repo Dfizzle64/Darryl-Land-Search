@@ -16,7 +16,9 @@ import { findZoningHit } from "./zoning";
  *   acreage / income / AADT use a rising ramp from the active minimum toward
  *   a comfort margin (larger / higher-income / busier sites rank up).
  *   Land-use scores zoning + FLU fit, with a bonus for rezoning candidates.
- *   OZ is a 0/1 bonus when the filter is Either or In OZ.
+ *   OZ is a 0/1 bonus for a current designated QOZ when the filter is Either,
+ *   In OZ, or an OZ 2.0 eligibility filter. OZ 2.0 nomination status is a
+ *   filter, not a score component. The weight is dropped only for “Not in OZ”.
  */
 export const SCORE_WEIGHTS = {
   acreage: 0.28,

@@ -12,6 +12,7 @@ import {
   type FilterState,
   type FluConfig,
   type OpportunityZoneCollection,
+  type Oz2TractCollection,
   type ParcelCollection,
   type ZoningConfig,
 } from "@/lib/types";
@@ -20,6 +21,7 @@ type AppShellProps = {
   parcels: ParcelCollection;
   traffic: GeoJSON.FeatureCollection<GeoJSON.LineString>;
   opportunityZones: OpportunityZoneCollection;
+  oz2Tracts: Oz2TractCollection;
   zoningConfig: ZoningConfig;
   fluConfig: FluConfig;
   meta: Record<string, unknown>;
@@ -29,6 +31,7 @@ export function AppShell({
   parcels,
   traffic,
   opportunityZones,
+  oz2Tracts,
   zoningConfig,
   fluConfig,
   meta,
@@ -39,6 +42,7 @@ export function AppShell({
   const [showExcluded, setShowExcluded] = useState(false);
   const [showTraffic, setShowTraffic] = useState(true);
   const [showOz, setShowOz] = useState(false);
+  const [showOz2, setShowOz2] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sitesOpen, setSitesOpen] = useState(false);
   const [error] = useState<string | null>(null);
@@ -121,6 +125,8 @@ export function AppShell({
           onShowTraffic={setShowTraffic}
           showOz={showOz}
           onShowOz={setShowOz}
+          showOz2={showOz2}
+          onShowOz2={setShowOz2}
           open={filtersOpen}
           onClose={() => setFiltersOpen(false)}
           meta={meta}
@@ -130,12 +136,15 @@ export function AppShell({
             parcels={parcels}
             traffic={traffic}
             opportunityZones={opportunityZones}
+            oz2Tracts={oz2Tracts}
             matchedIds={matchedIds}
             selectedId={selectedId}
             hoveredId={hoveredId}
             showExcluded={showExcluded}
             showTraffic={showTraffic}
             showOz={showOz}
+            showOz2={showOz2}
+            ozFilter={filters.ozFilter}
             onSelect={selectSite}
             onHover={setHoveredId}
           />

@@ -5,6 +5,7 @@ import {
   OVERLAY_LAYER_IDS,
   excludedFillPaint,
   excludedLinePaint,
+  OZ_TRACT_SWATCH,
   oz2FillPaint,
   oz2LinePaint,
   ozFillPaint,
@@ -58,13 +59,39 @@ describe("basemap helpers", () => {
     expect(Number(ozLinePaint("satellite")["line-opacity"])).toBeGreaterThan(
       Number(ozLinePaint("streets")["line-opacity"]),
     );
-    expect(Number(oz2FillPaint("satellite")["fill-opacity"])).toBeGreaterThan(
-      Number(oz2FillPaint("streets")["fill-opacity"]),
+    const streetOz2Opacity = oz2FillPaint("streets")["fill-opacity"];
+    const satelliteOz2Opacity = oz2FillPaint("satellite")["fill-opacity"];
+    expect(Array.isArray(streetOz2Opacity) ? streetOz2Opacity[3] : streetOz2Opacity).toBeLessThan(
+      Array.isArray(satelliteOz2Opacity) ? Number(satelliteOz2Opacity[3]) : Number(satelliteOz2Opacity),
     );
-    expect(JSON.stringify(oz2FillPaint("streets")["fill-color"])).toContain("#3dbe86");
-    expect(JSON.stringify(oz2FillPaint("streets")["fill-color"])).toContain("#5b8def");
+    expect(JSON.stringify(oz2FillPaint("streets")["fill-color"])).toContain(OZ_TRACT_SWATCH.rural);
+    expect(JSON.stringify(oz2FillPaint("streets")["fill-color"])).toContain(OZ_TRACT_SWATCH.eligible);
+    expect(ozFillPaint("streets")["fill-color"]).toBe(OZ_TRACT_SWATCH.designated);
+    expect(ozLinePaint("streets")["line-dasharray"]).toEqual([2, 1.2]);
     expect(Number(oz2LinePaint("satellite")["line-opacity"])).toBeGreaterThan(
       Number(oz2LinePaint("streets")["line-opacity"]),
     );
+  });
+
+  it("paints census tracts in distinct oranges and leaves parcel fills green", () => {
+    const parcelFill = JSON.stringify(parcelFillPaint("streets")["fill-color"]);
+    expect(parcelFill).toContain("#3f9d74");
+
+    const rural = OZ_TRACT_SWATCH.rural;
+    const eligible = OZ_TRACT_SWATCH.eligible;
+    const designated = OZ_TRACT_SWATCH.designated;
+    expect(new Set([rural, eligible, designated]).size).toBe(3);
+
+    const tractPaint = [
+      JSON.stringify(oz2FillPaint("streets")),
+      JSON.stringify(oz2FillPaint("satellite")),
+      JSON.stringify(ozFillPaint("streets")),
+      JSON.stringify(ozFillPaint("satellite")),
+    ].join(" ");
+    expect(tractPaint).not.toMatch(/#3dbe86|#5ee0a0|#5b8def|#9ec1ff|#3f9d74/i);
+    expect(JSON.stringify(oz2FillPaint("streets")["fill-opacity"])).toContain("0.32");
+    expect(JSON.stringify(oz2FillPaint("streets")["fill-opacity"])).toContain("0.22");
+    expect(JSON.stringify(oz2LinePaint("streets")["line-width"])).toContain("2.5");
+    expect(JSON.stringify(oz2LinePaint("streets")["line-width"])).toContain("1.05");
   });
 });

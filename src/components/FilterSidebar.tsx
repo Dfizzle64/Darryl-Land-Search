@@ -221,13 +221,13 @@ export function FilterSidebar({
             label="Show OZ 2.0 eligible tracts"
             checked={showOz2}
             onChange={onShowOz2}
-            hint="2020 tracts eligible for nomination. Green is rural-eligible; blue is eligible and not rural."
+            hint="2020 tracts eligible for nomination. Orange is rural-eligible; amber is eligible and not rural."
           />
           <Toggle
             label="Show designated Opportunity Zone overlay"
             checked={showOz}
             onChange={onShowOz}
-            hint="Current HUD/Treasury QOZ tracts (2010 geography). Gold fill on the map."
+            hint="Current HUD/Treasury QOZ tracts (2010 geography). Copper fill with a dashed outline."
           />
         </section>
 
@@ -348,7 +348,7 @@ export function FilterSidebar({
         <p className="mt-6 text-[11px] leading-relaxed text-ink-500">
           Fixture snapshot {generatedAt ?? "unknown"}. Owner, sale, tax, and acreage come from the Orange County
           Property Appraiser public GIS layer. FLU is joined from Orange County and Orlando open data. Opportunity
-          Zones shown in gold are current designated QOZs. OZ 2.0 tracts are Rev. Proc. 2026-14 nomination eligibility (not 2027 designations); rural flags are the official Rural Status column and Notice 2025-50. Income is ACS median household income. AADT is the
+          Zones shown in copper with a dashed outline are current designated QOZs. OZ 2.0 tracts are Rev. Proc. 2026-14 nomination eligibility (not 2027 designations); orange is rural-eligible and amber is eligible but not rural. Rural flags are the official Rural Status column and Notice 2025-50. Income is ACS median household income. AADT is the
           nearest FDOT count segment.
         </p>
       </aside>

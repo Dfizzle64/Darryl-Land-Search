@@ -96,34 +96,49 @@ export function trafficLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecif
   };
 }
 
+/**
+ * Census-tract overlay swatches (street basemap). Orange/amber so tracts stay
+ * distinct from green parcel fills. Satellite paint uses brighter variants.
+ */
+export const OZ_TRACT_SWATCH = {
+  /** Stronger, warmer orange — OZ 2.0 rural-eligible tracts. */
+  rural: "#f15a08",
+  /** Lighter amber — OZ 2.0 eligible tracts that are not rural. */
+  eligible: "#f0b429",
+  /** Copper accent — current designated QOZ tracts (dashed outline on the map). */
+  designated: "#c46a2f",
+} as const;
+
 export function ozFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
   return mode === "satellite"
-    ? { "fill-color": "#f4c15d", "fill-opacity": 0.22 }
-    : { "fill-color": "#c9a227", "fill-opacity": 0.18 };
+    ? { "fill-color": "#e88845", "fill-opacity": 0.36 }
+    : { "fill-color": OZ_TRACT_SWATCH.designated, "fill-opacity": 0.26 };
 }
 
 export function ozLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecification["paint"]> {
   return mode === "satellite"
-    ? { "line-color": "#ffe08a", "line-width": 1.6, "line-opacity": 0.9 }
-    : { "line-color": "#e4c36a", "line-width": 1.2, "line-opacity": 0.75 };
+    ? { "line-color": "#ffe4cf", "line-width": 2.1, "line-opacity": 0.95, "line-dasharray": [2, 1.2] }
+    : { "line-color": "#f6d0b0", "line-width": 1.7, "line-opacity": 0.88, "line-dasharray": [2, 1.2] };
 }
 
 export function oz2FillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
-  const rural = mode === "satellite" ? "#5ee0a0" : "#3dbe86";
-  const other = mode === "satellite" ? "#9ec1ff" : "#5b8def";
+  const rural = mode === "satellite" ? "#ff7a29" : OZ_TRACT_SWATCH.rural;
+  const other = mode === "satellite" ? "#ffd56a" : OZ_TRACT_SWATCH.eligible;
+  const ruralOpacity = mode === "satellite" ? 0.42 : 0.32;
+  const otherOpacity = mode === "satellite" ? 0.32 : 0.22;
   return {
     "fill-color": ["case", ["==", ["get", "rural"], true], rural, other],
-    "fill-opacity": mode === "satellite" ? 0.3 : 0.22,
+    "fill-opacity": ["case", ["==", ["get", "rural"], true], ruralOpacity, otherOpacity],
   };
 }
 
 export function oz2LinePaint(mode: BasemapMode): NonNullable<LineLayerSpecification["paint"]> {
-  const rural = mode === "satellite" ? "#e8fff3" : "#c8f5de";
-  const other = mode === "satellite" ? "#e4eeff" : "#d5e4ff";
+  const rural = mode === "satellite" ? "#ffe6d4" : "#ffd0b0";
+  const other = mode === "satellite" ? "#fff3d4" : "#ffe7ad";
   return {
     "line-color": ["case", ["==", ["get", "rural"], true], rural, other],
-    "line-width": ["case", ["==", ["get", "rural"], true], mode === "satellite" ? 2.8 : 2.4, mode === "satellite" ? 1.3 : 1],
-    "line-opacity": mode === "satellite" ? 0.95 : 0.85,
+    "line-width": ["case", ["==", ["get", "rural"], true], mode === "satellite" ? 2.8 : 2.5, mode === "satellite" ? 1.35 : 1.05],
+    "line-opacity": mode === "satellite" ? 0.96 : 0.88,
   };
 }
 

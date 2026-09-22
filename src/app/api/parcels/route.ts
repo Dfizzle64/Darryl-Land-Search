@@ -47,7 +47,7 @@ export async function GET(request: Request) {
   const state = url.searchParams.get("state") ?? (county ? "Florida" : null);
   const bbox = parseBbox(url.searchParams.get("bbox"));
   const source = url.searchParams.get("source") === "live" ? "live" : "fixture";
-  const limit = Number(url.searchParams.get("limit") ?? (source === "live" ? 800 : 5000));
+  const limit = Number(url.searchParams.get("limit") ?? (source === "live" ? 800 : 4000));
   const applyFilters = url.searchParams.get("filter") === "1";
 
   const filters: FilterState = {
@@ -67,16 +67,24 @@ export async function GET(request: Request) {
 
   try {
     const provider = getParcelProvider();
-    let collection =
+    let page =
       market === "Orlando" && provider.queryOrlandoParcels
         ? await provider.queryOrlandoParcels({
             bbox,
             county,
             state,
-            limit: Number.isFinite(limit) ? limit : 5000,
+            limit: Number.isFinite(limit) ? Math.min(limit, 8000) : 4000,
             source,
           })
-        : await provider.listParcels();
+        : {
+            collection: await provider.listParcels(),
+            totalInBbox: 0,
+            truncated: false,
+          };
+    let collection = page.collection;
+    if (market !== "Orlando") {
+      page = { collection, totalInBbox: collection.features.length, truncated: false };
+    }
 
     if (applyFilters) {
       const [zoningConfig, fluConfig] = await Promise.all([loadZoningConfig(), loadFluConfig()]);
@@ -96,6 +104,8 @@ export async function GET(request: Request) {
         bbox,
         source,
         total: collection.features.length,
+        totalInBbox: applyFilters ? collection.features.length : page.totalInBbox,
+        truncated: applyFilters ? false : page.truncated,
         filters: applyFilters ? filters : undefined,
       },
     });

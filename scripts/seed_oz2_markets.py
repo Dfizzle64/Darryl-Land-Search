@@ -320,8 +320,10 @@ def main() -> None:
         "rowCount": len(rows),
         "uniqueGeoidCount": len(unique),
         "parcelNote": (
-            "Parcel polygons, zoning, FLU, income, and AADT in this app are the Orange County, Florida sample. "
-            "Other counties in these sheds are tract overlays and Gazetteer pins only."
+            "Lake, Orange, Osceola, Polk, and Seminole include every public parcel from 5.0 through 150.0 acres from Florida DOH EHWATER "
+            "(parcels under 5 or over 150 are excluded; Orange zoning and FLU from OCPA and county open data). "
+            "Brevard, Marion, Sumter, and Volusia remain thinner samples. "
+            "Other metros stay rural-tract overlays."
         ),
         "markets": markets,
         "rows": rows,

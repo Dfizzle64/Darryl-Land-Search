@@ -1,14 +1,27 @@
-import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { access, readFile } from "node:fs/promises";
 import {
+  ORLANDO_CORE_ACREAGE,
+  ORLANDO_CORE_SQFT,
   ORLANDO_DOH_LAYER_BY_FIPS,
   ORLANDO_DOH_PARCELS_BASE,
   ORLANDO_NAME_BY_FIPS,
   featureIntersectsBbox,
   fipsForOrlandoCountyFilter,
   fipsIntersectingBbox,
+  isFull5AcCounty,
+  spatiallyThinFeatures,
+  tileFileName,
+  tileIndicesForBbox,
 } from "../orlandoParcels";
-import type { BBox, OrlandoParcelsMeta, ParcelCollection, ParcelFeature, ParcelProperties } from "../types";
+import type {
+  BBox,
+  OrlandoParcelCountyMeta,
+  OrlandoParcelsMeta,
+  ParcelCollection,
+  ParcelFeature,
+  ParcelProperties,
+} from "../types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const PARTITION_DIR = path.join(DATA_DIR, "fixtures/orlando-parcels");
@@ -35,8 +48,16 @@ const DOH_OUT_FIELDS = [
   "OWN_ZIPCD",
 ].join(",");
 
-let cachedCollection: ParcelCollection | null = null;
 let cachedMeta: OrlandoParcelsMeta | null = null;
+const tileCache = new Map<string, ParcelFeature[]>();
+const lookupCache = new Map<string, Record<string, string>>();
+const TILE_CACHE_LIMIT = 48;
+
+export type OrlandoParcelPage = {
+  collection: ParcelCollection;
+  totalInBbox: number;
+  truncated: boolean;
+};
 
 function normalizeParcel(feature: ParcelFeature): ParcelFeature {
   const props = feature.properties as ParcelProperties;
@@ -57,22 +78,51 @@ export async function loadOrlandoParcelsMeta(): Promise<OrlandoParcelsMeta> {
   return cachedMeta;
 }
 
-export async function loadOrlandoParcelCollection(): Promise<ParcelCollection> {
-  if (cachedCollection) return cachedCollection;
-  const meta = await loadOrlandoParcelsMeta();
-  const features: ParcelFeature[] = [];
-  for (const county of meta.counties) {
-    const raw = await readFile(path.join(process.cwd(), county.path), "utf8");
-    const collection = JSON.parse(raw) as ParcelCollection;
-    for (const feature of collection.features) {
-      features.push(normalizeParcel(feature));
-    }
+async function readFeatureFile(relativePath: string): Promise<ParcelFeature[]> {
+  const cached = tileCache.get(relativePath);
+  if (cached) return cached;
+  try {
+    await access(path.join(process.cwd(), relativePath));
+  } catch {
+    return [];
   }
-  cachedCollection = {
-    type: "FeatureCollection",
-    features,
-  };
-  return cachedCollection;
+  const raw = await readFile(path.join(process.cwd(), relativePath), "utf8");
+  const collection = JSON.parse(raw) as ParcelCollection;
+  const features = collection.features.map((feature) => normalizeParcel(feature));
+  tileCache.set(relativePath, features);
+  if (tileCache.size > TILE_CACHE_LIMIT) {
+    const oldest = tileCache.keys().next().value;
+    if (oldest) tileCache.delete(oldest);
+  }
+  return features;
+}
+
+function countyByFips(meta: OrlandoParcelsMeta, fips: string): OrlandoParcelCountyMeta | undefined {
+  return meta.counties.find((county) => county.fips === fips);
+}
+
+async function featuresForCountyBbox(county: OrlandoParcelCountyMeta, bbox: BBox | null): Promise<ParcelFeature[]> {
+  if (county.partition === "tiles") {
+    if (!bbox) {
+      const { readdir } = await import("node:fs/promises");
+      const dir = path.join(process.cwd(), county.path);
+      const names = await readdir(dir);
+      const groups = await Promise.all(
+        names.filter((name) => name.endsWith(".geojson")).map((name) => readFeatureFile(path.join(county.path, name))),
+      );
+      return groups.flat();
+    }
+    const { ix0, ix1, iy0, iy1 } = tileIndicesForBbox(bbox);
+    const paths: string[] = [];
+    for (let ix = ix0; ix <= ix1; ix += 1) {
+      for (let iy = iy0; iy <= iy1; iy += 1) {
+        paths.push(path.join(county.path, tileFileName(ix, iy)));
+      }
+    }
+    const groups = await Promise.all(paths.map((tilePath) => readFeatureFile(tilePath)));
+    return groups.flat();
+  }
+  return readFeatureFile(county.path);
 }
 
 export type OrlandoParcelQuery = {
@@ -82,20 +132,54 @@ export type OrlandoParcelQuery = {
   limit?: number;
 };
 
-export async function queryOrlandoFixtureParcels(query: OrlandoParcelQuery = {}): Promise<ParcelCollection> {
-  const collection = await loadOrlandoParcelCollection();
-  const fipsAllow = new Set(fipsForOrlandoCountyFilter(query.county ?? null, query.state ?? "Florida"));
+export async function queryOrlandoFixtureParcels(query: OrlandoParcelQuery = {}): Promise<OrlandoParcelPage> {
+  const meta = await loadOrlandoParcelsMeta();
+  const fipsAllow = fipsIntersectingBbox(
+    query.bbox ?? null,
+    fipsForOrlandoCountyFilter(query.county ?? null, query.state ?? "Florida"),
+  );
   const bbox = query.bbox ?? null;
-  const limit = query.limit ?? 5000;
-  const features: ParcelFeature[] = [];
-  for (const feature of collection.features) {
-    const fips = feature.properties.countyFips;
-    if (fips && !fipsAllow.has(fips)) continue;
-    if (!featureIntersectsBbox(feature.properties.centroid, bbox)) continue;
-    features.push(feature);
-    if (features.length >= limit) break;
+  const limit = query.limit ?? 4000;
+  const groups = await Promise.all(
+    fipsAllow.map(async (fips) => {
+      const county = countyByFips(meta, fips);
+      if (!county) return [];
+      const features = await featuresForCountyBbox(county, bbox);
+      if (!bbox) return features;
+      return features.filter((feature) => featureIntersectsBbox(feature.properties.centroid, bbox));
+    }),
+  );
+  const matched = groups.flat();
+  const thinned = spatiallyThinFeatures(matched, limit);
+  return {
+    collection: { type: "FeatureCollection", features: thinned },
+    totalInBbox: matched.length,
+    truncated: thinned.length < matched.length,
+  };
+}
+
+export async function getOrlandoFixtureParcel(id: string): Promise<ParcelFeature | null> {
+  const split = id.indexOf(":");
+  if (split <= 0) return null;
+  const fips = id.slice(0, split);
+  const parcelId = id.slice(split + 1);
+  const meta = await loadOrlandoParcelsMeta();
+  const county = countyByFips(meta, fips);
+  if (!county) return null;
+  if (county.partition === "tiles") {
+    let lookup = lookupCache.get(fips);
+    if (!lookup) {
+      const raw = await readFile(path.join(PARTITION_DIR, "lookup", `${fips}.json`), "utf8");
+      lookup = JSON.parse(raw) as Record<string, string>;
+      lookupCache.set(fips, lookup);
+    }
+    const tile = lookup[parcelId];
+    if (!tile) return null;
+    const features = await readFeatureFile(path.join(county.path, `${tile}.geojson`));
+    return features.find((feature) => feature.properties.id === id) ?? null;
   }
-  return { type: "FeatureCollection", features };
+  const features = await readFeatureFile(county.path);
+  return features.find((feature) => feature.properties.id === id) ?? null;
 }
 
 function num(value: unknown): number | null {
@@ -174,6 +258,13 @@ function normalizeLiveFeature(
   if (!parcelId) return null;
   const sqft = num(attrs.LND_SQFOOT);
   const acreage = sqft && sqft > 0 ? Math.round((sqft / 43560) * 10000) / 10000 : null;
+  const coreCounty = isFull5AcCounty(ORLANDO_NAME_BY_FIPS[fips]);
+  if (
+    coreCounty &&
+    (acreage == null || acreage < ORLANDO_CORE_ACREAGE.min || acreage > ORLANDO_CORE_ACREAGE.max)
+  ) {
+    return null;
+  }
   const price = num(attrs.SALE_PRC1);
   const id = `${fips}:${parcelId}`;
   const countyName = ORLANDO_NAME_BY_FIPS[fips] ?? null;
@@ -232,7 +323,9 @@ async function queryDohLayer(fips: string, bbox: BBox, limit: number): Promise<P
   if (layerId == null) return [];
   const [west, south, east, north] = bbox;
   const params = new URLSearchParams({
-    where: "LND_SQFOOT > 21780",
+    where: isFull5AcCounty(ORLANDO_NAME_BY_FIPS[fips])
+      ? `LND_SQFOOT >= ${ORLANDO_CORE_SQFT.min} AND LND_SQFOOT <= ${ORLANDO_CORE_SQFT.max}`
+      : `LND_SQFOOT >= ${ORLANDO_CORE_SQFT.min}`,
     geometry: JSON.stringify({
       xmin: west,
       ymin: south,

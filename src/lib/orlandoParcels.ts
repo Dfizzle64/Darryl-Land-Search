@@ -39,6 +39,91 @@ export const ORLANDO_DOH_LAYER_BY_FIPS: Record<string, number> = {
 export const ORLANDO_DOH_PARCELS_BASE =
   "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer";
 
+/**
+ * Viewport tile grid for the complete 5–150 acre extracts.
+ * Keep in sync with ORIGIN_LON / ORIGIN_LAT / TILE_DEG in scripts/seed_orlando_parcels.py.
+ */
+export const ORLANDO_PARCEL_TILE = {
+  originLon: -83,
+  originLat: 27,
+  tileDeg: 0.25,
+} as const;
+
+/** Inclusive acreage band for the five complete counties (FDOR land area). */
+export const ORLANDO_CORE_ACREAGE = { min: 5, max: 150 } as const;
+
+/** FDOR LND_SQFOOT bounds for that band (acres × 43,560). */
+export const ORLANDO_CORE_SQFT = { min: 217_800, max: 6_534_000 } as const;
+
+/** Counties whose fixtures are every public parcel from 5.0 through 150.0 acres. */
+export const ORLANDO_FULL_5AC_COUNTIES = ["Lake", "Orange", "Osceola", "Polk", "Seminole"] as const;
+
+export const ORLANDO_SAMPLE_COUNTIES = ["Brevard", "Marion", "Sumter", "Volusia"] as const;
+
+export function isFull5AcCounty(county: string | null | undefined): boolean {
+  return Boolean(county && (ORLANDO_FULL_5AC_COUNTIES as readonly string[]).includes(county));
+}
+
+export function tileIndicesForBbox(bbox: BBox): { ix0: number; ix1: number; iy0: number; iy1: number } {
+  const [west, south, east, north] = bbox;
+  const { originLon, originLat, tileDeg } = ORLANDO_PARCEL_TILE;
+  return {
+    ix0: Math.floor((west - originLon) / tileDeg),
+    ix1: Math.floor((east - originLon) / tileDeg),
+    iy0: Math.floor((south - originLat) / tileDeg),
+    iy1: Math.floor((north - originLat) / tileDeg),
+  };
+}
+
+export function tileFileName(ix: number, iy: number): string {
+  return `${ix}_${iy}.geojson`;
+}
+
+/**
+ * When a viewport holds more parcels than the browser should draw, keep a
+ * spatially even subset (largest acreage first inside each cell).
+ */
+export function spatiallyThinFeatures<T extends { properties: { centroid?: [number, number]; acreage: number | null } }>(
+  features: T[],
+  limit: number,
+  cellDeg = 0.045,
+): T[] {
+  if (features.length <= limit) return features;
+  const buckets = new Map<string, T[]>();
+  for (const feature of features) {
+    const centroid = feature.properties.centroid;
+    if (!centroid) {
+      const list = buckets.get("none") ?? [];
+      list.push(feature);
+      buckets.set("none", list);
+      continue;
+    }
+    const key = `${Math.floor(centroid[0] / cellDeg)}:${Math.floor(centroid[1] / cellDeg)}`;
+    const list = buckets.get(key) ?? [];
+    list.push(feature);
+    buckets.set(key, list);
+  }
+  for (const list of buckets.values()) {
+    list.sort((a, b) => (b.properties.acreage ?? 0) - (a.properties.acreage ?? 0));
+  }
+  const keys = Array.from(buckets.keys());
+  const out: T[] = [];
+  let depth = 0;
+  while (out.length < limit) {
+    let progressed = false;
+    for (const key of keys) {
+      const list = buckets.get(key);
+      if (!list || depth >= list.length) continue;
+      out.push(list[depth]);
+      progressed = true;
+      if (out.length >= limit) break;
+    }
+    if (!progressed) break;
+    depth += 1;
+  }
+  return out;
+}
+
 export function isOrlandoShedCounty(county: string | null, state: string | null): boolean {
   if (!county || state !== "Florida") return false;
   return Boolean(ORLANDO_FIPS_BY_NAME[county]);

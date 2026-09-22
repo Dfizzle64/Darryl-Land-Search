@@ -1,6 +1,12 @@
 import type { ParcelCollection, ParcelFeature } from "../types";
 import { loadParcelCollection } from "./loadFixtures";
-import { queryOrlandoFixtureParcels, queryOrlandoLiveParcels, type OrlandoParcelQuery } from "./orlandoParcelStore";
+import {
+  getOrlandoFixtureParcel,
+  queryOrlandoFixtureParcels,
+  queryOrlandoLiveParcels,
+  type OrlandoParcelPage,
+  type OrlandoParcelQuery,
+} from "./orlandoParcelStore";
 
 /**
  * Data-source adapters. The pilot ships on fixtures so `npm run dev` works
@@ -15,7 +21,7 @@ export interface ParcelProvider {
   id: string;
   listParcels(): Promise<ParcelCollection>;
   getParcel(id: string): Promise<ParcelFeature | null>;
-  queryOrlandoParcels?(query: OrlandoParcelQuery & { source?: "fixture" | "live" }): Promise<ParcelCollection>;
+  queryOrlandoParcels?(query: OrlandoParcelQuery & { source?: "fixture" | "live" }): Promise<OrlandoParcelPage>;
 }
 
 export class FixtureParcelProvider implements ParcelProvider {
@@ -27,18 +33,18 @@ export class FixtureParcelProvider implements ParcelProvider {
   }
 
   async getParcel(id: string): Promise<ParcelFeature | null> {
-    const orlando = await queryOrlandoFixtureParcels({ limit: 20000 });
-    const hit = orlando.features.find((feature) => feature.properties.id === id);
-    if (hit) return hit;
+    const orlando = await getOrlandoFixtureParcel(id);
+    if (orlando) return orlando;
     const collection = await this.listParcels();
     return collection.features.find((feature) => feature.properties.id === id) ?? null;
   }
 
   async queryOrlandoParcels(
     query: OrlandoParcelQuery & { source?: "fixture" | "live" },
-  ): Promise<ParcelCollection> {
+  ): Promise<OrlandoParcelPage> {
     if (query.source === "live") {
-      return queryOrlandoLiveParcels(query);
+      const collection = await queryOrlandoLiveParcels(query);
+      return { collection, totalInBbox: collection.features.length, truncated: false };
     }
     return queryOrlandoFixtureParcels(query);
   }
@@ -103,7 +109,7 @@ export class OcpaLiveParcelProvider implements ParcelProvider {
 
   async queryOrlandoParcels(
     query: OrlandoParcelQuery & { source?: "fixture" | "live" },
-  ): Promise<ParcelCollection> {
+  ): Promise<OrlandoParcelPage> {
     return new FixtureParcelProvider().queryOrlandoParcels!(query);
   }
 }

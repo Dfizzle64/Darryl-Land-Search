@@ -295,11 +295,27 @@ export type ParcelProperties = {
 
 export type BBox = [west: number, south: number, east: number, north: number];
 
+export type OrlandoParcelCoverage = "complete-gte-5ac" | "sample";
+
 export type OrlandoParcelCountyMeta = {
   name: string;
   fips: string;
   featureCount: number;
   ruralEligibleParcelCount: number;
+  oz2EligibleParcelCount?: number;
+  zoningJoinedCount?: number;
+  fluJoinedCount?: number;
+  ocpaMatchedCount?: number;
+  sourceCount?: number;
+  droppedNoGeometry?: number;
+  tileCount?: number;
+  coverage: OrlandoParcelCoverage;
+  partition: "tiles" | "file";
+  minAcres: number;
+  /** Inclusive upper bound for complete counties (150). Sample counties omit this. */
+  maxAcres?: number;
+  /** Parcels removed because stored acreage was above maxAcres. */
+  excludedOverMaxAcres?: number;
   source: string;
   queryUrl: string;
   gaps: string[];
@@ -310,8 +326,11 @@ export type OrlandoParcelsMeta = {
   generatedAt: string;
   market: "Orlando";
   parcelCount: number;
-  perCountyCap: number;
-  minAcres: number;
+  perCountyCap: number | null;
+  minAcres: number | null;
+  coreMinAcres: number;
+  coreMaxAcres: number;
+  tile: { originLon: number; originLat: number; tileDeg: number };
   sourcesDoc: string;
   notes: string[];
   counties: OrlandoParcelCountyMeta[];

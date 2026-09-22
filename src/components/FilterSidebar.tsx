@@ -174,7 +174,7 @@ export function FilterSidebar({
           <p className="text-xs uppercase tracking-[0.16em] text-ink-500">Results</p>
           <p className="mt-1 font-display text-3xl text-white">{matchedCount.toLocaleString()}</p>
           <p className="text-xs text-ink-500">
-            matching {totalCount.toLocaleString()} {orlandoParcels ? "loaded parcels" : "sample parcels"}
+            matching {totalCount.toLocaleString()} {orlandoParcels ? "parcels in this view" : "sample parcels"}
           </p>
           <button
             type="button"
@@ -303,7 +303,9 @@ export function FilterSidebar({
           </label>
           <p className="text-xs text-ink-500">
             Slider runs 0–{ACREAGE_SLIDER.max} acres. Larger parcels still match any threshold at or below{" "}
-            {ACREAGE_SLIDER.max} ac. Orlando shed fixtures favor ≥1 acre windows around rural tracts.
+            {ACREAGE_SLIDER.max} ac. Lake, Orange, Osceola, Polk, and Seminole fixtures include every public parcel from
+            5.0 through 150.0 acres. Parcels under 5 or over 150 are excluded. Brevard, Marion, Sumter, and Volusia are
+            still smaller samples.
           </p>
           <Toggle
             label="Include unknown acreage"

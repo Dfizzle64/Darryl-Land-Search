@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/AppShell";
-import { loadOrlandoParcelCollection, loadOrlandoParcelsMeta } from "@/lib/data/orlandoParcelStore";
+import { loadOrlandoParcelsMeta } from "@/lib/data/orlandoParcelStore";
+import type { ParcelCollection } from "@/lib/types";
 import {
   loadFixtureMeta,
   loadFluConfig,
@@ -15,8 +16,8 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  const emptyParcels: ParcelCollection = { type: "FeatureCollection", features: [] };
   const [
-    orlandoParcels,
     orlandoParcelsMeta,
     traffic,
     opportunityZones,
@@ -28,7 +29,6 @@ export default async function HomePage() {
     fluConfig,
     meta,
   ] = await Promise.all([
-    loadOrlandoParcelCollection(),
     loadOrlandoParcelsMeta(),
     loadTrafficCollection(),
     loadOpportunityZones(),
@@ -44,12 +44,12 @@ export default async function HomePage() {
   const catalog = {
     ...ruralCatalog,
     parcelNote:
-      "Orlando market loads partitioned parcel fixtures for Brevard, Lake, Marion, Orange, Osceola, Polk, Seminole, Sumter, and Volusia (public GIS). Zoning/FLU/AADT richness is Orange County first; other counties degrade gracefully. Other metros remain tract overlays until their parcel seeds land.",
+      "Lake, Orange, Osceola, Polk, and Seminole load every public parcel from 5.0 through 150.0 acres (Florida DOH EHWATER; Orange zoning and FLU from OCPA and county open data). Parcels under 5 or over 150 are excluded. Brevard, Marion, Sumter, and Volusia stay thinner samples. The map requests the current viewport so the full extract stays responsive. Other metros remain tract overlays.",
   };
 
   return (
     <AppShell
-      parcels={orlandoParcels}
+      parcels={emptyParcels}
       orlandoParcelsMeta={orlandoParcelsMeta}
       traffic={traffic}
       opportunityZones={opportunityZones}

@@ -2,6 +2,7 @@
 
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { formatCountyLabel, isSouthCarolinaState } from "@/lib/markets";
+import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME } from "@/lib/orlandoParcels";
 import { MF_PRIORITY_DISCLAIMER, NOM_WATCH_CAVEAT, tractPlaceLabel } from "@/lib/scMfPriority";
 import { RURAL_ELIGIBLE_STATUS_CHIP, SC_GOVERNOR_FILED_STATUS, SHED_CAVEAT, type RuralMarketTractRow } from "@/lib/types";
 
@@ -27,7 +28,6 @@ export function TractDrawer({ tract, statusHelp = null, onClose }: TractDrawerPr
     );
   }
 
-  const orangePilotTract = tract.state === "Florida" && tract.county === "Orange";
   const southCarolina = isSouthCarolinaState(tract.state);
   const priority = tract.mfPriority ?? null;
   const place = tractPlaceLabel(tract);
@@ -131,9 +131,11 @@ export function TractDrawer({ tract, statusHelp = null, onClose }: TractDrawerPr
       <p className="mt-4 text-xs leading-relaxed text-ink-500">
         {SHED_CAVEAT} A rural-eligible GEOID is not a pad site. Sewer, zoning, wetlands, title, and assembly still
         control.
-        {orangePilotTract
-          ? " Orange County, Florida still has the parcel sample on the map when this county is selected."
-          : " This county has no parcel extract in the app — the map shows the tract polygon and a pin."}
+        {tract.state === "Florida" && isFull5AcCounty(tract.county)
+          ? ` ${tract.county} County includes public parcels from 5.0 through 150.0 acres. Parcels under 5 or over 150 are excluded. Zoom in if the view says it is showing a spread of a larger set.`
+          : tract.state === "Florida" && ORLANDO_FIPS_BY_NAME[tract.county]
+            ? ` ${tract.county} County still uses a thinner public-GIS sample in this build, not every parcel of 5 acres and up.`
+            : " This county has no parcel extract in the app — the map shows the tract polygon and a pin."}
       </p>
     </aside>
   );

@@ -1,10 +1,12 @@
 import type { ParcelCollection, ParcelFeature } from "../types";
 import { loadParcelCollection } from "./loadFixtures";
+import { queryOrlandoFixtureParcels, queryOrlandoLiveParcels, type OrlandoParcelQuery } from "./orlandoParcelStore";
 
 /**
  * Data-source adapters. The pilot ships on fixtures so `npm run dev` works
- * without keys. Swap DATA_SOURCE=ocpa-live to hit the public OCPA MapServer
- * (rate-limited; not a complete county extract in this client).
+ * without keys. Orlando shed parcels are partitioned GeoJSON (+ optional live
+ * DOH viewport queries). Swap DATA_SOURCE=ocpa-live for Orange single-parcel
+ * lookups against OCPA.
  *
  * Commercial vendors (Regrid, ATTOM, etc.) should implement ParcelProvider
  * rather than replacing the UI. Do not put paid credentials in the repo.
@@ -13,18 +15,32 @@ export interface ParcelProvider {
   id: string;
   listParcels(): Promise<ParcelCollection>;
   getParcel(id: string): Promise<ParcelFeature | null>;
+  queryOrlandoParcels?(query: OrlandoParcelQuery & { source?: "fixture" | "live" }): Promise<ParcelCollection>;
 }
 
 export class FixtureParcelProvider implements ParcelProvider {
   id = "fixture";
 
   async listParcels(): Promise<ParcelCollection> {
+    // Backward-compatible Orange County pilot sample.
     return loadParcelCollection();
   }
 
   async getParcel(id: string): Promise<ParcelFeature | null> {
+    const orlando = await queryOrlandoFixtureParcels({ limit: 20000 });
+    const hit = orlando.features.find((feature) => feature.properties.id === id);
+    if (hit) return hit;
     const collection = await this.listParcels();
     return collection.features.find((feature) => feature.properties.id === id) ?? null;
+  }
+
+  async queryOrlandoParcels(
+    query: OrlandoParcelQuery & { source?: "fixture" | "live" },
+  ): Promise<ParcelCollection> {
+    if (query.source === "live") {
+      return queryOrlandoLiveParcels(query);
+    }
+    return queryOrlandoFixtureParcels(query);
   }
 }
 
@@ -37,15 +53,14 @@ export class OcpaLiveParcelProvider implements ParcelProvider {
   ) {}
 
   async listParcels(): Promise<ParcelCollection> {
-    // Live county-wide geometry is too large for the browser. The live adapter
-    // returns the fixture sample plus a documented extension point for tiling.
     const fixtures = new FixtureParcelProvider();
     return fixtures.listParcels();
   }
 
   async getParcel(id: string): Promise<ParcelFeature | null> {
+    const bareId = id.includes(":") ? id.split(":").slice(1).join(":") : id;
     const params = new URLSearchParams({
-      where: `PARCEL='${id.replace(/'/g, "''")}'`,
+      where: `PARCEL='${bareId.replace(/'/g, "''")}'`,
       outFields: [
         "PARCEL",
         "NAME1",
@@ -84,6 +99,12 @@ export class OcpaLiveParcelProvider implements ParcelProvider {
     }
     const body = (await response.json()) as ParcelCollection;
     return body.features[0] ?? null;
+  }
+
+  async queryOrlandoParcels(
+    query: OrlandoParcelQuery & { source?: "fixture" | "live" },
+  ): Promise<ParcelCollection> {
+    return new FixtureParcelProvider().queryOrlandoParcels!(query);
   }
 }
 

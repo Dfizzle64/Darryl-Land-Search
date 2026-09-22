@@ -16,10 +16,12 @@ import {
   marketSummary,
   parseCountyKey,
   showOrangeCountyPilot,
+  showOrlandoParcels,
   southCarolinaStatusHelp,
   viewBounds,
   viewIncludesSouthCarolina,
 } from "@/lib/markets";
+import { ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcels";
 import { rankSites } from "@/lib/score";
 import {
   annotateRuralRows,
@@ -38,6 +40,7 @@ import {
   type MarketId,
   type MfPriorityView,
   type OpportunityZoneCollection,
+  type OrlandoParcelsMeta,
   type Oz2TractCollection,
   type ParcelCollection,
   type RuralMarketTractCollection,
@@ -48,6 +51,7 @@ import {
 
 type AppShellProps = {
   parcels: ParcelCollection;
+  orlandoParcelsMeta: OrlandoParcelsMeta;
   traffic: GeoJSON.FeatureCollection<GeoJSON.LineString>;
   opportunityZones: OpportunityZoneCollection;
   oz2Tracts: Oz2TractCollection;
@@ -61,8 +65,11 @@ type AppShellProps = {
 
 type InventoryTab = "sites" | "tracts";
 
+const EMPTY_PARCELS: ParcelCollection = { type: "FeatureCollection", features: [] };
+
 export function AppShell({
   parcels,
+  orlandoParcelsMeta,
   traffic,
   opportunityZones,
   oz2Tracts,
@@ -73,10 +80,10 @@ export function AppShell({
   fluConfig,
   meta,
 }: AppShellProps) {
-  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<FilterState>({ ...DEFAULT_FILTERS, landUseFilter: "off" });
   const [market, setMarket] = useState<MarketId>("Orlando");
-  const [county, setCounty] = useState<string | null>("Orange");
-  const [countyState, setCountyState] = useState<string | null>("Florida");
+  const [county, setCounty] = useState<string | null>(null);
+  const [countyState, setCountyState] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedTractGeoid, setSelectedTractGeoid] = useState<string | null>(null);
@@ -88,7 +95,10 @@ export function AppShell({
   const [sitesOpen, setSitesOpen] = useState(false);
   const [inventoryTab, setInventoryTab] = useState<InventoryTab>("sites");
   const [mfView, setMfView] = useState<MfPriorityView>("all");
-  const [error] = useState<string | null>(null);
+  const [viewportParcels, setViewportParcels] = useState<ParcelCollection | null>(null);
+  const [parcelsLoading, setParcelsLoading] = useState(false);
+  const [parcelSource, setParcelSource] = useState<"fixture" | "live">("fixture");
+  const [error, setError] = useState<string | null>(null);
 
   const summary = marketSummary(ruralCatalog, market);
   const scView = viewIncludesSouthCarolina(market, countyState);
@@ -115,6 +125,7 @@ export function AppShell({
     () => geoidFilterForView(marketTracts, activeMfView),
     [marketTracts, activeMfView],
   );
+  const orlandoParcelsOn = showOrlandoParcels(market, county, countyState);
   const orangePilot = showOrangeCountyPilot(market, county, countyState);
   const statusHelp = southCarolinaStatusHelp(market, countyState);
   const bounds = useMemo(
@@ -146,24 +157,40 @@ export function AppShell({
     [visibleTracts],
   );
 
+  const countyParcelFeatures = useMemo(() => {
+    if (!orlandoParcelsOn) return EMPTY_PARCELS.features;
+    if (!county) return parcels.features;
+    const fips = ORLANDO_FIPS_BY_NAME[county];
+    if (!fips) return [];
+    return parcels.features.filter((feature) => feature.properties.countyFips === fips);
+  }, [orlandoParcelsOn, parcels.features, county]);
+
+  const activeParcels = useMemo<ParcelCollection>(() => {
+    if (!orlandoParcelsOn) return EMPTY_PARCELS;
+    if (viewportParcels) return viewportParcels;
+    return { type: "FeatureCollection", features: countyParcelFeatures };
+  }, [orlandoParcelsOn, viewportParcels, countyParcelFeatures]);
+
   const matched = useMemo(
-    () => filterParcels(parcels.features, filters, zoningConfig, fluConfig),
-    [parcels.features, filters, zoningConfig, fluConfig],
+    () => filterParcels(activeParcels.features, filters, zoningConfig, fluConfig),
+    [activeParcels.features, filters, zoningConfig, fluConfig],
   );
   const ranked = useMemo(
     () => rankSites(matched, filters, zoningConfig, fluConfig),
     [matched, filters, zoningConfig, fluConfig],
   );
   const matchedIds = useMemo(() => new Set(matched.map((feature) => feature.properties.id)), [matched]);
-  const selected = parcels.features.find((feature) => feature.properties.id === selectedId) ?? null;
+  const selected = activeParcels.features.find((feature) => feature.properties.id === selectedId) ?? null;
   const selectedTract = visibleTracts.find((row) => row.geoid === selectedTractGeoid) ?? null;
   const fluUnknownCount = useMemo(
-    () => parcels.features.filter((feature) => !feature.properties.flu?.code).length,
-    [parcels.features],
+    () => activeParcels.features.filter((feature) => !feature.properties.flu?.code).length,
+    [activeParcels.features],
   );
   const fluJoinedCount =
-    typeof meta.fluJoinedCount === "number" ? meta.fluJoinedCount : parcels.features.length - fluUnknownCount;
-  const hint = orangePilot ? emptyStateHint(filters, matched.length, fluUnknownCount) : null;
+    typeof meta.fluJoinedCount === "number" && orangePilot && county === "Orange"
+      ? meta.fluJoinedCount
+      : activeParcels.features.length - fluUnknownCount;
+  const hint = orlandoParcelsOn ? emptyStateHint(filters, matched.length, fluUnknownCount) : null;
 
   useEffect(() => {
     if (selectedId && !matchedIds.has(selectedId) && !showExcluded) {
@@ -178,8 +205,54 @@ export function AppShell({
   }, [selectedTractGeoid, visibleTracts]);
 
   useEffect(() => {
-    if (!orangePilot) setInventoryTab("tracts");
-  }, [orangePilot]);
+    if (!orlandoParcelsOn) {
+      setInventoryTab("tracts");
+      setViewportParcels(null);
+      return;
+    }
+    setInventoryTab("sites");
+  }, [orlandoParcelsOn]);
+
+  useEffect(() => {
+    // Outside Orange, zoning/FLU knowledge is mostly missing — default to all parcels.
+    if (orlandoParcelsOn && county && county !== "Orange") {
+      setFilters((prev) => (prev.landUseFilter === "zoning" ? { ...prev, landUseFilter: "off" } : prev));
+    }
+  }, [orlandoParcelsOn, county]);
+
+  const loadViewportParcels = async (bbox: [number, number, number, number], zoom: number) => {
+    if (!orlandoParcelsOn) return;
+    // Prefer live DOH fill when zoomed in; fixtures cover the shed offline.
+    const useLive = zoom >= 11.5;
+    setParcelsLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({
+        market: "Orlando",
+        source: useLive ? "live" : "fixture",
+        bbox: bbox.join(","),
+        limit: useLive ? "900" : "5000",
+      });
+      if (county && countyState) {
+        params.set("county", county);
+        params.set("state", countyState);
+      }
+      const response = await fetch(`/api/parcels?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error(`Parcel load failed (${response.status})`);
+      }
+      const body = (await response.json()) as ParcelCollection & { error?: string };
+      if (body.error) throw new Error(body.error);
+      setViewportParcels({ type: "FeatureCollection", features: body.features ?? [] });
+      setParcelSource(useLive ? "live" : "fixture");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to refresh parcels");
+      setViewportParcels(null);
+      setParcelSource("fixture");
+    } finally {
+      setParcelsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!scView && mfView !== "all") setMfView("all");
@@ -205,7 +278,8 @@ export function AppShell({
     setCountyState(null);
     setSelectedTractGeoid(null);
     setSelectedId(null);
-    setInventoryTab("tracts");
+    setViewportParcels(null);
+    setInventoryTab(next === "Orlando" ? "sites" : "tracts");
   };
 
   const changeCounty = (key: string) => {
@@ -213,9 +287,11 @@ export function AppShell({
     setCounty(parsed?.county ?? null);
     setCountyState(parsed?.state ?? null);
     setSelectedTractGeoid(null);
+    setSelectedId(null);
+    setViewportParcels(null);
   };
 
-  const showSites = orangePilot && inventoryTab === "sites";
+  const showSites = orlandoParcelsOn && inventoryTab === "sites";
   const tractEmptyMessage =
     activeMfView === "all"
       ? "No rural-eligible tracts in this county filter."
@@ -223,16 +299,33 @@ export function AppShell({
   const priorityFilter = scView
     ? { priorityView: mfView, priorityCounts, onPriorityView: setMfView }
     : { priorityView: undefined, priorityCounts: undefined, onPriorityView: undefined };
+  const countyOptions = useMemo(() => {
+    if (market !== "Orlando") return summary.counties;
+    // Ensure Seminole appears even with 0 rural tracts.
+    const byKey = new Map(summary.counties.map((item) => [countyKey(item.county, item.state), item]));
+    for (const shed of ORLANDO_SHED_COUNTIES) {
+      const key = countyKey(shed.name, "Florida");
+      if (!byKey.has(key)) {
+        byKey.set(key, { county: shed.name, state: "Florida", count: 0, outerEdge: false });
+      }
+    }
+    return Array.from(byKey.values()).sort((a, b) => a.county.localeCompare(b.county));
+  }, [market, summary.counties]);
+
+  const headerPlace =
+    orlandoParcelsOn && county
+      ? `${county} County, Florida`
+      : orlandoParcelsOn
+        ? "Orlando ~90-min shed"
+        : market;
 
   return (
     <div className="flex h-dvh min-h-0 flex-col bg-ink-950 text-ink-100">
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-3 md:px-5">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.22em] text-clay-400">
-            {orangePilot && county === "Orange" ? "Orange County, Florida" : market}
-          </p>
+          <p className="text-[11px] uppercase tracking-[0.22em] text-clay-400">{headerPlace}</p>
           <h1 className="font-display text-xl tracking-tight text-white md:text-2xl">
-            {orangePilot && county === "Orange" ? "Multifamily site search" : "Rural-eligible tracts"}
+            {orlandoParcelsOn ? "Multifamily site search" : "Rural-eligible tracts"}
           </h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -260,7 +353,7 @@ export function AppShell({
               onChange={(event) => changeCounty(event.target.value)}
             >
               <option value="">All counties ({summary.rowCount})</option>
-              {summary.counties.map((item) => (
+              {countyOptions.map((item) => (
                 <option key={countyKey(item.county, item.state)} value={countyKey(item.county, item.state)}>
                   {formatCountyLabel(item.county, item.state)} ({item.count}
                   {item.outerEdge ? ", outer edge" : ""})
@@ -272,15 +365,20 @@ export function AppShell({
             {visibleTracts.length.toLocaleString()}{" "}
             {activeMfView === "all" ? "rural-eligible" : "SC MF priority"}{" "}
             {visibleTracts.length === 1 ? "tract" : "tracts"}
-            {orangePilot ? (
+            {orlandoParcelsOn ? (
               <span className="block text-[11px]">
-                {matched.length.toLocaleString()} of {parcels.features.length.toLocaleString()} Orange County sample parcels
+                {matched.length.toLocaleString()} of {activeParcels.features.length.toLocaleString()} parcels
+                {parcelsLoading ? " · loading…" : ` · ${parcelSource}`}
+                <span className="block">
+                  Shed fixtures: {orlandoParcelsMeta.parcelCount.toLocaleString()} across{" "}
+                  {orlandoParcelsMeta.counties.length} counties
+                </span>
               </span>
             ) : (
-              <span className="block text-[11px]">Tract overlay and pins · parcel extract is Orange County only</span>
+              <span className="block text-[11px]">Tract overlay and pins · parcels are Orlando-shed only for now</span>
             )}
           </p>
-          {orangePilot ? (
+          {orlandoParcelsOn ? (
             <button
               type="button"
               className="rounded-full border border-white/15 bg-ink-800 px-3 py-1.5 text-sm xl:hidden"
@@ -330,7 +428,7 @@ export function AppShell({
           zoningConfig={zoningConfig}
           fluConfig={fluConfig}
           matchedCount={matched.length}
-          totalCount={parcels.features.length}
+          totalCount={activeParcels.features.length}
           fluJoinedCount={fluJoinedCount}
           showExcluded={showExcluded}
           onShowExcluded={setShowExcluded}
@@ -344,6 +442,7 @@ export function AppShell({
           onClose={() => setFiltersOpen(false)}
           meta={meta}
           orangePilot={orangePilot}
+          orlandoParcels={orlandoParcelsOn}
           market={market}
           tractCount={marketTracts.length}
           parcelNote={ruralCatalog.parcelNote}
@@ -354,7 +453,7 @@ export function AppShell({
         />
         <main className="relative min-w-0 flex-1">
           <SiteMap
-            parcels={parcels}
+            parcels={activeParcels}
             traffic={traffic}
             opportunityZones={opportunityZones}
             oz2Tracts={oz2Tracts}
@@ -368,7 +467,9 @@ export function AppShell({
             showTraffic={showTraffic}
             showOz={showOz}
             showOz2={showOz2}
+            showParcels={orlandoParcelsOn}
             showOrangePilot={orangePilot}
+            parcelsLoading={parcelsLoading}
             market={market}
             county={county}
             countyState={countyState}
@@ -382,17 +483,18 @@ export function AppShell({
             onSelect={selectSite}
             onHover={setHoveredId}
             onSelectTract={selectTract}
+            onViewportIdle={orlandoParcelsOn ? loadViewportParcels : undefined}
           />
           <div className="pointer-events-none absolute bottom-3 right-3 top-16 z-10 hidden w-80 xl:block">
             <div className="pointer-events-auto flex h-full min-h-0 flex-col gap-2">
-              {orangePilot ? (
+              {orlandoParcelsOn ? (
                 <div className="flex gap-1">
                   <button
                     type="button"
                     className={`rounded-full border px-3 py-1 text-xs ${inventoryTab === "sites" ? "border-clay-400/50 bg-ink-800 text-white" : "border-white/10 bg-ink-900/80 text-ink-300"}`}
                     onClick={() => setInventoryTab("sites")}
                   >
-                    Orange County parcels
+                    Shed parcels
                   </button>
                   <button
                     type="button"
@@ -438,9 +540,7 @@ export function AppShell({
             </div>
           ) : null}
         </main>
-        {selectedTract || !orangePilot ? (
-          <TractDrawer tract={selectedTract} statusHelp={statusHelp} onClose={() => setSelectedTractGeoid(null)} />
-        ) : (
+        {selected ? (
           <ParcelDrawer
             parcel={selected}
             zoningConfig={zoningConfig}
@@ -448,6 +548,8 @@ export function AppShell({
             filters={filters}
             onClose={() => setSelectedId(null)}
           />
+        ) : (
+          <TractDrawer tract={selectedTract} statusHelp={statusHelp} onClose={() => setSelectedTractGeoid(null)} />
         )}
       </div>
 

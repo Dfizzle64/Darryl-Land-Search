@@ -1,8 +1,8 @@
-# Orange County multifamily site search (pilot)
+# Darryl Land Search — Orlando shed + seven-market rural OZ 2.0
 
-Interactive map of **Orange County, Florida** parcels for multifamily site selection. Filter by **minimum acreage**, **zoning mode** (multifamily-capable, all parcels, non-MF, rezoning candidates, FLU), **Opportunity Zones**, Census ACS median household income, and nearby FDOT Average Annual Daily Traffic (AADT). A ranked **sites** list scores matches. Click a row or parcel for owner, sale, tax, mailing address, zoning + FLU + OZ explanations, and public search links.
+Interactive map for multifamily site selection across the **Orlando ~90-minute county shed** (Brevard, Lake, Marion, Orange, Osceola, Polk, Seminole, Sumter, Volusia), plus **seven-market rural-eligible OZ 2.0 tract overlays**. Filter parcels by acreage, land-use mode, Opportunity Zones, ACS income, and FDOT AADT where data exists. Ranked sites + parcel drawer show owner/LLC (when public), sale, tax, mailing, and appraiser links.
 
-This is a v2 pass on the Orange County pilot: public data only, no paid parcel vendors, no scraped emails or phone numbers.
+Public GIS only — no paid parcel vendors, no scraped emails or phones. Zoning/FLU/AADT richness is Orange County first; other shed counties degrade gracefully.
 
 ## Run locally
 
@@ -24,15 +24,19 @@ npm run seed:oz      # designated QOZ polygons, then OZ 2.0 eligibility (Rev. Pr
 npm run seed:oz2     # refresh OZ 2.0 nomination tracts only (needs pypdf; see below)
 npm run seed:oz2-markets  # seven-market rural-eligible tracts from the CSV + TIGER 2020
 npm run seed:sc-mf        # South Carolina multifamily priority shortlist from its CSV
+npm run seed:parcels:orlando  # partitioned Orlando shed parcels from public DOH/OCPA GIS
 npm run seed:zoning  # refresh coverage report vs knowledge JSON (no LLM)
 ```
+
+Orlando parcel architecture, county source URLs, and field mapping: [`docs/orlando-parcels.md`](docs/orlando-parcels.md) and [`data/orlando-parcel-sources.json`](data/orlando-parcel-sources.json).
 
 No API keys are required for the default fixture mode. Copy `.env.example` to `.env.local` only if you want to point at live feeds.
 
 ## What you can do
 
-- Set a **minimum acreage** (OCPA `ACREAGE`). The slider is 0–25 acres; larger sites still match any threshold at or below 25. Acreage is shown in the parcel drawer.
-- Choose a **land-use mode**: multifamily-capable zoning (default), all parcels, non-multifamily zoning, rezoning candidates (FLU yes / zoning no), FLU allows multifamily, either, or both.
+- Switch **Market** / **County** across seven Southeast sheds. Orlando loads multi-county parcel polygons; other metros are rural-tract overlays until their parcel seeds land.
+- Set a **minimum acreage**. The slider is 0–25 acres; larger sites still match any threshold at or below 25. Acreage is shown in the parcel drawer.
+- Choose a **land-use mode**: multifamily-capable zoning (default on Orange), all parcels (recommended outside Orange), non-multifamily zoning, rezoning candidates (FLU yes / zoning no), FLU allows multifamily, either, or both.
 - Filter **Opportunity Zones**: OZ 2.0 rural-eligible, OZ 2.0 eligible but not rural, in a current designated QOZ, not in a designated QOZ, or either. Toggle the OZ 2.0 tract overlay (orange = rural-eligible, amber = eligible and not rural) and the copper dashed designated-QOZ overlay.
 - Include **planned development / PUD** (always labeled maybe — site-specific).
 - Include **conditional zoning** (Live Local commercial/industrial, limited multiplex, some mixed-use overlays). Off by default so C-2 warehouses do not flood the map.

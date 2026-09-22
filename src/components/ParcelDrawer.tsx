@@ -9,7 +9,7 @@ import {
   formatSale,
   formatUsd,
   isEntityOwner,
-  ocpaParcelUrl,
+  parcelAppraiserUrl,
   sunbizSearchUrl,
 } from "@/lib/format";
 import { describeFluMatch } from "@/lib/flu";
@@ -72,6 +72,15 @@ export function ParcelDrawer({
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
+  const placeLine =
+    [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
+    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+  const appraiser = parcelAppraiserUrl({
+    parcelId: properties.parcelId,
+    countyFips: properties.countyFips,
+    appraiserUrl: properties.appraiserUrl,
+  });
+  const gaps = properties.dataGaps?.length ? properties.dataGaps : null;
 
   return (
     <aside className="drawer-scroll absolute inset-x-0 bottom-0 z-20 max-h-[70vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-5 shadow-2xl lg:static lg:z-0 lg:max-h-none lg:w-[24rem] lg:shrink-0 lg:rounded-none lg:border-l lg:border-t-0 lg:shadow-none">
@@ -81,9 +90,7 @@ export function ParcelDrawer({
           <h2 className="mt-1 font-display text-2xl leading-tight text-white">
             {properties.situsAddress || "Address not available"}
           </h2>
-          <p className="text-sm text-ink-300">
-            {[properties.situsCity, properties.situsZip].filter(Boolean).join(" ") || "Orange County, FL"}
-          </p>
+          <p className="text-sm text-ink-300">{placeLine}</p>
         </div>
         <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-3 py-1 text-sm">
           Close
@@ -164,8 +171,8 @@ export function ParcelDrawer({
 
       <div className="mt-5 space-y-2 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Public contact paths</p>
-        <a className="block text-moss-400 underline-offset-2 hover:underline" href={ocpaParcelUrl(properties.parcelId)} target="_blank" rel="noreferrer">
-          Open in Orange County Property Appraiser
+        <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
+          {appraiser.label}
         </a>
         {entity && properties.ownerName ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={sunbizSearchUrl(properties.ownerName)} target="_blank" rel="noreferrer">
@@ -174,9 +181,14 @@ export function ParcelDrawer({
         ) : (
           <p className="text-ink-300">Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped.</p>
         )}
-        <a className="block text-moss-400 underline-offset-2 hover:underline" href={comptrollerRecordsUrl()} target="_blank" rel="noreferrer">
-          Orange County Comptroller official records
-        </a>
+        {properties.countyFips === "12095" || !properties.countyFips ? (
+          <a className="block text-moss-400 underline-offset-2 hover:underline" href={comptrollerRecordsUrl()} target="_blank" rel="noreferrer">
+            Orange County Comptroller official records
+          </a>
+        ) : null}
+        {gaps ? (
+          <p className="text-xs text-ink-500">Data gaps for this county extract: {gaps.join("; ")}</p>
+        ) : null}
         <p className="text-xs text-ink-500">
           Contact paths are mailing address plus official search links only. This app does not scrape or invent emails or
           phone numbers.

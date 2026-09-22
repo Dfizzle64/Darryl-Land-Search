@@ -1,0 +1,125 @@
+{
+  "generatedAt": "2026-09-22T13:30:08Z",
+  "market": "Orlando",
+  "parcelCount": 1411,
+  "perCountyCap": 120,
+  "minAcres": 1.0,
+  "sourcesDoc": "data/orlando-parcel-sources.json",
+  "notes": [
+    "Partitioned demo fixtures for the Orlando ~90-minute county shed.",
+    "Not a complete cadastral extract. Re-pull with npm run seed:parcels:orlando.",
+    "Live viewport queries use the same DOH layers via /api/parcels?source=live.",
+    "Zoning/FLU are Orange County OCPA pilot only; other counties degrade gracefully."
+  ],
+  "counties": [
+    {
+      "name": "Brevard",
+      "fips": "12009",
+      "featureCount": 120,
+      "ruralEligibleParcelCount": 29,
+      "source": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/4/query",
+      "gaps": [
+        "No zoning on DOH extract",
+        "BCPAO live endpoint may require allowlisted clients"
+      ],
+      "path": "data/fixtures/orlando-parcels/12009.geojson"
+    },
+    {
+      "name": "Lake",
+      "fips": "12069",
+      "featureCount": 120,
+      "ruralEligibleParcelCount": 56,
+      "source": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/33/query",
+      "gaps": [
+        "No zoning on DOH extract"
+      ],
+      "path": "data/fixtures/orlando-parcels/12069.geojson"
+    },
+    {
+      "name": "Marion",
+      "fips": "12083",
+      "featureCount": 120,
+      "ruralEligibleParcelCount": 95,
+      "source": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/40/query",
+      "gaps": [
+        "Zoning available on county MapServer but not joined in demo fixtures"
+      ],
+      "path": "data/fixtures/orlando-parcels/12083.geojson"
+    },
+    {
+      "name": "Orange",
+      "fips": "12095",
+      "featureCount": 462,
+      "ruralEligibleParcelCount": 3,
+      "source": "ocpa-webmap",
+      "queryUrl": "https://vgispublic.ocpafl.org/server/rest/services/Webmap/PARCEL/MapServer/4/query",
+      "gaps": [
+        "Municipal FLU besides Orlando still incomplete on the OCPA pilot"
+      ],
+      "path": "data/fixtures/orlando-parcels/12095.geojson"
+    },
+    {
+      "name": "Osceola",
+      "fips": "12097",
+      "featureCount": 120,
+      "ruralEligibleParcelCount": 83,
+      "source": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/48/query",
+      "gaps": [
+        "No county-wide zoning in fixtures"
+      ],
+      "path": "data/fixtures/orlando-parcels/12097.geojson"
+    },
+    {
+      "name": "Polk",
+      "fips": "12105",
+      "featureCount": 120,
+      "ruralEligibleParcelCount": 48,
+      "source": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/52/query",
+      "gaps": [
+        "No zoning on DOH extract"
+      ],
+      "path": "data/fixtures/orlando-parcels/12105.geojson"
+    },
+    {
+      "name": "Seminole",
+      "fips": "12117",
+      "featureCount": 109,
+      "ruralEligibleParcelCount": 0,
+      "source": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/58/query",
+      "gaps": [
+        "No rural-eligible OZ 2.0 tracts in Seminole; parcels still load for market completeness"
+      ],
+      "path": "data/fixtures/orlando-parcels/12117.geojson"
+    },
+    {
+      "name": "Sumter",
+      "fips": "12119",
+      "featureCount": 120,
+      "ruralEligibleParcelCount": 74,
+      "source": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/59/query",
+      "gaps": [
+        "No zoning on DOH extract"
+      ],
+      "path": "data/fixtures/orlando-parcels/12119.geojson"
+    },
+    {
+      "name": "Volusia",
+      "fips": "12127",
+      "featureCount": 120,
+      "ruralEligibleParcelCount": 0,
+      "source": "doh-ehwaters",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/63/query",
+      "gaps": [
+        "No zoning on DOH extract"
+      ],
+      "path": "data/fixtures/orlando-parcels/12127.geojson"
+    }
+  ]
+}

@@ -8,6 +8,9 @@ import {
   type RuralMarketTractRow,
   type RuralMarketsCatalog,
 } from "./types";
+import { showOrangeCountyPilot, showOrlandoParcels } from "./orlandoParcels";
+
+export { showOrangeCountyPilot, showOrlandoParcels } from "./orlandoParcels";
 
 export const STATE_ABBR: Record<string, string> = {
   Florida: "FL",
@@ -59,17 +62,6 @@ export function filterRuralRows(
   });
 }
 
-/**
- * Orange County parcel pilot (green parcels, all eligible tracts, designated
- * QOZ overlay, FDOT) stays on while Orlando is selected and the county filter
- * is all counties or Orange County, Florida.
- */
-export function showOrangeCountyPilot(market: MarketId, county: string | null, state: string | null): boolean {
-  if (market !== "Orlando") return false;
-  if (!county && !state) return true;
-  return county === "Orange" && state === "Florida";
-}
-
 export function viewBounds(
   summary: MarketSummary,
   rows: RuralMarketTractRow[],
@@ -84,7 +76,16 @@ export function viewBounds(
   const subset = !county
     ? rows.filter((row) => row.market === summary.market)
     : rows.filter((row) => row.market === summary.market && row.county === county && row.state === state);
-  if (subset.length === 0) return summary.bounds;
+  if (subset.length === 0) {
+    // Seminole has parcels but 0 rural-eligible tracts — use a county envelope.
+    if (showOrlandoParcels(summary.market, county, state) && county === "Seminole") {
+      return [
+        [-81.48, 28.6],
+        [-81.08, 28.88],
+      ];
+    }
+    return summary.bounds;
+  }
   let west = Math.min(...subset.map((row) => row.lon));
   let east = Math.max(...subset.map((row) => row.lon));
   let south = Math.min(...subset.map((row) => row.lat));

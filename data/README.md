@@ -17,6 +17,9 @@ These JSON files are the **source of truth** for what the map treats as multifam
 | `data/sc-oz2-mf-priority-shortlist.csv` | South Carolina multifamily priority shortlist (Charleston + York/Lancaster/Chester). Eligible rural only |
 | `data/sc-oz2-mf-priority-shortlist.md` | Why those 22 tracts are Tier A or Tier B. Not a nominated list |
 | `data/fixtures/sc-oz2-mf-priority.json` | Seeded shortlist joined to the rural pack. Chip stays eligible / not designated |
+| `data/orlando-parcel-sources.json` | Orlando shed county GIS URLs, field mapping, gaps |
+| `data/fixtures/orlando-parcels/` | Partitioned multi-county parcel fixtures (`{fips}.geojson` + `meta.json`) |
+| `docs/orlando-parcels.md` | How to refresh Orlando parcels and live viewport API |
 | `data/fixtures/oz2-eligible-tracts.json` | Appendix rows for those tracts, including Rural Status |
 | `data/fixtures/oz2-lookup.json` | Generated parcel → OZ 2.0 join audit |
 | `data/fixtures/notice-2025-50-rural-geoids.json` | GEOIDs parsed from the Notice 2025-50 rural appendix |

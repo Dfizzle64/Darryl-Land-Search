@@ -2,10 +2,12 @@ import { NextResponse } from "next/server";
 import { getParcelProvider } from "@/lib/data/adapters";
 import { loadFluConfig, loadZoningConfig } from "@/lib/data/loadFixtures";
 import { filterParcels } from "@/lib/filters";
+import { isMarketId } from "@/lib/markets";
 import {
   DEFAULT_FILTERS,
   LAND_USE_FILTERS,
   OZ_FILTERS,
+  type BBox,
   type FilterState,
   type IncomeGeography,
   type LandUseFilter,
@@ -28,8 +30,26 @@ function ozParam(value: string | null): OzFilter {
   return DEFAULT_FILTERS.ozFilter;
 }
 
+function parseBbox(value: string | null): BBox | null {
+  if (!value) return null;
+  const parts = value.split(",").map((part) => Number(part.trim()));
+  if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n))) return null;
+  const [west, south, east, north] = parts;
+  if (west >= east || south >= north) return null;
+  return [west, south, east, north];
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
+  const marketParam = url.searchParams.get("market");
+  const market = marketParam && isMarketId(marketParam) ? marketParam : null;
+  const county = url.searchParams.get("county");
+  const state = url.searchParams.get("state") ?? (county ? "Florida" : null);
+  const bbox = parseBbox(url.searchParams.get("bbox"));
+  const source = url.searchParams.get("source") === "live" ? "live" : "fixture";
+  const limit = Number(url.searchParams.get("limit") ?? (source === "live" ? 800 : 5000));
+  const applyFilters = url.searchParams.get("filter") === "1";
+
   const filters: FilterState = {
     ...DEFAULT_FILTERS,
     landUseFilter: landUseParam(url.searchParams.get("landUse") ?? url.searchParams.get("mf")),
@@ -46,16 +66,38 @@ export async function GET(request: Request) {
   };
 
   try {
-    const [collection, zoningConfig, fluConfig] = await Promise.all([
-      getParcelProvider().listParcels(),
-      loadZoningConfig(),
-      loadFluConfig(),
-    ]);
-    const features = filterParcels(collection.features, filters, zoningConfig, fluConfig);
+    const provider = getParcelProvider();
+    let collection =
+      market === "Orlando" && provider.queryOrlandoParcels
+        ? await provider.queryOrlandoParcels({
+            bbox,
+            county,
+            state,
+            limit: Number.isFinite(limit) ? limit : 5000,
+            source,
+          })
+        : await provider.listParcels();
+
+    if (applyFilters) {
+      const [zoningConfig, fluConfig] = await Promise.all([loadZoningConfig(), loadFluConfig()]);
+      collection = {
+        type: "FeatureCollection",
+        features: filterParcels(collection.features, filters, zoningConfig, fluConfig),
+      };
+    }
+
     return NextResponse.json({
       type: "FeatureCollection",
-      features,
-      meta: { total: collection.features.length, matched: features.length, filters },
+      features: collection.features,
+      meta: {
+        market,
+        county,
+        state,
+        bbox,
+        source,
+        total: collection.features.length,
+        filters: applyFilters ? filters : undefined,
+      },
     });
   } catch (error) {
     return NextResponse.json(

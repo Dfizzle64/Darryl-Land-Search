@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { formatAcres, formatUsd } from "@/lib/format";
 import type { RankedSite } from "@/lib/score";
 import { parcelAadt, parcelIncome } from "@/lib/filters";
-import type { FilterState } from "@/lib/types";
+import { RURAL_ELIGIBLE_STATUS_CHIP, type FilterState } from "@/lib/types";
 
 type SitesPanelProps = {
   sites: RankedSite[];
@@ -106,8 +106,8 @@ export function SitesPanel({
                     </p>
                     <span className="flex gap-1">
                       {oz2?.eligible && oz2.rural === true ? (
-                        <span className="rounded-full border border-moss-400/50 px-1.5 py-px text-[10px] text-moss-400">
-                          Rural OZ 2.0
+                        <span className="rounded-full border border-[#f15a08]/70 px-1.5 py-px text-[10px] text-[#ffc7a3]">
+                          {RURAL_ELIGIBLE_STATUS_CHIP}
                         </span>
                       ) : oz2?.eligible ? (
                         <span className="rounded-full border border-white/20 px-1.5 py-px text-[10px] text-ink-100">

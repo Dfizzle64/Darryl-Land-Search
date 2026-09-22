@@ -10,6 +10,10 @@ These JSON files are the **source of truth** for what the map treats as multifam
 | `data/fixtures/opportunity-zones.geojson` | Orange County HUD/Treasury QOZ tract polygons (map overlay). `rural` is Notice 2025-50 membership |
 | `data/fixtures/oz-lookup.json` | Generated parcel → designated OZ join audit |
 | `data/fixtures/oz2-eligible.geojson` | Orange County tracts eligible for nomination under Rev. Proc. 2026-14 (not designated) |
+| `data/oz2-7markets-90min-rural-eligible.csv` | Source table for seven Southeast markets: rural-eligible tracts in approximate 90-minute county rings |
+| `data/oz2-7markets-90min-counties.md` | Which counties are inside each shed, and which outer-edge counties are flagged |
+| `data/fixtures/oz2-rural-markets.json` | 446 market rows (Polk/Sumter kept on both Tampa and Orlando) plus bounds |
+| `data/fixtures/oz2-rural-markets.geojson` | One Census TIGER 2020 polygon per unique GEOID |
 | `data/fixtures/oz2-eligible-tracts.json` | Appendix rows for those tracts, including Rural Status |
 | `data/fixtures/oz2-lookup.json` | Generated parcel → OZ 2.0 join audit |
 | `data/fixtures/notice-2025-50-rural-geoids.json` | GEOIDs parsed from the Notice 2025-50 rural appendix |
@@ -86,6 +90,7 @@ npm run seed           # parcels + income + AADT, then FLU, designated OZ, OZ 2.
 npm run seed:flu       # re-join FLU onto the existing parcel fixture (network)
 npm run seed:oz        # designated QOZ polygons, then OZ 2.0 eligibility and Notice 2025-50 rural flags
 npm run seed:oz2       # OZ 2.0 + Notice 2025-50 only (python3 -m pip install pypdf)
+npm run seed:oz2-markets  # seven-market rural tracts from the CSV + Census TIGER 2020
 npm run seed:zoning    # coverage report only; does not scrape Municode
 ```
 
@@ -98,5 +103,7 @@ After a code amendment:
 5. Run `npm test`.
 
 OZ 2.0 refresh (`npm run seed:oz2`) downloads the Rev. Proc. 2026-14 appendix workbook and Notice 2025-50, keeps Orange County eligible rows, and joins Census TIGER 2020 polygons. Rural is the appendix value `Rural` or `Non-rural` only. A designated tract is rural only when its GEOID is in the Notice 2025-50 appendix. If the workbook columns change, or the notice parse is not about 3,309 GEOIDs, the script stops instead of inventing a flag. Install `pypdf` before that refresh. Run it after `join_oz.py` so `designatedRural` is stamped on the designated join.
+
+Seven-market refresh (`npm run seed:oz2-markets`) reads `data/oz2-7markets-90min-rural-eligible.csv` and joins the same TIGER 2020 tract service. It expects 446 rows and 424 unique GEOIDs. It does not fetch parcels. 90-minute sheds in that CSV are approximate county rings, not drive-time isochrones; outer-edge counties stay flagged in `notes`. `--offline` rebuilds the JSON catalog from the CSV and the polygons already saved.
 
 Do not require a live model in the app to “research zoning.” That is this file plus a future agent/script run.

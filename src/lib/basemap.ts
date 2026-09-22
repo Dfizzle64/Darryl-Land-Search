@@ -1,4 +1,9 @@
-import type { FillLayerSpecification, LineLayerSpecification, Map as MapLibreMap } from "maplibre-gl";
+import type {
+  CircleLayerSpecification,
+  FillLayerSpecification,
+  LineLayerSpecification,
+  Map as MapLibreMap,
+} from "maplibre-gl";
 
 export type BasemapMode = "streets" | "satellite";
 
@@ -19,6 +24,9 @@ export const SATELLITE_SOURCE_ID = "basemap-satellite";
 export const SATELLITE_LAYER_ID = "basemap-satellite";
 
 export const OVERLAY_LAYER_IDS = [
+  "rural-fill",
+  "rural-line",
+  "rural-pins",
   "oz2-fill",
   "oz2-line",
   "oz-fill",
@@ -197,4 +205,17 @@ export function applyBasemap(map: MapLibreMap, mode: BasemapMode) {
   setPaint(map, "oz-line", ozLinePaint(mode));
   setPaint(map, "oz2-fill", oz2FillPaint(mode));
   setPaint(map, "oz2-line", oz2LinePaint(mode));
+  setPaint(map, "rural-fill", oz2FillPaint(mode));
+  setPaint(map, "rural-line", oz2LinePaint(mode));
+  setPaint(map, "rural-pins", ruralPinPaint(mode));
+}
+
+export function ruralPinPaint(mode: BasemapMode): NonNullable<CircleLayerSpecification["paint"]> {
+  return {
+    "circle-color": mode === "satellite" ? "#ff7a29" : OZ_TRACT_SWATCH.rural,
+    "circle-radius": ["interpolate", ["linear"], ["zoom"], 6, 3, 10, 5, 13, 7],
+    "circle-stroke-color": mode === "satellite" ? "#fff6ee" : "#2a160c",
+    "circle-stroke-width": 1.25,
+    "circle-opacity": 0.95,
+  };
 }

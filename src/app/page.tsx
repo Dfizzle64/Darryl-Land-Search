@@ -5,6 +5,8 @@ import {
   loadFluConfig,
   loadOpportunityZones,
   loadOz2Tracts,
+  loadRuralMarketsCatalog,
+  loadRuralMarketTracts,
   loadTrafficCollection,
   loadZoningConfig,
 } from "@/lib/data/loadFixtures";
@@ -12,15 +14,18 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [parcels, traffic, opportunityZones, oz2Tracts, zoningConfig, fluConfig, meta] = await Promise.all([
-    getParcelProvider().listParcels(),
-    loadTrafficCollection(),
-    loadOpportunityZones(),
-    loadOz2Tracts(),
-    loadZoningConfig(),
-    loadFluConfig(),
-    loadFixtureMeta(),
-  ]);
+  const [parcels, traffic, opportunityZones, oz2Tracts, ruralCatalog, ruralTracts, zoningConfig, fluConfig, meta] =
+    await Promise.all([
+      getParcelProvider().listParcels(),
+      loadTrafficCollection(),
+      loadOpportunityZones(),
+      loadOz2Tracts(),
+      loadRuralMarketsCatalog(),
+      loadRuralMarketTracts(),
+      loadZoningConfig(),
+      loadFluConfig(),
+      loadFixtureMeta(),
+    ]);
 
   return (
     <AppShell
@@ -28,6 +33,8 @@ export default async function HomePage() {
       traffic={traffic}
       opportunityZones={opportunityZones}
       oz2Tracts={oz2Tracts}
+      ruralCatalog={ruralCatalog}
+      ruralTracts={ruralTracts}
       zoningConfig={zoningConfig}
       fluConfig={fluConfig}
       meta={meta}

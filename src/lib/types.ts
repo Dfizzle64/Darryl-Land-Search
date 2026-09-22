@@ -98,6 +98,97 @@ export type OpportunityZoneFeature = GeoJSON.Feature<
   OpportunityZoneProperties
 >;
 
+export const MARKETS = [
+  "Atlanta",
+  "Tampa",
+  "Orlando",
+  "Charleston",
+  "Nashville",
+  "Charlotte",
+  "Raleigh-Durham",
+] as const;
+
+export type MarketId = (typeof MARKETS)[number];
+
+/** Status chip for the seven-market rural pack. Never a certified 2027 QOZ. */
+export const RURAL_ELIGIBLE_STATUS_CHIP = "Eligible (rural) — not designated";
+
+export const SHED_CAVEAT =
+  "90-minute sheds are approximate county rings, not drive-time isochrones. Outer-edge counties are flagged in tract notes.";
+
+export type RuralMarketTractRow = {
+  market: MarketId;
+  state: string;
+  county: string;
+  geoid: string;
+  placeOrCorridor: string;
+  rural: "Y";
+  status: string;
+  lat: number;
+  lon: number;
+  notes: string;
+  outerEdge: boolean;
+  specialUse: boolean;
+};
+
+export type MarketCountySummary = {
+  county: string;
+  state: string;
+  count: number;
+  outerEdge: boolean;
+};
+
+export type MarketSummary = {
+  market: MarketId;
+  rowCount: number;
+  bounds: [[number, number], [number, number]];
+  center: [number, number];
+  counties: MarketCountySummary[];
+};
+
+export type RuralMarketsCatalog = {
+  generatedAt: string;
+  sourceCsv: string;
+  geometrySource: string;
+  shedCaveat: string;
+  statusChip: string;
+  rowCount: number;
+  uniqueGeoidCount: number;
+  parcelNote: string;
+  markets: MarketSummary[];
+  rows: RuralMarketTractRow[];
+};
+
+export type RuralMarketTractProperties = {
+  id: string;
+  tractGeoid: string;
+  tract: string | null;
+  name: string | null;
+  county: string;
+  state: string;
+  rural: true;
+  designation: "eligible-for-nomination";
+  statusChip: string;
+  markets: MarketId[];
+  placeOrCorridor: string;
+  notes: string;
+  outerEdge: boolean;
+  specialUse: boolean;
+  lat: number;
+  lon: number;
+  source: string;
+};
+
+export type RuralMarketTractFeature = GeoJSON.Feature<
+  GeoJSON.Polygon | GeoJSON.MultiPolygon,
+  RuralMarketTractProperties
+>;
+
+export type RuralMarketTractCollection = GeoJSON.FeatureCollection<
+  GeoJSON.Polygon | GeoJSON.MultiPolygon,
+  RuralMarketTractProperties
+>;
+
 export type Oz2TractFeature = GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.MultiPolygon, Oz2TractProperties>;
 
 export type Oz2TractCollection = GeoJSON.FeatureCollection<

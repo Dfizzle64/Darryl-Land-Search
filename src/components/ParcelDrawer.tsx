@@ -103,7 +103,7 @@ export function ParcelDrawer({
             oz2.eligible == null
               ? null
               : oz2.eligible
-                ? `${oz2.rural === true ? "Rural-eligible" : oz2.rural === false ? "Eligible, not rural" : "Eligible"} · GEOID ${properties.oz2Eligibility?.tractGeoid ?? "unknown"}`
+                ? `${oz2.statusChip ?? (oz2.rural === false ? "Eligible, not rural" : "Eligible")} · GEOID ${properties.oz2Eligibility?.tractGeoid ?? "unknown"}`
                 : "Not eligible"
           }
         />
@@ -142,7 +142,7 @@ export function ParcelDrawer({
       </div>
       <div className="mt-3 rounded-2xl border border-moss-400/30 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-moss-400">OZ 2.0 nomination</p>
-        <p className="mt-1 font-medium text-white">{oz2.label}</p>
+        <p className="mt-1 font-medium text-white">{oz2.statusChip ?? oz2.label}</p>
         <p className="mt-1 text-ink-100">{oz2.detail}</p>
       </div>
 

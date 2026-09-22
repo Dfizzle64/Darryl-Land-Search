@@ -98,6 +98,7 @@ npm run seed:oz        # designated QOZ polygons, then OZ 2.0 eligibility and No
 npm run seed:oz2       # OZ 2.0 + Notice 2025-50 only (python3 -m pip install pypdf)
 npm run seed:oz2-markets  # seven-market rural tracts from the CSV + Census TIGER 2020
 npm run seed:sc-mf        # SC multifamily priority shortlist from its CSV
+npm run seed:parcels:orlando  # full ≥5 acre DOH extract for Lake, Orange, Osceola, Polk, Seminole
 npm run seed:zoning    # coverage report only; does not scrape Municode
 ```
 

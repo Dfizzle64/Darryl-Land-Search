@@ -21,7 +21,7 @@ import {
   viewBounds,
   viewIncludesSouthCarolina,
 } from "@/lib/markets";
-import { ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcels";
+import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcels";
 import { rankSites } from "@/lib/score";
 import {
   annotateRuralRows,
@@ -96,7 +96,8 @@ export function AppShell({
   const [inventoryTab, setInventoryTab] = useState<InventoryTab>("sites");
   const [mfView, setMfView] = useState<MfPriorityView>("all");
   const [viewportParcels, setViewportParcels] = useState<ParcelCollection | null>(null);
-  const [parcelsLoading, setParcelsLoading] = useState(false);
+  const [viewportStats, setViewportStats] = useState<{ totalInBbox: number; truncated: boolean } | null>(null);
+  const [parcelsLoading, setParcelsLoading] = useState(true);
   const [parcelSource, setParcelSource] = useState<"fixture" | "live">("fixture");
   const [error, setError] = useState<string | null>(null);
 
@@ -179,6 +180,15 @@ export function AppShell({
     () => rankSites(matched, filters, zoningConfig, fluConfig),
     [matched, filters, zoningConfig, fluConfig],
   );
+  const rankedVisible = useMemo(() => ranked.slice(0, 200), [ranked]);
+  const fullAcreageCounties = useMemo(
+    () => orlandoParcelsMeta.counties.filter((item) => item.coverage === "complete-gte-5ac"),
+    [orlandoParcelsMeta.counties],
+  );
+  const fullAcreageParcelCount = useMemo(
+    () => fullAcreageCounties.reduce((sum, item) => sum + item.featureCount, 0),
+    [fullAcreageCounties],
+  );
   const matchedIds = useMemo(() => new Set(matched.map((feature) => feature.properties.id)), [matched]);
   const selected = activeParcels.features.find((feature) => feature.properties.id === selectedId) ?? null;
   const selectedTract = visibleTracts.find((row) => row.geoid === selectedTractGeoid) ?? null;
@@ -208,6 +218,7 @@ export function AppShell({
     if (!orlandoParcelsOn) {
       setInventoryTab("tracts");
       setViewportParcels(null);
+      setParcelsLoading(false);
       return;
     }
     setInventoryTab("sites");
@@ -222,8 +233,10 @@ export function AppShell({
 
   const loadViewportParcels = async (bbox: [number, number, number, number], zoom: number) => {
     if (!orlandoParcelsOn) return;
-    // Prefer live DOH fill when zoomed in; fixtures cover the shed offline.
-    const useLive = zoom >= 11.5;
+    // Live DOH fill is only for the thinner sample counties. The five core counties
+    // already ship every ≥5 acre parcel, and live queries stay at that same cutoff.
+    const useLive = zoom >= 11.5 && Boolean(county) && !isFull5AcCounty(county);
+    const limit = useLive ? 900 : zoom >= 12 ? 3500 : 5000;
     setParcelsLoading(true);
     setError(null);
     try {
@@ -231,7 +244,7 @@ export function AppShell({
         market: "Orlando",
         source: useLive ? "live" : "fixture",
         bbox: bbox.join(","),
-        limit: useLive ? "900" : "5000",
+        limit: String(limit),
       });
       if (county && countyState) {
         params.set("county", county);
@@ -241,13 +254,21 @@ export function AppShell({
       if (!response.ok) {
         throw new Error(`Parcel load failed (${response.status})`);
       }
-      const body = (await response.json()) as ParcelCollection & { error?: string };
+      const body = (await response.json()) as ParcelCollection & {
+        error?: string;
+        meta?: { totalInBbox?: number; truncated?: boolean };
+      };
       if (body.error) throw new Error(body.error);
       setViewportParcels({ type: "FeatureCollection", features: body.features ?? [] });
+      setViewportStats({
+        totalInBbox: body.meta?.totalInBbox ?? body.features?.length ?? 0,
+        truncated: Boolean(body.meta?.truncated),
+      });
       setParcelSource(useLive ? "live" : "fixture");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to refresh parcels");
       setViewportParcels(null);
+      setViewportStats(null);
       setParcelSource("fixture");
     } finally {
       setParcelsLoading(false);
@@ -367,11 +388,17 @@ export function AppShell({
             {visibleTracts.length === 1 ? "tract" : "tracts"}
             {orlandoParcelsOn ? (
               <span className="block text-[11px]">
-                {matched.length.toLocaleString()} of {activeParcels.features.length.toLocaleString()} parcels
+                {matched.length.toLocaleString()} of {activeParcels.features.length.toLocaleString()} in view
                 {parcelsLoading ? " · loading…" : ` · ${parcelSource}`}
+                {viewportStats?.truncated ? (
+                  <span className="block">
+                    Showing a spread of this view. {viewportStats.totalInBbox.toLocaleString()} parcels meet the
+                    fixture — zoom in for the rest.
+                  </span>
+                ) : null}
                 <span className="block">
-                  Shed fixtures: {orlandoParcelsMeta.parcelCount.toLocaleString()} across{" "}
-                  {orlandoParcelsMeta.counties.length} counties
+                  ≥5 ac fixtures: {fullAcreageParcelCount.toLocaleString()} in{" "}
+                  {fullAcreageCounties.map((item) => item.name).join(", ")}
                 </span>
               </span>
             ) : (
@@ -508,7 +535,8 @@ export function AppShell({
               <div className="min-h-0 flex-1">
                 {showSites ? (
                   <SitesPanel
-                    sites={ranked}
+                    sites={rankedVisible}
+                    matchedTotal={ranked.length}
                     selectedId={selectedId}
                     hoveredId={hoveredId}
                     incomeGeography={filters.incomeGeography}
@@ -560,7 +588,8 @@ export function AppShell({
             {showSites ? (
               <SitesPanel
                 variant="sheet"
-                sites={ranked}
+                sites={rankedVisible}
+                matchedTotal={ranked.length}
                 selectedId={selectedId}
                 hoveredId={hoveredId}
                 incomeGeography={filters.incomeGeography}

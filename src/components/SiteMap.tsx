@@ -309,15 +309,17 @@ export function SiteMap({
             map.getCanvas().style.cursor = "";
             callbacksRef.current.onHover(null);
           });
+          const emitViewport = () => {
+            const cb = callbacksRef.current.onViewportIdle;
+            if (!cb) return;
+            const b = map.getBounds();
+            cb([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], map.getZoom());
+          };
           map.on("moveend", () => {
             if (idleTimer.current) window.clearTimeout(idleTimer.current);
-            idleTimer.current = window.setTimeout(() => {
-              const cb = callbacksRef.current.onViewportIdle;
-              if (!cb) return;
-              const b = map.getBounds();
-              cb([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], map.getZoom());
-            }, 450);
+            idleTimer.current = window.setTimeout(emitViewport, 450);
           });
+          emitViewport();
 
           mapRef.current = map;
           setStatus("ready");

@@ -17,6 +17,7 @@ type SitesPanelProps = {
   onHover: (id: string | null) => void;
   onClose?: () => void;
   variant?: "overlay" | "sheet";
+  matchedTotal?: number;
 };
 
 export function SitesPanel({
@@ -30,6 +31,7 @@ export function SitesPanel({
   onHover,
   onClose,
   variant = "overlay",
+  matchedTotal,
 }: SitesPanelProps) {
   const listRef = useRef<HTMLUListElement | null>(null);
 
@@ -50,7 +52,9 @@ export function SitesPanel({
         <div>
           <p className="text-[11px] uppercase tracking-[0.16em] text-ink-500">Ranked sites</p>
           <p className="font-display text-2xl text-white">
-            {sites.length.toLocaleString()} {sites.length === 1 ? "site" : "sites"}
+            {matchedTotal && matchedTotal > sites.length
+              ? `Top ${sites.length.toLocaleString()} of ${matchedTotal.toLocaleString()}`
+              : `${sites.length.toLocaleString()} ${sites.length === 1 ? "site" : "sites"}`}
           </p>
           <p className="mt-0.5 text-[11px] leading-relaxed text-ink-500">
             Score 0–100 from acreage, income, AADT, zoning/FLU fit
@@ -66,7 +70,7 @@ export function SitesPanel({
 
       {landUseFilter === "rezoning" && fluUnknownCount > 0 ? (
         <p className="border-b border-clay-400/30 bg-clay-500/10 px-3 py-2 text-[11px] leading-relaxed text-clay-400">
-          Rezoning candidates need joined FLU. {fluUnknownCount.toLocaleString()} sample parcels have no municipal FLU
+          Rezoning candidates need joined FLU. {fluUnknownCount.toLocaleString()} parcels in this view have no municipal FLU
           (often Winter Park, Ocoee, Winter Garden, Apopka) and cannot be classified.
         </p>
       ) : null}

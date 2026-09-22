@@ -43,7 +43,7 @@ export function ZoningKnowledgePanel({
       <p className="mt-1 text-[11px] leading-relaxed text-ink-500">
         Updated {zoningConfig.updatedAt || "unknown"}. {verified} of {zoningConfig.jurisdictions.length}{" "}
         jurisdictions have a reviewed use table. FLU config {fluConfig.updatedAt}: {fluYes} categories treated as
-        MF-supportive. Joined FLU on {fluJoinedCount ?? "—"} / {parcelCount} sample parcels.
+        MF-supportive. Joined FLU on {fluJoinedCount ?? "—"} / {parcelCount} loaded parcels.
       </p>
 
       <details className="mt-2">

@@ -183,7 +183,7 @@ export function emptyStateHint(filters: FilterState, matched: number, fluUnknown
     return "No rezoning candidates match: that mode needs joined FLU that supports multifamily / higher density and current zoning that is not MF-capable. Municipal FLU besides Orlando is often missing — those parcels are omitted rather than guessed. Try All parcels or Non-multifamily zoning, or turn FLU-unknown jurisdictions off your mental map.";
   }
   if (filters.landUseFilter === "flu" && fluUnknownCount > 0) {
-    return "No joined FLU designations in this sample currently match the multifamily-supportive list. Municipal FLU besides Orlando is a known gap — try Either, or turn land-use filtering off.";
+    return "No joined FLU designations in this view currently match the multifamily-supportive list. Municipal FLU besides Orlando is a known gap — try Either, or turn land-use filtering off.";
   }
   if (filters.ozFilter === "in") {
     return "No matching parcels sit in a current designated Qualified Opportunity Zone under the other filters. Clear the OZ filter or lower acreage / income / AADT thresholds.";

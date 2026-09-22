@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { queryOrlandoFixtureParcels } from "../lib/data/orlandoParcelStore";
 import { readdirSync, readFileSync, existsSync, statSync } from "node:fs";
 import path from "node:path";
 import {
@@ -119,5 +120,27 @@ describe("Orlando shed parcels", () => {
     const orange = meta.counties.find((county) => county.name === "Orange");
     expect(orange?.zoningJoinedCount ?? 0).toBeGreaterThan(1000);
     expect(orange?.fluJoinedCount ?? 0).toBeGreaterThan(1000);
+  });
+
+  it("returns only centroids inside an area-of-interest bbox", async () => {
+    const bbox = [-81.45, 28.45, -81.3, 28.55] as [number, number, number, number];
+    const page = await queryOrlandoFixtureParcels({
+      bbox,
+      county: "Orange",
+      state: "Florida",
+      limit: 8000,
+    });
+    expect(page.totalInBbox).toBeGreaterThan(0);
+    expect(page.collection.features.length).toBeGreaterThan(0);
+    expect(page.collection.features.length).toBeLessThanOrEqual(page.totalInBbox);
+    for (const feature of page.collection.features) {
+      const [lon, lat] = feature.properties.centroid;
+      expect(lon).toBeGreaterThanOrEqual(bbox[0]);
+      expect(lon).toBeLessThanOrEqual(bbox[2]);
+      expect(lat).toBeGreaterThanOrEqual(bbox[1]);
+      expect(lat).toBeLessThanOrEqual(bbox[3]);
+      expect(feature.properties.acreage ?? 0).toBeGreaterThanOrEqual(5);
+      expect(feature.properties.acreage ?? 0).toBeLessThanOrEqual(150);
+    }
   });
 });

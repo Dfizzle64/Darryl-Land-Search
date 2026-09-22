@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FilterSidebar } from "./FilterSidebar";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { ParcelDrawer } from "./ParcelDrawer";
@@ -8,6 +8,7 @@ import { SiteMap } from "./SiteMap";
 import { SitesPanel } from "./SitesPanel";
 import { TractDrawer } from "./TractDrawer";
 import { TractPanel } from "./TractPanel";
+import { AOI_PARCEL_LIMIT, featuresIntersectingBbox, type AoiLock } from "@/lib/aoi";
 import { emptyStateHint, filterParcels } from "@/lib/filters";
 import {
   countyKey,
@@ -97,6 +98,13 @@ export function AppShell({
   const [mfView, setMfView] = useState<MfPriorityView>("all");
   const [viewportParcels, setViewportParcels] = useState<ParcelCollection | null>(null);
   const [viewportStats, setViewportStats] = useState<{ totalInBbox: number; truncated: boolean } | null>(null);
+  const [aoi, setAoi] = useState<AoiLock | null>(null);
+  const [lockedParcels, setLockedParcels] = useState<ParcelCollection | null>(null);
+  const [aoiStats, setAoiStats] = useState<{ totalInBbox: number; truncated: boolean } | null>(null);
+  const aoiRef = useRef(aoi);
+  aoiRef.current = aoi;
+  const viewportRequest = useRef(0);
+  const aoiRequest = useRef(0);
   const [parcelsLoading, setParcelsLoading] = useState(true);
   const [parcelSource, setParcelSource] = useState<"fixture" | "live">("fixture");
   const [error, setError] = useState<string | null>(null);
@@ -168,9 +176,15 @@ export function AppShell({
 
   const activeParcels = useMemo<ParcelCollection>(() => {
     if (!orlandoParcelsOn) return EMPTY_PARCELS;
+    if (aoi) {
+      return {
+        type: "FeatureCollection",
+        features: featuresIntersectingBbox(lockedParcels?.features ?? [], aoi.bbox),
+      };
+    }
     if (viewportParcels) return viewportParcels;
     return { type: "FeatureCollection", features: countyParcelFeatures };
-  }, [orlandoParcelsOn, viewportParcels, countyParcelFeatures]);
+  }, [orlandoParcelsOn, aoi, lockedParcels, viewportParcels, countyParcelFeatures]);
 
   const matched = useMemo(
     () => filterParcels(activeParcels.features, filters, zoningConfig, fluConfig),
@@ -218,6 +232,10 @@ export function AppShell({
     if (!orlandoParcelsOn) {
       setInventoryTab("tracts");
       setViewportParcels(null);
+      setViewportStats(null);
+      setAoi(null);
+      setLockedParcels(null);
+      setAoiStats(null);
       setParcelsLoading(false);
       return;
     }
@@ -232,11 +250,12 @@ export function AppShell({
   }, [orlandoParcelsOn, county]);
 
   const loadViewportParcels = async (bbox: [number, number, number, number], zoom: number) => {
-    if (!orlandoParcelsOn) return;
+    if (!orlandoParcelsOn || aoiRef.current) return;
     // Live DOH fill is only for the thinner sample counties. The five core counties
     // already ship every parcel from 5 through 150 acres.
     const useLive = zoom >= 11.5 && Boolean(county) && !isFull5AcCounty(county);
     const limit = useLive ? 900 : zoom >= 12 ? 3500 : 5000;
+    const requestId = ++viewportRequest.current;
     setParcelsLoading(true);
     setError(null);
     try {
@@ -251,6 +270,7 @@ export function AppShell({
         params.set("state", countyState);
       }
       const response = await fetch(`/api/parcels?${params.toString()}`);
+      if (requestId !== viewportRequest.current || aoiRef.current) return;
       if (!response.ok) {
         throw new Error(`Parcel load failed (${response.status})`);
       }
@@ -259,6 +279,7 @@ export function AppShell({
         meta?: { totalInBbox?: number; truncated?: boolean };
       };
       if (body.error) throw new Error(body.error);
+      if (requestId !== viewportRequest.current || aoiRef.current) return;
       setViewportParcels({ type: "FeatureCollection", features: body.features ?? [] });
       setViewportStats({
         totalInBbox: body.meta?.totalInBbox ?? body.features?.length ?? 0,
@@ -266,14 +287,72 @@ export function AppShell({
       });
       setParcelSource(useLive ? "live" : "fixture");
     } catch (err) {
+      if (requestId !== viewportRequest.current || aoiRef.current) return;
       setError(err instanceof Error ? err.message : "Unable to refresh parcels");
       setViewportParcels(null);
       setViewportStats(null);
       setParcelSource("fixture");
     } finally {
-      setParcelsLoading(false);
+      if (requestId === viewportRequest.current && !aoiRef.current) setParcelsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!orlandoParcelsOn || !aoi) {
+      aoiRequest.current += 1;
+      setLockedParcels(null);
+      setAoiStats(null);
+      return;
+    }
+    const requestId = ++aoiRequest.current;
+    viewportRequest.current += 1;
+    const bbox = aoi.bbox;
+    const params = new URLSearchParams({
+      market: "Orlando",
+      source: "fixture",
+      bbox: bbox.join(","),
+      limit: String(AOI_PARCEL_LIMIT),
+    });
+    if (county && countyState) {
+      params.set("county", county);
+      params.set("state", countyState);
+    }
+    setLockedParcels(null);
+    setAoiStats(null);
+    setParcelsLoading(true);
+    setError(null);
+    let cancelled = false;
+    void (async () => {
+      try {
+        const response = await fetch(`/api/parcels?${params.toString()}`);
+        if (cancelled || requestId !== aoiRequest.current) return;
+        if (!response.ok) throw new Error(`Parcel load failed (${response.status})`);
+        const body = (await response.json()) as ParcelCollection & {
+          error?: string;
+          meta?: { totalInBbox?: number; truncated?: boolean };
+        };
+        if (body.error) throw new Error(body.error);
+        if (cancelled || requestId !== aoiRequest.current) return;
+        const features = featuresIntersectingBbox(body.features ?? [], bbox);
+        setLockedParcels({ type: "FeatureCollection", features });
+        setAoiStats({
+          totalInBbox: body.meta?.totalInBbox ?? features.length,
+          truncated: Boolean(body.meta?.truncated),
+        });
+        setParcelSource("fixture");
+      } catch (err) {
+        if (cancelled || requestId !== aoiRequest.current) return;
+        setError(err instanceof Error ? err.message : "Unable to load the locked area");
+        setLockedParcels({ type: "FeatureCollection", features: [] });
+        setAoiStats(null);
+      } finally {
+        if (!cancelled && requestId === aoiRequest.current) setParcelsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [aoi, orlandoParcelsOn, county, countyState]);
 
   useEffect(() => {
     if (!scView && mfView !== "all") setMfView("all");
@@ -300,6 +379,10 @@ export function AppShell({
     setSelectedTractGeoid(null);
     setSelectedId(null);
     setViewportParcels(null);
+    setViewportStats(null);
+    setAoi(null);
+    setLockedParcels(null);
+    setAoiStats(null);
     setInventoryTab(next === "Orlando" ? "sites" : "tracts");
   };
 
@@ -388,9 +471,16 @@ export function AppShell({
             {visibleTracts.length === 1 ? "tract" : "tracts"}
             {orlandoParcelsOn ? (
               <span className="block text-[11px]">
-                {matched.length.toLocaleString()} of {activeParcels.features.length.toLocaleString()} in view
-                {parcelsLoading ? " · loading…" : ` · ${parcelSource}`}
-                {viewportStats?.truncated ? (
+                {matched.length.toLocaleString()} of {activeParcels.features.length.toLocaleString()}{" "}
+                {aoi ? "in AOI" : "in view"}
+                {parcelsLoading ? " · loading…" : aoi ? " · locked" : ` · ${parcelSource}`}
+                {aoi && aoiStats?.truncated ? (
+                  <span className="block">
+                    AOI holds {aoiStats.totalInBbox.toLocaleString()} parcels. The locked list is a stable spread —
+                    draw a smaller area for the rest.
+                  </span>
+                ) : null}
+                {!aoi && viewportStats?.truncated ? (
                   <span className="block">
                     Showing a spread of this view. {viewportStats.totalInBbox.toLocaleString()} parcels meet the
                     fixture — zoom in for the rest.
@@ -511,6 +601,10 @@ export function AppShell({
             onHover={setHoveredId}
             onSelectTract={selectTract}
             onViewportIdle={orlandoParcelsOn ? loadViewportParcels : undefined}
+            aoi={orlandoParcelsOn ? aoi : null}
+            aoiMatchedCount={matched.length}
+            aoiTruncated={Boolean(aoiStats?.truncated)}
+            onAoiChange={setAoi}
           />
           <div className="pointer-events-none absolute bottom-3 right-3 top-16 z-10 hidden w-80 xl:block">
             <div className="pointer-events-auto flex h-full min-h-0 flex-col gap-2">

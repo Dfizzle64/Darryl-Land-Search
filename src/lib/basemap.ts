@@ -40,6 +40,8 @@ export const OVERLAY_LAYER_IDS = [
   "parcels-line-excluded",
   "parcels-fill",
   "parcels-line",
+  "aoi-fill",
+  "aoi-line",
 ] as const;
 
 export const FIRST_OVERLAY_LAYER_ID = OVERLAY_LAYER_IDS[0];

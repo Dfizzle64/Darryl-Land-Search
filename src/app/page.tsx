@@ -7,6 +7,7 @@ import {
   loadOz2Tracts,
   loadRuralMarketsCatalog,
   loadRuralMarketTracts,
+  loadScMfPriority,
   loadTrafficCollection,
   loadZoningConfig,
 } from "@/lib/data/loadFixtures";
@@ -14,7 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [parcels, traffic, opportunityZones, oz2Tracts, ruralCatalog, ruralTracts, zoningConfig, fluConfig, meta] =
+  const [parcels, traffic, opportunityZones, oz2Tracts, ruralCatalog, ruralTracts, mfPriority, zoningConfig, fluConfig, meta] =
     await Promise.all([
       getParcelProvider().listParcels(),
       loadTrafficCollection(),
@@ -22,6 +23,7 @@ export default async function HomePage() {
       loadOz2Tracts(),
       loadRuralMarketsCatalog(),
       loadRuralMarketTracts(),
+      loadScMfPriority(),
       loadZoningConfig(),
       loadFluConfig(),
       loadFixtureMeta(),
@@ -35,6 +37,7 @@ export default async function HomePage() {
       oz2Tracts={oz2Tracts}
       ruralCatalog={ruralCatalog}
       ruralTracts={ruralTracts}
+      mfPriority={mfPriority}
       zoningConfig={zoningConfig}
       fluConfig={fluConfig}
       meta={meta}

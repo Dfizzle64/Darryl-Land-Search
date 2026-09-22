@@ -2,6 +2,7 @@
 
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { formatCountyLabel, isSouthCarolinaState } from "@/lib/markets";
+import { MF_PRIORITY_DISCLAIMER, NOM_WATCH_CAVEAT, tractPlaceLabel } from "@/lib/scMfPriority";
 import { RURAL_ELIGIBLE_STATUS_CHIP, SC_GOVERNOR_FILED_STATUS, SHED_CAVEAT, type RuralMarketTractRow } from "@/lib/types";
 
 type TractDrawerProps = {
@@ -28,16 +29,21 @@ export function TractDrawer({ tract, statusHelp = null, onClose }: TractDrawerPr
 
   const orangePilotTract = tract.state === "Florida" && tract.county === "Orange";
   const southCarolina = isSouthCarolinaState(tract.state);
+  const priority = tract.mfPriority ?? null;
+  const place = tractPlaceLabel(tract);
 
   return (
     <aside className="drawer-scroll absolute inset-x-0 bottom-0 z-20 max-h-[70vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-5 shadow-2xl lg:static lg:z-0 lg:max-h-none lg:w-[24rem] lg:shrink-0 lg:rounded-none lg:border-l lg:border-t-0 lg:shadow-none">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[11px] uppercase tracking-[0.18em] text-clay-400">{tract.geoid}</p>
-          <h2 className="mt-1 font-display text-2xl leading-tight text-white">{tract.placeOrCorridor}</h2>
+          <h2 className="mt-1 font-display text-2xl leading-tight text-white">{place}</h2>
           <p className="text-sm text-ink-300">
             {formatCountyLabel(tract.county, tract.state)} · {tract.market}
           </p>
+          {priority && priority.place !== tract.placeOrCorridor ? (
+            <p className="mt-1 text-xs text-ink-500">Pack label: {tract.placeOrCorridor}</p>
+          ) : null}
         </div>
         <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-3 py-1 text-sm">
           Close
@@ -48,8 +54,43 @@ export function TractDrawer({ tract, statusHelp = null, onClose }: TractDrawerPr
         {RURAL_ELIGIBLE_STATUS_CHIP}
       </p>
       {southCarolina ? <p className="mt-2 text-xs leading-relaxed text-ink-100">{SC_GOVERNOR_FILED_STATUS}</p> : null}
+      {priority ? (
+        <p
+          className={`mt-2 inline-block rounded-full border px-2 py-1 text-xs ${
+            priority.tier === "A"
+              ? "border-[#ffe08a]/80 bg-[#ffe08a]/15 text-[#ffe08a]"
+              : "border-[#7ec8ff]/80 bg-[#7ec8ff]/15 text-[#d7eeff]"
+          }`}
+        >
+          Tier {priority.tier} · SC MF priority
+        </p>
+      ) : null}
 
       <dl className="mt-4 space-y-3 text-sm">
+        {priority ? (
+          <>
+            <div>
+              <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Multifamily priority</dt>
+              <dd className="mt-1 text-ink-100">
+                {MF_PRIORITY_DISCLAIMER} {NOM_WATCH_CAVEAT}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Why it is on the shortlist</dt>
+              <dd className="mt-1 text-ink-100">{priority.mfRationale}</dd>
+            </div>
+            <div>
+              <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Acreage realism</dt>
+              <dd className="mt-1 text-ink-100">
+                {priority.acreageRealism}. This is tract-wide Census land area, not a 5–40 acre pad.
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">MF notes</dt>
+              <dd className="mt-1 text-ink-100">{priority.notes}</dd>
+            </div>
+          </>
+        ) : null}
         <div>
           <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">What this means</dt>
           <dd className="mt-1 text-ink-100">
@@ -61,7 +102,9 @@ export function TractDrawer({ tract, statusHelp = null, onClose }: TractDrawerPr
           </dd>
         </div>
         <div>
-          <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Notes</dt>
+          <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">
+            {priority ? "Rural-pack notes" : "Notes"}
+          </dt>
           <dd className="mt-1 text-ink-100">{tract.notes}</dd>
         </div>
         <div>

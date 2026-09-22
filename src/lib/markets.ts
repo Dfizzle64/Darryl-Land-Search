@@ -75,12 +75,15 @@ export function viewBounds(
   rows: RuralMarketTractRow[],
   county: string | null,
   state: string | null,
+  options?: { fitRows?: boolean },
 ): [[number, number], [number, number]] {
   if (showOrangeCountyPilot(summary.market, county, state) && county === "Orange") {
     return ORANGE_COUNTY_BOUNDS;
   }
-  if (!county) return summary.bounds;
-  const subset = rows.filter((row) => row.market === summary.market && row.county === county && row.state === state);
+  if (!county && !options?.fitRows) return summary.bounds;
+  const subset = !county
+    ? rows.filter((row) => row.market === summary.market)
+    : rows.filter((row) => row.market === summary.market && row.county === county && row.state === state);
   if (subset.length === 0) return summary.bounds;
   let west = Math.min(...subset.map((row) => row.lon));
   let east = Math.max(...subset.map((row) => row.lon));

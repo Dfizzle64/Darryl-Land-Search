@@ -11,7 +11,10 @@ import {
   applyBasemap,
   excludedFillPaint,
   excludedLinePaint,
+  MF_PRIORITY_SWATCH,
   OZ_TRACT_SWATCH,
+  mfPriorityFillPaint,
+  mfPriorityLinePaint,
   oz2FillPaint,
   oz2LinePaint,
   ozFillPaint,
@@ -49,16 +52,26 @@ type SiteMapProps = {
   bounds: LngLatBounds;
   boundsKey: string;
   ozFilter: OzFilter;
+  highlightTierA: string[];
+  highlightTierB: string[];
+  restrictGeoids: string[] | null;
+  showMfLegend: boolean;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   onSelectTract: (geoid: string) => void;
 };
+
+function geoidMatch(geoids: string[]): maplibregl.FilterSpecification {
+  if (geoids.length === 0) return ["==", ["get", "tractGeoid"], "__none__"];
+  return ["in", ["get", "tractGeoid"], ["literal", geoids]];
+}
 
 function ruralLayerFilter(
   market: MarketId,
   county: string | null,
   countyState: string | null,
   hideOrangeCounty: boolean,
+  geoids: string[] | null = null,
 ): maplibregl.FilterSpecification {
   const parts: maplibregl.FilterSpecification[] = [["in", ["literal", market], ["get", "markets"]]];
   if (county && countyState) {
@@ -68,6 +81,7 @@ function ruralLayerFilter(
   if (hideOrangeCounty) {
     parts.push(["!", ["all", ["==", ["get", "state"], "Florida"], ["==", ["get", "county"], "Orange"]]]);
   }
+  if (geoids) parts.push(geoidMatch(geoids));
   if (parts.length === 1) return parts[0];
   return ["all", ...parts] as maplibregl.FilterSpecification;
 }
@@ -100,6 +114,30 @@ function addOverlayLayers(
     type: "line",
     source: "rural-tracts",
     paint: oz2LinePaint(mode),
+  });
+  map.addLayer({
+    id: "mf-priority-a-fill",
+    type: "fill",
+    source: "rural-tracts",
+    paint: mfPriorityFillPaint(mode, "A"),
+  });
+  map.addLayer({
+    id: "mf-priority-a-line",
+    type: "line",
+    source: "rural-tracts",
+    paint: mfPriorityLinePaint(mode, "A"),
+  });
+  map.addLayer({
+    id: "mf-priority-b-fill",
+    type: "fill",
+    source: "rural-tracts",
+    paint: mfPriorityFillPaint(mode, "B"),
+  });
+  map.addLayer({
+    id: "mf-priority-b-line",
+    type: "line",
+    source: "rural-tracts",
+    paint: mfPriorityLinePaint(mode, "B"),
   });
   map.addLayer({
     id: "rural-pins",
@@ -187,6 +225,10 @@ export function SiteMap({
   bounds,
   boundsKey,
   ozFilter,
+  highlightTierA,
+  highlightTierB,
+  restrictGeoids,
+  showMfLegend,
   onSelect,
   onHover,
   onSelectTract,
@@ -242,7 +284,7 @@ export function SiteMap({
             const id = event.features?.[0]?.properties?.id;
             if (typeof id === "string") callbacksRef.current.onSelect(id);
           });
-          const tractLayers = ["rural-fill", "rural-pins", "oz2-fill"];
+          const tractLayers = ["mf-priority-a-fill", "mf-priority-b-fill", "rural-fill", "rural-pins", "oz2-fill"];
           map.on("click", tractLayers, (event) => {
             const parcelHit = map.queryRenderedFeatures(event.point, { layers: interactive });
             if (parcelHit.length > 0) return;
@@ -305,6 +347,9 @@ export function SiteMap({
     map.setLayoutProperty("rural-fill", "visibility", showRuralMarkets ? "visible" : "none");
     map.setLayoutProperty("rural-line", "visibility", showRuralMarkets ? "visible" : "none");
     map.setLayoutProperty("rural-pins", "visibility", showRuralMarkets ? "visible" : "none");
+    for (const layerId of ["mf-priority-a-fill", "mf-priority-a-line", "mf-priority-b-fill", "mf-priority-b-line"]) {
+      map.setLayoutProperty(layerId, "visibility", showRuralMarkets ? "visible" : "none");
+    }
     const oz2Filter: maplibregl.FilterSpecification | null =
       ozFilter === "rural-eligible"
         ? ["==", ["get", "rural"], true]
@@ -313,10 +358,31 @@ export function SiteMap({
           : null;
     map.setFilter("oz2-fill", oz2Filter);
     map.setFilter("oz2-line", oz2Filter);
-    const ruralFilter = ruralLayerFilter(market, county, countyState, showOrangePilot);
+    const ruralFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, restrictGeoids);
     map.setFilter("rural-fill", ruralFilter);
     map.setFilter("rural-line", ruralFilter);
-  }, [matchedIds, showExcluded, showTraffic, showOz, showOz2, showOrangePilot, ozFilter, market, county, countyState, status]);
+    const tierAFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, highlightTierA);
+    const tierBFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, highlightTierB);
+    map.setFilter("mf-priority-a-fill", tierAFilter);
+    map.setFilter("mf-priority-a-line", tierAFilter);
+    map.setFilter("mf-priority-b-fill", tierBFilter);
+    map.setFilter("mf-priority-b-line", tierBFilter);
+  }, [
+    matchedIds,
+    showExcluded,
+    showTraffic,
+    showOz,
+    showOz2,
+    showOrangePilot,
+    ozFilter,
+    market,
+    county,
+    countyState,
+    status,
+    highlightTierA,
+    highlightTierB,
+    restrictGeoids,
+  ]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -331,6 +397,9 @@ export function SiteMap({
     map.setLayoutProperty("rural-fill", "visibility", showRuralMarkets ? "visible" : "none");
     map.setLayoutProperty("rural-line", "visibility", showRuralMarkets ? "visible" : "none");
     map.setLayoutProperty("rural-pins", "visibility", showRuralMarkets ? "visible" : "none");
+    for (const layerId of ["mf-priority-a-fill", "mf-priority-a-line", "mf-priority-b-fill", "mf-priority-b-line"]) {
+      map.setLayoutProperty(layerId, "visibility", showRuralMarkets ? "visible" : "none");
+    }
   }, [basemap, showTraffic, showOz, showOz2, showOrangePilot, ozFilter, status]);
 
   const previousHover = useRef<string | null>(null);
@@ -440,6 +509,24 @@ export function SiteMap({
                   />
                   OZ 2.0 eligible, not rural (Orange County)
                 </p>
+              ) : null}
+              {showMfLegend ? (
+                <>
+                  <p>
+                    <span
+                      className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
+                      style={{ backgroundColor: MF_PRIORITY_SWATCH.tierA }}
+                    />
+                    SC MF priority · Tier A
+                  </p>
+                  <p>
+                    <span
+                      className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
+                      style={{ backgroundColor: MF_PRIORITY_SWATCH.tierB }}
+                    />
+                    SC MF priority · Tier B
+                  </p>
+                </>
               ) : null}
             </>
           ) : null}

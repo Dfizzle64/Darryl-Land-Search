@@ -8,6 +8,7 @@ import type {
   ParcelCollection,
   RuralMarketTractCollection,
   RuralMarketsCatalog,
+  ScMfPriorityCatalog,
   TrafficFeature,
   ZoningConfig,
 } from "../types";
@@ -79,6 +80,11 @@ export async function loadRuralMarketsCatalog(): Promise<RuralMarketsCatalog> {
 export async function loadRuralMarketTracts(): Promise<RuralMarketTractCollection> {
   const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-rural-markets.geojson"), "utf8");
   return JSON.parse(raw) as RuralMarketTractCollection;
+}
+
+export async function loadScMfPriority(): Promise<ScMfPriorityCatalog> {
+  const raw = await readFile(path.join(DATA_DIR, "fixtures/sc-oz2-mf-priority.json"), "utf8");
+  return JSON.parse(raw) as ScMfPriorityCatalog;
 }
 
 export async function loadFixtureMeta(): Promise<Record<string, unknown>> {

@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { aoiFeatureCollection, normalizeBbox, type AoiLock } from "@/lib/aoi";
 import { BasemapToggle } from "./BasemapToggle";
 import { AoiControls } from "./AoiControls";
+import { ParcelLayerToggle } from "./ParcelLayerToggle";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import {
   STREET_STYLE_CANDIDATES,
@@ -21,8 +22,11 @@ import {
   oz2LinePaint,
   ozFillPaint,
   ozLinePaint,
+  parcelExcludedFilter,
   parcelFillPaint,
+  parcelHiddenFilter,
   parcelLinePaint,
+  parcelMatchFilter,
   ruralPinPaint,
   trafficLinePaint,
   type BasemapMode,
@@ -39,7 +43,6 @@ type SiteMapProps = {
   oz2Tracts: Oz2TractCollection;
   ruralTracts: RuralMarketTractCollection;
   ruralPins: GeoJSON.FeatureCollection<GeoJSON.Point>;
-  matchedIds: Set<string>;
   selectedId: string | null;
   hoveredId: string | null;
   selectedTractGeoid: string | null;
@@ -48,6 +51,9 @@ type SiteMapProps = {
   showOz: boolean;
   showOz2: boolean;
   showParcels: boolean;
+  parcelLayerVisible?: boolean;
+  parcelVisibilityHint?: string;
+  onToggleParcelLayer?: () => void;
   showOrangePilot: boolean;
   parcelsLoading?: boolean;
   market: MarketId;
@@ -64,6 +70,7 @@ type SiteMapProps = {
   onHover: (id: string | null) => void;
   onSelectTract: (geoid: string) => void;
   onViewportIdle?: (bbox: [number, number, number, number], zoom: number) => void;
+  onZoom?: (zoom: number) => void;
   aoi?: AoiLock | null;
   aoiMatchedCount?: number;
   aoiTruncated?: boolean;
@@ -236,7 +243,6 @@ export function SiteMap({
   oz2Tracts,
   ruralTracts,
   ruralPins,
-  matchedIds,
   selectedId,
   hoveredId,
   selectedTractGeoid,
@@ -245,6 +251,9 @@ export function SiteMap({
   showOz,
   showOz2,
   showParcels,
+  parcelLayerVisible,
+  parcelVisibilityHint,
+  onToggleParcelLayer,
   showOrangePilot,
   parcelsLoading = false,
   market,
@@ -261,6 +270,7 @@ export function SiteMap({
   onHover,
   onSelectTract,
   onViewportIdle,
+  onZoom,
   aoi = null,
   aoiMatchedCount = 0,
   aoiTruncated = false,
@@ -272,8 +282,8 @@ export function SiteMap({
   const [message, setMessage] = useState("Loading map…");
   const [basemap, setBasemap] = useState<BasemapMode>("streets");
   const [drawing, setDrawing] = useState(false);
-  const callbacksRef = useRef({ onSelect, onHover, onSelectTract, onViewportIdle, onAoiChange });
-  callbacksRef.current = { onSelect, onHover, onSelectTract, onViewportIdle, onAoiChange };
+  const callbacksRef = useRef({ onSelect, onHover, onSelectTract, onViewportIdle, onZoom, onAoiChange });
+  callbacksRef.current = { onSelect, onHover, onSelectTract, onViewportIdle, onZoom, onAoiChange };
   const drawingRef = useRef(drawing);
   drawingRef.current = drawing;
   const aoiRef = useRef(aoi);
@@ -345,13 +355,18 @@ export function SiteMap({
             map.getCanvas().style.cursor = "";
             callbacksRef.current.onHover(null);
           });
+          const emitZoom = () => {
+            callbacksRef.current.onZoom?.(map.getZoom());
+          };
           const emitViewport = () => {
+            emitZoom();
             if (drawingRef.current || aoiRef.current) return;
             const cb = callbacksRef.current.onViewportIdle;
             if (!cb) return;
             const b = map.getBounds();
             cb([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], map.getZoom());
           };
+          map.on("zoom", emitZoom);
           map.on("moveend", () => {
             if (idleTimer.current) window.clearTimeout(idleTimer.current);
             idleTimer.current = window.setTimeout(emitViewport, 450);
@@ -536,15 +551,11 @@ export function SiteMap({
   useEffect(() => {
     const map = mapRef.current;
     if (!map || status !== "ready") return;
-    const ids = Array.from(matchedIds);
-    const matchedFilter: maplibregl.FilterSpecification =
-      ids.length === 0 ? ["==", ["get", "id"], "__none__"] : ["in", ["get", "id"], ["literal", ids]];
-    const excludedFilter: maplibregl.FilterSpecification = ["!", matchedFilter];
-    const none: maplibregl.FilterSpecification = ["==", ["get", "id"], "__none__"];
-    map.setFilter("parcels-fill", showParcels ? matchedFilter : none);
-    map.setFilter("parcels-line", showParcels ? matchedFilter : none);
-    map.setFilter("parcels-fill-excluded", showParcels && showExcluded ? excludedFilter : none);
-    map.setFilter("parcels-line-excluded", showParcels && showExcluded ? excludedFilter : none);
+    const layerOn = parcelLayerVisible ?? showParcels;
+    map.setFilter("parcels-fill", layerOn ? parcelMatchFilter : parcelHiddenFilter);
+    map.setFilter("parcels-line", layerOn ? parcelMatchFilter : parcelHiddenFilter);
+    map.setFilter("parcels-fill-excluded", layerOn && showExcluded ? parcelExcludedFilter : parcelHiddenFilter);
+    map.setFilter("parcels-line-excluded", layerOn && showExcluded ? parcelExcludedFilter : parcelHiddenFilter);
     map.setLayoutProperty("traffic-line", "visibility", showOrangePilot && showTraffic ? "visible" : "none");
     map.setLayoutProperty("oz-fill", "visibility", showOrangePilot && showOz ? "visible" : "none");
     map.setLayoutProperty("oz-line", "visibility", showOrangePilot && showOz ? "visible" : "none");
@@ -575,7 +586,7 @@ export function SiteMap({
     map.setFilter("mf-priority-b-fill", tierBFilter);
     map.setFilter("mf-priority-b-line", tierBFilter);
   }, [
-    matchedIds,
+    parcelLayerVisible,
     showExcluded,
     showTraffic,
     showOz,
@@ -694,11 +705,15 @@ export function SiteMap({
   }, [selectedId, selectedTractGeoid]);
 
   const scStatusHelp = southCarolinaStatusHelp(market, countyState);
+  const layerOn = parcelLayerVisible ?? showParcels;
 
   return (
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
       {status === "ready" ? <BasemapToggle value={basemap} onChange={setBasemap} /> : null}
+      {status === "ready" && showParcels && onToggleParcelLayer ? (
+        <ParcelLayerToggle visible={layerOn} hint={parcelVisibilityHint ?? ""} onToggle={onToggleParcelLayer} />
+      ) : null}
       {status === "ready" && showParcels ? (
         <AoiControls
           drawing={drawing}
@@ -731,7 +746,7 @@ export function SiteMap({
               Area of interest
             </p>
           ) : null}
-          {showParcels ? (
+          {layerOn ? (
             <p>
               <span className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle bg-moss-400" />
               Parcels (matched)

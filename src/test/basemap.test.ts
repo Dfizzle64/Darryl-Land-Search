@@ -12,6 +12,7 @@ import {
   ozLinePaint,
   parcelFillPaint,
   parcelLinePaint,
+  parcelMatchFilter,
   trafficLinePaint,
 } from "../lib/basemap";
 
@@ -52,9 +53,12 @@ describe("basemap helpers", () => {
     const streetFill = parcelFillPaint("streets")["fill-opacity"];
     const satelliteFill = parcelFillPaint("satellite")["fill-opacity"];
     expect(JSON.stringify(streetFill)).toContain("0.52");
+    expect(JSON.stringify(streetFill)).toContain("0.16");
     expect(JSON.stringify(satelliteFill)).toContain("0.26");
     expect(JSON.stringify(parcelLinePaint("satellite")["line-width"])).toContain("1.7");
-    expect(JSON.stringify(parcelLinePaint("streets")["line-width"])).toContain("1");
+    expect(JSON.stringify(parcelLinePaint("satellite")["line-width"])).toContain("0.55");
+    expect(JSON.stringify(parcelLinePaint("streets")["line-width"])).toContain("0.35");
+    expect(parcelMatchFilter).toEqual(["==", ["get", "filterMatch"], 1]);
     expect(Number(excludedFillPaint("satellite")["fill-opacity"])).toBeLessThan(0.2);
     expect(Number(excludedLinePaint("satellite")["line-opacity"])).toBeGreaterThan(
       Number(excludedLinePaint("streets")["line-opacity"]),

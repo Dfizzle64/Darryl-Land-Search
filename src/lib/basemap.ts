@@ -1,6 +1,8 @@
 import type {
   CircleLayerSpecification,
   FillLayerSpecification,
+  ExpressionSpecification,
+  FilterSpecification,
   LineLayerSpecification,
   Map as MapLibreMap,
 } from "maplibre-gl";
@@ -46,7 +48,23 @@ export const OVERLAY_LAYER_IDS = [
 
 export const FIRST_OVERLAY_LAYER_ID = OVERLAY_LAYER_IDS[0];
 
+/** Constant-size filters. A literal id list breaks once the viewport holds thousands of parcels. */
+export const parcelMatchFilter: FilterSpecification = ["==", ["get", "filterMatch"], 1];
+export const parcelExcludedFilter: FilterSpecification = ["==", ["get", "filterMatch"], 0];
+export const parcelHiddenFilter: FilterSpecification = ["==", ["get", "filterMatch"], -1];
+
+/**
+ * Mid zoom (just past the auto-on gate) stays light: lower fill, thinner line.
+ * Close zoom uses the original street/satellite weights. Selection stays strong.
+ */
+function parcelZoomStops(quiet: number, mid: number, full: number): ExpressionSpecification {
+  return ["interpolate", ["linear"], ["zoom"], 11, quiet, 12.5, mid, 14.5, full];
+}
+
 export function parcelFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
+  const quiet = mode === "satellite" ? 0.1 : 0.16;
+  const mid = mode === "satellite" ? 0.16 : 0.28;
+  const full = mode === "satellite" ? 0.26 : 0.52;
   return {
     "fill-color": [
       "case",
@@ -56,10 +74,14 @@ export function parcelFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecifi
       "#8fd4b5",
       "#3f9d74",
     ],
-    "fill-opacity":
-      mode === "satellite"
-        ? ["case", ["boolean", ["feature-state", "selected"], false], 0.5, ["boolean", ["feature-state", "hover"], false], 0.38, 0.26]
-        : ["case", ["boolean", ["feature-state", "selected"], false], 0.78, 0.52],
+    "fill-opacity": [
+      "case",
+      ["boolean", ["feature-state", "selected"], false],
+      mode === "satellite" ? 0.5 : 0.78,
+      ["boolean", ["feature-state", "hover"], false],
+      mode === "satellite" ? 0.38 : 0.62,
+      parcelZoomStops(quiet, mid, full),
+    ],
   };
 }
 
@@ -77,16 +99,23 @@ export function parcelLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecifi
       "line-width": [
         "case",
         ["boolean", ["feature-state", "selected"], false],
-        3,
+        2.6,
         ["boolean", ["feature-state", "hover"], false],
-        2.1,
-        1.7,
+        1.6,
+        parcelZoomStops(0.55, 0.9, 1.7),
       ],
     };
   }
   return {
     "line-color": ["case", ["boolean", ["feature-state", "selected"], false], "#f8e1b5", "#b7e3cf"],
-    "line-width": ["case", ["boolean", ["feature-state", "selected"], false], 2.4, 1],
+    "line-width": [
+      "case",
+      ["boolean", ["feature-state", "selected"], false],
+      2.2,
+      ["boolean", ["feature-state", "hover"], false],
+      1.3,
+      parcelZoomStops(0.35, 0.6, 1),
+    ],
   };
 }
 

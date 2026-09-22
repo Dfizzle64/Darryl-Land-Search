@@ -81,7 +81,7 @@ Orange enrichment:
 - Lake, Osceola, Polk, and Seminole have no zoning or FLU on the DOH extract. Land-use filters should stay on **All parcels** there. Missing zoning is not treated as multifamily.
 - Outside Orange, the OZ 2.0 flag is only the seven-market **rural-eligible** tract pack. Non-rural eligible tracts in those counties are not joined.
 - Orange municipal FLU other than Orlando is often the county placeholder `City` and stays unknown. In this 5–150 acre snapshot, 8,789 Orange parcels have a FLU code and 5,242 do not.
-- Income and AADT are not joined onto the full 5–150 acre extract.
+- Income and AADT are not stored on the 5–150 acre extract. `/api/parcels` joins Orange County ACS income and FDOT AADT at query time from the pilot fixtures before the acreage, income, and AADT filters run. Other counties stay unknown.
 - DOH land square feet and the county appraiser acreage field can disagree. The extract follows DOH for inclusion, then drops anything outside 5.0–150.0 acres. Orange OCPA acreage is stored only when it is still inside that band.
 - A public ArcGIS Online layer named Polk County parcels is the wrong state (Minnesota). It is not used.
 - Brevard’s property-appraiser MapServer has returned HTTP 403 from this environment. The sample uses DOH.

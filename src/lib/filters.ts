@@ -1,7 +1,15 @@
 import { fluAllowsMultifamily } from "./flu";
 import { parcelInOpportunityZone, parcelOz2Eligibility } from "./opportunityZone";
 import { zoningAllowsMultifamily } from "./zoning";
-import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "./types";
+import {
+  DEFAULT_FILTERS,
+  LAND_USE_FILTERS,
+  OZ_FILTERS,
+  type FilterState,
+  type FluConfig,
+  type ParcelFeature,
+  type ZoningConfig,
+} from "./types";
 
 export function parcelIncome(feature: ParcelFeature, geography: FilterState["incomeGeography"]): number | null {
   const info = geography === "tract" ? feature.properties.incomeTract : feature.properties.incomeBlockGroup;
@@ -175,6 +183,102 @@ export function filterParcels(
   fluConfig: FluConfig,
 ): ParcelFeature[] {
   return features.filter((feature) => parcelMatchesFilters(feature, filters, zoningConfig, fluConfig));
+}
+
+/** Stable key so viewport and AOI requests refetch when a slider moves. */
+export function parcelFilterKey(filters: FilterState): string {
+  return [
+    filters.landUseFilter,
+    filters.includePlannedDevelopment ? 1 : 0,
+    filters.includeConditionalZoning ? 1 : 0,
+    filters.ozFilter,
+    filters.minAcreage,
+    filters.includeUnknownAcreage ? 1 : 0,
+    filters.minIncome,
+    filters.incomeGeography,
+    filters.includeUnknownIncome ? 1 : 0,
+    filters.minAadt,
+    filters.includeUnknownAadt ? 1 : 0,
+  ].join("|");
+}
+
+function finiteNumber(value: string | null, fallback: number): number {
+  if (value == null || value.trim() === "") return fallback;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+/** Query-string form shared by the map client and `/api/parcels`. */
+export function writeParcelFilters(
+  params: URLSearchParams,
+  filters: FilterState,
+  includeExcluded = false,
+): void {
+  params.set("filter", "1");
+  params.set("landUse", filters.landUseFilter);
+  params.set("pd", filters.includePlannedDevelopment ? "1" : "0");
+  params.set("cond", filters.includeConditionalZoning ? "1" : "0");
+  params.set("oz", filters.ozFilter);
+  params.set("minAcres", String(filters.minAcreage));
+  params.set("unkAcres", filters.includeUnknownAcreage ? "1" : "0");
+  params.set("minIncome", String(filters.minIncome));
+  params.set("geo", filters.incomeGeography);
+  params.set("unkIncome", filters.includeUnknownIncome ? "1" : "0");
+  params.set("minAadt", String(filters.minAadt));
+  params.set("unkAadt", filters.includeUnknownAadt ? "1" : "0");
+  if (includeExcluded) params.set("includeExcluded", "1");
+}
+
+export function parcelFiltersFromSearchParams(params: { get(name: string): string | null }): FilterState {
+  const geo = params.get("geo");
+  return {
+    landUseFilter: landUseParam(params.get("landUse") ?? params.get("mf")),
+    includePlannedDevelopment: params.get("pd") !== "0",
+    includeConditionalZoning: params.get("cond") === "1",
+    ozFilter: ozParam(params.get("oz")),
+    minAcreage: finiteNumber(params.get("minAcres"), DEFAULT_FILTERS.minAcreage),
+    includeUnknownAcreage: params.get("unkAcres") !== "0",
+    minIncome: finiteNumber(params.get("minIncome"), DEFAULT_FILTERS.minIncome),
+    incomeGeography: geo === "blockGroup" ? "blockGroup" : "tract",
+    includeUnknownIncome: params.get("unkIncome") !== "0",
+    minAadt: finiteNumber(params.get("minAadt"), DEFAULT_FILTERS.minAadt),
+    includeUnknownAadt: params.get("unkAadt") !== "0",
+  };
+}
+
+function landUseParam(value: string | null): FilterState["landUseFilter"] {
+  if (value && (LAND_USE_FILTERS as string[]).includes(value)) {
+    return value as FilterState["landUseFilter"];
+  }
+  if (value === "0" || value === "all") return "off";
+  if (value === "mf") return "zoning";
+  return DEFAULT_FILTERS.landUseFilter;
+}
+
+function ozParam(value: string | null): FilterState["ozFilter"] {
+  if (value && (OZ_FILTERS as string[]).includes(value)) {
+    return value as FilterState["ozFilter"];
+  }
+  return DEFAULT_FILTERS.ozFilter;
+}
+
+/**
+ * MapLibre `in` filters with thousands of ids fail open on a dense viewport,
+ * so non-matching parcels stay drawn. A single property check does not.
+ */
+export function stampFilterMatch(
+  features: ParcelFeature[],
+  filters: FilterState,
+  zoningConfig: ZoningConfig,
+  fluConfig: FluConfig,
+): ParcelFeature[] {
+  return features.map((feature) => ({
+    ...feature,
+    properties: {
+      ...feature.properties,
+      filterMatch: parcelMatchesFilters(feature, filters, zoningConfig, fluConfig) ? 1 : 0,
+    },
+  }));
 }
 
 export function emptyStateHint(filters: FilterState, matched: number, fluUnknownCount: number): string | null {

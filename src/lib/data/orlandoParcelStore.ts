@@ -1,5 +1,7 @@
 import path from "node:path";
 import { access, readFile } from "node:fs/promises";
+import { parcelMatchesFilters } from "../filters";
+import { annotateParcelSignals, loadOrangeSignalIndex } from "../orangeSignals";
 import {
   ORLANDO_CORE_ACREAGE,
   ORLANDO_CORE_SQFT,
@@ -10,17 +12,22 @@ import {
   fipsForOrlandoCountyFilter,
   fipsIntersectingBbox,
   isFull5AcCounty,
+  selectParcelPage,
   spatiallyThinFeatures,
   tileFileName,
   tileIndicesForBbox,
 } from "../orlandoParcels";
+import { rankSites } from "../score";
 import type {
   BBox,
+  FilterState,
+  FluConfig,
   OrlandoParcelCountyMeta,
   OrlandoParcelsMeta,
   ParcelCollection,
   ParcelFeature,
   ParcelProperties,
+  ZoningConfig,
 } from "../types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -55,7 +62,9 @@ const TILE_CACHE_LIMIT = 48;
 
 export type OrlandoParcelPage = {
   collection: ParcelCollection;
+  excluded: ParcelFeature[];
   totalInBbox: number;
+  totalMatching: number;
   truncated: boolean;
 };
 
@@ -130,7 +139,65 @@ export type OrlandoParcelQuery = {
   county?: string | null;
   state?: string | null;
   limit?: number;
+  filters?: FilterState | null;
+  zoningConfig?: ZoningConfig | null;
+  fluConfig?: FluConfig | null;
+  includeExcluded?: boolean;
 };
+
+const EXCLUDED_DRAW_LIMIT = 800;
+const RANKED_KEEP = 200;
+
+function unionById(first: ParcelFeature[], second: ParcelFeature[]): ParcelFeature[] {
+  const seen = new Set<string>();
+  const out: ParcelFeature[] = [];
+  for (const feature of [...first, ...second]) {
+    const id = feature.properties.id;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    out.push(feature);
+  }
+  return out;
+}
+
+/**
+ * Attach Orange income/AADT, then keep parcels that pass the sliders, then
+ * thin. The ranked shortlist is unioned back in so the list is the real top
+ * of the filtered set, not the top of a spatial sample.
+ */
+export async function finalizeOrlandoParcelPage(
+  features: ParcelFeature[],
+  query: OrlandoParcelQuery = {},
+): Promise<OrlandoParcelPage> {
+  const index = await loadOrangeSignalIndex();
+  for (const feature of features) annotateParcelSignals(feature, index);
+
+  const limit = query.limit ?? 4000;
+  const filters = query.filters;
+  const zoningConfig = query.zoningConfig;
+  const fluConfig = query.fluConfig;
+  const canFilter = Boolean(filters && zoningConfig && fluConfig);
+  const page = selectParcelPage(features, limit, (feature) =>
+    canFilter ? parcelMatchesFilters(feature, filters!, zoningConfig!, fluConfig!) : true,
+  );
+
+  let drawn = page.thinned;
+  if (canFilter && page.truncated) {
+    const top = rankSites(page.matches, filters!, zoningConfig!, fluConfig!)
+      .slice(0, RANKED_KEEP)
+      .map((item) => item.feature);
+    drawn = unionById(top, page.thinned);
+  }
+
+  const excluded = query.includeExcluded ? spatiallyThinFeatures(page.rejected, EXCLUDED_DRAW_LIMIT) : [];
+  return {
+    collection: { type: "FeatureCollection", features: drawn },
+    excluded,
+    totalInBbox: page.totalInBbox,
+    totalMatching: page.totalMatching,
+    truncated: drawn.length < page.totalMatching,
+  };
+}
 
 export async function queryOrlandoFixtureParcels(query: OrlandoParcelQuery = {}): Promise<OrlandoParcelPage> {
   const meta = await loadOrlandoParcelsMeta();
@@ -149,13 +216,8 @@ export async function queryOrlandoFixtureParcels(query: OrlandoParcelQuery = {})
       return features.filter((feature) => featureIntersectsBbox(feature.properties.centroid, bbox));
     }),
   );
-  const matched = groups.flat();
-  const thinned = spatiallyThinFeatures(matched, limit);
-  return {
-    collection: { type: "FeatureCollection", features: thinned },
-    totalInBbox: matched.length,
-    truncated: thinned.length < matched.length,
-  };
+  const inBbox = groups.flat();
+  return finalizeOrlandoParcelPage(inBbox, { ...query, limit });
 }
 
 export async function getOrlandoFixtureParcel(id: string): Promise<ParcelFeature | null> {

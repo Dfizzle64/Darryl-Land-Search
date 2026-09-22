@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { formatCountyLabel } from "@/lib/markets";
-import { RURAL_ELIGIBLE_STATUS_CHIP, type RuralMarketTractRow } from "@/lib/types";
+import { formatCountyLabel, isSouthCarolinaState } from "@/lib/markets";
+import { RURAL_ELIGIBLE_STATUS_CHIP, SC_GOVERNOR_FILED_STATUS, type RuralMarketTractRow } from "@/lib/types";
 
 type TractPanelProps = {
   tracts: RuralMarketTractRow[];
@@ -36,6 +36,9 @@ export function TractPanel({ tracts, selectedGeoid, onSelect, onClose, variant =
           </p>
           <p className="mt-0.5 text-[11px] leading-relaxed text-ink-500">
             Rev. Proc. 2026-14 entirely rural tracts. Nomination eligibility only.
+            {tracts.some((tract) => isSouthCarolinaState(tract.state))
+              ? ` South Carolina tracts: ${SC_GOVERNOR_FILED_STATUS}.`
+              : ""}
           </p>
         </div>
         {onClose ? (
@@ -63,6 +66,9 @@ export function TractPanel({ tracts, selectedGeoid, onSelect, onClose, variant =
                   <span className="inline-block rounded-full border border-[#f15a08]/70 bg-[#f15a08]/15 px-1.5 py-px text-[10px] text-[#ffc7a3]">
                     {RURAL_ELIGIBLE_STATUS_CHIP}
                   </span>
+                  {isSouthCarolinaState(tract.state) ? (
+                    <p className="mt-1 text-[11px] leading-snug text-ink-300">{SC_GOVERNOR_FILED_STATUS}</p>
+                  ) : null}
                   <p className="mt-1 text-sm text-white">{tract.placeOrCorridor}</p>
                   <p className="truncate text-[11px] text-ink-500">
                     {formatCountyLabel(tract.county, tract.state)} · {tract.geoid}

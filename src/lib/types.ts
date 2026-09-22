@@ -113,6 +113,14 @@ export type MarketId = (typeof MARKETS)[number];
 /** Status chip for the seven-market rural pack. Never a certified 2027 QOZ. */
 export const RURAL_ELIGIBLE_STATUS_CHIP = "Eligible (rural) — not designated";
 
+/**
+ * Secondary status for South Carolina tracts after the Sep 10, 2026 governor filing.
+ * The nominated GEOID list is not public, so this is not a designation.
+ */
+export const SC_GOVERNOR_FILED_STATUS = "Governor-filed — list not public yet / not designated";
+
+export const SC_COMMERCE_OZ_URL = "https://www.sccommerce.com/opportunity-zone";
+
 export const SHED_CAVEAT =
   "90-minute sheds are approximate county rings, not drive-time isochrones. Outer-edge counties are flagged in tract notes.";
 

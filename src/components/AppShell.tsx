@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { FilterSidebar } from "./FilterSidebar";
+import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { ParcelDrawer } from "./ParcelDrawer";
 import { SiteMap } from "./SiteMap";
 import { SitesPanel } from "./SitesPanel";
@@ -15,6 +16,7 @@ import {
   marketSummary,
   parseCountyKey,
   showOrangeCountyPilot,
+  southCarolinaStatusHelp,
   viewBounds,
 } from "@/lib/markets";
 import { rankSites } from "@/lib/score";
@@ -80,6 +82,7 @@ export function AppShell({
     [ruralCatalog.rows, market, county, countyState],
   );
   const orangePilot = showOrangeCountyPilot(market, county, countyState);
+  const statusHelp = southCarolinaStatusHelp(market, countyState);
   const bounds = useMemo(
     () => viewBounds(summary, ruralCatalog.rows, county, countyState),
     [summary, ruralCatalog.rows, county, countyState],
@@ -258,6 +261,12 @@ export function AppShell({
         </div>
       </header>
       <p className="border-b border-white/10 px-4 py-2 text-[11px] leading-relaxed text-ink-500 md:px-5">{SHED_CAVEAT}</p>
+      {statusHelp ? (
+        <SouthCarolinaStatusNote
+          note={statusHelp}
+          className="border-b border-white/10 px-4 py-2 text-[11px] leading-relaxed text-ink-300 md:px-5"
+        />
+      ) : null}
 
       {error ? (
         <div className="border-b border-red-500/30 bg-red-950/60 px-4 py-2 text-sm text-red-100">{error}</div>
@@ -287,6 +296,7 @@ export function AppShell({
           market={market}
           tractCount={visibleTracts.length}
           parcelNote={ruralCatalog.parcelNote}
+          statusHelp={statusHelp}
         />
         <main className="relative min-w-0 flex-1">
           <SiteMap
@@ -363,7 +373,7 @@ export function AppShell({
           ) : null}
         </main>
         {selectedTract || !orangePilot ? (
-          <TractDrawer tract={selectedTract} onClose={() => setSelectedTractGeoid(null)} />
+          <TractDrawer tract={selectedTract} statusHelp={statusHelp} onClose={() => setSelectedTractGeoid(null)} />
         ) : (
           <ParcelDrawer
             parcel={selected}

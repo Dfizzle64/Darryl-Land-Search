@@ -1,14 +1,16 @@
 "use client";
 
-import { formatCountyLabel } from "@/lib/markets";
-import { RURAL_ELIGIBLE_STATUS_CHIP, SHED_CAVEAT, type RuralMarketTractRow } from "@/lib/types";
+import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
+import { formatCountyLabel, isSouthCarolinaState } from "@/lib/markets";
+import { RURAL_ELIGIBLE_STATUS_CHIP, SC_GOVERNOR_FILED_STATUS, SHED_CAVEAT, type RuralMarketTractRow } from "@/lib/types";
 
 type TractDrawerProps = {
   tract: RuralMarketTractRow | null;
+  statusHelp?: string | null;
   onClose: () => void;
 };
 
-export function TractDrawer({ tract, onClose }: TractDrawerProps) {
+export function TractDrawer({ tract, statusHelp = null, onClose }: TractDrawerProps) {
   if (!tract) {
     return (
       <aside className="hidden w-[24rem] shrink-0 border-l border-white/10 bg-ink-900/80 p-5 lg:block">
@@ -17,11 +19,15 @@ export function TractDrawer({ tract, onClose }: TractDrawerProps) {
           Select a rural-eligible tract to see its GEOID, county, and notes. These tracts are eligible for nomination.
           They are not certified 2027 Qualified Opportunity Zones. A tract is not a shovel-ready site.
         </p>
+        {statusHelp ? (
+          <SouthCarolinaStatusNote note={statusHelp} className="mt-3 text-xs leading-relaxed text-ink-300" />
+        ) : null}
       </aside>
     );
   }
 
   const orangePilotTract = tract.state === "Florida" && tract.county === "Orange";
+  const southCarolina = isSouthCarolinaState(tract.state);
 
   return (
     <aside className="drawer-scroll absolute inset-x-0 bottom-0 z-20 max-h-[70vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-5 shadow-2xl lg:static lg:z-0 lg:max-h-none lg:w-[24rem] lg:shrink-0 lg:rounded-none lg:border-l lg:border-t-0 lg:shadow-none">
@@ -41,13 +47,17 @@ export function TractDrawer({ tract, onClose }: TractDrawerProps) {
       <p className="mt-4 inline-block rounded-full border border-[#f15a08]/70 bg-[#f15a08]/15 px-2 py-1 text-xs text-[#ffc7a3]">
         {RURAL_ELIGIBLE_STATUS_CHIP}
       </p>
+      {southCarolina ? <p className="mt-2 text-xs leading-relaxed text-ink-100">{SC_GOVERNOR_FILED_STATUS}</p> : null}
 
       <dl className="mt-4 space-y-3 text-sm">
         <div>
           <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">What this means</dt>
           <dd className="mt-1 text-ink-100">
             Rev. Proc. 2026-14 lists this 2020 census tract as a low-income community comprised entirely of a rural
-            area. It is eligible for nomination. It has not been nominated or certified as a 2027 QOZ.
+            area. It is eligible for nomination.{" "}
+            {southCarolina
+              ? "South Carolina’s governor filed OZ 2.0 nominations on Sep 10, 2026, but the tract list is not public. This GEOID is not marked nominated or designated."
+              : "It has not been nominated or certified as a 2027 QOZ."}
           </dd>
         </div>
         <div>

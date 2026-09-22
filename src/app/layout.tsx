@@ -15,9 +15,9 @@ const display = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Orange County multifamily site search",
+  title: "Southeast rural OZ 2.0 land search",
   description:
-    "Pilot map of Orange County, Florida parcels with acreage, zoning modes, Future Land Use, Opportunity Zones, ACS income, and FDOT AADT filters.",
+    "Orange County, Florida multifamily parcel pilot plus rural-eligible census tracts for seven Southeast metros. Eligible (rural) — not designated.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

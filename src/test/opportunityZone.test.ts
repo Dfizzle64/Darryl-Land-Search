@@ -14,7 +14,9 @@ describe("describeOz2Eligibility", () => {
       source: "rev-proc-2026-14",
     });
     expect(described.label).toMatch(/rural-eligible/i);
+    expect(described.statusChip).toBe("Eligible (rural) — not designated");
     expect(described.detail).toContain("12095016605");
+    expect(described.detail).toContain("Eligible (rural) — not designated");
     expect(described.detail).toMatch(/eligible for nomination/i);
     expect(described.detail).toMatch(/has not been nominated or certified/i);
     expect(described.detail).not.toMatch(/designated as a 2027/i);

@@ -22,6 +22,7 @@ npm run seed         # parcels + income + AADT, then FLU join, then OZ join, the
 npm run seed:flu     # re-join FLU onto the existing parcel fixture
 npm run seed:oz      # designated QOZ polygons, then OZ 2.0 eligibility (Rev. Proc. 2026-14 + Notice 2025-50)
 npm run seed:oz2     # refresh OZ 2.0 nomination tracts only (needs pypdf; see below)
+npm run seed:oz2-markets  # seven-market rural-eligible tracts from the CSV + TIGER 2020
 npm run seed:zoning  # refresh coverage report vs knowledge JSON (no LLM)
 ```
 
@@ -158,7 +159,35 @@ Orange County has **87** eligible tracts in that appendix. **One** is rural: GEO
 
 Offline files: `data/fixtures/oz2-eligible.geojson`, `oz2-eligible-tracts.json`, and `oz2Eligibility` on each parcel. In this sample **185 / 462** centroids fall in an eligible tract and **3 / 462** fall in `12095016605` (those three were appended from the public OCPA layer so the rural filter and drawer have something to open). The OZ 2.0 overlay is on by default. Orange is rural-eligible; amber is eligible and not rural. Designated QOZs use a copper fill and a dashed outline. Parcel fills stay green. Choosing the rural-eligible or non-rural filter narrows the overlay to that class.
 
-The parcel drawer shows eligible / not eligible, the official rural flag, and the GEOID, and says the tract has not been nominated or certified.
+The parcel drawer shows eligible / not eligible, the official rural flag, and the GEOID, and says the tract has not been nominated or certified. A rural-eligible parcel uses the status chip **Eligible (rural) — not designated**.
+
+## Seven Southeast markets (rural-eligible only)
+
+The map can switch among **Atlanta, Tampa, Orlando, Charleston, Nashville, Charlotte, and Raleigh-Durham**. Each market loads the rural-eligible census tracts inside an approximate **90-minute county ring** of the city center. The source table is `data/oz2-7markets-90min-rural-eligible.csv` (446 rows, 424 unique GEOIDs). Polk and Sumter, Florida are listed under **both** Tampa and Orlando; the county filter is state-aware (Charlotte’s Union is North Carolina, not South Carolina).
+
+| Market | Rural-eligible rows |
+| --- | ---: |
+| Atlanta | 73 |
+| Tampa | 66 |
+| Orlando | 64 |
+| Charleston | 49 |
+| Nashville | 26 |
+| Charlotte | 60 |
+| Raleigh-Durham | 108 |
+
+**90-minute sheds are approximate county rings, not drive-time isochrones.** A county is included when its main corridor is commonly within about 90 minutes off-peak. Outer-edge counties are flagged in the tract notes and in the county menu. County membership, exclusions, and sources are in `data/oz2-7markets-90min-counties.md`.
+
+Every tract in this pack is **Eligible (rural) — not designated**. The chip uses that phrase. Florida, Georgia, South Carolina, Tennessee, and North Carolina had no public certified 2027 QOZ lists when the table was built (Sep 21, 2026). Do not read the orange overlay as a certified Opportunity Zone.
+
+The Orange County pilot stays in place. Choose **Orlando → Orange, FL** and the original parcel sample, amber non-rural eligible tracts, designated QOZ overlay, and green parcel fills come back. GEOID `12095016605` is still the only Orange County rural-eligible tract. Other counties in the seven sheds do **not** have parcel extracts in this build: the map draws the 2020 tract polygon and a Census Gazetteer pin. That is a coverage gap, not an empty county.
+
+### Refresh the seven-market fixtures
+
+```bash
+npm run seed:oz2-markets
+```
+
+That script reads the CSV, checks the row counts above, and joins [Census TIGER 2020 tracts](https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2020/MapServer/6). It writes `data/fixtures/oz2-rural-markets.json` (one row per market listing, so dual-listed tracts stay duplicated) and `data/fixtures/oz2-rural-markets.geojson` (one polygon per GEOID, with a `markets` array). Pass `--offline` to rebuild the catalog from the CSV using polygons already on disk. It does not download assessor parcels. `npm run seed:oz2` is still the Orange County all-eligible refresh and is separate on purpose.
 
 ### Refresh
 
@@ -219,6 +248,7 @@ HUD_OZ_URL=https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Opp
 - Municipal FLU besides Orlando is not in the public layers used here (Winter Park, Ocoee, Winter Garden, Apopka, Maitland, etc.). FLU-only and rezoning-candidate modes omit those parcels rather than guess.
 - Designated Opportunity Zone flags use 2010 QOZ polygons; ACS income and OZ 2.0 eligibility use 2020 census tracts. Do not expect those GEOIDs to match.
 - OZ 2.0 tracts are eligible for nomination under Rev. Proc. 2026-14. They are not designated 2027 QOZs. Rural vs non-rural is the appendix column, not a local rule. Orange County’s only rural-eligible tract in that list is `12095016605`.
+- The seven-market layer is rural-eligible tracts only. 90-minute sheds are approximate county rings, not isochrones. Parcel polygons outside the Orange County sample are not loaded; those markets use tract overlays and pins.
 - Belle Isle, Oakland, and Windermere zoning use tables were not independently verified; district lists are empty on purpose.
 - Winter Garden R-4 / R-5 exist in code but were not verified as multifamily in this pass.
 - AADT is nearest FDOT **state-count** segment, not local-road counts. Some parcels sit far from a counted road.

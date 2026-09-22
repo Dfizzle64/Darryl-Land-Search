@@ -27,6 +27,9 @@ describe("basemap helpers", () => {
 
   it("keeps overlay layer ids so a style swap can leave parcels and traffic in place", () => {
     expect(OVERLAY_LAYER_IDS).toEqual([
+      "rural-fill",
+      "rural-line",
+      "rural-pins",
       "oz2-fill",
       "oz2-line",
       "oz-fill",

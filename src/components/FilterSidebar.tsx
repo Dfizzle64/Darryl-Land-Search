@@ -1,7 +1,7 @@
 "use client";
 
 import { ZoningKnowledgePanel } from "./ZoningKnowledgePanel";
-import { ACREAGE_SLIDER, DEFAULT_FILTERS, type FilterState, type FluConfig, type LandUseFilter, type OzFilter, type ZoningConfig } from "@/lib/types";
+import { ACREAGE_SLIDER, DEFAULT_FILTERS, SHED_CAVEAT, type FilterState, type FluConfig, type LandUseFilter, type MarketId, type OzFilter, type ZoningConfig } from "@/lib/types";
 
 type FilterSidebarProps = {
   filters: FilterState;
@@ -22,6 +22,10 @@ type FilterSidebarProps = {
   open: boolean;
   onClose: () => void;
   meta: Record<string, unknown>;
+  orangePilot: boolean;
+  market: MarketId;
+  tractCount: number;
+  parcelNote: string;
 };
 
 function Toggle({
@@ -132,6 +136,10 @@ export function FilterSidebar({
   open,
   onClose,
   meta,
+  orangePilot,
+  market,
+  tractCount,
+  parcelNote,
 }: FilterSidebarProps) {
   const generatedAt = typeof meta.generatedAt === "string" ? meta.generatedAt.slice(0, 10) : null;
 
@@ -161,6 +169,21 @@ export function FilterSidebar({
           >
             Reset filters
           </button>
+        </section>
+
+        <section className="mt-5 space-y-2 rounded-2xl border border-white/10 bg-ink-800/70 p-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Seven-market sheds</h2>
+          <p className="text-sm text-white">
+            {market}: {tractCount.toLocaleString()} rural-eligible {tractCount === 1 ? "tract" : "tracts"}
+          </p>
+          <p className="text-xs leading-relaxed text-ink-500">{SHED_CAVEAT}</p>
+          <p className="text-xs leading-relaxed text-ink-500">{parcelNote}</p>
+          {!orangePilot ? (
+            <p className="text-xs leading-relaxed text-ink-300">
+              Acreage, zoning, income, and traffic filters apply to the Orange County parcel sample. Switch the market
+              back to Orlando and choose Orange County to use that pilot.
+            </p>
+          ) : null}
         </section>
 
         <section className="mt-5 space-y-3">
@@ -221,13 +244,13 @@ export function FilterSidebar({
             label="Show OZ 2.0 eligible tracts"
             checked={showOz2}
             onChange={onShowOz2}
-            hint="2020 tracts eligible for nomination. Orange is rural-eligible; amber is eligible and not rural."
+            hint="Rural-eligible tracts in the selected market are orange. In Orange County, Florida, amber tracts are eligible and not rural."
           />
           <Toggle
             label="Show designated Opportunity Zone overlay"
             checked={showOz}
             onChange={onShowOz}
-            hint="Current HUD/Treasury QOZ tracts (2010 geography). Copper fill with a dashed outline."
+            hint="Orange County pilot only. Current HUD/Treasury QOZ tracts (2010 geography), copper fill with a dashed outline."
           />
         </section>
 
@@ -348,8 +371,10 @@ export function FilterSidebar({
         <p className="mt-6 text-[11px] leading-relaxed text-ink-500">
           Fixture snapshot {generatedAt ?? "unknown"}. Owner, sale, tax, and acreage come from the Orange County
           Property Appraiser public GIS layer. FLU is joined from Orange County and Orlando open data. Opportunity
-          Zones shown in copper with a dashed outline are current designated QOZs. OZ 2.0 tracts are Rev. Proc. 2026-14 nomination eligibility (not 2027 designations); orange is rural-eligible and amber is eligible but not rural. Rural flags are the official Rural Status column and Notice 2025-50. Income is ACS median household income. AADT is the
-          nearest FDOT count segment.
+          Zones shown in copper with a dashed outline are current designated QOZs in that pilot. Rural tracts in the
+          seven markets are Rev. Proc. 2026-14 nomination eligibility — Eligible (rural) — not designated. Orange is
+          rural-eligible; amber, in Orange County only, is eligible and not rural. {SHED_CAVEAT} Income is ACS median
+          household income. AADT is the nearest FDOT count segment.
         </p>
       </aside>
     </>

@@ -1,4 +1,4 @@
-import type { OpportunityZoneInfo, Oz2EligibilityInfo, ParcelFeature } from "./types";
+import { RURAL_ELIGIBLE_STATUS_CHIP, type OpportunityZoneInfo, type Oz2EligibilityInfo, type ParcelFeature } from "./types";
 
 export function parcelOpportunityZone(feature: ParcelFeature): OpportunityZoneInfo | null {
   return feature.properties.opportunityZone ?? null;
@@ -53,6 +53,7 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
   eligible: boolean | null;
   rural: boolean | null;
   label: string;
+  statusChip: string | null;
   detail: string;
 } {
   if (!info) {
@@ -60,6 +61,7 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
       eligible: null,
       rural: null,
       label: "OZ 2.0 unknown",
+      statusChip: null,
       detail:
         "This parcel has not been joined to the Rev. Proc. 2026-14 list of census tracts eligible for nomination as 2027 Qualified Opportunity Zones.",
     };
@@ -71,7 +73,8 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
       eligible: true,
       rural: true,
       label: "OZ 2.0 rural-eligible",
-      detail: `Rural-eligible for nomination — GEOID ${geoid}${name}. Rev. Proc. 2026-14 lists this 2020 census tract as a low-income community comprised entirely of a rural area. It is eligible for nomination as a 2027 QOZ and has not been nominated or certified.`,
+      statusChip: RURAL_ELIGIBLE_STATUS_CHIP,
+      detail: `Rural-eligible for nomination — GEOID ${geoid}${name}. Rev. Proc. 2026-14 lists this 2020 census tract as a low-income community comprised entirely of a rural area. It is eligible for nomination as a 2027 QOZ and has not been nominated or certified. Status: ${RURAL_ELIGIBLE_STATUS_CHIP}.`,
     };
   }
   if (info.eligible && info.rural === false) {
@@ -79,6 +82,7 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
       eligible: true,
       rural: false,
       label: "OZ 2.0 eligible, not rural",
+      statusChip: null,
       detail: `Eligible for nomination, not rural — GEOID ${geoid}${name}. Rev. Proc. 2026-14 marks this tract Non-rural. It has not been nominated or certified as a 2027 QOZ.`,
     };
   }
@@ -87,6 +91,7 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
       eligible: true,
       rural: null,
       label: "OZ 2.0 eligible",
+      statusChip: null,
       detail: `Eligible for nomination — GEOID ${geoid}${name}. The Rev. Proc. 2026-14 appendix did not include a Rural Status for this tract, so it is not labeled rural. It has not been nominated or certified as a 2027 QOZ.`,
     };
   }
@@ -94,6 +99,7 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
     eligible: false,
     rural: null,
     label: "Not OZ 2.0 eligible",
+    statusChip: null,
     detail:
       "This parcel centroid is outside the Orange County census tracts Rev. Proc. 2026-14 lists as eligible for nomination. It is not a 2027 QOZ designation.",
   };

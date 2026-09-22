@@ -1,6 +1,6 @@
 "use client";
 
-import maplibregl, { type Map as MapLibreMap } from "maplibre-gl";
+import maplibregl, { type GeoJSONSource, type Map as MapLibreMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
 import { BasemapToggle } from "./BasemapToggle";
@@ -17,34 +17,58 @@ import {
   ozLinePaint,
   parcelFillPaint,
   parcelLinePaint,
+  ruralPinPaint,
   trafficLinePaint,
   type BasemapMode,
 } from "@/lib/basemap";
-import {
-  ORANGE_COUNTY_BOUNDS,
-  ORANGE_COUNTY_CENTER,
-  type OpportunityZoneCollection,
-  type Oz2TractCollection,
-  type OzFilter,
-  type ParcelCollection,
-} from "@/lib/types";
+import { ORANGE_COUNTY_CENTER, type MarketId, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection } from "@/lib/types";
+
+type LngLatBounds = [[number, number], [number, number]];
 
 type SiteMapProps = {
   parcels: ParcelCollection;
   traffic: GeoJSON.FeatureCollection<GeoJSON.LineString>;
   opportunityZones: OpportunityZoneCollection;
   oz2Tracts: Oz2TractCollection;
+  ruralTracts: RuralMarketTractCollection;
+  ruralPins: GeoJSON.FeatureCollection<GeoJSON.Point>;
   matchedIds: Set<string>;
   selectedId: string | null;
   hoveredId: string | null;
+  selectedTractGeoid: string | null;
   showExcluded: boolean;
   showTraffic: boolean;
   showOz: boolean;
   showOz2: boolean;
+  showOrangePilot: boolean;
+  market: MarketId;
+  county: string | null;
+  countyState: string | null;
+  bounds: LngLatBounds;
+  boundsKey: string;
   ozFilter: OzFilter;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
+  onSelectTract: (geoid: string) => void;
 };
+
+function ruralLayerFilter(
+  market: MarketId,
+  county: string | null,
+  countyState: string | null,
+  hideOrangeCounty: boolean,
+): maplibregl.FilterSpecification {
+  const parts: maplibregl.FilterSpecification[] = [["in", ["literal", market], ["get", "markets"]]];
+  if (county && countyState) {
+    parts.push(["==", ["get", "county"], county]);
+    parts.push(["==", ["get", "state"], countyState]);
+  }
+  if (hideOrangeCounty) {
+    parts.push(["!", ["all", ["==", ["get", "state"], "Florida"], ["==", ["get", "county"], "Orange"]]]);
+  }
+  if (parts.length === 1) return parts[0];
+  return ["all", ...parts] as maplibregl.FilterSpecification;
+}
 
 function addOverlayLayers(
   map: MapLibreMap,
@@ -52,13 +76,35 @@ function addOverlayLayers(
   traffic: GeoJSON.FeatureCollection<GeoJSON.LineString>,
   opportunityZones: OpportunityZoneCollection,
   oz2Tracts: Oz2TractCollection,
+  ruralTracts: RuralMarketTractCollection,
+  ruralPins: GeoJSON.FeatureCollection<GeoJSON.Point>,
   mode: BasemapMode,
 ) {
-  map.addSource("oz2-tracts", { type: "geojson", data: oz2Tracts });
+  map.addSource("rural-tracts", { type: "geojson", data: ruralTracts, promoteId: "tractGeoid" });
+  map.addSource("rural-pins", { type: "geojson", data: ruralPins, promoteId: "tractGeoid" });
+  map.addSource("oz2-tracts", { type: "geojson", data: oz2Tracts, promoteId: "tractGeoid" });
   map.addSource("opportunity-zones", { type: "geojson", data: opportunityZones });
   map.addSource("parcels", { type: "geojson", data: parcels, promoteId: "id" });
   map.addSource("traffic", { type: "geojson", data: traffic });
 
+  map.addLayer({
+    id: "rural-fill",
+    type: "fill",
+    source: "rural-tracts",
+    paint: oz2FillPaint(mode),
+  });
+  map.addLayer({
+    id: "rural-line",
+    type: "line",
+    source: "rural-tracts",
+    paint: oz2LinePaint(mode),
+  });
+  map.addLayer({
+    id: "rural-pins",
+    type: "circle",
+    source: "rural-pins",
+    paint: ruralPinPaint(mode),
+  });
   map.addLayer({
     id: "oz2-fill",
     type: "fill",
@@ -122,26 +168,40 @@ export function SiteMap({
   traffic,
   opportunityZones,
   oz2Tracts,
+  ruralTracts,
+  ruralPins,
   matchedIds,
   selectedId,
   hoveredId,
+  selectedTractGeoid,
   showExcluded,
   showTraffic,
   showOz,
   showOz2,
+  showOrangePilot,
+  market,
+  county,
+  countyState,
+  bounds,
+  boundsKey,
   ozFilter,
   onSelect,
   onHover,
+  onSelectTract,
 }: SiteMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
-  const [message, setMessage] = useState("Loading Orange County map…");
+  const [message, setMessage] = useState("Loading map…");
   const [basemap, setBasemap] = useState<BasemapMode>("streets");
-  const callbacksRef = useRef({ onSelect, onHover });
-  callbacksRef.current = { onSelect, onHover };
+  const callbacksRef = useRef({ onSelect, onHover, onSelectTract });
+  callbacksRef.current = { onSelect, onHover, onSelectTract };
   const basemapRef = useRef(basemap);
   basemapRef.current = basemap;
+  const boundsRef = useRef(bounds);
+  boundsRef.current = bounds;
+  const ruralPinsRef = useRef(ruralPins);
+  ruralPinsRef.current = ruralPins;
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -159,7 +219,7 @@ export function SiteMap({
             attributionControl: { compact: true },
           });
           map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), "bottom-right");
-          map.fitBounds(ORANGE_COUNTY_BOUNDS, { padding: 48, duration: 0 });
+          map.fitBounds(boundsRef.current, { padding: 48, duration: 0, maxZoom: 11 });
           await new Promise<void>((resolve, reject) => {
             const timer = window.setTimeout(() => reject(new Error("Basemap timed out")), 15000);
             map.once("load", () => {
@@ -171,7 +231,7 @@ export function SiteMap({
             map.remove();
             return;
           }
-          addOverlayLayers(map, parcels, traffic, opportunityZones, oz2Tracts, basemapRef.current);
+          addOverlayLayers(map, parcels, traffic, opportunityZones, oz2Tracts, ruralTracts, ruralPinsRef.current, basemapRef.current);
           addSatelliteSourceAndLayer(map);
           applyBasemap(map, basemapRef.current);
 
@@ -179,6 +239,15 @@ export function SiteMap({
           map.on("click", interactive, (event) => {
             const id = event.features?.[0]?.properties?.id;
             if (typeof id === "string") callbacksRef.current.onSelect(id);
+          });
+          const tractLayers = ["rural-fill", "rural-pins", "oz2-fill"];
+          map.on("click", tractLayers, (event) => {
+            const parcelHit = map.queryRenderedFeatures(event.point, { layers: interactive });
+            if (parcelHit.length > 0) return;
+            const props = event.features?.[0]?.properties;
+            const geoid = props?.tractGeoid;
+            const rural = props?.rural === true || props?.rural === "true";
+            if (rural && typeof geoid === "string") callbacksRef.current.onSelectTract(geoid);
           });
           map.on("mousemove", interactive, (event) => {
             map.getCanvas().style.cursor = "pointer";
@@ -210,7 +279,8 @@ export function SiteMap({
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, [parcels, traffic, opportunityZones, oz2Tracts]);
+    // Pins update through setData. Keeping them out of this effect avoids remounting the map.
+  }, [parcels, traffic, opportunityZones, oz2Tracts, ruralTracts]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -219,15 +289,20 @@ export function SiteMap({
     const matchedFilter: maplibregl.FilterSpecification =
       ids.length === 0 ? ["==", ["get", "id"], "__none__"] : ["in", ["get", "id"], ["literal", ids]];
     const excludedFilter: maplibregl.FilterSpecification = ["!", matchedFilter];
-    map.setFilter("parcels-fill", matchedFilter);
-    map.setFilter("parcels-line", matchedFilter);
-    map.setFilter("parcels-fill-excluded", showExcluded ? excludedFilter : ["==", ["get", "id"], "__none__"]);
-    map.setFilter("parcels-line-excluded", showExcluded ? excludedFilter : ["==", ["get", "id"], "__none__"]);
-    map.setLayoutProperty("traffic-line", "visibility", showTraffic ? "visible" : "none");
-    map.setLayoutProperty("oz-fill", "visibility", showOz ? "visible" : "none");
-    map.setLayoutProperty("oz-line", "visibility", showOz ? "visible" : "none");
-    map.setLayoutProperty("oz2-fill", "visibility", showOz2 ? "visible" : "none");
-    map.setLayoutProperty("oz2-line", "visibility", showOz2 ? "visible" : "none");
+    const none: maplibregl.FilterSpecification = ["==", ["get", "id"], "__none__"];
+    map.setFilter("parcels-fill", showOrangePilot ? matchedFilter : none);
+    map.setFilter("parcels-line", showOrangePilot ? matchedFilter : none);
+    map.setFilter("parcels-fill-excluded", showOrangePilot && showExcluded ? excludedFilter : none);
+    map.setFilter("parcels-line-excluded", showOrangePilot && showExcluded ? excludedFilter : none);
+    map.setLayoutProperty("traffic-line", "visibility", showOrangePilot && showTraffic ? "visible" : "none");
+    map.setLayoutProperty("oz-fill", "visibility", showOrangePilot && showOz ? "visible" : "none");
+    map.setLayoutProperty("oz-line", "visibility", showOrangePilot && showOz ? "visible" : "none");
+    map.setLayoutProperty("oz2-fill", "visibility", showOrangePilot && showOz2 ? "visible" : "none");
+    map.setLayoutProperty("oz2-line", "visibility", showOrangePilot && showOz2 ? "visible" : "none");
+    const showRuralMarkets = showOz2 && ozFilter !== "non-rural-eligible";
+    map.setLayoutProperty("rural-fill", "visibility", showRuralMarkets ? "visible" : "none");
+    map.setLayoutProperty("rural-line", "visibility", showRuralMarkets ? "visible" : "none");
+    map.setLayoutProperty("rural-pins", "visibility", showRuralMarkets ? "visible" : "none");
     const oz2Filter: maplibregl.FilterSpecification | null =
       ozFilter === "rural-eligible"
         ? ["==", ["get", "rural"], true]
@@ -236,18 +311,25 @@ export function SiteMap({
           : null;
     map.setFilter("oz2-fill", oz2Filter);
     map.setFilter("oz2-line", oz2Filter);
-  }, [matchedIds, showExcluded, showTraffic, showOz, showOz2, ozFilter, status]);
+    const ruralFilter = ruralLayerFilter(market, county, countyState, showOrangePilot);
+    map.setFilter("rural-fill", ruralFilter);
+    map.setFilter("rural-line", ruralFilter);
+  }, [matchedIds, showExcluded, showTraffic, showOz, showOz2, showOrangePilot, ozFilter, market, county, countyState, status]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map || status !== "ready") return;
     applyBasemap(map, basemap);
-    map.setLayoutProperty("traffic-line", "visibility", showTraffic ? "visible" : "none");
-    map.setLayoutProperty("oz-fill", "visibility", showOz ? "visible" : "none");
-    map.setLayoutProperty("oz-line", "visibility", showOz ? "visible" : "none");
-    map.setLayoutProperty("oz2-fill", "visibility", showOz2 ? "visible" : "none");
-    map.setLayoutProperty("oz2-line", "visibility", showOz2 ? "visible" : "none");
-  }, [basemap, showTraffic, showOz, showOz2, status]);
+    map.setLayoutProperty("traffic-line", "visibility", showOrangePilot && showTraffic ? "visible" : "none");
+    map.setLayoutProperty("oz-fill", "visibility", showOrangePilot && showOz ? "visible" : "none");
+    map.setLayoutProperty("oz-line", "visibility", showOrangePilot && showOz ? "visible" : "none");
+    map.setLayoutProperty("oz2-fill", "visibility", showOrangePilot && showOz2 ? "visible" : "none");
+    map.setLayoutProperty("oz2-line", "visibility", showOrangePilot && showOz2 ? "visible" : "none");
+    const showRuralMarkets = showOz2 && ozFilter !== "non-rural-eligible";
+    map.setLayoutProperty("rural-fill", "visibility", showRuralMarkets ? "visible" : "none");
+    map.setLayoutProperty("rural-line", "visibility", showRuralMarkets ? "visible" : "none");
+    map.setLayoutProperty("rural-pins", "visibility", showRuralMarkets ? "visible" : "none");
+  }, [basemap, showTraffic, showOz, showOz2, showOrangePilot, ozFilter, status]);
 
   const previousHover = useRef<string | null>(null);
   const previousSelected = useRef<string | null>(null);
@@ -281,9 +363,55 @@ export function SiteMap({
     previousSelected.current = selectedId;
   }, [selectedId, parcels.features, status]);
 
+  const previousTract = useRef<string | null>(null);
+  const skipInitialFit = useRef(true);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready") return;
+    const pinSource = map.getSource("rural-pins");
+    if (pinSource?.type === "geojson") {
+      (pinSource as GeoJSONSource).setData(ruralPins);
+    }
+  }, [ruralPins, status]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready") return;
+    if (skipInitialFit.current) {
+      skipInitialFit.current = false;
+      return;
+    }
+    map.fitBounds(bounds, { padding: 56, duration: 650, maxZoom: 11 });
+  }, [bounds, boundsKey, status]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready") return;
+    if (previousTract.current) {
+      for (const source of ["rural-tracts", "rural-pins"] as const) {
+        map.setFeatureState({ source, id: previousTract.current }, { selected: false });
+      }
+    }
+    if (selectedTractGeoid) {
+      for (const source of ["rural-tracts", "rural-pins"] as const) {
+        map.setFeatureState({ source, id: selectedTractGeoid }, { selected: true });
+      }
+      const pin = ruralPins.features.find((feature) => feature.properties?.tractGeoid === selectedTractGeoid);
+      const coordinates = pin?.geometry?.coordinates;
+      if (coordinates && coordinates.length >= 2) {
+        map.easeTo({
+          center: [coordinates[0], coordinates[1]],
+          zoom: Math.max(map.getZoom(), 10),
+          duration: 500,
+        });
+      }
+    }
+    previousTract.current = selectedTractGeoid;
+  }, [selectedTractGeoid, ruralPins.features, status]);
+
   useEffect(() => {
     mapRef.current?.resize();
-  }, [selectedId]);
+  }, [selectedId, selectedTractGeoid]);
 
   return (
     <div className="relative h-full w-full">
@@ -298,17 +426,20 @@ export function SiteMap({
                   className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
                   style={{ backgroundColor: OZ_TRACT_SWATCH.rural }}
                 />
-                OZ 2.0 rural-eligible (nomination only)
+                Eligible (rural) — not designated
               </p>
-              <p>
-                <span
-                  className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
-                  style={{ backgroundColor: OZ_TRACT_SWATCH.eligible }}
-                />
-                OZ 2.0 eligible, not rural
-              </p>
+              {showOrangePilot ? (
+                <p>
+                  <span
+                    className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
+                    style={{ backgroundColor: OZ_TRACT_SWATCH.eligible }}
+                  />
+                  OZ 2.0 eligible, not rural (Orange County)
+                </p>
+              ) : null}
             </>
           ) : null}
+          <p className="text-ink-500">Pins mark tract internal points. 90-minute sheds are approximate county rings, not drive-time isochrones.</p>
           {showOz ? (
             <p>
               <span

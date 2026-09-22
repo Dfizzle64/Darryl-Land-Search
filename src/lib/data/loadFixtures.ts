@@ -6,6 +6,8 @@ import type {
   OpportunityZoneCollection,
   Oz2TractCollection,
   ParcelCollection,
+  RuralMarketTractCollection,
+  RuralMarketsCatalog,
   TrafficFeature,
   ZoningConfig,
 } from "../types";
@@ -67,6 +69,16 @@ export async function loadOpportunityZones(): Promise<OpportunityZoneCollection>
 export async function loadOz2Tracts(): Promise<Oz2TractCollection> {
   const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-eligible.geojson"), "utf8");
   return JSON.parse(raw) as Oz2TractCollection;
+}
+
+export async function loadRuralMarketsCatalog(): Promise<RuralMarketsCatalog> {
+  const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-rural-markets.json"), "utf8");
+  return JSON.parse(raw) as RuralMarketsCatalog;
+}
+
+export async function loadRuralMarketTracts(): Promise<RuralMarketTractCollection> {
+  const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-rural-markets.geojson"), "utf8");
+  return JSON.parse(raw) as RuralMarketTractCollection;
 }
 
 export async function loadFixtureMeta(): Promise<Record<string, unknown>> {

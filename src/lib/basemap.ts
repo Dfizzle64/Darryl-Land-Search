@@ -188,15 +188,27 @@ export function addSatelliteSourceAndLayer(map: MapLibreMap) {
     });
   }
   if (!map.getLayer(SATELLITE_LAYER_ID)) {
-    map.addLayer(
-      {
-        id: SATELLITE_LAYER_ID,
-        type: "raster",
-        source: SATELLITE_SOURCE_ID,
-        layout: { visibility: "none" },
-      },
-      FIRST_OVERLAY_LAYER_ID,
-    );
+    const beforeId = map.getLayer(FIRST_OVERLAY_LAYER_ID) ? FIRST_OVERLAY_LAYER_ID : undefined;
+    try {
+      map.addLayer(
+        {
+          id: SATELLITE_LAYER_ID,
+          type: "raster",
+          source: SATELLITE_SOURCE_ID,
+          layout: { visibility: "none" },
+        },
+        beforeId,
+      );
+    } catch {
+      if (!map.getLayer(SATELLITE_LAYER_ID)) {
+        map.addLayer({
+          id: SATELLITE_LAYER_ID,
+          type: "raster",
+          source: SATELLITE_SOURCE_ID,
+          layout: { visibility: "none" },
+        });
+      }
+    }
   }
 }
 

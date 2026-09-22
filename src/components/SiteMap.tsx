@@ -415,6 +415,7 @@ export function SiteMap({
   useEffect(() => {
     const map = mapRef.current;
     if (!map || status !== "ready") return;
+    addSatelliteSourceAndLayer(map);
     applyBasemap(map, basemap);
     map.setLayoutProperty("traffic-line", "visibility", showOrangePilot && showTraffic ? "visible" : "none");
     map.setLayoutProperty("oz-fill", "visibility", showOrangePilot && showOz ? "visible" : "none");

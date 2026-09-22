@@ -14,7 +14,7 @@ type BasemapToggleProps = {
 
 export function BasemapToggle({ value, onChange }: BasemapToggleProps) {
   return (
-    <div className="pointer-events-auto absolute left-3 top-3 z-10 sm:left-4 sm:top-4">
+    <div className="pointer-events-auto absolute left-3 top-3 z-30 sm:left-4 sm:top-4">
       <div
         role="group"
         aria-label="Basemap"
@@ -27,7 +27,12 @@ export function BasemapToggle({ value, onChange }: BasemapToggleProps) {
               key={option.value}
               type="button"
               aria-pressed={active}
-              onClick={() => onChange(option.value)}
+              aria-label={`${option.label} basemap`}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onChange(option.value);
+              }}
               className={`px-3 py-1.5 text-xs font-medium sm:px-3.5 sm:text-sm ${
                 active ? "bg-white/15 text-white" : "text-ink-300 hover:text-white"
               }`}

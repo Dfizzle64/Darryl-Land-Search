@@ -234,7 +234,7 @@ export function AppShell({
   const loadViewportParcels = async (bbox: [number, number, number, number], zoom: number) => {
     if (!orlandoParcelsOn) return;
     // Live DOH fill is only for the thinner sample counties. The five core counties
-    // already ship every ≥5 acre parcel, and live queries stay at that same cutoff.
+    // already ship every parcel from 5 through 150 acres.
     const useLive = zoom >= 11.5 && Boolean(county) && !isFull5AcCounty(county);
     const limit = useLive ? 900 : zoom >= 12 ? 3500 : 5000;
     setParcelsLoading(true);
@@ -397,7 +397,7 @@ export function AppShell({
                   </span>
                 ) : null}
                 <span className="block">
-                  ≥5 ac fixtures: {fullAcreageParcelCount.toLocaleString()} in{" "}
+                  5–150 ac fixtures: {fullAcreageParcelCount.toLocaleString()} in{" "}
                   {fullAcreageCounties.map((item) => item.name).join(", ")}
                 </span>
               </span>

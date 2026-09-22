@@ -19,7 +19,7 @@ import type { OrlandoParcelsMeta, ParcelCollection, ParcelFeature } from "../lib
 const FULL_MINIMUMS: Record<string, number> = {
   Lake: 15000,
   Orange: 12000,
-  Osceola: 6000,
+  Osceola: 5500,
   Polk: 18000,
   Seminole: 4000,
 };
@@ -78,11 +78,12 @@ describe("Orlando shed parcels", () => {
     expect(thinned.map((item) => item.properties.acreage).sort()).toEqual([6, 9]);
   });
 
-  it("ships complete ≥5 acre fixtures for the five core counties and samples for the rest", () => {
+  it("ships complete 5–150 acre fixtures for the five core counties and samples for the rest", () => {
     const meta = JSON.parse(readFileSync("data/fixtures/orlando-parcels/meta.json", "utf8")) as OrlandoParcelsMeta;
     expect(meta.market).toBe("Orlando");
     expect(meta.counties).toHaveLength(9);
     expect(meta.coreMinAcres).toBe(5);
+    expect(meta.coreMaxAcres).toBe(150);
     expect(meta.tile).toEqual(ORLANDO_PARCEL_TILE);
     expect(meta.parcelCount).toBe(meta.counties.reduce((sum, county) => sum + county.featureCount, 0));
     for (const county of meta.counties) {
@@ -99,7 +100,13 @@ describe("Orlando shed parcels", () => {
       if (county.coverage === "complete-gte-5ac") {
         expect(FULL_MINIMUMS[county.name]).toBeGreaterThan(0);
         expect(features.length).toBeGreaterThanOrEqual(FULL_MINIMUMS[county.name]);
-        expect(features.every((feature) => (feature.properties.acreage ?? 0) >= 5)).toBe(true);
+        expect(
+          features.every((feature) => {
+            const acres = feature.properties.acreage ?? 0;
+            return acres >= 5 && acres <= 150;
+          }),
+        ).toBe(true);
+        expect(county.maxAcres).toBe(150);
         expect(county.partition).toBe("tiles");
         expect(existsSync(path.join("data/fixtures/orlando-parcels/lookup", `${county.fips}.json`))).toBe(true);
       } else {

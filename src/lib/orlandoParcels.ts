@@ -40,7 +40,7 @@ export const ORLANDO_DOH_PARCELS_BASE =
   "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer";
 
 /**
- * Viewport tile grid for the complete ≥5 acre extracts.
+ * Viewport tile grid for the complete 5–150 acre extracts.
  * Keep in sync with ORIGIN_LON / ORIGIN_LAT / TILE_DEG in scripts/seed_orlando_parcels.py.
  */
 export const ORLANDO_PARCEL_TILE = {
@@ -49,7 +49,13 @@ export const ORLANDO_PARCEL_TILE = {
   tileDeg: 0.25,
 } as const;
 
-/** Counties whose fixtures are every public parcel at or above 5.0 acres. */
+/** Inclusive acreage band for the five complete counties (FDOR land area). */
+export const ORLANDO_CORE_ACREAGE = { min: 5, max: 150 } as const;
+
+/** FDOR LND_SQFOOT bounds for that band (acres × 43,560). */
+export const ORLANDO_CORE_SQFT = { min: 217_800, max: 6_534_000 } as const;
+
+/** Counties whose fixtures are every public parcel from 5.0 through 150.0 acres. */
 export const ORLANDO_FULL_5AC_COUNTIES = ["Lake", "Orange", "Osceola", "Polk", "Seminole"] as const;
 
 export const ORLANDO_SAMPLE_COUNTIES = ["Brevard", "Marion", "Sumter", "Volusia"] as const;

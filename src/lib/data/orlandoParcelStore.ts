@@ -1,12 +1,15 @@
 import path from "node:path";
 import { access, readFile } from "node:fs/promises";
 import {
+  ORLANDO_CORE_ACREAGE,
+  ORLANDO_CORE_SQFT,
   ORLANDO_DOH_LAYER_BY_FIPS,
   ORLANDO_DOH_PARCELS_BASE,
   ORLANDO_NAME_BY_FIPS,
   featureIntersectsBbox,
   fipsForOrlandoCountyFilter,
   fipsIntersectingBbox,
+  isFull5AcCounty,
   spatiallyThinFeatures,
   tileFileName,
   tileIndicesForBbox,
@@ -255,6 +258,13 @@ function normalizeLiveFeature(
   if (!parcelId) return null;
   const sqft = num(attrs.LND_SQFOOT);
   const acreage = sqft && sqft > 0 ? Math.round((sqft / 43560) * 10000) / 10000 : null;
+  const coreCounty = isFull5AcCounty(ORLANDO_NAME_BY_FIPS[fips]);
+  if (
+    coreCounty &&
+    (acreage == null || acreage < ORLANDO_CORE_ACREAGE.min || acreage > ORLANDO_CORE_ACREAGE.max)
+  ) {
+    return null;
+  }
   const price = num(attrs.SALE_PRC1);
   const id = `${fips}:${parcelId}`;
   const countyName = ORLANDO_NAME_BY_FIPS[fips] ?? null;
@@ -313,7 +323,9 @@ async function queryDohLayer(fips: string, bbox: BBox, limit: number): Promise<P
   if (layerId == null) return [];
   const [west, south, east, north] = bbox;
   const params = new URLSearchParams({
-    where: "LND_SQFOOT >= 217800",
+    where: isFull5AcCounty(ORLANDO_NAME_BY_FIPS[fips])
+      ? `LND_SQFOOT >= ${ORLANDO_CORE_SQFT.min} AND LND_SQFOOT <= ${ORLANDO_CORE_SQFT.max}`
+      : `LND_SQFOOT >= ${ORLANDO_CORE_SQFT.min}`,
     geometry: JSON.stringify({
       xmin: west,
       ymin: south,

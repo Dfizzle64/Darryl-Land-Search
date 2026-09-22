@@ -1,10 +1,11 @@
 {
-  "generatedAt": "2026-09-22T15:37:40Z",
+  "generatedAt": "2026-09-22T15:54:59Z",
   "market": "Orlando",
-  "parcelCount": 66422,
+  "parcelCount": 62500,
   "perCountyCap": null,
   "minAcres": null,
   "coreMinAcres": 5.0,
+  "coreMaxAcres": 150.0,
   "tile": {
     "originLon": -83.0,
     "originLat": 27.0,
@@ -12,7 +13,7 @@
   },
   "sourcesDoc": "data/orlando-parcel-sources.json",
   "notes": [
-    "Lake, Orange, Osceola, Polk, and Seminole are complete public-GIS extracts of parcels with FDOR land area \u2265 5.0 acres (LND_SQFOOT / 43560).",
+    "Lake, Orange, Osceola, Polk, and Seminole are complete public-GIS extracts of parcels with FDOR land area from 5.0 through 150.0 acres (LND_SQFOOT / 43560).",
     "Brevard, Marion, Sumter, and Volusia remain thinner viewport samples in this build.",
     "Core counties are partitioned into 0.25\u00b0 tiles. The map loads a viewport through /api/parcels.",
     "Orange zoning, sale, and tax prefer OCPA when the parcel id matches. FLU is Orange County + Orlando only.",
@@ -38,9 +39,9 @@
     {
       "name": "Lake",
       "fips": "12069",
-      "featureCount": 18129,
-      "ruralEligibleParcelCount": 1257,
-      "oz2EligibleParcelCount": 1257,
+      "featureCount": 17470,
+      "ruralEligibleParcelCount": 1237,
+      "oz2EligibleParcelCount": 1237,
       "zoningJoinedCount": 0,
       "fluJoinedCount": 0,
       "coverage": "complete-gte-5ac",
@@ -49,6 +50,7 @@
       "source": "doh-ehwaters",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/33/query",
       "gaps": [
+        "Acreage band is 5.0\u2013150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
         "No zoning or future land use on the Florida DOH EHWATER extract.",
         "Owner, sale, and tax are FDOR Name-Address-Legal fields.",
         "OZ 2.0 here is the seven-market rural-eligible tract pack only, not every eligible tract in the county.",
@@ -60,7 +62,9 @@
       "mergedParts": 390,
       "tileCount": 10,
       "ocpaMatchedCount": 0,
-      "fluGaps": {}
+      "fluGaps": {},
+      "maxAcres": 150.0,
+      "excludedOverMaxAcres": 659
     },
     {
       "name": "Marion",
@@ -80,18 +84,18 @@
     {
       "name": "Orange",
       "fips": "12095",
-      "featureCount": 14249,
-      "ruralEligibleParcelCount": 36,
-      "oz2EligibleParcelCount": 4770,
-      "zoningJoinedCount": 8258,
-      "fluJoinedCount": 8946,
+      "featureCount": 14031,
+      "ruralEligibleParcelCount": 35,
+      "oz2EligibleParcelCount": 4758,
+      "zoningJoinedCount": 8072,
+      "fluJoinedCount": 8789,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "source": "doh-ehwaters+ocpa",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/47/query",
       "gaps": [
-        "Acreage universe is FDOR LND_SQFOOT / 43560 \u2265 5.0 from DOH EHWATER; OCPA ACREAGE replaces it when the appraiser value is also \u2265 5.",
+        "Acreage band is 5.0\u2013150.0 acres. Inclusion starts from FDOR LND_SQFOOT / 43560. OCPA ACREAGE replaces the stored value only when it is also inside that band.",
         "Zoning, owner, sale, and tax prefer the OCPA public parcel layer when the parcel id matches.",
         "FLU is centroid-joined to Orange County open-data layer 21 and Orlando layer 83. Other cities often stay unknown.",
         "Income and AADT are not joined on this full extract.",
@@ -102,18 +106,20 @@
       "droppedNoGeometry": 0,
       "mergedParts": 120,
       "tileCount": 10,
-      "ocpaMatchedCount": 12186,
+      "ocpaMatchedCount": 12000,
       "fluGaps": {
-        "no-hit": 4944,
-        "county-city-placeholder": 441
-      }
+        "no-hit": 4813,
+        "county-city-placeholder": 429
+      },
+      "maxAcres": 150.0,
+      "excludedOverMaxAcres": 218
     },
     {
       "name": "Osceola",
       "fips": "12097",
-      "featureCount": 7370,
-      "ruralEligibleParcelCount": 2399,
-      "oz2EligibleParcelCount": 2399,
+      "featureCount": 5997,
+      "ruralEligibleParcelCount": 1482,
+      "oz2EligibleParcelCount": 1482,
       "zoningJoinedCount": 0,
       "fluJoinedCount": 0,
       "coverage": "complete-gte-5ac",
@@ -122,6 +128,7 @@
       "source": "doh-ehwaters",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/48/query",
       "gaps": [
+        "Acreage band is 5.0\u2013150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
         "No zoning or future land use on the Florida DOH EHWATER extract.",
         "Owner, sale, and tax are FDOR Name-Address-Legal fields.",
         "OZ 2.0 here is the seven-market rural-eligible tract pack only, not every eligible tract in the county.",
@@ -133,14 +140,16 @@
       "mergedParts": 43,
       "tileCount": 13,
       "ocpaMatchedCount": 0,
-      "fluGaps": {}
+      "fluGaps": {},
+      "maxAcres": 150.0,
+      "excludedOverMaxAcres": 1373
     },
     {
       "name": "Polk",
       "fips": "12105",
-      "featureCount": 21285,
-      "ruralEligibleParcelCount": 4959,
-      "oz2EligibleParcelCount": 4959,
+      "featureCount": 19734,
+      "ruralEligibleParcelCount": 4250,
+      "oz2EligibleParcelCount": 4250,
       "zoningJoinedCount": 0,
       "fluJoinedCount": 0,
       "coverage": "complete-gte-5ac",
@@ -149,6 +158,7 @@
       "source": "doh-ehwaters",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/52/query",
       "gaps": [
+        "Acreage band is 5.0\u2013150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
         "No zoning or future land use on the Florida DOH EHWATER extract.",
         "Owner, sale, and tax are FDOR Name-Address-Legal fields.",
         "OZ 2.0 here is the seven-market rural-eligible tract pack only, not every eligible tract in the county.",
@@ -160,12 +170,14 @@
       "mergedParts": 7,
       "tileCount": 17,
       "ocpaMatchedCount": 0,
-      "fluGaps": {}
+      "fluGaps": {},
+      "maxAcres": 150.0,
+      "excludedOverMaxAcres": 1551
     },
     {
       "name": "Seminole",
       "fips": "12117",
-      "featureCount": 4909,
+      "featureCount": 4788,
       "ruralEligibleParcelCount": 0,
       "oz2EligibleParcelCount": 0,
       "zoningJoinedCount": 0,
@@ -176,6 +188,7 @@
       "source": "doh-ehwaters",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/58/query",
       "gaps": [
+        "Acreage band is 5.0\u2013150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
         "No zoning or future land use on the Florida DOH EHWATER extract.",
         "Owner, sale, and tax are FDOR Name-Address-Legal fields.",
         "OZ 2.0 here is the seven-market rural-eligible tract pack only, not every eligible tract in the county.",
@@ -187,7 +200,9 @@
       "mergedParts": 0,
       "tileCount": 5,
       "ocpaMatchedCount": 0,
-      "fluGaps": {}
+      "fluGaps": {},
+      "maxAcres": 150.0,
+      "excludedOverMaxAcres": 121
     },
     {
       "name": "Sumter",

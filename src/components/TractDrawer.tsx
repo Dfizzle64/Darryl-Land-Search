@@ -132,7 +132,7 @@ export function TractDrawer({ tract, statusHelp = null, onClose }: TractDrawerPr
         {SHED_CAVEAT} A rural-eligible GEOID is not a pad site. Sewer, zoning, wetlands, title, and assembly still
         control.
         {tract.state === "Florida" && isFull5AcCounty(tract.county)
-          ? ` ${tract.county} County includes public parcels of 5.0 acres and larger. Zoom in if the view says it is showing a spread of a larger set.`
+          ? ` ${tract.county} County includes public parcels from 5.0 through 150.0 acres. Parcels under 5 or over 150 are excluded. Zoom in if the view says it is showing a spread of a larger set.`
           : tract.state === "Florida" && ORLANDO_FIPS_BY_NAME[tract.county]
             ? ` ${tract.county} County still uses a thinner public-GIS sample in this build, not every parcel of 5 acres and up.`
             : " This county has no parcel extract in the app — the map shows the tract polygon and a pin."}

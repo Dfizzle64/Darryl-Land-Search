@@ -24,7 +24,7 @@ npm run seed:oz      # designated QOZ polygons, then OZ 2.0 eligibility (Rev. Pr
 npm run seed:oz2     # refresh OZ 2.0 nomination tracts only (needs pypdf; see below)
 npm run seed:oz2-markets  # seven-market rural-eligible tracts from the CSV + TIGER 2020
 npm run seed:sc-mf        # South Carolina multifamily priority shortlist from its CSV
-npm run seed:parcels:orlando  # full ≥5 acre parcels for Lake, Orange, Osceola, Polk, Seminole
+npm run seed:parcels:orlando  # full 5–150 acre parcels for Lake, Orange, Osceola, Polk, Seminole
 npm run seed:zoning  # refresh coverage report vs knowledge JSON (no LLM)
 ```
 
@@ -45,7 +45,7 @@ No API keys are required for the default fixture mode. Copy `.env.example` to `.
 - Open **Zoning knowledge** in the sidebar: jurisdictions covered, district explanations, citations, last-updated date. This is an offline JSON knowledge base, not a live model call.
 - Switch the map between **Streets** (OpenFreeMap dark / Carto Dark Matter fallback) and **Satellite** (Esri World Imagery). The toggle is a map control; parcel filters, selection, OZ overlay, and camera stay put. Satellite imagery is a public Esri tile service and needs no API key.
 
-Lake, Orange, Osceola, Polk, and Seminole load **every public parcel of 5.0 acres or more** from Florida DOH EHWATER (FDOR land square feet). Orange also joins OCPA zoning, sale, and tax when the parcel id matches, plus Orange County and Orlando future land use. The map requests the current viewport instead of shipping that whole extract in the page. Brevard, Marion, Sumter, and Volusia are still thinner samples. `data/fixtures/parcels.geojson` remains a separate 462-parcel Orange pilot with income and AADT, used by the legacy provider, not the Orlando shed map.
+Lake, Orange, Osceola, Polk, and Seminole load **every public parcel from 5.0 through 150.0 acres** from Florida DOH EHWATER (FDOR land square feet). Parcels under 5 or over 150 are excluded. Orange also joins OCPA zoning, sale, and tax when the parcel id matches, plus Orange County and Orlando future land use. The map requests the current viewport instead of shipping that whole extract in the page. Brevard, Marion, Sumter, and Volusia are still thinner samples. `data/fixtures/parcels.geojson` remains a separate 462-parcel Orange pilot with income and AADT, used by the legacy provider, not the Orlando shed map.
 
 ## How filters work
 
@@ -130,7 +130,7 @@ Product decisions:
 - County GIS does not have a separate **MHDR** code; plan text MHDR (35 du/ac) is noted in the MDR/HDR `why` fields.
 - **Innovation Way (`IW`)** is maybe / plan-specific. **Lake Pickett (`LP`)** is not treated as MF-supportive.
 
-The legacy Orange pilot file still has FLU joined on **375 / 462** parcels, including sites with MF-supportive FLU and non-MF zoning. The Orlando shed map uses the full ≥5 acre extract instead; its join counts are in `data/fixtures/orlando-parcels/meta.json`. Use land-use mode **Rezoning candidates**, **FLU allows multifamily / higher density**, or **Either** where FLU is joined.
+The legacy Orange pilot file still has FLU joined on **375 / 462** parcels, including sites with MF-supportive FLU and non-MF zoning. The Orlando shed map uses the full 5–150 acre extract instead; its join counts are in `data/fixtures/orlando-parcels/meta.json`. Use land-use mode **Rezoning candidates**, **FLU allows multifamily / higher density**, or **Either** where FLU is joined.
 
 ## Opportunity Zones
 
@@ -192,7 +192,7 @@ Charleston and Charlotte can filter the rural layer to a **22-tract** multifamil
 
 Tier A is a gold outline and pin. Tier B is blue. Both sit on top of the orange rural-eligible fill. The drawer shows the corridor label, tier, multifamily rationale, acreage realism, and notes. Nom-watch in those notes is an inference, not a confirmed nomination. The status chip stays **Eligible (rural) — not designated**, with the governor-filed line. This shortlist does not change Atlanta, Tampa, Orlando, Nashville, Raleigh-Durham, or the Orange County parcel pilot.
 
-Choose **Orlando** for shed parcels. Lake, Orange, Osceola, Polk, and Seminole are the complete ≥5 acre extracts. Orange still has the amber non-rural eligible tracts, the designated QOZ overlay, and green parcel fills. GEOID `12095016605` is still the only Orange County rural-eligible tract. Brevard, Marion, Sumter, and Volusia stay thinner samples. The other six metros do **not** have parcel extracts: the map draws the 2020 tract polygon and a Census Gazetteer pin. That is a coverage gap, not an empty county.
+Choose **Orlando** for shed parcels. Lake, Orange, Osceola, Polk, and Seminole are the complete 5–150 acre extracts. Orange still has the amber non-rural eligible tracts, the designated QOZ overlay, and green parcel fills. GEOID `12095016605` is still the only Orange County rural-eligible tract. Brevard, Marion, Sumter, and Volusia stay thinner samples. The other six metros do **not** have parcel extracts: the map draws the 2020 tract polygon and a Census Gazetteer pin. That is a coverage gap, not an empty county.
 
 ### Refresh the seven-market fixtures
 
@@ -235,7 +235,7 @@ A second public extract, [ArcGIS Online `orange_county_parcels`](https://service
 
 ## Why GeoJSON instead of PostGIS
 
-The app installs and runs with one command, including in environments without Docker or a database. Pre-joined GeoJSON tiles plus a viewport API cover the five-county ≥5 acre extracts without posting every polygon in the first page load. A full cadastral database (every lot under 5 acres) is still out of scope.
+The app installs and runs with one command, including in environments without Docker or a database. Pre-joined GeoJSON tiles plus a viewport API cover the five-county 5–150 acre extracts without posting every polygon in the first page load. A full cadastral database (every lot under 5 acres, or tracts over 150 acres) is still out of scope.
 
 ## Live keys and adapters
 
@@ -259,7 +259,7 @@ HUD_OZ_URL=https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Opp
 
 ## Known gaps
 
-- Lake, Orange, Osceola, Polk, and Seminole fixtures are every DOH parcel with land area ≥ 5.0 acres, not a sample. Parcels under 5 acres are omitted on purpose. Brevard, Marion, Sumter, and Volusia are still windowed samples. The legacy `parcels.geojson` pilot is still a 462-parcel Orange subset.
+- Lake, Orange, Osceola, Polk, and Seminole fixtures are every DOH parcel with land area from 5.0 through 150.0 acres, not a sample. Parcels under 5 or over 150 are omitted on purpose. Brevard, Marion, Sumter, and Volusia are still windowed samples and are not capped at 150. The legacy `parcels.geojson` pilot is still a 462-parcel Orange subset.
 - Last sale is the **most recent OCPA sale fields** on the parcel layer (date, adjusted price, qualified flag). Older sales exist in OCPA CAMA extracts (up to five) and in Comptroller official records; those are linked, not inlined.
 - Sentinel sale dates around 1900 are treated as “not available”.
 - Zoning match is GIS-code based, not a substitute for a zoning opinion or PD regulating plan.

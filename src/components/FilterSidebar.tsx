@@ -303,8 +303,9 @@ export function FilterSidebar({
           </label>
           <p className="text-xs text-ink-500">
             Slider runs 0–{ACREAGE_SLIDER.max} acres. Larger parcels still match any threshold at or below{" "}
-            {ACREAGE_SLIDER.max} ac. Lake, Orange, Osceola, Polk, and Seminole fixtures include every public parcel of
-            5.0 acres or more. Brevard, Marion, Sumter, and Volusia are still smaller samples.
+            {ACREAGE_SLIDER.max} ac. Lake, Orange, Osceola, Polk, and Seminole fixtures include every public parcel from
+            5.0 through 150.0 acres. Parcels under 5 or over 150 are excluded. Brevard, Marion, Sumter, and Volusia are
+            still smaller samples.
           </p>
           <Toggle
             label="Include unknown acreage"

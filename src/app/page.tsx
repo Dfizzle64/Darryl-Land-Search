@@ -44,7 +44,7 @@ export default async function HomePage() {
   const catalog = {
     ...ruralCatalog,
     parcelNote:
-      "Lake, Orange, Osceola, Polk, and Seminole load every public parcel of 5.0 acres or more (Florida DOH EHWATER; Orange zoning and FLU from OCPA and county open data). Brevard, Marion, Sumter, and Volusia stay thinner samples. The map requests the current viewport so the full extract stays responsive. Other metros remain tract overlays.",
+      "Lake, Orange, Osceola, Polk, and Seminole load every public parcel from 5.0 through 150.0 acres (Florida DOH EHWATER; Orange zoning and FLU from OCPA and county open data). Parcels under 5 or over 150 are excluded. Brevard, Marion, Sumter, and Volusia stay thinner samples. The map requests the current viewport so the full extract stays responsive. Other metros remain tract overlays.",
   };
 
   return (

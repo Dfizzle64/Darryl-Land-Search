@@ -6,25 +6,25 @@ Public GIS parcels for the nine Orlando drive-shed counties:
 
 ## Coverage
 
-Seeded 2026-09-22 from Florida DOH EHWATER. Source row is the service count for `LND_SQFOOT >= 217800`. Kept rows collapse duplicate parcel ids into one multipart geometry.
+Seeded 2026-09-22 from Florida DOH EHWATER. Source row is the service count for `LND_SQFOOT >= 217800` (5.0 acres and up). Kept rows are the **5.0–150.0 acre** band after duplicate parcel ids are collapsed into one multipart geometry. Parcels under 5 or over 150 are excluded.
 
-| County | FIPS | Kept | Source rows | Notes |
-| --- | --- | ---: | ---: | --- |
-| Lake | 12069 | 18,129 | 18,519 | 390 extra parts merged. No zoning/FLU. 1,257 rural-eligible centroids |
-| Orange | 12095 | 14,249 | 14,369 | 120 extra parts merged. OCPA zoning on 8,258. FLU on 8,946 |
-| Osceola | 12097 | 7,370 | 7,413 | 43 extra parts merged. No zoning/FLU |
-| Polk | 12105 | 21,285 | 21,292 | 7 extra parts merged. No zoning/FLU. 4,959 rural-eligible centroids |
-| Seminole | 12117 | 4,909 | 4,909 | No zoning/FLU. No rural-eligible OZ 2.0 tracts in the pack |
-| Brevard | 12009 | 120 | — | Thinner sample |
-| Marion | 12083 | 120 | — | Thinner sample |
-| Sumter | 12119 | 120 | — | Thinner sample |
-| Volusia | 12127 | 120 | — | Thinner sample |
+| County | FIPS | Kept (5–150 ac) | Source rows (≥5 ac) | Over 150 excluded | Notes |
+| --- | --- | ---: | ---: | ---: | --- |
+| Lake | 12069 | 17,470 | 18,519 | 659 | 390 extra parts merged. No zoning/FLU. 1,237 rural-eligible centroids |
+| Orange | 12095 | 14,031 | 14,369 | 218 | 120 extra parts merged. OCPA zoning on 8,072. FLU on 8,789 |
+| Osceola | 12097 | 5,997 | 7,413 | 1,373 | 43 extra parts merged. No zoning/FLU. 1,482 rural-eligible centroids |
+| Polk | 12105 | 19,734 | 21,292 | 1,551 | 7 extra parts merged. No zoning/FLU. 4,250 rural-eligible centroids |
+| Seminole | 12117 | 4,788 | 4,909 | 121 | No zoning/FLU. No rural-eligible OZ 2.0 tracts in the pack |
+| Brevard | 12009 | 120 | — | — | Thinner sample (not capped at 150) |
+| Marion | 12083 | 120 | — | — | Thinner sample (not capped at 150) |
+| Sumter | 12119 | 120 | — | — | Thinner sample (not capped at 150) |
+| Volusia | 12127 | 120 | — | — | Thinner sample (not capped at 150) |
 
-Shed total in `meta.json`: **66,422** parcels, of which **65,942** are the five complete ≥5 acre counties.
+Shed total in `meta.json`: **62,500** parcels, of which **62,020** are the five complete 5–150 acre counties.
 
 Counts, tile paths, and join gaps are in `data/fixtures/orlando-parcels/meta.json` after each seed. The five complete counties are not samples.
 
-**Acreage rule.** A parcel is in a complete county when Florida DOH EHWATER `LND_SQFOOT` is at least 217,800 (5.0 × 43,560). Stored acreage is `LND_SQFOOT / 43560`. On Orange County, the OCPA `ACREAGE` field replaces that value when the appraiser acreage is also ≥ 5. Parcels under 5 acres are out of scope for this extract.
+**Acreage rule.** A parcel is in a complete county when Florida DOH EHWATER `LND_SQFOOT` is from 217,800 through 6,534,000 (5.0 through 150.0 × 43,560). Stored acreage is `LND_SQFOOT / 43560`. On Orange County, the OCPA `ACREAGE` field replaces that value only when the appraiser acreage is also inside 5.0–150.0. Parcels under 5 or over 150 are excluded. A parcel of exactly 150.0 acres stays in.
 
 ## Architecture
 
@@ -36,7 +36,7 @@ Counts, tile paths, and join gaps are in `data/fixtures/orlando-parcels/meta.jso
 | `data/fixtures/orlando-parcels/meta.json` | Counts, coverage, gaps. |
 | `data/orlando-parcel-sources.json` | Source URLs, field mapping, rejected layers. |
 | `GET /api/parcels?market=Orlando&bbox=w,s,e,n` | Reads only tiles that intersect the viewport. |
-| `GET /api/parcels?market=Orlando&bbox=…&source=live` | Live DOH query, also ≥ 5 acres, used when a sample county is selected and the map is zoomed in. |
+| `GET /api/parcels?market=Orlando&bbox=…&source=live` | Live DOH query used when a sample county is selected and the map is zoomed in. Sample live queries stay at ≥ 5 acres. A live query for one of the five complete counties uses the 5.0–150.0 acre band. |
 
 The home page does not embed the full extract. The map asks for the current view. If that view still holds more parcels than the client should draw, the API returns a spatially even subset and `meta.truncated` so the UI can say to zoom in. The fixtures themselves stay complete.
 
@@ -81,8 +81,8 @@ Orange enrichment:
 - Lake, Osceola, Polk, and Seminole have no zoning or FLU on the DOH extract. Land-use filters should stay on **All parcels** there. Missing zoning is not treated as multifamily.
 - Outside Orange, the OZ 2.0 flag is only the seven-market **rural-eligible** tract pack. Non-rural eligible tracts in those counties are not joined.
 - Orange municipal FLU other than Orlando is often the county placeholder `City` and stays unknown.
-- Income and AADT are not joined onto the full ≥5 acre extract.
-- DOH land square feet and the county appraiser acreage field can disagree. The extract follows DOH for inclusion.
+- Income and AADT are not joined onto the full 5–150 acre extract.
+- DOH land square feet and the county appraiser acreage field can disagree. The extract follows DOH for inclusion, then drops anything outside 5.0–150.0 acres. Orange OCPA acreage is stored only when it is still inside that band.
 - A public ArcGIS Online layer named Polk County parcels is the wrong state (Minnesota). It is not used.
 - Brevard’s property-appraiser MapServer has returned HTTP 403 from this environment. The sample uses DOH.
-- Brevard, Marion, Sumter, and Volusia are still windowed samples around rural tracts, not every ≥5 acre parcel.
+- Brevard, Marion, Sumter, and Volusia are still windowed samples around rural tracts, not every 5–150 acre parcel. Those samples are not capped at 150 acres.

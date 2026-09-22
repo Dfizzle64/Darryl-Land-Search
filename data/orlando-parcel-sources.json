@@ -3,10 +3,10 @@
   "state": "Florida",
   "generatedFor": "Orlando ~90-minute drive shed (approximate county ring)",
   "architecture": {
-    "fixtures": "Lake, Orange, Osceola, Polk, and Seminole are complete ≥5.0 acre extracts in 0.25° tiles under data/fixtures/orlando-parcels/tiles/{fips}/. Brevard, Marion, Sumter, and Volusia remain single-file samples.",
-    "runtime": "GET /api/parcels?market=Orlando&bbox=w,s,e,n reads only tiles that intersect the viewport. Optional source=live queries DOH for a zoomed-in sample county, still at ≥5 acres.",
+    "fixtures": "Lake, Orange, Osceola, Polk, and Seminole are complete 5.0–150.0 acre extracts in 0.25° tiles under data/fixtures/orlando-parcels/tiles/{fips}/. Parcels under 5 or over 150 are excluded. Brevard, Marion, Sumter, and Volusia remain single-file samples.",
+    "runtime": "GET /api/parcels?market=Orlando&bbox=w,s,e,n reads only tiles that intersect the viewport. Optional source=live queries DOH for a zoomed-in sample county at ≥5 acres. A live query for a complete county uses 217800 <= LND_SQFOOT <= 6534000.",
     "refresh": "npm run seed:parcels:orlando",
-    "acreageRule": "Include when FDOR LND_SQFOOT >= 217800 (5.0 acres). Orange OCPA ACREAGE replaces the stored value when it is also >= 5."
+    "acreageRule": "Include when 217800 <= FDOR LND_SQFOOT <= 6534000 (5.0 through 150.0 acres). Exclude under 5 and over 150. Orange OCPA ACREAGE replaces the stored value only when it is also inside that band."
   },
   "primaryStack": {
     "name": "Florida DOH EHWATER parcels (FDOR NAL attributes)",
@@ -69,7 +69,7 @@
         }
       ],
       "gaps": [
-        "Complete ≥5 acre geometry and FDOR owner/sale/tax. No zoning or FLU on the DOH extract.",
+        "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded. No zoning or FLU on the DOH extract.",
         "OZ 2.0 join is the seven-market rural-eligible pack only."
       ]
     },
@@ -109,7 +109,7 @@
         }
       ],
       "gaps": [
-        "Universe is DOH LND_SQFOOT ≥ 5 acres. OCPA zoning, owner, sale, and tax join when PARCEL matches.",
+        "Universe is DOH LND_SQFOOT from 5.0 through 150.0 acres. Parcels under 5 or over 150 are excluded. OCPA zoning, owner, sale, and tax join when PARCEL matches.",
         "Municipal FLU besides Orlando is often the county placeholder City and stays unknown.",
         "Income and AADT are not joined on the full extract."
       ]
@@ -138,7 +138,7 @@
         }
       ],
       "gaps": [
-        "Complete ≥5 acre geometry and FDOR owner/sale/tax. No county-wide zoning layer is joined.",
+        "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded. No county-wide zoning layer is joined.",
         "St Cloud city parcels are not a substitute for the county extract."
       ]
     },
@@ -160,7 +160,7 @@
         }
       ],
       "gaps": [
-        "Complete ≥5 acre geometry and FDOR owner/sale/tax. No zoning on the DOH extract.",
+        "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded. No zoning on the DOH extract.",
         "The AGOL layer labeled Polk County parcels is in Minnesota and is not used."
       ]
     },
@@ -182,7 +182,7 @@
         }
       ],
       "gaps": [
-        "Complete ≥5 acre geometry and FDOR owner/sale/tax. No zoning on the DOH extract.",
+        "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded. No zoning on the DOH extract.",
         "Seminole has no rural-eligible OZ 2.0 tracts in the seven-market pack."
       ]
     },

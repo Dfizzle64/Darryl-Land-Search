@@ -312,6 +312,10 @@ export type OrlandoParcelCountyMeta = {
   coverage: OrlandoParcelCoverage;
   partition: "tiles" | "file";
   minAcres: number;
+  /** Inclusive upper bound for complete counties (150). Sample counties omit this. */
+  maxAcres?: number;
+  /** Parcels removed because stored acreage was above maxAcres. */
+  excludedOverMaxAcres?: number;
   source: string;
   queryUrl: string;
   gaps: string[];
@@ -325,6 +329,7 @@ export type OrlandoParcelsMeta = {
   perCountyCap: number | null;
   minAcres: number | null;
   coreMinAcres: number;
+  coreMaxAcres: number;
   tile: { originLon: number; originLat: number; tileDeg: number };
   sourcesDoc: string;
   notes: string[];

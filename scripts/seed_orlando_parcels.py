@@ -2,8 +2,8 @@
 """Seed Orlando shed parcel fixtures from public GIS.
 
 Core counties (Lake, Orange, Osceola, Polk, Seminole) are a complete extract of
-parcels whose FDOR land area is at least 5.0 acres
-(``LND_SQFOOT >= 217800``) from Florida DOH EHWATER. Orange is enriched with
+parcels whose FDOR land area is from 5.0 through 150.0 acres
+(``217800 <= LND_SQFOOT <= 6534000``) from Florida DOH EHWATER. Orange is enriched with
 OCPA zoning / owner / sale / tax and with Orange County + Orlando future land
 use. Geometries are simplified and written as viewport tiles.
 
@@ -58,7 +58,9 @@ ORIGIN_LON = -83.0
 ORIGIN_LAT = 27.0
 TILE_DEG = 0.25
 MIN_ACRES = 5.0
+MAX_ACRES = 150.0
 MIN_SQFT = 217800  # 5.0 * 43560
+MAX_SQFT = 6534000  # 150.0 * 43560
 CORE_COUNTIES = ("Lake", "Orange", "Osceola", "Polk", "Seminole")
 
 DOH_FIELDS = [
@@ -427,7 +429,7 @@ def load_geojson_features(path: Path) -> list[dict]:
 
 def normalize_doh(attrs: dict, geom: dict, county: dict) -> dict | None:
     sqft = _num(attrs.get("LND_SQFOOT"))
-    if sqft is None or sqft < MIN_SQFT:
+    if sqft is None or sqft < MIN_SQFT or sqft > MAX_SQFT:
         return None
     geometry = rings_to_geojson(geom)
     if not geometry:
@@ -441,8 +443,8 @@ def normalize_doh(attrs: dict, geom: dict, county: dict) -> dict | None:
     if not parcel_id:
         return None
     acreage = round(sqft / 43560.0, 4)
-    if acreage < MIN_ACRES:
-        acreage = MIN_ACRES
+    if acreage < MIN_ACRES or acreage > MAX_ACRES:
+        return None
     fips = county["fips"]
     feature_id = f"{fips}:{parcel_id}"
     price = _num(attrs.get("SALE_PRC1"))
@@ -571,7 +573,7 @@ def merge_parcel_parts(existing: dict, extra: dict) -> dict:
 def download_core_county(county: dict) -> tuple[list[dict], int, int, int]:
     layer = county["dohLayerId"]
     url = f"{DOH_BASE}/{layer}/query"
-    where = f"LND_SQFOOT >= {MIN_SQFT}"
+    where = f"LND_SQFOOT >= {MIN_SQFT} AND LND_SQFOOT <= {MAX_SQFT}"
     expected = count_where(url, where)
     cache_path = CACHE_DIR / f"{county['fips']}.json"
     if cache_path.exists():
@@ -673,7 +675,7 @@ def enrich_orange_ocpa(features: list[dict]) -> int:
         props.update(zoning)
         props["jurisdictionCode"] = zoning.get("jurisdictionPrefix")
         ocpa_acres = _num(attrs.get("ACREAGE"))
-        if ocpa_acres is not None and ocpa_acres >= MIN_ACRES:
+        if ocpa_acres is not None and MIN_ACRES <= ocpa_acres <= MAX_ACRES:
             props["acreage"] = round(ocpa_acres, 4)
             props["acreageSource"] = "ocpa-acreage"
         if clean(attrs.get("NAME1")):
@@ -1075,8 +1077,15 @@ def preserve_sample_row(county: dict, existing: dict | None) -> dict | None:
     return None
 
 
+def in_core_acreage_band(acres: Any) -> bool:
+    value = _num(acres)
+    if value is None:
+        return False
+    return MIN_ACRES <= value <= MAX_ACRES
+
+
 def seed_one_core(county: dict, skip_flu: bool) -> dict:
-    print(f"Seeding complete ≥5 ac {county['name']}…")
+    print(f"Seeding complete 5–150 ac {county['name']}…")
     features, source_count, dropped, merged_parts = download_core_county(county)
     ocpa_matched = 0
     flu_gaps: dict[str, int] = {}
@@ -1088,7 +1097,7 @@ def seed_one_core(county: dict, skip_flu: bool) -> dict:
             **county,
             "preferredSource": "doh-ehwaters+ocpa",
             "gaps": [
-                "Acreage universe is FDOR LND_SQFOOT / 43560 ≥ 5.0 from DOH EHWATER; OCPA ACREAGE replaces it when the appraiser value is also ≥ 5.",
+                "Acreage band is 5.0–150.0 acres. Inclusion starts from FDOR LND_SQFOOT / 43560. OCPA ACREAGE replaces the stored value only when it is also inside that band.",
                 "Zoning, owner, sale, and tax prefer the OCPA public parcel layer when the parcel id matches.",
                 "FLU is centroid-joined to Orange County open-data layer 21 and Orlando layer 83. Other cities often stay unknown.",
                 "Income and AADT are not joined on this full extract.",
@@ -1099,12 +1108,18 @@ def seed_one_core(county: dict, skip_flu: bool) -> dict:
         county = {
             **county,
             "gaps": [
+                "Acreage band is 5.0–150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
                 "No zoning or future land use on the Florida DOH EHWATER extract.",
                 "Owner, sale, and tax are FDOR Name-Address-Legal fields.",
                 "OZ 2.0 here is the seven-market rural-eligible tract pack only, not every eligible tract in the county.",
                 "Income and AADT are not joined.",
             ],
         }
+    before_cap = len(features)
+    features = [feature for feature in features if in_core_acreage_band(feature["properties"].get("acreage"))]
+    excluded_over_max = before_cap - len(features)
+    if excluded_over_max:
+        print(f"  dropped {excluded_over_max} parcels outside {MIN_ACRES}–{MAX_ACRES} acres")
     rural_n, eligible_n = stamp_overlays(features, county["name"])
     rel, tile_count, _lookup = write_tiles(county, features)
     print(f"  wrote {len(features)} features in {tile_count} tiles ({rural_n} rural-eligible)")
@@ -1116,7 +1131,9 @@ def seed_one_core(county: dict, skip_flu: bool) -> dict:
         path=rel,
         min_acres=MIN_ACRES,
         extra={
+            "maxAcres": MAX_ACRES,
             "sourceCount": source_count,
+            "excludedOverMaxAcres": excluded_over_max,
             "droppedNoGeometry": dropped,
             "mergedParts": merged_parts,
             "tileCount": tile_count,
@@ -1133,7 +1150,7 @@ def main() -> None:
     parser.add_argument("--per-county", type=int, default=120, help="Sample cap for non-core counties")
     parser.add_argument("--min-acres", type=float, default=1.0, help="Sample-mode minimum acreage")
     parser.add_argument("--county", type=str, default="")
-    parser.add_argument("--full-core", action="store_true", help="Download every ≥5 acre parcel in the five core counties")
+    parser.add_argument("--full-core", action="store_true", help="Download every 5–150 acre parcel in the five core counties")
     parser.add_argument("--sample", action="store_true", help="Refresh windowed samples instead of the full core extract")
     parser.add_argument("--refresh-samples", action="store_true", help="Also re-download Brevard/Marion/Sumter/Volusia samples")
     parser.add_argument("--skip-flu", action="store_true")
@@ -1198,10 +1215,11 @@ def main() -> None:
         "perCountyCap": None if full_core else args.per_county,
         "minAcres": None,
         "coreMinAcres": MIN_ACRES,
+        "coreMaxAcres": MAX_ACRES,
         "tile": {"originLon": ORIGIN_LON, "originLat": ORIGIN_LAT, "tileDeg": TILE_DEG},
         "sourcesDoc": "data/orlando-parcel-sources.json",
         "notes": [
-            "Lake, Orange, Osceola, Polk, and Seminole are complete public-GIS extracts of parcels with FDOR land area ≥ 5.0 acres (LND_SQFOOT / 43560).",
+            "Lake, Orange, Osceola, Polk, and Seminole are complete public-GIS extracts of parcels with FDOR land area from 5.0 through 150.0 acres (LND_SQFOOT / 43560).",
             "Brevard, Marion, Sumter, and Volusia remain thinner viewport samples in this build.",
             "Core counties are partitioned into 0.25° tiles. The map loads a viewport through /api/parcels.",
             "Orange zoning, sale, and tax prefer OCPA when the parcel id matches. FLU is Orange County + Orlando only.",

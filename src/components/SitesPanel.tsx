@@ -82,6 +82,7 @@ export function SitesPanel({
             const income = parcelIncome(site.feature, incomeGeography);
             const aadt = parcelAadt(site.feature);
             const oz = props.opportunityZone?.inOpportunityZone;
+            const oz2 = props.oz2Eligibility;
             return (
               <li key={props.id}>
                 <button
@@ -103,11 +104,22 @@ export function SitesPanel({
                       #{site.rank}
                       <span className="ml-2 font-display text-lg tracking-normal text-white">{site.score.toFixed(1)}</span>
                     </p>
-                    {oz ? (
-                      <span className="rounded-full border border-clay-400/40 px-1.5 py-px text-[10px] text-clay-400">
-                        OZ
-                      </span>
-                    ) : null}
+                    <span className="flex gap-1">
+                      {oz2?.eligible && oz2.rural === true ? (
+                        <span className="rounded-full border border-moss-400/50 px-1.5 py-px text-[10px] text-moss-400">
+                          Rural OZ 2.0
+                        </span>
+                      ) : oz2?.eligible ? (
+                        <span className="rounded-full border border-white/20 px-1.5 py-px text-[10px] text-ink-100">
+                          OZ 2.0
+                        </span>
+                      ) : null}
+                      {oz ? (
+                        <span className="rounded-full border border-clay-400/40 px-1.5 py-px text-[10px] text-clay-400">
+                          OZ
+                        </span>
+                      ) : null}
+                    </span>
                   </div>
                   <p className="mt-0.5 truncate text-sm text-white">{props.situsAddress || props.parcelId}</p>
                   <p className="truncate text-[11px] text-ink-500">

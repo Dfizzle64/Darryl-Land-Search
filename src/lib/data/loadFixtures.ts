@@ -4,6 +4,7 @@ import { flattenMultifamilyTokens } from "../zoning";
 import type {
   FluConfig,
   OpportunityZoneCollection,
+  Oz2TractCollection,
   ParcelCollection,
   TrafficFeature,
   ZoningConfig,
@@ -36,6 +37,9 @@ export async function loadParcelCollection(): Promise<ParcelCollection> {
     if (!("opportunityZone" in feature.properties) || feature.properties.opportunityZone === undefined) {
       feature.properties.opportunityZone = null;
     }
+    if (!("oz2Eligibility" in feature.properties) || feature.properties.oz2Eligibility === undefined) {
+      feature.properties.oz2Eligibility = null;
+    }
   }
   return collection;
 }
@@ -58,6 +62,11 @@ export async function loadFluConfig(): Promise<FluConfig> {
 export async function loadOpportunityZones(): Promise<OpportunityZoneCollection> {
   const raw = await readFile(path.join(DATA_DIR, "fixtures/opportunity-zones.geojson"), "utf8");
   return JSON.parse(raw) as OpportunityZoneCollection;
+}
+
+export async function loadOz2Tracts(): Promise<Oz2TractCollection> {
+  const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-eligible.geojson"), "utf8");
+  return JSON.parse(raw) as Oz2TractCollection;
 }
 
 export async function loadFixtureMeta(): Promise<Record<string, unknown>> {

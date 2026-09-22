@@ -10,6 +10,8 @@ import {
   applyBasemap,
   excludedFillPaint,
   excludedLinePaint,
+  oz2FillPaint,
+  oz2LinePaint,
   ozFillPaint,
   ozLinePaint,
   parcelFillPaint,
@@ -21,6 +23,8 @@ import {
   ORANGE_COUNTY_BOUNDS,
   ORANGE_COUNTY_CENTER,
   type OpportunityZoneCollection,
+  type Oz2TractCollection,
+  type OzFilter,
   type ParcelCollection,
 } from "@/lib/types";
 
@@ -28,12 +32,15 @@ type SiteMapProps = {
   parcels: ParcelCollection;
   traffic: GeoJSON.FeatureCollection<GeoJSON.LineString>;
   opportunityZones: OpportunityZoneCollection;
+  oz2Tracts: Oz2TractCollection;
   matchedIds: Set<string>;
   selectedId: string | null;
   hoveredId: string | null;
   showExcluded: boolean;
   showTraffic: boolean;
   showOz: boolean;
+  showOz2: boolean;
+  ozFilter: OzFilter;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
 };
@@ -43,12 +50,26 @@ function addOverlayLayers(
   parcels: ParcelCollection,
   traffic: GeoJSON.FeatureCollection<GeoJSON.LineString>,
   opportunityZones: OpportunityZoneCollection,
+  oz2Tracts: Oz2TractCollection,
   mode: BasemapMode,
 ) {
+  map.addSource("oz2-tracts", { type: "geojson", data: oz2Tracts });
   map.addSource("opportunity-zones", { type: "geojson", data: opportunityZones });
   map.addSource("parcels", { type: "geojson", data: parcels, promoteId: "id" });
   map.addSource("traffic", { type: "geojson", data: traffic });
 
+  map.addLayer({
+    id: "oz2-fill",
+    type: "fill",
+    source: "oz2-tracts",
+    paint: oz2FillPaint(mode),
+  });
+  map.addLayer({
+    id: "oz2-line",
+    type: "line",
+    source: "oz2-tracts",
+    paint: oz2LinePaint(mode),
+  });
   map.addLayer({
     id: "oz-fill",
     type: "fill",
@@ -99,12 +120,15 @@ export function SiteMap({
   parcels,
   traffic,
   opportunityZones,
+  oz2Tracts,
   matchedIds,
   selectedId,
   hoveredId,
   showExcluded,
   showTraffic,
   showOz,
+  showOz2,
+  ozFilter,
   onSelect,
   onHover,
 }: SiteMapProps) {
@@ -146,7 +170,7 @@ export function SiteMap({
             map.remove();
             return;
           }
-          addOverlayLayers(map, parcels, traffic, opportunityZones, basemapRef.current);
+          addOverlayLayers(map, parcels, traffic, opportunityZones, oz2Tracts, basemapRef.current);
           addSatelliteSourceAndLayer(map);
           applyBasemap(map, basemapRef.current);
 
@@ -185,7 +209,7 @@ export function SiteMap({
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, [parcels, traffic, opportunityZones]);
+  }, [parcels, traffic, opportunityZones, oz2Tracts]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -201,7 +225,17 @@ export function SiteMap({
     map.setLayoutProperty("traffic-line", "visibility", showTraffic ? "visible" : "none");
     map.setLayoutProperty("oz-fill", "visibility", showOz ? "visible" : "none");
     map.setLayoutProperty("oz-line", "visibility", showOz ? "visible" : "none");
-  }, [matchedIds, showExcluded, showTraffic, showOz, status]);
+    map.setLayoutProperty("oz2-fill", "visibility", showOz2 ? "visible" : "none");
+    map.setLayoutProperty("oz2-line", "visibility", showOz2 ? "visible" : "none");
+    const oz2Filter: maplibregl.FilterSpecification | null =
+      ozFilter === "rural-eligible"
+        ? ["==", ["get", "rural"], true]
+        : ozFilter === "non-rural-eligible"
+          ? ["==", ["get", "rural"], false]
+          : null;
+    map.setFilter("oz2-fill", oz2Filter);
+    map.setFilter("oz2-line", oz2Filter);
+  }, [matchedIds, showExcluded, showTraffic, showOz, showOz2, ozFilter, status]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -210,7 +244,9 @@ export function SiteMap({
     map.setLayoutProperty("traffic-line", "visibility", showTraffic ? "visible" : "none");
     map.setLayoutProperty("oz-fill", "visibility", showOz ? "visible" : "none");
     map.setLayoutProperty("oz-line", "visibility", showOz ? "visible" : "none");
-  }, [basemap, showTraffic, showOz, status]);
+    map.setLayoutProperty("oz2-fill", "visibility", showOz2 ? "visible" : "none");
+    map.setLayoutProperty("oz2-line", "visibility", showOz2 ? "visible" : "none");
+  }, [basemap, showTraffic, showOz, showOz2, status]);
 
   const previousHover = useRef<string | null>(null);
   const previousSelected = useRef<string | null>(null);
@@ -252,10 +288,26 @@ export function SiteMap({
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
       {status === "ready" ? <BasemapToggle value={basemap} onChange={setBasemap} /> : null}
-      {status === "ready" && showOz ? (
-        <div className="pointer-events-none absolute bottom-3 left-3 z-10 rounded-lg border border-white/10 bg-ink-900/90 px-2 py-1.5 text-[10px] text-ink-300 sm:bottom-4 sm:left-4">
-          <span className="mr-1.5 inline-block h-2 w-2 rounded-sm bg-[#c9a227]" />
-          Opportunity Zones (HUD/Treasury QOZ)
+      {status === "ready" && (showOz || showOz2) ? (
+        <div className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[16rem] space-y-1 rounded-lg border border-white/10 bg-ink-900/90 px-2 py-1.5 text-[10px] leading-snug text-ink-300 sm:bottom-4 sm:left-4">
+          {showOz2 ? (
+            <>
+              <p>
+                <span className="mr-1.5 inline-block h-2 w-2 rounded-sm bg-[#3dbe86]" />
+                OZ 2.0 rural-eligible (nomination only)
+              </p>
+              <p>
+                <span className="mr-1.5 inline-block h-2 w-2 rounded-sm bg-[#5b8def]" />
+                OZ 2.0 eligible, not rural
+              </p>
+            </>
+          ) : null}
+          {showOz ? (
+            <p>
+              <span className="mr-1.5 inline-block h-2 w-2 rounded-sm bg-[#c9a227]" />
+              Designated QOZ (2018)
+            </p>
+          ) : null}
         </div>
       ) : null}
       {status !== "ready" ? (

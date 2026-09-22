@@ -14,7 +14,7 @@ import {
 } from "@/lib/format";
 import { describeFluMatch } from "@/lib/flu";
 import { describeRezoningCandidate } from "@/lib/filters";
-import { describeOpportunityZone } from "@/lib/opportunityZone";
+import { describeOpportunityZone, describeOz2Eligibility } from "@/lib/opportunityZone";
 import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "@/lib/types";
 import { describeZoningMatch } from "@/lib/zoning";
 
@@ -64,6 +64,7 @@ export function ParcelDrawer({
   );
   const flu = describeFluMatch(properties.flu, fluConfig);
   const oz = describeOpportunityZone(properties.opportunityZone);
+  const oz2 = describeOz2Eligibility(properties.oz2Eligibility);
   const rezoning = describeRezoningCandidate(parcel, filters, zoningConfig, fluConfig);
   const income = filters.incomeGeography === "tract" ? properties.incomeTract : properties.incomeBlockGroup;
   const mailing = formatMailing(properties.mailingAddress);
@@ -95,7 +96,17 @@ export function ParcelDrawer({
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
         <Field label="Zoning" value={properties.zoningCode} />
         <Field label="Future Land Use" value={fluLine} />
-        <Field label="Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
+        <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
+        <Field
+          label="OZ 2.0"
+          value={
+            oz2.eligible == null
+              ? null
+              : oz2.eligible
+                ? `${oz2.rural === true ? "Rural-eligible" : oz2.rural === false ? "Eligible, not rural" : "Eligible"} · GEOID ${properties.oz2Eligibility?.tractGeoid ?? "unknown"}`
+                : "Not eligible"
+          }
+        />
         <Field label="Last sale" value={formatSale(properties.lastSale)} />
         <Field label="Qualified sale" value={properties.lastSale.qualified} />
         <Field label="Market value" value={formatUsd(properties.tax.marketValue)} />
@@ -126,8 +137,13 @@ export function ParcelDrawer({
         <p className="mt-1 text-ink-100">{flu.reason}</p>
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
-        <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Opportunity Zone</p>
+        <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Designated Opportunity Zone</p>
         <p className="mt-1 text-ink-100">{oz.detail}</p>
+      </div>
+      <div className="mt-3 rounded-2xl border border-moss-400/30 bg-ink-800/80 p-3 text-sm">
+        <p className="text-[11px] uppercase tracking-[0.14em] text-moss-400">OZ 2.0 nomination</p>
+        <p className="mt-1 font-medium text-white">{oz2.label}</p>
+        <p className="mt-1 text-ink-100">{oz2.detail}</p>
       </div>
 
       <div className="mt-4 space-y-3">

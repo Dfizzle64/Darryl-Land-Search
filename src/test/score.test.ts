@@ -91,6 +91,7 @@ function feature(partial: Partial<ParcelFeature["properties"]>): ParcelFeature {
       nearestRoad: { aadt: 12000, year: 2025, roadwayId: "1", from: "A", to: "B", distanceMeters: 100 },
       flu: { code: "MD", label: "MDR", jurisdiction: "ORG", source: "test" },
       opportunityZone: { inOpportunityZone: false, tractGeoid: null, tractName: null, source: "test" },
+      oz2Eligibility: null,
       source: "test",
       ...partial,
     },
@@ -158,6 +159,8 @@ describe("rankSites", () => {
     expect(outWeights.opportunityZone).toBe(0);
     const eitherWeights = effectiveScoreWeights({ ...filters, ozFilter: "either" });
     expect(eitherWeights.opportunityZone).toBeCloseTo(0.1, 5);
+    const ruralWeights = effectiveScoreWeights({ ...filters, ozFilter: "rural-eligible" });
+    expect(ruralWeights.opportunityZone).toBeCloseTo(0.1, 5);
   });
 
   it("scores rezoning candidates above already-zoned sites in all-parcels mode, and keeps list in sync with filters", () => {

@@ -6,9 +6,13 @@ These JSON files are the **source of truth** for what the map treats as multifam
 | --- | --- |
 | `data/zoning-config.json` | Per-jurisdiction zoning knowledge base (OCPA prefixes, districts, citations, PD/PUD) |
 | `data/flu-config.json` | Future Land Use codes → MF-supportive / maybe / no |
-| `data/fixtures/parcels.geojson` | Sample parcels, including joined `flu` and `opportunityZone` objects |
-| `data/fixtures/opportunity-zones.geojson` | Orange County HUD/Treasury QOZ tract polygons (map overlay) |
-| `data/fixtures/oz-lookup.json` | Generated parcel → OZ join audit |
+| `data/fixtures/parcels.geojson` | Sample parcels, including joined `flu`, `opportunityZone`, and `oz2Eligibility` objects |
+| `data/fixtures/opportunity-zones.geojson` | Orange County HUD/Treasury QOZ tract polygons (map overlay). `rural` is Notice 2025-50 membership |
+| `data/fixtures/oz-lookup.json` | Generated parcel → designated OZ join audit |
+| `data/fixtures/oz2-eligible.geojson` | Orange County tracts eligible for nomination under Rev. Proc. 2026-14 (not designated) |
+| `data/fixtures/oz2-eligible-tracts.json` | Appendix rows for those tracts, including Rural Status |
+| `data/fixtures/oz2-lookup.json` | Generated parcel → OZ 2.0 join audit |
+| `data/fixtures/notice-2025-50-rural-geoids.json` | GEOIDs parsed from the Notice 2025-50 rural appendix |
 | `data/fixtures/zoning-coverage.json` | Generated coverage report (observed GIS codes vs knowledge files) |
 
 The browser never calls an LLM. Refresh is an offline scripted pass (`npm run seed:zoning`, `npm run seed:flu`, `npm run seed:oz`).
@@ -78,9 +82,10 @@ Matching rules (implemented in `src/lib/zoning.ts`):
 ## How to refresh
 
 ```bash
-npm run seed           # parcels + income + AADT, then FLU join, then OZ join, then coverage report
+npm run seed           # parcels + income + AADT, then FLU, designated OZ, OZ 2.0, then coverage report
 npm run seed:flu       # re-join FLU onto the existing parcel fixture (network)
-npm run seed:oz        # re-join HUD/Treasury QOZ polygons onto parcels (network)
+npm run seed:oz        # designated QOZ polygons, then OZ 2.0 eligibility and Notice 2025-50 rural flags
+npm run seed:oz2       # OZ 2.0 + Notice 2025-50 only (python3 -m pip install pypdf)
 npm run seed:zoning    # coverage report only; does not scrape Municode
 ```
 
@@ -91,5 +96,7 @@ After a code amendment:
 3. Set `updatedAt`.
 4. Run `npm run seed:zoning` (and `seed:flu` / `seed:oz` if polygons may have moved).
 5. Run `npm test`.
+
+OZ 2.0 refresh (`npm run seed:oz2`) downloads the Rev. Proc. 2026-14 appendix workbook and Notice 2025-50, keeps Orange County eligible rows, and joins Census TIGER 2020 polygons. Rural is the appendix value `Rural` or `Non-rural` only. A designated tract is rural only when its GEOID is in the Notice 2025-50 appendix. If the workbook columns change, or the notice parse is not about 3,309 GEOIDs, the script stops instead of inventing a flag. Install `pypdf` before that refresh. Run it after `join_oz.py` so `designatedRural` is stamped on the designated join.
 
 Do not require a live model in the app to “research zoning.” That is this file plus a future agent/script run.

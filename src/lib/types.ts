@@ -3,7 +3,7 @@ export type IncomeGeography = "tract" | "blockGroup";
 /** Zoning / FLU search modes. `zoning` is the historical MF-capable default. */
 export type LandUseFilter = "off" | "zoning" | "non-mf" | "flu" | "rezoning" | "either" | "both";
 
-export type OzFilter = "either" | "in" | "out";
+export type OzFilter = "either" | "in" | "out" | "rural-eligible" | "non-rural-eligible";
 
 export type DistrictStatus = "permitted" | "conditional" | "maybe" | "not-mf";
 
@@ -58,6 +58,31 @@ export type OpportunityZoneInfo = {
   tractGeoid: string | null;
   tractName: string | null;
   source: string | null;
+  /** Notice 2025-50 rural flag for a current designated QOZ. Null when the parcel is not in one. */
+  designatedRural?: boolean | null;
+};
+
+/**
+ * Rev. Proc. 2026-14 nomination eligibility. This is not a 2027 designation.
+ * `rural` is the appendix Rural Status column, and is null when the tract is not eligible.
+ */
+export type Oz2EligibilityInfo = {
+  eligible: boolean;
+  rural: boolean | null;
+  tractGeoid: string | null;
+  tractName: string | null;
+  designation: "eligible-for-nomination" | "not-eligible";
+  source: string | null;
+};
+
+export type Oz2TractProperties = {
+  id: string;
+  tractGeoid: string;
+  tract: string | null;
+  name: string | null;
+  rural: boolean;
+  designation: "eligible-for-nomination";
+  source: string | null;
 };
 
 export type OpportunityZoneProperties = {
@@ -71,6 +96,13 @@ export type OpportunityZoneProperties = {
 export type OpportunityZoneFeature = GeoJSON.Feature<
   GeoJSON.Polygon | GeoJSON.MultiPolygon,
   OpportunityZoneProperties
+>;
+
+export type Oz2TractFeature = GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.MultiPolygon, Oz2TractProperties>;
+
+export type Oz2TractCollection = GeoJSON.FeatureCollection<
+  GeoJSON.Polygon | GeoJSON.MultiPolygon,
+  Oz2TractProperties
 >;
 
 export type OpportunityZoneCollection = GeoJSON.FeatureCollection<
@@ -102,6 +134,7 @@ export type ParcelProperties = {
   nearestRoad: NearestRoad | null;
   flu: FluInfo | null;
   opportunityZone: OpportunityZoneInfo | null;
+  oz2Eligibility: Oz2EligibilityInfo | null;
   source: string;
 };
 
@@ -216,7 +249,7 @@ export const LAND_USE_FILTERS: LandUseFilter[] = [
   "both",
 ];
 
-export const OZ_FILTERS: OzFilter[] = ["either", "in", "out"];
+export const OZ_FILTERS: OzFilter[] = ["either", "rural-eligible", "non-rural-eligible", "in", "out"];
 
 export const ACREAGE_SLIDER = {
   min: 0,

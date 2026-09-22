@@ -2,7 +2,7 @@
   "generatedAt": "2026-09-17T01:58:45Z",
   "county": "Orange County, FL",
   "countyFips": "12095",
-  "parcelCount": 459,
+  "parcelCount": 462,
   "skippedParcels": 0,
   "aadtSegmentCount": 1430,
   "majorRoadOverlayCount": 518,
@@ -13,7 +13,10 @@
     "income": "https://api.censusreporter.org/1.0/data/show/latest",
     "fluOrangeCounty": "https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/21",
     "fluOrlando": "https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/83",
-    "opportunityZones": "https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Opportunity_Zones/FeatureServer/13"
+    "opportunityZones": "https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Opportunity_Zones/FeatureServer/13",
+    "oz2Eligible": "https://www.irs.gov/pub/irs-drop/rp-26-14-appendix.xlsx",
+    "oz2Geometry": "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2020/MapServer/6",
+    "designatedRural": "https://www.irs.gov/pub/irs-drop/n-25-50.pdf"
   },
   "notes": [
     "Parcel attributes and polygons come from the public OCPA ArcGIS FeatureServer.",
@@ -21,10 +24,11 @@
     "Income is ACS median household income (B19013) assigned by point-in-polygon.",
     "This is a geographically mixed sample, not a complete county extract.",
     "FLU is joined by parcel centroid to OC layer 21 and Orlando layer 83. Other municipal FLU is a known gap.",
-    "Opportunity Zones are HUD/Treasury QOZ polygons (2010 tracts) joined by parcel centroid. ACS 2020 tract IDs are not used for the join."
+    "Opportunity Zones are HUD/Treasury QOZ polygons (2010 tracts) joined by parcel centroid. ACS 2020 tract IDs are not used for the join.",
+    "OZ 2.0 tracts are 2020 census tracts eligible for nomination under Rev. Proc. 2026-14, joined by parcel centroid. Rural status is the appendix Rural Status column. They are not designated 2027 QOZs. Current designated rural flags follow Notice 2025-50."
   ],
   "fluJoinedAt": "2026-09-17T03:18:11Z",
-  "fluJoinedCount": 372,
+  "fluJoinedCount": 375,
   "fluGaps": {
     "no-hit": 76,
     "county-city-placeholder": 11
@@ -32,5 +36,23 @@
   "ozJoinedAt": "2026-09-21T15:42:36Z",
   "ozJoinedCount": 26,
   "ozTractCount": 24,
-  "ozSource": "https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Opportunity_Zones/FeatureServer/13"
+  "ozSource": "https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Opportunity_Zones/FeatureServer/13",
+  "oz2JoinedAt": "2026-09-22T01:39:18Z",
+  "oz2EligibleTractCount": 87,
+  "oz2RuralTractCount": 1,
+  "oz2RuralTractGeoids": [
+    "12095016605"
+  ],
+  "oz2EligibleParcelCount": 185,
+  "oz2RuralParcelCount": 3,
+  "oz2Source": "https://www.irs.gov/pub/irs-drop/rp-26-14-appendix.xlsx",
+  "oz2GeometrySource": "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2020/MapServer/6",
+  "designatedRuralSource": "https://www.irs.gov/pub/irs-drop/n-25-50.pdf",
+  "designatedRuralOrangeCount": 0,
+  "notice202550RuralGeoidCount": 3309,
+  "oz2SampleParcelIds": [
+    "322220000000003",
+    "322221000000010",
+    "322221000000011"
+  ]
 }

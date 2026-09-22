@@ -17,6 +17,8 @@ type FilterSidebarProps = {
   onShowTraffic: (value: boolean) => void;
   showOz: boolean;
   onShowOz: (value: boolean) => void;
+  showOz2: boolean;
+  onShowOz2: (value: boolean) => void;
   open: boolean;
   onClose: () => void;
   meta: Record<string, unknown>;
@@ -88,9 +90,27 @@ const LAND_USE_OPTIONS: { value: LandUseFilter; label: string; hint: string }[] 
 ];
 
 const OZ_OPTIONS: { value: OzFilter; label: string; hint: string }[] = [
-  { value: "either", label: "Either", hint: "Do not filter by Opportunity Zone." },
-  { value: "in", label: "In Opportunity Zone", hint: "Parcel centroid is inside a HUD/Treasury QOZ tract." },
-  { value: "out", label: "Not in Opportunity Zone", hint: "Centroid is outside the county’s QOZ tracts." },
+  { value: "either", label: "Either", hint: "Do not filter by designated Opportunity Zones or OZ 2.0 eligibility." },
+  {
+    value: "rural-eligible",
+    label: "OZ 2.0 rural-eligible",
+    hint: "Centroid is in a Rev. Proc. 2026-14 tract marked Rural. Eligible for nomination — not a designated 2027 QOZ.",
+  },
+  {
+    value: "non-rural-eligible",
+    label: "OZ 2.0 eligible, not rural",
+    hint: "Centroid is in an eligible tract the revenue procedure marks Non-rural. Nomination only, not designated.",
+  },
+  {
+    value: "in",
+    label: "In designated Opportunity Zone",
+    hint: "Centroid is inside a current HUD/Treasury QOZ (2018 designation, 2010 tracts).",
+  },
+  {
+    value: "out",
+    label: "Not in designated Opportunity Zone",
+    hint: "Centroid is outside the county’s current designated QOZ tracts.",
+  },
 ];
 
 export function FilterSidebar({
@@ -107,6 +127,8 @@ export function FilterSidebar({
   onShowTraffic,
   showOz,
   onShowOz,
+  showOz2,
+  onShowOz2,
   open,
   onClose,
   meta,
@@ -196,10 +218,16 @@ export function FilterSidebar({
             ))}
           </fieldset>
           <Toggle
-            label="Show Opportunity Zone overlay"
+            label="Show OZ 2.0 eligible tracts"
+            checked={showOz2}
+            onChange={onShowOz2}
+            hint="2020 tracts eligible for nomination. Green is rural-eligible; blue is eligible and not rural."
+          />
+          <Toggle
+            label="Show designated Opportunity Zone overlay"
             checked={showOz}
             onChange={onShowOz}
-            hint="HUD/Treasury QOZ tracts (2010 geography). Gold fill on the map."
+            hint="Current HUD/Treasury QOZ tracts (2010 geography). Gold fill on the map."
           />
         </section>
 
@@ -320,7 +348,7 @@ export function FilterSidebar({
         <p className="mt-6 text-[11px] leading-relaxed text-ink-500">
           Fixture snapshot {generatedAt ?? "unknown"}. Owner, sale, tax, and acreage come from the Orange County
           Property Appraiser public GIS layer. FLU is joined from Orange County and Orlando open data. Opportunity
-          Zones are HUD/Treasury QOZ polygons joined by centroid. Income is ACS median household income. AADT is the
+          Zones shown in gold are current designated QOZs. OZ 2.0 tracts are Rev. Proc. 2026-14 nomination eligibility (not 2027 designations); rural flags are the official Rural Status column and Notice 2025-50. Income is ACS median household income. AADT is the
           nearest FDOT count segment.
         </p>
       </aside>

@@ -120,6 +120,7 @@ function feature(partial: Partial<ParcelFeature["properties"]>): ParcelFeature {
       },
       flu: { code: "RES-MED", label: "Residential Medium", jurisdiction: "ORL", source: "test" },
       opportunityZone: { inOpportunityZone: false, tractGeoid: null, tractName: null, source: "test" },
+      oz2Eligibility: null,
       source: "test",
       ...partial,
     },
@@ -365,5 +366,45 @@ describe("filterParcels", () => {
       "out-oz",
     ]);
     expect(filterParcels(parcels, { ...baseFilters, ozFilter: "either" }, config, fluConfig)).toHaveLength(2);
+  });
+
+  it("filters OZ 2.0 rural-eligible and non-rural eligible without treating them as designated", () => {
+    const parcels = [
+      feature({
+        id: "rural",
+        parcelId: "rural",
+        oz2Eligibility: {
+          eligible: true,
+          rural: true,
+          tractGeoid: "12095016605",
+          tractName: "Census Tract 166.05",
+          designation: "eligible-for-nomination",
+          source: "rev-proc-2026-14",
+        },
+      }),
+      feature({
+        id: "urban-eligible",
+        parcelId: "urban-eligible",
+        oz2Eligibility: {
+          eligible: true,
+          rural: false,
+          tractGeoid: "12095010400",
+          tractName: "Census Tract 104",
+          designation: "eligible-for-nomination",
+          source: "rev-proc-2026-14",
+        },
+      }),
+      feature({ id: "outside", parcelId: "outside" }),
+    ];
+    expect(
+      filterParcels(parcels, { ...baseFilters, ozFilter: "rural-eligible" }, config, fluConfig).map((item) => item.properties.id),
+    ).toEqual(["rural"]);
+    expect(
+      filterParcels(parcels, { ...baseFilters, ozFilter: "non-rural-eligible" }, config, fluConfig).map(
+        (item) => item.properties.id,
+      ),
+    ).toEqual(["urban-eligible"]);
+    expect(filterParcels(parcels, { ...baseFilters, ozFilter: "in" }, config, fluConfig)).toHaveLength(0);
+    expect(parcels[0].properties.oz2Eligibility?.designation).toBe("eligible-for-nomination");
   });
 });

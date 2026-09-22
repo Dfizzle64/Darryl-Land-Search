@@ -1,5 +1,5 @@
 import { fluAllowsMultifamily } from "./flu";
-import { parcelInOpportunityZone } from "./opportunityZone";
+import { parcelInOpportunityZone, parcelOz2Eligibility } from "./opportunityZone";
 import { zoningAllowsMultifamily } from "./zoning";
 import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "./types";
 
@@ -123,9 +123,16 @@ function landUsePasses(
 
 function ozPasses(feature: ParcelFeature, filters: FilterState): boolean {
   if (filters.ozFilter === "either") return true;
-  const inOz = parcelInOpportunityZone(feature);
-  if (filters.ozFilter === "in") return inOz === true;
-  return inOz === false;
+  if (filters.ozFilter === "in" || filters.ozFilter === "out") {
+    const inOz = parcelInOpportunityZone(feature);
+    if (filters.ozFilter === "in") return inOz === true;
+    return inOz === false;
+  }
+  const oz2 = parcelOz2Eligibility(feature);
+  if (!oz2) return false;
+  if (filters.ozFilter === "rural-eligible") return oz2.eligible === true && oz2.rural === true;
+  if (filters.ozFilter === "non-rural-eligible") return oz2.eligible === true && oz2.rural === false;
+  return true;
 }
 
 export function parcelMatchesFilters(
@@ -179,7 +186,13 @@ export function emptyStateHint(filters: FilterState, matched: number, fluUnknown
     return "No joined FLU designations in this sample currently match the multifamily-supportive list. Municipal FLU besides Orlando is a known gap — try Either, or turn land-use filtering off.";
   }
   if (filters.ozFilter === "in") {
-    return "No matching parcels sit in a Qualified Opportunity Zone under the current filters. Clear the OZ filter or lower acreage / income / AADT thresholds.";
+    return "No matching parcels sit in a current designated Qualified Opportunity Zone under the other filters. Clear the OZ filter or lower acreage / income / AADT thresholds.";
+  }
+  if (filters.ozFilter === "rural-eligible") {
+    return "No matching parcels have a centroid in an OZ 2.0 rural-eligible tract. In Orange County, Rev. Proc. 2026-14 rural-eligible is census tract 12095016605 (eligible for nomination, not a designated 2027 QOZ). Try All parcels if the land-use mode is hiding it, or clear the OZ filter.";
+  }
+  if (filters.ozFilter === "non-rural-eligible") {
+    return "No matching parcels have a centroid in an OZ 2.0 eligible tract that Rev. Proc. 2026-14 marks Non-rural. Try All parcels, or clear the OZ filter.";
   }
   if (filters.landUseFilter === "non-mf") {
     return "No non-multifamily parcels match the other filters. Lower acreage, income, or AADT, or switch to All parcels.";

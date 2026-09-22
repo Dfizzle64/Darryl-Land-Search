@@ -97,7 +97,7 @@
       "gaps": [
         "Acreage band is 5.0\u2013150.0 acres. Inclusion starts from FDOR LND_SQFOOT / 43560. OCPA ACREAGE replaces the stored value only when it is also inside that band.",
         "Zoning, owner, sale, and tax prefer the OCPA public parcel layer when the parcel id matches.",
-        "FLU is centroid-joined to Orange County open-data layer 21 and Orlando layer 83. Other cities often stay unknown.",
+        "FLU is centroid-joined to Orange County open-data layer 21 and Orlando layer 83. 8,789 parcels have a code. The other 5,242 do not; this 5–150 acre snapshot does not resplit those misses between no-hit and the county City placeholder.",
         "Income and AADT are not joined on this full extract.",
         "A small number of source rows can drop out when geometry is missing."
       ],
@@ -108,8 +108,7 @@
       "tileCount": 10,
       "ocpaMatchedCount": 12000,
       "fluGaps": {
-        "no-hit": 4813,
-        "county-city-placeholder": 429
+        "unjoined": 5242
       },
       "maxAcres": 150.0,
       "excludedOverMaxAcres": 218

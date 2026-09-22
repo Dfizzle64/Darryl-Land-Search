@@ -4,6 +4,7 @@ import maplibregl, { type GeoJSONSource, type Map as MapLibreMap } from "maplibr
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
 import { BasemapToggle } from "./BasemapToggle";
+import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import {
   STREET_STYLE_CANDIDATES,
   addSatelliteSourceAndLayer,
@@ -21,7 +22,8 @@ import {
   trafficLinePaint,
   type BasemapMode,
 } from "@/lib/basemap";
-import { ORANGE_COUNTY_CENTER, type MarketId, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection } from "@/lib/types";
+import { southCarolinaStatusHelp } from "@/lib/markets";
+import { ORANGE_COUNTY_CENTER, SC_GOVERNOR_FILED_STATUS, type MarketId, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection } from "@/lib/types";
 
 type LngLatBounds = [[number, number], [number, number]];
 
@@ -413,12 +415,14 @@ export function SiteMap({
     mapRef.current?.resize();
   }, [selectedId, selectedTractGeoid]);
 
+  const scStatusHelp = southCarolinaStatusHelp(market, countyState);
+
   return (
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
       {status === "ready" ? <BasemapToggle value={basemap} onChange={setBasemap} /> : null}
       {status === "ready" && (showOz || showOz2) ? (
-        <div className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[16rem] space-y-1 rounded-lg border border-white/10 bg-ink-900/90 px-2 py-1.5 text-[10px] leading-snug text-ink-300 sm:bottom-4 sm:left-4">
+        <div className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[20rem] space-y-1 rounded-lg border border-white/10 bg-ink-900/90 px-2 py-1.5 text-[10px] leading-snug text-ink-300 sm:bottom-4 sm:left-4">
           {showOz2 ? (
             <>
               <p>
@@ -440,6 +444,9 @@ export function SiteMap({
             </>
           ) : null}
           <p className="text-ink-500">Pins mark tract internal points. 90-minute sheds are approximate county rings, not drive-time isochrones.</p>
+          {scStatusHelp ? (
+            <SouthCarolinaStatusNote note={SC_GOVERNOR_FILED_STATUS} className="text-ink-300" />
+          ) : null}
           {showOz ? (
             <p>
               <span

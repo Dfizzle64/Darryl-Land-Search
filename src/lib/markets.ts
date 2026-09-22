@@ -110,6 +110,32 @@ export function ruralStatusChip(row: Pick<RuralMarketTractRow, "status"> | null 
   return row?.status || RURAL_ELIGIBLE_STATUS_CHIP;
 }
 
+export function isSouthCarolinaState(state: string | null | undefined): boolean {
+  return state === "South Carolina";
+}
+
+/**
+ * Charleston is entirely South Carolina. Charlotte’s shed includes York,
+ * Lancaster, and Chester. Other markets in this app have no South Carolina tracts.
+ */
+export function viewIncludesSouthCarolina(market: MarketId, state: string | null): boolean {
+  if (market === "Charleston") return true;
+  if (market !== "Charlotte") return false;
+  return state == null || isSouthCarolinaState(state);
+}
+
+/**
+ * Help copy for a view that includes South Carolina tracts. Null for FL/GA/NC/TN-only views.
+ * Does not name nominated GEOIDs — the public list is not posted.
+ */
+export function southCarolinaStatusHelp(market: MarketId, state: string | null): string | null {
+  if (!viewIncludesSouthCarolina(market, state)) return null;
+  if (market === "Charleston" || isSouthCarolinaState(state)) {
+    return "South Carolina’s governor filed OZ 2.0 nominations with Treasury on Sep 10, 2026. The nominated tract list is not public yet, so these tracts stay eligible and are not designated.";
+  }
+  return "York, Lancaster, and Chester, South Carolina: the governor filed OZ 2.0 nominations on Sep 10, 2026. The list is not public yet, so those tracts stay eligible and are not designated. North Carolina tracts in this market stay eligible and are not designated.";
+}
+
 export function isOuterEdgeNote(notes: string | null | undefined): boolean {
   return Boolean(notes && notes.toLowerCase().includes("outer/uncertain edge"));
 }

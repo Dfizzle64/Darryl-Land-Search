@@ -1,5 +1,6 @@
 "use client";
 
+import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { ZoningKnowledgePanel } from "./ZoningKnowledgePanel";
 import { ACREAGE_SLIDER, DEFAULT_FILTERS, SHED_CAVEAT, type FilterState, type FluConfig, type LandUseFilter, type MarketId, type OzFilter, type ZoningConfig } from "@/lib/types";
 
@@ -26,6 +27,7 @@ type FilterSidebarProps = {
   market: MarketId;
   tractCount: number;
   parcelNote: string;
+  statusHelp?: string | null;
 };
 
 function Toggle({
@@ -140,6 +142,7 @@ export function FilterSidebar({
   market,
   tractCount,
   parcelNote,
+  statusHelp = null,
 }: FilterSidebarProps) {
   const generatedAt = typeof meta.generatedAt === "string" ? meta.generatedAt.slice(0, 10) : null;
 
@@ -177,6 +180,9 @@ export function FilterSidebar({
             {market}: {tractCount.toLocaleString()} rural-eligible {tractCount === 1 ? "tract" : "tracts"}
           </p>
           <p className="text-xs leading-relaxed text-ink-500">{SHED_CAVEAT}</p>
+          {statusHelp ? (
+            <SouthCarolinaStatusNote note={statusHelp} className="text-xs leading-relaxed text-ink-300" />
+          ) : null}
           <p className="text-xs leading-relaxed text-ink-500">{parcelNote}</p>
           {!orangePilot ? (
             <p className="text-xs leading-relaxed text-ink-300">

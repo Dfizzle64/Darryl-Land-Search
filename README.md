@@ -177,7 +177,9 @@ The map can switch among **Atlanta, Tampa, Orlando, Charleston, Nashville, Charl
 
 **90-minute sheds are approximate county rings, not drive-time isochrones.** A county is included when its main corridor is commonly within about 90 minutes off-peak. Outer-edge counties are flagged in the tract notes and in the county menu. County membership, exclusions, and sources are in `data/oz2-7markets-90min-counties.md`.
 
-Every tract in this pack is **Eligible (rural) — not designated**. The chip uses that phrase. Florida, Georgia, South Carolina, Tennessee, and North Carolina had no public certified 2027 QOZ lists when the table was built (Sep 21, 2026). Do not read the orange overlay as a certified Opportunity Zone.
+Every tract in this pack is **Eligible (rural) — not designated**. The chip uses that phrase. Florida, Georgia, Tennessee, and North Carolina had no public certified 2027 QOZ lists when the table was built (Sep 21, 2026). Do not read the orange overlay as a certified Opportunity Zone.
+
+South Carolina is the exception on wording only. [SC Commerce](https://www.sccommerce.com/opportunity-zone) says Governor McMaster submitted OZ 2.0 nominations to Treasury on September 10, 2026. The page does not publish a GEOID list (the “list can be found here” sentence is not a link), and the ArcGIS map still describes eligibility. Charleston, and Charlotte’s South Carolina fringe (York, Lancaster, and Chester), therefore show a second line: **Governor-filed — list not public yet / not designated**. The chip and filters stay eligible / not designated. No tract is marked nominated or certified.
 
 The Orange County pilot stays in place. Choose **Orlando → Orange, FL** and the original parcel sample, amber non-rural eligible tracts, designated QOZ overlay, and green parcel fills come back. GEOID `12095016605` is still the only Orange County rural-eligible tract. Other counties in the seven sheds do **not** have parcel extracts in this build: the map draws the 2020 tract polygon and a Census Gazetteer pin. That is a coverage gap, not an empty county.
 
@@ -248,7 +250,7 @@ HUD_OZ_URL=https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Opp
 - Municipal FLU besides Orlando is not in the public layers used here (Winter Park, Ocoee, Winter Garden, Apopka, Maitland, etc.). FLU-only and rezoning-candidate modes omit those parcels rather than guess.
 - Designated Opportunity Zone flags use 2010 QOZ polygons; ACS income and OZ 2.0 eligibility use 2020 census tracts. Do not expect those GEOIDs to match.
 - OZ 2.0 tracts are eligible for nomination under Rev. Proc. 2026-14. They are not designated 2027 QOZs. Rural vs non-rural is the appendix column, not a local rule. Orange County’s only rural-eligible tract in that list is `12095016605`.
-- The seven-market layer is rural-eligible tracts only. 90-minute sheds are approximate county rings, not isochrones. Parcel polygons outside the Orange County sample are not loaded; those markets use tract overlays and pins.
+- The seven-market layer is rural-eligible tracts only. 90-minute sheds are approximate county rings, not isochrones. Parcel polygons outside the Orange County sample are not loaded; those markets use tract overlays and pins. South Carolina tracts add a governor-filed note (list not public, not designated). They are not certified 2027 QOZs.
 - Belle Isle, Oakland, and Windermere zoning use tables were not independently verified; district lists are empty on purpose.
 - Winter Garden R-4 / R-5 exist in code but were not verified as multifamily in this pass.
 - AADT is nearest FDOT **state-count** segment, not local-road counts. Some parcels sit far from a counted road.

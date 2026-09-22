@@ -13,6 +13,8 @@ County matching is **state-aware** (e.g., Charlotte includes NC Union only — n
 
 Status labeling for all rows: **Eligible — not designated**. As of Sep 21, 2026, Florida, Georgia, South Carolina, Tennessee, and North Carolina have **no public certified 2027 QOZ lists**.
 
+**Sep 22, 2026 update (copy only):** SC Commerce says Governor McMaster submitted OZ 2.0 nominations to Treasury on Sep 10, 2026 ([sccommerce.com/opportunity-zone](https://www.sccommerce.com/opportunity-zone)). The nominated GEOID list is not posted. Charleston and Charlotte’s South Carolina counties (York, Lancaster, Chester) use the extra line **Governor-filed — list not public yet / not designated**. The chip stays eligible / not designated. Florida, Georgia, North Carolina, and Tennessee rows are unchanged. No GEOIDs were marked nominated or designated.
+
 ---
 
 ## Atlanta

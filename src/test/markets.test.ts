@@ -5,11 +5,14 @@ import {
   filterRuralRows,
   formatCountyLabel,
   showOrangeCountyPilot,
+  southCarolinaStatusHelp,
   viewBounds,
+  viewIncludesSouthCarolina,
 } from "../lib/markets";
 import {
   MARKETS,
   RURAL_ELIGIBLE_STATUS_CHIP,
+  SC_GOVERNOR_FILED_STATUS,
   SHED_CAVEAT,
   type MarketId,
   type RuralMarketTractCollection,
@@ -161,5 +164,52 @@ describe("filterRuralRows", () => {
     expect(filterRuralRows(rows, "Tampa", "Polk", "Florida")).toHaveLength(1);
     expect(filterRuralRows(rows, "Orlando", "Polk", "Florida")).toHaveLength(1);
     expect(filterRuralRows(rows, "Tampa", "Polk", "Georgia")).toHaveLength(0);
+  });
+});
+
+describe("South Carolina governor-filed status copy", () => {
+  const catalog = loadCatalog();
+
+  it("keeps the eligible chip and adds governor-filed help only for South Carolina views", () => {
+    expect(SC_GOVERNOR_FILED_STATUS).toBe("Governor-filed — list not public yet / not designated");
+    expect(SC_GOVERNOR_FILED_STATUS).not.toMatch(/^designated/i);
+
+    expect(viewIncludesSouthCarolina("Charleston", null)).toBe(true);
+    expect(viewIncludesSouthCarolina("Charlotte", null)).toBe(true);
+    expect(viewIncludesSouthCarolina("Charlotte", "South Carolina")).toBe(true);
+    expect(viewIncludesSouthCarolina("Charlotte", "North Carolina")).toBe(false);
+    for (const market of ["Atlanta", "Tampa", "Orlando", "Nashville", "Raleigh-Durham"] as const) {
+      expect(viewIncludesSouthCarolina(market, null)).toBe(false);
+      expect(southCarolinaStatusHelp(market, null)).toBeNull();
+    }
+
+    const charleston = southCarolinaStatusHelp("Charleston", null);
+    const york = southCarolinaStatusHelp("Charlotte", "South Carolina");
+    const charlotteAll = southCarolinaStatusHelp("Charlotte", null);
+    expect(charleston).toMatch(/not public/i);
+    expect(charleston).toMatch(/not designated/i);
+    expect(york).toMatch(/not designated/i);
+    expect(charlotteAll).toMatch(/York, Lancaster, and Chester/);
+    expect(charlotteAll).toMatch(/North Carolina/);
+    expect(southCarolinaStatusHelp("Charlotte", "North Carolina")).toBeNull();
+
+    for (const note of [charleston, york, charlotteAll]) {
+      expect(note).not.toMatch(/\b\d{11}\b/);
+      expect(note).not.toMatch(/certified 2027/i);
+    }
+  });
+
+  it("does not relabel Florida, Georgia, North Carolina, or Tennessee rows", () => {
+    const untouched = catalog.rows.filter((row) => row.state !== "South Carolina");
+    expect(untouched.length).toBeGreaterThan(0);
+    expect(untouched.every((row) => row.status === RURAL_ELIGIBLE_STATUS_CHIP)).toBe(true);
+    expect(catalog.rows.filter((row) => row.state === "South Carolina").every((row) => row.status === RURAL_ELIGIBLE_STATUS_CHIP)).toBe(
+      true,
+    );
+    expect(filterRuralRows(catalog.rows, "Charlotte", "York", "South Carolina").length).toBeGreaterThan(0);
+    expect(filterRuralRows(catalog.rows, "Charlotte", "Lancaster", "South Carolina").length).toBeGreaterThan(0);
+    expect(filterRuralRows(catalog.rows, "Charleston", null, null).every((row) => row.state === "South Carolina")).toBe(
+      true,
+    );
   });
 });

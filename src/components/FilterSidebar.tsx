@@ -1,8 +1,9 @@
 "use client";
 
+import { MfPriorityFilter } from "./MfPriorityFilter";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { ZoningKnowledgePanel } from "./ZoningKnowledgePanel";
-import { ACREAGE_SLIDER, DEFAULT_FILTERS, SHED_CAVEAT, type FilterState, type FluConfig, type LandUseFilter, type MarketId, type OzFilter, type ZoningConfig } from "@/lib/types";
+import { ACREAGE_SLIDER, DEFAULT_FILTERS, SHED_CAVEAT, type FilterState, type FluConfig, type LandUseFilter, type MarketId, type MfPriorityView, type OzFilter, type ZoningConfig } from "@/lib/types";
 
 type FilterSidebarProps = {
   filters: FilterState;
@@ -28,6 +29,9 @@ type FilterSidebarProps = {
   tractCount: number;
   parcelNote: string;
   statusHelp?: string | null;
+  priorityView?: MfPriorityView;
+  priorityCounts?: { all: number; priority: number; A: number; B: number };
+  onPriorityView?: (view: MfPriorityView) => void;
 };
 
 function Toggle({
@@ -143,6 +147,9 @@ export function FilterSidebar({
   tractCount,
   parcelNote,
   statusHelp = null,
+  priorityView,
+  priorityCounts,
+  onPriorityView,
 }: FilterSidebarProps) {
   const generatedAt = typeof meta.generatedAt === "string" ? meta.generatedAt.slice(0, 10) : null;
 
@@ -189,6 +196,11 @@ export function FilterSidebar({
               Acreage, zoning, income, and traffic filters apply to the Orange County parcel sample. Switch the market
               back to Orlando and choose Orange County to use that pilot.
             </p>
+          ) : null}
+          {onPriorityView && priorityView && priorityCounts ? (
+            <div className="border-t border-white/10 pt-2">
+              <MfPriorityFilter value={priorityView} counts={priorityCounts} onChange={onPriorityView} />
+            </div>
           ) : null}
         </section>
 

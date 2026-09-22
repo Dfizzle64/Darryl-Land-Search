@@ -18,8 +18,17 @@ import {
   showOrangeCountyPilot,
   southCarolinaStatusHelp,
   viewBounds,
+  viewIncludesSouthCarolina,
 } from "@/lib/markets";
 import { rankSites } from "@/lib/score";
+import {
+  annotateRuralRows,
+  countMfPriority,
+  filterByMfPriority,
+  geoidFilterForView,
+  geoidsForHighlight,
+  sortTractsForDisplay,
+} from "@/lib/scMfPriority";
 import {
   DEFAULT_FILTERS,
   MARKETS,
@@ -27,11 +36,13 @@ import {
   type FilterState,
   type FluConfig,
   type MarketId,
+  type MfPriorityView,
   type OpportunityZoneCollection,
   type Oz2TractCollection,
   type ParcelCollection,
   type RuralMarketTractCollection,
   type RuralMarketsCatalog,
+  type ScMfPriorityCatalog,
   type ZoningConfig,
 } from "@/lib/types";
 
@@ -42,6 +53,7 @@ type AppShellProps = {
   oz2Tracts: Oz2TractCollection;
   ruralCatalog: RuralMarketsCatalog;
   ruralTracts: RuralMarketTractCollection;
+  mfPriority: ScMfPriorityCatalog;
   zoningConfig: ZoningConfig;
   fluConfig: FluConfig;
   meta: Record<string, unknown>;
@@ -56,6 +68,7 @@ export function AppShell({
   oz2Tracts,
   ruralCatalog,
   ruralTracts,
+  mfPriority,
   zoningConfig,
   fluConfig,
   meta,
@@ -74,20 +87,44 @@ export function AppShell({
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sitesOpen, setSitesOpen] = useState(false);
   const [inventoryTab, setInventoryTab] = useState<InventoryTab>("sites");
+  const [mfView, setMfView] = useState<MfPriorityView>("all");
   const [error] = useState<string | null>(null);
 
   const summary = marketSummary(ruralCatalog, market);
+  const scView = viewIncludesSouthCarolina(market, countyState);
+  const activeMfView: MfPriorityView = scView ? mfView : "all";
+  const annotatedRows = useMemo(() => annotateRuralRows(ruralCatalog.rows, mfPriority), [ruralCatalog.rows, mfPriority]);
+  const marketTracts = useMemo(
+    () => filterRuralRows(annotatedRows, market, county, countyState),
+    [annotatedRows, market, county, countyState],
+  );
   const visibleTracts = useMemo(
-    () => filterRuralRows(ruralCatalog.rows, market, county, countyState),
-    [ruralCatalog.rows, market, county, countyState],
+    () => sortTractsForDisplay(filterByMfPriority(marketTracts, activeMfView)),
+    [marketTracts, activeMfView],
+  );
+  const priorityCounts = useMemo(() => countMfPriority(marketTracts), [marketTracts]);
+  const highlightTierA = useMemo(
+    () => geoidsForHighlight(marketTracts, activeMfView, "A"),
+    [marketTracts, activeMfView],
+  );
+  const highlightTierB = useMemo(
+    () => geoidsForHighlight(marketTracts, activeMfView, "B"),
+    [marketTracts, activeMfView],
+  );
+  const restrictGeoids = useMemo(
+    () => geoidFilterForView(marketTracts, activeMfView),
+    [marketTracts, activeMfView],
   );
   const orangePilot = showOrangeCountyPilot(market, county, countyState);
   const statusHelp = southCarolinaStatusHelp(market, countyState);
   const bounds = useMemo(
-    () => viewBounds(summary, ruralCatalog.rows, county, countyState),
-    [summary, ruralCatalog.rows, county, countyState],
+    () =>
+      viewBounds(summary, activeMfView === "all" ? annotatedRows : visibleTracts, county, countyState, {
+        fitRows: activeMfView !== "all",
+      }),
+    [summary, annotatedRows, visibleTracts, county, countyState, activeMfView],
   );
-  const boundsKey = `${market}|${countyState ?? ""}|${county ?? ""}`;
+  const boundsKey = `${market}|${countyState ?? ""}|${county ?? ""}|${activeMfView}`;
 
   const ruralPins = useMemo<GeoJSON.FeatureCollection<GeoJSON.Point>>(
     () => ({
@@ -100,7 +137,8 @@ export function AppShell({
           rural: true,
           county: row.county,
           state: row.state,
-          placeOrCorridor: row.placeOrCorridor,
+          placeOrCorridor: row.mfPriority?.place ?? row.placeOrCorridor,
+          mfTier: row.mfPriority?.tier ?? "",
         },
         geometry: { type: "Point", coordinates: [row.lon, row.lat] },
       })),
@@ -143,6 +181,10 @@ export function AppShell({
     if (!orangePilot) setInventoryTab("tracts");
   }, [orangePilot]);
 
+  useEffect(() => {
+    if (!scView && mfView !== "all") setMfView("all");
+  }, [scView, mfView]);
+
   const selectSite = (id: string) => {
     setSelectedId(id);
     setSelectedTractGeoid(null);
@@ -174,6 +216,13 @@ export function AppShell({
   };
 
   const showSites = orangePilot && inventoryTab === "sites";
+  const tractEmptyMessage =
+    activeMfView === "all"
+      ? "No rural-eligible tracts in this county filter."
+      : "No SC multifamily priority tracts in this county. The shortlist is a subset of rural-eligible tracts, not a nomination.";
+  const priorityFilter = scView
+    ? { priorityView: mfView, priorityCounts, onPriorityView: setMfView }
+    : { priorityView: undefined, priorityCounts: undefined, onPriorityView: undefined };
 
   return (
     <div className="flex h-dvh min-h-0 flex-col bg-ink-950 text-ink-100">
@@ -220,7 +269,9 @@ export function AppShell({
             </select>
           </label>
           <p className="hidden text-right text-xs text-ink-500 sm:block">
-            {visibleTracts.length.toLocaleString()} rural-eligible {visibleTracts.length === 1 ? "tract" : "tracts"}
+            {visibleTracts.length.toLocaleString()}{" "}
+            {activeMfView === "all" ? "rural-eligible" : "SC MF priority"}{" "}
+            {visibleTracts.length === 1 ? "tract" : "tracts"}
             {orangePilot ? (
               <span className="block text-[11px]">
                 {matched.length.toLocaleString()} of {parcels.features.length.toLocaleString()} Orange County sample parcels
@@ -294,9 +345,12 @@ export function AppShell({
           meta={meta}
           orangePilot={orangePilot}
           market={market}
-          tractCount={visibleTracts.length}
+          tractCount={marketTracts.length}
           parcelNote={ruralCatalog.parcelNote}
           statusHelp={statusHelp}
+          priorityView={priorityFilter.priorityView}
+          priorityCounts={priorityFilter.priorityCounts}
+          onPriorityView={priorityFilter.onPriorityView}
         />
         <main className="relative min-w-0 flex-1">
           <SiteMap
@@ -321,6 +375,10 @@ export function AppShell({
             bounds={bounds}
             boundsKey={boundsKey}
             ozFilter={filters.ozFilter}
+            highlightTierA={highlightTierA}
+            highlightTierB={highlightTierB}
+            restrictGeoids={restrictGeoids}
+            showMfLegend={scView}
             onSelect={selectSite}
             onHover={setHoveredId}
             onSelectTract={selectTract}
@@ -358,7 +416,15 @@ export function AppShell({
                     onHover={setHoveredId}
                   />
                 ) : (
-                  <TractPanel tracts={visibleTracts} selectedGeoid={selectedTractGeoid} onSelect={selectTract} />
+                  <TractPanel
+                    tracts={visibleTracts}
+                    selectedGeoid={selectedTractGeoid}
+                    onSelect={selectTract}
+                    priorityView={priorityFilter.priorityView}
+                    priorityCounts={priorityFilter.priorityCounts}
+                    onPriorityView={priorityFilter.onPriorityView}
+                    emptyMessage={tractEmptyMessage}
+                  />
                 )}
               </div>
             </div>
@@ -409,6 +475,10 @@ export function AppShell({
                 selectedGeoid={selectedTractGeoid}
                 onSelect={selectTract}
                 onClose={() => setSitesOpen(false)}
+                priorityView={priorityFilter.priorityView}
+                priorityCounts={priorityFilter.priorityCounts}
+                onPriorityView={priorityFilter.onPriorityView}
+                emptyMessage={tractEmptyMessage}
               />
             )}
           </div>

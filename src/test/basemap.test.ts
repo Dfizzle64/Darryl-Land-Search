@@ -29,6 +29,10 @@ describe("basemap helpers", () => {
     expect(OVERLAY_LAYER_IDS).toEqual([
       "rural-fill",
       "rural-line",
+      "mf-priority-a-fill",
+      "mf-priority-a-line",
+      "mf-priority-b-fill",
+      "mf-priority-b-line",
       "rural-pins",
       "oz2-fill",
       "oz2-line",

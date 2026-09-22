@@ -1,8 +1,15 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { MfPriorityFilter } from "./MfPriorityFilter";
 import { formatCountyLabel, isSouthCarolinaState } from "@/lib/markets";
-import { RURAL_ELIGIBLE_STATUS_CHIP, SC_GOVERNOR_FILED_STATUS, type RuralMarketTractRow } from "@/lib/types";
+import { tractPlaceLabel } from "@/lib/scMfPriority";
+import {
+  RURAL_ELIGIBLE_STATUS_CHIP,
+  SC_GOVERNOR_FILED_STATUS,
+  type MfPriorityView,
+  type RuralMarketTractRow,
+} from "@/lib/types";
 
 type TractPanelProps = {
   tracts: RuralMarketTractRow[];
@@ -10,9 +17,23 @@ type TractPanelProps = {
   onSelect: (geoid: string) => void;
   onClose?: () => void;
   variant?: "overlay" | "sheet";
+  priorityView?: MfPriorityView;
+  priorityCounts?: { all: number; priority: number; A: number; B: number };
+  onPriorityView?: (view: MfPriorityView) => void;
+  emptyMessage?: string;
 };
 
-export function TractPanel({ tracts, selectedGeoid, onSelect, onClose, variant = "overlay" }: TractPanelProps) {
+export function TractPanel({
+  tracts,
+  selectedGeoid,
+  onSelect,
+  onClose,
+  variant = "overlay",
+  priorityView,
+  priorityCounts,
+  onPriorityView,
+  emptyMessage = "No rural-eligible tracts in this county filter.",
+}: TractPanelProps) {
   const listRef = useRef<HTMLUListElement | null>(null);
 
   useEffect(() => {
@@ -36,10 +57,15 @@ export function TractPanel({ tracts, selectedGeoid, onSelect, onClose, variant =
           </p>
           <p className="mt-0.5 text-[11px] leading-relaxed text-ink-500">
             Rev. Proc. 2026-14 entirely rural tracts. Nomination eligibility only.
-            {tracts.some((tract) => isSouthCarolinaState(tract.state))
+            {tracts.some((tract) => isSouthCarolinaState(tract.state)) || priorityView
               ? ` South Carolina tracts: ${SC_GOVERNOR_FILED_STATUS}.`
               : ""}
           </p>
+          {onPriorityView && priorityView && priorityCounts ? (
+            <div className="mt-2">
+              <MfPriorityFilter compact value={priorityView} counts={priorityCounts} onChange={onPriorityView} />
+            </div>
+          ) : null}
         </div>
         {onClose ? (
           <button type="button" className="rounded-full border border-white/15 px-3 py-1 text-sm" onClick={onClose}>
@@ -48,7 +74,7 @@ export function TractPanel({ tracts, selectedGeoid, onSelect, onClose, variant =
         ) : null}
       </header>
       {tracts.length === 0 ? (
-        <p className="px-3 py-4 text-sm text-ink-300">No rural-eligible tracts in this county filter.</p>
+        <p className="px-3 py-4 text-sm text-ink-300">{emptyMessage}</p>
       ) : (
         <ul ref={listRef} className="sites-scroll min-h-0 flex-1 overflow-y-auto px-2 py-2">
           {tracts.map((tract) => {
@@ -69,7 +95,21 @@ export function TractPanel({ tracts, selectedGeoid, onSelect, onClose, variant =
                   {isSouthCarolinaState(tract.state) ? (
                     <p className="mt-1 text-[11px] leading-snug text-ink-300">{SC_GOVERNOR_FILED_STATUS}</p>
                   ) : null}
-                  <p className="mt-1 text-sm text-white">{tract.placeOrCorridor}</p>
+                  {tract.mfPriority ? (
+                    <span
+                      className={`mt-1 inline-block rounded-full border px-1.5 py-px text-[10px] ${
+                        tract.mfPriority.tier === "A"
+                          ? "border-[#ffe08a]/80 text-[#ffe08a]"
+                          : "border-[#7ec8ff]/80 text-[#d7eeff]"
+                      }`}
+                    >
+                      Tier {tract.mfPriority.tier} · SC MF priority
+                    </span>
+                  ) : null}
+                  <p className="mt-1 text-sm text-white">{tractPlaceLabel(tract)}</p>
+                  {tract.mfPriority ? (
+                    <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-ink-300">{tract.mfPriority.mfRationale}</p>
+                  ) : null}
                   <p className="truncate text-[11px] text-ink-500">
                     {formatCountyLabel(tract.county, tract.state)} · {tract.geoid}
                   </p>

@@ -26,6 +26,10 @@ export const SATELLITE_LAYER_ID = "basemap-satellite";
 export const OVERLAY_LAYER_IDS = [
   "rural-fill",
   "rural-line",
+  "mf-priority-a-fill",
+  "mf-priority-a-line",
+  "mf-priority-b-fill",
+  "mf-priority-b-line",
   "rural-pins",
   "oz2-fill",
   "oz2-line",
@@ -117,6 +121,12 @@ export const OZ_TRACT_SWATCH = {
   designated: "#c46a2f",
 } as const;
 
+/** Highlight for the SC multifamily shortlist. Neither color means designated. */
+export const MF_PRIORITY_SWATCH = {
+  tierA: "#ffe08a",
+  tierB: "#7ec8ff",
+} as const;
+
 export function ozFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
   return mode === "satellite"
     ? { "fill-color": "#e88845", "fill-opacity": 0.36 }
@@ -137,6 +147,23 @@ export function oz2FillPaint(mode: BasemapMode): NonNullable<FillLayerSpecificat
   return {
     "fill-color": ["case", ["==", ["get", "rural"], true], rural, other],
     "fill-opacity": ["case", ["==", ["get", "rural"], true], ruralOpacity, otherOpacity],
+  };
+}
+
+export function mfPriorityFillPaint(mode: BasemapMode, tier: "A" | "B"): NonNullable<FillLayerSpecification["paint"]> {
+  const color = tier === "A" ? MF_PRIORITY_SWATCH.tierA : MF_PRIORITY_SWATCH.tierB;
+  return {
+    "fill-color": color,
+    "fill-opacity": mode === "satellite" ? (tier === "A" ? 0.28 : 0.22) : tier === "A" ? 0.2 : 0.16,
+  };
+}
+
+export function mfPriorityLinePaint(mode: BasemapMode, tier: "A" | "B"): NonNullable<LineLayerSpecification["paint"]> {
+  const color = tier === "A" ? MF_PRIORITY_SWATCH.tierA : MF_PRIORITY_SWATCH.tierB;
+  return {
+    "line-color": color,
+    "line-width": tier === "A" ? (mode === "satellite" ? 3.6 : 3.2) : mode === "satellite" ? 2.8 : 2.4,
+    "line-opacity": mode === "satellite" ? 0.98 : 0.95,
   };
 }
 
@@ -207,15 +234,30 @@ export function applyBasemap(map: MapLibreMap, mode: BasemapMode) {
   setPaint(map, "oz2-line", oz2LinePaint(mode));
   setPaint(map, "rural-fill", oz2FillPaint(mode));
   setPaint(map, "rural-line", oz2LinePaint(mode));
+  setPaint(map, "mf-priority-a-fill", mfPriorityFillPaint(mode, "A"));
+  setPaint(map, "mf-priority-a-line", mfPriorityLinePaint(mode, "A"));
+  setPaint(map, "mf-priority-b-fill", mfPriorityFillPaint(mode, "B"));
+  setPaint(map, "mf-priority-b-line", mfPriorityLinePaint(mode, "B"));
   setPaint(map, "rural-pins", ruralPinPaint(mode));
 }
 
 export function ruralPinPaint(mode: BasemapMode): NonNullable<CircleLayerSpecification["paint"]> {
+  const fallback = mode === "satellite" ? "#ff7a29" : OZ_TRACT_SWATCH.rural;
   return {
-    "circle-color": mode === "satellite" ? "#ff7a29" : OZ_TRACT_SWATCH.rural,
-    "circle-radius": ["interpolate", ["linear"], ["zoom"], 6, 3, 10, 5, 13, 7],
+    "circle-color": ["match", ["coalesce", ["get", "mfTier"], ""], "A", MF_PRIORITY_SWATCH.tierA, "B", MF_PRIORITY_SWATCH.tierB, fallback],
+    "circle-radius": [
+      "interpolate",
+      ["linear"],
+      ["zoom"],
+      6,
+      ["match", ["coalesce", ["get", "mfTier"], ""], "A", 4.5, "B", 4, 3],
+      10,
+      ["match", ["coalesce", ["get", "mfTier"], ""], "A", 7, "B", 6, 5],
+      13,
+      ["match", ["coalesce", ["get", "mfTier"], ""], "A", 9, "B", 8, 7],
+    ],
     "circle-stroke-color": mode === "satellite" ? "#fff6ee" : "#2a160c",
-    "circle-stroke-width": 1.25,
+    "circle-stroke-width": ["match", ["coalesce", ["get", "mfTier"], ""], "A", 2.2, "B", 1.8, 1.25],
     "circle-opacity": 0.95,
   };
 }

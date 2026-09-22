@@ -23,6 +23,7 @@ npm run seed:flu     # re-join FLU onto the existing parcel fixture
 npm run seed:oz      # designated QOZ polygons, then OZ 2.0 eligibility (Rev. Proc. 2026-14 + Notice 2025-50)
 npm run seed:oz2     # refresh OZ 2.0 nomination tracts only (needs pypdf; see below)
 npm run seed:oz2-markets  # seven-market rural-eligible tracts from the CSV + TIGER 2020
+npm run seed:sc-mf        # South Carolina multifamily priority shortlist from its CSV
 npm run seed:zoning  # refresh coverage report vs knowledge JSON (no LLM)
 ```
 
@@ -181,6 +182,12 @@ Every tract in this pack is **Eligible (rural) — not designated**. The chip us
 
 South Carolina is the exception on wording only. [SC Commerce](https://www.sccommerce.com/opportunity-zone) says Governor McMaster submitted OZ 2.0 nominations to Treasury on September 10, 2026. The page does not publish a GEOID list (the “list can be found here” sentence is not a link), and the ArcGIS map still describes eligibility. Charleston, and Charlotte’s South Carolina fringe (York, Lancaster, and Chester), therefore show a second line: **Governor-filed — list not public yet / not designated**. The chip and filters stay eligible / not designated. No tract is marked nominated or certified.
 
+### South Carolina multifamily priority shortlist
+
+Charleston and Charlotte can filter the rural layer to a **22-tract** multifamily shortlist (10 Tier A, 12 Tier B) sourced from `data/sc-oz2-mf-priority-shortlist.csv`. The research note is `data/sc-oz2-mf-priority-shortlist.md`. Buttons in the tract list and sidebar: **All rural**, **SC MF priority**, **Tier A**, **Tier B**.
+
+Tier A is a gold outline and pin. Tier B is blue. Both sit on top of the orange rural-eligible fill. The drawer shows the corridor label, tier, multifamily rationale, acreage realism, and notes. Nom-watch in those notes is an inference, not a confirmed nomination. The status chip stays **Eligible (rural) — not designated**, with the governor-filed line. This shortlist does not change Atlanta, Tampa, Orlando, Nashville, Raleigh-Durham, or the Orange County parcel pilot.
+
 The Orange County pilot stays in place. Choose **Orlando → Orange, FL** and the original parcel sample, amber non-rural eligible tracts, designated QOZ overlay, and green parcel fills come back. GEOID `12095016605` is still the only Orange County rural-eligible tract. Other counties in the seven sheds do **not** have parcel extracts in this build: the map draws the 2020 tract polygon and a Census Gazetteer pin. That is a coverage gap, not an empty county.
 
 ### Refresh the seven-market fixtures
@@ -190,6 +197,12 @@ npm run seed:oz2-markets
 ```
 
 That script reads the CSV, checks the row counts above, and joins [Census TIGER 2020 tracts](https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2020/MapServer/6). It writes `data/fixtures/oz2-rural-markets.json` (one row per market listing, so dual-listed tracts stay duplicated) and `data/fixtures/oz2-rural-markets.geojson` (one polygon per GEOID, with a `markets` array). Pass `--offline` to rebuild the catalog from the CSV using polygons already on disk. It does not download assessor parcels. `npm run seed:oz2` is still the Orange County all-eligible refresh and is separate on purpose.
+
+```bash
+npm run seed:sc-mf
+```
+
+That script reads `data/sc-oz2-mf-priority-shortlist.csv`, requires the eligible / not designated / not confirmed nominated status string, and checks each GEOID against the seven-market rural CSV (same market, county, South Carolina, and Gazetteer point). It writes `data/fixtures/sc-oz2-mf-priority.json`. It does not edit tract polygons or the Orange County parcel sample.
 
 ### Refresh
 
@@ -250,7 +263,7 @@ HUD_OZ_URL=https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Opp
 - Municipal FLU besides Orlando is not in the public layers used here (Winter Park, Ocoee, Winter Garden, Apopka, Maitland, etc.). FLU-only and rezoning-candidate modes omit those parcels rather than guess.
 - Designated Opportunity Zone flags use 2010 QOZ polygons; ACS income and OZ 2.0 eligibility use 2020 census tracts. Do not expect those GEOIDs to match.
 - OZ 2.0 tracts are eligible for nomination under Rev. Proc. 2026-14. They are not designated 2027 QOZs. Rural vs non-rural is the appendix column, not a local rule. Orange County’s only rural-eligible tract in that list is `12095016605`.
-- The seven-market layer is rural-eligible tracts only. 90-minute sheds are approximate county rings, not isochrones. Parcel polygons outside the Orange County sample are not loaded; those markets use tract overlays and pins. South Carolina tracts add a governor-filed note (list not public, not designated). They are not certified 2027 QOZs.
+- The seven-market layer is rural-eligible tracts only. 90-minute sheds are approximate county rings, not isochrones. Parcel polygons outside the Orange County sample are not loaded; those markets use tract overlays and pins. South Carolina tracts add a governor-filed note (list not public, not designated). They are not certified 2027 QOZs. The SC multifamily shortlist is a priority filter on that same rural layer, not a nomination.
 - Belle Isle, Oakland, and Windermere zoning use tables were not independently verified; district lists are empty on purpose.
 - Winter Garden R-4 / R-5 exist in code but were not verified as multifamily in this pass.
 - AADT is nearest FDOT **state-count** segment, not local-road counts. Some parcels sit far from a counted road.

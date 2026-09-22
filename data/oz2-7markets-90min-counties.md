@@ -15,6 +15,8 @@ Status labeling for all rows: **Eligible — not designated**. As of Sep 21, 202
 
 **Sep 22, 2026 update (copy only):** SC Commerce says Governor McMaster submitted OZ 2.0 nominations to Treasury on Sep 10, 2026 ([sccommerce.com/opportunity-zone](https://www.sccommerce.com/opportunity-zone)). The nominated GEOID list is not posted. Charleston and Charlotte’s South Carolina counties (York, Lancaster, Chester) use the extra line **Governor-filed — list not public yet / not designated**. The chip stays eligible / not designated. Florida, Georgia, North Carolina, and Tennessee rows are unchanged. No GEOIDs were marked nominated or designated.
 
+**Multifamily priority (same date):** `data/sc-oz2-mf-priority-shortlist.csv` ranks 22 of these rural-eligible tracts (10 Tier A, 12 Tier B) for garden/wrap site search. That rank is not a nomination. Refresh with `npm run seed:sc-mf`.
+
 ---
 
 ## Atlanta
@@ -118,6 +120,7 @@ Status labeling for all rows: **Eligible — not designated**. As of Sep 21, 202
   - Williamsburg (Kingstree often ≥90 — excluded)
   - Beaufort (Hilton Head corridor often >90 from peninsula — excluded)
 - **Uncertain / outer-edge counties (included but flagged in CSV notes):** Orangeburg (South Carolina), Clarendon (South Carolina), Georgetown (South Carolina)
+- **MF priority shortlist inside this shed:** 14 of 49 rural-eligible tracts (Berkeley, Charleston, Colleton, Dorchester, Orangeburg). See `data/sc-oz2-mf-priority-shortlist.md`.
 - **Sources:**
   - Charleston–North Charleston MSA
   - Prior Charleston ring: /workspace/rural-oz2-charleston.md (Williamsburg removed for 90-min)
@@ -172,6 +175,7 @@ Status labeling for all rows: **Eligible — not designated**. As of Sep 21, 202
   - Lancaster (South Carolina): 6
   - York (South Carolina): 2
 - **Included counties with 0 rural-eligible tracts:** Mecklenburg (North Carolina)
+- **MF priority shortlist inside the SC fringe:** 8 tracts in York, Lancaster, and Chester. North Carolina rows are not on that shortlist.
 - **Explicitly excluded (outside clear 90-min / wrong namesake):**
   - Chesterfield SC (often ~75–100 — excluded)
   - Union SC (not the NC Union ring; excluded — different county)

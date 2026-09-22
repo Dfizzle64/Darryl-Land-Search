@@ -124,6 +124,51 @@ export const SC_COMMERCE_OZ_URL = "https://www.sccommerce.com/opportunity-zone";
 export const SHED_CAVEAT =
   "90-minute sheds are approximate county rings, not drive-time isochrones. Outer-edge counties are flagged in tract notes.";
 
+/** Underwriting priority among rural-eligible tracts. Not a nomination. */
+export type MfPriorityTier = "A" | "B";
+
+/** `all` keeps every rural tract and still highlights the shortlist. */
+export type MfPriorityView = "all" | "priority" | "A" | "B";
+
+export type MfPriorityInfo = {
+  tier: MfPriorityTier;
+  rank: number;
+  place: string;
+  mfRationale: string;
+  acreageRealism: string;
+  notes: string;
+};
+
+export type ScMfPriorityTract = {
+  market: MarketId;
+  state: "South Carolina";
+  county: string;
+  geoid: string;
+  place: string;
+  rural: "Y";
+  status: string;
+  tier: MfPriorityTier;
+  rank: number;
+  mfRationale: string;
+  acreageRealism: string;
+  lat: number;
+  lon: number;
+  notes: string;
+  sourceStatus: string;
+};
+
+export type ScMfPriorityCatalog = {
+  generatedAt: string;
+  sourceCsv: string;
+  statusChip: string;
+  governorFiledStatus: string;
+  disclaimer: string;
+  rowCount: number;
+  tierACount: number;
+  tierBCount: number;
+  rows: ScMfPriorityTract[];
+};
+
 export type RuralMarketTractRow = {
   market: MarketId;
   state: string;
@@ -137,6 +182,8 @@ export type RuralMarketTractRow = {
   notes: string;
   outerEdge: boolean;
   specialUse: boolean;
+  /** Joined from the SC multifamily shortlist. Absent on the seven-market fixture. */
+  mfPriority?: MfPriorityInfo | null;
 };
 
 export type MarketCountySummary = {

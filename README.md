@@ -31,7 +31,7 @@ No API keys are required for the default fixture mode. Copy `.env.example` to `.
 
 - Set a **minimum acreage** (OCPA `ACREAGE`). The slider is 0–25 acres; larger sites still match any threshold at or below 25. Acreage is shown in the parcel drawer.
 - Choose a **land-use mode**: multifamily-capable zoning (default), all parcels, non-multifamily zoning, rezoning candidates (FLU yes / zoning no), FLU allows multifamily, either, or both.
-- Filter **Opportunity Zones**: OZ 2.0 rural-eligible, OZ 2.0 eligible but not rural, in a current designated QOZ, not in a designated QOZ, or either. Toggle the OZ 2.0 tract overlay (green = rural-eligible, blue = eligible and not rural) and the gold designated-QOZ overlay.
+- Filter **Opportunity Zones**: OZ 2.0 rural-eligible, OZ 2.0 eligible but not rural, in a current designated QOZ, not in a designated QOZ, or either. Toggle the OZ 2.0 tract overlay (orange = rural-eligible, amber = eligible and not rural) and the copper dashed designated-QOZ overlay.
 - Include **planned development / PUD** (always labeled maybe — site-specific).
 - Include **conditional zoning** (Live Local commercial/industrial, limited multiplex, some mixed-use overlays). Off by default so C-2 warehouses do not flood the map.
 - Set a **minimum median household income** (tract or block group) and **minimum AADT**.
@@ -46,7 +46,7 @@ The bundled sample is **462 parcels** spread across Orange County (Orlando, unin
 1. **Acreage.** OCPA parcel `ACREAGE`. Unknown acreage can be kept or dropped (the sample has acreage on every parcel).
 2. **Zoning.** OCPA stores codes like `ORL-R-3B/T/AN`. The app parses the jurisdiction prefix (`ORL`) and base district (`R-3B`), then matches **that jurisdiction’s** districts in `data/zoning-config.json`. County `R-3` does not silently match Orlando `R-3A` unless Orlando lists it. Token `P-D` does **not** match Orlando public-use `P`.
 3. **FLU.** Parcel centroids are joined to [Orange County Future Land Use](https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/21) and [Orlando Future Land Use](https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/83). `data/flu-config.json` decides which GIS codes are MF-supportive. Overlay suffixes such as `/RES-PRO` fall back to the base code.
-4. **Opportunity Zones.** Designated QOZs use HUD/Treasury polygons (2010 Census tracts), not ACS 2020 tract IDs. OZ 2.0 uses 2020 census tracts from the Rev. Proc. 2026-14 appendix. Filters: rural-eligible, eligible but not rural, in a designated QOZ, not in a designated QOZ, or either. The OZ 2.0 overlay draws all 87 Orange County eligible tracts; the gold overlay is the county’s 24 current QOZ tracts.
+4. **Opportunity Zones.** Designated QOZs use HUD/Treasury polygons (2010 Census tracts), not ACS 2020 tract IDs. OZ 2.0 uses 2020 census tracts from the Rev. Proc. 2026-14 appendix. Filters: rural-eligible, eligible but not rural, in a designated QOZ, not in a designated QOZ, or either. The OZ 2.0 overlay draws all 87 Orange County eligible tracts; the copper dashed overlay is the county’s 24 current QOZ tracts.
 5. **Income.** ACS median household income (B19013) by tract or block group.
 6. **AADT.** Nearest FDOT Orange County count segment.
 
@@ -156,7 +156,7 @@ Rev. Proc. 2026-14 lists population census tracts that are low-income communitie
 
 Orange County has **87** eligible tracts in that appendix. **One** is rural: GEOID `12095016605` (Census Tract 166.05, east Orange / Bithlo–Wedgefield, SR 50). The other 86 are `Non-rural`. The app does not run its own urban/rural classifier.
 
-Offline files: `data/fixtures/oz2-eligible.geojson`, `oz2-eligible-tracts.json`, and `oz2Eligibility` on each parcel. In this sample **185 / 462** centroids fall in an eligible tract and **3 / 462** fall in `12095016605` (those three were appended from the public OCPA layer so the rural filter and drawer have something to open). The OZ 2.0 overlay is on by default. Green is rural-eligible; blue is eligible and not rural. Choosing the rural-eligible or non-rural filter narrows the overlay to that class.
+Offline files: `data/fixtures/oz2-eligible.geojson`, `oz2-eligible-tracts.json`, and `oz2Eligibility` on each parcel. In this sample **185 / 462** centroids fall in an eligible tract and **3 / 462** fall in `12095016605` (those three were appended from the public OCPA layer so the rural filter and drawer have something to open). The OZ 2.0 overlay is on by default. Orange is rural-eligible; amber is eligible and not rural. Designated QOZs use a copper fill and a dashed outline. Parcel fills stay green. Choosing the rural-eligible or non-rural filter narrows the overlay to that class.
 
 The parcel drawer shows eligible / not eligible, the official rural flag, and the GEOID, and says the tract has not been nominated or certified.
 

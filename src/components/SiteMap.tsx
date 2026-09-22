@@ -10,6 +10,7 @@ import {
   applyBasemap,
   excludedFillPaint,
   excludedLinePaint,
+  OZ_TRACT_SWATCH,
   oz2FillPaint,
   oz2LinePaint,
   ozFillPaint,
@@ -293,19 +294,31 @@ export function SiteMap({
           {showOz2 ? (
             <>
               <p>
-                <span className="mr-1.5 inline-block h-2 w-2 rounded-sm bg-[#3dbe86]" />
+                <span
+                  className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
+                  style={{ backgroundColor: OZ_TRACT_SWATCH.rural }}
+                />
                 OZ 2.0 rural-eligible (nomination only)
               </p>
               <p>
-                <span className="mr-1.5 inline-block h-2 w-2 rounded-sm bg-[#5b8def]" />
+                <span
+                  className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
+                  style={{ backgroundColor: OZ_TRACT_SWATCH.eligible }}
+                />
                 OZ 2.0 eligible, not rural
               </p>
             </>
           ) : null}
           {showOz ? (
             <p>
-              <span className="mr-1.5 inline-block h-2 w-2 rounded-sm bg-[#c9a227]" />
-              Designated QOZ (2018)
+              <span
+                className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
+                style={{
+                  backgroundColor: OZ_TRACT_SWATCH.designated,
+                  boxShadow: "inset 0 0 0 1px #f6d0b0",
+                }}
+              />
+              Designated QOZ (2018), dashed
             </p>
           ) : null}
         </div>

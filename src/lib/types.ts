@@ -286,6 +286,11 @@ export type ParcelProperties = {
   flu: FluInfo | null;
   opportunityZone: OpportunityZoneInfo | null;
   oz2Eligibility: Oz2EligibilityInfo | null;
+  /**
+   * 1 when the parcel passes the active filters. The map uses this instead of
+   * an id list, which stops matching once a dense viewport is loaded.
+   */
+  filterMatch?: 0 | 1;
   /** County property appraiser / parcel search landing page when known. */
   appraiserUrl?: string | null;
   /** Honest per-county gaps (no zoning, etc.). */

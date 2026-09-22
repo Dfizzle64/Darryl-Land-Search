@@ -1,6 +1,7 @@
 import type { ParcelCollection, ParcelFeature } from "../types";
 import { loadParcelCollection } from "./loadFixtures";
 import {
+  finalizeOrlandoParcelPage,
   getOrlandoFixtureParcel,
   queryOrlandoFixtureParcels,
   queryOrlandoLiveParcels,
@@ -44,7 +45,7 @@ export class FixtureParcelProvider implements ParcelProvider {
   ): Promise<OrlandoParcelPage> {
     if (query.source === "live") {
       const collection = await queryOrlandoLiveParcels(query);
-      return { collection, totalInBbox: collection.features.length, truncated: false };
+      return finalizeOrlandoParcelPage(collection.features, query);
     }
     return queryOrlandoFixtureParcels(query);
   }

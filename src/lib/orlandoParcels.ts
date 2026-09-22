@@ -124,6 +124,41 @@ export function spatiallyThinFeatures<T extends { properties: { centroid?: [numb
   return out;
 }
 
+/**
+ * Attribute filters run before the draw cap. Thinning first keeps the largest
+ * parcel in each cell, then a slider can only see that sample — a smaller
+ * parcel that actually matches never comes back, and non-matches stay in the
+ * payload the map has to hide.
+ */
+export function selectParcelPage<T extends { properties: { centroid?: [number, number]; acreage: number | null } }>(
+  features: T[],
+  limit: number,
+  predicate: (feature: T) => boolean,
+): {
+  matches: T[];
+  rejected: T[];
+  thinned: T[];
+  totalInBbox: number;
+  totalMatching: number;
+  truncated: boolean;
+} {
+  const matches: T[] = [];
+  const rejected: T[] = [];
+  for (const feature of features) {
+    if (predicate(feature)) matches.push(feature);
+    else rejected.push(feature);
+  }
+  const thinned = spatiallyThinFeatures(matches, limit);
+  return {
+    matches,
+    rejected,
+    thinned,
+    totalInBbox: features.length,
+    totalMatching: matches.length,
+    truncated: thinned.length < matches.length,
+  };
+}
+
 export function isOrlandoShedCounty(county: string | null, state: string | null): boolean {
   if (!county || state !== "Florida") return false;
   return Boolean(ORLANDO_FIPS_BY_NAME[county]);

@@ -9,7 +9,16 @@ import { SitesPanel } from "./SitesPanel";
 import { TractDrawer } from "./TractDrawer";
 import { TractPanel } from "./TractPanel";
 import { AOI_PARCEL_LIMIT, featuresIntersectingBbox, type AoiLock } from "@/lib/aoi";
-import { emptyStateHint, filterParcels } from "@/lib/filters";
+import { emptyStateHint, filterParcels, parcelFilterKey, stampFilterMatch, writeParcelFilters } from "@/lib/filters";
+import {
+  isParcelVisibilityPreference,
+  parcelVisibilityHint,
+  parcelsAreVisible,
+  PARCEL_AUTO_ZOOM,
+  PARCEL_VISIBILITY_STORAGE_KEY,
+  toggleParcelVisibility,
+  type ParcelVisibilityPreference,
+} from "@/lib/parcelVisibility";
 import {
   countyKey,
   filterRuralRows,
@@ -44,11 +53,20 @@ import {
   type OrlandoParcelsMeta,
   type Oz2TractCollection,
   type ParcelCollection,
+  type ParcelFeature,
   type RuralMarketTractCollection,
   type RuralMarketsCatalog,
   type ScMfPriorityCatalog,
   type ZoningConfig,
 } from "@/lib/types";
+
+type ParcelViewStats = { totalInBbox: number; totalMatching: number; truncated: boolean };
+
+type ParcelResponse = ParcelCollection & {
+  error?: string;
+  excluded?: ParcelFeature[];
+  meta?: { totalInBbox?: number; totalMatching?: number; truncated?: boolean };
+};
 
 type AppShellProps = {
   parcels: ParcelCollection;
@@ -97,10 +115,12 @@ export function AppShell({
   const [inventoryTab, setInventoryTab] = useState<InventoryTab>("sites");
   const [mfView, setMfView] = useState<MfPriorityView>("all");
   const [viewportParcels, setViewportParcels] = useState<ParcelCollection | null>(null);
-  const [viewportStats, setViewportStats] = useState<{ totalInBbox: number; truncated: boolean } | null>(null);
+  const [viewportStats, setViewportStats] = useState<ParcelViewStats | null>(null);
   const [aoi, setAoi] = useState<AoiLock | null>(null);
   const [lockedParcels, setLockedParcels] = useState<ParcelCollection | null>(null);
-  const [aoiStats, setAoiStats] = useState<{ totalInBbox: number; truncated: boolean } | null>(null);
+  const [aoiStats, setAoiStats] = useState<ParcelViewStats | null>(null);
+  const [parcelPreference, setParcelPreference] = useState<ParcelVisibilityPreference>("auto");
+  const [mapZoom, setMapZoom] = useState(9);
   const aoiRef = useRef(aoi);
   aoiRef.current = aoi;
   const viewportRequest = useRef(0);
@@ -136,6 +156,9 @@ export function AppShell({
   );
   const orlandoParcelsOn = showOrlandoParcels(market, county, countyState);
   const orangePilot = showOrangeCountyPilot(market, county, countyState);
+  const parcelLayerVisible = orlandoParcelsOn && parcelsAreVisible(parcelPreference, mapZoom, Boolean(aoi));
+  const visibilityHint = parcelVisibilityHint(parcelPreference);
+  const filterKey = parcelFilterKey(filters);
   const statusHelp = southCarolinaStatusHelp(market, countyState);
   const bounds = useMemo(
     () =>
@@ -195,6 +218,16 @@ export function AppShell({
     [matched, filters, zoningConfig, fluConfig],
   );
   const rankedVisible = useMemo(() => ranked.slice(0, 200), [ranked]);
+  const mapParcels = useMemo<ParcelCollection>(
+    () => ({
+      type: "FeatureCollection",
+      features: stampFilterMatch(activeParcels.features, filters, zoningConfig, fluConfig),
+    }),
+    [activeParcels.features, filters, zoningConfig, fluConfig],
+  );
+  const parcelStats = aoi ? aoiStats : viewportStats;
+  const filterMatchTotal = parcelStats?.totalMatching ?? matched.length;
+  const parcelsInView = parcelStats?.totalInBbox ?? activeParcels.features.length;
   const fullAcreageCounties = useMemo(
     () => orlandoParcelsMeta.counties.filter((item) => item.coverage === "complete-gte-5ac"),
     [orlandoParcelsMeta.counties],
@@ -214,7 +247,7 @@ export function AppShell({
     typeof meta.fluJoinedCount === "number" && orangePilot && county === "Orange"
       ? meta.fluJoinedCount
       : activeParcels.features.length - fluUnknownCount;
-  const hint = orlandoParcelsOn ? emptyStateHint(filters, matched.length, fluUnknownCount) : null;
+  const hint = orlandoParcelsOn ? emptyStateHint(filters, filterMatchTotal, fluUnknownCount) : null;
 
   useEffect(() => {
     if (selectedId && !matchedIds.has(selectedId) && !showExcluded) {
@@ -249,12 +282,34 @@ export function AppShell({
     }
   }, [orlandoParcelsOn, county]);
 
+  const filtersRef = useRef(filters);
+  filtersRef.current = filters;
+  const preferenceRef = useRef(parcelPreference);
+  preferenceRef.current = parcelPreference;
+  const showExcludedRef = useRef(showExcluded);
+  showExcludedRef.current = showExcluded;
+  const lastViewport = useRef<{ bbox: [number, number, number, number]; zoom: number } | null>(null);
+  const loadViewportRef = useRef<(bbox: [number, number, number, number], zoom: number) => Promise<void>>(
+    async () => {},
+  );
+
   const loadViewportParcels = async (bbox: [number, number, number, number], zoom: number) => {
+    lastViewport.current = { bbox, zoom };
     if (!orlandoParcelsOn || aoiRef.current) return;
+    const visible = parcelsAreVisible(preferenceRef.current, zoom, false);
+    // Shed scale stays unloaded. Once the user is zoomed in, keep the query
+    // even if they turned the outlines off so the ranked list still filters.
+    if (!visible && zoom < PARCEL_AUTO_ZOOM) {
+      viewportRequest.current += 1;
+      setViewportParcels(EMPTY_PARCELS);
+      setViewportStats(null);
+      setParcelsLoading(false);
+      return;
+    }
     // Live DOH fill is only for the thinner sample counties. The five core counties
     // already ship every parcel from 5 through 150 acres.
     const useLive = zoom >= 11.5 && Boolean(county) && !isFull5AcCounty(county);
-    const limit = useLive ? 900 : zoom >= 12 ? 3500 : 5000;
+    const limit = useLive ? 900 : zoom >= 13 ? 3500 : zoom >= 11.5 ? 2200 : 900;
     const requestId = ++viewportRequest.current;
     setParcelsLoading(true);
     setError(null);
@@ -269,20 +324,20 @@ export function AppShell({
         params.set("county", county);
         params.set("state", countyState);
       }
+      writeParcelFilters(params, filtersRef.current, showExcludedRef.current);
       const response = await fetch(`/api/parcels?${params.toString()}`);
       if (requestId !== viewportRequest.current || aoiRef.current) return;
       if (!response.ok) {
         throw new Error(`Parcel load failed (${response.status})`);
       }
-      const body = (await response.json()) as ParcelCollection & {
-        error?: string;
-        meta?: { totalInBbox?: number; truncated?: boolean };
-      };
+      const body = (await response.json()) as ParcelResponse;
       if (body.error) throw new Error(body.error);
       if (requestId !== viewportRequest.current || aoiRef.current) return;
-      setViewportParcels({ type: "FeatureCollection", features: body.features ?? [] });
+      const features = featuresIntersectingBbox([...(body.features ?? []), ...(body.excluded ?? [])], bbox);
+      setViewportParcels({ type: "FeatureCollection", features });
       setViewportStats({
-        totalInBbox: body.meta?.totalInBbox ?? body.features?.length ?? 0,
+        totalInBbox: body.meta?.totalInBbox ?? features.length,
+        totalMatching: body.meta?.totalMatching ?? body.features?.length ?? features.length,
         truncated: Boolean(body.meta?.truncated),
       });
       setParcelSource(useLive ? "live" : "fixture");
@@ -296,6 +351,22 @@ export function AppShell({
       if (requestId === viewportRequest.current && !aoiRef.current) setParcelsLoading(false);
     }
   };
+  loadViewportRef.current = loadViewportParcels;
+
+  useEffect(() => {
+    const stored = window.sessionStorage.getItem(PARCEL_VISIBILITY_STORAGE_KEY);
+    if (isParcelVisibilityPreference(stored)) setParcelPreference(stored);
+  }, []);
+
+  useEffect(() => {
+    if (!orlandoParcelsOn || aoi) return;
+    const last = lastViewport.current;
+    if (!last) return;
+    const timer = window.setTimeout(() => {
+      void loadViewportRef.current(last.bbox, last.zoom);
+    }, 280);
+    return () => window.clearTimeout(timer);
+  }, [filterKey, parcelPreference, showExcluded, orlandoParcelsOn, county, countyState, aoi]);
 
   useEffect(() => {
     if (!orlandoParcelsOn || !aoi) {
@@ -307,52 +378,50 @@ export function AppShell({
     const requestId = ++aoiRequest.current;
     viewportRequest.current += 1;
     const bbox = aoi.bbox;
-    const params = new URLSearchParams({
-      market: "Orlando",
-      source: "fixture",
-      bbox: bbox.join(","),
-      limit: String(AOI_PARCEL_LIMIT),
-    });
-    if (county && countyState) {
-      params.set("county", county);
-      params.set("state", countyState);
-    }
-    setLockedParcels(null);
-    setAoiStats(null);
-    setParcelsLoading(true);
-    setError(null);
-    let cancelled = false;
-    void (async () => {
-      try {
-        const response = await fetch(`/api/parcels?${params.toString()}`);
-        if (cancelled || requestId !== aoiRequest.current) return;
-        if (!response.ok) throw new Error(`Parcel load failed (${response.status})`);
-        const body = (await response.json()) as ParcelCollection & {
-          error?: string;
-          meta?: { totalInBbox?: number; truncated?: boolean };
-        };
-        if (body.error) throw new Error(body.error);
-        if (cancelled || requestId !== aoiRequest.current) return;
-        const features = featuresIntersectingBbox(body.features ?? [], bbox);
-        setLockedParcels({ type: "FeatureCollection", features });
-        setAoiStats({
-          totalInBbox: body.meta?.totalInBbox ?? features.length,
-          truncated: Boolean(body.meta?.truncated),
-        });
-        setParcelSource("fixture");
-      } catch (err) {
-        if (cancelled || requestId !== aoiRequest.current) return;
-        setError(err instanceof Error ? err.message : "Unable to load the locked area");
-        setLockedParcels({ type: "FeatureCollection", features: [] });
-        setAoiStats(null);
-      } finally {
-        if (!cancelled && requestId === aoiRequest.current) setParcelsLoading(false);
+    const timer = window.setTimeout(() => {
+      const params = new URLSearchParams({
+        market: "Orlando",
+        source: "fixture",
+        bbox: bbox.join(","),
+        limit: String(AOI_PARCEL_LIMIT),
+      });
+      if (county && countyState) {
+        params.set("county", county);
+        params.set("state", countyState);
       }
-    })();
+      writeParcelFilters(params, filters, showExcluded);
+      setParcelsLoading(true);
+      setError(null);
+      void (async () => {
+        try {
+          const response = await fetch(`/api/parcels?${params.toString()}`);
+          if (requestId !== aoiRequest.current) return;
+          if (!response.ok) throw new Error(`Parcel load failed (${response.status})`);
+          const body = (await response.json()) as ParcelResponse;
+          if (body.error) throw new Error(body.error);
+          if (requestId !== aoiRequest.current) return;
+          const features = featuresIntersectingBbox([...(body.features ?? []), ...(body.excluded ?? [])], bbox);
+          setLockedParcels({ type: "FeatureCollection", features });
+          setAoiStats({
+            totalInBbox: body.meta?.totalInBbox ?? features.length,
+            totalMatching: body.meta?.totalMatching ?? body.features?.length ?? features.length,
+            truncated: Boolean(body.meta?.truncated),
+          });
+          setParcelSource("fixture");
+        } catch (err) {
+          if (requestId !== aoiRequest.current) return;
+          setError(err instanceof Error ? err.message : "Unable to load the locked area");
+          setLockedParcels({ type: "FeatureCollection", features: [] });
+          setAoiStats(null);
+        } finally {
+          if (requestId === aoiRequest.current) setParcelsLoading(false);
+        }
+      })();
+    }, 280);
     return () => {
-      cancelled = true;
+      window.clearTimeout(timer);
     };
-  }, [aoi, orlandoParcelsOn, county, countyState]);
+  }, [aoi, orlandoParcelsOn, county, countyState, filterKey, showExcluded, filters]);
 
   useEffect(() => {
     if (!scView && mfView !== "all") setMfView("all");
@@ -471,19 +540,21 @@ export function AppShell({
             {visibleTracts.length === 1 ? "tract" : "tracts"}
             {orlandoParcelsOn ? (
               <span className="block text-[11px]">
-                {matched.length.toLocaleString()} of {activeParcels.features.length.toLocaleString()}{" "}
-                {aoi ? "in AOI" : "in view"}
-                {parcelsLoading ? " · loading…" : aoi ? " · locked" : ` · ${parcelSource}`}
+                {filterMatchTotal.toLocaleString()} match
+                {parcelsInView > 0 ? ` of ${parcelsInView.toLocaleString()}` : ""} {aoi ? "in AOI" : "in view"}
+                {parcelsLoading ? " · loading…" : aoi ? " · locked" : parcelLayerVisible ? ` · ${parcelSource}` : " · parcels off"}
                 {aoi && aoiStats?.truncated ? (
                   <span className="block">
-                    AOI holds {aoiStats.totalInBbox.toLocaleString()} parcels. The locked list is a stable spread —
-                    draw a smaller area for the rest.
+                    {aoiStats.totalMatching.toLocaleString()} parcels match these filters inside the AOI (
+                    {aoiStats.totalInBbox.toLocaleString()} in the boundary). The list is a stable spread — draw a
+                    smaller area for the rest.
                   </span>
                 ) : null}
                 {!aoi && viewportStats?.truncated ? (
                   <span className="block">
-                    Showing a spread of this view. {viewportStats.totalInBbox.toLocaleString()} parcels meet the
-                    fixture — zoom in for the rest.
+                    Showing a spread of parcels that match these filters (
+                    {viewportStats.totalMatching.toLocaleString()} match, {viewportStats.totalInBbox.toLocaleString()}{" "}
+                    in the view). Zoom in for the rest.
                   </span>
                 ) : null}
                 <span className="block">
@@ -504,7 +575,7 @@ export function AppShell({
                 setSitesOpen(true);
               }}
             >
-              Sites ({matched.length.toLocaleString()})
+              Sites ({filterMatchTotal.toLocaleString()})
             </button>
           ) : null}
           <button
@@ -544,8 +615,8 @@ export function AppShell({
           onChange={setFilters}
           zoningConfig={zoningConfig}
           fluConfig={fluConfig}
-          matchedCount={matched.length}
-          totalCount={activeParcels.features.length}
+          matchedCount={filterMatchTotal}
+          totalCount={parcelsInView}
           fluJoinedCount={fluJoinedCount}
           showExcluded={showExcluded}
           onShowExcluded={setShowExcluded}
@@ -570,13 +641,12 @@ export function AppShell({
         />
         <main className="relative min-w-0 flex-1">
           <SiteMap
-            parcels={activeParcels}
+            parcels={mapParcels}
             traffic={traffic}
             opportunityZones={opportunityZones}
             oz2Tracts={oz2Tracts}
             ruralTracts={ruralTracts}
             ruralPins={ruralPins}
-            matchedIds={matchedIds}
             selectedId={selectedId}
             hoveredId={hoveredId}
             selectedTractGeoid={selectedTractGeoid}
@@ -585,6 +655,17 @@ export function AppShell({
             showOz={showOz}
             showOz2={showOz2}
             showParcels={orlandoParcelsOn}
+            parcelLayerVisible={parcelLayerVisible}
+            parcelVisibilityHint={visibilityHint}
+            onToggleParcelLayer={
+              orlandoParcelsOn
+                ? () => {
+                    const next = toggleParcelVisibility(parcelPreference, mapZoom, Boolean(aoi));
+                    setParcelPreference(next);
+                    window.sessionStorage.setItem(PARCEL_VISIBILITY_STORAGE_KEY, next);
+                  }
+                : undefined
+            }
             showOrangePilot={orangePilot}
             parcelsLoading={parcelsLoading}
             market={market}
@@ -601,8 +682,9 @@ export function AppShell({
             onHover={setHoveredId}
             onSelectTract={selectTract}
             onViewportIdle={orlandoParcelsOn ? loadViewportParcels : undefined}
+            onZoom={setMapZoom}
             aoi={orlandoParcelsOn ? aoi : null}
-            aoiMatchedCount={matched.length}
+            aoiMatchedCount={filterMatchTotal}
             aoiTruncated={Boolean(aoiStats?.truncated)}
             onAoiChange={setAoi}
           />
@@ -630,7 +712,7 @@ export function AppShell({
                 {showSites ? (
                   <SitesPanel
                     sites={rankedVisible}
-                    matchedTotal={ranked.length}
+                    matchedTotal={filterMatchTotal}
                     selectedId={selectedId}
                     hoveredId={hoveredId}
                     incomeGeography={filters.incomeGeography}
@@ -683,7 +765,7 @@ export function AppShell({
               <SitesPanel
                 variant="sheet"
                 sites={rankedVisible}
-                matchedTotal={ranked.length}
+                matchedTotal={filterMatchTotal}
                 selectedId={selectedId}
                 hoveredId={hoveredId}
                 incomeGeography={filters.incomeGeography}

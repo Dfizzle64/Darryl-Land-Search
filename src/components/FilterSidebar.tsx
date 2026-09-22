@@ -349,6 +349,10 @@ export function FilterSidebar({
             checked={filters.includeUnknownIncome}
             onChange={(includeUnknownIncome) => onChange({ ...filters, includeUnknownIncome })}
           />
+          <p className="text-xs text-ink-500">
+            Orange County parcels in the current view pick up ACS median income. Other shed counties stay unknown —
+            uncheck the box to hide them when a minimum is set.
+          </p>
         </section>
 
         <section className="mt-5 space-y-3">
@@ -373,6 +377,9 @@ export function FilterSidebar({
             checked={filters.includeUnknownAadt}
             onChange={(includeUnknownAadt) => onChange({ ...filters, includeUnknownAadt })}
           />
+          <p className="text-xs text-ink-500">
+            Orange County parcels pick up the nearest FDOT count. Other counties stay unknown unless that box is off.
+          </p>
           <Toggle
             label="Show major-road AADT overlay"
             checked={showTraffic}

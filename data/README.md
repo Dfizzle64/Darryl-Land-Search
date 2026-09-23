@@ -15,13 +15,13 @@ These JSON files are the **source of truth** for what the map treats as multifam
 | `data/fixtures/oz2-rural-markets.json` | 446 market rows (Polk/Sumter kept on both Tampa and Orlando) plus bounds |
 | `data/fixtures/oz2-rural-markets.geojson` | One Census TIGER 2020 polygon per unique rural GEOID |
 | `data/oz2-7markets-90min-urban-eligible.csv` | Non-rural eligible tracts for the same seven sheds (1,144 rows, 1,103 GEOIDs) |
-| `data/oz2-other-msas-eligible.csv` | Eligible tracts for 14 smaller MSAs (1,288 rows, 1,243 GEOIDs; 483 rural / 805 urban) |
+| `data/oz2-other-msas-eligible.csv` | Eligible tracts for 15 smaller MSAs (1,386 rows, 1,341 GEOIDs; 491 rural / 895 urban) |
 | `data/oz2-other-msas-rural-eligible.csv` | Rural split of the other-MSA pack |
 | `data/oz2-other-msas-urban-eligible.csv` | Urban split of the other-MSA pack |
-| `data/oz2-other-msas-counties.md` | County rings for the 14 smaller MSAs |
+| `data/oz2-other-msas-counties.md` | County rings for the 15 smaller MSAs |
 | `data/fixtures/oz2-urban-markets.json` | Urban pack catalog. Status chip is Eligible — not designated |
 | `data/fixtures/oz2-other-msas.json` | Other-MSA catalog, rural and urban rows kept |
-| `data/fixtures/oz2-eligible-packs.geojson` | One TIGER 2020 polygon per GEOID in the urban pack or the other-MSA pack (2,187) |
+| `data/fixtures/oz2-eligible-packs.geojson` | One TIGER 2020 polygon per GEOID in the urban pack or the other-MSA pack (2,285) |
 | `data/sc-oz2-mf-priority-shortlist.csv` | South Carolina multifamily priority shortlist (Charleston + York/Lancaster/Chester). Eligible rural only |
 | `data/sc-oz2-mf-priority-shortlist.md` | Why those 22 tracts are Tier A or Tier B. Not a nominated list |
 | `data/fixtures/sc-oz2-mf-priority.json` | Seeded shortlist joined to the rural pack. Chip stays eligible / not designated |

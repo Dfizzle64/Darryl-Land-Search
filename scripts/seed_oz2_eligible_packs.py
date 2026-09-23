@@ -4,7 +4,7 @@
 Sources (Rev. Proc. 2026-14, approximate 90-minute county rings):
 
   data/oz2-7markets-90min-urban-eligible.csv   — non-rural eligible, primary 7
-  data/oz2-other-msas-eligible.csv             — rural + non-rural, 14 smaller MSAs
+  data/oz2-other-msas-eligible.csv             — rural + non-rural, 15 smaller MSAs
   data/oz2-other-msas-rural-eligible.csv       — rural split (checked, not the join source)
   data/oz2-other-msas-urban-eligible.csv       — urban split (checked, not the join source)
 
@@ -62,6 +62,7 @@ PRIMARY_MARKETS = (
 OTHER_MARKETS = (
     "Vero Beach",
     "Melbourne",
+    "Jacksonville",
     "Pensacola",
     "Birmingham",
     "Mobile",
@@ -88,6 +89,7 @@ URBAN_EXPECTED = {
 OTHER_EXPECTED = {
     "Vero Beach": (62, 25, 37),
     "Melbourne": (175, 24, 151),
+    "Jacksonville": (98, 8, 90),
     "Pensacola": (49, 22, 27),
     "Birmingham": (152, 42, 110),
     "Mobile": (66, 15, 51),
@@ -232,7 +234,7 @@ def assert_other_splits(rows: list[dict]) -> None:
         raise RuntimeError("Other-MSA rural/urban split CSVs are missing")
     rural_rows = load_csv(OTHER_RURAL_CSV, OTHER_MARKETS, {"Y"})
     urban_rows = load_csv(OTHER_URBAN_CSV, OTHER_MARKETS, {"N"})
-    if len(rural_rows) != 483 or len(urban_rows) != 805:
+    if len(rural_rows) != 491 or len(urban_rows) != 895:
         raise RuntimeError(f"Split sizes drifted: rural {len(rural_rows)} urban {len(urban_rows)}")
     rural_keys = {(row["market"], row["geoid"]) for row in rural_rows}
     urban_keys = {(row["market"], row["geoid"]) for row in urban_rows}
@@ -445,7 +447,7 @@ def main() -> None:
     urban_rows = load_csv(URBAN_CSV, PRIMARY_MARKETS, {"N"})
     other_rows = load_csv(OTHER_CSV, OTHER_MARKETS, {"Y", "N"})
     assert_counts(urban_rows, URBAN_EXPECTED, "urban-7", 1103)
-    assert_counts(other_rows, {market: total for market, (total, _r, _u) in OTHER_EXPECTED.items()}, "other-msas", 1243)
+    assert_counts(other_rows, {market: total for market, (total, _r, _u) in OTHER_EXPECTED.items()}, "other-msas", 1341)
     assert_other_splits(other_rows)
     assert_sc_notes(urban_rows, "urban-7")
     assert_sc_notes(other_rows, "other-msas")
@@ -457,8 +459,8 @@ def main() -> None:
 
     geometries = load_cache()
     unique = sorted({row["geoid"] for row in urban_rows} | {row["geoid"] for row in other_rows})
-    if len(unique) != 2187:
-        raise RuntimeError(f"Expected 2187 combined unique GEOIDs, found {len(unique)}")
+    if len(unique) != 2285:
+        raise RuntimeError(f"Expected 2285 combined unique GEOIDs, found {len(unique)}")
     if offline:
         missing = [geoid for geoid in unique if geoid not in geometries]
         if missing:
@@ -467,8 +469,8 @@ def main() -> None:
         geometries = fetch_tiger_tracts(unique, geometries)
 
     features = build_features([("urban-7", urban_rows), ("other-msas", other_rows)], geometries)
-    if len(features) != 2187:
-        raise RuntimeError(f"Expected 2187 polygons, built {len(features)}")
+    if len(features) != 2285:
+        raise RuntimeError(f"Expected 2285 polygons, built {len(features)}")
     urban_catalog = catalog_payload(urban_rows, PRIMARY_MARKETS, "data/oz2-7markets-90min-urban-eligible.csv", "urban-7")
     other_catalog = catalog_payload(other_rows, OTHER_MARKETS, "data/oz2-other-msas-eligible.csv", "other-msas")
     collection = {

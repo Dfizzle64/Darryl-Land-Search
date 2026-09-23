@@ -9,6 +9,7 @@ import {
   showMarketParcels,
   type MarketParcelIndex,
 } from "../lib/marketParcels";
+import { parcelAppraiserUrl } from "../lib/format";
 import { ORLANDO_PARCEL_TILE, showOrlandoParcels } from "../lib/orlandoParcels";
 import type { ParcelCollection } from "../lib/types";
 
@@ -121,5 +122,90 @@ describe("market parcel gating and acreage", () => {
       }
       if (checked >= 25) break;
     }
+  });
+
+  it("opens Chatham County, Georgia in qPublic AppID 1094, not Chatham County, North Carolina", () => {
+    const link = parcelAppraiserUrl({ parcelId: "10010 01001", countyFips: "13051" });
+    expect(link.href).toContain("AppID=1094");
+    expect(link.href).toContain("ChathamCountyGA");
+    expect(link.href).not.toMatch(/chathamcountync/i);
+    expect(link.label).toMatch(/Chatham County, Georgia/);
+  });
+
+  it("keeps Chatham County, Georgia parcels in-state, with countywide zoning codes and FLU only for Savannah or unincorporated", () => {
+    const countyPath = path.join(process.cwd(), "data/fixtures/market-parcels/counties/13051/county.json");
+    const county = JSON.parse(readFileSync(countyPath, "utf8")) as {
+      fips: string;
+      state: string;
+      coverage: string;
+      source: string;
+      queryUrl: string | null;
+      featureCount: number;
+      gaps: string[];
+      minAcres: number;
+      maxAcres: number;
+    };
+    expect(county.fips).toBe("13051");
+    expect(county.state).toBe("Georgia");
+    expect(county.coverage).toBe("complete-gte-5ac");
+    expect(county.featureCount).toBeGreaterThan(1000);
+    expect(county.minAcres).toBe(5);
+    expect(county.maxAcres).toBe(150);
+    expect(county.source).toBe("sagis-chatham-ga-parcel-digest");
+    expect(county.queryUrl).toContain("pub.sagis.org");
+    expect(county.queryUrl).toContain("ParcelDigest/MapServer/0");
+    expect(county.queryUrl).not.toMatch(/chathamcountync/i);
+    expect(county.queryUrl).not.toMatch(/Zoning_BND_AGOL/i);
+    expect(county.queryUrl).not.toMatch(/MapServer\/40/i);
+    const gapText = county.gaps.join("\n");
+    expect(gapText).toMatch(/North Carolina/);
+    expect(gapText).toMatch(/CODE 01/);
+    expect(gapText).toMatch(/unincorporated only/i);
+    expect(gapText).toMatch(/Savannah only/i);
+    expect(gapText).toMatch(/not a designated Qualified Opportunity Zone/);
+    expect(gapText).toMatch(/AppID=1094/);
+    expect(gapText).toMatch(/eligible is not stored as designated/);
+
+    const tiles = path.join(process.cwd(), "data/fixtures/market-parcels/counties/13051/tiles");
+    const files = readdirSync(tiles).filter((name) => name.endsWith(".geojson"));
+    expect(files.length).toBeGreaterThan(0);
+    let seenFlu = 0;
+    let seenOtherCityGap = 0;
+    let checked = 0;
+    for (const file of files) {
+      const collection = JSON.parse(readFileSync(path.join(tiles, file), "utf8")) as ParcelCollection;
+      for (const feature of collection.features) {
+        const props = feature.properties;
+        expect(props.countyFips).toBe("13051");
+        expect(props.state).toBe("Georgia");
+        expect(props.marketIds).toContain("Savannah");
+        expect(props.marketIds).not.toContain("Orlando");
+        expect(inMarketAcreageBand(props.acreage)).toBe(true);
+        const [lon, lat] = props.centroid;
+        expect(lon).toBeLessThan(-80.5);
+        expect(lon).toBeGreaterThan(-81.5);
+        expect(lat).toBeGreaterThan(31.7);
+        expect(lat).toBeLessThan(32.4);
+        expect(props.appraiserUrl).toContain("AppID=1094");
+        expect(props.opportunityZone).toBeNull();
+        expect(props.oz2Eligibility).toBeNull();
+        if (props.jurisdictionCode) {
+          expect(["01", "02", "03", "04", "05", "06", "07", "08", "09"]).toContain(props.jurisdictionCode);
+        }
+        if (props.flu) {
+          expect(["SAV", "UNI"]).toContain(props.flu.jurisdiction);
+          expect(props.flu.source).toBe("sagis-opendata-boundaries-3");
+          seenFlu += 1;
+        }
+        if ((props.dataGaps || []).some((gap) => /other municipalities|this municipality/i.test(gap))) {
+          seenOtherCityGap += 1;
+          expect(props.flu).toBeNull();
+        }
+        checked += 1;
+      }
+    }
+    expect(checked).toBe(county.featureCount);
+    expect(seenFlu).toBeGreaterThan(100);
+    expect(seenOtherCityGap).toBeGreaterThan(50);
   });
 });

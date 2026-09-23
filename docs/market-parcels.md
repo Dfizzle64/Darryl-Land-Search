@@ -26,11 +26,11 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Chatham county services | Cobb complete. DeKalb is a polygon-acre sample. Chatham (Savannah) is a complete 5–150 acre SAGIS ParcelDigest extract with countywide zoning CODE 01–09 and future land use for Savannah and unincorporated only. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer carries a zoning field (DeKalb) or, for Chatham County, Georgia, by centroid to SAGIS OpenData zoning polygons (municipality CODE 01–09). That join is not the estimated ParcelDigest ZONEID, not unincorporated-only EnerGov zoning, and not Savannah-only AGOL zoning. Chatham future land use is joined only inside Savannah and unincorporated Chatham. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets. OZ 2.0 eligibility is not a designated Qualified Opportunity Zone; Chatham parcels are not stamped with either status.
 
 ## Coverage
 
@@ -49,12 +49,12 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
 | Huntsville | other | 0 | 0 | 0 | 7 |
-| Savannah | other | 0 | 0 | 0 | 8 |
+| Savannah | other | 3,283 | 1 | 0 | 7 |
 | Columbia | other | 0 | 0 | 0 | 10 |
 | Greenville | other | 1,570 | 0 | 1 | 7 |
 | Chattanooga | other | 10,537 | 2 | 0 | 8 |
@@ -212,7 +212,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 
@@ -270,7 +270,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Beaufort | South Carolina | 45013 | gap | 0 | unavailable |
 | Bryan | Georgia | 13029 | gap | 0 | unavailable |
 | Bulloch | Georgia | 13031 | gap | 0 | unavailable |
-| Chatham | Georgia | 13051 | gap | 0 | unavailable |
+| Chatham | Georgia | 13051 | complete-gte-5ac | 3,283 | sagis-chatham-ga-parcel-digest |
 | Effingham | Georgia | 13103 | gap | 0 | unavailable |
 | Jasper | South Carolina | 45053 | gap | 0 | unavailable |
 | Liberty | Georgia | 13179 | gap | 0 | unavailable |

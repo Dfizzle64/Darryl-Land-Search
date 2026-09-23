@@ -76,6 +76,39 @@ TN_URL = "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureSe
 MS_URL = "https://mgis19.mdeq.ms.gov/arcgis/rest/services/GeologyParcelAndFloodGIS/Parcels_Statewide_2023/FeatureServer/3/query"
 AR_URL = "https://gis.arkansas.gov/arcgis/rest/services/FEATURESERVICES/Planning_Cadastre/FeatureServer/6/query"
 
+# Chatham County, Georgia (FIPS 13051) — Savannah. Not Chatham County, North Carolina.
+CHATHAM_FIPS = "13051"
+CHATHAM_PARCEL_QUERY = "https://pub.sagis.org/arcgis/rest/services/Pictometry/ParcelDigest/MapServer/0/query"
+CHATHAM_ZONING_QUERY = "https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/4/query"
+CHATHAM_FLU_QUERY = "https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/3/query"
+CHATHAM_MUNI_QUERY = "https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/6/query"
+CHATHAM_QPUBLIC = (
+    "https://qpublic.schneidercorp.com/Application.aspx?AppID=1094&App=ChathamCountyGA&PageType=Search"
+)
+# Lookalikes that must not be treated as the countywide Chatham GA source.
+CHATHAM_REJECTED_SOURCES = (
+    "gisservices.chathamcountync.gov",
+    "chathamcountync.gov",
+    "zoning_bnd_agol",
+    "energovforchathamcounty/mapserver/40",
+)
+CHATHAM_ZONING_CODES = ("01", "02", "03", "04", "05", "06", "07", "08", "09")
+CHATHAM_ZONING_PREFIX = {
+    "01": "UNI",
+    "02": "SAV",
+    "03": "TB",
+    "04": "TYB",
+    "05": "PLR",
+    "06": "GC",
+    "07": "PW",
+    "08": "BL",
+    "09": "VB",
+}
+# Live 5–150 acre extent is about -81.39..-80.84, 31.83..32.24. North Carolina's Chatham is ~35.7N.
+CHATHAM_GA_BBOX = (-81.50, 31.70, -80.70, 32.35)
+CHATHAM_SAVANNAH_ATTRS = {"020", "T020", "CID1", "TC20"}
+CHATHAM_UNINCORP_ATTRS = {"010"}
+
 DOH_FIELDS = [
     "PARCEL_ID",
     "OWN_NAME",
@@ -394,6 +427,12 @@ def normalize_rows(
         if not plausible_centroid(center):
             dropped += 1
             continue
+        bbox = spec.get("bbox")
+        if bbox and center:
+            west, south, east, north = bbox
+            if not (west <= center[0] <= east and south <= center[1] <= north):
+                dropped += 1
+                continue
         acres = num(attrs.get(spec["acresField"])) if spec.get("acresField") else None
         scale = spec.get("acresScale") or 1
         if acres is not None and scale != 1:
@@ -566,7 +605,435 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+def assert_not_rejected_chatham_source(url: str) -> None:
+    lowered = url.lower()
+    for token in CHATHAM_REJECTED_SOURCES:
+        if token in lowered:
+            raise RuntimeError(f"Refusing rejected Chatham source ({token}) in {url}")
+
+
+def _point_in_ring(x: float, y: float, ring: list) -> bool:
+    inside = False
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = ring[i]
+        xj, yj = ring[j]
+        if ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / ((yj - yi) or 1e-12) + xi):
+            inside = not inside
+        j = i
+    return inside
+
+
+def _point_in_geometry(x: float, y: float, geometry: dict) -> bool:
+    kind = geometry.get("type")
+    if kind == "Polygon":
+        rings = geometry.get("coordinates") or []
+        if not rings or not _point_in_ring(x, y, rings[0]):
+            return False
+        return all(not _point_in_ring(x, y, hole) for hole in rings[1:])
+    if kind == "MultiPolygon":
+        for poly in geometry.get("coordinates") or []:
+            if poly and _point_in_ring(x, y, poly[0]) and all(not _point_in_ring(x, y, hole) for hole in poly[1:]):
+                return True
+    return False
+
+
+def _geometry_bbox(geometry: dict) -> tuple[float, float, float, float] | None:
+    xs: list[float] = []
+    ys: list[float] = []
+
+    def walk(node: Any) -> None:
+        if not node or isinstance(node, (str, bytes)):
+            return
+        if isinstance(node[0], (int, float)):
+            xs.append(float(node[0]))
+            ys.append(float(node[1]))
+            return
+        for item in node:
+            walk(item)
+
+    walk(geometry.get("coordinates") or [])
+    if not xs:
+        return None
+    return (min(xs), min(ys), max(xs), max(ys))
+
+
+class _GridIndex:
+    """Centroid lookup. Large polygons stay on a short list instead of filling the grid."""
+
+    def __init__(self, cell: float = 0.02) -> None:
+        self.cell = cell
+        self.buckets: dict[tuple[int, int], list[dict]] = defaultdict(list)
+        self.broad: list[dict] = []
+
+    def add(self, feature: dict) -> None:
+        bbox = _geometry_bbox(feature.get("geometry") or {})
+        if not bbox:
+            return
+        feature["_bbox"] = bbox
+        west, south, east, north = bbox
+        ix0 = math.floor(west / self.cell)
+        ix1 = math.floor(east / self.cell)
+        iy0 = math.floor(south / self.cell)
+        iy1 = math.floor(north / self.cell)
+        if (ix1 - ix0 + 1) * (iy1 - iy0 + 1) > 400:
+            self.broad.append(feature)
+            return
+        for ix in range(ix0, ix1 + 1):
+            for iy in range(iy0, iy1 + 1):
+                self.buckets[(ix, iy)].append(feature)
+
+    def hits(self, x: float, y: float) -> list[dict]:
+        ix = math.floor(x / self.cell)
+        iy = math.floor(y / self.cell)
+        found: list[dict] = []
+        for feature in self.buckets.get((ix, iy), []):
+            if _point_in_geometry(x, y, feature.get("geometry") or {}):
+                found.append(feature)
+        for feature in self.broad:
+            if _point_in_geometry(x, y, feature.get("geometry") or {}):
+                found.append(feature)
+        return found
+
+    def hit(self, x: float, y: float) -> dict | None:
+        found = self.hits(x, y)
+        if not found:
+            return None
+        return min(found, key=_feature_bbox_area)
+
+
+def _feature_bbox_area(feature: dict) -> float:
+    bbox = feature.get("_bbox")
+    if not bbox:
+        return 1e9
+    return max(0.0, (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]))
+
+
+def fetch_paged(url: str, where: str, out_fields: list[str], extra: dict | None = None, page: int = 2000) -> list[dict]:
+    assert_not_rejected_chatham_source(url)
+    features: list[dict] = []
+    seen: set[int] = set()
+    offset = 0
+    while True:
+        params: dict[str, Any] = {
+            "where": where,
+            "outFields": ",".join(out_fields),
+            "returnGeometry": "true",
+            "outSR": "4326",
+            "orderByFields": "OBJECTID",
+            "resultOffset": offset,
+            "resultRecordCount": page,
+            "f": "json",
+        }
+        if extra:
+            params.update(extra)
+        data = fetch_json(url, params, timeout=180)
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        chunk = data.get("features") or []
+        fresh: list[dict] = []
+        for item in chunk:
+            oid = (item.get("attributes") or {}).get("OBJECTID")
+            if isinstance(oid, int) and oid in seen:
+                continue
+            if isinstance(oid, int):
+                seen.add(oid)
+            fresh.append(item)
+        if not fresh:
+            break
+        features.extend(fresh)
+        print(f"    overlay {len(features)}", flush=True)
+        if len(chunk) < page and not data.get("exceededTransferLimit"):
+            break
+        offset += len(chunk)
+        if offset > 250000:
+            raise RuntimeError(f"Paging ran away for {url}")
+    return features
+
+
+def overlay_feature(item: dict, properties: dict) -> dict | None:
+    rings = (item.get("geometry") or {}).get("rings")
+    if not rings:
+        return None
+    geometry = esri_rings_to_geojson(rings)
+    if not geometry:
+        return None
+    return {"type": "Feature", "geometry": geometry, "properties": properties}
+
+
+def chatham_sale_iso(attrs: dict) -> str | None:
+    year = num(attrs.get("Sale_YY"))
+    month = num(attrs.get("Sale_MM"))
+    day = num(attrs.get("Sale_DD"))
+    if year is not None and 1900 <= year <= 2100:
+        mm = int(month) if month and 1 <= month <= 12 else 1
+        dd = int(day) if day and 1 <= day <= 31 else 1
+        return f"{int(year):04d}-{mm:02d}-{dd:02d}"
+    raw = attrs.get("SALE_DATE")
+    if raw in (None, "", 0):
+        return None
+    try:
+        ms = int(raw)
+        if ms < 315532800000:  # before 1980-01-01
+            return None
+        return time.strftime("%Y-%m-%d", time.gmtime(ms / 1000))
+    except (TypeError, ValueError, OSError):
+        return None
+
+
+def chatham_flu_scope(muni_name: str | None, muni_attr: str | None) -> str | None:
+    """Savannah and unincorporated only. Other cities stay null — that layer does not cover them."""
+    name = (muni_name or "").strip().upper()
+    if name == "SAVANNAH":
+        return "SAV"
+    if name == "UNINCORPORATED":
+        return "UNI"
+    if name:
+        return None
+    attr = (muni_attr or "").strip().upper()
+    if attr in CHATHAM_SAVANNAH_ATTRS:
+        return "SAV"
+    if attr in CHATHAM_UNINCORP_ATTRS:
+        return "UNI"
+    return None
+
+
+def join_chatham_ga(features: list[dict], raw: list[dict]) -> list[str]:
+    """Official zoning polygons (CODE 01–09) and Savannah + unincorporated FLU.
+
+    ParcelDigest ZONEID is an estimated assign and is not copied. EnerGov zoning
+    (unincorporated only) and Savannah-only AGOL zoning are not queried.
+    OZ 2.0 eligibility is left null, separate from designated QOZ.
+    """
+    assert_not_rejected_chatham_source(CHATHAM_ZONING_QUERY)
+    assert_not_rejected_chatham_source(CHATHAM_FLU_QUERY)
+    assert_not_rejected_chatham_source(CHATHAM_MUNI_QUERY)
+    by_pin: dict[str, dict] = {}
+    for item in raw:
+        attrs = item.get("attributes") or {}
+        pin = clean(attrs.get("PIN"))
+        if pin and pin not in by_pin:
+            by_pin[pin] = attrs
+
+    print("  Chatham zoning CODE 01-09", flush=True)
+    zoning_raw = fetch_paged(CHATHAM_ZONING_QUERY, "1=1", ["ZONE", "CODE", "ZONING_DISTRICT"])
+    codes_seen: set[str] = set()
+    null_code = 0
+    zoning_index = _GridIndex(0.015)
+    for item in zoning_raw:
+        attrs = item.get("attributes") or {}
+        code = clean(attrs.get("CODE"))
+        if code in CHATHAM_ZONING_CODES:
+            codes_seen.add(code)
+        elif code:
+            raise RuntimeError(
+                f"Unexpected zoning CODE {code}. Refusing a layer that is not countywide CODE 01–09."
+            )
+        else:
+            null_code += 1
+        zone = clean(attrs.get("ZONE"))
+        feature = overlay_feature(
+            item,
+            {
+                "code": code,
+                "zone": zone,
+                "prefix": CHATHAM_ZONING_PREFIX.get(code or ""),
+                "description": clean(attrs.get("ZONING_DISTRICT")),
+            },
+        )
+        if feature:
+            zoning_index.add(feature)
+    missing = [code for code in CHATHAM_ZONING_CODES if code not in codes_seen]
+    if missing or codes_seen <= {"01"} or codes_seen == {"02"}:
+        raise RuntimeError(
+            "OpenData zoning is not countywide CODE 01–09 "
+            f"(seen {sorted(codes_seen) or ['none']}, missing {missing or ['none']}). "
+            "Unincorporated-only EnerGov zoning and Savannah-only AGOL zoning are rejected."
+        )
+
+    print("  Chatham municipalities", flush=True)
+    muni_raw = fetch_paged(CHATHAM_MUNI_QUERY, "1=1", ["NAME", "CITYID"])
+    muni_index = _GridIndex(0.02)
+    for item in muni_raw:
+        attrs = item.get("attributes") or {}
+        feature = overlay_feature(item, {"name": clean(attrs.get("NAME"))})
+        if feature:
+            muni_index.add(feature)
+
+    print("  Chatham FLU (Savannah + unincorporated layer only)", flush=True)
+    flu_raw = fetch_paged(
+        CHATHAM_FLU_QUERY,
+        "1=1",
+        ["FUTURE_LU"],
+        extra={"maxAllowableOffset": "0.00008", "geometryPrecision": "5"},
+    )
+    flu_index = _GridIndex(0.012)
+    flu_kept = 0
+    for item in flu_raw:
+        label = clean((item.get("attributes") or {}).get("FUTURE_LU"))
+        if not label:
+            continue
+        feature = overlay_feature(item, {"label": label})
+        if feature:
+            flu_index.add(feature)
+            flu_kept += 1
+    print(f"    FLU indexed {flu_kept}", flush=True)
+
+    zoning_hits = 0
+    blank_zone = 0
+    flu_hits = 0
+    flu_scope_n = 0
+    other_city_n = 0
+    for feature in features:
+        props = feature["properties"]
+        attrs = by_pin.get(props["parcelId"]) or {}
+        props["ownerName2"] = clean(attrs.get("Owner2"))
+        props["appraiserUrl"] = CHATHAM_QPUBLIC
+        sale_iso = chatham_sale_iso(attrs)
+        props["lastSale"] = {
+            "date": sale_iso,
+            "price": props["lastSale"]["price"],
+            "qualified": clean(attrs.get("Sale_Quality")),
+        }
+        lon, lat = props["centroid"]
+        if lat > 34 or lon > -80.2:
+            raise RuntimeError(
+                f"Centroid {lon}, {lat} is not Chatham County, Georgia. Refusing Chatham County, North Carolina."
+            )
+        zhit = zoning_index.hit(lon, lat)
+        parcel_gaps: list[str] = []
+        if zhit and (zhit["properties"].get("zone")):
+            zp = zhit["properties"]
+            zone = zp.get("zone")
+            prefix = zp.get("prefix")
+            props["zoningCode"] = f"{prefix}-{zone}" if zone and prefix else zone
+            props["zoningDistrict"] = zp.get("description") or zone
+            props["jurisdictionPrefix"] = prefix
+            props["jurisdictionCode"] = zp.get("code")
+            zoning_hits += 1
+        elif zhit:
+            zp = zhit["properties"]
+            props["zoningCode"] = None
+            props["zoningDistrict"] = None
+            props["jurisdictionPrefix"] = zp.get("prefix")
+            props["jurisdictionCode"] = zp.get("code")
+            blank_zone += 1
+            parcel_gaps.append(
+                "Zoning polygon has no district code. Estimated ParcelDigest ZONEID was not used."
+            )
+        else:
+            props["zoningCode"] = None
+            props["zoningDistrict"] = None
+            props["jurisdictionPrefix"] = None
+            props["jurisdictionCode"] = None
+            parcel_gaps.append(
+                "No OpenData zoning polygon contains this centroid. Estimated ParcelDigest ZONEID was not used."
+            )
+        muni_hits = muni_index.hits(lon, lat)
+        cities = [
+            item
+            for item in muni_hits
+            if ((item.get("properties") or {}).get("name") or "").upper() != "UNINCORPORATED"
+        ]
+        chosen = cities[0] if cities else (muni_hits[0] if muni_hits else None)
+        muni_name = ((chosen or {}).get("properties") or {}).get("name")
+        scope = chatham_flu_scope(muni_name, clean(attrs.get("Municipality")))
+        if scope:
+            flu_scope_n += 1
+            fhit = flu_index.hit(lon, lat)
+            label = ((fhit or {}).get("properties") or {}).get("label") if fhit else None
+            if label:
+                props["flu"] = {
+                    "code": label,
+                    "label": label,
+                    "jurisdiction": scope,
+                    "source": "sagis-opendata-boundaries-3",
+                }
+                flu_hits += 1
+            else:
+                props["flu"] = None
+                parcel_gaps.append("Savannah or unincorporated centroid missed the future-land-use layer.")
+        else:
+            other_city_n += 1
+            props["flu"] = None
+            parcel_gaps.append(
+                "No public future land use for this municipality. The SAGIS FLU layer is Savannah and unincorporated Chatham only."
+            )
+        # Eligible for nomination is not a designated Qualified Opportunity Zone.
+        props["opportunityZone"] = None
+        props["oz2Eligibility"] = None
+        if parcel_gaps:
+            props["dataGaps"] = parcel_gaps
+
+    return [
+        (
+            f"Zoning polygon join (OpenData CODE 01–09) hit {zoning_hits} of {len(features)} parcels"
+            + (f" ({blank_zone} polygon hit had a blank ZONE). " if blank_zone else ". ")
+            + f"FLU join hit {flu_hits} of {flu_scope_n} Savannah/unincorporated parcels. "
+            f"{other_city_n} parcels are in other municipalities with no public FLU."
+        ),
+        "Source is SAGIS Pictometry ParcelDigest MapServer/0 for Chatham County, Georgia (FIPS 13051). Chatham County, North Carolina was rejected.",
+        "Countywide zoning is OpenData Boundaries FeatureServer/4, CODE 01–09 (unincorporated through Vernonburg). EnerGov MapServer/40 is unincorporated only and was not used as countywide. AGOL Zoning_BND_AGOL is Savannah only and was not used as countywide.",
+        "ParcelDigest ZONEID / ZONE_DESC is an estimated assign and was not stored as zoningCode.",
+        "Future land use (OpenData Boundaries FeatureServer/3) is Savannah and unincorporated only. Pooler, Garden City, Port Wentworth, Bloomingdale, Tybee Island, Thunderbolt, and Vernonburg have no public FLU on this service.",
+        f"{null_code} zoning polygon(s) have a null municipality CODE (C-M marsh conservation is the known case) and are not given a city prefix.",
+        "Only the latest sale is on this layer (Sale_Quality Q or U). Earlier sales are on qPublic AppID=1094, which may return HTTP 403 to scripts.",
+        "Total_Assessment is Georgia's 40% assessed value. Land and building fair-market splits and the tax bill are not stored on the parcel tax object.",
+        "OZ 2.0 eligibility is not a designated Qualified Opportunity Zone. Neither status is stamped on these parcels, so eligible is not stored as designated.",
+        f"Appraiser search is qPublic AppID=1094 ({CHATHAM_QPUBLIC}). No emails, phones, or paid vendors.",
+    ]
+
+
 def county_override(fips: str) -> dict | None:
+    if fips == CHATHAM_FIPS:
+        assert_not_rejected_chatham_source(CHATHAM_PARCEL_QUERY)
+        return {
+            "kind": "arcgis",
+            "url": CHATHAM_PARCEL_QUERY,
+            "where": "Acres>=5 AND Acres<=150",
+            "outFields": [
+                "PIN",
+                "Acres",
+                "Owner",
+                "Owner2",
+                "Mailing_Address",
+                "Mailing_City",
+                "Mailing_State",
+                "Mailing_Zip",
+                "PropAddress_Full",
+                "PropAddress_City",
+                "PropAddress_Zip",
+                "Sale_Price",
+                "Sale_YY",
+                "Sale_MM",
+                "Sale_DD",
+                "Sale_Quality",
+                "SALE_DATE",
+                "FairMarketValue",
+                "Total_Assessment",
+                "Property_Use",
+                "Municipality",
+            ],
+            "idField": "PIN",
+            "acresField": "Acres",
+            "ownerField": "Owner",
+            "situsField": "PropAddress_Full",
+            "cityField": "PropAddress_City",
+            "zipField": "PropAddress_Zip",
+            "dorField": "Property_Use",
+            "salePriceField": "Sale_Price",
+            "marketValueField": "FairMarketValue",
+            "assessedField": "Total_Assessment",
+            "mail1Field": "Mailing_Address",
+            "mailCityField": "Mailing_City",
+            "mailStateField": "Mailing_State",
+            "mailZipField": "Mailing_Zip",
+            "bbox": CHATHAM_GA_BBOX,
+            "join": "chatham-ga",
+            "source": "sagis-chatham-ga-parcel-digest",
+            "coverage": "complete-gte-5ac",
+            "gaps": [],
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -663,7 +1130,10 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        return (
+            "No public statewide Georgia parcel polygon service. "
+            "Cobb, DeKalb, and Chatham are the wired county services; this county is not one of them."
+        )
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -925,11 +1395,11 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Chatham county services | Cobb complete. DeKalb is a polygon-acre sample. Chatham (Savannah) is a complete 5–150 acre SAGIS ParcelDigest extract with countywide zoning CODE 01–09 and future land use for Savannah and unincorporated only. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer carries a zoning field (DeKalb) or, for Chatham County, Georgia, by centroid to SAGIS OpenData zoning polygons (municipality CODE 01–09). That join is not the estimated ParcelDigest ZONEID, not unincorporated-only EnerGov zoning, and not Savannah-only AGOL zoning. Chatham future land use is joined only inside Savannah and unincorporated Chatham. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets. OZ 2.0 eligibility is not a designated Qualified Opportunity Zone; Chatham parcels are not stamped with either status.
 
 ## Coverage
 """
@@ -957,7 +1427,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=list(cached.get("gaps") or spec.get("gaps") or []),
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
@@ -1015,12 +1485,17 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     features, dropped = normalize_rows(raw, county, markets, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
-    )
+    if spec.get("bbox") and expected > 100 and len(features) < expected * 0.5:
+        raise RuntimeError(
+            f"{fips} kept {len(features)} of {expected} rows inside the county bbox. "
+            "Refusing an extract that is not in the expected county (Chatham County, North Carolina is not Chatham County, Georgia)."
+        )
+    join_gaps: list[str] | None = None
+    if spec.get("join") == "chatham-ga":
+        assert_not_rejected_chatham_source(spec["url"])
+        join_gaps = join_chatham_ga(features, raw)
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
+    gaps = list(join_gaps if join_gaps is not None else (spec.get("gaps") or []))
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,
@@ -1029,6 +1504,13 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     if not features:
         coverage = "gap"
         gaps.insert(0, f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks.")
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "gaps": gaps, "features": features},
+            separators=(",", ":"),
+        )
+    )
     path, lookup, tiles = (None, None, 0)
     if features:
         path, lookup, tiles = write_tiles(county, features)

@@ -27,6 +27,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "13051": "https://qpublic.schneidercorp.com/Application.aspx?AppID=1094&App=ChathamCountyGA&PageType=Search",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -39,6 +40,12 @@ export function parcelAppraiserUrl(options: {
     return {
       href: ocpaParcelUrl(options.parcelId),
       label: "Open in Orange County Property Appraiser",
+    };
+  }
+  if (fips === "13051") {
+    return {
+      href: options.appraiserUrl || DEFAULT_APPRAISER_URLS["13051"],
+      label: "Open Chatham County, Georgia Property Appraiser search",
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);

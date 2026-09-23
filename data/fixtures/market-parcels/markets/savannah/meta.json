@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T23:30:34Z",
   "market": "Savannah",
   "tier": "other",
-  "parcelCount": 0,
+  "parcelCount": 3283,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -77,20 +77,30 @@
       "name": "Chatham",
       "fips": "13051",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 3283,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sagis-chatham-ga-parcel-digest",
+      "queryUrl": "https://pub.sagis.org/arcgis/rest/services/Pictometry/ParcelDigest/MapServer/0/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "3296 source rows collapsed to 3283 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Zoning polygon join (OpenData CODE 01\u201309) hit 3281 of 3283 parcels (1 polygon hit had a blank ZONE). FLU join hit 1987 of 2005 Savannah/unincorporated parcels. 1278 parcels are in other municipalities with no public FLU.",
+        "Source is SAGIS Pictometry ParcelDigest MapServer/0 for Chatham County, Georgia (FIPS 13051). Chatham County, North Carolina was rejected.",
+        "Countywide zoning is OpenData Boundaries FeatureServer/4, CODE 01\u201309 (unincorporated through Vernonburg). EnerGov MapServer/40 is unincorporated only and was not used as countywide. AGOL Zoning_BND_AGOL is Savannah only and was not used as countywide.",
+        "ParcelDigest ZONEID / ZONE_DESC is an estimated assign and was not stored as zoningCode.",
+        "Future land use (OpenData Boundaries FeatureServer/3) is Savannah and unincorporated only. Pooler, Garden City, Port Wentworth, Bloomingdale, Tybee Island, Thunderbolt, and Vernonburg have no public FLU on this service.",
+        "1 zoning polygon(s) have a null municipality CODE (C-M marsh conservation is the known case) and are not given a city prefix.",
+        "Only the latest sale is on this layer (Sale_Quality Q or U). Earlier sales are on qPublic AppID=1094, which may return HTTP 403 to scripts.",
+        "Total_Assessment is Georgia's 40% assessed value. Land and building fair-market splits and the tax bill are not stored on the parcel tax object.",
+        "OZ 2.0 eligibility is not a designated Qualified Opportunity Zone. Neither status is stamped on these parcels, so eligible is not stored as designated.",
+        "Appraiser search is qPublic AppID=1094 (https://qpublic.schneidercorp.com/Application.aspx?AppID=1094&App=ChathamCountyGA&PageType=Search). No emails, phones, or paid vendors."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13051/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13051/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 3296
     },
     {
       "name": "Effingham",

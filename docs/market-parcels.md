@@ -22,7 +22,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons. Wake County (37183) uses Property/Parcels instead | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Wake uses county `CALC_AREA` and joins municipal zoning by `PLANNING_JURISDICTION` |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -30,7 +30,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+DeKalb carries zoning on the parcel layer. Wake County (Raleigh–Durham, FIPS 37183) pulls owner, mailing, situs, assessed value, and last sale from county Property/Parcels, then joins zoning from Planning/Zoning MapServer layers 14–28 routed by `PLANNING_JURISDICTION` (Raleigh is MapServer/23; the Zoning FeatureServer omits it). Future land use is joined only where a public municipal layer exists. There is no countywide FLU. Rolesville and Zebulon have no public FLU REST layer. Those strings are the published GIS designation. They are not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 
@@ -47,7 +47,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
-| Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
+| Raleigh-Durham | primary | 153,288 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
 | Melbourne | other | 41,757 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
@@ -191,7 +191,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Person | North Carolina | 37145 | complete-gte-5ac | 5,956 | nc-onemap-37145 |
 | Sampson | North Carolina | 37163 | complete-gte-5ac | 14,031 | nc-onemap-37163 |
 | Vance | North Carolina | 37181 | complete-gte-5ac | 3,181 | nc-onemap-37181 |
-| Wake | North Carolina | 37183 | complete-gte-5ac | 12,427 | nc-onemap-37183 |
+| Wake | North Carolina | 37183 | complete-gte-5ac | 12,436 | nc-wake-county-parcels |
 | Warren | North Carolina | 37185 | complete-gte-5ac | 5,596 | nc-onemap-37185 |
 | Wayne | North Carolina | 37191 | complete-gte-5ac | 15,079 | nc-onemap-37191 |
 | Wilson | North Carolina | 37195 | complete-gte-5ac | 5,152 | nc-onemap-37195 |

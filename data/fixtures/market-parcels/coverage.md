@@ -11,7 +11,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
-| Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
+| Raleigh-Durham | primary | 153,288 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
 | Melbourne | other | 41,757 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
@@ -155,7 +155,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Person | North Carolina | 37145 | complete-gte-5ac | 5,956 | nc-onemap-37145 |
 | Sampson | North Carolina | 37163 | complete-gte-5ac | 14,031 | nc-onemap-37163 |
 | Vance | North Carolina | 37181 | complete-gte-5ac | 3,181 | nc-onemap-37181 |
-| Wake | North Carolina | 37183 | complete-gte-5ac | 12,427 | nc-onemap-37183 |
+| Wake | North Carolina | 37183 | complete-gte-5ac | 12,436 | nc-wake-county-parcels |
 | Warren | North Carolina | 37185 | complete-gte-5ac | 5,596 | nc-onemap-37185 |
 | Wayne | North Carolina | 37191 | complete-gte-5ac | 15,079 | nc-onemap-37191 |
 | Wilson | North Carolina | 37195 | complete-gte-5ac | 5,152 | nc-onemap-37195 |

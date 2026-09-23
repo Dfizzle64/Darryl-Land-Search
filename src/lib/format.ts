@@ -27,6 +27,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "37019": "https://tax.brunsco.net/ITSNet/AppraisalCard.aspx",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -35,6 +36,12 @@ export function parcelAppraiserUrl(options: {
   appraiserUrl?: string | null;
 }): { href: string; label: string } {
   const fips = options.countyFips ?? null;
+  if (fips === "37019") {
+    return {
+      href: options.appraiserUrl || DEFAULT_APPRAISER_URLS["37019"],
+      label: "Open Brunswick County tax card",
+    };
+  }
   if (fips === "12095" || (!fips && !options.appraiserUrl)) {
     return {
       href: ocpaParcelUrl(options.parcelId),

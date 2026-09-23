@@ -25,7 +25,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Knoxville | other | 38,433 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
-| Wilmington | other | 46,720 | 6 | 0 | 0 |
+| Wilmington | other | 47,233 | 6 | 0 | 0 |
 
 ## Counties
 
@@ -335,7 +335,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Brunswick | North Carolina | 37019 | complete-gte-5ac | 7,020 | nc-onemap-37019 |
+| Brunswick | North Carolina | 37019 | complete-gte-5ac | 7,533 | bcgis-seamless-37019 |
 | Columbus | North Carolina | 37047 | complete-gte-5ac | 12,025 | nc-onemap-37047 |
 | Duplin | North Carolina | 37061 | complete-gte-5ac | 11,397 | nc-onemap-37061 |
 | New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,256 | nc-onemap-37129 |

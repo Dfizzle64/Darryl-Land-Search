@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T23:40:31Z",
   "market": "Wilmington",
   "tier": "other",
-  "parcelCount": 46720,
+  "parcelCount": 47233,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,20 +20,27 @@
       "name": "Brunswick",
       "fips": "37019",
       "state": "North Carolina",
-      "featureCount": 7020,
+      "featureCount": 7533,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37019",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "bcgis-seamless-37019",
+      "queryUrl": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/SeamlessParcels/FeatureServer/0/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "Sale price is not published on Brunswick SeamlessParcels or NC OneMap. lastSale.date is DeedDate only; lastSale.price and qualified are null.",
+        "OZ 2.0 eligible tracts (Rev. Proc. 2026-14) are not designated QOZs. opportunityZone is only the HUD 2010 designated polygon join.",
+        "Geometry and the 5.0\u2013150.0 acre band are Brunswick County SeamlessParcels layer 0 on CALCAC (calculated GIS acres). DeedAcreage is text and is not the filter.",
+        "Tax values are the public NC OneMap county parcel table (brunswick-parcels-05-28-2026.zip) for stcntyfips 37019 and cntyfips 019, joined on parcel number. Matched 7003 of 7533. parval is market value when the roll type is Market. Land and improvement values are not stored as assessed value. Taxable value, the tax bill, and sale price are not published. OneMap saledatetx is not used.",
+        "Municipal zoning is a centroid join to MuniZoning layers 0\u201318 and replaces the county Zoning attribute inside a municipality (1879 parcels). Unincorporated parcels keep SeamlessParcels.Zoning. 9 parcels have a municipal CityDescription but missed the zoning polygons. These codes are not Orange County multifamily districts.",
+        "Future land use is a centroid join to FutureLandUse layer 0 (6368 of 7533). Codes are stored as published and are not in the Orange County FLU knowledge base, so multifamily screening leaves them unknown. A FLU value that is only a municipality name is not a land-use designation. Municipal FLU maps are not a separate layer in this service.",
+        "SeamlessParcels mailing city is not the situs city. Situs city is the municipality from CityDescription or the MuniZoning polygon.",
+        "The county UseCode is not a Florida DOR code and is not copied onto the parcel."
       ],
       "path": "data/fixtures/market-parcels/counties/37019/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37019/lookup.json",
       "tileCount": 10,
-      "sourceCount": 7020
+      "sourceCount": 7610
     },
     {
       "name": "Columbus",

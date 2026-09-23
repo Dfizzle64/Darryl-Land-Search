@@ -13,7 +13,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -21,7 +21,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Savannah | other | 0 | 0 | 0 | 8 |
 | Columbia | other | 0 | 0 | 0 | 10 |
 | Greenville | other | 1,570 | 0 | 1 | 7 |
-| Chattanooga | other | 10,537 | 2 | 0 | 8 |
+| Chattanooga | other | 14,591 | 2 | 0 | 8 |
 | Knoxville | other | 38,433 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
@@ -176,7 +176,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 
@@ -275,7 +275,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Bradley | Tennessee | 47011 | complete-gte-5ac | 5,429 | tn-impact-47011 |
 | Catoosa | Georgia | 13047 | gap | 0 | unavailable |
 | Dade | Georgia | 13083 | gap | 0 | unavailable |
-| Hamilton | Tennessee | 47065 | complete-gte-5ac | 5,108 | tn-impact-47065 |
+| Hamilton | Tennessee | 47065 | complete-gte-5ac | 9,162 | tn-hamilton-live-parcels |
 | Marion | Tennessee | 47115 | gap | 0 | tn-impact-47115 |
 | Meigs | Tennessee | 47121 | gap | 0 | tn-impact-47121 |
 | Rhea | Tennessee | 47143 | gap | 0 | tn-impact-47143 |

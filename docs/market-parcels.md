@@ -12,6 +12,7 @@ Orange, Osceola, and Polk already have a complete 5.0–150.0 acre Orlando extra
 npm run seed:parcels:markets
 python3 scripts/seed_market_parcels.py --market Charlotte
 python3 scripts/seed_market_parcels.py --market Tampa --county Hardee
+python3 scripts/seed_market_parcels.py --market Chattanooga --county Hamilton --refresh
 python3 scripts/seed_market_parcels.py --refresh
 ```
 
@@ -23,14 +24,14 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels, except Hamilton County | IMPACT where `CALC_ACRE` returns rows. Hamilton (Chattanooga) is not an IMPACT county and uses county `Live_Parcels` MapServer layer 0. Other counties absent from IMPACT stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or, for Hamilton County, by city limits first and then that city's zoning polygons. Hamilton is not an IMPACT county. Inside city limits the city layer wins: Chattanooga (`Live_PropertyZoning` 14, then Public Works Misc/Zoning), East Ridge (`OpenGov/Live_East_Ridge` 12), and Collegedale, Red Bank, Soddy Daisy, and Signal Mountain (`Live_PropertyZoning` 1–5). Lookout Mountain, Lakesite, Walden, and Ridgeside have no dedicated zoning service, so county RPA zoning is not stored as their city code. City of Chattanooga Place Type is a reconfirmed gap (no public FeatureServer on pwgis.chattanooga.gov). Plan Hamilton place types are joined only for unincorporated parcels, and they are policy guidance rather than zoning. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 
@@ -49,7 +50,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -57,7 +58,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Savannah | other | 0 | 0 | 0 | 8 |
 | Columbia | other | 0 | 0 | 0 | 10 |
 | Greenville | other | 1,570 | 0 | 1 | 7 |
-| Chattanooga | other | 10,537 | 2 | 0 | 8 |
+| Chattanooga | other | 14,591 | 2 | 0 | 8 |
 | Knoxville | other | 38,433 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
@@ -212,7 +213,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 
@@ -311,7 +312,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Bradley | Tennessee | 47011 | complete-gte-5ac | 5,429 | tn-impact-47011 |
 | Catoosa | Georgia | 13047 | gap | 0 | unavailable |
 | Dade | Georgia | 13083 | gap | 0 | unavailable |
-| Hamilton | Tennessee | 47065 | complete-gte-5ac | 5,108 | tn-impact-47065 |
+| Hamilton | Tennessee | 47065 | complete-gte-5ac | 9,162 | tn-hamilton-live-parcels |
 | Marion | Tennessee | 47115 | gap | 0 | tn-impact-47115 |
 | Meigs | Tennessee | 47121 | gap | 0 | tn-impact-47121 |
 | Rhea | Tennessee | 47143 | gap | 0 | tn-impact-47143 |

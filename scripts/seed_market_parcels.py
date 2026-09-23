@@ -567,6 +567,14 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    if fips == "47065":  # Hamilton TN — not an IMPACT county
+        return {
+            "kind": "hamilton",
+            "url": "https://mapsdev.hamiltontn.gov/hcwa03/rest/services/Live_Parcels/MapServer/0/query",
+            "source": "tn-hamilton-live-parcels",
+            "coverage": "complete-gte-5ac",
+            "gaps": [],
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -911,6 +919,7 @@ Orange, Osceola, and Polk already have a complete 5.0–150.0 acre Orlando extra
 npm run seed:parcels:markets
 python3 scripts/seed_market_parcels.py --market Charlotte
 python3 scripts/seed_market_parcels.py --market Tampa --county Hardee
+python3 scripts/seed_market_parcels.py --market Chattanooga --county Hamilton --refresh
 python3 scripts/seed_market_parcels.py --refresh
 ```
 
@@ -922,20 +931,89 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels, except Hamilton County | IMPACT where `CALC_ACRE` returns rows. Hamilton (Chattanooga) is not an IMPACT county and uses county `Live_Parcels` MapServer layer 0. Other counties absent from IMPACT stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or, for Hamilton County, by city limits first and then that city's zoning polygons. Hamilton is not an IMPACT county. Inside city limits the city layer wins: Chattanooga (`Live_PropertyZoning` 14, then Public Works Misc/Zoning), East Ridge (`OpenGov/Live_East_Ridge` 12), and Collegedale, Red Bank, Soddy Daisy, and Signal Mountain (`Live_PropertyZoning` 1–5). Lookout Mountain, Lakesite, Walden, and Ridgeside have no dedicated zoning service, so county RPA zoning is not stored as their city code. City of Chattanooga Place Type is a reconfirmed gap (no public FeatureServer on pwgis.chattanooga.gov). Plan Hamilton place types are joined only for unincorporated parcels, and they are policy guidance rather than zoning. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
 
 
+def download_hamilton(county: dict, markets: list[str], spec: dict) -> dict:
+    from hamilton_parcels import pull_hamilton
+
+    fips = county["fips"]
+    cache_path = CACHE_DIR / f"{fips}-live.json"
+    print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
+    if cache_path.exists() and not spec.get("ignoreCache"):
+        cached = json.loads(cache_path.read_text())
+        if cached.get("source") == spec["source"] and cached.get("features"):
+            print(f"  cache hit {len(cached['features'])}", flush=True)
+            features = cached["features"]
+            for feature in features:
+                feature["properties"]["marketIds"] = markets
+            path, lookup, tiles = write_tiles(county, features)
+            return county_row(
+                county,
+                markets,
+                feature_count=len(features),
+                coverage=spec["coverage"] if features else "gap",
+                partition="tiles" if features else "none",
+                path=path if features else None,
+                lookup=lookup if features else None,
+                source=spec["source"],
+                query_url=spec["url"],
+                gaps=list(cached.get("gaps") or spec.get("gaps") or []),
+                source_count=cached.get("sourceCount"),
+                dropped=cached.get("dropped"),
+                tile_count=tiles,
+            )
+    result = pull_hamilton(county, markets)
+    features = result["features"]
+    if features and not all(in_band(feature["properties"].get("acreage")) for feature in features):
+        raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps(
+            {
+                "source": spec["source"],
+                "sourceCount": result["sourceCount"],
+                "dropped": result["dropped"],
+                "gaps": result["gaps"],
+                "features": features,
+            },
+            separators=(",", ":"),
+        )
+    )
+    path, lookup, tiles = (None, None, 0)
+    if features:
+        path, lookup, tiles = write_tiles(county, features)
+    print(f"  kept {len(features)} ({result['coverage']})", flush=True)
+    return county_row(
+        county,
+        markets,
+        feature_count=len(features),
+        coverage=result["coverage"] if features else "gap",
+        partition="tiles" if features else "none",
+        path=path,
+        lookup=lookup,
+        source=result["source"],
+        query_url=result["url"],
+        gaps=result["gaps"],
+        source_count=result["sourceCount"],
+        dropped=result["dropped"],
+        tile_count=tiles,
+    )
+
+
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "hamilton":
+        return download_hamilton(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

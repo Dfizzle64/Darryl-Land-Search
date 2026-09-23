@@ -29,12 +29,32 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12127": "https://vcpa.vcgov.org/",
 };
 
+export function parcelPlaceLine(options: {
+  situsCity?: string | null;
+  situsZip?: string | null;
+  countyName?: string | null;
+  state?: string | null;
+}): string {
+  const cityZip = [options.situsCity, options.situsZip].filter(Boolean).join(" ");
+  if (cityZip) return cityZip;
+  if (options.countyName) return `${options.countyName} County, ${options.state || "Florida"}`;
+  return options.state || "Florida";
+}
+
 export function parcelAppraiserUrl(options: {
   parcelId: string;
   countyFips?: string | null;
   appraiserUrl?: string | null;
 }): { href: string; label: string } {
   const fips = options.countyFips ?? null;
+  if (fips === "47065") {
+    const href = options.appraiserUrl || "https://assessor.hamiltontn.gov/search";
+    const card = href.includes("/card/");
+    return {
+      href,
+      label: card ? "Open Hamilton County Assessor property card" : "Open Hamilton County Assessor search",
+    };
+  }
   if (fips === "12095" || (!fips && !options.appraiserUrl)) {
     return {
       href: ocpaParcelUrl(options.parcelId),

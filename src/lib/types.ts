@@ -21,6 +21,15 @@ export type LastSale = {
   date: string | null;
   price: number | null;
   qualified: string | null;
+  book?: string | null;
+  page?: string | null;
+};
+
+export type PriorSale = {
+  date: string | null;
+  price: number | null;
+  book?: string | null;
+  page?: string | null;
 };
 
 export type TaxInfo = {
@@ -28,6 +37,9 @@ export type TaxInfo = {
   assessedValue: number | null;
   taxableValue: number | null;
   taxes: number | null;
+  landValue?: number | null;
+  buildingValue?: number | null;
+  yardItemsValue?: number | null;
 };
 
 export type IncomeInfo = {
@@ -394,6 +406,8 @@ export type ParcelProperties = {
   acreage: number | null;
   centroid: [number, number];
   lastSale: LastSale;
+  /** Earlier assessor sale slots when the county layer publishes them. */
+  priorSales?: PriorSale[];
   tax: TaxInfo;
   mailingAddress: MailingAddress;
   incomeTract: IncomeInfo | null;
@@ -409,6 +423,9 @@ export type ParcelProperties = {
   filterMatch?: 0 | 1;
   /** County property appraiser / parcel search landing page when known. */
   appraiserUrl?: string | null;
+  /** Assessor GIS link when the human parcel id is a tax-map number. */
+  gisLink?: string | null;
+  pbaNum?: string | null;
   /** Honest per-county gaps (no zoning, etc.). */
   dataGaps?: string[];
   source: string;

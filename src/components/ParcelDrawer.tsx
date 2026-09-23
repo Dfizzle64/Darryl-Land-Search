@@ -10,6 +10,7 @@ import {
   formatUsd,
   isEntityOwner,
   parcelAppraiserUrl,
+  parcelPlaceLine,
   sunbizSearchUrl,
 } from "@/lib/format";
 import { describeFluMatch } from "@/lib/flu";
@@ -85,18 +86,36 @@ export function ParcelDrawer({
   const aadtEmpty = florida
     ? "No FDOT count segment within 15 km"
     : "FDOT AADT is Florida only";
-  const zoningEmpty =
-    properties.countyFips === "12095"
-      ? "Not on the OCPA parcel"
-      : "Not in this county's public parcel extract";
   const mailing = formatMailing(properties.mailingAddress);
   const entity = isEntityOwner(properties.ownerName) || isEntityOwner(properties.ownerName2);
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
-  const placeLine =
-    [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+  const placeLine = parcelPlaceLine(properties);
+  const zoningLine =
+    properties.countyFips === "47065" && properties.zoningDistrict
+      ? [properties.jurisdictionPrefix, properties.zoningDistrict].filter(Boolean).join(": ")
+      : properties.zoningCode;
+  const zoningEmpty =
+    properties.countyFips === "12095"
+      ? "Not on the OCPA parcel"
+      : properties.countyFips === "47065"
+        ? "No public zoning polygon covers this parcel"
+        : "Not in this county's public parcel extract";
+  const fluEmpty =
+    properties.countyFips === "47065"
+      ? "No Plan Hamilton place type here. Chattanooga Place Type has no public layer."
+      : "Not joined for this county";
+  const saleBook = [properties.lastSale.book, properties.lastSale.page].filter(Boolean).join(" / ");
+  const earlierSales = (properties.priorSales ?? [])
+    .map((sale) => {
+      const when = formatSale({ date: sale.date, price: sale.price });
+      const book = [sale.book, sale.page].filter(Boolean).join(" / ");
+      if (when === "Not available" && !book) return null;
+      return book && when !== "Not available" ? `${when} (${book})` : when !== "Not available" ? when : book;
+    })
+    .filter((line): line is string => Boolean(line))
+    .join("\n");
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -123,8 +142,8 @@ export function ParcelDrawer({
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
-        <Field label="Zoning" value={properties.zoningCode} empty={zoningEmpty} />
-        <Field label="Future Land Use" value={fluLine} empty="Not joined for this county" />
+        <Field label="Zoning" value={zoningLine} empty={zoningEmpty} />
+        <Field label="Future Land Use" value={fluLine} empty={fluEmpty} />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
           label="OZ 2.0"
@@ -138,7 +157,12 @@ export function ParcelDrawer({
         />
         <Field label="Last sale" value={formatSale(properties.lastSale)} />
         <Field label="Qualified sale" value={properties.lastSale.qualified} />
+        {saleBook ? <Field label="Sale book / page" value={saleBook} /> : null}
+        {earlierSales ? <Field label="Earlier sales" value={earlierSales} /> : null}
         <Field label="Market value" value={formatUsd(properties.tax.marketValue)} />
+        {properties.tax.landValue != null ? <Field label="Land value" value={formatUsd(properties.tax.landValue)} /> : null}
+        {properties.tax.buildingValue != null ? <Field label="Building value" value={formatUsd(properties.tax.buildingValue)} /> : null}
+        {properties.tax.yardItemsValue != null ? <Field label="Yard items" value={formatUsd(properties.tax.yardItemsValue)} /> : null}
         <Field label="Assessed value" value={formatUsd(properties.tax.assessedValue)} />
         <Field label="Taxable value" value={formatUsd(properties.tax.taxableValue)} />
         <Field label="Taxes" value={formatUsd(properties.tax.taxes)} />
@@ -177,6 +201,7 @@ export function ParcelDrawer({
 
       <div className="mt-4 space-y-3">
         <Field label="Owner mailing address" value={mailing} />
+        {properties.gisLink ? <Field label="GIS link" value={properties.gisLink} /> : null}
         <Field
           label={filters.incomeGeography === "tract" ? "Tract median household income" : "Block group median household income"}
           value={
@@ -204,12 +229,14 @@ export function ParcelDrawer({
         <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
           {appraiser.label}
         </a>
-        {entity && properties.ownerName ? (
+        {florida && entity && properties.ownerName ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={sunbizSearchUrl(properties.ownerName)} target="_blank" rel="noreferrer">
             Search Florida Sunbiz for LLC / corporate principals
           </a>
-        ) : (
+        ) : florida ? (
           <p className="text-ink-300">Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped.</p>
+        ) : (
+          <p className="text-ink-300">Sunbiz is a Florida entity search and is not used outside Florida.</p>
         )}
         {properties.countyFips === "12095" || !properties.countyFips ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={comptrollerRecordsUrl()} target="_blank" rel="noreferrer">

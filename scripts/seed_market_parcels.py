@@ -26,6 +26,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
+from davidson_parcels import davidson_spec, enrich_davidson, rebuild_davidson_gaps
 from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -446,6 +447,9 @@ def normalize_rows(
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        patch = spec.get("patch")
+        if patch:
+            patch(feature, attrs)
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -657,6 +661,8 @@ def county_override(fips: str) -> dict | None:
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
             ],
         }
+    if fips == "47037":
+        return davidson_spec()
     return None
 
 
@@ -922,14 +928,29 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels, except Davidson | IMPACT is complete where `CALC_ACRE` returns rows. Davidson County (47037) is not an IMPACT county and uses Metro Nashville cadastral parcels instead. Other large counties absent from IMPACT stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb, Davidson). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+## Davidson County (Nashville)
+
+Davidson is the core of the Nashville market and is **not** on the Comptroller IMPACT parcel service. The 5.0–150.0 acre extract is Metro GIS `Cadastral/Parcels` MapServer layer 0, keyed by APN, with owner, mailing, situs, sale price, appraised and assessed values, and the parcel `Zoning` attribute. Assessor links are the Metro Parcel Viewer (`parcelID` = APN) and Davidson WebPro quick search.
+
+Jurisdiction is resolved from `Boundaries/Jurisdictions` MapServer layer 2 (`Name`) before zoning or community character is trusted. Inside a satellite city the most local public code wins. Outside those limits, displayed zoning is the Metro parcel `Zoning` attribute with `*ZZ` placeholder tokens removed.
+
+Honest gaps:
+
+- `PropDate` is Property Date and `OwnDate` is Owner Instrument Date. Neither is a guaranteed last-sale date.
+- Metro base-zoning MapServer (`Zoning/Zoning`) is rechecked at ingest. A transient ArcGIS code 500 does not block the extract; the parcel `Zoning` attribute remains the Metro source. The legacy `Zoning_Landuse` service was not found.
+- Goodlettsville zoning is `ZONINGARGISMAP` FeatureServer layer 2 (`ZONECLASS` / `ZONEDESC`), joined only where a Metro parcel sits inside the Davidson satellite polygon. Belle Meade, Berry Hill, Forest Hills, Oak Hill, and Ridgetop have no public zoning FeatureServer, so city zoning stays blank.
+- Planning/CCM layer 2 (`PolicyCode` / `PolicyDesc`) is NashvilleNext **community character policy** for Metro geography only. It is guidance, not an entitlement and not Future Land Use. Satellite future land use stays blank; CCM is not those cities' comprehensive plans.
+- Income and FDOT AADT stay unknown. Those sidecars are Florida extracts.
+- No emails, phones, or paid parcel vendors.
 
 ## Coverage
 """
@@ -937,7 +958,7 @@ Zoning is joined only when the county layer already carries a zoning field (DeKa
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     fips = county["fips"]
-    cache_path = CACHE_DIR / f"{fips}.json"
+    cache_path = CACHE_DIR / f"{fips}.{spec['source']}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
     if cache_path.exists() and not spec.get("ignoreCache"):
         cached = json.loads(cache_path.read_text())
@@ -946,6 +967,28 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
             features = cached["features"]
             for feature in features:
                 feature["properties"]["marketIds"] = markets
+            gaps = list(cached.get("gaps") or spec.get("gaps") or [])
+            if spec.get("profile") == "davidson":
+                # Parcels stay cached. Community character, Metro overlays, and satellite
+                # zoning are re-joined so a city-limit fix can restore policy that an
+                # earlier pass cleared.
+                extra = enrich_davidson(features, fetch_json)
+                gaps = rebuild_davidson_gaps(
+                    features,
+                    source_count=cached.get("sourceCount"),
+                    extra=extra,
+                )
+                cache_path.write_text(
+                    json.dumps(
+                        {
+                            "sourceCount": cached.get("sourceCount"),
+                            "dropped": cached.get("dropped"),
+                            "gaps": gaps,
+                            "features": features,
+                        },
+                        separators=(",", ":"),
+                    )
+                )
             path, lookup, tiles = write_tiles(county, features)
             return county_row(
                 county,
@@ -957,7 +1000,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=gaps,
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
@@ -1011,24 +1054,33 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         )
     print(f"  source rows {expected}", flush=True)
     ids = fetch_object_ids(spec["url"], spec["where"])
-    raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
+    raw = fetch_by_ids(spec["url"], ids, spec["outFields"], batch=int(spec.get("batch") or 120))
     features, dropped = normalize_rows(raw, county, markets, spec)
+    enrich_notes: list[str] = []
+    if spec.get("profile") == "davidson":
+        enrich_notes = enrich_davidson(features, fetch_json)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
-    )
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
-    if expected and len(features) < expected and not spec.get("computeAcres"):
-        gaps.insert(
-            0,
-            f"{expected} source rows collapsed to {len(features)} parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        )
+    if spec.get("profile") == "davidson":
+        gaps = rebuild_davidson_gaps(features, source_count=expected, extra=enrich_notes)
+    else:
+        gaps = [*list(spec.get("gaps") or []), *enrich_notes]
+        if expected and len(features) < expected and not spec.get("computeAcres"):
+            gaps.insert(
+                0,
+                f"{expected} source rows collapsed to {len(features)} parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            )
     if not features:
         coverage = "gap"
         gaps.insert(0, f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks.")
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "gaps": gaps, "features": features},
+            separators=(",", ":"),
+        )
+    )
     path, lookup, tiles = (None, None, 0)
     if features:
         path, lookup, tiles = write_tiles(county, features)

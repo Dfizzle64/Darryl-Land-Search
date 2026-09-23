@@ -17,6 +17,12 @@ export function comptrollerRecordsUrl(): string {
   return "https://or.occompt.com/recorder/web/";
 }
 
+export const DAVIDSON_WEBPRO_URL = "https://portal.padctn.org/OFS/WP/PropertySearch/QuickSearch";
+
+export function davidsonParcelViewerUrl(parcelId: string): string {
+  return `https://maps.nashville.gov/ParcelViewer/?parcelID=${encodeURIComponent(parcelId)}`;
+}
+
 const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12009": "https://www.bcpao.us/PropertySearch/#/nav/Search",
   "12069": "https://www.lakecopropappr.com/",
@@ -35,6 +41,12 @@ export function parcelAppraiserUrl(options: {
   appraiserUrl?: string | null;
 }): { href: string; label: string } {
   const fips = options.countyFips ?? null;
+  if (fips === "47037") {
+    return {
+      href: options.appraiserUrl || davidsonParcelViewerUrl(options.parcelId),
+      label: "Open in Metro Nashville Parcel Viewer",
+    };
+  }
   if (fips === "12095" || (!fips && !options.appraiserUrl)) {
     return {
       href: ocpaParcelUrl(options.parcelId),
@@ -64,6 +76,35 @@ export function parcelAppraiserUrl(options: {
     href,
     label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,
   };
+}
+
+export function parcelPublicLinks(options: {
+  parcelId: string;
+  countyFips?: string | null;
+  appraiserUrl?: string | null;
+}): { href: string; label: string }[] {
+  if (options.countyFips === "47037") {
+    const viewer = parcelAppraiserUrl(options);
+    return [
+      viewer,
+      { href: DAVIDSON_WEBPRO_URL, label: "Open Davidson County Assessor (WebPro)" },
+    ];
+  }
+  return [parcelAppraiserUrl(options)];
+}
+
+export function formatParcelPlace(options: {
+  situsCity?: string | null;
+  situsZip?: string | null;
+  countyName?: string | null;
+  state?: string | null;
+}): string {
+  const cityZip = [options.situsCity, options.situsZip].filter(Boolean).join(" ");
+  if (!options.state || options.state === "Florida") {
+    return cityZip || (options.countyName ? `${options.countyName} County, FL` : "Florida");
+  }
+  const region = options.countyName ? `${options.countyName} County, ${options.state}` : options.state;
+  return cityZip ? `${cityZip} · ${region}` : region;
 }
 
 export function formatUsd(value: number | null | undefined): string {

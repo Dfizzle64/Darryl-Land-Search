@@ -1,4 +1,4 @@
-import { fluAllowsMultifamily } from "./flu";
+import { fluAllowsMultifamily, isNashvilleNextPolicy } from "./flu";
 import { parcelInOpportunityZone, parcelOz2Eligibility } from "./opportunityZone";
 import { zoningAllowsMultifamily } from "./zoning";
 import {
@@ -60,6 +60,14 @@ export function describeRezoningCandidate(
   zoningConfig: ZoningConfig,
   fluConfig: FluConfig,
 ): { isCandidate: boolean; label: string | null; reason: string } {
+  if (isNashvilleNextPolicy(feature.properties.flu)) {
+    return {
+      isCandidate: false,
+      label: null,
+      reason:
+        "NashvilleNext community character policy is joined as guidance. It is not a Future Land Use entitlement, so this parcel is not a rezoning candidate.",
+    };
+  }
   const flu = fluPasses(feature, filters, fluConfig);
   const zoning = zoningPasses(feature, filters, zoningConfig);
   const zoningCode = feature.properties.zoningCode || feature.properties.zoningDistrict || "unknown zoning";

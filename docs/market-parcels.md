@@ -23,14 +23,29 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels, except Davidson | IMPACT is complete where `CALC_ACRE` returns rows. Davidson County (47037) is not an IMPACT county and uses Metro Nashville cadastral parcels instead. Other large counties absent from IMPACT stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb, Davidson). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+## Davidson County (Nashville)
+
+Davidson is the core of the Nashville market and is **not** on the Comptroller IMPACT parcel service. The 5.0–150.0 acre extract is Metro GIS `Cadastral/Parcels` MapServer layer 0, keyed by APN, with owner, mailing, situs, sale price, appraised and assessed values, and the parcel `Zoning` attribute. Assessor links are the Metro Parcel Viewer (`parcelID` = APN) and Davidson WebPro quick search.
+
+Jurisdiction is resolved from `Boundaries/Jurisdictions` MapServer layer 2 (`Name`) before zoning or community character is trusted. Inside a satellite city the most local public code wins. Outside those limits, displayed zoning is the Metro parcel `Zoning` attribute with `*ZZ` placeholder tokens removed.
+
+Honest gaps:
+
+- `PropDate` is Property Date and `OwnDate` is Owner Instrument Date. Neither is a guaranteed last-sale date.
+- Metro base-zoning MapServer (`Zoning/Zoning`) is rechecked at ingest. A transient ArcGIS code 500 does not block the extract; the parcel `Zoning` attribute remains the Metro source. The legacy `Zoning_Landuse` service was not found.
+- Goodlettsville zoning is `ZONINGARGISMAP` FeatureServer layer 2 (`ZONECLASS` / `ZONEDESC`), joined only where a Metro parcel sits inside the Davidson satellite polygon. Belle Meade, Berry Hill, Forest Hills, Oak Hill, and Ridgetop have no public zoning FeatureServer, so city zoning stays blank.
+- Planning/CCM layer 2 (`PolicyCode` / `PolicyDesc`) is NashvilleNext **community character policy** for Metro geography only. It is guidance, not an entitlement and not Future Land Use. Satellite future land use stays blank; CCM is not those cities' comprehensive plans.
+- Income and FDOT AADT stay unknown. Those sidecars are Florida extracts.
+- No emails, phones, or paid parcel vendors.
 
 ## Coverage
 
@@ -45,11 +60,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
-| Nashville | primary | 31,132 | 6 | 0 | 11 |
+| Nashville | primary | 32,324 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -139,7 +154,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Bedford | Tennessee | 47003 | complete-gte-5ac | 4,211 | tn-impact-47003 |
 | Cannon | Tennessee | 47015 | complete-gte-5ac | 6,376 | tn-impact-47015 |
 | Cheatham | Tennessee | 47021 | complete-gte-5ac | 3,790 | tn-impact-47021 |
-| Davidson | Tennessee | 47037 | complete-gte-5ac | 8,286 | tn-impact-47037 |
+| Davidson | Tennessee | 47037 | complete-gte-5ac | 9,478 | tn-metro-davidson-parcels |
 | Dickson | Tennessee | 47043 | complete-gte-5ac | 4,797 | tn-impact-47043 |
 | Hickman | Tennessee | 47081 | complete-gte-5ac | 3,672 | tn-impact-47081 |
 | Macon | Tennessee | 47111 | gap | 0 | tn-impact-47111 |
@@ -212,7 +227,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 

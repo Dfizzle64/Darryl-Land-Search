@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { formatAcres, formatUsd } from "@/lib/format";
+import { NASHVILLE_NEXT_CCM_SOURCE } from "@/lib/flu";
 import type { RankedSite } from "@/lib/score";
 import { parcelAadt, parcelIncome } from "@/lib/filters";
 import { RURAL_ELIGIBLE_STATUS_CHIP, type FilterState } from "@/lib/types";
@@ -139,7 +140,15 @@ export function SitesPanel({
                     {[props.situsCity, formatAcres(props.acreage), props.zoningCode].filter(Boolean).join(" · ")}
                   </p>
                   <p className="mt-1 truncate text-[11px] text-ink-300">
-                    {props.flu?.code ? `FLU ${props.flu.label || props.flu.code}` : "FLU not joined"}
+                    {props.flu?.source === NASHVILLE_NEXT_CCM_SOURCE
+                      ? `Community character ${props.flu.label || props.flu.code}`
+                      : props.flu?.code
+                        ? `FLU ${props.flu.label || props.flu.code}`
+                        : props.countyFips === "47037" &&
+                            props.jurisdictionCode &&
+                            props.jurisdictionCode !== "Metro Nashville"
+                          ? "City FLU not published"
+                          : "FLU not joined"}
                     {income != null ? ` · ${formatUsd(income)}` : ""}
                     {aadt != null ? ` · ${aadt.toLocaleString()} AADT` : ""}
                   </p>

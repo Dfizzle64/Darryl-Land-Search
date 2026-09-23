@@ -28,6 +28,11 @@ export type TaxInfo = {
   assessedValue: number | null;
   taxableValue: number | null;
   taxes: number | null;
+  /** Metro Nashville appraisal split, when the county layer provides it. */
+  landAppraised?: number | null;
+  improvementAppraised?: number | null;
+  landAssessed?: number | null;
+  improvementAssessed?: number | null;
 };
 
 export type IncomeInfo = {
@@ -389,8 +394,25 @@ export type ParcelProperties = {
   propertyName: string | null;
   zoningCode: string | null;
   zoningDistrict: string | null;
+  /** Raw Metro parcel `Zoning` attribute, including `*ZZ` satellite placeholders. */
+  parcelZoning?: string | null;
+  /** Which public layer supplied the displayed zoning code. */
+  zoningSource?: string | null;
+  /** City zoning description when a municipal layer provides one (Goodlettsville ZONEDESC). */
+  zoningDescription?: string | null;
+  /** Metro base-zoning polygon code when that service is readable. Not required for the extract. */
+  metroZoningPolygon?: string | null;
   jurisdictionPrefix: string | null;
   dorCode: string | null;
+  /** Local land-use description when the county layer has one (Davidson LUCode / LUDesc). */
+  landUse?: string | null;
+  /** Deeded acreage when the county layer distinguishes it from the filtered acre field. */
+  deededAcreage?: number | null;
+  /** Alternate Davidson identifiers. Parcel Viewer and the drawer id use APN (`parcelId`). */
+  stanpar?: string | null;
+  parId?: string | null;
+  /** Supplemental overlay names. Not the base zone. */
+  zoningOverlays?: string[] | null;
   acreage: number | null;
   centroid: [number, number];
   lastSale: LastSale;

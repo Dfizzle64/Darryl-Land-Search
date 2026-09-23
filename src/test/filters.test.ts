@@ -197,6 +197,25 @@ describe("fluAllowsMultifamily", () => {
   it("returns null when FLU is missing rather than inventing a match", () => {
     expect(fluAllowsMultifamily(null, fluConfig)).toBeNull();
   });
+
+  it("does not treat NashvilleNext community character as an Orange County FLU entitlement", () => {
+    const policy = {
+      code: "MD",
+      label: "Urban Mixed Use Neighborhood",
+      jurisdiction: "NashvilleNext",
+      source: "nashville-next-ccm",
+    };
+    expect(fluAllowsMultifamily(policy, fluConfig)).toBeNull();
+    const parcel = feature({
+      countyFips: "47037",
+      state: "Tennessee",
+      zoningCode: "AR2A",
+      zoningDistrict: "AR2A",
+      flu: policy,
+    });
+    expect(isRezoningCandidate(parcel, baseFilters, config, fluConfig)).toBe(false);
+    expect(describeRezoningCandidate(parcel, baseFilters, config, fluConfig).reason).toMatch(/not a Future Land Use entitlement/i);
+  });
 });
 
 describe("filterParcels", () => {

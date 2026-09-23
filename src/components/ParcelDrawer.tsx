@@ -5,17 +5,18 @@ import {
   formatAcres,
   formatMailing,
   formatNumber,
+  formatParcelPlace,
   formatRoadLabel,
   formatSale,
   formatUsd,
   isEntityOwner,
-  parcelAppraiserUrl,
+  parcelPublicLinks,
   sunbizSearchUrl,
 } from "@/lib/format";
-import { describeFluMatch } from "@/lib/flu";
+import { describeFluMatch, isNashvilleNextPolicy } from "@/lib/flu";
 import { describeRezoningCandidate } from "@/lib/filters";
 import { describeOpportunityZone, describeOz2Eligibility } from "@/lib/opportunityZone";
-import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "@/lib/types";
+import type { FilterState, FluConfig, ParcelFeature, ParcelProperties, ZoningConfig } from "@/lib/types";
 import { describeZoningMatch } from "@/lib/zoning";
 
 type ParcelDrawerProps = {
@@ -27,6 +28,28 @@ type ParcelDrawerProps = {
   /** `pane` fills the desktop details rail. `page` is the standalone column / mobile sheet. */
   layout?: "page" | "pane";
 };
+
+function davidsonZoningReason(properties: ParcelProperties): string | null {
+  if (properties.countyFips !== "47037") return null;
+  const city = properties.jurisdictionCode;
+  if (properties.zoningSource === "satellite-zoning-rest-gap") {
+    return `${city} keeps its own zoning code. No public zoning FeatureServer was found, so city zoning stays blank. The Metro parcel attribute and *ZZ placeholders are not this city's district.`;
+  }
+  if (properties.zoningSource === "goodlettsville-unmatched") {
+    return "This parcel is inside Goodlettsville, but no ZONECLASS polygon from ZONINGARGISMAP layer 2 intersects it. City zoning stays blank.";
+  }
+  if (properties.zoningSource === "goodlettsville-zoningargismap-2") {
+    const desc = properties.zoningDescription ? ` ${properties.zoningDescription}.` : "";
+    return `Goodlettsville ZONECLASS ${properties.zoningCode}.${desc} Inside the satellite, this city layer replaces the Metro parcel attribute.`;
+  }
+  if (properties.zoningSource === "metro-parcel-attribute") {
+    if (properties.parcelZoning && properties.parcelZoning !== properties.zoningCode) {
+      return `Metro parcel Zoning attribute with *ZZ satellite placeholders removed (raw attribute ${properties.parcelZoning}). Metro Zoning/Zoning is not required for this value.`;
+    }
+    return "Metro parcel Zoning attribute, shown outside satellite cities. Metro Zoning/Zoning is rechecked at ingest and is not required.";
+  }
+  return null;
+}
 
 function Field({ label, value, empty }: { label: string; value: string | null | undefined; empty?: string }) {
   return (
@@ -85,23 +108,47 @@ export function ParcelDrawer({
   const aadtEmpty = florida
     ? "No FDOT count segment within 15 km"
     : "FDOT AADT is Florida only";
-  const zoningEmpty =
-    properties.countyFips === "12095"
+  const davidson = properties.countyFips === "47037";
+  const satelliteCity =
+    davidson && !!properties.jurisdictionCode && properties.jurisdictionCode !== "Metro Nashville";
+  const zoningEmpty = satelliteCity
+    ? properties.zoningSource === "goodlettsville-unmatched"
+      ? "No Goodlettsville ZONECLASS intersects this parcel"
+      : `No public zoning layer for ${properties.jurisdictionCode}`
+    : properties.countyFips === "12095"
       ? "Not on the OCPA parcel"
       : "Not in this county's public parcel extract";
   const mailing = formatMailing(properties.mailingAddress);
   const entity = isEntityOwner(properties.ownerName) || isEntityOwner(properties.ownerName2);
+  const nashvillePolicy = isNashvilleNextPolicy(properties.flu) || (davidson && !satelliteCity);
   const fluLine = properties.flu?.code
-    ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
+    ? nashvillePolicy
+      ? properties.flu.label || properties.flu.code
+      : `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
-  const placeLine =
-    [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
-  const appraiser = parcelAppraiserUrl({
+  const fluReason = satelliteCity
+    ? `${properties.jurisdictionCode} has no public future-land-use layer. NashvilleNext CCM is Metro guidance and is not this city's comprehensive plan, so future land use stays blank.`
+    : davidson && !properties.flu?.code
+      ? "No NashvilleNext community character polygon intersects this parcel. CCM is policy guidance, not an entitlement. A missing join is not a Future Land Use designation."
+      : flu.reason;
+  const zoningReason = davidsonZoningReason(properties) ?? zoning.reason;
+  const placeLine = formatParcelPlace(properties);
+  const publicLinks = parcelPublicLinks({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
     appraiserUrl: properties.appraiserUrl,
   });
+  const altIds = [
+    properties.stanpar && properties.stanpar !== properties.parcelId ? `STANPAR ${properties.stanpar}` : null,
+    properties.parId ? `ParID ${properties.parId}` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const acreageValue =
+    properties.deededAcreage != null && properties.deededAcreage !== properties.acreage
+      ? `${formatAcres(properties.acreage)}\nDeeded ${formatAcres(properties.deededAcreage)}`
+      : formatAcres(properties.acreage);
+  const appraisalSplit = properties.tax.landAppraised != null || properties.tax.improvementAppraised != null;
   const gaps = properties.dataGaps?.length ? properties.dataGaps : null;
 
   return (
@@ -122,9 +169,29 @@ export function ParcelDrawer({
       <dl className="mt-5 grid grid-cols-2 gap-4">
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
-        <Field label="Acreage" value={formatAcres(properties.acreage)} />
+        <Field label="Acreage" value={acreageValue} />
+        {davidson ? <Field label="Jurisdiction" value={properties.jurisdictionCode} /> : null}
         <Field label="Zoning" value={properties.zoningCode} empty={zoningEmpty} />
-        <Field label="Future Land Use" value={fluLine} empty="Not joined for this county" />
+        <Field
+          label={nashvillePolicy ? "Community character policy" : "Future Land Use"}
+          value={fluLine}
+          empty={
+            satelliteCity
+              ? "No public city comprehensive plan"
+              : nashvillePolicy
+                ? "No NashvilleNext policy intersects this parcel"
+                : "Not joined for this county"
+          }
+        />
+        {altIds ? <Field label="Alternate parcel ids" value={altIds} /> : null}
+        {properties.zoningDescription ? <Field label="Zoning description" value={properties.zoningDescription} /> : null}
+        {properties.parcelZoning && properties.parcelZoning !== properties.zoningCode ? (
+          <Field label="Metro parcel zoning attribute" value={properties.parcelZoning} />
+        ) : null}
+        {properties.landUse ? <Field label="Land use" value={properties.landUse} /> : null}
+        {properties.zoningOverlays?.length ? (
+          <Field label="Zoning overlays (not base zone)" value={properties.zoningOverlays.join("\n")} />
+        ) : null}
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
           label="OZ 2.0"
@@ -138,8 +205,16 @@ export function ParcelDrawer({
         />
         <Field label="Last sale" value={formatSale(properties.lastSale)} />
         <Field label="Qualified sale" value={properties.lastSale.qualified} />
-        <Field label="Market value" value={formatUsd(properties.tax.marketValue)} />
-        <Field label="Assessed value" value={formatUsd(properties.tax.assessedValue)} />
+        <Field label={appraisalSplit ? "Total appraised" : "Market value"} value={formatUsd(properties.tax.marketValue)} />
+        <Field label={appraisalSplit ? "Total assessed" : "Assessed value"} value={formatUsd(properties.tax.assessedValue)} />
+        {appraisalSplit ? (
+          <>
+            <Field label="Land appraised" value={formatUsd(properties.tax.landAppraised)} />
+            <Field label="Improvement appraised" value={formatUsd(properties.tax.improvementAppraised)} />
+            <Field label="Land assessed" value={formatUsd(properties.tax.landAssessed)} />
+            <Field label="Improvement assessed" value={formatUsd(properties.tax.improvementAssessed)} />
+          </>
+        ) : null}
         <Field label="Taxable value" value={formatUsd(properties.tax.taxableValue)} />
         <Field label="Taxes" value={formatUsd(properties.tax.taxes)} />
       </dl>
@@ -159,11 +234,13 @@ export function ParcelDrawer({
 
       <div className="mt-5 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Zoning</p>
-        <p className="mt-1 text-ink-100">{zoning.reason}</p>
+        <p className="mt-1 text-ink-100">{zoningReason}</p>
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
-        <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Future Land Use</p>
-        <p className="mt-1 text-ink-100">{flu.reason}</p>
+        <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">
+          {nashvillePolicy ? "Community character policy" : "Future Land Use"}
+        </p>
+        <p className="mt-1 text-ink-100">{fluReason}</p>
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Designated Opportunity Zone</p>
@@ -201,13 +278,17 @@ export function ParcelDrawer({
 
       <div className="mt-5 space-y-2 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Public contact paths</p>
-        <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
-          {appraiser.label}
-        </a>
-        {entity && properties.ownerName ? (
+        {publicLinks.map((link) => (
+          <a key={link.href} className="block text-moss-400 underline-offset-2 hover:underline" href={link.href} target="_blank" rel="noreferrer">
+            {link.label}
+          </a>
+        ))}
+        {entity && properties.ownerName && florida ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={sunbizSearchUrl(properties.ownerName)} target="_blank" rel="noreferrer">
             Search Florida Sunbiz for LLC / corporate principals
           </a>
+        ) : entity && properties.ownerName ? (
+          <p className="text-ink-300">Owner looks like a company or trust. This county extract does not link a business-entity registry.</p>
         ) : (
           <p className="text-ink-300">Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped.</p>
         )}

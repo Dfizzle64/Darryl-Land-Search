@@ -1,5 +1,12 @@
 import type { FluCategory, FluConfig, FluInfo } from "./types";
 
+/** Planning/CCM layer 2. Community character policy, not a Future Land Use entitlement. */
+export const NASHVILLE_NEXT_CCM_SOURCE = "nashville-next-ccm";
+
+export function isNashvilleNextPolicy(flu: FluInfo | null | undefined): boolean {
+  return flu?.source === NASHVILLE_NEXT_CCM_SOURCE;
+}
+
 function normalizeCode(code: string): string {
   return code.trim().toUpperCase();
 }
@@ -32,7 +39,7 @@ export function fluAllowsMultifamily(
   config: FluConfig,
   includeMaybe = true,
 ): boolean | null {
-  if (!flu?.code) return null;
+  if (!flu?.code || flu.source === NASHVILLE_NEXT_CCM_SOURCE) return null;
   const category = findFluCategory(flu, config);
   if (!category) return null;
   if (category.status === "no" || !category.allowsMultifamily) return false;
@@ -44,6 +51,14 @@ export function describeFluMatch(
   flu: FluInfo | null | undefined,
   config: FluConfig,
 ): { allows: boolean | null; reason: string; category: FluCategory | null } {
+  if (flu?.source === NASHVILLE_NEXT_CCM_SOURCE) {
+    const name = flu.label || flu.code;
+    return {
+      allows: null,
+      category: null,
+      reason: `NashvilleNext community character policy ${flu.code}${flu.label && flu.label !== flu.code ? ` — ${name}` : ""}. This is preferred future policy guidance, not a zoning entitlement and not Future Land Use.`,
+    };
+  }
   if (!flu?.code) {
     return {
       allows: null,

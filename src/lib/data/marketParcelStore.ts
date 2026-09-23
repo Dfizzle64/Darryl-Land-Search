@@ -49,6 +49,14 @@ async function loadMarketMeta(market: string): Promise<MarketParcelsMeta | null>
   }
 }
 
+function stampCountyGaps(features: ParcelFeature[], gaps: string[] | undefined): ParcelFeature[] {
+  if (!gaps?.length) return features;
+  for (const feature of features) {
+    if (!feature.properties.dataGaps?.length) feature.properties.dataGaps = gaps;
+  }
+  return features;
+}
+
 function normalizeParcel(feature: ParcelFeature): ParcelFeature {
   const props = feature.properties as ParcelProperties;
   if (props.flu === undefined) props.flu = null;
@@ -93,7 +101,7 @@ async function featuresForCounty(
         const groups = await Promise.all(
           names.filter((name) => name.endsWith(".geojson")).map((name) => readFeatureFile(path.join(county.path!, name))),
         );
-        return groups.flat();
+        return stampCountyGaps(groups.flat(), county.gaps);
       } catch {
         return [];
       }
@@ -106,9 +114,9 @@ async function featuresForCounty(
       }
     }
     const groups = await Promise.all(paths.map((tilePath) => readFeatureFile(tilePath)));
-    return groups.flat();
+    return stampCountyGaps(groups.flat(), county.gaps);
   }
-  return readFeatureFile(county.path);
+  return stampCountyGaps(await readFeatureFile(county.path), county.gaps);
 }
 
 async function finalizeMarketParcelPage(
@@ -169,10 +177,10 @@ export async function getMarketFixtureParcel(id: string): Promise<ParcelFeature 
       }
       const tile = lookup[parcelId];
       if (!tile) return null;
-      const features = await readFeatureFile(path.join(row.path, `${tile}.geojson`));
+      const features = stampCountyGaps(await readFeatureFile(path.join(row.path, `${tile}.geojson`)), row.gaps);
       return annotateLoadedParcel(features.find((feature) => feature.properties.id === id) ?? null);
     }
-    const features = await readFeatureFile(row.path);
+    const features = stampCountyGaps(await readFeatureFile(row.path), row.gaps);
     return annotateLoadedParcel(features.find((feature) => feature.properties.id === id) ?? null);
   } catch {
     return null;

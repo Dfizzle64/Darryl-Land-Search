@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:28:20Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -574,34 +574,36 @@
     },
     "Charleston": {
       "tier": "primary",
-      "parcelCount": 6774,
-      "completeCountyCount": 1,
+      "parcelCount": 22649,
+      "completeCountyCount": 3,
       "sampleCountyCount": 0,
-      "gapCountyCount": 6,
+      "gapCountyCount": 4,
       "path": "data/fixtures/market-parcels/markets/charleston/meta.json",
       "counties": [
         {
           "name": "Berkeley",
           "state": "South Carolina",
           "fips": "45015",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 7886,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Public parcels are custom/Addr_muni MapServer/1 (no token), filtered on TotalAcres 5\u2013150. The AGOL parcels_berkeley_county FeatureServer returns HTTP 499 Token Required and is not used.",
+            "Situs is GIS_Address when populated (about half of this acreage band). StreetAddress1, City, and Zip are owner mailing, not situs. GIS_Num and GIS_Street fill situs only when GIS_Address is empty."
           ]
         },
         {
           "name": "Charleston",
           "state": "South Carolina",
           "fips": "45019",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 7989,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "8001 source rows collapsed to 7989 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Public parcels are ENERGOV/energov_ent MapServer/12 (no token), filtered on ACREAGE 5\u2013150. GIS_VIEWER/Parcel_Search and GIS_VIEWER/Public_Search return HTTP 499 Token Required and are not used."
           ]
         },
         {
@@ -613,7 +615,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -625,7 +627,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -637,7 +639,8 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Dorchester public parcels. Situs is not on this layer. No zoning join."
+            "6821 source rows collapsed to 6774 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Public parcels are General_Data/Parcels_Public FeatureServer/0 (no token), filtered on GIS_ACREAGE 5\u2013150. Parcel id stays the dashed TMS. TMS13 is stored as the alternate id."
           ]
         },
         {
@@ -649,7 +652,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -661,7 +664,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         }
       ]
@@ -944,7 +947,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -1005,7 +1008,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -1078,7 +1081,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         }
       ]
@@ -1828,7 +1831,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -1888,7 +1891,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -1934,7 +1937,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -1946,7 +1949,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -1958,7 +1961,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -1970,7 +1973,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -1982,7 +1985,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -1994,7 +1997,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -2006,7 +2009,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -2018,7 +2021,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -2030,7 +2033,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -2042,7 +2045,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         }
       ]
@@ -2064,7 +2067,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -2076,7 +2079,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -2100,7 +2103,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -2112,7 +2115,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -2124,7 +2127,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -2136,7 +2139,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         },
         {
@@ -2148,7 +2151,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
           ]
         }
       ]

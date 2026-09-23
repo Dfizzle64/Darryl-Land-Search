@@ -17,12 +17,14 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import threading
 import time
 import urllib.parse
 import urllib.request
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -145,6 +147,60 @@ def zip_str(value: Any) -> str | None:
 
 def in_band(acres: float | None) -> bool:
     return acres is not None and MIN_ACRES <= acres <= MAX_ACRES
+
+
+def money(value: Any) -> float | None:
+    parsed = num(value)
+    if parsed is None or parsed <= 0:
+        return None
+    return parsed
+
+
+def join_fields(attrs: dict, fields: list[str] | None) -> str | None:
+    parts: list[str] = []
+    for field in fields or []:
+        text = clean(attrs.get(field))
+        if text:
+            parts.append(" ".join(text.split()))
+    return " ".join(parts) or None
+
+
+def split_city_state_zip(value: Any) -> tuple[str | None, str | None, str | None]:
+    text = clean(value)
+    if not text:
+        return None, None, None
+    compact = " ".join(text.replace(",", " ").split())
+    match = re.match(r"^(.*)\s+([A-Za-z]{2})\s+(\d{5})(\d{4})?$", compact)
+    if not match:
+        return compact, None, None
+    city = match.group(1).strip() or None
+    return city, match.group(2).upper(), match.group(3)
+
+
+def arcgis_date(value: Any) -> str | None:
+    """ArcGIS date fields arrive as epoch milliseconds. Keep the calendar day only."""
+    if value is None or value == "":
+        return None
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return None
+        if len(text) >= 10 and text[4] == "-" and text[7] == "-":
+            return text[:10]
+        try:
+            value = float(text)
+        except ValueError:
+            return None
+    if not isinstance(value, (int, float)) or not math.isfinite(value):
+        return None
+    seconds = float(value) / 1000.0 if abs(value) > 10_000_000_000 else float(value)
+    try:
+        parsed = datetime.fromtimestamp(seconds, timezone.utc)
+    except (OverflowError, OSError, ValueError):
+        return None
+    if parsed.year < 1900 or parsed.year > 2100:
+        return None
+    return parsed.strftime("%Y-%m-%d")
 
 
 def slug(market: str) -> str:
@@ -303,6 +359,11 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    owner2: str | None = None,
+    parcel_id_alt: str | None = None,
+    jurisdiction: str | None = None,
+    land_value: float | None = None,
+    improvement_value: float | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
     return {
@@ -311,6 +372,7 @@ def empty_feature(
         "properties": {
             "id": feature_id,
             "parcelId": parcel_id,
+            "parcelIdAlt": parcel_id_alt,
             "countyFips": fips,
             "countyName": county,
             "state": state,
@@ -318,9 +380,9 @@ def empty_feature(
             "situsAddress": situs,
             "situsCity": city,
             "situsZip": zip_code,
-            "jurisdictionCode": None,
+            "jurisdictionCode": jurisdiction,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
             "zoningDistrict": None,
@@ -334,6 +396,8 @@ def empty_feature(
                 "assessedValue": assessed,
                 "taxableValue": taxable,
                 "taxes": None,
+                "landValue": land_value,
+                "improvementValue": improvement_value,
             },
             "mailingAddress": {
                 "line1": mail1,
@@ -452,9 +516,48 @@ def normalize_rows(
         if not parcel_id:
             dropped += 1
             continue
-        price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
-        if price is not None and price <= 0:
-            price = None
+        price = money(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
+        situs = clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None
+        if situs:
+            situs = " ".join(situs.split())
+        if not situs:
+            situs = join_fields(attrs, spec.get("situsParts"))
+        mail1 = clean(attrs.get(spec["mail1Field"])) if spec.get("mail1Field") else None
+        mail2 = clean(attrs.get(spec["mail2Field"])) if spec.get("mail2Field") else None
+        if spec.get("mailParts") or spec.get("mailExtraParts"):
+            street = join_fields(attrs, spec.get("mailParts"))
+            extra = join_fields(attrs, spec.get("mailExtraParts"))
+            if street:
+                mail1 = mail1 or street
+                mail2 = mail2 or extra
+            elif extra:
+                mail1 = mail1 or extra
+        mail_city = clean(attrs.get(spec["mailCityField"])) if spec.get("mailCityField") else None
+        mail_state = clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None
+        mail_zip = zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None
+        if spec.get("mailCityStateZipField"):
+            parsed_city, parsed_state, parsed_zip = split_city_state_zip(attrs.get(spec["mailCityStateZipField"]))
+            mail_city = mail_city or parsed_city
+            mail_state = mail_state or parsed_state
+            mail_zip = mail_zip or parsed_zip
+        if spec.get("saleDateField"):
+            sold_on = arcgis_date(attrs.get(spec["saleDateField"]))
+        elif spec.get("saleYearField"):
+            sold_on = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
+        else:
+            sold_on = None
+        if spec.get("saleQualifiedField"):
+            qualified = clean(attrs.get(spec["saleQualifiedField"]))
+        elif spec.get("saleYearField"):
+            qualified = clean(attrs.get("QUAL_CD1"))
+        else:
+            qualified = None
+        alt_id = clean(attrs.get(spec["idAltField"])) if spec.get("idAltField") else None
+        if alt_id == parcel_id:
+            alt_id = None
+        assessed = num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None
+        if spec.get("positiveAssessed"):
+            assessed = money(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -466,22 +569,27 @@ def normalize_rows(
             center=center,  # type: ignore[arg-type]
             source=spec["source"],
             owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
-            situs=clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None,
+            owner2=clean(attrs.get(spec["owner2Field"])) if spec.get("owner2Field") else None,
+            situs=situs,
             city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
             zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
-            sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
+            sale_date=sold_on,
+            sale_qualified=qualified,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
-            assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
+            assessed=assessed,
             taxable=num(attrs.get(spec["taxableField"])) if spec.get("taxableField") else None,
-            mail1=clean(attrs.get(spec["mail1Field"])) if spec.get("mail1Field") else None,
-            mail2=clean(attrs.get(spec["mail2Field"])) if spec.get("mail2Field") else None,
-            mail_city=clean(attrs.get(spec["mailCityField"])) if spec.get("mailCityField") else None,
-            mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
-            mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
+            land_value=money(attrs.get(spec["landValueField"])) if spec.get("landValueField") else None,
+            improvement_value=money(attrs.get(spec["improvementValueField"])) if spec.get("improvementValueField") else None,
+            mail1=mail1,
+            mail2=mail2,
+            mail_city=mail_city,
+            mail_state=mail_state,
+            mail_zip=mail_zip,
+            parcel_id_alt=alt_id,
+            jurisdiction=clean(attrs.get(spec["jurisdictionField"])) if spec.get("jurisdictionField") else None,
         )
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
@@ -645,19 +753,157 @@ def county_override(fips: str) -> dict | None:
                 "DeKalb's public layer has no deed-acre field. Acres are computed from the polygon inside a Shape__Area window, so this county is a large sample, not a certified complete roll.",
             ],
         }
+    if fips == "45019":  # Charleston County SC
+        return {
+            "kind": "arcgis",
+            "url": "https://gisccapps.charlestoncounty.org/arcgis/rest/services/ENERGOV/energov_ent/MapServer/12/query",
+            "where": "ACREAGE>=5 AND ACREAGE<=150",
+            "outFields": [
+                "PID",
+                "GPIN",
+                "OWNER1",
+                "OWNER2",
+                "PROP_ST_NO",
+                "PROP_ST_NAME",
+                "PROP_TYPE",
+                "PROP_CITY",
+                "PROP_ZIP",
+                "MAIL_ST_NO",
+                "MAIL_ST_NAME",
+                "MAIL_ST_TYPE",
+                "MAIL_2ND_ADDR",
+                "MAIL_2ND_ADDT",
+                "MAIL_CITY",
+                "MAIL_STATE",
+                "MAIL_ZIP",
+                "ACREAGE",
+                "CLASS_CODE",
+                "SALE_PRICE",
+                "DOC_DATE",
+                "LAND_APPR",
+            ],
+            "idField": "PID",
+            "idAltField": "GPIN",
+            "acresField": "ACREAGE",
+            "ownerField": "OWNER1",
+            "owner2Field": "OWNER2",
+            "situsParts": ["PROP_ST_NO", "PROP_ST_NAME", "PROP_TYPE"],
+            "cityField": "PROP_CITY",
+            "zipField": "PROP_ZIP",
+            "dorField": "CLASS_CODE",
+            "salePriceField": "SALE_PRICE",
+            "saleDateField": "DOC_DATE",
+            "landValueField": "LAND_APPR",
+            "mailParts": ["MAIL_ST_NO", "MAIL_ST_NAME", "MAIL_ST_TYPE"],
+            "mailExtraParts": ["MAIL_2ND_ADDR", "MAIL_2ND_ADDT"],
+            "mailCityField": "MAIL_CITY",
+            "mailStateField": "MAIL_STATE",
+            "mailZipField": "MAIL_ZIP",
+            "source": "sc-charleston-energov-ent",
+            "coverage": "complete-gte-5ac",
+            "gaps": [
+                "Public parcels are ENERGOV/energov_ent MapServer/12 (no token), filtered on ACREAGE 5–150. GIS_VIEWER/Parcel_Search and GIS_VIEWER/Public_Search return HTTP 499 Token Required and are not used.",
+                "Parcel id is PID. GPIN is on the layer but was blank for every 5–150 acre row checked on 2026-09-23.",
+                "LAND_APPR is the land appraisal. Total appraisal and improvement value live on public ProVal ParcelMap (qualified SDE field names) and are not joined.",
+                "Last sale is DOC_DATE and SALE_PRICE only, not a multi-sale history.",
+                "County zoning is a separate public layer and does not cover the City of Charleston, North Charleston, or Mount Pleasant. Mount Pleasant has no verified public zoning REST URL. Zoning is not spatially joined.",
+                "Owner and mailing address are the public GIS attributes only. Emails and phone numbers are not scraped.",
+            ],
+        }
+    if fips == "45015":  # Berkeley County SC
+        return {
+            "kind": "arcgis",
+            "url": "https://gis.berkeleycountysc.gov/arcgis/rest/services/custom/Addr_muni/MapServer/1/query",
+            "where": "TotalAcres>=5 AND TotalAcres<=150",
+            "outFields": [
+                "ParcelID",
+                "O_TMS",
+                "OwnerName",
+                "StreetAddress1",
+                "City",
+                "StateProvince",
+                "Zip",
+                "GIS_Address",
+                "GIS_Num",
+                "GIS_Street",
+                "TotalAcres",
+                "SalePrice",
+                "SaleDate",
+                "Validity",
+                "LandMarket",
+                "BuildingMarket",
+                "TotalTaxValue",
+                "UseType",
+                "Jurisdiction",
+            ],
+            "idField": "ParcelID",
+            "idAltField": "O_TMS",
+            "acresField": "TotalAcres",
+            "ownerField": "OwnerName",
+            "situsField": "GIS_Address",
+            "situsParts": ["GIS_Num", "GIS_Street"],
+            "dorField": "UseType",
+            "jurisdictionField": "Jurisdiction",
+            "salePriceField": "SalePrice",
+            "saleDateField": "SaleDate",
+            "saleQualifiedField": "Validity",
+            "landValueField": "LandMarket",
+            "improvementValueField": "BuildingMarket",
+            "assessedField": "TotalTaxValue",
+            "positiveAssessed": True,
+            "mail1Field": "StreetAddress1",
+            "mailCityField": "City",
+            "mailStateField": "StateProvince",
+            "mailZipField": "Zip",
+            "source": "sc-berkeley-addr-muni",
+            "coverage": "complete-gte-5ac",
+            "gaps": [
+                "Public parcels are custom/Addr_muni MapServer/1 (no token), filtered on TotalAcres 5–150. The AGOL parcels_berkeley_county FeatureServer returns HTTP 499 Token Required and is not used.",
+                "Situs is GIS_Address when populated (about half of this acreage band). StreetAddress1, City, and Zip are owner mailing, not situs. GIS_Num and GIS_Street fill situs only when GIS_Address is empty.",
+                "Validity is stored as the county sale code and is not translated.",
+                "LandMarket, BuildingMarket, and TotalTaxValue (shown as assessed value) are on the parcel. County zoning on API/internet_map_with_api MapServer/33 is a separate layer and is not joined. Goose Creek, Hanahan, and Moncks Corner zoning field maps are incomplete.",
+                "Last sale only. Owner and mailing address are the public GIS attributes only. Emails and phone numbers are not scraped.",
+            ],
+        }
     if fips == "45035":  # Dorchester SC
         return {
             "kind": "arcgis",
-            "url": "https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/Parcels_Public/MapServer/0/query",
+            "url": "https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/Parcels_Public/FeatureServer/0/query",
             "where": "GIS_ACREAGE>=5 AND GIS_ACREAGE<=150",
-            "outFields": ["TMS", "OWNER", "GIS_ACREAGE", "TAXED_ACRES", "MAILING_ADDRESS", "CITY_STATE_ZIP"],
+            "outFields": [
+                "TMS",
+                "TMS13",
+                "FULL_TMS",
+                "OWNER",
+                "CARE_OF",
+                "MAILING_ADDRESS",
+                "CITY_STATE_ZIP",
+                "PROPERTY_LOCATION",
+                "GIS_ACREAGE",
+                "SALE_PRICE",
+                "SALE_DATE",
+                "ZONINGCODE",
+            ],
             "idField": "TMS",
+            "idFallbacks": ["TMS13", "FULL_TMS"],
+            "idAltField": "TMS13",
             "acresField": "GIS_ACREAGE",
             "ownerField": "OWNER",
+            "mail2Field": "CARE_OF",
+            "situsField": "PROPERTY_LOCATION",
+            "zoningField": "ZONINGCODE",
+            "salePriceField": "SALE_PRICE",
+            "saleDateField": "SALE_DATE",
             "mail1Field": "MAILING_ADDRESS",
+            "mailCityStateZipField": "CITY_STATE_ZIP",
             "source": "sc-dorchester-parcels-public",
             "coverage": "complete-gte-5ac",
-            "gaps": ["Dorchester public parcels. Situs is not on this layer. No zoning join."],
+            "gaps": [
+                "Public parcels are General_Data/Parcels_Public FeatureServer/0 (no token), filtered on GIS_ACREAGE 5–150. Parcel id stays the dashed TMS. TMS13 is stored as the alternate id.",
+                "Situs is PROPERTY_LOCATION. Zoning is ZONINGCODE on the parcel. This public layer has no market, assessed, or land-appraisal fields; those values stay on the county CAMA inquiry.",
+                "Last sale is SALE_DATE and SALE_PRICE only. Zoning_PUBLIC has no FeatureServer SOE (use MapServer/0 if a polygon overlay is needed later). County_Lands_Pub is a filtered subset and is not used.",
+                "Owner and mailing address are the public GIS attributes only. Emails and phone numbers are not scraped.",
+            ],
         }
     if fips == "01073":  # Jefferson AL
         return {
@@ -702,7 +948,7 @@ def gap_reason(county: dict) -> str:
     if state == "Georgia":
         return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
     if state == "South Carolina":
-        return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. No verified public county polygon service is wired for this county."
     if state == "Alabama":
         return "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
     if state == "Tennessee":
@@ -963,7 +1209,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
-| South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
+| South Carolina | Charleston ENERGOV/energov_ent MapServer/12; Berkeley Addr_muni MapServer/1; Dorchester Parcels_Public FeatureServer; Greenville city GIS | Charleston, Berkeley, and Dorchester are complete 5–150 acre extracts. Greenville is a city-hosted sample. Charleston GIS_VIEWER/Parcel_Search and Public_Search, and the Berkeley AGOL parcels FeatureServer, return HTTP 499 and are not used. Other South Carolina counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
 Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.

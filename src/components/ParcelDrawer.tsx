@@ -5,11 +5,13 @@ import {
   formatAcres,
   formatMailing,
   formatNumber,
+  formatParcelPlace,
   formatRoadLabel,
   formatSale,
   formatUsd,
   isEntityOwner,
   parcelAppraiserUrl,
+  showFloridaSunbiz,
   sunbizSearchUrl,
 } from "@/lib/format";
 import { describeFluMatch } from "@/lib/flu";
@@ -76,9 +78,8 @@ export function ParcelDrawer({
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
-  const placeLine =
-    [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+  const placeLine = formatParcelPlace(properties);
+  const floridaSunbiz = showFloridaSunbiz(properties.countyFips, properties.state);
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -90,7 +91,10 @@ export function ParcelDrawer({
     <aside className={pane ? "drawer-scroll h-full overflow-y-auto bg-ink-900 p-5" : "drawer-scroll absolute inset-x-0 bottom-0 z-20 max-h-[70vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-5 shadow-2xl lg:static lg:z-0 lg:max-h-none lg:w-[24rem] lg:shrink-0 lg:rounded-none lg:border-l lg:border-t-0 lg:shadow-none"}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-clay-400">{properties.parcelId}</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-clay-400">
+            {properties.parcelId}
+            {properties.parcelIdAlt ? ` · ${properties.parcelIdAlt}` : ""}
+          </p>
           <h2 className="mt-1 font-display text-2xl leading-tight text-white">
             {properties.situsAddress || "Address not available"}
           </h2>
@@ -120,6 +124,10 @@ export function ParcelDrawer({
         />
         <Field label="Last sale" value={formatSale(properties.lastSale)} />
         <Field label="Qualified sale" value={properties.lastSale.qualified} />
+        {properties.tax.landValue != null ? <Field label="Land value" value={formatUsd(properties.tax.landValue)} /> : null}
+        {properties.tax.improvementValue != null ? (
+          <Field label="Improvement value" value={formatUsd(properties.tax.improvementValue)} />
+        ) : null}
         <Field label="Market value" value={formatUsd(properties.tax.marketValue)} />
         <Field label="Assessed value" value={formatUsd(properties.tax.assessedValue)} />
         <Field label="Taxable value" value={formatUsd(properties.tax.taxableValue)} />
@@ -178,13 +186,13 @@ export function ParcelDrawer({
         <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
           {appraiser.label}
         </a>
-        {entity && properties.ownerName ? (
+        {floridaSunbiz && entity && properties.ownerName ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={sunbizSearchUrl(properties.ownerName)} target="_blank" rel="noreferrer">
             Search Florida Sunbiz for LLC / corporate principals
           </a>
-        ) : (
+        ) : floridaSunbiz ? (
           <p className="text-ink-300">Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped.</p>
-        )}
+        ) : null}
         {properties.countyFips === "12095" || !properties.countyFips ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={comptrollerRecordsUrl()} target="_blank" rel="noreferrer">
             Orange County Comptroller official records

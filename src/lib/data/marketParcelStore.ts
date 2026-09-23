@@ -56,6 +56,12 @@ async function loadMarketMeta(market: string): Promise<MarketParcelsMeta | null>
   }
 }
 
+function attachCountyGaps(feature: ParcelFeature, gaps: string[] | undefined): ParcelFeature {
+  if (!gaps?.length || feature.properties.dataGaps?.length) return feature;
+  feature.properties.dataGaps = gaps;
+  return feature;
+}
+
 function normalizeParcel(feature: ParcelFeature): ParcelFeature {
   const props = feature.properties as ParcelProperties;
   if (props.flu === undefined) props.flu = null;
@@ -182,7 +188,9 @@ export async function queryMarketFixtureParcels(
   const bbox = query.bbox ?? null;
   const groups = await Promise.all(
     counties.map(async (item) => {
-      let features = featuresInAcreageBand(await featuresForCounty(item, bbox));
+      let features = featuresInAcreageBand(await featuresForCounty(item, bbox)).map((feature) =>
+        attachCountyGaps(feature, item.gaps),
+      );
       if (item.path?.includes("orlando-parcels")) {
         features = features.map((feature) => ({
           ...feature,
@@ -216,10 +224,12 @@ export async function getMarketFixtureParcel(id: string): Promise<ParcelFeature 
       const tile = lookup[parcelId];
       if (!tile) return null;
       const features = await readFeatureFile(path.join(row.path, `${tile}.geojson`));
-      return features.find((feature) => feature.properties.id === id) ?? null;
+      const found = features.find((feature) => feature.properties.id === id) ?? null;
+      return found ? attachCountyGaps(found, row.gaps) : null;
     }
     const features = await readFeatureFile(row.path);
-    return features.find((feature) => feature.properties.id === id) ?? null;
+    const found = features.find((feature) => feature.properties.id === id) ?? null;
+    return found ? attachCountyGaps(found, row.gaps) : null;
   } catch {
     return null;
   }

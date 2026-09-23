@@ -5,19 +5,23 @@
   "markets": [
     "Charleston"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 7886,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-berkeley-addr-muni",
+  "queryUrl": "https://gis.berkeleycountysc.gov/arcgis/rest/services/custom/Addr_muni/MapServer/1/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Public parcels are custom/Addr_muni MapServer/1 (no token), filtered on TotalAcres 5\u2013150. The AGOL parcels_berkeley_county FeatureServer returns HTTP 499 Token Required and is not used.",
+    "Situs is GIS_Address when populated (about half of this acreage band). StreetAddress1, City, and Zip are owner mailing, not situs. GIS_Num and GIS_Street fill situs only when GIS_Address is empty.",
+    "Validity is stored as the county sale code and is not translated.",
+    "LandMarket, BuildingMarket, and TotalTaxValue (shown as assessed value) are on the parcel. County zoning on API/internet_map_with_api MapServer/33 is a separate layer and is not joined. Goose Creek, Hanahan, and Moncks Corner zoning field maps are incomplete.",
+    "Last sale only. Owner and mailing address are the public GIS attributes only. Emails and phone numbers are not scraped."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45015/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45015/lookup.json",
+  "sourceCount": 7886,
+  "dropped": 0,
+  "tileCount": 10
 }

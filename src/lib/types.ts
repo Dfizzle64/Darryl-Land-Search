@@ -28,6 +28,10 @@ export type TaxInfo = {
   assessedValue: number | null;
   taxableValue: number | null;
   taxes: number | null;
+  /** County land appraisal when the public parcel layer publishes one. */
+  landValue?: number | null;
+  /** Improvement / building value when the public parcel layer publishes one. */
+  improvementValue?: number | null;
 };
 
 export type IncomeInfo = {
@@ -375,6 +379,8 @@ export type OpportunityZoneCollection = GeoJSON.FeatureCollection<
 export type ParcelProperties = {
   id: string;
   parcelId: string;
+  /** Second public id (GPIN, TMS13, O_TMS) when the layer fills it. */
+  parcelIdAlt?: string | null;
   /** Five-digit county FIPS when known (Orlando shed partitions). */
   countyFips?: string | null;
   countyName?: string | null;

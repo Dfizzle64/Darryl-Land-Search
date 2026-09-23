@@ -8,7 +8,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | ---: | ---: | ---: | ---: |
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
-| Charleston | primary | 6,774 | 1 | 0 | 6 |
+| Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
@@ -88,8 +88,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Berkeley | South Carolina | 45015 | gap | 0 | unavailable |
-| Charleston | South Carolina | 45019 | gap | 0 | unavailable |
+| Berkeley | South Carolina | 45015 | complete-gte-5ac | 7,886 | sc-berkeley-addr-muni |
+| Charleston | South Carolina | 45019 | complete-gte-5ac | 7,989 | sc-charleston-energov-ent |
 | Clarendon | South Carolina | 45027 | gap | 0 | unavailable |
 | Colleton | South Carolina | 45029 | gap | 0 | unavailable |
 | Dorchester | South Carolina | 45035 | complete-gte-5ac | 6,774 | sc-dorchester-parcels-public |

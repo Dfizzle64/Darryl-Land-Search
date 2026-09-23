@@ -5,19 +5,25 @@
   "markets": [
     "Charleston"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 7989,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-charleston-energov-ent",
+  "queryUrl": "https://gisccapps.charlestoncounty.org/arcgis/rest/services/ENERGOV/energov_ent/MapServer/12/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "8001 source rows collapsed to 7989 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "Public parcels are ENERGOV/energov_ent MapServer/12 (no token), filtered on ACREAGE 5\u2013150. GIS_VIEWER/Parcel_Search and GIS_VIEWER/Public_Search return HTTP 499 Token Required and are not used.",
+    "Parcel id is PID. GPIN is on the layer but was blank for every 5\u2013150 acre row checked on 2026-09-23.",
+    "LAND_APPR is the land appraisal. Total appraisal and improvement value live on public ProVal ParcelMap (qualified SDE field names) and are not joined.",
+    "Last sale is DOC_DATE and SALE_PRICE only, not a multi-sale history.",
+    "County zoning is a separate public layer and does not cover the City of Charleston, North Charleston, or Mount Pleasant. Mount Pleasant has no verified public zoning REST URL. Zoning is not spatially joined.",
+    "Owner and mailing address are the public GIS attributes only. Emails and phone numbers are not scraped."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45019/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45019/lookup.json",
+  "sourceCount": 8001,
+  "dropped": 0,
+  "tileCount": 10
 }

@@ -27,6 +27,25 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "45015": "https://assessor.berkeleycountysc.gov/prop_card_search.php",
+  "45019": "https://gisccweb.charlestoncounty.org/public_search/",
+  "45035":
+    "https://www.dorchestercountysc.gov/government/property-tax-services/assessor/real-estate-mobile-home-search/cama-property-lookup",
+};
+
+const APPRAISER_LABELS: Record<string, string> = {
+  "12009": "Brevard",
+  "12069": "Lake",
+  "12083": "Marion",
+  "12095": "Orange",
+  "12097": "Osceola",
+  "12105": "Polk",
+  "12117": "Seminole",
+  "12119": "Sumter",
+  "12127": "Volusia",
+  "45015": "Berkeley County",
+  "45019": "Charleston County",
+  "45035": "Dorchester County",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -42,28 +61,53 @@ export function parcelAppraiserUrl(options: {
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);
-  const countyLabel =
-    fips === "12009"
-      ? "Brevard"
-      : fips === "12069"
-        ? "Lake"
-        : fips === "12083"
-          ? "Marion"
-          : fips === "12097"
-            ? "Osceola"
-            : fips === "12105"
-              ? "Polk"
-              : fips === "12117"
-                ? "Seminole"
-                : fips === "12119"
-                  ? "Sumter"
-                  : fips === "12127"
-                    ? "Volusia"
-                    : "county";
+  const countyLabel = (fips && APPRAISER_LABELS[fips]) || "county";
   return {
     href,
-    label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,
+    label:
+      fips === "12095"
+        ? "Open in Orange County Property Appraiser"
+        : `Open ${countyLabel} Property Appraiser search`,
   };
+}
+
+function stateAbbrev(state: string | null | undefined, countyFips: string | null | undefined): string | null {
+  if (state === "Florida" || state === "FL") return "FL";
+  if (state === "South Carolina" || state === "SC") return "SC";
+  if (state === "North Carolina" || state === "NC") return "NC";
+  if (state === "Georgia" || state === "GA") return "GA";
+  if (state === "Tennessee" || state === "TN") return "TN";
+  if (state === "Alabama" || state === "AL") return "AL";
+  if (state === "Mississippi" || state === "MS") return "MS";
+  if (state === "Arkansas" || state === "AR") return "AR";
+  if (state && state.length === 2) return state.toUpperCase();
+  if (state) return state;
+  if (countyFips?.startsWith("12")) return "FL";
+  if (countyFips?.startsWith("45")) return "SC";
+  return null;
+}
+
+/** City and ZIP when present, otherwise county and state. Florida is not assumed. */
+export function formatParcelPlace(properties: {
+  situsCity: string | null;
+  situsZip: string | null;
+  countyName?: string | null;
+  state?: string | null;
+  countyFips?: string | null;
+}): string {
+  const cityZip = [properties.situsCity, properties.situsZip].filter(Boolean).join(" ");
+  if (cityZip) return cityZip;
+  const state = stateAbbrev(properties.state, properties.countyFips);
+  if (properties.countyName && state) return `${properties.countyName} County, ${state}`;
+  if (properties.countyName) return `${properties.countyName} County`;
+  return state ?? "Location not available";
+}
+
+/** Sunbiz is a Florida entity search. Other states stay on the assessor link. */
+export function showFloridaSunbiz(countyFips?: string | null, state?: string | null): boolean {
+  if (state === "Florida" || state === "FL") return true;
+  if (countyFips?.startsWith("12")) return true;
+  return !state && !countyFips;
 }
 
 export function formatUsd(value: number | null | undefined): string {

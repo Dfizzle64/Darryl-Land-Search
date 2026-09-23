@@ -27,7 +27,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
-| South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
+| South Carolina | Charleston ENERGOV/energov_ent MapServer/12; Berkeley Addr_muni MapServer/1; Dorchester Parcels_Public FeatureServer; Greenville city GIS | Charleston, Berkeley, and Dorchester are complete 5–150 acre extracts. Greenville is a city-hosted sample. Charleston GIS_VIEWER/Parcel_Search and Public_Search, and the Berkeley AGOL parcels FeatureServer, return HTTP 499 and are not used. Other South Carolina counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
 Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
@@ -44,7 +44,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | ---: | ---: | ---: | ---: |
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
-| Charleston | primary | 6,774 | 1 | 0 | 6 |
+| Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
@@ -124,8 +124,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Berkeley | South Carolina | 45015 | gap | 0 | unavailable |
-| Charleston | South Carolina | 45019 | gap | 0 | unavailable |
+| Berkeley | South Carolina | 45015 | complete-gte-5ac | 7,886 | sc-berkeley-addr-muni |
+| Charleston | South Carolina | 45019 | complete-gte-5ac | 7,989 | sc-charleston-energov-ent |
 | Clarendon | South Carolina | 45027 | gap | 0 | unavailable |
 | Colleton | South Carolina | 45029 | gap | 0 | unavailable |
 | Dorchester | South Carolina | 45035 | complete-gte-5ac | 6,774 | sc-dorchester-parcels-public |

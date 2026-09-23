@@ -57,7 +57,7 @@ Lake, Orange, Osceola, Polk, and Seminole load **every public parcel from 5.0 th
 
 1. **Acreage.** OCPA parcel `ACREAGE`. Unknown acreage can be kept or dropped (the sample has acreage on every parcel).
 2. **Zoning.** OCPA stores codes like `ORL-R-3B/T/AN`. The app parses the jurisdiction prefix (`ORL`) and base district (`R-3B`), then matches **that jurisdiction’s** districts in `data/zoning-config.json`. County `R-3` does not silently match Orlando `R-3A` unless Orlando lists it. Token `P-D` does **not** match Orlando public-use `P`.
-3. **FLU.** Parcel centroids are joined to [Orange County Future Land Use](https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/21) and [Orlando Future Land Use](https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/83). `data/flu-config.json` decides which GIS codes are MF-supportive. Overlay suffixes such as `/RES-PRO` fall back to the base code.
+3. **FLU.** Parcel centroids are joined to [Orange County Future Land Use](https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/21) and city future land use where a municipal overlay exists. `data/flu-config.json` decides which GIS codes are MF-supportive. Overlay suffixes such as `/RES-PRO` fall back to the base code. See `docs/municipal-overlays.md`.
 4. **Opportunity Zones.** Designated QOZs use HUD/Treasury polygons (2010 Census tracts), not ACS 2020 tract IDs. OZ 2.0 uses 2020 census tracts from the Rev. Proc. 2026-14 appendix. Filters: rural-eligible, eligible but not rural, in a designated QOZ, not in a designated QOZ, or either. The OZ 2.0 overlay draws all 87 Orange County eligible tracts; the copper dashed overlay is the county’s 24 current QOZ tracts.
 5. **Income.** ACS median household income (B19013) by tract or block group on parcels. The same tract minimum also filters eligible-tract overlays where that GEOID is in the Orange County ACS fixture. Acreage and AADT are not on tract features, so those sliders stay parcel-only.
 6. **AADT.** Nearest FDOT Orange County count segment. Parcel-only.
@@ -127,7 +127,8 @@ PD/PUD is always “maybe — site-specific.” Confirm the regulating plan.
 | --- | --- |
 | Orange County FLU (open data 21) | Unincorporated + annexed parcels still on county FLU. GIS codes `MD`/`HD`/`NR`/`NAC`/`NC`/`ACR`/`ACMU`/… |
 | Orlando FLU (open data 83) | Preferred for `ORL` parcels. `RES-MED`, `RES-HIGH`, activity centers, mixed-use corridors, office-medium/high |
-| Other cities | **Not joined.** County layer often returns placeholder `City`. Those parcels have `flu: null`. |
+| Maitland, Winter Garden, Ocoee, Apopka, Winter Park, Orlando, Eatonville | City zoning and FLU from each city’s public GIS, labeled with the city name. Attribute join when the layer has a parcel id; centroid join otherwise. County `CITY` stubs are not used. |
+| Edgewood, Windermere, Belle Isle, Oakland, Bay Lake, Lake Buena Vista | **Gap.** No public city zoning/FLU REST. County layer 51 rows are `ZONING=CITY` stubs and are not shown as city districts. |
 
 Product decisions:
 
@@ -307,7 +308,7 @@ NEXT_PUBLIC_MAPTILER_KEY=
 - Sentinel sale dates around 1900 are treated as “not available”.
 - Zoning match is GIS-code based, not a substitute for a zoning opinion or PD regulating plan.
 - FLU is centroid-joined, not a full polygon overlay. A parcel that straddles two FLU polygons gets one code.
-- Municipal FLU besides Orlando is not in the public layers used here (Winter Park, Ocoee, Winter Garden, Apopka, Maitland, etc.). FLU-only and rezoning-candidate modes omit those parcels rather than guess.
+- Municipal zoning and FLU are joined for Winter Garden, Ocoee, Apopka, Maitland, Winter Park, Orlando, and Eatonville. Edgewood, Windermere, Belle Isle, Oakland, Bay Lake, and Lake Buena Vista have no public city REST and stay unknown. `maps.etcog.org` Edgewood zoning is Edgewood, Texas, and is not used. Details are in `docs/municipal-overlays.md`.
 - Designated Opportunity Zone flags use 2010 QOZ polygons; ACS income and OZ 2.0 eligibility use 2020 census tracts. Do not expect those GEOIDs to match.
 - OZ 2.0 tracts are eligible for nomination under Rev. Proc. 2026-14. They are not designated 2027 QOZs. Rural vs non-rural is the appendix column, not a local rule. Orange County’s only rural-eligible tract in that list is `12095016605`.
 - The seven primary markets draw rural-eligible tracts (orange) and urban eligible tracts (blue). Fourteen smaller MSAs under Other do the same. 90-minute sheds are approximate county rings, not isochrones. Parcel polygons outside the Orlando shed are not loaded. Inside the shed, Brevard, Marion, Sumter, and Volusia are thinner samples. South Carolina tracts add a governor-filed note (list not public, not designated) where that caveat is in the notes. They are not certified 2027 QOZs. The SC multifamily shortlist is a priority filter on the primary rural layer, not a nomination.

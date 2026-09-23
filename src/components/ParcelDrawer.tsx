@@ -73,9 +73,15 @@ export function ParcelDrawer({
   const income = filters.incomeGeography === "tract" ? properties.incomeTract : properties.incomeBlockGroup;
   const mailing = formatMailing(properties.mailingAddress);
   const entity = isEntityOwner(properties.ownerName) || isEntityOwner(properties.ownerName2);
+  const fluPlace = properties.flu?.jurisdictionName || properties.flu?.jurisdiction;
   const fluLine = properties.flu?.code
-    ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
-    : null;
+    ? `${properties.flu.label || properties.flu.code}${fluPlace ? ` · ${fluPlace}` : ""}`
+    : properties.zoningAuthority
+      ? `Not available · ${properties.zoningAuthority}`
+      : null;
+  const zoningValue = properties.zoningAuthority
+    ? `${properties.zoningDistrict || properties.zoningCode || "Not available"}\n${properties.zoningAuthority}`
+    : properties.zoningCode;
   const placeLine =
     [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
     (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
@@ -105,7 +111,7 @@ export function ParcelDrawer({
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
-        <Field label="Zoning" value={properties.zoningCode} />
+        <Field label="Zoning" value={zoningValue} />
         <Field label="Future Land Use" value={fluLine} />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
@@ -140,8 +146,16 @@ export function ParcelDrawer({
       ) : null}
 
       <div className="mt-5 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
-        <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Zoning</p>
+        <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">
+          {properties.zoningAuthority ? `${properties.zoningAuthority} zoning` : "Zoning"}
+        </p>
         <p className="mt-1 text-ink-100">{zoning.reason}</p>
+        {properties.zoningLabel ? <p className="mt-1 text-ink-300">{properties.zoningLabel}</p> : null}
+        {properties.municipalOverlay && properties.countyZoningCode && properties.countyZoningCode !== properties.zoningCode ? (
+          <p className="mt-1 text-xs text-ink-500">
+            County GIS zoning {properties.countyZoningCode} is not the municipal district.
+          </p>
+        ) : null}
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Future Land Use</p>

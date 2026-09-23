@@ -1,7 +1,7 @@
 {
   "version": 1,
   "updatedAt": "2026-09-17",
-  "notes": "Future Land Use (FLU) categories treated as multifamily-supportive or higher-density. GIS codes come from Orange County Open Data layer 21 (unincorporated + annexed parcels still on county FLU) and Orlando Open Data layer 83. Municipal FLU besides Orlando is not in these public layers; those parcels stay unknown unless a city GIS feed is added. This file is the matching source of truth — edit here, not in the app.",
+  "notes": "Future Land Use (FLU) categories treated as multifamily-supportive or higher-density. GIS codes come from Orange County Open Data layer 21, city future-land-use layers joined by the municipal overlay, and Orlando's city land-use service. Cities without a public FLU layer stay unknown. This file is the matching source of truth — edit here, not in the app.",
   "sources": [
     {
       "label": "Orange County Future Land Use GIS",
@@ -22,6 +22,14 @@
     {
       "label": "City of Orlando Future Land Use legend",
       "url": "https://gis.orlando.gov/PDF_Docs/PlanningMaps/FutureLandUseMaps/FutureLandUseLegend.pdf"
+    },
+    {
+      "label": "City of Maitland Future Land Use",
+      "url": "https://services8.arcgis.com/q4Vpy7r3KXnWcTBW/arcgis/rest/services/Future_Land_Use_public/FeatureServer/6"
+    },
+    {
+      "label": "City of Winter Park Future Land Use",
+      "url": "https://gis.cityofwinterpark.org/arcgis/rest/services/PublicAccess/MapServer/7"
     }
   ],
   "categories": [
@@ -550,6 +558,216 @@
       "status": "no",
       "maxDensityDuAc": null,
       "why": "Airport support. Not treated as residential FLU."
+    },
+    {
+      "code": "EMPLOYMENT CENTER",
+      "jurisdiction": "MTL",
+      "label": "Employment Center",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 65,
+      "why": "Maitland GIS: regional employment center with residential and service uses, up to 65 du/ac.",
+      "sourceUrl": "https://services8.arcgis.com/q4Vpy7r3KXnWcTBW/arcgis/rest/services/Future_Land_Use_public/FeatureServer/6"
+    },
+    {
+      "code": "CORRIDOR DISTRICT",
+      "jurisdiction": "MTL",
+      "label": "Corridor District",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 19.8,
+      "why": "Maitland GIS: light office, services, and medium-density residential, up to 19.8 du/ac.",
+      "sourceUrl": "https://services8.arcgis.com/q4Vpy7r3KXnWcTBW/arcgis/rest/services/Future_Land_Use_public/FeatureServer/6"
+    },
+    {
+      "code": "MAIN STREET",
+      "jurisdiction": "MTL",
+      "label": "Main Street",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 67,
+      "why": "Maitland GIS: Downtown Maitland, up to 67 du/ac.",
+      "sourceUrl": "https://services8.arcgis.com/q4Vpy7r3KXnWcTBW/arcgis/rest/services/Future_Land_Use_public/FeatureServer/6"
+    },
+    {
+      "code": "NEW NEIGHBORHOOD",
+      "jurisdiction": "MTL",
+      "label": "New Neighborhood",
+      "allowsMultifamily": true,
+      "status": "maybe",
+      "maxDensityDuAc": 25,
+      "why": "Maitland GIS: mix of housing sizes and types, published range 0–10/25 du/ac. Density is site-specific.",
+      "sourceUrl": "https://services8.arcgis.com/q4Vpy7r3KXnWcTBW/arcgis/rest/services/Future_Land_Use_public/FeatureServer/6"
+    },
+    {
+      "code": "TRADITIONAL NEIGHBORHOOD",
+      "jurisdiction": "MTL",
+      "label": "Traditional Neighborhood",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": 4.5,
+      "why": "Maitland GIS: established neighborhoods, 0–4.5 du/ac. Not multifamily-supportive.",
+      "sourceUrl": "https://services8.arcgis.com/q4Vpy7r3KXnWcTBW/arcgis/rest/services/Future_Land_Use_public/FeatureServer/6"
+    },
+    {
+      "code": "HIGH DENSITY RESIDENTIAL",
+      "jurisdiction": "WP",
+      "label": "High Density Residential",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": null,
+      "why": "Winter Park future land use designation High Density Residential on PublicAccess layer 7.",
+      "sourceUrl": "https://gis.cityofwinterpark.org/arcgis/rest/services/PublicAccess/MapServer/7"
+    },
+    {
+      "code": "MEDIUM DENSITY RESIDENTIAL",
+      "jurisdiction": "WP",
+      "label": "Medium Density Residential",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": null,
+      "why": "Winter Park future land use designation Medium Density Residential on PublicAccess layer 7.",
+      "sourceUrl": "https://gis.cityofwinterpark.org/arcgis/rest/services/PublicAccess/MapServer/7"
+    },
+    {
+      "code": "LOW DENSITY RESIDENTIAL",
+      "jurisdiction": "WP",
+      "label": "Low Density Residential",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Winter Park low-density residential. Not treated as multifamily-supportive.",
+      "sourceUrl": "https://gis.cityofwinterpark.org/arcgis/rest/services/PublicAccess/MapServer/7"
+    },
+    {
+      "code": "SINGLE FAMILY",
+      "jurisdiction": "WP",
+      "label": "Single Family",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Winter Park Single Family future land use. Not multifamily.",
+      "sourceUrl": "https://gis.cityofwinterpark.org/arcgis/rest/services/PublicAccess/MapServer/7"
+    },
+    {
+      "code": "CENTRAL BUSINESS DISTRICT",
+      "jurisdiction": "WP",
+      "label": "Central Business District",
+      "allowsMultifamily": true,
+      "status": "maybe",
+      "maxDensityDuAc": null,
+      "why": "Winter Park GIS label only. Downtown intensity is plan-specific; confirm the comprehensive plan before treating a site as entitled.",
+      "sourceUrl": "https://gis.cityofwinterpark.org/arcgis/rest/services/PublicAccess/MapServer/7"
+    },
+    {
+      "code": "HDR",
+      "jurisdiction": "OCO",
+      "label": "High Density Residential",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": null,
+      "why": "Ocoee future land use code HDR on the city Land Use layer.",
+      "sourceUrl": "https://maps.ocoee.org/arcgis/rest/services/LandUse/MapServer/1"
+    },
+    {
+      "code": "MDR",
+      "jurisdiction": "OCO",
+      "label": "Medium Density Residential",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": null,
+      "why": "Ocoee future land use code MDR on the city Land Use layer.",
+      "sourceUrl": "https://maps.ocoee.org/arcgis/rest/services/LandUse/MapServer/1"
+    },
+    {
+      "code": "LDR",
+      "jurisdiction": "OCO",
+      "label": "Low Density Residential",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Ocoee future land use code LDR. Not treated as multifamily-supportive.",
+      "sourceUrl": "https://maps.ocoee.org/arcgis/rest/services/LandUse/MapServer/1"
+    },
+    {
+      "code": "RH",
+      "jurisdiction": "APK",
+      "label": "Residential High",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": null,
+      "why": "Apopka future land use Residential High.",
+      "sourceUrl": "https://services.arcgis.com/syn8rfJ2eTAK0T6k/arcgis/rest/services/Apopka_FLUM_Data/FeatureServer/1"
+    },
+    {
+      "code": "RM",
+      "jurisdiction": "APK",
+      "label": "Residential Medium",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": null,
+      "why": "Apopka future land use Residential Medium.",
+      "sourceUrl": "https://services.arcgis.com/syn8rfJ2eTAK0T6k/arcgis/rest/services/Apopka_FLUM_Data/FeatureServer/1"
+    },
+    {
+      "code": "HDR-25",
+      "jurisdiction": "APK",
+      "label": "High Density Residential 25 du/ac",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": 25,
+      "why": "Apopka GIS label: High Density Residential 25 du/ac.",
+      "sourceUrl": "https://services.arcgis.com/syn8rfJ2eTAK0T6k/arcgis/rest/services/Apopka_FLUM_Data/FeatureServer/1"
+    },
+    {
+      "code": "RL",
+      "jurisdiction": "APK",
+      "label": "Residential Low",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Apopka future land use Residential Low. Not multifamily-supportive.",
+      "sourceUrl": "https://services.arcgis.com/syn8rfJ2eTAK0T6k/arcgis/rest/services/Apopka_FLUM_Data/FeatureServer/1"
+    },
+    {
+      "code": "MU",
+      "jurisdiction": "APK",
+      "label": "Mixed-Use",
+      "allowsMultifamily": true,
+      "status": "maybe",
+      "maxDensityDuAc": null,
+      "why": "Apopka mixed-use future land use. Residential intensity is plan-specific.",
+      "sourceUrl": "https://services.arcgis.com/syn8rfJ2eTAK0T6k/arcgis/rest/services/Apopka_FLUM_Data/FeatureServer/1"
+    },
+    {
+      "code": "MEDIUM DENSITY",
+      "jurisdiction": "EVL",
+      "label": "Medium Density",
+      "allowsMultifamily": true,
+      "status": "yes",
+      "maxDensityDuAc": null,
+      "why": "Eatonville future land use MEDIUM DENSITY on the county-hosted town layer.",
+      "sourceUrl": "https://ocgis4.ocfl.net/arcgis/rest/services/InfoMap_Public_Layers/MapServer/102"
+    },
+    {
+      "code": "LOW DENSITY",
+      "jurisdiction": "EVL",
+      "label": "Low Density",
+      "allowsMultifamily": false,
+      "status": "no",
+      "maxDensityDuAc": null,
+      "why": "Eatonville future land use LOW DENSITY. Not treated as multifamily-supportive.",
+      "sourceUrl": "https://ocgis4.ocfl.net/arcgis/rest/services/InfoMap_Public_Layers/MapServer/102"
+    },
+    {
+      "code": "MIXED USE",
+      "jurisdiction": "EVL",
+      "label": "Mixed Use",
+      "allowsMultifamily": true,
+      "status": "maybe",
+      "maxDensityDuAc": null,
+      "why": "Eatonville mixed-use future land use. Confirm the adopted town plan before treating a site as entitled.",
+      "sourceUrl": "https://ocgis4.ocfl.net/arcgis/rest/services/InfoMap_Public_Layers/MapServer/102"
     }
   ]
 }

@@ -1,0 +1,255 @@
+{
+  "version": 1,
+  "countyFips": "12095",
+  "updatedAt": "2026-09-23",
+  "notes": "Orange County municipal zoning and future land use. City layers replace county zoning when a parcel matches. Orange County AGOL zoning layer 51 municipal rows are ZONING=CITY stubs and are not used. Owner, mailing, sale, and tax are not copied from city layers. OCPA remains the appraiser deep-link. The 5.0–150.0 acre band is unchanged.",
+  "floridaBbox": [-87.7, 24.3, -79.6, 31.1],
+  "orangeBbox": [-81.7, 28.3, -80.85, 28.85],
+  "rejected": [
+    {
+      "id": "edgewood-tx",
+      "name": "Edgewood, Texas",
+      "url": "https://maps.etcog.org/arcgis/rest/services/EDGEWOOD/EdgewoodZoning_Public/FeatureServer/4",
+      "reason": "East Texas Council of Governments. Sample centroid about (-95.88, 32.68). Not the City of Edgewood, Florida. Never join onto Orange County parcels."
+    }
+  ],
+  "cities": [
+    {
+      "id": "winter-garden",
+      "name": "City of Winter Garden",
+      "prefix": "WG",
+      "status": "active",
+      "coverage": "city-only",
+      "join": "attribute",
+      "fixture": "data/fixtures/municipal-overlays/winter-garden.json",
+      "notes": "Parcel polygons. Attribute join on PARCEL. Zoning and FLU are on the same feature.",
+      "layers": [
+        {
+          "role": "parcel",
+          "url": "https://services6.arcgis.com/dUj2ew1ea9QOFR6u/arcgis/rest/services/FLU_New/FeatureServer/2",
+          "parcelIdField": "PARCEL",
+          "zoningField": "ZONING_COD",
+          "fluField": "FLU_2025_W",
+          "acreageField": "ACREAGE",
+          "geometry": "acres-gte-5"
+        }
+      ]
+    },
+    {
+      "id": "ocoee",
+      "name": "City of Ocoee",
+      "prefix": "OCO",
+      "status": "active",
+      "coverage": "city-only",
+      "join": "attribute",
+      "fixture": "data/fixtures/municipal-overlays/ocoee.json",
+      "notes": "Attribute join on ParcelsFLUZoning PARCELID. PIN is a different 15-digit id and is not used. District polygons fill a row when ZONECLASS is blank. OUT and UNC are not treated as city districts.",
+      "layers": [
+        {
+          "role": "parcel",
+          "url": "https://maps.ocoee.org/arcgis/rest/services/ParcelsFLUZoning/MapServer/0",
+          "parcelIdField": "PARCELID",
+          "zoningField": "ZONECLASS",
+          "zoningLabelField": "ZONEDESC",
+          "fluField": "LANDUSECOD",
+          "geometry": "none"
+        },
+        {
+          "role": "zoning",
+          "url": "https://maps.ocoee.org/arcgis/rest/services/Zoning_District_2026/FeatureServer/0",
+          "zoningField": "ZONECLASS",
+          "zoningLabelField": "ZONEDESC",
+          "geometry": "all"
+        },
+        {
+          "role": "flu",
+          "url": "https://maps.ocoee.org/arcgis/rest/services/LandUse/MapServer/1",
+          "fluField": "LANDUSECODE",
+          "fluLabelField": "LANDUSEDESC",
+          "geometry": "all"
+        }
+      ]
+    },
+    {
+      "id": "apopka",
+      "name": "City of Apopka",
+      "prefix": "APK",
+      "status": "active",
+      "coverage": "city-only",
+      "join": "spatial",
+      "fixture": "data/fixtures/municipal-overlays/apopka.json",
+      "notes": "District polygons. Spatial join. FLU PARCEL_ID is often blank, so it is not required.",
+      "layers": [
+        {
+          "role": "zoning",
+          "url": "https://services.arcgis.com/syn8rfJ2eTAK0T6k/arcgis/rest/services/Apopka_Zoning_view/FeatureServer/8",
+          "zoningField": "Zoning",
+          "zoningLabelField": "UseName",
+          "parcelIdField": "PARCEL_ID",
+          "geometry": "all"
+        },
+        {
+          "role": "flu",
+          "url": "https://services.arcgis.com/syn8rfJ2eTAK0T6k/arcgis/rest/services/Apopka_FLUM_Data/FeatureServer/1",
+          "fluField": "LAND_USE",
+          "fluLabelField": "UseName",
+          "parcelIdField": "PARCEL_ID",
+          "geometry": "all"
+        }
+      ]
+    },
+    {
+      "id": "maitland",
+      "name": "City of Maitland",
+      "prefix": "MTL",
+      "status": "active",
+      "coverage": "city-only",
+      "join": "attribute",
+      "fixture": "data/fixtures/municipal-overlays/maitland.json",
+      "notes": "Attribute join on PARCEL. Zoning prefers New_Zoning. FLU prefers F2018FLU. City-only coverage.",
+      "layers": [
+        {
+          "role": "parcel",
+          "url": "https://services8.arcgis.com/q4Vpy7r3KXnWcTBW/arcgis/rest/services/Maitland_Zoning_AppLayer/FeatureServer/2",
+          "parcelIdField": "PARCEL",
+          "zoningField": "New_Zoning",
+          "zoningLabelField": "ZoningDescription",
+          "acreageField": "ACREAGE",
+          "geometry": "acres-gte-5"
+        },
+        {
+          "role": "flu",
+          "url": "https://services8.arcgis.com/q4Vpy7r3KXnWcTBW/arcgis/rest/services/Future_Land_Use_public/FeatureServer/6",
+          "parcelIdField": "PARCEL",
+          "fluField": "F2018FLU",
+          "fluLabelField": "DESCRIPTION",
+          "altFluField": "NEW_LU",
+          "geometry": "none"
+        }
+      ]
+    },
+    {
+      "id": "winter-park",
+      "name": "City of Winter Park",
+      "prefix": "WP",
+      "status": "active",
+      "coverage": "city-only",
+      "join": "spatial",
+      "fixture": "data/fixtures/municipal-overlays/winter-park.json",
+      "notes": "District polygons. Spatial join. PublicAccess parcels often carry OCPA-style codes; MapServer 6 and 7 are the city districts.",
+      "layers": [
+        {
+          "role": "zoning",
+          "url": "https://gis.cityofwinterpark.org/arcgis/rest/services/PublicAccess/MapServer/6",
+          "zoningField": "Zoning",
+          "geometry": "all"
+        },
+        {
+          "role": "flu",
+          "url": "https://gis.cityofwinterpark.org/arcgis/rest/services/PublicAccess/MapServer/7",
+          "fluField": "FLU",
+          "geometry": "all"
+        }
+      ]
+    },
+    {
+      "id": "orlando",
+      "name": "City of Orlando",
+      "prefix": "ORL",
+      "status": "active",
+      "coverage": "city-only",
+      "join": "spatial",
+      "fixture": "data/fixtures/municipal-overlays/orlando.json",
+      "notes": "City Socrata zoning and future land use. Spatial join. Orange County open-data layers 82 and 83 are mirrors and are not the source used here.",
+      "layers": [
+        {
+          "role": "zoning",
+          "url": "https://gis.orlando.gov/server/rest/services/Socrata_OpenData/OrlandoLandUsePlanning/MapServer/7",
+          "zoningField": "Zoning",
+          "zoningLabelField": "PD_NAME",
+          "geometry": "all"
+        },
+        {
+          "role": "flu",
+          "url": "https://gis.orlando.gov/server/rest/services/Socrata_OpenData/OrlandoLandUsePlanning/MapServer/3",
+          "fluField": "LanduseType",
+          "geometry": "all"
+        }
+      ]
+    },
+    {
+      "id": "eatonville",
+      "name": "Town of Eatonville",
+      "prefix": "EVL",
+      "status": "active",
+      "coverage": "city-only",
+      "join": "spatial",
+      "fixture": "data/fixtures/municipal-overlays/eatonville.json",
+      "notes": "Orange County InfoMap town layers with real district codes. Not AGOL zoning layer 51 CITY stubs.",
+      "layers": [
+        {
+          "role": "zoning",
+          "url": "https://ocgis4.ocfl.net/arcgis/rest/services/InfoMap_Public_Layers/MapServer/137",
+          "zoningField": "ZONING",
+          "zoningLabelField": "PD_NAME",
+          "geometry": "all"
+        },
+        {
+          "role": "flu",
+          "url": "https://ocgis4.ocfl.net/arcgis/rest/services/InfoMap_Public_Layers/MapServer/102",
+          "fluField": "LAND_USE",
+          "parcelIdField": "TAX_ID",
+          "geometry": "all"
+        }
+      ]
+    },
+    {
+      "id": "edgewood",
+      "name": "City of Edgewood",
+      "prefix": "EDG",
+      "status": "gap",
+      "coverage": "city-only",
+      "notes": "Gap. The city publishes a PDF zoning map only (https://edgewood-fl.gov/planning/page/zoning-map). Orange County zoning layer 51 Edgewood rows are ZONING=CITY stubs, not LDC districts. maps.etcog.org EdgewoodZoning_Public is Edgewood, Texas, and is rejected."
+    },
+    {
+      "id": "windermere",
+      "name": "Town of Windermere",
+      "prefix": "WND",
+      "status": "gap",
+      "coverage": "city-only",
+      "notes": "Gap. No public zoning or FLU FeatureServer. Orange County layer 51 rows are ZONING=CITY stubs."
+    },
+    {
+      "id": "belle-isle",
+      "name": "City of Belle Isle",
+      "prefix": "BI",
+      "status": "gap",
+      "coverage": "city-only",
+      "notes": "Gap. Boundary and parcel PDFs only. Orange County layer 51 rows are ZONING=CITY stubs."
+    },
+    {
+      "id": "oakland",
+      "name": "Town of Oakland",
+      "prefix": "OAK",
+      "status": "gap",
+      "coverage": "city-only",
+      "notes": "Gap. No public zoning or FLU REST for the Town of Oakland, Florida. Do not use Oakland Park in Broward."
+    },
+    {
+      "id": "bay-lake",
+      "name": "City of Bay Lake",
+      "prefix": "BAY",
+      "status": "gap",
+      "coverage": "city-only",
+      "notes": "Gap. No public city zoning or FLU REST. Orange County layer 51 rows are ZONING=CITY stubs."
+    },
+    {
+      "id": "lake-buena-vista",
+      "name": "City of Lake Buena Vista",
+      "prefix": "LBV",
+      "status": "gap",
+      "coverage": "city-only",
+      "notes": "Gap. No public city zoning or FLU REST. Orange County layer 51 rows are ZONING=CITY stubs."
+    }
+  ]
+}

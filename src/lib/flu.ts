@@ -45,10 +45,13 @@ export function describeFluMatch(
   config: FluConfig,
 ): { allows: boolean | null; reason: string; category: FluCategory | null } {
   if (!flu?.code) {
+    const place = flu?.jurisdictionName;
     return {
       allows: null,
       category: null,
-      reason: "No Future Land Use designation is joined to this parcel. Municipal FLU besides Orlando is a known gap.",
+      reason: place
+        ? `No ${place} Future Land Use code is joined for this parcel. County FLU is not used in its place.`
+        : "No Future Land Use designation is joined to this parcel.",
     };
   }
   const category = findFluCategory(flu, config);

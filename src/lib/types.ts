@@ -50,7 +50,16 @@ export type FluInfo = {
   code: string | null;
   label: string | null;
   jurisdiction: string | null;
+  /** Display name, for example "City of Maitland". Matching still uses `jurisdiction`. */
+  jurisdictionName?: string | null;
   source: string | null;
+};
+
+export type MunicipalOverlayInfo = {
+  id: string;
+  name: string;
+  join: "attribute" | "spatial";
+  coverage: "city-only";
 };
 
 export type OpportunityZoneInfo = {
@@ -389,6 +398,14 @@ export type ParcelProperties = {
   propertyName: string | null;
   zoningCode: string | null;
   zoningDistrict: string | null;
+  /** City district description when the municipal overlay has one. */
+  zoningLabel?: string | null;
+  /** "City of Maitland" when municipal zoning replaced the county code. */
+  zoningAuthority?: string | null;
+  zoningSource?: string | null;
+  /** OCPA or other county code kept beside the municipal district. */
+  countyZoningCode?: string | null;
+  municipalOverlay?: MunicipalOverlayInfo | null;
   jurisdictionPrefix: string | null;
   dorCode: string | null;
   acreage: number | null;

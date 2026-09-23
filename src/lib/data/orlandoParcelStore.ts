@@ -1,6 +1,8 @@
 import path from "node:path";
 import { access, readFile } from "node:fs/promises";
 import { parcelMatchesFilters } from "../filters";
+import { applyMunicipalOverlay } from "../municipalOverlays";
+import { loadMunicipalOverlayIndex } from "./municipalOverlayStore";
 import { annotateParcelSignals, loadOrangeSignalIndex } from "../orangeSignals";
 import {
   ORLANDO_CORE_ACREAGE,
@@ -169,15 +171,16 @@ export async function finalizeOrlandoParcelPage(
   features: ParcelFeature[],
   query: OrlandoParcelQuery = {},
 ): Promise<OrlandoParcelPage> {
-  const index = await loadOrangeSignalIndex();
-  for (const feature of features) annotateParcelSignals(feature, index);
+  const [index, municipal] = await Promise.all([loadOrangeSignalIndex(), loadMunicipalOverlayIndex()]);
+  const withCity = features.map((feature) => applyMunicipalOverlay(feature, municipal));
+  for (const feature of withCity) annotateParcelSignals(feature, index);
 
   const limit = query.limit ?? 4000;
   const filters = query.filters;
   const zoningConfig = query.zoningConfig;
   const fluConfig = query.fluConfig;
   const canFilter = Boolean(filters && zoningConfig && fluConfig);
-  const page = selectParcelPage(features, limit, (feature) =>
+  const page = selectParcelPage(withCity, limit, (feature) =>
     canFilter ? parcelMatchesFilters(feature, filters!, zoningConfig!, fluConfig!) : true,
   );
 
@@ -238,10 +241,12 @@ export async function getOrlandoFixtureParcel(id: string): Promise<ParcelFeature
     const tile = lookup[parcelId];
     if (!tile) return null;
     const features = await readFeatureFile(path.join(county.path, `${tile}.geojson`));
-    return features.find((feature) => feature.properties.id === id) ?? null;
+    const feature = features.find((item) => item.properties.id === id) ?? null;
+    return feature ? applyMunicipalOverlay(feature, await loadMunicipalOverlayIndex()) : null;
   }
   const features = await readFeatureFile(county.path);
-  return features.find((feature) => feature.properties.id === id) ?? null;
+  const feature = features.find((item) => item.properties.id === id) ?? null;
+  return feature ? applyMunicipalOverlay(feature, await loadMunicipalOverlayIndex()) : null;
 }
 
 function num(value: unknown): number | null {

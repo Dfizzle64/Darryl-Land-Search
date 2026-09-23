@@ -70,7 +70,7 @@ export function describeRezoningCandidate(
       isCandidate: false,
       label: null,
       reason:
-        "FLU is not joined for this parcel, so it cannot be classified as a rezoning candidate. Municipal FLU besides Orlando is a known gap.",
+        "FLU is not joined for this parcel, so it cannot be classified as a rezoning candidate. Cities without a municipal FLU layer stay unknown.",
     };
   }
   if (flu && !zoning) {
@@ -301,10 +301,10 @@ export function emptyStateHint(filters: FilterState, matched: number, fluUnknown
   if (matched > 0) return null;
   filters = appliedParcelFilters(filters);
   if (filters.landUseFilter === "rezoning") {
-    return "No rezoning candidates match: that mode needs joined FLU that supports multifamily / higher density and current zoning that is not MF-capable. Municipal FLU besides Orlando is often missing — those parcels are omitted rather than guessed. Try All parcels or Non-multifamily zoning, or turn FLU-unknown jurisdictions off your mental map.";
+    return "No rezoning candidates match: that mode needs joined FLU that supports multifamily / higher density and current zoning that is not MF-capable. Edgewood, Windermere, Belle Isle, Oakland, Bay Lake, and Lake Buena Vista have no city FLU layer, so those parcels stay unknown. Try All parcels or Non-multifamily zoning.";
   }
   if (filters.landUseFilter === "flu" && fluUnknownCount > 0) {
-    return "No joined FLU designations in this view currently match the multifamily-supportive list. Municipal FLU besides Orlando is a known gap — try Either, or turn land-use filtering off.";
+    return "No joined FLU designations in this view currently match the multifamily-supportive list. Some cities still have no FLU layer. Try Either, or turn land-use filtering off.";
   }
   if (filters.ozFilter === "in") {
     return "No matching parcels sit in a current designated Qualified Opportunity Zone under the other filters. Clear the OZ filter or lower acreage / income / AADT thresholds.";

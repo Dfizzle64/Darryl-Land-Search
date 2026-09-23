@@ -675,6 +675,10 @@ def gap_reason(county: dict) -> str:
 
 def spec_for(county: dict) -> dict:
     fips = county["fips"]
+    if fips == "47189" and county.get("state") == "Tennessee":
+        from seed_wilson_tn import wilson_spec
+
+        return wilson_spec()
     if fips in ORLANDO_REUSE:
         return {"kind": "reuse-orlando"}
     override = county_override(fips)
@@ -922,20 +926,24 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Wilson County, Tennessee uses Comptroller county id 95 (not FIPS 189) and joins Themes attributes. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb), plus Wilson County, Tennessee city layers: Lebanon `zone` and Mt. Juliet `Zone_Curre` / `FLU_Lisa` inside those city limits only. Unincorporated Wilson zoning/FLU and Watertown zoning stay gaps. Wilson County, North Carolina is not a source. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "wilson-tn":
+        from seed_wilson_tn import download_wilson
+
+        return download_wilson(county, markets, refresh=bool(spec.get("refresh")))
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
@@ -1141,6 +1149,8 @@ def main() -> None:
     for fips, slot in grouped.items():
         markets = full_markets[fips]
         spec = spec_for(slot["county"])
+        if isinstance(spec, dict):
+            spec["refresh"] = args.refresh
         existing = COUNTY_DIR / fips / "county.json"
         if spec["kind"] == "gap":
             if not existing.exists() or args.refresh:

@@ -39,6 +39,32 @@ describe("describeOz2Eligibility", () => {
 });
 
 describe("describeOpportunityZone", () => {
+  it("does not treat a Wilson rural-eligible tract as a designated QOZ", () => {
+    const designated = describeOpportunityZone({
+      inOpportunityZone: false,
+      tractGeoid: null,
+      tractName: null,
+      source: "hud-opportunity-zones",
+      designatedRural: null,
+    });
+    const eligible = describeOz2Eligibility({
+      eligible: true,
+      rural: true,
+      tractGeoid: "47189030402",
+      tractName: "Census tract 304.02",
+      designation: "eligible-for-nomination",
+      source: "rev-proc-2026-14",
+    });
+    expect(designated.inZone).toBe(false);
+    expect(designated.label).toBe("Not in designated Opportunity Zone");
+    expect(designated.detail).toMatch(/not a designation/i);
+    expect(designated.detail).not.toMatch(/Orange County/);
+    expect(eligible.eligible).toBe(true);
+    expect(eligible.statusChip).toBe("Eligible (rural) — not designated");
+    expect(eligible.detail).toMatch(/has not been nominated or certified/i);
+    expect(eligible.detail).not.toMatch(/in designated opportunity zone/i);
+  });
+
   it("keeps Notice 2025-50 rural status on current designations separate from OZ 2.0", () => {
     const described = describeOpportunityZone({
       inOpportunityZone: true,

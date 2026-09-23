@@ -5,20 +5,45 @@
   "markets": [
     "Nashville"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 10671,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
   "source": "tn-impact-47189",
   "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
   "gaps": [
-    "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-    "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+    "Unincorporated Wilson zoning and future land use have no public FeatureServer (county PDF maps only; the $75 shapefile was not purchased). Zoning and FLU stay null outside Lebanon and Mt. Juliet.",
+    "Watertown zoning is the 2017 ordinance PDF only. No anonymous city-limit or zoning FeatureServer was verified. CITYNUM 758 parcels keep IMPACT geometry with null zoning and FLU.",
+    "Lebanon zone and Mt. Juliet Zone_Curre / FLU_Lisa are city-only. They are applied only when the parcel centroid is inside that city limit. CAMA ZONING is not used as an entitlement.",
+    "Rejected gis.wilson-co.com and county-data-wilsoncounty.opendata.arcgis.com \u2014 those are Wilson County, North Carolina.",
+    "Rejected token-gated GEOJobe PSA layers (WilsonTN_PSA and related utility proxies, including Lebanon Parcels_Address).",
+    "Comptroller COUNTY_ID is 95 (JUR 095), not Census FIPS 189. Attributes come from IMPACT Parcel_Layer_Themes layer 12 joined on GISLINK using the latest TAXYR.",
+    "HUD Opportunity Zones has no designated tract in Wilson County (GEOID 47189). Rev. Proc. 2026-14 rural eligibility is stored only on oz2Eligibility for the Nashville rural pack and is not a designated QOZ.",
+    "Assessed and taxable values are not on the public IMPACT extract. marketValue is APPRAISAL when it is positive; otherwise null."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": 0,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/47189/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47189/lookup.json",
+  "sourceCount": 10671,
+  "dropped": 0,
+  "tileCount": 8,
+  "comptrollerCountyId": 95,
+  "joinStats": {
+    "themes": 10646,
+    "owners": 10646,
+    "situs": 10646,
+    "appraisals": 10625,
+    "lebLimit": 719,
+    "mtjLimit": 506,
+    "lebZoning": 715,
+    "mtjZoning": 406,
+    "mtjFlu": 506,
+    "watertown": 29,
+    "unincorporated": 9413,
+    "cityNumOutsideLimit": 4,
+    "overlap": 0,
+    "eligible": 281,
+    "designated": 0,
+    "hudDesignatedTracts": 0
+  }
 }

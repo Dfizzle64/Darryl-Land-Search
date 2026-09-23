@@ -215,7 +215,7 @@ Urban status chips read **Eligible — not designated**. The rural chip stays **
 | Winston-Salem | 105 | 24 | 81 |
 | Wilmington | 55 | 31 | 24 |
 
-The status chip on this pack is **Eligible — not designated** for both rural and urban rows. Rural is still drawn orange and urban blue. Columbia, Greenville, and Savannah’s South Carolina fringe keep the governor-filed line where the notes say so. Alabama (Birmingham, Mobile, Huntsville, and Pensacola’s Baldwin spill) is new inventory. Memphis includes the Arkansas and Mississippi counties in the shed.
+The status chip on this pack is **Eligible — not designated** for both rural and urban rows. Rural is still drawn orange and urban blue. Columbia, Greenville, and Savannah’s South Carolina fringe keep the governor-filed line where the notes say so. Alabama (Birmingham, Mobile, Huntsville, and Pensacola’s Baldwin spill) is new inventory. Huntsville loads Madison, Limestone, and Morgan 5–150 acre parcels with owner, tax, and (where the city overlay hits) Huntsville or City of Madison zoning. Marshall County has no countywide parcel service, and Decatur zoning is MapGeo-only. Memphis includes the Arkansas and Mississippi counties in the shed.
 
 **90-minute sheds are approximate county rings, not drive-time isochrones.** A county is included when its main corridor is commonly within about 90 minutes off-peak. Outer-edge counties are flagged in the tract notes and in the county menu. County membership, exclusions, and sources for the seven are in `data/oz2-7markets-90min-counties.md`. The smaller MSAs are in `data/oz2-other-msas-counties.md`.
 

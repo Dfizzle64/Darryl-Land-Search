@@ -27,6 +27,23 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "01083": "https://isv.kcsgis.com/al.limestone_revenue/",
+  "01089": "https://isv.kcsgis.com/al.madison_revenue/",
+  "01103": "https://isv.kcsgis.com/al.morgan_revenue/",
+};
+
+const APPRAISER_COUNTY_LABEL: Record<string, string> = {
+  "12009": "Brevard",
+  "12069": "Lake",
+  "12083": "Marion",
+  "12097": "Osceola",
+  "12105": "Polk",
+  "12117": "Seminole",
+  "12119": "Sumter",
+  "12127": "Volusia",
+  "01083": "Limestone",
+  "01089": "Madison",
+  "01103": "Morgan",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -42,24 +59,7 @@ export function parcelAppraiserUrl(options: {
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);
-  const countyLabel =
-    fips === "12009"
-      ? "Brevard"
-      : fips === "12069"
-        ? "Lake"
-        : fips === "12083"
-          ? "Marion"
-          : fips === "12097"
-            ? "Osceola"
-            : fips === "12105"
-              ? "Polk"
-              : fips === "12117"
-                ? "Seminole"
-                : fips === "12119"
-                  ? "Sumter"
-                  : fips === "12127"
-                    ? "Volusia"
-                    : "county";
+  const countyLabel = (fips && APPRAISER_COUNTY_LABEL[fips]) || "county";
   return {
     href,
     label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,
@@ -92,12 +92,12 @@ export function formatDate(value: string | null | undefined): string {
   return `${month}/${day}/${year}`;
 }
 
-export function formatSale(sale: { date: string | null; price: number | null }): string {
-  if (!sale.date && (sale.price == null || sale.price <= 0)) return "Not available";
+export function formatSale(sale: { date: string | null; price: number | null }): string | null {
+  if (!sale.date && (sale.price == null || sale.price <= 0)) return null;
   const date = sale.date ? formatDate(sale.date) : null;
   const price = sale.price != null && sale.price > 0 ? formatUsd(sale.price) : null;
   if (date && price) return `${date}\n${price}`;
-  return date ?? price ?? "Not available";
+  return date ?? price;
 }
 
 export function formatMailing(address: {

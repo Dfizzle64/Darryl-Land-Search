@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:41:13Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -1719,10 +1719,10 @@
     },
     "Huntsville": {
       "tier": "other",
-      "parcelCount": 0,
-      "completeCountyCount": 0,
+      "parcelCount": 18584,
+      "completeCountyCount": 3,
       "sampleCountyCount": 0,
-      "gapCountyCount": 7,
+      "gapCountyCount": 4,
       "path": "data/fixtures/market-parcels/markets/huntsville/meta.json",
       "counties": [
         {
@@ -1753,12 +1753,13 @@
           "name": "Limestone",
           "state": "Alabama",
           "fips": "01083",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 5445,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "5728 source rows collapsed to 5445 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Limestone Remap (MapServer/1) is the countywide owner, situs, tax, and acreage source. Layer 0 is the older roll and is not used. No sale fields."
           ]
         },
         {
@@ -1778,12 +1779,13 @@
           "name": "Madison",
           "state": "Alabama",
           "fips": "01089",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 12312,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "12322 source rows collapsed to 12312 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Madison County Public ISV layer 185 is the ownership, tax, acreage, and deed source. There is no sale price field."
           ]
         },
         {
@@ -1795,19 +1797,20 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "Marshall County has no countywide public parcel REST. Huntsville CombinedParcels/MapServer/9 is a 137-feature sample, not a county roll, so Marshall stays a gap."
           ]
         },
         {
           "name": "Morgan",
           "state": "Alabama",
           "fips": "01103",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 827,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "1516 source rows collapsed to 827 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Morgan County parcels come from KCS VAM AL52 layer 10 (owner, situs, tax, and sale). Strings are fixed-width padded and trimmed."
           ]
         }
       ]

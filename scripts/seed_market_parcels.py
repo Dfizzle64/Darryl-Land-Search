@@ -15,6 +15,7 @@ Tile origin matches ORLANDO_PARCEL_TILE in src/lib/orlandoParcels.ts.
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import math
 import threading
@@ -26,7 +27,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
-from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
+from parcel_geometry import esri_rings_to_geojson, geometry_bbox, net_acres, point_in_geometry, representative_point
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "data" / "market-parcel-counties.json"
@@ -99,6 +100,15 @@ DOH_FIELDS = [
 ]
 
 WRITE_LOCK = threading.Lock()
+ZONE_LOCK = threading.Lock()
+ZONE_CACHE: dict[str, list[dict]] = {}
+
+HUNTSVILLE_ZONING_URL = (
+    "https://maps.huntsvilleal.gov/server/rest/services/Zoning/ZoningDistricts/MapServer/5/query"
+)
+MADISON_CITY_ZONING_BASE = "https://maps.madisonal.gov/server/rest/services/DV_PlanningPro1_MIL1/MapServer"
+# Layers/MapServer on maps.madisonal.gov returns 404. Do not use it.
+MADISON_CITY_ZONING_LAYERS = (57, 58, 59, 73)
 
 
 def fetch_json(url: str, params: dict | None = None, timeout: int = 180, retries: int = 5) -> dict:
@@ -266,6 +276,7 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    owner2: str | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
     return {
@@ -283,7 +294,7 @@ def empty_feature(
             "situsZip": zip_code,
             "jurisdictionCode": None,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
             "zoningDistrict": None,
@@ -367,6 +378,182 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
     return features
 
 
+def epoch_to_iso(value: Any) -> str | None:
+    """ArcGIS date fields arrive as epoch milliseconds. Some rolls use ISO strings."""
+    text = clean(value)
+    if text and len(text) >= 10 and text[4] == "-" and text[7] == "-":
+        return text[:10]
+    parsed = num(value)
+    if parsed is None or parsed <= 0:
+        return None
+    seconds = parsed / 1000.0 if abs(parsed) > 10_000_000_000 else parsed
+    try:
+        stamp = datetime.datetime.fromtimestamp(seconds, datetime.timezone.utc)
+    except (OverflowError, OSError, ValueError):
+        return None
+    if stamp.year < 1900 or stamp.year > 2100:
+        return None
+    return stamp.date().isoformat()
+
+
+def deed_instrument(attrs: dict, spec: dict) -> str | None:
+    parts: list[str] = []
+    if spec.get("deedTypeField"):
+        kind = clean(attrs.get(spec["deedTypeField"]))
+        if kind:
+            parts.append(kind)
+    book = clean(attrs.get(spec["deedBookField"])) if spec.get("deedBookField") else None
+    page = clean(attrs.get(spec["deedPageField"])) if spec.get("deedPageField") else None
+    book_bits = [bit for bit in (f"Book {book}" if book else None, f"Page {page}" if page else None) if bit]
+    if book_bits:
+        parts.append(" ".join(book_bits))
+    if spec.get("deedField"):
+        deed = clean(attrs.get(spec["deedField"]))
+        if deed:
+            parts.append(deed)
+    return " · ".join(parts) or None
+
+
+def appraiser_url_for(parcel_id: str, spec: dict) -> str | None:
+    template = spec.get("appraiserUrlTemplate")
+    if template and parcel_id.isdigit():
+        return template.replace("{parcelId}", urllib.parse.quote(parcel_id))
+    return spec.get("appraiserUrl") or None
+
+
+def huntsville_city_overlays() -> list[dict]:
+    """Huntsville districts plus the City of Madison zoning union.
+
+    Both cities cross Madison County and Limestone County. Join by centroid
+    onto whichever county parcel the point falls in. Do not FIPS-filter.
+    """
+    overlays = [
+        {
+            "jurisdiction": "Huntsville",
+            "url": HUNTSVILLE_ZONING_URL,
+            "where": "1=1",
+            "outFields": ["Zoning", "ZoneLabel"],
+            "codeField": "Zoning",
+            "labelField": "ZoneLabel",
+        }
+    ]
+    for layer in MADISON_CITY_ZONING_LAYERS:
+        overlays.append(
+            {
+                "jurisdiction": "City of Madison",
+                "url": f"{MADISON_CITY_ZONING_BASE}/{layer}/query",
+                "where": "1=1",
+                "outFields": ["Name", "Use_Status"],
+                "codeField": "Name",
+                "statusField": "Use_Status",
+            }
+        )
+    return overlays
+
+
+def _zones_for_overlay(overlay: dict) -> list[dict]:
+    key = overlay["url"]
+    with ZONE_LOCK:
+        cached = ZONE_CACHE.get(key)
+        if cached is not None:
+            return cached
+        print(f"  zoning {overlay['jurisdiction']} {key}", flush=True)
+        ids = fetch_object_ids(key, overlay.get("where") or "1=1")
+        raw = fetch_by_ids(key, ids, overlay["outFields"])
+        zones: list[dict] = []
+        for item in raw:
+            attrs = item.get("attributes") or {}
+            code = clean(attrs.get(overlay["codeField"]))
+            if not code:
+                continue
+            geometry, _acres = rings_to_feature_geometry(item.get("geometry"))
+            if not geometry:
+                continue
+            bbox = geometry_bbox(geometry)
+            if not bbox:
+                continue
+            status = clean(attrs.get(overlay["statusField"])) if overlay.get("statusField") else None
+            label = clean(attrs.get(overlay["labelField"])) if overlay.get("labelField") else None
+            proposed = bool(status and status.lower() != "current") or code.lower().startswith("proposed")
+            area = abs(net_acres(item.get("geometry", {}).get("rings") or []))
+            zones.append(
+                {
+                    "jurisdiction": overlay["jurisdiction"],
+                    "code": code,
+                    "label": label if label and label != code else None,
+                    "status": status,
+                    "proposed": proposed,
+                    "area": area or 0,
+                    "bbox": bbox,
+                    "geometry": geometry,
+                }
+            )
+        ZONE_CACHE[key] = zones
+        print(f"    {len(zones)} zoning polygons", flush=True)
+        return zones
+
+
+def apply_zoning_overlays(features: list[dict], overlays: list[dict], *, overlay_only: bool) -> dict:
+    zones: list[dict] = []
+    for overlay in overlays:
+        zones.extend(_zones_for_overlay(overlay))
+    outside = "Centroid is outside the Huntsville and City of Madison zoning overlays."
+    by_city: dict[str, int] = {}
+    joined = 0
+    for feature in features:
+        props = feature["properties"]
+        center = props.get("centroid") or [None, None]
+        lon, lat = center[0], center[1]
+        hit = None
+        if isinstance(lon, (int, float)) and isinstance(lat, (int, float)):
+            candidates = []
+            for zone in zones:
+                west, south, east, north = zone["bbox"]
+                if lon < west or lon > east or lat < south or lat > north:
+                    continue
+                if point_in_geometry(float(lon), float(lat), zone["geometry"]):
+                    candidates.append(zone)
+            if candidates:
+                hit = min(candidates, key=lambda zone: (1 if zone["proposed"] else 0, zone["area"], zone["code"]))
+        gaps = [gap for gap in (props.get("dataGaps") or []) if gap != outside]
+        if hit is None:
+            if overlay_only:
+                props["zoningCode"] = None
+                props["zoningDistrict"] = None
+                props["jurisdictionCode"] = None
+            if overlay_only:
+                gaps.append(outside)
+        else:
+            props["zoningCode"] = hit["code"]
+            props["zoningDistrict"] = hit["label"]
+            props["jurisdictionCode"] = hit["jurisdiction"]
+            joined += 1
+            by_city[hit["jurisdiction"]] = by_city.get(hit["jurisdiction"], 0) + 1
+        if gaps:
+            props["dataGaps"] = gaps
+        elif "dataGaps" in props:
+            props["dataGaps"] = []
+    return {"joined": joined, "byCity": by_city}
+
+
+def attach_overlays(features: list[dict], spec: dict) -> tuple[str | None, int | None, dict | None]:
+    overlays = spec.get("zoningOverlays")
+    if not overlays or not features:
+        return None, None, None
+    stats = apply_zoning_overlays(features, overlays, overlay_only=spec.get("zoningMode") == "overlay")
+    by_city = stats["byCity"]
+    huntsville = by_city.get("Huntsville", 0)
+    madison = by_city.get("City of Madison", 0)
+    note = (
+        f"City zoning is a centroid join: {huntsville} parcels in Huntsville ZoningDistricts/5 and "
+        f"{madison} in the City of Madison DV_PlanningPro1 union (layers 57+58+59+73). "
+        "Huntsville and City of Madison both span Madison County and Limestone County. "
+        "maps.madisonal.gov Layers/MapServer returns 404 and is not used."
+    )
+    print(f"  zoning joined {stats['joined']} (Huntsville {huntsville}, City of Madison {madison})", flush=True)
+    return note, stats["joined"], by_city
+
+
 def sale_date(year: Any, month: Any) -> str | None:
     y = num(year)
     if y is None or y < 1900 or y > 2100:
@@ -418,6 +605,17 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        if spec.get("saleDateField"):
+            sold_on = epoch_to_iso(attrs.get(spec["saleDateField"]))
+        elif spec.get("saleYearField"):
+            sold_on = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
+        else:
+            sold_on = None
+        situs = clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None
+        if spec.get("situs2Field"):
+            situs2 = clean(attrs.get(spec["situs2Field"]))
+            if situs2:
+                situs = f"{situs}, {situs2}" if situs else situs2
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -429,13 +627,14 @@ def normalize_rows(
             center=center,  # type: ignore[arg-type]
             source=spec["source"],
             owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
-            situs=clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None,
+            owner2=clean(attrs.get(spec["owner2Field"])) if spec.get("owner2Field") else None,
+            situs=situs,
             city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
             zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
+            sale_date=sold_on,
             sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
@@ -446,6 +645,18 @@ def normalize_rows(
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        if spec.get("landValueField"):
+            feature["properties"]["tax"]["landValue"] = num(attrs.get(spec["landValueField"]))
+        if spec.get("improvementValueField"):
+            feature["properties"]["tax"]["improvementValue"] = num(attrs.get(spec["improvementValueField"]))
+        instrument = deed_instrument(attrs, spec)
+        if instrument:
+            feature["properties"]["lastSale"]["instrument"] = instrument
+        appraiser = appraiser_url_for(parcel_id, spec)
+        if appraiser:
+            feature["properties"]["appraiserUrl"] = appraiser
+        if spec.get("featureGaps"):
+            feature["properties"]["dataGaps"] = list(spec["featureGaps"])
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -657,6 +868,182 @@ def county_override(fips: str) -> dict | None:
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
             ],
         }
+    if fips == "01089":  # Madison County AL
+        return {
+            "kind": "arcgis",
+            "url": "https://web3.kcsgis.com/kcsgis/rest/services/Madison/Madison_Public_ISV/MapServer/185/query",
+            "where": "Acres>=5 AND Acres<=150",
+            "outFields": [
+                "PIN",
+                "ParcelNum",
+                "ASSESS_NUM",
+                "PropertyOwner",
+                "MailingAddress",
+                "PropertyAddress",
+                "Acres",
+                "TotalLandValue",
+                "TotalBuildingValue",
+                "TotalAppraisedValue",
+                "TotalAssessedValue",
+                "DeedDate",
+                "DeedType",
+                "DeedBook",
+                "DeedPage",
+                "TaxYear",
+            ],
+            "idField": "PIN",
+            "idFallbacks": ["ParcelNum", "ASSESS_NUM"],
+            "acresField": "Acres",
+            "ownerField": "PropertyOwner",
+            "situsField": "PropertyAddress",
+            "mail1Field": "MailingAddress",
+            "marketValueField": "TotalAppraisedValue",
+            "assessedField": "TotalAssessedValue",
+            "landValueField": "TotalLandValue",
+            "improvementValueField": "TotalBuildingValue",
+            "saleDateField": "DeedDate",
+            "deedTypeField": "DeedType",
+            "deedBookField": "DeedBook",
+            "deedPageField": "DeedPage",
+            "appraiserUrlTemplate": "https://madisonproperty.countygovservices.com/Property/Property/Summary?ppin={parcelId}&taxyear=2027",
+            "appraiserUrl": "https://isv.kcsgis.com/al.madison_revenue/",
+            "zoningOverlays": huntsville_city_overlays(),
+            "zoningMode": "overlay",
+            "source": "al-madison-public-isv-185",
+            "coverage": "complete-gte-5ac",
+            "featureGaps": [
+                "No sale price on Madison Public ISV. Deed date and instrument are stored when the roll has them.",
+            ],
+            "gaps": [
+                "Madison County Public ISV layer 185 is the ownership, tax, acreage, and deed source. There is no sale price field.",
+                "PIN deep-link: https://madisonproperty.countygovservices.com/Property/Property/Summary?ppin={PIN}&taxyear=2027.",
+                "Huntsville and City of Madison zoning are joined by centroid. Parcels outside those city overlays have no zoning.",
+            ],
+        }
+    if fips == "01083":  # Limestone County AL
+        return {
+            "kind": "arcgis",
+            "url": "https://gis.limestonecounty-al.gov/arcgis/rest/services/Limestone_Parcels/MapServer/1/query",
+            "where": "CALC_ACRE>=5 AND CALC_ACRE<=150",
+            "outFields": [
+                "ParcelNo",
+                "PID",
+                "OwnerName",
+                "OwnerName2",
+                "MailAddress1",
+                "MailAddress2",
+                "MailCity",
+                "MailState",
+                "MailZip",
+                "PropertyAddr1",
+                "PropertyCity",
+                "PropertyState",
+                "PropertyZip",
+                "CALC_ACRE",
+                "TotalLandValue",
+                "TotalImpValue",
+                "TotalValue",
+                "RecordYear",
+            ],
+            "idField": "ParcelNo",
+            "idFallbacks": ["PID"],
+            "acresField": "CALC_ACRE",
+            "ownerField": "OwnerName",
+            "owner2Field": "OwnerName2",
+            "situsField": "PropertyAddr1",
+            "cityField": "PropertyCity",
+            "zipField": "PropertyZip",
+            "mail1Field": "MailAddress1",
+            "mail2Field": "MailAddress2",
+            "mailCityField": "MailCity",
+            "mailStateField": "MailState",
+            "mailZipField": "MailZip",
+            "marketValueField": "TotalValue",
+            "landValueField": "TotalLandValue",
+            "improvementValueField": "TotalImpValue",
+            "appraiserUrl": "https://isv.kcsgis.com/al.limestone_revenue/",
+            "zoningOverlays": huntsville_city_overlays(),
+            "zoningMode": "overlay",
+            "source": "al-limestone-remap-1",
+            "coverage": "complete-gte-5ac",
+            "featureGaps": ["No sale date or sale price on Limestone Remap parcels."],
+            "gaps": [
+                "Limestone Remap (MapServer/1) is the countywide owner, situs, tax, and acreage source. Layer 0 is the older roll and is not used. No sale fields.",
+                "Owner and address strings are fixed-width padded and trimmed before display.",
+                "Huntsville and City of Madison zoning are joined by centroid where those cities cross into Limestone. There is no county zoning layer.",
+            ],
+        }
+    if fips == "01103":  # Morgan County AL
+        return {
+            "kind": "arcgis",
+            "url": "https://web4.kcsgis.com/kcsgis/rest/services/VAM/AL52_VAM_MS/MapServer/10/query",
+            "where": "TotalAcres>=5 AND TotalAcres<=150",
+            "outFields": [
+                "PARCELID",
+                "PID",
+                "PIN",
+                "Owner",
+                "Owner2",
+                "MailAdd1",
+                "MailAdd2",
+                "MailCity",
+                "MailState",
+                "MailZip",
+                "PropAddr1",
+                "PropAddr2",
+                "PropCity",
+                "PropState",
+                "PropZip",
+                "TotalAcres",
+                "TotalLandValue",
+                "TotalImpValue",
+                "TotalValue",
+                "AssdValue",
+                "SoldTotalPrice",
+                "LastSalesDate",
+                "LastDeed",
+                "RecordYear",
+            ],
+            "idField": "PARCELID",
+            "idFallbacks": ["PID", "PIN"],
+            "acresField": "TotalAcres",
+            "ownerField": "Owner",
+            "owner2Field": "Owner2",
+            "situsField": "PropAddr1",
+            "situs2Field": "PropAddr2",
+            "cityField": "PropCity",
+            "zipField": "PropZip",
+            "mail1Field": "MailAdd1",
+            "mail2Field": "MailAdd2",
+            "mailCityField": "MailCity",
+            "mailStateField": "MailState",
+            "mailZipField": "MailZip",
+            "marketValueField": "TotalValue",
+            "assessedField": "AssdValue",
+            "landValueField": "TotalLandValue",
+            "improvementValueField": "TotalImpValue",
+            "salePriceField": "SoldTotalPrice",
+            "saleDateField": "LastSalesDate",
+            "deedField": "LastDeed",
+            "appraiserUrl": "https://isv.kcsgis.com/al.morgan_revenue/",
+            "source": "al-morgan-vam-10",
+            "coverage": "complete-gte-5ac",
+            "featureGaps": ["Decatur municipal zoning is MapGeo-only. No public zoning MapServer was found, so city zoning is not joined."],
+            "gaps": [
+                "Morgan County parcels come from KCS VAM AL52 layer 10 (owner, situs, tax, and sale). Strings are fixed-width padded and trimmed.",
+                "Decatur zoning is MapGeo-only. No public FeatureServer or MapServer was found, so Decatur zoning is documented as a gap and is not joined.",
+            ],
+        }
+    if fips == "01095":  # Marshall County AL
+        return {
+            "kind": "gap",
+            "source": "unavailable",
+            "queryUrl": "https://maps.huntsvilleal.gov/server/rest/services/Boundaries/CombinedParcels/MapServer/9",
+            "reason": "Marshall County has no countywide public parcel REST.",
+            "gaps": [
+                "Marshall County has no countywide public parcel REST. Huntsville CombinedParcels/MapServer/9 is a 137-feature sample, not a county roll, so Marshall stays a gap.",
+            ],
+        }
     return None
 
 
@@ -740,6 +1127,8 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    zoning_joined: int | None = None,
+    zoning_by_city: dict | None = None,
 ) -> dict:
     row = {
         "name": county["name"],
@@ -760,6 +1149,9 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    if zoning_joined is not None:
+        row["zoningJoinedCount"] = zoning_joined
+        row["zoningByCity"] = zoning_by_city or {}
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
     (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
     return row
@@ -927,9 +1319,9 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
-| Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
+| Alabama | Jefferson parcels; Madison Public ISV/185; Limestone Remap/1; Morgan VAM/10 | Jefferson, Madison, Limestone, and Morgan are complete 5–150 acre extracts. Huntsville ZoningDistricts/5 and City of Madison layers 57+58+59+73 are centroid-joined onto Madison and Limestone (both cities cross those counties). Marshall has no countywide REST (CombinedParcels/9 is a 137-feature sample). Decatur zoning is MapGeo-only. Other Alabama counties stay gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer carries a zoning field (DeKalb) or when a city overlay is configured. Huntsville and City of Madison overlays are not limited to one county FIPS. City of Madison zoning is the union of DV_PlanningPro1_MIL1 layers 57, 58, 59, and 73. The Layers/MapServer path on maps.madisonal.gov returns 404 and is not used. Joined codes are not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -946,6 +1338,18 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
             features = cached["features"]
             for feature in features:
                 feature["properties"]["marketIds"] = markets
+            gaps = list(spec.get("gaps") or [])
+            zoning_note, zoning_joined, zoning_by_city = (None, None, None)
+            if spec.get("zoningOverlays"):
+                try:
+                    zoning_note, zoning_joined, zoning_by_city = attach_overlays(features, spec)
+                except Exception as exc:  # noqa: BLE001
+                    zoning_note = f"City zoning join failed: {exc}. Parcel attributes were still saved."
+                    print(f"  zoning failed {exc}", flush=True)
+                    zoning_joined = 0
+                    zoning_by_city = {}
+            if zoning_note:
+                gaps.append(zoning_note)
             path, lookup, tiles = write_tiles(county, features)
             return county_row(
                 county,
@@ -957,10 +1361,12 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=gaps,
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
+                zoning_joined=zoning_joined,
+                zoning_by_city=zoning_by_city,
             )
     try:
         expected = count_where(spec["url"], spec["where"])
@@ -1029,6 +1435,17 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     if not features:
         coverage = "gap"
         gaps.insert(0, f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks.")
+    zoning_note, zoning_joined, zoning_by_city = (None, None, None)
+    if features and spec.get("zoningOverlays"):
+        try:
+            zoning_note, zoning_joined, zoning_by_city = attach_overlays(features, spec)
+        except Exception as exc:  # noqa: BLE001
+            zoning_note = f"City zoning join failed: {exc}. Parcel attributes were still saved."
+            print(f"  zoning failed {exc}", flush=True)
+            zoning_joined = 0
+            zoning_by_city = {}
+    if zoning_note:
+        gaps.append(zoning_note)
     path, lookup, tiles = (None, None, 0)
     if features:
         path, lookup, tiles = write_tiles(county, features)
@@ -1047,6 +1464,8 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         source_count=expected,
         dropped=dropped,
         tile_count=tiles,
+        zoning_joined=zoning_joined,
+        zoning_by_city=zoning_by_city,
     )
 
 

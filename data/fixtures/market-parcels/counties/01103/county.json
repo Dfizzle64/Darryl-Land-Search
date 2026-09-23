@@ -5,19 +5,21 @@
   "markets": [
     "Huntsville"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 827,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "al-morgan-vam-10",
+  "queryUrl": "https://web4.kcsgis.com/kcsgis/rest/services/VAM/AL52_VAM_MS/MapServer/10/query",
   "gaps": [
-    "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+    "1516 source rows collapsed to 827 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "Morgan County parcels come from KCS VAM AL52 layer 10 (owner, situs, tax, and sale). Strings are fixed-width padded and trimmed.",
+    "Decatur zoning is MapGeo-only. No public FeatureServer or MapServer was found, so Decatur zoning is documented as a gap and is not joined."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/01103/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01103/lookup.json",
+  "sourceCount": 1516,
+  "dropped": 0,
+  "tileCount": 6
 }

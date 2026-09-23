@@ -13,11 +13,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
-| Huntsville | other | 0 | 0 | 0 | 7 |
+| Huntsville | other | 18,584 | 3 | 0 | 4 |
 | Savannah | other | 0 | 0 | 0 | 8 |
 | Columbia | other | 0 | 0 | 0 | 10 |
 | Greenville | other | 1,570 | 0 | 1 | 7 |
@@ -176,7 +176,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 
@@ -221,11 +221,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Cullman | Alabama | 01043 | gap | 0 | unavailable |
 | Jackson | Alabama | 01071 | gap | 0 | unavailable |
-| Limestone | Alabama | 01083 | gap | 0 | unavailable |
+| Limestone | Alabama | 01083 | complete-gte-5ac | 5,445 | al-limestone-remap-1 |
 | Lincoln | Tennessee | 47103 | gap | 0 | tn-impact-47103 |
-| Madison | Alabama | 01089 | gap | 0 | unavailable |
+| Madison | Alabama | 01089 | complete-gte-5ac | 12,312 | al-madison-public-isv-185 |
 | Marshall | Alabama | 01095 | gap | 0 | unavailable |
-| Morgan | Alabama | 01103 | gap | 0 | unavailable |
+| Morgan | Alabama | 01103 | complete-gte-5ac | 827 | al-morgan-vam-10 |
 
 ### Savannah
 

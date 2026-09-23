@@ -21,6 +21,8 @@ export type LastSale = {
   date: string | null;
   price: number | null;
   qualified: string | null;
+  /** Deed type, book/page, or instrument number when the roll has no qualified-sale flag. */
+  instrument?: string | null;
 };
 
 export type TaxInfo = {
@@ -28,6 +30,8 @@ export type TaxInfo = {
   assessedValue: number | null;
   taxableValue: number | null;
   taxes: number | null;
+  landValue?: number | null;
+  improvementValue?: number | null;
 };
 
 export type IncomeInfo = {

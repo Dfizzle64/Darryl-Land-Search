@@ -26,6 +26,24 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
+from triangle_municipalities import (  # noqa: E402
+    APPRAISER_SEARCH_URL,
+    DURHAM_CACHE_VERSION,
+    DURHAM_GAPS,
+    DURHAM_PARCEL_URL,
+    FOLLOWUP_GAPS,
+    NC_ONEMAP_FALLBACK_URL,
+    PLACE_TYPE_LAYER,
+    VIEWER_URL,
+    appraiser_url,
+    apply_triangle_joins,
+    envelope_params,
+    epoch_ms_to_iso,
+    index_polygons,
+    layers_for_county,
+    municipality_summary,
+)
+
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "data" / "market-parcel-counties.json"
 OUT_DIR = ROOT / "data" / "fixtures" / "market-parcels"
@@ -219,7 +237,7 @@ def ring_signed_m2(coords: list[list[float]]) -> float:
     return area / 2.0
 
 
-def rings_to_feature_geometry(geom: dict | None) -> tuple[dict | None, float]:
+def rings_to_feature_geometry(geom: dict | None, tol: float | None = 0.00008) -> tuple[dict | None, float]:
     if not geom or not geom.get("rings"):
         return None, 0.0
     polygons: list[list[list[list[float]]]] = []
@@ -230,7 +248,12 @@ def rings_to_feature_geometry(geom: dict | None) -> tuple[dict | None, float]:
         if len(raw) < 4:
             continue
         net_m2 += ring_signed_m2(raw)
-        coords = simplify_ring(raw)
+        if tol is None:
+            coords = [[round(x, 6), round(y, 6)] for x, y in raw]
+            if coords[0] != coords[-1]:
+                coords.append(coords[0])
+        else:
+            coords = simplify_ring(raw, tol)
         if len(coords) < 4:
             continue
         area = 0.0
@@ -364,14 +387,23 @@ def count_where(url: str, where: str) -> int:
     return count
 
 
-def fetch_object_ids(url: str, where: str) -> list[int]:
-    data = fetch_json(url, {"where": where, "returnIdsOnly": "true", "f": "json"}, timeout=180)
+def fetch_object_ids(url: str, where: str, extra: dict | None = None) -> list[int]:
+    params = {"where": where, "returnIdsOnly": "true", "f": "json"}
+    if extra:
+        params.update(extra)
+    data = fetch_json(url, params, timeout=180)
     if data.get("error"):
         raise RuntimeError(json.dumps(data["error"])[:300])
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    extra: dict | None = None,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
@@ -379,6 +411,8 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
         "returnGeometry": "true",
         "outSR": "4326",
     }
+    if extra:
+        params.update(extra)
     for start in range(0, total, batch):
         chunk = ids[start : start + batch]
         query = dict(params)
@@ -388,12 +422,12 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), extra=extra))
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), extra=extra))
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -538,7 +572,10 @@ def nc_spec(fips: str) -> dict:
         "assessedField": "landval",
         "source": f"nc-onemap-{fips}",
         "coverage": "complete-gte-5ac",
-        "gaps": ["NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."],
+        "gaps": [
+            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join.",
+            *([FOLLOWUP_GAPS[fips]] if fips in FOLLOWUP_GAPS else []),
+        ],
         "fallbackWhere": f"cntyfips='{county3}'",
         "fallbackNote": "NC OneMap gisacres is 0 for this county. Acres were computed from the polygon and then limited to 5.0–150.0.",
     }
@@ -604,6 +641,15 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    if fips == "37063":  # Durham NC — City/County GIS, not NC OneMap
+        return {
+            "kind": "durham",
+            "url": DURHAM_PARCEL_URL,
+            "where": "ACREAGE >= 5 AND ACREAGE <= 150",
+            "source": "durham-property-37063",
+            "coverage": "complete-gte-5ac",
+            "gaps": list(DURHAM_GAPS),
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -777,6 +823,7 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    extra: dict | None = None,
 ) -> dict:
     row = {
         "name": county["name"],
@@ -797,6 +844,8 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    if extra:
+        row.update(extra)
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
     (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
     return row
@@ -958,7 +1007,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels`, except Durham County | Complete 5–150 acre extract. Durham County uses City–County Property/MapServer/4 (REID), joint UDO zoning, and Place Type future land use. Chapel Hill, Morrisville, Raleigh, and Cary tips are spatial-joined. Wake and Orange stay on OneMap until a follow-up (`docs/durham-parcels.md`). Most other counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -966,7 +1015,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county source carries it: DeKalb's parcel attribute, and Durham's UDO plus tip-city polygons. Future land use is joined for Durham City and unincorporated Durham County (Place Type). Tip-city future land use is a documented gap. It is not a multifamily knowledge-base match outside Orange County, Florida. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -1134,6 +1183,335 @@ def write_gap(county: dict, markets: list[str], spec: dict) -> None:
     )
 
 
+DURHAM_OUT_FIELDS = [
+    "REID",
+    "PARCEL_PK",
+    "ACREAGE",
+    "PROPERTY_OWNER",
+    "LOCATION_ADDR",
+    "PHYADDR_CITY",
+    "PHYADDR_ZIP",
+    "OWNER_MAIL_1",
+    "OWNER_MAIL_2",
+    "OWNER_MAIL_3",
+    "OWNER_MAIL_CITY",
+    "OWNER_MAIL_STATE",
+    "OWNER_MAIL_ZIP",
+    "PKG_SALE_DATE",
+    "PKG_SALE_PRICE",
+    "LAND_SALE_DATE",
+    "LAND_SALE_PRICE",
+    "TOTAL_PROP_VALUE",
+    "TOTAL_LAND_VALUE_ASSESSED",
+    "TOTAL_BLDG_VALUE_ASSESSED",
+    "TOTAL_OBLDG_VALUE",
+    "ZONING",
+    "LAND_CLASS",
+    "CITY",
+    "ETJ",
+]
+
+
+def _reid_text(value: Any) -> str | None:
+    text = clean(value)
+    if not text:
+        return None
+    if text.endswith(".0") and text[:-2].isdigit():
+        return text[:-2]
+    return text
+
+
+def _join_mail(*parts: Any) -> str | None:
+    lines = [clean(part) for part in parts]
+    kept = [line for line in lines if line]
+    return ", ".join(kept) if kept else None
+
+
+def _assessed_total(attrs: dict) -> float | None:
+    parts = [
+        num(attrs.get(key))
+        for key in ("TOTAL_LAND_VALUE_ASSESSED", "TOTAL_BLDG_VALUE_ASSESSED", "TOTAL_OBLDG_VALUE")
+    ]
+    if all(part is None for part in parts):
+        return None
+    return sum(part or 0 for part in parts)
+
+
+def _sale_pair(attrs: dict) -> tuple[str | None, float | None]:
+    price = num(attrs.get("PKG_SALE_PRICE"))
+    sale_on = epoch_ms_to_iso(attrs.get("PKG_SALE_DATE"))
+    if price is None or price <= 0:
+        land_price = num(attrs.get("LAND_SALE_PRICE"))
+        price = land_price if land_price is not None and land_price > 0 else None
+    if sale_on is None:
+        sale_on = epoch_ms_to_iso(attrs.get("LAND_SALE_DATE"))
+    return sale_on, price
+
+
+def normalize_durham_rows(raw: list[dict], county: dict, markets: list[str]) -> tuple[list[dict], int]:
+    by_id: dict[str, dict] = {}
+    dropped = 0
+    for item in raw:
+        attrs = item.get("attributes") or {}
+        geometry, computed = rings_to_feature_geometry(item.get("geometry"))
+        if not geometry:
+            dropped += 1
+            continue
+        center = centroid_of(geometry)
+        if not plausible_centroid(center):
+            dropped += 1
+            continue
+        acres = num(attrs.get("ACREAGE"))
+        if acres is None:
+            acres = computed
+        if not in_band(acres):
+            dropped += 1
+            continue
+        parcel_id = _reid_text(attrs.get("REID"))
+        if not parcel_id:
+            dropped += 1
+            continue
+        sale_on, sale_price = _sale_pair(attrs)
+        feature = empty_feature(
+            fips=county["fips"],
+            county=county["name"],
+            state=county["state"],
+            markets=markets,
+            parcel_id=parcel_id,
+            acreage=acres,
+            geometry=geometry,
+            center=center,  # type: ignore[arg-type]
+            source="durham-property-37063",
+            owner=clean(attrs.get("PROPERTY_OWNER")),
+            situs=clean(attrs.get("LOCATION_ADDR")),
+            city=clean(attrs.get("PHYADDR_CITY")),
+            zip_code=zip_str(attrs.get("PHYADDR_ZIP")),
+            zoning=None,
+            dor=clean(attrs.get("LAND_CLASS")),
+            sale_price=sale_price,
+            sale_date=sale_on,
+            market_value=num(attrs.get("TOTAL_PROP_VALUE")),
+            assessed=_assessed_total(attrs),
+            mail1=clean(attrs.get("OWNER_MAIL_1")),
+            mail2=_join_mail(attrs.get("OWNER_MAIL_2"), attrs.get("OWNER_MAIL_3")),
+            mail_city=clean(attrs.get("OWNER_MAIL_CITY")),
+            mail_state=clean(attrs.get("OWNER_MAIL_STATE")),
+            mail_zip=zip_str(attrs.get("OWNER_MAIL_ZIP")),
+        )
+        props = feature["properties"]
+        props["appraiserUrl"] = appraiser_url(parcel_id, attrs.get("PARCEL_PK"))
+        props["dataGaps"] = []
+        props["_durhamCity"] = clean(attrs.get("CITY"))
+        props["_durhamEtj"] = clean(attrs.get("ETJ"))
+        props["_zoningAttribute"] = clean(attrs.get("ZONING"))
+        previous = by_id.get(parcel_id)
+        if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
+            by_id[parcel_id] = feature
+    features = list(by_id.values())
+    features.sort(key=lambda row: row["properties"].get("acreage") or 0, reverse=True)
+    return features, dropped
+
+
+def _overlay_features(layer: dict) -> list[dict]:
+    extra_ids = envelope_params() if layer.get("clip") else None
+    print(f"  overlay {layer['id']}", flush=True)
+    try:
+        ids = fetch_object_ids(layer["url"], "1=1", extra_ids)
+    except RuntimeError:
+        if not extra_ids:
+            raise
+        print("    envelope filter rejected; loading the full layer", flush=True)
+        ids = fetch_object_ids(layer["url"], "1=1")
+        extra_ids = None
+    print(f"    ids {len(ids)}", flush=True)
+    if not ids:
+        return []
+    simplify = {"maxAllowableOffset": "0.00004", "geometryPrecision": "5"}
+    try:
+        raw = fetch_by_ids(layer["url"], ids, layer["outFields"], extra=simplify)
+    except RuntimeError as exc:
+        print(f"    simplify rejected ({exc}); retrying full geometry", flush=True)
+        raw = fetch_by_ids(layer["url"], ids, layer["outFields"])
+    features: list[dict] = []
+    for item in raw:
+        geometry, _acres = rings_to_feature_geometry(item.get("geometry"), tol=None)
+        if not geometry:
+            continue
+        features.append({"geometry": geometry, "attributes": item.get("attributes") or {}})
+    return features
+
+
+def _load_zoning_indexes(fips: str) -> dict:
+    indexes = {}
+    for layer in layers_for_county(fips):
+        polygons = _overlay_features(layer)
+        index, kept = index_polygons(polygons, layer["read"])
+        print(f"    indexed {layer['id']} {kept}", flush=True)
+        indexes[layer["id"]] = index
+    return indexes
+
+
+def _load_place_index(fips: str):
+    if fips not in PLACE_TYPE_LAYER["counties"]:
+        return None
+    polygons = _overlay_features(PLACE_TYPE_LAYER)
+    index, kept = index_polygons(polygons, PLACE_TYPE_LAYER["read"])
+    print(f"    indexed {PLACE_TYPE_LAYER['id']} {kept}", flush=True)
+    return index
+
+
+def _durham_extra(stats: dict[str, int]) -> dict:
+    return {
+        "primaryId": "REID",
+        "viewerUrl": VIEWER_URL,
+        "appraiserSearchUrl": APPRAISER_SEARCH_URL,
+        "fallbackQueryUrl": NC_ONEMAP_FALLBACK_URL,
+        "fallbackWhere": "cntyfips='063'",
+        "zoningJoinedCount": int(stats.get("zoning-polygon", 0) + stats.get("zoning-attribute", 0)),
+        "fluJoinedCount": int(stats.get("flu-joined", 0)),
+        "joinStats": stats,
+        "municipalities": municipality_summary(stats),
+        "followUps": [
+            {"fips": "37183", "county": "Wake", "status": "nc-onemap", "note": FOLLOWUP_GAPS["37183"]},
+            {"fips": "37135", "county": "Orange", "status": "nc-onemap", "note": FOLLOWUP_GAPS["37135"]},
+        ],
+    }
+
+
+def _write_durham_result(
+    county: dict,
+    markets: list[str],
+    spec: dict,
+    features: list[dict],
+    *,
+    expected: int,
+    dropped: int,
+    stats: dict[str, int],
+) -> dict:
+    if not all(in_band(feature["properties"].get("acreage")) for feature in features):
+        raise RuntimeError(f"{county['fips']} emitted a parcel outside 5–150 acres")
+    for feature in features:
+        leftovers = [key for key in feature["properties"] if str(key).startswith("_")]
+        if leftovers:
+            raise RuntimeError(f"internal keys left on parcel: {leftovers}")
+    path, lookup, tiles = write_tiles(county, features)
+    extra = _durham_extra(stats)
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    (CACHE_DIR / f"{county['fips']}.json").write_text(
+        json.dumps(
+            {
+                "version": DURHAM_CACHE_VERSION,
+                "sourceCount": expected,
+                "dropped": dropped,
+                "features": features,
+                "extra": extra,
+                "stats": stats,
+            },
+            separators=(",", ":"),
+        )
+    )
+    print(
+        f"  kept {len(features)} zoning {extra['zoningJoinedCount']} flu {extra['fluJoinedCount']}",
+        flush=True,
+    )
+    return county_row(
+        county,
+        markets,
+        feature_count=len(features),
+        coverage=spec["coverage"] if features else "gap",
+        partition="tiles" if features else "none",
+        path=path if features else None,
+        lookup=lookup if features else None,
+        source=spec["source"],
+        query_url=spec["url"],
+        gaps=list(spec.get("gaps") or []),
+        source_count=expected,
+        dropped=dropped,
+        tile_count=tiles,
+        extra=extra,
+    )
+
+
+def download_durham_county(county: dict, markets: list[str], spec: dict) -> dict:
+    fips = county["fips"]
+    cache_path = CACHE_DIR / f"{fips}.json"
+    print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
+    if cache_path.exists() and not spec.get("ignoreCache"):
+        cached = json.loads(cache_path.read_text())
+        if cached.get("version") == DURHAM_CACHE_VERSION and cached.get("features"):
+            features = cached["features"]
+            print(f"  cache hit {len(features)}", flush=True)
+            for feature in features:
+                feature["properties"]["marketIds"] = markets
+            path, lookup, tiles = write_tiles(county, features)
+            return county_row(
+                county,
+                markets,
+                feature_count=len(features),
+                coverage=spec["coverage"],
+                partition="tiles",
+                path=path,
+                lookup=lookup,
+                source=spec["source"],
+                query_url=spec["url"],
+                gaps=list(spec.get("gaps") or []),
+                source_count=cached.get("sourceCount"),
+                dropped=cached.get("dropped"),
+                tile_count=tiles,
+                extra=cached.get("extra"),
+            )
+    try:
+        expected = count_where(spec["url"], spec["where"])
+        if expected <= 0:
+            raise RuntimeError("Durham Property/MapServer/4 returned no 5–150 acre parcels")
+        print(f"  source rows {expected}", flush=True)
+        ids = fetch_object_ids(spec["url"], spec["where"])
+        raw = fetch_by_ids(spec["url"], ids, DURHAM_OUT_FIELDS)
+        features, dropped = normalize_durham_rows(raw, county, markets)
+        if not features:
+            raise RuntimeError(f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks")
+        zoning_indexes = _load_zoning_indexes(fips)
+        place_index = _load_place_index(fips)
+        stats = apply_triangle_joins(features, zoning_indexes, place_index)
+        return _write_durham_result(
+            county,
+            markets,
+            spec,
+            features,
+            expected=expected,
+            dropped=dropped,
+            stats=stats,
+        )
+    except Exception as exc:  # noqa: BLE001
+        print(f"  Durham host failed ({exc}); falling back to NC OneMap cntyfips=063", flush=True)
+        fallback = nc_spec(fips)
+        fallback["url"] = NC_ONEMAP_FALLBACK_URL
+        fallback["ignoreCache"] = True
+        fallback["gaps"] = [
+            (
+                "Durham Property/MapServer/4 failed "
+                f"({exc}). Fell back to NC OneMap FeatureServer/1 cntyfips='063'. "
+                "parno is PIN, not REID. No zoning or future land use join on the fallback."
+            ),
+            *(fallback.get("gaps") or []),
+        ]
+        return download_county(county, markets, fallback)
+
+
+def stamp_triangle_followups() -> None:
+    """Leave Wake and Orange on NC OneMap, with a visible hook to the shared tip layers."""
+    for fips, note in FOLLOWUP_GAPS.items():
+        path = COUNTY_DIR / fips / "county.json"
+        if not path.exists():
+            continue
+        row = json.loads(path.read_text())
+        gaps = list(row.get("gaps") or [])
+        if note not in gaps:
+            gaps.append(note)
+            row["gaps"] = gaps
+            path.write_text(json.dumps(row, indent=2) + "\n")
+
+
 def priority_of(markets: list[str], catalog: dict) -> tuple[int, str]:
     tiers = {market["id"]: 0 if market["tier"] == "primary" else 1 for market in catalog["markets"]}
     order = {market["id"]: index for index, market in enumerate(catalog["markets"])}
@@ -1151,6 +1529,7 @@ def main() -> None:
     args = parser.parse_args()
 
     catalog = json.loads(CATALOG_PATH.read_text())
+    stamp_triangle_followups()
     selected = set(args.market)
     county_filter = {name.lower() for name in args.county}
     grouped: dict[str, dict] = {}
@@ -1178,6 +1557,8 @@ def main() -> None:
     for fips, slot in grouped.items():
         markets = full_markets[fips]
         spec = spec_for(slot["county"])
+        if args.refresh:
+            spec["ignoreCache"] = True
         existing = COUNTY_DIR / fips / "county.json"
         if spec["kind"] == "gap":
             if not existing.exists() or args.refresh:
@@ -1203,7 +1584,10 @@ def main() -> None:
     def run(job: tuple) -> None:
         _priority, _name, county, markets, spec = job
         try:
-            download_county(county, markets, spec)
+            if spec.get("kind") == "durham":
+                download_durham_county(county, markets, spec)
+            else:
+                download_county(county, markets, spec)
         except Exception as exc:  # noqa: BLE001
             print(f"  failed {county['name']} {county['fips']}: {exc}", flush=True)
             county_row(

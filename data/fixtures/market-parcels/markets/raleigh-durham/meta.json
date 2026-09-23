@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:49:17Z",
   "market": "Raleigh-Durham",
   "tier": "primary",
-  "parcelCount": 153279,
+  "parcelCount": 153285,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -58,20 +58,28 @@
       "name": "Durham",
       "fips": "37063",
       "state": "North Carolina",
-      "featureCount": 4934,
+      "featureCount": 4940,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37063",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "durham-property-37063",
+      "queryUrl": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "Primary id is REID. PIN is unstable (Durham Tax Office) and is not used as parcelId. NC OneMap parno tracks PIN.",
+        "Durham City and unincorporated Durham County share the joint City\u2013County UDO (Planning/MapServer/12) and Place Type future land use (Planning/MapServer/25). A non-null Durham ZONING attribute is kept; null attributes are filled by a centroid spatial join.",
+        "Chapel Hill, Morrisville, Raleigh, and Cary are first-class tip municipalities. Zoning is a centroid spatial join to that city's polygons when CITY/ETJ names the tip or the parcel ZONING attribute is null or tip-mixed. Durham UDO is not used as the only zoning for those tips.",
+        "Tip-municipality future land use is thin. Chapel Hill Future_Land_Uses is ImageServer only. Morrisville, Raleigh, and Cary have no verified polygon FLU for the Durham County footprint, so those parcels keep flu null.",
+        "Cary's public zoning layer exposes CLASS and NAME, not a ZONING field. Only a handful of Durham County parcels are in the Cary tip.",
+        "Last sale is package sale (PKG_SALE_DATE/PRICE) with land sale as fallback. There is no multi-transfer sales layer. A sale price of 0 is stored as missing.",
+        "If Property/MapServer/4 is unavailable, the seed falls back to NC OneMap FeatureServer/1 with cntyfips='063' (no sale price; parno is PIN).",
+        "Owner phones and emails are not collected. The appraiser deep link is taxcama PropertySummary by PARCEL_PK, otherwise REID. Viewer: https://maps.durhamnc.gov/",
+        "Wake (37183) and Orange (37135) stay on NC OneMap. Shared tip layers are registered for a follow-up and are not joined onto those counties in this pull."
       ],
       "path": "data/fixtures/market-parcels/counties/37063/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37063/lookup.json",
       "tileCount": 5,
-      "sourceCount": 4934
+      "sourceCount": 4940
     },
     {
       "name": "Franklin",
@@ -200,7 +208,8 @@
       "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
       "gaps": [
         "NC OneMap gisacres is 0 for this county. Acres were computed from the polygon and then limited to 5.0\u2013150.0.",
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join.",
+        "Follow-up: Orange stays on NC OneMap. Chapel Hill zoning is registered in scripts/triangle_municipalities.py and is not joined onto Orange parcels in this pull. Chapel Hill future land use remains ImageServer-only."
       ],
       "path": "data/fixtures/market-parcels/counties/37135/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37135/lookup.json",
@@ -276,7 +285,8 @@
       "source": "nc-onemap-37183",
       "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join.",
+        "Follow-up: Wake stays on NC OneMap. Raleigh, Cary, and Morrisville zoning layers are registered in scripts/triangle_municipalities.py and are not joined onto Wake parcels in this pull."
       ],
       "path": "data/fixtures/market-parcels/counties/37183/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37183/lookup.json",

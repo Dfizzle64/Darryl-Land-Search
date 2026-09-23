@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:49:17Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -1085,7 +1085,7 @@
     },
     "Raleigh-Durham": {
       "tier": "primary",
-      "parcelCount": 153279,
+      "parcelCount": 153285,
       "completeCountyCount": 17,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
@@ -1119,12 +1119,13 @@
           "name": "Durham",
           "state": "North Carolina",
           "fips": "37063",
-          "featureCount": 4934,
+          "featureCount": 4940,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "Primary id is REID. PIN is unstable (Durham Tax Office) and is not used as parcelId. NC OneMap parno tracks PIN.",
+            "Durham City and unincorporated Durham County share the joint City\u2013County UDO (Planning/MapServer/12) and Place Type future land use (Planning/MapServer/25). A non-null Durham ZONING attribute is kept; null attributes are filled by a centroid spatial join."
           ]
         },
         {
@@ -1257,7 +1258,8 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join.",
+            "Follow-up: Wake stays on NC OneMap. Raleigh, Cary, and Morrisville zoning layers are registered in scripts/triangle_municipalities.py and are not joined onto Wake parcels in this pull."
           ]
         },
         {

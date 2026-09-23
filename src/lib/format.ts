@@ -35,6 +35,12 @@ export function parcelAppraiserUrl(options: {
   appraiserUrl?: string | null;
 }): { href: string; label: string } {
   const fips = options.countyFips ?? null;
+  if (fips === "37063") {
+    return {
+      href: options.appraiserUrl || "https://taxcama.dconc.gov/camapwa/",
+      label: "Open Durham County property summary",
+    };
+  }
   if (fips === "12095" || (!fips && !options.appraiserUrl)) {
     return {
       href: ocpaParcelUrl(options.parcelId),

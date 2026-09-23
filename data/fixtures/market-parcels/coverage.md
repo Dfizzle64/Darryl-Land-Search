@@ -11,7 +11,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
-| Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
+| Raleigh-Durham | primary | 153,285 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
 | Melbourne | other | 41,757 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
@@ -144,7 +144,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Alamance | North Carolina | 37001 | complete-gte-5ac | 8,846 | nc-onemap-37001 |
 | Chatham | North Carolina | 37037 | complete-gte-5ac | 13,229 | nc-onemap-37037 |
-| Durham | North Carolina | 37063 | complete-gte-5ac | 4,934 | nc-onemap-37063 |
+| Durham | North Carolina | 37063 | complete-gte-5ac | 4,940 | durham-property-37063 |
 | Franklin | North Carolina | 37069 | complete-gte-5ac | 7,639 | nc-onemap-37069 |
 | Granville | North Carolina | 37077 | complete-gte-5ac | 7,150 | nc-onemap-37077 |
 | Harnett | North Carolina | 37085 | complete-gte-5ac | 11,657 | nc-onemap-37085 |

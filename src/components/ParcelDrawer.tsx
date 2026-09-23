@@ -76,9 +76,15 @@ export function ParcelDrawer({
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
-  const placeLine =
-    [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+  const locality = [properties.situsCity, properties.situsZip].filter(Boolean).join(" ");
+  const countyLine = properties.countyName
+    ? `${properties.countyName} County${properties.state ? `, ${properties.state}` : ""}`
+    : null;
+  const placeLine = [locality, countyLine].filter(Boolean).join(" · ") || "Location not available";
+  const floridaOwner =
+    properties.state === "Florida" ||
+    Boolean(properties.countyFips?.startsWith("12")) ||
+    (!properties.state && !properties.countyFips);
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -106,6 +112,7 @@ export function ParcelDrawer({
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
         <Field label="Zoning" value={properties.zoningCode} />
+        {properties.municipality ? <Field label="Municipality" value={properties.municipality} /> : null}
         <Field label="Future Land Use" value={fluLine} />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
@@ -178,13 +185,18 @@ export function ParcelDrawer({
         <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
           {appraiser.label}
         </a>
-        {entity && properties.ownerName ? (
+        {properties.countyFips === "37063" ? (
+          <a className="block text-moss-400 underline-offset-2 hover:underline" href="https://maps.durhamnc.gov/" target="_blank" rel="noreferrer">
+            Durham Maps viewer
+          </a>
+        ) : null}
+        {floridaOwner && entity && properties.ownerName ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={sunbizSearchUrl(properties.ownerName)} target="_blank" rel="noreferrer">
             Search Florida Sunbiz for LLC / corporate principals
           </a>
-        ) : (
+        ) : floridaOwner ? (
           <p className="text-ink-300">Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped.</p>
-        )}
+        ) : null}
         {properties.countyFips === "12095" || !properties.countyFips ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={comptrollerRecordsUrl()} target="_blank" rel="noreferrer">
             Orange County Comptroller official records

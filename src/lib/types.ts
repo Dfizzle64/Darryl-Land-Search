@@ -384,6 +384,10 @@ export type ParcelProperties = {
   situsCity: string | null;
   situsZip: string | null;
   jurisdictionCode: string | null;
+  /** Municipality name when the county treats cities as first-class (Durham tips). */
+  municipality?: string | null;
+  /** Stable municipality id, for example `chapel-hill` or `durham-county`. */
+  municipalityId?: string | null;
   ownerName: string | null;
   ownerName2: string | null;
   propertyName: string | null;

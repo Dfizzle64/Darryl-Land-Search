@@ -10,11 +10,11 @@ Orange is the public OCPA cadastre. The other complete counties are Florida DOH 
 
 | County | FIPS | Kept (5–150 ac) | Source rows in band | Notes |
 | --- | --- | ---: | ---: | --- |
-| Lake | 12069 | 17,470 | 17,845 | 375 extra parts merged. No zoning/FLU. 1,234 rural-eligible centroids |
+| Lake | 12069 | 17,470 | 17,845 | 375 extra parts merged. Clermont and Mount Dora zoning/FLU inside city limits (344 zoning, 335 FLU). Other Lake cities stay null. 1,234 rural-eligible centroids |
 | Orange | 12095 | 11,709 | 11,887 | OCPA shapes. 320 extra parts merged. 36 multipart accounts summed past 150 and dropped. Zoning on 9,789. FLU on 8,238 |
-| Osceola | 12097 | 5,997 | 6,028 | 31 extra parts merged. No zoning/FLU. 1,481 rural-eligible centroids |
+| Osceola | 12097 | 5,997 | 6,028 | 31 extra parts merged. Kissimmee zoning/FLU inside city limits (352). Other Osceola cities stay null. 1,481 rural-eligible centroids |
 | Polk | 12105 | 19,734 | 19,738 | 4 extra parts merged. No zoning/FLU. 4,253 rural-eligible centroids |
-| Seminole | 12117 | 4,788 | 4,788 | No zoning/FLU. No rural-eligible OZ 2.0 tracts in the pack |
+| Seminole | 12117 | 4,788 | 4,788 | Sanford zoning/FLU inside city limits (368). Other Seminole cities stay null. No rural-eligible OZ 2.0 tracts in the pack |
 | Brevard | 12009 | 120 | — | Thinner sample (not capped at 150) |
 | Marion | 12083 | 120 | — | Thinner sample (not capped at 150) |
 | Sumter | 12119 | 120 | — | Thinner sample (not capped at 150) |
@@ -66,6 +66,8 @@ The seed simplifies rings at about 1–7 meters (never collapsing a ring to its 
 1. Downloads geometry, owner, mailing, sale, tax, and zoning from the OCPA parcel layer. Shapes that share a parcel id are one tax account: piece acres are summed, and the parcel is dropped if that sum is outside 5.0–150.0.
 2. Centroid-joins Orange County future land use (open data layer 21) and Orlando future land use (layer 83).
 
+City zoning and future land use for Sanford, Kissimmee, Clermont, and Mount Dora are a separate pass. `npm run seed:fl-muni` joins those layers onto parcels already in the tiles. It does not re-download the counties. Sanibel, Fort Myers, and Bonita Springs are in that same pass; Lee County has no parcel shelf yet, so those three stay at zero joins.
+
 A normalized cache under `/tmp/dls-orlando-core/` (`*-geom2.json`) avoids a second geometry download if the process is restarted in the same environment. Delete that directory to force a fresh pull. Older caches without `geometryVersion: 2` are ignored.
 
 ## Sources
@@ -80,7 +82,7 @@ Orange cadastre:
 
 ## Gaps
 
-- Lake, Osceola, Polk, and Seminole have no zoning or FLU on the DOH extract. Land-use filters should stay on **All parcels** there. Missing zoning is not treated as multifamily.
+- Polk still has no zoning or FLU on the DOH extract. Lake, Osceola, and Seminole stay null outside Clermont, Mount Dora, Kissimmee, and Sanford. Those four cities are centroid-joined from city layers; a centroid inside the city with no polygon hit stays null. Land-use filters should stay on **All parcels** there. Missing zoning is not treated as multifamily. Sanibel, Fort Myers, and Bonita Springs have verified city layers and no Lee County parcels on this shelf, so those joins are zero. See `docs/fl-muni-overlays.md`.
 - Outside Orange, the OZ 2.0 flag is only the seven-market **rural-eligible** tract pack. Non-rural eligible tracts in those counties are not joined.
 - Orange municipal FLU other than Orlando is often the county placeholder `City` and stays unknown. In this 5–150 acre snapshot, 8,238 Orange parcels have a FLU code and 3,471 do not.
 - Income and AADT are not stored on the parcel tiles. `/api/parcels` joins ACS B19013 and FDOT AADT at query time for Florida. Block-group income is still Orange County only. Other states stay unknown. Uncheck Include unknown to hide those parcels.

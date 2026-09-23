@@ -29,8 +29,8 @@
     "tax.assessedValue": "AV_SD",
     "tax.taxableValue": "TV_SD",
     "mailingAddress": "OWN_ADDR1/2, OWN_CITY, OWN_STATE, OWN_ZIPCD",
-    "zoning": "null on DOH layer — degrade gracefully",
-    "flu": "null except Orange County OCPA pilot join"
+    "zoning": "null on the DOH layer, except city overlays joined inside Sanford, Kissimmee, Clermont, Mount Dora, Sanibel, Fort Myers, and Bonita Springs when a shelf parcel centroid is inside that city",
+    "flu": "null except Orange County + Orlando, and those same seven city layers inside city limits"
   },
   "counties": [
     {
@@ -69,7 +69,8 @@
         }
       ],
       "gaps": [
-        "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded. No zoning or FLU on the DOH extract.",
+        "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded.",
+        "Clermont and Mount Dora zoning and future land use are joined from city layers inside those city limits. Other Lake municipalities stay null.",
         "OZ 2.0 join is the seven-market rural-eligible pack only."
       ]
     },
@@ -139,7 +140,8 @@
       ],
       "gaps": [
         "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded. No county-wide zoning layer is joined.",
-        "St Cloud city parcels are not a substitute for the county extract."
+        "St Cloud city parcels are not a substitute for the county extract.",
+        "Kissimmee zoning and future land use are joined from the city REST layers inside Kissimmee city limits. Other Osceola municipalities stay null."
       ]
     },
     {
@@ -182,7 +184,8 @@
         }
       ],
       "gaps": [
-        "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded. No zoning on the DOH extract.",
+        "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded.",
+        "Sanford zoning and future land use are joined from the city REST layers inside Sanford city limits. Other Seminole municipalities stay null.",
         "Seminole has no rural-eligible OZ 2.0 tracts in the seven-market pack."
       ]
     },

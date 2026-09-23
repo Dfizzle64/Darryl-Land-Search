@@ -112,6 +112,7 @@ npm run seed:sc-mf        # SC multifamily priority shortlist from its CSV
 npm run seed:parcels:orlando  # Orange from OCPA; Lake, Osceola, Polk, Seminole from DOH, all 5–150 acres
 npm run seed:signals          # ACS tract income + FDOT AADT sidecars joined at query time
 npm run seed:parcels:markets  # 5–150 acre tiles for the other MSAs; does not re-scrape Orlando
+npm run seed:fl-muni          # join seven closed Florida city zoning/FLU layers onto parcels already on the shelf
 npm run seed:zoning    # coverage report only; does not scrape Municode
 ```
 

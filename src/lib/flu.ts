@@ -21,6 +21,8 @@ export function findFluCategory(flu: FluInfo | null | undefined, config: FluConf
     if (jurisdiction) {
       const scoped = matches.find((category) => category.jurisdiction === jurisdiction);
       if (scoped) return scoped;
+      // A city code that collides with another jurisdiction stays unknown.
+      continue;
     }
     return matches[0] ?? null;
   }

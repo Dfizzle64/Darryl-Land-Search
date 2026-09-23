@@ -197,6 +197,12 @@ describe("fluAllowsMultifamily", () => {
   it("returns null when FLU is missing rather than inventing a match", () => {
     expect(fluAllowsMultifamily(null, fluConfig)).toBeNull();
   });
+
+  it("does not treat another city's colliding FLU code as Orange County", () => {
+    expect(
+      fluAllowsMultifamily({ code: "MD", label: "Mount Dora medium", jurisdiction: "Mount Dora", source: "t" }, fluConfig),
+    ).toBeNull();
+  });
 });
 
 describe("filterParcels", () => {

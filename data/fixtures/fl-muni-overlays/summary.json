@@ -1,0 +1,395 @@
+{
+  "checkedAt": "2026-09-23T23:41:59Z",
+  "note": "Centroid join of seven closed Florida city layers onto parcels already on the shelf. Acreage was not re-extracted. Pensacola stays a gap (HTTP 523). Other municipal rows stay null. Edgewood, Texas is rejected.",
+  "notUsed": [
+    "https://gis.fortmyers.gov \u2014 prior TLS failure; Fort Myers uses the CFMGIS ArcGIS Online zoning and FLU services",
+    "https://gissvr.leepa.org/gissvr/rest/services/Zoning/MapServer/4 \u2014 Lee County copy of Fort Myers zoning, not the city service",
+    "https://gissvr.leepa.org/gissvr/rest/services/Zoning/MapServer/14 \u2014 Lee County Future Land Use BS stub, not Bonita Springs EnerGov",
+    "Edgewood, Texas \u2014 wrong-state namesake, not Orange County Edgewood and not joined"
+  ],
+  "leftNull": [
+    "Pensacola (Escambia) remains HTTP 523. No zoning was invented.",
+    "The still-open municipal rows besides these seven cities were not filled.",
+    "Lee County has no parcel polygons on this shelf, so Sanibel, Fort Myers, and Bonita Springs join counts stay zero until parcels exist."
+  ],
+  "filesChanged": 9,
+  "cities": [
+    {
+      "id": "sanford",
+      "name": "Sanford",
+      "county": "Seminole",
+      "fips": "12117",
+      "prefix": "SAN",
+      "anchor": [
+        -81.2731,
+        28.8028
+      ],
+      "floridaVerified": true,
+      "rejected": null,
+      "limits": "https://gis.sanfordfl.gov/server/rest/services/City_Limits/MapServer/0",
+      "zoning": "https://gis.sanfordfl.gov/server/rest/services/Zoning/MapServer/0",
+      "flu": "https://gis.sanfordfl.gov/server/rest/services/Land_Use/FeatureServer/2",
+      "polygonCounts": {
+        "limits": 1,
+        "zoning": 2073,
+        "flu": 1969
+      },
+      "sampleZoning": [
+        "RI1",
+        "MR3",
+        "RC1",
+        "MR2",
+        "PD",
+        "GC2",
+        "AG",
+        "SR1AA",
+        "SR1",
+        "SC3",
+        "PRO",
+        "SR1A"
+      ],
+      "sampleFlu": [
+        "ROI",
+        "MDR15",
+        "LDRSF",
+        "WDBD",
+        "PSP",
+        "AIC",
+        "RP",
+        "GC",
+        "PRO",
+        "NC",
+        "LDRMH",
+        "WIC"
+      ],
+      "parcelsInside": 373,
+      "zoningJoined": 368,
+      "fluJoined": 368,
+      "zoningMissInside": 5,
+      "fluMissInside": 5
+    },
+    {
+      "id": "kissimmee",
+      "name": "Kissimmee",
+      "county": "Osceola",
+      "fips": "12097",
+      "prefix": "KIS",
+      "anchor": [
+        -81.4076,
+        28.2919
+      ],
+      "floridaVerified": true,
+      "rejected": null,
+      "limits": "https://cw.kissimmee.gov/arcgis/rest/services/Address_Parcels_Centerlines/MapServer/7",
+      "zoning": "https://cw.kissimmee.gov/arcgis/rest/services/Zoning_Districts/MapServer/10",
+      "flu": "https://cw.kissimmee.gov/arcgis/rest/services/Future_Land_Use/MapServer/4",
+      "polygonCounts": {
+        "limits": 18,
+        "zoning": 101,
+        "flu": 65
+      },
+      "sampleZoning": [
+        "BP",
+        "MH",
+        "RE",
+        "SRPUD",
+        "HF",
+        "RA-4",
+        "UT",
+        "RB-2",
+        "CF",
+        "SD",
+        "T1",
+        "T5-M"
+      ],
+      "sampleFlu": [
+        "MU-FR",
+        "MU-T",
+        "OR",
+        "UT",
+        "REC",
+        "MH-MDR",
+        "INST",
+        "MU-D",
+        "MF-MDR",
+        "MF-HDR",
+        "CG",
+        "AE"
+      ],
+      "parcelsInside": 356,
+      "zoningJoined": 352,
+      "fluJoined": 352,
+      "zoningMissInside": 4,
+      "fluMissInside": 4
+    },
+    {
+      "id": "clermont",
+      "name": "Clermont",
+      "county": "Lake",
+      "fips": "12069",
+      "prefix": "CLM",
+      "anchor": [
+        -81.7729,
+        28.5494
+      ],
+      "floridaVerified": true,
+      "rejected": null,
+      "limits": "https://gis.lakecountyfl.gov/lakegis/rest/services/CityView/MapServer/16",
+      "zoning": "https://gis.lakecountyfl.gov/lakegis/rest/services/LocalGov/CityZoning/MapServer/1",
+      "flu": "https://gis.lakecountyfl.gov/lakegis/rest/services/CityView/MapServer/27",
+      "polygonCounts": {
+        "limits": 1,
+        "zoning": 255,
+        "flu": 244
+      },
+      "sampleZoning": [
+        "UE",
+        "R-3-A",
+        "R-1",
+        "PUD",
+        "R-1-A",
+        "CDD",
+        "C-2",
+        "R-3",
+        "CBD",
+        "R-2",
+        "C-1",
+        "M-1"
+      ],
+      "sampleFlu": [
+        "Commercial",
+        "Master",
+        "Parks",
+        "Industrial",
+        "Office",
+        "Low",
+        "Public",
+        "Conservation",
+        "Medium",
+        "High",
+        "Downtown MU",
+        "Residential/Office"
+      ],
+      "parcelsInside": 247,
+      "zoningJoined": 212,
+      "fluJoined": 212,
+      "zoningMissInside": 35,
+      "fluMissInside": 35
+    },
+    {
+      "id": "mount-dora",
+      "name": "Mount Dora",
+      "county": "Lake",
+      "fips": "12069",
+      "prefix": "MTD",
+      "anchor": [
+        -81.6445,
+        28.8025
+      ],
+      "floridaVerified": true,
+      "rejected": null,
+      "limits": "https://gis.lakecountyfl.gov/lakegis/rest/services/CityView/MapServer/16",
+      "zoning": "https://gis.lakecountyfl.gov/lakegis/rest/services/LocalGov/CityZoning/MapServer/4",
+      "flu": "https://gis.lakecountyfl.gov/lakegis/rest/services/CityView/MapServer/40",
+      "polygonCounts": {
+        "limits": 1,
+        "zoning": 658,
+        "flu": 447
+      },
+      "sampleZoning": [
+        "R-2",
+        "C-3",
+        "R-3",
+        "PUD",
+        "R-1",
+        "R-1A",
+        "GB",
+        "PLI",
+        "C-2",
+        "RP",
+        "**Annex",
+        "C-2A"
+      ],
+      "sampleFlu": [
+        "HD",
+        "LD",
+        "OFF",
+        "MD",
+        "RP",
+        "COMM",
+        "PL",
+        "RD",
+        "REC",
+        "IND",
+        "CSRV",
+        "PLI"
+      ],
+      "parcelsInside": 144,
+      "zoningJoined": 132,
+      "fluJoined": 123,
+      "zoningMissInside": 12,
+      "fluMissInside": 21
+    },
+    {
+      "id": "sanibel",
+      "name": "Sanibel",
+      "county": "Lee",
+      "fips": "12071",
+      "prefix": "SNB",
+      "anchor": [
+        -82.0223,
+        26.4484
+      ],
+      "floridaVerified": true,
+      "rejected": null,
+      "limits": null,
+      "zoning": "https://services7.arcgis.com/OnCt8XFWOgmkvMJE/arcgis/rest/services/Sanibel_Future_Land_Use_Map_Series_Ecological_Zones_Map_1989/FeatureServer/0",
+      "flu": "https://services7.arcgis.com/OnCt8XFWOgmkvMJE/arcgis/rest/services/Sanibel_Future_Land_Use_Map_Series_Ecological_Zones_Map_1989/FeatureServer/0",
+      "polygonCounts": {
+        "limits": 548,
+        "zoning": 548,
+        "flu": 548
+      },
+      "sampleZoning": [
+        "A",
+        "B",
+        "C",
+        "D1",
+        "D2",
+        "E1",
+        "E2",
+        "F",
+        "FEDERAL",
+        "WATER",
+        "SURVEY",
+        "G"
+      ],
+      "sampleFlu": [
+        "A",
+        "B",
+        "C",
+        "D1",
+        "D2",
+        "E1",
+        "E2",
+        "F",
+        "FEDERAL",
+        "WATER",
+        "SURVEY",
+        "G"
+      ],
+      "parcelsInside": 0,
+      "zoningJoined": 0,
+      "fluJoined": 0,
+      "zoningMissInside": 0,
+      "fluMissInside": 0
+    },
+    {
+      "id": "fort-myers",
+      "name": "Fort Myers",
+      "county": "Lee",
+      "fips": "12071",
+      "prefix": "FTM",
+      "anchor": [
+        -81.8707,
+        26.6406
+      ],
+      "floridaVerified": true,
+      "rejected": null,
+      "limits": "https://services1.arcgis.com/T37xMyv8DRNzouiI/arcgis/rest/services/Fort_Myers_City_Boundary/FeatureServer/0",
+      "zoning": "https://services1.arcgis.com/T37xMyv8DRNzouiI/arcgis/rest/services/Zoning1/FeatureServer/0",
+      "flu": "https://services1.arcgis.com/T37xMyv8DRNzouiI/arcgis/rest/services/Fort_Myers_Future_Land_Use/FeatureServer/0",
+      "polygonCounts": {
+        "limits": 1,
+        "zoning": 394,
+        "flu": 201
+      },
+      "sampleZoning": [
+        "CG",
+        "RM-12",
+        "RS-7",
+        "IH",
+        "CIV-REC",
+        "RS-6",
+        "REC",
+        "IL",
+        "RS-D",
+        "RM-16",
+        "CI",
+        "CON"
+      ],
+      "sampleFlu": [
+        "A/P",
+        "D/T",
+        "CON",
+        "REC",
+        "RLD",
+        "C/C",
+        "T/C",
+        "RMD",
+        "IND",
+        "S/C",
+        "M/T"
+      ],
+      "parcelsInside": 0,
+      "zoningJoined": 0,
+      "fluJoined": 0,
+      "zoningMissInside": 0,
+      "fluMissInside": 0
+    },
+    {
+      "id": "bonita-springs",
+      "name": "Bonita Springs",
+      "county": "Lee",
+      "fips": "12071",
+      "prefix": "BNS",
+      "anchor": [
+        -81.7787,
+        26.3398
+      ],
+      "floridaVerified": true,
+      "rejected": null,
+      "limits": "https://services9.arcgis.com/YMMDDoyt1fVMlPjl/arcgis/rest/services/FL_Data/FeatureServer/8",
+      "zoning": "https://services9.arcgis.com/YMMDDoyt1fVMlPjl/arcgis/rest/services/EG_Data_v2/FeatureServer/21",
+      "flu": "https://services9.arcgis.com/YMMDDoyt1fVMlPjl/arcgis/rest/services/EG_Data_v2/FeatureServer/16",
+      "polygonCounts": {
+        "limits": 1,
+        "zoning": 1444,
+        "flu": 626
+      },
+      "sampleZoning": [
+        "C-1A",
+        "AG-2",
+        "RPD",
+        "RM-2",
+        "MH-2",
+        "CG",
+        "MH-1",
+        "CT",
+        "C-1",
+        "TFC-2",
+        "RS-1",
+        "CC"
+      ],
+      "sampleFlu": [
+        "Medium",
+        "Moderate",
+        "Public/Semi-Public",
+        "Resource",
+        "Recreation",
+        "Conservation",
+        "General",
+        "High",
+        "Industrial",
+        "Interchange",
+        "Low",
+        "Lee"
+      ],
+      "parcelsInside": 0,
+      "zoningJoined": 0,
+      "fluJoined": 0,
+      "zoningMissInside": 0,
+      "fluMissInside": 0
+    }
+  ]
+}

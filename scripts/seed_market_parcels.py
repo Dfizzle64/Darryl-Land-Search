@@ -446,6 +446,8 @@ def normalize_rows(
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        for source_field, dest in (spec.get("stashFields") or {}).items():
+            feature["properties"][dest] = attrs.get(source_field)
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -566,7 +568,358 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+# Paulding County, Georgia (FIPS 13223). Not Paulding, Ohio (~41.1N).
+PAULDING_GA_BOX = (-85.20, 33.65, -84.55, 34.20)
+PAULDING_PARCELS_URL = (
+    "https://services8.arcgis.com/7YXQzPPGs9Uc4qKl/arcgis/rest/services/"
+    "Paulding_Map_Auto_Updated_WFL3/FeatureServer/25/query"
+)
+PAULDING_ZONING_URL = (
+    "https://services8.arcgis.com/7YXQzPPGs9Uc4qKl/arcgis/rest/services/"
+    "Paulding_County_GA_Zoning_Map_WFL1/FeatureServer/3/query"
+)
+PAULDING_CITIES_URL = (
+    "https://services8.arcgis.com/7YXQzPPGs9Uc4qKl/arcgis/rest/services/"
+    "Paulding_Map_Auto_Updated_WFL3/FeatureServer/12/query"
+)
+PAULDING_DALLAS_FLU_URL = (
+    "https://services6.arcgis.com/eaXMnnhlTkGbwQYU/arcgis/rest/services/DallasFLU2017/FeatureServer/0/query"
+)
+PAULDING_QPUBLIC = (
+    "https://qpublic.schneidercorp.com/Application.aspx?App=PauldingCountyGA&Layer=Parcels&PageType=Search"
+)
+PAULDING_TAXDIST = {
+    1000: "Paulding County",
+    1100: "Dallas",
+    1200: "Hiram",
+    1300: "Braswell",
+}
+PAULDING_CITY_NAMES = {"DALLAS": "Dallas", "HIRAM": "Hiram", "BRASWELL": "Braswell"}
+PAULDING_GAPS = [
+    "Paulding Map Auto Updated FeatureServer/25. Acreage is DeedAc (5.0–150.0 inclusive). CalcAc is 0 on this layer and is not the filter. Parcel id is GPIN. Thin attributes are GPIN, DeedAc, TaxDist, OWNKEY, SubdivID, and SubdivLotNum. OWNKEY is an owner key, not a name.",
+    "Owner name, mailing address, tax values, and last sale are not on the public REST layer. qPublic HTML was not scraped. The county search page is linked; it is not a per-parcel record pull.",
+    "Zoning is a centroid join to Paulding_County_GA_Zoning_Map_WFL1 FeatureServer/3 ZoningCode (~42k polygons). The layer keeps preceding zoning underneath newer cases. The smallest polygon with a code wins. Denied, withdrawn, and pending statuses are skipped. There is no separate Dallas, Hiram, or Braswell zoning FeatureServer on this join.",
+    "County future land use is not a public FeatureServer. Dallas FLU is DallasFLU2017 Character_ (the character area), extent-checked to Paulding County, Georgia, and joined only where TaxDist is 1100 (Dallas). CA_Descrip is often blank and sometimes a different class, so it is not stored. Hiram and Braswell future land use are not on a public REST layer.",
+    "Municipality is the TaxDist proxy: 1000 Paulding County, 1100 Dallas, 1200 Hiram, 1300 Braswell. City Limits FeatureServer/12 (Dallas, Hiram, Braswell) is a boundary check and does not override TaxDist. Null TaxDist may take the city boundary name.",
+    "The parcel extent is checked against Paulding County, Georgia (about -84.87, 33.83). Paulding, Ohio is rejected and not queried.",
+]
+
+
+def layer_extent_wgs(url: str, where: str = "1=1") -> tuple[float | None, float | None, float | None, float | None]:
+    data = fetch_json(url, {"where": where, "returnExtentOnly": "true", "outSR": "4326", "f": "json"})
+    if data.get("error"):
+        raise RuntimeError(json.dumps(data["error"])[:240])
+    extent = data.get("extent") or {}
+    return extent.get("xmin"), extent.get("ymin"), extent.get("xmax"), extent.get("ymax")
+
+
+def require_paulding_ga_extent(url: str, label: str, where: str = "1=1") -> tuple[float, float, float, float]:
+    """Reject Paulding, Ohio and any layer that does not intersect this county."""
+    west, south, east, north = layer_extent_wgs(url, where)
+    if west is None or south is None or east is None or north is None:
+        raise RuntimeError(f"{label} returned no WGS84 extent")
+    if south > 36:
+        raise RuntimeError(
+            f"{label} extent latitude {south:.2f}–{north:.2f} is Paulding, Ohio, not Paulding County, Georgia. Not queried."
+        )
+    box_w, box_s, box_e, box_n = PAULDING_GA_BOX
+    if east < box_w or west > box_e or north < box_s or south > box_n:
+        raise RuntimeError(
+            f"{label} extent {west:.3f},{south:.3f},{east:.3f},{north:.3f} does not intersect Paulding County, Georgia. Not joined."
+        )
+    return west, south, east, north
+
+
+def paulding_point(lon: float, lat: float) -> bool:
+    west, south, east, north = PAULDING_GA_BOX
+    return west <= lon <= east and south <= lat <= north
+
+
+def point_in_esri_ring(x: float, y: float, ring: list) -> bool:
+    inside = False
+    count = len(ring)
+    if count < 3:
+        return False
+    previous = count - 1
+    for index in range(count):
+        xi, yi = ring[index][0], ring[index][1]
+        xj, yj = ring[previous][0], ring[previous][1]
+        if (yi > y) != (yj > y):
+            span = yj - yi
+            if span != 0 and x < (xj - xi) * (y - yi) / span + xi:
+                inside = not inside
+        previous = index
+    return inside
+
+
+def esri_rings_contain(x: float, y: float, rings: list) -> bool:
+    hits = 0
+    for ring in rings:
+        if point_in_esri_ring(x, y, ring):
+            hits += 1
+    return hits % 2 == 1
+
+
+def esri_ring_area_m2(ring: list) -> float:
+    coords = [[float(point[0]), float(point[1])] for point in ring]
+    if len(coords) < 4:
+        return 0.0
+    if coords[0] != coords[-1]:
+        coords = coords + [coords[0]]
+    return abs(ring_signed_m2(coords))
+
+
+class RingIndex:
+    """Grid index over raw ArcGIS rings. The smallest containing polygon wins."""
+
+    def __init__(self, cell: float = 0.02) -> None:
+        self.cell = cell
+        self.grid: dict[tuple[int, int], list[int]] = defaultdict(list)
+        self.wide: list[int] = []
+        self.items: list[tuple] = []
+
+    def add(self, rings: list, props: dict) -> None:
+        xs = [point[0] for ring in rings for point in ring]
+        ys = [point[1] for ring in rings for point in ring]
+        if not xs:
+            return
+        bbox = (min(xs), min(ys), max(xs), max(ys))
+        area = esri_ring_area_m2(rings[0]) if rings and rings[0] else 0.0
+        index = len(self.items)
+        self.items.append((rings, props, bbox, area))
+        x0, x1 = math.floor(bbox[0] / self.cell), math.floor(bbox[2] / self.cell)
+        y0, y1 = math.floor(bbox[1] / self.cell), math.floor(bbox[3] / self.cell)
+        if (x1 - x0 + 1) * (y1 - y0 + 1) > 80:
+            self.wide.append(index)
+            return
+        for ix in range(x0, x1 + 1):
+            for iy in range(y0, y1 + 1):
+                self.grid[(ix, iy)].append(index)
+
+    def hit(self, lon: float, lat: float) -> dict | None:
+        key = (math.floor(lon / self.cell), math.floor(lat / self.cell))
+        found: list[tuple[float, dict]] = []
+        seen: set[int] = set()
+        for index in [*self.grid.get(key, []), *self.wide]:
+            if index in seen:
+                continue
+            seen.add(index)
+            rings, props, bbox, area = self.items[index]
+            if not (bbox[0] <= lon <= bbox[2] and bbox[1] <= lat <= bbox[3]):
+                continue
+            if esri_rings_contain(lon, lat, rings):
+                found.append((area, props))
+        if not found:
+            return None
+        found.sort(key=lambda item: item[0])
+        return found[0][1]
+
+
+def fetch_layer_features(url: str, where: str, fields: list[str]) -> list[dict]:
+    ids = fetch_object_ids(url, where)
+    print(f"    {len(ids)} rows {url.split('/rest/services/')[-1][:88]}", flush=True)
+    if not ids:
+        return []
+    return fetch_by_ids(url, ids, fields, batch=80)
+
+
+def paulding_status_rejected(status: Any) -> bool:
+    text = (clean(status) or "").lower()
+    if not text:
+        return False
+    if "denied" in text or "withdrawn" in text:
+        return True
+    return text == "pending"
+
+
+def paulding_tax_district(value: Any) -> str | None:
+    parsed = num(value)
+    if parsed is None:
+        return None
+    return PAULDING_TAXDIST.get(int(parsed))
+
+
+def enrich_paulding(features: list[dict]) -> list[str]:
+    """Join county zoning, Dallas FLU, and the TaxDist municipality proxy.
+
+    Owner, mailing, tax, and sale stay null. qPublic is not scraped.
+    """
+    zoning_index = RingIndex()
+    zoning_rows = 0
+    zoning_skipped = 0
+    zoning_extent: tuple[float, float, float, float] | None = None
+    zoning_error: str | None = None
+    try:
+        zoning_extent = require_paulding_ga_extent(PAULDING_ZONING_URL, "Paulding zoning")
+        print(
+            f"  zoning extent {zoning_extent[0]:.3f},{zoning_extent[1]:.3f},{zoning_extent[2]:.3f},{zoning_extent[3]:.3f}",
+            flush=True,
+        )
+        print("  zoning polygons", flush=True)
+        for item in fetch_layer_features(PAULDING_ZONING_URL, "1=1", ["ZoningCode", "ZoningClass", "Status"]):
+            attrs = item.get("attributes") or {}
+            zoning_rows += 1
+            if paulding_status_rejected(attrs.get("Status")):
+                zoning_skipped += 1
+                continue
+            code = clean(attrs.get("ZoningCode"))
+            if not code:
+                zoning_skipped += 1
+                continue
+            rings = (item.get("geometry") or {}).get("rings")
+            if not rings:
+                zoning_skipped += 1
+                continue
+            zoning_index.add(rings, {"code": code, "klass": clean(attrs.get("ZoningClass"))})
+    except Exception as exc:  # noqa: BLE001
+        zoning_error = str(exc)
+        print(f"  zoning was not joined: {zoning_error}", flush=True)
+
+    city_index = RingIndex(cell=0.05)
+    city_extent: tuple[float, float, float, float] | None = None
+    city_error: str | None = None
+    try:
+        city_extent = require_paulding_ga_extent(PAULDING_CITIES_URL, "Paulding city limits")
+        print("  city limits", flush=True)
+        for item in fetch_layer_features(PAULDING_CITIES_URL, "1=1", ["Municipality", "Notes"]):
+            attrs = item.get("attributes") or {}
+            name = PAULDING_CITY_NAMES.get((clean(attrs.get("Municipality")) or "").upper())
+            rings = (item.get("geometry") or {}).get("rings")
+            if name and rings:
+                city_index.add(rings, {"name": name})
+    except Exception as exc:  # noqa: BLE001
+        city_error = str(exc)
+        print(f"  city limits were not joined: {city_error}", flush=True)
+
+    flu_index = RingIndex(cell=0.01)
+    flu_note = "Dallas FLU was not joined."
+    flu_rows = 0
+    try:
+        flu_extent = require_paulding_ga_extent(PAULDING_DALLAS_FLU_URL, "Dallas FLU 2017")
+        print(
+            f"  Dallas FLU extent {flu_extent[0]:.3f},{flu_extent[1]:.3f},{flu_extent[2]:.3f},{flu_extent[3]:.3f}",
+            flush=True,
+        )
+        print("  Dallas FLU polygons", flush=True)
+        for item in fetch_layer_features(PAULDING_DALLAS_FLU_URL, "1=1", ["Character_", "CA_Descrip"]):
+            attrs = item.get("attributes") or {}
+            # Character_ is the future-development class. CA_Descrip is often blank and
+            # sometimes names a different class, so it is not stored as the label.
+            code = clean(attrs.get("Character_")) or clean(attrs.get("CA_Descrip"))
+            rings = (item.get("geometry") or {}).get("rings")
+            if not code or not rings:
+                continue
+            flu_index.add(rings, {"code": code, "label": code})
+            flu_rows += 1
+        flu_note = (
+            f"DallasFLU2017 extent {flu_extent[0]:.3f},{flu_extent[1]:.3f},{flu_extent[2]:.3f},{flu_extent[3]:.3f} "
+            f"is inside Paulding County, Georgia ({flu_rows} character-area polygons)."
+        )
+    except Exception as exc:  # noqa: BLE001
+        flu_note = f"Dallas FLU was not joined: {exc}"
+        print(f"  {flu_note}", flush=True)
+
+    zoning_hits = 0
+    dallas_flu = 0
+    dallas_flu_miss = 0
+    city_counts: dict[str, int] = defaultdict(int)
+    boundary_mismatch = 0
+    boundary_fill = 0
+    county_inside_city = 0
+    for feature in features:
+        props = feature["properties"]
+        lon, lat = props["centroid"]
+        district_name = paulding_tax_district(props.pop("_taxDist", None))
+        boundary = (city_index.hit(lon, lat) or {}).get("name")
+        if district_name is None and boundary:
+            district_name = boundary
+            boundary_fill += 1
+        elif district_name == "Paulding County" and boundary:
+            county_inside_city += 1
+        elif district_name in {"Dallas", "Hiram", "Braswell"} and boundary and boundary != district_name:
+            boundary_mismatch += 1
+        municipality = district_name or "Unknown"
+        city_counts[municipality] += 1
+        props["jurisdictionCode"] = municipality
+        props["situsCity"] = municipality if municipality in {"Dallas", "Hiram", "Braswell"} else None
+        props["ownerName"] = None
+        props["ownerName2"] = None
+        props["lastSale"] = {"date": None, "price": None, "qualified": None}
+        props["tax"] = {"marketValue": None, "assessedValue": None, "taxableValue": None, "taxes": None}
+        props["mailingAddress"] = {"line1": None, "line2": None, "city": None, "state": None, "zip": None}
+        props["appraiserUrl"] = PAULDING_QPUBLIC
+        zone = zoning_index.hit(lon, lat)
+        gaps = [
+            "Owner, mailing address, tax values, and last sale are not on the public parcel REST. qPublic was not scraped.",
+            "County future land use is not on a public FeatureServer.",
+        ]
+        if zone and zone.get("code"):
+            zoning_hits += 1
+            props["zoningCode"] = zone["code"]
+            props["zoningDistrict"] = zone.get("klass") or zone["code"]
+        else:
+            props["zoningCode"] = None
+            props["zoningDistrict"] = None
+            gaps.append("No county zoning polygon contained this parcel centroid.")
+        if municipality == "Dallas":
+            flu = flu_index.hit(lon, lat)
+            if flu and flu.get("code"):
+                dallas_flu += 1
+                props["flu"] = {
+                    "code": flu["code"],
+                    "label": flu.get("label") or flu["code"],
+                    "jurisdiction": "Dallas",
+                    "source": "dallas-flu-2017",
+                }
+            else:
+                dallas_flu_miss += 1
+                props["flu"] = None
+                gaps.append("Dallas future land use polygon did not contain this centroid.")
+        else:
+            props["flu"] = None
+            if municipality in {"Hiram", "Braswell"}:
+                gaps.append(f"{municipality} future land use is not on a public REST layer.")
+        props["dataGaps"] = gaps
+
+    places = ", ".join(f"{name} {city_counts[name]}" for name in sorted(city_counts))
+    return [
+        (
+            f"Paulding 5–150 acre join: zoning {zoning_hits}/{len(features)} "
+            f"(zoning polygons read {zoning_rows}, skipped blank or closed status {zoning_skipped}). "
+            f"Dallas FLU {dallas_flu}; Dallas centroids with no FLU polygon {dallas_flu_miss}. "
+            f"TaxDist municipalities: {places}. "
+            f"City-limit boundary filled a null TaxDist on {boundary_fill}. "
+            f"TaxDist 1000 centroids inside a city polygon {county_inside_city} (TaxDist kept). "
+            f"TaxDist city disagreed with the city-limit polygon on {boundary_mismatch} (TaxDist kept). "
+            + (
+                f"City-limit extent {city_extent[0]:.3f},{city_extent[1]:.3f},{city_extent[2]:.3f},{city_extent[3]:.3f}."
+                if city_extent
+                else f"City limits were not joined: {city_error}."
+            )
+            + (
+                ""
+                if not zoning_error
+                else f" Zoning layer was not joined: {zoning_error}."
+            )
+        ),
+        flu_note,
+    ]
+
+
 def county_override(fips: str) -> dict | None:
+    if fips == "13223":  # Paulding GA — DeedAc, not CalcAc
+        return {
+            "kind": "arcgis",
+            "url": PAULDING_PARCELS_URL,
+            "where": "DeedAc>=5 AND DeedAc<=150",
+            "outFields": ["GPIN", "DeedAc", "TaxDist", "OWNKEY", "SubdivID", "SubdivLotNum"],
+            "idField": "GPIN",
+            "acresField": "DeedAc",
+            "stashFields": {"TaxDist": "_taxDist"},
+            "source": "ga-paulding-parcels",
+            "coverage": "complete-gte-5ac",
+            "gaps": list(PAULDING_GAPS),
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -925,11 +1278,13 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Paulding county services | Cobb complete. Paulding complete on `DeedAc` (not `CalcAc`) with county zoning and Dallas FLU. Owner, tax, and sale stay null. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county parcel layer already carries a zoning field (DeKalb) or a public zoning layer is wired (Paulding). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+Paulding County (13223, Atlanta, west ring) uses `Paulding_Map_Auto_Updated_WFL3/FeatureServer/25`. The 5.0–150.0 acre band is `DeedAc`. `CalcAc` is 0 on this layer and is not the filter. Parcel id is `GPIN`. The extent is checked against Paulding County, Georgia (about -84.87, 33.83); Paulding, Ohio is not queried. Zoning is a centroid join to `Paulding_County_GA_Zoning_Map_WFL1/FeatureServer/3` (`ZoningCode`). Preceding zoning polygons stay in that layer, so the smallest polygon with a code wins. Denied, withdrawn, and pending cases are skipped. County future land use is not on REST. Dallas FLU is `DallasFLU2017` `Character_` (not `CA_Descrip`, which is often blank or a different class), joined only for tax district 1100. Hiram and Braswell have no public FLU layer. Municipality is the tax-district proxy (1000 county, 1100 Dallas, 1200 Hiram, 1300 Braswell). City Limits layer 12 is a boundary check and does not override that proxy. Owner, mailing, tax, and last sale are not on the public REST layer. qPublic HTML is not scraped. The county search page is the link.
 
 ## Coverage
 """
@@ -957,12 +1312,14 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=[*(spec.get("gaps") or []), *(cached.get("joinNotes") or [])],
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
             )
     try:
+        if fips == "13223":
+            require_paulding_ga_extent(spec["url"], "Paulding parcels", spec["where"])
         expected = count_where(spec["url"], spec["where"])
     except Exception as exc:  # noqa: BLE001
         reason = f"Query failed: {exc}"
@@ -1015,12 +1372,35 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     features, dropped = normalize_rows(raw, county, markets, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    join_notes: list[str] = []
+    if fips == "13223" and features:
+        inside = []
+        outside = 0
+        for feature in features:
+            lon, lat = feature["properties"]["centroid"]
+            if paulding_point(lon, lat):
+                inside.append(feature)
+            else:
+                outside += 1
+        features = inside
+        dropped += outside
+        if outside:
+            join_notes.append(
+                f"{outside} centroids were outside Paulding County, Georgia (about -84.87, 33.83) and were dropped."
+            )
+        if features:
+            join_notes.extend(enrich_paulding(features))
+    if not all(in_band(feature["properties"].get("acreage")) for feature in features):
+        raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "features": features, "joinNotes": join_notes},
+            separators=(",", ":"),
+        )
     )
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
+    gaps = [*(spec.get("gaps") or []), *join_notes]
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,

@@ -26,11 +26,13 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Paulding county services | Cobb complete. Paulding complete on `DeedAc` (not `CalcAc`) with county zoning and Dallas FLU. Owner, tax, and sale stay null. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county parcel layer already carries a zoning field (DeKalb) or a public zoning layer is wired (Paulding). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+Paulding County (13223, Atlanta, west ring) uses `Paulding_Map_Auto_Updated_WFL3/FeatureServer/25`. The 5.0–150.0 acre band is `DeedAc`. `CalcAc` is 0 on this layer and is not the filter. Parcel id is `GPIN`. The extent is checked against Paulding County, Georgia (about -84.87, 33.83); Paulding, Ohio is not queried. Zoning is a centroid join to `Paulding_County_GA_Zoning_Map_WFL1/FeatureServer/3` (`ZoningCode`). Preceding zoning polygons stay in that layer, so the smallest polygon with a code wins. Denied, withdrawn, and pending cases are skipped. County future land use is not on REST. Dallas FLU is `DallasFLU2017` `Character_` (not `CA_Descrip`, which is often blank or a different class), joined only for tax district 1100. Hiram and Braswell have no public FLU layer. Municipality is the tax-district proxy (1000 county, 1100 Dallas, 1200 Hiram, 1300 Braswell). City Limits layer 12 is a boundary check and does not override that proxy. Owner, mailing, tax, and last sale are not on the public REST layer. qPublic HTML is not scraped. The county search page is the link.
 
 ## Coverage
 
@@ -42,14 +44,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 8,149 | 1 | 1 | 33 |
+| Atlanta | primary | 13,243 | 2 | 1 | 32 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -98,7 +100,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Monroe | Georgia | 13207 | gap | 0 | unavailable |
 | Morgan | Georgia | 13211 | gap | 0 | unavailable |
 | Newton | Georgia | 13217 | gap | 0 | unavailable |
-| Paulding | Georgia | 13223 | gap | 0 | unavailable |
+| Paulding | Georgia | 13223 | complete-gte-5ac | 5,094 | ga-paulding-parcels |
 | Pickens | Georgia | 13227 | gap | 0 | unavailable |
 | Pike | Georgia | 13231 | gap | 0 | unavailable |
 | Rockdale | Georgia | 13247 | gap | 0 | unavailable |
@@ -212,7 +214,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 

@@ -33,7 +33,7 @@ npm run seed:zoning  # refresh coverage report vs knowledge JSON (no LLM)
 
 Orlando parcel architecture, county source URLs, and field mapping: [`docs/orlando-parcels.md`](docs/orlando-parcels.md) and [`data/orlando-parcel-sources.json`](data/orlando-parcel-sources.json).
 
-Other MSAs use the same tile grid and the same zoom / area-lock / Show parcels gate. They load only while that market is selected. Refresh and the complete-vs-sample-vs-gap table: [`docs/market-parcels.md`](docs/market-parcels.md).
+Other MSAs use the same tile grid and the same zoom / area-lock / Show parcels gate. They load only while that market is selected. Refresh and the complete-vs-sample-vs-gap table: [`docs/market-parcels.md`](docs/market-parcels.md). Atlanta's Paulding County extract uses county `DeedAc` (not `CalcAc`, which is 0) on `Paulding_Map_Auto_Updated_WFL3/FeatureServer/25`, with zoning from the county zoning map. Owner, mailing, tax, and last sale are not on that public REST layer and are left null — qPublic HTML is not scraped. County future land use is a gap. Dallas future land use is joined for tax district 1100; Hiram and Braswell future land use are not on a public layer.
 
 No API keys are required for the default fixture mode. Copy `.env.example` to `.env.local` only if you want to point at live feeds.
 

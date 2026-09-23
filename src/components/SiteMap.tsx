@@ -43,6 +43,16 @@ import {
   type LngLat,
 } from "@/lib/measure";
 import { eligibleClassCut, southCarolinaStatusHelp } from "@/lib/markets";
+import {
+  arcgisExportTileUrl,
+  FEMA_FLOOD_LAYER,
+  FEMA_NFHL_SERVICE,
+  FEMA_SOURCE,
+  NWI_SERVICE,
+  NWI_SOURCE,
+  UTILITY_LAYER_NOTE,
+  type ScreeningToggles,
+} from "@/lib/screening";
 import { tractClickFromFeature, type TractClickDetails } from "@/lib/tractCounty";
 import { tractIncomeLayerFilter } from "@/lib/tractIncome";
 import { ORANGE_COUNTY_CENTER, SC_GOVERNOR_FILED_STATUS, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
@@ -64,6 +74,7 @@ type SiteMapProps = {
   showTraffic: boolean;
   showOz: boolean;
   showOz2: boolean;
+  screening: ScreeningToggles;
   showParcels: boolean;
   parcelLayerVisible?: boolean;
   parcelVisibilityHint?: string;
@@ -150,6 +161,69 @@ function ruralLayerFilter(
   return ["all", ...parts] as maplibregl.FilterSpecification;
 }
 
+const EMPTY_COLLECTION: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
+
+function utilityPaint(color: string, mode: BasemapMode) {
+  return {
+    fill: { "fill-color": color, "fill-opacity": mode === "satellite" ? 0.28 : 0.22 },
+    line: { "line-color": color, "line-width": 1.25, "line-opacity": 0.9 },
+  };
+}
+
+function addScreeningLayers(map: MapLibreMap, mode: BasemapMode) {
+  map.addSource("flood-raster", {
+    type: "raster",
+    tiles: [arcgisExportTileUrl(FEMA_NFHL_SERVICE, FEMA_FLOOD_LAYER)],
+    tileSize: 256,
+    attribution: FEMA_SOURCE,
+  });
+  map.addLayer({
+    id: "flood-raster",
+    type: "raster",
+    source: "flood-raster",
+    minzoom: 8,
+    layout: { visibility: "none" },
+    paint: { "raster-opacity": 0.55 },
+  });
+  map.addSource("wetlands-raster", {
+    type: "raster",
+    tiles: [arcgisExportTileUrl(NWI_SERVICE, "0")],
+    tileSize: 256,
+    attribution: NWI_SOURCE,
+  });
+  map.addLayer({
+    id: "wetlands-raster",
+    type: "raster",
+    source: "wetlands-raster",
+    minzoom: 11,
+    layout: { visibility: "none" },
+    paint: { "raster-opacity": 0.62 },
+  });
+  const utilities = [
+    ["water", "#3d7dff"],
+    ["sewer", "#7a5cff"],
+    ["power", "#e0b15a"],
+  ] as const;
+  for (const [kind, color] of utilities) {
+    const paint = utilityPaint(color, mode);
+    map.addSource(kind, { type: "geojson", data: EMPTY_COLLECTION });
+    map.addLayer({
+      id: `${kind}-fill`,
+      type: "fill",
+      source: kind,
+      layout: { visibility: "none" },
+      paint: paint.fill,
+    });
+    map.addLayer({
+      id: `${kind}-line`,
+      type: "line",
+      source: kind,
+      layout: { visibility: "none" },
+      paint: paint.line,
+    });
+  }
+}
+
 function addOverlayLayers(
   map: MapLibreMap,
   parcels: ParcelCollection,
@@ -161,6 +235,7 @@ function addOverlayLayers(
   ruralPins: GeoJSON.FeatureCollection<GeoJSON.Point>,
   mode: BasemapMode,
 ) {
+  addScreeningLayers(map, mode);
   map.addSource("rural-tracts", { type: "geojson", data: ruralTracts, promoteId: "tractGeoid" });
   map.addSource("eligible-tracts", { type: "geojson", data: eligibleTracts, promoteId: "tractGeoid" });
   map.addSource("rural-pins", { type: "geojson", data: ruralPins, promoteId: "tractGeoid" });
@@ -279,6 +354,33 @@ function addOverlayLayers(
     source: "parcels",
     paint: parcelLinePaint(mode),
   });
+  map.addSource("schools", { type: "geojson", data: EMPTY_COLLECTION });
+  map.addLayer({
+    id: "schools-circle",
+    type: "circle",
+    source: "schools",
+    layout: { visibility: "none" },
+    paint: {
+      "circle-radius": 6,
+      "circle-stroke-width": 1.25,
+      "circle-stroke-color": "#ffffff",
+      "circle-color": [
+        "match",
+        ["upcase", ["coalesce", ["get", "rating"], ""]],
+        "A",
+        "#1f7a4d",
+        "B",
+        "#3f9d74",
+        "C",
+        "#e0b15a",
+        "D",
+        "#d4783a",
+        "F",
+        "#c4473a",
+        "#8b97a3",
+      ],
+    },
+  });
   map.addSource("aoi", { type: "geojson", data: aoiFeatureCollection(null) });
   map.addLayer({
     id: "aoi-fill",
@@ -358,6 +460,7 @@ export function SiteMap({
   showTraffic,
   showOz,
   showOz2,
+  screening,
   showParcels,
   parcelLayerVisible,
   parcelVisibilityHint,
@@ -465,9 +568,37 @@ export function SiteMap({
           addSatelliteSourceAndLayer(map);
           applyBasemap(map, basemapRef.current);
 
+          map.on("click", "schools-circle", (event) => {
+            if (drawingRef.current || measuringRef.current) return;
+            const props = event.features?.[0]?.properties;
+            if (!props) return;
+            const root = document.createElement("div");
+            const name = document.createElement("p");
+            name.style.fontWeight = "600";
+            name.textContent = String(props.name ?? "School");
+            const summary = document.createElement("p");
+            summary.textContent = String(props.summary ?? "");
+            root.append(name, summary);
+            const href = typeof props.reportCardUrl === "string" ? props.reportCardUrl : "";
+            if (href.startsWith("https://")) {
+              const link = document.createElement("a");
+              link.href = href;
+              link.target = "_blank";
+              link.rel = "noreferrer";
+              link.textContent = "Official report card";
+              root.append(link);
+            }
+            popupRef.current?.remove();
+            popupRef.current = new maplibregl.Popup({ closeButton: true, maxWidth: "280px" })
+              .setLngLat(event.lngLat)
+              .setDOMContent(root)
+              .addTo(map);
+          });
+
           const interactive = ["parcels-fill", "parcels-fill-excluded"];
           map.on("click", interactive, (event) => {
             if (drawingRef.current || measuringRef.current) return;
+            if (queryRendered(map, event.point, ["schools-circle"]).length > 0) return;
             const id = event.features?.[0]?.properties?.id;
             if (typeof id === "string") callbacksRef.current.onSelect(id);
           });
@@ -869,6 +1000,66 @@ export function SiteMap({
     }
   }, [basemap, showTraffic, showOz, showOz2, showOrangePilot, ozFilter, tractClass, restrictGeoids, status]);
 
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready") return;
+    const show = (ids: string[], on: boolean) => {
+      for (const id of ids) setVisibilitySafe(map, id, on ? "visible" : "none");
+    };
+    show(["flood-raster"], screening.flood);
+    show(["wetlands-raster"], screening.wetlands);
+    show(["water-fill", "water-line"], screening.water);
+    show(["sewer-fill", "sewer-line"], screening.sewer);
+    show(["power-fill", "power-line"], screening.power);
+    show(["schools-circle"], screening.schools);
+  }, [screening, status, basemap]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready") return;
+    let timer: number | null = null;
+    let requestId = 0;
+    const setCollection = (sourceId: string, data: GeoJSON.FeatureCollection) => {
+      const source = map.getSource(sourceId);
+      if (source?.type === "geojson") (source as GeoJSONSource).setData(data);
+    };
+    const load = () => {
+      const camera = map.getBounds();
+      const bbox = [camera.getWest(), camera.getSouth(), camera.getEast(), camera.getNorth()].join(",");
+      const id = ++requestId;
+      const pull = async (url: string, sourceId: string, enabled: boolean) => {
+        if (!enabled) {
+          setCollection(sourceId, EMPTY_COLLECTION);
+          return;
+        }
+        try {
+          const response = await fetch(url);
+          if (!response.ok || id !== requestId) return;
+          const payload = (await response.json()) as GeoJSON.FeatureCollection;
+          if (id !== requestId) return;
+          setCollection(sourceId, { type: "FeatureCollection", features: payload.features ?? [] });
+        } catch {
+          if (id === requestId) setCollection(sourceId, EMPTY_COLLECTION);
+        }
+      };
+      void pull(`/api/screening/schools?bbox=${bbox}`, "schools", screening.schools);
+      void pull(`/api/screening/utilities?layer=water&bbox=${bbox}`, "water", screening.water);
+      void pull(`/api/screening/utilities?layer=sewer&bbox=${bbox}`, "sewer", screening.sewer);
+      void pull(`/api/screening/utilities?layer=power&bbox=${bbox}`, "power", screening.power);
+    };
+    const schedule = () => {
+      if (timer) window.clearTimeout(timer);
+      timer = window.setTimeout(load, 350);
+    };
+    schedule();
+    map.on("moveend", schedule);
+    return () => {
+      requestId += 1;
+      map.off("moveend", schedule);
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [screening, status]);
+
   const previousHover = useRef<string | null>(null);
   const previousSelected = useRef<string | null>(null);
   const flewToParcel = useRef<string | null>(null);
@@ -1041,7 +1232,7 @@ export function SiteMap({
           </div>
         </div>
       ) : null}
-      {status === "ready" && (showOz || showOz2 || showParcels) ? (
+      {status === "ready" && (showOz || showOz2 || showParcels || screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power) ? (
         <div className="map-chrome map-scrim absolute bottom-3 left-3 z-10 max-w-[17rem] rounded-xl border sm:bottom-4 sm:left-4 sm:max-w-[22rem]">
           <div className="legend-scroll max-h-[42vh] space-y-1.5 overflow-y-auto px-3 py-2.5 text-sm leading-snug">
           {aoi ? (
@@ -1126,6 +1317,47 @@ export function SiteMap({
           <p className="text-xs text-ink-100">Pins mark tract internal points. 90-minute sheds are approximate county rings, not drive-time isochrones.</p>
           {scStatusHelp ? (
             <SouthCarolinaStatusNote note={SC_GOVERNOR_FILED_STATUS} className="text-ink-300" />
+          ) : null}
+          {screening.flood ? (
+            <p>
+              <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle" style={{ backgroundColor: "#3b6ea5" }} />
+              FEMA flood zones
+            </p>
+          ) : null}
+          {screening.wetlands ? (
+            <p>
+              <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle" style={{ backgroundColor: "#2f6b4f" }} />
+              Wetlands (NWI, closer zoom)
+            </p>
+          ) : null}
+          {screening.water ? (
+            <p>
+              <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle" style={{ backgroundColor: "#3d7dff" }} />
+              Water service area (Orange County only)
+            </p>
+          ) : null}
+          {screening.sewer ? (
+            <p>
+              <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle" style={{ backgroundColor: "#7a5cff" }} />
+              Sewer service area (Orange County only)
+            </p>
+          ) : null}
+          {screening.power ? (
+            <p>
+              <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle" style={{ backgroundColor: "#e0b15a" }} />
+              Electric retail territory
+            </p>
+          ) : null}
+          {screening.schools ? (
+            <p>
+              <span className="mr-2 inline-block h-3.5 w-3.5 rounded-full align-middle" style={{ backgroundColor: "#1f7a4d" }} />
+              Schools · letter grade (gray = no grade in this extract)
+            </p>
+          ) : null}
+          {screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power ? (
+            <p className="text-xs text-ink-100">
+              School dots and utility areas load at about county zoom. Wetlands draw when you zoom in. No grade or service connection is invented.
+            </p>
           ) : null}
           {showOz ? (
             <p>

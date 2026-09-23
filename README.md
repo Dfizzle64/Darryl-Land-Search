@@ -28,6 +28,7 @@ npm run seed:sc-mf        # South Carolina multifamily priority shortlist from i
 npm run seed:parcels:orlando  # full 5–150 acre parcels for Lake, Orange, Osceola, Polk, Seminole
 npm run seed:parcels:markets  # 5–150 acre parcels for every other MSA (skips finished counties)
 npm run seed:zoning  # refresh coverage report vs knowledge JSON (no LLM)
+npm run seed:schools # Florida + North Carolina public school-grade fixture
 ```
 
 Orlando parcel architecture, county source URLs, and field mapping: [`docs/orlando-parcels.md`](docs/orlando-parcels.md) and [`data/orlando-parcel-sources.json`](data/orlando-parcel-sources.json).
@@ -35,6 +36,8 @@ Orlando parcel architecture, county source URLs, and field mapping: [`docs/orlan
 Other MSAs use the same tile grid and the same zoom / area-lock / Show parcels gate. They load only while that market is selected. Refresh and the complete-vs-sample-vs-gap table: [`docs/market-parcels.md`](docs/market-parcels.md).
 
 No API keys are required for the default fixture mode. Copy `.env.example` to `.env.local` only if you want to point at live feeds.
+
+**Site screening** (off until you turn a layer on): FEMA flood zones, National Wetlands Inventory (Florida included), public school ratings, Orange County water and sewer service areas, and HIFLD electric retail territories. The parcel drawer adds the mailing address already on the extract plus the county appraiser and, for entity owners, the state business search. It does not add phone numbers or emails. Coverage and refresh steps: [`docs/screening-layers.md`](docs/screening-layers.md).
 
 ## What you can do
 

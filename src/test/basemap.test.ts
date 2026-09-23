@@ -37,6 +37,14 @@ describe("basemap helpers", () => {
 
   it("keeps overlay layer ids so a style swap can leave parcels and traffic in place", () => {
     expect(OVERLAY_LAYER_IDS).toEqual([
+      "flood-raster",
+      "wetlands-raster",
+      "water-fill",
+      "water-line",
+      "sewer-fill",
+      "sewer-line",
+      "power-fill",
+      "power-line",
       "rural-fill",
       "rural-line",
       "eligible-fill",
@@ -55,6 +63,7 @@ describe("basemap helpers", () => {
       "parcels-line-excluded",
       "parcels-fill",
       "parcels-line",
+      "schools-circle",
       "aoi-fill",
       "aoi-line",
       "measure-casing",

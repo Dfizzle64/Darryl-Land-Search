@@ -225,7 +225,7 @@ export function describeWetland(input: {
       code: null,
       wetlandType: null,
       summary:
-        "No NWI wetland polygon at this centroid. Nearby wetlands can still exist — use the overlay. This is not a jurisdictional determination.",
+        "No NWI wetland polygon within about 70 feet of this point. Nearby wetlands can still exist — use the overlay. This is not a jurisdictional determination.",
       source: NWI_SOURCE,
       sourceUrl: NWI_SOURCE_URL,
     };
@@ -234,7 +234,7 @@ export function describeWetland(input: {
     status: "ok",
     code,
     wetlandType,
-    summary: `NWI ${[code, wetlandType].filter(Boolean).join(" · ")} at the centroid. National inventory, including Florida. Not a permit determination.`,
+    summary: `NWI ${[code, wetlandType].filter(Boolean).join(" · ")} within about 70 feet of this point. National inventory, including Florida. Not a permit determination.`,
     source: NWI_SOURCE,
     sourceUrl: NWI_SOURCE_URL,
   };

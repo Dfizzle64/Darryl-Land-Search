@@ -50,7 +50,6 @@ import {
   FEMA_SOURCE,
   NWI_SERVICE,
   NWI_SOURCE,
-  UTILITY_LAYER_NOTE,
   type ScreeningToggles,
 } from "@/lib/screening";
 import { tractClickFromFeature, type TractClickDetails } from "@/lib/tractCounty";

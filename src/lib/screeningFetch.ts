@@ -145,20 +145,20 @@ export async function floodAtPoint(lon: number, lat: number) {
 }
 
 export async function wetlandAtPoint(lon: number, lat: number) {
-  const pad = 0.02;
+  // The NWI query ignores a bare point. A ~70-foot envelope is the public lookup that still means "here."
+  const pad = 0.0002;
   const params = new URLSearchParams({
-    geometry: `${lon},${lat}`,
-    geometryType: "esriGeometryPoint",
-    sr: "4326",
-    layers: "all:0",
-    tolerance: "2",
-    mapExtent: `${lon - pad},${lat - pad},${lon + pad},${lat + pad}`,
-    imageDisplay: "400,400,96",
+    geometry: `${lon - pad},${lat - pad},${lon + pad},${lat + pad}`,
+    geometryType: "esriGeometryEnvelope",
+    inSR: "4326",
+    spatialRel: "esriSpatialRelIntersects",
+    outFields: "Wetlands.ATTRIBUTE,Wetlands.WETLAND_TYPE",
     returnGeometry: "false",
+    resultRecordCount: "1",
     f: "json",
   });
   try {
-    const payload = await getJson(`${NWI_SERVICE.replace(/\/$/, "")}/identify?${params}`);
+    const payload = await getJson(`${NWI_SERVICE.replace(/\/$/, "")}/0/query?${params}`);
     const features = featuresOf(payload);
     const attrs = attrsOf(features[0]);
     return describeWetland({
@@ -394,10 +394,16 @@ export async function schoolsInView(bbox: BBox): Promise<ScreeningCollection> {
       .filter((school): school is SchoolRating => Boolean(school))
       .filter((school) => pointInBbox(school.lon, school.lat, bbox))
       .map(schoolFeature);
+    const gradedFlorida = Boolean(loadSchoolRatings());
     return {
       type: "FeatureCollection",
       features: [...florida, ...remote].slice(0, SCHOOL_CAP),
-      meta: { status: "ok", summary: UTILITY_LAYER_NOTE.schools },
+      meta: {
+        status: "ok",
+        summary: gradedFlorida
+          ? UTILITY_LAYER_NOTE.schools
+          : "Florida letter grades are not in this build. Dots are NCES locations with a link to the state report card. No grade is invented.",
+      },
     };
   } catch {
     if (florida.length) {

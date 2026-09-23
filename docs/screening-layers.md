@@ -15,7 +15,7 @@ Nothing here is a will-serve letter, a survey, a jurisdictional determination, o
 | Sewer | Orange County polygons only | Same service, layer 61. |
 | Electric retail territory | Simplified polygons in the current view | [HIFLD electric retail service territories](https://services3.arcgis.com/OYP7N6mAJJCyH6hd/ArcGIS/rest/services/Electric_Retail_Service_Territories_HIFLD/FeatureServer/0). A territory is not a connection or a capacity check. |
 
-Selecting a parcel or a tract looks up the same sources at that centroid (tracts use the Census internal point) and lists the five nearest public schools within 3 miles.
+Selecting a parcel or a tract looks up flood and utilities at that point (tracts use the Census internal point) and lists the five nearest public schools within 3 miles. Wetlands use a roughly 70-foot box because the NWI service does not answer a bare point. Flood still uses the point itself.
 
 ## Contact
 

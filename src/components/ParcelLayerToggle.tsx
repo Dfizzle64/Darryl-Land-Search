@@ -8,10 +8,7 @@ type ParcelLayerToggleProps = {
 
 export function ParcelLayerToggle({ visible, hint, onToggle }: ParcelLayerToggleProps) {
   return (
-    <div
-      data-parcel-toggle
-      className="pointer-events-auto absolute left-3 top-16 z-30 max-w-[16.5rem] sm:left-4 sm:top-[4.25rem]"
-    >
+    <div data-parcel-toggle className="map-chrome absolute left-3 top-16 z-30 max-w-[18rem] sm:left-4 sm:top-[4.25rem]">
       <button
         type="button"
         aria-pressed={visible}
@@ -21,15 +18,15 @@ export function ParcelLayerToggle({ visible, hint, onToggle }: ParcelLayerToggle
           event.stopPropagation();
           onToggle();
         }}
-        className={`rounded-full border px-3 py-1.5 text-xs font-medium shadow-2xl ${
+        className={`rounded-full border px-3.5 py-2 text-sm font-semibold shadow-2xl ${
           visible
             ? "border-moss-400/70 bg-ink-800 text-white"
-            : "border-white/15 bg-ink-900/92 text-ink-100 hover:border-white/30"
+            : "border-clay-400 bg-clay-500 text-ink-950 hover:bg-clay-400"
         }`}
       >
-        Parcels {visible ? "on" : "off"}
+        {visible ? "Hide parcels" : "Show parcels"}
       </button>
-      <p className="mt-1.5 rounded-lg border border-white/10 bg-ink-950/80 px-2 py-1 text-[10px] leading-snug text-ink-300">
+      <p className="mt-1.5 rounded-lg border border-white/10 bg-ink-950/85 px-2 py-1 text-[11px] leading-snug text-ink-100">
         {hint}
       </p>
     </div>

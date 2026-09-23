@@ -14,7 +14,7 @@ type BasemapToggleProps = {
 
 export function BasemapToggle({ value, onChange }: BasemapToggleProps) {
   return (
-    <div className="pointer-events-auto absolute left-3 top-3 z-30 sm:left-4 sm:top-4">
+    <div className="map-chrome absolute left-3 top-3 z-30 sm:left-4 sm:top-4">
       <div
         role="group"
         aria-label="Basemap"

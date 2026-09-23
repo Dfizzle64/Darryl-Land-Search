@@ -15,8 +15,8 @@ import {
   isParcelVisibilityPreference,
   parcelVisibilityHint,
   parcelsAreVisible,
-  PARCEL_AUTO_ZOOM,
   PARCEL_VISIBILITY_STORAGE_KEY,
+  shouldQueryParcelsForZoom,
   toggleParcelVisibility,
   type ParcelVisibilityPreference,
 } from "@/lib/parcelVisibility";
@@ -145,7 +145,11 @@ export function AppShell({
   const [error, setError] = useState<string | null>(null);
 
   const primaryMarket = isPrimaryMarket(market);
-  const summary = catalogForMarket(ruralCatalog, urbanCatalog, otherCatalog, market);
+  // Stable across zoom updates. A fresh object here rebuilds map bounds and fitBounds snaps the camera back.
+  const summary = useMemo(
+    () => catalogForMarket(ruralCatalog, urbanCatalog, otherCatalog, market),
+    [ruralCatalog, urbanCatalog, otherCatalog, market],
+  );
   const scView = primaryMarket && viewIncludesSouthCarolina(market, countyState);
   const activeMfView: MfPriorityView = scView && tractClass !== "urban" ? mfView : "all";
   const annotatedRows = useMemo(() => annotateRuralRows(ruralCatalog.rows, mfPriority), [ruralCatalog.rows, mfPriority]);
@@ -185,7 +189,7 @@ export function AppShell({
   const orlandoParcelsOn = showOrlandoParcels(market, county, countyState);
   const orangePilot = showOrangeCountyPilot(market, county, countyState);
   const parcelLayerVisible = orlandoParcelsOn && parcelsAreVisible(parcelPreference, mapZoom, Boolean(aoi));
-  const visibilityHint = parcelVisibilityHint(parcelPreference);
+  const visibilityHint = parcelVisibilityHint(parcelPreference, parcelLayerVisible);
   const filterKey = parcelFilterKey(filters);
   const statusHelp = southCarolinaStatusHelp(market, countyState);
   const bounds = useMemo(
@@ -275,7 +279,11 @@ export function AppShell({
     typeof meta.fluJoinedCount === "number" && orangePilot && county === "Orange"
       ? meta.fluJoinedCount
       : activeParcels.features.length - fluUnknownCount;
-  const hint = orlandoParcelsOn ? emptyStateHint(filters, filterMatchTotal, fluUnknownCount) : null;
+  const queryingParcels = shouldQueryParcelsForZoom(parcelPreference, mapZoom);
+  const hint =
+    orlandoParcelsOn && queryingParcels && !parcelsLoading && parcelStats
+      ? emptyStateHint(filters, filterMatchTotal, fluUnknownCount)
+      : null;
 
   useEffect(() => {
     if (selectedId && !matchedIds.has(selectedId) && !showExcluded) {
@@ -324,20 +332,21 @@ export function AppShell({
   const loadViewportParcels = async (bbox: [number, number, number, number], zoom: number) => {
     lastViewport.current = { bbox, zoom };
     if (!orlandoParcelsOn || aoiRef.current) return;
-    const visible = parcelsAreVisible(preferenceRef.current, zoom, false);
-    // Shed scale stays unloaded. Once the user is zoomed in, keep the query
-    // even if they turned the outlines off so the ranked list still filters.
-    if (!visible && zoom < PARCEL_AUTO_ZOOM) {
+    // Shed scale stays unloaded in auto mode. Show parcels forces a query at any
+    // zoom. Once the camera is past the gate, keep querying even if outlines are
+    // hidden so the ranked list still filters.
+    if (!shouldQueryParcelsForZoom(preferenceRef.current, zoom)) {
       viewportRequest.current += 1;
       setViewportParcels(EMPTY_PARCELS);
       setViewportStats(null);
       setParcelsLoading(false);
       return;
     }
-    // Live DOH fill is only for the thinner sample counties. The five core counties
-    // already ship every parcel from 5 through 150 acres.
+    // Live DOH fill is only for the thinner sample counties, and only once the
+    // view is tighter than the neighborhood gate. The five core counties already
+    // ship every parcel from 5 through 150 acres.
     const useLive = zoom >= 11.5 && Boolean(county) && !isFull5AcCounty(county);
-    const limit = useLive ? 900 : zoom >= 13 ? 3500 : zoom >= 11.5 ? 2200 : 900;
+    const limit = useLive ? 900 : zoom >= 13 ? 3500 : zoom >= 11.5 ? 2200 : 1600;
     const requestId = ++viewportRequest.current;
     setParcelsLoading(true);
     setError(null);
@@ -526,7 +535,7 @@ export function AppShell({
         : market;
 
   return (
-    <div className="flex h-dvh min-h-0 flex-col bg-ink-950 text-ink-100">
+    <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-ink-950 text-ink-100">
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-3 md:px-5">
         <div>
           <p className="text-[11px] uppercase tracking-[0.22em] text-clay-400">{headerPlace}</p>
@@ -788,7 +797,7 @@ export function AppShell({
           </div>
           {hint && showSites ? (
             <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center px-4 xl:pr-[22rem]">
-              <div className="pointer-events-auto max-w-md rounded-2xl border border-white/10 bg-ink-900/95 px-4 py-3 text-sm shadow-2xl">
+              <div className="pointer-events-none max-w-md rounded-2xl border border-white/10 bg-ink-900/95 px-4 py-3 text-sm shadow-2xl">
                 <p className="font-medium text-white">No parcels match these filters</p>
                 <p className="mt-1 text-ink-300">{hint}</p>
               </div>

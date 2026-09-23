@@ -4,6 +4,7 @@ import maplibregl, { type GeoJSONSource, type Map as MapLibreMap, type MapMouseE
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
 import { aoiFeatureCollection, normalizeBbox, type AoiLock } from "@/lib/aoi";
+import { applyMapGestures } from "@/lib/mapGestures";
 import { BasemapToggle } from "./BasemapToggle";
 import { AoiControls } from "./AoiControls";
 import { ParcelLayerToggle } from "./ParcelLayerToggle";
@@ -302,6 +303,7 @@ export function SiteMap({
   aoiTruncated = false,
   onAoiChange,
 }: SiteMapProps) {
+  const shellRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -336,7 +338,15 @@ export function SiteMap({
             center: ORANGE_COUNTY_CENTER,
             zoom: 9.4,
             attributionControl: { compact: true },
+            scrollZoom: true,
+            dragPan: true,
+            touchZoomRotate: true,
+            doubleClickZoom: true,
+            boxZoom: true,
+            keyboard: true,
+            cooperativeGestures: false,
           });
+          applyMapGestures(map, false);
           map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), "bottom-right");
           map.fitBounds(boundsRef.current, { padding: 48, duration: 0, maxZoom: 11 });
           await new Promise<void>((resolve, reject) => {
@@ -391,7 +401,9 @@ export function SiteMap({
             callbacksRef.current.onHover(null);
           });
           const emitZoom = () => {
-            callbacksRef.current.onZoom?.(map.getZoom());
+            const zoomNow = map.getZoom();
+            containerRef.current?.setAttribute("data-map-zoom", zoomNow.toFixed(2));
+            callbacksRef.current.onZoom?.(zoomNow);
           };
           const emitViewport = () => {
             emitZoom();
@@ -434,6 +446,39 @@ export function SiteMap({
   }, [traffic, opportunityZones, oz2Tracts, ruralTracts, eligibleTracts]);
 
   useEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) return;
+    const onWheel = (event: WheelEvent) => {
+      if (!event.isTrusted) return;
+      const map = mapRef.current;
+      if (!map) return;
+      const target = event.target;
+      if (!(target instanceof Node) || !shell.contains(target)) return;
+      if (map.getCanvasContainer().contains(target)) return;
+      if (target instanceof Element && target.closest("[data-map-scroll]")) return;
+      event.preventDefault();
+      map.getCanvas().dispatchEvent(
+        new WheelEvent("wheel", {
+          bubbles: true,
+          cancelable: true,
+          deltaX: event.deltaX,
+          deltaY: event.deltaY,
+          deltaZ: event.deltaZ,
+          deltaMode: event.deltaMode,
+          clientX: event.clientX,
+          clientY: event.clientY,
+          ctrlKey: event.ctrlKey,
+          metaKey: event.metaKey,
+          shiftKey: event.shiftKey,
+          altKey: event.altKey,
+        }),
+      );
+    };
+    shell.addEventListener("wheel", onWheel, { capture: true, passive: false });
+    return () => shell.removeEventListener("wheel", onWheel, { capture: true });
+  }, []);
+
+  useEffect(() => {
     const map = mapRef.current;
     if (!map || status !== "ready") return;
     const source = map.getSource("parcels");
@@ -471,13 +516,10 @@ export function SiteMap({
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || status !== "ready" || !drawing) return;
+    if (!map || status !== "ready") return;
+    applyMapGestures(map, drawing);
+    if (!drawing) return;
 
-    map.dragPan.disable();
-    map.boxZoom.disable();
-    map.doubleClickZoom.disable();
-    map.scrollZoom.disable();
-    map.touchZoomRotate.disable();
     const canvas = map.getCanvas();
     canvas.style.cursor = "crosshair";
 
@@ -571,11 +613,7 @@ export function SiteMap({
       window.removeEventListener("mouseup", onWindowMouseUp);
       window.removeEventListener("keydown", onKey);
       try {
-        map.dragPan.enable();
-        map.boxZoom.enable();
-        map.doubleClickZoom.enable();
-        map.scrollZoom.enable();
-        map.touchZoomRotate.enable();
+        applyMapGestures(map, false);
         canvas.style.cursor = "";
       } catch {
         // Map already removed.
@@ -671,6 +709,7 @@ export function SiteMap({
 
   const previousHover = useRef<string | null>(null);
   const previousSelected = useRef<string | null>(null);
+  const flewToParcel = useRef<string | null>(null);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -692,17 +731,24 @@ export function SiteMap({
     }
     if (selectedId) {
       map.setFeatureState({ source: "parcels", id: selectedId }, { selected: true });
-      const feature = parcels.features.find((item) => item.properties.id === selectedId);
-      if (feature) {
-        const [lng, lat] = feature.properties.centroid;
-        map.easeTo({ center: [lng, lat], zoom: Math.max(map.getZoom(), 13), duration: 500 });
+      if (flewToParcel.current !== selectedId) {
+        const feature = parcels.features.find((item) => item.properties.id === selectedId);
+        if (feature) {
+          const [lng, lat] = feature.properties.centroid;
+          map.easeTo({ center: [lng, lat], zoom: Math.max(map.getZoom(), 13), duration: 500 });
+          flewToParcel.current = selectedId;
+        }
       }
+    } else {
+      flewToParcel.current = null;
     }
     previousSelected.current = selectedId;
   }, [selectedId, parcels.features, status]);
 
   const previousTract = useRef<string | null>(null);
+  const flewToTract = useRef<string | null>(null);
   const skipInitialFit = useRef(true);
+  const fittedBoundsKey = useRef<string | null>(null);
   useEffect(() => {
     const map = mapRef.current;
     if (!map || status !== "ready") return;
@@ -715,10 +761,15 @@ export function SiteMap({
   useEffect(() => {
     const map = mapRef.current;
     if (!map || status !== "ready") return;
+    // Same shed with a new array must not refit, or +/- and the scroll wheel snap back.
+    const signature = `${boundsKey}|${bounds.map((pair) => pair.join(",")).join("|")}`;
     if (skipInitialFit.current) {
       skipInitialFit.current = false;
+      fittedBoundsKey.current = signature;
       return;
     }
+    if (fittedBoundsKey.current === signature) return;
+    fittedBoundsKey.current = signature;
     map.fitBounds(bounds, { padding: 56, duration: 650, maxZoom: 11 });
   }, [bounds, boundsKey, status]);
 
@@ -738,15 +789,20 @@ export function SiteMap({
     if (previousTract.current) setTractState(previousTract.current, false);
     if (selectedTractGeoid) {
       setTractState(selectedTractGeoid, true);
-      const pin = ruralPins.features.find((feature) => feature.properties?.tractGeoid === selectedTractGeoid);
-      const coordinates = pin?.geometry?.coordinates;
-      if (coordinates && coordinates.length >= 2) {
-        map.easeTo({
-          center: [coordinates[0], coordinates[1]],
-          zoom: Math.max(map.getZoom(), 10),
-          duration: 500,
-        });
+      if (flewToTract.current !== selectedTractGeoid) {
+        const pin = ruralPins.features.find((feature) => feature.properties?.tractGeoid === selectedTractGeoid);
+        const coordinates = pin?.geometry?.coordinates;
+        if (coordinates && coordinates.length >= 2) {
+          map.easeTo({
+            center: [coordinates[0], coordinates[1]],
+            zoom: Math.max(map.getZoom(), 10),
+            duration: 500,
+          });
+          flewToTract.current = selectedTractGeoid;
+        }
       }
+    } else {
+      flewToTract.current = null;
     }
     previousTract.current = selectedTractGeoid;
   }, [selectedTractGeoid, ruralPins.features, ruralTracts.features, eligibleTracts.features, status]);
@@ -759,7 +815,7 @@ export function SiteMap({
   const layerOn = parcelLayerVisible ?? showParcels;
 
   return (
-    <div className="relative h-full w-full">
+    <div ref={shellRef} className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
       {status === "ready" ? <BasemapToggle value={basemap} onChange={setBasemap} /> : null}
       {status === "ready" && showParcels && onToggleParcelLayer ? (
@@ -789,8 +845,21 @@ export function SiteMap({
           }}
         />
       ) : null}
+      {status === "ready" && showParcels && !layerOn ? (
+        <div className="map-chrome absolute inset-x-3 top-28 z-20 flex justify-center sm:top-24 xl:right-[22rem]">
+          <div
+            data-parcel-banner
+            className="max-w-md rounded-xl border border-clay-400/70 bg-ink-900/95 px-3 py-2 text-center shadow-2xl"
+          >
+            <p className="text-sm font-medium text-clay-400">Parcels are hidden</p>
+            <p className="mt-1 text-xs leading-snug text-ink-100">
+              {parcelVisibilityHint || "Zoom in to neighborhood level, lock an area, or turn Show parcels on."}
+            </p>
+          </div>
+        </div>
+      ) : null}
       {status === "ready" && (showOz || showOz2 || showParcels) ? (
-        <div className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[20rem] space-y-1 rounded-lg border border-white/10 bg-ink-900/90 px-2 py-1.5 text-[10px] leading-snug text-ink-300 sm:bottom-4 sm:left-4">
+        <div className="map-chrome absolute bottom-3 left-3 z-10 max-w-[20rem] space-y-1 rounded-lg border border-white/10 bg-ink-900/90 px-2 py-1.5 text-[10px] leading-snug text-ink-300 sm:bottom-4 sm:left-4">
           {aoi ? (
             <p>
               <span className="mr-1.5 inline-block h-2 w-3 border border-dashed border-clay-400 align-middle" />
@@ -806,7 +875,7 @@ export function SiteMap({
           ) : null}
           {showOz2 ? (
             <>
-              <div className="pointer-events-auto flex gap-1 pb-1" role="group" aria-label="Rural or urban eligible tracts">
+              <div className="flex gap-1 pb-1" role="group" aria-label="Rural or urban eligible tracts">
                 {(
                   [
                     ["both", "Both"],

@@ -86,6 +86,8 @@ export type Oz2TractProperties = {
   /** Short county name, without a "County" suffix (for example "Orange"). */
   county?: string | null;
   state?: string | null;
+  /** Orange County ACS median household income when the GEOID is in that fixture. */
+  medianHouseholdIncome?: number;
 };
 
 export type OpportunityZoneProperties = {
@@ -294,6 +296,11 @@ export type EligiblePackTractProperties = {
   lat: number;
   lon: number;
   source: string;
+  /**
+   * ACS tract median household income when this GEOID is in the Orange County
+   * income fixture. Absent for every other tract — do not treat absence as zero.
+   */
+  medianHouseholdIncome?: number;
 };
 
 export type EligiblePackTractFeature = GeoJSON.Feature<
@@ -337,6 +344,8 @@ export type RuralMarketTractProperties = {
   lat: number;
   lon: number;
   source: string;
+  /** Orange County ACS median household income when the GEOID is in that fixture. */
+  medianHouseholdIncome?: number;
 };
 
 export type RuralMarketTractFeature = GeoJSON.Feature<
@@ -465,6 +474,15 @@ export type TrafficFeature = GeoJSON.Feature<
 >;
 
 export type FilterState = {
+  /**
+   * When false, parcel OZ radios are hidden and `ozFilter` is not applied.
+   * Map overlays for eligible tracts stay independent of this switch.
+   */
+  considerOpportunityZone: boolean;
+  /**
+   * When false, zoning / FLU / rezoning radios are hidden and land use is not applied.
+   */
+  considerZoning: boolean;
   landUseFilter: LandUseFilter;
   includePlannedDevelopment: boolean;
   includeConditionalZoning: boolean;
@@ -534,6 +552,8 @@ export type FluConfig = {
 };
 
 export const DEFAULT_FILTERS: FilterState = {
+  considerOpportunityZone: false,
+  considerZoning: false,
   landUseFilter: "zoning",
   includePlannedDevelopment: true,
   includeConditionalZoning: false,

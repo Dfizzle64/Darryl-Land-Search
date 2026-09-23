@@ -129,6 +129,15 @@ function landUsePasses(
   return zoning && flu;
 }
 
+/** Parcel OZ and zoning radios apply only while their master switches are on. */
+export function appliedParcelFilters(filters: FilterState): FilterState {
+  return {
+    ...filters,
+    ozFilter: filters.considerOpportunityZone ? filters.ozFilter : "either",
+    landUseFilter: filters.considerZoning ? filters.landUseFilter : "off",
+  };
+}
+
 function ozPasses(feature: ParcelFeature, filters: FilterState): boolean {
   if (filters.ozFilter === "either") return true;
   if (filters.ozFilter === "in" || filters.ozFilter === "out") {
@@ -149,8 +158,9 @@ export function parcelMatchesFilters(
   zoningConfig: ZoningConfig,
   fluConfig: FluConfig,
 ): boolean {
-  if (!landUsePasses(feature, filters, zoningConfig, fluConfig)) return false;
-  if (!ozPasses(feature, filters)) return false;
+  const applied = appliedParcelFilters(filters);
+  if (!landUsePasses(feature, applied, zoningConfig, fluConfig)) return false;
+  if (!ozPasses(feature, applied)) return false;
 
   const acreage = parcelAcreage(feature);
   if (acreage == null) {
@@ -188,6 +198,8 @@ export function filterParcels(
 /** Stable key so viewport and AOI requests refetch when a slider moves. */
 export function parcelFilterKey(filters: FilterState): string {
   return [
+    filters.considerOpportunityZone ? 1 : 0,
+    filters.considerZoning ? 1 : 0,
     filters.landUseFilter,
     filters.includePlannedDevelopment ? 1 : 0,
     filters.includeConditionalZoning ? 1 : 0,
@@ -215,6 +227,8 @@ export function writeParcelFilters(
   includeExcluded = false,
 ): void {
   params.set("filter", "1");
+  params.set("ozOn", filters.considerOpportunityZone ? "1" : "0");
+  params.set("zoneOn", filters.considerZoning ? "1" : "0");
   params.set("landUse", filters.landUseFilter);
   params.set("pd", filters.includePlannedDevelopment ? "1" : "0");
   params.set("cond", filters.includeConditionalZoning ? "1" : "0");
@@ -232,6 +246,8 @@ export function writeParcelFilters(
 export function parcelFiltersFromSearchParams(params: { get(name: string): string | null }): FilterState {
   const geo = params.get("geo");
   return {
+    considerOpportunityZone: params.get("ozOn") === "1",
+    considerZoning: params.get("zoneOn") === "1",
     landUseFilter: landUseParam(params.get("landUse") ?? params.get("mf")),
     includePlannedDevelopment: params.get("pd") !== "0",
     includeConditionalZoning: params.get("cond") === "1",
@@ -283,6 +299,7 @@ export function stampFilterMatch(
 
 export function emptyStateHint(filters: FilterState, matched: number, fluUnknownCount: number): string | null {
   if (matched > 0) return null;
+  filters = appliedParcelFilters(filters);
   if (filters.landUseFilter === "rezoning") {
     return "No rezoning candidates match: that mode needs joined FLU that supports multifamily / higher density and current zoning that is not MF-capable. Municipal FLU besides Orlando is often missing — those parcels are omitted rather than guessed. Try All parcels or Non-multifamily zoning, or turn FLU-unknown jurisdictions off your mental map.";
   }

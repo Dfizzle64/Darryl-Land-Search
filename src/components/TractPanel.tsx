@@ -11,6 +11,7 @@ type TractPanelProps = {
   selectedGeoid: string | null;
   onSelect: (geoid: string) => void;
   onClose?: () => void;
+  onCollapse?: () => void;
   variant?: "overlay" | "sheet";
   priorityView?: MfPriorityView;
   priorityCounts?: { all: number; priority: number; A: number; B: number };
@@ -23,6 +24,7 @@ export function TractPanel({
   selectedGeoid,
   onSelect,
   onClose,
+  onCollapse,
   variant = "overlay",
   priorityView,
   priorityCounts,
@@ -63,11 +65,18 @@ export function TractPanel({
             </div>
           ) : null}
         </div>
-        {onClose ? (
-          <button type="button" className="rounded-full border border-white/15 px-3 py-1 text-sm" onClick={onClose}>
-            Close
-          </button>
-        ) : null}
+        <div className="flex shrink-0 gap-1">
+          {onCollapse ? (
+            <button type="button" className="rounded-full border border-white/15 px-3 py-1 text-sm" onClick={onCollapse}>
+              Collapse
+            </button>
+          ) : null}
+          {onClose ? (
+            <button type="button" className="rounded-full border border-white/15 px-3 py-1 text-sm" onClick={onClose}>
+              Close
+            </button>
+          ) : null}
+        </div>
       </header>
       {tracts.length === 0 ? (
         <p className="px-3 py-4 text-sm text-ink-300">{emptyMessage}</p>

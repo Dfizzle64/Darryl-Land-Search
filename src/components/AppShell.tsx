@@ -10,7 +10,7 @@ import { SitesPanel } from "./SitesPanel";
 import { TractDrawer } from "./TractDrawer";
 import { TractPanel } from "./TractPanel";
 import { AOI_PARCEL_LIMIT, featuresIntersectingBbox, type AoiLock } from "@/lib/aoi";
-import { emptyStateHint, filterParcels, parcelFilterKey, stampFilterMatch, writeParcelFilters } from "@/lib/filters";
+import { appliedParcelFilters, emptyStateHint, filterParcels, parcelFilterKey, stampFilterMatch, writeParcelFilters } from "@/lib/filters";
 import {
   isParcelVisibilityPreference,
   parcelVisibilityHint,
@@ -38,6 +38,7 @@ import {
 } from "@/lib/markets";
 import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcels";
 import { rankSites } from "@/lib/score";
+import { filterTractRowsByIncome, incomeByGeoidFromFeatures } from "@/lib/tractIncome";
 import {
   annotateRuralRows,
   countMfPriority,
@@ -95,6 +96,8 @@ type AppShellProps = {
 
 type InventoryTab = "sites" | "tracts";
 
+const RANKING_STORAGE_KEY = "dls.rankingExpanded";
+
 const EMPTY_PARCELS: ParcelCollection = { type: "FeatureCollection", features: [] };
 
 export function AppShell({
@@ -127,6 +130,7 @@ export function AppShell({
   const [showOz2, setShowOz2] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sitesOpen, setSitesOpen] = useState(false);
+  const [rankingExpanded, setRankingExpanded] = useState(false);
   const [inventoryTab, setInventoryTab] = useState<InventoryTab>("sites");
   const [mfView, setMfView] = useState<MfPriorityView>("all");
   const [viewportParcels, setViewportParcels] = useState<ParcelCollection | null>(null);
@@ -169,22 +173,40 @@ export function AppShell({
     if (rowMatchesTractClass("N", tractClass)) rows.push(...urbanSide);
     return rows;
   }, [ruralSide, tractClass, urbanSide]);
+  const tractIncomeByGeoid = useMemo(
+    () => incomeByGeoidFromFeatures([ruralTracts, eligibleTracts, oz2Tracts]),
+    [eligibleTracts, oz2Tracts, ruralTracts],
+  );
+  const ruralShown = useMemo(
+    () => filterTractRowsByIncome(ruralSide, tractIncomeByGeoid, filters),
+    [filters, ruralSide, tractIncomeByGeoid],
+  );
+  const urbanShown = useMemo(
+    () => filterTractRowsByIncome(urbanSide, tractIncomeByGeoid, filters),
+    [filters, tractIncomeByGeoid, urbanSide],
+  );
+  const classRowsShown = useMemo(() => {
+    const rows: EligibleTractRow[] = [];
+    if (rowMatchesTractClass("Y", tractClass)) rows.push(...ruralShown);
+    if (rowMatchesTractClass("N", tractClass)) rows.push(...urbanShown);
+    return rows;
+  }, [ruralShown, tractClass, urbanShown]);
   const visibleTracts = useMemo(() => {
-    if (activeMfView === "all") return sortTractsForDisplay(classRows);
-    return sortTractsForDisplay(filterByMfPriority(ruralSide, activeMfView));
-  }, [activeMfView, classRows, ruralSide]);
-  const priorityCounts = useMemo(() => countMfPriority(ruralSide), [ruralSide]);
+    if (activeMfView === "all") return sortTractsForDisplay(classRowsShown);
+    return sortTractsForDisplay(filterByMfPriority(ruralShown, activeMfView));
+  }, [activeMfView, classRowsShown, ruralShown]);
+  const priorityCounts = useMemo(() => countMfPriority(ruralShown), [ruralShown]);
   const highlightTierA = useMemo(
-    () => geoidsForHighlight(ruralSide, activeMfView, "A"),
-    [ruralSide, activeMfView],
+    () => geoidsForHighlight(ruralShown, activeMfView, "A"),
+    [ruralShown, activeMfView],
   );
   const highlightTierB = useMemo(
-    () => geoidsForHighlight(ruralSide, activeMfView, "B"),
-    [ruralSide, activeMfView],
+    () => geoidsForHighlight(ruralShown, activeMfView, "B"),
+    [ruralShown, activeMfView],
   );
   const restrictGeoids = useMemo(
-    () => geoidFilterForView(ruralSide, activeMfView),
-    [ruralSide, activeMfView],
+    () => geoidFilterForView(ruralShown, activeMfView),
+    [ruralShown, activeMfView],
   );
   const orlandoParcelsOn = showOrlandoParcels(market, county, countyState);
   const orangePilot = showOrangeCountyPilot(market, county, countyState);
@@ -241,21 +263,22 @@ export function AppShell({
     return { type: "FeatureCollection", features: countyParcelFeatures };
   }, [orlandoParcelsOn, aoi, lockedParcels, viewportParcels, countyParcelFeatures]);
 
+  const appliedFilters = useMemo(() => appliedParcelFilters(filters), [filters]);
   const matched = useMemo(
-    () => filterParcels(activeParcels.features, filters, zoningConfig, fluConfig),
-    [activeParcels.features, filters, zoningConfig, fluConfig],
+    () => filterParcels(activeParcels.features, appliedFilters, zoningConfig, fluConfig),
+    [activeParcels.features, appliedFilters, zoningConfig, fluConfig],
   );
   const ranked = useMemo(
-    () => rankSites(matched, filters, zoningConfig, fluConfig),
-    [matched, filters, zoningConfig, fluConfig],
+    () => rankSites(matched, appliedFilters, zoningConfig, fluConfig),
+    [matched, appliedFilters, zoningConfig, fluConfig],
   );
   const rankedVisible = useMemo(() => ranked.slice(0, 200), [ranked]);
   const mapParcels = useMemo<ParcelCollection>(
     () => ({
       type: "FeatureCollection",
-      features: stampFilterMatch(activeParcels.features, filters, zoningConfig, fluConfig),
+      features: stampFilterMatch(activeParcels.features, appliedFilters, zoningConfig, fluConfig),
     }),
-    [activeParcels.features, filters, zoningConfig, fluConfig],
+    [activeParcels.features, appliedFilters, zoningConfig, fluConfig],
   );
   const parcelStats = aoi ? aoiStats : viewportStats;
   const filterMatchTotal = parcelStats?.totalMatching ?? matched.length;
@@ -282,7 +305,7 @@ export function AppShell({
   const queryingParcels = shouldQueryParcelsForZoom(parcelPreference, mapZoom);
   const hint =
     orlandoParcelsOn && queryingParcels && !parcelsLoading && parcelStats
-      ? emptyStateHint(filters, filterMatchTotal, fluUnknownCount)
+      ? emptyStateHint(appliedFilters, filterMatchTotal, fluUnknownCount)
       : null;
 
   useEffect(() => {
@@ -393,6 +416,7 @@ export function AppShell({
   useEffect(() => {
     const stored = window.sessionStorage.getItem(PARCEL_VISIBILITY_STORAGE_KEY);
     if (isParcelVisibilityPreference(stored)) setParcelPreference(stored);
+    if (window.sessionStorage.getItem(RANKING_STORAGE_KEY) === "1") setRankingExpanded(true);
   }, []);
 
   useEffect(() => {
@@ -503,8 +527,13 @@ export function AppShell({
   };
 
   const showSites = orlandoParcelsOn && inventoryTab === "sites";
-  const tractEmptyMessage =
-    activeMfView === "all"
+  const incomeDroppedTracts =
+    filters.incomeGeography === "tract" &&
+    (filters.minIncome > 0 || !filters.includeUnknownIncome) &&
+    classRowsShown.length < classRows.length;
+  const tractEmptyMessage = incomeDroppedTracts
+    ? "No eligible tracts pass the median-income filter. Only Orange County tracts have a joined ACS median income. Tracts without that attribute stay visible when Include unknown income is on."
+    : activeMfView === "all"
       ? tractClass === "urban"
         ? "No urban eligible tracts in this county filter."
         : tractClass === "rural"
@@ -515,7 +544,7 @@ export function AppShell({
     ? { priorityView: mfView, priorityCounts, onPriorityView: setMfView }
     : { priorityView: undefined, priorityCounts: undefined, onPriorityView: undefined };
   const countyOptions = useMemo(() => {
-    const counted = summarizeCounties(classRows);
+    const counted = summarizeCounties(classRowsShown);
     if (market !== "Orlando") return counted;
     // Ensure Seminole appears even with 0 eligible tracts in the current class.
     const byKey = new Map(counted.map((item) => [countyKey(item.county, item.state), item]));
@@ -526,7 +555,7 @@ export function AppShell({
       }
     }
     return Array.from(byKey.values()).sort((a, b) => a.county.localeCompare(b.county));
-  }, [classRows, market]);
+  }, [classRowsShown, market]);
 
   const headerPlace =
     orlandoParcelsOn && county
@@ -578,7 +607,7 @@ export function AppShell({
               value={county && countyState ? countyKey(county, countyState) : ""}
               onChange={(event) => changeCounty(event.target.value)}
             >
-              <option value="">All counties ({classRows.length})</option>
+              <option value="">All counties ({classRowsShown.length})</option>
               {countyOptions.map((item) => (
                 <option key={countyKey(item.county, item.state)} value={countyKey(item.county, item.state)}>
                   {formatCountyLabel(item.county, item.state)} ({item.count}
@@ -592,7 +621,7 @@ export function AppShell({
             {activeMfView === "all" ? "eligible" : "SC MF priority"}{" "}
             {visibleTracts.length === 1 ? "tract" : "tracts"}
             <span className="block text-[11px]">
-              {ruralSide.length.toLocaleString()} rural · {urbanSide.length.toLocaleString()} urban
+              {ruralShown.length.toLocaleString()} rural · {urbanShown.length.toLocaleString()} urban
             </span>
             {orlandoParcelsOn ? (
               <span className="block text-[11px]">
@@ -688,9 +717,9 @@ export function AppShell({
           orangePilot={orangePilot}
           orlandoParcels={orlandoParcelsOn}
           market={market}
-          tractCount={classRows.length}
-          ruralTractCount={ruralSide.length}
-          urbanTractCount={urbanSide.length}
+          tractCount={classRowsShown.length}
+          ruralTractCount={ruralShown.length}
+          urbanTractCount={urbanShown.length}
           parcelNote={ruralCatalog.parcelNote}
           statusHelp={statusHelp}
           priorityView={priorityFilter.priorityView}
@@ -734,7 +763,10 @@ export function AppShell({
             countyState={countyState}
             bounds={bounds}
             boundsKey={boundsKey}
-            ozFilter={filters.ozFilter}
+            ozFilter={appliedFilters.ozFilter}
+            minIncome={filters.minIncome}
+            includeUnknownIncome={filters.includeUnknownIncome}
+            incomeGeography={filters.incomeGeography}
             highlightTierA={highlightTierA}
             highlightTierB={highlightTierB}
             restrictGeoids={restrictGeoids}
@@ -749,55 +781,8 @@ export function AppShell({
             aoiTruncated={Boolean(aoiStats?.truncated)}
             onAoiChange={setAoi}
           />
-          <div className="pointer-events-none absolute bottom-3 right-3 top-16 z-10 hidden w-80 xl:block">
-            <div className="pointer-events-auto flex h-full min-h-0 flex-col gap-2">
-              {orlandoParcelsOn ? (
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    className={`rounded-full border px-3 py-1 text-xs ${inventoryTab === "sites" ? "border-clay-400/50 bg-ink-800 text-white" : "border-white/10 bg-ink-900/80 text-ink-300"}`}
-                    onClick={() => setInventoryTab("sites")}
-                  >
-                    Shed parcels
-                  </button>
-                  <button
-                    type="button"
-                    className={`rounded-full border px-3 py-1 text-xs ${inventoryTab === "tracts" ? "border-clay-400/50 bg-ink-800 text-white" : "border-white/10 bg-ink-900/80 text-ink-300"}`}
-                    onClick={() => setInventoryTab("tracts")}
-                  >
-                    Eligible tracts
-                  </button>
-                </div>
-              ) : null}
-              <div className="min-h-0 flex-1">
-                {showSites ? (
-                  <SitesPanel
-                    sites={rankedVisible}
-                    matchedTotal={filterMatchTotal}
-                    selectedId={selectedId}
-                    hoveredId={hoveredId}
-                    incomeGeography={filters.incomeGeography}
-                    landUseFilter={filters.landUseFilter}
-                    fluUnknownCount={fluUnknownCount}
-                    onSelect={selectSite}
-                    onHover={setHoveredId}
-                  />
-                ) : (
-                  <TractPanel
-                    tracts={visibleTracts}
-                    selectedGeoid={selectedTractGeoid}
-                    onSelect={selectTract}
-                    priorityView={priorityFilter.priorityView}
-                    priorityCounts={priorityFilter.priorityCounts}
-                    onPriorityView={priorityFilter.onPriorityView}
-                    emptyMessage={tractEmptyMessage}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
           {hint && showSites ? (
-            <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center px-4 xl:pr-[22rem]">
+            <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center px-4">
               <div className="pointer-events-none max-w-md rounded-2xl border border-white/10 bg-ink-900/95 px-4 py-3 text-sm shadow-2xl">
                 <p className="font-medium text-white">No parcels match these filters</p>
                 <p className="mt-1 text-ink-300">{hint}</p>
@@ -805,17 +790,121 @@ export function AppShell({
             </div>
           ) : null}
         </main>
-        {selected ? (
-          <ParcelDrawer
-            parcel={selected}
-            zoningConfig={zoningConfig}
-            fluConfig={fluConfig}
-            filters={filters}
-            onClose={() => setSelectedId(null)}
-          />
-        ) : (
-          <TractDrawer tract={selectedTract} statusHelp={statusHelp} onClose={() => setSelectedTractGeoid(null)} />
-        )}
+        <aside className="hidden min-h-0 w-[24rem] shrink-0 flex-col border-l border-white/10 bg-ink-900 lg:flex">
+          <div className="shrink-0 border-b border-white/10 px-3 py-3">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.16em] text-clay-400">
+                  {showSites ? "Ranked sites" : "Eligible tracts"}
+                </p>
+                <p className="text-sm text-white">
+                  {showSites
+                    ? `${filterMatchTotal.toLocaleString()} matching parcels`
+                    : `${visibleTracts.length.toLocaleString()} tracts`}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="rounded-full border border-white/20 bg-ink-800 px-3 py-1 text-sm text-white"
+                aria-expanded={rankingExpanded}
+                onClick={() => {
+                  const next = !rankingExpanded;
+                  setRankingExpanded(next);
+                  window.sessionStorage.setItem(RANKING_STORAGE_KEY, next ? "1" : "0");
+                }}
+              >
+                {rankingExpanded ? "Collapse" : "Expand"}
+              </button>
+            </div>
+            {orlandoParcelsOn ? (
+              <div className="mt-2 flex gap-1">
+                <button
+                  type="button"
+                  className={`rounded-full border px-3 py-1 text-xs ${inventoryTab === "sites" ? "border-clay-400/50 bg-ink-800 text-white" : "border-white/10 text-ink-300"}`}
+                  onClick={() => setInventoryTab("sites")}
+                >
+                  Shed parcels
+                </button>
+                <button
+                  type="button"
+                  className={`rounded-full border px-3 py-1 text-xs ${inventoryTab === "tracts" ? "border-clay-400/50 bg-ink-800 text-white" : "border-white/10 text-ink-300"}`}
+                  onClick={() => setInventoryTab("tracts")}
+                >
+                  Eligible tracts
+                </button>
+              </div>
+            ) : null}
+          </div>
+          {rankingExpanded ? (
+            <div className="min-h-0 flex-[1.35]">
+              {showSites ? (
+                <SitesPanel
+                  variant="sheet"
+                  sites={rankedVisible}
+                  matchedTotal={filterMatchTotal}
+                  selectedId={selectedId}
+                  hoveredId={hoveredId}
+                  incomeGeography={filters.incomeGeography}
+                  landUseFilter={appliedFilters.landUseFilter}
+                  fluUnknownCount={fluUnknownCount}
+                  onSelect={selectSite}
+                  onHover={setHoveredId}
+                  onCollapse={() => {
+                    setRankingExpanded(false);
+                    window.sessionStorage.setItem(RANKING_STORAGE_KEY, "0");
+                  }}
+                />
+              ) : (
+                <TractPanel
+                  variant="sheet"
+                  tracts={visibleTracts}
+                  selectedGeoid={selectedTractGeoid}
+                  onSelect={selectTract}
+                  onCollapse={() => {
+                    setRankingExpanded(false);
+                    window.sessionStorage.setItem(RANKING_STORAGE_KEY, "0");
+                  }}
+                  priorityView={priorityFilter.priorityView}
+                  priorityCounts={priorityFilter.priorityCounts}
+                  onPriorityView={priorityFilter.onPriorityView}
+                  emptyMessage={tractEmptyMessage}
+                />
+              )}
+            </div>
+          ) : null}
+          <div className={rankingExpanded ? "min-h-[12rem] flex-1 overflow-hidden border-t border-white/10" : "min-h-0 flex-1 overflow-hidden"}>
+            {selected ? (
+              <ParcelDrawer
+                layout="pane"
+                parcel={selected}
+                zoningConfig={zoningConfig}
+                fluConfig={fluConfig}
+                filters={appliedFilters}
+                onClose={() => setSelectedId(null)}
+              />
+            ) : (
+              <TractDrawer
+                layout="pane"
+                tract={selectedTract}
+                statusHelp={statusHelp}
+                onClose={() => setSelectedTractGeoid(null)}
+              />
+            )}
+          </div>
+        </aside>
+        <div className="lg:hidden">
+          {selected ? (
+            <ParcelDrawer
+              parcel={selected}
+              zoningConfig={zoningConfig}
+              fluConfig={fluConfig}
+              filters={appliedFilters}
+              onClose={() => setSelectedId(null)}
+            />
+          ) : (
+            <TractDrawer tract={selectedTract} statusHelp={statusHelp} onClose={() => setSelectedTractGeoid(null)} />
+          )}
+        </div>
       </div>
 
       {sitesOpen ? (
@@ -830,7 +919,7 @@ export function AppShell({
                 selectedId={selectedId}
                 hoveredId={hoveredId}
                 incomeGeography={filters.incomeGeography}
-                landUseFilter={filters.landUseFilter}
+                landUseFilter={appliedFilters.landUseFilter}
                 fluUnknownCount={fluUnknownCount}
                 onSelect={selectSite}
                 onHover={setHoveredId}

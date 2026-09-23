@@ -16,6 +16,7 @@ type SitesPanelProps = {
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   onClose?: () => void;
+  onCollapse?: () => void;
   variant?: "overlay" | "sheet";
   matchedTotal?: number;
 };
@@ -30,6 +31,7 @@ export function SitesPanel({
   onSelect,
   onHover,
   onClose,
+  onCollapse,
   variant = "overlay",
   matchedTotal,
 }: SitesPanelProps) {
@@ -61,11 +63,18 @@ export function SitesPanel({
             {landUseFilter === "off" ? "" : ", and an OZ bonus when relevant"}.
           </p>
         </div>
-        {onClose ? (
-          <button type="button" className="rounded-full border border-white/15 px-3 py-1 text-sm" onClick={onClose}>
-            Close
-          </button>
-        ) : null}
+        <div className="flex shrink-0 gap-1">
+          {onCollapse ? (
+            <button type="button" className="rounded-full border border-white/15 px-3 py-1 text-sm" onClick={onCollapse}>
+              Collapse
+            </button>
+          ) : null}
+          {onClose ? (
+            <button type="button" className="rounded-full border border-white/15 px-3 py-1 text-sm" onClick={onClose}>
+              Close
+            </button>
+          ) : null}
+        </div>
       </header>
 
       {landUseFilter === "rezoning" && fluUnknownCount > 0 ? (

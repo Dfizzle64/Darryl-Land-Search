@@ -18,6 +18,37 @@ import type {
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
+type IncomeStamped = { tractGeoid?: string; medianHouseholdIncome?: number };
+
+let orangeTractIncome: Promise<Map<string, number>> | null = null;
+
+export function loadOrangeTractIncomeMap(): Promise<Map<string, number>> {
+  if (!orangeTractIncome) {
+    orangeTractIncome = readFile(path.join(DATA_DIR, "fixtures/income-tracts.geojson"), "utf8").then((raw) => {
+      const collection = JSON.parse(raw) as {
+        features?: Array<{ properties?: { geoid?: string; medianHouseholdIncome?: number | null } }>;
+      };
+      const lookup = new Map<string, number>();
+      for (const feature of collection.features ?? []) {
+        const geoid = feature.properties?.geoid;
+        const income = feature.properties?.medianHouseholdIncome;
+        if (geoid && typeof income === "number" && Number.isFinite(income)) lookup.set(geoid, income);
+      }
+      return lookup;
+    });
+  }
+  return orangeTractIncome;
+}
+
+function stampOrangeTractIncome<T extends IncomeStamped>(features: Array<{ properties: T }>, income: Map<string, number>) {
+  for (const feature of features) {
+    const geoid = feature.properties.tractGeoid;
+    if (!geoid) continue;
+    const value = income.get(geoid);
+    if (value != null) feature.properties.medianHouseholdIncome = value;
+  }
+}
+
 function normalizeZoningConfig(raw: ZoningConfig): ZoningConfig {
   const config = {
     ...raw,
@@ -80,6 +111,7 @@ export async function loadOz2Tracts(): Promise<Oz2TractCollection> {
   const collection = JSON.parse(raw) as Oz2TractCollection;
   const table = JSON.parse(tableRaw) as { tracts?: { tractGeoid: string; county?: string; state?: string }[] };
   annotateTractCounty(collection.features, table.tracts ?? []);
+  stampOrangeTractIncome(collection.features, await loadOrangeTractIncomeMap());
   return collection;
 }
 
@@ -96,6 +128,7 @@ export async function loadRuralMarketTracts(): Promise<RuralMarketTractCollectio
   const collection = JSON.parse(raw) as RuralMarketTractCollection;
   const catalog = JSON.parse(catalogRaw) as { rows?: { geoid: string; county?: string; state?: string }[] };
   annotateTractCounty(collection.features, catalog.rows ?? []);
+  stampOrangeTractIncome(collection.features, await loadOrangeTractIncomeMap());
   return collection;
 }
 
@@ -111,7 +144,9 @@ export async function loadOtherMarketsCatalog(): Promise<EligibleMarketsCatalog>
 
 export async function loadEligiblePackTracts(): Promise<EligiblePackTractCollection> {
   const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-eligible-packs.geojson"), "utf8");
-  return JSON.parse(raw) as EligiblePackTractCollection;
+  const collection = JSON.parse(raw) as EligiblePackTractCollection;
+  stampOrangeTractIncome(collection.features, await loadOrangeTractIncomeMap());
+  return collection;
 }
 
 export async function loadScMfPriority(): Promise<ScMfPriorityCatalog> {

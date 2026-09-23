@@ -39,6 +39,8 @@ const fluConfig: FluConfig = {
 };
 
 const filters: FilterState = {
+  considerOpportunityZone: true,
+  considerZoning: true,
   landUseFilter: "off",
   includePlannedDevelopment: true,
   includeConditionalZoning: false,

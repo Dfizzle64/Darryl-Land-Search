@@ -39,6 +39,8 @@ describe("basemap helpers", () => {
     expect(OVERLAY_LAYER_IDS).toEqual([
       "rural-fill",
       "rural-line",
+      "eligible-fill",
+      "eligible-line",
       "mf-priority-a-fill",
       "mf-priority-a-line",
       "mf-priority-b-fill",

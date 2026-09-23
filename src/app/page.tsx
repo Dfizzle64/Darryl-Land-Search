@@ -2,13 +2,16 @@ import { AppShell } from "@/components/AppShell";
 import { loadOrlandoParcelsMeta } from "@/lib/data/orlandoParcelStore";
 import type { ParcelCollection } from "@/lib/types";
 import {
+  loadEligiblePackTracts,
   loadFixtureMeta,
   loadFluConfig,
   loadOpportunityZones,
+  loadOtherMarketsCatalog,
   loadOz2Tracts,
   loadRuralMarketsCatalog,
   loadRuralMarketTracts,
   loadScMfPriority,
+  loadUrbanMarketsCatalog,
   loadTrafficCollection,
   loadZoningConfig,
 } from "@/lib/data/loadFixtures";
@@ -24,6 +27,9 @@ export default async function HomePage() {
     oz2Tracts,
     ruralCatalog,
     ruralTracts,
+    urbanCatalog,
+    otherCatalog,
+    eligibleTracts,
     mfPriority,
     zoningConfig,
     fluConfig,
@@ -35,6 +41,9 @@ export default async function HomePage() {
     loadOz2Tracts(),
     loadRuralMarketsCatalog(),
     loadRuralMarketTracts(),
+    loadUrbanMarketsCatalog(),
+    loadOtherMarketsCatalog(),
+    loadEligiblePackTracts(),
     loadScMfPriority(),
     loadZoningConfig(),
     loadFluConfig(),
@@ -56,6 +65,9 @@ export default async function HomePage() {
       oz2Tracts={oz2Tracts}
       ruralCatalog={catalog}
       ruralTracts={ruralTracts}
+      urbanCatalog={urbanCatalog}
+      otherCatalog={otherCatalog}
+      eligibleTracts={eligibleTracts}
       mfPriority={mfPriority}
       zoningConfig={zoningConfig}
       fluConfig={fluConfig}

@@ -1,12 +1,19 @@
 import {
+  ELIGIBLE_NOT_DESIGNATED_STATUS,
   MARKETS,
   ORANGE_COUNTY_BOUNDS,
+  OTHER_MARKETS,
   RURAL_ELIGIBLE_STATUS_CHIP,
+  type EligibleMarketsCatalog,
+  type EligibleTractRow,
   type MarketCountySummary,
   type MarketId,
   type MarketSummary,
+  type OtherMarketId,
   type RuralMarketTractRow,
   type RuralMarketsCatalog,
+  type SearchMarketId,
+  type TractClassView,
 } from "./types";
 import { showOrangeCountyPilot, showOrlandoParcels } from "./orlandoParcels";
 
@@ -18,10 +25,25 @@ export const STATE_ABBR: Record<string, string> = {
   "South Carolina": "SC",
   "North Carolina": "NC",
   Tennessee: "TN",
+  Alabama: "AL",
+  Mississippi: "MS",
+  Arkansas: "AR",
 };
 
 export function isMarketId(value: string): value is MarketId {
   return (MARKETS as readonly string[]).includes(value);
+}
+
+export function isOtherMarketId(value: string): value is OtherMarketId {
+  return (OTHER_MARKETS as readonly string[]).includes(value);
+}
+
+export function isSearchMarketId(value: string): value is SearchMarketId {
+  return isMarketId(value) || isOtherMarketId(value);
+}
+
+export function isPrimaryMarket(value: string): value is MarketId {
+  return isMarketId(value);
 }
 
 /** State-aware county key so Charlotte's NC Union is not SC Union. */
@@ -40,7 +62,10 @@ export function formatCountyLabel(county: string, state: string): string {
   return `${county}, ${abbr}`;
 }
 
-export function marketSummary(catalog: RuralMarketsCatalog, market: MarketId): MarketSummary {
+export function marketSummary(
+  catalog: { markets: MarketSummary[] },
+  market: SearchMarketId,
+): MarketSummary {
   const summary = catalog.markets.find((item) => item.market === market);
   if (!summary) {
     throw new Error(`Catalog is missing market ${market}`);
@@ -64,7 +89,7 @@ export function filterRuralRows(
 
 export function viewBounds(
   summary: MarketSummary,
-  rows: RuralMarketTractRow[],
+  rows: Array<{ market: string; county: string; state: string; lat: number; lon: number }>,
   county: string | null,
   state: string | null,
   options?: { fitRows?: boolean },
@@ -122,22 +147,125 @@ export function isSouthCarolinaState(state: string | null | undefined): boolean 
  * Charleston is entirely South Carolina. Charlotte’s shed includes York,
  * Lancaster, and Chester. Other markets in this app have no South Carolina tracts.
  */
-export function viewIncludesSouthCarolina(market: MarketId, state: string | null): boolean {
-  if (market === "Charleston") return true;
-  if (market !== "Charlotte") return false;
-  return state == null || isSouthCarolinaState(state);
+const ENTIRELY_SOUTH_CAROLINA_MARKETS = new Set<SearchMarketId>(["Charleston", "Columbia", "Greenville"]);
+
+/**
+ * Charleston, Columbia, and Greenville are entirely South Carolina.
+ * Charlotte’s shed includes York, Lancaster, and Chester.
+ * Savannah’s shed includes Beaufort and Jasper.
+ */
+export function viewIncludesSouthCarolina(market: SearchMarketId, state: string | null): boolean {
+  if (ENTIRELY_SOUTH_CAROLINA_MARKETS.has(market)) return true;
+  if (market === "Charlotte" || market === "Savannah") {
+    return state == null || isSouthCarolinaState(state);
+  }
+  return false;
 }
 
 /**
  * Help copy for a view that includes South Carolina tracts. Null for FL/GA/NC/TN-only views.
  * Does not name nominated GEOIDs — the public list is not posted.
  */
-export function southCarolinaStatusHelp(market: MarketId, state: string | null): string | null {
+export function southCarolinaStatusHelp(market: SearchMarketId, state: string | null): string | null {
   if (!viewIncludesSouthCarolina(market, state)) return null;
-  if (market === "Charleston" || isSouthCarolinaState(state)) {
-    return "South Carolina’s governor filed OZ 2.0 nominations with Treasury on Sep 10, 2026. The nominated tract list is not public yet, so these tracts stay eligible and are not designated.";
+  if (market === "Charlotte" && !isSouthCarolinaState(state)) {
+    return "York, Lancaster, and Chester, South Carolina: the governor filed OZ 2.0 nominations on Sep 10, 2026. The list is not public yet, so those tracts stay eligible and are not designated. North Carolina tracts in this market stay eligible and are not designated.";
   }
-  return "York, Lancaster, and Chester, South Carolina: the governor filed OZ 2.0 nominations on Sep 10, 2026. The list is not public yet, so those tracts stay eligible and are not designated. North Carolina tracts in this market stay eligible and are not designated.";
+  if (market === "Savannah" && !isSouthCarolinaState(state)) {
+    return "Beaufort and Jasper, South Carolina: the governor filed OZ 2.0 nominations on Sep 10, 2026. The list is not public yet, so those tracts stay eligible and are not designated. Georgia tracts in this market stay eligible and are not designated.";
+  }
+  return "South Carolina’s governor filed OZ 2.0 nominations with Treasury on Sep 10, 2026. The nominated tract list is not public yet, so these tracts stay eligible and are not designated.";
+}
+
+export function filterEligibleRows(
+  rows: EligibleTractRow[],
+  market: SearchMarketId,
+  county: string | null,
+  state: string | null,
+): EligibleTractRow[] {
+  return rows.filter((row) => {
+    if (row.market !== market) return false;
+    if (county && row.county !== county) return false;
+    if (state && row.state !== state) return false;
+    return true;
+  });
+}
+
+export function rowMatchesTractClass(rural: "Y" | "N", view: TractClassView): boolean {
+  if (view === "both") return true;
+  return view === "rural" ? rural === "Y" : rural === "N";
+}
+
+/**
+ * Map-layer rural/urban cut. "none" means the rural and urban filters contradict
+ * (for example the parcel filter is rural-eligible while the legend is urban).
+ */
+export function eligibleClassCut(
+  tractClass: TractClassView,
+  ozFilter: "either" | "in" | "out" | "rural-eligible" | "non-rural-eligible",
+): "all" | "rural" | "urban" | "none" {
+  const rural = tractClass === "rural" || ozFilter === "rural-eligible";
+  const urban = tractClass === "urban" || ozFilter === "non-rural-eligible";
+  if (rural && urban) return "none";
+  if (rural) return "rural";
+  if (urban) return "urban";
+  return "all";
+}
+
+export function displayStatusChip(row: { market: string; rural: "Y" | "N"; status?: string | null }): string {
+  if (row.rural === "Y" && isPrimaryMarket(row.market)) return RURAL_ELIGIBLE_STATUS_CHIP;
+  return ELIGIBLE_NOT_DESIGNATED_STATUS;
+}
+
+export function governorFiledInNotes(notes: string | null | undefined): boolean {
+  return Boolean(notes && notes.toLowerCase().includes("governor-filed"));
+}
+
+export function showsGovernorFiledSoftCopy(row: { state: string; notes: string }): boolean {
+  return isSouthCarolinaState(row.state) || governorFiledInNotes(row.notes);
+}
+
+export function summarizeCounties(
+  rows: Array<Pick<RuralMarketTractRow, "county" | "state" | "outerEdge">>,
+): MarketCountySummary[] {
+  const counties = new Map<string, MarketCountySummary>();
+  for (const row of rows) {
+    const key = countyKey(row.county, row.state);
+    const bucket = counties.get(key) ?? { county: row.county, state: row.state, count: 0, outerEdge: false };
+    bucket.count += 1;
+    bucket.outerEdge = bucket.outerEdge || row.outerEdge;
+    counties.set(key, bucket);
+  }
+  return Array.from(counties.values()).sort((a, b) => a.state.localeCompare(b.state) || a.county.localeCompare(b.county));
+}
+
+export function unionBounds(
+  left: [[number, number], [number, number]],
+  right: [[number, number], [number, number]],
+): [[number, number], [number, number]] {
+  return [
+    [Math.min(left[0][0], right[0][0]), Math.min(left[0][1], right[0][1])],
+    [Math.max(left[1][0], right[1][0]), Math.max(left[1][1], right[1][1])],
+  ];
+}
+
+export function catalogForMarket(
+  ruralCatalog: RuralMarketsCatalog,
+  urbanCatalog: EligibleMarketsCatalog,
+  otherCatalog: EligibleMarketsCatalog,
+  market: SearchMarketId,
+): MarketSummary {
+  const catalog = isPrimaryMarket(market) ? ruralCatalog : otherCatalog;
+  if (!isPrimaryMarket(market)) return marketSummary(catalog, market);
+  const rural = marketSummary(ruralCatalog, market);
+  const urban = urbanCatalog.markets.find((item) => item.market === market);
+  if (!urban) return rural;
+  return {
+    ...rural,
+    ruralCount: rural.rowCount,
+    urbanCount: urban.rowCount,
+    bounds: unionBounds(rural.bounds, urban.bounds),
+  };
 }
 
 export function isOuterEdgeNote(notes: string | null | undefined): boolean {

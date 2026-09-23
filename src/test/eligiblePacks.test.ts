@@ -34,6 +34,7 @@ const URBAN_ROWS: Record<MarketId, number> = {
 };
 
 const OTHER_ROWS: Record<OtherMarketId, { total: number; rural: number; urban: number }> = {
+  SWFL: { total: 75, rural: 11, urban: 64 },
   "Vero Beach": { total: 62, rural: 25, urban: 37 },
   Melbourne: { total: 175, rural: 24, urban: 151 },
   Jacksonville: { total: 98, rural: 8, urban: 90 },
@@ -93,13 +94,13 @@ describe("urban eligible pack for the seven markets", () => {
 describe("other MSA eligible pack", () => {
   const catalog = loadOther();
 
-  it("keeps 1386 rows, 1341 GEOIDs, 491 rural and 895 urban", () => {
+  it("keeps 1461 rows, 1416 GEOIDs, 502 rural and 959 urban", () => {
     expect(catalog.pack).toBe("other-msas");
-    expect(catalog.rowCount).toBe(1386);
-    expect(catalog.uniqueGeoidCount).toBe(1341);
-    expect(catalog.ruralRowCount).toBe(491);
-    expect(catalog.urbanRowCount).toBe(895);
-    expect(new Set(catalog.rows.map((row) => row.geoid)).size).toBe(1341);
+    expect(catalog.rowCount).toBe(1461);
+    expect(catalog.uniqueGeoidCount).toBe(1416);
+    expect(catalog.ruralRowCount).toBe(502);
+    expect(catalog.urbanRowCount).toBe(959);
+    expect(new Set(catalog.rows.map((row) => row.geoid)).size).toBe(1416);
     expect(catalog.statusChip).toBe(ELIGIBLE_NOT_DESIGNATED_STATUS);
     expect(catalog.rows.every((row) => row.status === ELIGIBLE_NOT_DESIGNATED_STATUS)).toBe(true);
     expect(catalog.rows.every((row) => row.rural === "Y" || row.rural === "N")).toBe(true);
@@ -107,8 +108,9 @@ describe("other MSA eligible pack", () => {
   });
 
   it("matches each smaller market and does not treat them as primary", () => {
-    expect(OTHER_MARKETS).toHaveLength(15);
-    expect(OTHER_MARKETS[2]).toBe("Jacksonville");
+    expect(OTHER_MARKETS).toHaveLength(16);
+    expect(OTHER_MARKETS[0]).toBe("SWFL");
+    expect(OTHER_MARKETS[3]).toBe("Jacksonville");
     for (const market of OTHER_MARKETS) {
       const rows = filterEligibleRows(catalog.rows, market, null, null);
       const expected = OTHER_ROWS[market];
@@ -130,6 +132,37 @@ describe("other MSA eligible pack", () => {
     expect(memphis.some((row) => row.state === "Arkansas")).toBe(true);
     expect(memphis.some((row) => row.state === "Mississippi")).toBe(true);
     expect(memphis.every((row) => !governorFiledInNotes(row.notes))).toBe(true);
+  });
+
+  it("lists SWFL eligible tracts without marking them designated", () => {
+    expect(isOtherMarketId("SWFL")).toBe(true);
+    expect(isPrimaryMarket("SWFL")).toBe(false);
+    const rows = filterEligibleRows(catalog.rows, "SWFL", null, null);
+    expect(rows).toHaveLength(75);
+    expect(rows.every((row) => row.state === "Florida")).toBe(true);
+    expect(rows.every((row) => row.status === ELIGIBLE_NOT_DESIGNATED_STATUS)).toBe(true);
+    expect(rows.every((row) => !/^designated/i.test(row.status))).toBe(true);
+    expect(rows.every((row) => !row.notes.toLowerCase().includes("certified"))).toBe(true);
+    expect(displayStatusChip(rows[0])).toBe(ELIGIBLE_NOT_DESIGNATED_STATUS);
+    const fips: Record<string, string> = {
+      Lee: "12071",
+      Collier: "12021",
+      Sarasota: "12115",
+      Charlotte: "12015",
+    };
+    expect(new Set(rows.map((row) => row.county))).toEqual(new Set(Object.keys(fips)));
+    for (const row of rows) {
+      expect(row.geoid.startsWith(fips[row.county])).toBe(true);
+    }
+    expect(filterEligibleRows(rows, "SWFL", "Lee", "Florida")).toHaveLength(38);
+    expect(filterEligibleRows(rows, "SWFL", "Collier", "Florida")).toHaveLength(19);
+    expect(filterEligibleRows(rows, "SWFL", "Sarasota", "Florida")).toHaveLength(13);
+    expect(filterEligibleRows(rows, "SWFL", "Charlotte", "Florida")).toHaveLength(5);
+    expect(filterEligibleRows(rows, "SWFL", "Lee", "Florida").every((row) => row.outerEdge === false)).toBe(true);
+    expect(filterEligibleRows(rows, "SWFL", "Collier", "Florida").every((row) => row.outerEdge === false)).toBe(true);
+    expect(filterEligibleRows(rows, "SWFL", "Sarasota", "Florida").every((row) => row.outerEdge === true)).toBe(true);
+    expect(filterEligibleRows(rows, "SWFL", "Charlotte", "Florida").every((row) => row.outerEdge === true)).toBe(true);
+    expect(filterEligibleRows(rows, "SWFL", "Sarasota", "Florida").every((row) => row.rural === "N")).toBe(true);
   });
 
   it("lists Jacksonville as an other market on the OMB MSA core counties", () => {
@@ -184,8 +217,8 @@ describe("eligible pack polygons", () => {
       readFileSync("data/fixtures/oz2-eligible-packs.geojson", "utf8"),
     ) as EligiblePackTractCollection;
     const geoids = new Set([...urban.rows.map((row) => row.geoid), ...other.rows.map((row) => row.geoid)]);
-    expect(geoids.size).toBe(2285);
-    expect(collection.features).toHaveLength(2285);
+    expect(geoids.size).toBe(2347);
+    expect(collection.features).toHaveLength(2347);
     expect(new Set(collection.features.map((feature) => feature.properties.tractGeoid))).toEqual(geoids);
     expect(
       collection.features.every(
@@ -199,6 +232,16 @@ describe("eligible pack polygons", () => {
     ).toBe(true);
     const shared = collection.features.find((feature) => feature.properties.markets.includes("Melbourne") && feature.properties.markets.includes("Vero Beach"));
     expect(shared?.properties.rural).toBe(true);
+    const swfl = collection.features.filter((feature) => feature.properties.markets.includes("SWFL"));
+    expect(swfl).toHaveLength(75);
+    expect(swfl.filter((feature) => feature.properties.rural)).toHaveLength(11);
+    expect(swfl.every((feature) => feature.properties.packs.includes("other-msas"))).toBe(true);
+    expect(swfl.every((feature) => feature.properties.statusChip === ELIGIBLE_NOT_DESIGNATED_STATUS)).toBe(true);
+    expect(
+      swfl
+        .filter((feature) => feature.properties.county === "Sarasota")
+        .every((feature) => feature.properties.markets.includes("Tampa")),
+    ).toBe(true);
     const jacksonville = collection.features.filter((feature) => feature.properties.markets.includes("Jacksonville"));
     expect(jacksonville).toHaveLength(98);
     expect(jacksonville.every((feature) => feature.properties.markets.length === 1)).toBe(true);

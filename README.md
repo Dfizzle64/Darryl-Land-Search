@@ -39,7 +39,7 @@ No API keys are required for the default fixture mode. Copy `.env.example` to `.
 
 ## What you can do
 
-- Switch **Market** / **County** across seven Southeast sheds, or open **Other MSAs (15)** for the smaller markets. Primary markets stay listed first. Orlando loads multi-county parcel polygons. Each other market that already has a parcel extract loads only its own 5–150 acre tiles after you select it, and only at neighborhood zoom, an area lock, or Show parcels. Counties without an open polygon source stay on the tract overlay. Jacksonville is in that menu with eligible tracts; its 5–150 acre tiles are not seeded yet. Rural tracts are orange. Urban eligible tracts are blue. The legend toggles rural, urban, or both.
+- Switch **Market** / **County** across seven Southeast sheds, or open **Other MSAs (16)** for the smaller markets. Primary markets stay listed first. Orlando loads multi-county parcel polygons. Each other market that already has a parcel extract loads only its own 5–150 acre tiles after you select it, and only at neighborhood zoom, an area lock, or Show parcels. Counties without an open polygon source stay on the tract overlay. Jacksonville is in that menu with eligible tracts; its 5–150 acre tiles are not seeded yet. SWFL (Lee, Collier, optional Sarasota, partial Charlotte) is in that menu with eligible tracts and 5–150 acre tiles. Rural tracts are orange. Urban eligible tracts are blue. The legend toggles rural, urban, or both.
 - Set a **minimum acreage**. The slider is 0–25 acres; larger sites still match any threshold at or below 25. Acreage is shown in the parcel drawer. Eligible tracts have no acreage field, so this slider does not hide tracts.
 - Turn on **Consider zoning in parcels** (default No) to use a land-use mode: multifamily-capable zoning, all parcels, non-multifamily zoning, rezoning candidates (FLU yes / zoning no), FLU allows multifamily, either, or both. While the switch is No, those constraints are hidden and not applied.
 - Turn on **Consider opportunity zone in parcels** (default No) to filter parcels by OZ 2.0 rural-eligible, OZ 2.0 eligible but not rural, in a current designated QOZ, not in a designated QOZ, or either. While the switch is No, those parcel constraints are hidden and not applied. The map toggles for the OZ 2.0 tract overlay (orange = rural-eligible, blue = urban eligible, amber = Orange County urban overlay) and the copper dashed designated-QOZ overlay stay available either way. Eligible is not designated.
@@ -195,10 +195,11 @@ Urban status chips read **Eligible — not designated**. The rural chip stays **
 
 ## Other metros
 
-**Other MSAs (15)** in the market menu opens 15 smaller MSAs: Vero Beach, Melbourne, Jacksonville, Pensacola, Birmingham, Mobile, Huntsville, Savannah, Columbia, Greenville, Chattanooga, Knoxville, Memphis, Winston-Salem, and Wilmington. They are visually secondary to the seven. Each one has rural and urban eligible tracts from `data/oz2-other-msas-eligible.csv` (1,386 rows, 1,341 unique GEOIDs; 491 rural and 895 urban). County rings are in `data/oz2-other-msas-counties.md`. Markets other than Jacksonville load 5–150 acre parcel tiles when that extract exists (`docs/market-parcels.md`). Jacksonville stays a tract overlay until those tiles are seeded.
+**Other MSAs (16)** in the market menu opens 16 smaller MSAs: SWFL, Vero Beach, Melbourne, Jacksonville, Pensacola, Birmingham, Mobile, Huntsville, Savannah, Columbia, Greenville, Chattanooga, Knoxville, Memphis, Winston-Salem, and Wilmington. They are visually secondary to the seven. Each one has rural and urban eligible tracts from `data/oz2-other-msas-eligible.csv` (1,461 rows, 1,416 unique GEOIDs; 502 rural and 959 urban). County rings are in `data/oz2-other-msas-counties.md`. Markets other than Jacksonville load 5–150 acre parcel tiles when that extract exists (`docs/market-parcels.md`). Jacksonville stays a tract overlay until those tiles are seeded. SWFL parcel gaps are in `docs/swfl-parcels.md`.
 
 | Market | Total | Rural | Urban |
 | --- | ---: | ---: | ---: |
+| SWFL | 75 | 11 | 64 |
 | Vero Beach | 62 | 25 | 37 |
 | Melbourne | 175 | 24 | 151 |
 | Jacksonville | 98 | 8 | 90 |

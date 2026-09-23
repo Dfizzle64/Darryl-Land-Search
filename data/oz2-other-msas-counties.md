@@ -20,6 +20,22 @@ Status labeling: **Eligible — not designated**. SC markets include Governor-fi
 
 ---
 
+## SWFL
+
+- **City center:** Downtown Fort Myers (Lee), with Naples as the Collier anchor
+- **OMB MSA core:** Cape Coral-Fort Myers, FL (Lee) and Naples-Marco Island, FL (Collier). Optional: North Port-Sarasota-Bradenton’s Sarasota County, already in the Tampa shed. Partial: Punta Gorda, FL (Charlotte).
+- **Eligible tract count:** **75** (rural Y=11, non-rural N=64)
+- **Rationale:** Lee and Collier are the SWFL core. Eligible tracts are Rev. Proc. 2026-14 appendix rows in those counties, plus optional Sarasota (dual-listed with Tampa, not a second designation) and partial Charlotte. Rural vs urban is the appendix Rural Status column. No tract is marked designated or certified.
+- **Counties included:**
+  - Florida: Lee, Collier, Sarasota, Charlotte
+- **Eligible by county (rural / non-rural):**
+  - Charlotte (Florida): 5 (Y=2, N=3) _(outer/uncertain)_
+  - Collier (Florida): 19 (Y=8, N=11)
+  - Lee (Florida): 38 (Y=1, N=37)
+  - Sarasota (Florida): 13 (Y=0, N=13) _(outer/uncertain)_
+- **Uncertain / outer-edge counties:** Charlotte, Sarasota
+- **Exclusions / notes:** Manatee stays on Tampa and is not copied here. Glades, Hendry, and DeSoto are outside this cut. Sarasota’s 13 non-rural tracts are the same GEOIDs as the Tampa urban pack. Parcel sourcing and municipal gaps are in `docs/swfl-parcels.md`.
+
 ## Vero Beach
 
 - **City center:** Downtown Vero Beach (Indian River)
@@ -336,6 +352,7 @@ Status labeling: **Eligible — not designated**. SC markets include Governor-fi
 
 | Market | Total eligible | Rural (Y) | Non-rural (N) |
 | --- | ---: | ---: | ---: |
+| SWFL | 75 | 11 | 64 |
 | Vero Beach | 62 | 25 | 37 |
 | Melbourne | 175 | 24 | 151 |
 | Jacksonville | 98 | 8 | 90 |
@@ -351,8 +368,8 @@ Status labeling: **Eligible — not designated**. SC markets include Governor-fi
 | Memphis | 175 | 44 | 131 |
 | Winston-Salem | 105 | 24 | 81 |
 | Wilmington | 55 | 31 | 24 |
-| **CSV rows** | **1386** | **491** | **895** |
-| **Unique GEOIDs** | **1341** |  |  |
+| **CSV rows** | **1461** | **502** | **959** |
+| **Unique GEOIDs** | **1416** |  |  |
 
 Dual-list notes: Melbourne overlaps Vero Beach (Brevard/Indian River) and Orlando primary pack counties; Winston-Salem shares Davidson NC with Charlotte primary pack; Pensacola/Mobile both list Baldwin AL (intentional dual-market). Columbia and Charleston both can list Orangeburg SC.
 

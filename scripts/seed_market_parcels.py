@@ -62,6 +62,7 @@ FL_DOH_LAYER = {
     "12091": 45,
     "12093": 46,
     "12101": 50,
+    "12015": 7,
     "12103": 51,
     "12111": 55,
     "12113": 56,
@@ -250,7 +251,9 @@ def empty_feature(
     center: tuple[float, float],
     source: str,
     owner: str | None = None,
+    owner_name2: str | None = None,
     situs: str | None = None,
+    jurisdiction: str | None = None,
     city: str | None = None,
     zip_code: str | None = None,
     zoning: str | None = None,
@@ -281,9 +284,9 @@ def empty_feature(
             "situsAddress": situs,
             "situsCity": city,
             "situsZip": zip_code,
-            "jurisdictionCode": None,
+            "jurisdictionCode": jurisdiction,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner_name2,
             "propertyName": None,
             "zoningCode": zoning,
             "zoningDistrict": None,
@@ -367,6 +370,18 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
     return features
 
 
+def esri_date(value: Any) -> str | None:
+    """ArcGIS date fields arrive as epoch milliseconds."""
+    parsed = num(value)
+    if parsed is None:
+        return None
+    if parsed > 10_000_000_000:
+        parsed = parsed / 1000.0
+    if parsed < 1_000_000_000 or parsed > 4_000_000_000:
+        return None
+    return time.strftime("%Y-%m-%d", time.gmtime(parsed))
+
+
 def sale_date(year: Any, month: Any) -> str | None:
     y = num(year)
     if y is None or y < 1900 or y > 2100:
@@ -418,6 +433,16 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        if spec.get("saleDateField"):
+            sold_on = esri_date(attrs.get(spec["saleDateField"]))
+        elif spec.get("saleYearField"):
+            sold_on = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
+        else:
+            sold_on = None
+        jurisdiction = None
+        if spec.get("jurisdictionField"):
+            code = clean(attrs.get(spec["jurisdictionField"]))
+            jurisdiction = (spec.get("jurisdictionMap") or {}).get(code or "")
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -429,13 +454,15 @@ def normalize_rows(
             center=center,  # type: ignore[arg-type]
             source=spec["source"],
             owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
+            owner_name2=clean(attrs.get(spec["owner2Field"])) if spec.get("owner2Field") else None,
             situs=clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None,
+            jurisdiction=jurisdiction,
             city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
             zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
+            sale_date=sold_on,
             sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
@@ -657,6 +684,105 @@ def county_override(fips: str) -> dict | None:
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
             ],
         }
+    if fips == "12071":  # Lee FL — county GIS, not EagleView
+        return {
+            "kind": "arcgis",
+            "url": "https://gismapserver.leegov.com/gisserver910/rest/services/Layers/ParcelAddress/MapServer/0/query",
+            "where": "GISACRES >= 5 AND GISACRES <= 150",
+            "outFields": [
+                "STRAP",
+                "O_NAME",
+                "O_OTHERS",
+                "SITEADDR",
+                "SITECITY",
+                "SITEZIP",
+                "GISACRES",
+                "ZONING",
+                "DORCODE",
+                "MUNICODE",
+                "JUST",
+                "ASSESSED",
+                "TAXABLE",
+                "O_ADDR1",
+                "O_ADDR2",
+                "O_CITY",
+                "O_STATE",
+                "O_ZIP",
+                "S_1DATE",
+                "S_1AMOUNT",
+            ],
+            "idField": "STRAP",
+            "acresField": "GISACRES",
+            "ownerField": "O_NAME",
+            "owner2Field": "O_OTHERS",
+            "situsField": "SITEADDR",
+            "cityField": "SITECITY",
+            "zipField": "SITEZIP",
+            "zoningField": "ZONING",
+            "dorField": "DORCODE",
+            "jurisdictionField": "MUNICODE",
+            "jurisdictionMap": {
+                "C": "Cape Coral",
+                "P": "Fort Myers",
+                "B": "Bonita Springs",
+                "E": "Estero",
+                "T": "Sanibel",
+                "W": "Fort Myers Beach",
+                "L": "Unincorporated Lee",
+            },
+            "salePriceField": "S_1AMOUNT",
+            "saleDateField": "S_1DATE",
+            "marketValueField": "JUST",
+            "assessedField": "ASSESSED",
+            "taxableField": "TAXABLE",
+            "mail1Field": "O_ADDR1",
+            "mail2Field": "O_ADDR2",
+            "mailCityField": "O_CITY",
+            "mailStateField": "O_STATE",
+            "mailZipField": "O_ZIP",
+            "source": "fl-lee-parceladdress",
+            "coverage": "complete-gte-5ac",
+            "gaps": [
+                "Lee County public ParcelAddress on gismapserver.leegov.com. EagleView's Lee County FL Parcels service is a republish and was not used.",
+                "Fort Myers native GIS at https://gis.fortmyers.gov/arcgis/rest/services is TLS-blocked (certificate issuer could not be verified) and was not ingested. City of Fort Myers rows are the county layer where MUNICODE is P.",
+                "Bonita Springs, Estero, and Fort Myers Beach have no independent parcel REST. They are county stubs on this layer (MUNICODE B, E, and W).",
+                "Sanibel zoning is blank on this county layer for almost every 5–150 acre Sanibel parcel. Sanibel's public REST is a future-land-use map series, not a parcel zoning code, and was not joined. FGDL zoning was not used.",
+                "Lee S_1VI is a vacant/improved flag, not a qualified-sale code, so lastSale.qualified is left empty.",
+            ],
+        }
+    if fips == "12021":  # Collier FL — ParcelJoin, sales not on the layer
+        return {
+            "kind": "arcgis",
+            "url": "https://services2.arcgis.com/SlIq32SqARUHIhSx/arcgis/rest/services/Parcels/FeatureServer/42/query",
+            "where": "CAST(TOTALACRES AS FLOAT) >= 5 AND CAST(TOTALACRES AS FLOAT) <= 150",
+            "outFields": ["FOLIO", "PARCELID", "NAME1", "NAME2", "TOTALACRES"],
+            "idField": "FOLIO",
+            "acresField": "TOTALACRES",
+            "ownerField": "NAME1",
+            "owner2Field": "NAME2",
+            "source": "fl-collier-parceljoin",
+            "coverage": "complete-gte-5ac",
+            "gaps": [
+                "Collier sales are not on the ParcelJoin REST layer (Parcels Join, FeatureServer layer 42). Sale price and date are omitted. They were not filled from a paid vendor.",
+                "ParcelJoin has owner and total acres only. No situs, city, zip, zoning, or assessed value. Naples, Marco Island, and Everglades City are listed in data/swfl-municipalities.json and are not spatially joined.",
+                "Florida DOH EHWATER Collier layer 10 does carry NAL sales. This extract stays on county ParcelJoin so that missing-sales gap stays visible. FGDL zoning was not used.",
+            ],
+        }
+    if fips == "12015":  # Charlotte FL — partial municipal coverage
+        spec = fl_spec(fips)
+        spec["gaps"] = [
+            "Partial SWFL county. Parcel polygons are the public Florida DOH EHWATER 5.0–150.0 acre land-area extract.",
+            "Charlotte County CCGISLayers publishes county zoning and Punta Gorda zoning, not this parcel roll. Those zoning polygons are not joined.",
+            "No zoning or FLU on the Florida DOH extract.",
+        ]
+        return spec
+    if fips == "12115":  # Sarasota FL — optional, shared with Tampa
+        spec = fl_spec(fips)
+        spec["gaps"] = [
+            "No zoning or FLU on the Florida DOH extract.",
+            "Optional SWFL county. Tiles are shared with Tampa and are not downloaded a second time.",
+        ]
+        return spec
     return None
 
 
@@ -920,7 +1046,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 | State | Endpoint | What shipped |
 | --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
+| Florida | Florida DOH EHWATER Parcels, plus Lee ParcelAddress and Collier ParcelJoin for SWFL | Complete 5–150 acre extract where the county is not already an Orlando complete county. SWFL does not use EagleView or FGDL zoning. See `docs/swfl-parcels.md` |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
@@ -929,7 +1055,9 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb, and Lee County ParcelAddress). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+SWFL is an other market: Lee, Collier, optional Sarasota, and partial Charlotte. Lee parcels come from the county ParcelAddress service. Collier parcels come from county ParcelJoin, which has no sales. Sarasota reuses the Tampa tiles. Charlotte uses the DOH land-area extract because the county MapServer publishes zoning rather than a parcel roll. Municipalities are listed in `data/swfl-municipalities.json`. Eligible SWFL tracts use the Rev. Proc. 2026-14 chip **Eligible — not designated**.
 
 ## Coverage
 """
@@ -1082,6 +1210,33 @@ def write_reuse(county: dict, markets: list[str]) -> None:
     )
 
 
+def retag_tiles_if_needed(relative_path: str | None, markets: list[str]) -> None:
+    """Keep parcel marketIds aligned when a county is shared by two markets."""
+    if not relative_path:
+        return
+    folder = ROOT / relative_path
+    if not folder.is_dir():
+        return
+    files = sorted(folder.glob("*.geojson"))
+    if not files:
+        return
+    sample = json.loads(files[0].read_text())
+    sample_features = sample.get("features") or []
+    if sample_features and (sample_features[0].get("properties") or {}).get("marketIds") == markets:
+        return
+    for path in files:
+        collection = json.loads(path.read_text())
+        changed = False
+        for feature in collection.get("features") or []:
+            props = feature.setdefault("properties", {})
+            if props.get("marketIds") != markets:
+                props["marketIds"] = list(markets)
+                changed = True
+        if changed:
+            path.write_text(json.dumps(collection, separators=(",", ":")))
+            print(f"  retagged {path.name} -> {markets}", flush=True)
+
+
 def write_gap(county: dict, markets: list[str], spec: dict) -> None:
     county_row(
         county,
@@ -1155,6 +1310,8 @@ def main() -> None:
             if row.get("featureCount") and row.get("coverage") in {"complete-gte-5ac", "sample"}:
                 row["markets"] = markets
                 (COUNTY_DIR / fips / "county.json").write_text(json.dumps(row, indent=2) + "\n")
+                if row.get("partition") == "tiles":
+                    retag_tiles_if_needed(row.get("path"), markets)
                 continue
         jobs.append((priority_of(markets, catalog), slot["county"]["name"], slot["county"], markets, spec))
 

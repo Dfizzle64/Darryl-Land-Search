@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T23:26:04Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -554,7 +554,8 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "No zoning or FLU on the Florida DOH extract.",
+            "Optional SWFL county. Tiles are shared with Tampa and are not downloaded a second time."
           ]
         },
         {
@@ -1296,6 +1297,68 @@
           "gaps": [
             "6143 source rows collapsed to 5152 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
             "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+          ]
+        }
+      ]
+    },
+    "SWFL": {
+      "tier": "other",
+      "parcelCount": 32749,
+      "completeCountyCount": 4,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/swfl/meta.json",
+      "counties": [
+        {
+          "name": "Charlotte",
+          "state": "Florida",
+          "fips": "12015",
+          "featureCount": 4565,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "5780 source rows collapsed to 4565 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Partial SWFL county. Parcel polygons are the public Florida DOH EHWATER 5.0\u2013150.0 acre land-area extract."
+          ]
+        },
+        {
+          "name": "Collier",
+          "state": "Florida",
+          "fips": "12021",
+          "featureCount": 13889,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Collier sales are not on the ParcelJoin REST layer (Parcels Join, FeatureServer layer 42). Sale price and date are omitted. They were not filled from a paid vendor.",
+            "ParcelJoin has owner and total acres only. No situs, city, zip, zoning, or assessed value. Naples, Marco Island, and Everglades City are listed in data/swfl-municipalities.json and are not spatially joined."
+          ]
+        },
+        {
+          "name": "Lee",
+          "state": "Florida",
+          "fips": "12071",
+          "featureCount": 9992,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "10006 source rows collapsed to 9992 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Lee County public ParcelAddress on gismapserver.leegov.com. EagleView's Lee County FL Parcels service is a republish and was not used."
+          ]
+        },
+        {
+          "name": "Sarasota",
+          "state": "Florida",
+          "fips": "12115",
+          "featureCount": 4303,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "No zoning or FLU on the Florida DOH extract.",
+            "Optional SWFL county. Tiles are shared with Tampa and are not downloaded a second time."
           ]
         }
       ]

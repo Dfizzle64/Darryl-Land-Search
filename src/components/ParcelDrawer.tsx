@@ -123,6 +123,7 @@ export function ParcelDrawer({
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
+        {properties.jurisdictionCode ? <Field label="Municipality" value={properties.jurisdictionCode} /> : null}
         <Field label="Zoning" value={properties.zoningCode} empty={zoningEmpty} />
         <Field label="Future Land Use" value={fluLine} empty="Not joined for this county" />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />

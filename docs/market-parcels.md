@@ -21,7 +21,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 | State | Endpoint | What shipped |
 | --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
+| Florida | Florida DOH EHWATER Parcels, plus Lee ParcelAddress and Collier ParcelJoin for SWFL | Complete 5–150 acre extract where the county is not already an Orlando complete county. SWFL does not use EagleView or FGDL zoning. See `docs/swfl-parcels.md` |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
@@ -30,7 +30,9 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb, and Lee County ParcelAddress). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+SWFL is an other market: Lee, Collier, optional Sarasota, and partial Charlotte. Lee parcels come from the county ParcelAddress service. Collier parcels come from county ParcelJoin, which has no sales. Sarasota reuses the Tampa tiles. Charlotte uses the DOH land-area extract because the county MapServer publishes zoning rather than a parcel roll. Municipalities are listed in `data/swfl-municipalities.json`. Eligible SWFL tracts use the Rev. Proc. 2026-14 chip **Eligible — not designated**.
 
 ## Coverage
 
@@ -48,8 +50,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
+| SWFL | other | 32,749 | 4 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -196,6 +199,15 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Wayne | North Carolina | 37191 | complete-gte-5ac | 15,079 | nc-onemap-37191 |
 | Wilson | North Carolina | 37195 | complete-gte-5ac | 5,152 | nc-onemap-37195 |
 
+### SWFL
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Charlotte | Florida | 12015 | complete-gte-5ac | 4,565 | fl-doh-ehwaters-12015 |
+| Collier | Florida | 12021 | complete-gte-5ac | 13,889 | fl-collier-parceljoin |
+| Lee | Florida | 12071 | complete-gte-5ac | 9,992 | fl-lee-parceladdress |
+| Sarasota | Florida | 12115 | complete-gte-5ac | 4,303 | fl-doh-ehwaters-12115 |
+
 ### Vero Beach
 
 | County | State | FIPS | Coverage | Parcels | Source |
@@ -212,7 +224,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 

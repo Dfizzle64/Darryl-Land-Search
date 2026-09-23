@@ -1,0 +1,28 @@
+{
+  "name": "Lee",
+  "fips": "12071",
+  "state": "Florida",
+  "markets": [
+    "SWFL"
+  ],
+  "featureCount": 9992,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "fl-lee-parceladdress",
+  "queryUrl": "https://gismapserver.leegov.com/gisserver910/rest/services/Layers/ParcelAddress/MapServer/0/query",
+  "gaps": [
+    "10006 source rows collapsed to 9992 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "Lee County public ParcelAddress on gismapserver.leegov.com. EagleView's Lee County FL Parcels service is a republish and was not used.",
+    "Fort Myers native GIS at https://gis.fortmyers.gov/arcgis/rest/services is TLS-blocked (certificate issuer could not be verified) and was not ingested. City of Fort Myers rows are the county layer where MUNICODE is P.",
+    "Bonita Springs, Estero, and Fort Myers Beach have no independent parcel REST. They are county stubs on this layer (MUNICODE B, E, and W).",
+    "Sanibel zoning is blank on this county layer for almost every 5\u2013150 acre Sanibel parcel. Sanibel's public REST is a future-land-use map series, not a parcel zoning code, and was not joined. FGDL zoning was not used.",
+    "Lee S_1VI is a vacant/improved flag, not a qualified-sale code, so lastSale.qualified is left empty."
+  ],
+  "path": "data/fixtures/market-parcels/counties/12071/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12071/lookup.json",
+  "sourceCount": 10006,
+  "dropped": 0,
+  "tileCount": 11
+}

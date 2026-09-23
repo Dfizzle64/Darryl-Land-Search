@@ -76,9 +76,11 @@ export function ParcelDrawer({
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
+  const region = properties.state === "North Carolina" ? "NC" : properties.state?.trim() || "FL";
   const placeLine =
     [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+    (properties.countyName ? `${properties.countyName} County, ${region}` : region === "NC" ? "North Carolina" : "Florida");
+  const floridaRecords = !properties.state || properties.state === "Florida";
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -178,12 +180,14 @@ export function ParcelDrawer({
         <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
           {appraiser.label}
         </a>
-        {entity && properties.ownerName ? (
+        {entity && properties.ownerName && floridaRecords ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={sunbizSearchUrl(properties.ownerName)} target="_blank" rel="noreferrer">
             Search Florida Sunbiz for LLC / corporate principals
           </a>
-        ) : (
+        ) : floridaRecords ? (
           <p className="text-ink-300">Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped.</p>
+        ) : (
+          <p className="text-ink-300">Phone numbers and email addresses are not collected from the public parcel roll.</p>
         )}
         {properties.countyFips === "12095" || !properties.countyFips ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={comptrollerRecordsUrl()} target="_blank" rel="noreferrer">

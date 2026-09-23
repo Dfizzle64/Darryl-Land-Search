@@ -7,6 +7,7 @@ complete Orlando extract (Orange, Osceola, Polk) are referenced, not re-download
   python3 scripts/seed_market_parcels.py
   python3 scripts/seed_market_parcels.py --market Tampa
   python3 scripts/seed_market_parcels.py --county Hardee --market Tampa
+  python3 scripts/seed_market_parcels.py --market Raleigh-Durham --county Orange --refresh
   python3 scripts/seed_market_parcels.py --refresh
 
 Tile origin matches ORLANDO_PARCEL_TILE in src/lib/orlandoParcels.ts.
@@ -604,6 +605,14 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    if fips == "37135":  # Orange County, NC — county GIS, not thin OneMap
+        return {
+            "kind": "orange-nc",
+            "url": "https://gis.orangecountync.gov/arcgis/rest/services/WebParcelService/MapServer/0/query",
+            "source": "nc-orange-webparcel-37135",
+            "coverage": "complete-gte-5ac",
+            "gaps": [],
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -948,6 +957,7 @@ Orange, Osceola, and Polk already have a complete 5.0–150.0 acre Orlando extra
 npm run seed:parcels:markets
 python3 scripts/seed_market_parcels.py --market Charlotte
 python3 scripts/seed_market_parcels.py --market Tampa --county Hardee
+python3 scripts/seed_market_parcels.py --market Raleigh-Durham --county Orange --refresh
 python3 scripts/seed_market_parcels.py --refresh
 ```
 
@@ -958,7 +968,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons; Orange County uses county WebParcelService | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, and Warren store polygon acres because `gisacres` is 0. Orange County (37135) uses county parcels, a PIN situs join, and city-first zoning and future land use. NC OneMap is only the Orange fallback |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -966,7 +976,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) and for Orange County, NC from county districts plus Chapel Hill, Carrboro, and Hillsborough. It is not a multifamily knowledge-base match outside Orange County, Florida. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -1193,6 +1203,9 @@ def main() -> None:
                 row["markets"] = markets
                 (COUNTY_DIR / fips / "county.json").write_text(json.dumps(row, indent=2) + "\n")
                 continue
+        if spec.get("kind") == "orange-nc" and args.refresh:
+            spec = dict(spec)
+            spec["ignoreCache"] = True
         jobs.append((priority_of(markets, catalog), slot["county"]["name"], slot["county"], markets, spec))
 
     jobs.sort()
@@ -1203,7 +1216,12 @@ def main() -> None:
     def run(job: tuple) -> None:
         _priority, _name, county, markets, spec = job
         try:
-            download_county(county, markets, spec)
+            if spec.get("kind") == "orange-nc":
+                from orange_nc_enrich import download_orange_nc
+
+                download_orange_nc(county, markets, spec)
+            else:
+                download_county(county, markets, spec)
         except Exception as exc:  # noqa: BLE001
             print(f"  failed {county['name']} {county['fips']}: {exc}", flush=True)
             county_row(

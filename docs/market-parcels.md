@@ -12,6 +12,7 @@ Orange, Osceola, and Polk already have a complete 5.0–150.0 acre Orlando extra
 npm run seed:parcels:markets
 python3 scripts/seed_market_parcels.py --market Charlotte
 python3 scripts/seed_market_parcels.py --market Tampa --county Hardee
+python3 scripts/seed_market_parcels.py --market Raleigh-Durham --county Orange --refresh
 python3 scripts/seed_market_parcels.py --refresh
 ```
 
@@ -22,7 +23,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons; Orange County uses county WebParcelService | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, and Warren store polygon acres because `gisacres` is 0. Orange County (37135) uses county parcels, a PIN situs join, and city-first zoning and future land use. NC OneMap is only the Orange fallback |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -30,7 +31,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) and for Orange County, NC from county districts plus Chapel Hill, Carrboro, and Hillsborough. It is not a multifamily knowledge-base match outside Orange County, Florida. Prefer **All parcels** in these markets.
 
 ## Coverage
 
@@ -47,7 +48,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
-| Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
+| Raleigh-Durham | primary | 151,515 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
 | Melbourne | other | 41,757 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
@@ -187,7 +188,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Johnston | North Carolina | 37101 | complete-gte-5ac | 14,113 | nc-onemap-37101 |
 | Lee | North Carolina | 37105 | complete-gte-5ac | 4,858 | nc-onemap-37105 |
 | Nash | North Carolina | 37127 | complete-gte-5ac | 8,292 | nc-onemap-37127 |
-| Orange | North Carolina | 37135 | complete-gte-5ac | 11,139 | nc-onemap-37135 |
+| Orange | North Carolina | 37135 | complete-gte-5ac | 9,375 | nc-orange-webparcel-37135 |
 | Person | North Carolina | 37145 | complete-gte-5ac | 5,956 | nc-onemap-37145 |
 | Sampson | North Carolina | 37163 | complete-gte-5ac | 14,031 | nc-onemap-37163 |
 | Vance | North Carolina | 37181 | complete-gte-5ac | 3,181 | nc-onemap-37181 |

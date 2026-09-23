@@ -5,20 +5,24 @@
   "markets": [
     "Charlotte"
   ],
-  "featureCount": 21331,
+  "featureCount": 8402,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "nc-onemap-37119",
-  "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+  "source": "meck-taxparcel-camadata-37119",
+  "queryUrl": "https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/MapServer/0/query",
   "gaps": [
-    "33035 source rows collapsed to 21331 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-    "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+    "33567 TaxParcel_camadata rows with gisacres 5\u2013150 collapse onto 8402 parcel outlines (8277 joined to owner, tax, and sale; 8316 unique nc_pin values in that account pull). Condo and townhouse accounts that share an nc_pin are one polygon.",
+    "Outlines are Mecklenburg Tax/ParcelsViewer polygons. TaxParcel_camadata does not return geometry.",
+    "zone_class joined from ParcelsZoningZipcode for 8392 of 8402 parcels. There is no single countywide zoning service. Charlotte zoning polygons do not cover Cornelius, Davidson, Huntersville, Matthews, Mint Hill, Pineville, or Stallings. Town codes are stored only when this parcel join published them. Split zones are combined on zoningCode.",
+    "Charlotte 2040 Place Types joined for 5873 of 8402 parcels. The rest are outside that city layer, which does not cover Mecklenburg towns. The legacy area-plan future land use overlay is not used as current policy.",
+    "The drawer keeps one TaxParcelSales row per parcel (latest positive price, otherwise the newest row) and uses CAMA saledate/saleprice when that layer has no row. 5354 outlines have a positive price and 8077 have a date or price. The full sale history (about 1.6 million rows) is not stored. Grantor and grantee are not copied.",
+    "gisacres is GIS acreage, not deed acreage. Owner phones and emails are not on these public layers and are not scraped. POLARIS links use pid: https://polaris3g.mecklenburgcountync.gov/pid/{pid}."
   ],
   "path": "data/fixtures/market-parcels/counties/37119/tiles",
   "lookup": "data/fixtures/market-parcels/counties/37119/lookup.json",
-  "sourceCount": 33035,
-  "dropped": 0,
+  "sourceCount": 33567,
+  "dropped": 25165,
   "tileCount": 7
 }

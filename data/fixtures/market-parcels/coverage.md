@@ -10,10 +10,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
-| Charlotte | primary | 119,168 | 12 | 0 | 3 |
+| Charlotte | primary | 106,239 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -132,7 +132,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Iredell | North Carolina | 37097 | complete-gte-5ac | 10,771 | nc-onemap-37097 |
 | Lancaster | South Carolina | 45057 | gap | 0 | unavailable |
 | Lincoln | North Carolina | 37109 | complete-gte-5ac | 6,543 | nc-onemap-37109 |
-| Mecklenburg | North Carolina | 37119 | complete-gte-5ac | 21,331 | nc-onemap-37119 |
+| Mecklenburg | North Carolina | 37119 | complete-gte-5ac | 8,402 | meck-taxparcel-camadata-37119 |
 | Rowan | North Carolina | 37159 | complete-gte-5ac | 10,347 | nc-onemap-37159 |
 | Stanly | North Carolina | 37167 | complete-gte-5ac | 8,024 | nc-onemap-37167 |
 | Union | North Carolina | 37179 | complete-gte-5ac | 13,051 | nc-onemap-37179 |
@@ -176,7 +176,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 

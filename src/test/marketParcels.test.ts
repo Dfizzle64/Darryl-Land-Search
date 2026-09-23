@@ -123,3 +123,77 @@ describe("market parcel gating and acreage", () => {
     }
   });
 });
+
+describe("Mecklenburg County parcel extract", () => {
+  const countyPath = path.join(process.cwd(), "data/fixtures/market-parcels/counties/37119/county.json");
+
+  it("joins county outlines, CAMA attributes, zoning, sales, and city Place Types", () => {
+    const county = JSON.parse(readFileSync(countyPath, "utf8")) as {
+      source: string;
+      featureCount: number;
+      gaps: string[];
+      minAcres: number;
+      maxAcres: number;
+    };
+    expect(county.source).toBe("meck-taxparcel-camadata-37119");
+    expect(county.featureCount).toBeGreaterThan(7000);
+    expect(county.minAcres).toBe(5);
+    expect(county.maxAcres).toBe(150);
+    const gaps = county.gaps.join(" ");
+    expect(gaps).toMatch(/ParcelsViewer/);
+    expect(gaps).toMatch(/Place Types/);
+    expect(gaps).toMatch(/Cornelius/);
+    expect(gaps).toMatch(/does not cover Mecklenburg towns/);
+    expect(gaps).not.toMatch(/join failed/i);
+    expect(gaps).toMatch(/phones and emails are not/);
+
+    const tileDir = path.join(process.cwd(), "data/fixtures/market-parcels/counties/37119/tiles");
+    let owners = 0;
+    let zoned = 0;
+    let flu = 0;
+    let townGap = 0;
+    let polaris = 0;
+    let total = 0;
+    let zimmermann: ParcelCollection["features"][number] | undefined;
+    for (const name of readdirSync(tileDir)) {
+      if (!name.endsWith(".geojson")) continue;
+      const collection = JSON.parse(readFileSync(path.join(tileDir, name), "utf8")) as ParcelCollection;
+      for (const feature of collection.features) {
+        total += 1;
+        const props = feature.properties;
+        expect(inMarketAcreageBand(props.acreage)).toBe(true);
+        expect(props.countyFips).toBe("37119");
+        expect(props.state).toBe("North Carolina");
+        expect(props.marketIds).toEqual(["Charlotte"]);
+        expect(feature.geometry.type === "Polygon" || feature.geometry.type === "MultiPolygon").toBe(true);
+        const [lon, lat] = props.centroid;
+        expect(lon).toBeGreaterThan(-81.6);
+        expect(lon).toBeLessThan(-80.3);
+        expect(lat).toBeGreaterThan(34.9);
+        expect(lat).toBeLessThan(35.6);
+        if (props.ownerName) owners += 1;
+        if (props.zoningCode) zoned += 1;
+        if (props.flu?.code) {
+          flu += 1;
+          expect(props.flu.jurisdiction).toBe("Charlotte");
+          expect(props.flu.source).toMatch(/2040/);
+        }
+        if (props.dataGaps?.some((gap) => gap.includes("Place Types"))) townGap += 1;
+        if (props.appraiserUrl?.includes("polaris3g.mecklenburgcountync.gov/pid/")) polaris += 1;
+        if (props.parcelId === "4661960387") zimmermann = feature;
+      }
+    }
+    expect(total).toBe(county.featureCount);
+    expect(owners).toBeGreaterThan(7000);
+    expect(zoned).toBeGreaterThan(7000);
+    expect(flu).toBeGreaterThan(500);
+    expect(flu).toBeLessThan(total);
+    expect(townGap).toBeGreaterThan(500);
+    expect(polaris).toBe(total);
+    expect(zimmermann?.properties.ownerName).toBe("ZIMMERMANN MARGARET U F");
+    expect(zimmermann?.properties.zoningCode).toBe("R");
+    expect(zimmermann?.properties.situsCity).toBe("HUNTERSVILLE");
+    expect(zimmermann?.properties.appraiserUrl).toBe("https://polaris3g.mecklenburgcountync.gov/pid/01113108");
+    expect(zimmermann?.properties.flu).toBeNull();
+  });
+});

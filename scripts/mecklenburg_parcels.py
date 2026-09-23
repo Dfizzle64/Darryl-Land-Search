@@ -172,17 +172,27 @@ def fetch_ids(url: str, where: str) -> list[int]:
 def _query_ids(url: str, ids: list[int], fields: list[str], geometry: bool) -> list[dict]:
     if not ids:
         return []
-    data = fetch_json(
-        url,
-        {
-            "objectIds": ",".join(str(item) for item in ids),
-            "outFields": ",".join(fields),
-            "returnGeometry": "true" if geometry else "false",
-            "outSR": "4326",
-            "f": "json",
-        },
-        timeout=180,
-    )
+    last_error = "empty response"
+    data: dict = {}
+    for attempt in range(4):
+        data = fetch_json(
+            url,
+            {
+                "objectIds": ",".join(str(item) for item in ids),
+                "outFields": ",".join(fields),
+                "returnGeometry": "true" if geometry else "false",
+                "outSR": "4326",
+                "f": "json",
+            },
+            timeout=180,
+            retries=2,
+        )
+        if not data.get("error"):
+            break
+        last_error = json.dumps(data["error"])[:300]
+        time.sleep(0.8 * (attempt + 1))
+    else:
+        raise RuntimeError(last_error)
     if data.get("error"):
         raise RuntimeError(json.dumps(data["error"])[:300])
     features = data.get("features") or []
@@ -214,10 +224,12 @@ def fetch_by_object_ids(
             mid = len(chunk) // 2
             return pull(chunk[:mid]) + pull(chunk[mid:])
 
+    # County geometry services return HTTP 400 when several polygon pages run at once.
+    pool_size = 1 if geometry else max(1, min(workers, 4))
     chunks = [ids[index : index + batch] for index in range(0, len(ids), batch)]
     features: list[dict] = []
     done = 0
-    with ThreadPoolExecutor(max_workers=max(1, min(workers, len(chunks)))) as pool:
+    with ThreadPoolExecutor(max_workers=max(1, min(pool_size, len(chunks)))) as pool:
         futures = [pool.submit(pull, chunk) for chunk in chunks]
         for future in as_completed(futures):
             rows = future.result()
@@ -226,6 +238,40 @@ def fetch_by_object_ids(
             if done == 1 or done == len(chunks) or done % 8 == 0:
                 print(f"    {done}/{len(chunks)} batches", flush=True)
     return features
+
+
+def fetch_paged(url: str, where: str, fields: list[str], *, geometry: bool, page: int = 2000) -> list[dict]:
+    """Page with resultOffset. Some services omit geometry on objectIds queries."""
+    rows: list[dict] = []
+    offset = 0
+    while offset < 100_000:
+        data = fetch_json(
+            url,
+            {
+                "where": where,
+                "outFields": ",".join(fields),
+                "returnGeometry": "true" if geometry else "false",
+                "outSR": "4326",
+                "resultOffset": str(offset),
+                "resultRecordCount": str(page),
+                "orderByFields": "OBJECTID",
+                "f": "json",
+            },
+            timeout=180,
+        )
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        features = data.get("features") or []
+        if geometry and features and not (features[0].get("geometry") or {}).get("rings"):
+            raise RuntimeError(f"{url} page at {offset} returned no geometry")
+        rows.extend(features)
+        print(f"    page {offset}+{len(features)}", flush=True)
+        if not features:
+            break
+        offset += len(features)
+        if not data.get("exceededTransferLimit") and len(features) < page:
+            break
+    return rows
 
 
 def load_layer(
@@ -551,6 +597,7 @@ def _load_outlines(ignore_cache: bool) -> tuple[list[dict], str, str | None]:
             return outlines, "parcels-viewer", None
         errors.append("ParcelsViewer returned no usable polygons")
     except Exception as exc:  # noqa: BLE001
+        print(f"  ParcelsViewer failed: {exc}", flush=True)
         errors.append(f"ParcelsViewer failed ({exc})")
     last = errors[-1]
     for url in ONEMAP_URLS:
@@ -652,18 +699,25 @@ def build_mecklenburg_features(markets: list[str], ignore_cache: bool = False) -
             sales_error = str(exc)
             print(f"  sales failed: {exc}", flush=True)
 
-    flu_raw, flu_error = _optional(
-        "place types",
-        lambda: load_layer(
-            "place-types",
+    def load_place_types() -> list[dict]:
+        path = CACHE_DIR / "place-types-paged.json"
+        if path.exists() and not ignore_cache:
+            cached = json.loads(path.read_text())
+            print(f"  cache place types ({len(cached)} rows)", flush=True)
+            return cached
+        print("  query place types by page", flush=True)
+        rows = fetch_paged(
             FLU_URL,
             "1=1",
             ["PlaceTypeFullTxt", "PlaceTypeCde"],
             geometry=True,
-            batch=100,
-            ignore_cache=ignore_cache,
-        ),
-    )
+            page=1000,
+        )
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(rows, separators=(",", ":")))
+        return rows
+
+    flu_raw, flu_error = _optional("place types", load_place_types)
     place_types = place_type_index(flu_raw or [])
     place_grid = flu_grid(place_types)
     print(f"  {len(place_types)} place type polygons", flush=True)
@@ -675,6 +729,7 @@ def build_mecklenburg_features(markets: list[str], ignore_cache: bool = False) -
         "flu": 0,
         "sales_priced": 0,
         "cama_sale_only": 0,
+        "sale_dated": 0,
         "owners": 0,
     }
     for outline in outlines:
@@ -719,6 +774,8 @@ def build_mecklenburg_features(markets: list[str], ignore_cache: bool = False) -
             stats["sales_priced"] += 1
         elif best and best.get("_from") == "cama" and (price is not None or sale_on):
             stats["cama_sale_only"] += 1
+        if price is not None or sale_on:
+            stats["sale_dated"] += 1
         flu = flu_at(place_grid, geometry, center) if not flu_error else None
         gaps: list[str] = []
         if account is None:
@@ -816,8 +873,8 @@ def build_mecklenburg_features(markets: list[str], ignore_cache: bool = False) -
             "The legacy area-plan future land use overlay is not used as current policy."
         ),
         (
-            f"TaxParcelSales supplied the latest positive-price sale for {stats['sales_priced']} parcels. "
-            f"CAMA saledate/saleprice fills the drawer for {stats['cama_sale_only']} other parcels. "
+            f"The drawer keeps one TaxParcelSales row per parcel (latest positive price, otherwise the newest row) and uses CAMA saledate/saleprice when that layer has no row. "
+            f"{stats['sales_priced']} outlines have a positive price and {stats['sale_dated']} have a date or price. "
             "The full sale history (about 1.6 million rows) is not stored. Grantor and grantee are not copied."
         ),
         (

@@ -377,7 +377,7 @@ export type ParcelProperties = {
   countyFips?: string | null;
   countyName?: string | null;
   state?: string | null;
-  marketIds?: MarketId[];
+  marketIds?: SearchMarketId[];
   situsAddress: string | null;
   situsCity: string | null;
   situsZip: string | null;

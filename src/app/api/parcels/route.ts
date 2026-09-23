@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getParcelProvider } from "@/lib/data/adapters";
 import { loadFluConfig, loadZoningConfig } from "@/lib/data/loadFixtures";
 import { filterParcels, parcelFiltersFromSearchParams } from "@/lib/filters";
-import { isMarketId } from "@/lib/markets";
+import { isSearchMarketId } from "@/lib/markets";
 import type { BBox, ParcelFeature } from "@/lib/types";
 
 function parseBbox(value: string | null): BBox | null {
@@ -17,9 +17,9 @@ function parseBbox(value: string | null): BBox | null {
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const marketParam = url.searchParams.get("market");
-  const market = marketParam && isMarketId(marketParam) ? marketParam : null;
+  const market = marketParam && isSearchMarketId(marketParam) ? marketParam : null;
   const county = url.searchParams.get("county");
-  const state = url.searchParams.get("state") ?? (county ? "Florida" : null);
+  const state = url.searchParams.get("state") ?? (county && market === "Orlando" ? "Florida" : null);
   const bbox = parseBbox(url.searchParams.get("bbox"));
   const source = url.searchParams.get("source") === "live" ? "live" : "fixture";
   const limit = Number(url.searchParams.get("limit") ?? (source === "live" ? 800 : 4000));
@@ -55,6 +55,36 @@ export async function GET(request: Request) {
           state,
           bbox,
           source,
+          total: page.collection.features.length,
+          totalInBbox: page.totalInBbox,
+          totalMatching: page.totalMatching,
+          truncated: page.truncated,
+          filters: applyFilters ? filters : undefined,
+        },
+      });
+    }
+
+    if (market && market !== "Orlando" && provider.queryMarketParcels) {
+      const page = await provider.queryMarketParcels(market, {
+        bbox,
+        county,
+        state,
+        limit: Number.isFinite(limit) ? Math.min(limit, 8000) : 4000,
+        filters: applyFilters ? filters : null,
+        zoningConfig,
+        fluConfig,
+        includeExcluded: applyFilters && includeExcluded,
+      });
+      return NextResponse.json({
+        type: "FeatureCollection",
+        features: page.collection.features,
+        excluded: page.excluded,
+        meta: {
+          market,
+          county,
+          state,
+          bbox,
+          source: "fixture",
           total: page.collection.features.length,
           totalInBbox: page.totalInBbox,
           totalMatching: page.totalMatching,

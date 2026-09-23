@@ -26,16 +26,19 @@ npm run seed:oz2-markets  # seven-market rural-eligible tracts from the CSV + TI
 npm run seed:oz2-eligible # seven-market urban tracts + 14 other MSAs (rural and urban) + TIGER 2020
 npm run seed:sc-mf        # South Carolina multifamily priority shortlist from its CSV
 npm run seed:parcels:orlando  # full 5–150 acre parcels for Lake, Orange, Osceola, Polk, Seminole
+npm run seed:parcels:markets  # 5–150 acre parcels for every other MSA (skips finished counties)
 npm run seed:zoning  # refresh coverage report vs knowledge JSON (no LLM)
 ```
 
 Orlando parcel architecture, county source URLs, and field mapping: [`docs/orlando-parcels.md`](docs/orlando-parcels.md) and [`data/orlando-parcel-sources.json`](data/orlando-parcel-sources.json).
 
+Other MSAs use the same tile grid and the same zoom / area-lock / Show parcels gate. They load only while that market is selected. Refresh and the complete-vs-sample-vs-gap table: [`docs/market-parcels.md`](docs/market-parcels.md).
+
 No API keys are required for the default fixture mode. Copy `.env.example` to `.env.local` only if you want to point at live feeds.
 
 ## What you can do
 
-- Switch **Market** / **County** across seven Southeast sheds, or open **Other MSAs** for 14 smaller markets. Primary markets stay listed first. Orlando loads multi-county parcel polygons. Every other market is an eligible-tract overlay. Rural tracts are orange. Urban eligible tracts are blue. The legend toggles rural, urban, or both.
+- Switch **Market** / **County** across seven Southeast sheds, or open **Other MSAs** for 14 smaller markets. Primary markets stay listed first. Orlando loads multi-county parcel polygons. Each other market loads only its own 5–150 acre tiles after you select it, and only at neighborhood zoom, an area lock, or Show parcels. Counties without an open polygon source stay on the tract overlay. Rural tracts are orange. Urban eligible tracts are blue. The legend toggles rural, urban, or both.
 - Set a **minimum acreage**. The slider is 0–25 acres; larger sites still match any threshold at or below 25. Acreage is shown in the parcel drawer. Eligible tracts have no acreage field, so this slider does not hide tracts.
 - Turn on **Consider zoning in parcels** (default No) to use a land-use mode: multifamily-capable zoning, all parcels, non-multifamily zoning, rezoning candidates (FLU yes / zoning no), FLU allows multifamily, either, or both. While the switch is No, those constraints are hidden and not applied.
 - Turn on **Consider opportunity zone in parcels** (default No) to filter parcels by OZ 2.0 rural-eligible, OZ 2.0 eligible but not rural, in a current designated QOZ, not in a designated QOZ, or either. While the switch is No, those parcel constraints are hidden and not applied. The map toggles for the OZ 2.0 tract overlay (orange = rural-eligible, blue = urban eligible, amber = Orange County urban overlay) and the copper dashed designated-QOZ overlay stay available either way. Eligible is not designated.

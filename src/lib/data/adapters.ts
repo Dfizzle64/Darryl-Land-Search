@@ -1,5 +1,6 @@
 import type { ParcelCollection, ParcelFeature } from "../types";
 import { loadParcelCollection } from "./loadFixtures";
+import { getMarketFixtureParcel, queryMarketFixtureParcels } from "./marketParcelStore";
 import {
   finalizeOrlandoParcelPage,
   getOrlandoFixtureParcel,
@@ -23,6 +24,7 @@ export interface ParcelProvider {
   listParcels(): Promise<ParcelCollection>;
   getParcel(id: string): Promise<ParcelFeature | null>;
   queryOrlandoParcels?(query: OrlandoParcelQuery & { source?: "fixture" | "live" }): Promise<OrlandoParcelPage>;
+  queryMarketParcels?(market: string, query: OrlandoParcelQuery): Promise<OrlandoParcelPage>;
 }
 
 export class FixtureParcelProvider implements ParcelProvider {
@@ -36,6 +38,8 @@ export class FixtureParcelProvider implements ParcelProvider {
   async getParcel(id: string): Promise<ParcelFeature | null> {
     const orlando = await getOrlandoFixtureParcel(id);
     if (orlando) return orlando;
+    const market = await getMarketFixtureParcel(id);
+    if (market) return market;
     const collection = await this.listParcels();
     return collection.features.find((feature) => feature.properties.id === id) ?? null;
   }
@@ -48,6 +52,10 @@ export class FixtureParcelProvider implements ParcelProvider {
       return finalizeOrlandoParcelPage(collection.features, query);
     }
     return queryOrlandoFixtureParcels(query);
+  }
+
+  async queryMarketParcels(market: string, query: OrlandoParcelQuery): Promise<OrlandoParcelPage> {
+    return queryMarketFixtureParcels(market, query);
   }
 }
 

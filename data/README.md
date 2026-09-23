@@ -28,6 +28,9 @@ These JSON files are the **source of truth** for what the map treats as multifam
 | `data/orlando-parcel-sources.json` | Orlando shed county GIS URLs, field mapping, gaps |
 | `data/fixtures/orlando-parcels/` | Partitioned multi-county parcel fixtures (`{fips}.geojson` + `meta.json`) |
 | `docs/orlando-parcels.md` | How to refresh Orlando parcels and live viewport API |
+| `data/market-parcel-counties.json` | Non-Orlando shed counties and FIPS. Orlando is omitted |
+| `data/fixtures/market-parcels/` | Per-county tiles, per-market meta, and `coverage.md` |
+| `docs/market-parcels.md` | How to refresh non-Orlando parcels, and which counties are complete, sample, or gaps |
 | `data/fixtures/oz2-eligible-tracts.json` | Appendix rows for those tracts, including Rural Status |
 | `data/fixtures/oz2-lookup.json` | Generated parcel → OZ 2.0 join audit |
 | `data/fixtures/notice-2025-50-rural-geoids.json` | GEOIDs parsed from the Notice 2025-50 rural appendix |
@@ -107,6 +110,7 @@ npm run seed:oz2       # OZ 2.0 + Notice 2025-50 only (python3 -m pip install py
 npm run seed:oz2-markets  # seven-market rural tracts from the CSV + Census TIGER 2020
 npm run seed:sc-mf        # SC multifamily priority shortlist from its CSV
 npm run seed:parcels:orlando  # full 5–150 acre DOH extract for Lake, Orange, Osceola, Polk, Seminole
+npm run seed:parcels:markets  # 5–150 acre tiles for the other MSAs; does not re-scrape Orlando
 npm run seed:zoning    # coverage report only; does not scrape Municode
 ```
 

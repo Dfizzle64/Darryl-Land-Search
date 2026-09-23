@@ -139,6 +139,7 @@ describe("screening layers", () => {
       lat: 28.4,
     });
     expect(rated.summary).toMatch(/Public rating A \(2025-26\)/);
+    expect(rated.summary).toMatch(/medium until the FL DOE School Grades Excel/);
   });
 
   it("keeps the five nearest schools inside 3 miles", () => {

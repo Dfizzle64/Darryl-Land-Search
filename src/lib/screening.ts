@@ -409,11 +409,15 @@ export function describeSchoolRating(input: {
   year: string | null;
   source: string | null;
 }): string {
+  const floridaConfidence =
+    input.state === "FL"
+      ? " Confidence is medium until the FL DOE School Grades Excel can be ingested."
+      : "";
   if (input.rating && input.ratingKind === "letter") {
-    return `Public rating ${input.rating}${input.year ? ` (${input.year})` : ""}. ${input.source ?? ""}`.trim();
+    return `Public rating ${input.rating}${input.year ? ` (${input.year})` : ""}. ${input.source ?? ""}${floridaConfidence}`.trim();
   }
   if (input.rating && input.ratingKind === "improvement") {
-    return `Improvement rating ${input.rating}${input.year ? ` (${input.year})` : ""}, not an A–F grade. ${input.source ?? ""}`.trim();
+    return `Improvement rating ${input.rating}${input.year ? ` (${input.year})` : ""}, not an A–F grade. ${input.source ?? ""}${floridaConfidence}`.trim();
   }
   const portal = input.state ? STATE_REPORT_CARDS[input.state] : null;
   if (portal) {

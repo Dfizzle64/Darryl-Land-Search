@@ -30,7 +30,7 @@ The parcel drawer shows the **owner mailing address already on the parcel extrac
 - Water and sewer outside Orange County, Florida. No second metro had a public service-area layer that was clearly usable for this pass. Hillsborough County’s utilities folder is geocoding tools, not service areas.
 - Gas. Orange County’s open-data map has water, sewer, and electric service areas, and no gas polygon. Other markets do not gain a gas layer either.
 - Electric outside Orange County is still the HIFLD retail territory, which can overlap (a downtown Orlando HIFLD query returns more than one utility). Inside Orange County the drawer uses layer 68 instead, which is one service-area company.
-- School letter grades are Florida 2025-26 and North Carolina 2024-25 only. Georgia, South Carolina, Tennessee, and Alabama dots link the state report card and do not show a made-up grade.
+- School letter grades are Florida 2025-26 and North Carolina 2024-25 only. Florida letters come from the Know Your Schools report card. Confidence stays medium until the School Grades Excel workbook can be downloaded — that file returns 403 from many hosts. Georgia, South Carolina, Tennessee, and Alabama dots link the state report card and do not show a made-up grade.
 - An empty FEMA response is **unknown**, not Zone X. An empty NWI hit is “no polygon at this centroid,” not a permit answer.
 - There is no “hide floodway” filter. Turning that on would query FEMA for every parcel.
 

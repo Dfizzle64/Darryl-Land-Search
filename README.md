@@ -37,7 +37,7 @@ Other MSAs use the same tile grid and the same zoom / area-lock / Show parcels g
 
 No API keys are required for the default fixture mode. Copy `.env.example` to `.env.local` only if you want to point at live feeds.
 
-**Site screening** (off until you turn a layer on): FEMA flood zones, National Wetlands Inventory (Florida included), public school ratings, Orange County water and sewer service areas, and HIFLD electric retail territories. The parcel drawer adds the mailing address already on the extract plus the county appraiser and, for entity owners, the state business search. It does not add phone numbers or emails. Coverage and refresh steps: [`docs/screening-layers.md`](docs/screening-layers.md).
+**Site screening** (off until you turn a layer on): FEMA flood zones (with a base flood elevation only when NFHL publishes one), National Wetlands Inventory, public school ratings plus Orange County attendance zones, and Orange County water, sewer, and electric service areas. Gas stays unknown. Outside Orange County, electric falls back to HIFLD retail territories. The parcel drawer adds the mailing address already on the extract plus the county appraiser and, for entity owners, the state business search. It does not add phone numbers or emails. Coverage and refresh steps: [`docs/screening-layers.md`](docs/screening-layers.md).
 
 ## What you can do
 

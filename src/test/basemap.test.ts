@@ -39,6 +39,8 @@ describe("basemap helpers", () => {
     expect(OVERLAY_LAYER_IDS).toEqual([
       "flood-raster",
       "wetlands-raster",
+      "school-zone-raster",
+      "school-ms-raster",
       "water-fill",
       "water-line",
       "sewer-fill",

@@ -27,6 +27,10 @@ export type FloodAtPoint = {
   subtype: string | null;
   sfha: boolean | null;
   floodway: boolean;
+  /** Feet, only when NFHL publishes a static BFE. -9999 is not a number we keep. */
+  staticBfe: number | null;
+  depth: number | null;
+  datum: string | null;
   summary: string;
   source: string;
   sourceUrl: string;
@@ -41,7 +45,7 @@ export type WetlandAtPoint = {
   sourceUrl: string;
 };
 
-export type UtilityKind = "water" | "sewer" | "power";
+export type UtilityKind = "water" | "sewer" | "power" | "gas";
 
 export type UtilityAtPoint = {
   kind: UtilityKind;
@@ -69,6 +73,8 @@ export type SchoolRating = {
   distanceMiles: number | null;
   lon: number;
   lat: number;
+  /** Orange County attendance zone (OCPS), not merely the nearest campus. */
+  zoned?: boolean;
 };
 
 export type ScreeningPoint = {
@@ -89,11 +95,17 @@ export const NWI_SERVICE =
 export const NWI_SOURCE = "U.S. Fish & Wildlife Service National Wetlands Inventory";
 export const NWI_SOURCE_URL = "https://www.fws.gov/program/national-wetlands-inventory";
 
-export const ORANGE_WATER_SERVICE =
-  "https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/60";
-export const ORANGE_SEWER_SERVICE =
-  "https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/61";
-export const ORANGE_UTILITY_SOURCE = "Orange County open data — water and wastewater service providers";
+export const ORANGE_OPEN_DATA = "https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer";
+export const ORANGE_WATER_SERVICE = `${ORANGE_OPEN_DATA}/60`;
+export const ORANGE_SEWER_SERVICE = `${ORANGE_OPEN_DATA}/61`;
+export const ORANGE_POWER_SERVICE = `${ORANGE_OPEN_DATA}/68`;
+export const ORANGE_SCHOOL_POINTS = `${ORANGE_OPEN_DATA}/76`;
+export const ORANGE_ELEM_ZONES = `${ORANGE_OPEN_DATA}/91`;
+export const ORANGE_HIGH_ZONES = `${ORANGE_OPEN_DATA}/90`;
+export const ORANGE_MIDDLE_ZONES =
+  "https://ocgis4.ocfl.net/arcgis/rest/services/InfoMap_Public_Layers/MapServer/66";
+export const ORANGE_MIDDLE_MAP = "https://ocgis4.ocfl.net/arcgis/rest/services/InfoMap_Public_Layers/MapServer";
+export const ORANGE_UTILITY_SOURCE = "Orange County open data — water, wastewater, and electric service areas";
 export const ORANGE_UTILITY_SOURCE_URL = "https://www.orangecountyfl.net/PlanningDevelopment/InteractiveMapping.aspx";
 
 /** Orange County service-area polygons. Outside this box the app has no water/sewer layer. */
@@ -130,6 +142,14 @@ export const STATE_REPORT_CARDS: Record<string, { label: string; url: string }> 
 
 const SFHA_ZONES = new Set(["A", "AE", "AH", "AO", "AR", "A99", "V", "VE"]);
 
+/** NFHL uses -9999 when a static BFE or depth was not published. That is not an elevation. */
+export function publishedFloodMeasure(value: number | string | null | undefined): number | null {
+  if (value == null || value === "") return null;
+  const number = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(number) || number <= -999) return null;
+  return number;
+}
+
 export function arcgisExportTileUrl(service: string, layers: string): string {
   const base = service.replace(/\/$/, "");
   return `${base}/export?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&dpi=96&format=png32&transparent=true&f=image&layers=show:${layers}`;
@@ -156,9 +176,15 @@ export function describeFloodZone(input: {
   zone?: string | null;
   subtype?: string | null;
   sfhaFlag?: string | null;
+  staticBfe?: number | string | null;
+  depth?: number | string | null;
+  datum?: string | null;
   featuresFound: boolean;
   failed?: boolean;
 }): FloodAtPoint {
+  const staticBfe = publishedFloodMeasure(input.staticBfe);
+  const depth = publishedFloodMeasure(input.depth);
+  const datum = input.datum?.trim() || null;
   if (input.failed) {
     return {
       status: "unavailable",
@@ -166,6 +192,9 @@ export function describeFloodZone(input: {
       subtype: null,
       sfha: null,
       floodway: false,
+      staticBfe: null,
+      depth: null,
+      datum: null,
       summary: "FEMA’s flood service did not respond. Flood zone is unknown — that is not a finding of no hazard.",
       source: FEMA_SOURCE,
       sourceUrl: FEMA_SOURCE_URL,
@@ -178,6 +207,9 @@ export function describeFloodZone(input: {
       subtype: null,
       sfha: null,
       floodway: false,
+      staticBfe: null,
+      depth: null,
+      datum: null,
       summary:
         "No NFHL flood-hazard polygon at this centroid. That can mean the digital map has no zone here. It is unknown, not Zone X.",
       source: FEMA_SOURCE,
@@ -190,13 +222,20 @@ export function describeFloodZone(input: {
   const sfha = input.sfhaFlag?.toUpperCase() === "T" || SFHA_ZONES.has(zone);
   const sfhaLine = sfha ? "Special Flood Hazard Area (1% annual chance)." : "Not flagged as SFHA on this polygon.";
   const subtypeLine = subtype ? ` ${subtype}.` : "";
+  const bfeLine = staticBfe != null
+    ? ` Static BFE ${staticBfe} ft${datum ? ` ${datum}` : ""}.`
+    : " No published static base flood elevation on this polygon.";
+  const depthLine = depth != null ? ` Depth ${depth} ft.` : "";
   return {
     status: "ok",
     zone,
     subtype,
     sfha,
     floodway,
-    summary: `FEMA zone ${zone} at the parcel centroid.${subtypeLine} ${sfhaLine} This is not a survey or an insurance determination.`,
+    staticBfe,
+    depth,
+    datum: staticBfe != null ? datum : null,
+    summary: `FEMA zone ${zone} at the parcel centroid.${subtypeLine} ${sfhaLine}${bfeLine}${depthLine} This is not a survey or an insurance determination.`,
     source: FEMA_SOURCE,
     sourceUrl: FEMA_SOURCE_URL,
   };
@@ -246,12 +285,32 @@ export function describeUtility(input: {
   covered: boolean;
   failed?: boolean;
   extra?: string | null;
+  /** Orange County layer 68, or the national HIFLD retail layer outside that county. */
+  powerLayer?: "ocfl" | "hifld";
 }): UtilityAtPoint {
+  if (input.kind === "gas") {
+    return {
+      kind: "gas",
+      status: "unknown",
+      providers: [],
+      summary:
+        "No public gas service-area layer is wired. Gas availability is unknown — not a finding that gas is unavailable.",
+      source: ORANGE_UTILITY_SOURCE,
+      sourceUrl: ORANGE_UTILITY_SOURCE_URL,
+    };
+  }
+  const ocflPower = input.kind === "power" && input.powerLayer !== "hifld";
   const source =
-    input.kind === "power"
+    input.kind === "power" && !ocflPower
       ? { name: HIFLD_POWER_SOURCE, url: HIFLD_POWER_SOURCE_URL }
       : { name: ORANGE_UTILITY_SOURCE, url: ORANGE_UTILITY_SOURCE_URL };
-  const label = input.kind === "power" ? "Electric retail territory" : input.kind === "water" ? "Water service area" : "Sewer service area";
+  const label = input.kind === "power"
+    ? ocflPower
+      ? "Electric service area"
+      : "Electric retail territory"
+    : input.kind === "water"
+      ? "Water service area"
+      : "Sewer service area";
   if (!input.covered && input.kind !== "power") {
     return {
       kind: input.kind,
@@ -279,7 +338,9 @@ export function describeUtility(input: {
       providers: [],
       summary:
         input.kind === "power"
-          ? "No HIFLD electric retail territory contains this point. That is not a finding that power cannot be extended."
+          ? ocflPower
+            ? "This point is outside the published Orange County electric service-area polygons. It is not a will-serve letter."
+            : "No HIFLD electric retail territory contains this point. That is not a finding that power cannot be extended."
           : `This point is outside the published Orange County ${input.kind} service-area polygons. It is not a will-serve letter.`,
       source: source.name,
       sourceUrl: source.url,
@@ -287,7 +348,9 @@ export function describeUtility(input: {
   }
   const caveat =
     input.kind === "power"
-      ? "Retail territory only — not a connection, capacity check, or will-serve."
+      ? ocflPower
+        ? "Orange County electric service area — not a connection, capacity check, or will-serve."
+        : "Retail territory only — not a connection, capacity check, or will-serve."
       : "Service-area provider from county open data — not a connection or will-serve letter.";
   const extra = input.extra ? ` ${input.extra}` : "";
   return {
@@ -329,10 +392,12 @@ export function toSchoolRating(input: {
   reportCardUrl: string | null;
   lon: number;
   lat: number;
+  zoned?: boolean;
 }): SchoolRating {
   return {
     ...input,
     distanceMiles: null,
+    zoned: input.zoned ?? false,
     summary: describeSchoolRating(input),
   };
 }
@@ -411,10 +476,11 @@ export const UTILITY_LAYER_NOTE = {
   sewer:
     "Sewer overlay is Orange County’s public wastewater service-area layer only. Every other county is unknown.",
   power:
-    "Electric overlay is the national HIFLD retail-territory layer. A territory is not a connection or a will-serve letter.",
-  flood: "FEMA NFHL effective flood zones. The drawer reports the zone at the centroid when the service returns one.",
+    "In Orange County this is open-data electric service areas (layer 68). Outside that county it is the HIFLD retail-territory layer. Neither is a connection or a will-serve. Gas has no public layer here.",
+  flood:
+    "FEMA NFHL effective flood zones. The drawer reports the zone at the centroid. A static BFE is shown only when NFHL publishes one. The -9999 sentinel is not an elevation.",
   wetlands:
     "National Wetlands Inventory, which covers Florida and the other states in this app. Polygons draw at closer zoom because the service scale limit is about 1:100,000.",
   schools:
-    "Florida dots use 2025-26 DOE letter grades. North Carolina dots use 2024-25 school performance grades. Other states plot NCES locations and link the state report card — no invented grade.",
+    "Orange County also draws OCPS attendance zones. Florida letters are the 2025-26 Know Your Schools report card — the School Grades Excel file returns 403 from many hosts, so it is not re-downloaded here. North Carolina dots use 2024-25 school performance grades. Other states plot NCES locations and link the state report card. No grade is invented.",
 } as const;

@@ -105,6 +105,8 @@ export function rasterLayerVisibility(
 export const OVERLAY_LAYER_IDS = [
   "flood-raster",
   "wetlands-raster",
+  "school-zone-raster",
+  "school-ms-raster",
   "water-fill",
   "water-line",
   "sewer-fill",

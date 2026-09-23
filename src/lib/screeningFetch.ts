@@ -6,9 +6,17 @@ import {
   describeFloodZone,
   describeUtility,
   describeWetland,
+  haversineMiles,
   FEMA_FLOOD_LAYER,
   FEMA_NFHL_SERVICE,
+  FL_GRADES_SOURCE,
+  FL_GRADES_URL,
   HIFLD_POWER_SERVICE,
+  ORANGE_ELEM_ZONES,
+  ORANGE_HIGH_ZONES,
+  ORANGE_MIDDLE_ZONES,
+  ORANGE_POWER_SERVICE,
+  ORANGE_SCHOOL_POINTS,
   NCES_SCHOOLS_SERVICE,
   NCES_SOURCE,
   NCES_SOURCE_URL,
@@ -38,6 +46,8 @@ type FloridaSchool = {
   improvement: string | null;
   city: string | null;
   level: string | null;
+  district?: string;
+  school?: string;
   lat: number;
   lon: number;
   reportCardUrl: string | null;
@@ -129,7 +139,7 @@ function pointQuery(service: string, lon: number, lat: number, outFields: string
 export async function floodAtPoint(lon: number, lat: number) {
   try {
     const payload = await getJson(
-      pointQuery(`${FEMA_NFHL_SERVICE}/${FEMA_FLOOD_LAYER}`, lon, lat, "FLD_ZONE,ZONE_SUBTY,SFHA_TF"),
+      pointQuery(`${FEMA_NFHL_SERVICE}/${FEMA_FLOOD_LAYER}`, lon, lat, "FLD_ZONE,ZONE_SUBTY,SFHA_TF,STATIC_BFE,V_DATUM,DEPTH"),
     );
     const features = featuresOf(payload);
     const attrs = attrsOf(features[0]);
@@ -137,6 +147,9 @@ export async function floodAtPoint(lon: number, lat: number) {
       zone: textAttr(attrs, "FLD_ZONE"),
       subtype: textAttr(attrs, "ZONE_SUBTY"),
       sfhaFlag: textAttr(attrs, "SFHA_TF"),
+      staticBfe: textAttr(attrs, "STATIC_BFE"),
+      depth: textAttr(attrs, "DEPTH"),
+      datum: textAttr(attrs, "V_DATUM"),
       featuresFound: features.length > 0,
     });
   } catch {
@@ -173,22 +186,36 @@ export async function wetlandAtPoint(lon: number, lat: number) {
 async function utilityProviders(service: string, lon: number, lat: number, field: string): Promise<string[]> {
   const payload = await getJson(pointQuery(service, lon, lat, field));
   const names = featuresOf(payload)
-    .map((feature) => textAttr(attrsOf(feature), field, "NAME", "SERVEDBY"))
+    .map((feature) => textAttr(attrsOf(feature), field, "NAME", "SERVEDBY", "COMPANY"))
     .filter((name): name is string => Boolean(name));
   return [...new Set(names)];
 }
 
 export async function utilityAtPoint(kind: UtilityKind, lon: number, lat: number) {
-  if (kind !== "power" && !pointInBbox(lon, lat, ORANGE_UTILITY_BBOX)) {
+  if (kind === "gas") return describeUtility({ kind: "gas", providers: [], covered: false });
+  const inOrange = pointInBbox(lon, lat, ORANGE_UTILITY_BBOX);
+  if (!inOrange && kind !== "power") {
     return describeUtility({ kind, providers: [], covered: false });
   }
-  const service = kind === "water" ? ORANGE_WATER_SERVICE : kind === "sewer" ? ORANGE_SEWER_SERVICE : HIFLD_POWER_SERVICE;
-  const field = kind === "power" ? "NAME" : "SERVEDBY";
+  const ocflPower = kind === "power" && inOrange;
+  const service = kind === "water" ? ORANGE_WATER_SERVICE : kind === "sewer" ? ORANGE_SEWER_SERVICE : ocflPower ? ORANGE_POWER_SERVICE : HIFLD_POWER_SERVICE;
+  const field = kind === "water" || kind === "sewer" ? "SERVEDBY" : ocflPower ? "COMPANY" : "NAME";
   try {
     const providers = await utilityProviders(service, lon, lat, field);
-    return describeUtility({ kind, providers, covered: true });
+    return describeUtility({
+      kind,
+      providers,
+      covered: true,
+      powerLayer: kind === "power" ? (ocflPower ? "ocfl" : "hifld") : undefined,
+    });
   } catch {
-    return describeUtility({ kind, providers: [], covered: true, failed: true });
+    return describeUtility({
+      kind,
+      providers: [],
+      covered: true,
+      failed: true,
+      powerLayer: kind === "power" ? (ocflPower ? "ocfl" : "hifld") : undefined,
+    });
   }
 }
 
@@ -214,6 +241,102 @@ function floridaSchoolsInBbox(bbox: BBox): SchoolRating[] {
         lat: school.lat,
       }),
     );
+}
+
+let ocpsIndex: Map<number, FloridaSchool> | null = null;
+
+function ocpsByNumber(): Map<number, FloridaSchool> {
+  const fixture = loadSchoolRatings();
+  if (!fixture) return new Map();
+  if (ocpsIndex) return ocpsIndex;
+  const index = new Map<number, FloridaSchool>();
+  for (const school of fixture.florida.schools) {
+    if (school.district !== "48" || !school.school) continue;
+    const number = Number(school.school);
+    if (Number.isFinite(number)) index.set(number, school);
+  }
+  ocpsIndex = index;
+  return index;
+}
+
+function pointLonLat(feature: unknown): { lon: number; lat: number } | null {
+  if (!feature || typeof feature !== "object") return null;
+  const geometry = (feature as { geometry?: { x?: number; y?: number } }).geometry;
+  const x = geometry?.x;
+  const y = geometry?.y;
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  return { lon: x as number, lat: y as number };
+}
+
+async function orangeZonedSchools(lon: number, lat: number): Promise<SchoolRating[]> {
+  if (!pointInBbox(lon, lat, ORANGE_UTILITY_BBOX)) return [];
+  const zones = [
+    { service: ORANGE_ELEM_ZONES, level: "Elementary" },
+    { service: ORANGE_MIDDLE_ZONES, level: "Middle" },
+    { service: ORANGE_HIGH_ZONES, level: "High" },
+  ];
+  const hits = (
+    await Promise.all(
+      zones.map(async (zone) => {
+        try {
+          const payload = await getJson(pointQuery(zone.service, lon, lat, "SCHL_NUM,SCHOOL,TYPE"));
+          const attrs = attrsOf(featuresOf(payload)[0]);
+          const number = Number(textAttr(attrs, "SCHL_NUM"));
+          const name = textAttr(attrs, "SCHOOL");
+          if (!name || !Number.isFinite(number)) return null;
+          return { number, name, level: zone.level };
+        } catch {
+          return null;
+        }
+      }),
+    )
+  ).filter((hit): hit is { number: number; name: string; level: string } => Boolean(hit));
+  if (!hits.length) return [];
+
+  const where = hits.map((hit) => `SCHL_NUM=${hit.number}`).join(" OR ");
+  const campuses = new Map<number, { lon: number; lat: number }>();
+  try {
+    const payload = await getJson(
+      `${ORANGE_SCHOOL_POINTS}/query?where=${encodeURIComponent(where)}&outFields=SCHL_NUM&returnGeometry=true&outSR=4326&f=json`,
+    );
+    for (const feature of featuresOf(payload)) {
+      const number = Number(textAttr(attrsOf(feature), "SCHL_NUM"));
+      const point = pointLonLat(feature);
+      if (Number.isFinite(number) && point) campuses.set(number, point);
+    }
+  } catch {
+    // Zone names still stand. Campus distance stays unpublished.
+  }
+
+  const grades = ocpsByNumber();
+  const fixture = loadSchoolRatings();
+  return hits.map((hit) => {
+    const campus = campuses.get(hit.number);
+    const graded = grades.get(hit.number);
+    const rating = graded?.grade ?? graded?.improvement ?? null;
+    return toSchoolRating({
+      id: `ocps-${hit.number}`,
+      name: graded?.name || hit.name,
+      city: graded?.city ?? null,
+      state: "FL",
+      level: `${hit.level} attendance zone`,
+      rating,
+      ratingKind: graded?.grade ? "letter" : graded?.improvement ? "improvement" : null,
+      year: rating ? fixture?.florida.year ?? "2025-26" : null,
+      source: rating ? FL_GRADES_SOURCE : "Orange County Public Schools attendance zones",
+      sourceUrl: rating ? FL_GRADES_URL : "https://www.orangecountyfl.net/PlanningDevelopment/InteractiveMapping.aspx",
+      reportCardUrl: graded?.reportCardUrl ?? null,
+      lon: campus?.lon ?? lon,
+      lat: campus?.lat ?? lat,
+      zoned: true,
+    });
+  }).map((school, index) => {
+    const campus = campuses.get(hits[index].number);
+    return {
+      ...school,
+      distanceMiles: campus ? Math.round(haversineMiles(lon, lat, campus.lon, campus.lat) * 10) / 10 : null,
+    };
+  });
 }
 
 function ncesSchool(attrs: Record<string, unknown>): SchoolRating | null {
@@ -247,6 +370,7 @@ function ncesSchool(attrs: Record<string, unknown>): SchoolRating | null {
 export async function schoolsNear(lon: number, lat: number): Promise<{ schools: SchoolRating[]; note: string }> {
   const pad = 0.06;
   const bbox: BBox = [lon - pad, lat - pad, lon + pad, lat + pad];
+  const zoned = await orangeZonedSchools(lon, lat).catch(() => [] as SchoolRating[]);
   try {
     const local = floridaSchoolsInBbox(bbox);
     const params = new URLSearchParams({
@@ -264,14 +388,21 @@ export async function schoolsNear(lon: number, lat: number): Promise<{ schools: 
     const remote = featuresOf(payload)
       .map((feature) => ncesSchool(attrsOf(feature)))
       .filter((school): school is SchoolRating => Boolean(school));
-    const schools = nearestSchools([...local, ...remote], lon, lat);
+    const zonedIds = new Set(zoned.map((school) => school.name.toUpperCase()));
+    const schools = [
+      ...zoned,
+      ...nearestSchools([...local, ...remote], lon, lat).filter((school) => !zonedIds.has(school.name.toUpperCase())),
+    ].slice(0, 8);
     const fixture = loadSchoolRatings();
+    const orangeNote = zoned.length
+      ? " Zoned elementary, middle, and high schools are OCPS attendance zones, not the nearest campus. "
+      : " ";
     const note = fixture
-      ? UTILITY_LAYER_NOTE.schools
-      : "Florida letter grades are not loaded in this build. Dots still use NCES locations and state report-card links. No grade is invented.";
+      ? `${UTILITY_LAYER_NOTE.schools}${orangeNote}`
+      : `Florida letter grades are not loaded in this build. Dots still use NCES locations and state report-card links. No grade is invented.${orangeNote}`;
     return { schools, note };
   } catch {
-    const schools = nearestSchools(floridaSchoolsInBbox(bbox), lon, lat);
+    const schools = [...zoned, ...nearestSchools(floridaSchoolsInBbox(bbox), lon, lat)].slice(0, 8);
     return {
       schools,
       note: schools.length
@@ -300,7 +431,8 @@ export async function screeningAtPoint(lon: number, lat: number): Promise<Screen
     utilities: [
       water.status === "fulfilled" ? water.value : describeUtility({ kind: "water", providers: [], covered: true, failed: true }),
       sewer.status === "fulfilled" ? sewer.value : describeUtility({ kind: "sewer", providers: [], covered: true, failed: true }),
-      power.status === "fulfilled" ? power.value : describeUtility({ kind: "power", providers: [], covered: true, failed: true }),
+      power.status === "fulfilled" ? power.value : describeUtility({ kind: "power", providers: [], covered: true, failed: true, powerLayer: "hifld" }),
+      describeUtility({ kind: "gas", providers: [], covered: false }),
     ],
     schools: schoolResult.schools,
     schoolsNote: schoolResult.note,
@@ -325,7 +457,7 @@ function slimGeometry(payload: unknown, nameField: string): GeoJSON.Feature[] {
     const record = feature as { geometry?: GeoJSON.Geometry | null; attributes?: Record<string, unknown>; properties?: Record<string, unknown> };
     if (!record.geometry) return [];
     const attrs = record.attributes ?? record.properties ?? {};
-    const name = textAttr(attrs, nameField, "NAME", "SERVEDBY") ?? "Unnamed provider";
+    const name = textAttr(attrs, nameField, "NAME", "SERVEDBY", "COMPANY") ?? "Unnamed provider";
     return [{ type: "Feature" as const, geometry: record.geometry, properties: { name } }];
   });
 }
@@ -334,14 +466,16 @@ export async function utilityPolygons(kind: UtilityKind, bbox: BBox): Promise<Sc
   if (bboxSpan(bbox) > MAX_VECTOR_SPAN) {
     return EMPTY_COLLECTION("zoom", "Zoom in to about a county before this utility layer loads.");
   }
-  if (kind !== "power" && !bboxesIntersect(bbox, ORANGE_UTILITY_BBOX)) {
+  const orangeView = bboxesIntersect(bbox, ORANGE_UTILITY_BBOX);
+  if (!orangeView && kind !== "power") {
     return EMPTY_COLLECTION(
       "unknown",
       kind === "water" ? UTILITY_LAYER_NOTE.water : UTILITY_LAYER_NOTE.sewer,
     );
   }
-  const service = kind === "water" ? ORANGE_WATER_SERVICE : kind === "sewer" ? ORANGE_SEWER_SERVICE : HIFLD_POWER_SERVICE;
-  const field = kind === "power" ? "NAME" : "SERVEDBY";
+  const ocflPower = kind === "power" && orangeView;
+  const service = kind === "water" ? ORANGE_WATER_SERVICE : kind === "sewer" ? ORANGE_SEWER_SERVICE : ocflPower ? ORANGE_POWER_SERVICE : HIFLD_POWER_SERVICE;
+  const field = kind === "water" || kind === "sewer" ? "SERVEDBY" : ocflPower ? "COMPANY" : "NAME";
   const params = new URLSearchParams({
     geometry: bbox.join(","),
     geometryType: "esriGeometryEnvelope",
@@ -350,8 +484,8 @@ export async function utilityPolygons(kind: UtilityKind, bbox: BBox): Promise<Sc
     outFields: field,
     returnGeometry: "true",
     outSR: "4326",
-    maxAllowableOffset: kind === "power" ? "0.02" : "0.002",
-    geometryPrecision: kind === "power" ? "3" : "4",
+    maxAllowableOffset: kind === "power" && !ocflPower ? "0.02" : "0.002",
+    geometryPrecision: kind === "power" && !ocflPower ? "3" : "4",
     f: "geojson",
   });
   try {

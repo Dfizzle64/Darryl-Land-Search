@@ -9,6 +9,7 @@ import {
   mailingGap,
   nearestSchools,
   pointInBbox,
+  publishedFloodMeasure,
   schoolSwatch,
   toSchoolRating,
   type SchoolRating,
@@ -52,6 +53,32 @@ describe("screening layers", () => {
     expect(flood.zone).toBe("AE");
   });
 
+  it("does not treat the NFHL -9999 sentinel as a base flood elevation", () => {
+    expect(publishedFloodMeasure(-9999)).toBeNull();
+    expect(publishedFloodMeasure("-9999")).toBeNull();
+    const missing = describeFloodZone({
+      featuresFound: true,
+      zone: "X",
+      subtype: "AREA OF MINIMAL FLOOD HAZARD",
+      sfhaFlag: "F",
+      staticBfe: -9999,
+      depth: -9999,
+      datum: "",
+    });
+    expect(missing.staticBfe).toBeNull();
+    expect(missing.summary).toMatch(/No published static base flood elevation/);
+    expect(missing.summary).not.toMatch(/-9999/);
+    const published = describeFloodZone({
+      featuresFound: true,
+      zone: "AE",
+      sfhaFlag: "T",
+      staticBfe: 89.3,
+      datum: "NAVD88",
+    });
+    expect(published.staticBfe).toBe(89.3);
+    expect(published.summary).toMatch(/89\.3 ft NAVD88/);
+  });
+
   it("says a failed flood lookup is unavailable", () => {
     expect(describeFloodZone({ featuresFound: false, failed: true }).status).toBe("unavailable");
   });
@@ -70,6 +97,20 @@ describe("screening layers", () => {
     expect(outside.summary).toMatch(/not a finding that service is unavailable/);
     expect(pointInBbox(-84.3, 33.7, [-81.66, 28.34, -80.99, 28.79])).toBe(false);
     expect(pointInBbox(-81.379, 28.538, [-81.66, 28.34, -80.99, 28.79])).toBe(true);
+  });
+
+  it("leaves gas unknown and keeps Orange electric off the national territory wording", () => {
+    const gas = describeUtility({ kind: "gas", providers: [], covered: false });
+    expect(gas.status).toBe("unknown");
+    expect(gas.summary).toMatch(/No public gas/);
+    const orangePower = describeUtility({
+      kind: "power",
+      providers: ["Duke Energy"],
+      covered: true,
+      powerLayer: "ocfl",
+    });
+    expect(orangePower.summary).toMatch(/Orange County electric service area/);
+    expect(orangePower.summary).toMatch(/not a connection/);
   });
 
   it("does not call an empty electric territory a connection", () => {

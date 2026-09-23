@@ -23,6 +23,7 @@ function SchoolRow({ school }: { school: SchoolRating }) {
   return (
     <li className="border-t border-white/10 pt-2 first:border-t-0 first:pt-0">
       <p className="text-white">
+        {school.zoned ? <span className="mr-2 text-clay-400">Zoned</span> : null}
         {school.rating ? <span className="mr-2 font-semibold">{school.rating}</span> : <span className="mr-2 text-ink-500">No grade</span>}
         {school.name}
       </p>
@@ -58,14 +59,16 @@ export function ScreeningDetails({ point, status }: ScreeningDetailsProps) {
           {point.utilities.map((utility) => (
             <Block
               key={utility.kind}
-              title={utility.kind === "power" ? "Electric territory" : utility.kind === "water" ? "Water" : "Sewer"}
+              title={
+                utility.kind === "power" ? "Electric" : utility.kind === "gas" ? "Gas" : utility.kind === "water" ? "Water" : "Sewer"
+              }
               summary={utility.summary}
               source={utility.source}
               sourceUrl={utility.sourceUrl}
             />
           ))}
           <div className="rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
-            <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Nearby schools</p>
+            <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Schools</p>
             {point.schools.length ? (
               <ul className="mt-2 space-y-2">
                 {point.schools.map((school) => (

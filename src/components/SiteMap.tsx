@@ -50,6 +50,8 @@ import {
   FEMA_SOURCE,
   NWI_SERVICE,
   NWI_SOURCE,
+  ORANGE_MIDDLE_MAP,
+  ORANGE_OPEN_DATA,
   type ScreeningToggles,
 } from "@/lib/screening";
 import { tractClickFromFeature, type TractClickDetails } from "@/lib/tractCounty";
@@ -197,6 +199,34 @@ function addScreeningLayers(map: MapLibreMap, mode: BasemapMode) {
     minzoom: 11,
     layout: { visibility: "none" },
     paint: { "raster-opacity": 0.62 },
+  });
+  map.addSource("school-zone-raster", {
+    type: "raster",
+    tiles: [arcgisExportTileUrl(ORANGE_OPEN_DATA, "90,91")],
+    tileSize: 256,
+    attribution: "Orange County Public Schools attendance zones",
+  });
+  map.addLayer({
+    id: "school-zone-raster",
+    type: "raster",
+    source: "school-zone-raster",
+    minzoom: 9,
+    layout: { visibility: "none" },
+    paint: { "raster-opacity": 0.45 },
+  });
+  map.addSource("school-ms-raster", {
+    type: "raster",
+    tiles: [arcgisExportTileUrl(ORANGE_MIDDLE_MAP, "66")],
+    tileSize: 256,
+    attribution: "Orange County middle school attendance zones",
+  });
+  map.addLayer({
+    id: "school-ms-raster",
+    type: "raster",
+    source: "school-ms-raster",
+    minzoom: 9,
+    layout: { visibility: "none" },
+    paint: { "raster-opacity": 0.35 },
   });
   const utilities = [
     ["water", "#3d7dff"],
@@ -1010,7 +1040,7 @@ export function SiteMap({
     show(["water-fill", "water-line"], screening.water);
     show(["sewer-fill", "sewer-line"], screening.sewer);
     show(["power-fill", "power-line"], screening.power);
-    show(["schools-circle"], screening.schools);
+    show(["schools-circle", "school-zone-raster", "school-ms-raster"], screening.schools);
   }, [screening, status, basemap]);
 
   useEffect(() => {
@@ -1344,13 +1374,13 @@ export function SiteMap({
           {screening.power ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle" style={{ backgroundColor: "#e0b15a" }} />
-              Electric retail territory
+              Electric service area (Orange County; retail territory elsewhere)
             </p>
           ) : null}
           {screening.schools ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-full align-middle" style={{ backgroundColor: "#1f7a4d" }} />
-              Schools · letter grade (gray = no grade in this extract)
+              Schools · letter grade, plus OCPS attendance zones in Orange County
             </p>
           ) : null}
           {screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power ? (

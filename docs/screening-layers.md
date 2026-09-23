@@ -10,12 +10,13 @@ Nothing here is a will-serve letter, a survey, a jurisdictional determination, o
 | --- | --- | --- |
 | Flood zones | Raster overlay, from about zoom 8 | [FEMA National Flood Hazard Layer](https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer), layer 28 (flood hazard zones). Map export tiles. |
 | Wetlands | Raster overlay, from about zoom 11 | [USFWS National Wetlands Inventory](https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/MapServer). This is the national layer, so it covers Florida and the other states in the app. The service itself stops drawing past about 1:100,000. |
-| Schools | Dots in the current view, once the view is about a county | Florida 2025-26 letter grades from the public [Know Your Schools](https://edudata.fldoe.org/ReportCards/Schools.html) report card (`GetBase`). North Carolina 2024-25 school performance grades from the [DPI researcher file](https://www.dpi.nc.gov/data-reports/school-report-cards/school-report-card-resources-researchers) (`rcd_acc_spg1`, subgroup ALL), joined to NCES ids. Other states: [NCES public school locations](https://services1.arcgis.com/Ua5sjt3LWTPigjyD/arcgis/rest/services/Public_School_Locations_Current/FeatureServer/0) plus a link to that state’s report card. Gray means no letter in this extract. |
+| Schools | Dots in the current view, plus Orange County attendance-zone tiles | Florida 2025-26 letter grades from the public [Know Your Schools](https://edudata.fldoe.org/ReportCards/Schools.html) report card. The School Grades Excel workbook on fldoe.org returns 403 from many hosts, so this app does not re-download it and does not use a secondary grade list. Orange County zones are live: elementary layer 91, high school layer 90, middle school [InfoMap layer 66](https://ocgis4.ocfl.net/arcgis/rest/services/InfoMap_Public_Layers/MapServer/66). North Carolina 2024-25 grades come from the [DPI researcher file](https://www.dpi.nc.gov/data-reports/school-report-cards/school-report-card-resources-researchers). Other states plot [NCES locations](https://services1.arcgis.com/Ua5sjt3LWTPigjyD/arcgis/rest/services/Public_School_Locations_Current/FeatureServer/0) and link the state report card. Gray means no letter in this extract. |
 | Water | Orange County polygons only | [Orange County open data](https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer), layer 60 (`SERVEDBY`). |
 | Sewer | Orange County polygons only | Same service, layer 61. |
-| Electric retail territory | Simplified polygons in the current view | [HIFLD electric retail service territories](https://services3.arcgis.com/OYP7N6mAJJCyH6hd/ArcGIS/rest/services/Electric_Retail_Service_Territories_HIFLD/FeatureServer/0). A territory is not a connection or a capacity check. |
+| Electric | Orange County polygons; HIFLD outside that county | Orange County layer 68 (`COMPANY`) inside the county. Outside it, [HIFLD electric retail service territories](https://services3.arcgis.com/OYP7N6mAJJCyH6hd/ArcGIS/rest/services/Electric_Retail_Service_Territories_HIFLD/FeatureServer/0). Neither is a connection or a will-serve. |
+| Gas | No overlay | No public gas service-area layer. The drawer says unknown. |
 
-Selecting a parcel or a tract looks up flood and utilities at that point (tracts use the Census internal point) and lists the five nearest public schools within 3 miles. Wetlands use a roughly 70-foot box because the NWI service does not answer a bare point. Flood still uses the point itself.
+Selecting a parcel or a tract looks up flood, utilities, and Orange County attendance zones at that point (tracts use the Census internal point) and lists nearby public schools within 3 miles. Flood reads `STATIC_BFE`. The value `-9999` means no published static base flood elevation, and the drawer does not turn that sentinel into a number. Wetlands use a roughly 70-foot box because the NWI service does not answer a bare point.
 
 ## Contact
 
@@ -27,7 +28,8 @@ The parcel drawer shows the **owner mailing address already on the parcel extrac
 ## Gaps
 
 - Water and sewer outside Orange County, Florida. No second metro had a public service-area layer that was clearly usable for this pass. Hillsborough County’s utilities folder is geocoding tools, not service areas.
-- Electric coverage is a retail territory, often a huge utility. Overlapping territories can appear at one point (Orlando returns OUC, Reedy Creek, and Duke). That is what the layer contains.
+- Gas. Orange County’s open-data map has water, sewer, and electric service areas, and no gas polygon. Other markets do not gain a gas layer either.
+- Electric outside Orange County is still the HIFLD retail territory, which can overlap (a downtown Orlando HIFLD query returns more than one utility). Inside Orange County the drawer uses layer 68 instead, which is one service-area company.
 - School letter grades are Florida 2025-26 and North Carolina 2024-25 only. Georgia, South Carolina, Tennessee, and Alabama dots link the state report card and do not show a made-up grade.
 - An empty FEMA response is **unknown**, not Zone X. An empty NWI hit is “no polygon at this centroid,” not a permit answer.
 - There is no “hide floodway” filter. Turning that on would query FEMA for every parcel.

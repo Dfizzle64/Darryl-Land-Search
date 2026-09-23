@@ -648,17 +648,19 @@ def parse_deed_date(value: Any) -> str | None:
 
 
 def epoch_ms_date(value: Any) -> tuple[int, str] | None:
+    """ArcGIS SALEDATE milliseconds. Rejects the rare truncated stamp that lands in the future."""
     stamp = num(value)
     if stamp is None:
         return None
     millis = int(stamp if abs(stamp) >= 10_000_000_000 else stamp * 1000)
-    # Reject timestamps outside 1900–2100 before calling fromtimestamp.
-    if not 0 <= millis <= 4_102_444_800_000:
-        return None
     import datetime
 
-    parsed = datetime.datetime.fromtimestamp(millis / 1000, datetime.timezone.utc)
-    if parsed.year < 1900 or parsed.year > 2100:
+    try:
+        parsed = datetime.datetime.fromtimestamp(millis / 1000, datetime.timezone.utc)
+    except (OverflowError, OSError, ValueError):
+        return None
+    # A 2071 stamp in this layer is a bad integer, not a sale.
+    if parsed.year < 1900 or parsed.year > 2026:
         return None
     return millis, parsed.strftime("%Y-%m-%d")
 

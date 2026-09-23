@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T23:43:43Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 8149,
+  "parcelCount": 12380,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -229,20 +229,28 @@
       "name": "Douglas",
       "fips": "13097",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 4231,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-douglas-landrecords",
+      "queryUrl": "https://maps.douglascountyga.gov/arcgis/rest/services/LandRecords/LandRecords/MapServer/0/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "4254 LandRecords rows matched ACREAGE_GIS 5\u2013150. 4231 Douglas County, Georgia tax parcels were kept. Placeholder PINs and any geometry outside the Douglas County bbox were dropped.",
+        "Acreage is ACREAGE_GIS, not the TOTAL_ACRES string. Band is 5.0\u2013150.0 inclusive.",
+        "No public assessed or taxable value. CURR_VAL is fair market value. ACC is not the Georgia 40% assessed value.",
+        "Austell has no official city zoning or future land use service. Tax district 06 parcels keep null zoning and FLU.",
+        "Douglasville uses DV_ZONING_CODE and DV_FLU_CODE. Villa Rica uses city Proposed_Z on PIN and a spatial future-land-use join. County values of 'city' are municipal stubs and are not stored.",
+        "Unincorporated zoning and future land use come from DC_CURR_ZONING and DC_CURR_FLU. Dissolved Zoning/Zoning districts fill a missing county code only.",
+        "Placeholder PINs TAXED IN COBB, TAXED PAULDING, and CHATTOHOOCHEE are dropped. They are boundary slivers or river polygons, not Douglas tax parcels.",
+        "Last sale prefers PIW_Sales rows with SALEVAL='0' (VALID SALE). Polygon SALEPRICE and DEED_DATE are the fallback.",
+        "CAD_CITY is a postal code, not an incorporated city. Municipality is TAX_DISTRICT."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13097/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13097/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 4254
     },
     {
       "name": "Fayette",

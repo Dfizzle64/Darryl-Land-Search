@@ -38,7 +38,7 @@ export function annotateRuralRows(rows: RuralMarketTractRow[], catalog: ScMfPrio
   });
 }
 
-export function filterByMfPriority(rows: RuralMarketTractRow[], view: MfPriorityView): RuralMarketTractRow[] {
+export function filterByMfPriority<T extends { mfPriority?: MfPriorityInfo | null }>(rows: T[], view: MfPriorityView): T[] {
   if (view === "all") return rows;
   return rows.filter((row) => {
     const tier = row.mfPriority?.tier;
@@ -49,13 +49,13 @@ export function filterByMfPriority(rows: RuralMarketTractRow[], view: MfPriority
 }
 
 /** Tier A, then Tier B (CSV rank), then the rest of the rural pack. */
-export function sortTractsForDisplay(rows: RuralMarketTractRow[]): RuralMarketTractRow[] {
-  const group = (row: RuralMarketTractRow) => {
+export function sortTractsForDisplay<T extends { mfPriority?: MfPriorityInfo | null }>(rows: T[]): T[] {
+  const group = (row: T) => {
     if (row.mfPriority?.tier === "A") return 0;
     if (row.mfPriority?.tier === "B") return 1;
     return 2;
   };
-  return rows.toSorted((a, b) => {
+  return [...rows].sort((a, b) => {
     const byGroup = group(a) - group(b);
     if (byGroup !== 0) return byGroup;
     const aRank = a.mfPriority?.rank ?? Number.MAX_SAFE_INTEGER;
@@ -64,7 +64,7 @@ export function sortTractsForDisplay(rows: RuralMarketTractRow[]): RuralMarketTr
   });
 }
 
-export function countMfPriority(rows: RuralMarketTractRow[]): { all: number; priority: number; A: number; B: number } {
+export function countMfPriority(rows: Array<{ mfPriority?: MfPriorityInfo | null }>): { all: number; priority: number; A: number; B: number } {
   let priority = 0;
   let tierA = 0;
   let tierB = 0;
@@ -81,7 +81,7 @@ export function countMfPriority(rows: RuralMarketTractRow[]): { all: number; pri
 }
 
 export function geoidsForHighlight(
-  rows: RuralMarketTractRow[],
+  rows: Array<{ geoid: string; mfPriority?: MfPriorityInfo | null }>,
   view: MfPriorityView,
   tier: MfPriorityTier,
 ): string[] {
@@ -90,11 +90,14 @@ export function geoidsForHighlight(
 }
 
 /** Null means the rural layer stays on the full county/market set. */
-export function geoidFilterForView(rows: RuralMarketTractRow[], view: MfPriorityView): string[] | null {
+export function geoidFilterForView(
+  rows: Array<{ geoid: string; mfPriority?: MfPriorityInfo | null }>,
+  view: MfPriorityView,
+): string[] | null {
   if (view === "all") return null;
   return filterByMfPriority(rows, view).map((row) => row.geoid);
 }
 
-export function tractPlaceLabel(row: RuralMarketTractRow): string {
+export function tractPlaceLabel(row: { placeOrCorridor: string; mfPriority?: MfPriorityInfo | null }): string {
   return row.mfPriority?.place || row.placeOrCorridor;
 }

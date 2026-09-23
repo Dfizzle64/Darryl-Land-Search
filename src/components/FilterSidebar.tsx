@@ -3,7 +3,7 @@
 import { MfPriorityFilter } from "./MfPriorityFilter";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { ZoningKnowledgePanel } from "./ZoningKnowledgePanel";
-import { ACREAGE_SLIDER, DEFAULT_FILTERS, SHED_CAVEAT, type FilterState, type FluConfig, type LandUseFilter, type MarketId, type MfPriorityView, type OzFilter, type ZoningConfig } from "@/lib/types";
+import { ACREAGE_SLIDER, DEFAULT_FILTERS, SHED_CAVEAT, type FilterState, type FluConfig, type LandUseFilter, type MfPriorityView, type OzFilter, type SearchMarketId, type ZoningConfig } from "@/lib/types";
 
 type FilterSidebarProps = {
   filters: FilterState;
@@ -26,8 +26,10 @@ type FilterSidebarProps = {
   meta: Record<string, unknown>;
   orangePilot: boolean;
   orlandoParcels: boolean;
-  market: MarketId;
+  market: SearchMarketId;
   tractCount: number;
+  ruralTractCount: number;
+  urbanTractCount: number;
   parcelNote: string;
   statusHelp?: string | null;
   priorityView?: MfPriorityView;
@@ -147,6 +149,8 @@ export function FilterSidebar({
   orlandoParcels,
   market,
   tractCount,
+  ruralTractCount,
+  urbanTractCount,
   parcelNote,
   statusHelp = null,
   priorityView,
@@ -186,9 +190,13 @@ export function FilterSidebar({
         </section>
 
         <section className="mt-5 space-y-2 rounded-2xl border border-white/10 bg-ink-800/70 p-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Seven-market sheds</h2>
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Eligible sheds</h2>
           <p className="text-sm text-white">
-            {market}: {tractCount.toLocaleString()} rural-eligible {tractCount === 1 ? "tract" : "tracts"}
+            {market}: {tractCount.toLocaleString()} eligible {tractCount === 1 ? "tract" : "tracts"}
+          </p>
+          <p className="text-xs text-ink-300">
+            {ruralTractCount.toLocaleString()} rural · {urbanTractCount.toLocaleString()} urban. Orange is rural. Blue
+            is urban. Status is eligible — not designated.
           </p>
           <p className="text-xs leading-relaxed text-ink-500">{SHED_CAVEAT}</p>
           {statusHelp ? (
@@ -272,7 +280,7 @@ export function FilterSidebar({
             label="Show OZ 2.0 eligible tracts"
             checked={showOz2}
             onChange={onShowOz2}
-            hint="Rural-eligible tracts in the selected market are orange. In Orange County, Florida, amber tracts are eligible and not rural."
+            hint="Orange tracts are rural-eligible. Blue tracts are urban eligible. In Orange County, Florida, the amber overlay is the county urban set. None of these are designated."
           />
           <Toggle
             label="Show designated Opportunity Zone overlay"
@@ -409,9 +417,10 @@ export function FilterSidebar({
           Fixture snapshot {generatedAt ?? "unknown"}. Orlando shed parcels are partitioned public GIS extracts (DOH
           EHWATER / Orange County Property Appraiser). Zoning and FLU joins are richest for Orange County; other counties
           degrade when a field is missing. Opportunity Zones shown in copper with a dashed outline are current designated
-          QOZs in the Orange pilot. Rural tracts in the seven markets are Rev. Proc. 2026-14 nomination eligibility —
-          Eligible (rural) — not designated. Orange is rural-eligible; amber, in Orange County only, is eligible and not
-          rural. {SHED_CAVEAT} Income and AADT joins are Orange-pilot first.
+          QOZs in the Orange pilot. Rural tracts are orange and urban eligible tracts are blue. Both are Rev. Proc.
+          2026-14 nomination eligibility — Eligible — not designated. The seven-market rural chip still reads Eligible
+          (rural) — not designated. Amber, in Orange County only, is that county’s urban overlay. {SHED_CAVEAT} Income
+          and AADT joins are Orange-pilot first.
         </p>
       </aside>
     </>

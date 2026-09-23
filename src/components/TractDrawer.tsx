@@ -1,13 +1,13 @@
 "use client";
 
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
-import { formatCountyLabel, isSouthCarolinaState } from "@/lib/markets";
+import { displayStatusChip, formatCountyLabel, showsGovernorFiledSoftCopy } from "@/lib/markets";
 import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME } from "@/lib/orlandoParcels";
 import { MF_PRIORITY_DISCLAIMER, NOM_WATCH_CAVEAT, tractPlaceLabel } from "@/lib/scMfPriority";
-import { RURAL_ELIGIBLE_STATUS_CHIP, SC_GOVERNOR_FILED_STATUS, SHED_CAVEAT, type RuralMarketTractRow } from "@/lib/types";
+import { SC_GOVERNOR_FILED_STATUS, SHED_CAVEAT, type EligibleTractRow } from "@/lib/types";
 
 type TractDrawerProps = {
-  tract: RuralMarketTractRow | null;
+  tract: EligibleTractRow | null;
   statusHelp?: string | null;
   onClose: () => void;
 };
@@ -18,8 +18,8 @@ export function TractDrawer({ tract, statusHelp = null, onClose }: TractDrawerPr
       <aside className="hidden w-[24rem] shrink-0 border-l border-white/10 bg-ink-900/80 p-5 lg:block">
         <p className="font-display text-2xl text-white">Tract details</p>
         <p className="mt-2 text-sm leading-relaxed text-ink-300">
-          Select a rural-eligible tract to see its GEOID, county, and notes. These tracts are eligible for nomination.
-          They are not certified 2027 Qualified Opportunity Zones. A tract is not a shovel-ready site.
+          Select an eligible tract to see its county, state, GEOID, rural flag, status, and place or corridor notes.
+          These tracts are eligible for nomination. They are not certified 2027 Qualified Opportunity Zones.
         </p>
         {statusHelp ? (
           <SouthCarolinaStatusNote note={statusHelp} className="mt-3 text-xs leading-relaxed text-ink-300" />
@@ -28,9 +28,11 @@ export function TractDrawer({ tract, statusHelp = null, onClose }: TractDrawerPr
     );
   }
 
-  const southCarolina = isSouthCarolinaState(tract.state);
+  const southCarolina = showsGovernorFiledSoftCopy(tract);
   const priority = tract.mfPriority ?? null;
   const place = tractPlaceLabel(tract);
+  const rural = tract.rural === "Y";
+  const statusChip = displayStatusChip(tract);
 
   return (
     <aside className="drawer-scroll absolute inset-x-0 bottom-0 z-20 max-h-[70vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-5 shadow-2xl lg:static lg:z-0 lg:max-h-none lg:w-[24rem] lg:shrink-0 lg:rounded-none lg:border-l lg:border-t-0 lg:shadow-none">
@@ -50,8 +52,14 @@ export function TractDrawer({ tract, statusHelp = null, onClose }: TractDrawerPr
         </button>
       </div>
 
-      <p className="mt-4 inline-block rounded-full border border-[#f15a08]/70 bg-[#f15a08]/15 px-2 py-1 text-xs text-[#ffc7a3]">
-        {RURAL_ELIGIBLE_STATUS_CHIP}
+      <p
+        className={`mt-4 inline-block rounded-full border px-2 py-1 text-xs ${
+          rural
+            ? "border-[#f15a08]/70 bg-[#f15a08]/15 text-[#ffc7a3]"
+            : "border-[#3d7dff]/70 bg-[#3d7dff]/15 text-[#d6e4ff]"
+        }`}
+      >
+        {statusChip}
       </p>
       {southCarolina ? <p className="mt-2 text-xs leading-relaxed text-ink-100">{SC_GOVERNOR_FILED_STATUS}</p> : null}
       {priority ? (
@@ -94,12 +102,34 @@ export function TractDrawer({ tract, statusHelp = null, onClose }: TractDrawerPr
         <div>
           <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">What this means</dt>
           <dd className="mt-1 text-ink-100">
-            Rev. Proc. 2026-14 lists this 2020 census tract as a low-income community comprised entirely of a rural
-            area. It is eligible for nomination.{" "}
+            {rural
+              ? "Rev. Proc. 2026-14 lists this 2020 census tract as a low-income community comprised entirely of a rural area."
+              : "Rev. Proc. 2026-14 lists this 2020 census tract as a low-income community that is eligible and not entirely rural."}{" "}
+            It is eligible for nomination.{" "}
             {southCarolina
               ? "South Carolina’s governor filed OZ 2.0 nominations on Sep 10, 2026, but the tract list is not public. This GEOID is not marked nominated or designated."
               : "It has not been nominated or certified as a 2027 QOZ."}
           </dd>
+        </div>
+        <div>
+          <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">County</dt>
+          <dd className="mt-1 text-ink-100">{formatCountyLabel(tract.county, tract.state)}</dd>
+        </div>
+        <div>
+          <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">GEOID</dt>
+          <dd className="mt-1 text-ink-100">{tract.geoid}</dd>
+        </div>
+        <div>
+          <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Rural</dt>
+          <dd className="mt-1 text-ink-100">{rural ? "Y — entirely rural" : "N — urban / not entirely rural"}</dd>
+        </div>
+        <div>
+          <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Status</dt>
+          <dd className="mt-1 text-ink-100">{statusChip}</dd>
+        </div>
+        <div>
+          <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Place / corridor</dt>
+          <dd className="mt-1 text-ink-100">{tract.placeOrCorridor}</dd>
         </div>
         <div>
           <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">
@@ -129,8 +159,7 @@ export function TractDrawer({ tract, statusHelp = null, onClose }: TractDrawerPr
       ) : null}
 
       <p className="mt-4 text-xs leading-relaxed text-ink-500">
-        {SHED_CAVEAT} A rural-eligible GEOID is not a pad site. Sewer, zoning, wetlands, title, and assembly still
-        control.
+        {SHED_CAVEAT} An eligible GEOID is not a pad site. Sewer, zoning, wetlands, title, and assembly still control.
         {tract.state === "Florida" && isFull5AcCounty(tract.county)
           ? ` ${tract.county} County includes public parcels from 5.0 through 150.0 acres. Parcels under 5 or over 150 are excluded. Zoom in if the view says it is showing a spread of a larger set.`
           : tract.state === "Florida" && ORLANDO_FIPS_BY_NAME[tract.county]

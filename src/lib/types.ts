@@ -110,8 +110,42 @@ export const MARKETS = [
 
 export type MarketId = (typeof MARKETS)[number];
 
+/**
+ * Smaller MSAs, visually secondary to the seven primary markets.
+ * Order matches the research handoff.
+ */
+export const OTHER_MARKETS = [
+  "Vero Beach",
+  "Melbourne",
+  "Pensacola",
+  "Birmingham",
+  "Mobile",
+  "Huntsville",
+  "Savannah",
+  "Columbia",
+  "Greenville",
+  "Chattanooga",
+  "Knoxville",
+  "Memphis",
+  "Winston-Salem",
+  "Wilmington",
+] as const;
+
+export type OtherMarketId = (typeof OTHER_MARKETS)[number];
+
+export type SearchMarketId = MarketId | OtherMarketId;
+
+/** Rural, urban (non-rural eligible), or both. */
+export type TractClassView = "both" | "rural" | "urban";
+
 /** Status chip for the seven-market rural pack. Never a certified 2027 QOZ. */
 export const RURAL_ELIGIBLE_STATUS_CHIP = "Eligible (rural) — not designated";
+
+/**
+ * Status chip for the urban pack and the other-MSA pack.
+ * Rural vs urban is a separate flag. This chip is never a designation.
+ */
+export const ELIGIBLE_NOT_DESIGNATED_STATUS = "Eligible — not designated";
 
 /**
  * Secondary status for South Carolina tracts after the Sep 10, 2026 governor filing.
@@ -194,12 +228,77 @@ export type MarketCountySummary = {
 };
 
 export type MarketSummary = {
-  market: MarketId;
+  market: SearchMarketId;
   rowCount: number;
+  ruralCount?: number;
+  urbanCount?: number;
   bounds: [[number, number], [number, number]];
   center: [number, number];
   counties: MarketCountySummary[];
 };
+
+/** Urban 7-market pack, or the 14 smaller MSAs (rural and urban together). */
+export type EligibleTractRow = {
+  market: SearchMarketId;
+  state: string;
+  county: string;
+  geoid: string;
+  placeOrCorridor: string;
+  rural: "Y" | "N";
+  status: string;
+  lat: number;
+  lon: number;
+  notes: string;
+  outerEdge: boolean;
+  specialUse: boolean;
+  mfPriority?: MfPriorityInfo | null;
+};
+
+export type EligibleMarketsCatalog = {
+  generatedAt: string;
+  sourceCsv: string;
+  geometrySource: string;
+  shedCaveat: string;
+  statusChip: string;
+  pack: "urban-7" | "other-msas";
+  rowCount: number;
+  uniqueGeoidCount: number;
+  ruralRowCount: number;
+  urbanRowCount: number;
+  markets: MarketSummary[];
+  rows: EligibleTractRow[];
+};
+
+export type EligiblePackTractProperties = {
+  id: string;
+  tractGeoid: string;
+  tract: string | null;
+  name: string | null;
+  county: string;
+  state: string;
+  rural: boolean;
+  designation: "eligible-for-nomination";
+  statusChip: string;
+  markets: SearchMarketId[];
+  packs: Array<"urban-7" | "other-msas">;
+  placeOrCorridor: string;
+  notes: string;
+  outerEdge: boolean;
+  specialUse: boolean;
+  lat: number;
+  lon: number;
+  source: string;
+};
+
+export type EligiblePackTractFeature = GeoJSON.Feature<
+  GeoJSON.Polygon | GeoJSON.MultiPolygon,
+  EligiblePackTractProperties
+>;
+
+export type EligiblePackTractCollection = GeoJSON.FeatureCollection<
+  GeoJSON.Polygon | GeoJSON.MultiPolygon,
+  EligiblePackTractProperties
+>;
 
 export type RuralMarketsCatalog = {
   generatedAt: string;

@@ -13,6 +13,14 @@ export function ocpaParcelUrl(parcelId: string): string {
   return `https://ocpaweb.ocpafl.org/site/parcelsearch?pid=${encodeURIComponent(parcelId)}`;
 }
 
+export function osceolaParcelUrl(parcelId: string): string {
+  return `https://maps.property-appraiser.org/?Pin=${encodeURIComponent(parcelId)}`;
+}
+
+export function lakeAppraiserUrl(url: string): string {
+  return url.replace(/^http:\/\/www\.lakecopropappr\.com/i, "https://www.lakecopropappr.com");
+}
+
 export function comptrollerRecordsUrl(): string {
   return "https://or.occompt.com/recorder/web/";
 }
@@ -39,6 +47,25 @@ export function parcelAppraiserUrl(options: {
     return {
       href: ocpaParcelUrl(options.parcelId),
       label: "Open in Orange County Property Appraiser",
+    };
+  }
+  if (fips === "12097") {
+    const stored = options.appraiserUrl;
+    return {
+      href: stored && stored.includes("Pin=") ? stored : osceolaParcelUrl(options.parcelId),
+      label: "Open Osceola Property Appraiser map",
+    };
+  }
+  if (fips === "12069" && options.appraiserUrl) {
+    return {
+      href: lakeAppraiserUrl(options.appraiserUrl),
+      label: "Open Lake County Property Appraiser record",
+    };
+  }
+  if (fips === "12119" && options.appraiserUrl?.includes("sumterpa.com")) {
+    return {
+      href: options.appraiserUrl,
+      label: "Open Sumter Property Appraiser record",
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);

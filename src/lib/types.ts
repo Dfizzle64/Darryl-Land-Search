@@ -21,6 +21,12 @@ export type LastSale = {
   date: string | null;
   price: number | null;
   qualified: string | null;
+  /** Knox DATE_PURCHASED when the layer also has SALE_DATE. */
+  datePurchased?: string | null;
+  deedBook?: string | null;
+  deedPage?: string | null;
+  odocBook?: string | null;
+  odocPage?: string | null;
 };
 
 export type TaxInfo = {
@@ -28,6 +34,10 @@ export type TaxInfo = {
   assessedValue: number | null;
   taxableValue: number | null;
   taxes: number | null;
+  /** Knox APPRAISED_LAND. Absent on counties that do not publish the split. */
+  appraisedLand?: number | null;
+  /** Knox APPRAISED_BLDG. */
+  appraisedBuilding?: number | null;
 };
 
 export type IncomeInfo = {
@@ -412,6 +422,12 @@ export type ParcelProperties = {
   /** Honest per-county gaps (no zoning, etc.). */
   dataGaps?: string[];
   source: string;
+  /** City of Knoxville, Town of Farragut, or unincorporated Knox County when resolved. */
+  municipality?: string | null;
+  /** KGIS machine key. Human-facing id stays on parcelId. */
+  baseParcelId?: string | null;
+  pbaid?: string | null;
+  recordedAcreage?: number | null;
 };
 
 export type BBox = [west: number, south: number, east: number, north: number];

@@ -195,7 +195,7 @@ Urban status chips read **Eligible — not designated**. The rural chip stays **
 
 ## Other metros
 
-**Other MSAs (15)** in the market menu opens 15 smaller MSAs: Vero Beach, Melbourne, Jacksonville, Pensacola, Birmingham, Mobile, Huntsville, Savannah, Columbia, Greenville, Chattanooga, Knoxville, Memphis, Winston-Salem, and Wilmington. They are visually secondary to the seven. Each one has rural and urban eligible tracts from `data/oz2-other-msas-eligible.csv` (1,386 rows, 1,341 unique GEOIDs; 491 rural and 895 urban). County rings are in `data/oz2-other-msas-counties.md`. Markets other than Jacksonville load 5–150 acre parcel tiles when that extract exists (`docs/market-parcels.md`). Jacksonville stays a tract overlay until those tiles are seeded.
+**Other MSAs (15)** in the market menu opens 15 smaller MSAs: Vero Beach, Melbourne, Jacksonville, Pensacola, Birmingham, Mobile, Huntsville, Savannah, Columbia, Greenville, Chattanooga, Knoxville, Memphis, Winston-Salem, and Wilmington. They are visually secondary to the seven. Each one has rural and urban eligible tracts from `data/oz2-other-msas-eligible.csv` (1,386 rows, 1,341 unique GEOIDs; 491 rural and 895 urban). County rings are in `data/oz2-other-msas-counties.md`. Markets other than Jacksonville load 5–150 acre parcel tiles when that extract exists (`docs/market-parcels.md`). Jacksonville stays a tract overlay until those tiles are seeded. Knox County is not an IMPACT county: KGIS anonymous parcel query is an ingestion blocker, and city/county zoning, unincorporated future land use, and Farragut zoning are ready to join (`docs/knox-parcels.md`).
 
 | Market | Total | Rural | Urban |
 | --- | ---: | ---: | ---: |

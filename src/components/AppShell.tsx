@@ -36,6 +36,7 @@ import {
   viewBounds,
   viewIncludesSouthCarolina,
 } from "@/lib/markets";
+import { KNOX_PARCEL_BLOCKER } from "@/lib/knox";
 import { showMarketParcels, type MarketParcelIndex } from "@/lib/marketParcels";
 import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcels";
 import { rankSites } from "@/lib/score";
@@ -739,9 +740,14 @@ export function AppShell({
           orangePilot={orangePilot}
           orlandoParcels={shedParcelsOn}
           parcelCoverageNote={
-            marketCoverage
-              ? `${marketCoverage.parcelCount.toLocaleString()} parcels in the 5–150 acre band · ${marketCoverage.completeCountyCount} complete counties · ${marketCoverage.sampleCountyCount} sample · ${marketCoverage.gapCountyCount} not pulled`
-              : null
+            [
+              marketCoverage
+                ? `${marketCoverage.parcelCount.toLocaleString()} parcels in the 5–150 acre band · ${marketCoverage.completeCountyCount} complete counties · ${marketCoverage.sampleCountyCount} sample · ${marketCoverage.gapCountyCount} not pulled`
+                : null,
+              market === "Knoxville" || (county === "Knox" && countyState === "Tennessee") ? KNOX_PARCEL_BLOCKER : null,
+            ]
+              .filter(Boolean)
+              .join(" ") || null
           }
           market={market}
           tractCount={classRowsShown.length}

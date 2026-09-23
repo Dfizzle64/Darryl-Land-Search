@@ -1,3 +1,5 @@
+import { KNOX_FIPS, knoxAppraiserUrl } from "./knox";
+
 const ENTITY_RE = /\b(LLC|L\.L\.C|INC|INCORPORATED|LP|L\.P|LLP|CORP|CORPORATION|LTD|TRUST|HOLDINGS|PARTNERS|COMPANY|CO)\b/i;
 
 export function isEntityOwner(name: string | null | undefined): boolean {
@@ -35,6 +37,12 @@ export function parcelAppraiserUrl(options: {
   appraiserUrl?: string | null;
 }): { href: string; label: string } {
   const fips = options.countyFips ?? null;
+  if (fips === KNOX_FIPS) {
+    return {
+      href: options.appraiserUrl || knoxAppraiserUrl(options.parcelId),
+      label: "Open Knox County Property Assessor record",
+    };
+  }
   if (fips === "12095" || (!fips && !options.appraiserUrl)) {
     return {
       href: ocpaParcelUrl(options.parcelId),

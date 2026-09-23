@@ -3,6 +3,7 @@
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { displayStatusChip, formatCountyLabel, showsGovernorFiledSoftCopy } from "@/lib/markets";
 import { formatTractCounty } from "@/lib/tractCounty";
+import { KNOX_PARCEL_BLOCKER } from "@/lib/knox";
 import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME } from "@/lib/orlandoParcels";
 import { MF_PRIORITY_DISCLAIMER, NOM_WATCH_CAVEAT, tractPlaceLabel } from "@/lib/scMfPriority";
 import { SC_GOVERNOR_FILED_STATUS, SHED_CAVEAT, type EligibleTractRow } from "@/lib/types";
@@ -172,7 +173,9 @@ export function TractDrawer({ tract, statusHelp = null, onClose, layout = "page"
           ? ` ${tract.county} County includes public parcels from 5.0 through 150.0 acres. Parcels under 5 or over 150 are excluded. Zoom in if the view says it is showing a spread of a larger set.`
           : tract.state === "Florida" && ORLANDO_FIPS_BY_NAME[tract.county]
             ? ` ${tract.county} County still uses a thinner public-GIS sample in this build, not every parcel of 5 acres and up.`
-            : " This county has no parcel extract in the app — the map shows the tract polygon and a pin."}
+            : tract.state === "Tennessee" && tract.county === "Knox"
+              ? ` ${KNOX_PARCEL_BLOCKER}`
+              : " This county has no parcel extract in the app — the map shows the tract polygon and a pin."}
       </p>
     </aside>
   );

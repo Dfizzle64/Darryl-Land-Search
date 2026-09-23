@@ -26,11 +26,21 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb and DeKalb county services | Cobb complete on `ACRES`. DeKalb is a complete 5–150 acre extract from Tax_Parcels_Assessment_View layer 2 (`ACREAGE`). City zoning and future land use are joined where a public layer exists. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when a public layer supports it. DeKalb municipalities are first-class: Decatur (Georgia, not Illinois), Brookhaven, Dunwoody, Doraville, Tucker, and Stonecrest supply zoning and future land use. Chamblee is future land use only. Atlanta's citywide layers are joined only inside DeKalb's Atlanta boundary. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake stay blank. County Zoning_District and LandUse fill unincorporated DeKalb only. Those codes are not scored as Orange County multifamily districts. There is no public DeKalb sale table. Prefer **All parcels** in these markets.
+
+### DeKalb County, Georgia
+
+Parcels come from `Tax_Parcels_Assessment_View` FeatureServer layer 2 (about 246,000 countywide; the 5.0–150.0 acre band is `ACREAGE`). Owner, mailing address, site address, `TOTAPR1` (appraised), and `CNTASSDVAL` (assessed) are on that roll. `CVTTXDSCRP` is the tax district description, not a sale and not future land use. The hosted `Tax_Parcels` layer has no acre field and is not the source.
+
+No sale price, sale date, or qualified flag is published on that service. Delinquent-tax layers are not sales.
+
+City layers are extent-checked in WGS84. A layer centered on Decatur, Illinois, or on DeKalb County in Alabama, Illinois, Indiana, or Tennessee, is skipped. Decatur, Georgia is `decatur_admin` on ArcGIS Online.
+
+OZ 2.0 tracts that are eligible for nomination are not designated QOZs. This extract does not copy eligibility onto `opportunityZone`.
 
 ## Coverage
 
@@ -42,14 +52,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 8,149 | 1 | 1 | 33 |
+| Atlanta | primary | 8,181 | 2 | 0 | 33 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -79,7 +89,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Cobb | Georgia | 13067 | complete-gte-5ac | 4,780 | ga-cobb-parcels |
 | Coweta | Georgia | 13077 | gap | 0 | unavailable |
 | Dawson | Georgia | 13085 | gap | 0 | unavailable |
-| DeKalb | Georgia | 13089 | sample | 3,369 | ga-dekalb-tax-parcels |
+| DeKalb | Georgia | 13089 | complete-gte-5ac | 3,401 | ga-dekalb-assessment-view-2 |
 | Douglas | Georgia | 13097 | gap | 0 | unavailable |
 | Fayette | Georgia | 13113 | gap | 0 | unavailable |
 | Forsyth | Georgia | 13117 | gap | 0 | unavailable |
@@ -212,7 +222,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 

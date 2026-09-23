@@ -19,8 +19,7 @@ export function findFluCategory(flu: FluInfo | null | undefined, config: FluConf
     const matches = config.categories.filter((category) => normalizeCode(category.code) === code);
     if (matches.length === 0) continue;
     if (jurisdiction) {
-      const scoped = matches.find((category) => category.jurisdiction === jurisdiction);
-      if (scoped) return scoped;
+      return matches.find((category) => category.jurisdiction === jurisdiction) ?? null;
     }
     return matches[0] ?? null;
   }

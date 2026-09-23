@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:41:32Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -1920,10 +1920,10 @@
     },
     "Columbia": {
       "tier": "other",
-      "parcelCount": 0,
-      "completeCountyCount": 0,
-      "sampleCountyCount": 0,
-      "gapCountyCount": 10,
+      "parcelCount": 14613,
+      "completeCountyCount": 1,
+      "sampleCountyCount": 1,
+      "gapCountyCount": 8,
       "path": "data/fixtures/market-parcels/markets/columbia/meta.json",
       "counties": [
         {
@@ -1978,12 +1978,13 @@
           "name": "Lexington",
           "state": "South Carolina",
           "fips": "45063",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 13975,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Municipal zoning is joined from public layers: West Columbia and Cayce (spatial, Lexington PlanZoning), Chapin (TMS), and City of Columbia ZoningInfo where CityLimit is Y (TMS). County PlanZoning NameAbbr fills parcels that still have no code. The parcel Zoning attribute is often blank inside municipalities.",
+            "Town of Lexington, Irmo, Batesburg-Leesville, Springdale, South Congaree, Swansea, and Gaston have no verified public municipal zoning service. Countywide future land use is not published; City of Columbia FLU is joined only when the centroid falls in that city layer. Last sale is one sale on the parcel (Valid is the source code, including NOT VALID)."
           ]
         },
         {
@@ -2014,12 +2015,13 @@
           "name": "Richland",
           "state": "South Carolina",
           "fips": "45079",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 638,
+          "coverage": "sample",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "City of Columbia only (CityLimit=Y on the Richland side of LandRecords). This is not a Richland County-wide parcel roll. Richland County has no public ArcGIS FeatureServer or MapServer for countywide parcels; GeoServer WFS is disabled and county GIS is sold under license. This pull does not use richlandmaps.com PHP parcel endpoints.",
+            "City LandRecords has no sale or tax fields. Acreage is Shape_Area in South Carolina State Plane feet divided by 43560, limited to 5.0\u2013150.0. Forest Acres, Blythewood, Arcadia Lakes, Eastover, and Irmo have no verified public municipal parcel service. Lexington-side city parcels stay on the Lexington County extract, which carries CAMA."
           ]
         },
         {

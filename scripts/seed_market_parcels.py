@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import threading
 import time
 import urllib.parse
@@ -376,6 +377,49 @@ def sale_date(year: Any, month: Any) -> str | None:
     return f"{int(y):04d}-{month_num:02d}-01"
 
 
+def parse_recorded_date(value: Any) -> str | None:
+    """ArcGIS epoch millis, /Date(ms)/, ISO dates, or m/d/yyyy."""
+    if value is None or value == "":
+        return None
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return None
+        wrapped = re.search(r"/Date\((-?\d+)\)/", text)
+        if wrapped:
+            value = int(wrapped.group(1))
+        elif re.fullmatch(r"-?\d+", text):
+            value = int(text)
+        elif len(text) >= 10 and text[4] == "-" and text[7] == "-":
+            return text[:10]
+        else:
+            parts = re.fullmatch(r"(\d{1,2})/(\d{1,2})/(\d{4})", text)
+            if not parts:
+                return None
+            month, day, year = int(parts.group(1)), int(parts.group(2)), int(parts.group(3))
+            if year < 1900 or year > 2100 or not 1 <= month <= 12 or not 1 <= day <= 31:
+                return None
+            return f"{year:04d}-{month:02d}-{day:02d}"
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    ms = float(value)
+    if abs(ms) > 10_000_000_000:
+        ms /= 1000.0
+    try:
+        stamp = time.gmtime(ms)
+    except (OverflowError, OSError, ValueError):
+        return None
+    if stamp.tm_year < 1900 or stamp.tm_year > 2100:
+        return None
+    return f"{stamp.tm_year:04d}-{stamp.tm_mon:02d}-{stamp.tm_mday:02d}"
+
+
+def compose_parts(attrs: dict, fields: list[str]) -> str | None:
+    parts = [clean(attrs.get(field)) for field in fields]
+    kept = [part for part in parts if part]
+    return " ".join(kept) if kept else None
+
+
 def normalize_rows(
     raw: list[dict],
     county: dict,
@@ -418,6 +462,26 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        if spec.get("situsFields"):
+            situs = compose_parts(attrs, spec["situsFields"])
+            extra_situs = clean(attrs.get(spec["situs2Field"])) if spec.get("situs2Field") else None
+            if extra_situs:
+                situs = f"{situs}, {extra_situs}" if situs else extra_situs
+        else:
+            situs = clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None
+        if spec.get("saleDateField"):
+            recorded = parse_recorded_date(attrs.get(spec["saleDateField"]))
+            qualified = clean(attrs.get(spec["saleQualifiedField"])) if spec.get("saleQualifiedField") else None
+        elif spec.get("saleYearField"):
+            recorded = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
+            qualified = clean(attrs.get("QUAL_CD1"))
+        else:
+            recorded = None
+            qualified = None
+        mail2 = clean(attrs.get(spec["mail2Field"])) if spec.get("mail2Field") else None
+        mail3 = clean(attrs.get(spec["mail3Field"])) if spec.get("mail3Field") else None
+        if mail3:
+            mail2 = f"{mail2}; {mail3}" if mail2 else mail3
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -429,19 +493,19 @@ def normalize_rows(
             center=center,  # type: ignore[arg-type]
             source=spec["source"],
             owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
-            situs=clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None,
+            situs=situs,
             city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
             zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
-            sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
+            sale_date=recorded,
+            sale_qualified=qualified,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
             taxable=num(attrs.get(spec["taxableField"])) if spec.get("taxableField") else None,
             mail1=clean(attrs.get(spec["mail1Field"])) if spec.get("mail1Field") else None,
-            mail2=clean(attrs.get(spec["mail2Field"])) if spec.get("mail2Field") else None,
+            mail2=mail2,
             mail_city=clean(attrs.get(spec["mailCityField"])) if spec.get("mailCityField") else None,
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
@@ -655,6 +719,111 @@ def county_override(fips: str) -> dict | None:
             "coverage": "sample",
             "gaps": [
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
+            ],
+        }
+    if fips == "45063":  # Lexington County, SC — Columbia MSA
+        return {
+            "kind": "arcgis",
+            "url": "https://maps.lex-co.com/agstserver/rest/services/Property/MapServer/4/query",
+            "where": "Acres>=5 AND Acres<=150",
+            "outFields": [
+                "TMS",
+                "TMS_No_Dash",
+                "Owner",
+                "MailAddr",
+                "MailAddr2",
+                "MailAddr3",
+                "MailAddr_City",
+                "MailAddr_State",
+                "MailAddr_Zip",
+                "PropAddr_Num",
+                "PropAddr_Str",
+                "PropAddr_Suf",
+                "PropAddr2",
+                "PropAddr_City",
+                "PropAddr_Zip",
+                "Acres",
+                "Zoning",
+                "PropTypeCode",
+                "SaleDate",
+                "SalePrice",
+                "Valid",
+                "MktTotal",
+                "AsmtTotal",
+                "TaxableTotal",
+            ],
+            "idField": "TMS",
+            "idFallbacks": ["TMS_No_Dash"],
+            "acresField": "Acres",
+            "ownerField": "Owner",
+            "situsFields": ["PropAddr_Num", "PropAddr_Str", "PropAddr_Suf"],
+            "situs2Field": "PropAddr2",
+            "cityField": "PropAddr_City",
+            "zipField": "PropAddr_Zip",
+            "zoningField": "Zoning",
+            "dorField": "PropTypeCode",
+            "salePriceField": "SalePrice",
+            "saleDateField": "SaleDate",
+            "saleQualifiedField": "Valid",
+            "marketValueField": "MktTotal",
+            "assessedField": "AsmtTotal",
+            "taxableField": "TaxableTotal",
+            "mail1Field": "MailAddr",
+            "mail2Field": "MailAddr2",
+            "mail3Field": "MailAddr3",
+            "mailCityField": "MailAddr_City",
+            "mailStateField": "MailAddr_State",
+            "mailZipField": "MailAddr_Zip",
+            "source": "sc-lexington-property-4",
+            "coverage": "complete-gte-5ac",
+            "enrich": "lexington",
+            "pinGaps": True,
+            "gaps": [
+                "Municipal zoning is joined from public layers: West Columbia and Cayce (spatial, Lexington PlanZoning), Chapin (TMS), and City of Columbia ZoningInfo where CityLimit is Y (TMS). County PlanZoning NameAbbr fills parcels that still have no code. The parcel Zoning attribute is often blank inside municipalities.",
+                "Town of Lexington, Irmo, Batesburg-Leesville, Springdale, South Congaree, Swansea, and Gaston have no verified public municipal zoning service. Countywide future land use is not published; City of Columbia FLU is joined only when the centroid falls in that city layer. Last sale is one sale on the parcel (Valid is the source code, including NOT VALID).",
+            ],
+        }
+    if fips == "45079":  # Richland County — city footprint only; countywide layer is a gap
+        return {
+            "kind": "arcgis",
+            "url": "https://gis.columbiasc.gov/cola/rest/services/InnercityMap/LandRecords/MapServer/2/query",
+            "where": "CityLimit='Y' AND County='Richland' AND Shape_Area>=217800 AND Shape_Area<=6534000",
+            "outFields": [
+                "TMS",
+                "RCTMSJoin",
+                "Owner",
+                "Address1",
+                "Address2",
+                "City",
+                "ST",
+                "Zip",
+                "Loc",
+                "ZoningDistrict",
+                "Address3",
+                "County",
+                "CityLimit",
+                "Shape_Area",
+            ],
+            "idField": "TMS",
+            "idFallbacks": ["RCTMSJoin"],
+            "acresField": "Shape_Area",
+            "acresScale": 43560,
+            "ownerField": "Owner",
+            "situsField": "Loc",
+            "zoningField": "ZoningDistrict",
+            "dorField": "Address3",
+            "mail1Field": "Address1",
+            "mail2Field": "Address2",
+            "mailCityField": "City",
+            "mailStateField": "ST",
+            "mailZipField": "Zip",
+            "source": "sc-columbia-city-landrecords",
+            "coverage": "sample",
+            "enrich": "columbia-city",
+            "pinGaps": True,
+            "gaps": [
+                "City of Columbia only (CityLimit=Y on the Richland side of LandRecords). This is not a Richland County-wide parcel roll. Richland County has no public ArcGIS FeatureServer or MapServer for countywide parcels; GeoServer WFS is disabled and county GIS is sold under license. This pull does not use richlandmaps.com PHP parcel endpoints.",
+                "City LandRecords has no sale or tax fields. Acreage is Shape_Area in South Carolina State Plane feet divided by 43560, limited to 5.0–150.0. Forest Acres, Blythewood, Arcadia Lakes, Eastover, and Irmo have no verified public municipal parcel service. Lexington-side city parcels stay on the Lexington County extract, which carries CAMA.",
             ],
         }
     return None
@@ -926,10 +1095,10 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
-| South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
+| South Carolina | Dorchester public parcels; Greenville city GIS; Lexington County Property/4; City of Columbia LandRecords | Dorchester and Lexington are complete 5–150 acre extracts. Greenville is a city-hosted sample. Columbia city (`CityLimit=Y`, Richland side) is a city-only sample. Richland County has no public FeatureServer (WFS disabled; GIS sold under license). Charleston County GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) and, for Lexington, from public municipal layers (West Columbia, Cayce, Chapin, and City of Columbia where `CityLimit` is Y). City of Columbia parcels keep `ZoningDistrict` from the city layer. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -947,6 +1116,8 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
             for feature in features:
                 feature["properties"]["marketIds"] = markets
             path, lookup, tiles = write_tiles(county, features)
+            gaps = list(spec.get("gaps") or [])
+            gaps.extend(cached.get("enrichNotes") or [])
             return county_row(
                 county,
                 markets,
@@ -957,7 +1128,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=gaps,
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
@@ -1013,19 +1184,35 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     ids = fetch_object_ids(spec["url"], spec["where"])
     raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
     features, dropped = normalize_rows(raw, county, markets, spec)
+    enrich_notes: list[str] = []
+    if spec.get("enrich") and features:
+        from columbia_muni import enrich_market_parcels
+
+        print(f"  joining municipal overlays ({spec['enrich']})", flush=True)
+        try:
+            enrich_notes = enrich_market_parcels(spec["enrich"], features)
+        except Exception as exc:  # noqa: BLE001
+            enrich_notes = [f"Municipal overlay join failed: {exc}"]
+        for note in enrich_notes:
+            print(f"  {note}", flush=True)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "enrichNotes": enrich_notes, "features": features},
+            separators=(",", ":"),
+        )
     )
     coverage = spec["coverage"]
     gaps = list(spec.get("gaps") or [])
+    gaps.extend(enrich_notes)
     if expected and len(features) < expected and not spec.get("computeAcres"):
-        gaps.insert(
-            0,
-            f"{expected} source rows collapsed to {len(features)} parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        )
+        collapse = f"{expected} source rows collapsed to {len(features)} parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county."
+        if spec.get("pinGaps"):
+            gaps.append(collapse)
+        else:
+            gaps.insert(0, collapse)
     if not features:
         coverage = "gap"
         gaps.insert(0, f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks.")

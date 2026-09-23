@@ -102,6 +102,20 @@ export function showMarketParcels(
   return entry.counties.some((item) => item.name === county && item.state === state);
 }
 
+const SCOPE_GAP = /city of columbia only|richland county has no public|municipal zoning is joined/i;
+
+/** Coverage sentences that should stay visible on the map for this market. */
+export function marketParcelScopeNotes(entry: MarketParcelMarketSummary | null | undefined): string[] {
+  if (!entry) return [];
+  const notes: string[] = [];
+  for (const county of entry.counties) {
+    for (const gap of county.gaps ?? []) {
+      if (SCOPE_GAP.test(gap) && !notes.includes(gap)) notes.push(gap);
+    }
+  }
+  return notes;
+}
+
 export function marketParcelCountyFips(
   entry: MarketParcelMarketSummary | null | undefined,
   county: string | null,

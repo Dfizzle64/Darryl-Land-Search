@@ -36,7 +36,7 @@ import {
   viewBounds,
   viewIncludesSouthCarolina,
 } from "@/lib/markets";
-import { showMarketParcels, type MarketParcelIndex } from "@/lib/marketParcels";
+import { marketParcelScopeNotes, showMarketParcels, type MarketParcelIndex } from "@/lib/marketParcels";
 import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcels";
 import { rankSites } from "@/lib/score";
 import { filterTractRowsByIncome, incomeByGeoidFromFeatures } from "@/lib/tractIncome";
@@ -303,6 +303,12 @@ export function AppShell({
     () => fullAcreageCounties.reduce((sum, item) => sum + item.featureCount, 0),
     [fullAcreageCounties],
   );
+  const sampleAcreageCounties = useMemo(() => {
+    if (market === "Orlando") return [];
+    return (marketParcelIndex.markets[market]?.counties ?? []).filter(
+      (item) => item.coverage === "sample" && item.featureCount > 0,
+    );
+  }, [market, marketParcelIndex.markets]);
   const matchedIds = useMemo(() => new Set(matched.map((feature) => feature.properties.id)), [matched]);
   const selected = activeParcels.features.find((feature) => feature.properties.id === selectedId) ?? null;
   const selectedTract = visibleTracts.find((row) => row.geoid === selectedTractGeoid) ?? null;
@@ -575,6 +581,7 @@ export function AppShell({
   }, [classRowsShown, market, marketParcelIndex.markets]);
 
   const marketCoverage = market === "Orlando" ? null : marketParcelIndex.markets[market];
+  const scopeNotes = marketParcelScopeNotes(marketCoverage);
   const headerPlace =
     shedParcelsOn && county
       ? `${county} County, ${countyState ?? ""}`
@@ -664,6 +671,14 @@ export function AppShell({
                   5–150 ac fixtures: {fullAcreageParcelCount.toLocaleString()} in{" "}
                   {fullAcreageCounties.map((item) => item.name).join(", ")}
                 </span>
+                {sampleAcreageCounties.length ? (
+                  <span className="block">
+                    City-only or sample:{" "}
+                    {sampleAcreageCounties
+                      .map((item) => `${item.name} (${item.featureCount.toLocaleString()})`)
+                      .join(", ")}
+                  </span>
+                ) : null}
               </span>
               ) : (
               <span className="block text-[11px]">
@@ -705,6 +720,11 @@ export function AppShell({
         </div>
       </header>
       <p className="border-b border-white/10 px-4 py-2 text-[11px] leading-relaxed text-ink-500 md:px-5">{SHED_CAVEAT}</p>
+      {scopeNotes.length ? (
+        <p className="border-b border-white/10 px-4 py-2 text-[11px] leading-relaxed text-ink-300 md:px-5">
+          {scopeNotes.join(" ")}
+        </p>
+      ) : null}
       {statusHelp ? (
         <SouthCarolinaStatusNote
           note={statusHelp}
@@ -740,7 +760,10 @@ export function AppShell({
           orlandoParcels={shedParcelsOn}
           parcelCoverageNote={
             marketCoverage
-              ? `${marketCoverage.parcelCount.toLocaleString()} parcels in the 5–150 acre band · ${marketCoverage.completeCountyCount} complete counties · ${marketCoverage.sampleCountyCount} sample · ${marketCoverage.gapCountyCount} not pulled`
+              ? [
+                  `${marketCoverage.parcelCount.toLocaleString()} parcels in the 5–150 acre band · ${marketCoverage.completeCountyCount} complete counties · ${marketCoverage.sampleCountyCount} sample · ${marketCoverage.gapCountyCount} not pulled`,
+                  ...scopeNotes,
+                ].join(" ")
               : null
           }
           market={market}

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:41:32Z",
   "market": "Columbia",
   "tier": "other",
-  "parcelCount": 0,
+  "parcelCount": 14613,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -96,20 +96,23 @@
       "name": "Lexington",
       "fips": "45063",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 13975,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-lexington-property-4",
+      "queryUrl": "https://maps.lex-co.com/agstserver/rest/services/Property/MapServer/4/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Municipal zoning is joined from public layers: West Columbia and Cayce (spatial, Lexington PlanZoning), Chapin (TMS), and City of Columbia ZoningInfo where CityLimit is Y (TMS). County PlanZoning NameAbbr fills parcels that still have no code. The parcel Zoning attribute is often blank inside municipalities.",
+        "Town of Lexington, Irmo, Batesburg-Leesville, Springdale, South Congaree, Swansea, and Gaston have no verified public municipal zoning service. Countywide future land use is not published; City of Columbia FLU is joined only when the centroid falls in that city layer. Last sale is one sale on the parcel (Valid is the source code, including NOT VALID).",
+        "Zoning join counts \u2014 Chapin 42, West Columbia 123, Cayce 114, City of Columbia 26, parcel attribute 8559, county PlanZoning 5109, still blank 2. City of Columbia FLU centroids 28.",
+        "13998 source rows collapsed to 13975 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45063/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45063/lookup.json",
+      "tileCount": 10,
+      "sourceCount": 13998
     },
     {
       "name": "Newberry",
@@ -153,20 +156,23 @@
       "name": "Richland",
       "fips": "45079",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 638,
+      "coverage": "sample",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-columbia-city-landrecords",
+      "queryUrl": "https://gis.columbiasc.gov/cola/rest/services/InnercityMap/LandRecords/MapServer/2/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "City of Columbia only (CityLimit=Y on the Richland side of LandRecords). This is not a Richland County-wide parcel roll. Richland County has no public ArcGIS FeatureServer or MapServer for countywide parcels; GeoServer WFS is disabled and county GIS is sold under license. This pull does not use richlandmaps.com PHP parcel endpoints.",
+        "City LandRecords has no sale or tax fields. Acreage is Shape_Area in South Carolina State Plane feet divided by 43560, limited to 5.0\u2013150.0. Forest Acres, Blythewood, Arcadia Lakes, Eastover, and Irmo have no verified public municipal parcel service. Lexington-side city parcels stay on the Lexington County extract, which carries CAMA.",
+        "City of Columbia FLU centroids 636. Zoning stays the parcel ZoningDistrict.",
+        "641 source rows collapsed to 638 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45079/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45079/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 641
     },
     {
       "name": "Saluda",

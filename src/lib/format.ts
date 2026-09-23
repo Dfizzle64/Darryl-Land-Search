@@ -27,7 +27,38 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "45063": "https://maps.lex-co.com/OneMap/",
+  "45079": "https://property.spatialest.com/sc/richland#/",
 };
+
+const APPRAISER_COUNTY_LABELS: Record<string, string> = {
+  "12009": "Brevard",
+  "12069": "Lake",
+  "12083": "Marion",
+  "12097": "Osceola",
+  "12105": "Polk",
+  "12117": "Seminole",
+  "12119": "Sumter",
+  "12127": "Volusia",
+  "45063": "Lexington County",
+  "45079": "Richland County",
+};
+
+export function formatParcelPlace(properties: {
+  situsCity?: string | null;
+  situsZip?: string | null;
+  countyName?: string | null;
+  state?: string | null;
+  jurisdictionCode?: string | null;
+}): string {
+  const stateLabel = properties.state && properties.state !== "Florida" ? properties.state : "FL";
+  const countyLine = properties.countyName ? `${properties.countyName} County, ${stateLabel}` : stateLabel;
+  const cityLine = [properties.situsCity, properties.situsZip].filter(Boolean).join(" ");
+  const base = cityLine || countyLine;
+  const jurisdiction = properties.jurisdictionCode?.trim() || "";
+  if (jurisdiction && jurisdiction !== base) return `${base} · ${jurisdiction}`;
+  return base;
+}
 
 export function parcelAppraiserUrl(options: {
   parcelId: string;
@@ -42,27 +73,11 @@ export function parcelAppraiserUrl(options: {
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);
-  const countyLabel =
-    fips === "12009"
-      ? "Brevard"
-      : fips === "12069"
-        ? "Lake"
-        : fips === "12083"
-          ? "Marion"
-          : fips === "12097"
-            ? "Osceola"
-            : fips === "12105"
-              ? "Polk"
-              : fips === "12117"
-                ? "Seminole"
-                : fips === "12119"
-                  ? "Sumter"
-                  : fips === "12127"
-                    ? "Volusia"
-                    : "county";
+  const countyLabel = (fips && APPRAISER_COUNTY_LABELS[fips]) || "county";
+  const searchNoun = fips?.startsWith("45") ? "property search" : "Property Appraiser search";
   return {
     href,
-    label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,
+    label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} ${searchNoun}`,
   };
 }
 

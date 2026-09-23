@@ -27,10 +27,10 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
-| South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
+| South Carolina | Dorchester public parcels; Greenville city GIS; Lexington County Property/4; City of Columbia LandRecords | Dorchester and Lexington are complete 5–150 acre extracts. Greenville is a city-hosted sample. Columbia city (`CityLimit=Y`, Richland side) is a city-only sample. Richland County has no public FeatureServer (WFS disabled; GIS sold under license). Charleston County GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) and, for Lexington, from public municipal layers (West Columbia, Cayce, Chapin, and City of Columbia where `CityLimit` is Y). City of Columbia parcels keep `ZoningDistrict` from the city layer. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 
@@ -49,13 +49,13 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
 | Huntsville | other | 0 | 0 | 0 | 7 |
 | Savannah | other | 0 | 0 | 0 | 8 |
-| Columbia | other | 0 | 0 | 0 | 10 |
+| Columbia | other | 14,613 | 1 | 1 | 8 |
 | Greenville | other | 1,570 | 0 | 1 | 7 |
 | Chattanooga | other | 10,537 | 2 | 0 | 8 |
 | Knoxville | other | 38,433 | 7 | 0 | 6 |
@@ -212,7 +212,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 
@@ -284,10 +284,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Fairfield | South Carolina | 45039 | gap | 0 | unavailable |
 | Kershaw | South Carolina | 45055 | gap | 0 | unavailable |
 | Lee | South Carolina | 45061 | gap | 0 | unavailable |
-| Lexington | South Carolina | 45063 | gap | 0 | unavailable |
+| Lexington | South Carolina | 45063 | complete-gte-5ac | 13,975 | sc-lexington-property-4 |
 | Newberry | South Carolina | 45071 | gap | 0 | unavailable |
 | Orangeburg | South Carolina | 45075 | gap | 0 | unavailable |
-| Richland | South Carolina | 45079 | gap | 0 | unavailable |
+| Richland | South Carolina | 45079 | sample | 638 | sc-columbia-city-landrecords |
 | Saluda | South Carolina | 45081 | gap | 0 | unavailable |
 | Sumter | South Carolina | 45085 | gap | 0 | unavailable |
 

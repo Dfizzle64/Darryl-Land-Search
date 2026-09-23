@@ -217,6 +217,14 @@ Urban status chips read **Eligible — not designated**. The rural chip stays **
 
 The status chip on this pack is **Eligible — not designated** for both rural and urban rows. Rural is still drawn orange and urban blue. Columbia, Greenville, and Savannah’s South Carolina fringe keep the governor-filed line where the notes say so. Alabama (Birmingham, Mobile, Huntsville, and Pensacola’s Baldwin spill) is new inventory. Memphis includes the Arkansas and Mississippi counties in the shed.
 
+### Columbia MSA parcels
+
+Lexington County (FIPS 45063) is a complete 5.0–150.0 acre extract from the public county layer [Property MapServer layer 4](https://maps.lex-co.com/agstserver/rest/services/Property/MapServer/4) (`Acres`). Owner, mailing, situs, last sale, and tax values are on that layer. Municipal zoning is joined from Lexington PlanZoning for West Columbia, Cayce, and Chapin, and from City of Columbia ZoningInfo where `CityLimit` is Y. Towns without a public zoning service stay on the county layer or blank.
+
+City of Columbia parcels inside the municipal footprint are a separate city-only sample, not a Richland County roll. The source is [LandRecords layer 2](https://gis.columbiasc.gov/cola/rest/services/InnercityMap/LandRecords/MapServer/2) with `CityLimit='Y'` and `County='Richland'`. Zoning is the parcel `ZoningDistrict`. Acreage is GIS area (`Shape_Area` / 43560) because the city layer has no acreage, sale, or tax fields. Lexington-side city parcels stay on the Lexington extract, which has the CAMA attributes. The map labels these Richland-side polygons as City of Columbia.
+
+Richland County has no public countywide parcel FeatureServer. `richlandmaps.com/arcgis/rest/services` is not published. The county GeoServer WFS is disabled (`Service WFS is disabled`), and county GIS is sold under license. This app does not use the dataviewer PHP parcel endpoints. Unincorporated Richland, and Forest Acres, Blythewood, Arcadia Lakes, Eastover, and Irmo, stay a coverage gap. The urban core the city publishes is the City of Columbia sample above.
+
 **90-minute sheds are approximate county rings, not drive-time isochrones.** A county is included when its main corridor is commonly within about 90 minutes off-peak. Outer-edge counties are flagged in the tract notes and in the county menu. County membership, exclusions, and sources for the seven are in `data/oz2-7markets-90min-counties.md`. The smaller MSAs are in `data/oz2-other-msas-counties.md`.
 
 Every tract in the rural pack is **Eligible (rural) — not designated**. The chip uses that phrase. Florida, Georgia, Tennessee, and North Carolina had no public certified 2027 QOZ lists when the table was built (Sep 21, 2026). Do not read the orange overlay as a certified Opportunity Zone. Urban and other-MSA tracts use **Eligible — not designated** and are not certified either.

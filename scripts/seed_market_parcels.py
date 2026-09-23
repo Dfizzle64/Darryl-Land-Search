@@ -23,6 +23,7 @@ import urllib.parse
 import urllib.request
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -250,6 +251,7 @@ def empty_feature(
     center: tuple[float, float],
     source: str,
     owner: str | None = None,
+    owner2: str | None = None,
     situs: str | None = None,
     city: str | None = None,
     zip_code: str | None = None,
@@ -283,7 +285,7 @@ def empty_feature(
             "situsZip": zip_code,
             "jurisdictionCode": None,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
             "zoningDistrict": None,
@@ -334,12 +336,18 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    return_geometry: bool = True,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
         "outFields": ",".join(out_fields),
-        "returnGeometry": "true",
+        "returnGeometry": "true" if return_geometry else "false",
         "outSR": "4326",
     }
     for start in range(0, total, batch):
@@ -351,12 +359,28 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(
+                        url,
+                        chunk,
+                        out_fields,
+                        batch=max(20, len(chunk) // 2),
+                        return_geometry=return_geometry,
+                    )
+                )
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(
+                        url,
+                        chunk,
+                        out_fields,
+                        batch=max(20, len(chunk) // 2),
+                        return_geometry=return_geometry,
+                    )
+                )
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -365,6 +389,18 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             print(f"    {done}/{total}", flush=True)
         time.sleep(0.05)
     return features
+
+
+def parse_us_date(value: Any) -> str | None:
+    text = clean(value)
+    if not text:
+        return None
+    for fmt in ("%m/%d/%Y", "%m/%d/%y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(text, fmt).date().isoformat()
+        except ValueError:
+            continue
+    return None
 
 
 def sale_date(year: Any, month: Any) -> str | None:
@@ -418,6 +454,18 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        if spec.get("saleYearField"):
+            sold_on = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
+            qualified = clean(attrs.get("QUAL_CD1"))
+        elif spec.get("saleDateField"):
+            sold_on = parse_us_date(attrs.get(spec["saleDateField"]))
+            qualified = clean(attrs.get(spec["saleQualifiedField"])) if spec.get("saleQualifiedField") else None
+        else:
+            sold_on = None
+            qualified = None
+        market_value = num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None
+        if market_value is not None and market_value <= 0:
+            market_value = None
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -429,15 +477,16 @@ def normalize_rows(
             center=center,  # type: ignore[arg-type]
             source=spec["source"],
             owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
+            owner2=clean(attrs.get(spec["owner2Field"])) if spec.get("owner2Field") else None,
             situs=clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None,
             city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
             zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
-            sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
-            market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
+            sale_date=sold_on,
+            sale_qualified=qualified,
+            market_value=market_value,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
             taxable=num(attrs.get(spec["taxableField"])) if spec.get("taxableField") else None,
             mail1=clean(attrs.get(spec["mail1Field"])) if spec.get("mail1Field") else None,
@@ -566,6 +615,326 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+def _point_in_ring(x: float, y: float, ring: list[list[float]]) -> bool:
+    inside = False
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = ring[i]
+        xj, yj = ring[j]
+        if ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / ((yj - yi) or 1e-12) + xi):
+            inside = not inside
+        j = i
+    return inside
+
+
+def _point_in_geo(x: float, y: float, geometry: dict) -> bool:
+    kind = geometry.get("type")
+    if kind == "Polygon":
+        rings = geometry.get("coordinates") or []
+        if not rings or not _point_in_ring(x, y, rings[0]):
+            return False
+        return not any(_point_in_ring(x, y, hole) for hole in rings[1:])
+    if kind == "MultiPolygon":
+        for poly in geometry.get("coordinates") or []:
+            if poly and _point_in_ring(x, y, poly[0]) and not any(_point_in_ring(x, y, hole) for hole in poly[1:]):
+                return True
+    return False
+
+
+def _feature_bbox(geometry: dict) -> tuple[float, float, float, float] | None:
+    xs: list[float] = []
+    ys: list[float] = []
+
+    def walk(node: Any) -> None:
+        if isinstance(node, (int, float)):
+            return
+        if node and isinstance(node[0], (int, float)):
+            xs.append(float(node[0]))
+            ys.append(float(node[1]))
+            return
+        for item in node:
+            walk(item)
+
+    walk(geometry.get("coordinates") or [])
+    if not xs:
+        return None
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+class OverlayIndex:
+    """Centroid hits against a modest zoning or tract layer."""
+
+    def __init__(self, cell: float = 0.03) -> None:
+        self.cell = cell
+        self.buckets: dict[tuple[int, int], list[dict]] = defaultdict(list)
+        self.broad: list[dict] = []
+
+    def add(self, feature: dict) -> None:
+        bbox = _feature_bbox(feature.get("geometry") or {})
+        if not bbox:
+            return
+        west, south, east, north = bbox
+        feature["properties"]["_bbox"] = bbox
+        ix0, ix1 = math.floor(west / self.cell), math.floor(east / self.cell)
+        iy0, iy1 = math.floor(south / self.cell), math.floor(north / self.cell)
+        if (ix1 - ix0 + 1) * (iy1 - iy0 + 1) > 400:
+            self.broad.append(feature)
+            return
+        for ix in range(ix0, ix1 + 1):
+            for iy in range(iy0, iy1 + 1):
+                self.buckets[(ix, iy)].append(feature)
+
+    def hits(self, x: float, y: float) -> list[dict]:
+        ix = math.floor(x / self.cell)
+        iy = math.floor(y / self.cell)
+        found: list[dict] = []
+        seen: set[int] = set()
+        for feature in [*self.buckets.get((ix, iy), []), *self.broad]:
+            marker = id(feature)
+            if marker in seen:
+                continue
+            seen.add(marker)
+            if _point_in_geo(x, y, feature.get("geometry") or {}):
+                found.append(feature)
+        return found
+
+
+def _smallest_hit(index: OverlayIndex, x: float, y: float) -> dict | None:
+    found = index.hits(x, y)
+    if not found:
+        return None
+    return min(found, key=lambda feature: feature["properties"].get("_area") or 1e18)
+
+
+def _bbox_overlaps(
+    a: tuple[float, float, float, float],
+    b: tuple[float, float, float, float],
+) -> bool:
+    return a[0] <= b[2] and a[2] >= b[0] and a[1] <= b[3] and a[3] >= b[1]
+
+
+def _gis_key(value: Any) -> str | None:
+    text = clean(value)
+    if not text:
+        return None
+    return "".join(text.split())
+
+
+def _overlay_polygons(url: str, where: str, fields: list[str], label: str) -> list[dict]:
+    print(f"  overlay {label}", flush=True)
+    ids = fetch_object_ids(url, where)
+    raw = fetch_by_ids(url, ids, fields, batch=80)
+    features: list[dict] = []
+    for item in raw:
+        geometry, _acres = rings_to_feature_geometry(item.get("geometry"))
+        if not geometry:
+            continue
+        attrs = item.get("attributes") or {}
+        props = {name: clean(attrs.get(name)) for name in fields}
+        bbox = _feature_bbox(geometry)
+        area = 0.0
+        if bbox:
+            area = max(0.0, (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]))
+        props["_area"] = area
+        features.append({"type": "Feature", "properties": props, "geometry": geometry})
+    print(f"    {label} polygons {len(features)}", flush=True)
+    return features
+
+
+def _attribute_map(url: str, where: str, key_field: str, value_field: str, label: str) -> dict[str, str]:
+    print(f"  attributes {label}", flush=True)
+    ids = fetch_object_ids(url, where)
+    raw = fetch_by_ids(url, ids, [key_field, value_field], batch=400, return_geometry=False)
+    table: dict[str, str] = {}
+    for item in raw:
+        attrs = item.get("attributes") or {}
+        key = _gis_key(attrs.get(key_field))
+        value = clean(attrs.get(value_field))
+        if key and value:
+            table[key] = value
+    print(f"    {label} keys {len(table)}", flush=True)
+    return table
+
+
+def _index_overlays(features: list[dict], envelope: tuple[float, float, float, float] | None = None) -> tuple[OverlayIndex, int]:
+    index = OverlayIndex()
+    kept = 0
+    for feature in features:
+        bbox = _feature_bbox(feature.get("geometry") or {})
+        if envelope and bbox and not _bbox_overlaps(bbox, envelope):
+            continue
+        index.add(feature)
+        kept += 1
+    return index, kept
+
+
+MAURY_RURAL_TRACTS = ROOT / "data" / "fixtures" / "oz2-rural-markets.geojson"
+COLUMBIA_ZONING_URL = "https://services6.arcgis.com/ubRvNDgGwwJuZMcL/arcgis/rest/services/Zoning/FeatureServer/1/query"
+COLUMBIA_FLU_URL = (
+    "https://services6.arcgis.com/ubRvNDgGwwJuZMcL/arcgis/rest/services/FLU_Classifications_2024_Dissolve/FeatureServer/1/query"
+)
+SPRING_HILL_ZONING_URL = (
+    "https://services1.arcgis.com/tF0XsRR9ptiKNVW2/arcgis/rest/services/Zoning_Spring_Hill_view/FeatureServer/2/query"
+)
+MOUNT_PLEASANT_ZONING_URL = (
+    "https://services8.arcgis.com/VZg7sW9AaQ9Lf91M/arcgis/rest/services/City_of_Mount_Pleasant_Zoning_Public_Viewer/FeatureServer/1/query"
+)
+# Published service name keeps the extra "l" in Zonel.
+MAURY_UNINC_ZONING_URL = (
+    "https://services7.arcgis.com/XUPcCUM3EN27beNY/arcgis/rest/services/MCParcelZonelLayer/FeatureServer/0/query"
+)
+
+
+def _stamp_maury_eligibility(features: list[dict]) -> int:
+    """Rural-eligible tracts only. Eligibility is not a designated QOZ."""
+    payload = json.loads(MAURY_RURAL_TRACTS.read_text())
+    tracts = []
+    for feature in payload.get("features") or []:
+        props = feature.get("properties") or {}
+        if props.get("state") != "Tennessee" or props.get("county") != "Maury":
+            continue
+        if props.get("designation") != "eligible-for-nomination":
+            continue
+        tracts.append(feature)
+    if len(tracts) != 3:
+        raise RuntimeError(f"Expected 3 Maury rural-eligible tracts, found {len(tracts)}")
+    index, _kept = _index_overlays(tracts)
+    eligible = 0
+    for feature in features:
+        props = feature["properties"]
+        # Do not copy nomination eligibility onto the designated-zone flag.
+        props["opportunityZone"] = None
+        lon, lat = props["centroid"]
+        hit = _smallest_hit(index, lon, lat)
+        if hit:
+            hp = hit["properties"]
+            props["oz2Eligibility"] = {
+                "eligible": True,
+                "rural": True,
+                "tractGeoid": hp.get("tractGeoid"),
+                "tractName": hp.get("name"),
+                "designation": "eligible-for-nomination",
+                "source": "rev-proc-2026-14",
+            }
+            eligible += 1
+        else:
+            props["oz2Eligibility"] = {
+                "eligible": False,
+                "rural": None,
+                "tractGeoid": None,
+                "tractName": None,
+                "designation": "not-eligible",
+                "source": "rev-proc-2026-14",
+            }
+        zone = props.get("opportunityZone") or {}
+        if zone.get("inOpportunityZone"):
+            raise RuntimeError("Maury eligibility was stored as a designated QOZ")
+    return eligible
+
+
+def enrich_maury(features: list[dict]) -> list[str]:
+    """Join municipal zoning and Columbia FLU. Spring Hill is Maury centroids only."""
+    if not features:
+        return []
+    lons = [feature["properties"]["centroid"][0] for feature in features]
+    lats = [feature["properties"]["centroid"][1] for feature in features]
+    pad = 0.03
+    envelope = (min(lons) - pad, min(lats) - pad, max(lons) + pad, max(lats) + pad)
+    columbia = _overlay_polygons(COLUMBIA_ZONING_URL, "1=1", ["ZONING"], "Columbia zoning")
+    flu = _overlay_polygons(COLUMBIA_FLU_URL, "1=1", ["FLUM2024", "FLUMName"], "Columbia FLU")
+    spring_hill = _overlay_polygons(SPRING_HILL_ZONING_URL, "1=1", ["Zone", "Label"], "Spring Hill zoning")
+    columbia_index, _ = _index_overlays(columbia)
+    flu_index, _ = _index_overlays(flu)
+    spring_index, spring_kept = _index_overlays(spring_hill, envelope)
+    pleasant = _attribute_map(MOUNT_PLEASANT_ZONING_URL, "1=1", "GISLINK", "ZONING", "Mount Pleasant MP_Zoning")
+    uninc = _attribute_map(MAURY_UNINC_ZONING_URL, "1=1", "GISLINK", "cZoneDistr", "unincorporated MCParcelZonelLayer")
+    counts = {"Columbia": 0, "Spring Hill": 0, "Mount Pleasant": 0, "Maury County": 0, "unmatched": 0}
+    flu_joined = 0
+    for feature in features:
+        props = feature["properties"]
+        lon, lat = props["centroid"]
+        key = _gis_key(props.get("parcelId"))
+        zone = None
+        jurisdiction = None
+        prefix = None
+        district = None
+        columbia_hit = _smallest_hit(columbia_index, lon, lat)
+        columbia_code = clean((columbia_hit or {}).get("properties", {}).get("ZONING")) if columbia_hit else None
+        if columbia_code:
+            zone, jurisdiction, prefix = columbia_code, "Columbia", "COL"
+        else:
+            spring_hit = _smallest_hit(spring_index, lon, lat)
+            spring_code = clean((spring_hit or {}).get("properties", {}).get("Zone")) if spring_hit else None
+            if spring_code and spring_code.upper() != "NA":
+                zone, jurisdiction, prefix = spring_code, "Spring Hill", "SH"
+                label = clean(spring_hit["properties"].get("Label")) if spring_hit else None
+                if label and label != spring_code:
+                    district = label
+            elif key and pleasant.get(key):
+                zone, jurisdiction, prefix = pleasant[key], "Mount Pleasant", "MP"
+            elif key and uninc.get(key):
+                zone, jurisdiction, prefix = uninc[key], "Maury County", "MC"
+        if zone and jurisdiction:
+            props["zoningCode"] = zone
+            props["zoningDistrict"] = district
+            props["jurisdictionPrefix"] = prefix
+            props["jurisdictionCode"] = prefix
+            counts[jurisdiction] += 1
+        else:
+            counts["unmatched"] += 1
+        if jurisdiction == "Columbia":
+            flu_hit = _smallest_hit(flu_index, lon, lat)
+            code = clean((flu_hit or {}).get("properties", {}).get("FLUM2024")) if flu_hit else None
+            label = clean((flu_hit or {}).get("properties", {}).get("FLUMName")) if flu_hit else None
+            if code:
+                props["flu"] = {
+                    "code": code,
+                    "label": label or code,
+                    "jurisdiction": "Columbia",
+                    "source": "columbia-flu-2024",
+                }
+                flu_joined += 1
+            else:
+                props["flu"] = None
+        else:
+            props["flu"] = None
+    eligible = _stamp_maury_eligibility(features)
+    print(
+        "  maury zoning "
+        f"Columbia {counts['Columbia']}, Spring Hill {counts['Spring Hill']} "
+        f"({spring_kept} zones indexed), Mount Pleasant {counts['Mount Pleasant']}, "
+        f"unincorporated {counts['Maury County']}, unmatched {counts['unmatched']}; "
+        f"Columbia FLU {flu_joined}; rural-eligible parcels {eligible}",
+        flush=True,
+    )
+    return [
+        (
+            "Zoning is a parcel-centroid join, in this order: Columbia zoning districts, "
+            "Spring Hill Zoning_Spring_Hill_view only where a Maury parcel centroid falls in a zone "
+            f"({counts['Spring Hill']} parcels; the city layer also covers Williamson, and those parcels are not in this county), "
+            "Mount Pleasant MP_Zoning (GISLINK), then unincorporated MCParcelZonelLayer "
+            "(published service name; field cZoneDistr). "
+            f"Joined Columbia {counts['Columbia']}, Spring Hill {counts['Spring Hill']}, "
+            f"Mount Pleasant {counts['Mount Pleasant']}, unincorporated {counts['Maury County']}, "
+            f"unmatched {counts['unmatched']}. "
+            "The assessor ZONING column on the parcel roll is blank and is not used. "
+            "These codes are not an Orange County multifamily knowledge-base match."
+        ),
+        (
+            "Future land use is Columbia FLU Classifications 2024 only, and only on parcels whose "
+            f"centroid falls in Columbia zoning ({flu_joined} joined). "
+            "Spring Hill, Mount Pleasant, and unincorporated Maury have no FLU join."
+        ),
+        (
+            f"{eligible} parcels fall in the three Nashville rural-eligible Maury tracts "
+            "(47119010500, 47119010700, 47119011004) from Rev. Proc. 2026-14. "
+            "That stamp is eligible-for-nomination, not a designated QOZ. "
+            "opportunityZone is left unset. Tennessee has no public certified 2027 QOZ list. "
+            "The Nashville urban-eligible pack has no Maury tracts, so other parcels are not-eligible."
+        ),
+    ]
+
+
 def county_override(fips: str) -> dict | None:
     if fips == "13067":  # Cobb GA
         return {
@@ -655,6 +1024,53 @@ def county_override(fips: str) -> dict | None:
             "coverage": "sample",
             "gaps": [
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
+            ],
+        }
+    if fips == "47119":  # Maury TN — IMPACT jurisdiction 060
+        return {
+            "kind": "arcgis",
+            "url": "https://services6.arcgis.com/ubRvNDgGwwJuZMcL/arcgis/rest/services/Parcels/FeatureServer/1/query",
+            "where": "PARCEL_TYP=1 AND CALC_ACRE>=5 AND CALC_ACRE<=150",
+            "outFields": [
+                "GISLINK",
+                "PARCELID",
+                "PARID",
+                "CALC_ACRE",
+                "OWNER",
+                "OWNER2",
+                "ADDRESS",
+                "MAILADDR",
+                "MAILCITY",
+                "STATE",
+                "ZIP",
+                "APPRAISAL",
+                "PRICE",
+                "SALEDATE",
+                "VI",
+                "JUR",
+                "COUNTY_ID",
+                "PARCEL_TYP",
+            ],
+            "idField": "GISLINK",
+            "idFallbacks": ["PARCELID", "PARID"],
+            "acresField": "CALC_ACRE",
+            "ownerField": "OWNER",
+            "owner2Field": "OWNER2",
+            "situsField": "ADDRESS",
+            "mail1Field": "MAILADDR",
+            "mailCityField": "MAILCITY",
+            "mailStateField": "STATE",
+            "mailZipField": "ZIP",
+            "marketValueField": "APPRAISAL",
+            "salePriceField": "PRICE",
+            "saleDateField": "SALEDATE",
+            "saleQualifiedField": "VI",
+            "source": "tn-columbia-agol-47119",
+            "coverage": "complete-gte-5ac",
+            "landUse": "maury",
+            "gaps": [
+                "Maury is Tennessee IMPACT jurisdiction 060 (COUNTY_ID 60). IMPACT has calculated acres and a GIS link but no owner, situs, or zoning. This extract uses City of Columbia AGOL Parcels layer 1, parcel type 1, calculated acres 5.0–150.0 (about 9,000 parcels). The roll has a street address and a mailing city, not a situs city.",
+                "Future land use is not on Spring Hill, Mount Pleasant, or unincorporated Maury. Columbia FLU is joined only where Columbia zoning hits. Rev. Proc. 2026-14 eligibility is not a designated QOZ.",
             ],
         }
     return None
@@ -922,14 +1338,14 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels, plus City of Columbia AGOL for Maury | Complete where `CALC_ACRE` returns rows. Maury (IMPACT jurisdiction 060) uses Columbia AGOL Parcels layer 1 because IMPACT has no owner, situs, or zoning. Several other large counties are absent from IMPACT and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or a public municipal join is wired (Maury: Columbia zoning and FLU, Spring Hill zoning on Maury parcels only, Mount Pleasant MP_Zoning, unincorporated MCParcelZonelLayer). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets. Nomination-eligible tracts are not designated QOZs.
 
 ## Coverage
 """
@@ -957,7 +1373,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=[*(spec.get("gaps") or []), *(cached.get("gaps") or [])],
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
@@ -1015,12 +1431,19 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     features, dropped = normalize_rows(raw, county, markets, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    extra_gaps: list[str] = []
+    if features and spec.get("landUse") == "maury":
+        extra_gaps = enrich_maury(features)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "gaps": extra_gaps, "features": features},
+            separators=(",", ":"),
+        )
     )
     coverage = spec["coverage"]
     gaps = list(spec.get("gaps") or [])
+    gaps.extend(extra_gaps)
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,

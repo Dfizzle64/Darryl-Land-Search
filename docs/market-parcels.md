@@ -23,14 +23,14 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels, plus City of Columbia AGOL for Maury | Complete where `CALC_ACRE` returns rows. Maury (IMPACT jurisdiction 060) uses Columbia AGOL Parcels layer 1 because IMPACT has no owner, situs, or zoning. Several other large counties are absent from IMPACT and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or a public municipal join is wired (Maury: Columbia zoning and FLU, Spring Hill zoning on Maury parcels only, Mount Pleasant MP_Zoning, unincorporated MCParcelZonelLayer). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets. Nomination-eligible tracts are not designated QOZs.
 
 ## Coverage
 
@@ -45,11 +45,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
-| Nashville | primary | 31,132 | 6 | 0 | 11 |
+| Nashville | primary | 40,165 | 7 | 0 | 10 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -144,7 +144,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Hickman | Tennessee | 47081 | complete-gte-5ac | 3,672 | tn-impact-47081 |
 | Macon | Tennessee | 47111 | gap | 0 | tn-impact-47111 |
 | Marshall | Tennessee | 47117 | gap | 0 | tn-impact-47117 |
-| Maury | Tennessee | 47119 | gap | 0 | tn-impact-47119 |
+| Maury | Tennessee | 47119 | complete-gte-5ac | 9,033 | tn-columbia-agol-47119 |
 | Montgomery | Tennessee | 47125 | gap | 0 | tn-impact-47125 |
 | Robertson | Tennessee | 47147 | gap | 0 | tn-impact-47147 |
 | Rutherford | Tennessee | 47149 | gap | 0 | tn-impact-47149 |
@@ -212,7 +212,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T23:46:57Z",
   "market": "Nashville",
   "tier": "primary",
-  "parcelCount": 31132,
+  "parcelCount": 40165,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -174,21 +174,25 @@
       "name": "Maury",
       "fips": "47119",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 9033,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47119",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-columbia-agol-47119",
+      "queryUrl": "https://services6.arcgis.com/ubRvNDgGwwJuZMcL/arcgis/rest/services/Parcels/FeatureServer/1/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "9034 source rows collapsed to 9033 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Maury is Tennessee IMPACT jurisdiction 060 (COUNTY_ID 60). IMPACT has calculated acres and a GIS link but no owner, situs, or zoning. This extract uses City of Columbia AGOL Parcels layer 1, parcel type 1, calculated acres 5.0\u2013150.0 (about 9,000 parcels). The roll has a street address and a mailing city, not a situs city.",
+        "Future land use is not on Spring Hill, Mount Pleasant, or unincorporated Maury. Columbia FLU is joined only where Columbia zoning hits. Rev. Proc. 2026-14 eligibility is not a designated QOZ.",
+        "Zoning is a parcel-centroid join, in this order: Columbia zoning districts, Spring Hill Zoning_Spring_Hill_view only where a Maury parcel centroid falls in a zone (217 parcels; the city layer also covers Williamson, and those parcels are not in this county), Mount Pleasant MP_Zoning (GISLINK), then unincorporated MCParcelZonelLayer (published service name; field cZoneDistr). Joined Columbia 467, Spring Hill 217, Mount Pleasant 193, unincorporated 8135, unmatched 21. The assessor ZONING column on the parcel roll is blank and is not used. These codes are not an Orange County multifamily knowledge-base match.",
+        "Future land use is Columbia FLU Classifications 2024 only, and only on parcels whose centroid falls in Columbia zoning (462 joined). Spring Hill, Mount Pleasant, and unincorporated Maury have no FLU join.",
+        "411 parcels fall in the three Nashville rural-eligible Maury tracts (47119010500, 47119010700, 47119011004) from Rev. Proc. 2026-14. That stamp is eligible-for-nomination, not a designated QOZ. opportunityZone is left unset. Tennessee has no public certified 2027 QOZ list. The Nashville urban-eligible pack has no Maury tracts, so other parcels are not-eligible."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47119/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47119/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 9034
     },
     {
       "name": "Montgomery",

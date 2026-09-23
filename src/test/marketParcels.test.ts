@@ -122,4 +122,57 @@ describe("market parcel gating and acreage", () => {
       if (checked >= 25) break;
     }
   });
+
+  it("keeps Maury eligibility off the designated QOZ flag", () => {
+    const countyPath = path.join(process.cwd(), "data/fixtures/market-parcels/counties/47119/county.json");
+    const tileDir = path.join(process.cwd(), "data/fixtures/market-parcels/counties/47119/tiles");
+    if (!existsSync(countyPath) || !existsSync(tileDir)) return;
+    const county = JSON.parse(readFileSync(countyPath, "utf8")) as {
+      coverage: string;
+      featureCount: number;
+      source: string;
+      gaps: string[];
+      minAcres: number;
+      maxAcres: number;
+    };
+    expect(county.coverage).toBe("complete-gte-5ac");
+    expect(county.source).toBe("tn-columbia-agol-47119");
+    expect(county.minAcres).toBe(5);
+    expect(county.maxAcres).toBe(150);
+    expect(county.featureCount).toBeGreaterThan(8000);
+    expect(county.gaps.join(" ")).toMatch(/Spring Hill/i);
+    expect(county.gaps.join(" ")).toMatch(/Mount Pleasant/i);
+    expect(county.gaps.join(" ")).toMatch(/unincorporated/i);
+    expect(county.gaps.join(" ")).toMatch(/no FLU join/i);
+    expect(county.gaps.join(" ")).toMatch(/not a designated QOZ/i);
+    let parcels = 0;
+    let eligible = 0;
+    let designated = 0;
+    let fluOutsideColumbia = 0;
+    for (const name of readdirSync(tileDir)) {
+      if (!name.endsWith(".geojson")) continue;
+      const collection = JSON.parse(readFileSync(path.join(tileDir, name), "utf8")) as ParcelCollection;
+      for (const feature of collection.features) {
+        parcels += 1;
+        expect(inMarketAcreageBand(feature.properties.acreage)).toBe(true);
+        expect(feature.properties.countyFips).toBe("47119");
+        expect(feature.properties.marketIds).toEqual(["Nashville"]);
+        const oz2 = feature.properties.oz2Eligibility;
+        const zone = feature.properties.opportunityZone;
+        if (oz2?.eligible) {
+          eligible += 1;
+          expect(oz2.designation).toBe("eligible-for-nomination");
+          expect(oz2.rural).toBe(true);
+          expect(zone?.inOpportunityZone).not.toBe(true);
+        }
+        if (zone?.inOpportunityZone) designated += 1;
+        const flu = feature.properties.flu;
+        if (flu && flu.jurisdiction !== "Columbia") fluOutsideColumbia += 1;
+      }
+    }
+    expect(parcels).toBe(county.featureCount);
+    expect(eligible).toBeGreaterThan(0);
+    expect(designated).toBe(0);
+    expect(fluOutsideColumbia).toBe(0);
+  });
 });

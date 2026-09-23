@@ -9,6 +9,7 @@ import {
   showMarketParcels,
   type MarketParcelIndex,
 } from "../lib/marketParcels";
+import { parcelAppraiserUrl } from "../lib/format";
 import { ORLANDO_PARCEL_TILE, showOrlandoParcels } from "../lib/orlandoParcels";
 import type { ParcelCollection } from "../lib/types";
 
@@ -121,5 +122,76 @@ describe("market parcel gating and acreage", () => {
       }
       if (checked >= 25) break;
     }
+  });
+
+  it("loads Montgomery County, Tennessee from county CAMA, not IMPACT or Clarksville, Indiana", () => {
+    const countyPath = path.join(process.cwd(), "data/fixtures/market-parcels/counties/47125/county.json");
+    const row = JSON.parse(readFileSync(countyPath, "utf8")) as {
+      state: string;
+      coverage: string;
+      source: string;
+      queryUrl: string;
+      featureCount: number;
+      gaps: string[];
+    };
+    expect(row.state).toBe("Tennessee");
+    expect(row.coverage).toBe("complete-gte-5ac");
+    expect(row.source).toBe("tn-mcgtn-cama-47125");
+    expect(row.queryUrl).toContain("gis.montgomerytn.gov");
+    expect(row.queryUrl).toContain("mcgtn_parcels");
+    expect(row.source.includes("impact")).toBe(false);
+    expect(row.featureCount).toBeGreaterThan(1000);
+    const gaps = row.gaps.join("\n");
+    expect(gaps).toContain("IMPACT");
+    expect(gaps).toContain("TaxingDistrictCode 135");
+    expect(gaps).toContain("Clarksville, Indiana");
+    expect(gaps).toContain("Growth Plan 2040");
+    expect(gaps).toContain("CMCRPC");
+    expect(gaps).toContain("GISLINK");
+    expect(gaps).toContain("not a designated QOZ");
+
+    const assessor = parcelAppraiserUrl({ parcelId: "063", countyFips: "47125" });
+    expect(assessor.href).toContain("montgomerytn.gov");
+    expect(assessor.label).toContain("Tennessee");
+    expect(assessor.label.toLowerCase().includes("indiana")).toBe(false);
+
+    const tileDir = path.join(process.cwd(), "data/fixtures/market-parcels/counties/47125/tiles");
+    const ids = new Set<string>();
+    let zoning = 0;
+    let clarksville = 0;
+    let unincorporated = 0;
+    let count = 0;
+    for (const file of readdirSync(tileDir)) {
+      if (!file.endsWith(".geojson")) continue;
+      const collection = JSON.parse(readFileSync(path.join(tileDir, file), "utf8")) as ParcelCollection;
+      for (const feature of collection.features) {
+        const props = feature.properties;
+        expect(inMarketAcreageBand(props.acreage)).toBe(true);
+        expect(props.countyFips).toBe("47125");
+        expect(props.state).toBe("Tennessee");
+        expect(props.countyName).toBe("Montgomery");
+        expect(props.marketIds).toEqual(["Nashville"]);
+        expect(props.source).toBe("tn-mcgtn-cama-47125");
+        expect(props.opportunityZone).toBeNull();
+        expect(props.oz2Eligibility).toBeNull();
+        expect(props.flu).toBeNull();
+        const [lon, lat] = props.centroid;
+        expect(lon).toBeGreaterThanOrEqual(-87.7);
+        expect(lon).toBeLessThanOrEqual(-87.05);
+        expect(lat).toBeGreaterThanOrEqual(36.25);
+        expect(lat).toBeLessThanOrEqual(36.7);
+        expect(props.jurisdictionCode === "135" || props.jurisdictionCode === "000").toBe(true);
+        if (props.jurisdictionCode === "135") clarksville += 1;
+        if (props.jurisdictionCode === "000") unincorporated += 1;
+        if (props.zoningCode) zoning += 1;
+        expect(ids.has(props.parcelId)).toBe(false);
+        ids.add(props.parcelId);
+        count += 1;
+      }
+    }
+    expect(count).toBe(row.featureCount);
+    expect(clarksville).toBeGreaterThan(0);
+    expect(unincorporated).toBeGreaterThan(clarksville);
+    expect(zoning / count).toBeGreaterThan(0.95);
   });
 });

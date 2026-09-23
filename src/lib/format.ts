@@ -27,6 +27,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "47125": "https://montgomerytn.gov/assessor/public-parcels",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -59,10 +60,16 @@ export function parcelAppraiserUrl(options: {
                   ? "Sumter"
                   : fips === "12127"
                     ? "Volusia"
-                    : "county";
+                    : fips === "47125"
+                      ? "Montgomery County, Tennessee"
+                      : "county";
+  const office = fips === "47125" ? "Property Assessor" : "Property Appraiser";
   return {
     href,
-    label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,
+    label:
+      fips === "12095"
+        ? "Open in Orange County Property Appraiser"
+        : `Open ${countyLabel} ${office} search`,
   };
 }
 

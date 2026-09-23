@@ -9,11 +9,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
-| Nashville | primary | 31,132 | 6 | 0 | 11 |
+| Nashville | primary | 38,170 | 7 | 0 | 10 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -109,7 +109,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Macon | Tennessee | 47111 | gap | 0 | tn-impact-47111 |
 | Marshall | Tennessee | 47117 | gap | 0 | tn-impact-47117 |
 | Maury | Tennessee | 47119 | gap | 0 | tn-impact-47119 |
-| Montgomery | Tennessee | 47125 | gap | 0 | tn-impact-47125 |
+| Montgomery | Tennessee | 47125 | complete-gte-5ac | 7,038 | tn-mcgtn-cama-47125 |
 | Robertson | Tennessee | 47147 | gap | 0 | tn-impact-47147 |
 | Rutherford | Tennessee | 47149 | gap | 0 | tn-impact-47149 |
 | Smith | Tennessee | 47159 | gap | 0 | tn-impact-47159 |
@@ -176,7 +176,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 

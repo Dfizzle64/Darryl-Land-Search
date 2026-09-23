@@ -126,6 +126,11 @@ def clean(value: Any) -> str | None:
 def num(value: Any) -> float | None:
     if value is None or value == "":
         return None
+    if isinstance(value, str):
+        text = value.strip().replace("$", "").replace(",", "")
+        if not text or text in {"-", "—"}:
+            return None
+        value = text
     try:
         parsed = float(value)
     except (TypeError, ValueError):
@@ -266,6 +271,9 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    jurisdiction_code: str | None = None,
+    owner2: str | None = None,
+    appraiser_url: str | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
     return {
@@ -281,9 +289,9 @@ def empty_feature(
             "situsAddress": situs,
             "situsCity": city,
             "situsZip": zip_code,
-            "jurisdictionCode": None,
+            "jurisdictionCode": jurisdiction_code,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
             "zoningDistrict": None,
@@ -311,6 +319,7 @@ def empty_feature(
             "flu": None,
             "opportunityZone": None,
             "oz2Eligibility": None,
+            "appraiserUrl": appraiser_url,
             "source": source,
         },
         "geometry": geometry,
@@ -376,6 +385,38 @@ def sale_date(year: Any, month: Any) -> str | None:
     return f"{int(y):04d}-{month_num:02d}-01"
 
 
+def epoch_date(value: Any) -> str | None:
+    """ArcGIS date fields arrive as epoch milliseconds. Date-only, UTC."""
+    parsed = num(value)
+    if parsed is None:
+        return None
+    seconds = parsed / 1000.0 if parsed > 10_000_000_000 else parsed
+    if seconds < 315_532_800 or seconds > 4_102_444_800:  # 1980-01-01 .. 2100-01-01
+        return None
+    return time.strftime("%Y-%m-%d", time.gmtime(seconds))
+
+
+def in_bounds(center: tuple[float, float], bounds: list[float] | None) -> bool:
+    if not bounds:
+        return True
+    lon, lat = center
+    west, south, east, north = bounds
+    return west <= lon <= east and south <= lat <= north
+
+
+def prefers_card(attrs: dict, spec: dict) -> bool:
+    field = spec.get("dedupePreferField")
+    if not field:
+        return False
+    raw = attrs.get(field)
+    want = spec.get("dedupePreferValue")
+    raw_num = num(raw)
+    want_num = num(want)
+    if raw_num is not None and want_num is not None:
+        return raw_num == want_num
+    return clean(raw) == clean(want)
+
+
 def normalize_rows(
     raw: list[dict],
     county: dict,
@@ -383,7 +424,9 @@ def normalize_rows(
     spec: dict,
 ) -> tuple[list[dict], int]:
     by_id: dict[str, dict] = {}
+    preferred: dict[str, bool] = {}
     dropped = 0
+    bounds = spec.get("bounds")
     for item in raw:
         attrs = item.get("attributes") or {}
         geometry, computed = rings_to_feature_geometry(item.get("geometry"))
@@ -391,7 +434,7 @@ def normalize_rows(
             dropped += 1
             continue
         center = centroid_of(geometry)
-        if not plausible_centroid(center):
+        if not plausible_centroid(center) or not in_bounds(center, bounds):
             dropped += 1
             continue
         acres = num(attrs.get(spec["acresField"])) if spec.get("acresField") else None
@@ -418,6 +461,21 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        if spec.get("saleYearField"):
+            sold = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
+            qualified = clean(attrs.get("QUAL_CD1"))
+        elif spec.get("saleEpochField"):
+            sold = epoch_date(attrs.get(spec["saleEpochField"]))
+            qualified = None
+        else:
+            sold = None
+            qualified = None
+        jurisdiction = None
+        if spec.get("jurisdictionField"):
+            jurisdiction = clean(attrs.get(spec["jurisdictionField"]))
+            mapped = (spec.get("jurisdictionMap") or {}).get(jurisdiction or "")
+            if mapped:
+                jurisdiction = mapped
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -435,8 +493,8 @@ def normalize_rows(
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
-            sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
+            sale_date=sold,
+            sale_qualified=qualified,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
             taxable=num(attrs.get(spec["taxableField"])) if spec.get("taxableField") else None,
@@ -445,10 +503,21 @@ def normalize_rows(
             mail_city=clean(attrs.get(spec["mailCityField"])) if spec.get("mailCityField") else None,
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
+            jurisdiction_code=jurisdiction,
+            owner2=clean(attrs.get(spec["owner2Field"])) if spec.get("owner2Field") else None,
+            appraiser_url=clean(attrs.get(spec["appraiserField"])) if spec.get("appraiserField") else None,
         )
+        card_preferred = prefers_card(attrs, spec)
         previous = by_id.get(parcel_id)
-        if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
+        if previous is None:
             by_id[parcel_id] = feature
+            preferred[parcel_id] = card_preferred
+            continue
+        acres_now = feature["properties"]["acreage"] or 0
+        acres_prev = previous["properties"]["acreage"] or 0
+        if acres_now > acres_prev or (acres_now == acres_prev and card_preferred and not preferred.get(parcel_id)):
+            by_id[parcel_id] = feature
+            preferred[parcel_id] = card_preferred
     features = list(by_id.values())
     features.sort(key=lambda row: row["properties"].get("acreage") or 0, reverse=True)
     return features, dropped
@@ -655,6 +724,70 @@ def county_override(fips: str) -> dict | None:
             "coverage": "sample",
             "gaps": [
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
+            ],
+        }
+    if fips == "47125":  # Montgomery County, Tennessee — Clarksville. Not Clarksville, Indiana.
+        return {
+            "kind": "arcgis",
+            "url": "https://gis.montgomerytn.gov/gisserver/rest/services/mcgtn_parcels/MapServer/0/query",
+            "where": "PARCEL_TYPE=1 AND CalcAcreage>=5 AND CalcAcreage<=150",
+            # County extent, padded. Rejects Clarksville, Indiana (~38.3 N, 85.8 W).
+            "bounds": [-87.70, 36.25, -87.05, 36.70],
+            "outFields": [
+                "GISLINK",
+                "PARCEL_TYPE",
+                "COUNTY_ID",
+                "CalcAcreage",
+                "Owner1",
+                "Owner2",
+                "PropertyAddress",
+                "PropertyCity",
+                "MailingAddress",
+                "MailCity",
+                "MailState",
+                "MailZip",
+                "Zoning",
+                "TaxingDistrictCode",
+                "MktAppraisedValue",
+                "AssessedValue",
+                "SalesDate",
+                "SalesPrice",
+                "BldgCardNo",
+                "WebUrl",
+            ],
+            "idField": "GISLINK",
+            "dedupePreferField": "BldgCardNo",
+            "dedupePreferValue": 1,
+            "acresField": "CalcAcreage",
+            "ownerField": "Owner1",
+            "owner2Field": "Owner2",
+            "situsField": "PropertyAddress",
+            "cityField": "PropertyCity",
+            "zoningField": "Zoning",
+            "jurisdictionField": "TaxingDistrictCode",
+            "salePriceField": "SalesPrice",
+            "saleEpochField": "SalesDate",
+            "marketValueField": "MktAppraisedValue",
+            "assessedField": "AssessedValue",
+            "mail1Field": "MailingAddress",
+            "mailCityField": "MailCity",
+            "mailStateField": "MailState",
+            "mailZipField": "MailZip",
+            "appraiserField": "WebUrl",
+            "source": "tn-mcgtn-cama-47125",
+            "coverage": "complete-gte-5ac",
+            "collapseNote": (
+                "{expected} PARCEL_TYPE=1 rows in the 5.0–150.0 acre band collapsed to {kept} GISLINK ids. "
+                "Extra rows are CAMA building cards on the same polygon. One feature is kept per GISLINK "
+                "(largest CalcAcreage, then building card 1)."
+            ),
+            "gaps": [
+                "Montgomery County, Tennessee (FIPS 47125, Clarksville) is not on Comptroller IMPACT (COUNTY_ID 125 returns no 5–150 acre rows). Parcels are the county CAMA service mcgtn_parcels on gis.montgomerytn.gov. Filter is PARCEL_TYPE=1 and CalcAcreage 5.0–150.0. COUNTY_ID on this layer is 63, the Comptroller county number, not FIPS 125.",
+                "City of Clarksville is TaxingDistrictCode 135. TaxingDistrictCode 000 is unincorporated Montgomery County. PropertyCity CLARKSVILLE is a post office and includes unincorporated parcels, so it is not the city limit. Clarksville, Indiana is a different city and is not in this extract; centroids outside the Montgomery TN extent are dropped.",
+                "Zoning is the CMCRPC district stored on the CAMA parcel (Zoning), which matches the public Zoning map service. Districts are not classified in the multifamily knowledge base. Prefer All parcels. The CMCRPC zoning map also has a Fort Campbell polygon; this extract is taxable PARCEL_TYPE=1 parcels only.",
+                "Clarksville-Montgomery County Growth Plan 2040 is adopted policy for the urban growth boundary, planned growth areas, and rural area. It is not current zoning and is not joined as future land use.",
+                "Opportunity Zone fields are left unset. OZ 2.0 eligibility on the tract overlay means eligible for nomination, not a designated QOZ. Designated zones are HUD/Treasury geography and are not inferred from eligibility.",
+                "No tax bill on this layer. Market value is MktAppraisedValue and assessed value is AssessedValue. Greenbelt use value is not copied into taxable. A sale price of $0 is treated as not available. There is no situs ZIP field; mailing ZIP is kept. Sale qualification codes are not interpreted.",
             ],
         }
     return None
@@ -922,14 +1055,16 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels, plus Montgomery County CAMA | IMPACT is complete where `CALC_ACRE` returns rows. Montgomery (47125, Clarksville TN) is absent from IMPACT and uses county `mcgtn_parcels` (`PARCEL_TYPE=1`, `CalcAcreage` 5–150, GISLINK dedupe). Other missing counties stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb, Montgomery TN). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+Montgomery County, Tennessee (FIPS 47125) is Clarksville, not Clarksville, Indiana. City parcels are `TaxingDistrictCode` 135; unincorporated parcels are 000. `PropertyCity` CLARKSVILLE is a post office, not the city limit. Zoning codes are the CMCRPC district on the county CAMA. The Clarksville-Montgomery County Growth Plan 2040 is policy for the growth boundary only and is not joined as future land use. OZ 2.0 eligibility is not a designated Qualified Opportunity Zone, and this extract does not stamp either flag on parcels.
 
 ## Coverage
 """
@@ -1022,10 +1157,10 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     coverage = spec["coverage"]
     gaps = list(spec.get("gaps") or [])
     if expected and len(features) < expected and not spec.get("computeAcres"):
-        gaps.insert(
-            0,
-            f"{expected} source rows collapsed to {len(features)} parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        template = spec.get("collapseNote") or (
+            "{expected} source rows collapsed to {kept} parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county."
         )
+        gaps.insert(0, template.format(expected=expected, kept=len(features)))
     if not features:
         coverage = "gap"
         gaps.insert(0, f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks.")

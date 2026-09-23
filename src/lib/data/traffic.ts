@@ -12,12 +12,12 @@ export class FdotAadtProvider implements TrafficProvider {
 
   constructor(
     private readonly endpoint = process.env.FDOT_AADT_URL ??
-      "https://gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0/query",
+      "https://services1.arcgis.com/O1JpcwDW8sjYuddV/arcgis/rest/services/Annual_Average_Daily_Traffic_Historical_TDA/FeatureServer/0/query",
   ) {}
 
   async listOrangeCountyAadt(): Promise<GeoJSON.FeatureCollection> {
     const params = new URLSearchParams({
-      where: "COUNTY='Orange' AND AADT IS NOT NULL",
+      where: "YEAR_=2025 AND COUNTY='Orange' AND AADT>0",
       outFields: "AADT,ROADWAY,DESC_FRM,DESC_TO,YEAR_",
       returnGeometry: "true",
       outSR: "4326",

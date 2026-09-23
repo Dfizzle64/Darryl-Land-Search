@@ -33,6 +33,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
+from parcel_geometry import esri_rings_to_geojson, representative_point, simplify_ring as simplify_ring_shared
 from seed_fixtures import epoch_to_iso, parse_zoning
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -185,102 +186,18 @@ def fetch_json(url: str, params: dict | None = None, timeout: int = 120, retries
     raise RuntimeError(f"Failed to fetch {url[:180]}: {last}")
 
 
-def perp_dist(p: tuple[float, float], a: tuple[float, float], b: tuple[float, float]) -> float:
-    ax, ay = a
-    bx, by = b
-    px, py = p
-    dx, dy = bx - ax, by - ay
-    if dx == 0 and dy == 0:
-        return math.hypot(px - ax, py - ay)
-    t = ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)
-    t = max(0.0, min(1.0, t))
-    return math.hypot(px - (ax + t * dx), py - (ay + t * dy))
-
-
-def douglas_peucker(points: list[tuple[float, float]], tol: float) -> list[tuple[float, float]]:
-    if len(points) <= 2:
-        return points
-    stack = [(0, len(points) - 1)]
-    keep = {0, len(points) - 1}
-    while stack:
-        start, end = stack.pop()
-        max_d = 0.0
-        idx = None
-        for i in range(start + 1, end):
-            dist = perp_dist(points[i], points[start], points[end])
-            if dist > max_d:
-                max_d = dist
-                idx = i
-        if idx is not None and max_d > tol:
-            keep.add(idx)
-            stack.append((start, idx))
-            stack.append((idx, end))
-    return [points[i] for i in sorted(keep)]
-
-
-def simplify_ring(coords: list[list[float]], tol: float = 0.00008) -> list[list[float]]:
-    if len(coords) <= 4:
-        return [[round(x, 5), round(y, 5)] for x, y in coords]
-    open_ring = coords[:-1] if coords[0] == coords[-1] else list(coords)
-    pts = [(float(x), float(y)) for x, y in open_ring]
-    use = tol
-    if len(pts) > 900:
-        use = max(tol, 0.00028)
-    elif len(pts) > 280:
-        use = max(tol, 0.00014)
-    simplified = douglas_peucker(pts, use)
-    if len(simplified) < 3:
-        step = max(1, len(pts) // 12)
-        simplified = pts[::step][:12]
-    if simplified[0] != simplified[-1]:
-        simplified = simplified + [simplified[0]]
-    if len(simplified) < 4:
-        simplified = pts[:3] + [pts[0]]
-    return [[round(x, 5), round(y, 5)] for x, y in simplified]
+def simplify_ring(coords: list[list[float]], tol: float = 0.000012) -> list[list[float]]:
+    return simplify_ring_shared(coords, tol)
 
 
 def rings_to_geojson(geom: dict | None) -> dict | None:
     if not geom or not geom.get("rings"):
         return None
-    polygons: list[list[list[list[float]]]] = []
-    current: list[list[list[float]]] = []
-    for ring in geom["rings"]:
-        coords = simplify_ring([[float(x), float(y)] for x, y in ring])
-        if len(coords) < 4:
-            continue
-        area = 0.0
-        for i in range(len(coords) - 1):
-            area += coords[i][0] * coords[i + 1][1] - coords[i + 1][0] * coords[i][1]
-        if not current or area > 0:
-            if current:
-                polygons.append(current)
-            current = [coords]
-        else:
-            current.append(coords)
-    if current:
-        polygons.append(current)
-    if not polygons:
-        return None
-    if len(polygons) == 1:
-        return {"type": "Polygon", "coordinates": polygons[0]}
-    return {"type": "MultiPolygon", "coordinates": polygons}
+    return esri_rings_to_geojson(geom["rings"])
 
 
 def centroid(geom: dict) -> tuple[float, float] | None:
-    rings: list[list[list[float]]] = []
-    if geom.get("type") == "Polygon":
-        rings = [geom["coordinates"][0]]
-    elif geom.get("type") == "MultiPolygon":
-        rings = [poly[0] for poly in geom["coordinates"] if poly]
-    xs: list[float] = []
-    ys: list[float] = []
-    for ring in rings:
-        body = ring[:-1] if len(ring) > 1 else ring
-        xs.extend(p[0] for p in body)
-        ys.extend(p[1] for p in body)
-    if not xs:
-        return None
-    return (round(sum(xs) / len(xs), 6), round(sum(ys) / len(ys), 6))
+    return representative_point(geom)
 
 
 def clean(value: Any) -> str | None:
@@ -575,10 +492,10 @@ def download_core_county(county: dict) -> tuple[list[dict], int, int, int]:
     url = f"{DOH_BASE}/{layer}/query"
     where = f"LND_SQFOOT >= {MIN_SQFT} AND LND_SQFOOT <= {MAX_SQFT}"
     expected = count_where(url, where)
-    cache_path = CACHE_DIR / f"{county['fips']}.json"
+    cache_path = CACHE_DIR / f"{county['fips']}-geom2.json"
     if cache_path.exists():
         cached = json.loads(cache_path.read_text())
-        if "merged" in cached and cached.get("sourceCount") == expected and cached.get("features"):
+        if cached.get("geometryVersion") == 2 and cached.get("sourceCount") == expected and cached.get("features"):
             print(f"  cache hit {cache_path.name} ({len(cached['features'])} features, source {expected})")
             return (
                 cached["features"],
@@ -617,13 +534,22 @@ def download_core_county(county: dict) -> tuple[list[dict], int, int, int]:
     features = list(by_id.values())
     if merged:
         print(f"  merged {merged} extra parts into {len(features)} parcel ids")
-    if len(features) < expected * 0.97:
+    accounted = len(features) + merged
+    if accounted < expected * 0.97:
         raise RuntimeError(
-            f"{county['name']} kept {len(features)} of {expected} source rows (dropped {dropped}). Refusing a thin extract."
+            f"{county['name']} kept {len(features)} parcels plus {merged} merged parts from {expected} source rows (dropped {dropped}). Refusing a thin extract."
         )
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "merged": merged, "features": features})
+        json.dumps(
+            {
+                "geometryVersion": 2,
+                "sourceCount": expected,
+                "dropped": dropped,
+                "merged": merged,
+                "features": features,
+            }
+        )
     )
     print(f"  normalized {len(features)} (dropped {dropped}, merged parts {merged}, source {expected})")
     return features, expected, dropped, merged
@@ -1084,35 +1010,235 @@ def in_core_acreage_band(acres: Any) -> bool:
     return MIN_ACRES <= value <= MAX_ACRES
 
 
+def normalize_ocpa_shape(attrs: dict, geom: dict) -> dict | None:
+    geometry = rings_to_geojson(geom)
+    if not geometry:
+        return None
+    center = centroid(geometry)
+    if not center or not (-88 < center[0] < -79 and 24 < center[1] < 31.5):
+        return None
+    parcel_id = clean(attrs.get("PARCEL"))
+    if not parcel_id:
+        return None
+    acres = _num(attrs.get("ACREAGE"))
+    if acres is None:
+        return None
+    zoning = parse_zoning(clean(attrs.get("ZONING_CODE")))
+    price = _num(attrs.get("SALE_ADJ_VALUE"))
+    if price is not None and price <= 0:
+        price = None
+    feature_id = f"12095:{parcel_id}"
+    return {
+        "type": "Feature",
+        "id": feature_id,
+        "properties": {
+            "id": feature_id,
+            "parcelId": parcel_id,
+            "countyFips": "12095",
+            "countyName": "Orange",
+            "state": "Florida",
+            "marketIds": ["Orlando"],
+            "situsAddress": clean(attrs.get("SITUS")),
+            "situsCity": clean(attrs.get("CITY_SITUS")),
+            "situsZip": zip_str(attrs.get("ZIP_SITUS")),
+            "jurisdictionCode": zoning.get("jurisdictionPrefix"),
+            "ownerName": clean(attrs.get("NAME1")),
+            "ownerName2": clean(attrs.get("NAME2")),
+            "propertyName": clean(attrs.get("PROP_NAME")),
+            "zoningCode": zoning.get("zoningCode"),
+            "zoningDistrict": zoning.get("zoningDistrict"),
+            "jurisdictionPrefix": zoning.get("jurisdictionPrefix"),
+            "dorCode": clean(attrs.get("DOR_CODE")),
+            "acreage": round(acres, 4),
+            "acreageSource": "ocpa-acreage",
+            "centroid": list(center),
+            "lastSale": {
+                "date": epoch_to_iso(attrs.get("SALE_DATE")),
+                "price": price,
+                "qualified": clean(attrs.get("QUAL_CODE")),
+            },
+            "tax": {
+                "marketValue": _num(attrs.get("TOTAL_MKT")),
+                "assessedValue": _num(attrs.get("TOTAL_ASSD")),
+                "taxableValue": _num(attrs.get("TAXABLE")),
+                "taxes": _num(attrs.get("TAXES")),
+            },
+            "mailingAddress": {
+                "line1": clean(attrs.get("ADD1")),
+                "line2": clean(attrs.get("ADD2")),
+                "city": clean(attrs.get("CITY")),
+                "state": clean(attrs.get("STATE")),
+                "zip": zip_str(attrs.get("ZIP")),
+            },
+            "incomeTract": None,
+            "incomeBlockGroup": None,
+            "nearestRoad": None,
+            "flu": None,
+            "opportunityZone": None,
+            "oz2Eligibility": None,
+            "appraiserUrl": "https://ocpaweb.ocpafl.org/site/parcelsearch",
+            "source": "ocpa-webmap-12095",
+            "dataGaps": [
+                "Income and AADT are joined at query time from ACS and FDOT, not stored on the tile.",
+                "Future land use is Orange County and Orlando only. Other cities often stay unknown.",
+            ],
+        },
+        "geometry": geometry,
+    }
+
+
+def combine_ocpa_parts(parts: list[dict]) -> dict:
+    host = max(parts, key=lambda feature: feature["properties"].get("acreage") or 0)
+    acres = [feature["properties"]["acreage"] for feature in parts if feature["properties"].get("acreage") is not None]
+    if acres and max(acres) - min(acres) <= 0.05:
+        acreage = round(max(acres), 4)
+        host["properties"]["acreageSource"] = "ocpa-acreage"
+    else:
+        acreage = round(sum(acres), 4)
+        host["properties"]["acreageSource"] = "ocpa-part-sum"
+    polygons: list = []
+    for feature in parts:
+        polygons.extend(polygon_parts(feature["geometry"]))
+    geometry = {"type": "Polygon", "coordinates": polygons[0]} if len(polygons) == 1 else {
+        "type": "MultiPolygon",
+        "coordinates": polygons,
+    }
+    center = centroid(geometry)
+    host = {
+        **host,
+        "geometry": geometry,
+        "properties": {**host["properties"], "acreage": acreage},
+    }
+    if center:
+        host["properties"]["centroid"] = list(center)
+    return host
+
+
+def download_orange_ocpa(county: dict) -> tuple[list[dict], int, int, int]:
+    """Cadastral geometry and tax attributes from the public OCPA parcel layer.
+
+    DOH statewide polygons are a thinner copy and were over-simplified. OCPA is
+    the county cadastre. Shapes that share a parcel id are one tax account.
+    """
+    where = f"ACREAGE >= {MIN_ACRES} AND ACREAGE <= {MAX_ACRES}"
+    expected = count_where(OCPA_QUERY, where)
+    cache_path = CACHE_DIR / "orange-ocpa-geom2.json"
+    if cache_path.exists():
+        cached = json.loads(cache_path.read_text())
+        if cached.get("geometryVersion") == 2 and cached.get("sourceCount") == expected and cached.get("features"):
+            print(f"  OCPA cache hit ({len(cached['features'])} parcels, source shapes {expected})")
+            return (
+                cached["features"],
+                expected,
+                int(cached.get("dropped") or 0),
+                int(cached.get("merged") or 0),
+            )
+
+    print(f"  OCPA shapes in the {MIN_ACRES}–{MAX_ACRES} acre band: {expected}")
+    ids = fetch_object_ids(OCPA_QUERY, where)
+    raw = fetch_by_object_ids(
+        OCPA_QUERY,
+        ids,
+        {"outFields": ",".join(OCPA_FIELDS), "returnGeometry": "true", "outSR": 4326},
+        batch=60,
+    )
+    parcel_ids = []
+    seen_ids: set[str] = set()
+    for item in raw:
+        pid = clean((item.get("attributes") or {}).get("PARCEL"))
+        if pid and pid not in seen_ids:
+            seen_ids.add(pid)
+            parcel_ids.append(pid)
+    print(f"  fetching every shape for {len(parcel_ids)} parcel ids")
+    by_parcel_raw: dict[str, list[dict]] = defaultdict(list)
+    for start in range(0, len(parcel_ids), 40):
+        chunk = parcel_ids[start : start + 40]
+        clause = "PARCEL IN (" + ",".join("'" + pid.replace("'", "''") + "'" for pid in chunk) + ")"
+        data = fetch_json(
+            OCPA_QUERY,
+            {
+                "where": clause,
+                "outFields": ",".join(OCPA_FIELDS),
+                "returnGeometry": "true",
+                "outSR": 4326,
+                "f": "json",
+            },
+            timeout=120,
+        )
+        if data.get("error"):
+            raise RuntimeError(data["error"])
+        for item in data.get("features") or []:
+            pid = clean((item.get("attributes") or {}).get("PARCEL"))
+            if pid:
+                by_parcel_raw[pid].append(item)
+        if start == 0 or start + 40 >= len(parcel_ids) or (start // 40) % 25 == 0:
+            print(f"    parcel batches {min(start + 40, len(parcel_ids))}/{len(parcel_ids)}")
+        time.sleep(0.05)
+
+    features: list[dict] = []
+    dropped = 0
+    merged = 0
+    for pid, items in by_parcel_raw.items():
+        parts: list[dict] = []
+        for item in items:
+            feature = normalize_ocpa_shape(item.get("attributes") or {}, item.get("geometry") or {})
+            if feature:
+                parts.append(feature)
+            else:
+                dropped += 1
+        if not parts:
+            continue
+        if len(parts) > 1:
+            merged += len(parts) - 1
+        features.append(combine_ocpa_parts(parts) if len(parts) > 1 else parts[0])
+    if len(features) < max(1, int(len(parcel_ids) * 0.9)):
+        raise RuntimeError(
+            f"Orange OCPA kept {len(features)} of {len(parcel_ids)} parcel ids. Refusing a thin extract."
+        )
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps(
+            {
+                "geometryVersion": 2,
+                "sourceCount": expected,
+                "dropped": dropped,
+                "merged": merged,
+                "features": features,
+            }
+        )
+    )
+    print(f"  OCPA normalized {len(features)} parcels (dropped shapes {dropped}, merged parts {merged})")
+    return features, expected, dropped, merged
+
+
 def seed_one_core(county: dict, skip_flu: bool) -> dict:
     print(f"Seeding complete 5–150 ac {county['name']}…")
-    features, source_count, dropped, merged_parts = download_core_county(county)
     ocpa_matched = 0
     flu_gaps: dict[str, int] = {}
     if county["name"] == "Orange":
-        ocpa_matched = enrich_orange_ocpa(features)
+        features, source_count, dropped, merged_parts = download_orange_ocpa(county)
+        ocpa_matched = len(features)
         if not skip_flu:
             _joined, flu_gaps = join_orange_flu(features)
         county = {
             **county,
-            "preferredSource": "doh-ehwaters+ocpa",
+            "preferredSource": "ocpa-webmap",
             "gaps": [
-                "Acreage band is 5.0–150.0 acres. Inclusion starts from FDOR LND_SQFOOT / 43560. OCPA ACREAGE replaces the stored value only when it is also inside that band.",
-                "Zoning, owner, sale, and tax prefer the OCPA public parcel layer when the parcel id matches.",
+                "Acreage band is 5.0–150.0 acres on the public OCPA parcel layer. Multipart tax accounts sum their piece acres and drop out above 150.",
+                "Geometry, owner, mailing, sale, tax, and zoning come from OCPA. Parcels that exist only on the older DOH extract are not drawn.",
                 "FLU is centroid-joined to Orange County open-data layer 21 and Orlando layer 83. Other cities often stay unknown.",
-                "Income and AADT are not joined on this full extract.",
-                "A small number of source rows can drop out when geometry is missing.",
+                "Median household income and FDOT AADT are not copied onto each tile. /api/parcels joins them at query time.",
             ],
         }
     else:
+        features, source_count, dropped, merged_parts = download_core_county(county)
         county = {
             **county,
             "gaps": [
                 "Acreage band is 5.0–150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
-                "No zoning or future land use on the Florida DOH EHWATER extract.",
-                "Owner, sale, and tax are FDOR Name-Address-Legal fields.",
+                "No zoning or future land use on the Florida DOH EHWATER extract. Owner, sale, and tax are the public FDOR fields when that roll has them.",
                 "OZ 2.0 here is the seven-market rural-eligible tract pack only, not every eligible tract in the county.",
-                "Income and AADT are not joined.",
+                "Median household income and FDOT AADT are joined at query time for Florida counties, not stored on each tile.",
             ],
         }
     before_cap = len(features)
@@ -1121,6 +1247,9 @@ def seed_one_core(county: dict, skip_flu: bool) -> dict:
     if excluded_over_max:
         print(f"  dropped {excluded_over_max} parcels outside {MIN_ACRES}–{MAX_ACRES} acres")
     rural_n, eligible_n = stamp_overlays(features, county["name"])
+    gaps = list(county.get("gaps") or [])
+    for feature in features:
+        feature["properties"]["dataGaps"] = gaps
     rel, tile_count, _lookup = write_tiles(county, features)
     print(f"  wrote {len(features)} features in {tile_count} tiles ({rural_n} rural-eligible)")
     return county_meta_row(
@@ -1219,10 +1348,11 @@ def main() -> None:
         "tile": {"originLon": ORIGIN_LON, "originLat": ORIGIN_LAT, "tileDeg": TILE_DEG},
         "sourcesDoc": "data/orlando-parcel-sources.json",
         "notes": [
-            "Lake, Orange, Osceola, Polk, and Seminole are complete public-GIS extracts of parcels with FDOR land area from 5.0 through 150.0 acres (LND_SQFOOT / 43560).",
+            "Lake, Osceola, Polk, and Seminole are complete DOH extracts of parcels from 5.0 through 150.0 acres (LND_SQFOOT / 43560). Orange is the OCPA cadastre in that same acreage band.",
             "Brevard, Marion, Sumter, and Volusia remain thinner viewport samples in this build.",
             "Core counties are partitioned into 0.25° tiles. The map loads a viewport through /api/parcels.",
-            "Orange zoning, sale, and tax prefer OCPA when the parcel id matches. FLU is Orange County + Orlando only.",
+            "Orange geometry, owner, mailing, sale, tax, and zoning come from OCPA. FLU is Orange County + Orlando only.",
+            "Median household income and FDOT AADT are joined at query time from sidecar fixtures, not stored on tiles.",
             "Re-pull with npm run seed:parcels:orlando.",
         ],
         "counties": rows,

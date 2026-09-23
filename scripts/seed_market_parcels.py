@@ -26,6 +26,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
+from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
+
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "data" / "market-parcel-counties.json"
 OUT_DIR = ROOT / "data" / "fixtures" / "market-parcels"
@@ -222,50 +224,11 @@ def ring_signed_m2(coords: list[list[float]]) -> float:
 def rings_to_feature_geometry(geom: dict | None) -> tuple[dict | None, float]:
     if not geom or not geom.get("rings"):
         return None, 0.0
-    polygons: list[list[list[list[float]]]] = []
-    current: list[list[list[float]]] = []
-    net_m2 = 0.0
-    for ring in geom["rings"]:
-        raw = [[float(x), float(y)] for x, y in ring]
-        if len(raw) < 4:
-            continue
-        net_m2 += ring_signed_m2(raw)
-        coords = simplify_ring(raw)
-        if len(coords) < 4:
-            continue
-        area = 0.0
-        for i in range(len(coords) - 1):
-            area += coords[i][0] * coords[i + 1][1] - coords[i + 1][0] * coords[i][1]
-        if not current or area > 0:
-            if current:
-                polygons.append(current)
-            current = [coords]
-        else:
-            current.append(coords)
-    if current:
-        polygons.append(current)
-    acres = abs(net_m2) / 4046.8564224
-    if not polygons:
-        return None, acres
-    if len(polygons) == 1:
-        return {"type": "Polygon", "coordinates": polygons[0]}, acres
-    return {"type": "MultiPolygon", "coordinates": polygons}, acres
+    return esri_rings_to_geojson(geom["rings"]), net_acres(geom["rings"])
 
 
 def centroid_of(geometry: dict) -> tuple[float, float] | None:
-    ring = None
-    if geometry.get("type") == "Polygon":
-        ring = geometry["coordinates"][0]
-    elif geometry.get("type") == "MultiPolygon" and geometry["coordinates"]:
-        ring = geometry["coordinates"][0][0]
-    if not ring:
-        return None
-    pts = ring[:-1] if len(ring) > 1 else ring
-    if not pts:
-        return None
-    lon = sum(p[0] for p in pts) / len(pts)
-    lat = sum(p[1] for p in pts) / len(pts)
-    return round(lon, 6), round(lat, 6)
+    return representative_point(geometry)
 
 
 def plausible_centroid(center: tuple[float, float] | None) -> bool:

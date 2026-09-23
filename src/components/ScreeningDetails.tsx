@@ -55,6 +55,9 @@ export function ScreeningDetails({ point, status }: ScreeningDetailsProps) {
       {point ? (
         <>
           <Block title="Flood zone" summary={point.flood.summary} source={point.flood.source} sourceUrl={point.flood.sourceUrl} />
+          {point.tract ? (
+            <Block title="Census tract" summary={point.tract.summary} source={point.tract.source} sourceUrl={point.tract.sourceUrl} />
+          ) : null}
           <Block title="Wetlands" summary={point.wetland.summary} source={point.wetland.source} sourceUrl={point.wetland.sourceUrl} />
           {point.utilities.map((utility) => (
             <Block

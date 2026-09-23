@@ -3,15 +3,29 @@ import path from "node:path";
 import {
   bboxSpan,
   bboxesIntersect,
+  CMS_ELEM_ZONES,
+  CMS_GRADES_SOURCE,
+  CMS_GRADES_URL,
+  CMS_HIGH_ZONES,
+  CMS_MIDDLE_ZONES,
+  CMS_SCHOOL_POINTS,
+  CMS_ZONES_SOURCE,
+  CMS_ZONES_URL,
+  cmsAgencyCode,
   describeFloodZone,
+  describeMeckTract,
   describeUtility,
   describeWetland,
   haversineMiles,
   FEMA_FLOOD_LAYER,
   FEMA_NFHL_SERVICE,
+  FEMA_POLITICAL_LAYER,
   FL_GRADES_SOURCE,
   FL_GRADES_URL,
   HIFLD_POWER_SERVICE,
+  MECK_BBOX,
+  MECK_JURISDICTIONS,
+  MECK_TRACTS,
   ORANGE_ELEM_ZONES,
   ORANGE_HIGH_ZONES,
   ORANGE_MIDDLE_ZONES,
@@ -31,10 +45,12 @@ import {
   UTILITY_LAYER_NOTE,
   type SchoolRating,
   type ScreeningPoint,
+  type TractAtPoint,
   type UtilityKind,
 } from "./screening";
 
 const FIXTURE_PATH = path.join(process.cwd(), "data/fixtures/screening/school-ratings.json");
+const CMS_FIXTURE_PATH = path.join(process.cwd(), "data/fixtures/screening/cms-spg-2025-26.json");
 const QUERY_MS = 12000;
 const MAX_VECTOR_SPAN = 1.2;
 const SCHOOL_CAP = 400;
@@ -58,7 +74,28 @@ type RatingsFixture = {
   northCarolina: { year: string; source: string; sourceUrl: string; byNces: Record<string, string> };
 };
 
+type CmsGradeFile = {
+  year: string;
+  source: string;
+  sourceUrl: string;
+  reportCardUrl: string;
+  byCode: Record<string, { grade: string; name: string }>;
+  byNces: Record<string, string>;
+  alternativeModel: { code: string; name: string }[];
+};
+
 let ratingsCache: RatingsFixture | null = null;
+let cmsGradesCache: CmsGradeFile | null | undefined;
+
+export function loadCmsGrades(): CmsGradeFile | null {
+  if (cmsGradesCache !== undefined) return cmsGradesCache;
+  try {
+    cmsGradesCache = JSON.parse(fs.readFileSync(CMS_FIXTURE_PATH, "utf8")) as CmsGradeFile;
+  } catch {
+    cmsGradesCache = null;
+  }
+  return cmsGradesCache;
+}
 
 export function loadSchoolRatings(): RatingsFixture | null {
   if (ratingsCache) return ratingsCache;
@@ -136,25 +173,43 @@ function pointQuery(service: string, lon: number, lat: number, outFields: string
   return `${service.replace(/\/$/, "")}/query?${params}`;
 }
 
-export async function floodAtPoint(lon: number, lat: number) {
+async function floodCommunity(lon: number, lat: number): Promise<{ community: string | null; cid: string | null }> {
   try {
     const payload = await getJson(
-      pointQuery(`${FEMA_NFHL_SERVICE}/${FEMA_FLOOD_LAYER}`, lon, lat, "FLD_ZONE,ZONE_SUBTY,SFHA_TF,STATIC_BFE,V_DATUM,DEPTH"),
+      pointQuery(`${FEMA_NFHL_SERVICE}/${FEMA_POLITICAL_LAYER}`, lon, lat, "POL_NAME1,CID"),
     );
-    const features = featuresOf(payload);
-    const attrs = attrsOf(features[0]);
-    return describeFloodZone({
-      zone: textAttr(attrs, "FLD_ZONE"),
-      subtype: textAttr(attrs, "ZONE_SUBTY"),
-      sfhaFlag: textAttr(attrs, "SFHA_TF"),
-      staticBfe: textAttr(attrs, "STATIC_BFE"),
-      depth: textAttr(attrs, "DEPTH"),
-      datum: textAttr(attrs, "V_DATUM"),
-      featuresFound: features.length > 0,
-    });
+    const attrs = attrsOf(featuresOf(payload)[0]);
+    return { community: textAttr(attrs, "POL_NAME1"), cid: textAttr(attrs, "CID") };
   } catch {
-    return describeFloodZone({ featuresFound: false, failed: true });
+    return { community: null, cid: null };
   }
+}
+
+export async function floodAtPoint(lon: number, lat: number) {
+  const [zoneResult, community] = await Promise.all([
+    getJson(
+      pointQuery(`${FEMA_NFHL_SERVICE}/${FEMA_FLOOD_LAYER}`, lon, lat, "FLD_ZONE,ZONE_SUBTY,SFHA_TF,STATIC_BFE,V_DATUM,DEPTH"),
+    ).then(
+      (payload) => ({ payload, failed: false as const }),
+      () => ({ payload: null, failed: true as const }),
+    ),
+    floodCommunity(lon, lat),
+  ]);
+  if (zoneResult.failed || !zoneResult.payload) {
+    return describeFloodZone({ featuresFound: false, failed: true, ...community });
+  }
+  const features = featuresOf(zoneResult.payload);
+  const attrs = attrsOf(features[0]);
+  return describeFloodZone({
+    zone: textAttr(attrs, "FLD_ZONE"),
+    subtype: textAttr(attrs, "ZONE_SUBTY"),
+    sfhaFlag: textAttr(attrs, "SFHA_TF"),
+    staticBfe: textAttr(attrs, "STATIC_BFE"),
+    depth: textAttr(attrs, "DEPTH"),
+    datum: textAttr(attrs, "V_DATUM"),
+    featuresFound: features.length > 0,
+    ...community,
+  });
 }
 
 export async function wetlandAtPoint(lon: number, lat: number) {
@@ -191,11 +246,25 @@ async function utilityProviders(service: string, lon: number, lat: number, field
   return [...new Set(names)];
 }
 
+async function meckJurisdictionName(lon: number, lat: number): Promise<string | null> {
+  if (!pointInBbox(lon, lat, MECK_BBOX)) return null;
+  try {
+    const payload = await getJson(pointQuery(MECK_JURISDICTIONS, lon, lat, "name"));
+    return textAttr(attrsOf(featuresOf(payload)[0]), "name");
+  } catch {
+    return null;
+  }
+}
+
 export async function utilityAtPoint(kind: UtilityKind, lon: number, lat: number) {
-  if (kind === "gas") return describeUtility({ kind: "gas", providers: [], covered: false });
+  if (kind === "gas") {
+    const jurisdictionName = await meckJurisdictionName(lon, lat);
+    return describeUtility({ kind: "gas", providers: [], covered: false, jurisdictionName });
+  }
   const inOrange = pointInBbox(lon, lat, ORANGE_UTILITY_BBOX);
   if (!inOrange && kind !== "power") {
-    return describeUtility({ kind, providers: [], covered: false });
+    const jurisdictionName = await meckJurisdictionName(lon, lat);
+    return describeUtility({ kind, providers: [], covered: false, jurisdictionName });
   }
   const ocflPower = kind === "power" && inOrange;
   const service = kind === "water" ? ORANGE_WATER_SERVICE : kind === "sewer" ? ORANGE_SEWER_SERVICE : ocflPower ? ORANGE_POWER_SERVICE : HIFLD_POWER_SERVICE;
@@ -339,6 +408,110 @@ async function orangeZonedSchools(lon: number, lat: number): Promise<SchoolRatin
   });
 }
 
+function sameZonedSchool(zoned: SchoolRating, nearby: SchoolRating): boolean {
+  const zone = zoned.name.toUpperCase().replace(/[^A-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  const other = nearby.name.toUpperCase().replace(/[^A-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  if (!zone || !other) return false;
+  if (other !== zone && !other.startsWith(`${zone} `) && !zone.startsWith(`${other} `)) return false;
+  const level = zoned.level?.toUpperCase() ?? "";
+  if (level.includes("ELEMENTARY") && /MIDDLE|HIGH/.test(other) && !/ELEMENTARY/.test(other)) return false;
+  if (level.includes("MIDDLE") && /ELEMENTARY|HIGH/.test(other) && !/MIDDLE/.test(other)) return false;
+  if (level.includes("HIGH") && /ELEMENTARY|MIDDLE/.test(other) && !/HIGH/.test(other)) return false;
+  return true;
+}
+
+async function cmsZonedSchools(lon: number, lat: number): Promise<SchoolRating[]> {
+  if (!pointInBbox(lon, lat, MECK_BBOX)) return [];
+  const zones = [
+    { service: CMS_ELEM_ZONES, num: "elem_num", name: "elem_name", level: "Elementary" },
+    { service: CMS_MIDDLE_ZONES, num: "midd_num", name: "midd_name", level: "Middle" },
+    { service: CMS_HIGH_ZONES, num: "high_num", name: "high_name", level: "High" },
+  ];
+  const hits = (
+    await Promise.all(
+      zones.map(async (zone) => {
+        try {
+          const payload = await getJson(pointQuery(zone.service, lon, lat, `${zone.num},${zone.name}`));
+          const attrs = attrsOf(featuresOf(payload)[0]);
+          const number = Number(textAttr(attrs, zone.num));
+          const name = textAttr(attrs, zone.name);
+          if (!name || !Number.isFinite(number)) return null;
+          return { number, name, level: zone.level };
+        } catch {
+          return null;
+        }
+      }),
+    )
+  ).filter((hit): hit is { number: number; name: string; level: string } => Boolean(hit));
+  if (!hits.length) return [];
+
+  const campuses = new Map<number, { lon: number; lat: number }>();
+  try {
+    const where = hits.map((hit) => `school_num=${Math.round(hit.number)}`).join(" OR ");
+    const payload = await getJson(
+      `${CMS_SCHOOL_POINTS}/query?where=${encodeURIComponent(where)}&outFields=school_num,school_typ&returnGeometry=true&outSR=4326&f=json`,
+    );
+    const wanted = new Map(hits.map((hit) => [Math.round(hit.number), hit.level.toUpperCase()]));
+    for (const feature of featuresOf(payload)) {
+      const number = Math.round(Number(textAttr(attrsOf(feature), "school_num")));
+      const point = pointLonLat(feature);
+      const level = wanted.get(number);
+      const type = textAttr(attrsOf(feature), "school_typ")?.toUpperCase() ?? "";
+      if (!point || !level) continue;
+      if (type && type !== level && campuses.has(number)) continue;
+      if (!campuses.has(number) || type === level) campuses.set(number, point);
+    }
+  } catch {
+    // Zone names still stand. Campus distance stays unpublished.
+  }
+
+  const grades = loadCmsGrades();
+  const alt = new Set((grades?.alternativeModel ?? []).map((school) => school.code));
+  return hits.map((hit) => {
+    const code = cmsAgencyCode(hit.number);
+    const graded = code ? grades?.byCode[code] : undefined;
+    const campus = campuses.get(Math.round(hit.number));
+    const letter = graded?.grade ?? null;
+    const onAltModel = Boolean(code && alt.has(code));
+    const rating = letter && !onAltModel ? letter : null;
+    const school = toSchoolRating({
+      id: `cms-${code ?? Math.round(hit.number)}`,
+      name: graded?.name || hit.name,
+      city: null,
+      state: "NC",
+      level: `${hit.level} attendance zone`,
+      rating,
+      ratingKind: rating ? "letter" : null,
+      year: rating || onAltModel ? grades?.year ?? "2025-26" : null,
+      source: rating || onAltModel ? grades?.source ?? CMS_GRADES_SOURCE : CMS_ZONES_SOURCE,
+      sourceUrl: rating || onAltModel ? grades?.sourceUrl ?? CMS_GRADES_URL : CMS_ZONES_URL,
+      reportCardUrl: code && grades?.reportCardUrl ? grades.reportCardUrl.replace("{code}", code) : null,
+      lon: campus?.lon ?? lon,
+      lat: campus?.lat ?? lat,
+      zoned: true,
+    });
+    if (onAltModel) {
+      school.summary =
+        "NCDPI 2025-26 lists this school on the alternative accountability model, not an A–F school performance grade.";
+    }
+    return {
+      ...school,
+      distanceMiles: campus ? Math.round(haversineMiles(lon, lat, campus.lon, campus.lat) * 10) / 10 : null,
+    };
+  });
+}
+
+export async function meckTractAtPoint(lon: number, lat: number): Promise<TractAtPoint | null> {
+  if (!pointInBbox(lon, lat, MECK_BBOX)) return null;
+  try {
+    const payload = await getJson(pointQuery(MECK_TRACTS, lon, lat, "geoid20,name20"));
+    const attrs = attrsOf(featuresOf(payload)[0]);
+    return describeMeckTract({ geoid: textAttr(attrs, "geoid20"), name: textAttr(attrs, "name20") });
+  } catch {
+    return describeMeckTract({ failed: true });
+  }
+}
+
 function ncesSchool(attrs: Record<string, unknown>): SchoolRating | null {
   const lon = Number(textAttr(attrs, "LON"));
   const lat = Number(textAttr(attrs, "LAT"));
@@ -347,7 +520,9 @@ function ncesSchool(attrs: Record<string, unknown>): SchoolRating | null {
   const state = textAttr(attrs, "STATE");
   const nces = textAttr(attrs, "NCESSCH");
   const fixture = loadSchoolRatings();
-  const ncGrade = state === "NC" && nces ? fixture?.northCarolina.byNces[nces] ?? null : null;
+  const cms = loadCmsGrades();
+  const cmsGrade = state === "NC" && nces ? cms?.byNces[nces] ?? null : null;
+  const ncGrade = cmsGrade ?? (state === "NC" && nces ? fixture?.northCarolina.byNces[nces] ?? null : null);
   const portal = state ? STATE_REPORT_CARDS[state] : null;
   const graded = Boolean(ncGrade);
   return toSchoolRating({
@@ -358,9 +533,9 @@ function ncesSchool(attrs: Record<string, unknown>): SchoolRating | null {
     level: null,
     rating: ncGrade,
     ratingKind: ncGrade ? "letter" : null,
-    year: graded ? fixture?.northCarolina.year ?? null : null,
-    source: graded ? fixture?.northCarolina.source ?? null : NCES_SOURCE,
-    sourceUrl: graded ? fixture?.northCarolina.sourceUrl ?? null : NCES_SOURCE_URL,
+    year: cmsGrade ? cms?.year ?? "2025-26" : graded ? fixture?.northCarolina.year ?? null : null,
+    source: cmsGrade ? cms?.source ?? CMS_GRADES_SOURCE : graded ? fixture?.northCarolina.source ?? null : NCES_SOURCE,
+    sourceUrl: cmsGrade ? cms?.sourceUrl ?? CMS_GRADES_URL : graded ? fixture?.northCarolina.sourceUrl ?? null : NCES_SOURCE_URL,
     reportCardUrl: portal?.url ?? null,
     lon,
     lat,
@@ -370,7 +545,12 @@ function ncesSchool(attrs: Record<string, unknown>): SchoolRating | null {
 export async function schoolsNear(lon: number, lat: number): Promise<{ schools: SchoolRating[]; note: string }> {
   const pad = 0.06;
   const bbox: BBox = [lon - pad, lat - pad, lon + pad, lat + pad];
-  const zoned = await orangeZonedSchools(lon, lat).catch(() => [] as SchoolRating[]);
+  const zoned = (
+    await Promise.all([
+      orangeZonedSchools(lon, lat).catch(() => [] as SchoolRating[]),
+      cmsZonedSchools(lon, lat).catch(() => [] as SchoolRating[]),
+    ])
+  ).flat();
   try {
     const local = floridaSchoolsInBbox(bbox);
     const params = new URLSearchParams({
@@ -388,15 +568,18 @@ export async function schoolsNear(lon: number, lat: number): Promise<{ schools: 
     const remote = featuresOf(payload)
       .map((feature) => ncesSchool(attrsOf(feature)))
       .filter((school): school is SchoolRating => Boolean(school));
-    const zonedIds = new Set(zoned.map((school) => school.name.toUpperCase()));
     const schools = [
       ...zoned,
-      ...nearestSchools([...local, ...remote], lon, lat).filter((school) => !zonedIds.has(school.name.toUpperCase())),
+      ...nearestSchools([...local, ...remote], lon, lat).filter(
+        (school) => !zoned.some((zone) => sameZonedSchool(zone, school)),
+      ),
     ].slice(0, 8);
     const fixture = loadSchoolRatings();
-    const orangeNote = zoned.length
+    const orangeNote = zoned.some((school) => school.id.startsWith("ocps-"))
       ? " Zoned elementary, middle, and high schools are OCPS attendance zones, not the nearest campus. "
-      : " ";
+      : zoned.some((school) => school.id.startsWith("cms-"))
+        ? " Zoned elementary, middle, and high schools are CMS attendance zones, not the nearest campus. Charlotte-Mecklenburg letters are the 2025-26 NCDPI file for LEA 600. "
+        : " ";
     const note = fixture
       ? `${UTILITY_LAYER_NOTE.schools}${orangeNote}`
       : `Florida letter grades are not loaded in this build. Dots still use NCES locations and state report-card links. No grade is invented.${orangeNote}`;
@@ -413,13 +596,15 @@ export async function schoolsNear(lon: number, lat: number): Promise<{ schools: 
 }
 
 export async function screeningAtPoint(lon: number, lat: number): Promise<ScreeningPoint> {
-  const [flood, wetland, water, sewer, power, schools] = await Promise.allSettled([
+  const [flood, wetland, water, sewer, power, gas, schools, tract] = await Promise.allSettled([
     floodAtPoint(lon, lat),
     wetlandAtPoint(lon, lat),
     utilityAtPoint("water", lon, lat),
     utilityAtPoint("sewer", lon, lat),
     utilityAtPoint("power", lon, lat),
+    utilityAtPoint("gas", lon, lat),
     schoolsNear(lon, lat),
+    meckTractAtPoint(lon, lat),
   ]);
   const schoolResult =
     schools.status === "fulfilled"
@@ -432,10 +617,11 @@ export async function screeningAtPoint(lon: number, lat: number): Promise<Screen
       water.status === "fulfilled" ? water.value : describeUtility({ kind: "water", providers: [], covered: true, failed: true }),
       sewer.status === "fulfilled" ? sewer.value : describeUtility({ kind: "sewer", providers: [], covered: true, failed: true }),
       power.status === "fulfilled" ? power.value : describeUtility({ kind: "power", providers: [], covered: true, failed: true, powerLayer: "hifld" }),
-      describeUtility({ kind: "gas", providers: [], covered: false }),
+      gas.status === "fulfilled" ? gas.value : describeUtility({ kind: "gas", providers: [], covered: false }),
     ],
     schools: schoolResult.schools,
     schoolsNote: schoolResult.note,
+    tract: tract.status === "fulfilled" ? tract.value : null,
   };
 }
 

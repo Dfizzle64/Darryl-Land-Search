@@ -45,6 +45,9 @@ import {
 import { eligibleClassCut, southCarolinaStatusHelp } from "@/lib/markets";
 import {
   arcgisExportTileUrl,
+  CMS_ELEM_MAP,
+  CMS_HIGH_MAP,
+  CMS_MIDDLE_MAP,
   FEMA_FLOOD_LAYER,
   FEMA_NFHL_SERVICE,
   FEMA_SOURCE,
@@ -228,6 +231,27 @@ function addScreeningLayers(map: MapLibreMap, mode: BasemapMode) {
     layout: { visibility: "none" },
     paint: { "raster-opacity": 0.35 },
   });
+  const cmsZones = [
+    ["school-cms-es-raster", CMS_ELEM_MAP, "Charlotte-Mecklenburg elementary attendance zones"],
+    ["school-cms-ms-raster", CMS_MIDDLE_MAP, "Charlotte-Mecklenburg middle attendance zones"],
+    ["school-cms-hs-raster", CMS_HIGH_MAP, "Charlotte-Mecklenburg high school attendance zones"],
+  ] as const;
+  for (const [id, service, attribution] of cmsZones) {
+    map.addSource(id, {
+      type: "raster",
+      tiles: [arcgisExportTileUrl(service, "0")],
+      tileSize: 256,
+      attribution,
+    });
+    map.addLayer({
+      id,
+      type: "raster",
+      source: id,
+      minzoom: 9,
+      layout: { visibility: "none" },
+      paint: { "raster-opacity": 0.4 },
+    });
+  }
   const utilities = [
     ["water", "#3d7dff"],
     ["sewer", "#7a5cff"],
@@ -1040,7 +1064,10 @@ export function SiteMap({
     show(["water-fill", "water-line"], screening.water);
     show(["sewer-fill", "sewer-line"], screening.sewer);
     show(["power-fill", "power-line"], screening.power);
-    show(["schools-circle", "school-zone-raster", "school-ms-raster"], screening.schools);
+    show(
+      ["schools-circle", "school-zone-raster", "school-ms-raster", "school-cms-es-raster", "school-cms-ms-raster", "school-cms-hs-raster"],
+      screening.schools,
+    );
   }, [screening, status, basemap]);
 
   useEffect(() => {
@@ -1380,7 +1407,7 @@ export function SiteMap({
           {screening.schools ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-full align-middle" style={{ backgroundColor: "#1f7a4d" }} />
-              Schools · letter grade, plus OCPS attendance zones in Orange County
+              Schools · letter grade, OCPS zones in Orange County, CMS zones in Mecklenburg
             </p>
           ) : null}
           {screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power ? (

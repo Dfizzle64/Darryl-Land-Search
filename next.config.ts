@@ -8,8 +8,8 @@ const nextConfig: NextConfig = {
     "/": ["./data/fixtures/orlando-parcels/meta.json"],
     "/api/parcels": ["./data/fixtures/orlando-parcels/**/*"],
     "/api/parcels/[id]": ["./data/fixtures/orlando-parcels/**/*"],
-    "/api/screening/point": ["./data/fixtures/screening/school-ratings.json"],
-    "/api/screening/schools": ["./data/fixtures/screening/school-ratings.json"],
+    "/api/screening/point": ["./data/fixtures/screening/school-ratings.json", "./data/fixtures/screening/cms-spg-2025-26.json"],
+    "/api/screening/schools": ["./data/fixtures/screening/school-ratings.json", "./data/fixtures/screening/cms-spg-2025-26.json"],
   },
 };
 

@@ -31,6 +31,9 @@ export type FloodAtPoint = {
   staticBfe: number | null;
   depth: number | null;
   datum: string | null;
+  /** NFHL political jurisdiction. Not a Community Rating System class. */
+  community: string | null;
+  cid: string | null;
   summary: string;
   source: string;
   sourceUrl: string;
@@ -73,8 +76,16 @@ export type SchoolRating = {
   distanceMiles: number | null;
   lon: number;
   lat: number;
-  /** Orange County attendance zone (OCPS), not merely the nearest campus. */
+  /** Attendance zone (OCPS or CMS), not merely the nearest campus. */
   zoned?: boolean;
+};
+
+export type TractAtPoint = {
+  geoid: string | null;
+  name: string | null;
+  summary: string;
+  source: string;
+  sourceUrl: string;
 };
 
 export type ScreeningPoint = {
@@ -83,10 +94,14 @@ export type ScreeningPoint = {
   utilities: UtilityAtPoint[];
   schools: SchoolRating[];
   schoolsNote: string;
+  /** Mecklenburg County 2020 tract (geoid20). Null outside that county layer. */
+  tract: TractAtPoint | null;
 };
 
 export const FEMA_NFHL_SERVICE = "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer";
 export const FEMA_FLOOD_LAYER = "28";
+/** Political areas. CID is the community identifier. This layer has no CRS class. */
+export const FEMA_POLITICAL_LAYER = "22";
 export const FEMA_SOURCE = "FEMA National Flood Hazard Layer (effective flood zones)";
 export const FEMA_SOURCE_URL = "https://www.fema.gov/flood-maps/national-flood-hazard-layer";
 
@@ -110,6 +125,29 @@ export const ORANGE_UTILITY_SOURCE_URL = "https://www.orangecountyfl.net/Plannin
 
 /** Orange County service-area polygons. Outside this box the app has no water/sewer layer. */
 export const ORANGE_UTILITY_BBOX = [-81.66, 28.34, -80.99, 28.79] as const;
+
+export const MECK_GIS = "https://meckgis.mecklenburgcountync.gov/server/rest/services";
+export const CMS_ELEM_ZONES = `${MECK_GIS}/CMSElementarySchoolDistricts/FeatureServer/0`;
+export const CMS_MIDDLE_ZONES = `${MECK_GIS}/CMSMiddleSchoolDistricts/FeatureServer/0`;
+export const CMS_HIGH_ZONES = `${MECK_GIS}/CMSHighSchoolDistricts/FeatureServer/0`;
+export const CMS_SCHOOL_POINTS = `${MECK_GIS}/CMSPublicSchool/FeatureServer/0`;
+export const CMS_ELEM_MAP = `${MECK_GIS}/CMSElementarySchoolDistricts/MapServer`;
+export const CMS_MIDDLE_MAP = `${MECK_GIS}/CMSMiddleSchoolDistricts/MapServer`;
+export const CMS_HIGH_MAP = `${MECK_GIS}/CMSHighSchoolDistricts/MapServer`;
+export const MECK_TRACTS = `${MECK_GIS}/2020CensusTracts/FeatureServer/0`;
+export const MECK_JURISDICTIONS = `${MECK_GIS}/Jurisdictions/FeatureServer/0`;
+/** Mecklenburg County, padded. Used only to skip county queries outside this market. */
+export const MECK_BBOX = [-81.08, 34.94, -80.52, 35.54] as const;
+export const MECK_JURISDICTION_SOURCE =
+  "Mecklenburg County jurisdictions (political limits, not a utility service area)";
+export const MECK_JURISDICTION_URL = `${MECK_JURISDICTIONS}`;
+export const MECK_TRACT_SOURCE = "Mecklenburg County 2020 census tracts (geoid20)";
+export const MECK_TRACT_URL = MECK_TRACTS;
+export const CMS_ZONES_SOURCE = "Charlotte-Mecklenburg Schools attendance zones (Mecklenburg County GIS)";
+export const CMS_ZONES_URL = CMS_SCHOOL_POINTS;
+export const CMS_GRADES_SOURCE =
+  "North Carolina DPI School Performance Grades, 2025-26, Charlotte-Mecklenburg Schools (LEA 600), subgroup ALL";
+export const CMS_GRADES_URL = "https://accrpt.tops.ncsu.edu/docs/spgdisag_datasets/SPG_Disag_2025-26.zip";
 
 export const HIFLD_POWER_SERVICE =
   "https://services3.arcgis.com/OYP7N6mAJJCyH6hd/ArcGIS/rest/services/Electric_Retail_Service_Territories_HIFLD/FeatureServer/0";
@@ -172,6 +210,22 @@ export function bboxSpan(bbox: readonly [number, number, number, number]): numbe
   return Math.max(bbox[2] - bbox[0], bbox[3] - bbox[1]);
 }
 
+function withFloodCommunity(
+  point: Omit<FloodAtPoint, "community" | "cid">,
+  input: { community?: string | null; cid?: string | null },
+): FloodAtPoint {
+  const community = input.community?.trim() || null;
+  const cid = input.cid?.trim() || null;
+  if (!community && !cid) return { ...point, community: null, cid: null };
+  const label = [community, cid ? `CID ${cid}` : null].filter(Boolean).join(", ");
+  return {
+    ...point,
+    community,
+    cid,
+    summary: `${point.summary} NFHL community ${label}. This layer does not publish a Community Rating System class.`,
+  };
+}
+
 export function describeFloodZone(input: {
   zone?: string | null;
   subtype?: string | null;
@@ -179,6 +233,8 @@ export function describeFloodZone(input: {
   staticBfe?: number | string | null;
   depth?: number | string | null;
   datum?: string | null;
+  community?: string | null;
+  cid?: string | null;
   featuresFound: boolean;
   failed?: boolean;
 }): FloodAtPoint {
@@ -186,35 +242,41 @@ export function describeFloodZone(input: {
   const depth = publishedFloodMeasure(input.depth);
   const datum = input.datum?.trim() || null;
   if (input.failed) {
-    return {
-      status: "unavailable",
-      zone: null,
-      subtype: null,
-      sfha: null,
-      floodway: false,
-      staticBfe: null,
-      depth: null,
-      datum: null,
-      summary: "FEMA’s flood service did not respond. Flood zone is unknown — that is not a finding of no hazard.",
-      source: FEMA_SOURCE,
-      sourceUrl: FEMA_SOURCE_URL,
-    };
+    return withFloodCommunity(
+      {
+        status: "unavailable",
+        zone: null,
+        subtype: null,
+        sfha: null,
+        floodway: false,
+        staticBfe: null,
+        depth: null,
+        datum: null,
+        summary: "FEMA’s flood service did not respond. Flood zone is unknown — that is not a finding of no hazard.",
+        source: FEMA_SOURCE,
+        sourceUrl: FEMA_SOURCE_URL,
+      },
+      input,
+    );
   }
   if (!input.featuresFound || !input.zone) {
-    return {
-      status: "unknown",
-      zone: null,
-      subtype: null,
-      sfha: null,
-      floodway: false,
-      staticBfe: null,
-      depth: null,
-      datum: null,
-      summary:
-        "No NFHL flood-hazard polygon at this centroid. That can mean the digital map has no zone here. It is unknown, not Zone X.",
-      source: FEMA_SOURCE,
-      sourceUrl: FEMA_SOURCE_URL,
-    };
+    return withFloodCommunity(
+      {
+        status: "unknown",
+        zone: null,
+        subtype: null,
+        sfha: null,
+        floodway: false,
+        staticBfe: null,
+        depth: null,
+        datum: null,
+        summary:
+          "No NFHL flood-hazard polygon at this centroid. That can mean the digital map has no zone here. It is unknown, not Zone X.",
+        source: FEMA_SOURCE,
+        sourceUrl: FEMA_SOURCE_URL,
+      },
+      input,
+    );
   }
   const zone = input.zone.trim().toUpperCase();
   const subtype = input.subtype?.trim() || null;
@@ -226,19 +288,22 @@ export function describeFloodZone(input: {
     ? ` Static BFE ${staticBfe} ft${datum ? ` ${datum}` : ""}.`
     : " No published static base flood elevation on this polygon.";
   const depthLine = depth != null ? ` Depth ${depth} ft.` : "";
-  return {
-    status: "ok",
-    zone,
-    subtype,
-    sfha,
-    floodway,
-    staticBfe,
-    depth,
-    datum: staticBfe != null ? datum : null,
-    summary: `FEMA zone ${zone} at the parcel centroid.${subtypeLine} ${sfhaLine}${bfeLine}${depthLine} This is not a survey or an insurance determination.`,
-    source: FEMA_SOURCE,
-    sourceUrl: FEMA_SOURCE_URL,
-  };
+  return withFloodCommunity(
+    {
+      status: "ok",
+      zone,
+      subtype,
+      sfha,
+      floodway,
+      staticBfe,
+      depth,
+      datum: staticBfe != null ? datum : null,
+      summary: `FEMA zone ${zone} at the parcel centroid.${subtypeLine} ${sfhaLine}${bfeLine}${depthLine} This is not a survey or an insurance determination.`,
+      source: FEMA_SOURCE,
+      sourceUrl: FEMA_SOURCE_URL,
+    },
+    input,
+  );
 }
 
 export function describeWetland(input: {
@@ -279,6 +344,57 @@ export function describeWetland(input: {
   };
 }
 
+/** City of Charlotte, the county name used for unincorporated area, or another municipality. */
+export function meckJurisdictionKind(name: string | null | undefined): "charlotte" | "unincorporated" | "other" | null {
+  if (!name?.trim()) return null;
+  const key = name.trim().toLowerCase();
+  if (key === "charlotte") return "charlotte";
+  if (key === "mecklenburg") return "unincorporated";
+  return "other";
+}
+
+/**
+ * CMS GIS school numbers are a level prefix plus the 3-digit DPI school code.
+ * 4322 (Beverly Woods Elementary) is LEA 600 school 322.
+ */
+export function cmsAgencyCode(schoolNum: number): string | null {
+  if (!Number.isFinite(schoolNum)) return null;
+  const number = Math.round(schoolNum);
+  if (number < 1000 || number > 9999) return null;
+  return `600${String(number % 1000).padStart(3, "0")}`;
+}
+
+export function describeMeckTract(input: { geoid?: string | null; name?: string | null; failed?: boolean }): TractAtPoint {
+  if (input.failed) {
+    return {
+      geoid: null,
+      name: null,
+      summary: "Mecklenburg County’s census-tract service did not respond. The tract id is unknown.",
+      source: MECK_TRACT_SOURCE,
+      sourceUrl: MECK_TRACT_URL,
+    };
+  }
+  const geoid = input.geoid?.trim() || null;
+  const name = input.name?.trim() || null;
+  if (!geoid) {
+    return {
+      geoid: null,
+      name: null,
+      summary: "No Mecklenburg 2020 census tract contains this point.",
+      source: MECK_TRACT_SOURCE,
+      sourceUrl: MECK_TRACT_URL,
+    };
+  }
+  const label = name ? `tract ${name}` : "this tract";
+  return {
+    geoid,
+    name,
+    summary: `2020 census ${label}, GEOID ${geoid}, from Mecklenburg County GIS (geoid20). This does not change Opportunity Zone designation.`,
+    source: MECK_TRACT_SOURCE,
+    sourceUrl: MECK_TRACT_URL,
+  };
+}
+
 export function describeUtility(input: {
   kind: UtilityKind;
   providers: string[];
@@ -287,8 +403,22 @@ export function describeUtility(input: {
   extra?: string | null;
   /** Orange County layer 68, or the national HIFLD retail layer outside that county. */
   powerLayer?: "ocfl" | "hifld";
+  /** Political jurisdiction name from Mecklenburg GIS, when the point hits that layer. */
+  jurisdictionName?: string | null;
 }): UtilityAtPoint {
+  const jurisdiction = meckJurisdictionKind(input.jurisdictionName);
   if (input.kind === "gas") {
+    if (jurisdiction) {
+      return {
+        kind: "gas",
+        status: "unknown",
+        providers: [],
+        summary:
+          "No public gas service-area polygon is published for Mecklenburg County. Gas availability is unknown — not a finding that gas is unavailable.",
+        source: "Mecklenburg County open GIS — no gas service-area layer",
+        sourceUrl: MECK_GIS,
+      };
+    }
     return {
       kind: "gas",
       status: "unknown",
@@ -297,6 +427,24 @@ export function describeUtility(input: {
         "No public gas service-area layer is wired. Gas availability is unknown — not a finding that gas is unavailable.",
       source: ORANGE_UTILITY_SOURCE,
       sourceUrl: ORANGE_UTILITY_SOURCE_URL,
+    };
+  }
+  if (jurisdiction && (input.kind === "water" || input.kind === "sewer")) {
+    const service = input.kind === "water" ? "Water" : "Sewer";
+    const place = input.jurisdictionName?.trim() || "this jurisdiction";
+    const summary =
+      jurisdiction === "charlotte"
+        ? `${service}: no public Charlotte Water service-area polygon. This point is inside the City of Charlotte, so the municipal boundary is only a jurisdiction proxy — not a connection, a capacity check, or a will-serve. Unincorporated Mecklenburg stays unverified.`
+        : jurisdiction === "unincorporated"
+          ? `${service}: this point is in unincorporated Mecklenburg County. Charlotte Water publishes no service-area polygon, so service here stays unverified.`
+          : `${service}: this point is in ${place}. Charlotte Water publishes no service-area polygon, and ${place} service is not verified by a public layer.`;
+    return {
+      kind: input.kind,
+      status: "unknown",
+      providers: [],
+      summary,
+      source: MECK_JURISDICTION_SOURCE,
+      sourceUrl: MECK_JURISDICTION_URL,
     };
   }
   const ocflPower = input.kind === "power" && input.powerLayer !== "hifld";
@@ -476,15 +624,15 @@ export function mailingGap(address: MailingAddress | null | undefined): string |
 
 export const UTILITY_LAYER_NOTE = {
   water:
-    "Water overlay is Orange County’s public service-area layer only. Every other county is unknown — the map does not invent a provider.",
+    "Water polygons are Orange County’s public service-area layer only. Charlotte Water publishes no service-area polygon. Inside the City of Charlotte the drawer uses the municipal boundary as a jurisdiction proxy, and unincorporated Mecklenburg stays unverified. Every other county is unknown.",
   sewer:
-    "Sewer overlay is Orange County’s public wastewater service-area layer only. Every other county is unknown.",
+    "Sewer polygons are Orange County’s public wastewater service-area layer only. Charlotte has no public sewer polygon either — same jurisdiction proxy as water, with unincorporated Mecklenburg unverified.",
   power:
-    "In Orange County this is open-data electric service areas (layer 68). Outside that county it is the HIFLD retail-territory layer. Neither is a connection or a will-serve. Gas has no public layer here.",
+    "In Orange County this is open-data electric service areas (layer 68). Outside that county it is the HIFLD retail-territory layer, which in Mecklenburg includes Duke Energy Carolinas and EnergyUnited EMC and can overlap a municipal retailer. Neither layer is a connection or a will-serve. Gas has no public polygon.",
   flood:
-    "FEMA NFHL effective flood zones. The drawer reports the zone at the centroid. A static BFE is shown only when NFHL publishes one. The -9999 sentinel is not an elevation.",
+    "FEMA NFHL effective flood zones. The drawer reports the zone at the centroid. A static BFE is shown only when NFHL publishes one. The -9999 sentinel is not an elevation. The community id comes from the NFHL political layer. That layer does not include a Community Rating System class.",
   wetlands:
     "National Wetlands Inventory, which covers Florida and the other states in this app. Polygons draw at closer zoom because the service scale limit is about 1:100,000.",
   schools:
-    "Orange County also draws OCPS attendance zones. Florida letters are the 2025-26 Know Your Schools report card — the School Grades Excel file returns 403 from many hosts, so it is not re-downloaded here. North Carolina dots use 2024-25 school performance grades. Other states plot NCES locations and link the state report card. No grade is invented.",
+    "Orange County draws OCPS attendance zones. Mecklenburg County draws CMS elementary, middle, and high attendance zones, with 2025-26 NCDPI school performance grades for LEA 600. Other North Carolina dots stay on the 2024-25 researcher file. Florida letters are the 2025-26 Know Your Schools report card — the School Grades Excel file returns 403 from many hosts, so it is not re-downloaded here. Other states plot NCES locations and link the state report card. No grade is invented.",
 } as const;

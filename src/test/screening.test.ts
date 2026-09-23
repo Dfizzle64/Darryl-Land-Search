@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { entitySearchLink, parcelAppraiserUrl } from "../lib/format";
+import fs from "node:fs";
 import {
   bboxSpan,
+  cmsAgencyCode,
   describeFloodZone,
+  describeMeckTract,
   describeSchoolRating,
   describeUtility,
   describeWetland,
@@ -89,6 +92,70 @@ describe("screening layers", () => {
     const hit = describeWetland({ code: "PEM1C", wetlandType: "Freshwater Emergent Wetland" });
     expect(hit.status).toBe("ok");
     expect(hit.summary).toMatch(/PEM1C/);
+  });
+
+  it("reports an NFHL community id without inventing a CRS class", () => {
+    const flood = describeFloodZone({
+      featuresFound: true,
+      zone: "X",
+      subtype: "AREA OF MINIMAL FLOOD HAZARD",
+      sfhaFlag: "F",
+      staticBfe: -9999,
+      community: "CITY OF CHARLOTTE",
+      cid: "370159",
+    });
+    expect(flood.zone).toBe("X");
+    expect(flood.cid).toBe("370159");
+    expect(flood.summary).toMatch(/CID 370159/);
+    expect(flood.summary).toMatch(/does not publish a Community Rating System class/);
+    expect(flood.summary).not.toMatch(/CRS class \d/);
+  });
+
+  it("uses the Charlotte jurisdiction as a water proxy and leaves unincorporated unverified", () => {
+    const city = describeUtility({ kind: "water", providers: [], covered: false, jurisdictionName: "Charlotte" });
+    expect(city.status).toBe("unknown");
+    expect(city.providers).toEqual([]);
+    expect(city.summary).toMatch(/no public Charlotte Water service-area polygon/);
+    expect(city.summary).toMatch(/jurisdiction proxy/);
+    expect(city.summary).toMatch(/Unincorporated Mecklenburg stays unverified/);
+    const county = describeUtility({ kind: "sewer", providers: [], covered: false, jurisdictionName: "Mecklenburg" });
+    expect(county.summary).toMatch(/unincorporated Mecklenburg/);
+    expect(county.summary).toMatch(/stays unverified/);
+    const town = describeUtility({ kind: "water", providers: [], covered: false, jurisdictionName: "Huntersville" });
+    expect(town.summary).toMatch(/Huntersville/);
+    expect(town.summary).toMatch(/not verified/);
+    const gas = describeUtility({ kind: "gas", providers: [], covered: false, jurisdictionName: "Charlotte" });
+    expect(gas.providers).toEqual([]);
+    expect(gas.summary).toMatch(/No public gas service-area polygon/);
+  });
+
+  it("joins CMS GIS school numbers to NCDPI LEA 600 and keeps the 2025-26 letters", () => {
+    expect(cmsAgencyCode(4322)).toBe("600322");
+    expect(cmsAgencyCode(5333)).toBe("600333");
+    expect(cmsAgencyCode(7535)).toBe("600535");
+    expect(cmsAgencyCode(12)).toBeNull();
+    const cms = JSON.parse(fs.readFileSync("data/fixtures/screening/cms-spg-2025-26.json", "utf8")) as {
+      year: string;
+      leaCode: string;
+      byCode: Record<string, { grade: string; name: string }>;
+    };
+    expect(cms.year).toBe("2025-26");
+    expect(cms.leaCode).toBe("600");
+    expect(cms.byCode["600322"]).toMatchObject({ grade: "B", name: "Beverly Woods Elementary" });
+    expect(cms.byCode["600333"].grade).toBe("C");
+    const tract = describeMeckTract({ geoid: "37119003008", name: "30.08" });
+    expect(tract.geoid).toBe("37119003008");
+    expect(tract.summary).toMatch(/geoid20/);
+    expect(tract.summary).toMatch(/does not change Opportunity Zone/);
+    const nc = describeSchoolRating({
+      state: "NC",
+      rating: "B",
+      ratingKind: "letter",
+      year: "2025-26",
+      source: "North Carolina DPI",
+    });
+    expect(nc).toMatch(/Public rating B \(2025-26\)/);
+    expect(nc).not.toMatch(/medium until the FL DOE/);
   });
 
   it("keeps water unknown outside the Orange County layer", () => {

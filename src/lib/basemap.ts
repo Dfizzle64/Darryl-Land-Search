@@ -16,13 +16,18 @@ export const STREET_STYLE_CANDIDATES = [
 ] as const;
 
 /**
- * Keyless navigation streets. CARTO Voyager is a general basemap (roads, labels, places),
- * not OpenStreetMap Carto and not the dark style. MapTiler Streets v2 replaces it when
- * NEXT_PUBLIC_MAPTILER_KEY is set.
+ * Keyless navigation streets. Esri World Street Map is a public XYZ raster (roads,
+ * labels, and places) with no API key and no watermark. It uses the same overlay
+ * path as satellite, so toggling basemaps does not reload the OpenFreeMap dark style
+ * or drop parcel layers. MapTiler Streets v2 replaces it when NEXT_PUBLIC_MAPTILER_KEY
+ * is set. CARTO Voyager is not the fallback: that raster now requires a key and
+ * paints "API KEY REQUIRED" tiles.
  */
-export const VOYAGER_STREETS_TILES = "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png";
+export const ESRI_WORLD_STREET_TILES =
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}";
 
-export const VOYAGER_STREETS_ATTRIBUTION = "© OpenStreetMap contributors © CARTO";
+export const ESRI_STREETS_ATTRIBUTION =
+  "Tiles © Esri — Sources: Esri, HERE, Garmin, USGS, Intermap, INCREMENT P, NRCan, Esri Japan, METI, Esri China (Hong Kong), Esri Korea, Esri (Thailand), NGCC, © OpenStreetMap contributors, and the GIS User Community";
 
 /** Esri World Imagery — public XYZ tiles, no API key. */
 export const ESRI_WORLD_IMAGERY_TILES =
@@ -65,7 +70,7 @@ export const MAPTILER_KEY = maptilerKeyFrom(process.env.NEXT_PUBLIC_MAPTILER_KEY
 
 export function streetsTileUrl(key: string | null = MAPTILER_KEY): string {
   if (key) return `https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}.png?key=${encodeURIComponent(key)}`;
-  return VOYAGER_STREETS_TILES;
+  return ESRI_WORLD_STREET_TILES;
 }
 
 export function hybridImageryTileUrl(key: string | null = MAPTILER_KEY): string {
@@ -80,7 +85,7 @@ export function usesEsriHybridReference(key: string | null = MAPTILER_KEY): bool
 
 export function basemapAttribution(mode: BasemapMode, key: string | null = MAPTILER_KEY): string {
   if (mode === "dark") return DARK_BASEMAP_ATTRIBUTION;
-  if (mode === "streets") return key ? MAPTILER_ATTRIBUTION : VOYAGER_STREETS_ATTRIBUTION;
+  if (mode === "streets") return key ? MAPTILER_ATTRIBUTION : ESRI_STREETS_ATTRIBUTION;
   return key ? MAPTILER_ATTRIBUTION : ESRI_HYBRID_ATTRIBUTION;
 }
 
@@ -361,7 +366,7 @@ export function addBasemapRasterLayers(map: MapLibreMap, key: string | null = MA
     STREETS_SOURCE_ID,
     STREETS_LAYER_ID,
     [streetsTileUrl(key)],
-    maptiler ? MAPTILER_ATTRIBUTION : VOYAGER_STREETS_ATTRIBUTION,
+    maptiler ? MAPTILER_ATTRIBUTION : ESRI_STREETS_ATTRIBUTION,
     20,
   );
   addRasterLayer(

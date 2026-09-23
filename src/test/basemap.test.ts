@@ -6,8 +6,8 @@ import {
   ESRI_WORLD_IMAGERY_ATTRIBUTION,
   ESRI_WORLD_IMAGERY_TILES,
   OVERLAY_LAYER_IDS,
-  VOYAGER_STREETS_ATTRIBUTION,
-  VOYAGER_STREETS_TILES,
+  ESRI_STREETS_ATTRIBUTION,
+  ESRI_WORLD_STREET_TILES,
   basemapAttribution,
   excludedFillPaint,
   excludedLinePaint,
@@ -63,20 +63,28 @@ describe("basemap helpers", () => {
     ]);
   });
 
-  it("uses keyless navigation streets and an imagery-plus-labels hybrid", () => {
-    expect(VOYAGER_STREETS_TILES).toBe("https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png");
-    expect(VOYAGER_STREETS_ATTRIBUTION).toMatch(/CARTO/);
-    expect(VOYAGER_STREETS_ATTRIBUTION).toMatch(/OpenStreetMap/);
-    expect(streetsTileUrl(null)).toBe(VOYAGER_STREETS_TILES);
+  it("uses keyless Esri streets and an imagery-plus-labels hybrid", () => {
+    expect(ESRI_WORLD_STREET_TILES).toBe(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+    );
+    expect(ESRI_WORLD_STREET_TILES).toContain("{z}/{y}/{x}");
+    expect(ESRI_WORLD_STREET_TILES).not.toMatch(/voyager|cartocdn|carto\.com/i);
+    expect(ESRI_STREETS_ATTRIBUTION).toMatch(/Esri/);
+    expect(ESRI_STREETS_ATTRIBUTION).toMatch(/OpenStreetMap/);
+    expect(streetsTileUrl(null)).toBe(ESRI_WORLD_STREET_TILES);
+    expect(streetsTileUrl(null)).not.toMatch(/voyager|cartocdn|carto\.com/i);
     expect(hybridImageryTileUrl(null)).toBe(ESRI_WORLD_IMAGERY_TILES);
     expect(ESRI_TRANSPORTATION_TILES).toContain("World_Transportation");
     expect(ESRI_PLACES_TILES).toContain("World_Boundaries_and_Places");
     expect(ESRI_HYBRID_ATTRIBUTION).toMatch(/Esri/);
     expect(streetsTileUrl("demo-key")).toContain("maps/streets-v2/256/");
     expect(streetsTileUrl("demo-key")).toContain("key=demo-key");
+    expect(streetsTileUrl("demo-key")).not.toContain("World_Street_Map");
     expect(hybridImageryTileUrl("demo-key")).toContain("maps/hybrid/256/");
-    expect(basemapAttribution("streets", null)).toMatch(/CARTO/);
+    expect(basemapAttribution("streets", null)).toBe(ESRI_STREETS_ATTRIBUTION);
+    expect(basemapAttribution("streets", null)).not.toMatch(/CARTO|Voyager/);
     expect(basemapAttribution("satellite", null)).toMatch(/Esri/);
+    expect(basemapAttribution("dark", null)).toMatch(/OpenFreeMap/);
     expect(basemapAttribution("streets", "demo-key")).toMatch(/MapTiler/);
     expect(rasterLayerVisibility("streets", true)).toEqual({
       "basemap-streets": "visible",

@@ -24,14 +24,14 @@ export function MeasureControl({ active, points, onStart, onClear, onCancel }: M
           if (active) onCancel();
           else onStart();
         }}
-        className={`rounded-full border px-3 py-1.5 text-xs font-medium shadow-2xl sm:text-sm ${
-          active ? "border-white/40 bg-white/15 text-white" : "border-white/15 bg-ink-900/92 text-ink-100 hover:text-white"
+        className={`rounded-full border px-3 py-1.5 text-xs font-semibold sm:text-sm ${
+          active ? "map-scrim-active border-white" : "map-scrim text-white hover:bg-white/10"
         }`}
       >
         Measure
       </button>
       {active ? (
-        <div className="rounded-xl border border-white/15 bg-ink-900/95 px-3 py-2 text-xs leading-snug text-ink-100 shadow-2xl">
+        <div className="map-scrim rounded-xl border px-3 py-2 text-xs leading-snug text-ink-100">
           <p className="font-medium text-white">Distance</p>
           {summary.segmentsMiles.length === 0 ? (
             <p className="mt-1 text-ink-300">Click the map to add points. Each click extends the line.</p>

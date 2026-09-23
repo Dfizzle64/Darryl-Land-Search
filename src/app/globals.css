@@ -37,6 +37,31 @@ body {
   filter: invert(1) hue-rotate(180deg);
 }
 
+/* MapLibre's default attribution is a translucent white chip. Force the same solid scrim as the other controls. */
+.maplibregl-ctrl-attrib {
+  background-color: #0c1218 !important;
+  color: #ffffff !important;
+}
+
+.maplibregl-ctrl-attrib a {
+  color: #ffffff !important;
+}
+
+@layer components {
+  /* One opaque scrim for map chrome. Reads on light Streets, Satellite hybrid, and Dark. */
+  .map-scrim {
+    background-color: #0c1218;
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+  }
+
+  .map-scrim-active {
+    background-color: #ffffff;
+    color: #0c1218;
+  }
+}
+
 /* Keep +/- off the desktop sites panel (w-80 + right-3). MapLibre's own rule sets right: 0 later in the cascade. */
 @media (min-width: 1280px) {
   .maplibregl-map .maplibregl-ctrl-bottom-right {

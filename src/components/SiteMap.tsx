@@ -1008,7 +1008,7 @@ export function SiteMap({
         <div className="map-chrome absolute inset-x-3 top-28 z-20 flex justify-center sm:top-24 xl:right-[22rem]">
           <div
             data-parcel-banner
-            className="max-w-md rounded-xl border border-clay-400/70 bg-ink-900/95 px-3 py-2 text-center shadow-2xl"
+            className="map-scrim max-w-md rounded-xl border px-3 py-2 text-center"
           >
             <p className="text-sm font-medium text-clay-400">Parcels are hidden</p>
             <p className="mt-1 text-xs leading-snug text-ink-100">
@@ -1018,7 +1018,7 @@ export function SiteMap({
         </div>
       ) : null}
       {status === "ready" && (showOz || showOz2 || showParcels) ? (
-        <div className="map-chrome absolute bottom-3 left-3 z-10 max-w-[20rem] space-y-1 rounded-lg border border-white/10 bg-ink-900/90 px-2 py-1.5 text-[10px] leading-snug text-ink-300 sm:bottom-4 sm:left-4">
+        <div className="map-chrome map-scrim absolute bottom-3 left-3 z-10 max-w-[20rem] space-y-1 rounded-lg border px-2 py-1.5 text-[10px] leading-snug text-ink-100 sm:bottom-4 sm:left-4">
           {aoi ? (
             <p>
               <span className="mr-1.5 inline-block h-2 w-3 border border-dashed border-clay-400 align-middle" />
@@ -1046,10 +1046,8 @@ export function SiteMap({
                     key={value}
                     type="button"
                     aria-pressed={tractClass === value}
-                    className={`rounded-full border px-2 py-0.5 text-[10px] ${
-                      tractClass === value
-                        ? "border-white/40 bg-ink-800 text-white"
-                        : "border-white/10 text-ink-400"
+                    className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${
+                      tractClass === value ? "map-scrim-active border-white" : "border-white/55 text-white hover:bg-white/10"
                     }`}
                     onClick={() => onTractClass(value)}
                   >
@@ -1100,7 +1098,7 @@ export function SiteMap({
               ) : null}
             </>
           ) : null}
-          <p className="text-ink-500">Pins mark tract internal points. 90-minute sheds are approximate county rings, not drive-time isochrones.</p>
+          <p className="text-ink-300">Pins mark tract internal points. 90-minute sheds are approximate county rings, not drive-time isochrones.</p>
           {scStatusHelp ? (
             <SouthCarolinaStatusNote note={SC_GOVERNOR_FILED_STATUS} className="text-ink-300" />
           ) : null}

@@ -23,14 +23,14 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels, except Rutherford | Complete where `CALC_ACRE` returns rows. Rutherford (47149) is not IMPACT; it uses the public AGOL `Parcel_Data` FeatureServer with city zoning and FLU joins. Other large counties absent from IMPACT stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb) or, for Rutherford, from city and county zoning polygons after `CITYCODE`. Rutherford multifamily tokens are Murfreesboro RM-12/RM-16, Smyrna R-5/R-6, and county RMF. Other districts in these markets are not a multifamily knowledge-base match. Prefer **All parcels** outside that list.
 
 ## Coverage
 
@@ -45,7 +45,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
-| Nashville | primary | 31,132 | 6 | 0 | 11 |
+| Nashville | primary | 40,809 | 7 | 0 | 10 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
@@ -147,7 +147,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Maury | Tennessee | 47119 | gap | 0 | tn-impact-47119 |
 | Montgomery | Tennessee | 47125 | gap | 0 | tn-impact-47125 |
 | Robertson | Tennessee | 47147 | gap | 0 | tn-impact-47147 |
-| Rutherford | Tennessee | 47149 | gap | 0 | tn-impact-47149 |
+| Rutherford | Tennessee | 47149 | complete-gte-5ac | 9,677 | tn-rutherford-agol-parcels |
 | Smith | Tennessee | 47159 | gap | 0 | tn-impact-47159 |
 | Sumner | Tennessee | 47165 | gap | 0 | tn-impact-47165 |
 | Trousdale | Tennessee | 47169 | gap | 0 | tn-impact-47169 |

@@ -76,9 +76,21 @@ export function ParcelDrawer({
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
+  const stateName = properties.state || (properties.countyFips?.startsWith("12") ? "Florida" : null);
   const placeLine =
     [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+    (properties.countyName
+      ? `${properties.countyName} County${stateName ? `, ${stateName}` : ""}`
+      : stateName || "Address area not available");
+  const floridaOwner = !properties.state || properties.state === "Florida" || properties.countyFips?.startsWith("12");
+  const zoningLine = [properties.zoningCode, properties.zoningLabel].filter(Boolean).join(" · ");
+  const saleInstrument = [
+    properties.lastSale.legalReference ? `Instrument ${properties.lastSale.legalReference}` : null,
+    properties.lastSale.grantor ? `Grantor ${properties.lastSale.grantor}` : null,
+    properties.lastSale.grantee ? `Grantee ${properties.lastSale.grantee}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -105,7 +117,7 @@ export function ParcelDrawer({
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
-        <Field label="Zoning" value={properties.zoningCode} />
+        <Field label="Zoning" value={zoningLine || properties.zoningCode} />
         <Field label="Future Land Use" value={fluLine} />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
@@ -120,8 +132,14 @@ export function ParcelDrawer({
         />
         <Field label="Last sale" value={formatSale(properties.lastSale)} />
         <Field label="Qualified sale" value={properties.lastSale.qualified} />
+        {saleInstrument ? <Field label="Sale instrument" value={saleInstrument} /> : null}
         <Field label="Market value" value={formatUsd(properties.tax.marketValue)} />
         <Field label="Assessed value" value={formatUsd(properties.tax.assessedValue)} />
+        {properties.tax.landValue != null ? <Field label="Land value" value={formatUsd(properties.tax.landValue)} /> : null}
+        {properties.tax.buildingValue != null ? (
+          <Field label="Building value" value={formatUsd(properties.tax.buildingValue)} />
+        ) : null}
+        {properties.tax.yardItemValue != null ? <Field label="Yard value" value={formatUsd(properties.tax.yardItemValue)} /> : null}
         <Field label="Taxable value" value={formatUsd(properties.tax.taxableValue)} />
         <Field label="Taxes" value={formatUsd(properties.tax.taxes)} />
       </dl>
@@ -178,12 +196,14 @@ export function ParcelDrawer({
         <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
           {appraiser.label}
         </a>
-        {entity && properties.ownerName ? (
+        {floridaOwner && entity && properties.ownerName ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={sunbizSearchUrl(properties.ownerName)} target="_blank" rel="noreferrer">
             Search Florida Sunbiz for LLC / corporate principals
           </a>
-        ) : (
+        ) : floridaOwner ? (
           <p className="text-ink-300">Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped.</p>
+        ) : (
+          <p className="text-ink-300">Sunbiz is a Florida entity search. This county uses the assessor link and the mailing address.</p>
         )}
         {properties.countyFips === "12095" || !properties.countyFips ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={comptrollerRecordsUrl()} target="_blank" rel="noreferrer">

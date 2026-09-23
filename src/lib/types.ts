@@ -21,6 +21,9 @@ export type LastSale = {
   date: string | null;
   price: number | null;
   qualified: string | null;
+  legalReference?: string | null;
+  grantor?: string | null;
+  grantee?: string | null;
 };
 
 export type TaxInfo = {
@@ -28,6 +31,12 @@ export type TaxInfo = {
   assessedValue: number | null;
   taxableValue: number | null;
   taxes: number | null;
+  /** Appraised land, when the county layer publishes it separately (Rutherford). */
+  landValue?: number | null;
+  buildingValue?: number | null;
+  yardItemValue?: number | null;
+  landValueWithAg?: number | null;
+  agriculturalCredit?: number | null;
 };
 
 export type IncomeInfo = {
@@ -389,9 +398,25 @@ export type ParcelProperties = {
   propertyName: string | null;
   zoningCode: string | null;
   zoningDistrict: string | null;
+  /** Long district name when the GIS layer has one. Matching still uses zoningDistrict. */
+  zoningLabel?: string | null;
+  /** Which public layer supplied zoningCode (city polygon, county polygon, or parcel attribute). */
+  zoningSource?: string | null;
+  /** Assessor parcel ZONING attribute before the jurisdiction polygon join. Often null. */
+  parcelZoningAttribute?: string | null;
   jurisdictionPrefix: string | null;
   dorCode: string | null;
   acreage: number | null;
+  /** Deed acres when the assessor publishes them beside calculated acres. */
+  deedAcres?: number | null;
+  /** Polygon geodesic acres kept for QA. The acreage filter uses calculated acres. */
+  geodesicAcres?: number | null;
+  /** Assessors join key (Rutherford GISLINK). Display id stays parcelId. */
+  gisLink?: string | null;
+  propertyId?: string | null;
+  camaAccount?: string | null;
+  /** Parcel CITYCODE (Rutherford), not the state+county FIPS. */
+  cityCode?: string | null;
   centroid: [number, number];
   lastSale: LastSale;
   tax: TaxInfo;

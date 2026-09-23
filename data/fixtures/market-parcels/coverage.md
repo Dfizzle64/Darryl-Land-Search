@@ -9,7 +9,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
-| Nashville | primary | 31,132 | 6 | 0 | 11 |
+| Nashville | primary | 40,809 | 7 | 0 | 10 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
@@ -111,7 +111,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Maury | Tennessee | 47119 | gap | 0 | tn-impact-47119 |
 | Montgomery | Tennessee | 47125 | gap | 0 | tn-impact-47125 |
 | Robertson | Tennessee | 47147 | gap | 0 | tn-impact-47147 |
-| Rutherford | Tennessee | 47149 | gap | 0 | tn-impact-47149 |
+| Rutherford | Tennessee | 47149 | complete-gte-5ac | 9,677 | tn-rutherford-agol-parcels |
 | Smith | Tennessee | 47159 | gap | 0 | tn-impact-47159 |
 | Sumner | Tennessee | 47165 | gap | 0 | tn-impact-47165 |
 | Trousdale | Tennessee | 47169 | gap | 0 | tn-impact-47169 |

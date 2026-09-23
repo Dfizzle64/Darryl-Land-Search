@@ -27,6 +27,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "47149": "https://secured.rutherfordcountytn.gov/OFS/WP/PropertySearch/QuickSearch",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -57,8 +58,10 @@ export function parcelAppraiserUrl(options: {
                 ? "Seminole"
                 : fips === "12119"
                   ? "Sumter"
-                  : fips === "12127"
-                    ? "Volusia"
+                : fips === "12127"
+                  ? "Volusia"
+                  : fips === "47149"
+                    ? "Rutherford"
                     : "county";
   return {
     href,

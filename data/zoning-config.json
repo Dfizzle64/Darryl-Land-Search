@@ -2,7 +2,7 @@
   "version": 2,
   "county": "Orange County, FL",
   "updatedAt": "2026-09-17",
-  "notes": "OCPA stores zoning as JURISDICTION-DISTRICT/overlays, e.g. ORL-R-3B/T/AN. Matching uses the jurisdiction prefix plus the base district (before overlay suffixes). Edit this file to change what counts as multifamily-capable; do not hard-code a second list in the app. PD/PUD is always maybe — site-specific. Conditional districts (Live Local commercial/industrial, some mixed-use overlays) are off by default and gated by the conditional toggle.",
+  "notes": "OCPA stores zoning as JURISDICTION-DISTRICT/overlays, e.g. ORL-R-3B/T/AN. Matching uses the jurisdiction prefix plus the base district (before overlay suffixes). Edit this file to change what counts as multifamily-capable; do not hard-code a second list in the app. PD/PUD is always maybe — site-specific. Conditional districts (Live Local commercial/industrial, some mixed-use overlays) are off by default and gated by the conditional toggle. Rutherford County, TN prefixes (MUR, SMY, LVG, EAG, RUT) are included for the Nashville market. Only districts the county card calls multifamily-relevant are scored; other Rutherford districts stay unscored.",
   "sources": [
     {
       "label": "Orange County Code Ch. 38 Zoning (Municode)",
@@ -576,6 +576,99 @@
         "url": "https://www.town.windermere.fl.us/"
       },
       "districts": []
+    },
+    {
+      "code": "MUR",
+      "name": "City of Murfreesboro, TN",
+      "coverage": "partial",
+      "coverageNote": "Joined from Murfreesboro GovUnits zoning (SubZoning) onto countywide parcels with CITYCODE 515. RM-12 and RM-16 are the multifamily districts called out on the county card. Planned residential, mixed-use, and CBD stay unscored until the Land Use Chart is coded district by district.",
+      "codeSource": {
+        "label": "Murfreesboro zoning inquiry / Land Use Chart",
+        "url": "https://www.murfreesborotn.gov/1663/Zoning-Inquiry"
+      },
+      "districts": [
+        {
+          "token": "RM-12",
+          "label": "Residential Multi-Family 12",
+          "status": "permitted",
+          "why": "Murfreesboro multifamily district on the public zoning layer. Confirm the Land Use Chart before treating a site as entitled.",
+          "sourceUrl": "https://maps.murfreesborotn.gov/server/rest/services/Cityworks/GovUnits/FeatureServer/24"
+        },
+        {
+          "token": "RM-16",
+          "label": "Residential Multi-Family 16",
+          "status": "permitted",
+          "why": "Murfreesboro multifamily district on the public zoning layer. Confirm the Land Use Chart before treating a site as entitled.",
+          "sourceUrl": "https://maps.murfreesborotn.gov/server/rest/services/Cityworks/GovUnits/FeatureServer/24"
+        }
+      ]
+    },
+    {
+      "code": "SMY",
+      "name": "Town of Smyrna, TN",
+      "coverage": "partial",
+      "coverageNote": "Joined from the town zoning MapServer (county mirror if the town host fails) onto CITYCODE 674. High-density residential is R-5 and R-6. Other Smyrna districts are not scored.",
+      "codeSource": {
+        "label": "Town of Smyrna interactive GIS",
+        "url": "https://www.townofsmyrna.org/departments/planning_zoning/interactive_gis_maps.php"
+      },
+      "districts": [
+        {
+          "token": "R-5",
+          "label": "High density residential",
+          "status": "permitted",
+          "why": "Smyrna ZONE_ID R-5 high density residential. Confirm the town zoning ordinance before treating a site as entitled.",
+          "sourceUrl": "https://maps.townofsmyrna.org/server/rest/services/Public_Access/Smyrna_Online_Utility_Map/MapServer/24"
+        },
+        {
+          "token": "R-6",
+          "label": "High density residential",
+          "status": "permitted",
+          "why": "Smyrna ZONE_ID R-6 high density residential. Confirm the town zoning ordinance before treating a site as entitled.",
+          "sourceUrl": "https://maps.townofsmyrna.org/server/rest/services/Public_Access/Smyrna_Online_Utility_Map/MapServer/24"
+        }
+      ]
+    },
+    {
+      "code": "LVG",
+      "name": "City of La Vergne, TN",
+      "coverage": "partial",
+      "coverageNote": "Zoning polygons are the county mirror (Zoning_Typ), not a city FeatureServer. La Vergne's 2025-10-09 ordinance says the legal zoning map is the city GIS layer, so these districts may predate that ordinance. No multifamily token is invented from the old code list.",
+      "codeSource": {
+        "label": "La Vergne zoning ordinance (2025-10-09)",
+        "url": "https://www.lavergnetn.gov/DocumentCenter/View/5032/New-Zoning-Ordinance---2025-10-09"
+      },
+      "districts": []
+    },
+    {
+      "code": "EAG",
+      "name": "Town of Eagleville, TN",
+      "coverage": "unverified",
+      "coverageNote": "No Eagleville public zoning FeatureServer was verified. The parcel ZONING attribute is stored when present. No district is treated as multifamily.",
+      "codeSource": {
+        "label": "Rutherford County GIS",
+        "url": "https://rutherfordcountytn.gov/gis"
+      },
+      "districts": []
+    },
+    {
+      "code": "RUT",
+      "name": "Unincorporated Rutherford County, TN",
+      "coverage": "partial",
+      "coverageNote": "Joined from Planning_Zoning_Subdivisions MapServer layer 2 (ZONEABBRV) for CITYCODE 000. RMF is Residential Multi-Family. Other county districts (RM, RL, CG, and so on) are not scored as 4+ multifamily.",
+      "codeSource": {
+        "label": "Rutherford County Planning zoning",
+        "url": "https://maps.rutherfordcountytn.gov/server/rest/services/Planning/Planning_Zoning_Subdivisions/MapServer/2"
+      },
+      "districts": [
+        {
+          "token": "RMF",
+          "label": "Residential Multi-Family",
+          "status": "permitted",
+          "why": "Unincorporated Rutherford ZONEABBRV RMF is Residential Multi-Family. Confirm the county zoning ordinance before treating a site as entitled.",
+          "sourceUrl": "https://maps.rutherfordcountytn.gov/server/rest/services/Planning/Planning_Zoning_Subdivisions/MapServer/2"
+        }
+      ]
     }
   ],
   "multifamilyTokens": [],

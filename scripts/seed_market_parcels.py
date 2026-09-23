@@ -694,6 +694,10 @@ def county_override(fips: str) -> dict | None:
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
             ],
         }
+    if fips == "47149":  # Rutherford TN — not IMPACT
+        from rutherford_parcels import rutherford_spec
+
+        return rutherford_spec()
     return None
 
 
@@ -959,14 +963,14 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels, except Rutherford | Complete where `CALC_ACRE` returns rows. Rutherford (47149) is not IMPACT; it uses the public AGOL `Parcel_Data` FeatureServer with city zoning and FLU joins. Other large counties absent from IMPACT stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb) or, for Rutherford, from city and county zoning polygons after `CITYCODE`. Rutherford multifamily tokens are Murfreesboro RM-12/RM-16, Smyrna R-5/R-6, and county RMF. Other districts in these markets are not a multifamily knowledge-base match. Prefer **All parcels** outside that list.
 
 ## Coverage
 """
@@ -1049,7 +1053,13 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     print(f"  source rows {expected}", flush=True)
     ids = fetch_object_ids(spec["url"], spec["where"])
     raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
-    features, dropped = normalize_rows(raw, county, markets, spec)
+    extra_gaps: list[str] = []
+    if spec.get("normalizer") == "rutherford":
+        from rutherford_parcels import features_from_rutherford
+
+        features, dropped, extra_gaps = features_from_rutherford(raw, county, markets)
+    else:
+        features, dropped = normalize_rows(raw, county, markets, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -1058,6 +1068,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     )
     coverage = spec["coverage"]
     gaps = list(spec.get("gaps") or [])
+    gaps.extend(extra_gaps)
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,
@@ -1193,6 +1204,9 @@ def main() -> None:
                 row["markets"] = markets
                 (COUNTY_DIR / fips / "county.json").write_text(json.dumps(row, indent=2) + "\n")
                 continue
+        if args.refresh:
+            spec = dict(spec)
+            spec["ignoreCache"] = True
         jobs.append((priority_of(markets, catalog), slot["county"]["name"], slot["county"], markets, spec))
 
     jobs.sort()

@@ -78,7 +78,10 @@ export function ParcelDrawer({
     : null;
   const placeLine =
     [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+    (properties.countyName
+      ? `${properties.countyName} County${properties.state ? `, ${properties.state}` : ""}`
+      : "Florida");
+  const zoningLabel = [properties.zoningCode, properties.jurisdictionCode].filter(Boolean).join(" · ");
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -105,7 +108,7 @@ export function ParcelDrawer({
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
-        <Field label="Zoning" value={properties.zoningCode} />
+        <Field label="Zoning" value={zoningLabel} />
         <Field label="Future Land Use" value={fluLine} />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field

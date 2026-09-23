@@ -10,7 +10,7 @@ import {
   type MarketParcelIndex,
 } from "../lib/marketParcels";
 import { ORLANDO_PARCEL_TILE, showOrlandoParcels } from "../lib/orlandoParcels";
-import type { ParcelCollection } from "../lib/types";
+import type { ParcelCollection, ParcelFeature } from "../lib/types";
 
 const index: MarketParcelIndex = {
   generatedAt: "2026-09-23T00:00:00Z",
@@ -121,5 +121,66 @@ describe("market parcel gating and acreage", () => {
       }
       if (checked >= 25) break;
     }
+  });
+});
+
+describe("Atlanta ring county extracts", () => {
+  const root = path.join(process.cwd(), "data/fixtures/market-parcels");
+
+  function countyMeta(fips: string) {
+    return JSON.parse(readFileSync(path.join(root, "counties", fips, "county.json"), "utf8")) as {
+      coverage: string;
+      featureCount: number;
+      source: string;
+      queryUrl: string;
+      gaps: string[];
+      minAcres: number;
+      maxAcres: number;
+    };
+  }
+
+  function firstFeature(fips: string): ParcelFeature {
+    const tiles = path.join(root, "counties", fips, "tiles");
+    const file = readdirSync(tiles).find((name) => name.endsWith(".geojson"));
+    if (!file) throw new Error(`No tiles for ${fips}`);
+    const collection = JSON.parse(readFileSync(path.join(tiles, file), "utf8")) as {
+      features: ParcelFeature[];
+    };
+    const feature = collection.features[0];
+    if (!feature) throw new Error(`Empty tile for ${fips}`);
+    return feature;
+  }
+
+  it("ships Gwinnett from GC_Parcel with zoning, tax, and unqualified sales", () => {
+    const county = countyMeta("13135");
+    expect(county.coverage).toBe("complete-gte-5ac");
+    expect(county.featureCount).toBeGreaterThan(1000);
+    expect(county.minAcres).toBe(5);
+    expect(county.maxAcres).toBe(150);
+    expect(county.source).toBe("ga-gwinnett-gc-parcel");
+    expect(county.queryUrl).toContain("GC_Parcel/MapServer/6");
+    expect(county.queryUrl).not.toContain("FeatureServer/0");
+    const gaps = county.gaps.join(" ");
+    expect(gaps).toMatch(/qualified/i);
+    expect(gaps).toMatch(/Lawrenceville/);
+    expect(gaps).toMatch(/unincorporated/i);
+    expect(gaps).toMatch(/Future Development/);
+    const feature = firstFeature("13135");
+    expect(feature.properties.countyFips).toBe("13135");
+    expect(feature.properties.marketIds).toContain("Atlanta");
+    expect(feature.properties.acreage).toBeGreaterThanOrEqual(5);
+    expect(feature.properties.acreage).toBeLessThanOrEqual(150);
+    expect(feature.properties.ownerName).toBeTruthy();
+    expect(feature.properties.lastSale.qualified).toBeNull();
+    expect(feature.geometry.type === "Polygon" || feature.geometry.type === "MultiPolygon").toBe(true);
+  });
+
+  it("documents the Gwinnett gaps and does not claim untiled counties are complete", () => {
+    const docs = readFileSync(path.join(process.cwd(), "docs/market-parcels.md"), "utf8");
+    expect(docs).toMatch(/no sale qualified flag/i);
+    expect(docs).toMatch(/Lawrenceville/);
+    expect(docs).toMatch(/FeatureServer\/0 is geometry and PIN only/);
+    expect(docs).toMatch(/\| Gwinnett \| Georgia \| 13135 \| complete-gte-5ac \|/);
+    expect(docs).not.toMatch(/Cherokee, Clayton, and Gwinnett are complete/);
   });
 });

@@ -26,11 +26,17 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Gwinnett county services. Cherokee and Clayton adapters are in the seeder | Cobb complete. DeKalb is a polygon-acre sample. Gwinnett is a complete 5–150 acre extract. Cherokee and Clayton are wired in `county_override` and stay gaps until that pull is run. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when a public county or city layer carries it. DeKalb uses the parcel zoning attribute. Gwinnett uses county-wide zoning polygons (TYPE and JURISDICTION), then city zoning for Lawrenceville, Duluth, and Peachtree Corners. Cherokee and Clayton seed adapters are in the script and were not tiled in this pull. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+## Gwinnett
+
+Gwinnett parcels come from `GC_Parcel` MapServer/6 (owner, situs, string tax values, CAMA zoning). AGOL `Property_and_Tax` FeatureServer/0 is geometry and PIN only and is not the parcel source. Zoning is the county-wide FeatureServer/1 layer, which covers unincorporated and every municipality. Lawrenceville, Duluth, and Peachtree Corners then replace that code from each city's REST. Suwanee, Norcross, Snellville, Buford, Sugar Hill, Lilburn, Dacula, Grayson, Berkeley Lake, Loganville, Auburn, Braselton, Mulberry, and Rest Haven stay on the county `JURISDICTION` filter. Sales join the Land Value Table on TAXPIN (`SALE1AMT` / `SALE1D`). There is no sale qualified flag. The 2045 Future Development Map is 16 coarse polygons and is not parcel FLU. Character-area FLU is joined only inside Lawrenceville, Duluth, and Peachtree Corners. Human search is qPublic AppID 1282.
+
+Cherokee and Clayton adapters are in `county_override` (`--county Cherokee`, `--county Clayton`) and are not tiled yet. Cherokee would use MainLayersPRO MapServer/1 on `gis.cherokeecountyga.gov` (not `gis.cherokeega.com`). It has no sale price or date; `CURR_VAL` on the older AGOL backup is only a partial market-value join. Unincorporated zoning is ZoningOnlinePortal MapServer/3. `Zoning=CITY` would use Canton, Woodstock, and Ball Ground. Holly Springs, Waleska, Nelson, and Mountain Park have no public zoning service. Clayton would use TaxAssessor/Parcels MapServer/0. Sales there have no qualified flag. Unincorporated zoning and future land use would join PEZ FeatureServer/1 on `PARCELID`, with Comp Plan 2039 as the fallback. Forest Park, Morrow, Jonesboro, Riverdale, Lake City, and Lovejoy stay on county `ZONE` filtered by `CVTTXCD`. Rex is unincorporated.
 
 ## Coverage
 
@@ -42,7 +48,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 8,149 | 1 | 1 | 33 |
+| Atlanta | primary | 14,802 | 2 | 1 | 32 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
@@ -85,7 +91,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Forsyth | Georgia | 13117 | gap | 0 | unavailable |
 | Fulton | Georgia | 13121 | gap | 0 | unavailable |
 | Gordon | Georgia | 13129 | gap | 0 | unavailable |
-| Gwinnett | Georgia | 13135 | gap | 0 | unavailable |
+| Gwinnett | Georgia | 13135 | complete-gte-5ac | 6,653 | ga-gwinnett-gc-parcel |
 | Hall | Georgia | 13139 | gap | 0 | unavailable |
 | Haralson | Georgia | 13143 | gap | 0 | unavailable |
 | Heard | Georgia | 13149 | gap | 0 | unavailable |

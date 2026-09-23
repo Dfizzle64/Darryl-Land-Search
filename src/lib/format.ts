@@ -27,6 +27,10 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "13057": "https://property.spatialest.com/ga/cherokee/",
+  "13063": "https://publicaccess.claytoncountyga.gov/search/commonsearch.aspx?mode=realprop",
+  "13135":
+    "https://qpublic.schneidercorp.com/Application.aspx?AppID=1282&LayerID=43872&PageTypeID=2&PageID=16058",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -57,9 +61,15 @@ export function parcelAppraiserUrl(options: {
                 ? "Seminole"
                 : fips === "12119"
                   ? "Sumter"
-                  : fips === "12127"
-                    ? "Volusia"
-                    : "county";
+      : fips === "12127"
+        ? "Volusia"
+        : fips === "13057"
+          ? "Cherokee"
+          : fips === "13063"
+            ? "Clayton"
+            : fips === "13135"
+              ? "Gwinnett"
+              : "county";
   return {
     href,
     label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,

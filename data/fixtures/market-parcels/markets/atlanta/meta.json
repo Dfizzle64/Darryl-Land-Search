@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:48:14Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 8149,
+  "parcelCount": 14802,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -324,20 +324,32 @@
       "name": "Gwinnett",
       "fips": "13135",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 6653,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-gwinnett-gc-parcel",
+      "queryUrl": "https://gis3.gwinnettcounty.com/mapvis/rest/services/GISDataBrowser/GC_Parcel/MapServer/6/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "6655 source rows collapsed to 6653 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Parcels are Gwinnett GC_Parcel MapServer/6. AGOL Property_and_Tax FeatureServer/0 is geometry and PIN only and is not the parcel source.",
+        "Acreage is CALCULATEDACREAGE 5\u2013150. Deeded acreage is often 0 and was not used.",
+        "Zoning polygons are county-wide Property_and_Tax FeatureServer/1 (TYPE and JURISDICTION), including unincorporated. The parcel CAMA ZONING string is only the fallback.",
+        "Lawrenceville, Duluth, and Peachtree Corners replace TYPE with the city's own REST zoning where the parcel joins. Duluth uses the UDC_Zoning domain (RA-200 through PUD), not the joined county CAMA code.",
+        "Other municipalities (Suwanee, Norcross, Snellville, Buford, Sugar Hill, Lilburn, Dacula, Grayson, Berkeley Lake, Loganville, Auburn, Braselton, Mulberry, Rest Haven) have no independent public zoning REST. They use the county zoning layer filtered by JURISDICTION.",
+        "Sales join Property_and_Tax FeatureServer/10 (Land Value Table) on TAXPIN = trimmed PIN, using SALE1AMT and SALE1D. There is no lastSale.qualified flag. Amounts of 0 or 1 are omitted.",
+        "County 2045 Future Development (GC_Planning/7) is 16 coarse INTENSITY polygons and is not joined as parcel FLU. Character-area FLU is joined only for Lawrenceville, Duluth, and Peachtree Corners.",
+        "TOTVAL1 and TAXTOT1 are parsed from strings. There is no tax.taxableValue.",
+        "Buford, Loganville, Auburn, and Braselton cross county lines. This extract covers the Gwinnett footprint only.",
+        "Appraiser search is qPublic AppID 1282. Automated clients often get a CDN 403; the page is public for people.",
+        "Parcels in this 5\u2013150 acre extract by zoning jurisdiction: BERKELEY LAKE 21, BRASELTON 39, BUFORD 272, DACULA 74, DULUTH 168, GRAYSON 36, LAWRENCEVILLE 246, LILBURN 94, LOGANVILLE 28, MULBERRY 477, NORCROSS 132, PEACHTREE CORNERS 283, REST HAVEN 3, SNELLVILLE 114, SUGAR HILL 161, SUWANEE 193, UNINCORPORATED 4232, UNKNOWN 80.",
+        "County zoning polygon hit 6573 of 6653 parcels. City REST zoning replaced the county code for Lawrenceville 241, Duluth 168, Peachtree Corners 283. Character-area FLU joined for 679 parcels in those three cities. Land Value Table prices above $1 joined for 2560 parcels. qualified is always null."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13135/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13135/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 6655
     },
     {
       "name": "Hall",

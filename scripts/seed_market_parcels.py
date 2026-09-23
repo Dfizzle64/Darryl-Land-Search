@@ -287,6 +287,7 @@ def empty_feature(
     center: tuple[float, float],
     source: str,
     owner: str | None = None,
+    owner2: str | None = None,
     situs: str | None = None,
     city: str | None = None,
     zip_code: str | None = None,
@@ -320,7 +321,7 @@ def empty_feature(
             "situsZip": zip_code,
             "jurisdictionCode": None,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
             "zoningDistrict": None,
@@ -371,12 +372,18 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    return_geometry: bool = True,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
         "outFields": ",".join(out_fields),
-        "returnGeometry": "true",
+        "returnGeometry": "true" if return_geometry else "false",
         "outSR": "4326",
     }
     for start in range(0, total, batch):
@@ -388,12 +395,28 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(
+                        url,
+                        chunk,
+                        out_fields,
+                        batch=max(20, len(chunk) // 2),
+                        return_geometry=return_geometry,
+                    )
+                )
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(
+                        url,
+                        chunk,
+                        out_fields,
+                        batch=max(20, len(chunk) // 2),
+                        return_geometry=return_geometry,
+                    )
+                )
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -455,6 +478,13 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        sold = None
+        qualified = None
+        if spec.get("saleYearField"):
+            sold = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
+            qualified = clean(attrs.get("QUAL_CD1"))
+        elif spec.get("saleDateField"):
+            sold = parse_any_sale_date(attrs.get(spec["saleDateField"]))
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -466,14 +496,15 @@ def normalize_rows(
             center=center,  # type: ignore[arg-type]
             source=spec["source"],
             owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
+            owner2=clean(attrs.get(spec["owner2Field"])) if spec.get("owner2Field") else None,
             situs=clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None,
             city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
             zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
-            sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
+            sale_date=sold,
+            sale_qualified=qualified,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
             taxable=num(attrs.get(spec["taxableField"])) if spec.get("taxableField") else None,
@@ -483,6 +514,12 @@ def normalize_rows(
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        if spec.get("taxPinField"):
+            feature["properties"]["_taxPin"] = clean(attrs.get(spec["taxPinField"]))
+        if spec.get("zoningDescriptionField"):
+            feature["properties"]["_zoningDesc"] = clean(attrs.get(spec["zoningDescriptionField"]))
+        if spec.get("districtField"):
+            feature["properties"]["_district"] = clean(attrs.get(spec["districtField"]))
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -603,7 +640,775 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+def pin_key(value: Any) -> str | None:
+    text = clean(value)
+    if not text:
+        return None
+    return " ".join(text.upper().split())
+
+
+def nospace_key(value: Any) -> str | None:
+    text = pin_key(value)
+    if not text:
+        return None
+    return text.replace(" ", "")
+
+
+def parse_mdy(value: Any) -> str | None:
+    text = clean(value)
+    if not text:
+        return None
+    parts = text.split("/")
+    if len(parts) != 3:
+        return None
+    try:
+        month, day, year = (int(parts[0]), int(parts[1]), int(parts[2]))
+    except ValueError:
+        return None
+    if year < 100:
+        year += 2000 if year < 70 else 1900
+    if not (1900 <= year <= 2100 and 1 <= month <= 12 and 1 <= day <= 31):
+        return None
+    return f"{year:04d}-{month:02d}-{day:02d}"
+
+
+def parse_any_sale_date(value: Any) -> str | None:
+    text = clean(value)
+    if not text:
+        return None
+    if "/" in text:
+        return parse_mdy(text)
+    digits = "".join(ch for ch in text if ch.isdigit())
+    if len(digits) != 8:
+        return None
+    year, month, day = int(digits[:4]), int(digits[4:6]), int(digits[6:8])
+    if not (1900 <= year <= 2100 and 1 <= month <= 12 and 1 <= day <= 31):
+        return None
+    return f"{year:04d}-{month:02d}-{day:02d}"
+
+
+def market_sale_price(value: Any) -> float | None:
+    """Land Value Table stores 0 and 1 for non-market instruments. There is no qualified flag."""
+    price = num(value)
+    if price is None or price <= 1:
+        return None
+    return price
+
+
+def flu_info(code: Any, label: Any, jurisdiction: str, source: str) -> dict | None:
+    text = clean(code)
+    if not text:
+        return None
+    return {
+        "code": text,
+        "label": clean(label) or text,
+        "jurisdiction": jurisdiction,
+        "source": source,
+    }
+
+
+def page_features(
+    url: str,
+    where: str,
+    fields: list[str],
+    *,
+    geometry: bool,
+    page: int,
+) -> list[dict] | None:
+    """Page with resultOffset. None means the server repeated a page and offset is unsafe."""
+    rows: list[dict] = []
+    offset = 0
+    seen: set[int] = set()
+    label = url.split("/services/")[-1][:72]
+    while offset < 400000:
+        data = fetch_json(
+            url,
+            {
+                "where": where,
+                "outFields": ",".join(fields),
+                "returnGeometry": "true" if geometry else "false",
+                "outSR": "4326",
+                "resultOffset": str(offset),
+                "resultRecordCount": str(page),
+                "f": "json",
+            },
+            timeout=120,
+        )
+        if data.get("error"):
+            if page > 80:
+                page = max(80, page // 2)
+                continue
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        feats = data.get("features") or []
+        fresh = 0
+        for feature in feats:
+            attrs = feature.get("attributes") or {}
+            oid = attrs.get("OBJECTID", attrs.get("OBJECTID1", attrs.get("OBJECTID_1", attrs.get("objectid"))))
+            if isinstance(oid, int):
+                if oid in seen:
+                    print(f"    offset ignored for {label}", flush=True)
+                    return None
+                seen.add(oid)
+            fresh += 1
+        rows.extend(feats)
+        print(f"    {len(rows)} {label}", flush=True)
+        if not feats or (len(feats) < page and not data.get("exceededTransferLimit")):
+            return rows
+        offset += len(feats)
+    return rows
+
+
+def load_layer(
+    url: str,
+    where: str,
+    fields: list[str],
+    *,
+    geometry: bool,
+    batch: int = 120,
+) -> list[dict]:
+    paged = page_features(url, where, fields, geometry=geometry, page=400 if geometry else 2000)
+    if paged is not None:
+        return paged
+    ids = fetch_object_ids(url, where)
+    print(f"    {len(ids)} rows {url.split('/services/')[-1][:72]}", flush=True)
+    if not ids:
+        return []
+    return fetch_by_ids(url, ids, fields, batch=min(batch, 80), return_geometry=geometry)
+
+
+def query_attributes_in(url: str, field: str, values: list[str], out_fields: list[str], batch: int = 60) -> list[dict]:
+    rows: list[dict] = []
+    unique: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        if value and value not in seen:
+            seen.add(value)
+            unique.append(value)
+    for start in range(0, len(unique), batch):
+        chunk = unique[start : start + batch]
+        quoted = ",".join("'" + value.replace("'", "''") + "'" for value in chunk)
+        data = fetch_json(
+            url,
+            {
+                "where": f"{field} IN ({quoted})",
+                "outFields": ",".join(out_fields),
+                "returnGeometry": "false",
+                "f": "json",
+            },
+        )
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        rows.extend(data.get("features") or [])
+        done = min(start + len(chunk), len(unique))
+        if done == len(chunk) or done == len(unique) or done % (batch * 8) == 0:
+            print(f"    {field} {done}/{len(unique)}", flush=True)
+    return rows
+
+
+def index_attrs(rows: list[dict], fields: list[str]) -> dict[str, dict]:
+    indexed: dict[str, dict] = {}
+    for row in rows:
+        attrs = row.get("attributes") or {}
+        for field in fields:
+            for key in (pin_key(attrs.get(field)), nospace_key(attrs.get(field))):
+                if key and key not in indexed:
+                    indexed[key] = attrs
+    return indexed
+
+
+def lookup_attr(index: dict[str, dict], *values: Any) -> dict | None:
+    for value in values:
+        for key in (pin_key(value), nospace_key(value)):
+            if key and key in index:
+                return index[key]
+    return None
+
+
+def ring_contains(x: float, y: float, ring: list) -> bool:
+    inside = False
+    count = len(ring)
+    if count < 3:
+        return False
+    previous = count - 1
+    for index in range(count):
+        xi, yi = ring[index][0], ring[index][1]
+        xj, yj = ring[previous][0], ring[previous][1]
+        if (yi > y) != (yj > y):
+            span = yj - yi
+            if span != 0 and x < (xj - xi) * (y - yi) / span + xi:
+                inside = not inside
+        previous = index
+    return inside
+
+
+def rings_contain(x: float, y: float, rings: list) -> bool:
+    hits = 0
+    for ring in rings:
+        if ring_contains(x, y, ring):
+            hits += 1
+    return hits % 2 == 1
+
+
+class PolyIndex:
+    """Grid index for point-in-polygon against ArcGIS rings in WGS84."""
+
+    def __init__(self, cell: float = 0.03) -> None:
+        self.cell = cell
+        self.grid: dict[tuple[int, int], list[int]] = defaultdict(list)
+        self.wide: list[int] = []
+        self.items: list[tuple] = []
+
+    def add(self, feature: dict, props: dict) -> None:
+        rings = (feature.get("geometry") or {}).get("rings") or []
+        if not rings:
+            return
+        xs = [point[0] for ring in rings for point in ring]
+        ys = [point[1] for ring in rings for point in ring]
+        if not xs:
+            return
+        bbox = (min(xs), min(ys), max(xs), max(ys))
+        area = abs(ring_signed_m2(rings[0])) if rings[0] else 0.0
+        index = len(self.items)
+        self.items.append((rings, props, bbox, area))
+        x0, x1 = math.floor(bbox[0] / self.cell), math.floor(bbox[2] / self.cell)
+        y0, y1 = math.floor(bbox[1] / self.cell), math.floor(bbox[3] / self.cell)
+        if (x1 - x0 + 1) * (y1 - y0 + 1) > 600:
+            self.wide.append(index)
+            return
+        for ix in range(x0, x1 + 1):
+            for iy in range(y0, y1 + 1):
+                self.grid[(ix, iy)].append(index)
+
+    def hits(self, lon: float, lat: float) -> list[dict]:
+        key = (math.floor(lon / self.cell), math.floor(lat / self.cell))
+        found: list[tuple[float, dict]] = []
+        for index in [*self.grid.get(key, []), *self.wide]:
+            rings, props, bbox, area = self.items[index]
+            if not (bbox[0] <= lon <= bbox[2] and bbox[1] <= lat <= bbox[3]):
+                continue
+            if rings_contain(lon, lat, rings):
+                found.append((area, props))
+        found.sort(key=lambda item: item[0])
+        return [props for _area, props in found]
+
+
+def index_polygons(features: list[dict], prop_fn) -> PolyIndex:
+    index = PolyIndex()
+    for feature in features:
+        props = prop_fn(feature.get("attributes") or {})
+        if props:
+            index.add(feature, props)
+    return index
+
+
+def stamp_notes(feature: dict, gaps: list[str], appraiser_url: str) -> None:
+    props = feature["properties"]
+    props["dataGaps"] = gaps
+    props["appraiserUrl"] = appraiser_url
+    props.pop("_taxPin", None)
+    props.pop("_zoningDesc", None)
+    props.pop("_district", None)
+
+
+def jurisdiction_counts(features: list[dict]) -> str:
+    counts: dict[str, int] = defaultdict(int)
+    for feature in features:
+        code = feature["properties"].get("jurisdictionCode") or "UNKNOWN"
+        counts[code] += 1
+    parts = [f"{name} {counts[name]}" for name in sorted(counts)]
+    return "Parcels in this 5–150 acre extract by zoning jurisdiction: " + ", ".join(parts) + "."
+
+
+DULUTH_UDC = {
+    "1": "RA-200",
+    "2": "R-100",
+    "3": "R-75",
+    "4": "RM",
+    "5": "R-50",
+    "6": "HRD",
+    "7": "C-1",
+    "8": "C-2",
+    "9": "HC-R",
+    "10": "HC-A",
+    "11": "O-I",
+    "12": "O-N",
+    "13": "CBD",
+    "14": "M-1",
+    "15": "M-2",
+    "16": "RD",
+    "17": "PUD",
+}
+
+GWINNETT_APPRAISER = (
+    "https://qpublic.schneidercorp.com/Application.aspx?AppID=1282&LayerID=43872&PageTypeID=2&PageID=16058"
+)
+CHEROKEE_APPRAISER = "https://property.spatialest.com/ga/cherokee/"
+CHEROKEE_CITY_NAMES = {
+    2: "Ball Ground",
+    3: "Canton",
+    4: "Holly Springs",
+    5: "Nelson",
+    6: "Waleska",
+    7: "Woodstock",
+    8: "Mountain Park",
+}
+CHEROKEE_FLU = {
+    1: "Utilities",
+    2: "Workplace Center",
+    3: "Regional Center",
+    4: "Urban Core",
+    5: "Neighborhood Living",
+    6: "Suburban Living",
+    7: "Suburban Growth",
+    8: "Country Estates",
+    9: "Rural Places",
+    10: "Natural Preserve",
+    11: "Bells Ferry LCI",
+    12: "SW Cherokee",
+    13: "Wild Cat",
+    14: "Scenic Corridor",
+    15: "Corridor and Nodes",
+    16: "Community Village",
+}
+GWINNETT_FEATURE_GAPS = [
+    "No lastSale.qualified flag. Sale amounts of 0 or 1 are omitted as non-market.",
+    "County 2045 Future Development is 16 coarse polygons and is not joined as parcel FLU.",
+    "No tax.taxableValue. TOTVAL1 and TAXTOT1 were parsed from strings.",
+]
+CHEROKEE_FEATURE_GAPS = [
+    "No public sale price, date, or qualified flag. Sale history is Spatialest only.",
+    "Tax market value is partial AGOL CURR_VAL when joined. No assessed or taxable value.",
+    "Future Development FLU is coarse plan geography, not a parcel-level land-use code.",
+]
+
+
+def enrich_gwinnett(features: list[dict]) -> list[str]:
+    zoning_url = "https://services3.arcgis.com/RfpmnkSAQleRbndX/arcgis/rest/services/Property_and_Tax/FeatureServer/1/query"
+    sales_url = "https://services3.arcgis.com/RfpmnkSAQleRbndX/arcgis/rest/services/Property_and_Tax/FeatureServer/10/query"
+    lawrenceville_url = "https://gisinfo.lawrencevillega.org/server/rest/services/PlanningDevelopment/PlanningDevelopment/MapServer/2/query"
+    lawrenceville_flu_url = "https://gisinfo.lawrencevillega.org/server/rest/services/PlanningDevelopment/PlanningDevelopment/MapServer/0/query"
+    duluth_url = "https://services7.arcgis.com/ZTAeUzNBWlnSi6by/arcgis/rest/services/Zoning2024/FeatureServer/150/query"
+    duluth_flu_url = "https://services7.arcgis.com/ZTAeUzNBWlnSi6by/arcgis/rest/services/CharacterAreas/FeatureServer/108/query"
+    ptc_url = "https://services3.arcgis.com/jEYjQXUX2JTVoctH/arcgis/rest/services/Parcel_Zoning_Sept_2022/FeatureServer/37/query"
+    ptc_flu_url = "https://services3.arcgis.com/jEYjQXUX2JTVoctH/arcgis/rest/services/PTC_Character_Area/FeatureServer/15/query"
+
+    zoning_rows = load_layer(zoning_url, "1=1", ["TYPE", "JURISDICTION"], geometry=True, batch=80)
+    zoning_index = index_polygons(
+        zoning_rows,
+        lambda attrs: {"code": clean(attrs.get("TYPE")), "jurisdiction": clean(attrs.get("JURISDICTION"))}
+        if clean(attrs.get("TYPE")) or clean(attrs.get("JURISDICTION"))
+        else None,
+    )
+    lawrenceville = index_attrs(
+        load_layer(lawrenceville_url, "1=1", ["PIN", "ZoningCode", "ZoningCodeDescription"], geometry=False, batch=400),
+        ["PIN"],
+    )
+    duluth = index_attrs(
+        load_layer(duluth_url, "1=1", ["PIN", "UDC_Zoning", "ZONEDESC"], geometry=False, batch=300),
+        ["PIN"],
+    )
+    ptc_rows = load_layer(ptc_url, "1=1", ["TYPE"], geometry=True, batch=80)
+    ptc_index = index_polygons(ptc_rows, lambda attrs: {"code": clean(attrs.get("TYPE"))} if clean(attrs.get("TYPE")) else None)
+    law_flu = index_polygons(
+        load_layer(lawrenceville_flu_url, "1=1", ["CharacterAreas2045"], geometry=True, batch=20),
+        lambda attrs: {"code": clean(attrs.get("CharacterAreas2045"))} if clean(attrs.get("CharacterAreas2045")) else None,
+    )
+    duluth_flu = index_polygons(
+        load_layer(duluth_flu_url, "1=1", ["CHARC_AREA", "Label"], geometry=True, batch=20),
+        lambda attrs: {"code": clean(attrs.get("CHARC_AREA")), "label": clean(attrs.get("Label"))}
+        if clean(attrs.get("CHARC_AREA")) or clean(attrs.get("Label"))
+        else None,
+    )
+    ptc_flu = index_attrs(
+        load_layer(ptc_flu_url, "1=1", ["PIN", "Character_", "Character1"], geometry=False, batch=300),
+        ["PIN"],
+    )
+    taxpins = [feature["properties"].get("_taxPin") for feature in features]
+    sales = index_attrs(
+        query_attributes_in(sales_url, "PIN", [pin for pin in taxpins if pin], ["PIN", "SALE1AMT", "SALE1D"]),
+        ["PIN"],
+    )
+
+    city_hits = {"LAWRENCEVILLE": 0, "DULUTH": 0, "PEACHTREE CORNERS": 0}
+    county_zone = 0
+    sale_prices = 0
+    flu_hits = 0
+    for feature in features:
+        props = feature["properties"]
+        lon, lat = props["centroid"]
+        zone_hits = zoning_index.hits(lon, lat)
+        zone = zone_hits[0] if zone_hits else None
+        if zone:
+            county_zone += 1
+            if zone.get("code"):
+                props["zoningCode"] = zone["code"]
+            if zone.get("jurisdiction"):
+                props["jurisdictionCode"] = zone["jurisdiction"]
+        jurisdiction = (props.get("jurisdictionCode") or "").upper()
+        if jurisdiction == "LAWRENCEVILLE":
+            city = lookup_attr(lawrenceville, props.get("parcelId"))
+            code = clean(city.get("ZoningCode")) if city else None
+            if code:
+                props["zoningCode"] = code
+                city_hits["LAWRENCEVILLE"] += 1
+            flu = law_flu.hits(lon, lat)
+            if flu and flu[0].get("code"):
+                props["flu"] = flu_info(flu[0]["code"], flu[0]["code"], "Lawrenceville", "lawrenceville-character-areas-2045")
+                flu_hits += 1
+        elif jurisdiction == "DULUTH":
+            city = lookup_attr(duluth, props.get("parcelId"))
+            raw_code = clean(city.get("UDC_Zoning")) if city else None
+            code = DULUTH_UDC.get(raw_code or "")
+            if code:
+                props["zoningCode"] = code
+                city_hits["DULUTH"] += 1
+            flu = duluth_flu.hits(lon, lat)
+            if flu and (flu[0].get("code") or flu[0].get("label")):
+                props["flu"] = flu_info(
+                    flu[0].get("code") or flu[0].get("label"),
+                    flu[0].get("label") or flu[0].get("code"),
+                    "Duluth",
+                    "duluth-character-areas-2024",
+                )
+                flu_hits += 1
+        elif jurisdiction == "PEACHTREE CORNERS":
+            city = ptc_index.hits(lon, lat)
+            if city and city[0].get("code"):
+                props["zoningCode"] = city[0]["code"]
+                city_hits["PEACHTREE CORNERS"] += 1
+            flu_row = lookup_attr(ptc_flu, props.get("parcelId"))
+            code = clean(flu_row.get("Character_")) if flu_row else None
+            if code:
+                props["flu"] = flu_info(
+                    code,
+                    clean(flu_row.get("Character1")) if flu_row else code,
+                    "Peachtree Corners",
+                    "ptc-character-area",
+                )
+                flu_hits += 1
+        sale = lookup_attr(sales, props.get("_taxPin"))
+        if sale:
+            price = market_sale_price(sale.get("SALE1AMT"))
+            sold = parse_mdy(sale.get("SALE1D"))
+            props["lastSale"] = {"date": sold, "price": price, "qualified": None}
+            if price is not None:
+                sale_prices += 1
+        else:
+            props["lastSale"] = {"date": None, "price": None, "qualified": None}
+        stamp_notes(feature, GWINNETT_FEATURE_GAPS, GWINNETT_APPRAISER)
+    return [
+        jurisdiction_counts(features),
+        (
+            f"County zoning polygon hit {county_zone} of {len(features)} parcels. "
+            f"City REST zoning replaced the county code for Lawrenceville {city_hits['LAWRENCEVILLE']}, "
+            f"Duluth {city_hits['DULUTH']}, Peachtree Corners {city_hits['PEACHTREE CORNERS']}. "
+            f"Character-area FLU joined for {flu_hits} parcels in those three cities. "
+            f"Land Value Table prices above $1 joined for {sale_prices} parcels. qualified is always null."
+        ),
+    ]
+
+
+def enrich_cherokee(features: list[dict]) -> list[str]:
+    portal_url = "https://gis.cherokeecountyga.gov/arcgis/rest/services/ZoningOnlinePortal/MapServer/3/query"
+    cities_url = "https://gis.cherokeecountyga.gov/arcgis/rest/services/MainLayersPRO/MapServer/28/query"
+    flu_url = "https://gis.cherokeecountyga.gov/arcgis/rest/services/MainLayersPRO/MapServer/42/query"
+    value_url = "https://services9.arcgis.com/CAVmSZdRT9pdZgEk/arcgis/rest/services/Cherokee_County_Parcels_2025/FeatureServer/2/query"
+    canton_url = "https://services6.arcgis.com/dpaY3zboICQILFY5/arcgis/rest/services/Canton_Zoning_Parcels/FeatureServer/0/query"
+    canton_flu_url = "https://services6.arcgis.com/dpaY3zboICQILFY5/arcgis/rest/services/Character_Area_Future_Land_Use/FeatureServer/0/query"
+    woodstock_url = "https://gis.woodstockga.gov/arcgis/rest/services/OpsLayers/CD_ZoningCodes/MapServer/2/query"
+    woodstock_flu_url = "https://gis.woodstockga.gov/arcgis/rest/services/OpsLayers/CD_FutureDevelopment/MapServer/1/query"
+    ball_url = "https://services9.arcgis.com/CAVmSZdRT9pdZgEk/arcgis/rest/services/Zoning_August_2024/FeatureServer/0/query"
+
+    ids = [feature["properties"].get("parcelId") for feature in features]
+    portal = index_attrs(
+        query_attributes_in(portal_url, "TIN__No_Spaces_", [pin for pin in ids if pin], ["TIN__No_Spaces_", "Zoning"]),
+        ["TIN__No_Spaces_"],
+    )
+    values = index_attrs(
+        query_attributes_in(value_url, "TINNoSpace", [pin for pin in ids if pin], ["TINNoSpace", "CURR_VAL"]),
+        ["TINNoSpace"],
+    )
+    canton = index_attrs(
+        load_layer(canton_url, "1=1", ["TINNoSpace", "TIN", "CantonZoning"], geometry=False, batch=300),
+        ["TINNoSpace", "TIN"],
+    )
+    ball = index_attrs(
+        load_layer(ball_url, "1=1", ["TINNoSpace", "TIN", "Zoning", "Zoning_Description"], geometry=False, batch=200),
+        ["TINNoSpace", "TIN"],
+    )
+    def cherokee_city(attrs: dict) -> dict | None:
+        try:
+            name = CHEROKEE_CITY_NAMES.get(int(attrs.get("Jurisidiction")))
+        except (TypeError, ValueError):
+            return None
+        return {"name": name} if name else None
+
+    cities = index_polygons(
+        load_layer(cities_url, "1=1", ["Jurisidiction", "CityCodes"], geometry=True, batch=10),
+        cherokee_city,
+    )
+    county_flu = index_polygons(
+        load_layer(flu_url, "1=1", ["AreaType"], geometry=True, batch=40),
+        lambda attrs: {"code": attrs.get("AreaType")} if attrs.get("AreaType") is not None else None,
+    )
+    canton_flu = index_polygons(
+        load_layer(canton_flu_url, "1=1", ["Character_Area"], geometry=True, batch=20),
+        lambda attrs: {"code": clean(attrs.get("Character_Area"))} if clean(attrs.get("Character_Area")) else None,
+    )
+    woodstock = index_polygons(
+        load_layer(woodstock_url, "1=1", ["ZONING", "Description"], geometry=True, batch=20),
+        lambda attrs: {"code": clean(attrs.get("ZONING")), "label": clean(attrs.get("Description"))}
+        if clean(attrs.get("ZONING")) or clean(attrs.get("Description"))
+        else None,
+    )
+    woodstock_flu = index_polygons(
+        load_layer(woodstock_flu_url, "1=1", ["CharacterA"], geometry=True, batch=10),
+        lambda attrs: {"code": clean(attrs.get("CharacterA"))} if clean(attrs.get("CharacterA")) else None,
+    )
+
+    portal_hits = 0
+    city_hits = {"Canton": 0, "Woodstock": 0, "Ball Ground": 0}
+    gap_cities = {"Holly Springs": 0, "Waleska": 0, "Nelson": 0, "Mountain Park": 0}
+    value_hits = 0
+    flu_hits = 0
+    unresolved_city = 0
+    for feature in features:
+        props = feature["properties"]
+        lon, lat = props["centroid"]
+        parcel_id = props.get("parcelId")
+        portal_row = lookup_attr(portal, parcel_id)
+        portal_code = clean(portal_row.get("Zoning")) if portal_row else None
+        if portal_code and portal_code.upper() != "CITY":
+            props["zoningCode"] = portal_code
+            portal_hits += 1
+        city_hit = cities.hits(lon, lat)
+        city_name = city_hit[0]["name"] if city_hit else None
+        if city_name:
+            props["jurisdictionCode"] = city_name
+        else:
+            props["jurisdictionCode"] = "UNINCORPORATED"
+        zoning_flag = (props.get("zoningCode") or "").upper() == "CITY" or (portal_code or "").upper() == "CITY"
+        if zoning_flag and city_name == "Canton":
+            city = lookup_attr(canton, parcel_id)
+            code = clean(city.get("CantonZoning")) if city else None
+            if code:
+                props["zoningCode"] = code
+                city_hits["Canton"] += 1
+        elif zoning_flag and city_name == "Woodstock":
+            zones = woodstock.hits(lon, lat)
+            base = [item for item in zones if (item.get("code") or "").upper() != "OVER"]
+            overlay = [item for item in zones if (item.get("code") or "").upper() == "OVER"]
+            if base and base[0].get("code"):
+                props["zoningCode"] = base[0]["code"]
+                city_hits["Woodstock"] += 1
+            elif overlay and (overlay[0].get("label") or overlay[0].get("code")):
+                props["zoningCode"] = overlay[0].get("label") or overlay[0].get("code")
+                city_hits["Woodstock"] += 1
+        elif zoning_flag and city_name == "Ball Ground":
+            city = lookup_attr(ball, parcel_id)
+            code = clean(city.get("Zoning")) if city else None
+            if code:
+                props["zoningCode"] = code
+                city_hits["Ball Ground"] += 1
+        elif zoning_flag and city_name in gap_cities:
+            gap_cities[city_name] += 1
+        elif zoning_flag:
+            unresolved_city += 1
+        plan = county_flu.hits(lon, lat)
+        if plan and plan[0].get("code") is not None:
+            try:
+                area_code = int(plan[0]["code"])
+            except (TypeError, ValueError):
+                area_code = None
+            if area_code is not None:
+                props["flu"] = flu_info(
+                    str(area_code),
+                    CHEROKEE_FLU.get(area_code, str(area_code)),
+                    "Cherokee County",
+                    "cherokee-future-development",
+                )
+                flu_hits += 1
+        if city_name == "Canton":
+            local = canton_flu.hits(lon, lat)
+            if local and local[0].get("code"):
+                props["flu"] = flu_info(local[0]["code"], local[0]["code"], "Canton", "canton-character-area-flu")
+        elif city_name == "Woodstock":
+            local = woodstock_flu.hits(lon, lat)
+            if local and local[0].get("code"):
+                props["flu"] = flu_info(local[0]["code"], local[0]["code"], "Woodstock", "woodstock-future-development")
+        value = lookup_attr(values, parcel_id)
+        market = num(value.get("CURR_VAL")) if value else None
+        if market is not None and market > 0:
+            props["tax"]["marketValue"] = market
+            value_hits += 1
+        props["tax"]["assessedValue"] = None
+        props["tax"]["taxableValue"] = None
+        props["lastSale"] = {"date": None, "price": None, "qualified": None}
+        stamp_notes(feature, CHEROKEE_FEATURE_GAPS, CHEROKEE_APPRAISER)
+    gap_text = ", ".join(f"{name} {gap_cities[name]}" for name in gap_cities)
+    return [
+        jurisdiction_counts(features),
+        (
+            f"ZoningOnlinePortal codes joined for {portal_hits} unincorporated-style parcels. "
+            f"CITY overlays: Canton {city_hits['Canton']}, Woodstock {city_hits['Woodstock']}, "
+            f"Ball Ground {city_hits['Ball Ground']}. Zoning=CITY left unresolved for {gap_text}"
+            f"{'' if unresolved_city == 0 else f', plus {unresolved_city} outside a city polygon'}. "
+            f"Coarse Future Development FLU joined for {flu_hits} parcels; Canton and Woodstock character areas replace it inside those cities. "
+            f"CURR_VAL market proxy joined for {value_hits} parcels. No sale price or date."
+        ),
+    ]
+
+
+CLAYTON_DISTRICT = {
+    "1": "UNINCORPORATED",
+    "8": "UNINCORPORATED",
+    "2": "COLLEGE PARK",
+    "3": "FOREST PARK",
+    "4": "JONESBORO",
+    "5": "MORROW",
+    "6": "RIVERDALE",
+    "7": "LAKE CITY",
+    "9": "LOVEJOY",
+}
+CLAYTON_APPRAISER = "https://publicaccess.claytoncountyga.gov/search/commonsearch.aspx?mode=realprop"
+CLAYTON_FEATURE_GAPS = [
+    "No lastSale.qualified flag. A sale price of 0 is omitted.",
+    "PEZ future land use and Comp Plan 2039 cover unincorporated parcels. City FLU is not on those layers.",
+    "No tax.taxableValue. Most city zoning is the coarse county ZONE code.",
+]
+
+
+def enrich_clayton(features: list[dict]) -> list[str]:
+    pez_url = "https://gis.claytoncountyga.gov/server/rest/services/Hosted/PEZ_CurrentZoningProCached/FeatureServer/1/query"
+    comp_url = "https://services5.arcgis.com/m528W8U8YDYeMPrQ/arcgis/rest/services/Comp_Plan_Deliverables_06202024/FeatureServer/0/query"
+    unincorporated = []
+    for feature in features:
+        district = CLAYTON_DISTRICT.get(feature["properties"].get("_district") or "")
+        feature["properties"]["jurisdictionCode"] = district
+        if district == "UNINCORPORATED":
+            unincorporated.append(feature["properties"].get("parcelId"))
+    pez = index_attrs(
+        query_attributes_in(
+            pez_url,
+            "parcelid",
+            [pin for pin in unincorporated if pin],
+            ["parcelid", "zoning", "futurelu"],
+        ),
+        ["parcelid"],
+    )
+    pez_zone = 0
+    pez_flu = 0
+    missing_flu: list[str] = []
+    rex = 0
+    sale_prices = 0
+    for feature in features:
+        props = feature["properties"]
+        if props.get("jurisdictionCode") == "UNINCORPORATED" and (props.get("situsCity") or "").upper() == "REX":
+            rex += 1
+        if props.get("jurisdictionCode") == "UNINCORPORATED":
+            row = lookup_attr(pez, props.get("parcelId"))
+            code = clean(row.get("zoning")) if row else None
+            flu = clean(row.get("futurelu")) if row else None
+            if code:
+                props["zoningCode"] = code
+                pez_zone += 1
+            if flu:
+                props["flu"] = flu_info(flu, flu, "Clayton County", "clayton-pez-futurelu")
+                pez_flu += 1
+            elif props.get("parcelId"):
+                missing_flu.append(props["parcelId"])
+        if props.get("lastSale", {}).get("price") is not None:
+            sale_prices += 1
+        props["lastSale"]["qualified"] = None
+    comp_flu = 0
+    if missing_flu:
+        comp = index_attrs(
+            query_attributes_in(comp_url, "PARCELID", missing_flu, ["PARCELID", "F2039_FLUM"]),
+            ["PARCELID"],
+        )
+        for feature in features:
+            props = feature["properties"]
+            if props.get("flu"):
+                continue
+            row = lookup_attr(comp, props.get("parcelId"))
+            flu = clean(row.get("F2039_FLUM")) if row else None
+            if flu:
+                props["flu"] = flu_info(flu, flu, "Clayton County", "clayton-comp-plan-2039-flum")
+                comp_flu += 1
+    for feature in features:
+        stamp_notes(feature, CLAYTON_FEATURE_GAPS, CLAYTON_APPRAISER)
+    return [
+        jurisdiction_counts(features),
+        (
+            f"Unincorporated zoning replaced from PEZ CurrentZoning for {pez_zone} parcels. "
+            f"PEZ futurelu joined for {pez_flu}; Comp Plan 2039 FLUM filled {comp_flu} more. "
+            f"City parcels keep TaxAssessor ZONE (Forest Park is the richest code set; "
+            f"Morrow, Jonesboro, Riverdale, Lake City, and Lovejoy are mostly coarse R/C/I). "
+            f"Rex is unincorporated: {rex} parcels in this band use county zoning, not a city district. "
+            f"Sale prices above 0: {sale_prices}. qualified is always null."
+        ),
+    ]
+
+
+def enrich_county(name: str, features: list[dict]) -> list[str]:
+    if name == "gwinnett":
+        return enrich_gwinnett(features)
+    if name == "cherokee":
+        return enrich_cherokee(features)
+    if name == "clayton":
+        return enrich_clayton(features)
+    raise RuntimeError(f"Unknown parcel enricher {name}")
+
+
 def county_override(fips: str) -> dict | None:
+    if fips == "13057":  # Cherokee GA
+        return {
+            "kind": "arcgis",
+            "url": "https://gis.cherokeecountyga.gov/arcgis/rest/services/MainLayersPRO/MapServer/1/query",
+            "where": "Acreage>=5 AND Acreage<=150",
+            "outFields": [
+                "TIN",
+                "TINNoSpace",
+                "PIN",
+                "Acreage",
+                "OWNER",
+                "Mailing_Address",
+                "Mailing_Suite",
+                "Mailing_City",
+                "Mailing_State",
+                "Mailing_Zip",
+                "Property_Address",
+                "Property_City",
+                "Property_Zip",
+                "Zoning",
+            ],
+            "idField": "TINNoSpace",
+            "idFallbacks": ["TIN", "PIN"],
+            "acresField": "Acreage",
+            "ownerField": "OWNER",
+            "situsField": "Property_Address",
+            "cityField": "Property_City",
+            "zipField": "Property_Zip",
+            "zoningField": "Zoning",
+            "mail1Field": "Mailing_Address",
+            "mail2Field": "Mailing_Suite",
+            "mailCityField": "Mailing_City",
+            "mailStateField": "Mailing_State",
+            "mailZipField": "Mailing_Zip",
+            "source": "ga-cherokee-mainlayers-parcels",
+            "coverage": "complete-gte-5ac",
+            "enrich": "cherokee",
+            "gaps": [
+                "Parcels are Cherokee MainLayersPRO MapServer/1 on gis.cherokeecountyga.gov. gis.cherokeega.com is not used (certificate hostname mismatch).",
+                "AGOL Cherokee_County_Parcels_2025 is a slightly older backup. It is not the polygon source. CURR_VAL from that backup is joined as a partial tax.marketValue only.",
+                "No assessed value, taxable value, or land/improvement split on the county REST layers.",
+                "No public sale price, sale date, or lastSale.qualified. Parcels have DEEDBOOK/DEEDPAGE only. Sale history is Spatialest HTML, not a GIS join.",
+                "Unincorporated zoning comes from ZoningOnlinePortal MapServer/3 (TYPE equivalent field Zoning) joined on TINNoSpace. County Zoning=CITY is only a municipal flag.",
+                "Canton, Woodstock, and Ball Ground replace Zoning=CITY from each city's public REST. Holly Springs, Waleska, Nelson, and Mountain Park have no public zoning REST, so those parcels stay CITY.",
+                "Future Development MapServer/42 (205 AreaType polygons) is a coarse FLU join, not parcel-level future land use. Canton and Woodstock character areas replace it inside those cities. Ball Ground has no city FLU layer.",
+                "Appraiser search is https://property.spatialest.com/ga/cherokee/.",
+            ],
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -643,6 +1448,121 @@ def county_override(fips: str) -> dict | None:
             "coverage": "sample",
             "gaps": [
                 "DeKalb's public layer has no deed-acre field. Acres are computed from the polygon inside a Shape__Area window, so this county is a large sample, not a certified complete roll.",
+            ],
+        }
+    if fips == "13135":  # Gwinnett GA
+        return {
+            "kind": "arcgis",
+            "url": "https://gis3.gwinnettcounty.com/mapvis/rest/services/GISDataBrowser/GC_Parcel/MapServer/6/query",
+            "where": "CALCULATEDACREAGE>=5 AND CALCULATEDACREAGE<=150",
+            "outFields": [
+                "PIN",
+                "TAXPIN",
+                "CALCULATEDACREAGE",
+                "OWNER1",
+                "OWNER2",
+                "LOCADDR",
+                "LOCCITY",
+                "LOCZIP",
+                "MAILADDR",
+                "MAILCITY",
+                "MAILSTAT",
+                "MAILZIP",
+                "TOTVAL1",
+                "TAXTOT1",
+                "ZONING",
+                "ZONEDESC",
+                "PROPCLAS",
+            ],
+            "idField": "PIN",
+            "idFallbacks": ["TAXPIN"],
+            "acresField": "CALCULATEDACREAGE",
+            "ownerField": "OWNER1",
+            "owner2Field": "OWNER2",
+            "situsField": "LOCADDR",
+            "cityField": "LOCCITY",
+            "zipField": "LOCZIP",
+            "zoningField": "ZONING",
+            "zoningDescriptionField": "ZONEDESC",
+            "dorField": "PROPCLAS",
+            "marketValueField": "TOTVAL1",
+            "assessedField": "TAXTOT1",
+            "mail1Field": "MAILADDR",
+            "mailCityField": "MAILCITY",
+            "mailStateField": "MAILSTAT",
+            "mailZipField": "MAILZIP",
+            "taxPinField": "TAXPIN",
+            "source": "ga-gwinnett-gc-parcel",
+            "coverage": "complete-gte-5ac",
+            "enrich": "gwinnett",
+            "gaps": [
+                "Parcels are Gwinnett GC_Parcel MapServer/6. AGOL Property_and_Tax FeatureServer/0 is geometry and PIN only and is not the parcel source.",
+                "Acreage is CALCULATEDACREAGE 5–150. Deeded acreage is often 0 and was not used.",
+                "Zoning polygons are county-wide Property_and_Tax FeatureServer/1 (TYPE and JURISDICTION), including unincorporated. The parcel CAMA ZONING string is only the fallback.",
+                "Lawrenceville, Duluth, and Peachtree Corners replace TYPE with the city's own REST zoning where the parcel joins. Duluth uses the UDC_Zoning domain (RA-200 through PUD), not the joined county CAMA code.",
+                "Other municipalities (Suwanee, Norcross, Snellville, Buford, Sugar Hill, Lilburn, Dacula, Grayson, Berkeley Lake, Loganville, Auburn, Braselton, Mulberry, Rest Haven) have no independent public zoning REST. They use the county zoning layer filtered by JURISDICTION.",
+                "Sales join Property_and_Tax FeatureServer/10 (Land Value Table) on TAXPIN = trimmed PIN, using SALE1AMT and SALE1D. There is no lastSale.qualified flag. Amounts of 0 or 1 are omitted.",
+                "County 2045 Future Development (GC_Planning/7) is 16 coarse INTENSITY polygons and is not joined as parcel FLU. Character-area FLU is joined only for Lawrenceville, Duluth, and Peachtree Corners.",
+                "TOTVAL1 and TAXTOT1 are parsed from strings. There is no tax.taxableValue.",
+                "Buford, Loganville, Auburn, and Braselton cross county lines. This extract covers the Gwinnett footprint only.",
+                "Appraiser search is qPublic AppID 1282. Automated clients often get a CDN 403; the page is public for people.",
+            ],
+        }
+    if fips == "13063":  # Clayton GA
+        return {
+            "kind": "arcgis",
+            "url": "https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/Parcels/MapServer/0/query",
+            "where": "ACERAGE>=5 AND ACERAGE<=150",
+            "outFields": [
+                "PARCELID",
+                "ACERAGE",
+                "OWNERNME",
+                "PSTLADDRES",
+                "PSTLCITY",
+                "PSTLSTATE",
+                "PSTLZIP5",
+                "SITEADDRES",
+                "SITECITY",
+                "SITEZIP5",
+                "ZONE",
+                "APPRVAL",
+                "ASSESSVAL",
+                "SALEDATE",
+                "SALEPRICE",
+                "LANDUSEC",
+                "CVTTXCD",
+            ],
+            "idField": "PARCELID",
+            "acresField": "ACERAGE",
+            "ownerField": "OWNERNME",
+            "situsField": "SITEADDRES",
+            "cityField": "SITECITY",
+            "zipField": "SITEZIP5",
+            "zoningField": "ZONE",
+            "dorField": "LANDUSEC",
+            "marketValueField": "APPRVAL",
+            "assessedField": "ASSESSVAL",
+            "salePriceField": "SALEPRICE",
+            "saleDateField": "SALEDATE",
+            "mail1Field": "PSTLADDRES",
+            "mailCityField": "PSTLCITY",
+            "mailStateField": "PSTLSTATE",
+            "mailZipField": "PSTLZIP5",
+            "districtField": "CVTTXCD",
+            "source": "ga-clayton-tax-parcels",
+            "coverage": "complete-gte-5ac",
+            "enrich": "clayton",
+            "gaps": [
+                "Parcels are Clayton TaxAssessor/Parcels MapServer/0. Acreage field on the service is spelled ACERAGE.",
+                "Owner, situs, ZONE, APPRVAL, ASSESSVAL, SALEDATE, and SALEPRICE are on the parcel polygon. Value and sale fields are strings.",
+                "There is no lastSale.qualified flag. A sale price of 0 is omitted. Multi-sale history is the publicaccess sales search, not a GIS join.",
+                "Unincorporated zoning and FLU join Hosted PEZ_CurrentZoningProCached FeatureServer/1 on PARCELID (zoning + futurelu). Comp Plan 2039 FLUM fills unincorporated parcels the PEZ futurelu misses.",
+                "PEZ and Comp Plan 2039 do not cover city parcels. Forest Park, Morrow, Jonesboro, Riverdale, Lake City, and Lovejoy use county ZONE filtered by CVTTXCD. Forest Park codes are the richest. The other cities are mostly coarse R/C/I. No independent city zoning FeatureServer is wired.",
+                "Rex is an unincorporated place, not a tax district. Those parcels stay on county PEZ/ZONE. There is no Rex zoning layer.",
+                "College Park (CVTTXCD 2) is only the Clayton footprint. The Fulton side is out of this extract.",
+                "FLUM_Composite_04122024 is a 15-feature sample and is not used. Future Land Use 2034 is older and is not the FLU source.",
+                "No tax.taxableValue field.",
+                "Appraiser search is https://publicaccess.claytoncountyga.gov/search/commonsearch.aspx?mode=realprop.",
             ],
         }
     if fips == "45035":  # Dorchester SC
@@ -700,7 +1620,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, Cherokee, Clayton, or Gwinnett pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -962,11 +1882,17 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Gwinnett county services. Cherokee and Clayton adapters are in the seeder | Cobb complete. DeKalb is a polygon-acre sample. Gwinnett is a complete 5–150 acre extract. Cherokee and Clayton are wired in `county_override` and stay gaps until that pull is run. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when a public county or city layer carries it. DeKalb uses the parcel zoning attribute. Gwinnett uses county-wide zoning polygons (TYPE and JURISDICTION), then city zoning for Lawrenceville, Duluth, and Peachtree Corners. Cherokee and Clayton seed adapters are in the script and were not tiled in this pull. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+## Gwinnett
+
+Gwinnett parcels come from `GC_Parcel` MapServer/6 (owner, situs, string tax values, CAMA zoning). AGOL `Property_and_Tax` FeatureServer/0 is geometry and PIN only and is not the parcel source. Zoning is the county-wide FeatureServer/1 layer, which covers unincorporated and every municipality. Lawrenceville, Duluth, and Peachtree Corners then replace that code from each city's REST. Suwanee, Norcross, Snellville, Buford, Sugar Hill, Lilburn, Dacula, Grayson, Berkeley Lake, Loganville, Auburn, Braselton, Mulberry, and Rest Haven stay on the county `JURISDICTION` filter. Sales join the Land Value Table on TAXPIN (`SALE1AMT` / `SALE1D`). There is no sale qualified flag. The 2045 Future Development Map is 16 coarse polygons and is not parcel FLU. Character-area FLU is joined only inside Lawrenceville, Duluth, and Peachtree Corners. Human search is qPublic AppID 1282.
+
+Cherokee and Clayton adapters are in `county_override` (`--county Cherokee`, `--county Clayton`) and are not tiled yet. Cherokee would use MainLayersPRO MapServer/1 on `gis.cherokeecountyga.gov` (not `gis.cherokeega.com`). It has no sale price or date; `CURR_VAL` on the older AGOL backup is only a partial market-value join. Unincorporated zoning is ZoningOnlinePortal MapServer/3. `Zoning=CITY` would use Canton, Woodstock, and Ball Ground. Holly Springs, Waleska, Nelson, and Mountain Park have no public zoning service. Clayton would use TaxAssessor/Parcels MapServer/0. Sales there have no qualified flag. Unincorporated zoning and future land use would join PEZ FeatureServer/1 on `PARCELID`, with Comp Plan 2039 as the fallback. Forest Park, Morrow, Jonesboro, Riverdale, Lake City, and Lovejoy stay on county `ZONE` filtered by `CVTTXCD`. Rex is unincorporated.
 
 ## Coverage
 """
@@ -1050,6 +1976,11 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     ids = fetch_object_ids(spec["url"], spec["where"])
     raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
     features, dropped = normalize_rows(raw, county, markets, spec)
+    if spec.get("enrich"):
+        print(f"  enrich {spec['enrich']}", flush=True)
+        extra_gaps = enrich_county(spec["enrich"], features)
+        spec = dict(spec)
+        spec["gaps"] = [*(spec.get("gaps") or []), *extra_gaps]
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)

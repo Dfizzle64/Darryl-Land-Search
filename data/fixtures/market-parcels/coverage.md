@@ -6,7 +6,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 8,149 | 1 | 1 | 33 |
+| Atlanta | primary | 14,802 | 2 | 1 | 32 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
@@ -49,7 +49,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Forsyth | Georgia | 13117 | gap | 0 | unavailable |
 | Fulton | Georgia | 13121 | gap | 0 | unavailable |
 | Gordon | Georgia | 13129 | gap | 0 | unavailable |
-| Gwinnett | Georgia | 13135 | gap | 0 | unavailable |
+| Gwinnett | Georgia | 13135 | complete-gte-5ac | 6,653 | ga-gwinnett-gc-parcel |
 | Hall | Georgia | 13139 | gap | 0 | unavailable |
 | Haralson | Georgia | 13143 | gap | 0 | unavailable |
 | Heard | Georgia | 13149 | gap | 0 | unavailable |

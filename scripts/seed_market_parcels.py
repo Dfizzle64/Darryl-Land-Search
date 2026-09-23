@@ -266,53 +266,61 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    owner2: str | None = None,
+    appraiser_url: str | None = None,
+    data_gaps: list[str] | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
+    properties: dict[str, Any] = {
+        "id": feature_id,
+        "parcelId": parcel_id,
+        "countyFips": fips,
+        "countyName": county,
+        "state": state,
+        "marketIds": markets,
+        "situsAddress": situs,
+        "situsCity": city,
+        "situsZip": zip_code,
+        "jurisdictionCode": None,
+        "ownerName": owner,
+        "ownerName2": owner2,
+        "propertyName": None,
+        "zoningCode": zoning,
+        "zoningDistrict": None,
+        "jurisdictionPrefix": None,
+        "dorCode": dor,
+        "acreage": round(acreage, 4),
+        "centroid": [center[0], center[1]],
+        "lastSale": {"date": sale_date, "price": sale_price, "qualified": sale_qualified},
+        "tax": {
+            "marketValue": market_value,
+            "assessedValue": assessed,
+            "taxableValue": taxable,
+            "taxes": None,
+        },
+        "mailingAddress": {
+            "line1": mail1,
+            "line2": mail2,
+            "city": mail_city,
+            "state": mail_state,
+            "zip": mail_zip,
+        },
+        "incomeTract": None,
+        "incomeBlockGroup": None,
+        "nearestRoad": None,
+        "flu": None,
+        "opportunityZone": None,
+        "oz2Eligibility": None,
+        "source": source,
+    }
+    if appraiser_url:
+        properties["appraiserUrl"] = appraiser_url
+    if data_gaps:
+        properties["dataGaps"] = data_gaps
     return {
         "type": "Feature",
         "id": feature_id,
-        "properties": {
-            "id": feature_id,
-            "parcelId": parcel_id,
-            "countyFips": fips,
-            "countyName": county,
-            "state": state,
-            "marketIds": markets,
-            "situsAddress": situs,
-            "situsCity": city,
-            "situsZip": zip_code,
-            "jurisdictionCode": None,
-            "ownerName": owner,
-            "ownerName2": None,
-            "propertyName": None,
-            "zoningCode": zoning,
-            "zoningDistrict": None,
-            "jurisdictionPrefix": None,
-            "dorCode": dor,
-            "acreage": round(acreage, 4),
-            "centroid": [center[0], center[1]],
-            "lastSale": {"date": sale_date, "price": sale_price, "qualified": sale_qualified},
-            "tax": {
-                "marketValue": market_value,
-                "assessedValue": assessed,
-                "taxableValue": taxable,
-                "taxes": None,
-            },
-            "mailingAddress": {
-                "line1": mail1,
-                "line2": mail2,
-                "city": mail_city,
-                "state": mail_state,
-                "zip": mail_zip,
-            },
-            "incomeTract": None,
-            "incomeBlockGroup": None,
-            "nearestRoad": None,
-            "flu": None,
-            "opportunityZone": None,
-            "oz2Eligibility": None,
-            "source": source,
-        },
+        "properties": properties,
         "geometry": geometry,
     }
 
@@ -445,6 +453,9 @@ def normalize_rows(
             mail_city=clean(attrs.get(spec["mailCityField"])) if spec.get("mailCityField") else None,
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
+            owner2=clean(attrs.get(spec["owner2Field"])) if spec.get("owner2Field") else None,
+            appraiser_url=spec.get("appraiserUrl"),
+            data_gaps=list(spec["featureGaps"]) if spec.get("featureGaps") else None,
         )
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
@@ -567,23 +578,59 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
-    if fips == "13067":  # Cobb GA
+    if fips == "13067":  # Cobb GA — tax assessor daily roll, not the older public parcel layer
         return {
             "kind": "arcgis",
-            "url": "https://gis.cobbcounty.org/gisserver/rest/services/cobbpublic/Parcels/MapServer/3/query",
+            "url": "https://gis.cobbcounty.gov/gisserver/rest/services/tax/taxassessorsdaily/MapServer/0/query",
             "where": "ACRES>=5 AND ACRES<=150",
-            "outFields": ["PIN", "ACRES", "SITUS_ADDR", "OWNER_NAM1", "OWNER_ADDR", "OWNER_CITY", "OWNER_STAT", "OWNER_ZIP"],
+            "outFields": [
+                "PIN",
+                "ACRES",
+                "ACRE_DEEDED",
+                "SITUS_ADDR",
+                "OWNER_NAM1",
+                "OWNER_NAM2",
+                "OWNER_ADDR",
+                "OWNER_CITY",
+                "OWNER_STAT",
+                "OWNER_ZIP",
+                "FMV_TOTAL",
+                "ASV_TOTAL",
+                "CLASS",
+                "TAXDIST",
+            ],
             "idField": "PIN",
             "acresField": "ACRES",
             "ownerField": "OWNER_NAM1",
+            "owner2Field": "OWNER_NAM2",
             "situsField": "SITUS_ADDR",
+            "dorField": "CLASS",
+            "marketValueField": "FMV_TOTAL",
+            "assessedField": "ASV_TOTAL",
             "mail1Field": "OWNER_ADDR",
             "mailCityField": "OWNER_CITY",
             "mailStateField": "OWNER_STAT",
             "mailZipField": "OWNER_ZIP",
-            "source": "ga-cobb-parcels",
+            "appraiserUrl": "https://www.cobbcounty.gov/tax-assessor",
+            "source": "ga-cobb-taxassessorsdaily",
             "coverage": "complete-gte-5ac",
-            "gaps": ["Cobb County open parcels. No zoning join on this layer."],
+            "enrich": "cobb",
+            "featureGaps": [
+                "Acworth and Austell have no public zoning or future land use service. Mableton centroids in this band did not intersect the county zoning or FLU layers, and Mableton has no city service, so those fields stay blank.",
+                "The sale is the latest ParcelSales row with STEB=FMV and a positive price. Other STEB codes are not qualified.",
+                "OZ 2.0 eligibility is not a designated Qualified Opportunity Zone.",
+            ],
+            "gaps": [
+                "Parcels are Cobb Tax Assessors Daily MapServer/0 (CobbParcels on gis.cobbcounty.gov), filtered on ACRES 5.0–150.0. A live count was 279,635 parcels and 4,859 in that band. ACRE_DEEDED is a different field (about 4,681 in the band) and was not the filter. The older cobbpublic Parcels MapServer/3 on gis.cobbcounty.org was not used.",
+                "Owner, mailing, situs street, FMV_TOTAL (market), and ASV_TOTAL (assessed) come from that layer. There is no situs ZIP on the county layer except where the Marietta parcel view supplies ZIP_CODE. There is no taxable value and no tax bill. CLASS is the assessor use code, not zoning. TAXDIST is not a municipality name.",
+                "Zoning for unincorporated Cobb is comdev/CobbZoningData MapServer/6 (Zoning Districts, about 8,468 polygons). It does not cover Marietta, Smyrna, Kennesaw, Powder Springs, Acworth, or Austell. A live intersect also missed every Mableton centroid in this 5–150 acre extract (the layer's WGS84 extent begins near latitude 33.805, and points inside Mableton returned no district). Mableton has no separate public zoning service, so Mableton zoning stays blank. Marietta, Smyrna (Georgia), Kennesaw, and Powder Springs use their own public REST services.",
+                "No public zoning or future land use REST service: Acworth and Austell. Those parcels stay blank. City ordinance text was not invented. Mableton zoning stays blank for the reason above.",
+                "Future land use for unincorporated Cobb is comdev/Future_Land_Use FeatureServer/0 (about 2,849 polygons, code FLU_ABBR2). That layer did not intersect Mableton centroids in this band, and Mableton has no city FLU service, so Mableton FLU stays blank. Marietta FLU is the parcel view FLU field. Smyrna, Georgia FLU is FLU_Overlay (FLU_2040). Kennesaw FLU is the city Future_Land_Use layer. Powder Springs uses character areas (F2022_CA) as the public FLU stand-in.",
+                "Sales are tax/taxassessorsmapwm MapServer/41 ParcelSales (about 939,000 rows), joined on PIN. STEB=FMV is the qualified filter (about 391,000 rows). The latest positive-price FMV row is kept. Other STEB codes are not treated as qualified and are not stored.",
+                "Rejected and not joined: Smyrna, Tennessee; City of Boulder (cob.org); Sampson County, North Carolina and Orange County, Virginia federated layers; Athens-Clarke County. The City of Smyrna, Georgia (Smyrna_GA) is the municipality that was used. Its archived Opportunity Zone layer was not joined.",
+                "Eligible OZ 2.0 tracts are not designated Qualified Opportunity Zones. This extract does not copy eligibility onto opportunityZone.",
+                "Joined zoning is stored as City:code (for example Marietta:R-4 or Unincorporated Cobb:R-20) and is not scored as Orange County multifamily zoning. FLU jurisdiction is the Cobb city or unincorporated Cobb, not ORG or ORL.",
+            ],
         }
     if fips == "13089":  # DeKalb GA
         return {
@@ -925,11 +972,21 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb and DeKalb county services only | Cobb complete from Tax Assessors Daily MapServer/0, with city zoning, FLU, and STEB=FMV sales. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when a public layer supports it. DeKalb's parcel layer carries zoning. Cobb Tax Assessors Daily MapServer/0 does not. Unincorporated Cobb uses CobbZoningData MapServer/6. Marietta, Smyrna (Georgia, not Tennessee), Kennesaw, and Powder Springs use city REST layers. Mableton, Acworth, and Austell stay blank. Joined codes are labeled with the city (`Marietta:R-4`, future-land-use jurisdiction `Smyrna`) and are not scored as Orange County multifamily districts. Qualified sales are ParcelSales rows with STEB=FMV. Eligible OZ 2.0 tracts are not designated QOZs. Prefer **All parcels** in these markets.
+
+### Cobb County, Georgia
+
+County-wide parcels come from [Tax Assessors Daily MapServer/0](https://gis.cobbcounty.gov/gisserver/rest/services/tax/taxassessorsdaily/MapServer/0) (`ACRES` 5.0–150.0). A live count was 279,635 parcels and 4,859 in the acreage band. Do not use the older `cobbpublic/Parcels` MapServer/3 on `gis.cobbcounty.org`, and do not filter on `ACRE_DEEDED` (that band is smaller).
+
+`FMV_TOTAL` is market value and `ASV_TOTAL` is assessed value. There is no taxable value and no tax bill. `CLASS` is an assessor use code, not zoning. Situs is the street only; city comes from Cobb city limits. Marietta's public parcel view is the only situs ZIP join.
+
+Sales are [ParcelSales MapServer/41](https://gis.cobbcounty.gov/gisserver/rest/services/tax/taxassessorsmapwm/MapServer/41) joined on `PIN`. Only `STEB=FMV` with a positive price is a qualified sale (about 391,000 of about 939,000 rows). The latest of those is kept.
+
+Municipalities with a public zoning or FLU join: Marietta, Smyrna (Georgia), Kennesaw, and Powder Springs. Mableton is a city-limit municipality, but CobbZoningData MapServer/6 and the county FLU layer did not intersect its 5–150 acre centroids, and it has no city REST service, so zoning and FLU stay blank. Acworth and Austell are the same kind of gap: no public service. Each overlay is extent-checked in WGS84 and refused if it is Smyrna, Tennessee, Boulder (`cob.org`), a Sampson County NC or Orange County VA federated layer, or an Athens-Clarke lookalike. Smyrna's archived Opportunity Zone service is not a designated QOZ and is not joined. Eligibility is not designation.
 
 ## Coverage
 """
@@ -947,6 +1004,8 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
             for feature in features:
                 feature["properties"]["marketIds"] = markets
             path, lookup, tiles = write_tiles(county, features)
+            gaps = list(spec.get("gaps") or [])
+            gaps.extend(cached.get("joinNotes") or [])
             return county_row(
                 county,
                 markets,
@@ -957,7 +1016,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=gaps,
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
@@ -1015,12 +1074,21 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     features, dropped = normalize_rows(raw, county, markets, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    join_notes: list[str] = []
+    if spec.get("enrich") == "cobb" and features:
+        from cobb_ga import enrich_cobb
+
+        join_notes = enrich_cobb(features)
+        print(f"  cobb joins {len(join_notes)} notes", flush=True)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "joinNotes": join_notes, "features": features},
+            separators=(",", ":"),
+        )
     )
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
+    gaps = [*list(spec.get("gaps") or []), *join_notes]
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,
@@ -1141,6 +1209,9 @@ def main() -> None:
     for fips, slot in grouped.items():
         markets = full_markets[fips]
         spec = spec_for(slot["county"])
+        if args.refresh and fips == "13067":
+            spec = dict(spec)
+            spec["ignoreCache"] = True
         existing = COUNTY_DIR / fips / "county.json"
         if spec["kind"] == "gap":
             if not existing.exists() or args.refresh:

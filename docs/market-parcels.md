@@ -26,11 +26,21 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb and DeKalb county services only | Cobb complete from Tax Assessors Daily MapServer/0, with city zoning, FLU, and STEB=FMV sales. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when a public layer supports it. DeKalb's parcel layer carries zoning. Cobb Tax Assessors Daily MapServer/0 does not. Unincorporated Cobb uses CobbZoningData MapServer/6. Marietta, Smyrna (Georgia, not Tennessee), Kennesaw, and Powder Springs use city REST layers. Mableton, Acworth, and Austell stay blank. Joined codes are labeled with the city (`Marietta:R-4`, future-land-use jurisdiction `Smyrna`) and are not scored as Orange County multifamily districts. Qualified sales are ParcelSales rows with STEB=FMV. Eligible OZ 2.0 tracts are not designated QOZs. Prefer **All parcels** in these markets.
+
+### Cobb County, Georgia
+
+County-wide parcels come from [Tax Assessors Daily MapServer/0](https://gis.cobbcounty.gov/gisserver/rest/services/tax/taxassessorsdaily/MapServer/0) (`ACRES` 5.0–150.0). A live count was 279,635 parcels and 4,859 in the acreage band. Do not use the older `cobbpublic/Parcels` MapServer/3 on `gis.cobbcounty.org`, and do not filter on `ACRE_DEEDED` (that band is smaller).
+
+`FMV_TOTAL` is market value and `ASV_TOTAL` is assessed value. There is no taxable value and no tax bill. `CLASS` is an assessor use code, not zoning. Situs is the street only; city comes from Cobb city limits. Marietta's public parcel view is the only situs ZIP join.
+
+Sales are [ParcelSales MapServer/41](https://gis.cobbcounty.gov/gisserver/rest/services/tax/taxassessorsmapwm/MapServer/41) joined on `PIN`. Only `STEB=FMV` with a positive price is a qualified sale (about 391,000 of about 939,000 rows). The latest of those is kept.
+
+Municipalities with a public zoning or FLU join: Marietta, Smyrna (Georgia), Kennesaw, and Powder Springs. Mableton is a city-limit municipality, but CobbZoningData MapServer/6 and the county FLU layer did not intersect its 5–150 acre centroids, and it has no city REST service, so zoning and FLU stay blank. Acworth and Austell are the same kind of gap: no public service. Each overlay is extent-checked in WGS84 and refused if it is Smyrna, Tennessee, Boulder (`cob.org`), a Sampson County NC or Orange County VA federated layer, or an Athens-Clarke lookalike. Smyrna's archived Opportunity Zone service is not a designated QOZ and is not joined. Eligibility is not designation.
 
 ## Coverage
 
@@ -42,14 +52,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 8,149 | 1 | 1 | 33 |
+| Atlanta | primary | 8,139 | 1 | 1 | 33 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -76,7 +86,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Carroll | Georgia | 13045 | gap | 0 | unavailable |
 | Cherokee | Georgia | 13057 | gap | 0 | unavailable |
 | Clayton | Georgia | 13063 | gap | 0 | unavailable |
-| Cobb | Georgia | 13067 | complete-gte-5ac | 4,780 | ga-cobb-parcels |
+| Cobb | Georgia | 13067 | complete-gte-5ac | 4,770 | ga-cobb-taxassessorsdaily |
 | Coweta | Georgia | 13077 | gap | 0 | unavailable |
 | Dawson | Georgia | 13085 | gap | 0 | unavailable |
 | DeKalb | Georgia | 13089 | sample | 3,369 | ga-dekalb-tax-parcels |
@@ -212,7 +222,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 

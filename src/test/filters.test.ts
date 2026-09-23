@@ -197,6 +197,11 @@ describe("fluAllowsMultifamily", () => {
   it("returns null when FLU is missing rather than inventing a match", () => {
     expect(fluAllowsMultifamily(null, fluConfig)).toBeNull();
   });
+
+  it("does not treat another jurisdiction's FLU code as an Orange County match", () => {
+    expect(fluAllowsMultifamily({ code: "NAC", label: "Neighborhood Activity Center", jurisdiction: "Smyrna", source: "t" }, fluConfig)).toBeNull();
+    expect(fluAllowsMultifamily({ code: "NAC", label: "Neighborhood Activity Center", jurisdiction: "Unincorporated Cobb", source: "t" }, fluConfig)).toBeNull();
+  });
 });
 
 describe("filterParcels", () => {

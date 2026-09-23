@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:58:19Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -441,7 +441,7 @@
     },
     "Tampa": {
       "tier": "primary",
-      "parcelCount": 98259,
+      "parcelCount": 124649,
       "completeCountyCount": 10,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
@@ -487,13 +487,13 @@
           "name": "Hillsborough",
           "state": "Florida",
           "fips": "12057",
-          "featureCount": 13351,
+          "featureCount": 13838,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "15626 source rows collapsed to 13351 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "No zoning or FLU on the Florida DOH extract."
+            "Hillsborough sale flag VI is vacant/improved, not an FDOR qualified (Q/U) sale.",
+            "Unincorporated zoning is RegulatoryZoning/8. Tampa, Temple Terrace, and Plant City zoning are city layers joined onto county parcels."
           ]
         },
         {
@@ -513,36 +513,39 @@
           "name": "Pasco",
           "state": "Florida",
           "fips": "12101",
-          "featureCount": 10590,
+          "featureCount": 12372,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Pasco parcels are PascoMapper/7 (countywide). Hosted County_Master_Property_List FeatureServer/0 is a ~2,266-feature subset and is not used.",
+            "Unincorporated zoning and FLU are Landuse_Planning district polygons. County ZN_TYPE values NPR, PR, and SA are city placeholders, not districts."
           ]
         },
         {
           "name": "Pinellas",
           "state": "Florida",
           "fips": "12103",
-          "featureCount": 18638,
+          "featureCount": 42230,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Pinellas public parcels have taxable, land, and improvement values but no just/market value.",
+            "Unincorporated zoning and FLU are PublicWebGIS Landuse_Zoning and are not applied inside cities."
           ]
         },
         {
           "name": "Polk",
           "state": "Florida",
           "fips": "12105",
-          "featureCount": 19734,
+          "featureCount": 20263,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Reused the Orlando complete 5.0\u2013150.0 acre tiles. Not re-scraped."
+            "Polk market parcels are Property_Appraiser MapServer/134. Orlando shed tiles are unchanged.",
+            "No countywide zoning-district polygons are published. FLU 2030 (FLUNAME / FLU_LDC) is land use only and is not stored as zoning."
           ]
         },
         {

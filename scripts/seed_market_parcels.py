@@ -45,7 +45,9 @@ MIN_SQFT = 217800
 MAX_SQFT = 6534000
 
 # Complete Orlando extracts reused as-is. Sample Orlando counties are not reused.
-ORLANDO_REUSE = {"12095", "12097", "12105"}
+# Polk (12105) is a Tampa market upgrade (Property Appraiser/134), not an Orlando reuse.
+ORLANDO_REUSE = {"12095", "12097"}
+TAMPA_SHED_FIPS = {"12057", "12101", "12103", "12105"}
 
 FL_DOH_LAYER = {
     "12009": 4,
@@ -712,6 +714,10 @@ def gap_reason(county: dict) -> str:
 
 def spec_for(county: dict) -> dict:
     fips = county["fips"]
+    if fips in TAMPA_SHED_FIPS:
+        from tampa_shed import spec_for_fips
+
+        return spec_for_fips(fips)
     if fips in ORLANDO_REUSE:
         return {"kind": "reuse-orlando"}
     override = county_override(fips)
@@ -829,7 +835,7 @@ def rebuild_indexes(catalog: dict) -> None:
     coverage_lines = [
         "# Market parcel coverage",
         "",
-        "Acreage band is **5.0–150.0 inclusive**. Orlando is not re-scraped. Complete Orlando counties that also sit in another shed (Orange, Osceola, Polk) are reused in place.",
+        "Acreage band is **5.0–150.0 inclusive**. Orlando is not re-scraped. Orange and Osceola are reused from the Orlando complete extract. Tampa Polk uses the Property Appraiser upgrade under market-parcels and does not rewrite Orlando tiles.",
         "",
         "Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map requests the selected market's viewport tiles only.",
         "",
@@ -859,7 +865,7 @@ def rebuild_indexes(catalog: dict) -> None:
             "notes": [
                 "Loaded only when this market is selected.",
                 "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
-                "Orange, Osceola, and Polk point at the existing Orlando complete extract.",
+                "Orange and Osceola point at the existing Orlando complete extract. Tampa Hillsborough, Pasco, Pinellas, and Polk use the county GIS cards in docs/tampa-shed-parcels.md.",
             ],
             "counties": [
                 {
@@ -940,7 +946,7 @@ Orlando keeps `scripts/seed_orlando_parcels.py` and `data/fixtures/orlando-parce
 
 Other markets use the same 0.25° tile grid (origin longitude -83, latitude 27) under `data/fixtures/market-parcels/counties/{fips}/tiles`. The home page does not embed the polygons. `GET /api/parcels?market={Market}&bbox=w,s,e,n` reads only the tiles for **that market** that intersect the viewport. Outlines stay off until neighborhood zoom (about 10.5), an area is locked, or Show parcels is on — the same gate as Orlando.
 
-Orange, Osceola, and Polk already have a complete 5.0–150.0 acre Orlando extract. Tampa and Melbourne point at those tiles instead of downloading them again.
+Orange and Osceola already have a complete 5.0–150.0 acre Orlando extract. Melbourne points at those tiles instead of downloading them again. Tampa Hillsborough, Pasco, Pinellas, and Polk are county GIS extracts (see `docs/tampa-shed-parcels.md`). Polk's Orlando tiles stay in place; the Tampa market reads the Property Appraiser upgrade.
 
 ## Refresh
 
@@ -957,7 +963,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 | State | Endpoint | What shipped |
 | --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
+| Florida | Florida DOH EHWATER Parcels, plus Tampa shed county GIS | DOH for counties without a county card. Hillsborough ParcelPublishing/12, Pasco PascoMapper/7, Pinellas PublicWebGIS/1, and Polk Property_Appraiser/134 replace DOH for those four. Pasco's Hosted Master Property List (~2,266 rows) is rejected |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
@@ -966,7 +972,12 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when a public district layer is available (DeKalb, and the Tampa shed city/county overlays). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets. Polk still has no zoning-district polygons.
+
+```bash
+python3 scripts/seed_tampa_shed.py
+python3 scripts/seed_tampa_shed.py --county Hillsborough --refresh
+```
 
 ## Coverage
 """
@@ -1187,6 +1198,19 @@ def main() -> None:
             if not existing.exists() or args.refresh:
                 write_reuse(slot["county"], markets)
             continue
+        if spec["kind"] == "tampa-shed":
+            if existing.exists() and not args.refresh:
+                row = json.loads(existing.read_text())
+                if (
+                    row.get("source") == spec.get("source")
+                    and row.get("featureCount")
+                    and row.get("coverage") == "complete-gte-5ac"
+                ):
+                    row["markets"] = markets
+                    existing.write_text(json.dumps(row, indent=2) + "\n")
+                    continue
+            jobs.append((priority_of(markets, catalog), slot["county"]["name"], slot["county"], markets, spec))
+            continue
         if existing.exists() and not args.refresh:
             row = json.loads(existing.read_text())
             if row.get("featureCount") and row.get("coverage") in {"complete-gte-5ac", "sample"}:
@@ -1203,7 +1227,12 @@ def main() -> None:
     def run(job: tuple) -> None:
         _priority, _name, county, markets, spec = job
         try:
-            download_county(county, markets, spec)
+            if spec.get("kind") == "tampa-shed":
+                from tampa_shed import pull_county
+
+                pull_county(county, markets, redownload=args.refresh)
+            else:
+                download_county(county, markets, spec)
         except Exception as exc:  # noqa: BLE001
             print(f"  failed {county['name']} {county['fips']}: {exc}", flush=True)
             county_row(

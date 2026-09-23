@@ -4,7 +4,7 @@ Orlando keeps `scripts/seed_orlando_parcels.py` and `data/fixtures/orlando-parce
 
 Other markets use the same 0.25° tile grid (origin longitude -83, latitude 27) under `data/fixtures/market-parcels/counties/{fips}/tiles`. The home page does not embed the polygons. `GET /api/parcels?market={Market}&bbox=w,s,e,n` reads only the tiles for **that market** that intersect the viewport. Outlines stay off until neighborhood zoom (about 10.5), an area is locked, or Show parcels is on — the same gate as Orlando.
 
-Orange, Osceola, and Polk already have a complete 5.0–150.0 acre Orlando extract. Tampa and Melbourne point at those tiles instead of downloading them again.
+Orange and Osceola already have a complete 5.0–150.0 acre Orlando extract. Melbourne points at those tiles instead of downloading them again. Tampa Hillsborough, Pasco, Pinellas, and Polk are county GIS extracts (see `docs/tampa-shed-parcels.md`). Polk's Orlando tiles stay in place; the Tampa market reads the Property Appraiser upgrade.
 
 ## Refresh
 
@@ -21,7 +21,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 | State | Endpoint | What shipped |
 | --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
+| Florida | Florida DOH EHWATER Parcels, plus Tampa shed county GIS | DOH for counties without a county card. Hillsborough ParcelPublishing/12, Pasco PascoMapper/7, Pinellas PublicWebGIS/1, and Polk Property_Appraiser/134 replace DOH for those four. Pasco's Hosted Master Property List (~2,266 rows) is rejected |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
@@ -30,20 +30,25 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when a public district layer is available (DeKalb, and the Tampa shed city/county overlays). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets. Polk still has no zoning-district polygons.
+
+```bash
+python3 scripts/seed_tampa_shed.py
+python3 scripts/seed_tampa_shed.py --county Hillsborough --refresh
+```
 
 ## Coverage
 
 # Market parcel coverage
 
-Acreage band is **5.0–150.0 inclusive**. Orlando is not re-scraped. Complete Orlando counties that also sit in another shed (Orange, Osceola, Polk) are reused in place.
+Acreage band is **5.0–150.0 inclusive**. Orlando is not re-scraped. Orange and Osceola are reused from the Orlando complete extract. Tampa Polk uses the Property Appraiser upgrade under market-parcels and does not rewrite Orlando tiles.
 
 Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map requests the selected market's viewport tiles only.
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
-| Tampa | primary | 98,259 | 10 | 0 | 0 |
+| Tampa | primary | 124,649 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
@@ -112,11 +117,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Citrus | Florida | 12017 | complete-gte-5ac | 5,810 | fl-doh-ehwaters-12017 |
 | Hardee | Florida | 12049 | complete-gte-5ac | 5,055 | fl-doh-ehwaters-12049 |
 | Hernando | Florida | 12053 | complete-gte-5ac | 7,180 | fl-doh-ehwaters-12053 |
-| Hillsborough | Florida | 12057 | complete-gte-5ac | 13,351 | fl-doh-ehwaters-12057 |
+| Hillsborough | Florida | 12057 | complete-gte-5ac | 13,838 | fl-hillsborough-parcelpublishing-12 |
 | Manatee | Florida | 12081 | complete-gte-5ac | 7,239 | fl-doh-ehwaters-12081 |
-| Pasco | Florida | 12101 | complete-gte-5ac | 10,590 | fl-doh-ehwaters-12101 |
-| Pinellas | Florida | 12103 | complete-gte-5ac | 18,638 | fl-doh-ehwaters-12103 |
-| Polk | Florida | 12105 | complete-gte-5ac | 19,734 | reused-orlando-complete-5-150 |
+| Pasco | Florida | 12101 | complete-gte-5ac | 12,372 | fl-pasco-pascomapper-7 |
+| Pinellas | Florida | 12103 | complete-gte-5ac | 42,230 | fl-pinellas-publicwebgis-1 |
+| Polk | Florida | 12105 | complete-gte-5ac | 20,263 | fl-polk-property-appraiser-134 |
 | Sarasota | Florida | 12115 | complete-gte-5ac | 4,303 | fl-doh-ehwaters-12115 |
 | Sumter | Florida | 12119 | complete-gte-5ac | 6,359 | fl-doh-ehwaters-12119 |
 

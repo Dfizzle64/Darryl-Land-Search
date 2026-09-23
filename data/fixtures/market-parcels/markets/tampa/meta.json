@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:58:19Z",
   "market": "Tampa",
   "tier": "primary",
-  "parcelCount": 98259,
+  "parcelCount": 124649,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -13,7 +13,7 @@
   "notes": [
     "Loaded only when this market is selected.",
     "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
-    "Orange, Osceola, and Polk point at the existing Orlando complete extract."
+    "Orange and Osceola point at the existing Orlando complete extract. Tampa Hillsborough, Pasco, Pinellas, and Polk use the county GIS cards in docs/tampa-shed-parcels.md."
   ],
   "counties": [
     {
@@ -77,21 +77,23 @@
       "name": "Hillsborough",
       "fips": "12057",
       "state": "Florida",
-      "featureCount": 13351,
+      "featureCount": 13838,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12057",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/27/query",
+      "source": "fl-hillsborough-parcelpublishing-12",
+      "queryUrl": "https://maps.hillsboroughcounty.org/arcgis1a/rest/services/SDEMapServices/ParcelPublishing/FeatureServer/12/query",
       "gaps": [
-        "15626 source rows collapsed to 13351 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "No zoning or FLU on the Florida DOH extract."
+        "Hillsborough sale flag VI is vacant/improved, not an FDOR qualified (Q/U) sale.",
+        "Unincorporated zoning is RegulatoryZoning/8. Tampa, Temple Terrace, and Plant City zoning are city layers joined onto county parcels.",
+        "Temple Terrace zoning joins on FOLIO. Tampa and Plant City zoning are spatial. Future land use is Planning/4 filtered by JURISDICTION.",
+        "MUNI letters were verified from the PIN prefix: A is Tampa, T is Temple Terrace, P is Plant City, U is unincorporated."
       ],
       "path": "data/fixtures/market-parcels/counties/12057/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12057/lookup.json",
-      "tileCount": 9,
-      "sourceCount": 15626
+      "tileCount": 10,
+      "sourceCount": 13838
     },
     {
       "name": "Manatee",
@@ -117,58 +119,65 @@
       "name": "Pasco",
       "fips": "12101",
       "state": "Florida",
-      "featureCount": 10590,
+      "featureCount": 12372,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12101",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/50/query",
+      "source": "fl-pasco-pascomapper-7",
+      "queryUrl": "https://pascogis.pascocountyfl.net/giswebmm/rest/services/PascoMapper/Parcels/MapServer/7/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Pasco parcels are PascoMapper/7 (countywide). Hosted County_Master_Property_List FeatureServer/0 is a ~2,266-feature subset and is not used.",
+        "Unincorporated zoning and FLU are Landuse_Planning district polygons. County ZN_TYPE values NPR, PR, and SA are city placeholders, not districts.",
+        "New Port Richey, Port Richey, San Antonio, Dade City, Zephyrhills, and St. Leo have no verified public city zoning/FLU FeatureServer."
       ],
       "path": "data/fixtures/market-parcels/counties/12101/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12101/lookup.json",
       "tileCount": 8,
-      "sourceCount": 10885
+      "sourceCount": 12557
     },
     {
       "name": "Pinellas",
       "fips": "12103",
       "state": "Florida",
-      "featureCount": 18638,
+      "featureCount": 42230,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12103",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/51/query",
+      "source": "fl-pinellas-publicwebgis-1",
+      "queryUrl": "https://egis.pinellas.gov/gis/rest/services/PublicWebGIS/Parcels/MapServer/1/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Pinellas public parcels have taxable, land, and improvement values but no just/market value.",
+        "Unincorporated zoning and FLU are PublicWebGIS Landuse_Zoning and are not applied inside cities.",
+        "St. Petersburg and Clearwater have city zoning and FLU. Largo has FLU only. Other Pinellas municipalities have no verified zoning/FLU layer."
       ],
       "path": "data/fixtures/market-parcels/counties/12103/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12103/lookup.json",
       "tileCount": 6,
-      "sourceCount": 18639
+      "sourceCount": 42236
     },
     {
       "name": "Polk",
       "fips": "12105",
       "state": "Florida",
-      "featureCount": 19734,
+      "featureCount": 20263,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "reused-orlando-complete-5-150",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/52/query",
+      "source": "fl-polk-property-appraiser-134",
+      "queryUrl": "https://gis.polk-county.net/hosting/rest/services/All-In-One_Viewer/Property_Appraiser/MapServer/134/query",
       "gaps": [
-        "Reused the Orlando complete 5.0\u2013150.0 acre tiles. Not re-scraped."
+        "Polk market parcels are Property_Appraiser MapServer/134. Orlando shed tiles are unchanged.",
+        "No countywide zoning-district polygons are published. FLU 2030 (FLUNAME / FLU_LDC) is land use only and is not stored as zoning.",
+        "Property Appraiser parcels have no sale fields. A sale is copied from the FDOR/DOH extract when the parcel id matches.",
+        "Lakeland zoning/FLU REST failed TLS or HTTP verification (URLError) and was not joined."
       ],
-      "path": "data/fixtures/orlando-parcels/tiles/12105",
-      "lookup": "data/fixtures/orlando-parcels/lookup/12105.json",
+      "path": "data/fixtures/market-parcels/counties/12105/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12105/lookup.json",
       "tileCount": 17,
-      "sourceCount": 21292
+      "sourceCount": 20263
     },
     {
       "name": "Sarasota",

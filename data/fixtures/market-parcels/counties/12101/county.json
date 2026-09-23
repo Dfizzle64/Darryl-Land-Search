@@ -5,19 +5,45 @@
   "markets": [
     "Tampa"
   ],
-  "featureCount": 10590,
+  "featureCount": 12372,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-doh-ehwaters-12101",
-  "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/50/query",
+  "source": "fl-pasco-pascomapper-7",
+  "queryUrl": "https://pascogis.pascocountyfl.net/giswebmm/rest/services/PascoMapper/Parcels/MapServer/7/query",
   "gaps": [
-    "No zoning or FLU on the Florida DOH extract."
+    "Pasco parcels are PascoMapper/7 (countywide). Hosted County_Master_Property_List FeatureServer/0 is a ~2,266-feature subset and is not used.",
+    "Unincorporated zoning and FLU are Landuse_Planning district polygons. County ZN_TYPE values NPR, PR, and SA are city placeholders, not districts.",
+    "New Port Richey, Port Richey, San Antonio, Dade City, Zephyrhills, and St. Leo have no verified public city zoning/FLU FeatureServer."
   ],
   "path": "data/fixtures/market-parcels/counties/12101/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12101/lookup.json",
-  "sourceCount": 10885,
-  "dropped": 0,
-  "tileCount": 8
+  "sourceCount": 12557,
+  "dropped": 29,
+  "tileCount": 8,
+  "zoningJoinedCount": 11834,
+  "fluJoinedCount": 12033,
+  "municipalityCounts": {
+    "Unincorporated Pasco": 11855,
+    "Zephyrhills": 186,
+    "Dade City": 144,
+    "New Port Richey": 65,
+    "Port Richey": 57,
+    "St. Leo": 36,
+    "San Antonio": 29
+  },
+  "overlays": [
+    {
+      "role": "zoning",
+      "url": "https://pascogis.pascocountyfl.net/giswebmm/rest/services/FeatureDatasets/Landuse_Planning/MapServer/4"
+    },
+    {
+      "role": "flu",
+      "url": "https://pascogis.pascocountyfl.net/giswebmm/rest/services/FeatureDatasets/Landuse_Planning/MapServer/1"
+    }
+  ],
+  "rejected": [
+    "https://pascogis.pascocountyfl.net/giswebeserver/rest/services/Hosted/County_Master_Property_List/FeatureServer/0"
+  ]
 }

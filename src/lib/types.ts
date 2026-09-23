@@ -384,11 +384,15 @@ export type ParcelProperties = {
   situsCity: string | null;
   situsZip: string | null;
   jurisdictionCode: string | null;
+  /** City or unincorporated jurisdiction from the county/city GIS card. */
+  municipality?: string | null;
   ownerName: string | null;
   ownerName2: string | null;
   propertyName: string | null;
   zoningCode: string | null;
   zoningDistrict: string | null;
+  /** District description, or an explicit parcel-attribute hint when the code is not official. */
+  zoningDescription?: string | null;
   jurisdictionPrefix: string | null;
   dorCode: string | null;
   acreage: number | null;

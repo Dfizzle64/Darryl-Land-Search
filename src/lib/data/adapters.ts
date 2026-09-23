@@ -36,9 +36,10 @@ export class FixtureParcelProvider implements ParcelProvider {
   }
 
   async getParcel(id: string): Promise<ParcelFeature | null> {
-    const orlando = await getOrlandoFixtureParcel(id);
+    const [orlando, market] = await Promise.all([getOrlandoFixtureParcel(id), getMarketFixtureParcel(id)]);
+    // Polk shares parcel ids with the Orlando DOH extract. The Tampa market tile is the upgrade.
+    if (market && (!orlando || market.properties.source !== orlando.properties.source)) return market;
     if (orlando) return orlando;
-    const market = await getMarketFixtureParcel(id);
     if (market) return market;
     const collection = await this.listParcels();
     return collection.features.find((feature) => feature.properties.id === id) ?? null;

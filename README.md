@@ -27,12 +27,13 @@ npm run seed:oz2-eligible # seven-market urban tracts + 15 other MSAs (rural and
 npm run seed:sc-mf        # South Carolina multifamily priority shortlist from its CSV
 npm run seed:parcels:orlando  # full 5–150 acre parcels for Lake, Orange, Osceola, Polk, Seminole
 npm run seed:parcels:markets  # 5–150 acre parcels for every other MSA (skips finished counties)
+npm run seed:parcels:tampa    # Hillsborough, Pasco, Pinellas, and the Polk upgrade
 npm run seed:zoning  # refresh coverage report vs knowledge JSON (no LLM)
 ```
 
 Orlando parcel architecture, county source URLs, and field mapping: [`docs/orlando-parcels.md`](docs/orlando-parcels.md) and [`data/orlando-parcel-sources.json`](data/orlando-parcel-sources.json).
 
-Other MSAs use the same tile grid and the same zoom / area-lock / Show parcels gate. They load only while that market is selected. Refresh and the complete-vs-sample-vs-gap table: [`docs/market-parcels.md`](docs/market-parcels.md).
+Other MSAs use the same tile grid and the same zoom / area-lock / Show parcels gate. They load only while that market is selected. Refresh and the complete-vs-sample-vs-gap table: [`docs/market-parcels.md`](docs/market-parcels.md). Tampa Hillsborough, Pasco, Pinellas, and Polk use county GIS cards, including city zoning overlays and the gaps those cards could not fill: [`docs/tampa-shed-parcels.md`](docs/tampa-shed-parcels.md).
 
 No API keys are required for the default fixture mode. Copy `.env.example` to `.env.local` only if you want to point at live feeds.
 

@@ -1,0 +1,41 @@
+{
+  "market": "Tampa",
+  "acreage": { "min": 5, "max": 150 },
+  "architecture": "data/fixtures/market-parcels county tiles. Orlando Polk tiles are not rewritten.",
+  "counties": [
+    {
+      "name": "Hillsborough",
+      "fips": "12057",
+      "source": "fl-hillsborough-parcelpublishing-12",
+      "queryUrl": "https://maps.hillsboroughcounty.org/arcgis1a/rest/services/SDEMapServices/ParcelPublishing/FeatureServer/12/query",
+      "appraiserSearchUrl": "https://www.hcpafl.org/",
+      "muniField": "MUNI",
+      "muniLabels": { "U": "Unincorporated Hillsborough", "T": "Tampa", "P": "Plant City", "A": "Temple Terrace" }
+    },
+    {
+      "name": "Pasco",
+      "fips": "12101",
+      "source": "fl-pasco-pascomapper-7",
+      "queryUrl": "https://pascogis.pascocountyfl.net/giswebmm/rest/services/PascoMapper/Parcels/MapServer/7/query",
+      "appraiserSearchUrl": "https://www.pascopa.com/",
+      "rejected": [
+        "https://pascogis.pascocountyfl.net/giswebeserver/rest/services/Hosted/County_Master_Property_List/FeatureServer/0"
+      ]
+    },
+    {
+      "name": "Pinellas",
+      "fips": "12103",
+      "source": "fl-pinellas-publicwebgis-1",
+      "queryUrl": "https://egis.pinellas.gov/gis/rest/services/PublicWebGIS/Parcels/MapServer/1/query",
+      "appraiserSearchUrl": "https://www.pcpao.org/"
+    },
+    {
+      "name": "Polk",
+      "fips": "12105",
+      "source": "fl-polk-property-appraiser-134",
+      "queryUrl": "https://gis.polk-county.net/hosting/rest/services/All-In-One_Viewer/Property_Appraiser/MapServer/134/query",
+      "appraiserSearchUrl": "https://www.polkpa.org/",
+      "zoningDistricts": "gap"
+    }
+  ]
+}

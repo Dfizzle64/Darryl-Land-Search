@@ -1,13 +1,13 @@
 # Market parcel coverage
 
-Acreage band is **5.0–150.0 inclusive**. Orlando is not re-scraped. Complete Orlando counties that also sit in another shed (Orange, Osceola, Polk) are reused in place.
+Acreage band is **5.0–150.0 inclusive**. Orlando is not re-scraped. Orange and Osceola are reused from the Orlando complete extract. Tampa Polk uses the Property Appraiser upgrade under market-parcels and does not rewrite Orlando tiles.
 
 Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map requests the selected market's viewport tiles only.
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
-| Tampa | primary | 98,259 | 10 | 0 | 0 |
+| Tampa | primary | 124,649 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
@@ -76,11 +76,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Citrus | Florida | 12017 | complete-gte-5ac | 5,810 | fl-doh-ehwaters-12017 |
 | Hardee | Florida | 12049 | complete-gte-5ac | 5,055 | fl-doh-ehwaters-12049 |
 | Hernando | Florida | 12053 | complete-gte-5ac | 7,180 | fl-doh-ehwaters-12053 |
-| Hillsborough | Florida | 12057 | complete-gte-5ac | 13,351 | fl-doh-ehwaters-12057 |
+| Hillsborough | Florida | 12057 | complete-gte-5ac | 13,838 | fl-hillsborough-parcelpublishing-12 |
 | Manatee | Florida | 12081 | complete-gte-5ac | 7,239 | fl-doh-ehwaters-12081 |
-| Pasco | Florida | 12101 | complete-gte-5ac | 10,590 | fl-doh-ehwaters-12101 |
-| Pinellas | Florida | 12103 | complete-gte-5ac | 18,638 | fl-doh-ehwaters-12103 |
-| Polk | Florida | 12105 | complete-gte-5ac | 19,734 | reused-orlando-complete-5-150 |
+| Pasco | Florida | 12101 | complete-gte-5ac | 12,372 | fl-pasco-pascomapper-7 |
+| Pinellas | Florida | 12103 | complete-gte-5ac | 42,230 | fl-pinellas-publicwebgis-1 |
+| Polk | Florida | 12105 | complete-gte-5ac | 20,263 | fl-polk-property-appraiser-134 |
 | Sarasota | Florida | 12115 | complete-gte-5ac | 4,303 | fl-doh-ehwaters-12115 |
 | Sumter | Florida | 12119 | complete-gte-5ac | 6,359 | fl-doh-ehwaters-12119 |
 

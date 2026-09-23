@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T23:15:06Z",
   "market": "Nashville",
   "tier": "primary",
-  "parcelCount": 31132,
+  "parcelCount": 47114,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -274,21 +274,25 @@
       "name": "Sumner",
       "fips": "47165",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 15982,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47165",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-sumner-911-parcels-cama",
+      "queryUrl": "https://services8.arcgis.com/8jhIZBvwlxdbJdGN/arcgis/rest/services/ParcelsCAMA/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Parcels are Sumner 911 AGOL ParcelsCAMA FeatureServer/0 filtered to PARCEL_TYP=1 and CALC_ACRE 5\u2013150 (15982 kept). Comptroller IMPACT COUNTY_ID=83 (https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0) and the stale Dec-2023 hosted CAMA (https://maps.cot.tn.gov/hosting/rest/services/Hosted/SUMNER_Dec2023_Parcels_CAMA_A/FeatureServer/0) were not used. Source rows include the same PARID in TAXYR 2026 and 2027. One record per PARID is kept, preferring the later tax year.",
+        "Municipal zoning joined on 4786 of 15982 parcels. Hendersonville MFR parcels: 328. Portland RM-1 parcels: 11. City counts: Unincorporated 10835, Gallatin 2273, Hendersonville 1277, Millersville 552, Portland 336, Goodlettsville 320, White House 206, Westmoreland 161, Mitchellville 22. Westmoreland and Mitchellville have no public zoning REST. Unincorporated Sumner has no county zoning REST. The CAMA ZONING field is not used as a district.",
+        "Future land use joined on 2479 parcels. Gallatin FLU is Community Character. White House FLU is CompPlan Future_LU. Hendersonville, Portland, Millersville, Goodlettsville, Westmoreland, Mitchellville, and unincorporated Sumner have no public FLU layer joined. Joined FLU codes are not in flu-config.json, so they stay unknown rather than multifamily.",
+        "Goodlettsville zoning is Zoning_District_2025 on the city AGOL org that also hosts Davidson County parcels. Metro Nashville Zoning MapServer was down and was not used. White House zoning is the city WhiteHouseTN_Zoning FeatureServer layer 3, not the thinner AGOL ZoningDistricts copy. Portland zoning is planimetric annexation polygons (Zoning_Dis). Hendersonville zoning is HvilleTN_Zoning_UPDATED MapServer layer 3. Millersville zoning is Millersville_Zoning_view layer 5 (ZONE_2021).",
+        "Rev. Proc. 2026-14 nomination eligibility is not a designated Qualified Opportunity Zone. Neither a current QOZ flag nor an eligibility flag is stored on these parcels.",
+        "Owner, mailing, situs street, last sale, and total appraisal come from ParcelsCAMA. A sale price or appraisal of 0 is stored as no value. Situs ZIP is not on this layer and is not copied from the mailing address. The public property search is https://tn.sumner.geopowered.com/. Owner phones and emails are not on these layers. Municipal zoning codes are not an Orange County multifamily knowledge-base match."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47165/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47165/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 17465
     },
     {
       "name": "Trousdale",

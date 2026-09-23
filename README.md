@@ -319,8 +319,8 @@ TypeScript, Next.js 15 App Router, MapLibre GL, Tailwind CSS. Data layer is fixt
 
 ## Product decisions
 
-- Desktop-first map + filter sidebar + ranked sites overlay (`xl+`) + parcel drawer; filters collapse to a sheet on small screens and the sites list is a **Sites** sheet. The Streets / Satellite hybrid / Dark control and the Measure tool sit at the top-left of the map so they stay clear of the mobile filter button, zoom controls, and the bottom parcel sheet.
-- Default filters: multifamily-capable zoning, planned development included, conditional zoning off, OZ either, no acreage/income/AADT minimum, unknown values included — so first load still shows a useful candidate set. The OZ 2.0 tract overlay starts on; the designated QOZ overlay stays off.
+- Desktop-first map + filter sidebar + tract-details rail. Ranked sites collapse into that rail instead of floating over the map. Filters and the sites list collapse to sheets on small screens. The Streets / Satellite hybrid / Dark control and the Measure tool sit at the top-left of the map so they stay clear of the mobile filter button, zoom controls, and the bottom parcel sheet.
+- Parcel Opportunity Zone and zoning constraints stay off until their Yes/No switches are turned on. When zoning is considered, planned development is included and conditional zoning is off. No acreage/income/AADT minimum, and unknown values are included. The OZ 2.0 tract overlay starts on; the designated QOZ overlay stays off.
 - Acreage slider caps at 25 ac because a linear slider to Disney-scale tracts would be unusable as a *minimum*.
 - Honest empty/loading/error states rather than fake completeness, including when FLU data is missing for rezoning candidates.
 - Orange County + municipal codes are both in the knowledge base because OCPA parcels span both. Unverified cities stay empty rather than copied from the county table.

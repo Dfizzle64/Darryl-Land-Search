@@ -1,0 +1,168 @@
+{
+  "generatedAt": "2026-09-23T23:41:59Z",
+  "market": "Big Bend",
+  "tier": "other",
+  "parcelCount": 21551,
+  "coreMinAcres": 5.0,
+  "coreMaxAcres": 150.0,
+  "tile": {
+    "originLon": -83.0,
+    "originLat": 27.0,
+    "tileDeg": 0.25
+  },
+  "notes": [
+    "Loaded only when this market is selected.",
+    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Orange, Osceola, and Polk point at the existing Orlando complete extract."
+  ],
+  "counties": [
+    {
+      "name": "Dixie",
+      "fips": "12029",
+      "state": "Florida",
+      "featureCount": 0,
+      "coverage": "gap",
+      "partition": "none",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "unavailable",
+      "queryUrl": null,
+      "gaps": [
+        "Gap. No county-hosted parcel polygon service for Dixie County. The property appraiser portal (https://www.qpublic.net/fl/dixie/) is qPublic/Schneider or a search page, not an open parcel GIS, and was not used as a geometry source.",
+        "Statewide FDOR cadastral, Florida DOH EHWATER, and SRWMD republished rolls exist and were not wired. No municipal zoning FeatureServer was confirmed. Eligible tracts in this county stay eligible and are not designated QOZs."
+      ],
+      "path": null,
+      "lookup": null,
+      "tileCount": null,
+      "sourceCount": null
+    },
+    {
+      "name": "Gadsden",
+      "fips": "12039",
+      "state": "Florida",
+      "featureCount": 5917,
+      "coverage": "sample",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-gadsden-arpc-par-071218-12039",
+      "queryUrl": "https://services8.arcgis.com/N3lCn6dEKCL6LidU/arcgis/rest/services/Gadsden_FLUM2/FeatureServer/0/query",
+      "gaps": [
+        "Partial. Parcels are Apalachee RPC Gadsden_FLUM2 layer Par_071218 (a 2018 roll), not a live county host. Deed acres are a zero-padded string. Rows stored as 0 are omitted instead of guessed from the polygon.",
+        "Quincy zoning is a PDF at https://www.myquincy.net/building-planning/page/maps, not a FeatureServer. Quincy FLUM categories are joined as future land use inside those polygons and are not zoning codes. Havana zoning districts are joined from the city zoning layer. Midway, Gretna, Chattahoochee, and Greensboro publish FLUM only and are not joined. The roll's situs city is a post office and is not the zoning jurisdiction. Eligible tracts in this county stay eligible and are not designated QOZs.",
+        "County FLUM categories are joined outside Quincy. Property appraiser search is https://gadsdenpa.com/.",
+        "Join counts: quincyFlu=108, havanaZoning=29, countyFlu=5683, county=5780"
+      ],
+      "path": "data/fixtures/market-parcels/counties/12039/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12039/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 5984
+    },
+    {
+      "name": "Jefferson",
+      "fips": "12065",
+      "state": "Florida",
+      "featureCount": 5165,
+      "coverage": "sample",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-jefferson-pa-parcels-12065",
+      "queryUrl": "https://services5.arcgis.com/vFMp1Ly1q6rKKp0o/arcgis/rest/services/JC__PARCELS_view/FeatureServer/0/query",
+      "gaps": [
+        "Partial. Jefferson County Property Appraiser parcels have COGO_ACRES and a parcel id. No owner or situs.",
+        "Monticello city zoning and city future land use are joined inside the city outline. Unincorporated Jefferson County has no public zoning FeatureServer. Eligible tracts in this county stay eligible and are not designated QOZs.",
+        "Property appraiser search is https://jeffersonpa.net/. Null COGO_ACRES rows are omitted.",
+        "Join counts: monticello=48, county=5117, zoning=48, flu=48"
+      ],
+      "path": "data/fixtures/market-parcels/counties/12065/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12065/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 5383
+    },
+    {
+      "name": "Leon",
+      "fips": "12073",
+      "state": "Florida",
+      "featureCount": 5685,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-leon-overlay-parcel-12073",
+      "queryUrl": "https://intervector.leoncountyfl.gov/intervector/rest/services/MapServices/TLC_OverlayParcel_D_WM/MapServer/0/query",
+      "gaps": [
+        "Usable countywide 5\u2013150 acre extract from TLC_OverlayParcel_D_WM/MapServer/0 (TAXID and CALC_ACREA). Property Appraiser link is https://search.leonpa.gov/Property/Details/{TAXID}. Eligible tracts in this county stay eligible and are not designated QOZs.",
+        "Tallahassee and unincorporated Leon County are separate jurisdictions. The city-limits polygon sets Tallahassee. Zoning polygons keep City versus County. PropInfo supplies situs, future land use, and tax. AccelaXAPO supplies owner and mailing address.",
+        "The overlay parcel layer has no owner or value. PropInfo has no sale date, no situs ZIP, and no DOR use code.",
+        "Join counts: tallahassee=1101, leonCounty=4584, zoning=5595, flu=5586, owners=5685, propinfo=5596"
+      ],
+      "path": "data/fixtures/market-parcels/counties/12073/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12073/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 5685
+    },
+    {
+      "name": "Madison",
+      "fips": "12079",
+      "state": "Florida",
+      "featureCount": 0,
+      "coverage": "gap",
+      "partition": "none",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "unavailable",
+      "queryUrl": null,
+      "gaps": [
+        "Gap. No county-hosted parcel polygon service for Madison County. The property appraiser portal (https://madisonpa.com/) is qPublic/Schneider or a search page, not an open parcel GIS, and was not used as a geometry source.",
+        "Statewide FDOR cadastral, Florida DOH EHWATER, and SRWMD republished rolls exist and were not wired. No municipal zoning FeatureServer was confirmed. Eligible tracts in this county stay eligible and are not designated QOZs."
+      ],
+      "path": null,
+      "lookup": null,
+      "tileCount": null,
+      "sourceCount": null
+    },
+    {
+      "name": "Taylor",
+      "fips": "12123",
+      "state": "Florida",
+      "featureCount": 0,
+      "coverage": "gap",
+      "partition": "none",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "unavailable",
+      "queryUrl": null,
+      "gaps": [
+        "Gap. No county-hosted parcel polygon service for Taylor County. The property appraiser portal (https://qpublic.net/fl/taylor/) is qPublic/Schneider or a search page, not an open parcel GIS, and was not used as a geometry source.",
+        "Statewide FDOR cadastral, Florida DOH EHWATER, and SRWMD republished rolls exist and were not wired. No municipal zoning FeatureServer was confirmed. Eligible tracts in this county stay eligible and are not designated QOZs."
+      ],
+      "path": null,
+      "lookup": null,
+      "tileCount": null,
+      "sourceCount": null
+    },
+    {
+      "name": "Wakulla",
+      "fips": "12129",
+      "state": "Florida",
+      "featureCount": 4784,
+      "coverage": "sample",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-wakulla-county-parcels-12129",
+      "queryUrl": "https://services9.arcgis.com/vAltLjtfYIJc7pDt/arcgis/rest/services/Wakulla_County_Parcels/FeatureServer/0/query",
+      "gaps": [
+        "Partial. The county parcel layer has MAP_ACRES and PARCEL_ID only. No owner, situs, or county zoning.",
+        "County future land use is joined from the planning Future Land Use layer. Sopchoppy zoning (ZoningCat on Sopchoppy_FLUM_WFL1) is joined when the centroid falls inside it. St. Marks has no public zoning FeatureServer. Eligible tracts in this county stay eligible and are not designated QOZs.",
+        "Property appraiser search is https://mywakullapa.com/.",
+        "Join counts: flu=4776, sopchoppy=35, county=4749"
+      ],
+      "path": "data/fixtures/market-parcels/counties/12129/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12129/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 4801
+    }
+  ]
+}

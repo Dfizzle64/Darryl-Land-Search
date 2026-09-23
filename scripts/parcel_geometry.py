@@ -170,6 +170,13 @@ def polygon_parts(geometry: dict) -> list:
     return []
 
 
+def contains_point(geometry: dict | None, x: float, y: float) -> bool:
+    """True when (x, y) is inside an exterior ring and outside holes."""
+    if not geometry:
+        return False
+    return any(_inside_polygon(x, y, poly) for poly in polygon_parts(geometry))
+
+
 def _point_in_ring(x: float, y: float, ring: list[list[float]]) -> bool:
     inside = False
     j = len(ring) - 1

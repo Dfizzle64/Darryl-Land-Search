@@ -23,7 +23,7 @@ npm run seed:flu     # re-join FLU onto the existing parcel fixture
 npm run seed:oz      # designated QOZ polygons, then OZ 2.0 eligibility (Rev. Proc. 2026-14 + Notice 2025-50)
 npm run seed:oz2     # refresh OZ 2.0 nomination tracts only (needs pypdf; see below)
 npm run seed:oz2-markets  # seven-market rural-eligible tracts from the CSV + TIGER 2020
-npm run seed:oz2-eligible # seven-market urban tracts + 15 other MSAs (rural and urban) + TIGER 2020
+npm run seed:oz2-eligible # seven-market urban tracts + 16 other MSAs (rural and urban) + TIGER 2020
 npm run seed:sc-mf        # South Carolina multifamily priority shortlist from its CSV
 npm run seed:parcels:orlando  # full 5–150 acre parcels for Lake, Orange, Osceola, Polk, Seminole
 npm run seed:signals          # Florida ACS income + FDOT AADT sidecars (not copied onto tiles)
@@ -39,7 +39,7 @@ No API keys are required for the default fixture mode. Copy `.env.example` to `.
 
 ## What you can do
 
-- Switch **Market** / **County** across seven Southeast sheds, or open **Other MSAs (15)** for the smaller markets. Primary markets stay listed first. Orlando loads multi-county parcel polygons. Each other market that already has a parcel extract loads only its own 5–150 acre tiles after you select it, and only at neighborhood zoom, an area lock, or Show parcels. Counties without an open polygon source stay on the tract overlay. Jacksonville is in that menu with eligible tracts; its 5–150 acre tiles are not seeded yet. Rural tracts are orange. Urban eligible tracts are blue. The legend toggles rural, urban, or both.
+- Switch **Market** / **County** across seven Southeast sheds, or open **Other MSAs (16)** for the smaller markets. Primary markets stay listed first. Orlando loads multi-county parcel polygons. Each other market that already has a parcel extract loads only its own 5–150 acre tiles after you select it, and only at neighborhood zoom, an area lock, or Show parcels. Counties without an open polygon source stay on the tract overlay. Jacksonville is in that menu with eligible tracts; its 5–150 acre tiles are not seeded yet. Big Bend (Tallahassee MSA plus Madison, Taylor, and Dixie) is in that menu too: Leon parcels are a usable 5–150 acre extract, Wakulla, Jefferson, and Gadsden are partial, and Madison, Taylor, and Dixie stay gaps. Rural tracts are orange. Urban eligible tracts are blue. The legend toggles rural, urban, or both.
 - Set a **minimum acreage**. The slider is 0–25 acres; larger sites still match any threshold at or below 25. Acreage is shown in the parcel drawer. Eligible tracts have no acreage field, so this slider does not hide tracts.
 - Turn on **Consider zoning in parcels** (default No) to use a land-use mode: multifamily-capable zoning, all parcels, non-multifamily zoning, rezoning candidates (FLU yes / zoning no), FLU allows multifamily, either, or both. While the switch is No, those constraints are hidden and not applied.
 - Turn on **Consider opportunity zone in parcels** (default No) to filter parcels by OZ 2.0 rural-eligible, OZ 2.0 eligible but not rural, in a current designated QOZ, not in a designated QOZ, or either. While the switch is No, those parcel constraints are hidden and not applied. The map toggles for the OZ 2.0 tract overlay (orange = rural-eligible, blue = urban eligible, amber = Orange County urban overlay) and the copper dashed designated-QOZ overlay stay available either way. Eligible is not designated.
@@ -195,7 +195,7 @@ Urban status chips read **Eligible — not designated**. The rural chip stays **
 
 ## Other metros
 
-**Other MSAs (15)** in the market menu opens 15 smaller MSAs: Vero Beach, Melbourne, Jacksonville, Pensacola, Birmingham, Mobile, Huntsville, Savannah, Columbia, Greenville, Chattanooga, Knoxville, Memphis, Winston-Salem, and Wilmington. They are visually secondary to the seven. Each one has rural and urban eligible tracts from `data/oz2-other-msas-eligible.csv` (1,386 rows, 1,341 unique GEOIDs; 491 rural and 895 urban). County rings are in `data/oz2-other-msas-counties.md`. Markets other than Jacksonville load 5–150 acre parcel tiles when that extract exists (`docs/market-parcels.md`). Jacksonville stays a tract overlay until those tiles are seeded.
+**Other MSAs (16)** in the market menu opens 16 smaller MSAs: Vero Beach, Melbourne, Jacksonville, Big Bend, Pensacola, Birmingham, Mobile, Huntsville, Savannah, Columbia, Greenville, Chattanooga, Knoxville, Memphis, Winston-Salem, and Wilmington. They are visually secondary to the seven. Each one has rural and urban eligible tracts from `data/oz2-other-msas-eligible.csv` (1,443 rows, 1,398 unique GEOIDs; 515 rural and 928 urban). County rings are in `data/oz2-other-msas-counties.md`. Markets other than Jacksonville load 5–150 acre parcel tiles when that extract exists (`docs/market-parcels.md`). Jacksonville stays a tract overlay until those tiles are seeded. Big Bend keeps eligible tracts unmarked as designated. Leon uses the county overlay parcels. Wakulla, Jefferson, and Gadsden are partial public extracts. Madison, Taylor, and Dixie are documented gaps.
 
 | Market | Total | Rural | Urban |
 | --- | ---: | ---: | ---: |

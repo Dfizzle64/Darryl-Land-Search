@@ -71,6 +71,25 @@ Status labeling: **Eligible — not designated**. SC markets include Governor-fi
 - **Uncertain / outer-edge counties:** none (MSA core)
 - **Exclusions / notes:** Putnam, Flagler, Bradford, and Union (Florida) and Camden (Georgia) are outside the OMB 2023 MSA and are not in this market. No tract is marked designated or certified.
 
+## Big Bend
+
+- **City center:** Downtown Tallahassee (Leon)
+- **OMB MSA core:** Tallahassee, FL (OMB 2023: Gadsden, Jefferson, Leon, Wakulla)
+- **Eligible tract count:** **57** (rural Y=24, non-rural N=33)
+- **Rationale:** Tallahassee MSA core plus the Big Bend counties named on the parcel card (Madison, Taylor, Dixie) as an outer ring. Eligible tracts are Rev. Proc. 2026-14 appendix rows. Rural vs urban is the appendix Rural Status column. None of these tracts are designated or certified.
+- **Counties included:**
+  - Florida: Leon, Wakulla, Jefferson, Gadsden, Madison, Taylor, Dixie
+- **Eligible by county (rural / non-rural):**
+  - Dixie (Florida): 3 (Y=3, N=0) _(outer/uncertain)_
+  - Gadsden (Florida): 6 (Y=6, N=0)
+  - Jefferson (Florida): 2 (Y=2, N=0)
+  - Leon (Florida): 34 (Y=1, N=33)
+  - Madison (Florida): 4 (Y=4, N=0) _(outer/uncertain)_
+  - Taylor (Florida): 7 (Y=7, N=0) _(outer/uncertain)_
+  - Wakulla (Florida): 1 (Y=1, N=0)
+- **Uncertain / outer-edge counties:** Madison, Taylor, Dixie
+- **Exclusions / notes:** Franklin, Liberty, Lafayette, and Gulf are outside this card. No tract is marked designated or certified.
+
 ## Pensacola
 
 - **City center:** Downtown Pensacola
@@ -339,6 +358,7 @@ Status labeling: **Eligible — not designated**. SC markets include Governor-fi
 | Vero Beach | 62 | 25 | 37 |
 | Melbourne | 175 | 24 | 151 |
 | Jacksonville | 98 | 8 | 90 |
+| Big Bend | 57 | 24 | 33 |
 | Pensacola | 49 | 22 | 27 |
 | Birmingham | 152 | 42 | 110 |
 | Mobile | 66 | 15 | 51 |
@@ -351,8 +371,8 @@ Status labeling: **Eligible — not designated**. SC markets include Governor-fi
 | Memphis | 175 | 44 | 131 |
 | Winston-Salem | 105 | 24 | 81 |
 | Wilmington | 55 | 31 | 24 |
-| **CSV rows** | **1386** | **491** | **895** |
-| **Unique GEOIDs** | **1341** |  |  |
+| **CSV rows** | **1443** | **515** | **928** |
+| **Unique GEOIDs** | **1398** |  |  |
 
 Dual-list notes: Melbourne overlaps Vero Beach (Brevard/Indian River) and Orlando primary pack counties; Winston-Salem shares Davidson NC with Charlotte primary pack; Pensacola/Mobile both list Baldwin AL (intentional dual-market). Columbia and Charleston both can list Orangeburg SC.
 

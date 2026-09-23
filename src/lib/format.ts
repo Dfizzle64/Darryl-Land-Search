@@ -13,6 +13,11 @@ export function ocpaParcelUrl(parcelId: string): string {
   return `https://ocpaweb.ocpafl.org/site/parcelsearch?pid=${encodeURIComponent(parcelId)}`;
 }
 
+/** Leon County Property Appraiser parcel record. TAXID is the overlay parcel id. */
+export function leonParcelUrl(parcelId: string): string {
+  return `https://search.leonpa.gov/Property/Details/${encodeURIComponent(parcelId)}`;
+}
+
 export function comptrollerRecordsUrl(): string {
   return "https://or.occompt.com/recorder/web/";
 }
@@ -35,6 +40,12 @@ export function parcelAppraiserUrl(options: {
   appraiserUrl?: string | null;
 }): { href: string; label: string } {
   const fips = options.countyFips ?? null;
+  if (fips === "12073") {
+    return {
+      href: options.appraiserUrl || leonParcelUrl(options.parcelId),
+      label: "Open Leon County Property Appraiser",
+    };
+  }
   if (fips === "12095" || (!fips && !options.appraiserUrl)) {
     return {
       href: ocpaParcelUrl(options.parcelId),

@@ -675,6 +675,10 @@ def gap_reason(county: dict) -> str:
 
 def spec_for(county: dict) -> dict:
     fips = county["fips"]
+    if fips in {"12073", "12129", "12065", "12039", "12079", "12123", "12029"}:
+        from big_bend_parcels import spec_for_fips
+
+        return spec_for_fips(fips)
     if fips in ORLANDO_REUSE:
         return {"kind": "reuse-orlando"}
     override = county_override(fips)
@@ -920,7 +924,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 | State | Endpoint | What shipped |
 | --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
+| Florida | Florida DOH EHWATER Parcels, plus Big Bend county hosts | DOH is the complete 5–150 acre extract where the county is not already an Orlando complete county. Big Bend does not use DOH: Leon is the TLCGIS overlay parcel layer, Wakulla and Jefferson are partial county layers, Gadsden is a partial 2018 ARPC roll with Quincy FLU and Havana zoning, and Madison, Taylor, and Dixie stay gaps |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
@@ -929,13 +933,17 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb) or a Big Bend municipality publishes its own polygons (Tallahassee and unincorporated Leon, Monticello, Sopchoppy, Havana). Quincy zoning is a PDF, so Quincy FLUM is future land use only. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets. Eligible tracts are not designated.
 
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "big-bend":
+        from big_bend_parcels import download_big_bend
+
+        return download_big_bend(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import Any
 
 from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
+from tn_robertson_parcels import download_robertson, robertson_spec
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "data" / "market-parcel-counties.json"
@@ -567,6 +568,8 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    if fips == "47147":
+        return robertson_spec()
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -922,7 +925,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Robertson (FIPS 47147) uses IMPACT `COUNTY_ID` 74 / `JUR` 074 — the FIPS suffix 147 is empty on this layer. Municipal zoning is joined for that county. Other Nashville-ring counties that are absent from the layer stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
@@ -1166,7 +1169,10 @@ def main() -> None:
     def run(job: tuple) -> None:
         _priority, _name, county, markets, spec = job
         try:
-            download_county(county, markets, spec)
+            if spec.get("kind") == "robertson":
+                download_robertson(county, markets)
+            else:
+                download_county(county, markets, spec)
         except Exception as exc:  # noqa: BLE001
             print(f"  failed {county['name']} {county['fips']}: {exc}", flush=True)
             county_row(

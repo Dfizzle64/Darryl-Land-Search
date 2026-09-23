@@ -188,6 +188,12 @@ def _inside_polygon(x: float, y: float, poly: list[list[list[float]]]) -> bool:
     return not any(_point_in_ring(x, y, hole) for hole in poly[1:])
 
 
+def geometry_contains(geometry: dict | None, lon: float, lat: float) -> bool:
+    if not geometry:
+        return False
+    return any(_inside_polygon(lon, lat, poly) for poly in polygon_parts(geometry))
+
+
 def representative_point(geometry: dict) -> tuple[float, float] | None:
     """A point inside the largest part. Vertex averages fall outside concave rings."""
     parts = polygon_parts(geometry)

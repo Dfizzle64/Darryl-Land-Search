@@ -27,6 +27,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "47147": "https://assessment.cot.tn.gov/TPAD/",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -59,7 +60,9 @@ export function parcelAppraiserUrl(options: {
                   ? "Sumter"
                   : fips === "12127"
                     ? "Volusia"
-                    : "county";
+                    : fips === "47147"
+                      ? "Robertson County"
+                      : "county";
   return {
     href,
     label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,

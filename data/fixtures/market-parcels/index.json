@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:52:07Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -11,10 +11,10 @@
   "markets": {
     "Atlanta": {
       "tier": "primary",
-      "parcelCount": 8149,
-      "completeCountyCount": 1,
+      "parcelCount": 16423,
+      "completeCountyCount": 2,
       "sampleCountyCount": 1,
-      "gapCountyCount": 33,
+      "gapCountyCount": 32,
       "path": "data/fixtures/market-parcels/markets/atlanta/meta.json",
       "counties": [
         {
@@ -189,12 +189,13 @@
           "name": "Fulton",
           "state": "Georgia",
           "fips": "13121",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 8274,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "Hosted CurrentParcels FeatureServer (services5\u2026/CurrentParcels) is a north-Fulton subset (~29.8k of ~373k), not county-wide. This extract uses Property Map Viewer MapServer/11 (LandAcres, county-wide).",
+            "No county-wide zoning layer. City zoning/FLU is joined where a public layer exists. Gaps with no public zoning/FLU REST: Hapeville, Palmetto (do not use Palmetto FL layers), Chattahoochee Hills, and Mountain Park. Fulton Industrial District (MapServer/34, ~37 polygons) is not county zoning. Unincorporated Fulton stays blank."
           ]
         },
         {

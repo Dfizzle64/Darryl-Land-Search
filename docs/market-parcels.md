@@ -26,11 +26,25 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Fulton county services | Cobb complete. Fulton complete from Property Map Viewer MapServer/11 (county-wide). DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when a public layer supports it. DeKalb's parcel layer carries zoning. Fulton Property Map Viewer layer 11 does not. City zoning and future land use are joined onto that county roll and labeled with the city (`Atlanta:C-1`, future-land-use jurisdiction `Sandy Springs`). They are not scored as Orange County multifamily districts. Prefer **All parcels** in these markets.
+
+### Fulton County
+
+County-wide parcels come from Fulton Property Map Viewer `MapServer/11` (Tax Parcel). A live count on 2026-09-23 was 373,306 parcels, TaxYear 2026, including the 5.0–150.0 acre band on `LandAcres`. Do not use the hosted `CurrentParcels` FeatureServer (`services5.arcgis.com/…/CurrentParcels`) as the county source. That layer is a north-Fulton subset of about 29,800 parcels (roughly the Sandy Springs / Buckhead corridor), not the full county. The same subset trap applies to its 5–150 acre count.
+
+`MapServer/11` supplies parcel id, owner, situs street (`Address`), mailing (`OwnerAddr1` + `OwnerAddr2`, with city/state/ZIP parsed when `OwnerAddr2` is `CITY ST ZIP`), appraised value (`TotAppr`), assessed value (`TotAssess`), and land-use code (`LUCode`). It has no situs city or ZIP, no distinct taxable value (`TotAssess` is assessed, typically 40% of appraised), and no zoning or sale fields.
+
+Tyler yearly sales stop at 2022 (price and year only, many zero prices, no qualified flag) and are not joined. OpenData Tax Parcels match the county-wide count but omit assessment values, so they are not the source. Fulton Industrial District zoning (MapServer/34, about 37 polygons) is not county zoning and is not joined.
+
+Each city overlay is extent-checked in WGS84 before download. A layer whose north edge is south of Georgia (a Florida bbox, including Palmetto FL) or that misses Fulton County is skipped.
+
+Attribute `ParcelID` join, where the city id matches the county id: Sandy Springs zoning and character areas (the character-area layer is the public FLU stand-in), Roswell zoning (`PARCELID` / `LOWPARCELI`), Johns Creek future land use, College Park zoning, South Fulton future land use 2045, Fairburn zoning and FLU (one 2025 layer), and Union City zoning. Every other city layer is a centroid intersect. Roswell's official FLU polygons run before the parcel character-area field, which fills only parcels the polygon layer missed. That FLU layer leaves `LANDUSECODE` empty on every polygon, so the joined code is `LANDUSEDESC`. Union City character-area codes have no published legend and are not joined. Sandy Springs has no separate FLU FeatureServer. College Park FLU is a coarse polygon set (about 15 features).
+
+No public zoning or FLU REST service: Hapeville, Palmetto (do not substitute Palmetto, Florida layers), Chattahoochee Hills, and Mountain Park. Unincorporated Fulton stays blank. Atlanta zoning and future land use stay on the City of Atlanta layers named on the county card.
 
 ## Coverage
 
@@ -42,14 +56,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 8,149 | 1 | 1 | 33 |
+| Atlanta | primary | 16,423 | 2 | 1 | 32 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -83,7 +97,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Douglas | Georgia | 13097 | gap | 0 | unavailable |
 | Fayette | Georgia | 13113 | gap | 0 | unavailable |
 | Forsyth | Georgia | 13117 | gap | 0 | unavailable |
-| Fulton | Georgia | 13121 | gap | 0 | unavailable |
+| Fulton | Georgia | 13121 | complete-gte-5ac | 8,274 | ga-fulton-pmv-mapserver-11 |
 | Gordon | Georgia | 13129 | gap | 0 | unavailable |
 | Gwinnett | Georgia | 13135 | gap | 0 | unavailable |
 | Hall | Georgia | 13139 | gap | 0 | unavailable |
@@ -212,7 +226,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 

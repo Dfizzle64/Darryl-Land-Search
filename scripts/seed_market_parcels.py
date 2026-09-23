@@ -984,7 +984,7 @@ def _fulton_overlay_joins() -> list[dict]:
             "geometry": True,
             "url": "https://gisweb.ci.roswell.ga.us/arcgis/rest/services/LGIM_LandUsePlanning/FLU/MapServer/0/query",
             "outFields": ["LANDUSECODE", "LANDUSEDESC"],
-            "codeField": "LANDUSECODE",
+            "codeField": "LANDUSEDESC",
             "labelField": "LANDUSEDESC",
             "source": "roswell-future-land-use",
         },
@@ -1562,7 +1562,7 @@ Tyler yearly sales stop at 2022 (price and year only, many zero prices, no quali
 
 Each city overlay is extent-checked in WGS84 before download. A layer whose north edge is south of Georgia (a Florida bbox, including Palmetto FL) or that misses Fulton County is skipped.
 
-Attribute `ParcelID` join, where the city id matches the county id: Sandy Springs zoning and character areas (the character-area layer is the public FLU stand-in), Roswell zoning (`PARCELID` / `LOWPARCELI`), Johns Creek future land use, College Park zoning, South Fulton future land use 2045, Fairburn zoning and FLU (one 2025 layer), and Union City zoning. Every other city layer is a centroid intersect. Roswell's official FLU polygons run before the parcel character-area field, which fills only parcels the polygon layer missed. Union City character-area codes have no published legend and are not joined. Sandy Springs has no separate FLU FeatureServer. College Park FLU is a coarse polygon set (about 15 features).
+Attribute `ParcelID` join, where the city id matches the county id: Sandy Springs zoning and character areas (the character-area layer is the public FLU stand-in), Roswell zoning (`PARCELID` / `LOWPARCELI`), Johns Creek future land use, College Park zoning, South Fulton future land use 2045, Fairburn zoning and FLU (one 2025 layer), and Union City zoning. Every other city layer is a centroid intersect. Roswell's official FLU polygons run before the parcel character-area field, which fills only parcels the polygon layer missed. That FLU layer leaves `LANDUSECODE` empty on every polygon, so the joined code is `LANDUSEDESC`. Union City character-area codes have no published legend and are not joined. Sandy Springs has no separate FLU FeatureServer. College Park FLU is a coarse polygon set (about 15 features).
 
 No public zoning or FLU REST service: Hapeville, Palmetto (do not substitute Palmetto, Florida layers), Chattahoochee Hills, and Mountain Park. Unincorporated Fulton stays blank. Atlanta zoning and future land use stay on the City of Atlanta layers named on the county card.
 

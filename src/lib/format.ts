@@ -29,12 +29,57 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12127": "https://vcpa.vcgov.org/",
 };
 
+export function parcelPlaceLine(options: {
+  situsCity?: string | null;
+  situsZip?: string | null;
+  countyName?: string | null;
+  state?: string | null;
+}): string {
+  const cityZip = [options.situsCity, options.situsZip].filter(Boolean).join(" ");
+  const state = options.state?.trim();
+  if (cityZip && state && state !== "Florida") return `${cityZip}, ${state}`;
+  if (cityZip) return cityZip;
+  if (options.countyName && state && state !== "Florida") return `${options.countyName} County, ${state}`;
+  if (options.countyName) return `${options.countyName} County, FL`;
+  return state && state !== "Florida" ? state : "Florida";
+}
+
+/** Empty-FLU copy for Shelby. Memphis is the only joined future-land-use layer. */
+export function shelbyFluGap(jurisdictionCode: string | null | undefined): string {
+  if (jurisdictionCode === "MEMPHIS") {
+    return "No Memphis 3.0 future land use match on this parcel id. Memphis FLU is guidance, not zoning.";
+  }
+  return "Future land use is joined for the City of Memphis only. This municipality has no public FLU layer in the extract.";
+}
+
+/** County parcel `MUNI` codes, plus a readable fallback for other jurisdiction codes. */
+export function formatJurisdiction(code: string | null | undefined): string | null {
+  if (!code?.trim()) return null;
+  if (code === "UNINCORPORATED") return "Unincorporated Shelby County";
+  const known: Record<string, string> = {
+    MEMPHIS: "Memphis",
+    BARTLETT: "Bartlett",
+    COLLIERVILLE: "Collierville",
+    GERMANTOWN: "Germantown",
+    ARLINGTON: "Arlington",
+    LAKELAND: "Lakeland",
+    MILLINGTON: "Millington",
+  };
+  return known[code] ?? code;
+}
+
 export function parcelAppraiserUrl(options: {
   parcelId: string;
   countyFips?: string | null;
   appraiserUrl?: string | null;
 }): { href: string; label: string } {
   const fips = options.countyFips ?? null;
+  if (fips === "47157") {
+    return {
+      href: options.appraiserUrl || "https://www.assessormelvinburgess.com/PropertySearch",
+      label: "Open Shelby County Assessor property record",
+    };
+  }
   if (fips === "12095" || (!fips && !options.appraiserUrl)) {
     return {
       href: ocpaParcelUrl(options.parcelId),

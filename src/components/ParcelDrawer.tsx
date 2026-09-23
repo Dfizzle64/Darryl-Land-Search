@@ -3,11 +3,14 @@
 import {
   comptrollerRecordsUrl,
   formatAcres,
+  formatJurisdiction,
   formatMailing,
   formatNumber,
   formatRoadLabel,
   formatSale,
   formatUsd,
+  parcelPlaceLine,
+  shelbyFluGap,
   isEntityOwner,
   parcelAppraiserUrl,
   sunbizSearchUrl,
@@ -67,6 +70,10 @@ export function ParcelDrawer({
     filters.includeConditionalZoning,
   );
   const flu = describeFluMatch(properties.flu, fluConfig);
+  const fluPanel =
+    properties.countyFips === "47157" && !properties.flu?.code
+      ? shelbyFluGap(properties.jurisdictionCode)
+      : flu.reason;
   const oz = describeOpportunityZone(properties.opportunityZone);
   const oz2 = describeOz2Eligibility(properties.oz2Eligibility);
   const rezoning = describeRezoningCandidate(parcel, filters, zoningConfig, fluConfig);
@@ -76,9 +83,8 @@ export function ParcelDrawer({
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
-  const placeLine =
-    [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+  const placeLine = parcelPlaceLine(properties);
+  const municipality = formatJurisdiction(properties.jurisdictionCode);
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -102,6 +108,7 @@ export function ParcelDrawer({
       </div>
 
       <dl className="mt-5 grid grid-cols-2 gap-4">
+        {municipality ? <Field label="Municipality" value={municipality} /> : null}
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
@@ -145,7 +152,7 @@ export function ParcelDrawer({
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Future Land Use</p>
-        <p className="mt-1 text-ink-100">{flu.reason}</p>
+        <p className="mt-1 text-ink-100">{fluPanel}</p>
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Designated Opportunity Zone</p>
@@ -178,12 +185,16 @@ export function ParcelDrawer({
         <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
           {appraiser.label}
         </a>
-        {entity && properties.ownerName ? (
+        {entity && properties.ownerName && (!properties.state || properties.state === "Florida") ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={sunbizSearchUrl(properties.ownerName)} target="_blank" rel="noreferrer">
             Search Florida Sunbiz for LLC / corporate principals
           </a>
         ) : (
-          <p className="text-ink-300">Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped.</p>
+          <p className="text-ink-300">
+            {entity && properties.state && properties.state !== "Florida"
+              ? "Sunbiz search applies to Florida entity names."
+              : "Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped."}
+          </p>
         )}
         {properties.countyFips === "12095" || !properties.countyFips ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={comptrollerRecordsUrl()} target="_blank" rel="noreferrer">

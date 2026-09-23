@@ -17,12 +17,14 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import ssl
 import threading
 import time
 import urllib.parse
 import urllib.request
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -71,6 +73,25 @@ FL_DOH_LAYER = {
 
 NC_URL = "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query"
 TN_URL = "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query"
+SHELBY_PARCEL_QUERY = "https://scgis.shelbycountytn.gov/serverhigh/rest/services/Parcel/CurrentParcels/MapServer/0/query"
+SHELBY_SALES_QUERY = "https://scgis.shelbycountytn.gov/serverhigh/rest/services/Parcel/CERTParcel/MapServer/1/query"
+SHELBY_FLU_QUERY = "https://services2.arcgis.com/saWmpKJIUAjyyNVc/arcgis/rest/services/Memphis_30_Future_Land_Use/FeatureServer/0/query"
+SHELBY_ZONING_QUERY = "https://services2.arcgis.com/saWmpKJIUAjyyNVc/arcgis/rest/services/old_zoning_dissolved_WEB/FeatureServer/0/query"
+SHELBY_COLLIERVILLE_QUERY = "https://services1.arcgis.com/sRmcNvrTVX9Y0AgX/arcgis/rest/services/Zoning_Features/FeatureServer/1/query"
+SHELBY_ZONE_FIELD = "old_zone_fix_key_ExcelToTable_CorrZone"
+# Web Mercator area is inflated near latitude 35. This window is only a prefilter.
+SHELBY_STAREA_MIN = 15000
+SHELBY_STAREA_MAX = 1400000
+SHELBY_MUNI_CITY = {
+    "MEMPHIS": "Memphis",
+    "BARTLETT": "Bartlett",
+    "COLLIERVILLE": "Collierville",
+    "GERMANTOWN": "Germantown",
+    "ARLINGTON": "Arlington",
+    "LAKELAND": "Lakeland",
+    "MILLINGTON": "Millington",
+}
+_SHELBY_SSL: ssl.SSLContext | None = None
 MS_URL = "https://mgis19.mdeq.ms.gov/arcgis/rest/services/GeologyParcelAndFloodGIS/Parcels_Statewide_2023/FeatureServer/3/query"
 AR_URL = "https://gis.arkansas.gov/arcgis/rest/services/FEATURESERVICES/Planning_Cadastre/FeatureServer/6/query"
 
@@ -99,14 +120,36 @@ DOH_FIELDS = [
 WRITE_LOCK = threading.Lock()
 
 
+def shelby_ssl_context() -> ssl.SSLContext:
+    """scgis.shelbycountytn.gov still requires TLS renegotiation."""
+    global _SHELBY_SSL
+    if _SHELBY_SSL is not None:
+        return _SHELBY_SSL
+    flag = getattr(ssl, "OP_LEGACY_SERVER_CONNECT", None)
+    if flag is None:
+        raise RuntimeError(
+            "This Python/OpenSSL build has no OP_LEGACY_SERVER_CONNECT. "
+            "scgis.shelbycountytn.gov requires UnsafeLegacyServerConnect and cannot be queried from this environment."
+        )
+    ctx = ssl.create_default_context()
+    ctx.options |= flag
+    _SHELBY_SSL = ctx
+    return ctx
+
+
 def fetch_json(url: str, params: dict | None = None, timeout: int = 180, retries: int = 5) -> dict:
     if params:
         url = url + ("&" if "?" in url else "?") + urllib.parse.urlencode(params)
+    host = urllib.parse.urlparse(url).hostname or ""
+    context = shelby_ssl_context() if host.endswith("shelbycountytn.gov") else None
     last: Exception | None = None
     for attempt in range(retries):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "darryl-land-search/market-parcels"})
-            with urllib.request.urlopen(req, timeout=timeout) as resp:
+            if context is None:
+                with urllib.request.urlopen(req, timeout=timeout) as resp:
+                    return json.loads(resp.read().decode("utf-8"))
+            with urllib.request.urlopen(req, timeout=timeout, context=context) as resp:
                 return json.loads(resp.read().decode("utf-8"))
         except Exception as exc:  # noqa: BLE001
             last = exc
@@ -603,6 +646,553 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+def sale_date_ms(value: Any) -> str | None:
+    ms = num(value)
+    if ms is None or ms <= 0:
+        return None
+    if ms < 315_532_800_000 or ms > 4_102_444_800_000:
+        return None
+    return datetime.fromtimestamp(ms / 1000, tz=timezone.utc).strftime("%Y-%m-%d")
+
+
+def shelby_mailing(attrs: dict) -> tuple[str | None, str | None, str | None, str | None, str | None]:
+    line1 = clean(attrs.get("OWN_ADDR1"))
+    line2 = clean(attrs.get("OWN_ADDR2"))
+    addr3 = clean(attrs.get("OWN_ADDR3"))
+    city = clean(attrs.get("OWN_CITY"))
+    state = clean(attrs.get("OWN_STATE"))
+    zip_code = zip_str(attrs.get("OWN_ZIP"))
+    zip4 = clean(attrs.get("OWN_ZIP4"))
+    if zip_code and zip4:
+        digits = "".join(ch for ch in zip4 if ch.isdigit())
+        if len(digits) >= 4:
+            zip_code = f"{zip_code}-{digits[:4]}"
+    if addr3 and city and city.upper() in addr3.upper():
+        addr3 = None
+    if addr3:
+        line2 = " ".join(part for part in (line2, addr3) if part) or None
+    return line1, line2, city, state, zip_code
+
+
+def shelby_appraiser_url(parcel_id: str) -> str:
+    return "https://www.assessormelvinburgess.com/propertyDetails?IR=true&parcelid=" + urllib.parse.quote(parcel_id)
+
+
+def point_in_ring(x: float, y: float, ring: list) -> bool:
+    inside = False
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = float(ring[i][0]), float(ring[i][1])
+        xj, yj = float(ring[j][0]), float(ring[j][1])
+        if (yi > y) != (yj > y):
+            xinter = (xj - xi) * (y - yi) / (yj - yi) + xi
+            if x < xinter:
+                inside = not inside
+        j = i
+    return inside
+
+
+def point_in_rings(x: float, y: float, rings: list) -> bool:
+    inside = False
+    for ring in rings:
+        if len(ring) >= 4 and point_in_ring(x, y, ring):
+            inside = not inside
+    return inside
+
+
+def arcgis_features(url: str, where: str, out_fields: list[str], *, geometry: bool, page_size: int = 1000) -> list[dict]:
+    rows: list[dict] = []
+    offset = 0
+    seen_first: set[Any] = set()
+    while offset <= 400_000:
+        params: dict[str, Any] = {
+            "where": where,
+            "outFields": ",".join(out_fields),
+            "returnGeometry": "true" if geometry else "false",
+            "f": "json",
+            "resultOffset": offset,
+            "resultRecordCount": page_size,
+        }
+        if geometry:
+            params["outSR"] = "4326"
+        data = fetch_json(url, params, timeout=180)
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:400])
+        batch = data.get("features") or []
+        if not batch:
+            break
+        marker = (batch[0].get("attributes") or {}).get("OBJECTID")
+        if marker is None:
+            marker = (batch[0].get("attributes") or {}).get("FID")
+        if marker is not None:
+            if marker in seen_first:
+                break
+            seen_first.add(marker)
+        rows.extend(batch)
+        if len(batch) < page_size and not data.get("exceededTransferLimit"):
+            break
+        offset += len(batch)
+    return rows
+
+
+def features_for_ids(
+    url: str,
+    field: str,
+    ids: list[str],
+    out_fields: list[str],
+    *,
+    geometry: bool,
+    chunk_size: int,
+    label: str,
+) -> dict[str, list[dict]]:
+    grouped: dict[str, list[dict]] = defaultdict(list)
+    chunks = [ids[i : i + chunk_size] for i in range(0, len(ids), chunk_size)]
+    if not chunks:
+        return grouped
+
+    def one(chunk_ids: list[str]) -> list[dict]:
+        quoted = ",".join("'" + value.replace("'", "''") + "'" for value in chunk_ids)
+        where = f"{field} IN ({quoted})"
+        try:
+            return arcgis_features(url, where, out_fields, geometry=geometry)
+        except RuntimeError:
+            if len(chunk_ids) == 1:
+                raise
+            mid = max(1, len(chunk_ids) // 2)
+            return one(chunk_ids[:mid]) + one(chunk_ids[mid:])
+
+    done = 0
+    workers = 4 if len(chunks) > 1 else 1
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = [pool.submit(one, chunk) for chunk in chunks]
+        for future in as_completed(futures):
+            for feature in future.result():
+                key = clean((feature.get("attributes") or {}).get(field))
+                if key:
+                    grouped[key].append(feature)
+            done += 1
+            if done == 1 or done == len(chunks) or done % 25 == 0:
+                print(f"    {label} {done}/{len(chunks)}", flush=True)
+    return grouped
+
+
+def pick_sale(rows: list[dict]) -> tuple[str | None, float | None, str | None]:
+    parsed: list[tuple[str, float | None, dict]] = []
+    for row in rows:
+        attrs = row.get("attributes") or {}
+        dated = sale_date_ms(attrs.get("SALEDT"))
+        price = num(attrs.get("PRICE"))
+        if price is not None and price <= 0:
+            price = None
+        if dated:
+            parsed.append((dated, price, attrs))
+    priced = [item for item in parsed if item[1] is not None]
+    pool = priced or parsed
+    if not pool:
+        return None, None, None
+    pool.sort(key=lambda item: item[0], reverse=True)
+    dated, price, attrs = pool[0]
+    qualified = clean(attrs.get("SALEVAL")) or clean(attrs.get("SALETYPE"))
+    return dated, price, qualified
+
+
+def prepare_zoning_polygons(raw: list[dict]) -> list[tuple]:
+    prepared = []
+    for feature in raw:
+        attrs = feature.get("attributes") or {}
+        code = clean(attrs.get(SHELBY_ZONE_FIELD))
+        rings = (feature.get("geometry") or {}).get("rings") or []
+        if not code or not rings:
+            continue
+        xs = [float(pt[0]) for ring in rings for pt in ring]
+        ys = [float(pt[1]) for ring in rings for pt in ring]
+        if not xs:
+            continue
+        prepared.append((min(xs), min(ys), max(xs), max(ys), code, rings))
+    return prepared
+
+
+def zone_code_at(prepared: list[tuple], lon: float, lat: float) -> str | None:
+    best: str | None = None
+    best_area: float | None = None
+    for minx, miny, maxx, maxy, code, rings in prepared:
+        if lon < minx or lon > maxx or lat < miny or lat > maxy:
+            continue
+        if not point_in_rings(lon, lat, rings):
+            continue
+        area = (maxx - minx) * (maxy - miny)
+        if best_area is None or area < best_area:
+            best = code
+            best_area = area
+    return best
+
+
+def collierville_code(rows: list[dict], lon: float, lat: float) -> str | None:
+    containing: list[str] = []
+    codes: list[str] = []
+    for row in rows:
+        attrs = row.get("attributes") or {}
+        code = clean(attrs.get("ZONECLASS"))
+        if not code:
+            continue
+        codes.append(code)
+        rings = (row.get("geometry") or {}).get("rings") or []
+        if rings and point_in_rings(lon, lat, rings):
+            containing.append(code)
+    if containing:
+        return containing[0]
+    return codes[0] if codes else None
+
+
+def shelby_feature_gaps(muni: str | None, zoning_source: str, has_flu: bool) -> list[str]:
+    gaps = [
+        "Tax values are not on the public Shelby parcel service. Shelby is not an IMPACT county.",
+    ]
+    if muni == "MEMPHIS":
+        if not has_flu:
+            gaps.append("Memphis 3.0 future land use had no PARCELID match for this parcel.")
+    else:
+        gaps.append("Future land use is published for Memphis only. This place has no public FLU layer in this extract.")
+    if zoning_source == "memphis-udc":
+        gaps.append("Zoning is the Memphis dissolved UDC polygon, joined onto a countywide parcel.")
+    elif zoning_source == "collierville":
+        gaps.append("Zoning is Collierville Zoning_Features, joined onto a countywide parcel inside the city.")
+    elif zoning_source == "unincorporated-udc":
+        gaps.append("Zoning is the Memphis/Shelby UDC polygon where it covers this unincorporated parcel.")
+    elif muni == "BARTLETT":
+        gaps.append("Bartlett zoning is a web map, not a FeatureServer. Zoning is the county parcel attribute.")
+    elif muni in {"GERMANTOWN", "ARLINGTON", "LAKELAND", "MILLINGTON"}:
+        gaps.append("No public zoning FeatureServer for this city. Zoning is the county parcel attribute.")
+    elif muni == "COLLIERVILLE":
+        gaps.append("Collierville zoning layer did not match this parcel. Zoning is the county parcel attribute.")
+    elif muni == "MEMPHIS":
+        gaps.append("Memphis zoning polygon did not contain the centroid. Zoning is the county parcel attribute.")
+    elif muni == "UNINCORPORATED":
+        gaps.append("No countywide future-land-use layer. Zoning is the county parcel attribute.")
+    else:
+        gaps.append("Zoning is the county parcel attribute.")
+    return gaps
+
+
+def assert_shelby_helpers() -> None:
+    if sale_date_ms(1_480_982_400_000) != "2016-12-06":
+        raise RuntimeError("Shelby sale-date conversion failed")
+    ring = [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]
+    if not point_in_rings(0.5, 0.5, [ring]) or point_in_rings(2, 2, [ring]):
+        raise RuntimeError("Shelby point-in-polygon check failed")
+    line1, line2, city, _state, zip_code = shelby_mailing(
+        {
+            "OWN_ADDR1": "1 MAIN",
+            "OWN_ADDR3": "MEMPHIS, TN",
+            "OWN_CITY": "MEMPHIS",
+            "OWN_STATE": "TN",
+            "OWN_ZIP": "38103",
+            "OWN_ZIP4": "1234",
+        }
+    )
+    if (line1, line2, city, zip_code) != ("1 MAIN", None, "MEMPHIS", "38103-1234"):
+        raise RuntimeError("Shelby mailing assembly failed")
+
+
+def shelby_features_from_raw(raw: list[dict], county: dict, markets: list[str]) -> tuple[list[dict], int]:
+    by_id: dict[str, dict] = {}
+    dropped = 0
+    for item in raw:
+        attrs = item.get("attributes") or {}
+        geometry, acres = rings_to_feature_geometry(item.get("geometry"))
+        if not geometry:
+            dropped += 1
+            continue
+        center = centroid_of(geometry)
+        if not plausible_centroid(center) or not in_band(acres):
+            dropped += 1
+            continue
+        parcel_id = clean(attrs.get("PARCELID")) or clean(attrs.get("PARID")) or clean(attrs.get("PAID"))
+        if not parcel_id or center is None:
+            dropped += 1
+            continue
+        muni = (clean(attrs.get("MUNI")) or "").upper() or None
+        mail1, mail2, mail_city, mail_state, mail_zip = shelby_mailing(attrs)
+        zoning = clean(attrs.get("ZONING"))
+        feature = empty_feature(
+            fips=county["fips"],
+            county=county["name"],
+            state=county["state"],
+            markets=markets,
+            parcel_id=parcel_id,
+            acreage=acres,
+            geometry=geometry,
+            center=center,
+            source="tn-shelby-current-parcels",
+            owner=clean(attrs.get("OWNER")),
+            situs=clean(attrs.get("PAR_ADDR1")),
+            city=SHELBY_MUNI_CITY.get(muni or ""),
+            zip_code=zip_str(attrs.get("PAR_ZIP")),
+            zoning=zoning,
+            mail1=mail1,
+            mail2=mail2,
+            mail_city=mail_city,
+            mail_state=mail_state,
+            mail_zip=mail_zip,
+        )
+        props = feature["properties"]
+        props["ownerName2"] = clean(attrs.get("OWNER_EXT"))
+        props["jurisdictionCode"] = muni
+        props["zoningDistrict"] = zoning
+        props["jurisdictionPrefix"] = SHELBY_MUNI_CITY.get(muni or "")
+        props["appraiserUrl"] = shelby_appraiser_url(parcel_id)
+        feature["_parid"] = clean(attrs.get("PARID")) or parcel_id
+        feature["_muni"] = muni
+        previous = by_id.get(parcel_id)
+        if previous is None or (props["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
+            by_id[parcel_id] = feature
+    features = list(by_id.values())
+    features.sort(key=lambda row: row["properties"].get("acreage") or 0, reverse=True)
+    return features, dropped
+
+
+def shelby_county_gaps(
+    *,
+    memphis_n: int,
+    memphis_poly: int,
+    memphis_flu: int,
+    coll_n: int,
+    coll_hit: int,
+    uni_n: int,
+    uni_poly: int,
+    sale_hit: int,
+) -> list[str]:
+    return [
+        "Shelby County is not an IMPACT county. The Comptroller IMPACT parcel service is not used. Public CurrentParcels has no land, building, or total appraised or assessed value fields, so tax values stay null.",
+        "No native acreage field. Stored acres are the absolute area of the returned WGS84 rings in a local equirectangular projection (111320*cos(latitude) meters per degree of longitude and 110540 meters per degree of latitude), divided by 4046.8564224. Shape.STArea() is only a widened Web Mercator prefilter (15000 to 1400000), not the stored acreage. The inclusive 5.0–150.0 acre band is applied after that derivation.",
+        "scgis.shelbycountytn.gov requires OpenSSL legacy renegotiation (OP_LEGACY_SERVER_CONNECT / UnsafeLegacyServerConnect). The seeder enables that flag only for shelbycountytn.gov hosts.",
+        (
+            f"Memphis zoning polygons from old_zoning_dissolved_WEB (CorrZone) joined by centroid for MUNI=MEMPHIS "
+            f"({memphis_poly} of {memphis_n}). Misses keep the parcel ZONING attribute. City zoning is joined onto countywide parcels and is not a countywide entitlement."
+        ),
+        (
+            f"Collierville Zoning_Features ZONECLASS joined on PARCELID for MUNI=COLLIERVILLE "
+            f"({coll_hit} of {coll_n}). Misses keep the parcel ZONING attribute. City zoning is preferred inside the city limits."
+        ),
+        (
+            f"Unincorporated parcels use a Memphis/Shelby UDC polygon when the centroid falls inside one "
+            f"({uni_poly} of {uni_n}); otherwise the parcel ZONING attribute."
+        ),
+        "Bartlett zoning is an embedded web-map feature collection, not a FeatureServer. Germantown, Arlington, Lakeland, and Millington have no verified anonymous zoning FeatureServer. ReGIS Zoning/Zoning returns 499 Token Required. Those municipalities use the CurrentParcels ZONING attribute.",
+        (
+            f"Memphis 3.0 Future Land Use joined on PARCELID for MUNI=MEMPHIS only ({memphis_flu} of {memphis_n}). "
+            "FLU_2025Update_Final_WEB is not substituted; its layer name still includes Draft4 and adoption cutover is not confirmed. Parcel LANDUSE is existing use, not future land use."
+        ),
+        "No public future-land-use FeatureServer for unincorporated Shelby or for Arlington, Bartlett, Collierville, Germantown, Lakeland, or Millington. Memphis FLU is not applied outside Memphis.",
+        f"Last sale is the latest CERTParcel RSALES row with a positive PRICE for PARID ({sale_hit} parcels). Register of Deeds instrument links stay on that table.",
+        "Assessor property-details URLs can return HTTP 403 to automated clients. The interactive assessor site is the supported path.",
+        "Proposed UDC zoning FeatureServers (FINAL_Simple_WEB and related drafts) are not treated as adopted entitlement.",
+    ]
+
+
+def download_shelby(county: dict, markets: list[str], spec: dict) -> dict:
+    assert_shelby_helpers()
+    fips = county["fips"]
+    cache_path = CACHE_DIR / f"{fips}.json"
+    print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
+    if cache_path.exists() and not spec.get("ignoreCache"):
+        cached = json.loads(cache_path.read_text())
+        features = cached.get("features") or []
+        if features:
+            print(f"  cache hit {len(features)}", flush=True)
+            for feature in features:
+                feature["properties"]["marketIds"] = markets
+            path, lookup, tiles = write_tiles(county, features)
+            return county_row(
+                county,
+                markets,
+                feature_count=len(features),
+                coverage=spec["coverage"],
+                partition="tiles",
+                path=path,
+                lookup=lookup,
+                source=spec["source"],
+                query_url=spec["url"],
+                gaps=list(cached.get("gaps") or spec.get("gaps") or []),
+                source_count=cached.get("sourceCount"),
+                dropped=cached.get("dropped"),
+                tile_count=tiles,
+            )
+    where = f"Shape.STArea() >= {SHELBY_STAREA_MIN} AND Shape.STArea() <= {SHELBY_STAREA_MAX}"
+    expected = count_where(SHELBY_PARCEL_QUERY, where)
+    print(f"  prefilter rows {expected}", flush=True)
+    if expected <= 0:
+        raise RuntimeError("Shelby CurrentParcels returned no rows in the acreage prefilter")
+    ids = fetch_object_ids(SHELBY_PARCEL_QUERY, where)
+    raw = fetch_by_ids(
+        SHELBY_PARCEL_QUERY,
+        ids,
+        [
+            "PARCELID",
+            "PARID",
+            "PAID",
+            "OWNER",
+            "OWNER_EXT",
+            "OWN_ADDR1",
+            "OWN_ADDR2",
+            "OWN_ADDR3",
+            "OWN_CITY",
+            "OWN_STATE",
+            "OWN_ZIP",
+            "OWN_ZIP4",
+            "PAR_ADDR1",
+            "PAR_ZIP",
+            "MUNI",
+            "ZONING",
+        ],
+        batch=60,
+    )
+    features, dropped = shelby_features_from_raw(raw, county, markets)
+    print(f"  in band {len(features)} dropped {dropped}", flush=True)
+    if not features:
+        raise RuntimeError("Shelby prefilter returned rows but none survived the 5–150 acre derivation")
+
+    print("  Memphis / Shelby UDC zoning polygons", flush=True)
+    zoning_raw = arcgis_features(SHELBY_ZONING_QUERY, "1=1", [SHELBY_ZONE_FIELD], geometry=True, page_size=500)
+    zoning_polys = prepare_zoning_polygons(zoning_raw)
+    print(f"    polygons {len(zoning_polys)}", flush=True)
+
+    coll_ids = [feature["properties"]["parcelId"] for feature in features if feature.get("_muni") == "COLLIERVILLE"]
+    print(f"  Collierville zoning for {len(coll_ids)} parcels", flush=True)
+    coll_rows = features_for_ids(
+        SHELBY_COLLIERVILLE_QUERY,
+        "OWNPARCELID",
+        coll_ids,
+        ["ZONECLASS", "ZONEDESC", "OWNPARCELID", "PUDNAME"],
+        geometry=True,
+        chunk_size=20,
+        label="collierville",
+    )
+    memphis_ids = [feature["properties"]["parcelId"] for feature in features if feature.get("_muni") == "MEMPHIS"]
+    print(f"  Memphis FLU for {len(memphis_ids)} parcels", flush=True)
+    flu_rows = features_for_ids(
+        SHELBY_FLU_QUERY,
+        "PARCELID",
+        memphis_ids,
+        ["PARCELID", "FLU", "Form_char", "Scale_ht"],
+        geometry=False,
+        chunk_size=40,
+        label="flu",
+    )
+    sale_ids = list(dict.fromkeys(feature["_parid"] for feature in features if feature.get("_parid")))
+    print(f"  RSALES for {len(sale_ids)} parcels", flush=True)
+    sale_rows = features_for_ids(
+        SHELBY_SALES_QUERY,
+        "PARID",
+        sale_ids,
+        ["PARID", "SALEDT", "PRICE", "SALETYPE", "SALEVAL"],
+        geometry=False,
+        chunk_size=20,
+        label="sales",
+    )
+
+    memphis_n = memphis_poly = memphis_flu = coll_n = coll_hit = uni_n = uni_poly = sale_hit = 0
+    for feature in features:
+        props = feature["properties"]
+        muni = feature.get("_muni")
+        lon, lat = props["centroid"]
+        zoning_source = "parcel-attribute"
+        if muni == "MEMPHIS":
+            memphis_n += 1
+        elif muni == "COLLIERVILLE":
+            coll_n += 1
+        elif muni == "UNINCORPORATED":
+            uni_n += 1
+        if muni == "COLLIERVILLE":
+            code = collierville_code(coll_rows.get(props["parcelId"]) or [], lon, lat)
+            if code:
+                props["zoningCode"] = code
+                props["zoningDistrict"] = code
+                zoning_source = "collierville"
+                coll_hit += 1
+        elif muni in {"MEMPHIS", "UNINCORPORATED"}:
+            code = zone_code_at(zoning_polys, lon, lat)
+            if code:
+                props["zoningCode"] = code
+                props["zoningDistrict"] = code
+                zoning_source = "memphis-udc" if muni == "MEMPHIS" else "unincorporated-udc"
+                if muni == "MEMPHIS":
+                    memphis_poly += 1
+                else:
+                    uni_poly += 1
+        has_flu = False
+        if muni == "MEMPHIS":
+            flu_hit = flu_rows.get(props["parcelId"]) or []
+            flu_name = None
+            form = None
+            for row in flu_hit:
+                attrs = row.get("attributes") or {}
+                flu_name = clean(attrs.get("FLU")) or flu_name
+                form = clean(attrs.get("Form_char")) or form
+            if flu_name:
+                label = flu_name if not form or form.lower() in flu_name.lower() else f"{flu_name} ({form})"
+                props["flu"] = {
+                    "code": flu_name,
+                    "label": label,
+                    "jurisdiction": "Memphis",
+                    "source": SHELBY_FLU_QUERY.replace("/query", ""),
+                }
+                has_flu = True
+                memphis_flu += 1
+        dated, price, qualified = pick_sale(sale_rows.get(feature.get("_parid")) or [])
+        if dated or price is not None:
+            props["lastSale"] = {"date": dated, "price": price, "qualified": qualified}
+            if price is not None:
+                sale_hit += 1
+        props["dataGaps"] = shelby_feature_gaps(muni, zoning_source, has_flu)
+        feature.pop("_parid", None)
+        feature.pop("_muni", None)
+
+    if not all(in_band(feature["properties"].get("acreage")) for feature in features):
+        raise RuntimeError("Shelby emitted a parcel outside 5–150 acres")
+    outside = [
+        feature["properties"]["parcelId"]
+        for feature in features
+        if feature["properties"].get("flu") and feature["properties"].get("jurisdictionCode") != "MEMPHIS"
+    ]
+    if outside:
+        raise RuntimeError(f"Memphis FLU applied outside Memphis: {outside[:5]}")
+    gaps = shelby_county_gaps(
+        memphis_n=memphis_n,
+        memphis_poly=memphis_poly,
+        memphis_flu=memphis_flu,
+        coll_n=coll_n,
+        coll_hit=coll_hit,
+        uni_n=uni_n,
+        uni_poly=uni_poly,
+        sale_hit=sale_hit,
+    )
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "gaps": gaps, "features": features},
+            separators=(",", ":"),
+        )
+    )
+    path, lookup, tiles = write_tiles(county, features)
+    print(f"  kept {len(features)} memphis flu {memphis_flu}/{memphis_n} sales {sale_hit}", flush=True)
+    return county_row(
+        county,
+        markets,
+        feature_count=len(features),
+        coverage=spec["coverage"] if features else "gap",
+        partition="tiles" if features else "none",
+        path=path if features else None,
+        lookup=lookup if features else None,
+        source=spec["source"],
+        query_url=spec["url"],
+        gaps=gaps,
+        source_count=expected,
+        dropped=dropped,
+        tile_count=tiles,
+    )
+
+
 def county_override(fips: str) -> dict | None:
     if fips == "13067":  # Cobb GA
         return {
@@ -693,6 +1283,14 @@ def county_override(fips: str) -> dict | None:
             "gaps": [
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
             ],
+        }
+    if fips == "47157":  # Shelby County, Tennessee — not IMPACT
+        return {
+            "kind": "shelby",
+            "url": SHELBY_PARCEL_QUERY,
+            "source": "tn-shelby-current-parcels",
+            "coverage": "complete-gte-5ac",
+            "gaps": [],
         }
     return None
 
@@ -959,20 +1557,22 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels; Shelby County ReGIS CurrentParcels | IMPACT where `CALC_ACRE` returns rows. Shelby (Memphis) is not IMPACT: county parcels, polygon-derived acres, Memphis FLU, and Memphis plus Collierville zoning. Other missing IMPACT counties stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) and for Shelby County, where city zoning is joined onto countywide parcels inside Memphis, Collierville, and unincorporated areas that intersect the UDC layer. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "shelby":
+        return download_shelby(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

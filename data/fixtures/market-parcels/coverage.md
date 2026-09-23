@@ -23,7 +23,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Greenville | other | 1,570 | 0 | 1 | 7 |
 | Chattanooga | other | 10,537 | 2 | 0 | 8 |
 | Knoxville | other | 38,433 | 7 | 0 | 6 |
-| Memphis | other | 35,611 | 7 | 0 | 4 |
+| Memphis | other | 45,278 | 8 | 0 | 3 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
 
@@ -312,7 +312,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Lauderdale | Tennessee | 47097 | gap | 0 | tn-impact-47097 |
 | Marshall | Mississippi | 28093 | complete-gte-5ac | 7,984 | ms-mdeq-2023-28093 |
 | Mississippi | Arkansas | 05093 | complete-gte-5ac | 6,585 | ar-cadastre-05093 |
-| Shelby | Tennessee | 47157 | gap | 0 | tn-impact-47157 |
+| Shelby | Tennessee | 47157 | complete-gte-5ac | 9,667 | tn-shelby-current-parcels |
 | Tate | Mississippi | 28137 | complete-gte-5ac | 5,758 | ms-mdeq-2023-28137 |
 | Tipton | Tennessee | 47167 | gap | 0 | tn-impact-47167 |
 | Tunica | Mississippi | 28143 | complete-gte-5ac | 1,842 | ms-mdeq-2023-28143 |

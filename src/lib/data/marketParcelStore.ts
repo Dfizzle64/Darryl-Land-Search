@@ -1,16 +1,9 @@
 import path from "node:path";
 import { access, readFile } from "node:fs/promises";
-import { parcelMatchesFilters } from "../filters";
-import {
-  featureIntersectsBbox,
-  selectParcelPage,
-  spatiallyThinFeatures,
-  tileFileName,
-  tileIndicesForBbox,
-} from "../orlandoParcels";
+import { featureIntersectsBbox, tileFileName, tileIndicesForBbox } from "../orlandoParcels";
 import { featuresInAcreageBand, type MarketParcelIndex, type MarketParcelsMeta } from "../marketParcels";
-import { rankSites } from "../score";
-import type { FilterState, FluConfig, ParcelCollection, ParcelFeature, ParcelProperties, SearchMarketId, ZoningConfig } from "../types";
+import type { ParcelCollection, ParcelFeature, ParcelProperties, SearchMarketId } from "../types";
+import { annotateParcelSignals, loadOrangeSignalIndex } from "../orangeSignals";
 import { finalizeOrlandoParcelPage, type OrlandoParcelPage, type OrlandoParcelQuery } from "./orlandoParcelStore";
 
 const INDEX_PATH = path.join(process.cwd(), "data/fixtures/market-parcels/index.json");
@@ -118,51 +111,12 @@ async function featuresForCounty(
   return readFeatureFile(county.path);
 }
 
-const EXCLUDED_DRAW_LIMIT = 800;
-const RANKED_KEEP = 200;
-
-function unionById(first: ParcelFeature[], second: ParcelFeature[]): ParcelFeature[] {
-  const seen = new Set<string>();
-  const out: ParcelFeature[] = [];
-  for (const feature of [...first, ...second]) {
-    const id = feature.properties.id;
-    if (seen.has(id)) continue;
-    seen.add(id);
-    out.push(feature);
-  }
-  return out;
-}
-
 async function finalizeMarketParcelPage(
   features: ParcelFeature[],
   query: OrlandoParcelQuery,
 ): Promise<OrlandoParcelPage> {
-  const touchesOrange = features.some((feature) => feature.properties.countyFips === "12095");
-  if (touchesOrange) return finalizeOrlandoParcelPage(features, query);
-
-  const limit = query.limit ?? 4000;
-  const filters = query.filters;
-  const zoningConfig = query.zoningConfig;
-  const fluConfig = query.fluConfig;
-  const canFilter = Boolean(filters && zoningConfig && fluConfig);
-  const page = selectParcelPage(features, limit, (feature) =>
-    canFilter ? parcelMatchesFilters(feature, filters as FilterState, zoningConfig as ZoningConfig, fluConfig as FluConfig) : true,
-  );
-  let drawn = page.thinned;
-  if (canFilter && page.truncated && filters && zoningConfig && fluConfig) {
-    const top = rankSites(page.matches, filters, zoningConfig, fluConfig)
-      .slice(0, RANKED_KEEP)
-      .map((item) => item.feature);
-    drawn = unionById(top, page.thinned);
-  }
-  const excluded = query.includeExcluded ? spatiallyThinFeatures(page.rejected, EXCLUDED_DRAW_LIMIT) : [];
-  return {
-    collection: { type: "FeatureCollection", features: drawn },
-    excluded,
-    totalInBbox: page.totalInBbox,
-    totalMatching: page.totalMatching,
-    truncated: drawn.length < page.totalMatching,
-  };
+  // Same income/AADT join as Orlando. Counties outside the Florida fixtures stay unknown.
+  return finalizeOrlandoParcelPage(features, query);
 }
 
 export async function queryMarketFixtureParcels(
@@ -216,11 +170,17 @@ export async function getMarketFixtureParcel(id: string): Promise<ParcelFeature 
       const tile = lookup[parcelId];
       if (!tile) return null;
       const features = await readFeatureFile(path.join(row.path, `${tile}.geojson`));
-      return features.find((feature) => feature.properties.id === id) ?? null;
+      return annotateLoadedParcel(features.find((feature) => feature.properties.id === id) ?? null);
     }
     const features = await readFeatureFile(row.path);
-    return features.find((feature) => feature.properties.id === id) ?? null;
+    return annotateLoadedParcel(features.find((feature) => feature.properties.id === id) ?? null);
   } catch {
     return null;
   }
+}
+
+async function annotateLoadedParcel(feature: ParcelFeature | null): Promise<ParcelFeature | null> {
+  if (!feature) return null;
+  annotateParcelSignals(feature, await loadOrangeSignalIndex());
+  return feature;
 }

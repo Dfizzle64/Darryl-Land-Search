@@ -34,14 +34,17 @@ describe("tract income", () => {
     expect(filterTractRowsByIncome(rows, lookup, { ...filters, minIncome: 0 })).toHaveLength(3);
   });
 
-  it("stamps Orange County ACS income onto eligible tracts and leaves other tracts unstamped", async () => {
+  it("stamps ACS income onto eligible tracts in Florida parcel counties and leaves other states unstamped", async () => {
     const [income, packs] = await Promise.all([loadOrangeTractIncomeMap(), loadEligiblePackTracts()]);
     const stamped = packs.features.filter((feature) => typeof feature.properties.medianHouseholdIncome === "number");
     expect(stamped.length).toBeGreaterThan(10);
-    expect(stamped.every((feature) => feature.properties.tractGeoid.startsWith("12095"))).toBe(true);
-    const outside = packs.features.find((feature) => !feature.properties.tractGeoid.startsWith("12095"));
-    expect(outside?.properties.medianHouseholdIncome).toBeUndefined();
-    const sample = stamped[0];
-    expect(income.get(sample.properties.tractGeoid)).toBe(sample.properties.medianHouseholdIncome);
+    const orange = stamped.filter((feature) => feature.properties.tractGeoid.startsWith("12095"));
+    expect(orange.length).toBeGreaterThan(10);
+    expect(
+      stamped.every((feature) => income.get(feature.properties.tractGeoid) === feature.properties.medianHouseholdIncome),
+    ).toBe(true);
+    const outsideFlorida = packs.features.find((feature) => !feature.properties.tractGeoid.startsWith("12"));
+    expect(outsideFlorida).toBeTruthy();
+    expect(outsideFlorida?.properties.medianHouseholdIncome).toBeUndefined();
   });
 });

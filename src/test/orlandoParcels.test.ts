@@ -15,11 +15,12 @@ import {
   spatiallyThinFeatures,
   tileIndicesForBbox,
 } from "../lib/orlandoParcels";
+import { signedArea } from "../lib/parcelGeometry";
 import type { OrlandoParcelsMeta, ParcelCollection, ParcelFeature } from "../lib/types";
 
 const FULL_MINIMUMS: Record<string, number> = {
   Lake: 15000,
-  Orange: 12000,
+  Orange: 9000,
   Osceola: 5500,
   Polk: 18000,
   Seminole: 4000,
@@ -87,6 +88,7 @@ describe("Orlando shed parcels", () => {
     expect(meta.coreMaxAcres).toBe(150);
     expect(meta.tile).toEqual(ORLANDO_PARCEL_TILE);
     expect(meta.parcelCount).toBe(meta.counties.reduce((sum, county) => sum + county.featureCount, 0));
+    let clockwiseOuters = 0;
     for (const county of meta.counties) {
       expect(existsSync(county.path)).toBe(true);
       expect(statSync(county.path).isDirectory()).toBe(county.partition === "tiles");
@@ -110,6 +112,18 @@ describe("Orlando shed parcels", () => {
         expect(county.maxAcres).toBe(150);
         expect(county.partition).toBe("tiles");
         expect(existsSync(path.join("data/fixtures/orlando-parcels/lookup", `${county.fips}.json`))).toBe(true);
+        for (const feature of features) {
+          const geometry = feature.geometry;
+          const outers =
+            geometry.type === "Polygon"
+              ? [geometry.coordinates[0]]
+              : geometry.type === "MultiPolygon"
+                ? geometry.coordinates.map((poly) => poly[0])
+                : [];
+          for (const ring of outers) {
+            if (signedArea(ring) < 0) clockwiseOuters += 1;
+          }
+        }
       } else {
         expect(county.coverage).toBe("sample");
         expect(county.partition).toBe("file");
@@ -117,9 +131,32 @@ describe("Orlando shed parcels", () => {
         expect(features.length).toBeLessThan(500);
       }
     }
+    expect(clockwiseOuters).toBe(0);
     const orange = meta.counties.find((county) => county.name === "Orange");
-    expect(orange?.zoningJoinedCount ?? 0).toBeGreaterThan(1000);
+    expect(orange?.zoningJoinedCount ?? 0).toBeGreaterThan(7000);
     expect(orange?.fluJoinedCount ?? 0).toBeGreaterThan(1000);
+    const orangeFeatures = featuresForCounty(orange!);
+    const withOwner = orangeFeatures.filter((feature) => feature.properties.ownerName).length;
+    const withZoning = orangeFeatures.filter((feature) => feature.properties.zoningCode).length;
+    expect(withOwner).toBe(orangeFeatures.length);
+    expect(withZoning).toBeGreaterThan(7000);
+    let clockwise = 0;
+    let collapsed = 0;
+    for (const feature of orangeFeatures) {
+      const geometry = feature.geometry;
+      const outers =
+        geometry.type === "Polygon" ? [geometry.coordinates[0]] : geometry.type === "MultiPolygon" ? geometry.coordinates.map((poly) => poly[0]) : [];
+      for (const ring of outers) {
+        if (signedArea(ring) < 0) clockwise += 1;
+        if (ring.length <= 4) collapsed += 1;
+      }
+    }
+    expect(clockwise).toBe(0);
+    expect(collapsed).toBeLessThan(50);
+    const dean = orangeFeatures.find((feature) => feature.properties.parcelId === "302230851500010");
+    expect(dean?.properties.ownerName).toContain("DEAN DAIRY");
+    expect(dean?.properties.zoningCode).toBe("ORL-PD/AN");
+    expect(dean?.properties.situsAddress).toBe("315 N BUMBY AVE");
   });
 
   it("returns only centroids inside an area-of-interest bbox", async () => {

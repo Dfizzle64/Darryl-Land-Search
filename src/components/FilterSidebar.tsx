@@ -430,11 +430,10 @@ export function FilterSidebar({
             onChange={(includeUnknownIncome) => onChange({ ...filters, includeUnknownIncome })}
           />
           <p className="text-xs text-ink-500">
-            Orange County parcels in the current view pick up ACS median income. Other shed counties stay unknown —
-            uncheck the box to hide them when a minimum is set. With Census geography set to tract, the same minimum
-            hides eligible tracts that have a joined Orange County ACS median income below it. Tracts outside that
-            fixture have no AMI attribute and stay on the map while Include unknown income is on. Block group income
-            applies to parcels only.
+            Florida parcels in the current view pick up ACS tract median income (B19013) where that county has a parcel
+            extract. The minimum hides parcels whose known income is below it. While Include unknown income is checked,
+            parcels and tracts with no joined median stay on the map — uncheck it to hide them. Block group income is
+            joined for Orange County parcels only. Tract geography uses the same minimum on eligible-tract overlays.
           </p>
         </section>
 
@@ -461,8 +460,9 @@ export function FilterSidebar({
             onChange={(includeUnknownAadt) => onChange({ ...filters, includeUnknownAadt })}
           />
           <p className="text-xs text-ink-500">
-            Orange County parcels pick up the nearest FDOT count. Other counties stay unknown unless that box is off.
-            Eligible tracts have no AADT attribute, so this slider does not hide tracts.
+            Florida parcels pick up the nearest FDOT count segment within 15 km, including counts under 15,000. A parcel
+            farther away, or outside Florida, stays unknown. While Include unknown AADT is checked, those parcels stay
+            visible — uncheck it to hide them. Eligible tracts have no AADT, so this slider does not hide tracts.
           </p>
           <Toggle
             label="Show major-road AADT overlay"

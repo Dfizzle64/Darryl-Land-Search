@@ -23,14 +23,14 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels; Blount County AGOL `BlountParcels` | Complete where `CALC_ACRE` returns rows. Blount (47009) is an IMPACT county enriched from public county AGOL (owner, mailing, situs, sale, appraisal), shared zoning, and Maryville/Alcoa FLU. Several large counties remain gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) and, for Blount County TN, from the shared LandUsePlanning zoning polygons after CityLimits / CITYNUM resolve. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 
@@ -58,7 +58,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Columbia | other | 0 | 0 | 0 | 10 |
 | Greenville | other | 1,570 | 0 | 1 | 7 |
 | Chattanooga | other | 10,537 | 2 | 0 | 8 |
-| Knoxville | other | 38,433 | 7 | 0 | 6 |
+| Knoxville | other | 40,514 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
@@ -324,7 +324,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Anderson | Tennessee | 47001 | complete-gte-5ac | 4,302 | tn-impact-47001 |
-| Blount | Tennessee | 47009 | complete-gte-5ac | 6,102 | tn-impact-47009 |
+| Blount | Tennessee | 47009 | complete-gte-5ac | 8,183 | tn-blount-agol-47009 |
 | Campbell | Tennessee | 47013 | complete-gte-5ac | 5,445 | tn-impact-47013 |
 | Cocke | Tennessee | 47029 | complete-gte-5ac | 4,448 | tn-impact-47029 |
 | Grainger | Tennessee | 47057 | complete-gte-5ac | 6,406 | tn-impact-47057 |

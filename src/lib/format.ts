@@ -27,6 +27,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "47009": "https://assessment.cot.tn.gov/tpad/",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -42,6 +43,9 @@ export function parcelAppraiserUrl(options: {
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);
+  if (fips === "47009") {
+    return { href, label: "Open Blount County in Tennessee TPAD" };
+  }
   const countyLabel =
     fips === "12009"
       ? "Brevard"

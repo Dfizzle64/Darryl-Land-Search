@@ -22,7 +22,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Columbia | other | 0 | 0 | 0 | 10 |
 | Greenville | other | 1,570 | 0 | 1 | 7 |
 | Chattanooga | other | 10,537 | 2 | 0 | 8 |
-| Knoxville | other | 38,433 | 7 | 0 | 6 |
+| Knoxville | other | 40,514 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
@@ -288,7 +288,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Anderson | Tennessee | 47001 | complete-gte-5ac | 4,302 | tn-impact-47001 |
-| Blount | Tennessee | 47009 | complete-gte-5ac | 6,102 | tn-impact-47009 |
+| Blount | Tennessee | 47009 | complete-gte-5ac | 8,183 | tn-blount-agol-47009 |
 | Campbell | Tennessee | 47013 | complete-gte-5ac | 5,445 | tn-impact-47013 |
 | Cocke | Tennessee | 47029 | complete-gte-5ac | 4,448 | tn-impact-47029 |
 | Grainger | Tennessee | 47057 | complete-gte-5ac | 6,406 | tn-impact-47057 |

@@ -23,6 +23,7 @@ import urllib.parse
 import urllib.request
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -371,7 +372,13 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    extra: dict | None = None,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
@@ -379,6 +386,8 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
         "returnGeometry": "true",
         "outSR": "4326",
     }
+    if extra:
+        params.update(extra)
     for start in range(0, total, batch):
         chunk = ids[start : start + batch]
         query = dict(params)
@@ -388,12 +397,12 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), extra=extra))
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), extra=extra))
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -483,6 +492,9 @@ def normalize_rows(
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        hook = spec.get("afterFeature")
+        if hook:
+            hook(feature, attrs)
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -603,7 +615,569 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+# Blount County, Tennessee (FIPS 47009). Comptroller JUR / COUNTY_ID is 005 / 5, not the FIPS suffix.
+# Do not query web5.kcsgis.com Blount/Public — that is Blount County, Alabama.
+BLOUNT_PARCELS_URL = (
+    "https://services3.arcgis.com/NIOS5f3vobGvnGtD/arcgis/rest/services/BlountParcels/FeatureServer/0/query"
+)
+BLOUNT_ZONING_URL = "https://com.blountgis.org/server/rest/services/LandUsePlanning/Zoning/MapServer/2/query"
+BLOUNT_CITY_LIMITS_URL = "https://com.blountgis.org/server/rest/services/AdministrativeArea/CityLimits/MapServer/0/query"
+BLOUNT_MARYVILLE_FLU_URL = (
+    "https://com.blountgis.org/server/rest/services/LandUsePlanning/Maryville_Future_Land_Use/MapServer/0/query"
+)
+BLOUNT_ALCOA_FLU_URL = (
+    "https://coa.blountgis.org/server/rest/services/Hosted/CurrentLandUseUpdateFile/FeatureServer/4/query"
+)
+BLOUNT_TPAD_URL = "https://assessment.cot.tn.gov/tpad/"
+BLOUNT_CITYNUM = {"464": "MARYVILLE", "012": "ALCOA"}
+BLOUNT_ADMIN = {
+    "MARYVILLE": "Maryville",
+    "ALCOA": "Alcoa",
+    "FRIENDSVILLE": "Friendsville",
+    "LOUISVILLE": "Louisville",
+    "TOWNSEND": "Townsend",
+    "ROCKFORD": "Rockford",
+    "UNINCORPORATED": "Blount County",
+}
+BLOUNT_PREFIX = {
+    "MARYVILLE": "MVL",
+    "ALCOA": "ALC",
+    "FRIENDSVILLE": "FRV",
+    "LOUISVILLE": "LOU",
+    "TOWNSEND": "TWN",
+    "ROCKFORD": "RKF",
+    "UNINCORPORATED": "BLC",
+}
+BLOUNT_DISPLAY = {
+    "MARYVILLE": "Maryville",
+    "ALCOA": "Alcoa",
+    "FRIENDSVILLE": "Friendsville",
+    "LOUISVILLE": "Louisville",
+    "TOWNSEND": "Townsend",
+    "ROCKFORD": "Rockford",
+}
+
+
+def positive_amount(value: Any) -> float | None:
+    parsed = num(value)
+    if parsed is None or parsed <= 0:
+        return None
+    return parsed
+
+
+def parse_us_date(value: Any) -> str | None:
+    text = clean(value)
+    if not text or text in {"0", "0000"}:
+        return None
+    for fmt in ("%m/%d/%Y", "%m/%d/%y", "%Y-%m-%d", "%Y%m%d"):
+        try:
+            return datetime.strptime(text, fmt).date().isoformat()
+        except ValueError:
+            continue
+    parsed = num(text)
+    if parsed is None:
+        return None
+    seconds = parsed / 1000 if parsed > 10_000_000_000 else parsed
+    if seconds < 0:
+        return None
+    try:
+        return datetime.fromtimestamp(seconds, timezone.utc).date().isoformat()
+    except (OverflowError, OSError, ValueError):
+        return None
+
+
+def compact_gislink(value: Any) -> str | None:
+    text = clean(value)
+    if not text:
+        return None
+    return "".join(text.split()).upper()
+
+
+def esri_rings_to_geometry(geom: dict | None) -> dict | None:
+    """WGS84 polygon for point-in-polygon. Keeps rings; does not simplify."""
+    if not geom or not geom.get("rings"):
+        return None
+    polygons: list[list[list[list[float]]]] = []
+    current: list[list[list[float]]] = []
+    for ring in geom["rings"]:
+        coords = [[round(float(x), 6), round(float(y), 6)] for x, y in ring]
+        if len(coords) < 4:
+            continue
+        if coords[0] != coords[-1]:
+            coords.append(coords[0])
+        area = 0.0
+        for i in range(len(coords) - 1):
+            area += coords[i][0] * coords[i + 1][1] - coords[i + 1][0] * coords[i][1]
+        # ArcGIS exterior rings are clockwise (negative shoelace in lon/lat).
+        if not current or area < 0:
+            if current:
+                polygons.append(current)
+            current = [coords]
+        else:
+            current.append(coords)
+    if current:
+        polygons.append(current)
+    if not polygons:
+        return None
+    if len(polygons) == 1:
+        return {"type": "Polygon", "coordinates": polygons[0]}
+    return {"type": "MultiPolygon", "coordinates": polygons}
+
+
+def point_in_ring(x: float, y: float, ring: list[list[float]]) -> bool:
+    inside = False
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = ring[i]
+        xj, yj = ring[j]
+        if ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / ((yj - yi) or 1e-12) + xi):
+            inside = not inside
+        j = i
+    return inside
+
+
+def point_in_feature(x: float, y: float, feature: dict) -> bool:
+    geom = feature.get("geometry") or {}
+    if geom.get("type") == "Polygon":
+        rings = geom["coordinates"]
+        if not rings or not point_in_ring(x, y, rings[0]):
+            return False
+        return not any(point_in_ring(x, y, hole) for hole in rings[1:])
+    if geom.get("type") == "MultiPolygon":
+        for poly in geom["coordinates"]:
+            if poly and point_in_ring(x, y, poly[0]) and not any(point_in_ring(x, y, hole) for hole in poly[1:]):
+                return True
+    return False
+
+
+def feature_bbox(feature: dict) -> tuple[float, float, float, float] | None:
+    xs: list[float] = []
+    ys: list[float] = []
+
+    def walk(node: Any) -> None:
+        if isinstance(node, (int, float)) or not node:
+            return
+        if isinstance(node[0], (int, float)):
+            xs.append(float(node[0]))
+            ys.append(float(node[1]))
+            return
+        for item in node:
+            walk(item)
+
+    walk((feature.get("geometry") or {}).get("coordinates") or [])
+    if not xs:
+        return None
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+class GridIndex:
+    def __init__(self, cell: float = 0.02) -> None:
+        self.cell = cell
+        self.buckets: dict[tuple[int, int], list[dict]] = defaultdict(list)
+        self.broad: list[dict] = []
+
+    def add(self, feature: dict) -> None:
+        bbox = feature_bbox(feature)
+        if not bbox:
+            return
+        west, south, east, north = bbox
+        ix0, ix1 = math.floor(west / self.cell), math.floor(east / self.cell)
+        iy0, iy1 = math.floor(south / self.cell), math.floor(north / self.cell)
+        if (ix1 - ix0 + 1) * (iy1 - iy0 + 1) > 500:
+            self.broad.append(feature)
+            return
+        for ix in range(ix0, ix1 + 1):
+            for iy in range(iy0, iy1 + 1):
+                self.buckets[(ix, iy)].append(feature)
+
+    def hit(self, x: float, y: float) -> dict | None:
+        ix = math.floor(x / self.cell)
+        iy = math.floor(y / self.cell)
+        for feature in self.buckets.get((ix, iy), []):
+            if point_in_feature(x, y, feature):
+                return feature
+        for feature in self.broad:
+            if point_in_feature(x, y, feature):
+                return feature
+        return None
+
+
+def blount_sale_record(attrs: dict, prefix: str) -> dict | None:
+    date = parse_us_date(attrs.get(f"{prefix}SALEDATE"))
+    price = positive_amount(attrs.get(f"{prefix}PRICE"))
+    deed = clean(attrs.get(f"{prefix}DEEDBKPG"))
+    vi = clean(attrs.get(f"{prefix}VI"))
+    ar = clean(attrs.get(f"{prefix}AR"))
+    year = clean(attrs.get(f"{prefix}SALEYEAR"))
+    if not any((date, price, deed, vi, ar)):
+        return None
+    record: dict[str, Any] = {"date": date, "price": price, "qualified": ar}
+    if deed:
+        record["deedBookPage"] = deed
+    if vi:
+        record["vi"] = vi
+    if year and year != "0":
+        record["saleYear"] = year
+    return record
+
+
+def blount_after_feature(feature: dict, attrs: dict) -> None:
+    props = feature["properties"]
+    owner2 = clean(attrs.get("OWNER2"))
+    if owner2:
+        props["ownerName2"] = owner2
+    if not props.get("situsAddress"):
+        street = clean(attrs.get("STREET"))
+        number = clean(attrs.get("ST_NUM"))
+        props["situsAddress"] = " ".join(part for part in (street, number) if part) or None
+    human_id = clean(attrs.get("ID"))
+    if human_id:
+        props["assessorParcelId"] = human_id
+    primary = blount_sale_record(attrs, "")
+    verified = blount_sale_record(attrs, "V_")
+    chosen = None
+    if primary and (primary.get("date") or primary.get("price")):
+        chosen = primary
+    elif verified and (verified.get("date") or verified.get("price")):
+        chosen = verified
+    props["lastSale"] = chosen or {"date": None, "price": None, "qualified": None}
+    props["tax"] = {
+        "marketValue": positive_amount(attrs.get("APPRAISAL")),
+        "assessedValue": None,
+        "taxableValue": None,
+        "taxes": None,
+        "landAppraisal": positive_amount(attrs.get("LANDVAL")),
+        "improvementAppraisal": positive_amount(attrs.get("IMPVAL")),
+        "outbuildingAppraisal": positive_amount(attrs.get("OBYVAL")),
+    }
+    props["appraiserUrl"] = BLOUNT_TPAD_URL
+    feature["_blount"] = {
+        "citynum": str(attrs.get("CITYNUM") or "").strip(),
+        "camaZoning": clean(attrs.get("ZONING")),
+        "gislink": compact_gislink(attrs.get("GISLINK")) or compact_gislink(props.get("parcelId")),
+    }
+
+
+def blount_spec() -> dict:
+    if "kcsgis.com" in BLOUNT_PARCELS_URL or "Blount/Public" in BLOUNT_PARCELS_URL:
+        raise RuntimeError("Refusing Blount County, Alabama parcel service.")
+    return {
+        "kind": "arcgis",
+        "url": BLOUNT_PARCELS_URL,
+        "where": "PARCEL_TYP=1 AND CALC_ACRE>=5 AND CALC_ACRE<=150",
+        "outFields": [
+            "GISLINK",
+            "GISLINK2",
+            "PARCELID",
+            "PARID",
+            "ID",
+            "CITYNUM",
+            "ADDRESS",
+            "ST_NUM",
+            "STREET",
+            "OWNER",
+            "OWNER2",
+            "MAILADDR",
+            "MAILCITY",
+            "STATE",
+            "ZIP",
+            "SALEDATE",
+            "SALEYEAR",
+            "PRICE",
+            "DEEDBKPG",
+            "VI",
+            "AR",
+            "SALELABEL",
+            "V_SALEDATE",
+            "V_SALEYEAR",
+            "V_PRICE",
+            "V_DEEDBKPG",
+            "V_VI",
+            "V_AR",
+            "LANDVAL",
+            "IMPVAL",
+            "OBYVAL",
+            "APPRAISAL",
+            "LANDUSEVAL",
+            "CALC_ACRE",
+            "CAMADEEDAC",
+            "CAMACALCAC",
+            "ZONING",
+            "LANDUSE",
+            "PROPTYPE",
+            "PT",
+            "SUBDIV",
+            "DISTRICT",
+            "TAXYR",
+            "COUNTY",
+            "JUR",
+            "COUNTY_ID",
+            "PARCEL_TYP",
+            "MAP",
+            "GP",
+            "PARCEL",
+            "PARCELWP",
+        ],
+        "idField": "GISLINK",
+        "idFallbacks": ["ID", "PARID", "PARCELID"],
+        "acresField": "CALC_ACRE",
+        "ownerField": "OWNER",
+        "situsField": "ADDRESS",
+        "zoningField": "ZONING",
+        "mail1Field": "MAILADDR",
+        "mailCityField": "MAILCITY",
+        "mailStateField": "STATE",
+        "mailZipField": "ZIP",
+        "marketValueField": "APPRAISAL",
+        "afterFeature": blount_after_feature,
+        "overlay": "blount-tn",
+        "source": "tn-blount-agol-47009",
+        "coverage": "complete-gte-5ac",
+        "gaps": [
+            "Blount County TN (FIPS 47009) is an IMPACT/TPAD county. Comptroller JUR is 005 and COUNTY_ID is 5, not the FIPS suffix. Parcels are the public AGOL BlountParcels layer (PARCEL_TYP=1, CALC_ACRE 5–150) with owner, mailing, situs, sale, and appraisal. The geometry-only statewide IMPACT Parcels layer is not the attribute source. Token-gated ParcelPublishing (499) and the county GIS premium extract are not used. Blount County, Alabama (kcsgis Blount/Public) is the wrong state and is not used.",
+            "tax.marketValue is total appraisal (APPRAISAL). LANDVAL, IMPVAL, and OBYVAL are appraisal components stored beside it. Assessed and taxable totals are not on this public REST layer — confirm those, and blank or zero sales, on TPAD (https://assessment.cot.tn.gov/tpad/). No stable anonymous deep link was verified; search by parcel ID (ID / PARID) or GISLINK. lastSale.qualified is the roll AR code when present; deed book/page and VI are retained on the sale object.",
+            "Zoning is city-only on countywide parcels. The parcel ZONING attribute is a weak CAMA label. The joined code prefers LandUsePlanning/Zoning MapServer layer 2 ZONECLASS after CityLimits, then CITYNUM (464 Maryville, 012 Alcoa). Friendsville, Louisville, Townsend, and Rockford have no CITYNUM and resolve only from CityLimits. Blount County zoning polygons are not applied inside a city.",
+            "Adopted FLU is joined only inside Maryville (Maryville Future Land Use LANDUSEDESC) and Alcoa (Current Land Use landusedesc). Friendsville, Louisville, Townsend, Rockford, and unincorporated Blount have no verified public adopted FLU service, so FLU stays null there. Proposed countywide FLU Option layers are draft and are not joined. Maryville and Alcoa FLU are not applied outside those cities.",
+            "Acreage filter is CALC_ACRE. CAMADEEDAC and CAMACALCAC are secondary and often zero. National Park (NP) and federal rows can fall in the 5–150 acre band; acreage is not a developability judgment.",
+        ],
+    }
+
+
+def fetch_paged(url: str, where: str, fields: list[str], page: int = 400, extra: dict | None = None) -> list[dict]:
+    """Offset pagination. Object-id URLs on the Alcoa host fail in large batches."""
+    rows: list[dict] = []
+    offset = 0
+    label = url.split("/rest/services/")[-1][:90]
+    print(f"  overlay {label}", flush=True)
+    while True:
+        params = {
+            "where": where,
+            "outFields": ",".join(fields),
+            "returnGeometry": "true",
+            "outSR": "4326",
+            "resultOffset": str(offset),
+            "resultRecordCount": str(page),
+            "f": "json",
+        }
+        if extra:
+            params.update(extra)
+        data = fetch_json(url, params, timeout=180)
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        batch = data.get("features") or []
+        rows.extend(batch)
+        print(f"    {len(rows)}", flush=True)
+        if len(batch) < page or not data.get("exceededTransferLimit"):
+            break
+        offset += len(batch)
+    return rows
+
+
+def fetch_overlay(url: str, where: str, fields: list[str], batch: int = 100, extra: dict | None = None) -> list[dict]:
+    label = url.split("/rest/services/")[-1][:90]
+    print(f"  overlay {label}", flush=True)
+    ids = fetch_object_ids(url, where)
+    print(f"    {len(ids)} rows", flush=True)
+    if not ids:
+        return []
+    return fetch_by_ids(url, ids, fields, batch=batch, extra=extra)
+
+
+def blount_city_limits_name(lon: float, lat: float, cities: GridIndex) -> str | None:
+    hit = cities.hit(lon, lat)
+    if not hit:
+        return None
+    name = str((hit.get("properties") or {}).get("name") or "").upper()
+    if name in BLOUNT_ADMIN and name != "UNINCORPORATED":
+        return name
+    return None
+
+
+def join_blount_overlays(features: list[dict]) -> tuple[list[dict], list[str]]:
+    lons = [feature["properties"]["centroid"][0] for feature in features]
+    lons.sort()
+    median_lon = lons[len(lons) // 2]
+    if not (-84.7 < median_lon < -83.3):
+        raise RuntimeError(
+            f"Blount centroids are outside Blount County TN (median lon {median_lon}). "
+            "Refusing a west-Tennessee IMPACT id mix-up or a Blount Alabama extract."
+        )
+
+    city_raw = fetch_overlay(
+        BLOUNT_CITY_LIMITS_URL,
+        "1=1",
+        ["NAME", "TYPE", "LABEL"],
+        batch=20,
+    )
+    cities = GridIndex(0.03)
+    for item in city_raw:
+        name = clean((item.get("attributes") or {}).get("NAME"))
+        geometry = esri_rings_to_geometry(item.get("geometry"))
+        if not name or not geometry:
+            continue
+        cities.add({"type": "Feature", "geometry": geometry, "properties": {"name": name.upper()}})
+
+    zoning_raw = fetch_overlay(
+        BLOUNT_ZONING_URL,
+        "1=1",
+        ["ZONECLASS", "ZONEDESC", "ADMINNAME"],
+        batch=80,
+    )
+    zoning_by_admin: dict[str, GridIndex] = defaultdict(lambda: GridIndex(0.02))
+    for item in zoning_raw:
+        attrs = item.get("attributes") or {}
+        admin = clean(attrs.get("ADMINNAME"))
+        code = clean(attrs.get("ZONECLASS"))
+        geometry = esri_rings_to_geometry(item.get("geometry"))
+        if not admin or not code or not geometry:
+            continue
+        zoning_by_admin[admin].add(
+            {
+                "type": "Feature",
+                "geometry": geometry,
+                "properties": {"code": code, "desc": clean(attrs.get("ZONEDESC"))},
+            }
+        )
+
+    maryville_raw = fetch_overlay(
+        BLOUNT_MARYVILLE_FLU_URL,
+        "1=1",
+        ["LANDUSECODE", "LANDUSEDESC", "ADMINNAME"],
+        batch=80,
+    )
+    maryville_flu = GridIndex(0.015)
+    for item in maryville_raw:
+        attrs = item.get("attributes") or {}
+        admin = clean(attrs.get("ADMINNAME"))
+        if admin and admin.lower() != "maryville":
+            continue
+        label = clean(attrs.get("LANDUSEDESC"))
+        if not label:
+            continue
+        geometry = esri_rings_to_geometry(item.get("geometry"))
+        if not geometry:
+            continue
+        code = clean(attrs.get("LANDUSECODE")) or label
+        maryville_flu.add(
+            {
+                "type": "Feature",
+                "geometry": geometry,
+                "properties": {
+                    "code": code,
+                    "label": label,
+                    "jurisdiction": "Maryville",
+                    "source": "maryville-future-land-use",
+                },
+            }
+        )
+
+    # One Alcoa parcel can carry several land-use parts under the same gislink.
+    # Intersect the parcel centroid with the part polygon instead of keeping the last attribute row.
+    alcoa_raw = fetch_paged(
+        BLOUNT_ALCOA_FLU_URL,
+        "1=1",
+        ["landusecode", "landusedesc", "adminname"],
+        page=300,
+        extra={"maxAllowableOffset": "0.00015", "geometryPrecision": "5"},
+    )
+    alcoa_flu = GridIndex(0.01)
+    for item in alcoa_raw:
+        attrs = item.get("attributes") or {}
+        admin = clean(attrs.get("adminname"))
+        if admin and admin.lower() != "alcoa":
+            continue
+        label = clean(attrs.get("landusedesc"))
+        geometry = esri_rings_to_geometry(item.get("geometry"))
+        if not label or not geometry:
+            continue
+        alcoa_flu.add(
+            {
+                "type": "Feature",
+                "geometry": geometry,
+                "properties": {
+                    "code": clean(attrs.get("landusecode")) or label,
+                    "label": label,
+                    "jurisdiction": "Alcoa",
+                    "source": "alcoa-current-land-use",
+                },
+            }
+        )
+
+    counts: dict[str, int] = defaultdict(int)
+    citynum_check = {"464": [0, 0], "012": [0, 0]}
+    for feature in features:
+        props = feature["properties"]
+        extra = feature.pop("_blount", {}) or {}
+        lon, lat = props["centroid"]
+        citynum = str(extra.get("citynum") or "")
+        spatial_name = blount_city_limits_name(lon, lat, cities)
+        name = spatial_name or BLOUNT_CITYNUM.get(citynum) or "UNINCORPORATED"
+        if citynum in citynum_check:
+            citynum_check[citynum][1] += 1
+            if spatial_name == BLOUNT_CITYNUM[citynum]:
+                citynum_check[citynum][0] += 1
+        counts[f"jurisdiction:{name}"] += 1
+        props["jurisdictionCode"] = name
+        props["jurisdictionPrefix"] = BLOUNT_PREFIX[name]
+        if name != "UNINCORPORATED":
+            props["situsCity"] = BLOUNT_DISPLAY[name]
+        zone_hit = zoning_by_admin.get(BLOUNT_ADMIN[name])
+        zone = zone_hit.hit(lon, lat) if zone_hit else None
+        if zone:
+            zone_props = zone.get("properties") or {}
+            props["zoningCode"] = zone_props.get("code")
+            props["zoningDistrict"] = zone_props.get("desc")
+            props["zoningSource"] = "blount-zoning-zoneclass"
+            counts["zoning:polygon"] += 1
+        elif extra.get("camaZoning"):
+            props["zoningCode"] = extra["camaZoning"]
+            props["zoningDistrict"] = None
+            props["zoningSource"] = "cama-zoning"
+            counts["zoning:cama"] += 1
+        else:
+            props["zoningCode"] = None
+            props["zoningDistrict"] = None
+            props["zoningSource"] = None
+            counts["zoning:none"] += 1
+        props["flu"] = None
+        if name == "MARYVILLE":
+            flu_hit = maryville_flu.hit(lon, lat)
+            if flu_hit:
+                props["flu"] = flu_hit.get("properties")
+                counts["flu:maryville"] += 1
+            else:
+                counts["flu:maryville-miss"] += 1
+        elif name == "ALCOA":
+            flu_hit = alcoa_flu.hit(lon, lat)
+            if flu_hit:
+                props["flu"] = flu_hit.get("properties")
+                counts["flu:alcoa"] += 1
+            else:
+                props["flu"] = None
+                counts["flu:alcoa-miss"] += 1
+        else:
+            counts["flu:gap"] += 1
+
+    for code, expected in (("464", "MARYVILLE"), ("012", "ALCOA")):
+        matched, total = citynum_check[code]
+        if total >= 20 and matched / total < 0.5:
+            raise RuntimeError(
+                f"CITYNUM {code} intersected CityLimits {expected} for only {matched}/{total} parcels. "
+                "CityLimits join looks inverted or pointed at the wrong layer."
+            )
+    summary = (
+        "Join counts — "
+        + ", ".join(f"{key} {counts[key]}" for key in sorted(counts))
+        + ". FLU stays null for Friendsville, Louisville, Townsend, Rockford, and unincorporated "
+        "(no adopted public FLU). Proposed county FLU options were not joined."
+    )
+    print(f"  {summary}", flush=True)
+    return features, [summary]
+
+
 def county_override(fips: str) -> dict | None:
+    if fips == "47009":  # Blount County, Tennessee — not Blount County, Alabama
+        return blount_spec()
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -959,14 +1533,14 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels; Blount County AGOL `BlountParcels` | Complete where `CALC_ACRE` returns rows. Blount (47009) is an IMPACT county enriched from public county AGOL (owner, mailing, situs, sale, appraisal), shared zoning, and Maryville/Alcoa FLU. Several large counties remain gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) and, for Blount County TN, from the shared LandUsePlanning zoning polygons after CityLimits / CITYNUM resolve. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -978,7 +1552,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
     if cache_path.exists() and not spec.get("ignoreCache"):
         cached = json.loads(cache_path.read_text())
-        if cached.get("features"):
+        if cached.get("features") and cached.get("source") == spec["source"]:
             print(f"  cache hit {len(cached['features'])}", flush=True)
             features = cached["features"]
             for feature in features:
@@ -1050,14 +1624,21 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     ids = fetch_object_ids(spec["url"], spec["where"])
     raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
     features, dropped = normalize_rows(raw, county, markets, spec)
+    overlay_gaps: list[str] = []
+    if spec.get("overlay") == "blount-tn" and features:
+        features, overlay_gaps = join_blount_overlays(features)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+        json.dumps(
+            {"source": spec["source"], "sourceCount": expected, "dropped": dropped, "features": features},
+            separators=(",", ":"),
+        )
     )
     coverage = spec["coverage"]
     gaps = list(spec.get("gaps") or [])
+    gaps.extend(overlay_gaps)
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,

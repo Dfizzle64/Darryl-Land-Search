@@ -567,6 +567,10 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    if fips == "37067":  # Forsyth NC (Winston-Salem) — not Forsyth GA / Cumming
+        from forsyth_parcels import forsyth_spec
+
+        return forsyth_spec()
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -740,6 +744,7 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    extra: dict | None = None,
 ) -> dict:
     row = {
         "name": county["name"],
@@ -760,6 +765,8 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    if extra:
+        row.update(extra)
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
     (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
     return row
@@ -786,6 +793,29 @@ def orlando_county(fips: str) -> dict | None:
 
 
 def rebuild_indexes(catalog: dict) -> None:
+    def public_county(row: dict) -> dict:
+        item = {
+            "name": row["name"],
+            "fips": row["fips"],
+            "state": row["state"],
+            "featureCount": row.get("featureCount") or 0,
+            "coverage": row.get("coverage"),
+            "partition": row.get("partition"),
+            "minAcres": MIN_ACRES,
+            "maxAcres": MAX_ACRES,
+            "source": row.get("source"),
+            "queryUrl": row.get("queryUrl"),
+            "gaps": row.get("gaps") or [],
+            "path": row.get("path"),
+            "lookup": row.get("lookup"),
+            "tileCount": row.get("tileCount"),
+            "sourceCount": row.get("sourceCount"),
+        }
+        for key in ("municipalities", "unincorporated", "zoningJoinedCount", "fluJoinedCount"):
+            if row.get(key) is not None:
+                item[key] = row[key]
+        return item
+
     rows = load_county_rows()
     MARKET_DIR.mkdir(parents=True, exist_ok=True)
     index_markets: dict[str, dict] = {}
@@ -824,26 +854,7 @@ def rebuild_indexes(catalog: dict) -> None:
                 "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
                 "Orange, Osceola, and Polk point at the existing Orlando complete extract.",
             ],
-            "counties": [
-                {
-                    "name": row["name"],
-                    "fips": row["fips"],
-                    "state": row["state"],
-                    "featureCount": row.get("featureCount") or 0,
-                    "coverage": row.get("coverage"),
-                    "partition": row.get("partition"),
-                    "minAcres": MIN_ACRES,
-                    "maxAcres": MAX_ACRES,
-                    "source": row.get("source"),
-                    "queryUrl": row.get("queryUrl"),
-                    "gaps": row.get("gaps") or [],
-                    "path": row.get("path"),
-                    "lookup": row.get("lookup"),
-                    "tileCount": row.get("tileCount"),
-                    "sourceCount": row.get("sourceCount"),
-                }
-                for row in sorted(market_rows, key=lambda item: item["name"])
-            ],
+            "counties": [public_county(row) for row in sorted(market_rows, key=lambda item: item["name"])],
         }
         rel = f"data/fixtures/market-parcels/markets/{slug(market['id'])}/meta.json"
         market_path = ROOT / rel
@@ -921,7 +932,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons. Forsyth (Winston-Salem, FIPS 37067) uses MapForsyth Parcels_Hosted plus municipal zoning and FLU | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Forsyth NC is MapForsyth, not Forsyth County, Georgia |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -929,13 +940,17 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or when a county override spatial-joins municipal polygons (Forsyth NC MapForsyth). It is not a multifamily knowledge-base match outside Orange County, Florida. Prefer **All parcels** in these markets. Forsyth County, Georgia (FIPS 13117, Cumming) stays a gap and is not this extract.
 
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "forsyth":
+        from forsyth_parcels import download_forsyth
+
+        return download_forsyth(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

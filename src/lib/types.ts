@@ -28,6 +28,10 @@ export type TaxInfo = {
   assessedValue: number | null;
   taxableValue: number | null;
   taxes: number | null;
+  /** NC OneMap land value when the county roll has no land/building split. */
+  landValue?: number | null;
+  /** NC OneMap improvement value when the county roll has no land/building split. */
+  improvementValue?: number | null;
 };
 
 export type IncomeInfo = {

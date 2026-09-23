@@ -41,6 +41,12 @@ export function parcelAppraiserUrl(options: {
       label: "Open in Orange County Property Appraiser",
     };
   }
+  if (fips === "37067") {
+    return {
+      href: options.appraiserUrl || "https://lrcpwa.ncptscloud.com/forsyth/parcel-search",
+      label: "Open Forsyth County NCPTS parcel",
+    };
+  }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);
   const countyLabel =
     fips === "12009"

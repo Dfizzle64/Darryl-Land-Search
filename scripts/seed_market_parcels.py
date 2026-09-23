@@ -806,7 +806,10 @@ def county_override(fips: str) -> dict | None:
                 "Parcel id is PID. GPIN is on the layer but was blank for every 5–150 acre row checked on 2026-09-23.",
                 "LAND_APPR is the land appraisal. Total appraisal and improvement value live on public ProVal ParcelMap (qualified SDE field names) and are not joined.",
                 "Last sale is DOC_DATE and SALE_PRICE only, not a multi-sale history.",
-                "County zoning is a separate public layer and does not cover the City of Charleston, North Charleston, or Mount Pleasant. Mount Pleasant has no verified public zoning REST URL. Zoning is not spatially joined.",
+                "Mount Pleasant zoning is town MPSC_Zoning_New MapServer/2, joined on PARCEL_ID = PID. ZONINGVALU values COUNTY and AWENDAW are excluded. Town future land use is MPSC_Land_Use_New MapServer/3 (New_FLU), joined by parcel centroid. County Public_Works/Public_Works_Viewer/46 is the older Mt Pleasant zoning layer and is not used.",
+                "Isle of Palms has no single public zoning service. Sullivan's Island and James Island publish PDF or static maps only. Those districts stay gaps.",
+                "Folly Beach has a public AGOL zoning layer owned by College of Charleston / SCGIS, not the city. That third-party layer is not ingested.",
+                "City of Charleston and North Charleston publish their own zoning services. They are not joined onto this county extract.",
                 "Owner and mailing address are the public GIS attributes only. Emails and phone numbers are not scraped.",
             ],
         }
@@ -1209,13 +1212,208 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
-| South Carolina | Charleston ENERGOV/energov_ent MapServer/12; Berkeley Addr_muni MapServer/1; Dorchester Parcels_Public FeatureServer; Greenville city GIS | Charleston, Berkeley, and Dorchester are complete 5–150 acre extracts. Greenville is a city-hosted sample. Charleston GIS_VIEWER/Parcel_Search and Public_Search, and the Berkeley AGOL parcels FeatureServer, return HTTP 499 and are not used. Other South Carolina counties are gaps |
+| South Carolina | Charleston ENERGOV/energov_ent MapServer/12; Berkeley Addr_muni MapServer/1; Dorchester Parcels_Public FeatureServer; Greenville city GIS | Charleston, Berkeley, and Dorchester are complete 5–150 acre extracts. Mount Pleasant town zoning (MPSC_Zoning_New, PARCEL_ID = PID, COUNTY/AWENDAW excluded) and future land use (MPSC_Land_Use_New New_FLU, centroid join) overlay Charleston County parcels. Greenville is a city-hosted sample. Charleston GIS_VIEWER/Parcel_Search and Public_Search, and the Berkeley AGOL parcels FeatureServer, return HTTP 499 and are not used. Folly Beach zoning is third-party AGOL and is not ingested. Isle of Palms, Sullivan's Island, and James Island stay gaps. Other South Carolina counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county parcel layer already carries a zoning field (DeKalb, Dorchester) or when a town layer joins on parcel id (Mount Pleasant). Mount Pleasant future land use is a centroid join. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
+
+
+MP_ZONING_QUERY = (
+    "https://maps.tompsc.com/arcgis/rest/services/Parcel_Search_New/MPSC_Zoning_New/MapServer/2/query"
+)
+MP_FLU_QUERY = (
+    "https://maps.tompsc.com/arcgis/rest/services/Parcel_Search_New/MPSC_Land_Use_New/MapServer/3/query"
+)
+MP_ZONING_SKIP = {"COUNTY", "AWENDAW"}
+
+
+def pid_key(value: Any) -> str | None:
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    if isinstance(value, int) and not isinstance(value, bool):
+        return str(value)
+    return clean(value)
+
+
+def fetch_paged(url: str, where: str, out_fields: list[str], *, geometry: bool, page: int) -> list[dict]:
+    rows: list[dict] = []
+    seen: set[int] = set()
+    offset = 0
+    while True:
+        params: dict[str, str] = {
+            "where": where,
+            "outFields": ",".join(out_fields),
+            "returnGeometry": "true" if geometry else "false",
+            "orderByFields": "OBJECTID",
+            "resultOffset": str(offset),
+            "resultRecordCount": str(page),
+            "f": "json",
+        }
+        if geometry:
+            params["outSR"] = "4326"
+        data = fetch_json(url, params, timeout=180)
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        batch = data.get("features") or []
+        fresh = 0
+        for item in batch:
+            oid = (item.get("attributes") or {}).get("OBJECTID")
+            if isinstance(oid, int) and oid in seen:
+                continue
+            if isinstance(oid, int):
+                seen.add(oid)
+            rows.append(item)
+            fresh += 1
+        print(f"    overlay {len(rows)}", flush=True)
+        if fresh == 0 or len(batch) < page:
+            break
+        offset += len(batch)
+        if offset > 200_000:
+            break
+    return rows
+
+
+def ring_contains(lon: float, lat: float, ring: list) -> bool:
+    inside = False
+    count = len(ring)
+    if count < 4:
+        return False
+    j = count - 1
+    for i in range(count):
+        xi, yi = float(ring[i][0]), float(ring[i][1])
+        xj, yj = float(ring[j][0]), float(ring[j][1])
+        if (yi > lat) != (yj > lat):
+            denom = yj - yi
+            if denom != 0 and lon < (xj - xi) * (lat - yi) / denom + xi:
+                inside = not inside
+        j = i
+    return inside
+
+
+def rings_contain(lon: float, lat: float, rings: list) -> bool:
+    inside = False
+    for ring in rings:
+        if ring_contains(lon, lat, ring):
+            inside = not inside
+    return inside
+
+
+def apply_mount_pleasant_overlays(features: list[dict]) -> dict[str, int]:
+    """Town zoning by PID, then future land use by centroid. COUNTY/AWENDAW are not town districts."""
+    print("  Mount Pleasant zoning + future land use", flush=True)
+    for feature in features:
+        props = feature["properties"]
+        if props.get("jurisdictionCode") == "MOUNT PLEASANT":
+            props["zoningCode"] = None
+            props["zoningDistrict"] = None
+            props["jurisdictionCode"] = None
+        flu = props.get("flu") or None
+        if isinstance(flu, dict) and flu.get("source") == "sc-mount-pleasant-flu":
+            props["flu"] = None
+
+    zoning_rows = fetch_paged(
+        MP_ZONING_QUERY,
+        "ZONINGVALU<>'COUNTY' AND ZONINGVALU<>'AWENDAW'",
+        ["PARCEL_ID", "ZONINGVALU", "SPLITZONED", "DEVNAME"],
+        geometry=False,
+        page=1000,
+    )
+    by_pid: dict[str, dict] = {}
+    for item in zoning_rows:
+        attrs = item.get("attributes") or {}
+        code = clean(attrs.get("ZONINGVALU"))
+        pid = pid_key(attrs.get("PARCEL_ID"))
+        if not pid or not code or code.upper() in MP_ZONING_SKIP:
+            continue
+        by_pid[pid] = attrs
+    print(f"    town zoning ids {len(by_pid)}", flush=True)
+
+    flu_rows = fetch_paged(MP_FLU_QUERY, "1=1", ["New_FLU"], geometry=True, page=200)
+    cell = 0.02
+    buckets: dict[tuple[int, int], list[dict]] = defaultdict(list)
+    prepared = 0
+    for item in flu_rows:
+        attrs = item.get("attributes") or {}
+        label = clean(attrs.get("New_FLU"))
+        rings = (item.get("geometry") or {}).get("rings") or []
+        if not label or not rings:
+            continue
+        if not (-93 < float(rings[0][0][0]) < -75 and 24 < float(rings[0][0][1]) < 37):
+            raise RuntimeError("Mount Pleasant future land use did not return WGS84 coordinates")
+        xs = [float(pt[0]) for ring in rings for pt in ring]
+        ys = [float(pt[1]) for ring in rings for pt in ring]
+        record = {"label": label, "rings": rings, "bbox": (min(xs), min(ys), max(xs), max(ys))}
+        minx, miny, maxx, maxy = record["bbox"]
+        ix0, ix1 = math.floor(minx / cell), math.floor(maxx / cell)
+        iy0, iy1 = math.floor(miny / cell), math.floor(maxy / cell)
+        for ix in range(ix0, ix1 + 1):
+            for iy in range(iy0, iy1 + 1):
+                buckets[(ix, iy)].append(record)
+        prepared += 1
+    print(f"    future land use polygons {prepared}", flush=True)
+
+    zoning_hits = 0
+    flu_hits = 0
+    for feature in features:
+        props = feature["properties"]
+        row = by_pid.get(props.get("parcelId") or "")
+        if row:
+            code = clean(row.get("ZONINGVALU"))
+            if code and code.upper() not in MP_ZONING_SKIP:
+                props["zoningCode"] = code
+                props["zoningDistrict"] = clean(row.get("DEVNAME"))
+                props["jurisdictionCode"] = "MOUNT PLEASANT"
+                zoning_hits += 1
+        lon, lat = props.get("centroid") or (None, None)
+        if not isinstance(lon, (int, float)) or not isinstance(lat, (int, float)):
+            continue
+        ix, iy = math.floor(float(lon) / cell), math.floor(float(lat) / cell)
+        best: dict | None = None
+        best_area: float | None = None
+        seen_ids: set[int] = set()
+        for record in buckets.get((ix, iy), []):
+            key = id(record)
+            if key in seen_ids:
+                continue
+            seen_ids.add(key)
+            minx, miny, maxx, maxy = record["bbox"]
+            if not (minx <= float(lon) <= maxx and miny <= float(lat) <= maxy):
+                continue
+            if not rings_contain(float(lon), float(lat), record["rings"]):
+                continue
+            area = (maxx - minx) * (maxy - miny)
+            if best_area is None or area < best_area:
+                best = record
+                best_area = area
+        if best is not None:
+            props["flu"] = {
+                "code": best["label"],
+                "label": best["label"],
+                "jurisdiction": "Mount Pleasant",
+                "source": "sc-mount-pleasant-flu",
+            }
+            flu_hits += 1
+    print(f"    joined zoning {zoning_hits}, flu {flu_hits}", flush=True)
+    return {"zoning": zoning_hits, "flu": flu_hits}
+
+
+def charleston_overlay_gaps(spec: dict, stats: dict[str, int] | None) -> list[str]:
+    gaps = list(spec.get("gaps") or [])
+    if not stats:
+        return gaps
+    gaps.insert(
+        0,
+        (
+            f"Mount Pleasant town zoning joined {stats['zoning']} parcels "
+            "(MPSC_Zoning_New MapServer/2, PARCEL_ID = PID, COUNTY and AWENDAW excluded). "
+            f"Town future land use centroid-joined {stats['flu']} parcels "
+            "(MPSC_Land_Use_New MapServer/3, New_FLU)."
+        ),
+    )
+    return gaps
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
@@ -1229,6 +1427,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
             features = cached["features"]
             for feature in features:
                 feature["properties"]["marketIds"] = markets
+            overlay = apply_mount_pleasant_overlays(features) if fips == "45019" and features else None
             path, lookup, tiles = write_tiles(county, features)
             return county_row(
                 county,
@@ -1240,7 +1439,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=charleston_overlay_gaps(spec, overlay) if fips == "45019" else list(spec.get("gaps") or []),
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
@@ -1298,6 +1497,10 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     features, dropped = normalize_rows(raw, county, markets, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    overlay = apply_mount_pleasant_overlays(features) if fips == "45019" and features else None
+    if fips == "45019":
+        spec = dict(spec)
+        spec["gaps"] = charleston_overlay_gaps(spec, overlay)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
         json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))

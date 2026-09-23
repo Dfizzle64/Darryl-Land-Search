@@ -27,10 +27,10 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
-| South Carolina | Charleston ENERGOV/energov_ent MapServer/12; Berkeley Addr_muni MapServer/1; Dorchester Parcels_Public FeatureServer; Greenville city GIS | Charleston, Berkeley, and Dorchester are complete 5–150 acre extracts. Greenville is a city-hosted sample. Charleston GIS_VIEWER/Parcel_Search and Public_Search, and the Berkeley AGOL parcels FeatureServer, return HTTP 499 and are not used. Other South Carolina counties are gaps |
+| South Carolina | Charleston ENERGOV/energov_ent MapServer/12; Berkeley Addr_muni MapServer/1; Dorchester Parcels_Public FeatureServer; Greenville city GIS | Charleston, Berkeley, and Dorchester are complete 5–150 acre extracts. Mount Pleasant town zoning (MPSC_Zoning_New, PARCEL_ID = PID, COUNTY/AWENDAW excluded) and future land use (MPSC_Land_Use_New New_FLU, centroid join) overlay Charleston County parcels. Greenville is a city-hosted sample. Charleston GIS_VIEWER/Parcel_Search and Public_Search, and the Berkeley AGOL parcels FeatureServer, return HTTP 499 and are not used. Folly Beach zoning is third-party AGOL and is not ingested. Isle of Palms, Sullivan's Island, and James Island stay gaps. Other South Carolina counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county parcel layer already carries a zoning field (DeKalb, Dorchester) or when a town layer joins on parcel id (Mount Pleasant). Mount Pleasant future land use is a centroid join. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 

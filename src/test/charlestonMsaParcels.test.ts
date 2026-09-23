@@ -97,7 +97,25 @@ describe("Charleston MSA parcel extracts", () => {
       expect(lat).toBeGreaterThan(32.3);
       expect(lat).toBeLessThan(33.3);
       expect(feature.properties.tax.marketValue ?? null).toBeNull();
+      const zoning = feature.properties.zoningCode?.toUpperCase();
+      expect(zoning === "COUNTY" || zoning === "AWENDAW").toBe(false);
     }
+    const townZoned = features.filter((feature) => feature.properties.jurisdictionCode === "MOUNT PLEASANT");
+    const townFlu = features.filter((feature) => feature.properties.flu?.source === "sc-mount-pleasant-flu");
+    expect(townZoned.length).toBeGreaterThan(20);
+    expect(townFlu.length).toBeGreaterThan(20);
+    expect(townZoned.every((feature) => Boolean(feature.properties.zoningCode))).toBe(true);
+    expect(townFlu.every((feature) => feature.properties.flu?.jurisdiction === "Mount Pleasant" && feature.properties.flu?.code)).toBe(
+      true,
+    );
+    const notes = county.gaps.join(" ");
+    expect(notes).toMatch(/MPSC_Zoning_New/);
+    expect(notes).toMatch(/MPSC_Land_Use_New/);
+    expect(notes).toMatch(/Folly Beach/);
+    expect(notes).toMatch(/Isle of Palms/);
+    expect(notes).toMatch(/Sullivan/);
+    expect(notes).toMatch(/James Island/);
+    expect(notes).not.toMatch(/no verified public zoning REST URL/i);
   });
 
   it("loads Berkeley County outlines with owner, mailing, and tax fields from Addr_muni", () => {

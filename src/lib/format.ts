@@ -27,6 +27,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "13121": "https://fultonassessor.org/",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -59,7 +60,9 @@ export function parcelAppraiserUrl(options: {
                   ? "Sumter"
                   : fips === "12127"
                     ? "Volusia"
-                    : "county";
+                    : fips === "13121"
+                      ? "Fulton"
+                      : "county";
   return {
     href,
     label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,
@@ -98,6 +101,22 @@ export function formatSale(sale: { date: string | null; price: number | null }):
   const price = sale.price != null && sale.price > 0 ? formatUsd(sale.price) : null;
   if (date && price) return `${date}\n${price}`;
   return date ?? price ?? "Not available";
+}
+
+export function formatParcelPlace(properties: {
+  situsCity?: string | null;
+  situsZip?: string | null;
+  countyName?: string | null;
+  state?: string | null;
+}): string {
+  const cityZip = [properties.situsCity, properties.situsZip].filter(Boolean).join(" ");
+  if (cityZip) return cityZip;
+  if (properties.countyName) {
+    const stateLabel =
+      properties.state === "Georgia" ? "Georgia" : properties.state && properties.state !== "Florida" ? properties.state : "FL";
+    return `${properties.countyName} County, ${stateLabel}`;
+  }
+  return properties.state || "Florida";
 }
 
 export function formatMailing(address: {

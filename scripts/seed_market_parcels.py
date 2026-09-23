@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import threading
 import time
 import urllib.parse
@@ -26,7 +27,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
-from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
+from parcel_geometry import esri_rings_to_geojson, net_acres, polygon_parts, representative_point
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "data" / "market-parcel-counties.json"
@@ -266,53 +267,60 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    appraiser_url: str | None = None,
+    data_gaps: list[str] | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
+    properties: dict[str, Any] = {
+        "id": feature_id,
+        "parcelId": parcel_id,
+        "countyFips": fips,
+        "countyName": county,
+        "state": state,
+        "marketIds": markets,
+        "situsAddress": situs,
+        "situsCity": city,
+        "situsZip": zip_code,
+        "jurisdictionCode": None,
+        "ownerName": owner,
+        "ownerName2": None,
+        "propertyName": None,
+        "zoningCode": zoning,
+        "zoningDistrict": None,
+        "jurisdictionPrefix": None,
+        "dorCode": dor,
+        "acreage": round(acreage, 4),
+        "centroid": [center[0], center[1]],
+        "lastSale": {"date": sale_date, "price": sale_price, "qualified": sale_qualified},
+        "tax": {
+            "marketValue": market_value,
+            "assessedValue": assessed,
+            "taxableValue": taxable,
+            "taxes": None,
+        },
+        "mailingAddress": {
+            "line1": mail1,
+            "line2": mail2,
+            "city": mail_city,
+            "state": mail_state,
+            "zip": mail_zip,
+        },
+        "incomeTract": None,
+        "incomeBlockGroup": None,
+        "nearestRoad": None,
+        "flu": None,
+        "opportunityZone": None,
+        "oz2Eligibility": None,
+        "source": source,
+    }
+    if appraiser_url:
+        properties["appraiserUrl"] = appraiser_url
+    if data_gaps:
+        properties["dataGaps"] = data_gaps
     return {
         "type": "Feature",
         "id": feature_id,
-        "properties": {
-            "id": feature_id,
-            "parcelId": parcel_id,
-            "countyFips": fips,
-            "countyName": county,
-            "state": state,
-            "marketIds": markets,
-            "situsAddress": situs,
-            "situsCity": city,
-            "situsZip": zip_code,
-            "jurisdictionCode": None,
-            "ownerName": owner,
-            "ownerName2": None,
-            "propertyName": None,
-            "zoningCode": zoning,
-            "zoningDistrict": None,
-            "jurisdictionPrefix": None,
-            "dorCode": dor,
-            "acreage": round(acreage, 4),
-            "centroid": [center[0], center[1]],
-            "lastSale": {"date": sale_date, "price": sale_price, "qualified": sale_qualified},
-            "tax": {
-                "marketValue": market_value,
-                "assessedValue": assessed,
-                "taxableValue": taxable,
-                "taxes": None,
-            },
-            "mailingAddress": {
-                "line1": mail1,
-                "line2": mail2,
-                "city": mail_city,
-                "state": mail_state,
-                "zip": mail_zip,
-            },
-            "incomeTract": None,
-            "incomeBlockGroup": None,
-            "nearestRoad": None,
-            "flu": None,
-            "opportunityZone": None,
-            "oz2Eligibility": None,
-            "source": source,
-        },
+        "properties": properties,
         "geometry": geometry,
     }
 
@@ -334,12 +342,18 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    geometry: bool = True,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
         "outFields": ",".join(out_fields),
-        "returnGeometry": "true",
+        "returnGeometry": "true" if geometry else "false",
         "outSR": "4326",
     }
     for start in range(0, total, batch):
@@ -351,12 +365,16 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), geometry=geometry)
+                )
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), geometry=geometry)
+                )
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -365,6 +383,23 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             print(f"    {done}/{total}", flush=True)
         time.sleep(0.05)
     return features
+
+
+_MAIL_CSZ = re.compile(r"^(?P<city>.+?),?\s+(?P<state>[A-Z]{2})\s+(?P<zip>\d{5})(?:-\d{4})?$")
+
+
+def parse_city_state_zip(line: str | None) -> tuple[str | None, str | None, str | None, str | None]:
+    """Split a mailing line that is entirely CITY ST ZIP. Other lines stay intact."""
+    text = clean(line)
+    if not text:
+        return None, None, None, None
+    match = _MAIL_CSZ.match(text.upper())
+    if not match:
+        return text, None, None, None
+    city = match.group("city").strip(" ,")
+    if len(city) < 2 or any(ch.isdigit() for ch in city):
+        return text, None, None, None
+    return None, city, match.group("state"), match.group("zip")
 
 
 def sale_date(year: Any, month: Any) -> str | None:
@@ -418,6 +453,16 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        mail1 = clean(attrs.get(spec["mail1Field"])) if spec.get("mail1Field") else None
+        mail2 = clean(attrs.get(spec["mail2Field"])) if spec.get("mail2Field") else None
+        mail_city = clean(attrs.get(spec["mailCityField"])) if spec.get("mailCityField") else None
+        mail_state = clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None
+        mail_zip = zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None
+        if spec.get("parseMail2AsCityStateZip") and mail2 and not (mail_city or mail_state or mail_zip):
+            mail2, parsed_city, parsed_state, parsed_zip = parse_city_state_zip(mail2)
+            mail_city = parsed_city
+            mail_state = parsed_state
+            mail_zip = parsed_zip
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -440,11 +485,13 @@ def normalize_rows(
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
             taxable=num(attrs.get(spec["taxableField"])) if spec.get("taxableField") else None,
-            mail1=clean(attrs.get(spec["mail1Field"])) if spec.get("mail1Field") else None,
-            mail2=clean(attrs.get(spec["mail2Field"])) if spec.get("mail2Field") else None,
-            mail_city=clean(attrs.get(spec["mailCityField"])) if spec.get("mailCityField") else None,
-            mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
-            mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
+            mail1=mail1,
+            mail2=mail2,
+            mail_city=mail_city,
+            mail_state=mail_state,
+            mail_zip=mail_zip,
+            appraiser_url=spec.get("appraiserUrl"),
+            data_gaps=list(spec["featureGaps"]) if spec.get("featureGaps") else None,
         )
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
@@ -566,6 +613,539 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+def _point_in_ring(x: float, y: float, ring: list[list[float]]) -> bool:
+    inside = False
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = ring[i]
+        xj, yj = ring[j]
+        if ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / ((yj - yi) or 1e-12) + xi):
+            inside = not inside
+        j = i
+    return inside
+
+
+def _point_in_geometry(x: float, y: float, geometry: dict) -> bool:
+    for poly in polygon_parts(geometry):
+        if not poly or not _point_in_ring(x, y, poly[0]):
+            continue
+        if any(_point_in_ring(x, y, hole) for hole in poly[1:]):
+            continue
+        return True
+    return False
+
+
+def _feature_bbox(feature: dict) -> tuple[float, float, float, float] | None:
+    xs: list[float] = []
+    ys: list[float] = []
+
+    def walk(node: Any) -> None:
+        if isinstance(node, (int, float)):
+            return
+        if node and isinstance(node[0], (int, float)):
+            xs.append(float(node[0]))
+            ys.append(float(node[1]))
+            return
+        for item in node:
+            walk(item)
+
+    walk((feature.get("geometry") or {}).get("coordinates") or [])
+    if not xs:
+        return None
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+class _GridIndex:
+    """Centroid lookup for an overlay. The smallest containing polygon wins."""
+
+    def __init__(self, cell: float = 0.02) -> None:
+        self.cell = cell
+        self.buckets: dict[tuple[int, int], list[dict]] = defaultdict(list)
+        self.broad: list[dict] = []
+
+    def add(self, feature: dict) -> None:
+        bbox = _feature_bbox(feature)
+        if not bbox:
+            return
+        west, south, east, north = bbox
+        feature["_bboxArea"] = max(0.0, (east - west) * (north - south))
+        ix0, iy0 = math.floor(west / self.cell), math.floor(south / self.cell)
+        ix1, iy1 = math.floor(east / self.cell), math.floor(north / self.cell)
+        if (ix1 - ix0 + 1) * (iy1 - iy0 + 1) > 80:
+            self.broad.append(feature)
+            return
+        for ix in range(ix0, ix1 + 1):
+            for iy in range(iy0, iy1 + 1):
+                self.buckets[(ix, iy)].append(feature)
+
+    def hit(self, x: float, y: float) -> dict | None:
+        ix, iy = math.floor(x / self.cell), math.floor(y / self.cell)
+        found: list[dict] = []
+        for feature in self.buckets.get((ix, iy), []):
+            if _point_in_geometry(x, y, feature["geometry"]):
+                found.append(feature)
+        for feature in self.broad:
+            if _point_in_geometry(x, y, feature["geometry"]):
+                found.append(feature)
+        if not found:
+            return None
+        found.sort(key=lambda item: item.get("_bboxArea") or 0)
+        return found[0]
+
+
+# Fulton County, Georgia. Reject Florida layers (Palmetto FL and similar) before a join.
+_FULTON_EXTENT = (-85.05, 33.35, -83.95, 34.30)
+
+
+def _parcel_keys(value: Any) -> list[str]:
+    text = clean(value)
+    if not text:
+        return []
+    compact = "".join(text.split()).upper()
+    keys = [text]
+    if compact and compact not in keys:
+        keys.append(compact)
+    return keys
+
+
+def _overlay_code(attrs: dict, field: str, fallback: str | None = None) -> str | None:
+    code = clean(attrs.get(field)) if field else None
+    if not code and fallback:
+        code = clean(attrs.get(fallback))
+    return code
+
+
+def _zoning_district_label(city: str, code: str) -> str:
+    """City-prefixed match key so a bare PD / PD-H does not hit the Orange County list.
+
+    The drawer shows the raw code plus this city. There is no space before the code.
+    """
+    return f"{city}:{code}"
+
+
+def _extent_outside_fulton(bbox: tuple[float | None, float | None, float | None, float | None]) -> str | None:
+    west, south, east, north = bbox
+    if west is None or south is None or east is None or north is None:
+        return "layer returned no WGS84 extent"
+    if north < 32.2:
+        return (
+            f"extent {west:.3f},{south:.3f},{east:.3f},{north:.3f} is south of Georgia "
+            "(Florida bbox). Not joined."
+        )
+    fw, fs, fe, fn = _FULTON_EXTENT
+    if east < fw or west > fe or north < fs or south > fn:
+        return (
+            f"extent {west:.3f},{south:.3f},{east:.3f},{north:.3f} does not intersect "
+            "Fulton County, Georgia. Not joined."
+        )
+    return None
+
+
+def _layer_extent_wgs(url: str, where: str) -> tuple[float | None, float | None, float | None, float | None]:
+    data = fetch_json(url, {"where": where, "returnExtentOnly": "true", "outSR": "4326", "f": "json"})
+    if data.get("error"):
+        raise RuntimeError(json.dumps(data["error"])[:240])
+    extent = data.get("extent") or {}
+    return extent.get("xmin"), extent.get("ymin"), extent.get("xmax"), extent.get("ymax")
+
+
+def _load_overlay(url: str, where: str, out_fields: list[str], geometry: bool) -> list[dict]:
+    ids = fetch_object_ids(url, where)
+    print(f"  overlay {len(ids)} {url.split('/rest/services/')[-1][:90]}", flush=True)
+    raw = fetch_by_ids(url, ids, out_fields, batch=200 if not geometry else 80, geometry=geometry)
+    features: list[dict] = []
+    for item in raw:
+        attrs = item.get("attributes") or {}
+        if not geometry:
+            features.append({"type": "Feature", "geometry": None, "properties": attrs})
+            continue
+        rings = (item.get("geometry") or {}).get("rings")
+        if not rings:
+            continue
+        geom = esri_rings_to_geojson(rings)
+        if not geom:
+            continue
+        features.append({"type": "Feature", "geometry": geom, "properties": attrs})
+    return features
+
+
+def _set_zoning(feature: dict, code: str, city: str) -> None:
+    props = feature["properties"]
+    if props.get("zoningCode"):
+        return
+    props["zoningCode"] = code
+    props["zoningDistrict"] = _zoning_district_label(city, code)
+    if not props.get("jurisdictionCode"):
+        props["jurisdictionCode"] = city
+
+
+def _set_flu(feature: dict, code: str, label: str | None, city: str, source: str) -> None:
+    props = feature["properties"]
+    if props.get("flu"):
+        return
+    props["flu"] = {
+        "code": code,
+        "label": label or code,
+        "jurisdiction": city,
+        "source": source,
+    }
+
+
+def _apply_attr_fields(feature: dict, attrs: dict, join: dict, *, flu_only_fallback: bool) -> bool:
+    city = join["city"]
+    source = join.get("source") or join.get("label") or city
+    wrote = False
+    if not flu_only_fallback and join.get("target") in {"zoning", "both"} and join.get("codeField"):
+        code = _overlay_code(attrs, join["codeField"], join.get("codeFallback"))
+        if code and not feature["properties"].get("zoningCode"):
+            _set_zoning(feature, code, city)
+            wrote = True
+    flu_field = join.get("fluFallbackField") if flu_only_fallback else join.get("fluField")
+    if flu_field and not feature["properties"].get("flu"):
+        flu_code = _overlay_code(attrs, flu_field, join.get("fluFallback"))
+        if flu_code:
+            flu_label = clean(attrs.get(join["fluLabelField"])) if join.get("fluLabelField") else None
+            _set_flu(feature, flu_code, flu_label, city, source)
+            wrote = True
+    if not flu_only_fallback and join.get("target") == "flu" and join.get("codeField"):
+        code = _overlay_code(attrs, join["codeField"], join.get("codeFallback"))
+        if code and not feature["properties"].get("flu"):
+            label = clean(attrs.get(join["labelField"])) if join.get("labelField") else None
+            _set_flu(feature, code, label, city, source)
+            wrote = True
+    return wrote
+
+
+def apply_overlay_joins(features: list[dict], spec: dict) -> list[str]:
+    notes: list[str] = []
+    prepared: list[tuple[dict, list[dict]]] = []
+    for join in spec.get("overlayJoins") or []:
+        label = join.get("label") or join.get("city") or "overlay"
+        where = join.get("where") or "1=1"
+        try:
+            bbox = _layer_extent_wgs(join["url"], where)
+            problem = _extent_outside_fulton(bbox)
+            if problem:
+                notes.append(f"{label}: {problem}")
+                print(f"  skip {label}: {problem}", flush=True)
+                continue
+            overlay = _load_overlay(join["url"], where, join["outFields"], geometry=bool(join.get("geometry")))
+        except Exception as exc:  # noqa: BLE001
+            notes.append(f"{label} was not joined: {exc}")
+            print(f"  overlay failed {label}: {exc}", flush=True)
+            continue
+        west, south, east, north = bbox
+        print(
+            f"  {label} extent {west:.3f},{south:.3f},{east:.3f},{north:.3f} rows {len(overlay)}",
+            flush=True,
+        )
+        prepared.append((join, overlay))
+
+    def run_attribute(flu_only_fallback: bool) -> None:
+        for join, overlay in prepared:
+            if join.get("method") != "attribute":
+                continue
+            if flu_only_fallback and not join.get("fluFallbackField"):
+                continue
+            if not flu_only_fallback and join.get("target") == "flu-fallback":
+                continue
+            label = join.get("label") or join["city"]
+            lookup: dict[str, dict] = {}
+            for item in overlay:
+                attrs = item["properties"]
+                for field in join.get("idFields") or []:
+                    for key in _parcel_keys(attrs.get(field)):
+                        lookup.setdefault(key, attrs)
+            matched = 0
+            for feature in features:
+                attrs = None
+                for key in _parcel_keys(feature["properties"].get("parcelId")):
+                    attrs = lookup.get(key)
+                    if attrs:
+                        break
+                if not attrs:
+                    continue
+                if _apply_attr_fields(feature, attrs, join, flu_only_fallback=flu_only_fallback):
+                    matched += 1
+            if not flu_only_fallback:
+                notes.append(
+                    f"{label}: attribute join on {', '.join(join.get('idFields') or [])} matched {matched} of {len(features)} parcels ({len(overlay)} city rows)."
+                )
+                print(f"  {label} attribute matched {matched}/{len(features)}", flush=True)
+            elif matched:
+                notes.append(
+                    f"{label}: character-area fallback matched {matched} parcels that had no FLU polygon."
+                )
+                print(f"  {label} flu fallback matched {matched}", flush=True)
+
+    def run_spatial() -> None:
+        for join, overlay in prepared:
+            if join.get("method") != "spatial":
+                continue
+            label = join.get("label") or join["city"]
+            city = join["city"]
+            source = join.get("source") or label
+            index = _GridIndex(cell=float(join.get("cell") or 0.02))
+            for item in overlay:
+                if item.get("geometry"):
+                    index.add(item)
+            matched = 0
+            for feature in features:
+                lon, lat = feature["properties"]["centroid"]
+                hit = index.hit(lon, lat)
+                if not hit:
+                    continue
+                before_z = feature["properties"].get("zoningCode")
+                before_f = feature["properties"].get("flu")
+                _apply_attr_fields(feature, hit["properties"], join, flu_only_fallback=False)
+                if feature["properties"].get("zoningCode") != before_z or feature["properties"].get("flu") != before_f:
+                    matched += 1
+            notes.append(
+                f"{label}: spatial intersect matched {matched} of {len(features)} parcels ({len(overlay)} polygons). Jurisdiction {city}."
+            )
+            print(f"  {label} spatial matched {matched}/{len(features)}", flush=True)
+
+    run_attribute(False)
+    run_spatial()
+    run_attribute(True)
+    return notes
+
+
+def _fulton_overlay_joins() -> list[dict]:
+    """City zoning/FLU on top of Fulton PMV/11. Attribute join only where the card says the id matches."""
+    return [
+        {
+            "city": "Atlanta",
+            "label": "Atlanta zoning",
+            "target": "zoning",
+            "method": "spatial",
+            "geometry": True,
+            "url": "https://gis.atlantaga.gov/dpcd/rest/services/OpenDataService1/FeatureServer/22/query",
+            "outFields": ["ZONING", "ZONECLASS"],
+            "codeField": "ZONING",
+            "codeFallback": "ZONECLASS",
+            "source": "atlanta-zoning",
+        },
+        {
+            "city": "Atlanta",
+            "label": "Atlanta future land use",
+            "target": "flu",
+            "method": "spatial",
+            "geometry": True,
+            "url": "https://gis.atlantaga.gov/dpcd/rest/services/LandUsePlanning/LandUsePlanning/MapServer/8/query",
+            "outFields": ["LANDUSECOD", "LANDUSEDES"],
+            "codeField": "LANDUSECOD",
+            "labelField": "LANDUSEDES",
+            "source": "atlanta-future-land-use",
+        },
+        {
+            "city": "Sandy Springs",
+            "label": "Sandy Springs zoning",
+            "target": "zoning",
+            "method": "attribute",
+            "geometry": False,
+            "url": "https://gis2.sandyspringsga.gov/arcgis/rest/services/OpenData/General_Reference/FeatureServer/127/query",
+            "outFields": ["ParcelID", "Zoning", "ZoningDistrict"],
+            "idFields": ["ParcelID"],
+            "codeField": "Zoning",
+            "codeFallback": "ZoningDistrict",
+            "source": "sandy-springs-zoning",
+        },
+        {
+            "city": "Sandy Springs",
+            "label": "Sandy Springs character areas",
+            "target": "flu",
+            "method": "attribute",
+            "geometry": False,
+            "url": "https://gis2.sandyspringsga.gov/arcgis/rest/services/CommDev/CommDevApp_Public/MapServer/307/query",
+            "outFields": ["ParcelID", "CharArea_R1"],
+            "idFields": ["ParcelID"],
+            "codeField": "CharArea_R1",
+            "source": "sandy-springs-character-area",
+        },
+        {
+            "city": "Roswell",
+            "label": "Roswell zoning",
+            "target": "zoning",
+            "method": "attribute",
+            "geometry": False,
+            "url": "https://gisweb.ci.roswell.ga.us/arcgis/rest/services/PublicViewer/CommunityDevelopmentPublic/MapServer/8/query",
+            "outFields": ["PARCELID", "LOWPARCELI", "USECD", "CHAR_AREA_"],
+            "idFields": ["PARCELID", "LOWPARCELI"],
+            "codeField": "USECD",
+            "fluFallbackField": "CHAR_AREA_",
+            "source": "roswell-zoning",
+        },
+        {
+            "city": "Roswell",
+            "label": "Roswell future land use",
+            "target": "flu",
+            "method": "spatial",
+            "geometry": True,
+            "url": "https://gisweb.ci.roswell.ga.us/arcgis/rest/services/LGIM_LandUsePlanning/FLU/MapServer/0/query",
+            "outFields": ["LANDUSECODE", "LANDUSEDESC"],
+            "codeField": "LANDUSECODE",
+            "labelField": "LANDUSEDESC",
+            "source": "roswell-future-land-use",
+        },
+        {
+            "city": "Alpharetta",
+            "label": "Alpharetta zoning",
+            "target": "zoning",
+            "method": "spatial",
+            "geometry": True,
+            "url": "https://alphagis.alpharetta.ga.us/arcgis/rest/services/ZoningDistricts/FeatureServer/0/query",
+            "outFields": ["ZoningDistrict"],
+            "codeField": "ZoningDistrict",
+            "source": "alpharetta-zoning",
+        },
+        {
+            "city": "Alpharetta",
+            "label": "Alpharetta future land use",
+            "target": "flu",
+            "method": "spatial",
+            "geometry": True,
+            "url": "https://alphagis.alpharetta.ga.us/arcgis/rest/services/FutureLandUse/FeatureServer/0/query",
+            "outFields": ["character_", "CA_Descrip"],
+            "codeField": "character_",
+            "labelField": "CA_Descrip",
+            "source": "alpharetta-future-land-use",
+        },
+        {
+            "city": "Johns Creek",
+            "label": "Johns Creek zoning",
+            "target": "zoning",
+            "method": "spatial",
+            "geometry": True,
+            "url": "https://services1.arcgis.com/bqfNVPUK3HOnCFmA/arcgis/rest/services/Zoning_Current/FeatureServer/0/query",
+            "outFields": ["ZoningClassAbbrev", "ZoningClass"],
+            "codeField": "ZoningClassAbbrev",
+            "codeFallback": "ZoningClass",
+            "source": "johns-creek-zoning",
+        },
+        {
+            "city": "Johns Creek",
+            "label": "Johns Creek future land use",
+            "target": "flu",
+            "method": "attribute",
+            "geometry": False,
+            "url": "https://services1.arcgis.com/bqfNVPUK3HOnCFmA/arcgis/rest/services/Future_Land_Use/FeatureServer/0/query",
+            "outFields": ["ParcelID", "FutureLandUse"],
+            "idFields": ["ParcelID"],
+            "codeField": "FutureLandUse",
+            "source": "johns-creek-future-land-use",
+        },
+        {
+            "city": "Milton",
+            "label": "Milton zoning",
+            "target": "zoning",
+            "method": "spatial",
+            "geometry": True,
+            "url": "https://gis.miltonga.gov/arcgis/rest/services/Zoning/FeatureServer/59/query",
+            "outFields": ["ClassAbbr", "Class"],
+            "codeField": "ClassAbbr",
+            "codeFallback": "Class",
+            "source": "milton-zoning",
+        },
+        {
+            "city": "Milton",
+            "label": "Milton future land use",
+            "target": "flu",
+            "method": "spatial",
+            "geometry": True,
+            "url": "https://gis.miltonga.gov/arcgis/rest/services/FutureLandUse2040/FeatureServer/68/query",
+            "outFields": ["Label", "LUClass"],
+            "codeField": "Label",
+            "labelField": "LUClass",
+            "source": "milton-future-land-use-2040",
+        },
+        {
+            "city": "East Point",
+            "label": "East Point zoning and future use",
+            "target": "both",
+            "method": "spatial",
+            "geometry": True,
+            "url": "https://services7.arcgis.com/CPLm4MuWYjfnA2R9/arcgis/rest/services/Current_Zoning/FeatureServer/0/query",
+            "outFields": ["ZONING", "Future_Use"],
+            "codeField": "ZONING",
+            "fluField": "Future_Use",
+            "source": "east-point-current-zoning",
+        },
+        {
+            "city": "College Park",
+            "label": "College Park zoning",
+            "target": "zoning",
+            "method": "attribute",
+            "geometry": False,
+            "url": "https://services7.arcgis.com/snkPZPJHBqHjJ0On/arcgis/rest/services/Zoning_20241226/FeatureServer/0/query",
+            "outFields": ["ParcelID", "Zoning_Cod", "Zoning_Dis"],
+            "idFields": ["ParcelID"],
+            "codeField": "Zoning_Cod",
+            "source": "college-park-zoning",
+        },
+        {
+            "city": "College Park",
+            "label": "College Park future land use",
+            "target": "flu",
+            "method": "spatial",
+            "geometry": True,
+            "url": "https://services7.arcgis.com/snkPZPJHBqHjJ0On/arcgis/rest/services/Future_Land_Use/FeatureServer/0/query",
+            "outFields": ["Future_LU", "FLU_Name"],
+            "codeField": "Future_LU",
+            "labelField": "FLU_Name",
+            "source": "college-park-future-land-use",
+        },
+        {
+            "city": "South Fulton",
+            "label": "South Fulton zoning",
+            "target": "zoning",
+            "method": "spatial",
+            "geometry": True,
+            "url": "https://services3.arcgis.com/y2BJK2GUfoTwH7py/arcgis/rest/services/CurrentZoning/FeatureServer/0/query",
+            "outFields": ["ZClass", "ZClassDesc"],
+            "codeField": "ZClass",
+            "source": "south-fulton-zoning",
+        },
+        {
+            "city": "South Fulton",
+            "label": "South Fulton future land use",
+            "target": "flu",
+            "method": "attribute",
+            "geometry": False,
+            "url": "https://services3.arcgis.com/y2BJK2GUfoTwH7py/arcgis/rest/services/Future_Landuse_2045/FeatureServer/0/query",
+            "outFields": ["ParcelID", "FLUM_2045"],
+            "idFields": ["ParcelID"],
+            "codeField": "FLUM_2045",
+            "source": "south-fulton-flu-2045",
+        },
+        {
+            "city": "Fairburn",
+            "label": "Fairburn zoning and future land use",
+            "target": "both",
+            "method": "attribute",
+            "geometry": False,
+            "url": "https://services8.arcgis.com/ZvMgtqecACHwgXJb/arcgis/rest/services/Current_Zoning_FLU/FeatureServer/0/query",
+            "outFields": ["ParcelID", "ZoningCurr", "FLU"],
+            "idFields": ["ParcelID"],
+            "codeField": "ZoningCurr",
+            "fluField": "FLU",
+            "source": "fairburn-zoning-flu",
+        },
+        {
+            "city": "Union City",
+            "label": "Union City zoning",
+            "target": "zoning",
+            "method": "attribute",
+            "geometry": False,
+            "url": "https://services.arcgis.com/MewUCwyCByL0k7La/arcgis/rest/services/Union_City_Data_WFL1/FeatureServer/14/query",
+            "outFields": ["ParcelID", "Zoning", "ZonDesc"],
+            "idFields": ["ParcelID"],
+            "codeField": "Zoning",
+            "source": "union-city-zoning-2025",
+        },
+    ]
+
+
 def county_override(fips: str) -> dict | None:
     if fips == "13067":  # Cobb GA
         return {
@@ -584,6 +1164,47 @@ def county_override(fips: str) -> dict | None:
             "source": "ga-cobb-parcels",
             "coverage": "complete-gte-5ac",
             "gaps": ["Cobb County open parcels. No zoning join on this layer."],
+        }
+    if fips == "13121":  # Fulton GA — county-wide Property Map Viewer, not the hosted subset
+        return {
+            "kind": "arcgis",
+            "url": "https://gismaps.fultoncountyga.gov/arcgispub2/rest/services/PropertyMapViewer/PropertyMapViewer/MapServer/11/query",
+            "where": "LandAcres>=5 AND LandAcres<=150",
+            "outFields": [
+                "ParcelID",
+                "LandAcres",
+                "Owner",
+                "OwnerAddr1",
+                "OwnerAddr2",
+                "Address",
+                "TotAppr",
+                "TotAssess",
+                "LUCode",
+            ],
+            "idField": "ParcelID",
+            "acresField": "LandAcres",
+            "ownerField": "Owner",
+            "situsField": "Address",
+            "dorField": "LUCode",
+            "marketValueField": "TotAppr",
+            "assessedField": "TotAssess",
+            "mail1Field": "OwnerAddr1",
+            "mail2Field": "OwnerAddr2",
+            "parseMail2AsCityStateZip": True,
+            "appraiserUrl": "https://fultonassessor.org/",
+            "source": "ga-fulton-pmv-mapserver-11",
+            "coverage": "complete-gte-5ac",
+            "featureGaps": [
+                "Zoning and FLU are city layers joined to Property Map Viewer MapServer/11, not a county-wide zoning map. Hapeville, Palmetto, Chattahoochee Hills, Mountain Park, and unincorporated Fulton have no public zoning/FLU layer.",
+                "No sale on MapServer/11. Hosted CurrentParcels is a north-Fulton subset (~30k of ~373k) and was not used.",
+            ],
+            "gaps": [
+                "Hosted CurrentParcels FeatureServer (services5…/CurrentParcels) is a north-Fulton subset (~29.8k of ~373k), not county-wide. This extract uses Property Map Viewer MapServer/11 (LandAcres, county-wide).",
+                "No county-wide zoning layer. City zoning/FLU is joined where a public layer exists. Gaps with no public zoning/FLU REST: Hapeville, Palmetto (do not use Palmetto FL layers), Chattahoochee Hills, and Mountain Park. Fulton Industrial District (MapServer/34, ~37 polygons) is not county zoning. Unincorporated Fulton stays blank.",
+                "No sale date or qualified flag on MapServer/11. Tyler_YearlySales stops at 2022 (price and tax year only, many zero prices) and was not joined.",
+                "No situs city or ZIP on MapServer/11. Mailing is OwnerAddr1 plus OwnerAddr2; city/state/ZIP is parsed when OwnerAddr2 is CITY ST ZIP. No distinct taxable value; TotAssess is assessed (about 40% of TotAppr). Each joined zoning code is labeled with its city and is not scored as Orange County multifamily zoning.",
+            ],
+            "overlayJoins": _fulton_overlay_joins(),
         }
     if fips == "13089":  # DeKalb GA
         return {
@@ -663,7 +1284,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, or Fulton pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -925,11 +1546,25 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Fulton county services | Cobb complete. Fulton complete from Property Map Viewer MapServer/11 (county-wide). DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when a public layer supports it. DeKalb's parcel layer carries zoning. Fulton Property Map Viewer layer 11 does not. City zoning and future land use are joined onto that county roll and labeled with the city (`Atlanta:C-1`, future-land-use jurisdiction `Sandy Springs`). They are not scored as Orange County multifamily districts. Prefer **All parcels** in these markets.
+
+### Fulton County
+
+County-wide parcels come from Fulton Property Map Viewer `MapServer/11` (Tax Parcel). A live count on 2026-09-23 was 373,306 parcels, TaxYear 2026, including the 5.0–150.0 acre band on `LandAcres`. Do not use the hosted `CurrentParcels` FeatureServer (`services5.arcgis.com/…/CurrentParcels`) as the county source. That layer is a north-Fulton subset of about 29,800 parcels (roughly the Sandy Springs / Buckhead corridor), not the full county. The same subset trap applies to its 5–150 acre count.
+
+`MapServer/11` supplies parcel id, owner, situs street (`Address`), mailing (`OwnerAddr1` + `OwnerAddr2`, with city/state/ZIP parsed when `OwnerAddr2` is `CITY ST ZIP`), appraised value (`TotAppr`), assessed value (`TotAssess`), and land-use code (`LUCode`). It has no situs city or ZIP, no distinct taxable value (`TotAssess` is assessed, typically 40% of appraised), and no zoning or sale fields.
+
+Tyler yearly sales stop at 2022 (price and year only, many zero prices, no qualified flag) and are not joined. OpenData Tax Parcels match the county-wide count but omit assessment values, so they are not the source. Fulton Industrial District zoning (MapServer/34, about 37 polygons) is not county zoning and is not joined.
+
+Each city overlay is extent-checked in WGS84 before download. A layer whose north edge is south of Georgia (a Florida bbox, including Palmetto FL) or that misses Fulton County is skipped.
+
+Attribute `ParcelID` join, where the city id matches the county id: Sandy Springs zoning and character areas (the character-area layer is the public FLU stand-in), Roswell zoning (`PARCELID` / `LOWPARCELI`), Johns Creek future land use, College Park zoning, South Fulton future land use 2045, Fairburn zoning and FLU (one 2025 layer), and Union City zoning. Every other city layer is a centroid intersect. Roswell's official FLU polygons run before the parcel character-area field, which fills only parcels the polygon layer missed. Union City character-area codes have no published legend and are not joined. Sandy Springs has no separate FLU FeatureServer. College Park FLU is a coarse polygon set (about 15 features).
+
+No public zoning or FLU REST service: Hapeville, Palmetto (do not substitute Palmetto, Florida layers), Chattahoochee Hills, and Mountain Park. Unincorporated Fulton stays blank. Atlanta zoning and future land use stay on the City of Atlanta layers named on the county card.
 
 ## Coverage
 """
@@ -947,6 +1582,8 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
             for feature in features:
                 feature["properties"]["marketIds"] = markets
             path, lookup, tiles = write_tiles(county, features)
+            gaps = list(spec.get("gaps") or [])
+            gaps.extend(cached.get("joinNotes") or [])
             return county_row(
                 county,
                 markets,
@@ -957,7 +1594,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=gaps,
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
@@ -1015,12 +1652,16 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     features, dropped = normalize_rows(raw, county, markets, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    join_notes = apply_overlay_joins(features, spec) if features else []
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "joinNotes": join_notes, "features": features},
+            separators=(",", ":"),
+        )
     )
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
+    gaps = [*list(spec.get("gaps") or []), *join_notes]
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,

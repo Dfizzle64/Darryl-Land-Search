@@ -4,6 +4,7 @@ import {
   comptrollerRecordsUrl,
   formatAcres,
   formatMailing,
+  formatParcelPlace,
   formatNumber,
   formatRoadLabel,
   formatSale,
@@ -27,6 +28,17 @@ type ParcelDrawerProps = {
   /** `pane` fills the desktop details rail. `page` is the standalone column / mobile sheet. */
   layout?: "page" | "pane";
 };
+
+/** City-prefixed districts are `{city}:{code}` with no space. Orange districts stay the raw code. */
+function formatZoningWithCity(code: string | null, district: string | null): string | null {
+  if (!code) return null;
+  const suffix = `:${code}`;
+  if (district?.endsWith(suffix)) {
+    const city = district.slice(0, -suffix.length);
+    if (city && !city.includes(":")) return `${code} · ${city}`;
+  }
+  return code;
+}
 
 function Field({ label, value, empty }: { label: string; value: string | null | undefined; empty?: string }) {
   return (
@@ -88,15 +100,16 @@ export function ParcelDrawer({
   const zoningEmpty =
     properties.countyFips === "12095"
       ? "Not on the OCPA parcel"
-      : "Not in this county's public parcel extract";
+      : properties.countyFips === "13121"
+        ? "No city zoning joined for this parcel"
+        : "Not in this county's public parcel extract";
+  const zoningLine = formatZoningWithCity(properties.zoningCode, properties.zoningDistrict);
   const mailing = formatMailing(properties.mailingAddress);
   const entity = isEntityOwner(properties.ownerName) || isEntityOwner(properties.ownerName2);
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
-  const placeLine =
-    [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+  const placeLine = formatParcelPlace(properties);
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -123,8 +136,15 @@ export function ParcelDrawer({
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
-        <Field label="Zoning" value={properties.zoningCode} empty={zoningEmpty} />
-        <Field label="Future Land Use" value={fluLine} empty="Not joined for this county" />
+        {properties.dorCode || properties.countyFips === "13121" ? (
+          <Field label="Use code" value={properties.dorCode} empty="LUCode not on this parcel" />
+        ) : null}
+        <Field label="Zoning" value={zoningLine} empty={zoningEmpty} />
+        <Field
+          label="Future Land Use"
+          value={fluLine}
+          empty={properties.countyFips === "13121" ? "No city future land use joined for this parcel" : "Not joined for this county"}
+        />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
           label="OZ 2.0"
@@ -204,12 +224,14 @@ export function ParcelDrawer({
         <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
           {appraiser.label}
         </a>
-        {entity && properties.ownerName ? (
+        {florida && entity && properties.ownerName ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={sunbizSearchUrl(properties.ownerName)} target="_blank" rel="noreferrer">
             Search Florida Sunbiz for LLC / corporate principals
           </a>
-        ) : (
+        ) : florida ? (
           <p className="text-ink-300">Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped.</p>
+        ) : (
+          <p className="text-ink-300">Florida Sunbiz is not used outside Florida. Owner contact is the mailing address and the county appraiser search.</p>
         )}
         {properties.countyFips === "12095" || !properties.countyFips ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={comptrollerRecordsUrl()} target="_blank" rel="noreferrer">

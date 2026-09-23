@@ -197,6 +197,10 @@ describe("fluAllowsMultifamily", () => {
   it("returns null when FLU is missing rather than inventing a match", () => {
     expect(fluAllowsMultifamily(null, fluConfig)).toBeNull();
   });
+
+  it("does not treat another jurisdiction's FLU code as a match", () => {
+    expect(fluAllowsMultifamily({ code: "MD", label: "Medium", jurisdiction: "ATL", source: "t" }, fluConfig)).toBeNull();
+  });
 });
 
 describe("filterParcels", () => {

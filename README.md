@@ -33,7 +33,7 @@ npm run seed:zoning  # refresh coverage report vs knowledge JSON (no LLM)
 
 Orlando parcel architecture, county source URLs, and field mapping: [`docs/orlando-parcels.md`](docs/orlando-parcels.md) and [`data/orlando-parcel-sources.json`](data/orlando-parcel-sources.json).
 
-Other MSAs use the same tile grid and the same zoom / area-lock / Show parcels gate. They load only while that market is selected. Refresh and the complete-vs-sample-vs-gap table: [`docs/market-parcels.md`](docs/market-parcels.md).
+Other MSAs use the same tile grid and the same zoom / area-lock / Show parcels gate. They load only while that market is selected. Refresh and the complete-vs-sample-vs-gap table: [`docs/market-parcels.md`](docs/market-parcels.md). Atlanta's Fulton County extract uses Property Map Viewer MapServer/11 (county-wide, about 373k parcels). The hosted CurrentParcels FeatureServer is a north-Fulton subset of about 30k and is not the source. City zoning and future land use are joined from Atlanta plus northside and southside cities (Sandy Springs, Roswell, Alpharetta, Johns Creek, Milton, East Point, College Park, South Fulton, Fairburn, Union City). Hapeville, Palmetto, Chattahoochee Hills, and Mountain Park have no public layer and stay blank.
 
 No API keys are required for the default fixture mode. Copy `.env.example` to `.env.local` only if you want to point at live feeds.
 

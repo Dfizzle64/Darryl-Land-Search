@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:47:53Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -1446,22 +1446,23 @@
     },
     "Pensacola": {
       "tier": "other",
-      "parcelCount": 30141,
-      "completeCountyCount": 4,
+      "parcelCount": 48128,
+      "completeCountyCount": 5,
       "sampleCountyCount": 0,
-      "gapCountyCount": 1,
+      "gapCountyCount": 0,
       "path": "data/fixtures/market-parcels/markets/pensacola/meta.json",
       "counties": [
         {
           "name": "Baldwin",
           "state": "Alabama",
           "fips": "01003",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 17987,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "17989 source rows collapsed to 17987 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Baldwin County Zoning/42 spatial join set ZONE_1 on 6997 of 17987 parcels. Parcel ZoningCode is usually empty, so this is the unincorporated baseline."
           ]
         },
         {
@@ -1649,22 +1650,23 @@
     },
     "Mobile": {
       "tier": "other",
-      "parcelCount": 7189,
-      "completeCountyCount": 1,
+      "parcelCount": 42446,
+      "completeCountyCount": 3,
       "sampleCountyCount": 0,
-      "gapCountyCount": 4,
+      "gapCountyCount": 2,
       "path": "data/fixtures/market-parcels/markets/mobile/meta.json",
       "counties": [
         {
           "name": "Baldwin",
           "state": "Alabama",
           "fips": "01003",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 17987,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "17989 source rows collapsed to 17987 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Baldwin County Zoning/42 spatial join set ZONE_1 on 6997 of 17987 parcels. Parcel ZoningCode is usually empty, so this is the unincorporated baseline."
           ]
         },
         {
@@ -1676,7 +1678,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "Escambia County, Alabama has no public FeatureServer or MapServer. The county site is Flagship HTML only. This is not Escambia County, Florida (FIPS 12033), which is already on the Florida DOH extract in the Pensacola market."
           ]
         },
         {
@@ -1695,12 +1697,13 @@
           "name": "Mobile",
           "state": "Alabama",
           "fips": "01097",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 17270,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "CaptureCAMA geometry joined on parcel number for 17050 of 17270 AGOL rows in the 5\u2013150 acre band. 220 rows had no CaptureCAMA Parcel_Num match and used AGOL geometry when a ring was returned.",
+            "Attributes (owner, tax, situs, URL_Revenue) come from AGOL Mobile_County_Facilities/FeatureServer/0, which is countywide despite the service name. The layer description dates the ownership join to 2023/06/21."
           ]
         },
         {
@@ -1712,7 +1715,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "Washington County, Alabama has no public FeatureServer or MapServer. The county site is Flagship HTML only."
           ]
         }
       ]

@@ -15,6 +15,7 @@ Tile origin matches ORLANDO_PARCEL_TILE in src/lib/orlandoParcels.ts.
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import math
 import threading
@@ -26,6 +27,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
+from al_coastal_zoning import apply_pid_overlay, apply_spatial_overlay, polygon_record, strip_internal, zone_label
 from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -266,6 +268,11 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    owner2: str | None = None,
+    zoning_district: str | None = None,
+    taxes: float | None = None,
+    appraiser_url: str | None = None,
+    data_gaps: list[str] | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
     return {
@@ -283,10 +290,10 @@ def empty_feature(
             "situsZip": zip_code,
             "jurisdictionCode": None,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
-            "zoningDistrict": None,
+            "zoningDistrict": zoning_district,
             "jurisdictionPrefix": None,
             "dorCode": dor,
             "acreage": round(acreage, 4),
@@ -296,7 +303,7 @@ def empty_feature(
                 "marketValue": market_value,
                 "assessedValue": assessed,
                 "taxableValue": taxable,
-                "taxes": None,
+                "taxes": taxes,
             },
             "mailingAddress": {
                 "line1": mail1,
@@ -311,6 +318,8 @@ def empty_feature(
             "flu": None,
             "opportunityZone": None,
             "oz2Eligibility": None,
+            "appraiserUrl": appraiser_url,
+            "dataGaps": data_gaps or None,
             "source": source,
         },
         "geometry": geometry,
@@ -334,14 +343,21 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    geometry: bool = True,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
         "outFields": ",".join(out_fields),
-        "returnGeometry": "true",
-        "outSR": "4326",
+        "returnGeometry": "true" if geometry else "false",
     }
+    if geometry:
+        params["outSR"] = "4326"
     for start in range(0, total, batch):
         chunk = ids[start : start + batch]
         query = dict(params)
@@ -351,12 +367,16 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), geometry=geometry)
+                )
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), geometry=geometry)
+                )
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -365,6 +385,46 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             print(f"    {done}/{total}", flush=True)
         time.sleep(0.05)
     return features
+
+
+def epoch_day(value: Any) -> str | None:
+    parsed = num(value)
+    if parsed is None or parsed <= 0:
+        return None
+    seconds = parsed / 1000.0 if parsed > 10_000_000_000 else parsed
+    if seconds > 4_102_444_800:
+        return None
+    try:
+        dt = datetime.datetime.fromtimestamp(seconds, datetime.timezone.utc)
+    except (OverflowError, OSError, ValueError):
+        return None
+    if dt.year < 1900 or dt.year > 2100:
+        return None
+    return dt.date().isoformat()
+
+
+def situs_line(number: Any, street: Any) -> str | None:
+    parts: list[str] = []
+    parsed = num(number)
+    if parsed is not None and parsed > 0:
+        parts.append(str(int(parsed)) if parsed == int(parsed) else str(parsed))
+    else:
+        text = clean(number)
+        if text and text != "0":
+            parts.append(text)
+    street_text = clean(street)
+    if street_text:
+        parts.append(street_text)
+    return " ".join(parts) or None
+
+
+def clean_http_url(value: Any) -> str | None:
+    text = clean(value)
+    if not text:
+        return None
+    if text.startswith("https://") or text.startswith("http://"):
+        return text
+    return None
 
 
 def sale_date(year: Any, month: Any) -> str | None:
@@ -418,6 +478,21 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        if spec.get("situsNumberField") or spec.get("situsStreetField"):
+            situs = situs_line(attrs.get(spec.get("situsNumberField")), attrs.get(spec.get("situsStreetField")))
+        else:
+            situs = clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None
+        dated = sale_date(attrs.get(spec["saleYearField"]), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None
+        if dated is None and spec.get("saleDateEpochField"):
+            dated = epoch_day(attrs.get(spec["saleDateEpochField"]))
+            if not dated:
+                for key in spec.get("saleDateEpochFallbacks") or []:
+                    dated = epoch_day(attrs.get(key))
+                    if dated:
+                        break
+        appraiser = clean_http_url(attrs.get(spec["appraiserUrlField"])) if spec.get("appraiserUrlField") else None
+        if not appraiser:
+            appraiser = spec.get("appraiserUrl")
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -429,23 +504,30 @@ def normalize_rows(
             center=center,  # type: ignore[arg-type]
             source=spec["source"],
             owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
-            situs=clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None,
+            owner2=clean(attrs.get(spec["owner2Field"])) if spec.get("owner2Field") else None,
+            situs=situs,
             city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
             zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
+            zoning_district=clean(attrs.get(spec["zoningDistrictField"])) if spec.get("zoningDistrictField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
+            sale_date=dated,
             sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
             taxable=num(attrs.get(spec["taxableField"])) if spec.get("taxableField") else None,
+            taxes=num(attrs.get(spec["taxesField"])) if spec.get("taxesField") else None,
             mail1=clean(attrs.get(spec["mail1Field"])) if spec.get("mail1Field") else None,
             mail2=clean(attrs.get(spec["mail2Field"])) if spec.get("mail2Field") else None,
             mail_city=clean(attrs.get(spec["mailCityField"])) if spec.get("mailCityField") else None,
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
+            appraiser_url=appraiser,
+            data_gaps=list(spec.get("featureGaps") or []) or None,
         )
+        if spec.get("joinKeyField"):
+            feature["properties"]["_joinKey"] = clean(attrs.get(spec["joinKeyField"]))
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -639,6 +721,180 @@ def county_override(fips: str) -> dict | None:
             "coverage": "complete-gte-5ac",
             "gaps": ["Jefferson County public parcels. Owner and situs are sparse on this layer. No zoning join."],
         }
+    if fips == "01003":  # Baldwin AL — web6 Public ISV only. al05baldrevenue Baldwin/Public is 404.
+        return {
+            "kind": "arcgis",
+            "url": "https://web6.kcsgis.com/kcsgis/rest/services/Baldwin/Baldwin_Public_ISV/MapServer/31/query",
+            "where": "CalcAcre>=5 AND CalcAcre<=150",
+            "outFields": [
+                "PARCELID",
+                "PIN",
+                "PID",
+                "acctNum",
+                "Owner",
+                "MailAdd1",
+                "MailAdd2",
+                "MailCity",
+                "MailState",
+                "MailZip1",
+                "SitusAddNumber",
+                "SitusAddName",
+                "SitusAddCity",
+                "CalcAcre",
+                "TTV",
+                "TAV",
+                "TotalTaxDue",
+                "ZoningCode",
+                "ZoningDesc",
+                "DeedSigned",
+                "DeedRecorded",
+                "PropertyClass",
+            ],
+            "idField": "PARCELID",
+            "idFallbacks": ["PIN", "acctNum"],
+            "joinKeyField": "PID",
+            "acresField": "CalcAcre",
+            "ownerField": "Owner",
+            "situsNumberField": "SitusAddNumber",
+            "situsStreetField": "SitusAddName",
+            "cityField": "SitusAddCity",
+            "mail1Field": "MailAdd1",
+            "mail2Field": "MailAdd2",
+            "mailCityField": "MailCity",
+            "mailStateField": "MailState",
+            "mailZipField": "MailZip1",
+            "marketValueField": "TTV",
+            "assessedField": "TAV",
+            "taxesField": "TotalTaxDue",
+            "zoningField": "ZoningCode",
+            "zoningDistrictField": "ZoningDesc",
+            "dorField": "PropertyClass",
+            "saleDateEpochField": "DeedSigned",
+            "saleDateEpochFallbacks": ["DeedRecorded"],
+            "appraiserUrl": "https://isv.kcsgis.com/al.baldwin_revenue/",
+            "batch": 60,
+            "source": "al-baldwin-public-isv",
+            "coverage": "complete-gte-5ac",
+            "countyZoning": {
+                "url": "https://web6.kcsgis.com/kcsgis/rest/services/Baldwin/Baldwin_Public_ISV/MapServer/42/query",
+                "where": "1=1",
+                "outFields": ["ZONE_1", "PLAN_DEV_1"],
+                "zoningField": "ZONE_1",
+                "districtField": "PLAN_DEV_1",
+                "city": "Baldwin County",
+            },
+            "zoningOverlays": [
+                {
+                    "name": "Foley",
+                    "kind": "pid",
+                    "url": "https://arcgis.cityoffoley.org/server/rest/services/Zoning/FeatureServer/3/query",
+                    "where": "1=1",
+                    "outFields": ["PID", "Zone"],
+                    "idField": "PID",
+                    "zoningField": "Zone",
+                    "domainField": "Zone",
+                },
+                {
+                    "name": "Gulf Shores",
+                    "kind": "spatial",
+                    "url": "https://services2.arcgis.com/d53H8HWVL7iicQLS/arcgis/rest/services/ZoningDistricts/FeatureServer/0/query",
+                    "where": "1=1",
+                    "outFields": ["Zone", "Description"],
+                    "zoningField": "Zone",
+                    "districtField": "Description",
+                },
+                {
+                    "name": "Orange Beach",
+                    "kind": "spatial",
+                    "url": "https://services6.arcgis.com/Nx0Kxzo2nhFhIbCV/arcgis/rest/services/Zoning_Districts/FeatureServer/0/query",
+                    "where": "1=1",
+                    "outFields": ["TYPE"],
+                    "zoningField": "TYPE",
+                },
+            ],
+            "featureGaps": [
+                "Acreage is CalcAcre. No sale price on the public parcel layer.",
+                "City zoning overlays Gulf Shores and Orange Beach (spatial) and Foley (PID). Daphne and Fairhope base zoning are not joined.",
+            ],
+            "gaps": [
+                "Acreage filter and stored acres use CalcAcre. DeededAcres is usually 0 or null.",
+                "No last-sale price. DeedSigned (fallback DeedRecorded) is stored as lastSale.date when the epoch converts.",
+                "Future land use is not parcel-level. Baldwin FLUM layer 43 is six place polygons and was not joined.",
+                "Dead URL https://al05baldrevenue.kcsgis.com/kcsgis/rest/services/Baldwin/Public/MapServer returns 404 and is not used.",
+                "Daphne has no public zoning REST and is not joined. Fairhope base zoning was not found (research saw AO/MO overlays only) and is not joined.",
+                "Foley ZoningOverlays/32 (five overlay polygons) is not applied as the base district. The base zone is the PID join.",
+            ],
+        }
+    if fips == "01097":  # Mobile AL — AGOL attributes, CaptureCAMA geometry, city zoning overlay.
+        return {
+            "kind": "mobile-al",
+            "url": "https://services2.arcgis.com/dJHAcAx6kccDBtM6/arcgis/rest/services/Mobile_County_Facilities/FeatureServer/0/query",
+            "geometryUrl": "https://maps.capturecama.com/arcgis/rest/services/Mobile/Mobile03182025/MapServer/20/query",
+            "where": "StatedArea>=5 AND StatedArea<=150",
+            "outFields": [
+                "Parcel_Number",
+                "Account_Number",
+                "Name1",
+                "Name2",
+                "Address1",
+                "Address2",
+                "City",
+                "State",
+                "Zip",
+                "PropAddr1",
+                "PropCity",
+                "PropZip",
+                "StatedArea",
+                "TotalValue",
+                "AssdValue",
+                "Zoning",
+                "URL_Revenue",
+            ],
+            "geometryFields": ["Parcel_Num", "StatedArea"],
+            "geometryIdField": "Parcel_Num",
+            "idField": "Parcel_Number",
+            "idFallbacks": ["Account_Number"],
+            "acresField": "StatedArea",
+            "ownerField": "Name1",
+            "owner2Field": "Name2",
+            "situsField": "PropAddr1",
+            "cityField": "PropCity",
+            "zipField": "PropZip",
+            "mail1Field": "Address1",
+            "mail2Field": "Address2",
+            "mailCityField": "City",
+            "mailStateField": "State",
+            "mailZipField": "Zip",
+            "marketValueField": "TotalValue",
+            "assessedField": "AssdValue",
+            "zoningField": "Zoning",
+            "appraiserUrlField": "URL_Revenue",
+            "appraiserUrl": "https://esearch.mobilecopropertytax.com/",
+            "source": "al-mobile-agol-capturecama",
+            "coverage": "complete-gte-5ac",
+            "zoningOverlays": [
+                {
+                    "name": "City of Mobile",
+                    "kind": "spatial",
+                    "districtMode": "mobile-city",
+                    "url": "https://maps.cityofmobile.org/arcgis/rest/services/EG_Data_MS/MapServer/20/query",
+                    "where": "1=1",
+                    "outFields": ["district_code", "district_name", "sub_district_name", "overlay"],
+                    "zoningField": "district_code",
+                },
+            ],
+            "featureGaps": [
+                "Owner and tax are from the AGOL Mobile_County_Facilities ownership join dated 2023/06/21. Geometry prefers CaptureCAMA Mobile03182025.",
+                "City of Mobile zoning is a spatial overlay from EG_Data_MS/20. Outside the city, only the sparse AGOL Zoning field is available.",
+            ],
+            "gaps": [
+                "Attributes (owner, tax, situs, URL_Revenue) come from AGOL Mobile_County_Facilities/FeatureServer/0, which is countywide despite the service name. The layer description dates the ownership join to 2023/06/21.",
+                "Geometry prefers CaptureCAMA Mobile/Mobile03182025/MapServer/20 (parcel number join). CaptureCAMA attributes are parcel fabric and stated area only, so they are not the attribute source. AGOL geometry is the fallback when the parcel number does not match.",
+                "No last-sale price on the AGOL layer.",
+                "City of Mobile EG_Data_MS/1 is an alternate county-wide parcel host, not a city-only layer, and is not the parcel source.",
+                "No public county zoning FeatureServer was verified. FLU was not found on public Mobile REST (the city LandUse folder is token-walled).",
+            ],
+        }
     if fips == "45045":  # Greenville SC
         return {
             "kind": "arcgis",
@@ -667,6 +923,18 @@ def gap_reason(county: dict) -> str:
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
+        fips = county["fips"]
+        if fips == "01053":
+            return (
+                "Escambia County, Alabama has no public FeatureServer or MapServer. "
+                "The county site is Flagship HTML only. This is not Escambia County, Florida (FIPS 12033), "
+                "which is already on the Florida DOH extract in the Pensacola market."
+            )
+        if fips == "01129":
+            return (
+                "Washington County, Alabama has no public FeatureServer or MapServer. "
+                "The county site is Flagship HTML only."
+            )
         return "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
     if state == "Tennessee":
         return "Tennessee IMPACT did not publish this county, and no substitute county endpoint was wired."
@@ -927,12 +1195,207 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
-| Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
+| Alabama | Jefferson, Baldwin, and Mobile county services | Jefferson, Baldwin, and Mobile are complete 5–150 acre extracts. Baldwin acres use CalcAcre on web6 Baldwin_Public_ISV/31 (the al05baldrevenue Baldwin/Public URL is dead). County Zoning/42 is the unincorporated baseline. City overlays: Gulf Shores and Orange Beach (spatial), Foley (PID join to Baldwin PID; numeric Zone labeled from the FeatureServer coded-value domain). Daphne and Fairhope base zoning are not joined. Mobile owner/tax/situs come from AGOL Mobile_County_Facilities/FeatureServer/0; geometry prefers CaptureCAMA Mobile03182025/20. City of Mobile zoning is EG_Data_MS/20 and does not replace county attributes. Washington County and Escambia County, Alabama stay Flagship HTML gaps. Escambia, Alabama is not Escambia, Florida. |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer carries a zoning field (DeKalb), when a county zoning polygon layer can be spatially joined (Baldwin County Zoning/42), or when a city overlay is verified (Gulf Shores, Orange Beach, Foley, City of Mobile). City zoning replaces the county code only where the overlay hits. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
+
+
+def layer_coded_domain(query_url: str, field_name: str) -> dict[int, str]:
+    meta_url = query_url[: -len("/query")] if query_url.endswith("/query") else query_url
+    meta = fetch_json(meta_url, {"f": "json"})
+    domain: dict[int, str] = {}
+    for field in meta.get("fields") or []:
+        if field.get("name") != field_name:
+            continue
+        coded = field.get("domain") or {}
+        if coded.get("type") != "codedValue":
+            return {}
+        for entry in coded.get("codedValues") or []:
+            code = entry.get("code")
+            label = clean(entry.get("name"))
+            if code is None or not label:
+                continue
+            try:
+                domain[int(code)] = label
+            except (TypeError, ValueError):
+                continue
+        return domain
+    return domain
+
+
+def _blank(value: Any) -> bool:
+    text = clean(value)
+    return not text or text.upper() in {"N/A", "NA"}
+
+
+def mobile_city_district(attrs: dict) -> str | None:
+    parts: list[str] = []
+    name = clean(attrs.get("district_name"))
+    sub = clean(attrs.get("sub_district_name"))
+    overlay = clean(attrs.get("overlay"))
+    if name:
+        parts.append(name)
+    if sub and not _blank(sub) and sub != name:
+        parts.append(sub)
+    if overlay and not _blank(overlay):
+        parts.append(overlay)
+    return " · ".join(parts) or None
+
+
+def load_spatial_zoning(overlay: dict) -> list[dict]:
+    url = overlay["url"]
+    ids = fetch_object_ids(url, overlay.get("where") or "1=1")
+    raw = fetch_by_ids(url, ids, overlay["outFields"], batch=160, geometry=True)
+    polys: list[dict] = []
+    field = overlay["zoningField"]
+    for item in raw:
+        attrs = item.get("attributes") or {}
+        code = clean(attrs.get(field))
+        if not code:
+            continue
+        if overlay.get("districtMode") == "mobile-city":
+            district = mobile_city_district(attrs)
+        elif overlay.get("districtField"):
+            district = clean(attrs.get(overlay["districtField"]))
+        else:
+            district = None
+        record = polygon_record((item.get("geometry") or {}).get("rings") or [], code, district)
+        if record:
+            polys.append(record)
+    return polys
+
+
+def load_foley_pid_table(overlay: dict) -> tuple[dict[str, dict], int, int]:
+    domain = layer_coded_domain(overlay["url"], overlay.get("domainField") or "Zone")
+    ids = fetch_object_ids(overlay["url"], overlay.get("where") or "1=1")
+    raw = fetch_by_ids(overlay["url"], ids, overlay["outFields"], batch=400, geometry=False)
+    table: dict[str, dict] = {}
+    decoded = 0
+    numeric = 0
+    for item in raw:
+        attrs = item.get("attributes") or {}
+        pid = clean(attrs.get(overlay["idField"]))
+        label, used_domain = zone_label(attrs.get(overlay["zoningField"]), domain)
+        if not pid or not label:
+            continue
+        if used_domain:
+            decoded += 1
+        else:
+            numeric += 1
+        table[pid] = {"code": label, "district": None}
+    return table, decoded, numeric
+
+
+def apply_zoning_overlays(features: list[dict], spec: dict, gaps: list[str]) -> list[str]:
+    """County zoning fills blanks. City overlays replace that code where they hit."""
+    notes = list(gaps)
+    county_layer = spec.get("countyZoning")
+    if county_layer:
+        print(f"  county zoning {county_layer['url'].split('/services/')[-1][:80]}", flush=True)
+        polys = load_spatial_zoning(county_layer)
+        hits = apply_spatial_overlay(features, polys, city=county_layer.get("city") or "County", replace=False)
+        # County baseline should not look like a municipality in jurisdictionCode.
+        for feature in features:
+            if feature["properties"].get("_zoningSource") == county_layer.get("city"):
+                feature["properties"]["jurisdictionCode"] = None
+        notes.insert(
+            0,
+            f"Baldwin County Zoning/42 spatial join set ZONE_1 on {hits} of {len(features)} parcels. Parcel ZoningCode is usually empty, so this is the unincorporated baseline.",
+        )
+        print(f"  county zoning hits {hits}/{len(features)}", flush=True)
+    foley_note = None
+    for overlay in spec.get("zoningOverlays") or []:
+        name = overlay["name"]
+        print(f"  city overlay {name}", flush=True)
+        if overlay.get("kind") == "pid":
+            table, decoded, numeric = load_foley_pid_table(overlay)
+            hits = apply_pid_overlay(features, table, city=name)
+            foley_note = (
+                f"Foley zoning is a PID join from Zoning/FeatureServer/3 onto Baldwin PID ({hits} of {len(features)} parcels in this 5–150 acre extract). "
+                f"Zone is an integer; {decoded} city rows were labeled from the layer coded-value domain and {numeric} stayed numeric because they were outside that domain."
+            )
+            print(f"  Foley PID hits {hits}", flush=True)
+            continue
+        polys = load_spatial_zoning(overlay)
+        hits = apply_spatial_overlay(features, polys, city=name, replace=True)
+        notes.append(
+            f"{name} zoning overlay ({overlay['url']}) matched {hits} of {len(features)} parcels. City zoning replaces the county code only on those parcels."
+        )
+        print(f"  {name} spatial hits {hits} from {len(polys)} polygons", flush=True)
+    if foley_note:
+        notes.insert(1 if county_layer else 0, foley_note)
+    return notes
+
+
+def rings_wgs84(geom: dict | None) -> dict | None:
+    rings = (geom or {}).get("rings")
+    if not rings or not rings[0]:
+        return None
+    try:
+        x = float(rings[0][0][0])
+        y = float(rings[0][0][1])
+    except (TypeError, ValueError, IndexError):
+        return None
+    if abs(x) > 180 or abs(y) > 90:
+        return None
+    return {"rings": rings}
+
+
+def pull_mobile_rows(spec: dict) -> tuple[list[dict], int, list[str]]:
+    where = spec["where"]
+    print("  CaptureCAMA geometry", flush=True)
+    geom_ids = fetch_object_ids(spec["geometryUrl"], where)
+    geom_raw = fetch_by_ids(spec["geometryUrl"], geom_ids, spec["geometryFields"], batch=80, geometry=True)
+    geoms: dict[str, dict] = {}
+    for item in geom_raw:
+        attrs = item.get("attributes") or {}
+        pid = clean(attrs.get(spec["geometryIdField"]))
+        geom = rings_wgs84(item.get("geometry"))
+        if pid and geom:
+            geoms[pid] = geom
+    print(f"  CaptureCAMA geometries {len(geoms)}", flush=True)
+    print("  AGOL attributes", flush=True)
+    attr_ids = fetch_object_ids(spec["url"], where)
+    fields = list(dict.fromkeys([*spec["outFields"], "OBJECTID"]))
+    attr_raw = fetch_by_ids(spec["url"], attr_ids, fields, batch=80, geometry=False)
+    raw: list[dict] = []
+    missing: list[int] = []
+    matched = 0
+    for item in attr_raw:
+        attrs = item.get("attributes") or {}
+        pid = clean(attrs.get(spec["idField"]))
+        geom = geoms.get(pid) if pid else None
+        if geom:
+            matched += 1
+            raw.append({"attributes": attrs, "geometry": geom})
+        else:
+            oid = attrs.get("OBJECTID")
+            if oid is not None:
+                missing.append(int(oid))
+            raw.append({"attributes": attrs, "geometry": None})
+    if missing:
+        print(f"  AGOL geometry fallback {len(missing)}", flush=True)
+        fallback = fetch_by_ids(spec["url"], missing, ["OBJECTID"], batch=80, geometry=True)
+        by_oid: dict[int, dict] = {}
+        for item in fallback:
+            oid = (item.get("attributes") or {}).get("OBJECTID")
+            geom = rings_wgs84(item.get("geometry"))
+            if oid is not None and geom:
+                by_oid[int(oid)] = geom
+        for item in raw:
+            if item.get("geometry"):
+                continue
+            oid = (item.get("attributes") or {}).get("OBJECTID")
+            if oid is not None and int(oid) in by_oid:
+                item["geometry"] = by_oid[int(oid)]
+    note = (
+        f"CaptureCAMA geometry joined on parcel number for {matched} of {len(attr_raw)} AGOL rows in the 5–150 acre band. "
+        f"{len(missing)} rows had no CaptureCAMA Parcel_Num match and used AGOL geometry when a ring was returned."
+    )
+    return raw, len(attr_raw), [note]
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
@@ -957,13 +1420,18 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=list(cached.get("gaps") or spec.get("gaps") or []),
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
             )
+    pull_notes: list[str] = []
     try:
-        expected = count_where(spec["url"], spec["where"])
+        if spec.get("kind") == "mobile-al":
+            raw, expected, pull_notes = pull_mobile_rows(spec)
+        else:
+            expected = count_where(spec["url"], spec["where"])
+            raw = None
     except Exception as exc:  # noqa: BLE001
         reason = f"Query failed: {exc}"
         print(f"  gap {reason}", flush=True)
@@ -1010,17 +1478,17 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
             source_count=0,
         )
     print(f"  source rows {expected}", flush=True)
-    ids = fetch_object_ids(spec["url"], spec["where"])
-    raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
+    if raw is None:
+        ids = fetch_object_ids(spec["url"], spec["where"])
+        raw = fetch_by_ids(spec["url"], ids, spec["outFields"], batch=int(spec.get("batch") or 120))
     features, dropped = normalize_rows(raw, county, markets, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
-    )
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
+    gaps = [*pull_notes, *list(spec.get("gaps") or [])]
+    if spec.get("countyZoning") or spec.get("zoningOverlays"):
+        gaps = apply_zoning_overlays(features, spec, gaps)
+    strip_internal(features)
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,
@@ -1029,6 +1497,10 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     if not features:
         coverage = "gap"
         gaps.insert(0, f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks.")
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features, "gaps": gaps}, separators=(",", ":"))
+    )
     path, lookup, tiles = (None, None, 0)
     if features:
         path, lookup, tiles = write_tiles(county, features)

@@ -18,6 +18,8 @@ export function comptrollerRecordsUrl(): string {
 }
 
 const DEFAULT_APPRAISER_URLS: Record<string, string> = {
+  "01003": "https://isv.kcsgis.com/al.baldwin_revenue/",
+  "01097": "https://esearch.mobilecopropertytax.com/",
   "12009": "https://www.bcpao.us/PropertySearch/#/nav/Search",
   "12069": "https://www.lakecopropappr.com/",
   "12083": "https://www.pa.marion.fl.us/",
@@ -27,6 +29,19 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+};
+
+const APPRAISER_COUNTY_LABELS: Record<string, string> = {
+  "01003": "Baldwin",
+  "01097": "Mobile",
+  "12009": "Brevard",
+  "12069": "Lake",
+  "12083": "Marion",
+  "12097": "Osceola",
+  "12105": "Polk",
+  "12117": "Seminole",
+  "12119": "Sumter",
+  "12127": "Volusia",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -42,24 +57,7 @@ export function parcelAppraiserUrl(options: {
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);
-  const countyLabel =
-    fips === "12009"
-      ? "Brevard"
-      : fips === "12069"
-        ? "Lake"
-        : fips === "12083"
-          ? "Marion"
-          : fips === "12097"
-            ? "Osceola"
-            : fips === "12105"
-              ? "Polk"
-              : fips === "12117"
-                ? "Seminole"
-                : fips === "12119"
-                  ? "Sumter"
-                  : fips === "12127"
-                    ? "Volusia"
-                    : "county";
+  const countyLabel = (fips && APPRAISER_COUNTY_LABELS[fips]) || "county";
   return {
     href,
     label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:47:53Z",
   "market": "Pensacola",
   "tier": "other",
-  "parcelCount": 30141,
+  "parcelCount": 48128,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,20 +20,30 @@
       "name": "Baldwin",
       "fips": "01003",
       "state": "Alabama",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 17987,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "al-baldwin-public-isv",
+      "queryUrl": "https://web6.kcsgis.com/kcsgis/rest/services/Baldwin/Baldwin_Public_ISV/MapServer/31/query",
       "gaps": [
-        "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+        "17989 source rows collapsed to 17987 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Baldwin County Zoning/42 spatial join set ZONE_1 on 6997 of 17987 parcels. Parcel ZoningCode is usually empty, so this is the unincorporated baseline.",
+        "Foley zoning is a PID join from Zoning/FeatureServer/3 onto Baldwin PID (489 of 17987 parcels in this 5\u2013150 acre extract). Zone is an integer; 11717 city rows were labeled from the layer coded-value domain and 0 stayed numeric because they were outside that domain.",
+        "Acreage filter and stored acres use CalcAcre. DeededAcres is usually 0 or null.",
+        "No last-sale price. DeedSigned (fallback DeedRecorded) is stored as lastSale.date when the epoch converts.",
+        "Future land use is not parcel-level. Baldwin FLUM layer 43 is six place polygons and was not joined.",
+        "Dead URL https://al05baldrevenue.kcsgis.com/kcsgis/rest/services/Baldwin/Public/MapServer returns 404 and is not used.",
+        "Daphne has no public zoning REST and is not joined. Fairhope base zoning was not found (research saw AO/MO overlays only) and is not joined.",
+        "Foley ZoningOverlays/32 (five overlay polygons) is not applied as the base district. The base zone is the PID join.",
+        "Gulf Shores zoning overlay (https://services2.arcgis.com/d53H8HWVL7iicQLS/arcgis/rest/services/ZoningDistricts/FeatureServer/0/query) matched 443 of 17987 parcels. City zoning replaces the county code only on those parcels.",
+        "Orange Beach zoning overlay (https://services6.arcgis.com/Nx0Kxzo2nhFhIbCV/arcgis/rest/services/Zoning_Districts/FeatureServer/0/query) matched 202 of 17987 parcels. City zoning replaces the county code only on those parcels."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/01003/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01003/lookup.json",
+      "tileCount": 16,
+      "sourceCount": 17989
     },
     {
       "name": "Escambia",

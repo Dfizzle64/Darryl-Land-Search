@@ -13,10 +13,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
-| Pensacola | other | 30,141 | 4 | 0 | 1 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
+| Pensacola | other | 48,128 | 5 | 0 | 0 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
-| Mobile | other | 7,189 | 1 | 0 | 4 |
+| Mobile | other | 42,446 | 3 | 0 | 2 |
 | Huntsville | other | 0 | 0 | 0 | 7 |
 | Savannah | other | 0 | 0 | 0 | 8 |
 | Columbia | other | 0 | 0 | 0 | 10 |
@@ -176,7 +176,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 
@@ -184,7 +184,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Baldwin | Alabama | 01003 | gap | 0 | unavailable |
+| Baldwin | Alabama | 01003 | complete-gte-5ac | 17,987 | al-baldwin-public-isv |
 | Escambia | Florida | 12033 | complete-gte-5ac | 9,097 | fl-doh-ehwaters-12033 |
 | Okaloosa | Florida | 12091 | complete-gte-5ac | 5,854 | fl-doh-ehwaters-12091 |
 | Santa Rosa | Florida | 12113 | complete-gte-5ac | 7,011 | fl-doh-ehwaters-12113 |
@@ -209,10 +209,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Baldwin | Alabama | 01003 | gap | 0 | unavailable |
+| Baldwin | Alabama | 01003 | complete-gte-5ac | 17,987 | al-baldwin-public-isv |
 | Escambia | Alabama | 01053 | gap | 0 | unavailable |
 | George | Mississippi | 28039 | complete-gte-5ac | 7,189 | ms-mdeq-2023-28039 |
-| Mobile | Alabama | 01097 | gap | 0 | unavailable |
+| Mobile | Alabama | 01097 | complete-gte-5ac | 17,270 | al-mobile-agol-capturecama |
 | Washington | Alabama | 01129 | gap | 0 | unavailable |
 
 ### Huntsville

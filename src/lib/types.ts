@@ -389,6 +389,10 @@ export type ParcelProperties = {
   propertyName: string | null;
   zoningCode: string | null;
   zoningDistrict: string | null;
+  /** Incorporated place or unincorporated county label when a public layer provides it. */
+  municipality?: string | null;
+  /** Public zoning layer that supplied zoningCode. */
+  zoningSource?: string | null;
   jurisdictionPrefix: string | null;
   dorCode: string | null;
   acreage: number | null;

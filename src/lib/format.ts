@@ -27,6 +27,8 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "45045": "https://www.greenvillecounty.org/AppsAS400/RealProperty/",
+  "45083": "https://www.spartanburgcounty.gov/288/Assessor-Property-Records-Search",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -59,7 +61,11 @@ export function parcelAppraiserUrl(options: {
                   ? "Sumter"
                   : fips === "12127"
                     ? "Volusia"
-                    : "county";
+                    : fips === "45045"
+                      ? "Greenville County"
+                      : fips === "45083"
+                        ? "Spartanburg County"
+                        : "county";
   return {
     href,
     label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,

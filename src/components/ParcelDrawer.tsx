@@ -78,7 +78,8 @@ export function ParcelDrawer({
     : null;
   const placeLine =
     [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+    [properties.countyName ? `${properties.countyName} County` : null, properties.state].filter(Boolean).join(", ") ||
+    "Location not available";
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -106,6 +107,7 @@ export function ParcelDrawer({
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
         <Field label="Zoning" value={properties.zoningCode} />
+        {properties.municipality ? <Field label="Municipality" value={properties.municipality} /> : null}
         <Field label="Future Land Use" value={fluLine} />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { parcelAppraiserUrl } from "../lib/format";
 import {
   featuresInAcreageBand,
   inMarketAcreageBand,
@@ -120,6 +121,84 @@ describe("market parcel gating and acreage", () => {
         checked += 1;
       }
       if (checked >= 25) break;
+    }
+  });
+});
+
+describe("Greenville–Spartanburg parcel enrich", () => {
+  it("links Greenville and Spartanburg assessor searches", () => {
+    expect(parcelAppraiserUrl({ parcelId: "1", countyFips: "45045" })).toEqual({
+      href: "https://www.greenvillecounty.org/AppsAS400/RealProperty/",
+      label: "Open Greenville County Property Appraiser search",
+    });
+    expect(parcelAppraiserUrl({ parcelId: "1", countyFips: "45083" })).toEqual({
+      href: "https://www.spartanburgcounty.gov/288/Assessor-Property-Records-Search",
+      label: "Open Spartanburg County Property Appraiser search",
+    });
+  });
+
+  it("keeps countywide 5–150 acre rolls with owner, mail, situs, tax, and city zoning", () => {
+    const root = path.join(process.cwd(), "data/fixtures/market-parcels/counties");
+    const expected = [
+      {
+        fips: "45045",
+        source: "sc-greenville-gcgia-tax-parcel",
+        url: "GCGIA_FeatureAccess/FeatureServer/10",
+      },
+      {
+        fips: "45083",
+        source: "sc-spartanburg-cama-parcels",
+        url: "GIS/CAMA_Parcels/FeatureServer/0",
+      },
+    ];
+    for (const county of expected) {
+      const meta = JSON.parse(readFileSync(path.join(root, county.fips, "county.json"), "utf8")) as {
+        coverage: string;
+        source: string;
+        queryUrl: string;
+        featureCount: number;
+        gaps: string[];
+        markets: string[];
+      };
+      expect(meta.coverage).toBe("complete-gte-5ac");
+      expect(meta.source).toBe(county.source);
+      expect(meta.queryUrl).toContain(county.url);
+      expect(meta.queryUrl.includes("Greenville_Base_Data")).toBe(false);
+      expect(meta.queryUrl.includes("Campobello")).toBe(false);
+      expect(meta.featureCount).toBeGreaterThan(1000);
+      expect(meta.markets).toContain("Greenville");
+      expect(meta.gaps.join(" ").includes("EnerGov") || county.fips === "45045").toBe(true);
+      const tiles = readdirSync(path.join(root, county.fips, "tiles")).filter((name) => name.endsWith(".geojson"));
+      expect(tiles.length).toBeGreaterThan(0);
+      let sawOwner = false;
+      let sawMail = false;
+      let sawSitus = false;
+      let sawTax = false;
+      let sawZoning = false;
+      let checked = 0;
+      for (const tile of tiles) {
+        const collection = JSON.parse(readFileSync(path.join(root, county.fips, "tiles", tile), "utf8")) as ParcelCollection;
+        for (const feature of collection.features) {
+          if (checked < 30) {
+            expect(inMarketAcreageBand(feature.properties.acreage)).toBe(true);
+            expect(feature.properties.countyFips).toBe(county.fips);
+            expect(feature.properties.marketIds).toContain("Greenville");
+            expect(feature.properties.source).toBe(county.source);
+            checked += 1;
+          }
+          expect(String(feature.properties.zoningSource || "").toLowerCase().includes("energov")).toBe(false);
+          if (feature.properties.ownerName) sawOwner = true;
+          if (feature.properties.mailingAddress?.line1) sawMail = true;
+          if (feature.properties.situsAddress) sawSitus = true;
+          if (feature.properties.tax?.marketValue || feature.properties.tax?.taxes || feature.properties.tax?.taxableValue) sawTax = true;
+          if (feature.properties.zoningCode && feature.properties.municipality) sawZoning = true;
+        }
+      }
+      expect(sawOwner).toBe(true);
+      expect(sawMail).toBe(true);
+      expect(sawSitus).toBe(true);
+      expect(sawTax).toBe(true);
+      expect(sawZoning).toBe(true);
     }
   });
 });

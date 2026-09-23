@@ -291,6 +291,11 @@ def empty_feature(
     city: str | None = None,
     zip_code: str | None = None,
     zoning: str | None = None,
+    zoning_district: str | None = None,
+    zoning_source: str | None = None,
+    municipality: str | None = None,
+    jurisdiction: str | None = None,
+    appraiser_url: str | None = None,
     dor: str | None = None,
     sale_price: float | None = None,
     sale_date: str | None = None,
@@ -303,6 +308,8 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    owner2: str | None = None,
+    taxes: float | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
     return {
@@ -318,12 +325,14 @@ def empty_feature(
             "situsAddress": situs,
             "situsCity": city,
             "situsZip": zip_code,
-            "jurisdictionCode": None,
+            "jurisdictionCode": jurisdiction,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
-            "zoningDistrict": None,
+            "zoningDistrict": zoning_district,
+            "municipality": municipality,
+            "zoningSource": zoning_source,
             "jurisdictionPrefix": None,
             "dorCode": dor,
             "acreage": round(acreage, 4),
@@ -333,7 +342,7 @@ def empty_feature(
                 "marketValue": market_value,
                 "assessedValue": assessed,
                 "taxableValue": taxable,
-                "taxes": None,
+                "taxes": taxes,
             },
             "mailingAddress": {
                 "line1": mail1,
@@ -348,6 +357,7 @@ def empty_feature(
             "flu": None,
             "opportunityZone": None,
             "oz2Eligibility": None,
+            "appraiserUrl": appraiser_url,
             "source": source,
         },
         "geometry": geometry,
@@ -371,12 +381,18 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    return_geometry: bool = True,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
         "outFields": ",".join(out_fields),
-        "returnGeometry": "true",
+        "returnGeometry": "true" if return_geometry else "false",
         "outSR": "4326",
     }
     for start in range(0, total, batch):
@@ -388,12 +404,28 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(
+                        url,
+                        chunk,
+                        out_fields,
+                        batch=max(20, len(chunk) // 2),
+                        return_geometry=return_geometry,
+                    )
+                )
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(
+                        url,
+                        chunk,
+                        out_fields,
+                        batch=max(20, len(chunk) // 2),
+                        return_geometry=return_geometry,
+                    )
+                )
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -676,22 +708,41 @@ def county_override(fips: str) -> dict | None:
             "coverage": "complete-gte-5ac",
             "gaps": ["Jefferson County public parcels. Owner and situs are sparse on this layer. No zoning join."],
         }
-    if fips == "45045":  # Greenville SC
+    if fips == "45045":  # Greenville County SC — GCGIA Tax Parcel, not the city sample
         return {
-            "kind": "arcgis",
-            "url": "https://citygis.greenvillesc.gov/arcgis/rest/services/GeneralData/GeneralData_WGS84/MapServer/2/query",
-            "where": "GIS_ACRES>=5 AND GIS_ACRES<=150",
-            "outFields": ["PIN", "GIS_ACRES", "NAMECO", "POWNNM", "STREET", "CITY", "ZIP5"],
-            "idField": "PIN",
-            "acresField": "GIS_ACRES",
-            "ownerField": "NAMECO",
-            "situsField": "STREET",
-            "cityField": "CITY",
-            "zipField": "ZIP5",
-            "source": "sc-greenville-city-gis",
-            "coverage": "sample",
+            "kind": "gsp",
+            "gsp": "greenville",
+            "url": "https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/10/query",
+            "where": "TACRES>=5 AND TACRES<=150",
+            "source": "sc-greenville-gcgia-tax-parcel",
+            "coverage": "complete-gte-5ac",
             "gaps": [
-                "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
+                "Countywide GCGIA Tax Parcel (FeatureServer/10), PIN, TACRES 5–150. Owner, mailing, situs (STRNUM+LOCATE), last deed sale, and tax amounts are on the polygon. Zoning is not.",
+                "Zoning is a spatial join: City of Greenville AddressSearch/Regulation MapServer/7 first, then City of Greer UDO (Pro_Zoning), otherwise GCGIA Zoning/13 by JCODE.",
+                "Mauldin (JCODE 45115), Simpsonville (66580), Travelers Rest (72430), and Fountain Inn (27070) are county Zoning/13 only. No separate city FeatureServer was verified. Fountain Inn also sits in Laurens; only the Greenville County portion is in this extract.",
+                "Unincorporated Greenville County is JCODE 45045 on the county zoning layer.",
+                "Rejected: AGOL Greenville_Base_Data/33 is a ~32k city-extent subset (wrong geography for a countywide roll). City Property/3 is a large city-hosted extract, not the county source. The previous GeneralData/2 sample is retired.",
+                "Last-deed sale only. GreenvilleNJ/Sales/MapServer/7 has older sales and is not joined. County FLU/21 is a character-area layer and is not joined. City of Greenville has no verified FLU REST. Greer FLU is public and is not joined.",
+                "Parcel JURIS is the tax jurisdiction code, not zoning JCODE. No phones or emails.",
+            ],
+        }
+    if fips == "45083":  # Spartanburg County SC — CAMA parcels
+        return {
+            "kind": "gsp",
+            "gsp": "spartanburg",
+            "url": "https://maps.spartanburgcounty.org/server/rest/services/GIS/CAMA_Parcels/FeatureServer/0/query",
+            "where": "Acreage>=5 AND Acreage<=150",
+            "source": "sc-spartanburg-cama-parcels",
+            "coverage": "complete-gte-5ac",
+            "gaps": [
+                "Countywide CAMA Parcels (FeatureServer/0), MAPNUMBER, Acreage 5–150. Owner, mailing, situs, appraised/assessed/taxable values, and last sale are on the polygon. Zoning is not. SaleAmount is often null and is left null.",
+                "City of Spartanburg zoning is Zoning_Layer_2026 (spatial). Parcel_Info_1_2026 ZoningDist fills a city parcel only when the map join misses. Inman and Wellford join on MAPNUMBER. Their countywide parcel layers are wrong geography and are not used.",
+                "Lyman zoning is partial: TOL_Zoning_Map layers 11–22 have no zoning attribute, so the district is the layer name, joined spatially.",
+                "Greer straddles Spartanburg. Spa-side parcels use the Greer UDO zoning layer (spatial), the same layer as Greenville County.",
+                "County EnerGov Display_Map/12 is only three coarse districts (GENERAL DEVELOPMENT, RESTRICTIVE DEVELOPMENT, PARTIAL RESTRICTION). It is not stored as municipal zoning.",
+                "No verified municipal zoning FeatureServer: Campobello, Cowpens, Chesnee, Duncan, Landrum, Pacolet, Central Pacolet, Reidville, Woodruff. AGOL Campobello_Zoning is Campobello Island, New Brunswick, and is rejected.",
+                "Incorporated place names come from county BasemapFeatures Municipalities. Assessor TownCode stays on the parcel. The county card confirms Z = City of Spartanburg and L ≈ Greer; other letters are not given an official legend here.",
+                "No verified county or city Future Land Use REST. No multi-sale history table. No phones or emails. These parcels ship on the Greenville market, which is the app shed that includes Spartanburg County.",
             ],
         }
     return None
@@ -963,16 +1014,35 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
-| South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
+| South Carolina | Dorchester public parcels; Greenville County GCGIA Tax Parcel; Spartanburg County CAMA | Dorchester, Greenville, and Spartanburg are complete 5–150 acre extracts. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county parcel already carries it (DeKalb) or when a public municipal layer can be joined without a token (Greenville and Spartanburg). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+## Greenville–Spartanburg
+
+Greenville County (45045) and Spartanburg County (45083) are countywide 5.0–150.0 acre extracts on the **Greenville** market. The app has no separate Spartanburg market id; Spartanburg County is part of that shed.
+
+Greenville parcels come from GCGIA Tax Parcel `FeatureServer/10` (PIN, `TACRES`). Owner, mailing, situs street, last deed sale, and tax amounts are on that polygon. Zoning is not. The join is city-first: City of Greenville `AddressSearch/Regulation/MapServer/7`, then the City of Greer UDO, otherwise county Zoning layer 13 by `JCODE`. Mauldin, Simpsonville, Travelers Rest, and Fountain Inn stay on that county `JCODE`. AGOL `Greenville_Base_Data/33` is a city-extent subset and is not used. The older City of Greenville GeneralData sample is retired.
+
+Spartanburg parcels come from CAMA `FeatureServer/0` (`MAPNUMBER`, `Acreage`). Owner, mailing, situs, appraised/assessed/taxable values, and last sale are on that polygon. Zoning is not. City of Spartanburg uses `Zoning_Layer_2026`, with `Parcel_Info` `ZoningDist` only where the map misses. Inman and Wellford join on `MAPNUMBER`. Lyman is partial (district = layer name). Greer uses the UDO layer on the Spartanburg side too. County EnerGov zoning is three coarse districts and is not written as municipal zoning. Campobello, Cowpens, Chesnee, Duncan, Landrum, Pacolet, Central Pacolet, Reidville, and Woodruff have no verified municipal zoning layer. An AGOL layer named Campobello Zoning is Campobello Island, New Brunswick, and is not used.
+
+Public GIS only. No phones or emails. `SaleAmount` is often empty. Multi-sale history and future land use are not joined.
 
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "gsp":
+        import importlib
+        import sys
+
+        script_dir = str(Path(__file__).resolve().parent)
+        if script_dir not in sys.path:
+            sys.path.insert(0, script_dir)
+        return importlib.import_module("gsp_market_parcels").pull(county, markets, spec)
+
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

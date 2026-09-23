@@ -27,10 +27,20 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
-| South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
+| South Carolina | Dorchester public parcels; Greenville County GCGIA Tax Parcel; Spartanburg County CAMA | Dorchester, Greenville, and Spartanburg are complete 5–150 acre extracts. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county parcel already carries it (DeKalb) or when a public municipal layer can be joined without a token (Greenville and Spartanburg). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+## Greenville–Spartanburg
+
+Greenville County (45045) and Spartanburg County (45083) are countywide 5.0–150.0 acre extracts on the **Greenville** market. The app has no separate Spartanburg market id; Spartanburg County is part of that shed.
+
+Greenville parcels come from GCGIA Tax Parcel `FeatureServer/10` (PIN, `TACRES`). Owner, mailing, situs street, last deed sale, and tax amounts are on that polygon. Zoning is not. The join is city-first: City of Greenville `AddressSearch/Regulation/MapServer/7`, then the City of Greer UDO, otherwise county Zoning layer 13 by `JCODE`. Mauldin, Simpsonville, Travelers Rest, and Fountain Inn stay on that county `JCODE`. AGOL `Greenville_Base_Data/33` is a city-extent subset and is not used. The older City of Greenville GeneralData sample is retired.
+
+Spartanburg parcels come from CAMA `FeatureServer/0` (`MAPNUMBER`, `Acreage`). Owner, mailing, situs, appraised/assessed/taxable values, and last sale are on that polygon. Zoning is not. City of Spartanburg uses `Zoning_Layer_2026`, with `Parcel_Info` `ZoningDist` only where the map misses. Inman and Wellford join on `MAPNUMBER`. Lyman is partial (district = layer name). Greer uses the UDO layer on the Spartanburg side too. County EnerGov zoning is three coarse districts and is not written as municipal zoning. Campobello, Cowpens, Chesnee, Duncan, Landrum, Pacolet, Central Pacolet, Reidville, and Woodruff have no verified municipal zoning layer. An AGOL layer named Campobello Zoning is Campobello Island, New Brunswick, and is not used.
+
+Public GIS only. No phones or emails. `SaleAmount` is often empty. Multi-sale history and future land use are not joined.
 
 ## Coverage
 
@@ -56,7 +66,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Huntsville | other | 0 | 0 | 0 | 7 |
 | Savannah | other | 0 | 0 | 0 | 8 |
 | Columbia | other | 0 | 0 | 0 | 10 |
-| Greenville | other | 1,570 | 0 | 1 | 7 |
+| Greenville | other | 31,164 | 2 | 0 | 6 |
 | Chattanooga | other | 10,537 | 2 | 0 | 8 |
 | Knoxville | other | 38,433 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
@@ -297,12 +307,12 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Abbeville | South Carolina | 45001 | gap | 0 | unavailable |
 | Anderson | South Carolina | 45007 | gap | 0 | unavailable |
-| Greenville | South Carolina | 45045 | sample | 1,570 | sc-greenville-city-gis |
+| Greenville | South Carolina | 45045 | complete-gte-5ac | 14,959 | sc-greenville-gcgia-tax-parcel |
 | Greenwood | South Carolina | 45047 | gap | 0 | unavailable |
 | Laurens | South Carolina | 45059 | gap | 0 | unavailable |
 | Oconee | South Carolina | 45073 | gap | 0 | unavailable |
 | Pickens | South Carolina | 45077 | gap | 0 | unavailable |
-| Spartanburg | South Carolina | 45083 | gap | 0 | unavailable |
+| Spartanburg | South Carolina | 45083 | complete-gte-5ac | 16,205 | sc-spartanburg-cama-parcels |
 
 ### Chattanooga
 

@@ -639,6 +639,10 @@ def county_override(fips: str) -> dict | None:
             "coverage": "complete-gte-5ac",
             "gaps": ["Jefferson County public parcels. Owner and situs are sparse on this layer. No zoning join."],
         }
+    if fips == "37129":  # New Hanover NC — county parcels, tax table, city zoning, PlanNHC place types
+        from new_hanover_parcels import new_hanover_spec
+
+        return new_hanover_spec()
     if fips == "45045":  # Greenville SC
         return {
             "kind": "arcgis",
@@ -740,6 +744,7 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    extra: dict | None = None,
 ) -> dict:
     row = {
         "name": county["name"],
@@ -760,6 +765,8 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    if extra:
+        row.update(extra)
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
     (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
     return row
@@ -841,6 +848,22 @@ def rebuild_indexes(catalog: dict) -> None:
                     "lookup": row.get("lookup"),
                     "tileCount": row.get("tileCount"),
                     "sourceCount": row.get("sourceCount"),
+                    **(
+                        {"municipalities": row["municipalities"]}
+                        if row.get("municipalities")
+                        else {}
+                    ),
+                    **({"unincorporated": row["unincorporated"]} if row.get("unincorporated") else {}),
+                    **(
+                        {"zoningJoinedCount": row["zoningJoinedCount"]}
+                        if row.get("zoningJoinedCount") is not None
+                        else {}
+                    ),
+                    **(
+                        {"fluJoinedCount": row["fluJoinedCount"]}
+                        if row.get("fluJoinedCount") is not None
+                        else {}
+                    ),
                 }
                 for row in sorted(market_rows, key=lambda item: item["name"])
             ],
@@ -921,7 +944,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels`, except New Hanover | Other counties are a complete 5–150 acre OneMap extract. Most use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. New Hanover uses county parcel polygons, the IASTAX table, city zoning, and PlanNHC place types |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -929,13 +952,32 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or when a county override spatial-joins zoning polygons (New Hanover). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+## New Hanover County (Wilmington)
+
+Public county and municipal GIS only. The etax HTML site is not scraped. Phones and emails are not on these layers. OZ 2.0 eligibility is not a designated Qualified Opportunity Zone.
+
+- **Geometry.** [Parcels layer 0](https://gis.nhcgov.com/server/rest/services/Layers/Parcels/FeatureServer/0) where `ACRES` is 5–150 (about 2.3k polygons). Stored in WGS84. Source WKID is 103122 / 6543.
+- **Attributes.** [IASTAX table 1](https://gis.nhcgov.com/server/rest/services/Layers/IASTAX/FeatureServer/1) joined on `MAPIDKEY`. `APRTOT` is the appraised total, not a market value, taxable value, or tax bill. `SALE_PRICE` of 0 is missing. There is no qualified-sale flag and no multi-year history.
+- **Zoning, city first.** Wilmington [Planning/Zoning layer 0](https://gis.wilmingtonnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/0), Carolina Beach [GIS_Viewer layer 21](https://cw.carolinabeach.org/arcgis/rest/services/GISViewer/GIS_Viewer/MapServer/21), and Wrightsville Beach [WrightsvilleBeachZoning layer 0](https://services3.arcgis.com/XyPkMiF0OxEhc77I/arcgis/rest/services/WrightsvilleBeachZoning/FeatureServer/0) override county [Zoning layer 1](https://gis.nhcgov.com/server/rest/services/Layers/Zoning/FeatureServer/1). County codes `CITY`, `WB`, `CB`, and `KB` are municipal stamps, not districts.
+- **Future land use.** [PlanNHC_FLUM layer 8](https://gis.nhcgov.com/server/rest/services/Thematic/PlanNHC_FLUM/MapServer/8) place types, unincorporated parcels only. Create Wilmington future land use has no feature service. Wilmington `Planning/LandUse` is existing land use and is not joined. Kure Beach zoning polygons are not published.
+- **Fallback.** NC OneMap `cntyfips='129'` if the county parcel service fails. Tax, zoning, and place types are still joined on that geometry when the other services respond.
+- **Opportunity zones.** HUD designated tracts (2010) and Rev. Proc. 2026-14 nomination eligibility (2020) are separate centroid joins. Eligible is not designated.
+
+```bash
+python3 scripts/seed_market_parcels.py --market Wilmington --county "New Hanover" --refresh
+```
 
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "new-hanover":
+        from new_hanover_parcels import download_new_hanover
+
+        return download_new_hanover(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
@@ -1141,6 +1183,9 @@ def main() -> None:
     for fips, slot in grouped.items():
         markets = full_markets[fips]
         spec = spec_for(slot["county"])
+        if args.refresh and spec.get("kind") == "new-hanover":
+            spec = dict(spec)
+            spec["ignoreCache"] = True
         existing = COUNTY_DIR / fips / "county.json"
         if spec["kind"] == "gap":
             if not existing.exists() or args.refresh:

@@ -41,6 +41,12 @@ export function parcelAppraiserUrl(options: {
       label: "Open in Orange County Property Appraiser",
     };
   }
+  if (fips === "37129") {
+    return {
+      href: options.appraiserUrl || "https://etax.nhcgov.com/pt/main/home.aspx",
+      label: "Open New Hanover County property search",
+    };
+  }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);
   const countyLabel =
     fips === "12009"

@@ -22,7 +22,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels`, except New Hanover | Other counties are a complete 5–150 acre OneMap extract. Most use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. New Hanover uses county parcel polygons, the IASTAX table, city zoning, and PlanNHC place types |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -30,7 +30,22 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or when a county override spatial-joins zoning polygons (New Hanover). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+## New Hanover County (Wilmington)
+
+Public county and municipal GIS only. The etax HTML site is not scraped. Phones and emails are not on these layers. OZ 2.0 eligibility is not a designated Qualified Opportunity Zone.
+
+- **Geometry.** [Parcels layer 0](https://gis.nhcgov.com/server/rest/services/Layers/Parcels/FeatureServer/0) where `ACRES` is 5–150 (about 2.3k polygons). Stored in WGS84. Source WKID is 103122 / 6543.
+- **Attributes.** [IASTAX table 1](https://gis.nhcgov.com/server/rest/services/Layers/IASTAX/FeatureServer/1) joined on `MAPIDKEY`. `APRTOT` is the appraised total, not a market value, taxable value, or tax bill. `SALE_PRICE` of 0 is missing. There is no qualified-sale flag and no multi-year history.
+- **Zoning, city first.** Wilmington [Planning/Zoning layer 0](https://gis.wilmingtonnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/0), Carolina Beach [GIS_Viewer layer 21](https://cw.carolinabeach.org/arcgis/rest/services/GISViewer/GIS_Viewer/MapServer/21), and Wrightsville Beach [WrightsvilleBeachZoning layer 0](https://services3.arcgis.com/XyPkMiF0OxEhc77I/arcgis/rest/services/WrightsvilleBeachZoning/FeatureServer/0) override county [Zoning layer 1](https://gis.nhcgov.com/server/rest/services/Layers/Zoning/FeatureServer/1). County codes `CITY`, `WB`, `CB`, and `KB` are municipal stamps, not districts.
+- **Future land use.** [PlanNHC_FLUM layer 8](https://gis.nhcgov.com/server/rest/services/Thematic/PlanNHC_FLUM/MapServer/8) place types, unincorporated parcels only. Create Wilmington future land use has no feature service. Wilmington `Planning/LandUse` is existing land use and is not joined. Kure Beach zoning polygons are not published.
+- **Fallback.** NC OneMap `cntyfips='129'` if the county parcel service fails. Tax, zoning, and place types are still joined on that geometry when the other services respond.
+- **Opportunity zones.** HUD designated tracts (2010) and Rev. Proc. 2026-14 nomination eligibility (2020) are separate centroid joins. Eligible is not designated.
+
+```bash
+python3 scripts/seed_market_parcels.py --market Wilmington --county "New Hanover" --refresh
+```
 
 ## Coverage
 
@@ -49,7 +64,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -61,7 +76,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Knoxville | other | 38,433 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
-| Wilmington | other | 46,720 | 6 | 0 | 0 |
+| Wilmington | other | 46,727 | 6 | 0 | 0 |
 
 ## Counties
 
@@ -212,7 +227,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 
@@ -374,7 +389,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Brunswick | North Carolina | 37019 | complete-gte-5ac | 7,020 | nc-onemap-37019 |
 | Columbus | North Carolina | 37047 | complete-gte-5ac | 12,025 | nc-onemap-37047 |
 | Duplin | North Carolina | 37061 | complete-gte-5ac | 11,397 | nc-onemap-37061 |
-| New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,256 | nc-onemap-37129 |
+| New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,263 | nc-new-hanover-parcels-37129 |
 | Onslow | North Carolina | 37133 | complete-gte-5ac | 6,747 | nc-onemap-37133 |
 | Pender | North Carolina | 37141 | complete-gte-5ac | 7,275 | nc-onemap-37141 |
 

@@ -6,7 +6,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 8,149 | 1 | 1 | 33 |
+| Atlanta | primary | 12,074 | 2 | 1 | 32 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
@@ -46,7 +46,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | DeKalb | Georgia | 13089 | sample | 3,369 | ga-dekalb-tax-parcels |
 | Douglas | Georgia | 13097 | gap | 0 | unavailable |
 | Fayette | Georgia | 13113 | gap | 0 | unavailable |
-| Forsyth | Georgia | 13117 | gap | 0 | unavailable |
+| Forsyth | Georgia | 13117 | complete-gte-5ac | 3,925 | ga-forsyth-tax-parcels |
 | Fulton | Georgia | 13121 | gap | 0 | unavailable |
 | Gordon | Georgia | 13129 | gap | 0 | unavailable |
 | Gwinnett | Georgia | 13135 | gap | 0 | unavailable |

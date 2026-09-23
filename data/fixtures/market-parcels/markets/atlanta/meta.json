@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:56:03Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 8149,
+  "parcelCount": 12074,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -267,20 +267,28 @@
       "name": "Forsyth",
       "fips": "13117",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 3925,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-forsyth-tax-parcels",
+      "queryUrl": "https://geo.forsythco.com/gis/rest/services/Public/Tax_Parcel/FeatureServer/0/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "No lastSale.price, lastSale.date, or lastSale.qualified on any public Forsyth County GA REST layer. Sale history is qPublic HTML only (AppID=1027), not a GIS join.",
+        "FLU is partial: EnerGov CharacterArea is 11 coarse 2022 comprehensive-plan polygons (Big Creek, Campground, Chestatee/Jot Em Down, Etowah, Haw Creek and Daves Creek, Lanier, McFarland, North Georgia 400, Sawnee Mountain, South Georgia 400, Vickery Creek), joined to 3758 of 3925 parcels. This is not parcel-level future land use. Cumming city FLU is a comprehensive-plan PDF, not REST.",
+        "Cumming is the only incorporated city (MunicipalBoundary NAME=Cumming, LOCALFIPS 20932). 147 parcels in the 5\u2013150 acre band fall inside the city. Zoning there uses the parcel ZONING attribute. County Zoning_Districts ZONECLASS=CUMMING is a stub (138 polygons) and is not used as a district code. No Cumming-owned zoning or FLU FeatureServer.",
+        "ownerName is not on Public Tax_Parcel. Joined EnerGov TaxParcels/1 OWNERNME1 on PARCELID for 3925 of 3925 parcels.",
+        "CNTASSDVAL is stored as tax.marketValue (the field alias says assessed, but values behave as fair-market). CNTTXBLVAL is tax.taxableValue (about 40% of market value when there is no exemption). There is no tax.assessedValue field. LNDVALUE is tax.landMarketValue.",
+        "Appraiser search: https://www.qpublic.net/ga/forsyth/search.html. Parcel deep link pattern (often HTTP 403 to automated clients): https://qpublic.schneidercorp.com/Application.aspx?AppID=1027&LayerID=21667&PageTypeID=4&PageID=9230&KeyValue={PARCELID with spaces as +}. Tax bills: https://forsythproperty.assurancegov.com/Property/Search.",
+        "Rejected lookalikes: forsyth.cc (Forsyth County, North Carolina) and Athens-Clarke. Centroids are kept only inside the Forsyth County, Georgia bbox. Postal city names (Alpharetta, Suwanee, Gainesville, and others) are not treated as incorporated cities.",
+        "Zoning joined on 3925 of 3925 parcels (3741 from unincorporated zoning polygons, 184 from the parcel ZONING attribute, mostly Cumming).",
+        "4009 source rows collapsed to 3925 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13117/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13117/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 4009
     },
     {
       "name": "Fulton",

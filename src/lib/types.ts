@@ -28,6 +28,10 @@ export type TaxInfo = {
   assessedValue: number | null;
   taxableValue: number | null;
   taxes: number | null;
+  /** Land portion of fair-market value when the county publishes it separately. */
+  landMarketValue?: number | null;
+  /** Prior-year fair-market value when published. Not the 40% assessed figure. */
+  previousMarketValue?: number | null;
 };
 
 export type IncomeInfo = {

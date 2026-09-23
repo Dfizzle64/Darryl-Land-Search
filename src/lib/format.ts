@@ -27,6 +27,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "13117": "https://www.qpublic.net/ga/forsyth/search.html",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -39,6 +40,14 @@ export function parcelAppraiserUrl(options: {
     return {
       href: ocpaParcelUrl(options.parcelId),
       label: "Open in Orange County Property Appraiser",
+    };
+  }
+  if (fips === "13117") {
+    const href = options.appraiserUrl || DEFAULT_APPRAISER_URLS["13117"];
+    const deep = href.includes("schneidercorp.com") || href.includes("KeyValue=");
+    return {
+      href,
+      label: deep ? "Open Forsyth County qPublic parcel" : "Open Forsyth County qPublic search",
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);

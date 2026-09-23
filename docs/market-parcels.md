@@ -26,11 +26,11 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Forsyth county services | Cobb complete. DeKalb is a polygon-acre sample. Forsyth is a complete 5–150 acre extract on STATEDAREA, with EnerGov owner join, zoning, and coarse character-area future land use. Sales stay a qPublic gap. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county source carries it (DeKalb parcel attribute; Forsyth parcel attribute inside Cumming and county zoning polygons in the unincorporated county). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 
@@ -42,7 +42,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 8,149 | 1 | 1 | 33 |
+| Atlanta | primary | 12,074 | 2 | 1 | 32 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
@@ -82,7 +82,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | DeKalb | Georgia | 13089 | sample | 3,369 | ga-dekalb-tax-parcels |
 | Douglas | Georgia | 13097 | gap | 0 | unavailable |
 | Fayette | Georgia | 13113 | gap | 0 | unavailable |
-| Forsyth | Georgia | 13117 | gap | 0 | unavailable |
+| Forsyth | Georgia | 13117 | complete-gte-5ac | 3,925 | ga-forsyth-tax-parcels |
 | Fulton | Georgia | 13121 | gap | 0 | unavailable |
 | Gordon | Georgia | 13129 | gap | 0 | unavailable |
 | Gwinnett | Georgia | 13135 | gap | 0 | unavailable |

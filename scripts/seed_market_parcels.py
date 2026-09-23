@@ -275,6 +275,97 @@ def plausible_centroid(center: tuple[float, float] | None) -> bool:
     return -93.5 < lon < -75 and 24 < lat < 37.6
 
 
+def shoelace(ring: list) -> float:
+    area = 0.0
+    for i in range(len(ring) - 1):
+        x1, y1 = float(ring[i][0]), float(ring[i][1])
+        x2, y2 = float(ring[i + 1][0]), float(ring[i + 1][1])
+        area += x1 * y2 - x2 * y1
+    return area / 2.0
+
+
+def point_in_ring(x: float, y: float, ring: list) -> bool:
+    inside = False
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = float(ring[i][0]), float(ring[i][1])
+        xj, yj = float(ring[j][0]), float(ring[j][1])
+        if ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / ((yj - yi) or 1e-12) + xi):
+            inside = not inside
+        j = i
+    return inside
+
+
+def point_in_arcgis_rings(x: float, y: float, rings: list) -> bool:
+    """ArcGIS exteriors are clockwise (negative shoelace). Counterclockwise rings are holes."""
+    exteriors = 0
+    holes = 0
+    for ring in rings:
+        if not ring or len(ring) < 4:
+            continue
+        if not point_in_ring(x, y, ring):
+            continue
+        area = shoelace(ring)
+        if area < 0:
+            exteriors += 1
+        elif area > 0:
+            holes += 1
+    return exteriors > holes
+
+
+class RingIndex:
+    """Point-in-polygon index over ArcGIS feature rings in WGS84."""
+
+    def __init__(self, cell: float = 0.03) -> None:
+        self.cell = cell
+        self.buckets: dict[tuple[int, int], list[dict]] = defaultdict(list)
+        self.broad: list[dict] = []
+
+    def add(self, item: dict) -> None:
+        rings = (item.get("geometry") or {}).get("rings") or []
+        xs: list[float] = []
+        ys: list[float] = []
+        for ring in rings:
+            for pt in ring:
+                xs.append(float(pt[0]))
+                ys.append(float(pt[1]))
+        if not xs:
+            return
+        west, east = min(xs), max(xs)
+        south, north = min(ys), max(ys)
+        stored = dict(item)
+        stored["_bbox"] = (west, south, east, north)
+        stored["_area"] = abs(sum(shoelace(ring) for ring in rings if ring and len(ring) >= 4))
+        ix0 = math.floor(west / self.cell)
+        ix1 = math.floor(east / self.cell)
+        iy0 = math.floor(south / self.cell)
+        iy1 = math.floor(north / self.cell)
+        if (ix1 - ix0 + 1) * (iy1 - iy0 + 1) > 500:
+            self.broad.append(stored)
+            return
+        for ix in range(ix0, ix1 + 1):
+            for iy in range(iy0, iy1 + 1):
+                self.buckets[(ix, iy)].append(stored)
+
+    def containing(self, x: float, y: float) -> list[dict]:
+        ix = math.floor(x / self.cell)
+        iy = math.floor(y / self.cell)
+        hits: list[dict] = []
+        seen: set[int] = set()
+        for item in [*self.buckets.get((ix, iy), []), *self.broad]:
+            key = id(item)
+            if key in seen:
+                continue
+            seen.add(key)
+            west, south, east, north = item["_bbox"]
+            if x < west or x > east or y < south or y > north:
+                continue
+            rings = (item.get("geometry") or {}).get("rings") or []
+            if point_in_arcgis_rings(x, y, rings):
+                hits.append(item)
+        return hits
+
+
 def empty_feature(
     *,
     fips: str,
@@ -483,6 +574,8 @@ def normalize_rows(
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        if spec.get("passthrough"):
+            feature["properties"]["_raw"] = {key: attrs.get(key) for key in spec["passthrough"]}
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -694,13 +787,52 @@ def county_override(fips: str) -> dict | None:
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
             ],
         }
+    if fips == "13117":  # Forsyth County, Georgia — not Forsyth County, NC
+        return {
+            "kind": "arcgis",
+            "url": "https://geo.forsythco.com/gis/rest/services/Public/Tax_Parcel/FeatureServer/0/query",
+            "where": "STATEDAREA>=5 AND STATEDAREA<=150",
+            "outFields": [
+                "PARCELID",
+                "STATEDAREA",
+                "SITEADDRESS",
+                "PSTLADDRESS",
+                "PSTLCITY",
+                "PSTLSTATE",
+                "PSTLZIP5",
+                "PSTLZIP4",
+                "ZONING",
+                "LNDVALUE",
+                "CNTASSDVAL",
+                "CNTTXBLVAL",
+                "PRVASSDVAL",
+                "USECD",
+                "Link",
+            ],
+            "idField": "PARCELID",
+            "acresField": "STATEDAREA",
+            "situsField": "SITEADDRESS",
+            "zoningField": "ZONING",
+            "dorField": "USECD",
+            "marketValueField": "CNTASSDVAL",
+            "taxableField": "CNTTXBLVAL",
+            "mail1Field": "PSTLADDRESS",
+            "mailCityField": "PSTLCITY",
+            "mailStateField": "PSTLSTATE",
+            "mailZipField": "PSTLZIP5",
+            "passthrough": ["ZONING", "PSTLZIP4", "LNDVALUE", "PRVASSDVAL", "Link"],
+            "source": "ga-forsyth-tax-parcels",
+            "coverage": "complete-gte-5ac",
+            "enrich": "forsyth-ga",
+            "gaps": [],
+        }
     return None
 
 
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, or Forsyth pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -777,6 +909,7 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    extra: dict | None = None,
 ) -> dict:
     row = {
         "name": county["name"],
@@ -797,6 +930,8 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    if extra:
+        row.update(extra)
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
     (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
     return row
@@ -962,14 +1097,324 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Forsyth county services | Cobb complete. DeKalb is a polygon-acre sample. Forsyth is a complete 5–150 acre extract on STATEDAREA, with EnerGov owner join, zoning, and coarse character-area future land use. Sales stay a qPublic gap. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county source carries it (DeKalb parcel attribute; Forsyth parcel attribute inside Cumming and county zoning polygons in the unincorporated county). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
+
+
+FORSYTH_OWNER_URL = "https://geo.forsythco.com/gis/rest/services/EnerGov/EnerGovParcelAddressMapService/MapServer/1/query"
+FORSYTH_ZONING_URL = "https://geo.forsythco.com/gisworkflow/rest/services/Public/Zoning_Districts/FeatureServer/0/query"
+FORSYTH_FLU_URL = "https://geo.forsythco.com/gis/rest/services/EnerGov/EnerGovParcelAddressMapService/MapServer/10/query"
+FORSYTH_MUNI_URL = "https://geo.forsythco.com/gis/rest/services/EnerGov/EnerGovParcelAddressMapService/MapServer/3/query"
+FORSYTH_APPRAISER_SEARCH = "https://www.qpublic.net/ga/forsyth/search.html"
+# West, south, east, north. Keeps Forsyth County NC (~36.1, -80.2) and Athens-Clarke (~33.96, -83.4) out.
+FORSYTH_GA_BBOX = (-84.45, 33.95, -83.90, 34.45)
+FORSYTH_DATA_GAPS = [
+    "No last sale on public GIS (qPublic HTML only).",
+    "Future land use is a coarse 2022 character area, not a parcel FLU code.",
+    "No assessed value field; market value is CNTASSDVAL and taxable is CNTTXBLVAL.",
+]
+
+
+def assert_forsyth_ga_url(url: str) -> None:
+    lowered = url.lower()
+    if "forsyth.cc" in lowered or "athens" in lowered or "clarke" in lowered:
+        raise RuntimeError(f"Rejected lookalike source (Forsyth NC or Athens-Clarke): {url}")
+    if "geo.forsythco.com" not in lowered:
+        raise RuntimeError(f"Forsyth County GA enrich must use geo.forsythco.com, not {url}")
+
+
+def forsyth_appraiser_url(link: Any, parcel_id: str) -> str:
+    text = clean(link)
+    if text and "qpublic.schneidercorp.com" in text and "AppID=1027" in text and "forsyth.cc" not in text.lower():
+        return text
+    key = parcel_id.replace(" ", "+")
+    return (
+        "https://qpublic.schneidercorp.com/Application.aspx?AppID=1027&LayerID=21667"
+        f"&PageTypeID=4&PageID=9230&KeyValue={key}"
+    )
+
+
+def fetch_arcgis_features(url: str, where: str, out_fields: list[str], batch: int = 80) -> list[dict]:
+    assert_forsyth_ga_url(url)
+    ids = fetch_object_ids(url, where)
+    if not ids:
+        return []
+    return fetch_by_ids(url, ids, out_fields, batch=batch)
+
+
+def fetch_forsyth_owners(parcel_ids: list[str]) -> dict[str, dict]:
+    assert_forsyth_ga_url(FORSYTH_OWNER_URL)
+    found: dict[str, dict] = {}
+    batch = 30
+    start = 0
+    total = len(parcel_ids)
+    while start < total:
+        chunk = parcel_ids[start : start + batch]
+        quoted = ",".join("'" + pid.replace("'", "''") + "'" for pid in chunk)
+        try:
+            data = fetch_json(
+                FORSYTH_OWNER_URL,
+                {
+                    "where": f"PARCELID IN ({quoted})",
+                    "outFields": "PARCELID,OWNERNME1,OWNERNME2",
+                    "returnGeometry": "false",
+                    "f": "json",
+                },
+                timeout=120,
+            )
+        except RuntimeError:
+            if len(chunk) > 8:
+                batch = max(8, len(chunk) // 2)
+                continue
+            raise
+        if data.get("error"):
+            if len(chunk) > 8:
+                batch = max(8, len(chunk) // 2)
+                continue
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        for item in data.get("features") or []:
+            attrs = item.get("attributes") or {}
+            pid = clean(attrs.get("PARCELID"))
+            if pid:
+                found[pid] = attrs
+        start += len(chunk)
+        if start == len(chunk) or start == total or start % 300 == 0:
+            print(f"    owners {min(start, total)}/{total}", flush=True)
+        time.sleep(0.04)
+    return found
+
+
+def load_cumming_rings() -> list:
+    assert_forsyth_ga_url(FORSYTH_MUNI_URL)
+    data = fetch_json(
+        FORSYTH_MUNI_URL,
+        {
+            "where": "NAME='Cumming'",
+            "outFields": "NAME,MUNITYP,LOCALFIPS,MUNIAREA",
+            "returnGeometry": "true",
+            "outSR": "4326",
+            "f": "json",
+        },
+        timeout=180,
+    )
+    if data.get("error"):
+        raise RuntimeError(json.dumps(data["error"])[:300])
+    features = data.get("features") or []
+    if len(features) != 1:
+        raise RuntimeError(f"Expected one Cumming municipal polygon, got {len(features)}")
+    attrs = features[0].get("attributes") or {}
+    name = clean(attrs.get("NAME"))
+    place_fips = clean(attrs.get("LOCALFIPS"))
+    if name != "Cumming" or place_fips != "20932":
+        raise RuntimeError(f"Municipal boundary is not Cumming GA (name={name}, LOCALFIPS={place_fips})")
+    rings = (features[0].get("geometry") or {}).get("rings") or []
+    if not rings:
+        raise RuntimeError("Cumming municipal polygon has no rings")
+    vertex = rings[0][0]
+    lon, lat = float(vertex[0]), float(vertex[1])
+    if not (-84.3 < lon < -84.0 and 34.05 < lat < 34.3):
+        raise RuntimeError(f"Cumming boundary vertex {lon},{lat} is not Cumming, Georgia")
+    return rings
+
+
+def smallest_hit(hits: list[dict]) -> dict | None:
+    if not hits:
+        return None
+    return min(hits, key=lambda item: item.get("_area") or 0)
+
+
+def enrich_forsyth_ga(features: list[dict]) -> tuple[list[dict], list[str], dict]:
+    """Join EnerGov owner, county zoning, coarse character areas, and Cumming city limits.
+
+    Public GIS only. Forsyth County NC (forsyth.cc) and Athens-Clarke are rejected.
+    """
+    for url in (FORSYTH_OWNER_URL, FORSYTH_ZONING_URL, FORSYTH_FLU_URL, FORSYTH_MUNI_URL):
+        assert_forsyth_ga_url(url)
+    west, south, east, north = FORSYTH_GA_BBOX
+    inside: list[dict] = []
+    outside = 0
+    for feature in features:
+        lon, lat = feature["properties"]["centroid"]
+        if west <= lon <= east and south <= lat <= north:
+            inside.append(feature)
+        else:
+            outside += 1
+    if outside > 25:
+        raise RuntimeError(
+            f"Rejected {outside} centroids outside Forsyth County GA. "
+            "Refusing Forsyth NC (forsyth.cc) and Athens-Clarke lookalikes."
+        )
+    features = inside
+    print(f"  Forsyth GA bbox kept {len(features)} (outside {outside})", flush=True)
+
+    print("  Cumming city boundary", flush=True)
+    cumming_rings = load_cumming_rings()
+    print("  zoning districts", flush=True)
+    zoning_rows = fetch_arcgis_features(FORSYTH_ZONING_URL, "1=1", ["ZONECLASS", "ZONEDESC"], batch=40)
+    zoning_index = RingIndex(0.025)
+    cumming_stub = 0
+    for row in zoning_rows:
+        zone = clean((row.get("attributes") or {}).get("ZONECLASS"))
+        if zone == "CUMMING":
+            cumming_stub += 1
+        zoning_index.add(row)
+    if len(zoning_rows) < 1000:
+        raise RuntimeError(f"Forsyth zoning district layer returned {len(zoning_rows)} polygons; expected thousands")
+    print(f"  zoning polygons {len(zoning_rows)} (CUMMING stub {cumming_stub})", flush=True)
+
+    print("  character areas", flush=True)
+    flu_rows = fetch_arcgis_features(FORSYTH_FLU_URL, "1=1", ["CharacterArea", "AdoptionYear", "ACRES"], batch=20)
+    flu_index = RingIndex(0.04)
+    flu_names: set[str] = set()
+    for row in flu_rows:
+        label = clean((row.get("attributes") or {}).get("CharacterArea"))
+        if label:
+            flu_names.add(label)
+        flu_index.add(row)
+    if len(flu_rows) > 40:
+        raise RuntimeError(
+            f"CharacterArea returned {len(flu_rows)} polygons. Forsyth FLU is 11 coarse areas; refusing a lookalike layer."
+        )
+    print(f"  character areas {len(flu_rows)}: {', '.join(sorted(flu_names))}", flush=True)
+
+    print("  owners", flush=True)
+    owners = fetch_forsyth_owners([feature["properties"]["parcelId"] for feature in features])
+
+    owner_n = 0
+    zoning_n = 0
+    parcel_zoning_n = 0
+    polygon_zoning_n = 0
+    flu_n = 0
+    cumming_n = 0
+    for feature in features:
+        props = feature["properties"]
+        raw = props.pop("_raw", {}) or {}
+        lon, lat = props["centroid"]
+        in_cumming = point_in_arcgis_rings(lon, lat, cumming_rings)
+        parcel_zoning = clean(raw.get("ZONING")) or clean(props.get("zoningCode"))
+        if in_cumming:
+            cumming_n += 1
+            props["situsCity"] = "Cumming"
+            props["jurisdictionCode"] = "CUMMING"
+            props["jurisdictionPrefix"] = "CUMMING"
+            props["zoningCode"] = parcel_zoning
+            props["zoningDistrict"] = parcel_zoning
+            if parcel_zoning:
+                parcel_zoning_n += 1
+                zoning_n += 1
+        else:
+            props["jurisdictionCode"] = None
+            props["jurisdictionPrefix"] = None
+            hits = [
+                hit
+                for hit in zoning_index.containing(lon, lat)
+                if clean((hit.get("attributes") or {}).get("ZONECLASS")) not in {None, "CUMMING"}
+            ]
+            chosen = smallest_hit(hits)
+            if chosen:
+                attrs = chosen.get("attributes") or {}
+                props["zoningCode"] = clean(attrs.get("ZONECLASS"))
+                props["zoningDistrict"] = clean(attrs.get("ZONEDESC"))
+                polygon_zoning_n += 1
+                zoning_n += 1
+            else:
+                props["zoningCode"] = parcel_zoning
+                props["zoningDistrict"] = None
+                if parcel_zoning:
+                    parcel_zoning_n += 1
+                    zoning_n += 1
+        flu_hit = smallest_hit(flu_index.containing(lon, lat))
+        if flu_hit:
+            attrs = flu_hit.get("attributes") or {}
+            label = clean(attrs.get("CharacterArea"))
+            year = clean(attrs.get("AdoptionYear")) or "2022"
+            if label:
+                props["flu"] = {
+                    "code": label,
+                    "label": label,
+                    "jurisdiction": "Forsyth County",
+                    "source": f"ga-forsyth-character-area-{year}-coarse",
+                }
+                flu_n += 1
+        else:
+            props["flu"] = None
+        owner = owners.get(props["parcelId"]) or {}
+        owner_name = clean(owner.get("OWNERNME1"))
+        props["ownerName"] = owner_name
+        props["ownerName2"] = clean(owner.get("OWNERNME2"))
+        if owner_name:
+            owner_n += 1
+        zip5 = (props.get("mailingAddress") or {}).get("zip")
+        zip4 = clean(raw.get("PSTLZIP4"))
+        if zip5 and zip4 and zip4.isdigit():
+            props["mailingAddress"]["zip"] = f"{zip5}-{zip4.zfill(4)[:4]}"
+        land = num(raw.get("LNDVALUE"))
+        previous = num(raw.get("PRVASSDVAL"))
+        props["tax"]["landMarketValue"] = land if land and land > 0 else None
+        props["tax"]["previousMarketValue"] = previous if previous and previous > 0 else None
+        props["tax"]["assessedValue"] = None
+        props["appraiserUrl"] = forsyth_appraiser_url(raw.get("Link"), props["parcelId"])
+        props["dataGaps"] = list(FORSYTH_DATA_GAPS)
+        props["lastSale"] = {"date": None, "price": None, "qualified": None}
+        if "forsyth.cc" in (props.get("appraiserUrl") or "").lower():
+            raise RuntimeError("Refusing a Forsyth NC appraiser link")
+
+    total = len(features)
+    gaps = [
+        "No lastSale.price, lastSale.date, or lastSale.qualified on any public Forsyth County GA REST layer. Sale history is qPublic HTML only (AppID=1027), not a GIS join.",
+        (
+            f"FLU is partial: EnerGov CharacterArea is {len(flu_rows)} coarse 2022 comprehensive-plan polygons "
+            f"({', '.join(sorted(flu_names)) or 'none'}), joined to {flu_n} of {total} parcels. "
+            "This is not parcel-level future land use. Cumming city FLU is a comprehensive-plan PDF, not REST."
+        ),
+        (
+            f"Cumming is the only incorporated city (MunicipalBoundary NAME=Cumming, LOCALFIPS 20932). "
+            f"{cumming_n} parcels in the 5–150 acre band fall inside the city. Zoning there uses the parcel ZONING attribute. "
+            f"County Zoning_Districts ZONECLASS=CUMMING is a stub ({cumming_stub} polygons) and is not used as a district code. "
+            "No Cumming-owned zoning or FLU FeatureServer."
+        ),
+        (
+            f"ownerName is not on Public Tax_Parcel. Joined EnerGov TaxParcels/1 OWNERNME1 on PARCELID for {owner_n} of {total} parcels."
+        ),
+        "CNTASSDVAL is stored as tax.marketValue (the field alias says assessed, but values behave as fair-market). CNTTXBLVAL is tax.taxableValue (about 40% of market value when there is no exemption). There is no tax.assessedValue field. LNDVALUE is tax.landMarketValue.",
+        (
+            "Appraiser search: https://www.qpublic.net/ga/forsyth/search.html. "
+            "Parcel deep link pattern (often HTTP 403 to automated clients): "
+            "https://qpublic.schneidercorp.com/Application.aspx?AppID=1027&LayerID=21667&PageTypeID=4&PageID=9230&KeyValue={PARCELID with spaces as +}. "
+            "Tax bills: https://forsythproperty.assurancegov.com/Property/Search."
+        ),
+        "Rejected lookalikes: forsyth.cc (Forsyth County, North Carolina) and Athens-Clarke. Centroids are kept only inside the Forsyth County, Georgia bbox. Postal city names (Alpharetta, Suwanee, Gainesville, and others) are not treated as incorporated cities.",
+        (
+            f"Zoning joined on {zoning_n} of {total} parcels "
+            f"({polygon_zoning_n} from unincorporated zoning polygons, {parcel_zoning_n} from the parcel ZONING attribute, mostly Cumming)."
+        ),
+    ]
+    if outside:
+        gaps.append(f"{outside} source parcels were dropped because the centroid fell outside the Forsyth County, Georgia bbox.")
+    extra = {
+        "appraiserSearchUrl": FORSYTH_APPRAISER_SEARCH,
+        "ownerJoinedCount": owner_n,
+        "zoningJoinedCount": zoning_n,
+        "polygonZoningCount": polygon_zoning_n,
+        "parcelZoningCount": parcel_zoning_n,
+        "fluJoinedCount": flu_n,
+        "characterAreaCount": len(flu_rows),
+        "cummingParcelCount": cumming_n,
+        "cummingStubPolygons": cumming_stub,
+        "outsideBboxDropped": outside,
+        "rejectedLookalikes": ["Forsyth County NC (forsyth.cc)", "Athens-Clarke"],
+    }
+    print(
+        f"  enrich owner {owner_n}/{total} zoning {zoning_n} flu {flu_n} cumming {cumming_n}",
+        flush=True,
+    )
+    return features, gaps, extra
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
@@ -978,7 +1423,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
     if cache_path.exists() and not spec.get("ignoreCache"):
         cached = json.loads(cache_path.read_text())
-        if cached.get("features"):
+        if cached.get("features") and cached.get("enrich") == spec.get("enrich"):
             print(f"  cache hit {len(cached['features'])}", flush=True)
             features = cached["features"]
             for feature in features:
@@ -994,10 +1439,11 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=list(cached.get("gaps") or spec.get("gaps") or []),
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
+                extra=cached.get("extra"),
             )
     try:
         expected = count_where(spec["url"], spec["where"])
@@ -1050,22 +1496,42 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     ids = fetch_object_ids(spec["url"], spec["where"])
     raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
     features, dropped = normalize_rows(raw, county, markets, spec)
+    extra = None
+    gaps = list(spec.get("gaps") or [])
+    if spec.get("enrich") == "forsyth-ga":
+        features, enrich_gaps, extra = enrich_forsyth_ga(features)
+        gaps.extend(enrich_gaps)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    if expected and len(features) < expected and not spec.get("computeAcres"):
+        note = (
+            f"{expected} source rows collapsed to {len(features)} parcel ids "
+            "(duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county."
+        )
+        # Keep the substantive source gaps first for counties whose index only shows two lines.
+        if spec.get("enrich") == "forsyth-ga":
+            gaps.append(note)
+        else:
+            gaps.insert(0, note)
+    if not features:
+        gaps.insert(0, f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks.")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+        json.dumps(
+            {
+                "sourceCount": expected,
+                "dropped": dropped,
+                "enrich": spec.get("enrich"),
+                "gaps": gaps,
+                "extra": extra,
+                "features": features,
+            },
+            separators=(",", ":"),
+        )
     )
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
-    if expected and len(features) < expected and not spec.get("computeAcres"):
-        gaps.insert(
-            0,
-            f"{expected} source rows collapsed to {len(features)} parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        )
     if not features:
         coverage = "gap"
-        gaps.insert(0, f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks.")
     path, lookup, tiles = (None, None, 0)
     if features:
         path, lookup, tiles = write_tiles(county, features)
@@ -1084,6 +1550,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         source_count=expected,
         dropped=dropped,
         tile_count=tiles,
+        extra=extra,
     )
 
 

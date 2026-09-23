@@ -9,6 +9,7 @@ import {
   showMarketParcels,
   type MarketParcelIndex,
 } from "../lib/marketParcels";
+import { parcelAppraiserUrl } from "../lib/format";
 import { ORLANDO_PARCEL_TILE, showOrlandoParcels } from "../lib/orlandoParcels";
 import type { ParcelCollection } from "../lib/types";
 
@@ -121,5 +122,70 @@ describe("market parcel gating and acreage", () => {
       }
       if (checked >= 25) break;
     }
+  });
+
+  it("keeps Forsyth County GA on the Atlanta 5–150 acre extract and records the real gaps", () => {
+    const countyPath = path.join(process.cwd(), "data/fixtures/market-parcels/counties/13117/county.json");
+    expect(existsSync(countyPath)).toBe(true);
+    const county = JSON.parse(readFileSync(countyPath, "utf8")) as {
+      fips: string;
+      state: string;
+      markets: string[];
+      featureCount: number;
+      coverage: string;
+      source: string;
+      queryUrl: string;
+      gaps: string[];
+      appraiserSearchUrl?: string;
+      ownerJoinedCount?: number;
+      fluJoinedCount?: number;
+      cummingParcelCount?: number;
+      characterAreaCount?: number;
+    };
+    expect(county.fips).toBe("13117");
+    expect(county.state).toBe("Georgia");
+    expect(county.markets).toContain("Atlanta");
+    expect(county.coverage).toBe("complete-gte-5ac");
+    expect(county.featureCount).toBeGreaterThan(3500);
+    expect(county.source).toBe("ga-forsyth-tax-parcels");
+    expect(county.queryUrl).toContain("geo.forsythco.com");
+    expect(county.queryUrl.toLowerCase()).not.toContain("forsyth.cc");
+    expect(county.appraiserSearchUrl).toBe("https://www.qpublic.net/ga/forsyth/search.html");
+    expect(county.ownerJoinedCount ?? 0).toBeGreaterThan(3000);
+    expect(county.characterAreaCount).toBe(11);
+    expect(county.fluJoinedCount ?? 0).toBeGreaterThan(0);
+    expect(county.cummingParcelCount ?? 0).toBeGreaterThan(0);
+    const gapText = county.gaps.join(" ").toLowerCase();
+    expect(gapText).toContain("qpublic");
+    expect(gapText).toContain("character");
+    expect(gapText).toContain("cumming");
+    expect(gapText).toContain("forsyth county, north carolina");
+    expect(gapText).toContain("athens-clarke");
+    expect(gapText).not.toContain("forsyth.cc parcel");
+
+    const tiles = path.join(process.cwd(), "data/fixtures/market-parcels/counties/13117/tiles");
+    const file = readdirSync(tiles).find((name) => name.endsWith(".geojson"));
+    expect(file).toBeTruthy();
+    const collection = JSON.parse(readFileSync(path.join(tiles, file as string), "utf8")) as ParcelCollection;
+    const feature = collection.features[0];
+    expect(inMarketAcreageBand(feature.properties.acreage)).toBe(true);
+    expect(feature.properties.countyFips).toBe("13117");
+    expect(feature.properties.state).toBe("Georgia");
+    expect(feature.properties.marketIds).toEqual(["Atlanta"]);
+    expect(feature.properties.lastSale).toEqual({ date: null, price: null, qualified: null });
+    expect(feature.properties.tax.assessedValue).toBeNull();
+    const [lon, lat] = feature.properties.centroid;
+    expect(lon).toBeGreaterThan(-84.45);
+    expect(lon).toBeLessThan(-83.9);
+    expect(lat).toBeGreaterThan(33.95);
+    expect(lat).toBeLessThan(34.45);
+    expect(feature.properties.appraiserUrl || "").not.toMatch(/forsyth\.cc/i);
+    const link = parcelAppraiserUrl({
+      parcelId: feature.properties.parcelId,
+      countyFips: "13117",
+      appraiserUrl: feature.properties.appraiserUrl,
+    });
+    expect(link.label).toMatch(/Forsyth/);
+    expect(link.href).not.toMatch(/forsyth\.cc/i);
   });
 });

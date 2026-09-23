@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-09-23T23:00:45Z",
+  "market": "Jackson",
+  "tier": "other",
+  "parcelCount": 6384,
+  "coreMinAcres": 5.0,
+  "coreMaxAcres": 150.0,
+  "tile": {
+    "originLon": -83.0,
+    "originLat": 27.0,
+    "tileDeg": 0.25
+  },
+  "notes": [
+    "Loaded only when this market is selected.",
+    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Orange, Osceola, and Polk point at the existing Orlando complete extract."
+  ],
+  "counties": [
+    {
+      "name": "Madison",
+      "fips": "47113",
+      "state": "Tennessee",
+      "featureCount": 6384,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "tn-impact-47113",
+      "queryUrl": "https://services3.arcgis.com/k6aQP9AQncZQEtBv/arcgis/rest/services/Cadastral/FeatureServer/45/query",
+      "gaps": [
+        "Joined 6384 parcels. Owner 6351, situs 6351, sale 2878, appraisal 6333. Jackson zoning 848 / FLU 848 (MF 44). Three Way zoning 73 / FLU 73. Medon parcels 7 (county zoning hits 6, FLU 0). Unincorporated zoning 5454. CAMA miss 33.",
+        "Anonymous production pull is GeoJobe AGOL Cadastral/45 Parcels_57 joined to table/46 Cama MadisonTN on GISLINK. Comptroller IMPACT Parcels (COUNTY_ID=57 / JUR=057) is the official sibling and can 403, so it is not the fetch path.",
+        "Acreage band is geometry CALC_ACRE from 5 through 150 with PARCEL_TYPE=1. CAMA calc acres stay on the source row when present and do not set the band.",
+        "Owner, mailing, situs, sale, and APPRAISAL come from the latest CAMA row (highest TAXYR, then UPDATED). Official assessed value is on TPAD, not this extract, so assessedValue stays null.",
+        "Jackson (CITYNUM 359) zoning is city Zoning/0 Type_ joined onto countywide parcels. County R-* labels on PSALayers/19 are not applied inside Jackson.",
+        "Jackson FLU is Civic Master PSALayers/3 HLA_FutLU (includes MF). It is plan guidance, not zoning, and is not applied outside Jackson.",
+        "Three Way (CITYNUM 720) zoning prefers PSALayers/19 Type_. FLU is PSALayers/29 LU_TYPE.",
+        "Medon (CITYNUM 350) has no public zoning or FLU FeatureServer. FLU is null. Zoning is only a PSALayers/19 hit when the centroid falls in a county district, not a Medon ordinance layer.",
+        "Unincorporated Madison (blank CITYNUM) uses PSALayers/19 when the centroid hits. There is no parcel-scale county FLU layer.",
+        "gis.cmpdd.org Madison_County_Map / City_of_Jackson is Madison County, Mississippi and is not used.",
+        "Appraiser link is the TPAD GIS card https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}."
+      ],
+      "path": "data/fixtures/market-parcels/counties/47113/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47113/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 6384
+    }
+  ]
+}

@@ -121,7 +121,8 @@ export type MarketId = (typeof MARKETS)[number];
 /**
  * Smaller MSAs, visually secondary to the seven primary markets.
  * Florida markets stay together: east coast south to north, then the panhandle.
- * The rest of the order matches the research handoff.
+ * The rest of the order matches the research handoff. Jackson is Jackson, Tennessee
+ * (Madison County), not Jacksonville, Florida.
  */
 export const OTHER_MARKETS = [
   "Vero Beach",
@@ -137,6 +138,7 @@ export const OTHER_MARKETS = [
   "Chattanooga",
   "Knoxville",
   "Memphis",
+  "Jackson",
   "Winston-Salem",
   "Wilmington",
 ] as const;
@@ -247,7 +249,7 @@ export type MarketSummary = {
   counties: MarketCountySummary[];
 };
 
-/** Urban 7-market pack, or the 15 smaller MSAs (rural and urban together). */
+/** Urban 7-market pack, or the smaller MSAs (rural and urban together). Jackson, Tennessee has parcels and no eligible-tract rows in the shipped CSV. */
 export type EligibleTractRow = {
   market: SearchMarketId;
   state: string;

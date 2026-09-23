@@ -47,6 +47,7 @@ const OTHER_ROWS: Record<OtherMarketId, { total: number; rural: number; urban: n
   Chattanooga: { total: 47, rural: 21, urban: 26 },
   Knoxville: { total: 70, rural: 41, urban: 29 },
   Memphis: { total: 175, rural: 44, urban: 131 },
+  Jackson: { total: 0, rural: 0, urban: 0 },
   "Winston-Salem": { total: 105, rural: 24, urban: 81 },
   Wilmington: { total: 55, rural: 31, urban: 24 },
 };
@@ -107,8 +108,9 @@ describe("other MSA eligible pack", () => {
   });
 
   it("matches each smaller market and does not treat them as primary", () => {
-    expect(OTHER_MARKETS).toHaveLength(15);
+    expect(OTHER_MARKETS).toHaveLength(16);
     expect(OTHER_MARKETS[2]).toBe("Jacksonville");
+    expect(OTHER_MARKETS).toContain("Jackson");
     for (const market of OTHER_MARKETS) {
       const rows = filterEligibleRows(catalog.rows, market, null, null);
       const expected = OTHER_ROWS[market];
@@ -117,8 +119,14 @@ describe("other MSA eligible pack", () => {
       expect(rows.filter((row) => row.rural === "N")).toHaveLength(expected.urban);
       expect(isOtherMarketId(market)).toBe(true);
       expect(isPrimaryMarket(market)).toBe(false);
-      expect(displayStatusChip(rows[0])).toBe(ELIGIBLE_NOT_DESIGNATED_STATUS);
+      if (rows.length > 0) {
+        expect(displayStatusChip(rows[0])).toBe(ELIGIBLE_NOT_DESIGNATED_STATUS);
+      }
     }
+    const jackson = catalog.markets.find((item) => item.market === "Jackson");
+    expect(jackson?.rowCount).toBe(0);
+    expect(jackson?.counties.map((item) => item.county)).toEqual(["Madison"]);
+    expect(jackson?.counties[0].state).toBe("Tennessee");
   });
 
   it("keeps governor-filed soft copy on South Carolina rows and nowhere else as a status", () => {

@@ -77,6 +77,17 @@ OTHER_MARKETS = (
     "Wilmington",
 )
 
+# Jackson, Tennessee is a parcel market. Eligible tracts are not in the shipped CSV.
+JACKSON_TN_SUMMARY = {
+    "market": "Jackson",
+    "rowCount": 0,
+    "ruralCount": 0,
+    "urbanCount": 0,
+    "bounds": [[-89.02, 35.4], [-88.35, 35.82]],
+    "center": [-88.8139, 35.6145],
+    "counties": [{"county": "Madison", "state": "Tennessee", "count": 0, "outerEdge": False}],
+}
+
 URBAN_EXPECTED = {
     "Atlanta": 342,
     "Tampa": 251,
@@ -473,6 +484,12 @@ def main() -> None:
         raise RuntimeError(f"Expected 2285 polygons, built {len(features)}")
     urban_catalog = catalog_payload(urban_rows, PRIMARY_MARKETS, "data/oz2-7markets-90min-urban-eligible.csv", "urban-7")
     other_catalog = catalog_payload(other_rows, OTHER_MARKETS, "data/oz2-other-msas-eligible.csv", "other-msas")
+    if not any(item.get("market") == "Jackson" for item in other_catalog["markets"]):
+        memphis_at = next(
+            (index for index, item in enumerate(other_catalog["markets"]) if item.get("market") == "Memphis"),
+            len(other_catalog["markets"]),
+        )
+        other_catalog["markets"].insert(memphis_at + 1, JACKSON_TN_SUMMARY)
     collection = {
         "type": "FeatureCollection",
         "name": "oz2-eligible-packs",

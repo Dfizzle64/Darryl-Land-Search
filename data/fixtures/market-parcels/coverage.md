@@ -24,6 +24,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Chattanooga | other | 10,537 | 2 | 0 | 8 |
 | Knoxville | other | 38,433 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
+| Jackson | other | 6,384 | 1 | 0 | 0 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
 
@@ -316,6 +317,12 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Tate | Mississippi | 28137 | complete-gte-5ac | 5,758 | ms-mdeq-2023-28137 |
 | Tipton | Tennessee | 47167 | gap | 0 | tn-impact-47167 |
 | Tunica | Mississippi | 28143 | complete-gte-5ac | 1,842 | ms-mdeq-2023-28143 |
+
+### Jackson
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Madison | Tennessee | 47113 | complete-gte-5ac | 6,384 | tn-impact-47113 |
 
 ### Winston-Salem
 

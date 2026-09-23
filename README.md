@@ -38,7 +38,7 @@ No API keys are required for the default fixture mode. Copy `.env.example` to `.
 
 ## What you can do
 
-- Switch **Market** / **County** across seven Southeast sheds, or open **Other MSAs (15)** for the smaller markets. Primary markets stay listed first. Orlando loads multi-county parcel polygons. Each other market that already has a parcel extract loads only its own 5–150 acre tiles after you select it, and only at neighborhood zoom, an area lock, or Show parcels. Counties without an open polygon source stay on the tract overlay. Jacksonville is in that menu with eligible tracts; its 5–150 acre tiles are not seeded yet. Rural tracts are orange. Urban eligible tracts are blue. The legend toggles rural, urban, or both.
+- Switch **Market** / **County** across seven Southeast sheds, or open **Other MSAs** for the smaller markets. Primary markets stay listed first. Orlando loads multi-county parcel polygons. Each other market that already has a parcel extract loads only its own 5–150 acre tiles after you select it, and only at neighborhood zoom, an area lock, or Show parcels. Counties without an open polygon source stay on the tract overlay. Jacksonville is in that menu with eligible tracts; its 5–150 acre tiles are not seeded yet. Jackson, Tennessee (Madison County) loads 5–150 acre parcels; eligible tracts for that MSA are not in the shipped CSV. Rural tracts are orange. Urban eligible tracts are blue. The legend toggles rural, urban, or both.
 - Set a **minimum acreage**. The slider is 0–25 acres; larger sites still match any threshold at or below 25. Acreage is shown in the parcel drawer. Eligible tracts have no acreage field, so this slider does not hide tracts.
 - Turn on **Consider zoning in parcels** (default No) to use a land-use mode: multifamily-capable zoning, all parcels, non-multifamily zoning, rezoning candidates (FLU yes / zoning no), FLU allows multifamily, either, or both. While the switch is No, those constraints are hidden and not applied.
 - Turn on **Consider opportunity zone in parcels** (default No) to filter parcels by OZ 2.0 rural-eligible, OZ 2.0 eligible but not rural, in a current designated QOZ, not in a designated QOZ, or either. While the switch is No, those parcel constraints are hidden and not applied. The map toggles for the OZ 2.0 tract overlay (orange = rural-eligible, blue = urban eligible, amber = Orange County urban overlay) and the copper dashed designated-QOZ overlay stay available either way. Eligible is not designated.
@@ -192,7 +192,7 @@ Urban status chips read **Eligible — not designated**. The rural chip stays **
 
 ## Other metros
 
-**Other MSAs (15)** in the market menu opens 15 smaller MSAs: Vero Beach, Melbourne, Jacksonville, Pensacola, Birmingham, Mobile, Huntsville, Savannah, Columbia, Greenville, Chattanooga, Knoxville, Memphis, Winston-Salem, and Wilmington. They are visually secondary to the seven. Each one has rural and urban eligible tracts from `data/oz2-other-msas-eligible.csv` (1,386 rows, 1,341 unique GEOIDs; 491 rural and 895 urban). County rings are in `data/oz2-other-msas-counties.md`. Markets other than Jacksonville load 5–150 acre parcel tiles when that extract exists (`docs/market-parcels.md`). Jacksonville stays a tract overlay until those tiles are seeded.
+**Other MSAs** in the market menu opens the smaller MSAs: Vero Beach, Melbourne, Jacksonville, Pensacola, Birmingham, Mobile, Huntsville, Savannah, Columbia, Greenville, Chattanooga, Knoxville, Memphis, Jackson (Tennessee), Winston-Salem, and Wilmington. They are visually secondary to the seven. Fifteen of them have rural and urban eligible tracts from `data/oz2-other-msas-eligible.csv` (1,386 rows, 1,341 unique GEOIDs; 491 rural and 895 urban). County rings are in `data/oz2-other-msas-counties.md`. Jackson, Tennessee is Madison County parcels only — that MSA is not in the eligible-tract CSV, so its tract overlay is empty. Markets other than Jacksonville load 5–150 acre parcel tiles when that extract exists (`docs/market-parcels.md`). Jacksonville stays a tract overlay until those tiles are seeded.
 
 | Market | Total | Rural | Urban |
 | --- | ---: | ---: | ---: |
@@ -209,6 +209,7 @@ Urban status chips read **Eligible — not designated**. The rural chip stays **
 | Chattanooga | 47 | 21 | 26 |
 | Knoxville | 70 | 41 | 29 |
 | Memphis | 175 | 44 | 131 |
+| Jackson (TN) | 0 | 0 | 0 |
 | Winston-Salem | 105 | 24 | 81 |
 | Wilmington | 55 | 31 | 24 |
 

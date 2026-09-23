@@ -290,6 +290,15 @@ Status labeling: **Eligible — not designated**. SC markets include Governor-fi
 - **Uncertain / outer-edge counties:** Benton, Lauderdale, Marshall, Mississippi, Tate, Tunica
 - **Exclusions / notes:** Craighead AR / Panola MS deeper — excluded as outside clear 90-min
 
+## Jackson
+
+- **City center:** Downtown Jackson, Tennessee (Madison County). Not Jacksonville, Florida, and not Jackson, Mississippi.
+- **OMB MSA core:** Jackson, TN (Madison; Chester is the other OMB county and is not in this parcel pull).
+- **Eligible tract count:** **0**. Rev. Proc. 2026-14 rows for this MSA are not in `data/oz2-other-msas-eligible.csv`. The tract overlay stays empty. Do not invent GEOIDs.
+- **Parcels:** Madison County FIPS 47113, 5–150 acres, from the GeoJobe IMPACT mirror. Medon has no public zoning or FLU layer.
+- **Counties included:**
+  - Tennessee: Madison
+
 ## Winston-Salem
 
 - **City center:** Downtown Winston-Salem

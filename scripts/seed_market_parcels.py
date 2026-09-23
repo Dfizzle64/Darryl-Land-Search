@@ -710,8 +710,274 @@ def gap_reason(county: dict) -> str:
     return "No open parcel polygon endpoint was confirmed for this county."
 
 
+def fetch_paged(url: str, where: str, out_fields: list[str], *, geometry: bool, simplify: bool = False) -> list[dict]:
+    """Page an ArcGIS query at maxRecordCount 2000. Geometry requests stay in WGS84."""
+    features: list[dict] = []
+    offset = 0
+    seen_page: set[int] = set()
+    while True:
+        params: dict[str, str] = {
+            "where": where,
+            "outFields": ",".join(out_fields),
+            "returnGeometry": "true" if geometry else "false",
+            "resultOffset": str(offset),
+            "resultRecordCount": "2000",
+            "orderByFields": "OBJECTID",
+            "f": "json",
+        }
+        if geometry:
+            params["outSR"] = "4326"
+            if simplify:
+                params["geometryPrecision"] = "5"
+                params["maxAllowableOffset"] = "0.0002"
+        data = fetch_json(url, params, timeout=180)
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        chunk = data.get("features") or []
+        first_id = (chunk[0].get("attributes") or {}).get("OBJECTID") if chunk else None
+        if isinstance(first_id, int) and first_id in seen_page:
+            break
+        if isinstance(first_id, int):
+            seen_page.add(first_id)
+        features.extend(chunk)
+        print(f"    page {offset}+{len(chunk)}", flush=True)
+        if not chunk or (not data.get("exceededTransferLimit") and len(chunk) < 2000):
+            break
+        offset += len(chunk)
+        time.sleep(0.05)
+    return features
+
+
+def index_cama(rows: list[dict]) -> dict[str, dict]:
+    from madison_tn_parcels import cama_sort_key, clean
+
+    grouped: dict[str, dict] = {}
+    for item in rows:
+        attrs = item.get("attributes") or {}
+        gislink = clean(attrs.get("GISLINK"))
+        if not gislink:
+            continue
+        current = grouped.get(gislink)
+        if current is None or cama_sort_key(attrs) >= cama_sort_key(current):
+            grouped[gislink] = attrs
+    return grouped
+
+
+def index_attr_by_gislink(rows: list[dict], field: str) -> dict[str, str]:
+    from madison_tn_parcels import clean
+
+    found: dict[str, str] = {}
+    for item in rows:
+        attrs = item.get("attributes") or {}
+        gislink = clean(attrs.get("GISLINK"))
+        code = clean(attrs.get(field))
+        if gislink and code and gislink not in found:
+            found[gislink] = code
+    return found
+
+
+def polygon_index_from(rows: list[dict], field: str):
+    from madison_tn_parcels import PolygonIndex, clean
+
+    index = PolygonIndex()
+    for item in rows:
+        attrs = item.get("attributes") or {}
+        code = clean(attrs.get(field))
+        rings = (item.get("geometry") or {}).get("rings") or []
+        if code and rings:
+            index.add(rings, code)
+    return index
+
+
+def download_madison_tn(county: dict, markets: list[str], spec: dict) -> dict:
+    """5–150 acre Madison County parcels from GeoJobe, with CAMA, zoning, and FLU."""
+    from madison_tn_parcels import (
+        CAMA_FIELDS,
+        CAMA_QUERY,
+        COUNTY_ZONING_QUERY,
+        JACKSON_FLU_QUERY,
+        JACKSON_ZONING_QUERY,
+        THREE_WAY_FLU_QUERY,
+        apply_cama,
+        assign_land_use,
+        coverage_note,
+    )
+
+    fips = county["fips"]
+    cache_path = CACHE_DIR / f"{fips}-madison-agol.json"
+    if cache_path.exists() and not spec.get("ignoreCache"):
+        cached = json.loads(cache_path.read_text())
+        if cached.get("version") == 2 and cached.get("features"):
+            print(f"  cache hit {len(cached['features'])}", flush=True)
+            features = cached["features"]
+            for feature in features:
+                feature["properties"]["marketIds"] = markets
+            path, lookup, tiles = write_tiles(county, features)
+            gaps = list(spec.get("gaps") or [])
+            note = cached.get("coverageNote")
+            if note and note not in gaps:
+                gaps.insert(0, note)
+            return county_row(
+                county,
+                markets,
+                feature_count=len(features),
+                coverage=spec["coverage"],
+                partition="tiles",
+                path=path,
+                lookup=lookup,
+                source=spec["source"],
+                query_url=spec["url"],
+                gaps=gaps,
+                source_count=cached.get("sourceCount"),
+                dropped=cached.get("dropped"),
+                tile_count=tiles,
+            )
+
+    print("  parcel ids", flush=True)
+    ids = fetch_object_ids(spec["url"], spec["where"])
+    print(f"  source rows {len(ids)}", flush=True)
+    raw = fetch_by_ids(spec["url"], ids, spec["outFields"], batch=80)
+    features, dropped = normalize_rows(raw, county, markets, spec)
+    if not all(in_band(feature["properties"].get("acreage")) for feature in features):
+        raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    wanted = {feature["properties"]["parcelId"] for feature in features}
+    print(f"  kept geometry {len(features)}; loading CAMA", flush=True)
+    cama_rows = fetch_paged(CAMA_QUERY, "1=1", CAMA_FIELDS, geometry=False)
+    cama = index_cama(cama_rows)
+    print(f"  cama keys {len(cama)}; loading zoning and FLU", flush=True)
+    jackson_zoning = polygon_index_from(
+        fetch_paged(JACKSON_ZONING_QUERY, "1=1", ["Type_"], geometry=True),
+        "Type_",
+    )
+    county_zoning = polygon_index_from(
+        fetch_paged(COUNTY_ZONING_QUERY, "1=1", ["Type_"], geometry=True),
+        "Type_",
+    )
+    jackson_flu_rows = fetch_paged(JACKSON_FLU_QUERY, "1=1", ["GISLINK", "HLA_FutLU"], geometry=True, simplify=True)
+    three_way_flu_rows = fetch_paged(THREE_WAY_FLU_QUERY, "1=1", ["GISLINK", "LU_TYPE"], geometry=True, simplify=True)
+    jackson_flu_by_id = index_attr_by_gislink(jackson_flu_rows, "HLA_FutLU")
+    three_way_flu_by_id = index_attr_by_gislink(three_way_flu_rows, "LU_TYPE")
+    jackson_flu_spatial = polygon_index_from(jackson_flu_rows, "HLA_FutLU")
+    three_way_flu_spatial = polygon_index_from(three_way_flu_rows, "LU_TYPE")
+
+    stats = {
+        "features": len(features),
+        "owner": 0,
+        "situs": 0,
+        "sale": 0,
+        "appraisal": 0,
+        "jackson": 0,
+        "jacksonZoning": 0,
+        "jacksonFlu": 0,
+        "jacksonMf": 0,
+        "threeWayZoning": 0,
+        "threeWayFlu": 0,
+        "medon": 0,
+        "medonZoning": 0,
+        "medonFlu": 0,
+        "unincorpZoning": 0,
+        "camaMiss": 0,
+    }
+    for feature in features:
+        props = feature["properties"]
+        gislink = props["parcelId"]
+        if gislink not in wanted:
+            continue
+        attrs = cama.get(gislink)
+        if attrs is None:
+            stats["camaMiss"] += 1
+        city = apply_cama(feature, attrs)
+        lon, lat = props["centroid"]
+        jackson_zone = jackson_zoning.code_at(lon, lat)
+        county_zone = county_zoning.code_at(lon, lat)
+        jackson_flu = jackson_flu_by_id.get(gislink) or jackson_flu_spatial.code_at(lon, lat)
+        three_way_flu = three_way_flu_by_id.get(gislink) or three_way_flu_spatial.code_at(lon, lat)
+        # CITYNUM decides the layer. Zoning/0 F-A-R polygons cover most of the county,
+        # so a city-layer hit must not relabel a blank CITYNUM parcel as Jackson.
+        assign_land_use(
+            feature,
+            city,
+            jackson_zoning=jackson_zone if city == "Jackson" else None,
+            county_zoning=None if city == "Jackson" else county_zone,
+            jackson_flu=jackson_flu if city == "Jackson" else None,
+            three_way_flu=three_way_flu if city == "Three Way" else None,
+        )
+        if props.get("ownerName"):
+            stats["owner"] += 1
+        if props.get("situsAddress"):
+            stats["situs"] += 1
+        if (props.get("lastSale") or {}).get("date") or (props.get("lastSale") or {}).get("price"):
+            stats["sale"] += 1
+        if (props.get("tax") or {}).get("marketValue"):
+            stats["appraisal"] += 1
+        code = props.get("jurisdictionCode")
+        if code == "JACKSON":
+            stats["jackson"] += 1
+            if props.get("zoningCode"):
+                stats["jacksonZoning"] += 1
+            if props.get("flu"):
+                stats["jacksonFlu"] += 1
+                if props["flu"].get("code") == "MF":
+                    stats["jacksonMf"] += 1
+        elif code == "THREE WAY":
+            if props.get("zoningCode"):
+                stats["threeWayZoning"] += 1
+            if props.get("flu"):
+                stats["threeWayFlu"] += 1
+        elif code == "MEDON":
+            stats["medon"] += 1
+            if props.get("zoningCode"):
+                stats["medonZoning"] += 1
+            if props.get("flu"):
+                stats["medonFlu"] += 1
+        elif props.get("zoningCode"):
+            stats["unincorpZoning"] += 1
+
+    note = coverage_note(stats)
+    if stats["camaMiss"]:
+        note += f" CAMA miss {stats['camaMiss']}."
+    print(f"  {note}", flush=True)
+    gaps = [note, *list(spec.get("gaps") or [])]
+    if stats["medonFlu"]:
+        raise RuntimeError("Medon parcels received a FLU code; that layer does not exist")
+    if stats["features"] and stats["jackson"] > stats["features"] * 0.5:
+        raise RuntimeError(
+            "Jackson CITYNUM labeled more than half of the 5–150 acre parcels. "
+            "Zoning/0 is not a city limit; F-A-R polygons cover most of the county."
+        )
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps(
+            {"version": 2, "sourceCount": len(ids), "dropped": dropped, "coverageNote": note, "features": features},
+            separators=(",", ":"),
+        )
+    )
+    path, lookup, tiles = write_tiles(county, features)
+    coverage = spec["coverage"] if features else "gap"
+    print(f"  kept {len(features)} ({coverage})", flush=True)
+    return county_row(
+        county,
+        markets,
+        feature_count=len(features),
+        coverage=coverage,
+        partition="tiles" if features else "none",
+        path=path if features else None,
+        lookup=lookup if features else None,
+        source=spec["source"],
+        query_url=spec["url"],
+        gaps=gaps,
+        source_count=len(ids),
+        dropped=dropped,
+        tile_count=tiles,
+    )
+
+
 def spec_for(county: dict) -> dict:
     fips = county["fips"]
+    if fips == "47113":
+        from madison_tn_parcels import madison_spec
+
+        return madison_spec()
     if fips in ORLANDO_REUSE:
         return {"kind": "reuse-orlando"}
     override = county_override(fips)
@@ -959,14 +1225,14 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps. Madison County (47113) is IMPACT but the anonymous pull is GeoJobe AGOL `Parcels_57` plus the Cama table, because `maps.cot.tn.gov` can return 403 |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb) or, for Madison County, from Jackson Zoning/0 and county PSALayers/19 after `CITYNUM`. Those Tennessee codes are stored for display. They are not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -1203,7 +1469,10 @@ def main() -> None:
     def run(job: tuple) -> None:
         _priority, _name, county, markets, spec = job
         try:
-            download_county(county, markets, spec)
+            if spec.get("kind") == "madison-tn":
+                download_madison_tn(county, markets, spec)
+            else:
+                download_county(county, markets, spec)
         except Exception as exc:  # noqa: BLE001
             print(f"  failed {county['name']} {county['fips']}: {exc}", flush=True)
             county_row(

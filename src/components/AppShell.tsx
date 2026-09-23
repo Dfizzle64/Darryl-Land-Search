@@ -36,6 +36,7 @@ import {
   viewBounds,
   viewIncludesSouthCarolina,
 } from "@/lib/markets";
+import { showMarketParcels, type MarketParcelIndex } from "@/lib/marketParcels";
 import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcels";
 import { rankSites } from "@/lib/score";
 import { filterTractRowsByIncome, incomeByGeoidFromFeatures } from "@/lib/tractIncome";
@@ -80,6 +81,7 @@ type ParcelResponse = ParcelCollection & {
 type AppShellProps = {
   parcels: ParcelCollection;
   orlandoParcelsMeta: OrlandoParcelsMeta;
+  marketParcelIndex: MarketParcelIndex;
   traffic: GeoJSON.FeatureCollection<GeoJSON.LineString>;
   opportunityZones: OpportunityZoneCollection;
   oz2Tracts: Oz2TractCollection;
@@ -103,6 +105,7 @@ const EMPTY_PARCELS: ParcelCollection = { type: "FeatureCollection", features: [
 export function AppShell({
   parcels,
   orlandoParcelsMeta,
+  marketParcelIndex,
   traffic,
   opportunityZones,
   oz2Tracts,
@@ -209,8 +212,10 @@ export function AppShell({
     [ruralShown, activeMfView],
   );
   const orlandoParcelsOn = showOrlandoParcels(market, county, countyState);
+  const marketParcelsOn = showMarketParcels(market, county, countyState, marketParcelIndex);
+  const shedParcelsOn = orlandoParcelsOn || marketParcelsOn;
   const orangePilot = showOrangeCountyPilot(market, county, countyState);
-  const parcelLayerVisible = orlandoParcelsOn && parcelsAreVisible(parcelPreference, mapZoom, Boolean(aoi));
+  const parcelLayerVisible = shedParcelsOn && parcelsAreVisible(parcelPreference, mapZoom, Boolean(aoi));
   const visibilityHint = parcelVisibilityHint(parcelPreference, parcelLayerVisible);
   const filterKey = parcelFilterKey(filters);
   const statusHelp = southCarolinaStatusHelp(market, countyState);
@@ -244,15 +249,20 @@ export function AppShell({
   );
 
   const countyParcelFeatures = useMemo(() => {
-    if (!orlandoParcelsOn) return EMPTY_PARCELS.features;
+    if (!shedParcelsOn) return EMPTY_PARCELS.features;
     if (!county) return parcels.features;
-    const fips = ORLANDO_FIPS_BY_NAME[county];
-    if (!fips) return [];
-    return parcels.features.filter((feature) => feature.properties.countyFips === fips);
-  }, [orlandoParcelsOn, parcels.features, county]);
+    if (orlandoParcelsOn) {
+      const fips = ORLANDO_FIPS_BY_NAME[county];
+      if (!fips) return [];
+      return parcels.features.filter((feature) => feature.properties.countyFips === fips);
+    }
+    return parcels.features.filter(
+      (feature) => feature.properties.countyName === county && (!countyState || feature.properties.state === countyState),
+    );
+  }, [county, countyState, orlandoParcelsOn, parcels.features, shedParcelsOn]);
 
   const activeParcels = useMemo<ParcelCollection>(() => {
-    if (!orlandoParcelsOn) return EMPTY_PARCELS;
+    if (!shedParcelsOn) return EMPTY_PARCELS;
     if (aoi) {
       return {
         type: "FeatureCollection",
@@ -261,7 +271,7 @@ export function AppShell({
     }
     if (viewportParcels) return viewportParcels;
     return { type: "FeatureCollection", features: countyParcelFeatures };
-  }, [orlandoParcelsOn, aoi, lockedParcels, viewportParcels, countyParcelFeatures]);
+  }, [shedParcelsOn, aoi, lockedParcels, viewportParcels, countyParcelFeatures]);
 
   const appliedFilters = useMemo(() => appliedParcelFilters(filters), [filters]);
   const matched = useMemo(
@@ -283,10 +293,12 @@ export function AppShell({
   const parcelStats = aoi ? aoiStats : viewportStats;
   const filterMatchTotal = parcelStats?.totalMatching ?? matched.length;
   const parcelsInView = parcelStats?.totalInBbox ?? activeParcels.features.length;
-  const fullAcreageCounties = useMemo(
-    () => orlandoParcelsMeta.counties.filter((item) => item.coverage === "complete-gte-5ac"),
-    [orlandoParcelsMeta.counties],
-  );
+  const fullAcreageCounties = useMemo(() => {
+    if (market === "Orlando") {
+      return orlandoParcelsMeta.counties.filter((item) => item.coverage === "complete-gte-5ac");
+    }
+    return (marketParcelIndex.markets[market]?.counties ?? []).filter((item) => item.coverage === "complete-gte-5ac");
+  }, [market, marketParcelIndex.markets, orlandoParcelsMeta.counties]);
   const fullAcreageParcelCount = useMemo(
     () => fullAcreageCounties.reduce((sum, item) => sum + item.featureCount, 0),
     [fullAcreageCounties],
@@ -304,7 +316,7 @@ export function AppShell({
       : activeParcels.features.length - fluUnknownCount;
   const queryingParcels = shouldQueryParcelsForZoom(parcelPreference, mapZoom);
   const hint =
-    orlandoParcelsOn && queryingParcels && !parcelsLoading && parcelStats
+    shedParcelsOn && queryingParcels && !parcelsLoading && parcelStats
       ? emptyStateHint(appliedFilters, filterMatchTotal, fluUnknownCount)
       : null;
 
@@ -321,7 +333,7 @@ export function AppShell({
   }, [selectedTractGeoid, visibleTracts]);
 
   useEffect(() => {
-    if (!orlandoParcelsOn) {
+    if (!shedParcelsOn) {
       setInventoryTab("tracts");
       setViewportParcels(null);
       setViewportStats(null);
@@ -332,7 +344,7 @@ export function AppShell({
       return;
     }
     setInventoryTab("sites");
-  }, [orlandoParcelsOn]);
+  }, [shedParcelsOn]);
 
   useEffect(() => {
     // Outside Orange, zoning/FLU knowledge is mostly missing — default to all parcels.
@@ -354,7 +366,7 @@ export function AppShell({
 
   const loadViewportParcels = async (bbox: [number, number, number, number], zoom: number) => {
     lastViewport.current = { bbox, zoom };
-    if (!orlandoParcelsOn || aoiRef.current) return;
+    if (!shedParcelsOn || aoiRef.current) return;
     // Shed scale stays unloaded in auto mode. Show parcels forces a query at any
     // zoom. Once the camera is past the gate, keep querying even if outlines are
     // hidden so the ranked list still filters.
@@ -368,14 +380,14 @@ export function AppShell({
     // Live DOH fill is only for the thinner sample counties, and only once the
     // view is tighter than the neighborhood gate. The five core counties already
     // ship every parcel from 5 through 150 acres.
-    const useLive = zoom >= 11.5 && Boolean(county) && !isFull5AcCounty(county);
+    const useLive = orlandoParcelsOn && zoom >= 11.5 && Boolean(county) && !isFull5AcCounty(county);
     const limit = useLive ? 900 : zoom >= 13 ? 3500 : zoom >= 11.5 ? 2200 : 1600;
     const requestId = ++viewportRequest.current;
     setParcelsLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams({
-        market: "Orlando",
+        market,
         source: useLive ? "live" : "fixture",
         bbox: bbox.join(","),
         limit: String(limit),
@@ -420,17 +432,17 @@ export function AppShell({
   }, []);
 
   useEffect(() => {
-    if (!orlandoParcelsOn || aoi) return;
+    if (!shedParcelsOn || aoi) return;
     const last = lastViewport.current;
     if (!last) return;
     const timer = window.setTimeout(() => {
       void loadViewportRef.current(last.bbox, last.zoom);
     }, 280);
     return () => window.clearTimeout(timer);
-  }, [filterKey, parcelPreference, showExcluded, orlandoParcelsOn, county, countyState, aoi]);
+  }, [filterKey, parcelPreference, showExcluded, shedParcelsOn, orlandoParcelsOn, county, countyState, aoi]);
 
   useEffect(() => {
-    if (!orlandoParcelsOn || !aoi) {
+    if (!shedParcelsOn || !aoi) {
       aoiRequest.current += 1;
       setLockedParcels(null);
       setAoiStats(null);
@@ -441,7 +453,7 @@ export function AppShell({
     const bbox = aoi.bbox;
     const timer = window.setTimeout(() => {
       const params = new URLSearchParams({
-        market: "Orlando",
+        market,
         source: "fixture",
         bbox: bbox.join(","),
         limit: String(AOI_PARCEL_LIMIT),
@@ -482,7 +494,7 @@ export function AppShell({
     return () => {
       window.clearTimeout(timer);
     };
-  }, [aoi, orlandoParcelsOn, county, countyState, filterKey, showExcluded, filters]);
+  }, [aoi, shedParcelsOn, market, county, countyState, filterKey, showExcluded, filters]);
 
   useEffect(() => {
     if (!scView && mfView !== "all") setMfView("all");
@@ -514,7 +526,9 @@ export function AppShell({
     setAoi(null);
     setLockedParcels(null);
     setAoiStats(null);
-    setInventoryTab(next === "Orlando" ? "sites" : "tracts");
+    const nextParcels =
+      showOrlandoParcels(next, null, null) || showMarketParcels(next, null, null, marketParcelIndex);
+    setInventoryTab(nextParcels ? "sites" : "tracts");
   };
 
   const changeCounty = (key: string) => {
@@ -526,7 +540,7 @@ export function AppShell({
     setViewportParcels(null);
   };
 
-  const showSites = orlandoParcelsOn && inventoryTab === "sites";
+  const showSites = shedParcelsOn && inventoryTab === "sites";
   const incomeDroppedTracts =
     filters.incomeGeography === "tract" &&
     (filters.minIncome > 0 || !filters.includeUnknownIncome) &&
@@ -545,23 +559,27 @@ export function AppShell({
     : { priorityView: undefined, priorityCounts: undefined, onPriorityView: undefined };
   const countyOptions = useMemo(() => {
     const counted = summarizeCounties(classRowsShown);
-    if (market !== "Orlando") return counted;
-    // Ensure Seminole appears even with 0 eligible tracts in the current class.
+    // Keep shed counties in the menu when the current class or income filter has zero tracts.
     const byKey = new Map(counted.map((item) => [countyKey(item.county, item.state), item]));
-    for (const shed of ORLANDO_SHED_COUNTIES) {
-      const key = countyKey(shed.name, "Florida");
+    const extras =
+      market === "Orlando"
+        ? ORLANDO_SHED_COUNTIES.map((shed) => ({ county: shed.name, state: "Florida" }))
+        : (marketParcelIndex.markets[market]?.counties ?? []).map((item) => ({ county: item.name, state: item.state }));
+    for (const shed of extras) {
+      const key = countyKey(shed.county, shed.state);
       if (!byKey.has(key)) {
-        byKey.set(key, { county: shed.name, state: "Florida", count: 0, outerEdge: false });
+        byKey.set(key, { county: shed.county, state: shed.state, count: 0, outerEdge: false });
       }
     }
-    return Array.from(byKey.values()).sort((a, b) => a.county.localeCompare(b.county));
-  }, [classRowsShown, market]);
+    return Array.from(byKey.values()).sort((a, b) => a.county.localeCompare(b.county) || a.state.localeCompare(b.state));
+  }, [classRowsShown, market, marketParcelIndex.markets]);
 
+  const marketCoverage = market === "Orlando" ? null : marketParcelIndex.markets[market];
   const headerPlace =
-    orlandoParcelsOn && county
-      ? `${county} County, Florida`
-      : orlandoParcelsOn
-        ? "Orlando ~90-min shed"
+    shedParcelsOn && county
+      ? `${county} County, ${countyState ?? ""}`
+      : shedParcelsOn
+        ? `${market} ~90-min shed`
         : market;
 
   return (
@@ -570,7 +588,7 @@ export function AppShell({
         <div>
           <p className="text-[11px] uppercase tracking-[0.22em] text-clay-400">{headerPlace}</p>
           <h1 className="font-display text-xl tracking-tight text-white md:text-2xl">
-            {orlandoParcelsOn ? "Multifamily site search" : "Eligible tracts"}
+            {shedParcelsOn ? "Multifamily site search" : "Eligible tracts"}
           </h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -623,7 +641,7 @@ export function AppShell({
             <span className="block text-[11px]">
               {ruralShown.length.toLocaleString()} rural · {urbanShown.length.toLocaleString()} urban
             </span>
-            {orlandoParcelsOn ? (
+            {shedParcelsOn ? (
               <span className="block text-[11px]">
                 {filterMatchTotal.toLocaleString()} match
                 {parcelsInView > 0 ? ` of ${parcelsInView.toLocaleString()}` : ""} {aoi ? "in AOI" : "in view"}
@@ -647,11 +665,15 @@ export function AppShell({
                   {fullAcreageCounties.map((item) => item.name).join(", ")}
                 </span>
               </span>
-            ) : (
-              <span className="block text-[11px]">Tract overlay and pins · parcels stay on the Orlando shed</span>
+              ) : (
+              <span className="block text-[11px]">
+                {marketCoverage
+                  ? `Tract overlay · no 5–150 acre polygons in this pull (${marketCoverage.gapCountyCount} counties documented)`
+                  : "Tract overlay and pins · parcels stay on the Orlando shed"}
+              </span>
             )}
           </p>
-          {orlandoParcelsOn ? (
+          {shedParcelsOn ? (
             <button
               type="button"
               className="rounded-full border border-white/15 bg-ink-800 px-3 py-1.5 text-sm xl:hidden"
@@ -715,7 +737,12 @@ export function AppShell({
           onClose={() => setFiltersOpen(false)}
           meta={meta}
           orangePilot={orangePilot}
-          orlandoParcels={orlandoParcelsOn}
+          orlandoParcels={shedParcelsOn}
+          parcelCoverageNote={
+            marketCoverage
+              ? `${marketCoverage.parcelCount.toLocaleString()} parcels in the 5–150 acre band · ${marketCoverage.completeCountyCount} complete counties · ${marketCoverage.sampleCountyCount} sample · ${marketCoverage.gapCountyCount} not pulled`
+              : null
+          }
           market={market}
           tractCount={classRowsShown.length}
           ruralTractCount={ruralShown.length}
@@ -742,11 +769,11 @@ export function AppShell({
             showTraffic={showTraffic}
             showOz={showOz}
             showOz2={showOz2}
-            showParcels={orlandoParcelsOn}
+            showParcels={shedParcelsOn}
             parcelLayerVisible={parcelLayerVisible}
             parcelVisibilityHint={visibilityHint}
             onToggleParcelLayer={
-              orlandoParcelsOn
+              shedParcelsOn
                 ? () => {
                     const next = toggleParcelVisibility(parcelPreference, mapZoom, Boolean(aoi));
                     setParcelPreference(next);
@@ -774,9 +801,9 @@ export function AppShell({
             onSelect={selectSite}
             onHover={setHoveredId}
             onSelectTract={selectTract}
-            onViewportIdle={orlandoParcelsOn ? loadViewportParcels : undefined}
+            onViewportIdle={shedParcelsOn ? loadViewportParcels : undefined}
             onZoom={setMapZoom}
-            aoi={orlandoParcelsOn ? aoi : null}
+            aoi={shedParcelsOn ? aoi : null}
             aoiMatchedCount={filterMatchTotal}
             aoiTruncated={Boolean(aoiStats?.truncated)}
             onAoiChange={setAoi}
@@ -816,7 +843,7 @@ export function AppShell({
                 {rankingExpanded ? "Collapse" : "Expand"}
               </button>
             </div>
-            {orlandoParcelsOn ? (
+            {shedParcelsOn ? (
               <div className="mt-2 flex gap-1">
                 <button
                   type="button"

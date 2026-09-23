@@ -26,6 +26,7 @@ type FilterSidebarProps = {
   meta: Record<string, unknown>;
   orangePilot: boolean;
   orlandoParcels: boolean;
+  parcelCoverageNote?: string | null;
   market: SearchMarketId;
   tractCount: number;
   ruralTractCount: number;
@@ -189,6 +190,7 @@ export function FilterSidebar({
   meta,
   orangePilot,
   orlandoParcels,
+  parcelCoverageNote = null,
   market,
   tractCount,
   ruralTractCount,
@@ -251,10 +253,20 @@ export function FilterSidebar({
               treated honestly, not guessed.
             </p>
           ) : null}
+          {parcelCoverageNote ? (
+            <p className="text-xs leading-relaxed text-ink-300">{parcelCoverageNote}</p>
+          ) : null}
+          {orlandoParcels && !orangePilot ? (
+            <p className="text-xs leading-relaxed text-ink-300">
+              Parcel outlines stay off until neighborhood zoom, an area is locked, or Show parcels is on. Only this
+              market&apos;s tiles load.
+            </p>
+          ) : null}
           {!orlandoParcels ? (
             <p className="text-xs leading-relaxed text-ink-300">
-              Parcel polygons for this market are not seeded yet. Switch to Orlando to browse the nine-county shed
-              extract.
+              {parcelCoverageNote
+                ? "No parcel polygons were stored for this market. The map stays on eligible tracts."
+                : "Parcel polygons for this market are not seeded yet. Switch to Orlando to browse the nine-county shed extract."}
             </p>
           ) : null}
           {onPriorityView && priorityView && priorityCounts ? (

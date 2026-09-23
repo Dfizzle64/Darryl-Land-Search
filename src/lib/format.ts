@@ -27,6 +27,29 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "37007": "https://www.bttaxpayerportal.com/ITSPublicAN/",
+  "37025": "https://tax.cabarruscounty.us/BasicSearch.aspx",
+  "37071": "https://gastonnc.devnetwedge.com/",
+  "37109": "https://arcgisserver.lincolncountync.gov/taxparcelviewer/",
+  "37159": "https://tax.rowancountync.gov/search/commonsearch.aspx?mode=realprop",
+  "37179": "https://unionnc.devnetwedge.com/",
+};
+
+const COUNTY_LABELS: Record<string, string> = {
+  "12009": "Brevard",
+  "12069": "Lake",
+  "12083": "Marion",
+  "12097": "Osceola",
+  "12105": "Polk",
+  "12117": "Seminole",
+  "12119": "Sumter",
+  "12127": "Volusia",
+  "37007": "Anson",
+  "37025": "Cabarrus",
+  "37071": "Gaston",
+  "37109": "Lincoln",
+  "37159": "Rowan",
+  "37179": "Union",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -42,24 +65,7 @@ export function parcelAppraiserUrl(options: {
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);
-  const countyLabel =
-    fips === "12009"
-      ? "Brevard"
-      : fips === "12069"
-        ? "Lake"
-        : fips === "12083"
-          ? "Marion"
-          : fips === "12097"
-            ? "Osceola"
-            : fips === "12105"
-              ? "Polk"
-              : fips === "12117"
-                ? "Seminole"
-                : fips === "12119"
-                  ? "Sumter"
-                  : fips === "12127"
-                    ? "Volusia"
-                    : "county";
+  const countyLabel = (fips && COUNTY_LABELS[fips]) || "county";
   return {
     href,
     label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,

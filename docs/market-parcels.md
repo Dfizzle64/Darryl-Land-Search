@@ -22,7 +22,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons, plus county GIS for the Charlotte ring (Union, Gaston, Cabarrus, Rowan, Lincoln, Anson) | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Those six counties use the county parcel service (owner, mailing, situs, tax, last sale) and join municipal zoning. NC OneMap is the fallback if a county host fails |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -30,7 +30,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county parcel layer already carries a zoning field (DeKalb) and for Union, Gaston, Cabarrus, Rowan, Lincoln, and Anson, where cities and towns publish the zoning and a single county code does not cover them. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 
@@ -46,10 +46,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
-| Charlotte | primary | 119,168 | 12 | 0 | 3 |
+| Charlotte | primary | 119,204 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -158,20 +158,20 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Anson | North Carolina | 37007 | complete-gte-5ac | 5,814 | nc-onemap-37007 |
-| Cabarrus | North Carolina | 37025 | complete-gte-5ac | 6,974 | nc-onemap-37025 |
+| Anson | North Carolina | 37007 | complete-gte-5ac | 5,820 | nc-anson-vector-37007 |
+| Cabarrus | North Carolina | 37025 | complete-gte-5ac | 6,983 | nc-cabarrus-tax-parcels-37025 |
 | Catawba | North Carolina | 37035 | complete-gte-5ac | 8,502 | nc-onemap-37035 |
 | Chester | South Carolina | 45023 | gap | 0 | unavailable |
 | Cleveland | North Carolina | 37045 | complete-gte-5ac | 9,310 | nc-onemap-37045 |
 | Davidson | North Carolina | 37057 | complete-gte-5ac | 11,685 | nc-onemap-37057 |
-| Gaston | North Carolina | 37071 | complete-gte-5ac | 6,816 | nc-onemap-37071 |
+| Gaston | North Carolina | 37071 | complete-gte-5ac | 6,815 | nc-gaston-publicgis-37071 |
 | Iredell | North Carolina | 37097 | complete-gte-5ac | 10,771 | nc-onemap-37097 |
 | Lancaster | South Carolina | 45057 | gap | 0 | unavailable |
-| Lincoln | North Carolina | 37109 | complete-gte-5ac | 6,543 | nc-onemap-37109 |
+| Lincoln | North Carolina | 37109 | complete-gte-5ac | 6,563 | nc-lincoln-operational-37109 |
 | Mecklenburg | North Carolina | 37119 | complete-gte-5ac | 21,331 | nc-onemap-37119 |
-| Rowan | North Carolina | 37159 | complete-gte-5ac | 10,347 | nc-onemap-37159 |
+| Rowan | North Carolina | 37159 | complete-gte-5ac | 10,375 | nc-rowan-open-data-37159 |
 | Stanly | North Carolina | 37167 | complete-gte-5ac | 8,024 | nc-onemap-37167 |
-| Union | North Carolina | 37179 | complete-gte-5ac | 13,051 | nc-onemap-37179 |
+| Union | North Carolina | 37179 | complete-gte-5ac | 13,025 | nc-union-atlas-37179 |
 | York | South Carolina | 45091 | gap | 0 | unavailable |
 
 ### Raleigh-Durham
@@ -212,7 +212,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 

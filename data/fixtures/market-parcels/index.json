@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:59:13Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -893,7 +893,7 @@
     },
     "Charlotte": {
       "tier": "primary",
-      "parcelCount": 119168,
+      "parcelCount": 119204,
       "completeCountyCount": 12,
       "sampleCountyCount": 0,
       "gapCountyCount": 3,
@@ -903,24 +903,26 @@
           "name": "Anson",
           "state": "North Carolina",
           "fips": "37007",
-          "featureCount": 5814,
+          "featureCount": 5820,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "Peachland and Polkton zoning layers are empty. McFarlan has no public zoning service. Those towns stay unmatched.",
+            "CountyZoning=Mun. is not a zone class; town layers supply the code. LandUsePlan=MUN is not future land use. No town FLU service is published."
           ]
         },
         {
           "name": "Cabarrus",
           "state": "North Carolina",
           "fips": "37025",
-          "featureCount": 6974,
+          "featureCount": 6983,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "Situs is not on Tax_Parcels polygons; it is joined from AA ParcelAddresses by PIN14. gis.cabarruscounty.us redirects to the map and is not the REST host.",
+            "No countywide future land use service. Concord 2030 and Kannapolis Character Areas are joined. Harrisburg, Midland, Mount Pleasant, Locust, and the Huntersville edge have no public FLU layer."
           ]
         },
         {
@@ -976,12 +978,13 @@
           "name": "Gaston",
           "state": "North Carolina",
           "fips": "37071",
-          "featureCount": 6816,
+          "featureCount": 6815,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "No public future land use service. Envision Gaston 2050 is policy-only. High Shoals, Spencer Mountain, and Dellview have municipal boundaries and no zoning layer.",
+            "Zoning is a spatial join to PublicGIS/Zoning in the county CRS. Gastonia cogserver is a different State Plane vintage and is not the join source. Many sale amounts are zero."
           ]
         },
         {
@@ -1012,12 +1015,13 @@
           "name": "Lincoln",
           "state": "North Carolina",
           "fips": "37109",
-          "featureCount": 6543,
+          "featureCount": 6563,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "Maiden zoning and future land use are a gap on Lincoln County REST. The town is mostly in Catawba County; Lincoln publishes about one Maiden zoning polygon.",
+            "County Blueprint 2043 future land use is joined outside Lincolnton and Maiden. Lincolnton uses the city land-use layer. Parcel ZONING can be overlay-prefixed, so district polygons supply the code."
           ]
         },
         {
@@ -1037,12 +1041,13 @@
           "name": "Rowan",
           "state": "North Carolina",
           "fips": "37159",
-          "featureCount": 10347,
+          "featureCount": 10375,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "No countywide future land use service. Salisbury FLUM and Kannapolis Character Areas are joined. Other towns and unincorporated Rowan have no public FLU layer.",
+            "Zoning is split by municipality on Alll_Zoning. Cleveland is on that service (Municipal_Zoning omits it). No separate assessed-versus-taxable field beyond total value."
           ]
         },
         {
@@ -1061,12 +1066,13 @@
           "name": "Union",
           "state": "North Carolina",
           "fips": "37179",
-          "featureCount": 13051,
+          "featureCount": 13025,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "No countywide future land use service. Secrest Short Cut and employment-center scraps are not joined as county FLU.",
+            "FMV_LAND and FMV_IMPRV are zero on OperationalLayers parcels; tax totals only. Hemby Bridge has no zoning layer. Mint Hill in Union is negligible and is not joined."
           ]
         },
         {

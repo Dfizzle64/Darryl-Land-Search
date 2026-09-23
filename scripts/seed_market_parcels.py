@@ -266,6 +266,12 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    owner2: str | None = None,
+    zoning_district: str | None = None,
+    jurisdiction: str | None = None,
+    appraiser_url: str | None = None,
+    flu: dict | None = None,
+    data_gaps: list[str] | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
     return {
@@ -281,12 +287,12 @@ def empty_feature(
             "situsAddress": situs,
             "situsCity": city,
             "situsZip": zip_code,
-            "jurisdictionCode": None,
+            "jurisdictionCode": jurisdiction,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
-            "zoningDistrict": None,
+            "zoningDistrict": zoning_district,
             "jurisdictionPrefix": None,
             "dorCode": dor,
             "acreage": round(acreage, 4),
@@ -308,9 +314,11 @@ def empty_feature(
             "incomeTract": None,
             "incomeBlockGroup": None,
             "nearestRoad": None,
-            "flu": None,
+            "flu": flu,
             "opportunityZone": None,
             "oz2Eligibility": None,
+            "appraiserUrl": appraiser_url,
+            "dataGaps": data_gaps,
             "source": source,
         },
         "geometry": geometry,
@@ -334,12 +342,18 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    geometry: bool = True,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
         "outFields": ",".join(out_fields),
-        "returnGeometry": "true",
+        "returnGeometry": "true" if geometry else "false",
         "outSR": "4326",
     }
     for start in range(0, total, batch):
@@ -351,12 +365,12 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), geometry=geometry))
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), geometry=geometry))
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -677,6 +691,11 @@ def spec_for(county: dict) -> dict:
     fips = county["fips"]
     if fips in ORLANDO_REUSE:
         return {"kind": "reuse-orlando"}
+    from charlotte_ring import charlotte_ring_spec
+
+    ring = charlotte_ring_spec(fips)
+    if ring:
+        return ring
     override = county_override(fips)
     if override:
         return override
@@ -921,7 +940,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons, plus county GIS for the Charlotte ring (Union, Gaston, Cabarrus, Rowan, Lincoln, Anson) | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Those six counties use the county parcel service (owner, mailing, situs, tax, last sale) and join municipal zoning. NC OneMap is the fallback if a county host fails |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -929,13 +948,17 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county parcel layer already carries a zoning field (DeKalb) and for Union, Gaston, Cabarrus, Rowan, Lincoln, and Anson, where cities and towns publish the zoning and a single county code does not cover them. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "charlotte-ring":
+        from charlotte_ring import download_charlotte_ring
+
+        return download_charlotte_ring(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

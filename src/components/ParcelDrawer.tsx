@@ -88,7 +88,9 @@ export function ParcelDrawer({
   const zoningEmpty =
     properties.countyFips === "12095"
       ? "Not on the OCPA parcel"
-      : "Not in this county's public parcel extract";
+      : florida
+        ? "Not in this county's public parcel extract"
+        : "Not joined from the public zoning layers";
   const mailing = formatMailing(properties.mailingAddress);
   const entity = isEntityOwner(properties.ownerName) || isEntityOwner(properties.ownerName2);
   const fluLine = properties.flu?.code
@@ -96,7 +98,11 @@ export function ParcelDrawer({
     : null;
   const placeLine =
     [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+    (properties.countyName
+      ? `${properties.countyName} County${properties.state ? `, ${properties.state}` : ""}`
+      : florida
+        ? "Florida"
+        : "");
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -123,8 +129,20 @@ export function ParcelDrawer({
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
-        <Field label="Zoning" value={properties.zoningCode} empty={zoningEmpty} />
-        <Field label="Future Land Use" value={fluLine} empty="Not joined for this county" />
+        <Field
+          label="Zoning"
+          value={
+            properties.zoningCode
+              ? [properties.zoningCode, properties.zoningDistrict].filter(Boolean).join(" · ")
+              : null
+          }
+          empty={zoningEmpty}
+        />
+        <Field
+          label="Future Land Use"
+          value={fluLine}
+          empty={florida ? "Not joined for this county" : "No public future-land-use layer covers this parcel"}
+        />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
           label="OZ 2.0"

@@ -1,4 +1,4 @@
-import type { BBox, MarketId } from "./types";
+import type { BBox } from "./types";
 
 /** Orlando ~90-minute shed counties (authoritative handoff list). */
 export const ORLANDO_SHED_COUNTIES = [
@@ -168,14 +168,14 @@ export function isOrlandoShedCounty(county: string | null, state: string | null)
  * Show parcel inventory for the Orlando shed (all nine counties or a selected
  * Florida shed county). Other metros stay tract-only for now.
  */
-export function showOrlandoParcels(market: MarketId, county: string | null, state: string | null): boolean {
+export function showOrlandoParcels(market: string, county: string | null, state: string | null): boolean {
   if (market !== "Orlando") return false;
   if (!county && !state) return true;
   return isOrlandoShedCounty(county, state);
 }
 
 /** Orange-only layers: designated QOZ, FDOT traffic, OCPA zoning/FLU richness. */
-export function showOrangeCountyPilot(market: MarketId, county: string | null, state: string | null): boolean {
+export function showOrangeCountyPilot(market: string, county: string | null, state: string | null): boolean {
   if (market !== "Orlando") return false;
   if (!county && !state) return true;
   return county === "Orange" && state === "Florida";

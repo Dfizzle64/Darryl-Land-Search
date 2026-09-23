@@ -2,17 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import { MfPriorityFilter } from "./MfPriorityFilter";
-import { formatCountyLabel, isSouthCarolinaState } from "@/lib/markets";
+import { displayStatusChip, formatCountyLabel, showsGovernorFiledSoftCopy } from "@/lib/markets";
 import { tractPlaceLabel } from "@/lib/scMfPriority";
-import {
-  RURAL_ELIGIBLE_STATUS_CHIP,
-  SC_GOVERNOR_FILED_STATUS,
-  type MfPriorityView,
-  type RuralMarketTractRow,
-} from "@/lib/types";
+import { SC_GOVERNOR_FILED_STATUS, type EligibleTractRow, type MfPriorityView } from "@/lib/types";
 
 type TractPanelProps = {
-  tracts: RuralMarketTractRow[];
+  tracts: EligibleTractRow[];
   selectedGeoid: string | null;
   onSelect: (geoid: string) => void;
   onClose?: () => void;
@@ -32,7 +27,7 @@ export function TractPanel({
   priorityView,
   priorityCounts,
   onPriorityView,
-  emptyMessage = "No rural-eligible tracts in this county filter.",
+  emptyMessage = "No eligible tracts in this county filter.",
 }: TractPanelProps) {
   const listRef = useRef<HTMLUListElement | null>(null);
 
@@ -48,16 +43,17 @@ export function TractPanel({
       : "flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-ink-900/95 shadow-2xl backdrop-blur-sm";
 
   return (
-    <section className={shell} aria-label="Rural-eligible tracts">
+    <section className={shell} aria-label="Eligible tracts">
       <header className="flex items-start justify-between gap-3 border-b border-white/10 px-3 py-3">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.16em] text-ink-500">Rural-eligible tracts</p>
+          <p className="text-[11px] uppercase tracking-[0.16em] text-ink-500">Eligible tracts</p>
           <p className="font-display text-2xl text-white">
             {tracts.length.toLocaleString()} {tracts.length === 1 ? "tract" : "tracts"}
           </p>
           <p className="mt-0.5 text-[11px] leading-relaxed text-ink-500">
-            Rev. Proc. 2026-14 entirely rural tracts. Nomination eligibility only.
-            {tracts.some((tract) => isSouthCarolinaState(tract.state)) || priorityView
+            Rev. Proc. 2026-14 nomination eligibility only. Orange is rural. Blue is urban. Status stays eligible —
+            not designated.
+            {tracts.some((tract) => showsGovernorFiledSoftCopy(tract)) || priorityView
               ? ` South Carolina tracts: ${SC_GOVERNOR_FILED_STATUS}.`
               : ""}
           </p>
@@ -79,6 +75,7 @@ export function TractPanel({
         <ul ref={listRef} className="sites-scroll min-h-0 flex-1 overflow-y-auto px-2 py-2">
           {tracts.map((tract) => {
             const selected = tract.geoid === selectedGeoid;
+            const rural = tract.rural === "Y";
             return (
               <li key={`${tract.market}-${tract.geoid}`}>
                 <button
@@ -89,10 +86,16 @@ export function TractPanel({
                   }`}
                   onClick={() => onSelect(tract.geoid)}
                 >
-                  <span className="inline-block rounded-full border border-[#f15a08]/70 bg-[#f15a08]/15 px-1.5 py-px text-[10px] text-[#ffc7a3]">
-                    {RURAL_ELIGIBLE_STATUS_CHIP}
+                  <span
+                    className={`inline-block rounded-full border px-1.5 py-px text-[10px] ${
+                      rural
+                        ? "border-[#f15a08]/70 bg-[#f15a08]/15 text-[#ffc7a3]"
+                        : "border-[#3d7dff]/70 bg-[#3d7dff]/15 text-[#d6e4ff]"
+                    }`}
+                  >
+                    {rural ? "Rural" : "Urban"} · {displayStatusChip(tract)}
                   </span>
-                  {isSouthCarolinaState(tract.state) ? (
+                  {showsGovernorFiledSoftCopy(tract) ? (
                     <p className="mt-1 text-[11px] leading-snug text-ink-300">{SC_GOVERNOR_FILED_STATUS}</p>
                   ) : null}
                   {tract.mfPriority ? (

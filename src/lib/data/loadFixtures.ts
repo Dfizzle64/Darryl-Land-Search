@@ -2,6 +2,8 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { flattenMultifamilyTokens } from "../zoning";
 import type {
+  EligibleMarketsCatalog,
+  EligiblePackTractCollection,
   FluConfig,
   OpportunityZoneCollection,
   Oz2TractCollection,
@@ -80,6 +82,21 @@ export async function loadRuralMarketsCatalog(): Promise<RuralMarketsCatalog> {
 export async function loadRuralMarketTracts(): Promise<RuralMarketTractCollection> {
   const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-rural-markets.geojson"), "utf8");
   return JSON.parse(raw) as RuralMarketTractCollection;
+}
+
+export async function loadUrbanMarketsCatalog(): Promise<EligibleMarketsCatalog> {
+  const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-urban-markets.json"), "utf8");
+  return JSON.parse(raw) as EligibleMarketsCatalog;
+}
+
+export async function loadOtherMarketsCatalog(): Promise<EligibleMarketsCatalog> {
+  const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-other-msas.json"), "utf8");
+  return JSON.parse(raw) as EligibleMarketsCatalog;
+}
+
+export async function loadEligiblePackTracts(): Promise<EligiblePackTractCollection> {
+  const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-eligible-packs.geojson"), "utf8");
+  return JSON.parse(raw) as EligiblePackTractCollection;
 }
 
 export async function loadScMfPriority(): Promise<ScMfPriorityCatalog> {

@@ -3,14 +3,18 @@ import path from "node:path";
 import type { BBox, IncomeInfo, NearestRoad, ParcelFeature } from "./types";
 
 /**
- * Orange County ACS income and FDOT AADT from the pilot fixtures.
- * The 5–150 acre extract does not store these fields. Viewport and AOI
- * queries attach them before filters run so the income and AADT sliders
- * hide non-matching Orange parcels the way the small sample did.
+ * ACS median household income and FDOT AADT joined at query time.
+ * Tiles do not store these fields (they would duplicate the same tract and
+ * road onto every parcel). The income fixture covers Florida counties that
+ * have parcel extracts. AADT segments are statewide FDOT counts. Points
+ * outside that coverage stay unknown, and Include unknown keeps them.
  */
 
 const DATA_DIR = path.join(process.cwd(), "data", "fixtures");
 const M_PER_DEG = 111_320;
+/** Nearest FDOT segment farther than this is unknown, not a distant highway. */
+export const MAX_AADT_DISTANCE_METERS = 15_000;
+const ROAD_CELL_DEG = 0.2;
 
 export type SignalPolygon = {
   bbox: BBox;
@@ -34,6 +38,7 @@ export type OrangeSignalIndex = {
   tracts: SignalPolygon[];
   blockGroups: SignalPolygon[];
   roads: SignalRoad[];
+  roadGrid: Map<string, number[]>;
 };
 
 const EMPTY_INCOME: IncomeInfo = {
@@ -100,25 +105,71 @@ function bboxGap(x: number, y: number, bbox: BBox): number {
   return Math.hypot(dx, dy);
 }
 
-export function nearestRoad(x: number, y: number, roads: SignalRoad[]): NearestRoad | null {
-  let best: SignalRoad | null = null;
-  let bestDist = Number.POSITIVE_INFINITY;
-  for (const road of roads) {
-    if (bboxGap(x, y, road.bbox) >= bestDist) continue;
-    const dist = minDistToLine(x, y, road.coords);
-    if (dist < bestDist) {
-      bestDist = dist;
-      best = road;
+export function indexRoads(roads: SignalRoad[], cell = ROAD_CELL_DEG): Map<string, number[]> {
+  const grid = new Map<string, number[]>();
+  roads.forEach((road, index) => {
+    const [west, south, east, north] = road.bbox;
+    const ix0 = Math.floor(west / cell);
+    const ix1 = Math.floor(east / cell);
+    const iy0 = Math.floor(south / cell);
+    const iy1 = Math.floor(north / cell);
+    for (let ix = ix0; ix <= ix1; ix += 1) {
+      for (let iy = iy0; iy <= iy1; iy += 1) {
+        const key = `${ix}:${iy}`;
+        const bucket = grid.get(key);
+        if (bucket) bucket.push(index);
+        else grid.set(key, [index]);
+      }
     }
+  });
+  return grid;
+}
+
+export function nearestRoad(
+  x: number,
+  y: number,
+  roads: SignalRoad[],
+  grid?: Map<string, number[]>,
+  maxMeters = MAX_AADT_DISTANCE_METERS,
+): NearestRoad | null {
+  const maxDeg = maxMeters / M_PER_DEG;
+  // A closure assignment is not visible to control-flow narrowing, so keep
+  // the winner on an object. Otherwise `best` stays `null` and the return is `never`.
+  const state: { best: SignalRoad | null; bestDist: number } = { best: null, bestDist: maxDeg };
+  const consider = (index: number) => {
+    const road = roads[index];
+    if (!road || bboxGap(x, y, road.bbox) >= state.bestDist) return;
+    const dist = minDistToLine(x, y, road.coords);
+    if (dist < state.bestDist) {
+      state.bestDist = dist;
+      state.best = road;
+    }
+  };
+  if (grid && grid.size) {
+    const reach = Math.max(1, Math.ceil(maxDeg / ROAD_CELL_DEG));
+    const ix = Math.floor(x / ROAD_CELL_DEG);
+    const iy = Math.floor(y / ROAD_CELL_DEG);
+    const seen = new Set<number>();
+    for (let dx = -reach; dx <= reach; dx += 1) {
+      for (let dy = -reach; dy <= reach; dy += 1) {
+        for (const index of grid.get(`${ix + dx}:${iy + dy}`) ?? []) {
+          if (seen.has(index)) continue;
+          seen.add(index);
+          consider(index);
+        }
+      }
+    }
+  } else {
+    for (let index = 0; index < roads.length; index += 1) consider(index);
   }
-  if (!best) return null;
+  if (!state.best) return null;
   return {
-    aadt: best.aadt,
-    year: best.year,
-    roadwayId: best.roadwayId,
-    from: best.from,
-    to: best.to,
-    distanceMeters: Math.round(bestDist * M_PER_DEG),
+    aadt: state.best.aadt,
+    year: state.best.year,
+    roadwayId: state.best.roadwayId,
+    from: state.best.from,
+    to: state.best.to,
+    distanceMeters: Math.round(state.bestDist * M_PER_DEG),
   };
 }
 
@@ -214,6 +265,7 @@ export function buildOrangeSignalIndex(
     tracts: tractPolygons,
     blockGroups: blockGroupPolygons,
     roads,
+    roadGrid: indexRoads(roads),
   };
 }
 
@@ -237,17 +289,18 @@ export function annotateParcelSignals(feature: ParcelFeature, index: OrangeSigna
     feature.properties.incomeBlockGroup = lookupIncome(lon, lat, index.blockGroups) ?? EMPTY_INCOME;
   }
   if (feature.properties.nearestRoad == null) {
-    feature.properties.nearestRoad = nearestRoad(lon, lat, index.roads);
+    feature.properties.nearestRoad = nearestRoad(lon, lat, index.roads, index.roadGrid);
   }
 }
 
 export async function loadOrangeSignalIndex(): Promise<OrangeSignalIndex> {
   if (!indexPromise) {
     indexPromise = (async () => {
+      const segmentsPath = path.join(DATA_DIR, "aadt-segments.geojson");
       const [tractsRaw, blockGroupsRaw, trafficRaw] = await Promise.all([
         readFile(path.join(DATA_DIR, "income-tracts.geojson"), "utf8"),
         readFile(path.join(DATA_DIR, "income-block-groups.geojson"), "utf8"),
-        readFile(path.join(DATA_DIR, "traffic.geojson"), "utf8"),
+        readFile(segmentsPath, "utf8").catch(() => readFile(path.join(DATA_DIR, "traffic.geojson"), "utf8")),
       ]);
       return buildOrangeSignalIndex(
         JSON.parse(tractsRaw) as GeoJSON.FeatureCollection,

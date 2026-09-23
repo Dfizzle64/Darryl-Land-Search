@@ -32,11 +32,11 @@ type ParcelDrawerProps = {
   layout?: "page" | "pane";
 };
 
-function Field({ label, value }: { label: string; value: string | null | undefined }) {
+function Field({ label, value, empty }: { label: string; value: string | null | undefined; empty?: string }) {
   return (
     <div>
       <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">{label}</dt>
-      <dd className="mt-1 whitespace-pre-line text-sm text-white">{value?.trim() ? value : "Not available"}</dd>
+      <dd className="mt-1 whitespace-pre-line text-sm text-white">{value?.trim() ? value : empty ?? "Not available"}</dd>
     </div>
   );
 }
@@ -77,6 +77,24 @@ export function ParcelDrawer({
   const oz2 = describeOz2Eligibility(properties.oz2Eligibility);
   const rezoning = describeRezoningCandidate(parcel, filters, zoningConfig, fluConfig);
   const income = filters.incomeGeography === "tract" ? properties.incomeTract : properties.incomeBlockGroup;
+  const florida = !properties.state || properties.state === "Florida";
+  const orangeCounty = properties.countyFips === "12095" || properties.countyName === "Orange";
+  const incomeEmpty = !florida
+    ? "No ACS join outside Florida"
+    : filters.incomeGeography === "blockGroup"
+      ? orangeCounty
+        ? "No block-group income for this location"
+        : "Block-group income is joined for Orange County only"
+      : income?.geoid
+        ? "ACS did not publish a median for this tract"
+        : "No ACS tract join for this location";
+  const aadtEmpty = florida
+    ? "No FDOT count segment within 15 km"
+    : "FDOT AADT is Florida only";
+  const zoningEmpty =
+    properties.countyFips === "12095"
+      ? "Not on the OCPA parcel"
+      : "Not in this county's public parcel extract";
   const mailing = formatMailing(properties.mailingAddress) ?? mailingGap(properties.mailingAddress);
   const entityName = isEntityOwner(properties.ownerName)
     ? properties.ownerName
@@ -118,8 +136,8 @@ export function ParcelDrawer({
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
-        <Field label="Zoning" value={properties.zoningCode} />
-        <Field label="Future Land Use" value={fluLine} />
+        <Field label="Zoning" value={properties.zoningCode} empty={zoningEmpty} />
+        <Field label="Future Land Use" value={fluLine} empty="Not joined for this county" />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
           label="OZ 2.0"
@@ -174,7 +192,14 @@ export function ParcelDrawer({
         <Field label="Owner mailing address" value={mailing} />
         <Field
           label={filters.incomeGeography === "tract" ? "Tract median household income" : "Block group median household income"}
-          value={income?.medianHouseholdIncome != null ? `${formatUsd(income.medianHouseholdIncome)}\n${income.name}` : income?.name}
+          value={
+            income?.medianHouseholdIncome != null
+              ? `${formatUsd(income.medianHouseholdIncome)}\n${income.name ?? ""}`
+              : income?.name && income.medianHouseholdIncome == null
+                ? null
+                : income?.name
+          }
+          empty={incomeEmpty}
         />
         <Field
           label="Nearest FDOT AADT"
@@ -183,6 +208,7 @@ export function ParcelDrawer({
               ? `${formatNumber(properties.nearestRoad.aadt)} vehicles/day (${properties.nearestRoad.year ?? "year n/a"})\n${formatRoadLabel(properties.nearestRoad)}\n${properties.nearestRoad.distanceMeters != null ? `${formatNumber(properties.nearestRoad.distanceMeters)} m from centroid` : ""}`
               : null
           }
+          empty={aadtEmpty}
         />
       </div>
 

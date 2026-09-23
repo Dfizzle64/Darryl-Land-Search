@@ -17,6 +17,7 @@ import {
   tileFileName,
   tileIndicesForBbox,
 } from "../orlandoParcels";
+import { esriRingsToGeoJSON, representativePoint } from "../parcelGeometry";
 import { rankSites } from "../score";
 import type {
   BBox,
@@ -238,10 +239,16 @@ export async function getOrlandoFixtureParcel(id: string): Promise<ParcelFeature
     const tile = lookup[parcelId];
     if (!tile) return null;
     const features = await readFeatureFile(path.join(county.path, `${tile}.geojson`));
-    return features.find((feature) => feature.properties.id === id) ?? null;
+    return annotateLoadedParcel(features.find((feature) => feature.properties.id === id) ?? null);
   }
   const features = await readFeatureFile(county.path);
-  return features.find((feature) => feature.properties.id === id) ?? null;
+  return annotateLoadedParcel(features.find((feature) => feature.properties.id === id) ?? null);
+}
+
+async function annotateLoadedParcel(feature: ParcelFeature | null): Promise<ParcelFeature | null> {
+  if (!feature) return null;
+  annotateParcelSignals(feature, await loadOrangeSignalIndex());
+  return feature;
 }
 
 function num(value: unknown): number | null {
@@ -271,40 +278,11 @@ function saleDate(year: unknown, month: unknown): string | null {
 }
 
 function ringsToGeometry(rings: number[][][] | undefined): GeoJSON.Polygon | GeoJSON.MultiPolygon | null {
-  if (!rings?.length) return null;
-  const polygons: number[][][][] = [];
-  let current: number[][][] = [];
-  for (const ring of rings) {
-    if (ring.length < 4) continue;
-    const coords = ring.map(([x, y]) => [Math.round(x * 1e6) / 1e6, Math.round(y * 1e6) / 1e6]);
-    if (coords[0][0] !== coords[coords.length - 1][0] || coords[0][1] !== coords[coords.length - 1][1]) {
-      coords.push([...coords[0]]);
-    }
-    let area = 0;
-    for (let i = 0; i < coords.length - 1; i += 1) {
-      area += coords[i][0] * coords[i + 1][1] - coords[i + 1][0] * coords[i][1];
-    }
-    if (!current.length || area > 0) {
-      if (current.length) polygons.push(current);
-      current = [coords];
-    } else {
-      current.push(coords);
-    }
-  }
-  if (current.length) polygons.push(current);
-  if (!polygons.length) return null;
-  if (polygons.length === 1) return { type: "Polygon", coordinates: polygons[0] };
-  return { type: "MultiPolygon", coordinates: polygons };
+  return esriRingsToGeoJSON(rings);
 }
 
 function centroidOf(geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon): [number, number] | null {
-  const ring = geometry.type === "Polygon" ? geometry.coordinates[0] : geometry.coordinates[0]?.[0];
-  if (!ring?.length) return null;
-  const pts = ring.slice(0, -1);
-  if (!pts.length) return null;
-  const lon = pts.reduce((sum, p) => sum + p[0], 0) / pts.length;
-  const lat = pts.reduce((sum, p) => sum + p[1], 0) / pts.length;
-  return [Math.round(lon * 1e6) / 1e6, Math.round(lat * 1e6) / 1e6];
+  return representativePoint(geometry);
 }
 
 function normalizeLiveFeature(

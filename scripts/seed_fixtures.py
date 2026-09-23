@@ -18,12 +18,14 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+from parcel_geometry import esri_rings_to_geojson
+
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "data" / "fixtures"
 OUT.mkdir(parents=True, exist_ok=True)
 
 OCPA_URL = "https://vgispublic.ocpafl.org/server/rest/services/Webmap/PARCEL/MapServer/4/query"
-FDOT_URL = "https://gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0/query"
+FDOT_URL = "https://services1.arcgis.com/O1JpcwDW8sjYuddV/arcgis/rest/services/Annual_Average_Daily_Traffic_Historical_TDA/FeatureServer/0/query"
 CENSUS_REPORTER_DATA = "https://api.censusreporter.org/1.0/data/show/latest"
 CENSUS_REPORTER_GEO = "https://api.censusreporter.org/1.0/geo/show/tiger2023"
 
@@ -115,36 +117,9 @@ def arcgis_query(url: str, params: dict, page_size: int = 200, max_records: int 
 
 
 def rings_to_geojson(geom: dict | None) -> dict | None:
-    if not geom:
+    if not geom or not geom.get("rings"):
         return None
-    rings = geom.get("rings")
-    if not rings:
-        return None
-    polygons: list[list[list[list[float]]]] = []
-    current: list[list[list[float]]] = []
-    for ring in rings:
-        coords = [[round(x, 6), round(y, 6)] for x, y in ring]
-        if len(coords) < 4:
-            continue
-        coords = simplify_line(coords, 0.00008)
-        if len(coords) < 4:
-            continue
-        if coords[0] != coords[-1]:
-            coords.append(coords[0])
-        signed = ring_area(coords)
-        if not current or signed > 0:
-            if current:
-                polygons.append(current)
-            current = [coords]
-        else:
-            current.append(coords)
-    if current:
-        polygons.append(current)
-    if not polygons:
-        return None
-    if len(polygons) == 1:
-        return {"type": "Polygon", "coordinates": polygons[0]}
-    return {"type": "MultiPolygon", "coordinates": polygons}
+    return esri_rings_to_geojson(geom["rings"])
 
 
 def ring_area(coords: list[list[float]]) -> float:
@@ -339,13 +314,13 @@ def fetch_aadt() -> list[dict]:
     feats = arcgis_query(
         FDOT_URL,
         {
-            "where": "COUNTY='Orange' AND AADT IS NOT NULL",
-            "outFields": "AADT,ROADWAY,DESC_FRM,DESC_TO,YEAR_,AADTFLG",
+            "where": "YEAR_=2025 AND COUNTY='Orange' AND AADT>0",
+            "outFields": "AADT,ROADWAY,DESC_FRM,DESC_TO,YEAR_",
             "returnGeometry": "true",
             "outSR": 4326,
         },
         page_size=500,
-        max_records=1430,
+        max_records=4000,
     )
     print(f"  segments {len(feats)}")
     return feats
@@ -603,8 +578,15 @@ def main() -> None:
     }
 
     (OUT / "parcels.geojson").write_text(json.dumps(parcel_collection, separators=(",", ":")))
-    (OUT / "traffic.geojson").write_text(json.dumps(traffic_collection, separators=(",", ":")))
-    (OUT / "income-tracts.geojson").write_text(json.dumps(income_fc(tract_income, tract_geo, "orange-county-acs-tracts"), separators=(",", ":")))
+    # Statewide tract income and FDOT segments live in the sidecar written by
+    # scripts/seed_fl_signals.py. The Orange pilot seed must not replace them.
+    if (OUT / "signals-meta.json").exists():
+        print("Keeping income-tracts.geojson and traffic.geojson from seed_fl_signals.py")
+    else:
+        (OUT / "traffic.geojson").write_text(json.dumps(traffic_collection, separators=(",", ":")))
+        (OUT / "income-tracts.geojson").write_text(
+            json.dumps(income_fc(tract_income, tract_geo, "orange-county-acs-tracts"), separators=(",", ":"))
+        )
     (OUT / "income-block-groups.geojson").write_text(
         json.dumps(income_fc(bg_income, bg_geo, "orange-county-acs-block-groups"), separators=(",", ":"))
     )

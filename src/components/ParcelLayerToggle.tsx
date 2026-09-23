@@ -8,7 +8,7 @@ type ParcelLayerToggleProps = {
 
 export function ParcelLayerToggle({ visible, hint, onToggle }: ParcelLayerToggleProps) {
   return (
-    <div data-parcel-toggle className="map-chrome absolute left-3 top-16 z-30 max-w-[18rem] sm:left-4 sm:top-[4.25rem]">
+    <div data-parcel-toggle className="map-chrome max-w-[18rem]">
       <button
         type="button"
         aria-pressed={visible}

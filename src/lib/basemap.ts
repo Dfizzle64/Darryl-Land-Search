@@ -7,7 +7,7 @@ import type {
   Map as MapLibreMap,
 } from "maplibre-gl";
 
-export type BasemapMode = "streets" | "satellite";
+export type BasemapMode = "streets" | "satellite" | "dark";
 
 /** Dark street styles already used by the app (OpenFreeMap, then Carto Dark Matter). */
 export const STREET_STYLE_CANDIDATES = [
@@ -15,15 +15,87 @@ export const STREET_STYLE_CANDIDATES = [
   "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
 ] as const;
 
+/**
+ * Keyless navigation streets. CARTO Voyager is a general basemap (roads, labels, places),
+ * not OpenStreetMap Carto and not the dark style. MapTiler Streets v2 replaces it when
+ * NEXT_PUBLIC_MAPTILER_KEY is set.
+ */
+export const VOYAGER_STREETS_TILES = "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png";
+
+export const VOYAGER_STREETS_ATTRIBUTION = "© OpenStreetMap contributors © CARTO";
+
 /** Esri World Imagery — public XYZ tiles, no API key. */
 export const ESRI_WORLD_IMAGERY_TILES =
   "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
 
+/** Roads drawn on top of imagery for the keyless hybrid. */
+export const ESRI_TRANSPORTATION_TILES =
+  "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}";
+
+/** City, place, and boundary labels for the keyless hybrid. */
+export const ESRI_PLACES_TILES =
+  "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}";
+
 export const ESRI_WORLD_IMAGERY_ATTRIBUTION =
   "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community";
 
+export const ESRI_HYBRID_ATTRIBUTION =
+  "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community. Roads and place labels © Esri.";
+
+export const MAPTILER_ATTRIBUTION = "© MapTiler © OpenStreetMap contributors";
+
+export const DARK_BASEMAP_ATTRIBUTION = "© OpenFreeMap © OpenStreetMap contributors";
+
 export const SATELLITE_SOURCE_ID = "basemap-satellite";
 export const SATELLITE_LAYER_ID = "basemap-satellite";
+export const STREETS_SOURCE_ID = "basemap-streets";
+export const STREETS_LAYER_ID = "basemap-streets";
+export const HYBRID_ROADS_SOURCE_ID = "basemap-hybrid-roads";
+export const HYBRID_ROADS_LAYER_ID = "basemap-hybrid-roads";
+export const HYBRID_PLACES_SOURCE_ID = "basemap-hybrid-places";
+export const HYBRID_PLACES_LAYER_ID = "basemap-hybrid-places";
+
+export function maptilerKeyFrom(envValue: string | undefined | null): string | null {
+  const key = envValue?.trim();
+  return key ? key : null;
+}
+
+/** Inlined at build time for client bundles. Empty when the key is unset. */
+export const MAPTILER_KEY = maptilerKeyFrom(process.env.NEXT_PUBLIC_MAPTILER_KEY);
+
+export function streetsTileUrl(key: string | null = MAPTILER_KEY): string {
+  if (key) return `https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}.png?key=${encodeURIComponent(key)}`;
+  return VOYAGER_STREETS_TILES;
+}
+
+export function hybridImageryTileUrl(key: string | null = MAPTILER_KEY): string {
+  if (key) return `https://api.maptiler.com/maps/hybrid/256/{z}/{x}/{y}.jpg?key=${encodeURIComponent(key)}`;
+  return ESRI_WORLD_IMAGERY_TILES;
+}
+
+/** MapTiler hybrid tiles already include roads and labels, so the Esri reference stack stays off. */
+export function usesEsriHybridReference(key: string | null = MAPTILER_KEY): boolean {
+  return !key;
+}
+
+export function basemapAttribution(mode: BasemapMode, key: string | null = MAPTILER_KEY): string {
+  if (mode === "dark") return DARK_BASEMAP_ATTRIBUTION;
+  if (mode === "streets") return key ? MAPTILER_ATTRIBUTION : VOYAGER_STREETS_ATTRIBUTION;
+  return key ? MAPTILER_ATTRIBUTION : ESRI_HYBRID_ATTRIBUTION;
+}
+
+export function rasterLayerVisibility(
+  mode: BasemapMode,
+  includeHybridReference = usesEsriHybridReference(),
+): Record<string, "visible" | "none"> {
+  const hybrid = mode === "satellite";
+  return {
+    [STREETS_LAYER_ID]: mode === "streets" ? "visible" : "none",
+    [SATELLITE_LAYER_ID]: hybrid ? "visible" : "none",
+    [HYBRID_ROADS_LAYER_ID]: hybrid && includeHybridReference ? "visible" : "none",
+    [HYBRID_PLACES_LAYER_ID]: hybrid && includeHybridReference ? "visible" : "none",
+  };
+}
 
 export const OVERLAY_LAYER_IDS = [
   "rural-fill",
@@ -46,6 +118,9 @@ export const OVERLAY_LAYER_IDS = [
   "parcels-line",
   "aoi-fill",
   "aoi-line",
+  "measure-casing",
+  "measure-line",
+  "measure-vertices",
 ] as const;
 
 export const FIRST_OVERLAY_LAYER_ID = OVERLAY_LAYER_IDS[0];
@@ -58,9 +133,25 @@ export const parcelHiddenFilter: FilterSpecification = ["==", ["get", "filterMat
 /**
  * Neighborhood zoom (the auto-on gate) stays light: lower fill, thinner line.
  * Close zoom uses the original street/satellite weights. Selection stays strong.
+ * Zoom interpolation has to be the top-level expression. MapLibre rejects ["zoom"] nested in a case.
  */
-function parcelZoomStops(quiet: number, mid: number, full: number): ExpressionSpecification {
-  return ["interpolate", ["linear"], ["zoom"], 10, quiet, 12.5, mid, 14.5, full];
+function parcelZoomStops(
+  quiet: number,
+  mid: number,
+  full: number,
+  selected: number,
+  hover: number,
+): ExpressionSpecification {
+  const at = (base: number): ExpressionSpecification => [
+    "case",
+    ["boolean", ["feature-state", "selected"], false],
+    selected,
+    ["boolean", ["feature-state", "hover"], false],
+    hover,
+    base,
+  ];
+  // First stop is neighborhood zoom (the auto-on gate), not the old 11 stop.
+  return ["interpolate", ["linear"], ["zoom"], 10, at(quiet), 12.5, at(mid), 14.5, at(full)];
 }
 
 export function parcelFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
@@ -76,14 +167,13 @@ export function parcelFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecifi
       "#8fd4b5",
       "#3f9d74",
     ],
-    "fill-opacity": [
-      "case",
-      ["boolean", ["feature-state", "selected"], false],
+    "fill-opacity": parcelZoomStops(
+      quiet,
+      mid,
+      full,
       mode === "satellite" ? 0.5 : 0.78,
-      ["boolean", ["feature-state", "hover"], false],
       mode === "satellite" ? 0.38 : 0.62,
-      parcelZoomStops(quiet, mid, full),
-    ],
+    ),
   };
 }
 
@@ -98,26 +188,18 @@ export function parcelLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecifi
         "#ffffff",
         "#f3f7f5",
       ],
-      "line-width": [
-        "case",
-        ["boolean", ["feature-state", "selected"], false],
-        2.6,
-        ["boolean", ["feature-state", "hover"], false],
-        1.6,
-        parcelZoomStops(0.55, 0.9, 1.7),
-      ],
+      "line-width": parcelZoomStops(0.55, 0.9, 1.7, 2.6, 1.6),
     };
   }
+  const onLightStreets = mode === "streets";
   return {
-    "line-color": ["case", ["boolean", ["feature-state", "selected"], false], "#f8e1b5", "#b7e3cf"],
-    "line-width": [
+    "line-color": [
       "case",
       ["boolean", ["feature-state", "selected"], false],
-      2.2,
-      ["boolean", ["feature-state", "hover"], false],
-      1.3,
-      parcelZoomStops(0.35, 0.6, 1),
+      onLightStreets ? "#9a3412" : "#f8e1b5",
+      onLightStreets ? "#0f5132" : "#b7e3cf",
     ],
+    "line-width": parcelZoomStops(0.35, 0.6, 1, 2.2, 1.3),
   };
 }
 
@@ -169,9 +251,15 @@ export function ozFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecificati
 }
 
 export function ozLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecification["paint"]> {
-  return mode === "satellite"
-    ? { "line-color": "#ffe4cf", "line-width": 2.1, "line-opacity": 0.95, "line-dasharray": [2, 1.2] }
-    : { "line-color": "#f6d0b0", "line-width": 1.7, "line-opacity": 0.88, "line-dasharray": [2, 1.2] };
+  if (mode === "satellite") {
+    return { "line-color": "#ffe4cf", "line-width": 2.1, "line-opacity": 0.95, "line-dasharray": [2, 1.2] };
+  }
+  return {
+    "line-color": mode === "streets" ? "#9a3412" : "#f6d0b0",
+    "line-width": 1.7,
+    "line-opacity": 0.88,
+    "line-dasharray": [2, 1.2],
+  };
 }
 
 export function oz2FillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
@@ -224,8 +312,8 @@ export function eligiblePackLinePaint(mode: BasemapMode): NonNullable<LineLayerS
 }
 
 export function oz2LinePaint(mode: BasemapMode): NonNullable<LineLayerSpecification["paint"]> {
-  const rural = mode === "satellite" ? "#ffe6d4" : "#ffd0b0";
-  const other = mode === "satellite" ? "#fff3d4" : "#ffe7ad";
+  const rural = mode === "satellite" ? "#ffe6d4" : mode === "streets" ? "#9a3412" : "#ffd0b0";
+  const other = mode === "satellite" ? "#fff3d4" : mode === "streets" ? "#b45309" : "#ffe7ad";
   return {
     "line-color": ["case", ["==", ["get", "rural"], true], rural, other],
     "line-width": ["case", ["==", ["get", "rural"], true], mode === "satellite" ? 2.8 : 2.5, mode === "satellite" ? 1.35 : 1.05],
@@ -233,39 +321,63 @@ export function oz2LinePaint(mode: BasemapMode): NonNullable<LineLayerSpecificat
   };
 }
 
-export function addSatelliteSourceAndLayer(map: MapLibreMap) {
-  if (!map.getSource(SATELLITE_SOURCE_ID)) {
-    map.addSource(SATELLITE_SOURCE_ID, {
+function addRasterLayer(
+  map: MapLibreMap,
+  sourceId: string,
+  layerId: string,
+  tiles: string[],
+  attribution: string,
+  maxzoom: number,
+) {
+  if (!map.getSource(sourceId)) {
+    map.addSource(sourceId, {
       type: "raster",
-      tiles: [ESRI_WORLD_IMAGERY_TILES],
+      tiles,
       tileSize: 256,
-      attribution: ESRI_WORLD_IMAGERY_ATTRIBUTION,
-      maxzoom: 19,
+      attribution,
+      maxzoom,
     });
   }
-  if (!map.getLayer(SATELLITE_LAYER_ID)) {
-    const beforeId = map.getLayer(FIRST_OVERLAY_LAYER_ID) ? FIRST_OVERLAY_LAYER_ID : undefined;
-    try {
-      map.addLayer(
-        {
-          id: SATELLITE_LAYER_ID,
-          type: "raster",
-          source: SATELLITE_SOURCE_ID,
-          layout: { visibility: "none" },
-        },
-        beforeId,
-      );
-    } catch {
-      if (!map.getLayer(SATELLITE_LAYER_ID)) {
-        map.addLayer({
-          id: SATELLITE_LAYER_ID,
-          type: "raster",
-          source: SATELLITE_SOURCE_ID,
-          layout: { visibility: "none" },
-        });
-      }
-    }
+  if (map.getLayer(layerId)) return;
+  const beforeId = map.getLayer(FIRST_OVERLAY_LAYER_ID) ? FIRST_OVERLAY_LAYER_ID : undefined;
+  const layer = {
+    id: layerId,
+    type: "raster" as const,
+    source: sourceId,
+    layout: { visibility: "none" as const },
+  };
+  try {
+    map.addLayer(layer, beforeId);
+  } catch {
+    if (!map.getLayer(layerId)) map.addLayer(layer);
   }
+}
+
+/** Streets raster, imagery, and (keyless) hybrid reference labels. Idempotent. */
+export function addBasemapRasterLayers(map: MapLibreMap, key: string | null = MAPTILER_KEY) {
+  const maptiler = Boolean(key);
+  addRasterLayer(
+    map,
+    STREETS_SOURCE_ID,
+    STREETS_LAYER_ID,
+    [streetsTileUrl(key)],
+    maptiler ? MAPTILER_ATTRIBUTION : VOYAGER_STREETS_ATTRIBUTION,
+    20,
+  );
+  addRasterLayer(
+    map,
+    SATELLITE_SOURCE_ID,
+    SATELLITE_LAYER_ID,
+    [hybridImageryTileUrl(key)],
+    maptiler ? MAPTILER_ATTRIBUTION : ESRI_WORLD_IMAGERY_ATTRIBUTION,
+    19,
+  );
+  addRasterLayer(map, HYBRID_ROADS_SOURCE_ID, HYBRID_ROADS_LAYER_ID, [ESRI_TRANSPORTATION_TILES], ESRI_HYBRID_ATTRIBUTION, 19);
+  addRasterLayer(map, HYBRID_PLACES_SOURCE_ID, HYBRID_PLACES_LAYER_ID, [ESRI_PLACES_TILES], ESRI_HYBRID_ATTRIBUTION, 19);
+}
+
+export function addSatelliteSourceAndLayer(map: MapLibreMap) {
+  addBasemapRasterLayers(map);
 }
 
 function setPaint(map: MapLibreMap, layerId: string, paint: Record<string, unknown>) {
@@ -275,20 +387,22 @@ function setPaint(map: MapLibreMap, layerId: string, paint: Record<string, unkno
   }
 }
 
-/** Swap street vs satellite without dropping overlay sources, filters, or the camera. */
+/** Swap streets, hybrid, or dark without dropping overlay sources, filters, or the camera. */
 export function applyBasemap(map: MapLibreMap, mode: BasemapMode) {
   const style = map.getStyle();
   if (!style?.layers) return;
 
   const overlayIds = new Set<string>(OVERLAY_LAYER_IDS);
+  const rasters = rasterLayerVisibility(mode);
 
   for (const layer of style.layers) {
-    if (layer.id === SATELLITE_LAYER_ID) {
-      map.setLayoutProperty(layer.id, "visibility", mode === "satellite" ? "visible" : "none");
+    const raster = rasters[layer.id];
+    if (raster) {
+      map.setLayoutProperty(layer.id, "visibility", raster);
       continue;
     }
     if (overlayIds.has(layer.id)) continue;
-    map.setLayoutProperty(layer.id, "visibility", mode === "streets" ? "visible" : "none");
+    map.setLayoutProperty(layer.id, "visibility", mode === "dark" ? "visible" : "none");
   }
 
   setPaint(map, "parcels-fill", parcelFillPaint(mode));

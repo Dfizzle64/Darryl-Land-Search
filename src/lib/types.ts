@@ -83,6 +83,9 @@ export type Oz2TractProperties = {
   rural: boolean;
   designation: "eligible-for-nomination";
   source: string | null;
+  /** Short county name, without a "County" suffix (for example "Orange"). */
+  county?: string | null;
+  state?: string | null;
 };
 
 export type OpportunityZoneProperties = {
@@ -91,6 +94,9 @@ export type OpportunityZoneProperties = {
   tract: string | null;
   name: string | null;
   rural: boolean | null;
+  /** Short county name, without a "County" suffix. */
+  county?: string | null;
+  state?: string | null;
 };
 
 export type OpportunityZoneFeature = GeoJSON.Feature<

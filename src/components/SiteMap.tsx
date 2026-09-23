@@ -7,6 +7,7 @@ import { aoiFeatureCollection, normalizeBbox, type AoiLock } from "@/lib/aoi";
 import { applyMapGestures } from "@/lib/mapGestures";
 import { BasemapToggle } from "./BasemapToggle";
 import { AoiControls } from "./AoiControls";
+import { MeasureControl } from "./MeasureControl";
 import { ParcelLayerToggle } from "./ParcelLayerToggle";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import {
@@ -34,7 +35,15 @@ import {
   trafficLinePaint,
   type BasemapMode,
 } from "@/lib/basemap";
+import {
+  MEASURE_CASING_COLOR,
+  MEASURE_LINE_COLOR,
+  appendMeasurePoint,
+  measureFeatureCollection,
+  type LngLat,
+} from "@/lib/measure";
 import { eligibleClassCut, southCarolinaStatusHelp } from "@/lib/markets";
+import { tractClickFromFeature, type TractClickDetails } from "@/lib/tractCounty";
 import { ORANGE_COUNTY_CENTER, SC_GOVERNOR_FILED_STATUS, type EligiblePackTractCollection, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
 
 type LngLatBounds = [[number, number], [number, number]];
@@ -74,7 +83,7 @@ type SiteMapProps = {
   showMfLegend: boolean;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
-  onSelectTract: (geoid: string) => void;
+  onSelectTract: (geoid: string | null) => void;
   onViewportIdle?: (bbox: [number, number, number, number], zoom: number) => void;
   onZoom?: (zoom: number) => void;
   aoi?: AoiLock | null;
@@ -82,6 +91,22 @@ type SiteMapProps = {
   aoiTruncated?: boolean;
   onAoiChange?: (aoi: AoiLock | null) => void;
 };
+
+function queryRendered(map: MapLibreMap, point: maplibregl.PointLike, layers: string[]) {
+  const present = layers.filter((layerId) => map.getLayer(layerId));
+  if (present.length === 0) return [];
+  return map.queryRenderedFeatures(point, { layers: present });
+}
+
+function setFilterSafe(map: MapLibreMap, layerId: string, filter: maplibregl.FilterSpecification | null) {
+  if (!map.getLayer(layerId)) return;
+  map.setFilter(layerId, filter);
+}
+
+function setVisibilitySafe(map: MapLibreMap, layerId: string, visibility: "visible" | "none") {
+  if (!map.getLayer(layerId)) return;
+  map.setLayoutProperty(layerId, "visibility", visibility);
+}
 
 function geoidMatch(geoids: string[]): maplibregl.FilterSpecification {
   if (geoids.length === 0) return ["==", ["get", "tractGeoid"], "__none__"];
@@ -258,6 +283,51 @@ function addOverlayLayers(
       "line-dasharray": [1.5, 1],
     },
   });
+  map.addSource("measure", { type: "geojson", data: measureFeatureCollection([]) });
+  map.addLayer({
+    id: "measure-casing",
+    type: "line",
+    source: "measure",
+    filter: ["==", ["get", "kind"], "line"],
+    paint: { "line-color": MEASURE_CASING_COLOR, "line-width": 6, "line-opacity": 0.95 },
+  });
+  map.addLayer({
+    id: "measure-line",
+    type: "line",
+    source: "measure",
+    filter: ["==", ["get", "kind"], "line"],
+    paint: { "line-color": MEASURE_LINE_COLOR, "line-width": 3, "line-opacity": 1 },
+  });
+  map.addLayer({
+    id: "measure-vertices",
+    type: "circle",
+    source: "measure",
+    filter: ["==", ["get", "kind"], "vertex"],
+    paint: {
+      "circle-radius": 5,
+      "circle-color": MEASURE_LINE_COLOR,
+      "circle-stroke-color": MEASURE_CASING_COLOR,
+      "circle-stroke-width": 2,
+    },
+  });
+}
+
+function showTractPopup(map: MapLibreMap, lngLat: maplibregl.LngLatLike, details: TractClickDetails) {
+  const root = document.createElement("div");
+  const place = document.createElement("p");
+  place.style.fontWeight = "600";
+  place.textContent = details.placeLabel;
+  const geoid = document.createElement("p");
+  geoid.textContent = `GEOID ${details.geoid}`;
+  const status = document.createElement("p");
+  status.textContent = details.status;
+  const rural = document.createElement("p");
+  rural.textContent = details.ruralLabel;
+  root.append(place, geoid, status, rural);
+  return new maplibregl.Popup({ closeButton: true, maxWidth: "280px", closeOnClick: false })
+    .setLngLat(lngLat)
+    .setDOMContent(root)
+    .addTo(map);
 }
 
 export function SiteMap({
@@ -310,10 +380,15 @@ export function SiteMap({
   const [message, setMessage] = useState("Loading map…");
   const [basemap, setBasemap] = useState<BasemapMode>("streets");
   const [drawing, setDrawing] = useState(false);
+  const [measuring, setMeasuring] = useState(false);
+  const [measurePoints, setMeasurePoints] = useState<LngLat[]>([]);
   const callbacksRef = useRef({ onSelect, onHover, onSelectTract, onViewportIdle, onZoom, onAoiChange });
   callbacksRef.current = { onSelect, onHover, onSelectTract, onViewportIdle, onZoom, onAoiChange };
   const drawingRef = useRef(drawing);
   drawingRef.current = drawing;
+  const measuringRef = useRef(measuring);
+  measuringRef.current = measuring;
+  const popupRef = useRef<maplibregl.Popup | null>(null);
   const aoiRef = useRef(aoi);
   aoiRef.current = aoi;
   const basemapRef = useRef(basemap);
@@ -376,18 +451,39 @@ export function SiteMap({
 
           const interactive = ["parcels-fill", "parcels-fill-excluded"];
           map.on("click", interactive, (event) => {
-            if (drawingRef.current) return;
+            if (drawingRef.current || measuringRef.current) return;
             const id = event.features?.[0]?.properties?.id;
             if (typeof id === "string") callbacksRef.current.onSelect(id);
           });
-          const tractLayers = ["mf-priority-a-fill", "mf-priority-b-fill", "eligible-fill", "rural-fill", "rural-pins", "oz2-fill"];
+          const tractLayers = ["mf-priority-a-fill", "mf-priority-b-fill", "eligible-fill", "rural-fill", "rural-pins", "oz2-fill", "oz-fill"];
           map.on("click", tractLayers, (event) => {
-            if (drawingRef.current) return;
-            const parcelHit = map.queryRenderedFeatures(event.point, { layers: interactive });
-            if (parcelHit.length > 0) return;
-            const props = event.features?.[0]?.properties;
-            const geoid = props?.tractGeoid;
-            if (typeof geoid === "string") callbacksRef.current.onSelectTract(geoid);
+            if (drawingRef.current || measuringRef.current) return;
+            const feature = event.features?.[0];
+            const details = tractClickFromFeature({
+              layerId: feature?.layer.id ?? "",
+              properties: (feature?.properties ?? null) as Record<string, unknown> | null,
+            });
+            if (!details) return;
+            const parcelHit = queryRendered(map, event.point, interactive);
+            if (parcelHit.length > 0) {
+              popupRef.current?.remove();
+              popupRef.current = showTractPopup(map, event.lngLat, details);
+              return;
+            }
+            if (details.kind === "eligible") {
+              callbacksRef.current.onSelectTract(details.geoid);
+              popupRef.current?.remove();
+              popupRef.current = details.opensRuralDrawer ? null : showTractPopup(map, event.lngLat, details);
+              return;
+            }
+            callbacksRef.current.onSelectTract(null);
+            popupRef.current?.remove();
+            popupRef.current = showTractPopup(map, event.lngLat, details);
+          });
+          map.on("click", (event) => {
+            if (!measuringRef.current || drawingRef.current) return;
+            const next: LngLat = [event.lngLat.lng, event.lngLat.lat];
+            setMeasurePoints((points) => appendMeasurePoint(points, next));
           });
           map.on("mousemove", interactive, (event) => {
             if (drawingRef.current) return;
@@ -492,6 +588,48 @@ export function SiteMap({
   }, [showParcels, drawing]);
 
   useEffect(() => {
+    if (drawing && measuring) {
+      setMeasuring(false);
+      setMeasurePoints([]);
+    }
+  }, [drawing, measuring]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready") return;
+    const source = map.getSource("measure");
+    if (source?.type === "geojson") {
+      (source as GeoJSONSource).setData(measureFeatureCollection(measurePoints));
+    }
+  }, [measurePoints, status]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready") return;
+    if (measuring) {
+      map.doubleClickZoom.disable();
+      map.getCanvas().style.cursor = "crosshair";
+    } else if (!drawing) {
+      map.doubleClickZoom.enable();
+      map.getCanvas().style.cursor = "";
+    }
+  }, [measuring, drawing, status]);
+
+  useEffect(() => {
+    if (!measuring) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMeasuring(false);
+        setMeasurePoints([]);
+        popupRef.current?.remove();
+        popupRef.current = null;
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [measuring]);
+
+  useEffect(() => {
     const map = mapRef.current;
     if (!map || status !== "ready" || drawing) return;
     const source = map.getSource("aoi");
@@ -517,7 +655,7 @@ export function SiteMap({
   useEffect(() => {
     const map = mapRef.current;
     if (!map || status !== "ready") return;
-    applyMapGestures(map, drawing);
+    applyMapGestures(map, drawing, measuring);
     if (!drawing) return;
 
     const canvas = map.getCanvas();
@@ -613,37 +751,37 @@ export function SiteMap({
       window.removeEventListener("mouseup", onWindowMouseUp);
       window.removeEventListener("keydown", onKey);
       try {
-        applyMapGestures(map, false);
+        applyMapGestures(map, false, measuringRef.current);
         canvas.style.cursor = "";
       } catch {
         // Map already removed.
       }
     };
-  }, [drawing, status]);
+  }, [drawing, measuring, status]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map || status !== "ready") return;
     const layerOn = parcelLayerVisible ?? showParcels;
-    map.setFilter("parcels-fill", layerOn ? parcelMatchFilter : parcelHiddenFilter);
-    map.setFilter("parcels-line", layerOn ? parcelMatchFilter : parcelHiddenFilter);
-    map.setFilter("parcels-fill-excluded", layerOn && showExcluded ? parcelExcludedFilter : parcelHiddenFilter);
-    map.setFilter("parcels-line-excluded", layerOn && showExcluded ? parcelExcludedFilter : parcelHiddenFilter);
-    map.setLayoutProperty("traffic-line", "visibility", showOrangePilot && showTraffic ? "visible" : "none");
-    map.setLayoutProperty("oz-fill", "visibility", showOrangePilot && showOz ? "visible" : "none");
-    map.setLayoutProperty("oz-line", "visibility", showOrangePilot && showOz ? "visible" : "none");
-    map.setLayoutProperty("oz2-fill", "visibility", showOrangePilot && showOz2 ? "visible" : "none");
-    map.setLayoutProperty("oz2-line", "visibility", showOrangePilot && showOz2 ? "visible" : "none");
+    setFilterSafe(map, "parcels-fill", layerOn ? parcelMatchFilter : parcelHiddenFilter);
+    setFilterSafe(map, "parcels-line", layerOn ? parcelMatchFilter : parcelHiddenFilter);
+    setFilterSafe(map, "parcels-fill-excluded", layerOn && showExcluded ? parcelExcludedFilter : parcelHiddenFilter);
+    setFilterSafe(map, "parcels-line-excluded", layerOn && showExcluded ? parcelExcludedFilter : parcelHiddenFilter);
+    setVisibilitySafe(map, "traffic-line", showOrangePilot && showTraffic ? "visible" : "none");
+    setVisibilitySafe(map, "oz-fill", showOrangePilot && showOz ? "visible" : "none");
+    setVisibilitySafe(map, "oz-line", showOrangePilot && showOz ? "visible" : "none");
+    setVisibilitySafe(map, "oz2-fill", showOrangePilot && showOz2 ? "visible" : "none");
+    setVisibilitySafe(map, "oz2-line", showOrangePilot && showOz2 ? "visible" : "none");
     const classCut = eligibleClassCut(tractClass, ozFilter);
     const showRuralLayer = showOz2 && tractClass !== "urban" && ozFilter !== "non-rural-eligible";
     const showEligibleLayer = showOz2 && restrictGeoids == null && classCut !== "none";
-    map.setLayoutProperty("rural-fill", "visibility", showRuralLayer ? "visible" : "none");
-    map.setLayoutProperty("rural-line", "visibility", showRuralLayer ? "visible" : "none");
-    map.setLayoutProperty("eligible-fill", "visibility", showEligibleLayer ? "visible" : "none");
-    map.setLayoutProperty("eligible-line", "visibility", showEligibleLayer ? "visible" : "none");
-    map.setLayoutProperty("rural-pins", "visibility", showOz2 ? "visible" : "none");
+    setVisibilitySafe(map, "rural-fill", showRuralLayer ? "visible" : "none");
+    setVisibilitySafe(map, "rural-line", showRuralLayer ? "visible" : "none");
+    setVisibilitySafe(map, "eligible-fill", showEligibleLayer ? "visible" : "none");
+    setVisibilitySafe(map, "eligible-line", showEligibleLayer ? "visible" : "none");
+    setVisibilitySafe(map, "rural-pins", showOz2 ? "visible" : "none");
     for (const layerId of ["mf-priority-a-fill", "mf-priority-a-line", "mf-priority-b-fill", "mf-priority-b-line"]) {
-      map.setLayoutProperty(layerId, "visibility", showRuralLayer ? "visible" : "none");
+      setVisibilitySafe(map, layerId, showRuralLayer ? "visible" : "none");
     }
     const oz2Filter: maplibregl.FilterSpecification | null =
       classCut === "all"
@@ -651,20 +789,20 @@ export function SiteMap({
         : classCut === "none"
           ? ["==", ["get", "tractGeoid"], "__none__"]
           : ["==", ["get", "rural"], classCut === "rural"];
-    map.setFilter("oz2-fill", oz2Filter);
-    map.setFilter("oz2-line", oz2Filter);
+    setFilterSafe(map, "oz2-fill", oz2Filter);
+    setFilterSafe(map, "oz2-line", oz2Filter);
     const ruralFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, restrictGeoids);
-    map.setFilter("rural-fill", ruralFilter);
-    map.setFilter("rural-line", ruralFilter);
+    setFilterSafe(map, "rural-fill", ruralFilter);
+    setFilterSafe(map, "rural-line", ruralFilter);
     const eligibleFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, null, classCut);
-    map.setFilter("eligible-fill", eligibleFilter);
-    map.setFilter("eligible-line", eligibleFilter);
+    setFilterSafe(map, "eligible-fill", eligibleFilter);
+    setFilterSafe(map, "eligible-line", eligibleFilter);
     const tierAFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, highlightTierA);
     const tierBFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, highlightTierB);
-    map.setFilter("mf-priority-a-fill", tierAFilter);
-    map.setFilter("mf-priority-a-line", tierAFilter);
-    map.setFilter("mf-priority-b-fill", tierBFilter);
-    map.setFilter("mf-priority-b-line", tierBFilter);
+    setFilterSafe(map, "mf-priority-a-fill", tierAFilter);
+    setFilterSafe(map, "mf-priority-a-line", tierAFilter);
+    setFilterSafe(map, "mf-priority-b-fill", tierBFilter);
+    setFilterSafe(map, "mf-priority-b-line", tierBFilter);
   }, [
     parcelLayerVisible,
     showExcluded,
@@ -689,21 +827,21 @@ export function SiteMap({
     if (!map || status !== "ready") return;
     addSatelliteSourceAndLayer(map);
     applyBasemap(map, basemap);
-    map.setLayoutProperty("traffic-line", "visibility", showOrangePilot && showTraffic ? "visible" : "none");
-    map.setLayoutProperty("oz-fill", "visibility", showOrangePilot && showOz ? "visible" : "none");
-    map.setLayoutProperty("oz-line", "visibility", showOrangePilot && showOz ? "visible" : "none");
-    map.setLayoutProperty("oz2-fill", "visibility", showOrangePilot && showOz2 ? "visible" : "none");
-    map.setLayoutProperty("oz2-line", "visibility", showOrangePilot && showOz2 ? "visible" : "none");
+    setVisibilitySafe(map, "traffic-line", showOrangePilot && showTraffic ? "visible" : "none");
+    setVisibilitySafe(map, "oz-fill", showOrangePilot && showOz ? "visible" : "none");
+    setVisibilitySafe(map, "oz-line", showOrangePilot && showOz ? "visible" : "none");
+    setVisibilitySafe(map, "oz2-fill", showOrangePilot && showOz2 ? "visible" : "none");
+    setVisibilitySafe(map, "oz2-line", showOrangePilot && showOz2 ? "visible" : "none");
     const classCut = eligibleClassCut(tractClass, ozFilter);
     const showRuralLayer = showOz2 && tractClass !== "urban" && ozFilter !== "non-rural-eligible";
     const showEligibleLayer = showOz2 && restrictGeoids == null && classCut !== "none";
-    map.setLayoutProperty("rural-fill", "visibility", showRuralLayer ? "visible" : "none");
-    map.setLayoutProperty("rural-line", "visibility", showRuralLayer ? "visible" : "none");
-    map.setLayoutProperty("eligible-fill", "visibility", showEligibleLayer ? "visible" : "none");
-    map.setLayoutProperty("eligible-line", "visibility", showEligibleLayer ? "visible" : "none");
-    map.setLayoutProperty("rural-pins", "visibility", showOz2 ? "visible" : "none");
+    setVisibilitySafe(map, "rural-fill", showRuralLayer ? "visible" : "none");
+    setVisibilitySafe(map, "rural-line", showRuralLayer ? "visible" : "none");
+    setVisibilitySafe(map, "eligible-fill", showEligibleLayer ? "visible" : "none");
+    setVisibilitySafe(map, "eligible-line", showEligibleLayer ? "visible" : "none");
+    setVisibilitySafe(map, "rural-pins", showOz2 ? "visible" : "none");
     for (const layerId of ["mf-priority-a-fill", "mf-priority-a-line", "mf-priority-b-fill", "mf-priority-b-line"]) {
-      map.setLayoutProperty(layerId, "visibility", showRuralLayer ? "visible" : "none");
+      setVisibilitySafe(map, layerId, showRuralLayer ? "visible" : "none");
     }
   }, [basemap, showTraffic, showOz, showOz2, showOrangePilot, ozFilter, tractClass, restrictGeoids, status]);
 
@@ -817,9 +955,26 @@ export function SiteMap({
   return (
     <div ref={shellRef} className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
-      {status === "ready" ? <BasemapToggle value={basemap} onChange={setBasemap} /> : null}
-      {status === "ready" && showParcels && onToggleParcelLayer ? (
-        <ParcelLayerToggle visible={layerOn} hint={parcelVisibilityHint ?? ""} onToggle={onToggleParcelLayer} />
+      {status === "ready" ? (
+        <div className="map-chrome absolute left-3 top-3 z-30 flex flex-col items-start gap-2 sm:left-4 sm:top-4">
+          <BasemapToggle value={basemap} onChange={setBasemap} />
+          <MeasureControl
+            active={measuring}
+            points={measurePoints}
+            onStart={() => {
+              setDrawing(false);
+              setMeasuring(true);
+            }}
+            onClear={() => setMeasurePoints([])}
+            onCancel={() => {
+              setMeasuring(false);
+              setMeasurePoints([]);
+            }}
+          />
+          {showParcels && onToggleParcelLayer ? (
+            <ParcelLayerToggle visible={layerOn} hint={parcelVisibilityHint ?? ""} onToggle={onToggleParcelLayer} />
+          ) : null}
+        </div>
       ) : null}
       {status === "ready" && showParcels ? (
         <AoiControls
@@ -828,7 +983,11 @@ export function SiteMap({
           matchedCount={aoiMatchedCount}
           truncated={aoiTruncated}
           loading={parcelsLoading && Boolean(aoi)}
-          onDraw={() => setDrawing(true)}
+          onDraw={() => {
+            setMeasuring(false);
+            setMeasurePoints([]);
+            setDrawing(true);
+          }}
           onCancelDraw={() => setDrawing(false)}
           onClear={() => {
             setDrawing(false);

@@ -70,6 +70,7 @@ def simplify_feature(feature: dict) -> dict:
     if isinstance(rural_raw, str) and rural_raw.strip():
         rural = rural_raw.strip().upper() in {"Y", "YES", "1", "TRUE"}
     name = tract_name(tract, geoid)
+    county, state = county_state_from_source(props, geoid)
     return {
         "type": "Feature",
         "id": geoid,
@@ -79,12 +80,26 @@ def simplify_feature(feature: dict) -> dict:
             "tract": tract or None,
             "name": name,
             "rural": rural,
+            "county": county,
+            "state": state,
         },
         "geometry": {
             "type": geom.get("type"),
             "coordinates": round_coords(geom.get("coordinates") or []),
         },
     }
+
+
+def county_state_from_source(props: dict, geoid: str) -> tuple[str | None, str | None]:
+    """Orange County designated overlay is the HUD extract for state 12, county 095."""
+    state_fips = str(props.get("STATE") or "")
+    county_fips = str(props.get("COUNTY") or "")
+    if county_fips.isdigit():
+        county_fips = county_fips.zfill(3)
+    state_name = props.get("STATE_NAME") if isinstance(props.get("STATE_NAME"), str) else None
+    if geoid.startswith("12095") or (state_fips == "12" and county_fips == "095"):
+        return "Orange", state_name or "Florida"
+    return None, state_name
 
 
 def tract_name(tract: str, geoid: str) -> str:

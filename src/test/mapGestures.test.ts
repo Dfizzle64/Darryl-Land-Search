@@ -62,6 +62,18 @@ describe("map gestures", () => {
     expect(fake.trackpadRate()).toBe(MAP_TRACKPAD_ZOOM_RATE);
   });
 
+  it("keeps scroll zoom on while measuring and turns double-click zoom back on after", () => {
+    const fake = fakeMap();
+    applyMapGestures(fake.map, false, true);
+    expect(fake.scrollEnabled()).toBe(true);
+    expect(fake.enabled("dragPan")).toBe(true);
+    expect(fake.enabled("touchZoomRotate")).toBe(true);
+    expect(fake.enabled("doubleClickZoom")).toBe(false);
+    applyMapGestures(fake.map, false, false);
+    expect(fake.enabled("doubleClickZoom")).toBe(true);
+    expect(fake.enabled("dragPan")).toBe(true);
+  });
+
   it("restores pan after the draw tool closes", () => {
     const fake = fakeMap();
     applyMapGestures(fake.map, true);

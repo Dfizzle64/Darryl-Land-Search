@@ -29,13 +29,15 @@ export type MapGestureTarget = {
   keyboard: GestureHandler;
 };
 
-export function applyMapGestures(map: MapGestureTarget, drawing: boolean) {
+export function applyMapGestures(map: MapGestureTarget, drawing: boolean, measuring = false) {
   map.scrollZoom.enable();
   map.scrollZoom.setWheelZoomRate?.(MAP_WHEEL_ZOOM_RATE);
   map.scrollZoom.setZoomRate?.(MAP_TRACKPAD_ZOOM_RATE);
-  map.doubleClickZoom.enable();
   map.touchZoomRotate.enable();
   map.keyboard.enable();
+  // Measure uses double-click as a map click, so that zoom stays off until the tool closes.
+  if (measuring) map.doubleClickZoom.disable();
+  else map.doubleClickZoom.enable();
   if (drawing) {
     map.dragPan.disable();
     map.boxZoom.disable();

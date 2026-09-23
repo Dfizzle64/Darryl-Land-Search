@@ -78,7 +78,9 @@ export function ParcelDrawer({
     : null;
   const placeLine =
     [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+    (properties.countyName
+      ? `${properties.countyName} County${properties.state ? `, ${properties.state}` : ""}`
+      : "Location not available");
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -178,10 +180,12 @@ export function ParcelDrawer({
         <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
           {appraiser.label}
         </a>
-        {entity && properties.ownerName ? (
+        {entity && properties.ownerName && (properties.state === "Florida" || (properties.countyFips ?? "").startsWith("12")) ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={sunbizSearchUrl(properties.ownerName)} target="_blank" rel="noreferrer">
             Search Florida Sunbiz for LLC / corporate principals
           </a>
+        ) : entity && properties.ownerName ? (
+          <p className="text-ink-300">Owner looks like an entity. Florida Sunbiz is not used outside Florida. Use the county assessor search.</p>
         ) : (
           <p className="text-ink-300">Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped.</p>
         )}

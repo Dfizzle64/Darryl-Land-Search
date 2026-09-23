@@ -26,6 +26,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
+from williamson_enrich import pull_williamson, williamson_gap_lines, williamson_spec
+
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "data" / "market-parcel-counties.json"
 OUT_DIR = ROOT / "data" / "fixtures" / "market-parcels"
@@ -604,6 +606,8 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    if fips == "47187":  # Williamson TN — not IMPACT
+        return williamson_spec()
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -777,6 +781,7 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    extra: dict | None = None,
 ) -> dict:
     row = {
         "name": county["name"],
@@ -797,6 +802,8 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    if extra:
+        row.update(extra)
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
     (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
     return row
@@ -959,20 +966,67 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels, except Williamson | IMPACT where `CALC_ACRE` returns rows. Williamson (47187) is not IMPACT: HTTP `IDT/DataPull` layer 10, `CALC_ACRE` 5–150, owner/mailing/situs/sale/tax, jurisdiction from `CITY` tax codes and Corporate Limits layer 2, then city zoning REST. Nolensville and Thompson's Station zoning stay null |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning on the statewide extracts is joined only when the county layer already carries a zoning field (DeKalb). Williamson is the Nashville-market exception: after `CITY` / Corporate Limits resolution, Franklin, Brentwood, Fairview, Spring Hill, and unincorporated county zones are centroid-joined, and Franklin Envision plus Fairview 2040 FLU are joined only inside those cities. Those codes are not in the Orange County multifamily list. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
 
 
+def download_williamson(county: dict, markets: list[str], spec: dict) -> dict:
+    print(f"Pulling {county['name']} {county['state']} ({county['fips']}) via {spec['source']}", flush=True)
+    features, stats = pull_williamson(
+        county,
+        markets,
+        fetch_json=fetch_json,
+        empty_feature=empty_feature,
+        rings_to_geometry=rings_to_feature_geometry,
+        centroid_of=centroid_of,
+        plausible_centroid=plausible_centroid,
+        in_band=in_band,
+        num=num,
+    )
+    if not all(in_band(feature["properties"].get("acreage")) for feature in features):
+        raise RuntimeError(f"{county['fips']} emitted a parcel outside 5–150 acres")
+    path, lookup, tiles = write_tiles(county, features)
+    gaps = williamson_gap_lines(len(features), int(stats.get("sourceCount") or 0), int(stats.get("dropped") or 0), stats)
+    print(f"  kept {len(features)} ({spec['coverage']})", flush=True)
+    return county_row(
+        county,
+        markets,
+        feature_count=len(features),
+        coverage=spec["coverage"],
+        partition="tiles",
+        path=path,
+        lookup=lookup,
+        source=spec["source"],
+        query_url=spec["url"],
+        gaps=gaps,
+        source_count=stats.get("sourceCount"),
+        dropped=stats.get("dropped"),
+        tile_count=tiles,
+        extra={
+            "acreageField": "CALC_ACRE",
+            "impact": False,
+            "jurisdictionCounts": stats.get("byJurisdiction"),
+            "zoningJoined": stats.get("zoningJoined"),
+            "fluJoined": stats.get("fluJoined"),
+            "jurisdictionHow": stats.get("jurisdictionHow"),
+            "limitsDisagreements": stats.get("limitsDisagreements"),
+            "referenceLayerCounts": stats.get("layerCounts"),
+        },
+    )
+
+
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "williamson":
+        return download_williamson(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

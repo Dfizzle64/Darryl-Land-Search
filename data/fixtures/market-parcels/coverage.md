@@ -9,7 +9,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
-| Nashville | primary | 31,132 | 6 | 0 | 11 |
+| Nashville | primary | 41,892 | 7 | 0 | 10 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
@@ -115,7 +115,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Smith | Tennessee | 47159 | gap | 0 | tn-impact-47159 |
 | Sumner | Tennessee | 47165 | gap | 0 | tn-impact-47165 |
 | Trousdale | Tennessee | 47169 | gap | 0 | tn-impact-47169 |
-| Williamson | Tennessee | 47187 | gap | 0 | tn-impact-47187 |
+| Williamson | Tennessee | 47187 | complete-gte-5ac | 10,760 | tn-williamson-datapull-47187 |
 | Wilson | Tennessee | 47189 | gap | 0 | tn-impact-47189 |
 
 ### Charlotte

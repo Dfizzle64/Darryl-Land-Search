@@ -37,7 +37,7 @@ export function AoiControls({
       <div className="flex max-w-full flex-wrap items-center justify-end gap-1.5">
         {aoi ? (
           <div
-            className="flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-full border border-clay-400/60 bg-ink-900/95 px-3 py-1.5 text-xs text-white shadow-2xl"
+            className="map-scrim flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-full border px-3 py-1.5 text-xs text-white"
             aria-live="polite"
           >
             <span className="font-medium text-clay-400">AOI locked</span>
@@ -56,10 +56,8 @@ export function AoiControls({
         <button
           type="button"
           aria-pressed={drawing}
-          className={`rounded-full border px-3 py-1.5 text-xs shadow-2xl ${
-            drawing
-              ? "border-clay-400/70 bg-ink-800 text-white"
-              : "border-white/15 bg-ink-900/92 text-white hover:border-white/30"
+          className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
+            drawing ? "map-scrim-active border-white" : "map-scrim text-white hover:bg-white/10"
           }`}
           onClick={drawing ? onCancelDraw : onDraw}
         >
@@ -67,19 +65,19 @@ export function AoiControls({
         </button>
         <button
           type="button"
-          className="rounded-full border border-white/15 bg-ink-900/92 px-3 py-1.5 text-xs text-white shadow-2xl hover:border-white/30"
+          className="map-scrim rounded-full border px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/10"
           onClick={onLockView}
         >
           Lock view
         </button>
       </div>
       {drawing ? (
-        <p className="rounded-xl border border-white/10 bg-ink-900/95 px-3 py-2 text-xs leading-snug text-ink-100 shadow-2xl">
+        <p className="map-scrim rounded-xl border px-3 py-2 text-xs leading-snug text-ink-100">
           Drag a rectangle on the map. Release to lock parcels inside it.
         </p>
       ) : null}
       {aoi && truncated ? (
-        <p className="rounded-xl border border-white/10 bg-ink-900/95 px-3 py-2 text-[11px] leading-snug text-ink-300 shadow-2xl">
+        <p className="map-scrim rounded-xl border px-3 py-2 text-[11px] leading-snug text-ink-100">
           This boundary has more parcels than the map will hold at once. The list stays put while you pan. Draw a
           smaller area to load every parcel in it.
         </p>

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T23:15:23Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 8149,
+  "parcelCount": 15567,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -400,20 +400,28 @@
       "name": "Henry",
       "fips": "13151",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 7418,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-henry-parcels",
+      "queryUrl": "https://arcgis.co.henry.ga.us/server/rest/services/Parcels/MapServer/12/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "7669 source rows collapsed to 7418 parcel ids because the parcel id repeats. None failed the acreage band or the WGS84 centroid check. The acreage query covered the county.",
+        "Henry 5\u2013150 acre join: zoning 6424/7418 (GMC McDonough 314, McDonough clip 13, Stockbridge clip 248, Locust Grove clip 159, county ZONING 5238, CityZoning stub 364, Hampton CityZoning stub 88, CITY with blank CityZoning 205, no zoning row 789, other unmatched 0). FLU 4777/7418; FLU2023=CITY left blank on 1020; no FLU row 1621. McDonough owner names 198. Special overlays noted 55. Centroids outside Henry extent dropped 0.",
+        "County Parcels/MapServer/12 has situs and ACREAGE_1. It does not publish ownerName, mailing address, tax values, or last sale. CAMA is qPublic HTML (AppID=1035, LayerID=22139, PageTypeID=4, PageID=15803, KeyValue=PARCEL_NO). The deep link is stored on each parcel.",
+        "Zoning is joined from Current_Zoning_and_Future_Land_Use/MapServer/0 on PARCEL_NO. Unincorporated parcels use ZONING. When ZONING is CITY the county CityZoning stub is the fallback. McDonough prefers GMC mcd_Planning_view/FeatureServer/1 district polygons (centroid in polygon), then county McDonough/FeatureServer/3. Stockbridge uses county Stockbridge/FeatureServer/2. Locust Grove uses county Locust_Grove/FeatureServer/1. Hampton has no city REST; CityZoning stub only. Flippen is unincorporated and has no city layer.",
+        "Rejected services8.arcgis.com/gbzZfTaSTnfRdQPt (CITYNAME=Mustang, ST_FIPS=40, Oklahoma) as a wrong-state Hampton lookalike. It is not queried.",
+        "FLU is Planning/Future_Land_Use/FeatureServer/0 FLU2023 joined on PARCEL_NO. Code CITY is not stored; city comprehensive-plan FLU is PDF, not REST. The layer publishes codes without a legend expansion, so the code is the label. Parcel-layer ZONING and FUTURE_LAN are often null and are not the join source.",
+        "McDonough owner names come only from GMC mcd_Planning_view/FeatureServer/0 OWNER_NAME when the parcel is inside McDonough (FLU municipal, county city clip, or a GMC zoning hit when municipal is blank). GMC ACRES is not used (often 0; the GMC count does not match the county clip). That layer has no mailing, tax, or sale.",
+        "Stockbridge city AGOL webapp was not used (item inaccessible). No Locust Grove or Hampton city-owned zoning FeatureServer was verified. No emails or phones. No paid vendors.",
+        "POSTALCITY can include Ellenwood, Rex, Jonesboro, Jackson, or Jenkinsburg. Those are postal places, not Henry incorporated municipalities. Incorporated names on FLU MUNICIPAL are McDonough, Stockbridge, Hampton, and Locust Grove. Flippen is unincorporated and has no city layer."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13151/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13151/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 7669
     },
     {
       "name": "Jackson",

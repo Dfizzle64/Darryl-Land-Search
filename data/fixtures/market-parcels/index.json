@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T23:15:23Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -11,10 +11,10 @@
   "markets": {
     "Atlanta": {
       "tier": "primary",
-      "parcelCount": 8149,
-      "completeCountyCount": 1,
+      "parcelCount": 15567,
+      "completeCountyCount": 2,
       "sampleCountyCount": 1,
-      "gapCountyCount": 33,
+      "gapCountyCount": 32,
       "path": "data/fixtures/market-parcels/markets/atlanta/meta.json",
       "counties": [
         {
@@ -261,12 +261,13 @@
           "name": "Henry",
           "state": "Georgia",
           "fips": "13151",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 7418,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "7669 source rows collapsed to 7418 parcel ids because the parcel id repeats. None failed the acreage band or the WGS84 centroid check. The acreage query covered the county.",
+            "Henry 5\u2013150 acre join: zoning 6424/7418 (GMC McDonough 314, McDonough clip 13, Stockbridge clip 248, Locust Grove clip 159, county ZONING 5238, CityZoning stub 364, Hampton CityZoning stub 88, CITY with blank CityZoning 205, no zoning row 789, other unmatched 0). FLU 4777/7418; FLU2023=CITY left blank on 1020; no FLU row 1621. McDonough owner names 198. Special overlays noted 55. Centroids outside Henry extent dropped 0."
           ]
         },
         {

@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import threading
 import time
 import urllib.parse
@@ -483,6 +484,10 @@ def normalize_rows(
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        if spec.get("appraiserHtmlField"):
+            feature["properties"]["appraiserUrl"] = qpublic_href(
+                attrs.get(spec["appraiserHtmlField"]), parcel_id
+            )
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -603,7 +608,555 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+QPUBLIC_HREF_RE = re.compile(r'href="([^"]+)"', re.IGNORECASE)
+HENRY_APPRAISER_SEARCH = "https://qpublic.schneidercorp.com/Application.aspx?App=HenryCountyGA&PageType=Search"
+HENRY_QPUBLIC = (
+    "https://qpublic.schneidercorp.com/Application.aspx?AppID=1035&LayerID=22139"
+    "&PageTypeID=4&PageID=15803&KeyValue="
+)
+# Padded Henry County parcel extent (WGS84). Centroids are computed from simplified rings.
+HENRY_LON_MIN, HENRY_LAT_MIN, HENRY_LON_MAX, HENRY_LAT_MAX = -84.45, 33.22, -83.85, 33.72
+HENRY_OTHER_CITIES = {"stockbridge", "hampton", "locust grove"}
+
+HENRY_PARCELS_URL = "https://arcgis.co.henry.ga.us/server/rest/services/Parcels/MapServer/12/query"
+HENRY_ZONING_URL = (
+    "https://arcgis.co.henry.ga.us/server/rest/services/Current_Zoning_and_Future_Land_Use/MapServer/0/query"
+)
+HENRY_FLU_URL = "https://arcgis.co.henry.ga.us/server/rest/services/Planning/Future_Land_Use/FeatureServer/0/query"
+HENRY_MCDONOUGH_CLIP_URL = "https://arcgis.co.henry.ga.us/server/rest/services/McDonough/FeatureServer/3/query"
+HENRY_STOCKBRIDGE_CLIP_URL = "https://arcgis.co.henry.ga.us/server/rest/services/Stockbridge/FeatureServer/2/query"
+HENRY_LOCUST_GROVE_CLIP_URL = (
+    "https://arcgis.co.henry.ga.us/server/rest/services/Locust_Grove/Locust_Grove/FeatureServer/1/query"
+)
+HENRY_GMC_ZONING_URL = (
+    "https://services3.arcgis.com/7ScJ8q0HhcQyXcHe/arcgis/rest/services/mcd_Planning_view/FeatureServer/1/query"
+)
+HENRY_GMC_PARCELS_URL = (
+    "https://services3.arcgis.com/7ScJ8q0HhcQyXcHe/arcgis/rest/services/mcd_Planning_view/FeatureServer/0/query"
+)
+
+HENRY_GAPS = [
+    "County Parcels/MapServer/12 has situs and ACREAGE_1. It does not publish ownerName, mailing address, tax values, or last sale. CAMA is qPublic HTML (AppID=1035, LayerID=22139, PageTypeID=4, PageID=15803, KeyValue=PARCEL_NO). The deep link is stored on each parcel.",
+    "Zoning is joined from Current_Zoning_and_Future_Land_Use/MapServer/0 on PARCEL_NO. Unincorporated parcels use ZONING. When ZONING is CITY the county CityZoning stub is the fallback. McDonough prefers GMC mcd_Planning_view/FeatureServer/1 district polygons (centroid in polygon), then county McDonough/FeatureServer/3. Stockbridge uses county Stockbridge/FeatureServer/2. Locust Grove uses county Locust_Grove/FeatureServer/1. Hampton has no city REST; CityZoning stub only. Flippen is unincorporated and has no city layer.",
+    "Rejected services8.arcgis.com/gbzZfTaSTnfRdQPt (CITYNAME=Mustang, ST_FIPS=40, Oklahoma) as a wrong-state Hampton lookalike. It is not queried.",
+    "FLU is Planning/Future_Land_Use/FeatureServer/0 FLU2023 joined on PARCEL_NO. Code CITY is not stored; city comprehensive-plan FLU is PDF, not REST. The layer publishes codes without a legend expansion, so the code is the label. Parcel-layer ZONING and FUTURE_LAN are often null and are not the join source.",
+    "McDonough owner names come only from GMC mcd_Planning_view/FeatureServer/0 OWNER_NAME when the parcel is inside McDonough (FLU municipal, county city clip, or a GMC zoning hit when municipal is blank). GMC ACRES is not used (often 0; the GMC count does not match the county clip). That layer has no mailing, tax, or sale.",
+    "Stockbridge city AGOL webapp was not used (item inaccessible). No Locust Grove or Hampton city-owned zoning FeatureServer was verified. No emails or phones. No paid vendors.",
+    "POSTALCITY can include Ellenwood, Rex, Jonesboro, Jackson, or Jenkinsburg. Those are postal places, not Henry incorporated municipalities. Incorporated names on FLU MUNICIPAL are McDonough, Stockbridge, Hampton, and Locust Grove. Flippen is unincorporated and has no city layer.",
+]
+
+
+def prefer_henry_zoning(old: dict, new: dict) -> dict:
+    """Stacked zoning rows: keep a real district over a blank or CITY-only stub."""
+
+    def rank(attrs: dict) -> int:
+        zoning = (clean_code(attrs.get("ZONING")) or "").upper()
+        city = clean_code(attrs.get("CityZoning")) or ""
+        if zoning and zoning != "CITY":
+            return 3
+        if city:
+            return 2
+        if zoning:
+            return 1
+        return 0
+
+    return new if rank(new) > rank(old) else old
+
+
+def prefer_henry_flu(old: dict, new: dict) -> dict:
+    def rank(attrs: dict) -> int:
+        code = (clean_code(attrs.get("FLU2023")) or "").upper()
+        municipal = clean(attrs.get("MUNICIPAL")) or ""
+        score = 0
+        if code and code != "CITY":
+            score += 4
+        elif code == "CITY":
+            score += 1
+        if municipal:
+            score += 2
+        return score
+
+    return new if rank(new) > rank(old) else old
+
+
+def qpublic_href(raw: Any, parcel_id: str) -> str:
+    text = clean(raw) or ""
+    match = QPUBLIC_HREF_RE.search(text)
+    if match:
+        return match.group(1).replace("&amp;", "&")
+    return HENRY_QPUBLIC + urllib.parse.quote(parcel_id, safe="")
+
+
+def clean_code(value: Any) -> str | None:
+    text = clean(value)
+    if not text or text.upper() in {"NULL", "NONE", "N/A", "NA"}:
+        return None
+    return text
+
+
+def henry_municipal(value: Any) -> str | None:
+    text = clean(value)
+    if not text:
+        return None
+    return {
+        "henry county": "Henry County",
+        "mcdonough": "McDonough",
+        "stockbridge": "Stockbridge",
+        "hampton": "Hampton",
+        "locust grove": "Locust Grove",
+        "flippen": "Flippen",
+    }.get(text.lower(), text)
+
+
+def fetch_paged(
+    url: str,
+    where: str,
+    out_fields: list[str],
+    *,
+    geometry: bool,
+    page_size: int = 2000,
+) -> list[dict]:
+    rows: list[dict] = []
+    offset = 0
+    last_first: Any = None
+    fields = list(out_fields)
+    if "OBJECTID" not in fields and "objectid" not in fields:
+        fields = ["OBJECTID", *fields]
+    for _page in range(80):
+        params: dict[str, str] = {
+            "where": where,
+            "outFields": ",".join(fields),
+            "returnGeometry": "true" if geometry else "false",
+            "resultOffset": str(offset),
+            "resultRecordCount": str(page_size),
+            "orderByFields": "OBJECTID",
+            "f": "json",
+        }
+        if geometry:
+            params["outSR"] = "4326"
+        data = fetch_json(url, params, timeout=180)
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        batch = data.get("features") or []
+        if not batch:
+            break
+        first_oid = (batch[0].get("attributes") or {}).get("OBJECTID")
+        if first_oid is not None and first_oid == last_first:
+            raise RuntimeError(f"Pagination stuck at OBJECTID {first_oid} for {url[:80]}")
+        last_first = first_oid
+        rows.extend(batch)
+        print(f"    paged {len(rows)} {url.split('/rest/services/')[-1][:72]}", flush=True)
+        if len(batch) < page_size:
+            break
+        offset += len(batch)
+        time.sleep(0.05)
+    return rows
+
+
+def fetch_attrs_in(
+    url: str,
+    id_field: str,
+    ids: list[str],
+    out_fields: list[str],
+    batch: int = 80,
+    prefer=None,
+) -> dict[str, dict]:
+    found: dict[str, dict] = {}
+    total = len(ids)
+    label = url.split("/rest/services/")[-1][:64]
+    for start in range(0, total, batch):
+        chunk = ids[start : start + batch]
+        quoted = ",".join("'" + pid.replace("'", "''") + "'" for pid in chunk)
+        data = fetch_json(
+            url,
+            {
+                "where": f"{id_field} IN ({quoted})",
+                "outFields": ",".join(out_fields),
+                "returnGeometry": "false",
+                "f": "json",
+            },
+        )
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        for row in data.get("features") or []:
+            attrs = row.get("attributes") or {}
+            pid = clean(attrs.get(id_field))
+            if not pid:
+                continue
+            if pid in found and prefer:
+                found[pid] = prefer(found[pid], attrs)
+            else:
+                found[pid] = attrs
+        done = min(start + len(chunk), total)
+        if done == len(chunk) or done == total or done % (batch * 10) == 0:
+            print(f"    joined {done}/{total} {label}", flush=True)
+        time.sleep(0.02)
+    return found
+
+
+def fetch_attributes_once(url: str, where: str, out_fields: list[str]) -> list[dict]:
+    """One page, no OBJECTID order. Henry city clips use FID and are under maxRecordCount."""
+    data = fetch_json(
+        url,
+        {
+            "where": where,
+            "outFields": ",".join(out_fields),
+            "returnGeometry": "false",
+            "resultRecordCount": "2000",
+            "f": "json",
+        },
+        timeout=180,
+    )
+    if data.get("error"):
+        raise RuntimeError(json.dumps(data["error"])[:300])
+    rows = data.get("features") or []
+    if data.get("exceededTransferLimit"):
+        raise RuntimeError(f"Attribute query needs another page: {url[:100]}")
+    return rows
+
+
+def index_by_parcel(rows: list[dict], id_field: str, needed: set[str] | None = None) -> dict[str, dict]:
+    found: dict[str, dict] = {}
+    for row in rows:
+        attrs = row.get("attributes") or {}
+        pid = clean(attrs.get(id_field))
+        if not pid:
+            continue
+        if needed is not None and pid not in needed:
+            continue
+        found[pid] = attrs
+    return found
+
+
+def point_in_ring(lon: float, lat: float, ring: list) -> bool:
+    inside = False
+    count = len(ring)
+    if count < 3:
+        return False
+    previous = count - 1
+    for index in range(count):
+        x1, y1 = ring[index][0], ring[index][1]
+        x2, y2 = ring[previous][0], ring[previous][1]
+        if (y1 > lat) != (y2 > lat):
+            span = y2 - y1
+            if span != 0:
+                x_cross = (x2 - x1) * (lat - y1) / span + x1
+                if lon < x_cross:
+                    inside = not inside
+        previous = index
+    return inside
+
+
+class ZoningPolyIndex:
+    """Each ArcGIS ring is tested on its own. The smallest containing ring wins.
+
+    Multipart district polygons stay searchable, and a ring inside another ring
+    (a smaller district, or a hole stored on the same feature) keeps that feature's
+    code instead of being dropped as a hole.
+    """
+
+    def __init__(self, raw: list[dict]):
+        self.items: list[tuple[tuple[float, float, float, float], list, str, float]] = []
+        for item in raw:
+            code = clean_code((item.get("attributes") or {}).get("CODE"))
+            rings = (item.get("geometry") or {}).get("rings") or []
+            if not code:
+                continue
+            for ring in rings:
+                if len(ring) < 4:
+                    continue
+                xs = [point[0] for point in ring]
+                ys = [point[1] for point in ring]
+                area = 0.0
+                for index in range(len(ring) - 1):
+                    area += ring[index][0] * ring[index + 1][1] - ring[index + 1][0] * ring[index][1]
+                self.items.append(((min(xs), min(ys), max(xs), max(ys)), ring, code, abs(area) / 2.0 or 1.0))
+
+    def hit(self, lon: float, lat: float) -> str | None:
+        hits: list[tuple[float, str]] = []
+        for (minx, miny, maxx, maxy), ring, code, area in self.items:
+            if lon < minx or lon > maxx or lat < miny or lat > maxy:
+                continue
+            if point_in_ring(lon, lat, ring):
+                hits.append((area, code))
+        if not hits:
+            return None
+        hits.sort()
+        return hits[0][1]
+
+
+def enrich_henry_features(features: list[dict], spec: dict) -> None:
+    """Join Henry zoning, FLU, city overlays, McDonough owner, and qPublic gaps.
+
+    Owner, mailing, tax, and sale stay empty except McDonough ownerName. County
+    FLU code CITY is left unset. Mustang, Oklahoma is never requested.
+    """
+    needed = {feature["properties"]["parcelId"] for feature in features}
+    print(f"  Henry enrich for {len(needed)} parcels", flush=True)
+    print("  zoning attributes", flush=True)
+    id_list = sorted(needed)
+    zoning_by_id = fetch_attrs_in(
+        HENRY_ZONING_URL,
+        "PARCEL_NO",
+        id_list,
+        ["PARCEL_NO", "ZONING", "CityZoning", "Spl_Zoning"],
+        prefer=prefer_henry_zoning,
+    )
+    print("  FLU attributes", flush=True)
+    flu_by_id = fetch_attrs_in(
+        HENRY_FLU_URL,
+        "PARCEL_NO",
+        id_list,
+        ["PARCEL_NO", "FLU2023", "MUNICIPAL"],
+        prefer=prefer_henry_flu,
+    )
+    band = "ACREAGE_1>=5 AND ACREAGE_1<=150"
+    print("  city zoning clips", flush=True)
+    mcd_clip = index_by_parcel(
+        fetch_attributes_once(HENRY_MCDONOUGH_CLIP_URL, band, ["PARCEL_NO", "ZONING", "MUNICIPAL"]),
+        "PARCEL_NO",
+    )
+    stock_clip = index_by_parcel(
+        fetch_attributes_once(HENRY_STOCKBRIDGE_CLIP_URL, band, ["PARCEL_NO", "ZONING"]),
+        "PARCEL_NO",
+    )
+    locust_clip = index_by_parcel(
+        fetch_attributes_once(HENRY_LOCUST_GROVE_CLIP_URL, band, ["PARCEL_NO", "ZONING"]),
+        "PARCEL_NO",
+    )
+    print(
+        f"    clips McDonough {len(mcd_clip)} Stockbridge {len(stock_clip)} Locust Grove {len(locust_clip)}",
+        flush=True,
+    )
+    print("  GMC McDonough zoning polygons", flush=True)
+    gmc_index = ZoningPolyIndex(
+        fetch_paged(HENRY_GMC_ZONING_URL, "1=1", ["CODE", "Display", "Descri"], geometry=True, page_size=200)
+    )
+    print(f"    GMC polygons {len(gmc_index.items)}", flush=True)
+    print("  GMC McDonough owner names", flush=True)
+    owners = index_by_parcel(
+        fetch_paged(HENRY_GMC_PARCELS_URL, "1=1", ["PARCEL_ID", "OWNER_NAME"], geometry=False),
+        "PARCEL_ID",
+    )
+
+    def clip_misses(municipal_name: str, clip: dict[str, dict]) -> list[str]:
+        missing = []
+        for feature in features:
+            pid = feature["properties"]["parcelId"]
+            municipal = henry_municipal((flu_by_id.get(pid) or {}).get("MUNICIPAL"))
+            if municipal == municipal_name and pid not in clip:
+                missing.append(pid)
+        return missing
+
+    for municipal_name, clip, url in (
+        ("McDonough", mcd_clip, HENRY_MCDONOUGH_CLIP_URL),
+        ("Stockbridge", stock_clip, HENRY_STOCKBRIDGE_CLIP_URL),
+        ("Locust Grove", locust_clip, HENRY_LOCUST_GROVE_CLIP_URL),
+    ):
+        missing = clip_misses(municipal_name, clip)
+        if missing:
+            print(f"    {municipal_name} clip miss {len(missing)}", flush=True)
+            clip.update(fetch_attrs_in(url, "PARCEL_NO", missing, ["PARCEL_NO", "ZONING"]))
+
+    stats = {
+        "zoning": 0,
+        "gmc": 0,
+        "mcd_clip": 0,
+        "stockbridge": 0,
+        "locust": 0,
+        "county": 0,
+        "city_stub": 0,
+        "hampton_stub": 0,
+        "zoning_miss": 0,
+        "city_blank": 0,
+        "no_zoning_row": 0,
+        "flu": 0,
+        "flu_city": 0,
+        "flu_miss": 0,
+        "owner": 0,
+        "outside": 0,
+        "overlay": 0,
+        "flippen": 0,
+    }
+    kept: list[dict] = []
+    base_gap = (
+        "No mailing address, tax value, or last sale on Henry County public REST. "
+        "CAMA is qPublic HTML; the QPublic deep link is kept."
+    )
+    for feature in features:
+        props = feature["properties"]
+        lon, lat = props["centroid"]
+        if not (HENRY_LON_MIN <= lon <= HENRY_LON_MAX and HENRY_LAT_MIN <= lat <= HENRY_LAT_MAX):
+            stats["outside"] += 1
+            continue
+        pid = props["parcelId"]
+        flu_attrs = flu_by_id.get(pid) or {}
+        municipal = henry_municipal(flu_attrs.get("MUNICIPAL"))
+        muni_key = (municipal or "").lower()
+        zoning_attrs = zoning_by_id.get(pid) or {}
+        county_zoning = clean_code(zoning_attrs.get("ZONING"))
+        city_zoning = clean_code(zoning_attrs.get("CityZoning"))
+        overlay = clean_code(zoning_attrs.get("Spl_Zoning"))
+        gmc_code = gmc_index.hit(lon, lat)
+        in_mcd_clip = pid in mcd_clip
+        in_mcdonough = muni_key == "mcdonough" or in_mcd_clip or (
+            bool(gmc_code) and muni_key not in HENRY_OTHER_CITIES and muni_key != "henry county"
+        )
+        zoning_code = None
+        zoning_source = None
+        mcd_clip_code = clean_code((mcd_clip.get(pid) or {}).get("ZONING"))
+        stock_code = clean_code((stock_clip.get(pid) or {}).get("ZONING"))
+        locust_code = clean_code((locust_clip.get(pid) or {}).get("ZONING"))
+        if in_mcdonough and gmc_code:
+            zoning_code, zoning_source = gmc_code, "gmc"
+        elif in_mcdonough and mcd_clip_code:
+            zoning_code, zoning_source = mcd_clip_code, "mcd_clip"
+        elif (muni_key == "stockbridge" or pid in stock_clip) and stock_code:
+            zoning_code, zoning_source = stock_code, "stockbridge"
+        elif (muni_key == "locust grove" or pid in locust_clip) and locust_code:
+            zoning_code, zoning_source = locust_code, "locust"
+        elif county_zoning and county_zoning.upper() != "CITY":
+            zoning_code, zoning_source = county_zoning, "county"
+        elif city_zoning:
+            zoning_source = "hampton_stub" if muni_key == "hampton" else "city_stub"
+            zoning_code = city_zoning
+        if zoning_code:
+            stats["zoning"] += 1
+            stats[zoning_source or "zoning_miss"] += 1
+            props["zoningCode"] = zoning_code
+            # Keep the full code. Parser would treat RA-200 / RM-75 as a jurisdiction prefix.
+            props["zoningDistrict"] = zoning_code
+        else:
+            props["zoningCode"] = None
+            props["zoningDistrict"] = None
+            if county_zoning and county_zoning.upper() == "CITY":
+                stats["city_blank"] += 1
+            elif pid not in zoning_by_id:
+                stats["no_zoning_row"] += 1
+            else:
+                stats["zoning_miss"] += 1
+        if overlay:
+            stats["overlay"] += 1
+
+        flu_code = clean_code(flu_attrs.get("FLU2023"))
+        if flu_code and flu_code.upper() == "CITY":
+            stats["flu_city"] += 1
+            props["flu"] = None
+        elif flu_code:
+            stats["flu"] += 1
+            props["flu"] = {
+                "code": flu_code,
+                "label": flu_code,
+                "jurisdiction": municipal or "Henry County",
+                "source": "henry-planning-flu2023",
+            }
+        else:
+            stats["flu_miss"] += 1
+            props["flu"] = None
+        props["jurisdictionCode"] = municipal
+
+        owner = None
+        if in_mcdonough:
+            owner = clean((owners.get(pid) or {}).get("OWNER_NAME"))
+        props["ownerName"] = owner
+        if owner:
+            stats["owner"] += 1
+        # County REST has none of these. Do not copy GMC acres or invent CAMA fields.
+        props["lastSale"] = {"date": None, "price": None, "qualified": None}
+        props["tax"] = {"marketValue": None, "assessedValue": None, "taxableValue": None, "taxes": None}
+        props["mailingAddress"] = {"line1": None, "line2": None, "city": None, "state": None, "zip": None}
+        if not props.get("appraiserUrl"):
+            props["appraiserUrl"] = HENRY_QPUBLIC + urllib.parse.quote(pid, safe="")
+
+        gaps = [base_gap]
+        if owner:
+            gaps.append(
+                "Owner name is from McDonough GMC planning parcels only. Acreage stays county ACREAGE_1. "
+                "That layer has no mailing address, tax value, or last sale."
+            )
+        else:
+            gaps.append(
+                "Owner name is not on countywide REST. McDonough GMC owner names are joined only inside that city."
+            )
+        if props["flu"] is None and muni_key in {"mcdonough", "stockbridge", "hampton", "locust grove"}:
+            gaps.append(
+                f"{municipal} future land use is not on REST (county FLU2023 is CITY or blank). "
+                "City comprehensive-plan FLU was not invented."
+            )
+        elif props["flu"] is None:
+            gaps.append("No county FLU2023 class joined for this parcel.")
+        if zoning_source == "hampton_stub":
+            gaps.append(
+                "Hampton zoning is the county CityZoning stub. No Hampton city FeatureServer. "
+                "Mustang, Oklahoma AGOL was rejected (wrong state)."
+            )
+        elif zoning_source == "city_stub":
+            gaps.append("City zoning is the county CityZoning stub, not a city-owned zoning layer.")
+        elif county_zoning and county_zoning.upper() == "CITY":
+            gaps.append(
+                "County zoning code is CITY but CityZoning is blank, and no city-clip district matched."
+            )
+        elif not zoning_code:
+            gaps.append("No Current Zoning row matched this PARCEL_NO.")
+        if overlay:
+            gaps.append(f"County special zoning overlay: {overlay}.")
+        if muni_key == "flippen":
+            stats["flippen"] += 1
+            gaps.append("Flippen is unincorporated and has no city zoning or FLU layer.")
+        props["dataGaps"] = gaps
+        props["source"] = spec["source"]
+        kept.append(feature)
+
+    features[:] = kept
+    total = len(kept)
+    spec["gaps"] = [
+        (
+            f"Henry 5–150 acre join: zoning {stats['zoning']}/{total} "
+            f"(GMC McDonough {stats['gmc']}, McDonough clip {stats['mcd_clip']}, "
+            f"Stockbridge clip {stats['stockbridge']}, Locust Grove clip {stats['locust']}, "
+            f"county ZONING {stats['county']}, CityZoning stub {stats['city_stub']}, "
+            f"Hampton CityZoning stub {stats['hampton_stub']}, "
+            f"CITY with blank CityZoning {stats['city_blank']}, "
+            f"no zoning row {stats['no_zoning_row']}, other unmatched {stats['zoning_miss']}). "
+            f"FLU {stats['flu']}/{total}; FLU2023=CITY left blank on {stats['flu_city']}; "
+            f"no FLU row {stats['flu_miss']}. McDonough owner names {stats['owner']}. "
+            f"Special overlays noted {stats['overlay']}. "
+            f"Centroids outside Henry extent dropped {stats['outside']}."
+        ),
+        *HENRY_GAPS,
+    ]
+    print(
+        f"  Henry kept {total} zoning {stats['zoning']} flu {stats['flu']} "
+        f"city-placeholder {stats['flu_city']} owners {stats['owner']}",
+        flush=True,
+    )
+
+
 def county_override(fips: str) -> dict | None:
+    if fips == "13151":  # Henry GA — Atlanta. Public GIS only; CAMA stays on qPublic.
+        return {
+            "kind": "arcgis",
+            "url": HENRY_PARCELS_URL,
+            "where": "ACREAGE_1>=5 AND ACREAGE_1<=150",
+            "outFields": [
+                "PARCEL_NO",
+                "ACREAGE_1",
+                "FULLADDRES",
+                "POSTALCITY",
+                "ZIP",
+                "QPublic",
+            ],
+            "idField": "PARCEL_NO",
+            "acresField": "ACREAGE_1",
+            "situsField": "FULLADDRES",
+            "cityField": "POSTALCITY",
+            "zipField": "ZIP",
+            "appraiserHtmlField": "QPublic",
+            "enrich": "henry-ga",
+            "source": "ga-henry-parcels",
+            "coverage": "complete-gte-5ac",
+            "gaps": list(HENRY_GAPS),
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -700,7 +1253,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, or Henry pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -962,11 +1515,13 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Henry county services | Cobb complete. Henry complete on county `ACREAGE_1` with zoning and FLU joins; owner, mailing, tax, and sale stay on qPublic. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county parcel layer already carries a zoning field (DeKalb) or a separate public zoning layer is wired (Henry). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+Henry County (13151, Atlanta) uses `Parcels/MapServer/12` for the 5.0–150.0 acre band (`ACREAGE_1` and situs). Zoning joins from `Current_Zoning_and_Future_Land_Use/MapServer/0` on `PARCEL_NO` (`ZONING`, and `CityZoning` when the county code is `CITY`). McDonough prefers GMC zoning district polygons, then the county McDonough parcel clip. Stockbridge and Locust Grove use the county city-clip `ZONING` attribute. Hampton has no city GIS REST, so zoning stays the county `CityZoning` stub. Flippen is unincorporated. A Mustang, Oklahoma AGOL layer is not used. Future land use is `Planning/Future_Land_Use/FeatureServer/0` `FLU2023`. Code `CITY` is left blank because city comprehensive-plan FLU is not on REST. The parcel-layer `ZONING` and `FUTURE_LAN` fields are often null and are not the join. Owner, mailing, tax, and last sale are not on county REST. Each parcel keeps the qPublic deep link (`AppID=1035`, `KeyValue` = parcel id). McDonough GMC planning parcels supply `ownerName` inside that city only.
 
 ## Coverage
 """
@@ -994,7 +1549,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=list(cached.get("gaps") or spec.get("gaps") or []),
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
@@ -1050,22 +1605,42 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     ids = fetch_object_ids(spec["url"], spec["where"])
     raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
     features, dropped = normalize_rows(raw, county, markets, spec)
+    if spec.get("enrich") == "henry-ga":
+        before = len(features)
+        enrich_henry_features(features, spec)
+        dropped += before - len(features)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
-    )
     coverage = spec["coverage"]
     gaps = list(spec.get("gaps") or [])
     if expected and len(features) < expected and not spec.get("computeAcres"):
-        gaps.insert(
-            0,
-            f"{expected} source rows collapsed to {len(features)} parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        )
+        if dropped:
+            collapse = (
+                f"{expected} source rows collapsed to {len(features)} parcel ids "
+                "(duplicate ids, stacked units, or rings that failed the WGS84 check). "
+                "The acreage query covered the county."
+            )
+        else:
+            collapse = (
+                f"{expected} source rows collapsed to {len(features)} parcel ids because the parcel id repeats. "
+                "None failed the acreage band or the WGS84 centroid check. The acreage query covered the county."
+            )
+        gaps.insert(0, collapse)
     if not features:
         coverage = "gap"
         gaps.insert(0, f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks.")
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps(
+            {
+                "sourceCount": expected,
+                "dropped": dropped,
+                "gaps": gaps,
+                "features": features,
+            },
+            separators=(",", ":"),
+        )
+    )
     path, lookup, tiles = (None, None, 0)
     if features:
         path, lookup, tiles = write_tiles(county, features)

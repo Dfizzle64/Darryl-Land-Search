@@ -26,11 +26,13 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Henry county services | Cobb complete. Henry complete on county `ACREAGE_1` with zoning and FLU joins; owner, mailing, tax, and sale stay on qPublic. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county parcel layer already carries a zoning field (DeKalb) or a separate public zoning layer is wired (Henry). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+Henry County (13151, Atlanta) uses `Parcels/MapServer/12` for the 5.0–150.0 acre band (`ACREAGE_1` and situs). Zoning joins from `Current_Zoning_and_Future_Land_Use/MapServer/0` on `PARCEL_NO` (`ZONING`, and `CityZoning` when the county code is `CITY`). McDonough prefers GMC zoning district polygons, then the county McDonough parcel clip. Stockbridge and Locust Grove use the county city-clip `ZONING` attribute. Hampton has no city GIS REST, so zoning stays the county `CityZoning` stub. Flippen is unincorporated. A Mustang, Oklahoma AGOL layer is not used. Future land use is `Planning/Future_Land_Use/FeatureServer/0` `FLU2023`. Code `CITY` is left blank because city comprehensive-plan FLU is not on REST. The parcel-layer `ZONING` and `FUTURE_LAN` fields are often null and are not the join. Owner, mailing, tax, and last sale are not on county REST. Each parcel keeps the qPublic deep link (`AppID=1035`, `KeyValue` = parcel id). McDonough GMC planning parcels supply `ownerName` inside that city only.
 
 ## Coverage
 
@@ -42,7 +44,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 8,149 | 1 | 1 | 33 |
+| Atlanta | primary | 15,567 | 2 | 1 | 32 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
@@ -89,7 +91,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Hall | Georgia | 13139 | gap | 0 | unavailable |
 | Haralson | Georgia | 13143 | gap | 0 | unavailable |
 | Heard | Georgia | 13149 | gap | 0 | unavailable |
-| Henry | Georgia | 13151 | gap | 0 | unavailable |
+| Henry | Georgia | 13151 | complete-gte-5ac | 7,418 | ga-henry-parcels |
 | Jackson | Georgia | 13157 | gap | 0 | unavailable |
 | Jasper | Georgia | 13159 | gap | 0 | unavailable |
 | Lamar | Georgia | 13171 | gap | 0 | unavailable |

@@ -45,7 +45,8 @@ export function describeOpportunityZone(info: OpportunityZoneInfo | null | undef
   return {
     inZone: false,
     label: "Not in designated Opportunity Zone",
-    detail: "No — the parcel centroid is outside Orange County’s current HUD/Treasury Qualified Opportunity Zone tracts.",
+    detail:
+      "No — the parcel centroid is outside the HUD/Treasury Qualified Opportunity Zone tracts (2010 census geography) joined for this county. That is a current-designation check, not an OZ 2.0 eligibility finding.",
   };
 }
 
@@ -101,6 +102,6 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
     label: "Not OZ 2.0 eligible",
     statusChip: null,
     detail:
-      "This parcel centroid is outside the Orange County census tracts Rev. Proc. 2026-14 lists as eligible for nomination. It is not a 2027 QOZ designation.",
+      `This parcel centroid is in ${geoid}, which is not on the Rev. Proc. 2026-14 list of tracts eligible for nomination. Not eligible is not a statement about the current designated QOZ map.`,
   };
 }

@@ -5,19 +5,29 @@
   "markets": [
     "Winston-Salem"
   ],
-  "featureCount": 5721,
+  "featureCount": 5728,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "nc-onemap-37059",
-  "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+  "source": "davie-county-gis-parcels",
+  "queryUrl": "https://gis.daviecountync.gov/server/rest/services/WebTemplate2026/WebTemplate2026/MapServer/26/query",
   "gaps": [
-    "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+    "5786 source rows collapsed to 5728 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "Davie County GIS tax parcels (public WebTemplate2026 layer 26). TOTAL_ACRES is the county GIS acreage \u2014 it matched NC OneMap gisacres on checked pins \u2014 not the deed figure written in LegalDescription. The extract is 5.0\u2013150.0 acres inclusive.",
+    "Address1/City/State/Zip on the parcel layer are owner mailing, not situs. No emails or phone numbers are stored.",
+    "Zoning comes from the county Zoning Districts layer, which includes Davie County, Mocksville, Bermuda Run, and Cooleemee. It is not matched to the Orange County multifamily zoning list.",
+    "Sale year and month are on the parcel layer. Sale price, taxable value, and the tax bill are not.",
+    "Income and FDOT AADT are not joined outside Florida.",
+    "NC OneMap situs joined on NCPIN for 4596 of 5728 parcels. Unmatched or blank site addresses stay blank.",
+    "Zoning centroid-joined for 5724 of 5728 parcels from Davie County GIS Zoning Districts (county, Mocksville, Bermuda Run, Cooleemee).",
+    "Future land use joined for 5314 county-plan parcels and 322 Mocksville parcels. The county layer's TOWN value is a placeholder, not a town future-land-use code. Bermuda Run and Cooleemee have no public FLU polygons on this service.",
+    "Designated QOZ centroid join (HUD 2010 tracts) marked 239 of 5728 parcels inside a current zone. designatedRural is true only when that GEOID is in the Notice 2025-50 list shipped with this repo.",
+    "OZ 2.0 eligibility joined for 5728 parcels from 2020 Census tracts against the Rev. Proc. 2026-14 packs in this repo (0 eligible). Eligible is not a designated QOZ. Parcels whose centroid missed a tract were left unknown."
   ],
   "path": "data/fixtures/market-parcels/counties/37059/tiles",
   "lookup": "data/fixtures/market-parcels/counties/37059/lookup.json",
-  "sourceCount": 5780,
+  "sourceCount": 5786,
   "dropped": 0,
   "tileCount": 5
 }

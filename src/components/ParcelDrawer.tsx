@@ -94,13 +94,15 @@ export function ParcelDrawer({
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
+  const stateLabel = properties.state || (florida ? "Florida" : "");
   const placeLine =
     [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+    (properties.countyName ? `${properties.countyName} County${stateLabel ? `, ${stateLabel}` : ""}` : stateLabel || "Florida");
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
     appraiserUrl: properties.appraiserUrl,
+    countyName: properties.countyName,
   });
   const gaps = properties.dataGaps?.length ? properties.dataGaps : null;
 
@@ -123,7 +125,15 @@ export function ParcelDrawer({
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
-        <Field label="Zoning" value={properties.zoningCode} empty={zoningEmpty} />
+        <Field
+          label="Zoning"
+          value={
+            properties.zoningCode
+              ? [properties.zoningCode, properties.jurisdictionCode].filter(Boolean).join(" · ")
+              : null
+          }
+          empty={zoningEmpty}
+        />
         <Field label="Future Land Use" value={fluLine} empty="Not joined for this county" />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
@@ -204,10 +214,12 @@ export function ParcelDrawer({
         <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
           {appraiser.label}
         </a>
-        {entity && properties.ownerName ? (
+        {entity && properties.ownerName && florida ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={sunbizSearchUrl(properties.ownerName)} target="_blank" rel="noreferrer">
             Search Florida Sunbiz for LLC / corporate principals
           </a>
+        ) : entity && properties.ownerName ? (
+          <p className="text-ink-300">Entity owner. Florida Sunbiz is not a search path outside Florida, and no email or phone is inferred.</p>
         ) : (
           <p className="text-ink-300">Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped.</p>
         )}

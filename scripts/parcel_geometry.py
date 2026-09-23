@@ -170,6 +170,13 @@ def polygon_parts(geometry: dict) -> list:
     return []
 
 
+def point_in_geojson(lon: float, lat: float, geometry: dict | None) -> bool:
+    """True when the point is inside any polygon part and outside its holes."""
+    if not geometry:
+        return False
+    return any(_inside_polygon(lon, lat, poly) for poly in polygon_parts(geometry) if poly)
+
+
 def _point_in_ring(x: float, y: float, ring: list[list[float]]) -> bool:
     inside = False
     j = len(ring) - 1

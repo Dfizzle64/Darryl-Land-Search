@@ -26,7 +26,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
-from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
+from parcel_geometry import esri_rings_to_geojson, net_acres, point_in_geojson, representative_point
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "data" / "market-parcel-counties.json"
@@ -266,6 +266,7 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    owner2: str | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
     return {
@@ -283,7 +284,7 @@ def empty_feature(
             "situsZip": zip_code,
             "jurisdictionCode": None,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
             "zoningDistrict": None,
@@ -418,6 +419,14 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        sale_dt = None
+        sale_qualified = None
+        if spec.get("saleYearField"):
+            year_field = spec["saleYearField"]
+            month_field = spec.get("saleMonthField") or "SALE_MO1"
+            sale_dt = sale_date(attrs.get(year_field), attrs.get(month_field))
+            if year_field == "SALE_YR1":
+                sale_qualified = clean(attrs.get("QUAL_CD1"))
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -429,14 +438,15 @@ def normalize_rows(
             center=center,  # type: ignore[arg-type]
             source=spec["source"],
             owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
+            owner2=clean(attrs.get(spec["owner2Field"])) if spec.get("owner2Field") else None,
             situs=clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None,
             city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
             zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
-            sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
+            sale_date=sale_dt,
+            sale_qualified=sale_qualified,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
             taxable=num(attrs.get(spec["taxableField"])) if spec.get("taxableField") else None,
@@ -566,7 +576,491 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+DAVIE_PARCEL_URL = "https://gis.daviecountync.gov/server/rest/services/WebTemplate2026/WebTemplate2026/MapServer/26/query"
+DAVIE_ZONING_URL = "https://gis.daviecountync.gov/server/rest/services/WebTemplate2026/WebTemplate2026/MapServer/54/query"
+DAVIE_FLU_URL = "https://gis.daviecountync.gov/server/rest/services/WebTemplate2026/WebTemplate2026/MapServer/50/query"
+DAVIE_MOCKSVILLE_FLU_URL = "https://gis.daviecountync.gov/server/rest/services/WebTemplate2026/WebTemplate2026/MapServer/51/query"
+HUD_OZ_URL = "https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Opportunity_Zones/FeatureServer/13/query"
+TIGER_TRACT_URL = "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2020/MapServer/6/query"
+DAVIE_COUNTY_FLU_LABELS = {
+    "CON": "Conservation",
+    "R-R": "Rural-Residential",
+    "R": "Residential",
+    "R/MU": "Residential/Mixed Use",
+    "C": "Commercial",
+    "C/MU": "Commercial/Mixed Use",
+    "I": "Industrial",
+}
+
+
+def clean_situs(value: Any) -> str | None:
+    text = clean(value)
+    if not text:
+        return None
+    parts = text.split()
+    if parts and parts[0].isdigit():
+        parts[0] = parts[0].lstrip("0") or "0"
+    text = " ".join(parts)
+    if text in {"0"}:
+        return None
+    return text
+
+
+def geometry_bounds(geometry: dict) -> tuple[float, float, float, float] | None:
+    xs: list[float] = []
+    ys: list[float] = []
+
+    def walk(coords: Any) -> None:
+        if not coords:
+            return
+        if isinstance(coords[0], (int, float)):
+            xs.append(float(coords[0]))
+            ys.append(float(coords[1]))
+            return
+        for part in coords:
+            walk(part)
+
+    walk(geometry.get("coordinates"))
+    if not xs:
+        return None
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+class PolygonIndex:
+    """BBox grid so centroid joins do not test every county polygon."""
+
+    def __init__(self, features: list[dict], cell: float = 0.05) -> None:
+        self.cell = cell
+        self.buckets: dict[tuple[int, int], list[dict]] = defaultdict(list)
+        for feature in features:
+            bounds = geometry_bounds(feature["geometry"])
+            if not bounds:
+                continue
+            feature["_bounds"] = bounds
+            minx, miny, maxx, maxy = bounds
+            for ix in range(math.floor(minx / cell), math.floor(maxx / cell) + 1):
+                for iy in range(math.floor(miny / cell), math.floor(maxy / cell) + 1):
+                    self.buckets[(ix, iy)].append(feature)
+
+    def smallest_hit(self, lon: float, lat: float) -> dict | None:
+        ix = math.floor(lon / self.cell)
+        iy = math.floor(lat / self.cell)
+        best = None
+        best_area = None
+        seen: set[int] = set()
+        for feature in self.buckets.get((ix, iy), []):
+            marker = id(feature)
+            if marker in seen:
+                continue
+            seen.add(marker)
+            minx, miny, maxx, maxy = feature["_bounds"]
+            if lon < minx or lon > maxx or lat < miny or lat > maxy:
+                continue
+            if not point_in_geojson(lon, lat, feature["geometry"]):
+                continue
+            area = (maxx - minx) * (maxy - miny)
+            if best_area is None or area < best_area:
+                best = feature
+                best_area = area
+        return best
+
+
+def fetch_attribute_rows(url: str, where: str, out_fields: list[str], order_field: str) -> list[dict]:
+    rows: list[dict] = []
+    offset = 0
+    while offset < 80000:
+        data = fetch_json(
+            url,
+            {
+                "where": where,
+                "outFields": ",".join(out_fields),
+                "returnGeometry": "false",
+                "orderByFields": order_field,
+                "resultOffset": offset,
+                "resultRecordCount": 2000,
+                "f": "json",
+            },
+            timeout=180,
+        )
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        feats = data.get("features") or []
+        if not feats:
+            break
+        rows.extend(feats)
+        if not data.get("exceededTransferLimit"):
+            break
+        offset += len(feats)
+        time.sleep(0.05)
+    return rows
+
+
+def fetch_polygons(url: str, where: str, out_fields: list[str]) -> list[dict]:
+    ids = fetch_object_ids(url, where)
+    raw = fetch_by_ids(url, ids, out_fields, batch=60)
+    features: list[dict] = []
+    for item in raw:
+        geometry, _computed = rings_to_feature_geometry(item.get("geometry"))
+        if not geometry:
+            continue
+        features.append({"properties": item.get("attributes") or {}, "geometry": geometry})
+    return features
+
+
+def load_notice_rural_geoids() -> set[str]:
+    path = ROOT / "data" / "fixtures" / "notice-2025-50-rural-geoids.json"
+    data = json.loads(path.read_text())
+    return {str(geoid) for geoid in data.get("geoids") or []}
+
+
+def load_oz2_eligible() -> dict[str, bool | None]:
+    """Rev. Proc. 2026-14 packs already in the repo. These are not designations."""
+    eligible: dict[str, bool | None] = {}
+    paths = [
+        ROOT / "data" / "fixtures" / "oz2-other-msas.json",
+        ROOT / "data" / "fixtures" / "oz2-urban-markets.json",
+        ROOT / "data" / "fixtures" / "oz2-rural-markets.json",
+    ]
+
+    def consider(node: dict) -> None:
+        geoid = node.get("geoid") or node.get("tractGeoid")
+        status = node.get("status")
+        if not isinstance(status, str) or "eligible" not in status.lower():
+            return
+        if not isinstance(geoid, str) or len(geoid) != 11 or not geoid.isdigit() or "rural" not in node:
+            return
+        rural_raw = node.get("rural")
+        rural: bool | None
+        if rural_raw in {"Y", "y", True}:
+            rural = True
+        elif rural_raw in {"N", "n", False}:
+            rural = False
+        else:
+            rural = None
+        previous = eligible.get(geoid, "missing")
+        if previous != "missing" and previous != rural:
+            eligible[geoid] = None
+        elif previous == "missing":
+            eligible[geoid] = rural
+
+    def walk(node: Any) -> None:
+        if isinstance(node, dict):
+            consider(node)
+            for value in node.values():
+                walk(value)
+        elif isinstance(node, list):
+            for item in node:
+                walk(item)
+
+    for path in paths:
+        walk(json.loads(path.read_text()))
+    return eligible
+
+
+def tract_label(tract: str | None, geoid: str, name: str | None) -> str:
+    if name and name.strip():
+        return name.strip()
+    digits = "".join(ch for ch in (tract or "") if ch.isdigit()) or geoid[-6:]
+    if not digits:
+        return geoid
+    value = int(digits)
+    pretty = str(value // 100) if value % 100 == 0 else f"{value / 100:.2f}".rstrip("0")
+    return f"Census tract {pretty}"
+
+
+def join_local_layers(features: list[dict], spec: dict) -> list[str]:
+    """Centroid joins for counties that publish zoning/FLU separately from the parcel roll."""
+    notes: list[str] = []
+    joins = spec.get("localJoins") or {}
+    if not features or not joins:
+        return notes
+
+    situs_spec = joins.get("situs")
+    situs_hit = 0
+    if situs_spec:
+        try:
+            rows = fetch_attribute_rows(
+                situs_spec["url"],
+                situs_spec["where"],
+                [situs_spec["idField"], situs_spec["situsField"], situs_spec["cityField"]],
+                situs_spec["idField"],
+            )
+            by_pin: dict[str, dict] = {}
+            for row in rows:
+                attrs = row.get("attributes") or {}
+                pin = clean(attrs.get(situs_spec["idField"]))
+                if pin:
+                    by_pin[pin] = attrs
+            for feature in features:
+                attrs = by_pin.get(feature["properties"]["parcelId"])
+                if not attrs:
+                    continue
+                situs = clean_situs(attrs.get(situs_spec["situsField"]))
+                city = clean(attrs.get(situs_spec["cityField"]))
+                if situs:
+                    feature["properties"]["situsAddress"] = situs
+                    situs_hit += 1
+                if city:
+                    feature["properties"]["situsCity"] = city
+            notes.append(
+                f"NC OneMap situs joined on NCPIN for {situs_hit} of {len(features)} parcels. Unmatched or blank site addresses stay blank."
+            )
+        except Exception as exc:  # noqa: BLE001
+            notes.append(f"NC OneMap situs join failed ({exc}). Situs was not invented from the mailing address.")
+
+    zoning_hit = 0
+    zoning_spec = joins.get("zoning")
+    if zoning_spec:
+        try:
+            polygons = fetch_polygons(zoning_spec["url"], zoning_spec["where"], zoning_spec["outFields"])
+            index = PolygonIndex(polygons)
+            for feature in features:
+                lon, lat = feature["properties"]["centroid"]
+                hit = index.smallest_hit(lon, lat)
+                if not hit:
+                    continue
+                code = clean((hit["properties"] or {}).get(zoning_spec["codeField"]))
+                jurisdiction = clean((hit["properties"] or {}).get(zoning_spec["jurisdictionField"]))
+                if not code:
+                    continue
+                feature["properties"]["zoningCode"] = code
+                feature["properties"]["zoningDistrict"] = code
+                feature["properties"]["jurisdictionCode"] = jurisdiction
+                zoning_hit += 1
+            notes.append(
+                f"Zoning centroid-joined for {zoning_hit} of {len(features)} parcels from Davie County GIS Zoning Districts (county, Mocksville, Bermuda Run, Cooleemee)."
+            )
+        except Exception as exc:  # noqa: BLE001
+            notes.append(f"Zoning join failed ({exc}). Zoning was left blank rather than guessed.")
+
+    county_flu = 0
+    town_flu = 0
+    flu_layers = joins.get("flu") or []
+    county_layer = next((layer for layer in flu_layers if layer.get("role") == "county"), None)
+    town_layer = next((layer for layer in flu_layers if layer.get("role") == "municipal-fallback"), None)
+    county_index = None
+    town_index = None
+    try:
+        if county_layer:
+            county_index = PolygonIndex(fetch_polygons(county_layer["url"], county_layer["where"], county_layer["outFields"]))
+        if town_layer:
+            town_index = PolygonIndex(fetch_polygons(town_layer["url"], town_layer["where"], town_layer["outFields"]))
+    except Exception as exc:  # noqa: BLE001
+        notes.append(f"Future land use join failed ({exc}). FLU was left blank rather than guessed.")
+        county_index = None
+        town_index = None
+    if county_index or town_index:
+        for feature in features:
+            props = feature["properties"]
+            lon, lat = props["centroid"]
+            if county_index and county_layer:
+                hit = county_index.smallest_hit(lon, lat)
+                code = clean((hit["properties"] or {}).get(county_layer["codeField"])) if hit else None
+                if code and code.upper() != "TOWN":
+                    props["flu"] = {
+                        "code": code,
+                        "label": (county_layer.get("labels") or {}).get(code, code),
+                        "jurisdiction": county_layer["jurisdiction"],
+                        "source": county_layer["source"],
+                    }
+                    county_flu += 1
+                    continue
+            jurisdiction = (props.get("jurisdictionCode") or "").upper()
+            if town_index and town_layer and jurisdiction in {"", "MOCKSVILLE"}:
+                hit = town_index.smallest_hit(lon, lat)
+                code = clean((hit["properties"] or {}).get(town_layer["codeField"])) if hit else None
+                if code:
+                    props["flu"] = {
+                        "code": code,
+                        "label": code,
+                        "jurisdiction": town_layer["jurisdiction"],
+                        "source": town_layer["source"],
+                    }
+                    town_flu += 1
+        notes.append(
+            f"Future land use joined for {county_flu} county-plan parcels and {town_flu} Mocksville parcels. "
+            "The county layer's TOWN value is a placeholder, not a town future-land-use code. "
+            "Bermuda Run and Cooleemee have no public FLU polygons on this service."
+        )
+
+    qoz_spec = joins.get("qoz")
+    if qoz_spec:
+        try:
+            zones = fetch_polygons(qoz_spec["url"], qoz_spec["where"], qoz_spec["outFields"])
+            notice = load_notice_rural_geoids()
+            index = PolygonIndex(zones, cell=0.08)
+            inside = 0
+            for feature in features:
+                lon, lat = feature["properties"]["centroid"]
+                hit = index.smallest_hit(lon, lat)
+                if hit:
+                    props = hit["properties"]
+                    geoid = clean(props.get("GEOID10"))
+                    tract = clean(props.get("TRACT"))
+                    feature["properties"]["opportunityZone"] = {
+                        "inOpportunityZone": True,
+                        "tractGeoid": geoid,
+                        "tractName": tract_label(tract, geoid or "", None),
+                        "source": "hud-fs-13",
+                        "designatedRural": bool(geoid and geoid in notice),
+                    }
+                    inside += 1
+                else:
+                    feature["properties"]["opportunityZone"] = {
+                        "inOpportunityZone": False,
+                        "tractGeoid": None,
+                        "tractName": None,
+                        "source": "hud-fs-13",
+                        "designatedRural": None,
+                    }
+            notes.append(
+                f"Designated QOZ centroid join (HUD 2010 tracts) marked {inside} of {len(features)} parcels inside a current zone. "
+                "designatedRural is true only when that GEOID is in the Notice 2025-50 list shipped with this repo."
+            )
+        except Exception as exc:  # noqa: BLE001
+            notes.append(f"Designated QOZ join failed ({exc}). Opportunity Zone was left unknown rather than set to No.")
+
+    oz2_spec = joins.get("oz2")
+    if oz2_spec:
+        try:
+            tracts = fetch_polygons(oz2_spec["url"], oz2_spec["where"], oz2_spec["outFields"])
+            eligible = load_oz2_eligible()
+            index = PolygonIndex(tracts, cell=0.08)
+            eligible_n = 0
+            known_n = 0
+            for feature in features:
+                lon, lat = feature["properties"]["centroid"]
+                hit = index.smallest_hit(lon, lat)
+                if not hit:
+                    continue
+                props = hit["properties"]
+                geoid = clean(props.get("GEOID"))
+                if not geoid:
+                    continue
+                known_n += 1
+                name = tract_label(clean(props.get("TRACT")), geoid, clean(props.get("NAME")))
+                if geoid in eligible:
+                    rural = eligible[geoid]
+                    feature["properties"]["oz2Eligibility"] = {
+                        "eligible": True,
+                        "rural": rural,
+                        "tractGeoid": geoid,
+                        "tractName": name,
+                        "designation": "eligible-for-nomination",
+                        "source": "rev-proc-2026-14",
+                    }
+                    eligible_n += 1
+                else:
+                    feature["properties"]["oz2Eligibility"] = {
+                        "eligible": False,
+                        "rural": None,
+                        "tractGeoid": geoid,
+                        "tractName": name,
+                        "designation": "not-eligible",
+                        "source": "rev-proc-2026-14",
+                    }
+            notes.append(
+                f"OZ 2.0 eligibility joined for {known_n} parcels from 2020 Census tracts against the Rev. Proc. 2026-14 packs in this repo ({eligible_n} eligible). "
+                "Eligible is not a designated QOZ. Parcels whose centroid missed a tract were left unknown."
+            )
+        except Exception as exc:  # noqa: BLE001
+            notes.append(f"OZ 2.0 join failed ({exc}). Eligibility was left unknown and was not copied from the designated-zone flag.")
+
+    return notes
+
+
 def county_override(fips: str) -> dict | None:
+    if fips == "37059":  # Davie NC
+        return {
+            "kind": "arcgis",
+            "url": DAVIE_PARCEL_URL,
+            "where": "TOTAL_ACRES>=5 AND TOTAL_ACRES<=150",
+            "outFields": [
+                "NCPIN",
+                "Name1",
+                "Name2",
+                "Address1",
+                "Address2",
+                "City",
+                "State",
+                "ZipCode",
+                "TOTAL_ACRES",
+                "SaleYear",
+                "SaleMonth",
+                "TotalMarketValue",
+                "TotalAssessedValue",
+            ],
+            "idField": "NCPIN",
+            "acresField": "TOTAL_ACRES",
+            "ownerField": "Name1",
+            "owner2Field": "Name2",
+            "mail1Field": "Address1",
+            "mail2Field": "Address2",
+            "mailCityField": "City",
+            "mailStateField": "State",
+            "mailZipField": "ZipCode",
+            "saleYearField": "SaleYear",
+            "saleMonthField": "SaleMonth",
+            "marketValueField": "TotalMarketValue",
+            "assessedField": "TotalAssessedValue",
+            "source": "davie-county-gis-parcels",
+            "coverage": "complete-gte-5ac",
+            "appraiserUrl": "https://maps.daviecountync.gov/itsnet/basicsearch.aspx",
+            "gaps": [
+                "Davie County GIS tax parcels (public WebTemplate2026 layer 26). TOTAL_ACRES is the county GIS acreage — it matched NC OneMap gisacres on checked pins — not the deed figure written in LegalDescription. The extract is 5.0–150.0 acres inclusive.",
+                "Address1/City/State/Zip on the parcel layer are owner mailing, not situs. No emails or phone numbers are stored.",
+                "Zoning comes from the county Zoning Districts layer, which includes Davie County, Mocksville, Bermuda Run, and Cooleemee. It is not matched to the Orange County multifamily zoning list.",
+                "Sale year and month are on the parcel layer. Sale price, taxable value, and the tax bill are not.",
+                "Income and FDOT AADT are not joined outside Florida.",
+            ],
+            "localJoins": {
+                "situs": {
+                    "url": NC_URL,
+                    "where": "cntyfips='059' AND gisacres>=4 AND gisacres<=160",
+                    "idField": "parno",
+                    "situsField": "siteadd",
+                    "cityField": "scity",
+                },
+                "zoning": {
+                    "url": DAVIE_ZONING_URL,
+                    "where": "1=1",
+                    "outFields": ["ZONING", "JURISDICTION"],
+                    "codeField": "ZONING",
+                    "jurisdictionField": "JURISDICTION",
+                },
+                "flu": [
+                    {
+                        "role": "county",
+                        "url": DAVIE_FLU_URL,
+                        "where": "CODE_USE<>'TOWN'",
+                        "outFields": ["CODE_USE"],
+                        "codeField": "CODE_USE",
+                        "jurisdiction": "Davie County",
+                        "source": "davie-webtemplate-landuse-50",
+                        "labels": DAVIE_COUNTY_FLU_LABELS,
+                    },
+                    {
+                        "role": "municipal-fallback",
+                        "url": DAVIE_MOCKSVILLE_FLU_URL,
+                        "where": "1=1",
+                        "outFields": ["LANDUSECODE"],
+                        "codeField": "LANDUSECODE",
+                        "jurisdiction": "Mocksville",
+                        "source": "davie-webtemplate-mocksville-landuse-51",
+                    },
+                ],
+                "qoz": {
+                    "url": HUD_OZ_URL,
+                    "where": "STATE='37' AND COUNTY='059'",
+                    "outFields": ["GEOID10", "TRACT", "STATE", "COUNTY"],
+                },
+                "oz2": {
+                    "url": TIGER_TRACT_URL,
+                    "where": "STATE='37' AND COUNTY='059'",
+                    "outFields": ["GEOID", "NAME", "TRACT", "STATE", "COUNTY"],
+                },
+            },
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -921,7 +1415,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Davie County uses the county public parcel, zoning, and land-use layers, with NC OneMap situs joined on NCPIN |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -929,7 +1423,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb) or a public zoning polygon is joined by centroid (Davie). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -1013,14 +1507,17 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     ids = fetch_object_ids(spec["url"], spec["where"])
     raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
     features, dropped = normalize_rows(raw, county, markets, spec)
+    join_notes: list[str] = []
+    if spec.get("localJoins"):
+        print(f"  joining zoning, land use, situs, and opportunity zones", flush=True)
+        join_notes = join_local_layers(features, spec)
+        for note in join_notes:
+            print(f"  {note}", flush=True)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
-    )
     coverage = spec["coverage"]
     gaps = list(spec.get("gaps") or [])
+    gaps.extend(join_notes)
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,
@@ -1029,6 +1526,16 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     if not features:
         coverage = "gap"
         gaps.insert(0, f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks.")
+    if features and spec.get("localJoins"):
+        appraiser = spec.get("appraiserUrl")
+        for feature in features:
+            feature["properties"]["dataGaps"] = list(gaps)
+            if appraiser:
+                feature["properties"]["appraiserUrl"] = appraiser
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+    )
     path, lookup, tiles = (None, None, 0)
     if features:
         path, lookup, tiles = write_tiles(county, features)

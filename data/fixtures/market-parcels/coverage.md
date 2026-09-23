@@ -24,7 +24,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Chattanooga | other | 10,537 | 2 | 0 | 8 |
 | Knoxville | other | 38,433 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
-| Winston-Salem | other | 91,784 | 9 | 0 | 0 |
+| Winston-Salem | other | 91,791 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
 
 ## Counties
@@ -322,7 +322,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Davidson | North Carolina | 37057 | complete-gte-5ac | 11,685 | nc-onemap-37057 |
-| Davie | North Carolina | 37059 | complete-gte-5ac | 5,721 | nc-onemap-37059 |
+| Davie | North Carolina | 37059 | complete-gte-5ac | 5,728 | davie-county-gis-parcels |
 | Forsyth | North Carolina | 37067 | complete-gte-5ac | 8,134 | nc-onemap-37067 |
 | Guilford | North Carolina | 37081 | complete-gte-5ac | 12,953 | nc-onemap-37081 |
 | Randolph | North Carolina | 37151 | complete-gte-5ac | 16,449 | nc-onemap-37151 |

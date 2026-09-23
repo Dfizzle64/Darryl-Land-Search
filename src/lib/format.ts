@@ -33,12 +33,20 @@ export function parcelAppraiserUrl(options: {
   parcelId: string;
   countyFips?: string | null;
   appraiserUrl?: string | null;
+  countyName?: string | null;
 }): { href: string; label: string } {
   const fips = options.countyFips ?? null;
   if (fips === "12095" || (!fips && !options.appraiserUrl)) {
     return {
       href: ocpaParcelUrl(options.parcelId),
       label: "Open in Orange County Property Appraiser",
+    };
+  }
+  if (options.appraiserUrl && !DEFAULT_APPRAISER_URLS[fips ?? ""]) {
+    const name = options.countyName?.trim();
+    return {
+      href: options.appraiserUrl,
+      label: name ? `Open ${name} County property search` : "Open county property search",
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);

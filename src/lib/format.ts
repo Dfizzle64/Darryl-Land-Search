@@ -27,6 +27,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "37183": "https://services.wakegov.com/realestate/",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -39,6 +40,14 @@ export function parcelAppraiserUrl(options: {
     return {
       href: ocpaParcelUrl(options.parcelId),
       label: "Open in Orange County Property Appraiser",
+    };
+  }
+  if (fips === "37183") {
+    const href = options.appraiserUrl || DEFAULT_APPRAISER_URLS["37183"];
+    const account = href.includes("Account.asp");
+    return {
+      href,
+      label: account ? "Open Wake County real estate account" : "Open Wake County real estate search",
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);

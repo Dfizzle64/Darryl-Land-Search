@@ -371,12 +371,18 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    return_geometry: bool = True,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
         "outFields": ",".join(out_fields),
-        "returnGeometry": "true",
+        "returnGeometry": "true" if return_geometry else "false",
         "outSR": "4326",
     }
     for start in range(0, total, batch):
@@ -388,12 +394,28 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(
+                        url,
+                        chunk,
+                        out_fields,
+                        batch=max(20, len(chunk) // 2),
+                        return_geometry=return_geometry,
+                    )
+                )
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(
+                        url,
+                        chunk,
+                        out_fields,
+                        batch=max(20, len(chunk) // 2),
+                        return_geometry=return_geometry,
+                    )
+                )
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -675,6 +697,16 @@ def county_override(fips: str) -> dict | None:
             "source": "al-jefferson-parcels",
             "coverage": "complete-gte-5ac",
             "gaps": ["Jefferson County public parcels. Owner and situs are sparse on this layer. No zoning join."],
+        }
+    if fips == "37183":  # Wake County, NC — Raleigh–Durham
+        return {
+            "kind": "wake",
+            "url": "https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0/query",
+            "source": "nc-wake-county-parcels",
+            "coverage": "complete-gte-5ac",
+            "gaps": [
+                "Wake County Property/Parcels is the primary 5–150 acre source. Zoning follows PLANNING_JURISDICTION. See county gaps after the pull for FLU holes.",
+            ],
         }
     if fips == "45045":  # Greenville SC
         return {
@@ -958,7 +990,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons. Wake County (37183) uses Property/Parcels instead | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Wake uses county `CALC_AREA` and joins municipal zoning by `PLANNING_JURISDICTION` |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -966,10 +998,99 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+DeKalb carries zoning on the parcel layer. Wake County (Raleigh–Durham, FIPS 37183) pulls owner, mailing, situs, assessed value, and last sale from county Property/Parcels, then joins zoning from Planning/Zoning MapServer layers 14–28 routed by `PLANNING_JURISDICTION` (Raleigh is MapServer/23; the Zoning FeatureServer omits it). Future land use is joined only where a public municipal layer exists. There is no countywide FLU. Rolesville and Zebulon have no public FLU REST layer. Those strings are the published GIS designation. They are not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
+
+
+def download_wake_county(county: dict, markets: list[str], spec: dict) -> dict:
+    import wake_parcel_enrich as wake
+
+    fips = county["fips"]
+    cache_path = CACHE_DIR / f"{fips}-wake-v1.json"
+    if spec.get("refresh") and cache_path.exists():
+        cache_path.unlink()
+    print(f"Pulling {county['name']} {county['state']} ({fips}) via Wake Property/Parcels", flush=True)
+    if cache_path.exists():
+        cached = json.loads(cache_path.read_text())
+        features = cached.get("features") or []
+        if features:
+            print(f"  cache hit {len(features)}", flush=True)
+            for feature in features:
+                feature["properties"]["marketIds"] = markets
+            path, lookup, tiles = write_tiles(county, features)
+            return county_row(
+                county,
+                markets,
+                feature_count=len(features),
+                coverage=cached.get("coverage") or spec["coverage"],
+                partition="tiles",
+                path=path,
+                lookup=lookup,
+                source=cached.get("source") or spec["source"],
+                query_url=cached.get("queryUrl") or spec["url"],
+                gaps=list(cached.get("gaps") or spec.get("gaps") or []),
+                source_count=cached.get("sourceCount"),
+                dropped=cached.get("dropped"),
+                tile_count=tiles,
+            )
+    result = wake.pull_wake(
+        county,
+        markets,
+        {
+            "fetch_json": fetch_json,
+            "fetch_object_ids": fetch_object_ids,
+            "fetch_by_ids": fetch_by_ids,
+            "empty_feature": empty_feature,
+            "rings_to_feature_geometry": rings_to_feature_geometry,
+            "centroid_of": centroid_of,
+            "plausible_centroid": plausible_centroid,
+            "zip_str": zip_str,
+            "in_band": in_band,
+            "count_where": count_where,
+        },
+    )
+    features = result["features"]
+    if not all(in_band(feature["properties"].get("acreage")) for feature in features):
+        raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps(
+            {
+                "sourceCount": result["sourceCount"],
+                "dropped": result["dropped"],
+                "source": result["source"],
+                "queryUrl": result["queryUrl"],
+                "coverage": result["coverage"],
+                "gaps": result["gaps"],
+                "features": features,
+            },
+            separators=(",", ":"),
+        )
+    )
+    path, lookup, tiles = (None, None, 0)
+    if features:
+        path, lookup, tiles = write_tiles(county, features)
+    print(
+        f"  kept {len(features)} zoning {result['stats']['zoning']} flu {result['stats']['flu']}",
+        flush=True,
+    )
+    return county_row(
+        county,
+        markets,
+        feature_count=len(features),
+        coverage=result["coverage"] if features else "gap",
+        partition="tiles" if features else "none",
+        path=path,
+        lookup=lookup,
+        source=result["source"],
+        query_url=result["queryUrl"],
+        gaps=result["gaps"],
+        source_count=result["sourceCount"],
+        dropped=result["dropped"],
+        tile_count=tiles,
+    )
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
@@ -1187,6 +1308,9 @@ def main() -> None:
             if not existing.exists() or args.refresh:
                 write_reuse(slot["county"], markets)
             continue
+        if spec["kind"] == "wake":
+            spec = dict(spec)
+            spec["refresh"] = args.refresh
         if existing.exists() and not args.refresh:
             row = json.loads(existing.read_text())
             if row.get("featureCount") and row.get("coverage") in {"complete-gte-5ac", "sample"}:
@@ -1203,7 +1327,10 @@ def main() -> None:
     def run(job: tuple) -> None:
         _priority, _name, county, markets, spec = job
         try:
-            download_county(county, markets, spec)
+            if spec.get("kind") == "wake":
+                download_wake_county(county, markets, spec)
+            else:
+                download_county(county, markets, spec)
         except Exception as exc:  # noqa: BLE001
             print(f"  failed {county['name']} {county['fips']}: {exc}", flush=True)
             county_row(

@@ -15,6 +15,7 @@ Tile origin matches ORLANDO_PARCEL_TILE in src/lib/orlandoParcels.ts.
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import math
 import threading
@@ -27,6 +28,7 @@ from pathlib import Path
 from typing import Any
 
 from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
+from pender_overlays import enrich_pender_features
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "data" / "market-parcel-counties.json"
@@ -376,6 +378,16 @@ def sale_date(year: Any, month: Any) -> str | None:
     return f"{int(y):04d}-{month_num:02d}-01"
 
 
+def epoch_to_iso(value: Any) -> str | None:
+    parsed = num(value)
+    if parsed is None or parsed <= 0:
+        return None
+    seconds = parsed / 1000 if parsed > 10_000_000_000 else parsed
+    if seconds < 0 or seconds > 4_102_444_800:
+        return None
+    return datetime.datetime.fromtimestamp(seconds, datetime.timezone.utc).strftime("%Y-%m-%d")
+
+
 def normalize_rows(
     raw: list[dict],
     county: dict,
@@ -418,6 +430,12 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        if spec.get("saleEpochField"):
+            sold_on = epoch_to_iso(attrs.get(spec["saleEpochField"]))
+        elif spec.get("saleYearField"):
+            sold_on = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
+        else:
+            sold_on = None
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -435,7 +453,7 @@ def normalize_rows(
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
+            sale_date=sold_on,
             sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
@@ -657,6 +675,46 @@ def county_override(fips: str) -> dict | None:
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
             ],
         }
+    if fips == "37141":  # Pender NC — county Energov, not OneMap
+        return {
+            "kind": "arcgis",
+            "url": "https://gis.pendercountync.gov/arcgis/rest/services/Energov/MapServer/1/query",
+            "where": "ACRES>=5 AND ACRES<=150",
+            "outFields": [
+                "PIN",
+                "NAME",
+                "ADDR",
+                "CITY",
+                "STATE",
+                "ZIP",
+                "PROPERTY_ADDRESS",
+                "ACRES",
+                "SALE_PRICE",
+                "DATE",
+                "TOTAL_VALUE",
+                "LAND_VALUE",
+            ],
+            "idField": "PIN",
+            "acresField": "ACRES",
+            "ownerField": "NAME",
+            "situsField": "PROPERTY_ADDRESS",
+            "salePriceField": "SALE_PRICE",
+            "saleEpochField": "DATE",
+            "marketValueField": "TOTAL_VALUE",
+            "mail1Field": "ADDR",
+            "mailCityField": "CITY",
+            "mailStateField": "STATE",
+            "mailZipField": "ZIP",
+            "source": "nc-pender-energov-37141",
+            "coverage": "complete-gte-5ac",
+            "enrich": enrich_pender_features,
+            "gaps": [
+                "Imagine Pender 2050 (LayersPro/35) is joined by centroid. Municipal/ETJ is the county plan's placeholder inside towns, not a separate municipal future-land-use layer.",
+                "Zoning and future-land-use codes are not in the Orange County multifamily knowledge base, so the land-use filter treats them as unknown rather than inventing entitlements.",
+                "NC OneMap NC1Map_Parcels cntyfips='141' is the statewide parcel filter for Pender. This extract uses county Energov MapServer/1 (ACRES 5–150) instead of OneMap gisacres.",
+                "Energov ACRES is the tax-roll acre field used for the 5.0–150.0 band. CALCACRES is GIS acreage and was not the filter.",
+            ],
+        }
     return None
 
 
@@ -740,6 +798,7 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    extra: dict | None = None,
 ) -> dict:
     row = {
         "name": county["name"],
@@ -760,6 +819,9 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    for key, value in (extra or {}).items():
+        if key not in row:
+            row[key] = value
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
     (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
     return row
@@ -921,7 +983,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Pender (37141) uses county Energov parcels (`cntyfips='141'` is the OneMap filter, not this extract) |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -929,7 +991,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or a public zoning polygon is wired (Pender: LayersPro UDO/36 and Burgaw, St. Helena, Surf City, Topsail Beach, and Watha). Atkinson has no zoning layer. It is not a multifamily knowledge-base match outside Orange County. Eligible nomination tracts are not designated QOZs. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -941,7 +1003,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
     if cache_path.exists() and not spec.get("ignoreCache"):
         cached = json.loads(cache_path.read_text())
-        if cached.get("features"):
+        if cached.get("features") and cached.get("source") == spec["source"]:
             print(f"  cache hit {len(cached['features'])}", flush=True)
             features = cached["features"]
             for feature in features:
@@ -957,10 +1019,11 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=list(cached.get("gaps") or spec.get("gaps") or []),
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
+                extra=cached.get("extra") if isinstance(cached.get("extra"), dict) else None,
             )
     try:
         expected = count_where(spec["url"], spec["where"])
@@ -1015,20 +1078,34 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     features, dropped = normalize_rows(raw, county, markets, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
-    )
+    extra: dict = {}
+    enrich_gaps: list[str] = []
+    enrich = spec.get("enrich")
+    if enrich and features:
+        enrich_gaps, extra = enrich(features)
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
+    gaps = [*enrich_gaps, *(spec.get("gaps") or [])]
     if expected and len(features) < expected and not spec.get("computeAcres"):
-        gaps.insert(
-            0,
+        gaps.append(
             f"{expected} source rows collapsed to {len(features)} parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
         )
     if not features:
         coverage = "gap"
         gaps.insert(0, f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks.")
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps(
+            {
+                "source": spec["source"],
+                "sourceCount": expected,
+                "dropped": dropped,
+                "gaps": gaps,
+                "extra": extra,
+                "features": features,
+            },
+            separators=(",", ":"),
+        )
+    )
     path, lookup, tiles = (None, None, 0)
     if features:
         path, lookup, tiles = write_tiles(county, features)
@@ -1047,6 +1124,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         source_count=expected,
         dropped=dropped,
         tile_count=tiles,
+        extra=extra,
     )
 
 

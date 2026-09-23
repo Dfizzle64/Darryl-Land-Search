@@ -13,7 +13,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -25,7 +25,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Knoxville | other | 38,433 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
-| Wilmington | other | 46,720 | 6 | 0 | 0 |
+| Wilmington | other | 46,800 | 6 | 0 | 0 |
 
 ## Counties
 
@@ -176,7 +176,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 
@@ -340,5 +340,5 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Duplin | North Carolina | 37061 | complete-gte-5ac | 11,397 | nc-onemap-37061 |
 | New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,256 | nc-onemap-37129 |
 | Onslow | North Carolina | 37133 | complete-gte-5ac | 6,747 | nc-onemap-37133 |
-| Pender | North Carolina | 37141 | complete-gte-5ac | 7,275 | nc-onemap-37141 |
+| Pender | North Carolina | 37141 | complete-gte-5ac | 7,355 | nc-pender-energov-37141 |
 

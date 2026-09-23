@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T23:28:22Z",
   "market": "Wilmington",
   "tier": "other",
-  "parcelCount": 46720,
+  "parcelCount": 46800,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -116,20 +116,28 @@
       "name": "Pender",
       "fips": "37141",
       "state": "North Carolina",
-      "featureCount": 7275,
+      "featureCount": 7355,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37141",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-pender-energov-37141",
+      "queryUrl": "https://gis.pendercountync.gov/arcgis/rest/services/Energov/MapServer/1/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "Town of Atkinson has no public zoning layer. LayersPro municipal zoning is Burgaw (39), St. Helena (40), Surf City (41), Topsail Beach (42), and Watha (43). County UDO is not applied inside Atkinson corporate limits. 25 parcels in the 5\u2013150 acre extract have a centroid in the Atkinson corporate limit and are left unzoned.",
+        "Rev. Proc. 2026-14 eligibility is not a 2027 QOZ designation. Centroids in pack tracts 37141920204 and 37141920403 (1376 parcels) are stored as eligible-for-nomination only. opportunityZone is not set from that list. Notice 2025-50 rural designated tracts 37141920601 and 37141920602 are current designated QOZs and are not copied onto oz2Eligibility.",
+        "Wallace corporate limits have no LayersPro zoning layer. 4 parcels in this 5\u2013150 acre extract have a centroid inside those limits and are left unzoned.",
+        "Joined zoning on 7295 parcels and Imagine Pender 2050 future land use on 7354 parcels by centroid.",
+        "Imagine Pender 2050 (LayersPro/35) is joined by centroid. Municipal/ETJ is the county plan's placeholder inside towns, not a separate municipal future-land-use layer.",
+        "Zoning and future-land-use codes are not in the Orange County multifamily knowledge base, so the land-use filter treats them as unknown rather than inventing entitlements.",
+        "NC OneMap NC1Map_Parcels cntyfips='141' is the statewide parcel filter for Pender. This extract uses county Energov MapServer/1 (ACRES 5\u2013150) instead of OneMap gisacres.",
+        "Energov ACRES is the tax-roll acre field used for the 5.0\u2013150.0 band. CALCACRES is GIS acreage and was not the filter.",
+        "7493 source rows collapsed to 7355 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county."
       ],
       "path": "data/fixtures/market-parcels/counties/37141/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37141/lookup.json",
-      "tileCount": 7,
-      "sourceCount": 7437
+      "tileCount": 8,
+      "sourceCount": 7493
     }
   ]
 }

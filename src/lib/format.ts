@@ -27,6 +27,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "37141": "https://mss.pendercountync.gov/css/citizens/RealEstate/Default.aspx?mode=new",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -39,6 +40,12 @@ export function parcelAppraiserUrl(options: {
     return {
       href: ocpaParcelUrl(options.parcelId),
       label: "Open in Orange County Property Appraiser",
+    };
+  }
+  if (fips === "37141") {
+    return {
+      href: options.appraiserUrl || DEFAULT_APPRAISER_URLS["37141"],
+      label: "Open Pender County real estate search",
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);

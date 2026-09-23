@@ -10,6 +10,7 @@ import {
   type MarketParcelIndex,
 } from "../lib/marketParcels";
 import { ORLANDO_PARCEL_TILE, showOrlandoParcels } from "../lib/orlandoParcels";
+import { parcelAppraiserUrl } from "../lib/format";
 import type { ParcelCollection } from "../lib/types";
 
 const index: MarketParcelIndex = {
@@ -121,5 +122,92 @@ describe("market parcel gating and acreage", () => {
       }
       if (checked >= 25) break;
     }
+  });
+});
+
+describe("Pender County Energov extract", () => {
+  const countyPath = path.join(process.cwd(), "data/fixtures/market-parcels/counties/37141/county.json");
+
+  it("uses county Energov parcels and does not treat nomination eligibility as a designated QOZ", () => {
+    const row = JSON.parse(readFileSync(countyPath, "utf8")) as {
+      fips: string;
+      source: string;
+      coverage: string;
+      featureCount: number;
+      minAcres: number;
+      maxAcres: number;
+      queryUrl: string;
+      gaps: string[];
+      zoningJoinedCount?: number;
+      fluJoinedCount?: number;
+      oz2EligibleCount?: number;
+      atkinsonUnzonedCount?: number;
+    };
+    expect(row.fips).toBe("37141");
+    expect(row.source).toBe("nc-pender-energov-37141");
+    expect(row.queryUrl).toContain("/Energov/MapServer/1/query");
+    expect(row.coverage).toBe("complete-gte-5ac");
+    expect(row.minAcres).toBe(5);
+    expect(row.maxAcres).toBe(150);
+    expect(row.featureCount).toBeGreaterThan(7000);
+    expect(row.featureCount).toBeLessThan(8000);
+    expect(row.zoningJoinedCount).toBeGreaterThan(0);
+    expect(row.fluJoinedCount).toBeGreaterThan(0);
+    const gaps = row.gaps.join(" ");
+    expect(gaps).toMatch(/Atkinson/i);
+    expect(gaps).toMatch(/no public zoning layer/i);
+    expect(gaps).toMatch(/Wallace/);
+    expect(row.atkinsonUnzonedCount).toBeGreaterThan(0);
+    expect(gaps).toMatch(/cntyfips='141'/);
+    expect(gaps).toMatch(/eligible-for-nomination/);
+    expect(gaps).toMatch(/not a 2027 QOZ designation/i);
+    expect(gaps).toMatch(/37141920601/);
+    expect(row.oz2EligibleCount).toBeGreaterThan(0);
+
+    const tileDir = path.join(process.cwd(), "data/fixtures/market-parcels/counties/37141/tiles");
+    const files = readdirSync(tileDir).filter((name) => name.endsWith(".geojson"));
+    expect(files.length).toBeGreaterThan(0);
+    let counted = 0;
+    let zoning = 0;
+    let flu = 0;
+    let oz2 = 0;
+    let atkinson = 0;
+    for (const file of files) {
+      const collection = JSON.parse(readFileSync(path.join(tileDir, file), "utf8")) as ParcelCollection;
+      for (const feature of collection.features) {
+        counted += 1;
+        expect(inMarketAcreageBand(feature.properties.acreage)).toBe(true);
+        expect(feature.properties.countyFips).toBe("37141");
+        expect(feature.properties.source).toBe("nc-pender-energov-37141");
+        expect(feature.properties.marketIds).toEqual(["Wilmington"]);
+        expect(feature.properties.opportunityZone).toBeNull();
+        const eligibility = feature.properties.oz2Eligibility;
+        if (eligibility) {
+          oz2 += 1;
+          expect(eligibility.eligible).toBe(true);
+          expect(eligibility.designation).toBe("eligible-for-nomination");
+          expect(eligibility.tractGeoid === "37141920204" || eligibility.tractGeoid === "37141920403").toBe(true);
+        }
+        if (feature.properties.zoningCode) zoning += 1;
+        if (feature.properties.flu?.code) flu += 1;
+        const gapText = (feature.properties.dataGaps ?? []).join(" ");
+        if (/Atkinson/i.test(gapText)) {
+          atkinson += 1;
+          expect(feature.properties.zoningCode).toBeNull();
+        }
+      }
+    }
+    expect(counted).toBe(row.featureCount);
+    expect(zoning).toBe(row.zoningJoinedCount);
+    expect(flu).toBe(row.fluJoinedCount);
+    expect(oz2).toBe(row.oz2EligibleCount);
+    expect(atkinson).toBe(row.atkinsonUnzonedCount);
+  });
+
+  it("links Pender parcels to the county real estate search instead of Orange County", () => {
+    const link = parcelAppraiserUrl({ parcelId: "2229-41-7914-0000", countyFips: "37141" });
+    expect(link.href).toContain("pendercountync.gov");
+    expect(link.label).toMatch(/Pender/i);
+    expect(link.href).not.toContain("ocpafl.org");
   });
 });

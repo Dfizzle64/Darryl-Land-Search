@@ -16,7 +16,7 @@ City zoning and future land use join onto **county** parcel polygons. A city lay
 | Hillsborough | 12057 | ParcelPublishing FeatureServer/12 | Unincorporated RegulatoryZoning/8. Tampa Planning/28. Temple Terrace Zoning/0 (FOLIO). Plant City Zoning/2 | Planning FeatureServer/4, filtered by `JURISDICTION` |
 | Pasco | 12101 | PascoMapper Parcels/7 | Landuse_Planning/4 for unincorporated only | Landuse_Planning/1 for unincorporated. City values stay parcel-attribute hints |
 | Pinellas | 12103 | PublicWebGIS Parcels/1 | Unincorporated Landuse_Zoning/1. St. Petersburg Zoning/0. Clearwater Zoning_WGS84/1 | Unincorporated Landuse_Zoning/0. St. Petersburg Zoning/2. Clearwater FLU/0. Largo MapServer/1162 |
-| Polk | 12105 | Property_Appraiser MapServer/134 | None | Land_Use_and_Zoning FeatureServer/10 (`FLU_LDC` / `FLUNAME`) |
+| Polk | 12105 | Property_Appraiser MapServer/134 | Lakeland AGOL Zoning/0 only. No countywide districts | County FLU FeatureServer/10 (`FLU_LDC` / `FLUNAME`). Lakeland AGOL Future_Land_Use/0 inside the city |
 
 Pasco `Hosted/County_Master_Property_List/FeatureServer/0` is about 2,266 features. It is recorded under `rejected` and is not the parcel source.
 
@@ -30,13 +30,13 @@ Pasco cities (New Port Richey, Port Richey, San Antonio, Dade City, Zephyrhills,
 
 Pinellas uses St. Petersburg, Clearwater, and Largo layers only inside those cities. Other incorporated places stay labeled and do not receive the unincorporated zoning layer.
 
-Polk `municipality` is the property-appraiser city. Lakeland is labeled and still has no zoning join.
+Polk `municipality` is the property-appraiser city. Lakeland zoning and future land use are a spatial join, so a parcel gets them when its polygon falls inside the city layer. A Lakeland situs that misses the city polygon keeps county future land use and an empty zoning code. A few parcels labeled Auburndale or Polk City still receive Lakeland zoning where the city polygon contains them. Winter Haven and the other Polk cities stay on county future land use only.
 
 ## Gaps
 
 - **Polk zoning districts.** Land_Use_and_Zoning layers are overlays and FLU categories, not a countywide zoning-district map. Nothing is invented. FLU is not copied into `zoningCode`.
 - **Polk sales.** MapServer/134 has no sale fields. `lastSale` is copied from the existing FDOR/DOH Orlando extract when the parcel id matches.
-- **Lakeland.** `gismims.lakelandgov.net` zoning and FLU REST failed TLS verification (unexpected EOF). They are listed under `rejected` and are not joined.
+- **Lakeland.** City zoning (`LABEL`) and future land use (`LABEL`) come from `services1.arcgis.com/mcbQY5xNGGGM1vBX` Zoning/0 and Future_Land_Use/0 after the extent checks out inside Florida. The older `gismims.lakelandgov.net` host failed TLS and stays under `rejected`. A Lakeland situs that misses the city polygon keeps county future land use and an empty zoning code.
 - **Pinellas market value.** The public parcel layer has taxable, land, and improvement values only. `tax.marketValue` stays null. The property-appraiser site is often Cloudflare-blocked for bots.
 - **Pinellas cities.** Dunedin, Pinellas Park, Seminole, Tarpon Springs, Safety Harbor, the beach towns, and the other incorporated places in the parcel city list have no verified zoning/FLU FeatureServer.
 - **Largo.** Future land use only. No zoning layer on the city MapServer.

@@ -29,6 +29,17 @@ function countyRow(fips: string): CountyRow {
   return JSON.parse(readFileSync(file, "utf8")) as CountyRow;
 }
 
+function findFeature(relativeTiles: string, accept: (feature: ParcelFeature) => boolean): ParcelFeature | undefined {
+  const folder = path.join(root, relativeTiles);
+  const files = readdirSync(folder).filter((name) => name.endsWith(".geojson"));
+  for (const file of files) {
+    const collection = JSON.parse(readFileSync(path.join(folder, file), "utf8")) as ParcelCollection;
+    const found = collection.features.find(accept);
+    if (found) return found;
+  }
+  return undefined;
+}
+
 function sampleFeatures(relativeTiles: string, limit: number): ParcelFeature[] {
   const folder = path.join(root, relativeTiles);
   const files = readdirSync(folder).filter((name) => name.endsWith(".geojson"));
@@ -111,22 +122,37 @@ describe("Tampa shed county cards", () => {
     expect(appraiser.label).toContain("Pinellas");
   });
 
-  it("upgrades Polk parcels without inventing zoning districts", () => {
+  it("upgrades Polk parcels and joins Lakeland zoning without inventing county districts", () => {
     const polk = countyRow("12105");
     expect(polk.queryUrl).toContain("Property_Appraiser/MapServer/134");
     expect(polk.path.includes("orlando-parcels")).toBe(false);
-    expect(polk.zoningJoinedCount).toBe(0);
+    expect(polk.zoningJoinedCount).toBeGreaterThan(100);
+    expect(polk.zoningJoinedCount).toBeLessThan(polk.featureCount / 2);
     expect(polk.fluJoinedCount).toBeGreaterThan(2000);
     expect(polk.gaps.join(" ")).toMatch(/zoning-district/i);
     expect(polk.gaps.join(" ")).toMatch(/Lakeland/i);
     expect(polk.rejected?.join(" ")).toContain("lakelandgov.net");
+    expect(polk.rejected?.join(" ")).not.toContain("services1.arcgis.com");
+    const overlayUrls = (polk.overlays ?? []).map((overlay) => overlay.url).join(" ");
+    expect(overlayUrls).toContain("services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/Zoning/FeatureServer/0");
+    expect(overlayUrls).toContain("services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/Future_Land_Use/FeatureServer/0");
     const features = sampleFeatures(polk.path, 60);
     for (const feature of features) {
-      expect(feature.properties.zoningCode).toBeNull();
       expect(feature.properties.marketIds?.includes("Orlando")).toBe(false);
       expect(inMarketAcreageBand(feature.properties.acreage)).toBe(true);
       expect(feature.properties.municipality).toBeTruthy();
     }
+    const lakeland = findFeature(
+      polk.path,
+      (feature) =>
+        feature.properties.municipality === "Lakeland" &&
+        Boolean(feature.properties.zoningCode) &&
+        feature.properties.flu?.source === "lakeland-flu",
+    );
+    expect(lakeland?.properties.zoningCode).toBeTruthy();
+    expect(lakeland?.properties.zoningDistrict).toBe(lakeland?.properties.zoningCode);
+    expect(lakeland?.properties.flu?.jurisdiction).toBe("Lakeland");
+    expect(lakeland?.properties.flu?.source).toBe("lakeland-flu");
     const orlandoTile = path.join(root, "data/fixtures/orlando-parcels/tiles/12105");
     expect(existsSync(orlandoTile)).toBe(true);
   });

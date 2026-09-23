@@ -33,12 +33,20 @@ PASCO_SUBSET_URL = (
     "https://pascogis.pascocountyfl.net/giswebeserver/rest/services/Hosted/"
     "County_Master_Property_List/FeatureServer/0"
 )
-LAKELAND_ZONING_URL = (
+LAKELAND_TLS_ZONING_URL = (
     "https://gismims.lakelandgov.net/portal/rest/services/Public/Lakeland10_Zoning/FeatureServer/0"
 )
-LAKELAND_FLU_URL = (
+LAKELAND_TLS_FLU_URL = (
     "https://gismims.lakelandgov.net/portal/rest/services/Public/Lakeland10_FutureLandUse/FeatureServer/0"
 )
+LAKELAND_ZONING_URL = (
+    "https://services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/Zoning/FeatureServer/0"
+)
+LAKELAND_FLU_URL = (
+    "https://services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/Future_Land_Use/FeatureServer/0"
+)
+# west, south, east, north. A city overlay must sit inside this box and span less than 1.5°.
+FLORIDA_CITY_BBOX = (-87.8, 24.3, -79.7, 31.1)
 
 PASCO_CITY_STUBS = {"NPR", "PR", "SA"}
 
@@ -135,9 +143,9 @@ PINELLAS_GAPS = [
 
 POLK_GAPS = [
     "Polk market parcels are Property_Appraiser MapServer/134. Orlando shed tiles are unchanged.",
-    "No countywide zoning-district polygons are published. FLU 2030 (FLUNAME / FLU_LDC) is land use only and is not stored as zoning.",
+    "No countywide zoning-district polygons are published. County FLU 2030 (FLUNAME / FLU_LDC) is land use only and is not stored as zoning.",
     "Property Appraiser parcels have no sale fields. A sale is copied from the FDOR/DOH extract when the parcel id matches.",
-    "Lakeland zoning/FLU REST (gismims.lakelandgov.net) failed TLS verification and is not joined. Winter Haven has no verified public zoning FeatureServer.",
+    "Lakeland zoning and future land use are city AGOL polygons (LABEL / DESIGNATIO) joined onto county parcels inside the city. Winter Haven has no verified public zoning FeatureServer.",
 ]
 
 
@@ -524,19 +532,53 @@ def load_polk_fdor() -> dict[str, dict]:
     return found
 
 
-def probe_lakeland() -> str | None:
+def verify_florida_polygon(url: str) -> str | None:
+    """Return a gap note when the layer is not a small polygon service inside Florida."""
     try:
-        req = urllib.request.Request(
-            LAKELAND_ZONING_URL + "?" + urllib.parse.urlencode({"f": "json"}),
-            headers={"User-Agent": "darryl-land-search/tampa-shed"},
+        headers = {"User-Agent": "darryl-land-search/tampa-shed"}
+        meta_req = urllib.request.Request(url + "?" + urllib.parse.urlencode({"f": "json"}), headers=headers)
+        with urllib.request.urlopen(meta_req, timeout=30) as resp:
+            meta = json.loads(resp.read().decode("utf-8"))
+        if meta.get("error") or "Polygon" not in str(meta.get("geometryType") or ""):
+            return f"{url} did not return a polygon layer and was not joined."
+        extent_req = urllib.request.Request(
+            url
+            + "/query?"
+            + urllib.parse.urlencode(
+                {"where": "1=1", "returnExtentOnly": "true", "outSR": "4326", "f": "json"}
+            ),
+            headers=headers,
         )
-        with urllib.request.urlopen(req, timeout=20) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        if data.get("error") or not data.get("geometryType"):
-            return "Lakeland zoning service responded without a polygon layer and was not joined."
+        with urllib.request.urlopen(extent_req, timeout=30) as resp:
+            extent = (json.loads(resp.read().decode("utf-8")).get("extent") or {})
+        west, south, east, north = (float(extent[key]) for key in ("xmin", "ymin", "xmax", "ymax"))
+        box_west, box_south, box_east, box_north = FLORIDA_CITY_BBOX
+        outside = (
+            west < box_west
+            or south < box_south
+            or east > box_east
+            or north > box_north
+            or east - west > 1.5
+            or north - south > 1.5
+            or east <= west
+            or north <= south
+        )
+        if outside:
+            return (
+                f"{url} extent is outside the Florida city box "
+                f"({west:.3f},{south:.3f},{east:.3f},{north:.3f}) and was not joined."
+            )
+        count_req = urllib.request.Request(
+            url + "/query?" + urllib.parse.urlencode({"where": "1=1", "returnCountOnly": "true", "f": "json"}),
+            headers=headers,
+        )
+        with urllib.request.urlopen(count_req, timeout=30) as resp:
+            count = int(json.loads(resp.read().decode("utf-8")).get("count") or 0)
+        if count < 50 or count > 8000:
+            return f"{url} feature count {count} is not a city overlay and was not joined."
         return None
     except Exception as exc:  # noqa: BLE001
-        return f"Lakeland zoning/FLU REST failed TLS or HTTP verification ({exc.__class__.__name__}) and was not joined."
+        return f"{url} failed verification ({exc.__class__.__name__}) and was not joined."
 
 
 def compose(
@@ -1422,10 +1464,12 @@ def polk_situs(attrs: dict) -> str | None:
 
 
 def build_polk(county: dict, markets: list[str], spec: dict, redownload: bool) -> dict:
-    lakeland_note = probe_lakeland()
+    zoning_note = verify_florida_polygon(LAKELAND_ZONING_URL)
+    flu_note = verify_florida_polygon(LAKELAND_FLU_URL)
     gaps = list(POLK_GAPS)
-    if lakeland_note:
-        gaps = [gap if "Lakeland" not in gap else lakeland_note for gap in gaps]
+    if zoning_note or flu_note:
+        replacement = " ".join(note for note in (zoning_note, flu_note) if note)
+        gaps = [gap if "Lakeland zoning and future land use" not in gap else replacement for gap in gaps]
     parcels = download_layer(
         "12105-parcels",
         spec["url"],
@@ -1463,7 +1507,42 @@ def build_polk(county: dict, markets: list[str], spec: dict, redownload: bool) -
         redownload=redownload,
         batch=30,
     )
-    print("  indexing Polk FLU and FDOR sales", flush=True)
+    lakeland_zoning: list[dict] = []
+    lakeland_flu: list[dict] = []
+    if zoning_note is None:
+        lakeland_zoning = download_layer(
+            "12105-lakeland-zoning",
+            LAKELAND_ZONING_URL + "/query",
+            "1=1",
+            ["LABEL", "DESIGNATIO"],
+            redownload=redownload,
+            batch=80,
+        )
+    if flu_note is None:
+        lakeland_flu = download_layer(
+            "12105-lakeland-flu",
+            LAKELAND_FLU_URL + "/query",
+            "1=1",
+            ["LABEL", "DESIGNATIO"],
+            redownload=redownload,
+            batch=80,
+        )
+    print("  indexing Polk FLU, Lakeland overlays, and FDOR sales", flush=True)
+    lakeland_zoning_index = SpatialIndex(
+        lakeland_zoning,
+        lambda attrs: {"code": clean(attrs.get("LABEL")), "desc": clean(attrs.get("DESIGNATIO"))}
+        if clean(attrs.get("LABEL"))
+        else {},
+    )
+    lakeland_flu_index = SpatialIndex(
+        lakeland_flu,
+        lambda attrs: {
+            "code": clean(attrs.get("LABEL")),
+            "label": clean(attrs.get("DESIGNATIO")) or clean(attrs.get("LABEL")),
+        }
+        if clean(attrs.get("LABEL"))
+        else {},
+    )
     flu_index = SpatialIndex(
         flu,
         lambda attrs: {
@@ -1496,10 +1575,22 @@ def build_polk(county: dict, markets: list[str], spec: dict, redownload: bool) -
             continue
         city_name = title_place(attrs.get("PROP_CITY"))
         municipality = city_name or "Unincorporated Polk"
-        flu_hit = first_overlay(flu_index, candidate_points(geometry, center))
+        points = candidate_points(geometry, center)
+        city_zone = first_overlay(lakeland_zoning_index, points) if lakeland_zoning else None
+        city_flu = first_overlay(lakeland_flu_index, points) if lakeland_flu else None
+        flu_hit = None if city_flu and city_flu.get("code") else first_overlay(flu_index, points)
         flu_payload = None
         parcel_gaps = list(gaps)
-        if flu_hit and flu_hit.get("code"):
+        zoning_code = (city_zone or {}).get("code")
+        zoning_description = (city_zone or {}).get("desc")
+        if city_flu and city_flu.get("code"):
+            flu_payload = {
+                "code": city_flu["code"],
+                "label": city_flu.get("label") or city_flu["code"],
+                "jurisdiction": "Lakeland",
+                "source": "lakeland-flu",
+            }
+        elif flu_hit and flu_hit.get("code"):
             flu_city = clean(flu_hit.get("city"))
             flu_payload = {
                 "code": flu_hit["code"],
@@ -1509,6 +1600,10 @@ def build_polk(county: dict, markets: list[str], spec: dict, redownload: bool) -
             }
         else:
             parcel_gaps.append("FLU 2030 polygon did not intersect this parcel.")
+        if municipality == "Lakeland" and not zoning_code:
+            parcel_gaps.append("Lakeland zoning polygon did not intersect this parcel.")
+        if municipality == "Lakeland" and not (city_flu and city_flu.get("code")):
+            parcel_gaps.append("Lakeland future land use polygon did not intersect this parcel.")
         previous = prior.get(parcel_id) or {}
         last_sale = previous.get("lastSale") or {}
         sale_price = money(last_sale.get("price"))
@@ -1516,8 +1611,6 @@ def build_polk(county: dict, markets: list[str], spec: dict, redownload: bool) -
         sale_qualified = qualified_sale(last_sale.get("qualified"))
         if sale_price or sale_date:
             sales_copied += 1
-        if city_name and city_name.upper() == "LAKELAND":
-            parcel_gaps.append("Lakeland zoning and FLU were not joined. The public REST endpoint did not verify over TLS.")
         extra = {}
         if previous.get("oz2Eligibility") is not None:
             extra["oz2Eligibility"] = previous.get("oz2Eligibility")
@@ -1550,8 +1643,8 @@ def build_polk(county: dict, markets: list[str], spec: dict, redownload: bool) -
                 mail_zip=None if mail3 and seed.zip_str(attrs.get("MAIL_ZIP")) and (seed.zip_str(attrs.get("MAIL_ZIP")) or "") in mail3 else seed.zip_str(attrs.get("MAIL_ZIP")),
                 municipality=municipality,
                 jurisdiction_code=municipality,
-                zoning_code=None,
-                zoning_description=None,
+                zoning_code=zoning_code,
+                zoning_description=zoning_description,
                 flu=flu_payload,
                 data_gaps=parcel_gaps,
                 extra=extra or None,
@@ -1563,12 +1656,39 @@ def build_polk(county: dict, markets: list[str], spec: dict, redownload: bool) -
     require(sample is not None, "Polk sample PARCELID 222601000000021030 missing")
     require(sample["properties"]["zoningCode"] is None, "Polk sample must not invent zoning")
     require(abs((sample["properties"]["acreage"] or 0) - 103.85) < 1, "Polk sample acreage")
-    require(zoning_joined == 0, "Polk zoning districts must stay empty")
     require(18000 <= len(features) <= 23000, f"Polk count {len(features)}")
     require(flu_joined >= 2000, f"Polk FLU joins {flu_joined}")
     require(all(feature["properties"].get("marketIds") == markets for feature in features[:20]), "Polk market ids")
     require("Orlando" not in (features[0]["properties"].get("marketIds") or []), "Polk market tiles must not be tagged Orlando")
-    print(f"  Polk kept {len(features)} flu {flu_joined} fdor sales {sales_copied}", flush=True)
+    lakeland_zoned = sum(
+        1
+        for feature in features
+        if feature["properties"].get("municipality") == "Lakeland" and feature["properties"].get("zoningCode")
+    )
+    lakeland_flu_joined = sum(
+        1 for feature in features if (feature["properties"].get("flu") or {}).get("source") == "lakeland-flu"
+    )
+    outside_city = sorted(
+        {
+            str(feature["properties"].get("municipality") or "Unknown")
+            for feature in features
+            if feature["properties"].get("zoningCode") and feature["properties"].get("municipality") != "Lakeland"
+        }
+    )
+    if zoning_note is None:
+        require(lakeland_zoned >= 100, f"Lakeland zoning joins {lakeland_zoned}")
+        require(zoning_joined < len(features) / 2, "Lakeland zoning must not cover countywide Polk")
+        if outside_city:
+            print(f"  Lakeland zoning also hit: {', '.join(outside_city)}", flush=True)
+    else:
+        require(zoning_joined == 0, "Unverified Lakeland zoning must stay empty")
+    if flu_note is None:
+        require(lakeland_flu_joined >= 50, f"Lakeland FLU joins {lakeland_flu_joined}")
+    print(
+        f"  Polk kept {len(features)} zoning {zoning_joined} flu {flu_joined} "
+        f"lakeland zoning {lakeland_zoned} lakeland flu {lakeland_flu_joined} fdor sales {sales_copied}",
+        flush=True,
+    )
     row = write_county(
         county,
         markets,
@@ -1582,14 +1702,20 @@ def build_polk(county: dict, markets: list[str], spec: dict, redownload: bool) -
         gaps=gaps,
         overlays=[
             {"role": "flu-2030", "url": "https://gis.polk-county.net/hosting/rest/services/All-In-One_Viewer/Land_Use_and_Zoning/FeatureServer/10"},
+            *([{"role": "lakeland-zoning", "url": LAKELAND_ZONING_URL}] if zoning_note is None else []),
+            *([{"role": "lakeland-flu", "url": LAKELAND_FLU_URL}] if flu_note is None else []),
         ],
         rejected=[
             "Polk zoning-district polygons — none published on Land_Use_and_Zoning",
-            LAKELAND_ZONING_URL,
-            LAKELAND_FLU_URL,
+            LAKELAND_TLS_ZONING_URL,
+            LAKELAND_TLS_FLU_URL,
+            *([LAKELAND_ZONING_URL] if zoning_note else []),
+            *([LAKELAND_FLU_URL] if flu_note else []),
         ],
     )
     row["fdorSaleCopiedCount"] = sales_copied
+    row["lakelandZoningJoinedCount"] = lakeland_zoned
+    row["lakelandFluJoinedCount"] = lakeland_flu_joined
     target = _seed().COUNTY_DIR / county["fips"] / "county.json"
     target.write_text(json.dumps(row, indent=2) + "\n")
     return row

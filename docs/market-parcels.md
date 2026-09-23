@@ -4,7 +4,7 @@ Orlando keeps `scripts/seed_orlando_parcels.py` and `data/fixtures/orlando-parce
 
 Other markets use the same 0.25° tile grid (origin longitude -83, latitude 27) under `data/fixtures/market-parcels/counties/{fips}/tiles`. The home page does not embed the polygons. `GET /api/parcels?market={Market}&bbox=w,s,e,n` reads only the tiles for **that market** that intersect the viewport. Outlines stay off until neighborhood zoom (about 10.5), an area is locked, or Show parcels is on — the same gate as Orlando.
 
-Orange and Osceola already have a complete 5.0–150.0 acre Orlando extract. Melbourne points at those tiles instead of downloading them again. Tampa Hillsborough, Pasco, Pinellas, and Polk are county GIS extracts (see `docs/tampa-shed-parcels.md`). Polk's Orlando tiles stay in place; the Tampa market reads the Property Appraiser upgrade.
+Orange and Osceola already have a complete 5.0–150.0 acre Orlando extract. Melbourne points at those tiles instead of downloading them again. Tampa Hillsborough, Pasco, Pinellas, and Polk are county GIS extracts (see `docs/tampa-shed-parcels.md`). Polk's Orlando tiles stay in place; the Tampa market reads the Property Appraiser upgrade. Lakeland city zoning and future land use overlay those parcels. Countywide Polk zoning districts stay a gap.
 
 ## Refresh
 
@@ -21,7 +21,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 | State | Endpoint | What shipped |
 | --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels, plus Tampa shed county GIS | DOH for counties without a county card. Hillsborough ParcelPublishing/12, Pasco PascoMapper/7, Pinellas PublicWebGIS/1, and Polk Property_Appraiser/134 replace DOH for those four. Pasco's Hosted Master Property List (~2,266 rows) is rejected |
+| Florida | Florida DOH EHWATER Parcels, plus Tampa shed county GIS | DOH for counties without a county card. Hillsborough ParcelPublishing/12, Pasco PascoMapper/7, Pinellas PublicWebGIS/1, and Polk Property_Appraiser/134 replace DOH for those four. Pasco's Hosted Master Property List (~2,266 rows) is rejected. Polk has no countywide zoning districts; Lakeland city zoning and future land use overlay parcels inside the city |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
@@ -41,7 +41,7 @@ python3 scripts/seed_tampa_shed.py --county Hillsborough --refresh
 
 # Market parcel coverage
 
-Acreage band is **5.0–150.0 inclusive**. Orlando is not re-scraped. Orange and Osceola are reused from the Orlando complete extract. Tampa Polk uses the Property Appraiser upgrade under market-parcels and does not rewrite Orlando tiles.
+Acreage band is **5.0–150.0 inclusive**. Orlando is not re-scraped. Orange and Osceola are reused from the Orlando complete extract. Tampa Polk uses the Property Appraiser upgrade under market-parcels and does not rewrite Orlando tiles. Lakeland city zoning and future land use overlay parcels inside the city. Countywide Polk zoning districts remain a gap.
 
 Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map requests the selected market's viewport tiles only.
 

@@ -1,6 +1,6 @@
 # Market parcel coverage
 
-Acreage band is **5.0–150.0 inclusive**. Orlando is not re-scraped. Orange and Osceola are reused from the Orlando complete extract. Tampa Polk uses the Property Appraiser upgrade under market-parcels and does not rewrite Orlando tiles.
+Acreage band is **5.0–150.0 inclusive**. Orlando is not re-scraped. Orange and Osceola are reused from the Orlando complete extract. Tampa Polk uses the Property Appraiser upgrade under market-parcels and does not rewrite Orlando tiles. Lakeland city zoning and future land use overlay parcels inside the city. Countywide Polk zoning districts remain a gap.
 
 Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map requests the selected market's viewport tiles only.
 

@@ -1,0 +1,30 @@
+{
+  "name": "Duval",
+  "fips": "12031",
+  "state": "Florida",
+  "markets": [
+    "Jacksonville"
+  ],
+  "featureCount": 7768,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "fl-coj-citybiz-parcels-12031",
+  "queryUrl": "https://maps.coj.net/coj/rest/services/CityBiz/Parcels/MapServer/0/query",
+  "gaps": [
+    "Sale price is not on CityBiz/Parcels. The property appraiser sales download is the price source and is not joined here.",
+    "CAMA_VAL is the market value when it is at least $1,000. Smaller placeholders fall back to land plus building value. Assessed and taxable value are not on this layer.",
+    "ZON_LABEL and LND_LABEL are consolidated Jacksonville attributes, not official zoning for Jacksonville Beach, Atlantic Beach, Neptune Beach, or Baldwin.",
+    "No public Jacksonville zoning-district service was verified. Paid NLR zoning was not used.",
+    "Jacksonville Beach zoning applied to 60 parcels.",
+    "Atlantic Beach parcels left without city zoning: 22.",
+    "Neptune Beach parcels left without city zoning: 19.",
+    "Baldwin parcels left without city zoning: 57."
+  ],
+  "path": "data/fixtures/market-parcels/counties/12031/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12031/lookup.json",
+  "sourceCount": 7771,
+  "dropped": 0,
+  "tileCount": 11
+}

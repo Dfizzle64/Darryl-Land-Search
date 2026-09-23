@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T22:57:25Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -1439,6 +1439,81 @@
           "maxAcres": 150.0,
           "gaps": [
             "No zoning or FLU on the Florida DOH extract."
+          ]
+        }
+      ]
+    },
+    "Jacksonville": {
+      "tier": "other",
+      "parcelCount": 26301,
+      "completeCountyCount": 5,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/jacksonville/meta.json",
+      "counties": [
+        {
+          "name": "Baker",
+          "state": "Florida",
+          "fips": "12003",
+          "featureCount": 3314,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Baker 2024_sales requires a token and was not joined.",
+            "Tax values on parcels_web2 use unlabeled cama0827 columns and were not mapped."
+          ]
+        },
+        {
+          "name": "Clay",
+          "state": "Florida",
+          "fips": "12019",
+          "featureCount": 4688,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Acreage is GISACRES from the Clay utility parcel layer, joined to county Parcel CAMA attributes on PIN.",
+            "County parcel REST has no sale price, sale date, or tax values. Green Cove Springs existing land use supplies those inside the city only."
+          ]
+        },
+        {
+          "name": "Duval",
+          "state": "Florida",
+          "fips": "12031",
+          "featureCount": 7768,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Sale price is not on CityBiz/Parcels. The property appraiser sales download is the price source and is not joined here.",
+            "CAMA_VAL is the market value when it is at least $1,000. Smaller placeholders fall back to land plus building value. Assessed and taxable value are not on this layer."
+          ]
+        },
+        {
+          "name": "Nassau",
+          "state": "Florida",
+          "fips": "12089",
+          "featureCount": 5587,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "8117 source rows collapsed to 5587 parcel ids. Repeated PINs on the tax map were kept once.",
+            "Last sale is not on MapServer/144. Yearly sales sublayers were not joined."
+          ]
+        },
+        {
+          "name": "St. Johns",
+          "state": "Florida",
+          "fips": "12109",
+          "featureCount": 4944,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "No acreage field on Hosted/Parcel. Acres are computed from WGS84 rings after a Web Mercator SHAPE__Area prefilter.",
+            "Sale price and tax values are not on the public parcel layer."
           ]
         }
       ]

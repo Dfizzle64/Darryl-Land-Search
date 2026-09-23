@@ -14,6 +14,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
 | Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Jacksonville | other | 26,301 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -179,6 +180,16 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
+
+### Jacksonville
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Baker | Florida | 12003 | complete-gte-5ac | 3,314 | fl-baker-parcels-web2-12003 |
+| Clay | Florida | 12019 | complete-gte-5ac | 4,688 | fl-clay-parcels-lgim-12019 |
+| Duval | Florida | 12031 | complete-gte-5ac | 7,768 | fl-coj-citybiz-parcels-12031 |
+| Nassau | Florida | 12089 | complete-gte-5ac | 5,587 | fl-nassau-taxmap-12089 |
+| St. Johns | Florida | 12109 | complete-gte-5ac | 4,944 | fl-sjc-hosted-parcel-12109 |
 
 ### Pensacola
 

@@ -291,6 +291,8 @@ def empty_feature(
     city: str | None = None,
     zip_code: str | None = None,
     zoning: str | None = None,
+    zoning_district: str | None = None,
+    jurisdiction: str | None = None,
     dor: str | None = None,
     sale_price: float | None = None,
     sale_date: str | None = None,
@@ -303,9 +305,13 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    owner2: str | None = None,
+    flu: dict | None = None,
+    appraiser_url: str | None = None,
+    data_gaps: list | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
-    return {
+    feature = {
         "type": "Feature",
         "id": feature_id,
         "properties": {
@@ -318,12 +324,12 @@ def empty_feature(
             "situsAddress": situs,
             "situsCity": city,
             "situsZip": zip_code,
-            "jurisdictionCode": None,
+            "jurisdictionCode": jurisdiction,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
-            "zoningDistrict": None,
+            "zoningDistrict": zoning_district,
             "jurisdictionPrefix": None,
             "dorCode": dor,
             "acreage": round(acreage, 4),
@@ -345,13 +351,18 @@ def empty_feature(
             "incomeTract": None,
             "incomeBlockGroup": None,
             "nearestRoad": None,
-            "flu": None,
+            "flu": flu,
             "opportunityZone": None,
             "oz2Eligibility": None,
             "source": source,
         },
         "geometry": geometry,
     }
+    if appraiser_url:
+        feature["properties"]["appraiserUrl"] = appraiser_url
+    if data_gaps:
+        feature["properties"]["dataGaps"] = list(data_gaps)
+    return feature
 
 
 def count_where(url: str, where: str) -> int:
@@ -603,7 +614,34 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+JAX_SHED_FIPS = {"12031", "12109", "12019", "12089", "12003"}
+
+JAX_SHED_SOURCE = {
+    "12031": "fl-coj-citybiz-parcels-12031",
+    "12109": "fl-sjc-hosted-parcel-12109",
+    "12019": "fl-clay-parcels-lgim-12019",
+    "12089": "fl-nassau-taxmap-12089",
+    "12003": "fl-baker-parcels-web2-12003",
+}
+
+JAX_SHED_URL = {
+    "12031": "https://maps.coj.net/coj/rest/services/CityBiz/Parcels/MapServer/0/query",
+    "12109": "https://www.gis.sjcfl.us/portal_sjcgis/rest/services/Hosted/Parcel/FeatureServer/0/query",
+    "12019": "https://maps.clayutility.org/server/rest/services/Parcels_LGIM/MapServer/0/query",
+    "12089": "https://maps.ncpafl.com/ncflpa_arcgis/rest/services/nassau/NassauCountyPublicTaxMap/MapServer/144/query",
+    "12003": "https://services6.arcgis.com/HSWu3dhzHf7nZfIa/arcgis/rest/services/parcels_web2/FeatureServer/0/query",
+}
+
+
 def county_override(fips: str) -> dict | None:
+    if fips in JAX_SHED_FIPS:
+        return {
+            "kind": "jax-shed",
+            "url": JAX_SHED_URL[fips],
+            "source": JAX_SHED_SOURCE[fips],
+            "coverage": "complete-gte-5ac",
+            "gaps": [],
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -957,7 +995,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 | State | Endpoint | What shipped |
 | --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
+| Florida | Florida DOH EHWATER Parcels, plus Jacksonville shed county GIS | DOH complete 5–150 acre extract where the county is not already an Orlando complete county. Jacksonville (Duval, St. Johns, Clay, Nassau, Baker) uses each county's public parcel service. Wire order is Duval, St. Johns, Clay, Nassau, Baker |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
@@ -966,7 +1004,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Jacksonville shed zoning and future land use come from public county layers, and a city layer replaces them inside that city when the card has one. Atlantic Beach, Neptune Beach, Baldwin, Orange Park, Keystone Heights, and Penney Farms stay gaps. Elsewhere, zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -1193,6 +1231,9 @@ def main() -> None:
                 row["markets"] = markets
                 (COUNTY_DIR / fips / "county.json").write_text(json.dumps(row, indent=2) + "\n")
                 continue
+        if args.refresh:
+            spec = dict(spec)
+            spec["ignoreCache"] = True
         jobs.append((priority_of(markets, catalog), slot["county"]["name"], slot["county"], markets, spec))
 
     jobs.sort()
@@ -1203,7 +1244,15 @@ def main() -> None:
     def run(job: tuple) -> None:
         _priority, _name, county, markets, spec = job
         try:
-            download_county(county, markets, spec)
+            if spec.get("kind") == "jax-shed":
+                import sys
+
+                sys.path.insert(0, str(ROOT / "scripts"))
+                import jax_shed_parcels
+
+                jax_shed_parcels.pull(sys.modules[__name__], county, markets, spec)
+            else:
+                download_county(county, markets, spec)
         except Exception as exc:  # noqa: BLE001
             print(f"  failed {county['name']} {county['fips']}: {exc}", flush=True)
             county_row(

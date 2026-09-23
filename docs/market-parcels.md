@@ -12,6 +12,7 @@ Orange, Osceola, and Polk already have a complete 5.0–150.0 acre Orlando extra
 npm run seed:parcels:markets
 python3 scripts/seed_market_parcels.py --market Charlotte
 python3 scripts/seed_market_parcels.py --market Tampa --county Hardee
+python3 scripts/seed_panhandle_parcels.py
 python3 scripts/seed_market_parcels.py --refresh
 ```
 
@@ -21,7 +22,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 | State | Endpoint | What shipped |
 | --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
+| Florida | County GIS on the panhandle shelf (Bay, Okaloosa, Walton, Escambia, Santa Rosa); Florida DOH EHWATER elsewhere | Panhandle shelf uses public county and city REST (owner, mailing, situs, tax, and sale when that layer publishes them) plus city-aware zoning and FLU. Other Florida counties stay on DOH. See `docs/panhandle-parcels.md` |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
@@ -30,7 +31,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Panhandle shelf zoning and FLU are joined from the county and city layers on the public-GIS card. City layers win inside city limits. DeKalb is the other market county whose parcel layer already carries zoning. This is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 
@@ -50,7 +51,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
 | Melbourne | other | 41,757 | 5 | 0 | 0 |
-| Pensacola | other | 30,141 | 4 | 0 | 1 |
+| Pensacola | other | 41,915 | 5 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
 | Huntsville | other | 0 | 0 | 0 | 7 |
@@ -221,10 +222,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Baldwin | Alabama | 01003 | gap | 0 | unavailable |
-| Escambia | Florida | 12033 | complete-gte-5ac | 9,097 | fl-doh-ehwaters-12033 |
-| Okaloosa | Florida | 12091 | complete-gte-5ac | 5,854 | fl-doh-ehwaters-12091 |
-| Santa Rosa | Florida | 12113 | complete-gte-5ac | 7,011 | fl-doh-ehwaters-12113 |
-| Walton | Florida | 12131 | complete-gte-5ac | 8,179 | fl-doh-ehwaters-12131 |
+| Bay | Florida | 12005 | complete-gte-5ac | 4,861 | fl-panhandle-12005 |
+| Escambia | Florida | 12033 | complete-gte-5ac | 9,240 | fl-panhandle-12033 |
+| Okaloosa | Florida | 12091 | complete-gte-5ac | 9,956 | fl-panhandle-12091 |
+| Santa Rosa | Florida | 12113 | complete-gte-5ac | 8,928 | fl-panhandle-12113 |
+| Walton | Florida | 12131 | complete-gte-5ac | 8,930 | fl-panhandle-12131 |
 
 ### Birmingham
 

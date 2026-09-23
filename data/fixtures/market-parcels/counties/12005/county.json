@@ -1,0 +1,35 @@
+{
+  "name": "Bay",
+  "fips": "12005",
+  "state": "Florida",
+  "markets": [
+    "Pensacola"
+  ],
+  "featureCount": 4861,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "fl-panhandle-12005",
+  "queryUrl": "https://gis.baycountyfl.gov/arcgis/rest/services/Hosted/Parcels/FeatureServer/0/query",
+  "gaps": [
+    "Joined zoning on 4768 of 4861 parcels and FLU on 4777. Owner 4861, situs 4861, sale price 4083, sale date 4363.",
+    "5667 source rows became 4861 parcel ids. 830 split pieces with a new shape were merged. 2 repeated rows with the same polygon (stacked units or duplicate ids) were collapsed to one feature. Acreage and tax values are not summed across those rows. Rows that failed the WGS84 or county-extent check were dropped.",
+    "Official zoning and FLU come from LandUsePlanning MapServer 1 and 2 (spatial). Parcel zoning/flu attributes are often null and are not used.",
+    "Panama City Beach uses city Land_Use_and_Zoning FeatureServer 47 (zoning) and 49 (FLU) when the centroid hits those polygons; otherwise SUB_ZONING on the county layer (1 Bay County, 2 Callaway, 3 Lynn Haven, 4 Mexico Beach, 5 Panama City, 6 Panama City Beach). PCB zoning hits 264, county zoning hits 5267.",
+    "Parker and Springfield have no dedicated city REST this pass. They are not separate SUB_ZONING codes. A parcel there keeps the county multi-jurisdiction district only when that polygon intersects it.",
+    "Situs on rural samples is often legal or acre text (dsiteaddr), not a street address. The field is still the published situs.",
+    "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077)."
+  ],
+  "path": "data/fixtures/market-parcels/counties/12005/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12005/lookup.json",
+  "sourceCount": 5667,
+  "dropped": 1,
+  "tileCount": 8,
+  "zoningJoinedCount": 4768,
+  "fluJoinedCount": 4777,
+  "salePriceCount": 4083,
+  "saleDateCount": 4363,
+  "situsCount": 4861,
+  "ownerCount": 4861
+}

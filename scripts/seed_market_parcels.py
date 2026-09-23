@@ -710,8 +710,20 @@ def gap_reason(county: dict) -> str:
     return "No open parcel polygon endpoint was confirmed for this county."
 
 
+PANHANDLE_FIPS = ("12005", "12091", "12131", "12033", "12113")
+
+
 def spec_for(county: dict) -> dict:
     fips = county["fips"]
+    if fips in PANHANDLE_FIPS:
+        # County/city REST from the panhandle card. Do not fall through to FDOR/DOH.
+        return {
+            "kind": "panhandle",
+            "source": f"fl-panhandle-{fips}",
+            "url": None,
+            "coverage": "complete-gte-5ac",
+            "gaps": [],
+        }
     if fips in ORLANDO_REUSE:
         return {"kind": "reuse-orlando"}
     override = county_override(fips)
@@ -948,6 +960,7 @@ Orange, Osceola, and Polk already have a complete 5.0–150.0 acre Orlando extra
 npm run seed:parcels:markets
 python3 scripts/seed_market_parcels.py --market Charlotte
 python3 scripts/seed_market_parcels.py --market Tampa --county Hardee
+python3 scripts/seed_panhandle_parcels.py
 python3 scripts/seed_market_parcels.py --refresh
 ```
 
@@ -957,7 +970,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 | State | Endpoint | What shipped |
 | --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
+| Florida | County GIS on the panhandle shelf (Bay, Okaloosa, Walton, Escambia, Santa Rosa); Florida DOH EHWATER elsewhere | Panhandle shelf uses public county and city REST (owner, mailing, situs, tax, and sale when that layer publishes them) plus city-aware zoning and FLU. Other Florida counties stay on DOH. See `docs/panhandle-parcels.md` |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
@@ -966,7 +979,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Panhandle shelf zoning and FLU are joined from the county and city layers on the public-GIS card. City layers win inside city limits. DeKalb is the other market county whose parcel layer already carries zoning. This is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -1189,13 +1202,18 @@ def main() -> None:
             continue
         if existing.exists() and not args.refresh:
             row = json.loads(existing.read_text())
-            if row.get("featureCount") and row.get("coverage") in {"complete-gte-5ac", "sample"}:
+            stale_panhandle = spec.get("kind") == "panhandle" and not str(row.get("source") or "").startswith("fl-panhandle-")
+            if row.get("featureCount") and row.get("coverage") in {"complete-gte-5ac", "sample"} and not stale_panhandle:
                 row["markets"] = markets
                 (COUNTY_DIR / fips / "county.json").write_text(json.dumps(row, indent=2) + "\n")
                 continue
         jobs.append((priority_of(markets, catalog), slot["county"]["name"], slot["county"], markets, spec))
 
     jobs.sort()
+    wire_order = {fips: index for index, fips in enumerate(PANHANDLE_FIPS)}
+    panhandle_jobs = [job for job in jobs if job[-1].get("kind") == "panhandle"]
+    other_jobs = [job for job in jobs if job[-1].get("kind") != "panhandle"]
+    panhandle_jobs.sort(key=lambda job: wire_order.get(job[2]["fips"], 99))
     with WRITE_LOCK:
         rebuild_indexes(catalog)
     print(f"{len(jobs)} counties to pull, {len(grouped)} selected", flush=True)
@@ -1203,7 +1221,12 @@ def main() -> None:
     def run(job: tuple) -> None:
         _priority, _name, county, markets, spec = job
         try:
-            download_county(county, markets, spec)
+            if spec.get("kind") == "panhandle":
+                from seed_panhandle_parcels import seed_panhandle_county
+
+                seed_panhandle_county(county, markets, refresh=True)
+            else:
+                download_county(county, markets, spec)
         except Exception as exc:  # noqa: BLE001
             print(f"  failed {county['name']} {county['fips']}: {exc}", flush=True)
             county_row(
@@ -1221,10 +1244,12 @@ def main() -> None:
         with WRITE_LOCK:
             rebuild_indexes(catalog)
 
-    if jobs:
-        workers = max(1, min(args.workers, len(jobs)))
+    for job in panhandle_jobs:
+        run(job)
+    if other_jobs:
+        workers = max(1, min(args.workers, len(other_jobs)))
         with ThreadPoolExecutor(max_workers=workers) as pool:
-            futures = [pool.submit(run, job) for job in jobs]
+            futures = [pool.submit(run, job) for job in other_jobs]
             for future in as_completed(futures):
                 future.result()
     with WRITE_LOCK:

@@ -14,7 +14,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
 | Melbourne | other | 41,757 | 5 | 0 | 0 |
-| Pensacola | other | 30,141 | 4 | 0 | 1 |
+| Pensacola | other | 41,915 | 5 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
 | Huntsville | other | 0 | 0 | 0 | 7 |
@@ -185,10 +185,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Baldwin | Alabama | 01003 | gap | 0 | unavailable |
-| Escambia | Florida | 12033 | complete-gte-5ac | 9,097 | fl-doh-ehwaters-12033 |
-| Okaloosa | Florida | 12091 | complete-gte-5ac | 5,854 | fl-doh-ehwaters-12091 |
-| Santa Rosa | Florida | 12113 | complete-gte-5ac | 7,011 | fl-doh-ehwaters-12113 |
-| Walton | Florida | 12131 | complete-gte-5ac | 8,179 | fl-doh-ehwaters-12131 |
+| Bay | Florida | 12005 | complete-gte-5ac | 4,861 | fl-panhandle-12005 |
+| Escambia | Florida | 12033 | complete-gte-5ac | 9,240 | fl-panhandle-12033 |
+| Okaloosa | Florida | 12091 | complete-gte-5ac | 9,956 | fl-panhandle-12091 |
+| Santa Rosa | Florida | 12113 | complete-gte-5ac | 8,928 | fl-panhandle-12113 |
+| Walton | Florida | 12131 | complete-gte-5ac | 8,930 | fl-panhandle-12131 |
 
 ### Birmingham
 

@@ -43,7 +43,8 @@ No API keys are required for the default fixture mode. Copy `.env.example` to `.
 - Set a **minimum median household income** (tract or block group) and **minimum AADT**.
 - Browse a **ranked sites list** (score 0–100) that stays in sync with filters. Click a row to open the drawer and fly the map.
 - Open **Zoning knowledge** in the sidebar: jurisdictions covered, district explanations, citations, last-updated date. This is an offline JSON knowledge base, not a live model call.
-- Switch the map between **Streets** (OpenFreeMap dark / Carto Dark Matter fallback) and **Satellite** (Esri World Imagery). The toggle is a map control; parcel filters, selection, OZ overlay, and camera stay put. Satellite imagery is a public Esri tile service and needs no API key.
+- Switch the map between **Streets** (CARTO Voyager: roads, labels, and places — not OpenStreetMap Carto), **Satellite hybrid** (Esri imagery plus road and city/place labels), and **Dark** (OpenFreeMap dark / Carto Dark Matter fallback). The toggle is a map control; parcel filters, selection, OZ overlay, and camera stay put. No API key is required. Set `NEXT_PUBLIC_MAPTILER_KEY` to use MapTiler Streets v2 and MapTiler Hybrid instead of the keyless tiles.
+- **Measure** a polyline on any basemap. Each click adds a vertex; the readout lists every segment and the total in miles. Clear drops the line, Cancel (or Esc) leaves measure mode.
 - **Lock an area of interest** on the Orlando parcel map: **Draw area** and drag a rectangle, or **Lock view** to use the current map bounds. Queries and the ranked list stay inside that boundary while you pan and zoom; **Clear** follows the viewport again. The outline and an “AOI locked” chip (approximate acreage and parcel count) stay on the map. County, market, the 5–150 acre band, Opportunity Zone overlays, and the South Carolina shortlist still apply.
 
 Lake, Orange, Osceola, Polk, and Seminole load **every public parcel from 5.0 through 150.0 acres** from Florida DOH EHWATER (FDOR land square feet). Parcels under 5 or over 150 are excluded. Orange also joins OCPA zoning, sale, and tax when the parcel id matches, plus Orange County and Orlando future land use. The map requests the current viewport instead of shipping that whole extract in the page. Parcel outlines stay off below zoom 11.5 so the shed is not a solid fill; they turn on when you zoom in or lock an area. The Parcels toggle can force them on or off for the session. Off stays off until you turn them back on. **Lock view** or **Draw area** freezes that query to a boundary so parcels do not swap in and out as the camera moves. Brevard, Marion, Sumter, and Volusia are still thinner samples. `data/fixtures/parcels.geojson` remains a separate 462-parcel Orange pilot with income and AADT, used by the legacy provider, not the Orlando shed map.
@@ -147,7 +148,7 @@ The app runs offline from `data/fixtures/opportunity-zones.geojson` plus `opport
 Product decisions:
 
 - Join by geometry, never by ACS 2020 `incomeTract.geoid`.
-- The designated overlay is off by default so it does not fight parcel fills; the Streets / Satellite toggle does not drop it.
+- The designated overlay is off by default so it does not fight parcel fills; the Streets / Satellite hybrid / Dark toggle does not drop it.
 - “Not in designated Opportunity Zone” requires a successful join that returned false, not a missing property.
 - Rural on a **designated** zone is membership in the Notice 2025-50 appendix. The HUD `Rural` attribute is not the classifier.
 
@@ -166,6 +167,8 @@ Orange County has **87** eligible tracts in that appendix. **One** is rural: GEO
 Offline files: `data/fixtures/oz2-eligible.geojson`, `oz2-eligible-tracts.json`, and `oz2Eligibility` on each parcel. In this sample **185 / 462** centroids fall in an eligible tract and **3 / 462** fall in `12095016605` (those three were appended from the public OCPA layer so the rural filter and drawer have something to open). The OZ 2.0 overlay is on by default. Orange is rural-eligible; amber is eligible and not rural. Designated QOZs use a copper fill and a dashed outline. Parcel fills stay green. Choosing the rural-eligible or non-rural filter narrows the overlay to that class.
 
 The parcel drawer shows eligible / not eligible, the official rural flag, and the GEOID, and says the tract has not been nominated or certified. A rural-eligible parcel uses the status chip **Eligible (rural) — not designated**.
+
+Clicking a census tract overlay shows the county and state with the GEOID, status, and rural flag. Rural-eligible tracts open the tract drawer (county and state are labeled fields). Eligible tracts that are not rural, and current designated QOZ tracts, open a map popup. County comes from the tract properties: the Orange eligible table for the OZ 2.0 overlay, Orange County (FIPS 12095) for the designated overlay, and the seven-market pack for rural tracts. That label is not a 2027 designation.
 
 ## Seven Southeast markets (rural-eligible only)
 
@@ -227,8 +230,9 @@ That script reads `data/sc-oz2-mf-priority-shortlist.csv`, requires the eligible
 | OZ 2.0 tract geometry | Census TIGER 2020 census tracts | [TIGERweb Census 2020 tracts](https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2020/MapServer/6) |
 | Designated rural QOZs | Notice 2025-50 appendix | [n-25-50.pdf](https://www.irs.gov/pub/irs-drop/n-25-50.pdf) |
 | AADT | Florida DOT Traffic Characteristics Inventory | [`RCI_Layers` AADT](https://gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0) (`COUNTY='Orange'`) |
-| Streets basemap | OpenFreeMap (Carto Dark Matter fallback) | Free vector tiles, no key |
-| Satellite basemap | Esri World Imagery | Public XYZ tiles at `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}` — no API key. Attribution: *Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community* (shown on the map when Satellite is selected, and in MapLibre’s attribution control). |
+| Streets basemap | CARTO Voyager raster (keyless). Optional MapTiler Streets v2 when `NEXT_PUBLIC_MAPTILER_KEY` is set | `https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png`. Attribution: *© OpenStreetMap contributors © CARTO*. MapTiler: `https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}.png?key=` — *© MapTiler © OpenStreetMap contributors* |
+| Satellite hybrid | Esri World Imagery + World Transportation + World Boundaries and Places. Optional MapTiler Hybrid when `NEXT_PUBLIC_MAPTILER_KEY` is set | Imagery `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}`, roads `.../Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}`, labels `.../Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}`. No API key. Attribution: *Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community. Roads and place labels © Esri.* MapTiler hybrid replaces that stack: `https://api.maptiler.com/maps/hybrid/256/{z}/{x}/{y}.jpg?key=` |
+| Dark basemap | OpenFreeMap Dark (Carto Dark Matter fallback) | Free vector tiles, no key |
 
 Fixture snapshot metadata: `data/fixtures/meta.json`. Knowledge-base format and refresh steps: `data/README.md`.
 
@@ -252,9 +256,11 @@ FDOT_AADT_URL=https://gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer
 OC_FLU_URL=https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/21/query
 ORL_FLU_URL=https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/83/query
 HUD_OZ_URL=https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Opportunity_Zones/FeatureServer/13/query
+NEXT_PUBLIC_MAPTILER_KEY=
 ```
 
 - **Census Bureau ACS** now redirects unauthenticated `api.census.gov` calls to a “Missing Key” page. Sign up at [Census API key signup](https://api.census.gov/data/key_signup.html) and set `CENSUS_API_KEY` when you replace Census Reporter with a first-party live income adapter.
+- **MapTiler basemap** (`NEXT_PUBLIC_MAPTILER_KEY`) is optional. Leave it unset to use keyless CARTO Voyager streets and the Esri imagery hybrid (roads + place labels). With a key, Streets uses [MapTiler Streets v2](https://docs.maptiler.com/cloud/api/maps/) and Satellite hybrid uses MapTiler Hybrid. The key is public in the browser; restrict it by URL in [MapTiler Cloud](https://cloud.maptiler.com/account/keys/). Dark stays on OpenFreeMap either way.
 - **`DATA_SOURCE=ocpa-live`** uses `OcpaLiveParcelProvider` in `src/lib/data/adapters.ts`. The Orlando map still reads the seeded fixtures. `getParcel(id)` can query OCPA live for a single Orange County id.
 - **Commercial vendors:** implement `VendorParcelProvider` (Regrid, ATTOM, etc.). Do not commit paid credentials. The UI already consumes the `ParcelProvider` interface.
 
@@ -281,7 +287,7 @@ TypeScript, Next.js 15 App Router, MapLibre GL, Tailwind CSS. Data layer is fixt
 
 ## Product decisions
 
-- Desktop-first map + filter sidebar + ranked sites overlay (`xl+`) + parcel drawer; filters collapse to a sheet on small screens and the sites list is a **Sites** sheet. The Streets / Satellite control sits at the top-left of the map so it stays clear of the mobile filter button, zoom controls, and the bottom parcel sheet.
+- Desktop-first map + filter sidebar + ranked sites overlay (`xl+`) + parcel drawer; filters collapse to a sheet on small screens and the sites list is a **Sites** sheet. The Streets / Satellite hybrid / Dark control and the Measure tool sit at the top-left of the map so they stay clear of the mobile filter button, zoom controls, and the bottom parcel sheet.
 - Default filters: multifamily-capable zoning, planned development included, conditional zoning off, OZ either, no acreage/income/AADT minimum, unknown values included — so first load still shows a useful candidate set. The OZ 2.0 tract overlay starts on; the designated QOZ overlay stays off.
 - Acreage slider caps at 25 ac because a linear slider to Disney-scale tracts would be unusable as a *minimum*.
 - Honest empty/loading/error states rather than fake completeness, including when FLU data is missing for rezoning candidates.

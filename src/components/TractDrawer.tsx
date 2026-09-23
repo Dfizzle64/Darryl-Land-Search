@@ -2,6 +2,7 @@
 
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { formatCountyLabel, isSouthCarolinaState } from "@/lib/markets";
+import { formatTractCounty } from "@/lib/tractCounty";
 import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME } from "@/lib/orlandoParcels";
 import { MF_PRIORITY_DISCLAIMER, NOM_WATCH_CAVEAT, tractPlaceLabel } from "@/lib/scMfPriority";
 import { RURAL_ELIGIBLE_STATUS_CHIP, SC_GOVERNOR_FILED_STATUS, SHED_CAVEAT, type RuralMarketTractRow } from "@/lib/types";
@@ -67,6 +68,22 @@ export function TractDrawer({ tract, statusHelp = null, onClose }: TractDrawerPr
       ) : null}
 
       <dl className="mt-4 space-y-3 text-sm">
+        <div>
+          <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">County</dt>
+          <dd className="mt-1 text-ink-100">{formatTractCounty(tract.county, tract.state)}</dd>
+        </div>
+        <div>
+          <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">State</dt>
+          <dd className="mt-1 text-ink-100">{tract.state || "Unavailable"}</dd>
+        </div>
+        <div>
+          <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">GEOID</dt>
+          <dd className="mt-1 text-ink-100">{tract.geoid}</dd>
+        </div>
+        <div>
+          <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Rural</dt>
+          <dd className="mt-1 text-ink-100">Yes — entirely rural in Rev. Proc. 2026-14. Not designated.</dd>
+        </div>
         {priority ? (
           <>
             <div>

@@ -10,7 +10,7 @@ export function ParcelLayerToggle({ visible, hint, onToggle }: ParcelLayerToggle
   return (
     <div
       data-parcel-toggle
-      className="pointer-events-auto absolute left-3 top-16 z-30 max-w-[16.5rem] sm:left-4 sm:top-[4.25rem]"
+      className="pointer-events-auto max-w-[16.5rem]"
     >
       <button
         type="button"

@@ -418,6 +418,16 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        bbox = spec.get("bbox")
+        if bbox and not centroid_in_bbox(center, bbox):
+            dropped += 1
+            continue
+        if spec.get("saleDateField"):
+            parsed_sale_date = parse_deed_date(attrs.get(spec["saleDateField"]))
+        elif spec.get("saleYearField"):
+            parsed_sale_date = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
+        else:
+            parsed_sale_date = None
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -435,7 +445,7 @@ def normalize_rows(
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
+            sale_date=parsed_sale_date,
             sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
@@ -446,6 +456,11 @@ def normalize_rows(
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        if spec.get("appraiserUrl"):
+            feature["properties"]["appraiserUrl"] = spec["appraiserUrl"]
+        if spec.get("profile") == "douglas-ga" and not finish_douglas_feature(feature, attrs):
+            dropped += 1
+            continue
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -566,6 +581,527 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+# Douglas County, Georgia only. Rejects Douglas County CO/KS/MN/WI/OR/IL and the
+# other lookalikes (NE/NV/SD/WA), which sit far outside this Atlanta-west box.
+DOUGLAS_GA_BBOX = (-84.93, 33.56, -84.56, 33.82)
+DOUGLAS_PLACEHOLDER_PINS = {"TAXED IN COBB", "TAXED PAULDING", "CHATTOHOOCHEE"}
+DOUGLAS_NULLISH = {"<null>", "null", "none", "n/a"}
+DOUGLAS_MONTHS = {
+    "jan": 1,
+    "feb": 2,
+    "mar": 3,
+    "apr": 4,
+    "may": 5,
+    "jun": 6,
+    "jul": 7,
+    "aug": 8,
+    "sep": 9,
+    "oct": 10,
+    "nov": 11,
+    "dec": 12,
+}
+DOUGLAS_APPRAISER = "https://qpublic.schneidercorp.com/Application.aspx?AppID=988&LayerID=20162&PageTypeID=2&PageID=8760"
+DOUGLAS_AUSTELL_GAP = "Austell has no official city zoning or future land use service. County 'city' stubs were not copied."
+
+
+def centroid_in_bbox(center: tuple[float, float] | None, bbox: tuple[float, float, float, float] | list[float]) -> bool:
+    if not center:
+        return False
+    west, south, east, north = bbox
+    lon, lat = center
+    return west <= lon <= east and south <= lat <= north
+
+
+def text_or_none(value: Any) -> str | None:
+    text = clean(value)
+    if text is None or text.lower() in DOUGLAS_NULLISH:
+        return None
+    return text
+
+
+def code_or_none(value: Any) -> str | None:
+    text = text_or_none(value)
+    if text is None or text.lower() == "city":
+        return None
+    return text
+
+
+def parse_deed_date(value: Any) -> str | None:
+    """Douglas DEED_DATE looks like 'Jul 25 2000' or 'Dec  3 2015'."""
+    text = text_or_none(value)
+    if not text:
+        return None
+    parts = text.replace(",", " ").split()
+    if len(parts) != 3:
+        return None
+    month = DOUGLAS_MONTHS.get(parts[0][:3].lower())
+    if not month:
+        return None
+    try:
+        day = int(parts[1])
+        year = int(parts[2])
+    except ValueError:
+        return None
+    if year < 1900 or year > 2100 or not 1 <= day <= 31:
+        return None
+    return f"{year:04d}-{month:02d}-{day:02d}"
+
+
+def epoch_ms_date(value: Any) -> tuple[int, str] | None:
+    stamp = num(value)
+    if stamp is None:
+        return None
+    millis = int(stamp if abs(stamp) >= 10_000_000_000 else stamp * 1000)
+    # Reject timestamps outside 1900–2100 before calling fromtimestamp.
+    if not 0 <= millis <= 4_102_444_800_000:
+        return None
+    import datetime
+
+    parsed = datetime.datetime.fromtimestamp(millis / 1000, datetime.timezone.utc)
+    if parsed.year < 1900 or parsed.year > 2100:
+        return None
+    return millis, parsed.strftime("%Y-%m-%d")
+
+
+def point_in_ring(lon: float, lat: float, ring: list) -> bool:
+    if len(ring) < 4:
+        return False
+    inside = False
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = float(ring[i][0]), float(ring[i][1])
+        xj, yj = float(ring[j][0]), float(ring[j][1])
+        if (yi > lat) != (yj > lat):
+            denom = yj - yi
+            if denom != 0 and lon < (xj - xi) * (lat - yi) / denom + xi:
+                inside = not inside
+        j = i
+    return inside
+
+
+def point_in_geojson(lon: float, lat: float, geometry: dict | None) -> bool:
+    if not geometry:
+        return False
+    kind = geometry.get("type")
+    coords = geometry.get("coordinates") or []
+    polygons = coords if kind == "MultiPolygon" else [coords] if kind == "Polygon" else []
+    for polygon in polygons:
+        if not polygon or not point_in_ring(lon, lat, polygon[0]):
+            continue
+        if any(point_in_ring(lon, lat, hole) for hole in polygon[1:]):
+            continue
+        return True
+    return False
+
+
+def esri_feature_geojson(feature: dict) -> dict | None:
+    geometry, _acres = rings_to_feature_geometry(feature.get("geometry"))
+    return geometry
+
+
+def finish_douglas_feature(feature: dict, attrs: dict) -> bool:
+    """Map Douglas CAMA onto the shared parcel schema. Return False to drop the row."""
+    props = feature["properties"]
+    parcel_id = text_or_none(attrs.get("PIN")) or ""
+    if parcel_id.upper() in DOUGLAS_PLACEHOLDER_PINS:
+        return False
+    state = text_or_none(attrs.get("STATE"))
+    if state and state.upper() not in {"GA", "GEORGIA"}:
+        return False
+    center = props.get("centroid") or [None, None]
+    if not centroid_in_bbox((float(center[0]), float(center[1])), DOUGLAS_GA_BBOX):
+        return False
+
+    tax_district = (text_or_none(attrs.get("TAX_DISTRICT")) or "").upper()
+    city = text_or_none(attrs.get("CITY"))
+    county_zoning = code_or_none(attrs.get("DC_CURR_ZONING"))
+    county_flu = code_or_none(attrs.get("DC_CURR_FLU"))
+    city_zoning = code_or_none(attrs.get("DV_ZONING_CODE"))
+    city_flu = code_or_none(attrs.get("DV_FLU_CODE"))
+    city_flu_desc = text_or_none(attrs.get("DV_FLU_DESC"))
+    split = code_or_none(attrs.get("SZ_GIS"))
+
+    jurisdiction = None
+    if tax_district in {"03", "3A"}:
+        jurisdiction = "Douglasville"
+    elif tax_district == "04":
+        jurisdiction = "Villa Rica"
+    elif tax_district == "06":
+        jurisdiction = "Austell"
+    elif not tax_district and city and city.upper() == "VILLA RICA" and not county_zoning and not city_zoning:
+        jurisdiction = "Villa Rica"
+
+    props["jurisdictionCode"] = jurisdiction
+    if not city and jurisdiction:
+        props["situsCity"] = jurisdiction.upper()
+    elif city:
+        props["situsCity"] = city
+
+    mail2 = text_or_none(attrs.get("MAILADD2"))
+    mail3 = text_or_none(attrs.get("MAILADD3"))
+    if mail2 and mail3:
+        props["mailingAddress"]["line2"] = f"{mail2}, {mail3}"
+    elif mail3:
+        props["mailingAddress"]["line2"] = mail3
+    elif mail2:
+        props["mailingAddress"]["line2"] = mail2
+    line1 = text_or_none(attrs.get("MAILADD1"))
+    props["mailingAddress"]["line1"] = line1
+    for key, field in (("city", "MCITY"), ("state", "MSTATE")):
+        props["mailingAddress"][key] = text_or_none(attrs.get(field))
+    props["situsAddress"] = text_or_none(attrs.get("ADDRESS"))
+    props["situsZip"] = zip_str(text_or_none(attrs.get("ZIPCODE")))
+    props["mailingAddress"]["zip"] = zip_str(text_or_none(attrs.get("MZIP")))
+    props["ownerName"] = text_or_none(attrs.get("OWNER"))
+
+    gaps: list[str] = []
+    zoning = None
+    flu = None
+    if jurisdiction == "Austell":
+        gaps.append(DOUGLAS_AUSTELL_GAP)
+    elif jurisdiction == "Douglasville" or city_zoning or city_flu:
+        zoning = city_zoning
+        if city_flu:
+            flu = {
+                "code": city_flu,
+                "label": city_flu_desc or city_flu,
+                "jurisdiction": "Douglasville",
+                "source": "Douglas County LandRecords DV_FLU_CODE",
+            }
+        if jurisdiction == "Douglasville" and not zoning:
+            gaps.append("Douglasville parcel has no DV_ZONING_CODE. The county 'city' zoning stub was not copied.")
+    elif jurisdiction == "Villa Rica":
+        pass
+    else:
+        zoning = county_zoning
+        if county_flu:
+            flu = {
+                "code": county_flu,
+                "label": county_flu,
+                "jurisdiction": "Douglas County",
+                "source": "Douglas County LandRecords DC_CURR_FLU",
+            }
+    if split and jurisdiction != "Austell":
+        gaps.append(f"Split zoning SZ_GIS={split} is also published. The stored zoning code is the primary district.")
+    props["zoningCode"] = zoning
+    # Keep the district code in zoningCode. A description in zoningDistrict would
+    # replace that code in multifamily matching.
+    props["zoningDistrict"] = None
+    props["flu"] = flu
+    if gaps:
+        props["dataGaps"] = gaps
+    return True
+
+
+def fetch_attribute_rows(url: str, where: str, out_fields: list[str], page: int = 1000) -> list[dict]:
+    last_error: Exception | None = None
+    for order in ("OBJECTID", "FID", None):
+        rows: list[dict] = []
+        offset = 0
+        try:
+            while True:
+                params = {
+                    "where": where,
+                    "outFields": ",".join(out_fields),
+                    "returnGeometry": "false",
+                    "resultOffset": str(offset),
+                    "resultRecordCount": str(page),
+                    "f": "json",
+                }
+                if order:
+                    params["orderByFields"] = order
+                data = fetch_json(url, params)
+                if data.get("error"):
+                    raise RuntimeError(json.dumps(data["error"])[:300])
+                batch = data.get("features") or []
+                rows.extend(batch)
+                if not batch or not data.get("exceededTransferLimit"):
+                    return rows
+                offset += len(batch)
+        except RuntimeError as exc:
+            last_error = exc
+            continue
+    raise RuntimeError(last_error or "attribute query failed")
+
+
+def fetch_geo_layer(url: str, out_fields: list[str], *, paginate: bool) -> list[tuple[dict, dict]]:
+    params = {
+        "where": "1=1",
+        "outFields": ",".join(out_fields),
+        "returnGeometry": "true",
+        "outSR": "4326",
+        "f": "json",
+    }
+    if not paginate:
+        data = fetch_json(url, params)
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        batches = [data.get("features") or []]
+    else:
+        batches = []
+        offset = 0
+        while True:
+            query = dict(params)
+            query["resultOffset"] = str(offset)
+            query["resultRecordCount"] = "200"
+            data = fetch_json(url, query)
+            if data.get("error"):
+                raise RuntimeError(json.dumps(data["error"])[:300])
+            batch = data.get("features") or []
+            batches.append(batch)
+            if not batch or not data.get("exceededTransferLimit"):
+                break
+            offset += len(batch)
+    pairs: list[tuple[dict, dict]] = []
+    for batch in batches:
+        for feature in batch:
+            geometry = esri_feature_geojson(feature)
+            if geometry:
+                pairs.append((feature.get("attributes") or {}, geometry))
+    return pairs
+
+
+def geometry_area_m2(geometry: dict) -> float:
+    if geometry.get("type") == "Polygon":
+        return abs(ring_signed_m2(geometry["coordinates"][0]))
+    if geometry.get("type") == "MultiPolygon":
+        return sum(abs(ring_signed_m2(poly[0])) for poly in geometry["coordinates"] if poly)
+    return 0.0
+
+
+def smallest_hit(lon: float, lat: float, layers: list[tuple[dict, dict]], code_fn) -> str | None:
+    best_code = None
+    best_area = None
+    for attrs, geometry in layers:
+        code = code_fn(attrs)
+        if not code:
+            continue
+        if not point_in_geojson(lon, lat, geometry):
+            continue
+        area = geometry_area_m2(geometry)
+        if best_area is None or area < best_area:
+            best_area = area
+            best_code = code
+    return best_code
+
+
+def join_codes_by_pin(url: str, pins: list[str], field: str) -> dict[str, str]:
+    found: dict[str, str] = {}
+    for start in range(0, len(pins), 40):
+        chunk = pins[start : start + 40]
+        quoted = ",".join("'" + pin.replace("'", "''") + "'" for pin in chunk)
+        rows = fetch_attribute_rows(url, f"PIN IN ({quoted})", ["PIN", field], page=200)
+        for row in rows:
+            attrs = row.get("attributes") or {}
+            pin = text_or_none(attrs.get("PIN"))
+            code = code_or_none(attrs.get(field))
+            if pin and code:
+                found[pin] = code
+    return found
+
+
+def enrich_douglas_sales(features: list[dict]) -> int:
+    url = "https://maps.douglascountyga.gov/image/rest/services/PropertyInformation/PIW_Sales/MapServer/41/query"
+    by_pin = {feature["properties"]["parcelId"]: feature for feature in features}
+    pins = list(by_pin)
+    latest: dict[str, tuple[int, str, float | None]] = {}
+    for start in range(0, len(pins), 40):
+        chunk = pins[start : start + 40]
+        quoted = ",".join("'" + pin.replace("'", "''") + "'" for pin in chunk)
+        where = f"SALEVAL='0' AND PIN IN ({quoted})"
+        try:
+            rows = fetch_attribute_rows(url, where, ["PIN", "SALEPRICE", "SALEDATE", "SALEVAL", "REASON"], page=2000)
+        except RuntimeError:
+            rows = fetch_json(
+                url,
+                {
+                    "where": where,
+                    "outFields": "PIN,SALEPRICE,SALEDATE,SALEVAL,REASON",
+                    "returnGeometry": "false",
+                    "resultRecordCount": "2000",
+                    "f": "json",
+                },
+            ).get("features") or []
+        for row in rows:
+            attrs = row.get("attributes") or {}
+            if (text_or_none(attrs.get("SALEVAL")) or "") != "0":
+                continue
+            pin = text_or_none(attrs.get("PIN"))
+            parsed = epoch_ms_date(attrs.get("SALEDATE"))
+            if not pin or not parsed or pin not in by_pin:
+                continue
+            millis, day = parsed
+            price = num(attrs.get("SALEPRICE"))
+            if price is not None and price <= 0:
+                price = None
+            current = latest.get(pin)
+            if current is None or millis > current[0] or (millis == current[0] and (price or 0) > (current[2] or 0)):
+                latest[pin] = (millis, day, price)
+        time.sleep(0.05)
+    for pin, (_millis, day, price) in latest.items():
+        by_pin[pin]["properties"]["lastSale"] = {"date": day, "price": price, "qualified": "VALID SALE"}
+    return len(latest)
+
+
+def enrich_douglas_features(features: list[dict]) -> list[str]:
+    notes: list[str] = []
+    villa = [feature for feature in features if feature["properties"].get("jurisdictionCode") == "Villa Rica"]
+    douglasville = [feature for feature in features if feature["properties"].get("jurisdictionCode") == "Douglasville"]
+    try:
+        if villa:
+            codes = join_codes_by_pin(
+                "https://services2.arcgis.com/dW3WG2w9z33TTLpl/arcgis/rest/services/Map/FeatureServer/0/query",
+                [feature["properties"]["parcelId"] for feature in villa],
+                "Proposed_Z",
+            )
+            joined = 0
+            for feature in villa:
+                code = codes.get(feature["properties"]["parcelId"])
+                if not code:
+                    continue
+                feature["properties"]["zoningCode"] = code
+                gaps = [gap for gap in feature["properties"].get("dataGaps") or [] if "Villa Rica zoning" not in gap]
+                feature["properties"]["dataGaps"] = gaps or None
+                if feature["properties"]["dataGaps"] is None:
+                    feature["properties"].pop("dataGaps", None)
+                joined += 1
+            print(f"  Villa Rica zoning joined {joined}/{len(villa)}", flush=True)
+            flu_layers = fetch_geo_layer(
+                "https://services2.arcgis.com/dW3WG2w9z33TTLpl/arcgis/rest/services/Map/FeatureServer/3/query",
+                ["District"],
+                paginate=True,
+            )
+            flu_hits = 0
+            for feature in villa:
+                if feature["properties"].get("flu"):
+                    continue
+                lon, lat = feature["properties"]["centroid"]
+                code = smallest_hit(lon, lat, flu_layers, lambda attrs: code_or_none(attrs.get("District")))
+                if not code:
+                    continue
+                feature["properties"]["flu"] = {
+                    "code": code,
+                    "label": code,
+                    "jurisdiction": "Villa Rica",
+                    "source": "Villa Rica Interactive Map Future Land Use",
+                }
+                flu_hits += 1
+            print(f"  Villa Rica FLU joined {flu_hits}/{len(villa)}", flush=True)
+            for feature in villa:
+                props = feature["properties"]
+                gaps = list(props.get("dataGaps") or [])
+                if not props.get("zoningCode"):
+                    note = "Villa Rica Proposed_Z was not published for this PIN. The county 'city' stub was not copied."
+                    if note not in gaps:
+                        gaps.append(note)
+                if not props.get("flu"):
+                    note = "Villa Rica future land use was not joined for this parcel."
+                    if note not in gaps:
+                        gaps.append(note)
+                if gaps:
+                    props["dataGaps"] = gaps
+    except Exception as exc:  # noqa: BLE001
+        notes.append(f"Villa Rica city zoning or future land use join failed: {exc}")
+        print(f"  Villa Rica join failed: {exc}", flush=True)
+
+    try:
+        missing_zoning = [feature for feature in douglasville if not feature["properties"].get("zoningCode")]
+        missing_flu = [feature for feature in douglasville if not feature["properties"].get("flu")]
+        if missing_zoning:
+            layers = fetch_geo_layer(
+                "https://services3.arcgis.com/MvLJ3KHgohvvDRhi/arcgis/rest/services/Zoning/FeatureServer/1/query",
+                ["DV_ZONING_CODE"],
+                paginate=True,
+            )
+            hits = 0
+            for feature in missing_zoning:
+                lon, lat = feature["properties"]["centroid"]
+                code = smallest_hit(lon, lat, layers, lambda attrs: code_or_none(attrs.get("DV_ZONING_CODE")))
+                if not code:
+                    continue
+                feature["properties"]["zoningCode"] = code
+                feature["properties"]["dataGaps"] = [
+                    gap
+                    for gap in (feature["properties"].get("dataGaps") or [])
+                    if "no DV_ZONING_CODE" not in gap
+                ] or None
+                if feature["properties"].get("dataGaps") is None:
+                    feature["properties"].pop("dataGaps", None)
+                hits += 1
+            print(f"  Douglasville zoning fallback {hits}/{len(missing_zoning)}", flush=True)
+        if missing_flu:
+            layers = fetch_geo_layer(
+                "https://services3.arcgis.com/MvLJ3KHgohvvDRhi/arcgis/rest/services/Community_Character_Areas/FeatureServer/0/query",
+                ["DV_FLU_CODE", "DV_FLU_DESC"],
+                paginate=True,
+            )
+            hits = 0
+            for feature in missing_flu:
+                lon, lat = feature["properties"]["centroid"]
+
+                def flu_code(attrs: dict, lon=lon, lat=lat) -> str | None:
+                    return code_or_none(attrs.get("DV_FLU_CODE"))
+
+                code = smallest_hit(lon, lat, layers, flu_code)
+                if not code:
+                    continue
+                feature["properties"]["flu"] = {
+                    "code": code,
+                    "label": code,
+                    "jurisdiction": "Douglasville",
+                    "source": "City of Douglasville Community Character Areas",
+                }
+                hits += 1
+            print(f"  Douglasville FLU fallback {hits}/{len(missing_flu)}", flush=True)
+    except Exception as exc:  # noqa: BLE001
+        notes.append(f"Douglasville city zoning or future land use fallback failed: {exc}")
+        print(f"  Douglasville fallback failed: {exc}", flush=True)
+
+    try:
+        missing_county = [
+            feature
+            for feature in features
+            if not feature["properties"].get("jurisdictionCode") and not feature["properties"].get("zoningCode")
+        ]
+        if missing_county:
+            layers = fetch_geo_layer(
+                "https://maps.douglascountyga.gov/arcgis/rest/services/Zoning/Zoning/MapServer/7/query",
+                ["ZONING_GIS"],
+                paginate=False,
+            )
+            hits = 0
+            for feature in missing_county:
+                lon, lat = feature["properties"]["centroid"]
+                code = smallest_hit(lon, lat, layers, lambda attrs: code_or_none(attrs.get("ZONING_GIS")))
+                if not code:
+                    continue
+                feature["properties"]["zoningCode"] = code
+                hits += 1
+            print(f"  dissolved county zoning fallback {hits}/{len(missing_county)}", flush=True)
+    except Exception as exc:  # noqa: BLE001
+        notes.append(f"Dissolved county zoning fallback failed: {exc}")
+        print(f"  dissolved zoning failed: {exc}", flush=True)
+
+    try:
+        qualified = enrich_douglas_sales(features)
+        print(f"  qualified sales {qualified}/{len(features)}", flush=True)
+    except Exception as exc:  # noqa: BLE001
+        notes.append(f"Qualified sales history (PIW_Sales SALEVAL='0') was not joined: {exc}")
+        print(f"  sales join failed: {exc}", flush=True)
+
+    for feature in features:
+        props = feature["properties"]
+        if props.get("jurisdictionCode") != "Austell":
+            continue
+        props["zoningCode"] = None
+        props["zoningDistrict"] = None
+        props["flu"] = None
+        gaps = [gap for gap in (props.get("dataGaps") or []) if gap != DOUGLAS_AUSTELL_GAP]
+        gaps.append(DOUGLAS_AUSTELL_GAP)
+        props["dataGaps"] = gaps
+    return notes
+
+
 def county_override(fips: str) -> dict | None:
     if fips == "13067":  # Cobb GA
         return {
@@ -606,6 +1142,71 @@ def county_override(fips: str) -> dict | None:
             "coverage": "sample",
             "gaps": [
                 "DeKalb's public layer has no deed-acre field. Acres are computed from the polygon inside a Shape__Area window, so this county is a large sample, not a certified complete roll.",
+            ],
+        }
+    if fips == "13097":  # Douglas GA
+        return {
+            "kind": "arcgis",
+            "url": "https://maps.douglascountyga.gov/arcgis/rest/services/LandRecords/LandRecords/MapServer/0/query",
+            "where": "ACREAGE_GIS>=5 AND ACREAGE_GIS<=150",
+            "outFields": [
+                "PIN",
+                "OWNER",
+                "ADDRESS",
+                "CITY",
+                "STATE",
+                "ZIPCODE",
+                "MAILADD1",
+                "MAILADD2",
+                "MAILADD3",
+                "MCITY",
+                "MSTATE",
+                "MZIP",
+                "ACREAGE_GIS",
+                "CURR_VAL",
+                "TAX_DISTRICT",
+                "DESCRIP",
+                "DIGCLASS",
+                "DC_CURR_ZONING",
+                "DV_ZONING_CODE",
+                "DV_ZONING_DESC",
+                "SZ_GIS",
+                "DC_CURR_FLU",
+                "DV_FLU_CODE",
+                "DV_FLU_DESC",
+                "SALEPRICE",
+                "DEED_DATE",
+            ],
+            "idField": "PIN",
+            "acresField": "ACREAGE_GIS",
+            "ownerField": "OWNER",
+            "situsField": "ADDRESS",
+            "cityField": "CITY",
+            "zipField": "ZIPCODE",
+            "zoningField": "DC_CURR_ZONING",
+            "dorField": "DIGCLASS",
+            "salePriceField": "SALEPRICE",
+            "saleDateField": "DEED_DATE",
+            "marketValueField": "CURR_VAL",
+            "mail1Field": "MAILADD1",
+            "mail2Field": "MAILADD2",
+            "mailCityField": "MCITY",
+            "mailStateField": "MSTATE",
+            "mailZipField": "MZIP",
+            "bbox": list(DOUGLAS_GA_BBOX),
+            "profile": "douglas-ga",
+            "appraiserUrl": DOUGLAS_APPRAISER,
+            "source": "ga-douglas-landrecords",
+            "coverage": "complete-gte-5ac",
+            "gaps": [
+                "Acreage is ACREAGE_GIS, not the TOTAL_ACRES string. Band is 5.0–150.0 inclusive.",
+                "No public assessed or taxable value. CURR_VAL is fair market value. ACC is not the Georgia 40% assessed value.",
+                "Austell has no official city zoning or future land use service. Tax district 06 parcels keep null zoning and FLU.",
+                "Douglasville uses DV_ZONING_CODE and DV_FLU_CODE. Villa Rica uses city Proposed_Z on PIN and a spatial future-land-use join. County values of 'city' are municipal stubs and are not stored.",
+                "Unincorporated zoning and future land use come from DC_CURR_ZONING and DC_CURR_FLU. Dissolved Zoning/Zoning districts fill a missing county code only.",
+                "Placeholder PINs TAXED IN COBB, TAXED PAULDING, and CHATTOHOOCHEE are dropped. They are boundary slivers or river polygons, not Douglas tax parcels.",
+                "Last sale prefers PIW_Sales rows with SALEVAL='0' (VALID SALE). Polygon SALEPRICE and DEED_DATE are the fallback.",
+                "CAD_CITY is a postal code, not an incorporated city. Municipality is TAX_DISTRICT.",
             ],
         }
     if fips == "45035":  # Dorchester SC
@@ -663,7 +1264,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, or Douglas pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -925,11 +1526,11 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Douglas county services | Cobb complete. Douglas complete on LandRecords ACREAGE_GIS (5–150). DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer carries it (DeKalb, Douglas). Douglas uses county zoning and future land use outside cities, Douglasville parcel fields, and Villa Rica city zoning. Austell stays a gap. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -1013,6 +1614,10 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     ids = fetch_object_ids(spec["url"], spec["where"])
     raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
     features, dropped = normalize_rows(raw, county, markets, spec)
+    if spec.get("profile") == "douglas-ga":
+        extra_gaps = enrich_douglas_features(features)
+        spec = dict(spec)
+        spec["gaps"] = [*list(spec.get("gaps") or []), *extra_gaps]
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -1022,10 +1627,16 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     coverage = spec["coverage"]
     gaps = list(spec.get("gaps") or [])
     if expected and len(features) < expected and not spec.get("computeAcres"):
-        gaps.insert(
-            0,
-            f"{expected} source rows collapsed to {len(features)} parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        )
+        if spec.get("profile") == "douglas-ga":
+            gaps.insert(
+                0,
+                f"{expected} LandRecords rows matched ACREAGE_GIS 5–150. {len(features)} Douglas County, Georgia tax parcels were kept. Placeholder PINs and any geometry outside the Douglas County bbox were dropped.",
+            )
+        else:
+            gaps.insert(
+                0,
+                f"{expected} source rows collapsed to {len(features)} parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            )
     if not features:
         coverage = "gap"
         gaps.insert(0, f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks.")

@@ -123,3 +123,54 @@ describe("market parcel gating and acreage", () => {
     }
   });
 });
+
+describe("Douglas County, Georgia parcels", () => {
+  const countyPath = path.join(process.cwd(), "data/fixtures/market-parcels/counties/13097/county.json");
+  const tileDir = path.join(process.cwd(), "data/fixtures/market-parcels/counties/13097/tiles");
+
+  it("keeps the 5–150 acre Douglas GA extract and leaves Austell zoning empty", () => {
+    expect(existsSync(countyPath)).toBe(true);
+    const county = JSON.parse(readFileSync(countyPath, "utf8")) as {
+      fips: string;
+      featureCount: number;
+      coverage: string;
+      source: string;
+      gaps: string[];
+    };
+    expect(county.fips).toBe("13097");
+    expect(county.coverage).toBe("complete-gte-5ac");
+    expect(county.source).toBe("ga-douglas-landrecords");
+    expect(county.featureCount).toBeGreaterThan(4000);
+    expect(county.gaps.join(" ").toLowerCase()).toContain("austell");
+
+    const files = readdirSync(tileDir).filter((name) => name.endsWith(".geojson"));
+    expect(files.length).toBeGreaterThan(0);
+    let seen = 0;
+    let austell = 0;
+    for (const file of files) {
+      const collection = JSON.parse(readFileSync(path.join(tileDir, file), "utf8")) as ParcelCollection;
+      for (const feature of collection.features) {
+        const props = feature.properties;
+        expect(inMarketAcreageBand(props.acreage)).toBe(true);
+        expect(props.countyFips).toBe("13097");
+        expect(props.state).toBe("Georgia");
+        expect(props.marketIds).toContain("Atlanta");
+        const [lon, lat] = props.centroid;
+        expect(lon).toBeGreaterThan(-84.93);
+        expect(lon).toBeLessThan(-84.56);
+        expect(lat).toBeGreaterThan(33.56);
+        expect(lat).toBeLessThan(33.82);
+        expect(props.zoningCode?.toLowerCase()).not.toBe("city");
+        expect(props.flu?.code?.toLowerCase()).not.toBe("city");
+        if (props.jurisdictionCode === "Austell") {
+          austell += 1;
+          expect(props.zoningCode).toBeNull();
+          expect(props.flu).toBeNull();
+        }
+        seen += 1;
+      }
+    }
+    expect(seen).toBe(county.featureCount);
+    expect(austell).toBeGreaterThan(0);
+  });
+});

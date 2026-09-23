@@ -266,6 +266,10 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    owner2: str | None = None,
+    appraiser_url: str | None = None,
+    flu: dict | None = None,
+    data_gaps: list[str] | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
     return {
@@ -283,7 +287,7 @@ def empty_feature(
             "situsZip": zip_code,
             "jurisdictionCode": None,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
             "zoningDistrict": None,
@@ -308,9 +312,11 @@ def empty_feature(
             "incomeTract": None,
             "incomeBlockGroup": None,
             "nearestRoad": None,
-            "flu": None,
+            "flu": flu,
             "opportunityZone": None,
             "oz2Eligibility": None,
+            "appraiserUrl": appraiser_url,
+            "dataGaps": data_gaps,
             "source": source,
         },
         "geometry": geometry,
@@ -639,6 +645,14 @@ def county_override(fips: str) -> dict | None:
             "coverage": "complete-gte-5ac",
             "gaps": ["Jefferson County public parcels. Owner and situs are sparse on this layer. No zoning join."],
         }
+    if fips == "37119":  # Mecklenburg NC — county CAMA + parcel polygons, not OneMap
+        return {
+            "kind": "mecklenburg",
+            "url": "https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/MapServer/0/query",
+            "source": "meck-taxparcel-camadata-37119",
+            "coverage": "complete-gte-5ac",
+            "gaps": [],
+        }
     if fips == "45045":  # Greenville SC
         return {
             "kind": "arcgis",
@@ -921,7 +935,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels`, except Mecklenburg | Other counties are a complete 5–150 acre OneMap extract. Most use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Mecklenburg uses county CAMA attributes, county parcel outlines, parcel zoning, the latest priced sale, and Charlotte 2040 Place Types |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -929,13 +943,70 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb) or, for Mecklenburg, from the county parcel zoning join. It is not a multifamily knowledge-base match outside Orange County. Mecklenburg `zone_class` values and Charlotte Place Types are stored for the drawer and left unknown to the land-use filters, rather than treated as entitlements. Prefer **All parcels** in these markets.
+
+## Mecklenburg County (Charlotte)
+
+Public county GIS only. POLARIS HTML is not scraped. Phones and emails are not on these layers.
+
+- **Attributes.** [TaxParcel_camadata](https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/MapServer/0) filtered to `gisacres` 5–150 (about 33.5k tax accounts). Join key is `nc_pin`. Accounts that share a PIN (condo and townhouse stacks) collapse to one parcel. This layer does not return geometry.
+- **Outlines.** [Tax/ParcelsViewer](https://meckags.mecklenburgcountync.gov/server/rest/services/Tax/ParcelsViewer/MapServer/0) polygons in the same acreage band, one outline per `nc_pin`.
+- **Zoning.** `zone_class` from [ParcelsZoningZipcode](https://meckgis.mecklenburgcountync.gov/server/rest/services/ParcelsZoningZipcode/FeatureServer/0), joined on `nc_pin`. Split zones are listed together. There is no single countywide zoning service. Charlotte zoning polygons do not cover Cornelius, Davidson, Huntersville, Matthews, Mint Hill, Pineville, or Stallings. Town codes appear only when that parcel join published them.
+- **Sales.** Latest positive-price row on [TaxParcelSales](https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcelSales/FeatureServer/0) for the kept `parcelid`. The full history (about 1.6 million rows) is not stored. Grantor and grantee are not copied. CAMA `saledate` / `saleprice` fills in when the sales layer has no priced row.
+- **Future land use.** Centroid join to [Charlotte 2040 Place Types](https://services.arcgis.com/9Nl857LBlQVyzq54/arcgis/rest/services/Charlotte_Future_2040_Policy_Map/FeatureServer/0). City jurisdiction only. Towns stay empty. The legacy area-plan overlay is not used as current policy.
+- **Viewer.** `https://polaris3g.mecklenburgcountync.gov/pid/{pid}`
+- **Fallback.** NC OneMap `NC1Map_Parcels` with `cntyfips='119'` if the county polygon service fails.
+
+```bash
+python3 scripts/seed_market_parcels.py --market Charlotte --county Mecklenburg --refresh
+```
 
 ## Coverage
 """
 
 
+def download_mecklenburg_county(county: dict, markets: list[str], spec: dict) -> dict:
+    from mecklenburg_parcels import MeckSourceError, build_mecklenburg_features
+
+    print(f"Pulling {county['name']} {county['state']} ({county['fips']}) via {spec['source']}", flush=True)
+    try:
+        features, info = build_mecklenburg_features(markets, ignore_cache=bool(spec.get("ignoreCache")))
+    except MeckSourceError as exc:
+        print(f"  county polygons failed, OneMap fallback: {exc}", flush=True)
+        fallback = nc_spec(county["fips"])
+        fallback["gaps"] = [
+            f"Mecklenburg county parcel polygons failed ({exc}). Geometry fell back to NC OneMap cntyfips 119 without the CAMA, zoning, sales, or Place Type joins.",
+            *list(fallback.get("gaps") or []),
+        ]
+        fallback["ignoreCache"] = True
+        return download_county(county, markets, fallback)
+    if not features:
+        raise RuntimeError("Mecklenburg build returned no parcels")
+    if not all(in_band(feature["properties"].get("acreage")) for feature in features):
+        raise RuntimeError("37119 emitted a parcel outside 5–150 acres")
+    path, lookup, tiles = write_tiles(county, features)
+    gaps = list(info.get("gaps") or [])
+    print(f"  kept {len(features)} outlines ({info.get('geometrySource')})", flush=True)
+    return county_row(
+        county,
+        markets,
+        feature_count=len(features),
+        coverage=spec["coverage"],
+        partition="tiles",
+        path=path,
+        lookup=lookup,
+        source=spec["source"] if info.get("geometrySource") == "parcels-viewer" else f"{spec['source']}+{info.get('geometrySource')}",
+        query_url=spec["url"],
+        gaps=gaps,
+        source_count=info.get("sourceCount"),
+        dropped=info.get("dropped"),
+        tile_count=tiles,
+    )
+
+
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "mecklenburg":
+        return download_mecklenburg_county(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
@@ -1141,6 +1212,9 @@ def main() -> None:
     for fips, slot in grouped.items():
         markets = full_markets[fips]
         spec = spec_for(slot["county"])
+        if args.refresh and spec.get("kind") == "mecklenburg":
+            spec = dict(spec)
+            spec["ignoreCache"] = True
         existing = COUNTY_DIR / fips / "county.json"
         if spec["kind"] == "gap":
             if not existing.exists() or args.refresh:

@@ -17,6 +17,22 @@ export function comptrollerRecordsUrl(): string {
   return "https://or.occompt.com/recorder/web/";
 }
 
+const STATE_POSTAL: Record<string, string> = {
+  Florida: "FL",
+  "North Carolina": "NC",
+  Georgia: "GA",
+  "South Carolina": "SC",
+  Tennessee: "TN",
+  Alabama: "AL",
+  Mississippi: "MS",
+  Arkansas: "AR",
+};
+
+export function statePostal(state: string | null | undefined): string | null {
+  if (!state) return null;
+  return STATE_POSTAL[state] ?? null;
+}
+
 const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12009": "https://www.bcpao.us/PropertySearch/#/nav/Search",
   "12069": "https://www.lakecopropappr.com/",
@@ -35,6 +51,12 @@ export function parcelAppraiserUrl(options: {
   appraiserUrl?: string | null;
 }): { href: string; label: string } {
   const fips = options.countyFips ?? null;
+  if (fips === "37119") {
+    return {
+      href: options.appraiserUrl || "https://polaris3g.mecklenburgcountync.gov/",
+      label: "Open in Mecklenburg POLARIS",
+    };
+  }
   if (fips === "12095" || (!fips && !options.appraiserUrl)) {
     return {
       href: ocpaParcelUrl(options.parcelId),

@@ -41,6 +41,21 @@ export type MarketParcelIndex = {
   markets: Record<string, MarketParcelMarketSummary>;
 };
 
+/** Municipal zoning/FLU wired as its own layer, joined spatially onto county parcels. */
+export type MarketParcelMunicipality = {
+  name: string;
+  independentGis: boolean;
+  zoningUrl?: string | null;
+  fluUrl?: string | null;
+  fluGap?: string | null;
+  join?: string | null;
+  zoningFeatures?: number | null;
+  fluFeatures?: number | null;
+  zoningJoined?: number | null;
+  fluJoined?: number | null;
+  note?: string | null;
+};
+
 export type MarketParcelCountyMeta = MarketParcelCountyRef & {
   partition: "tiles" | "file" | "none" | string;
   source: string;
@@ -49,6 +64,18 @@ export type MarketParcelCountyMeta = MarketParcelCountyRef & {
   lookup?: string | null;
   tileCount?: number | null;
   sourceCount?: number | null;
+  municipalities?: MarketParcelMunicipality[];
+  unincorporated?: {
+    zoningUrl?: string | null;
+    fluUrl?: string | null;
+    zoningFeatures?: number | null;
+    fluFeatures?: number | null;
+    zoningJoined?: number | null;
+    fluJoined?: number | null;
+    note?: string | null;
+  };
+  zoningJoinedCount?: number | null;
+  fluJoinedCount?: number | null;
 };
 
 export type MarketParcelsMeta = {

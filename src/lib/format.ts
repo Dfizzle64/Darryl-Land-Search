@@ -41,6 +41,12 @@ export function parcelAppraiserUrl(options: {
       label: "Open in Orange County Property Appraiser",
     };
   }
+  if (fips === "37097") {
+    return {
+      href: options.appraiserUrl || "https://iredellcountync.mapgeo.io/",
+      label: "Open Iredell County MapGeo parcel",
+    };
+  }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);
   const countyLabel =
     fips === "12009"

@@ -37,6 +37,48 @@ type FilterSidebarProps = {
   onPriorityView?: (view: MfPriorityView) => void;
 };
 
+function YesNo({
+  label,
+  hint,
+  value,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  value: boolean;
+  onChange: (next: boolean) => void;
+}) {
+  return (
+    <div>
+      <p className="text-sm text-white">{label}</p>
+      {hint ? <p className="mt-0.5 text-xs leading-relaxed text-ink-300">{hint}</p> : null}
+      <div className="mt-2 grid grid-cols-2 gap-1 rounded-xl border border-white/15 bg-ink-950 p-1" role="group" aria-label={label}>
+        {(
+          [
+            [true, "Yes"],
+            [false, "No"],
+          ] as const
+        ).map(([next, text]) => {
+          const selected = value === next;
+          return (
+            <button
+              key={text}
+              type="button"
+              aria-pressed={selected}
+              className={`rounded-lg px-3 py-1.5 text-sm ${
+                selected ? "bg-white text-ink-950" : "text-ink-200 hover:bg-white/10"
+              }`}
+              onClick={() => onChange(next)}
+            >
+              {text}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function Toggle({
   label,
   checked,
@@ -223,59 +265,33 @@ export function FilterSidebar({
         </section>
 
         <section className="mt-5 space-y-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Land use</h2>
-          <fieldset className="space-y-2">
-            <legend className="sr-only">Zoning and Future Land Use mode</legend>
-            {LAND_USE_OPTIONS.map((option) => (
-              <label key={option.value} className="flex cursor-pointer items-start gap-2 rounded-xl border border-white/5 bg-ink-950/30 px-2 py-2">
-                <input
-                  type="radio"
-                  className="mt-1 accent-moss-400"
-                  name="land-use-filter"
-                  checked={filters.landUseFilter === option.value}
-                  onChange={() => onChange({ ...filters, landUseFilter: option.value })}
-                />
-                <span>
-                  <span className="block text-sm text-white">{option.label}</span>
-                  <span className="mt-0.5 block text-xs text-ink-500">{option.hint}</span>
-                </span>
-              </label>
-            ))}
-          </fieldset>
-          <Toggle
-            label="Include planned development"
-            checked={filters.includePlannedDevelopment}
-            onChange={(includePlannedDevelopment) => onChange({ ...filters, includePlannedDevelopment })}
-            hint="PD / PUD / PURD is maybe — entitlements are site-specific"
-          />
-          <Toggle
-            label="Include conditional zoning"
-            checked={filters.includeConditionalZoning}
-            onChange={(includeConditionalZoning) => onChange({ ...filters, includeConditionalZoning })}
-            hint="Live Local commercial/industrial, limited multiplex, some mixed-use overlays"
-          />
-        </section>
-
-        <section className="mt-5 space-y-3">
           <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Opportunity Zones</h2>
-          <fieldset className="space-y-2">
-            <legend className="sr-only">Opportunity Zone filter</legend>
-            {OZ_OPTIONS.map((option) => (
-              <label key={option.value} className="flex cursor-pointer items-start gap-2 rounded-xl border border-white/5 bg-ink-950/30 px-2 py-2">
-                <input
-                  type="radio"
-                  className="mt-1 accent-moss-400"
-                  name="oz-filter"
-                  checked={filters.ozFilter === option.value}
-                  onChange={() => onChange({ ...filters, ozFilter: option.value })}
-                />
-                <span>
-                  <span className="block text-sm text-white">{option.label}</span>
-                  <span className="mt-0.5 block text-xs text-ink-500">{option.hint}</span>
-                </span>
-              </label>
-            ))}
-          </fieldset>
+          <YesNo
+            label="Consider opportunity zone in parcels"
+            hint="No leaves parcel results unfiltered by Opportunity Zone. Yes shows the parcel OZ choices below."
+            value={filters.considerOpportunityZone}
+            onChange={(considerOpportunityZone) => onChange({ ...filters, considerOpportunityZone })}
+          />
+          {filters.considerOpportunityZone ? (
+            <fieldset className="space-y-2">
+              <legend className="sr-only">Opportunity Zone filter</legend>
+              {OZ_OPTIONS.map((option) => (
+                <label key={option.value} className="flex cursor-pointer items-start gap-2 rounded-xl border border-white/5 bg-ink-950/30 px-2 py-2">
+                  <input
+                    type="radio"
+                    className="mt-1 accent-moss-400"
+                    name="oz-filter"
+                    checked={filters.ozFilter === option.value}
+                    onChange={() => onChange({ ...filters, ozFilter: option.value })}
+                  />
+                  <span>
+                    <span className="block text-sm text-white">{option.label}</span>
+                    <span className="mt-0.5 block text-xs text-ink-500">{option.hint}</span>
+                  </span>
+                </label>
+              ))}
+            </fieldset>
+          ) : null}
           <Toggle
             label="Show OZ 2.0 eligible tracts"
             checked={showOz2}
@@ -286,8 +302,52 @@ export function FilterSidebar({
             label="Show designated Opportunity Zone overlay"
             checked={showOz}
             onChange={onShowOz}
-            hint="Orange County pilot only. Current HUD/Treasury QOZ tracts (2010 geography), copper fill with a dashed outline."
+            hint="Orange County pilot only. Current HUD/Treasury QOZ tracts (2010 geography), copper fill with a dashed outline. Eligible is not designated."
           />
+        </section>
+
+        <section className="mt-5 space-y-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Zoning</h2>
+          <YesNo
+            label="Consider zoning in parcels"
+            hint="No ignores zoning, future land use, and rezoning rules. Yes shows those parcel choices below."
+            value={filters.considerZoning}
+            onChange={(considerZoning) => onChange({ ...filters, considerZoning })}
+          />
+          {filters.considerZoning ? (
+            <>
+              <fieldset className="space-y-2">
+                <legend className="sr-only">Zoning and Future Land Use mode</legend>
+                {LAND_USE_OPTIONS.map((option) => (
+                  <label key={option.value} className="flex cursor-pointer items-start gap-2 rounded-xl border border-white/5 bg-ink-950/30 px-2 py-2">
+                    <input
+                      type="radio"
+                      className="mt-1 accent-moss-400"
+                      name="land-use-filter"
+                      checked={filters.landUseFilter === option.value}
+                      onChange={() => onChange({ ...filters, landUseFilter: option.value })}
+                    />
+                    <span>
+                      <span className="block text-sm text-white">{option.label}</span>
+                      <span className="mt-0.5 block text-xs text-ink-500">{option.hint}</span>
+                    </span>
+                  </label>
+                ))}
+              </fieldset>
+              <Toggle
+                label="Include planned development"
+                checked={filters.includePlannedDevelopment}
+                onChange={(includePlannedDevelopment) => onChange({ ...filters, includePlannedDevelopment })}
+                hint="PD / PUD / PURD is maybe — entitlements are site-specific"
+              />
+              <Toggle
+                label="Include conditional zoning"
+                checked={filters.includeConditionalZoning}
+                onChange={(includeConditionalZoning) => onChange({ ...filters, includeConditionalZoning })}
+                hint="Live Local commercial/industrial, limited multiplex, some mixed-use overlays"
+              />
+            </>
+          ) : null}
         </section>
 
         <section className="mt-5 space-y-3">
@@ -313,7 +373,7 @@ export function FilterSidebar({
             Slider runs 0–{ACREAGE_SLIDER.max} acres. Larger parcels still match any threshold at or below{" "}
             {ACREAGE_SLIDER.max} ac. Lake, Orange, Osceola, Polk, and Seminole fixtures include every public parcel from
             5.0 through 150.0 acres. Parcels under 5 or over 150 are excluded. Brevard, Marion, Sumter, and Volusia are
-            still smaller samples.
+            still smaller samples. Eligible tracts have no acreage attribute, so this slider does not hide tracts.
           </p>
           <Toggle
             label="Include unknown acreage"
@@ -359,7 +419,10 @@ export function FilterSidebar({
           />
           <p className="text-xs text-ink-500">
             Orange County parcels in the current view pick up ACS median income. Other shed counties stay unknown —
-            uncheck the box to hide them when a minimum is set.
+            uncheck the box to hide them when a minimum is set. With Census geography set to tract, the same minimum
+            hides eligible tracts that have a joined Orange County ACS median income below it. Tracts outside that
+            fixture have no AMI attribute and stay on the map while Include unknown income is on. Block group income
+            applies to parcels only.
           </p>
         </section>
 
@@ -387,6 +450,7 @@ export function FilterSidebar({
           />
           <p className="text-xs text-ink-500">
             Orange County parcels pick up the nearest FDOT count. Other counties stay unknown unless that box is off.
+            Eligible tracts have no AADT attribute, so this slider does not hide tracts.
           </p>
           <Toggle
             label="Show major-road AADT overlay"

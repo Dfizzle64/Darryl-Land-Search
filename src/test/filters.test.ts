@@ -128,6 +128,8 @@ function feature(partial: Partial<ParcelFeature["properties"]>): ParcelFeature {
 }
 
 const baseFilters: FilterState = {
+  considerOpportunityZone: true,
+  considerZoning: true,
   landUseFilter: "zoning",
   includePlannedDevelopment: true,
   includeConditionalZoning: false,
@@ -406,5 +408,33 @@ describe("filterParcels", () => {
     ).toEqual(["urban-eligible"]);
     expect(filterParcels(parcels, { ...baseFilters, ozFilter: "in" }, config, fluConfig)).toHaveLength(0);
     expect(parcels[0].properties.oz2Eligibility?.designation).toBe("eligible-for-nomination");
+  });
+
+  it("ignores opportunity zone and zoning constraints until those switches are on", () => {
+    const parcels = [
+      feature({
+        id: "oz-non-mf",
+        zoningCode: "ORG-R-1",
+        zoningDistrict: "R-1",
+        opportunityZone: { inOpportunityZone: true, tractGeoid: "1", tractName: null, source: "t" },
+      }),
+      feature({ id: "plain" }),
+    ];
+    const gatedOff = {
+      ...baseFilters,
+      considerOpportunityZone: false,
+      considerZoning: false,
+      ozFilter: "in" as const,
+      landUseFilter: "non-mf" as const,
+    };
+    expect(filterParcels(parcels, gatedOff, config, fluConfig)).toHaveLength(2);
+    expect(
+      filterParcels(parcels, { ...gatedOff, considerOpportunityZone: true }, config, fluConfig).map(
+        (item) => item.properties.id,
+      ),
+    ).toEqual(["oz-non-mf"]);
+    expect(
+      filterParcels(parcels, { ...gatedOff, considerZoning: true }, config, fluConfig).map((item) => item.properties.id),
+    ).toEqual(["oz-non-mf"]);
   });
 });

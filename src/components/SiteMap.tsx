@@ -44,7 +44,8 @@ import {
 } from "@/lib/measure";
 import { eligibleClassCut, southCarolinaStatusHelp } from "@/lib/markets";
 import { tractClickFromFeature, type TractClickDetails } from "@/lib/tractCounty";
-import { ORANGE_COUNTY_CENTER, SC_GOVERNOR_FILED_STATUS, type EligiblePackTractCollection, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
+import { tractIncomeLayerFilter } from "@/lib/tractIncome";
+import { ORANGE_COUNTY_CENTER, SC_GOVERNOR_FILED_STATUS, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
 
 type LngLatBounds = [[number, number], [number, number]];
 
@@ -77,6 +78,9 @@ type SiteMapProps = {
   bounds: LngLatBounds;
   boundsKey: string;
   ozFilter: OzFilter;
+  minIncome: number;
+  includeUnknownIncome: boolean;
+  incomeGeography: IncomeGeography;
   highlightTierA: string[];
   highlightTierB: string[];
   restrictGeoids: string[] | null;
@@ -111,6 +115,15 @@ function setVisibilitySafe(map: MapLibreMap, layerId: string, visibility: "visib
 function geoidMatch(geoids: string[]): maplibregl.FilterSpecification {
   if (geoids.length === 0) return ["==", ["get", "tractGeoid"], "__none__"];
   return ["in", ["get", "tractGeoid"], ["literal", geoids]];
+}
+
+function andFilter(
+  base: maplibregl.FilterSpecification | null,
+  extra: maplibregl.FilterSpecification | null,
+): maplibregl.FilterSpecification | null {
+  if (!extra) return base;
+  if (!base) return extra;
+  return ["all", base, extra] as maplibregl.FilterSpecification;
 }
 
 function ruralLayerFilter(
@@ -359,6 +372,9 @@ export function SiteMap({
   bounds,
   boundsKey,
   ozFilter,
+  minIncome,
+  includeUnknownIncome,
+  incomeGeography,
   highlightTierA,
   highlightTierB,
   restrictGeoids,
@@ -783,26 +799,31 @@ export function SiteMap({
     for (const layerId of ["mf-priority-a-fill", "mf-priority-a-line", "mf-priority-b-fill", "mf-priority-b-line"]) {
       setVisibilitySafe(map, layerId, showRuralLayer ? "visible" : "none");
     }
+    const incomeFilter = tractIncomeLayerFilter(
+      incomeGeography,
+      minIncome,
+      includeUnknownIncome,
+    ) as maplibregl.FilterSpecification | null;
     const oz2Filter: maplibregl.FilterSpecification | null =
       classCut === "all"
         ? null
         : classCut === "none"
           ? ["==", ["get", "tractGeoid"], "__none__"]
           : ["==", ["get", "rural"], classCut === "rural"];
-    setFilterSafe(map, "oz2-fill", oz2Filter);
-    setFilterSafe(map, "oz2-line", oz2Filter);
+    setFilterSafe(map, "oz2-fill", andFilter(oz2Filter, incomeFilter));
+    setFilterSafe(map, "oz2-line", andFilter(oz2Filter, incomeFilter));
     const ruralFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, restrictGeoids);
-    setFilterSafe(map, "rural-fill", ruralFilter);
-    setFilterSafe(map, "rural-line", ruralFilter);
+    setFilterSafe(map, "rural-fill", andFilter(ruralFilter, incomeFilter));
+    setFilterSafe(map, "rural-line", andFilter(ruralFilter, incomeFilter));
     const eligibleFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, null, classCut);
-    setFilterSafe(map, "eligible-fill", eligibleFilter);
-    setFilterSafe(map, "eligible-line", eligibleFilter);
+    setFilterSafe(map, "eligible-fill", andFilter(eligibleFilter, incomeFilter));
+    setFilterSafe(map, "eligible-line", andFilter(eligibleFilter, incomeFilter));
     const tierAFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, highlightTierA);
     const tierBFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, highlightTierB);
-    setFilterSafe(map, "mf-priority-a-fill", tierAFilter);
-    setFilterSafe(map, "mf-priority-a-line", tierAFilter);
-    setFilterSafe(map, "mf-priority-b-fill", tierBFilter);
-    setFilterSafe(map, "mf-priority-b-line", tierBFilter);
+    setFilterSafe(map, "mf-priority-a-fill", andFilter(tierAFilter, incomeFilter));
+    setFilterSafe(map, "mf-priority-a-line", andFilter(tierAFilter, incomeFilter));
+    setFilterSafe(map, "mf-priority-b-fill", andFilter(tierBFilter, incomeFilter));
+    setFilterSafe(map, "mf-priority-b-line", andFilter(tierBFilter, incomeFilter));
   }, [
     parcelLayerVisible,
     showExcluded,
@@ -812,6 +833,9 @@ export function SiteMap({
     showParcels,
     showOrangePilot,
     ozFilter,
+    minIncome,
+    includeUnknownIncome,
+    incomeGeography,
     tractClass,
     market,
     county,
@@ -1005,7 +1029,7 @@ export function SiteMap({
         />
       ) : null}
       {status === "ready" && showParcels && !layerOn ? (
-        <div className="map-chrome absolute inset-x-3 top-28 z-20 flex justify-center sm:top-24 xl:right-[22rem]">
+        <div className="map-chrome absolute inset-x-3 top-28 z-20 flex justify-center sm:top-24">
           <div
             data-parcel-banner
             className="map-scrim max-w-md rounded-xl border px-3 py-2 text-center"
@@ -1018,16 +1042,17 @@ export function SiteMap({
         </div>
       ) : null}
       {status === "ready" && (showOz || showOz2 || showParcels) ? (
-        <div className="map-chrome map-scrim absolute bottom-3 left-3 z-10 max-w-[20rem] space-y-1 rounded-lg border px-2 py-1.5 text-[10px] leading-snug text-ink-100 sm:bottom-4 sm:left-4">
+        <div className="map-chrome map-scrim absolute bottom-3 left-3 z-10 max-w-[17rem] rounded-xl border sm:bottom-4 sm:left-4 sm:max-w-[22rem]">
+          <div className="legend-scroll max-h-[42vh] space-y-1.5 overflow-y-auto px-3 py-2.5 text-sm leading-snug">
           {aoi ? (
             <p>
-              <span className="mr-1.5 inline-block h-2 w-3 border border-dashed border-clay-400 align-middle" />
+              <span className="mr-2 inline-block h-3.5 w-5 border border-dashed border-clay-400 align-middle" />
               Area of interest
             </p>
           ) : null}
           {layerOn ? (
             <p>
-              <span className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle bg-moss-400" />
+              <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle bg-moss-400" />
               Parcels (matched)
               {parcelsLoading ? (aoi ? " · loading AOI…" : " · refreshing viewport…") : aoi ? " · AOI locked" : ""}
             </p>
@@ -1046,7 +1071,7 @@ export function SiteMap({
                     key={value}
                     type="button"
                     aria-pressed={tractClass === value}
-                    className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${
+                    className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${
                       tractClass === value ? "map-scrim-active border-white" : "border-white/55 text-white hover:bg-white/10"
                     }`}
                     onClick={() => onTractClass(value)}
@@ -1057,14 +1082,14 @@ export function SiteMap({
               </div>
               <p>
                 <span
-                  className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
+                  className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
                   style={{ backgroundColor: OZ_TRACT_SWATCH.rural }}
                 />
                 Rural eligible — not designated
               </p>
               <p>
                 <span
-                  className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
+                  className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
                   style={{ backgroundColor: OZ_TRACT_SWATCH.urban }}
                 />
                 Urban eligible — not designated
@@ -1072,7 +1097,7 @@ export function SiteMap({
               {showOrangePilot ? (
                 <p>
                   <span
-                    className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
+                    className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
                     style={{ backgroundColor: OZ_TRACT_SWATCH.eligible }}
                   />
                   Orange County urban eligible (amber overlay)
@@ -1082,14 +1107,14 @@ export function SiteMap({
                 <>
                   <p>
                     <span
-                      className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
+                      className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
                       style={{ backgroundColor: MF_PRIORITY_SWATCH.tierA }}
                     />
                     SC MF priority · Tier A
                   </p>
                   <p>
                     <span
-                      className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
+                      className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
                       style={{ backgroundColor: MF_PRIORITY_SWATCH.tierB }}
                     />
                     SC MF priority · Tier B
@@ -1098,14 +1123,14 @@ export function SiteMap({
               ) : null}
             </>
           ) : null}
-          <p className="text-ink-300">Pins mark tract internal points. 90-minute sheds are approximate county rings, not drive-time isochrones.</p>
+          <p className="text-xs text-ink-100">Pins mark tract internal points. 90-minute sheds are approximate county rings, not drive-time isochrones.</p>
           {scStatusHelp ? (
             <SouthCarolinaStatusNote note={SC_GOVERNOR_FILED_STATUS} className="text-ink-300" />
           ) : null}
           {showOz ? (
             <p>
               <span
-                className="mr-1.5 inline-block h-2 w-2 rounded-sm align-middle"
+                className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
                 style={{
                   backgroundColor: OZ_TRACT_SWATCH.designated,
                   boxShadow: "inset 0 0 0 1px #f6d0b0",
@@ -1114,6 +1139,7 @@ export function SiteMap({
               Designated QOZ (2018), dashed
             </p>
           ) : null}
+          </div>
         </div>
       ) : null}
       {status !== "ready" ? (

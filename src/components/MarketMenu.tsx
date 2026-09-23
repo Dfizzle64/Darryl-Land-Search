@@ -42,20 +42,20 @@ export function MarketMenu({ value, onChange }: MarketMenuProps) {
         aria-label="Market"
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="rounded-full border border-white/15 bg-ink-800 px-3 py-1.5 text-sm text-white"
+        className="rounded-full border border-white/30 bg-ink-800 px-3 py-1.5 text-sm text-white"
         onClick={() => {
           setOpen((current) => !current);
           if (isOtherMarketId(value)) setOtherOpen(true);
         }}
       >
         {value}
-        <span className="ml-2 text-[10px] text-ink-400">{open ? "▴" : "▾"}</span>
+        <span className="ml-2 text-xs text-clay-300">{open ? "▴" : "▾"}</span>
       </button>
       {open ? (
         <div
           role="listbox"
           aria-label="Markets"
-          className="absolute right-0 z-30 mt-1 max-h-[70vh] w-56 overflow-y-auto rounded-2xl border border-white/10 bg-ink-900 p-1 shadow-2xl"
+          className="absolute right-0 z-30 mt-1 max-h-[70vh] w-64 overflow-y-auto rounded-2xl border border-white/15 bg-ink-900 p-1.5 shadow-2xl"
         >
           <p className="px-2 pb-1 pt-1.5 text-[10px] uppercase tracking-[0.16em] text-ink-500">Primary</p>
           {MARKETS.map((market) => (
@@ -75,11 +75,16 @@ export function MarketMenu({ value, onChange }: MarketMenuProps) {
           <button
             type="button"
             aria-expanded={otherOpen}
-            className="mt-1 flex w-full items-center justify-between rounded-xl px-2 py-1.5 text-left text-[11px] uppercase tracking-[0.14em] text-ink-400 hover:bg-white/5"
+            className="mt-1.5 flex w-full items-center justify-between rounded-xl border border-clay-400/70 bg-ink-800 px-2.5 py-2 text-left text-ink-100 hover:border-clay-400 hover:bg-ink-700"
             onClick={() => setOtherOpen((current) => !current)}
           >
-            Other
-            <span>{otherOpen ? "▾" : "▸"}</span>
+            <span>
+              <span className="block text-[10px] uppercase tracking-[0.16em] text-clay-300">More markets</span>
+              <span className="text-sm font-medium text-white">Other MSAs ({OTHER_MARKETS.length})</span>
+            </span>
+            <span className="text-sm text-clay-300" aria-hidden>
+              {otherOpen ? "▾" : "▸"}
+            </span>
           </button>
           {otherOpen
             ? OTHER_MARKETS.map((market) => (
@@ -88,8 +93,8 @@ export function MarketMenu({ value, onChange }: MarketMenuProps) {
                   type="button"
                   role="option"
                   aria-selected={market === value}
-                  className={`block w-full rounded-xl py-1 pl-4 pr-2 text-left text-xs ${
-                    market === value ? "bg-white/10 text-ink-100" : "text-ink-400 hover:bg-white/5 hover:text-ink-200"
+                  className={`block w-full rounded-xl py-1.5 pl-4 pr-2 text-left text-sm ${
+                    market === value ? "bg-white/15 text-white" : "text-ink-100 hover:bg-white/10"
                   }`}
                   onClick={() => choose(market)}
                 >

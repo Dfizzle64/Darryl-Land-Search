@@ -22,7 +22,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Columbia | other | 0 | 0 | 0 | 10 |
 | Greenville | other | 1,570 | 0 | 1 | 7 |
 | Chattanooga | other | 10,537 | 2 | 0 | 8 |
-| Knoxville | other | 33,289 | 6 | 0 | 7 |
+| Knoxville | other | 37,858 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
@@ -294,7 +294,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Grainger | Tennessee | 47057 | complete-gte-5ac | 6,406 | tn-impact-47057 |
 | Hamblen | Tennessee | 47063 | gap | 0 | tn-impact-47063 |
 | Jefferson | Tennessee | 47089 | complete-gte-5ac | 6,586 | tn-impact-47089 |
-| Knox | Tennessee | 47093 | gap | 0 | kgis-globalsearch-blocked |
+| Knox | Tennessee | 47093 | complete-gte-5ac | 4,569 | kgis-parcel-search |
 | Loudon | Tennessee | 47105 | gap | 0 | tn-impact-47105 |
 | Morgan | Tennessee | 47129 | gap | 0 | tn-impact-47129 |
 | Roane | Tennessee | 47145 | gap | 0 | tn-impact-47145 |

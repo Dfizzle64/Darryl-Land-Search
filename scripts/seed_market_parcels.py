@@ -567,20 +567,15 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
-    if fips == "47093":  # Knox TN — not IMPACT. KGIS parcel query is anonymous-401.
+    if fips == "47093":  # Knox TN — Parcel Search portal proxy, seeded by scripts/seed_knox.py. Not IMPACT.
         return {
-            "kind": "gap",
-            "source": "kgis-globalsearch-blocked",
-            "queryUrl": "https://www.kgis.org/arcgis/rest/services/Maps/GlobalSearch/MapServer/0/query",
-            "reason": (
-                "Knox County parcel pull is an ingestion blocker. Anonymous queries to KGIS "
-                "Maps/GlobalSearch/MapServer/0 and Maps/Property/MapServer/2 return HTTP 401. "
-                "Comptroller IMPACT is not used for Knox."
-            ),
+            "kind": "external",
+            "source": "kgis-parcel-search",
+            "queryUrl": "https://www.kgis.org/gisportal/sharing/servers/871856067a1243bd899774b2072381c5/rest/services/Parcel_Search_Layer/MapServer/0/query",
+            "reason": "Knox parcels are seeded by scripts/seed_knox.py from the public Parcel Search portal proxy.",
             "gaps": [
-                "Knox County parcel pull is an ingestion blocker. Anonymous queries to KGIS Maps/GlobalSearch/MapServer/0 and Maps/Property/MapServer/2 return HTTP 401, and no tokenless countywide parcel service was found. Comptroller IMPACT is not used for Knox.",
-                "Public overlays ready to join when parcel polygons exist: KnoxvilleKnoxCountyZoning FeatureServer/2 (ZONE1, ZONE2, ZONE_TYPE; Farragut excluded), Knox_County_Future_Land_Use FeatureServer/326 (PLACETYPE, unincorporated only), and Farragut_Zoning FeatureServer/1 (ZONE).",
-                "City of Knoxville FLU (PRLU / One Year Plan) is token-gated or 401. Farragut has no public future-land-use FeatureServer. Those FLU values stay null.",
+                "City of Knoxville future land use and the One Year Plan are not available to anonymous query. FLU stays null inside the city.",
+                "Town of Farragut has no public future-land-use FeatureServer. FLU stays null in Farragut.",
             ],
         }
     if fips == "13067":  # Cobb GA
@@ -938,7 +933,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Knox County is not an IMPACT county and is not pulled from this layer. Several other counties are absent and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Knox County is not an IMPACT county; its 5–150 acre parcels come from the KGIS Parcel Search portal proxy via `npm run seed:knox`. Several other counties are absent and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
@@ -1170,6 +1165,8 @@ def main() -> None:
         markets = full_markets[fips]
         spec = spec_for(slot["county"])
         existing = COUNTY_DIR / fips / "county.json"
+        if spec["kind"] == "external":
+            continue
         if spec["kind"] == "gap":
             if not existing.exists() or args.refresh:
                 write_gap(slot["county"], markets, spec)

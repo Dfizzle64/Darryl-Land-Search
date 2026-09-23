@@ -3,8 +3,9 @@ import type { BBox, FluInfo, LastSale, MailingAddress, ParcelProperties, TaxInfo
 /** Knox County, Tennessee. Not a Comptroller IMPACT county. */
 export const KNOX_FIPS = "47093";
 
+/** Tokenless countywide parcels. Direct kgis.org/arcgis GlobalSearch stays 401. */
 export const KNOX_PARCEL_QUERY_URL =
-  "https://www.kgis.org/arcgis/rest/services/Maps/GlobalSearch/MapServer/0/query";
+  "https://www.kgis.org/gisportal/sharing/servers/871856067a1243bd899774b2072381c5/rest/services/Parcel_Search_Layer/MapServer/0/query";
 
 export const KNOX_PROPERTY_PARCEL_QUERY_URL =
   "https://www.kgis.org/arcgis/rest/services/Maps/Property/MapServer/2/query";
@@ -24,11 +25,11 @@ export const KNOX_APPRAISER_SEARCH_URL =
 export const KNOX_ACREAGE = { min: 5, max: 150 } as const;
 
 /**
- * Shown wherever Knox County is selected. Parcel polygons are not in the extract.
- * Zoning and FLU overlays are downloaded and joined only after a parcel polygon exists.
+ * Shown on the Knoxville market. Parcels are the 5–150 calculated-acre band.
+ * City and Farragut future land use stay null.
  */
-export const KNOX_PARCEL_BLOCKER =
-  "Knox County parcel pull is an ingestion blocker. Anonymous queries to KGIS Maps/GlobalSearch/MapServer/0 and Maps/Property/MapServer/2 return HTTP 401, and no tokenless countywide parcel service was found. Comptroller IMPACT is not used for Knox. City/county zoning, unincorporated Advance Knox place types, and Farragut zoning are stored and ready to join when parcel polygons exist.";
+export const KNOX_PARCEL_NOTE =
+  "Knox County parcels are the public KGIS Parcel Search layer, calculated acres 5.0 through 150.0. Direct kgis.org/arcgis parcel MapServers stay 401 and are not used. Comptroller IMPACT is not used. City of Knoxville and Farragut future land use stay null; unincorporated parcels use Advance Knox place types.";
 
 export type KnoxMunicipalityId = "knoxville" | "farragut" | "unincorporated";
 
@@ -158,7 +159,7 @@ export function knoxAcreage(attrs: Record<string, unknown>): {
 export function knoxDate(value: unknown): string | null {
   if (value == null || value === "") return null;
   if (typeof value === "number" && Number.isFinite(value)) {
-    const ms = value > 1e12 ? value : value > 1e9 ? value * 1000 : null;
+    const ms = Math.abs(value) >= 1e11 ? value : Math.abs(value) > 1e9 ? value * 1000 : null;
     if (ms == null) return null;
     const date = new Date(ms);
     if (Number.isNaN(date.getTime())) return null;

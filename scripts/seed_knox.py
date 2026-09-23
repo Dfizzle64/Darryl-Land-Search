@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Knox County overlays, and parcels when KGIS anonymous query is open.
+"""Knox County parcels plus zoning and future-land-use overlays.
 
 Knox is not a Comptroller IMPACT county. This script never calls maps.cot.tn.gov.
+Parcels come from the tokenless KGIS Portal Parcel_Search_Layer proxy.
+Direct www.kgis.org/arcgis MapServers stay 401 and are not used.
 
   python3 scripts/seed_knox.py
-
-When GlobalSearch /query is still HTTP 401, parcel tiles are removed and the
-county stays a documented ingestion blocker. Zoning, unincorporated future land
-use, Farragut zoning, and municipality boundaries are still refreshed.
+  python3 scripts/seed_knox.py --refresh-overlays
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 import urllib.error
@@ -28,6 +28,13 @@ OUT = ROOT / "data" / "fixtures" / "knox"
 CHECKED = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 PARCEL_QUERY = "https://www.kgis.org/arcgis/rest/services/Maps/GlobalSearch/MapServer/0/query"
+PORTAL_QUERY = "https://www.kgis.org/gisportal/sharing/servers/871856067a1243bd899774b2072381c5/rest/services/Parcel_Search_Layer/MapServer/0/query"
+PARCEL_WHERE = "CALCULATED_AREA >= 5 AND CALCULATED_AREA <= 150"
+KNOX_GAPS = [
+    "City of Knoxville future land use (PRLU) and the One Year Plan are not available to anonymous query. FLU stays null inside the city.",
+    "Town of Farragut has no public future-land-use FeatureServer. FLU stays null in Farragut.",
+    "Direct www.kgis.org/arcgis GlobalSearch and Property MapServers still return HTTP 401. This extract uses the public Parcel_Search_Layer portal proxy. Comptroller IMPACT is not used.",
+]
 PROPERTY_QUERY = "https://www.kgis.org/arcgis/rest/services/Maps/Property/MapServer/2/query"
 PARCEL_EXPORT = "https://www.kgis.org/arcgis/rest/services/Maps/GlobalSearch/MapServer/export?bbox=-84.3,35.7,-83.5,36.3&bboxSR=4326&layers=show:0&f=json"
 ZONING_LAYER = "https://services1.arcgis.com/QWaOgwdmpqI9HUzf/arcgis/rest/services/KnoxvilleKnoxCountyZoning/FeatureServer/2"
@@ -429,13 +436,15 @@ Knox County (FIPS 47093) is in the Knoxville market. It includes the **City of K
 
 Checked {summary["checkedAt"]}.
 
-## Parcel pull — ingestion blocker
+## Parcels
 
-Anonymous `GET` of KGIS `Maps/GlobalSearch/MapServer/0/query` returned **HTTP {parcel["globalSearchStatus"]}**. `Maps/Property/MapServer/2/query` returned **HTTP {parcel["propertyStatus"]}**. The MapServer export returned **HTTP {parcel["exportStatus"]}**. Geocortex Essentials publishes the field list for the same GlobalSearch layer, and a guest query is not supported. No tokenless countywide parcel polygon service or open-data download was found (`City_Parcel_Merged_HEX` is a hex grid, not the cadastre).
+Countywide parcels are the public KGIS Portal proxy `Parcel_Search_Layer` MapServer layer 0. The extract keeps `CALCULATED_AREA` from 5.0 through 150.0 inclusive ({parcel.get("count", 0):,} polygons kept, {parcel.get("sourceCount", 0):,} returned by that filter). Owner, situs, mailing, sale, appraised land/building/total, and assessed total are on the parcel. `RECORDED_AREA` is stored and is not used to add rows whose calculated acres are null.
 
-Parcel polygons and owner, mailing, situs, sale, and value attributes are **not** in `data/fixtures/market-parcels/counties/47093`. The previous IMPACT tile extract was removed so it is not presented as the Knox roll.
+Direct `www.kgis.org/arcgis` GlobalSearch query returned **HTTP {parcel.get("globalSearchStatus")}**. Property layer 2 returned **HTTP {parcel.get("propertyStatus")}**. Those hosts are not the extract. Comptroller IMPACT is not used.
 
-When anonymous query starts returning features, filter `CALCULATED_AREA` from 5 through 150 inclusive (`RECORDED_AREA` only when calculated acres are null) and map attributes with `mapKnoxParcel` in `src/lib/knox.ts`. Do not backfill from a paid vendor.
+Tiles: `data/fixtures/market-parcels/counties/47093/tiles`. Source id `kgis-parcel-search`.
+
+Zoning and future land use are joined at the centroid after resolving Town of Farragut, then City of Knoxville, then unincorporated Knox County. Joined zoning: {parcel.get("zoningJoined", 0):,}. Joined unincorporated place types: {parcel.get("fluJoined", 0):,}.
 
 Appraiser record, when a parcel id exists:
 
@@ -478,28 +487,316 @@ npm run seed:knox
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
 
 
+def knox_date(value) -> str | None:
+    if value is None or value == "":
+        return None
+    if isinstance(value, (int, float)):
+        # Parcel Search dates are ArcGIS epoch milliseconds, including 1990s values below 1e12.
+        try:
+            parsed = datetime.fromtimestamp(value / 1000.0, timezone.utc)
+        except (OverflowError, OSError, ValueError):
+            return None
+        if parsed.year < 1800 or parsed.year > 2200:
+            return None
+        return parsed.strftime("%Y-%m-%d")
+    text = str(value).strip()
+    if len(text) >= 10 and text[4] == "-" and text[7] == "-":
+        return text[:10]
+    return text or None
+
+
+def money(value):
+    return market.num(value)
+
+
+def sale_price(value):
+    parsed = market.num(value)
+    if parsed is None or parsed <= 0:
+        return None
+    return parsed
+
+
+def mailing(attrs: dict) -> tuple[str | None, str | None, str | None, str | None, str | None]:
+    full = clean(attrs.get("FULL_MAIL_ADDRESS"))
+    extra = clean(attrs.get("FULL_MAIL_ADDRESS_EXTRA"))
+    if full:
+        line1 = full
+    else:
+        parts = [clean(attrs.get(key)) for key in ("MAIL_HOUSE_NUMBER", "MAIL_UNIT", "MAIL_STREET_NAME", "MAIL_STREET_EXTRA")]
+        line1 = " ".join(part for part in parts if part) or None
+    line2_parts = []
+    if extra and extra != full:
+        line2_parts.append(extra)
+    attention = clean(attrs.get("MAIL_ATTENTION"))
+    if attention:
+        line2_parts.append(attention)
+    city = clean(attrs.get("MAIL_CITY"))
+    state = clean(attrs.get("MAIL_STATE"))
+    zip_code = clean(attrs.get("MAIL_ZIP_CODE"))
+    suffix = clean(attrs.get("MAIL_ZIP_CODE_SUF"))
+    if zip_code and suffix and "-" not in zip_code:
+        zip_code = f"{zip_code}-{suffix}"
+    return line1, ", ".join(line2_parts) or None, city, state, zip_code
+
+
+def situs(attrs: dict) -> str | None:
+    full = clean(attrs.get("FULL_ADDRESS"))
+    if full:
+        return full
+    unit = clean(attrs.get("LOC_UNIT"))
+    parts = [
+        clean(attrs.get(key))
+        for key in (
+            "LOC_HOUSE_NUMBER",
+            "LOC_HOUSE_NUM_SUF",
+            "LOC_STREET_PREFIX",
+            "LOC_STREET_NAME",
+            "LOC_STREET_TYPE",
+            "LOC_STREET_SUFFIX",
+        )
+    ]
+    if unit:
+        parts.append(f"Unit {unit}")
+    return " ".join(part for part in parts if part) or None
+
+
+def index_features(features: list[dict], cell: float = 0.05) -> dict:
+    buckets: dict[tuple[int, int], list[dict]] = {}
+    for feature in features:
+        west, south, east, north = bbox_of(feature["geometry"])
+        for i in range(int(west // cell), int(east // cell) + 1):
+            for j in range(int(south // cell), int(north // cell) + 1):
+                buckets.setdefault((i, j), []).append(feature)
+    return buckets
+
+
+def hits_at(buckets: dict, lon: float, lat: float, cell: float = 0.05) -> list[dict]:
+    found = []
+    for feature in buckets.get((int(lon // cell), int(lat // cell)), []):
+        if point_in_geometry(lon, lat, feature["geometry"]):
+            found.append(feature)
+    return found
+
+
+def smallest(features: list[dict]) -> dict | None:
+    best = None
+    best_area = None
+    for feature in features:
+        west, south, east, north = bbox_of(feature["geometry"])
+        area = abs((east - west) * (north - south))
+        if best is None or area < best_area:
+            best = feature
+            best_area = area
+    return best
+
+
+def load_boundaries() -> dict[str, dict]:
+    features = load_collection("municipalities.geojson")
+    return {
+        "knoxville": next(feature["geometry"] for feature in features if feature["properties"]["municipality"] == "knoxville"),
+        "farragut": next(feature["geometry"] for feature in features if feature["properties"]["municipality"] == "farragut"),
+    }
+
+
+def join_one(lon: float, lat: float, boundaries: dict, indexes: dict) -> dict:
+    if point_in_geometry(lon, lat, boundaries["farragut"]):
+        municipality = "farragut"
+    elif point_in_geometry(lon, lat, boundaries["knoxville"]):
+        municipality = "knoxville"
+    else:
+        municipality = "unincorporated"
+    gaps: list[str] = []
+    flu = None
+    if municipality == "farragut":
+        hit = smallest(hits_at(indexes["farragut"], lon, lat))
+        zoning_code = hit["properties"].get("zoningCode") if hit else None
+        zoning_district = hit["properties"].get("zone") if hit else None
+        if not zoning_code:
+            gaps.append("No Farragut zoning polygon contained this parcel centroid.")
+        gaps.append("Town of Farragut has no public future-land-use FeatureServer. FLU stays null.")
+        prefix, name = "FARRAGUT", "Town of Farragut"
+    elif municipality == "knoxville":
+        hit = smallest(hits_at(indexes["city"], lon, lat))
+        zoning_code = hit["properties"].get("zoningCode") if hit else None
+        zoning_district = hit["properties"].get("zone1") if hit else None
+        if not zoning_code:
+            gaps.append("No City of Knoxville zoning polygon contained this parcel centroid.")
+        gaps.append("City of Knoxville future land use (PRLU) and the One Year Plan are not available to anonymous query. FLU stays null inside the city.")
+        prefix, name = "KNOX-CITY", "City of Knoxville"
+    else:
+        hit = smallest(hits_at(indexes["county"], lon, lat))
+        zoning_code = hit["properties"].get("zoningCode") if hit else None
+        zoning_district = hit["properties"].get("zone1") if hit else None
+        if not zoning_code:
+            gaps.append("No Knox County zoning polygon contained this parcel centroid.")
+        flu_hit = smallest(hits_at(indexes["flu"], lon, lat))
+        place = flu_hit["properties"].get("placeType") if flu_hit else None
+        if place:
+            flu = {
+                "code": place,
+                "label": place,
+                "jurisdiction": "KNOX-COUNTY",
+                "source": flu_hit["properties"].get("source") or "advance-knox",
+            }
+        else:
+            gaps.append("No Advance Knox place type contained this parcel centroid.")
+        prefix, name = "KNOX-COUNTY", "Unincorporated Knox County"
+    return {
+        "municipality": municipality,
+        "name": name,
+        "prefix": prefix,
+        "zoningCode": zoning_code,
+        "zoningDistrict": zoning_district,
+        "flu": flu,
+        "dataGaps": gaps,
+    }
+
+
+def download_parcels(boundaries: dict) -> tuple[list[dict], dict]:
+    print("parcels", flush=True)
+    rows = fetch_layer(PORTAL_QUERY, PARCEL_FIELDS, where=PARCEL_WHERE)
+    zoning = load_collection("zoning.geojson")
+    indexes = {
+        "city": index_features([feature for feature in zoning if feature["properties"].get("zoneType") == "City of Knoxville"]),
+        "county": index_features([feature for feature in zoning if feature["properties"].get("zoneType") == "Knox County"]),
+        "flu": index_features(load_collection("county-flu.geojson")),
+        "farragut": index_features(load_collection("farragut-zoning.geojson")),
+    }
+    by_id: dict[str, dict] = {}
+    dropped = 0
+    municipalities = {"knoxville": 0, "farragut": 0, "unincorporated": 0}
+    zoning_joined = 0
+    flu_joined = 0
+    for row in rows:
+        attrs = row.get("attributes") or {}
+        geometry, _acres = market.rings_to_feature_geometry(row.get("geometry"))
+        if not geometry:
+            dropped += 1
+            continue
+        center = market.centroid_of(geometry)
+        if not center or not market.plausible_centroid(center):
+            dropped += 1
+            continue
+        acres = market.num(attrs.get("CALCULATED_AREA"))
+        if acres is None or acres < 5 or acres > 150:
+            dropped += 1
+            continue
+        parcel_id = clean(attrs.get("PARCELID")) or clean(attrs.get("PARCELID_1"))
+        if not parcel_id:
+            dropped += 1
+            continue
+        designation = join_one(center[0], center[1], boundaries, indexes)
+        line1, line2, mail_city, mail_state, mail_zip = mailing(attrs)
+        feature = market.empty_feature(
+            fips="47093",
+            county="Knox",
+            state="Tennessee",
+            markets=["Knoxville"],
+            parcel_id=parcel_id,
+            acreage=acres,
+            geometry=geometry,
+            center=center,
+            source="kgis-parcel-search",
+            owner=clean(attrs.get("OWNER")) or clean(attrs.get("KGIS_OWNER")) or clean(attrs.get("ACCELA_OWNER")),
+            situs=situs(attrs),
+            zoning=designation["zoningCode"],
+            dor=clean(attrs.get("LANDUSE")),
+            sale_price=sale_price(attrs.get("PURCHASE_PRICE")),
+            sale_date=knox_date(attrs.get("SALE_DATE")),
+            sale_qualified=clean(attrs.get("VALIDITY_FLAG")),
+            market_value=money(attrs.get("APPRAISED_TOTAL")),
+            assessed=money(attrs.get("ASSESSED_TOTAL")),
+            mail1=line1,
+            mail2=line2,
+            mail_city=mail_city,
+            mail_state=mail_state,
+            mail_zip=mail_zip,
+        )
+        props = feature["properties"]
+        props["zoningDistrict"] = designation["zoningDistrict"]
+        props["jurisdictionPrefix"] = designation["prefix"]
+        props["jurisdictionCode"] = designation["prefix"]
+        props["flu"] = designation["flu"]
+        props["appraiserUrl"] = (
+            "https://propertyinfo.knoxcountytn.gov/Datalets/Datalet.aspx?ParcelID="
+            + urllib.parse.quote(parcel_id)
+            + "&UseSearch=yes"
+        )
+        props["dataGaps"] = designation["dataGaps"]
+        props["municipality"] = designation["name"]
+        props["baseParcelId"] = clean(attrs.get("BASE_PARCELID"))
+        props["pbaid"] = clean(attrs.get("PBAID"))
+        props["recordedAcreage"] = market.num(attrs.get("RECORDED_AREA"))
+        props["tax"]["appraisedLand"] = money(attrs.get("APPRAISED_LAND"))
+        props["tax"]["appraisedBuilding"] = money(attrs.get("APPRAISED_BLDG"))
+        props["mailingAddress"]["zip"] = mail_zip
+        props["lastSale"]["datePurchased"] = knox_date(attrs.get("DATE_PURCHASED"))
+        props["lastSale"]["deedBook"] = clean(attrs.get("DEED_BOOK"))
+        props["lastSale"]["deedPage"] = clean(attrs.get("DEED_PAGE"))
+        props["lastSale"]["odocBook"] = clean(attrs.get("ODOC_BOOK"))
+        props["lastSale"]["odocPage"] = clean(attrs.get("ODOC_PAGE"))
+        previous = by_id.get(parcel_id)
+        if previous is None or (props["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
+            by_id[parcel_id] = feature
+    features = sorted(by_id.values(), key=lambda item: item["properties"].get("acreage") or 0, reverse=True)
+    for feature in features:
+        municipalities[feature["properties"]["jurisdictionPrefix"] and {
+            "KNOX-CITY": "knoxville",
+            "FARRAGUT": "farragut",
+            "KNOX-COUNTY": "unincorporated",
+        }[feature["properties"]["jurisdictionPrefix"]]] += 1
+        if feature["properties"].get("zoningCode"):
+            zoning_joined += 1
+        if feature["properties"].get("flu"):
+            flu_joined += 1
+    stats = {
+        "blocked": False,
+        "count": len(features),
+        "sourceCount": len(rows),
+        "dropped": dropped,
+        "zoningJoined": zoning_joined,
+        "fluJoined": flu_joined,
+        "municipalities": municipalities,
+        "queryUrl": PORTAL_QUERY,
+    }
+    return features, stats
+
+
 def main() -> None:
-    overlays = download_overlays()
-    boundaries = overlays.pop("boundaries")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--refresh-overlays", action="store_true")
+    args = parser.parse_args()
+    overlays_ready = (OUT / "zoning.geojson").exists() and (OUT / "municipalities.geojson").exists()
+    if args.refresh_overlays or not overlays_ready:
+        overlays = download_overlays()
+        boundaries = overlays.pop("boundaries")
+        overlay_summary = overlays
+    else:
+        print("reusing overlay fixtures", flush=True)
+        boundaries = load_boundaries()
+        overlay_summary = {key: json.loads((OUT / "summary.json").read_text())[key] for key in ("zoning", "countyFlu", "farragutZoning")}
     print("probing parcel access", flush=True)
     global_search = probe(f"{PARCEL_QUERY}?where=1%3D1&returnCountOnly=true&f=json")
     property_layer = probe(f"{PROPERTY_QUERY}?where=1%3D1&returnCountOnly=true&f=json")
     export = probe(PARCEL_EXPORT)
     city_flu = probe(CITY_FLU)
     one_year = probe(ONE_YEAR)
+    portal = probe(f"{PORTAL_QUERY}?where={urllib.parse.quote(PARCEL_WHERE)}&returnCountOnly=true&f=json")
+    if portal.get("status") != 200:
+        raise SystemExit(f"Parcel Search proxy did not answer: {portal}")
+    features, parcel_stats = download_parcels(boundaries)
+    if parcel_stats["count"] < 4000:
+        raise SystemExit(f"Expected about 4569 Knox parcels, kept {parcel_stats['count']}")
+    parcel_stats["globalSearchStatus"] = global_search.get("status")
+    parcel_stats["propertyStatus"] = property_layer.get("status")
+    parcel_stats["exportStatus"] = export.get("status")
+    parcel_stats["portalStatus"] = portal.get("status")
     samples = sample_joins(boundaries)
-    parcel_open = global_search.get("status") == 200
     summary = {
         "checkedAt": CHECKED,
         "fips": "47093",
         "impact": False,
-        "parcel": {
-            "blocked": not parcel_open,
-            "globalSearchStatus": global_search.get("status"),
-            "propertyStatus": property_layer.get("status"),
-            "exportStatus": export.get("status"),
-            "queryUrl": PARCEL_QUERY,
-        },
+        "parcel": parcel_stats,
         "cityFlu": {
             "futureLandUseStatus": city_flu.get("status"),
             "futureLandUseLabel": access_label(city_flu),
@@ -508,35 +805,46 @@ def main() -> None:
             "gap": True,
         },
         "samples": samples,
-        **overlays,
+        **overlay_summary,
     }
-    probes = {
-        "checkedAt": CHECKED,
-        "globalSearch": global_search,
-        "property": property_layer,
-        "export": export,
-        "cityFlu": city_flu,
-        "oneYearPlan": one_year,
-    }
-    (OUT / "access.json").write_text(json.dumps(probes, indent=2) + "\n")
-    write_docs(summary)
-
-    catalog = json.loads(market.CATALOG_PATH.read_text())
-    county = {"name": "Knox", "state": "Tennessee", "fips": "47093"}
-    if parcel_open:
-        raise SystemExit(
-            "KGIS GlobalSearch query returned HTTP 200. Parcel paging is still an ingestion step: "
-            "do not mark Knox complete from IMPACT, and do not invent polygons."
+    (OUT / "access.json").write_text(
+        json.dumps(
+            {
+                "checkedAt": CHECKED,
+                "portal": portal,
+                "globalSearch": global_search,
+                "property": property_layer,
+                "export": export,
+                "cityFlu": city_flu,
+                "oneYearPlan": one_year,
+            },
+            indent=2,
         )
-    spec = market.spec_for(county)
-    if spec.get("source") != "kgis-globalsearch-blocked":
-        raise SystemExit(f"Knox spec drifted back to {spec.get('source')}")
-    if "cot.tn.gov" in json.dumps(spec):
-        raise SystemExit("Knox spec still points at Comptroller IMPACT")
-    market.write_gap(county, ["Knoxville"], spec)
-    market.rebuild_indexes(catalog)
-    print("Knox parcel pull remains blocked. Overlays are on disk.", flush=True)
-    print(json.dumps(samples, indent=2), flush=True)
+        + "\n"
+    )
+    write_docs(summary)
+    county = {"name": "Knox", "state": "Tennessee", "fips": "47093"}
+    path, lookup, tiles = market.write_tiles(county, features)
+    market.county_row(
+        county,
+        ["Knoxville"],
+        feature_count=len(features),
+        coverage="complete-gte-5ac",
+        partition="tiles",
+        path=path,
+        lookup=lookup,
+        source="kgis-parcel-search",
+        query_url=PORTAL_QUERY,
+        gaps=KNOX_GAPS,
+        source_count=parcel_stats["sourceCount"],
+        dropped=parcel_stats["dropped"],
+        tile_count=tiles,
+    )
+    market.rebuild_indexes(json.loads(market.CATALOG_PATH.read_text()))
+    print(
+        f"Knox parcels {len(features)} zoning {parcel_stats['zoningJoined']} flu {parcel_stats['fluJoined']} {parcel_stats['municipalities']}",
+        flush=True,
+    )
 
 
 if __name__ == "__main__":

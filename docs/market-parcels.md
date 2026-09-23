@@ -23,7 +23,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Knox County is not an IMPACT county and is not pulled from this layer. Several other counties are absent and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Knox County is not an IMPACT county; its 5–150 acre parcels come from the KGIS Parcel Search portal proxy via `npm run seed:knox`. Several other counties are absent and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
@@ -58,7 +58,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Columbia | other | 0 | 0 | 0 | 10 |
 | Greenville | other | 1,570 | 0 | 1 | 7 |
 | Chattanooga | other | 10,537 | 2 | 0 | 8 |
-| Knoxville | other | 33,289 | 6 | 0 | 7 |
+| Knoxville | other | 37,858 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
@@ -330,7 +330,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Grainger | Tennessee | 47057 | complete-gte-5ac | 6,406 | tn-impact-47057 |
 | Hamblen | Tennessee | 47063 | gap | 0 | tn-impact-47063 |
 | Jefferson | Tennessee | 47089 | complete-gte-5ac | 6,586 | tn-impact-47089 |
-| Knox | Tennessee | 47093 | gap | 0 | kgis-globalsearch-blocked |
+| Knox | Tennessee | 47093 | complete-gte-5ac | 4,569 | kgis-parcel-search |
 | Loudon | Tennessee | 47105 | gap | 0 | tn-impact-47105 |
 | Morgan | Tennessee | 47129 | gap | 0 | tn-impact-47129 |
 | Roane | Tennessee | 47145 | gap | 0 | tn-impact-47145 |

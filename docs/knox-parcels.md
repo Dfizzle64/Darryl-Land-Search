@@ -2,15 +2,17 @@
 
 Knox County (FIPS 47093) is in the Knoxville market. It includes the **City of Knoxville**, the **Town of Farragut**, and **unincorporated Knox County**. Knox is **not** a Tennessee Comptroller IMPACT county. This pull does not call `maps.cot.tn.gov`.
 
-Checked 2026-09-23T22:39:02Z.
+Checked 2026-09-23T22:53:16Z.
 
-## Parcel pull — ingestion blocker
+## Parcels
 
-Anonymous `GET` of KGIS `Maps/GlobalSearch/MapServer/0/query` returned **HTTP 401**. `Maps/Property/MapServer/2/query` returned **HTTP 401**. The MapServer export returned **HTTP 401**. Geocortex Essentials publishes the field list for the same GlobalSearch layer, and a guest query is not supported. No tokenless countywide parcel polygon service or open-data download was found (`City_Parcel_Merged_HEX` is a hex grid, not the cadastre).
+Countywide parcels are the public KGIS Portal proxy `Parcel_Search_Layer` MapServer layer 0. The extract keeps `CALCULATED_AREA` from 5.0 through 150.0 inclusive (4,569 polygons kept, 4,569 returned by that filter). Owner, situs, mailing, sale, appraised land/building/total, and assessed total are on the parcel. `RECORDED_AREA` is stored and is not used to add rows whose calculated acres are null.
 
-Parcel polygons and owner, mailing, situs, sale, and value attributes are **not** in `data/fixtures/market-parcels/counties/47093`. The previous IMPACT tile extract was removed so it is not presented as the Knox roll.
+Direct `www.kgis.org/arcgis` GlobalSearch query returned **HTTP 401**. Property layer 2 returned **HTTP 401**. Those hosts are not the extract. Comptroller IMPACT is not used.
 
-When anonymous query starts returning features, filter `CALCULATED_AREA` from 5 through 150 inclusive (`RECORDED_AREA` only when calculated acres are null) and map attributes with `mapKnoxParcel` in `src/lib/knox.ts`. Do not backfill from a paid vendor.
+Tiles: `data/fixtures/market-parcels/counties/47093/tiles`. Source id `kgis-parcel-search`.
+
+Zoning and future land use are joined at the centroid after resolving Town of Farragut, then City of Knoxville, then unincorporated Knox County. Joined zoning: 4,564. Joined unincorporated place types: 3,498.
 
 Appraiser record, when a parcel id exists:
 
@@ -39,7 +41,7 @@ Resolve jurisdiction **before** the zoning or FLU join. Farragut is tested first
 
 Zoning `ZONE_TYPE` values: City of Knoxville, Knox County. City polygons on the service: 9727. County polygons on the service: 3769. Place types: BP, CC, CI, CMU, MHI, POS, RA, RC, RCC, RL, ROW, SMR, SR, TCMU, TN.
 
-34 zoning polygons and 1 Farragut polygon did not survive ring simplification, so the files are slightly smaller than the live counts. A centroid that lands on a right-of-way polygon joins that polygon.
+Service counts include polygons that ring simplification could not keep. A centroid that lands on a right-of-way polygon joins that polygon.
 
 `joinKnoxDesignation` in `src/lib/knox.ts` is the join. It is centroid-in-polygon, keeps the smallest containing polygon, and leaves city and Farragut FLU null.
 

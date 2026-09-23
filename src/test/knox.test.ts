@@ -7,7 +7,7 @@ import {
   KNOX_ACREAGE,
   KNOX_CITY_FLU_GAP,
   KNOX_FIPS,
-  KNOX_PARCEL_BLOCKER,
+  KNOX_PARCEL_NOTE,
   geometryBbox,
   indexKnoxOverlays,
   joinKnoxDesignation,
@@ -149,6 +149,8 @@ describe("Knox parcel mapping", () => {
     expect(knoxZoningCode("RN-2", null)).toBe("RN-2");
     expect(knoxMailing({ FULL_MAIL_CITY_STATE_ZIP: "Knoxville TN 37902" }).city).toBe("Knoxville");
     expect(knoxDate(null)).toBeNull();
+    expect(knoxDate(751161660000)).toBe("1993-10-21");
+    expect(knoxDate(1714521600000)).toBe("2024-05-01");
   });
 });
 
@@ -226,11 +228,19 @@ describe("Knox municipality join", () => {
 describe("Knox overlay fixtures", () => {
   const summaryPath = path.join(process.cwd(), "data/fixtures/knox/summary.json");
 
-  it("documents the parcel blocker and the public overlays", () => {
+  it("keeps the 5–150 acre parcel extract and the public overlays", () => {
     expect(existsSync(summaryPath)).toBe(true);
     const summary = JSON.parse(readFileSync(summaryPath, "utf8")) as {
       impact: boolean;
-      parcel: { blocked: boolean; globalSearchStatus: number; propertyStatus: number; queryUrl: string };
+      parcel: {
+        blocked: boolean;
+        count: number;
+        globalSearchStatus: number;
+        propertyStatus: number;
+        queryUrl: string;
+        zoningJoined: number;
+        fluJoined: number;
+      };
       zoning: { count: number; city: number; county: number; zoneTypes: string[]; farragutExcluded: boolean };
       countyFlu: { count: number; placeTypes: string[] };
       farragutZoning: { count: number; acres5to150: number };
@@ -238,9 +248,13 @@ describe("Knox overlay fixtures", () => {
       samples: Record<string, { municipality: string; zoningCode: string | null; placeType: string | null }>;
     };
     expect(summary.impact).toBe(false);
-    expect(summary.parcel.blocked).toBe(true);
+    expect(summary.parcel.blocked).toBe(false);
+    expect(summary.parcel.count).toBeGreaterThanOrEqual(4500);
+    expect(summary.parcel.zoningJoined).toBeGreaterThan(0);
+    expect(summary.parcel.fluJoined).toBeGreaterThan(0);
     expect(summary.parcel.globalSearchStatus).toBe(401);
     expect(summary.parcel.propertyStatus).toBe(401);
+    expect(summary.parcel.queryUrl).toContain("Parcel_Search_Layer/MapServer/0/query");
     expect(summary.parcel.queryUrl).not.toContain("cot.tn.gov");
     expect(summary.zoning.count).toBeGreaterThan(10000);
     expect(summary.zoning.city).toBeGreaterThan(9000);
@@ -258,21 +272,26 @@ describe("Knox overlay fixtures", () => {
     expect(summary.samples.farragut.municipality).toBe("farragut");
     expect(summary.samples.unincorporated.municipality).toBe("unincorporated");
     expect(summary.samples.unincorporated.placeType).toBeTruthy();
-    expect(KNOX_PARCEL_BLOCKER).toContain("ingestion blocker");
+    expect(KNOX_PARCEL_NOTE).toContain("Parcel Search");
+    expect(KNOX_PARCEL_NOTE).not.toContain("ingestion blocker");
 
     const county = JSON.parse(
       readFileSync(path.join(process.cwd(), "data/fixtures/market-parcels/counties/47093/county.json"), "utf8"),
     ) as { coverage: string; featureCount: number; source: string; queryUrl: string; gaps: string[] };
-    expect(county.coverage).toBe("gap");
-    expect(county.featureCount).toBe(0);
-    expect(county.source).toBe("kgis-globalsearch-blocked");
-    expect(county.queryUrl).toContain("GlobalSearch/MapServer/0/query");
+    expect(county.coverage).toBe("complete-gte-5ac");
+    expect(county.featureCount).toBeGreaterThanOrEqual(4500);
+    expect(county.featureCount).toBe(summary.parcel.count);
+    expect(county.source).toBe("kgis-parcel-search");
+    expect(county.queryUrl).toContain("Parcel_Search_Layer/MapServer/0/query");
     expect(county.queryUrl).not.toContain("IMPACT");
-    expect(county.gaps.join(" ")).toContain("ingestion blocker");
-    expect(existsSync(path.join(process.cwd(), "data/fixtures/market-parcels/counties/47093/tiles"))).toBe(false);
+    expect(county.gaps.join(" ")).not.toContain("ingestion blocker");
+    expect(existsSync(path.join(process.cwd(), "data/fixtures/market-parcels/counties/47093/tiles"))).toBe(true);
     expect(existsSync(path.join(process.cwd(), "data/fixtures/knox/zoning.geojson"))).toBe(true);
     expect(existsSync(path.join(process.cwd(), "data/fixtures/knox/county-flu.geojson"))).toBe(true);
     expect(existsSync(path.join(process.cwd(), "data/fixtures/knox/farragut-zoning.geojson"))).toBe(true);
-    expect(existsSync(path.join(process.cwd(), "docs/knox-parcels.md"))).toBe(true);
+    const docs = readFileSync(path.join(process.cwd(), "docs/knox-parcels.md"), "utf8");
+    expect(docs).toContain("Parcel_Search_Layer");
+    expect(docs).not.toContain("ingestion blocker");
+    expect(docs).toContain("propertyinfo.knoxcountytn.gov/Datalets/Datalet.aspx?ParcelID=");
   });
 });

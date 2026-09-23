@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T22:39:37Z",
+  "generatedAt": "2026-09-23T22:53:27Z",
   "market": "Knoxville",
   "tier": "other",
-  "parcelCount": 33289,
+  "parcelCount": 37858,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -154,22 +154,22 @@
       "name": "Knox",
       "fips": "47093",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 4569,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "kgis-globalsearch-blocked",
-      "queryUrl": "https://www.kgis.org/arcgis/rest/services/Maps/GlobalSearch/MapServer/0/query",
+      "source": "kgis-parcel-search",
+      "queryUrl": "https://www.kgis.org/gisportal/sharing/servers/871856067a1243bd899774b2072381c5/rest/services/Parcel_Search_Layer/MapServer/0/query",
       "gaps": [
-        "Knox County parcel pull is an ingestion blocker. Anonymous queries to KGIS Maps/GlobalSearch/MapServer/0 and Maps/Property/MapServer/2 return HTTP 401, and no tokenless countywide parcel service was found. Comptroller IMPACT is not used for Knox.",
-        "Public overlays ready to join when parcel polygons exist: KnoxvilleKnoxCountyZoning FeatureServer/2 (ZONE1, ZONE2, ZONE_TYPE; Farragut excluded), Knox_County_Future_Land_Use FeatureServer/326 (PLACETYPE, unincorporated only), and Farragut_Zoning FeatureServer/1 (ZONE).",
-        "City of Knoxville FLU (PRLU / One Year Plan) is token-gated or 401. Farragut has no public future-land-use FeatureServer. Those FLU values stay null."
+        "City of Knoxville future land use (PRLU) and the One Year Plan are not available to anonymous query. FLU stays null inside the city.",
+        "Town of Farragut has no public future-land-use FeatureServer. FLU stays null in Farragut.",
+        "Direct www.kgis.org/arcgis GlobalSearch and Property MapServers still return HTTP 401. This extract uses the public Parcel_Search_Layer portal proxy. Comptroller IMPACT is not used."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/47093/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47093/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 4569
     },
     {
       "name": "Loudon",

@@ -28,9 +28,21 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
-| Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
+| Alabama | Shelby Cadastral_2025/91; St. Clair Owner Parcels/57; existing Jefferson JCC parcels | Shelby and St. Clair are complete 5–150 acre county extracts. Jefferson stays the existing county extract (gap-fill). Walker has no public MapServer. Blount's public MapServer was verified and left unseeded |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+County parcels stay the ownership, acreage, sale, and tax source. Birmingham-area city zoning is overlaid afterward and does not replace those county services. Birmingham city GIS parcel mirrors of Shelby are not used as a county source. DeKalb still joins zoning from its own county tax layer. City zoning is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+Birmingham municipal overlay, joined onto county parcels already in the 5–150 acre tiles:
+
+| City | Status | Join |
+| --- | --- | --- |
+| Birmingham | usable zoning + FLU | Spatial. Zoning `Planning/Zoning/0`. FLU `EssentialsPublic/61` (`FUTURE_LU`). Jefferson only |
+| Hoover | usable | Spatial onto Jefferson and Shelby. AGOL `Zoning_Map_2025_WFL1/6` |
+| Homewood | usable | Spatial onto Jefferson. `Permit_Software_Info/2` |
+| Helena | usable | Spatial onto Shelby. Helena public zoning view |
+| Pelham | usable | Spatial onto Shelby. AGOL utility `Zoning_District_Public/36` |
+| Vestavia Hills | partial | Jefferson `PARCELID` plus spatial for the Shelby fringe. Blank `VH_ZONING` stays unknown |
+| Alabaster | gap | No public zoning REST. The public webmap is wards only. Documented, not joined |
 
 ## Coverage
 
@@ -51,7 +63,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
 | Melbourne | other | 41,757 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
-| Birmingham | other | 15,641 | 1 | 0 | 9 |
+| Birmingham | other | 38,101 | 3 | 0 | 7 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
 | Huntsville | other | 0 | 0 | 0 | 7 |
 | Savannah | other | 0 | 0 | 0 | 8 |
@@ -231,15 +243,15 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Bibb | Alabama | 01007 | gap | 0 | unavailable |
-| Blount | Alabama | 01009 | gap | 0 | unavailable |
+| Blount | Alabama | 01009 | gap | 0 | not-seeded-blount-public-mapserver |
 | Chilton | Alabama | 01021 | gap | 0 | unavailable |
 | Cullman | Alabama | 01043 | gap | 0 | unavailable |
 | Jefferson | Alabama | 01073 | complete-gte-5ac | 15,641 | al-jefferson-parcels |
-| Shelby | Alabama | 01117 | gap | 0 | unavailable |
-| St. Clair | Alabama | 01115 | gap | 0 | unavailable |
+| Shelby | Alabama | 01117 | complete-gte-5ac | 11,994 | al-shelby-cadastral-2025 |
+| St. Clair | Alabama | 01115 | complete-gte-5ac | 10,466 | al-stclair-owner-parcels |
 | Talladega | Alabama | 01121 | gap | 0 | unavailable |
 | Tuscaloosa | Alabama | 01125 | gap | 0 | unavailable |
-| Walker | Alabama | 01127 | gap | 0 | unavailable |
+| Walker | Alabama | 01127 | gap | 0 | blocked-no-public-mapserver |
 
 ### Mobile
 

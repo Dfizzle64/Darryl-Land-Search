@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T23:19:45Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -1517,10 +1517,10 @@
     },
     "Birmingham": {
       "tier": "other",
-      "parcelCount": 15641,
-      "completeCountyCount": 1,
+      "parcelCount": 38101,
+      "completeCountyCount": 3,
       "sampleCountyCount": 0,
-      "gapCountyCount": 9,
+      "gapCountyCount": 7,
       "path": "data/fixtures/market-parcels/markets/birmingham/meta.json",
       "counties": [
         {
@@ -1544,7 +1544,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "Blount County Revenue GIS publishes parcels at web5.kcsgis.com Blount/Public MapServer/32 (owner, CalculatedAcreage, tax value; no sale or zoning). DeededAcres is sparse. Not ingested here so this pull stays on Shelby and St. Clair. Do not use blountgis.org \u2014 that is Blount County, Tennessee."
           ]
         },
         {
@@ -1580,32 +1580,34 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "68985 source rows collapsed to 15641 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "Jefferson County public parcels. Owner and situs are sparse on this layer. No zoning join."
+            "Municipal overlay: county parcel source unchanged (JCC Basemap/Parcels). Birmingham zoning 1658, Birmingham FLU 1639, Hoover 267, Homewood 38, Vestavia Hills 161 (676 blank VH_ZONING left unknown).",
+            "Gap-fill only. This Jefferson extract is the existing county service. Birmingham city GIS parcel mirrors of Shelby were not used as parcels."
           ]
         },
         {
           "name": "Shelby",
           "state": "Alabama",
           "fips": "01117",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 11994,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "Municipal overlay: county parcel source unchanged (Cadastral_2025/91). Hoover 324, Helena 294, Pelham 424, Vestavia Hills 0. Alabaster has no public zoning REST (the public webmap is wards only) and was not joined.",
+            "12123 source rows collapsed to 11994 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county."
           ]
         },
         {
           "name": "St. Clair",
           "state": "Alabama",
           "fips": "01115",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 10466,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "10469 source rows collapsed to 10466 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "St. Clair Owner Parcels (PublicParcelViewerStPln MapServer/57). Owner, deeded acres, situs, sale, and tax values come from that public layer."
           ]
         },
         {
@@ -1641,7 +1643,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "Walker County has no public ArcGIS MapServer or FeatureServer. County GIS is Flagship HTML / subscription only, so parcel outlines cannot be seeded from a public GIS service."
           ]
         }
       ]

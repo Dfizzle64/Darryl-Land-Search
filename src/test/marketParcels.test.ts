@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { parcelAppraiserUrl } from "../lib/format";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import {
@@ -121,5 +122,78 @@ describe("market parcel gating and acreage", () => {
       }
       if (checked >= 25) break;
     }
+  });
+
+  it("links Birmingham MSA counties to their public property search", () => {
+    expect(parcelAppraiserUrl({ parcelId: "01 6 23 0 001 019.007", countyFips: "01117" })).toMatchObject({
+      href: "https://ptc.shelbyal.com/propsearch",
+      label: "Open Shelby Property Appraiser search",
+    });
+    expect(parcelAppraiserUrl({ parcelId: "2909320001023031", countyFips: "01115" }).href).toBe(
+      "https://isv.kcsgis.com/al.stclair_revenue/",
+    );
+    expect(parcelAppraiserUrl({ parcelId: "1300163000001000", countyFips: "01073" }).href).toBe(
+      "https://eringcapture.jccal.org/propsearch",
+    );
+    expect(parcelAppraiserUrl({ parcelId: "1300163000001000", countyFips: "01073" }).href).not.toContain("ocpafl");
+  });
+
+  it("keeps Shelby and St. Clair county parcels and city zoning overlays", () => {
+    const root = path.join(process.cwd(), "data/fixtures/market-parcels/counties");
+    const readCounty = (fips: string) => JSON.parse(readFileSync(path.join(root, fips, "county.json"), "utf8"));
+    const shelby = readCounty("01117");
+    const clair = readCounty("01115");
+    const jefferson = readCounty("01073");
+    const walker = readCounty("01127");
+    expect(shelby.coverage).toBe("complete-gte-5ac");
+    expect(shelby.source).toBe("al-shelby-cadastral-2025");
+    expect(shelby.queryUrl).toContain("Cadastral_2025/MapServer/91");
+    expect(shelby.featureCount).toBeGreaterThan(1000);
+    expect(shelby.gaps.join(" ")).toMatch(/Alabaster/);
+    expect(shelby.gaps.join(" ")).toMatch(/Municipal overlay/);
+    expect(clair.coverage).toBe("complete-gte-5ac");
+    expect(clair.source).toBe("al-stclair-owner-parcels");
+    expect(clair.queryUrl).toContain("PublicParcelViewerStPln/MapServer/57");
+    expect(clair.featureCount).toBeGreaterThan(1000);
+    expect(jefferson.source).toBe("al-jefferson-parcels");
+    expect(jefferson.queryUrl).toContain("jccgis.jccal.org");
+    expect(jefferson.gaps.join(" ")).toMatch(/Gap-fill only/);
+    expect(jefferson.gaps.join(" ")).toMatch(/Municipal overlay/);
+    expect(jefferson.gaps.join(" ")).toMatch(/blank VH_ZONING/);
+    expect(walker.coverage).toBe("gap");
+    expect(walker.featureCount).toBe(0);
+    expect(walker.gaps.join(" ")).toMatch(/no public ArcGIS MapServer/i);
+
+    const sample = (fips: string) => {
+      const tiles = path.join(root, fips, "tiles");
+      const file = readdirSync(tiles).find((name) => name.endsWith(".geojson"));
+      expect(file).toBeTruthy();
+      return JSON.parse(readFileSync(path.join(tiles, file!), "utf8")) as ParcelCollection;
+    };
+    const shelbyTile = sample("01117");
+    const owned = shelbyTile.features.find((feature) => feature.properties.ownerName && feature.geometry);
+    expect(owned?.properties.countyFips).toBe("01117");
+    expect(owned?.properties.state).toBe("Alabama");
+    expect(inMarketAcreageBand(owned?.properties.acreage)).toBe(true);
+    expect(owned?.geometry.type === "Polygon" || owned?.geometry.type === "MultiPolygon").toBe(true);
+
+    const countIn = (text: string, label: string) => {
+      const match = text.match(new RegExp(`${label} (\\d+)`));
+      return match ? Number(match[1]) : 0;
+    };
+    const jeffGaps = jefferson.gaps.join(" ");
+    const shelbyGaps = shelby.gaps.join(" ");
+    expect(countIn(jeffGaps, "Birmingham zoning")).toBeGreaterThan(0);
+    expect(countIn(jeffGaps, "Birmingham FLU")).toBeGreaterThan(0);
+    expect(countIn(jeffGaps, "Hoover")).toBeGreaterThan(0);
+    expect(countIn(shelbyGaps, "Helena")).toBeGreaterThan(0);
+    expect(countIn(shelbyGaps, "Pelham")).toBeGreaterThan(0);
+
+    const clairTile = sample("01115");
+    const clairOwned = clairTile.features.find(
+      (feature) => feature.properties.ownerName && (feature.properties.tax.marketValue || feature.properties.lastSale.date),
+    );
+    expect(clairOwned?.properties.countyFips).toBe("01115");
+    expect(inMarketAcreageBand(clairOwned?.properties.acreage)).toBe(true);
   });
 });

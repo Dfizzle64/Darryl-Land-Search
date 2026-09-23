@@ -15,7 +15,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
 | Melbourne | other | 41,757 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
-| Birmingham | other | 15,641 | 1 | 0 | 9 |
+| Birmingham | other | 38,101 | 3 | 0 | 7 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
 | Huntsville | other | 0 | 0 | 0 | 7 |
 | Savannah | other | 0 | 0 | 0 | 8 |
@@ -195,15 +195,15 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Bibb | Alabama | 01007 | gap | 0 | unavailable |
-| Blount | Alabama | 01009 | gap | 0 | unavailable |
+| Blount | Alabama | 01009 | gap | 0 | not-seeded-blount-public-mapserver |
 | Chilton | Alabama | 01021 | gap | 0 | unavailable |
 | Cullman | Alabama | 01043 | gap | 0 | unavailable |
 | Jefferson | Alabama | 01073 | complete-gte-5ac | 15,641 | al-jefferson-parcels |
-| Shelby | Alabama | 01117 | gap | 0 | unavailable |
-| St. Clair | Alabama | 01115 | gap | 0 | unavailable |
+| Shelby | Alabama | 01117 | complete-gte-5ac | 11,994 | al-shelby-cadastral-2025 |
+| St. Clair | Alabama | 01115 | complete-gte-5ac | 10,466 | al-stclair-owner-parcels |
 | Talladega | Alabama | 01121 | gap | 0 | unavailable |
 | Tuscaloosa | Alabama | 01125 | gap | 0 | unavailable |
-| Walker | Alabama | 01127 | gap | 0 | unavailable |
+| Walker | Alabama | 01127 | gap | 0 | blocked-no-public-mapserver |
 
 ### Mobile
 

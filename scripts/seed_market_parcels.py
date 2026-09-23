@@ -26,7 +26,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
-from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
+from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point, signed_area
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "data" / "market-parcel-counties.json"
@@ -566,7 +566,762 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+FAYETTE_PARCELS_URL = "https://gis.fayettecountyga.gov/arcgis/rest/services/Pictometry/parcelsRO/MapServer/0/query"
+FAYETTE_SAGES_URL = "https://services5.arcgis.com/Hg5aLg4LtSINzVWa/arcgis/rest/services/Parcels_Data_SAGES/FeatureServer/0/query"
+FAYETTE_TAX_URL = "https://services5.arcgis.com/Hg5aLg4LtSINzVWa/arcgis/rest/services/TaxParcels_public/FeatureServer/0/query"
+FAYETTE_SALES_URL = "https://services5.arcgis.com/Hg5aLg4LtSINzVWa/arcgis/rest/services/Sales_Analysis_5e04729658e04c9488fb3401f5ee29e9/FeatureServer/2/query"
+FAYETTE_ZONING_URL = "https://gis.fayettecountyga.gov/arcgis/rest/services/Pictometry/ZoningRO/MapServer/0/query"
+FAYETTE_CITIES_URL = "https://gis.fayettecountyga.gov/arcgis/rest/services/Pictometry/CityLimitsRO/FeatureServer/0/query"
+FAYETTEVILLE_ZONING_URL = "https://services5.arcgis.com/cYdGvS3rAv77unWU/arcgis/rest/services/City_Zoning/FeatureServer/0/query"
+FAYETTEVILLE_FLU_URL = "https://services5.arcgis.com/cYdGvS3rAv77unWU/arcgis/rest/services/FUTURE_LAND_USE/FeatureServer/18/query"
+PTC_ZONING_URL = "https://gis.peachtree-city.org/arcgis/rest/services/Zoning2021/FeatureServer/0/query"
+PTC_FLU_URL = "https://gis.peachtree-city.org/arcgis/rest/services/LandUse/FeatureServer/2/query"
+PTC_PARCELS_URL = "https://gis.peachtree-city.org/arcgis/rest/services/Peachtree_City_Parcels/FeatureServer/0/query"
+TYRONE_ZONING_URL = "https://services8.arcgis.com/CAwtAHohiClrjBri/arcgis/rest/services/Tyrone_Online_Zoning_Map_WFL1/FeatureServer/7/query"
+FAYETTE_APPRAISER = (
+    "https://qpublic.schneidercorp.com/Application.aspx?AppID=942&LayerID=18406&PageTypeID=4&PageID=8206&KeyValue="
+)
+FAYETTE_SQFT = 43560.0
+_BLANK_ZONE = {"", "NA", "N/A", "N.A.", "NONE", "NULL", "NAN", "-"}
+_FAYETTE_CITY_NAMES = {
+    "FAYETTEVILLE": "Fayetteville",
+    "PEACHTREE CITY": "Peachtree City",
+    "TYRONE": "Tyrone",
+    "BROOKS": "Brooks",
+    "WOOLSEY": "Woolsey",
+}
+_FAYETTE_CVT = {
+    "2": "Fayetteville",
+    "90": "Fayetteville",
+    "3": "Tyrone",
+    "4": "Brooks",
+    "5": "Peachtree City",
+}
+
+
+def fayette_acres(acres_value: Any, shape_area: Any) -> float | None:
+    """Prefer deeded acres when >0; otherwise StatePlane square feet / 43560."""
+    acres = num(acres_value)
+    if acres is not None and acres > 0:
+        return acres
+    area = num(shape_area)
+    if area is None or area <= 0:
+        return None
+    return area / FAYETTE_SQFT
+
+
+def fayette_ga_point(lon: float, lat: float) -> bool:
+    """Fayette County, Georgia, with a small pad. Rejects KY, PA, IN, NC, and AR lookalikes."""
+    return -84.70 <= lon <= -84.30 and 33.20 <= lat <= 33.60
+
+
+def _assert_fayette_helpers() -> None:
+    sample = fayette_acres(0, 64583.430419921875)
+    if sample is None or abs(sample - (64583.430419921875 / FAYETTE_SQFT)) > 1e-9:
+        raise RuntimeError("Fayette acreage helper failed the 0402  029 sample")
+    if fayette_acres(12.5, 9_999_999) != 12.5:
+        raise RuntimeError("Fayette acreage helper ignored deeded acres")
+    if in_band(sample):
+        raise RuntimeError("The 1.48 acre Brooks sample must stay outside 5–150")
+    lookalikes = (
+        (-84.5, 38.0, "Fayette KY"),
+        (-79.7, 39.9, "Fayette PA"),
+        (-85.14, 39.64, "Fayette IN"),
+        (-78.9, 35.05, "Fayetteville NC"),
+        (-94.16, 36.06, "Fayetteville AR"),
+    )
+    for lon, lat, name in lookalikes:
+        if fayette_ga_point(lon, lat):
+            raise RuntimeError(f"Fayette bbox accepted {name}")
+    if not fayette_ga_point(-84.474, 33.258) or not fayette_ga_point(-84.596, 33.441):
+        raise RuntimeError("Fayette bbox rejected a verified Georgia sample")
+
+
+def _code_str(value: Any) -> str | None:
+    parsed = num(value)
+    if parsed is not None and abs(parsed - round(parsed)) < 1e-6:
+        return str(int(round(parsed)))
+    return clean(value)
+
+
+def _zone_text(value: Any) -> str | None:
+    text = clean(value)
+    if not text or text.upper() in _BLANK_ZONE:
+        return None
+    return text
+
+
+def _situs_state_ok(value: Any) -> bool:
+    text = clean(value)
+    if not text:
+        return True
+    parts = [part.strip().upper() for part in text.split(";") if part.strip()]
+    return bool(parts) and all(part in {"GA", "GEORGIA"} for part in parts)
+
+
+def _postal_city(value: Any) -> str | None:
+    text = clean(value)
+    if not text:
+        return None
+    text = " ".join(text.split(";")[0].split())
+    if not text or text.upper() in _BLANK_ZONE:
+        return None
+    return text
+
+
+def _epoch_day(value: Any) -> str | None:
+    parsed = num(value)
+    if parsed is None:
+        return None
+    if parsed > 10_000_000_000:
+        parsed = parsed / 1000.0
+    if parsed < 1_000_000_000 or parsed > 4_000_000_000:
+        return None
+    return time.strftime("%Y-%m-%d", time.gmtime(int(parsed)))
+
+
+def _prefer(score):
+    def reduce(left: dict, right: dict) -> dict:
+        return right if score(right) > score(left) else left
+
+    return reduce
+
+
+def _pin_index(rows: list[dict], pin_field: str, accept=None, reduce=None) -> tuple[dict, dict]:
+    exact: dict[str, dict] = {}
+    buckets: dict[str, list[str]] = defaultdict(list)
+    for row in rows:
+        pin = clean(row.get(pin_field))
+        if not pin:
+            continue
+        if accept and not accept(row):
+            continue
+        if pin not in exact:
+            exact[pin] = row
+        elif reduce:
+            exact[pin] = reduce(exact[pin], row)
+        buckets["".join(pin.split()).upper()].append(pin)
+    collapsed: dict[str, dict] = {}
+    for key, pins in buckets.items():
+        unique = list(dict.fromkeys(pins))
+        if len(unique) == 1:
+            collapsed[key] = exact[unique[0]]
+    return exact, collapsed
+
+
+def _pin_get(exact: dict, collapsed: dict, pin: str) -> dict | None:
+    found = exact.get(pin)
+    if found is not None:
+        return found
+    return collapsed.get("".join(pin.split()).upper())
+
+
+def _fetch_attributes(url: str, where: str, fields: list[str], label: str) -> list[dict]:
+    rows: list[dict] = []
+    offset = 0
+    page = 2000
+    order_by: str | None = "OBJECTID"
+    seen_offset_anchor: set[str] = set()
+    while True:
+        params: dict[str, str] = {
+            "where": where,
+            "outFields": ",".join(fields),
+            "returnGeometry": "false",
+            "resultOffset": str(offset),
+            "resultRecordCount": str(page),
+            "f": "json",
+        }
+        if order_by:
+            params["orderByFields"] = order_by
+        data = fetch_json(url, params, timeout=180)
+        if data.get("error") and order_by:
+            order_by = "OBJECTID_1" if order_by == "OBJECTID" else None
+            continue
+        if data.get("error"):
+            raise RuntimeError(f"{label} query failed: {json.dumps(data['error'])[:300]}")
+        batch = data.get("features") or []
+        if not batch:
+            break
+        anchor = json.dumps((batch[0].get("attributes") or {}), sort_keys=True)[:180]
+        token = f"{offset}:{anchor}"
+        if token in seen_offset_anchor:
+            raise RuntimeError(f"{label} pagination stuck at offset {offset}")
+        seen_offset_anchor.add(token)
+        rows.extend(item.get("attributes") or {} for item in batch)
+        print(f"    {label} {len(rows)}", flush=True)
+        if len(batch) < page:
+            break
+        offset += len(batch)
+        if offset > 250_000:
+            raise RuntimeError(f"{label} attribute pull exceeded 250k rows")
+        time.sleep(0.04)
+    return rows
+
+
+def _fetch_polygons(url: str, where: str, fields: list[str], label: str) -> list[dict]:
+    features: list[dict] = []
+    offset = 0
+    while True:
+        data = fetch_json(
+            url,
+            {
+                "where": where,
+                "outFields": ",".join(fields),
+                "returnGeometry": "true",
+                "outSR": "4326",
+                "resultOffset": str(offset),
+                "resultRecordCount": "2000",
+                "f": "json",
+            },
+            timeout=180,
+        )
+        if data.get("error"):
+            raise RuntimeError(f"{label} geometry failed: {json.dumps(data['error'])[:300]}")
+        batch = data.get("features") or []
+        features.extend(batch)
+        if len(batch) < 2000 and not data.get("exceededTransferLimit"):
+            break
+        if not batch:
+            break
+        offset += len(batch)
+        if offset > 20_000:
+            raise RuntimeError(f"{label} geometry pull is unexpectedly large")
+    print(f"    {label} polygons {len(features)}", flush=True)
+    return features
+
+
+def _point_in_ring(x: float, y: float, ring: list) -> bool:
+    inside = False
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = ring[i][0], ring[i][1]
+        xj, yj = ring[j][0], ring[j][1]
+        if ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / ((yj - yi) or 1e-12) + xi):
+            inside = not inside
+        j = i
+    return inside
+
+
+def _point_in_geo(lon: float, lat: float, geometry: dict) -> bool:
+    polys = [geometry["coordinates"]] if geometry.get("type") == "Polygon" else geometry.get("coordinates") or []
+    if geometry.get("type") not in {"Polygon", "MultiPolygon"}:
+        return False
+    for poly in polys:
+        if not poly or not _point_in_ring(lon, lat, poly[0]):
+            continue
+        if any(_point_in_ring(lon, lat, hole) for hole in poly[1:]):
+            continue
+        return True
+    return False
+
+
+def _prepare_polygon(feature: dict, name: str | None = None, zoning: str | None = None) -> dict | None:
+    geometry, _acres = rings_to_feature_geometry(feature.get("geometry"))
+    if not geometry:
+        return None
+    xs: list[float] = []
+    ys: list[float] = []
+
+    def walk(coords: Any) -> None:
+        if not coords:
+            return
+        if isinstance(coords[0], (int, float)):
+            xs.append(float(coords[0]))
+            ys.append(float(coords[1]))
+            return
+        for child in coords:
+            walk(child)
+
+    walk(geometry.get("coordinates"))
+    if not xs:
+        return None
+    polys = [geometry["coordinates"]] if geometry["type"] == "Polygon" else geometry["coordinates"]
+    area = sum(abs(signed_area(poly[0])) for poly in polys if poly)
+    return {
+        "name": name,
+        "zoning": zoning,
+        "bbox": (min(xs), min(ys), max(xs), max(ys)),
+        "geometry": geometry,
+        "area": area or 0.0,
+    }
+
+
+def _containing(lon: float, lat: float, prepared: list[dict]) -> dict | None:
+    hits = []
+    for item in prepared:
+        west, south, east, north = item["bbox"]
+        if lon < west or lon > east or lat < south or lat > north:
+            continue
+        if _point_in_geo(lon, lat, item["geometry"]):
+            hits.append(item)
+    if not hits:
+        return None
+    hits.sort(key=lambda item: item["area"])
+    return hits[0]
+
+
+def _assert_fayette_extent() -> None:
+    data = fetch_json(
+        FAYETTE_PARCELS_URL,
+        {"where": "1=1", "returnExtentOnly": "true", "outSR": "4326", "f": "json"},
+    )
+    extent = data.get("extent") or {}
+    xmin, ymin = num(extent.get("xmin")), num(extent.get("ymin"))
+    xmax, ymax = num(extent.get("xmax")), num(extent.get("ymax"))
+    if None in {xmin, ymin, xmax, ymax} or not (
+        -84.75 < xmin < -84.50 and -84.50 < xmax < -84.25 and 33.15 < ymin < 33.40 and 33.45 < ymax < 33.70
+    ):
+        raise RuntimeError(f"parcelsRO extent is not Fayette County, Georgia: {extent}")
+
+
+def download_fayette(county: dict, markets: list[str], spec: dict) -> dict:
+    """Fayette County, Georgia parcels in the 5–150 acre band, with public joins."""
+    _assert_fayette_helpers()
+    fips = county["fips"]
+    cache_path = CACHE_DIR / f"{fips}.json"
+    print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
+    if cache_path.exists() and not spec.get("ignoreCache"):
+        cached = json.loads(cache_path.read_text())
+        if cached.get("features"):
+            print(f"  cache hit {len(cached['features'])}", flush=True)
+            features = cached["features"]
+            for feature in features:
+                feature["properties"]["marketIds"] = markets
+                center = feature["properties"].get("centroid") or [None, None]
+                if not fayette_ga_point(float(center[0]), float(center[1])):
+                    raise RuntimeError(f"Cached Fayette parcel is outside Georgia: {center}")
+                if not in_band(feature["properties"].get("acreage")):
+                    raise RuntimeError("Cached Fayette parcel is outside 5–150 acres")
+            path, lookup, tiles = write_tiles(county, features)
+            return county_row(
+                county,
+                markets,
+                feature_count=len(features),
+                coverage=spec["coverage"],
+                partition="tiles",
+                path=path,
+                lookup=lookup,
+                source=spec["source"],
+                query_url=spec["url"],
+                gaps=list(cached.get("gaps") or spec.get("gaps") or []),
+                source_count=cached.get("sourceCount"),
+                dropped=cached.get("dropped"),
+                tile_count=tiles,
+            )
+
+    _assert_fayette_extent()
+    where = spec["where"]
+    expected = count_where(spec["url"], where)
+    print(f"  in-band source rows {expected}", flush=True)
+    if expected <= 0:
+        raise RuntimeError("Fayette parcelsRO returned no 5–150 acre rows")
+
+    print("  parcel geometry", flush=True)
+    ids = fetch_object_ids(spec["url"], where)
+    raw = fetch_by_ids(spec["url"], ids, spec["outFields"], batch=80)
+    print("  situs, tax, zoning, sales", flush=True)
+    sages_rows = _fetch_attributes(
+        FAYETTE_SAGES_URL,
+        "1=1",
+        ["PARCEL_NO", "single_line_address", "City", "state", "ZipCode"],
+        "sages",
+    )
+    tax_rows = _fetch_attributes(
+        FAYETTE_TAX_URL,
+        "1=1",
+        [
+            "PARCELID",
+            "OWNERNME1",
+            "OWNERNME2",
+            "PSTLADDRESS",
+            "PSTLCITY",
+            "PSTLSTATE",
+            "PSTLZIP5",
+            "SITEADDRESS",
+            "CNTASSDVAL",
+            "CLASSCD",
+            "CVTTXCD",
+        ],
+        "tax",
+    )
+    zoning_rows = _fetch_attributes(FAYETTE_ZONING_URL, "1=1", ["PARCEL_NO", "ZONING_1"], "zoningro")
+    fay_zone_rows = _fetch_attributes(FAYETTEVILLE_ZONING_URL, "1=1", ["PARCEL_NO", "ZONING"], "fayetteville-zoning")
+    fay_flu_rows = _fetch_attributes(FAYETTEVILLE_FLU_URL, "1=1", ["PARCEL_NO", "Land_use"], "fayetteville-flu")
+    ptc_flu_rows = _fetch_attributes(PTC_FLU_URL, "1=1", ["PARCEL_NO", "Proposed_L"], "ptc-flu")
+    ptc_sale_rows = _fetch_attributes(
+        PTC_PARCELS_URL,
+        "SALEPRICE>0",
+        ["PARCEL_NO", "SALEPRICE", "SALEDT", "QUAL"],
+        "ptc-sales",
+    )
+    tyrone_rows = _fetch_attributes(
+        TYRONE_ZONING_URL,
+        "TAXDIST=3",
+        ["PARCEL_NO", "Zoning", "ZONING_1", "TAXDIST"],
+        "tyrone-zoning",
+    )
+    sales_rows = _fetch_attributes(
+        FAYETTE_SALES_URL,
+        "saleamnt>0",
+        ["parcelid", "saleamnt", "recorddt", "saletype"],
+        "sales",
+    )
+    city_features = _fetch_polygons(FAYETTE_CITIES_URL, "1=1", ["CITY"], "city-limits")
+    ptc_zone_features = _fetch_polygons(PTC_ZONING_URL, "1=1", ["Zoning"], "ptc-zoning")
+
+    city_names = {str((item.get("attributes") or {}).get("CITY") or "").strip().upper() for item in city_features}
+    if not {"FAYETTEVILLE", "PEACHTREE CITY", "TYRONE", "BROOKS", "WOOLSEY"} <= city_names:
+        raise RuntimeError(f"City limits layer is not Fayette County, Georgia: {sorted(city_names)}")
+    cities = []
+    for item in city_features:
+        raw_name = str((item.get("attributes") or {}).get("CITY") or "").strip().upper()
+        prepared = _prepare_polygon(item, name=_FAYETTE_CITY_NAMES.get(raw_name))
+        if prepared and prepared["name"]:
+            center = centroid_of(prepared["geometry"])
+            if not center or not fayette_ga_point(center[0], center[1]):
+                raise RuntimeError(f"City limits polygon is outside Fayette GA: {raw_name} {center}")
+            cities.append(prepared)
+    ptc_zones = []
+    for item in ptc_zone_features:
+        zoning = _zone_text((item.get("attributes") or {}).get("Zoning"))
+        prepared = _prepare_polygon(item, zoning=zoning)
+        if not prepared:
+            continue
+        center = centroid_of(prepared["geometry"])
+        if not center or not fayette_ga_point(center[0], center[1]):
+            raise RuntimeError(f"Peachtree City zoning polygon is outside Fayette GA: {center}")
+        ptc_zones.append(prepared)
+    if len(ptc_zones) < 100:
+        raise RuntimeError("Peachtree City Zoning2021 did not return a city zoning layer")
+
+    sages_exact, sages_collapsed = _pin_index(
+        sages_rows,
+        "PARCEL_NO",
+        reduce=_prefer(lambda row: 1 if clean(row.get("single_line_address")) else 0),
+    )
+    tax_exact, tax_collapsed = _pin_index(
+        tax_rows,
+        "PARCELID",
+        reduce=_prefer(
+            lambda row: (
+                1 if clean(row.get("OWNERNME1")) else 0,
+                1 if (num(row.get("CNTASSDVAL")) or 0) > 0 else 0,
+                1 if clean(row.get("SITEADDRESS")) else 0,
+            )
+        ),
+    )
+    zone_exact, zone_collapsed = _pin_index(
+        zoning_rows,
+        "PARCEL_NO",
+        reduce=_prefer(lambda row: 1 if _zone_text(row.get("ZONING_1")) else 0),
+    )
+    fay_zone_exact, fay_zone_collapsed = _pin_index(
+        fay_zone_rows,
+        "PARCEL_NO",
+        reduce=_prefer(lambda row: 1 if _zone_text(row.get("ZONING")) else 0),
+    )
+    fay_flu_exact, fay_flu_collapsed = _pin_index(
+        fay_flu_rows,
+        "PARCEL_NO",
+        reduce=_prefer(lambda row: 1 if clean(row.get("Land_use")) else 0),
+    )
+    ptc_flu_exact, ptc_flu_collapsed = _pin_index(
+        ptc_flu_rows,
+        "PARCEL_NO",
+        reduce=_prefer(lambda row: 1 if _zone_text(row.get("Proposed_L")) else 0),
+    )
+    ptc_sale_exact, ptc_sale_collapsed = _pin_index(
+        ptc_sale_rows,
+        "PARCEL_NO",
+        reduce=_prefer(lambda row: (num(row.get("SALEDT")) or 0, num(row.get("SALEPRICE")) or 0)),
+    )
+    tyrone_exact, tyrone_collapsed = _pin_index(
+        tyrone_rows,
+        "PARCEL_NO",
+        accept=lambda row: _code_str(row.get("TAXDIST")) == "3",
+        reduce=_prefer(lambda row: 1 if _zone_text(row.get("Zoning")) else 0),
+    )
+    sales_exact, sales_collapsed = _pin_index(
+        sales_rows,
+        "parcelid",
+        accept=lambda row: (num(row.get("saleamnt")) or 0) > 0,
+        reduce=_prefer(lambda row: (num(row.get("recorddt")) or 0, num(row.get("saleamnt")) or 0)),
+    )
+
+    by_id: dict[str, dict] = {}
+    dropped = 0
+    non_ga_state = 0
+    stats = defaultdict(int)
+    for item in raw:
+        attrs = item.get("attributes") or {}
+        geometry, _computed = rings_to_feature_geometry(item.get("geometry"))
+        if not geometry:
+            dropped += 1
+            continue
+        center = centroid_of(geometry)
+        if not center or not fayette_ga_point(center[0], center[1]):
+            raise RuntimeError(f"Rejected non-Fayette GA parcel {attrs.get('PARCEL_NO')} at {center}")
+        acres = fayette_acres(attrs.get("acres"), attrs.get("Shape.STArea()"))
+        if not in_band(acres):
+            dropped += 1
+            continue
+        pin = clean(attrs.get("PARCEL_NO"))
+        if not pin:
+            dropped += 1
+            continue
+        tax = _pin_get(tax_exact, tax_collapsed, pin)
+        sages = _pin_get(sages_exact, sages_collapsed, pin)
+        cvt = _code_str(tax.get("CVTTXCD")) if tax else None
+        muni = _FAYETTE_CVT.get(cvt or "")
+        if not muni:
+            hit = _containing(center[0], center[1], cities)
+            muni = hit["name"] if hit else "Unincorporated"
+        zoning = None
+        zoning_source = None
+        if muni == "Fayetteville":
+            row = _pin_get(fay_zone_exact, fay_zone_collapsed, pin)
+            zoning = _zone_text(row.get("ZONING")) if row else None
+            zoning_source = "zoning:fayetteville" if zoning else "zoning:fayetteville-missing"
+        elif muni == "Peachtree City":
+            hit = _containing(center[0], center[1], ptc_zones)
+            zoning = hit["zoning"] if hit else None
+            zoning_source = "zoning:ptc" if zoning else "zoning:ptc-missing"
+        elif muni == "Tyrone":
+            row = _pin_get(tyrone_exact, tyrone_collapsed, pin)
+            zoning = _zone_text(row.get("Zoning")) if row else None
+            if not zoning and row:
+                zoning = _zone_text(row.get("ZONING_1"))
+            zoning_source = "zoning:tyrone" if zoning else "zoning:tyrone-missing"
+        elif muni in {"Brooks", "Woolsey"}:
+            zoning_source = f"zoning:{muni.lower()}-gap"
+        else:
+            row = _pin_get(zone_exact, zone_collapsed, pin)
+            zoning = _zone_text(row.get("ZONING_1")) if row else None
+            if zoning:
+                zoning_source = "zoning:zoningro"
+            else:
+                zoning = _zone_text(attrs.get("Zoning"))
+                zoning_source = "zoning:parcelsro" if zoning else "zoning:unincorporated-missing"
+
+        flu = None
+        flu_source = None
+        if muni == "Fayetteville":
+            row = _pin_get(fay_flu_exact, fay_flu_collapsed, pin)
+            label = clean(row.get("Land_use")) if row else None
+            if label and label.upper() not in _BLANK_ZONE:
+                flu = {
+                    "code": label,
+                    "label": label,
+                    "jurisdiction": "Fayetteville",
+                    "source": "fayetteville-future-land-use",
+                }
+                flu_source = "flu:fayetteville"
+        elif muni == "Peachtree City":
+            row = _pin_get(ptc_flu_exact, ptc_flu_collapsed, pin)
+            label = _zone_text(row.get("Proposed_L")) if row else None
+            if label:
+                flu = {
+                    "code": label,
+                    "label": label,
+                    "jurisdiction": "Peachtree City",
+                    "source": "peachtree-city-proposed-land-use",
+                }
+                flu_source = "flu:ptc"
+
+        price = None
+        sold = None
+        qualified = None
+        sale_source = None
+        if muni == "Peachtree City":
+            row = _pin_get(ptc_sale_exact, ptc_sale_collapsed, pin)
+            amount = num(row.get("SALEPRICE")) if row else None
+            if amount and amount > 0:
+                price = amount
+                sold = _epoch_day(row.get("SALEDT"))
+                qualified = clean(row.get("QUAL"))
+                sale_source = "sale:ptc"
+        if price is None:
+            row = _pin_get(sales_exact, sales_collapsed, pin)
+            amount = num(row.get("saleamnt")) if row else None
+            if amount and amount > 0:
+                price = amount
+                sold = _epoch_day(row.get("recorddt"))
+                qualified = clean(row.get("saletype"))
+                sale_source = "sale:county"
+
+        situs = clean(sages.get("single_line_address")) if sages else None
+        city = _postal_city(sages.get("City")) if sages else None
+        zip_code = zip_str(sages.get("ZipCode")) if sages else None
+        if sages and not _situs_state_ok(sages.get("state")):
+            non_ga_state += 1
+        if not situs and tax:
+            situs = clean(tax.get("SITEADDRESS"))
+        owner = clean(tax.get("OWNERNME1")) if tax else None
+        owner2 = clean(tax.get("OWNERNME2")) if tax else None
+        assessed = num(tax.get("CNTASSDVAL")) if tax else None
+        if assessed is not None and assessed <= 0:
+            assessed = None
+
+        feature = empty_feature(
+            fips=fips,
+            county=county["name"],
+            state=county["state"],
+            markets=markets,
+            parcel_id=pin,
+            acreage=acres,
+            geometry=geometry,
+            center=center,
+            source=spec["source"],
+            owner=owner,
+            situs=situs,
+            city=city,
+            zip_code=zip_code,
+            zoning=zoning,
+            dor=clean(tax.get("CLASSCD")) if tax else None,
+            sale_price=price,
+            sale_date=sold,
+            sale_qualified=qualified,
+            market_value=None,
+            assessed=assessed,
+            taxable=None,
+            mail1=clean(tax.get("PSTLADDRESS")) if tax else None,
+            mail_city=clean(tax.get("PSTLCITY")) if tax else None,
+            mail_state=clean(tax.get("PSTLSTATE")) if tax else None,
+            mail_zip=zip_str(tax.get("PSTLZIP5")) if tax else None,
+        )
+        feature["properties"]["ownerName2"] = owner2
+        feature["properties"]["jurisdictionCode"] = muni
+        feature["properties"]["flu"] = flu
+        feature["properties"]["appraiserUrl"] = FAYETTE_APPRAISER + urllib.parse.quote(pin, safe="")
+        if muni == "Brooks":
+            feature["properties"]["dataGaps"] = ["Town of Brooks has no public zoning REST; zoning left blank."]
+        elif muni == "Woolsey":
+            feature["properties"]["dataGaps"] = ["Town of Woolsey has no public zoning REST; zoning left blank."]
+        feature["_meta"] = {
+            "muni": muni,
+            "zoningSource": zoning_source,
+            "fluSource": flu_source,
+            "saleSource": sale_source,
+            "situs": bool(situs),
+            "owner": bool(owner),
+            "assessed": assessed is not None,
+        }
+        previous = by_id.get(pin)
+        if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
+            by_id[pin] = feature
+        else:
+            dropped += 1
+
+    if non_ga_state:
+        raise RuntimeError(f"SAGES state was not GA on {non_ga_state} joined rows")
+    features = list(by_id.values())
+    features.sort(key=lambda row: row["properties"].get("acreage") or 0, reverse=True)
+    for feature in features:
+        meta = feature.pop("_meta")
+        stats[f"muni:{meta['muni']}"] += 1
+        if meta["zoningSource"]:
+            stats[meta["zoningSource"]] += 1
+        if meta["fluSource"]:
+            stats[meta["fluSource"]] += 1
+        if meta["saleSource"]:
+            stats[meta["saleSource"]] += 1
+        if meta["situs"]:
+            stats["situs"] += 1
+        if meta["owner"]:
+            stats["owner"] += 1
+        if meta["assessed"]:
+            stats["assessed"] += 1
+    if not features or not all(in_band(feature["properties"].get("acreage")) for feature in features):
+        raise RuntimeError("Fayette extract failed the 5–150 acre check")
+    if any(not fayette_ga_point(*feature["properties"]["centroid"]) for feature in features):
+        raise RuntimeError("Fayette extract includes a centroid outside Fayette County, Georgia")
+
+    def need(muni_key: str, stat_key: str, minimum: int, message: str) -> None:
+        if stats[muni_key] >= minimum and stats[stat_key] <= 0:
+            raise RuntimeError(message)
+
+    need("muni:Unincorporated", "zoning:zoningro", 20, "ZoningRO join produced no unincorporated zoning")
+    need("muni:Fayetteville", "zoning:fayetteville", 10, "Fayetteville zoning join produced no codes")
+    need("muni:Peachtree City", "zoning:ptc", 10, "Peachtree City zoning spatial join produced no codes")
+    need("muni:Tyrone", "zoning:tyrone", 5, "Tyrone zoning join produced no codes")
+    need("muni:Fayetteville", "flu:fayetteville", 10, "Fayetteville FLU join produced no codes")
+    need("muni:Peachtree City", "flu:ptc", 10, "Peachtree City FLU join produced no codes")
+    if len(features) > 100 and stats["owner"] < len(features) * 0.3:
+        raise RuntimeError(f"TaxParcels_public owner join is too low ({stats['owner']}/{len(features)})")
+    if len(features) > 100 and stats["situs"] < len(features) * 0.3:
+        raise RuntimeError(f"SAGES situs join is too low ({stats['situs']}/{len(features)})")
+    if stats["flu:fayetteville"] + stats["flu:ptc"] != sum(1 for feature in features if feature["properties"].get("flu")):
+        raise RuntimeError("County FLU was set; only Fayetteville and Peachtree City FLU are public")
+
+    kept = len(features)
+    zoned = sum(1 for feature in features if feature["properties"].get("zoningCode"))
+    gaps = [
+        "Acreage uses parcelsRO acres when >0, otherwise StatePlane feet Shape.STArea()/43560. Deeded acres are sparse.",
+        (
+            f"Zoning on {zoned} of {kept}: ZoningRO unincorporated {stats['zoning:zoningro']}, "
+            f"parcelsRO fallback {stats['zoning:parcelsro']}, Fayetteville {stats['zoning:fayetteville']}, "
+            f"Peachtree City Zoning2021 {stats['zoning:ptc']}, Tyrone TAXDIST=3 {stats['zoning:tyrone']}. "
+            f"Brooks {stats['zoning:brooks-gap']} and Woolsey {stats['zoning:woolsey-gap']} left blank — no city zoning REST."
+        ),
+        (
+            f"Future land use on Fayetteville {stats['flu:fayetteville']} and Peachtree City Proposed_L {stats['flu:ptc']} only. "
+            "County FLU is token-gated and left null. Tyrone, Brooks, Woolsey, and unincorporated FLU are null."
+        ),
+        (
+            f"Owner/mailing/assessed from TaxParcels_public on PARCEL_NO=PARCELID "
+            f"({stats['owner']} owners, {stats['assessed']} assessed). No market value: CNTASSDVAL is assessed, and CNTTXBLVAL is not used as FMV."
+        ),
+        f"Situs from Parcels_Data_SAGES single_line_address ({stats['situs']}). Postal City is not the municipality.",
+        (
+            f"Last sale on {stats['sale:ptc'] + stats['sale:county']} parcels "
+            f"(Peachtree City SALEPRICE {stats['sale:ptc']}, county Sales_Analysis saleamnt>0 {stats['sale:county']}). "
+            "Partial snapshot; saletype/QUAL are blank. No qualified multi-sale history."
+        ),
+        "qPublic AppID=942, LayerID=18406. Brooks, Woolsey, and county future land use stay gaps.",
+    ]
+    dropped = expected - kept
+    print(f"  kept {kept} stats {dict(stats)}", flush=True)
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "gaps": gaps, "features": features},
+            separators=(",", ":"),
+        )
+    )
+    path, lookup, tiles = write_tiles(county, features)
+    return county_row(
+        county,
+        markets,
+        feature_count=kept,
+        coverage=spec["coverage"],
+        partition="tiles",
+        path=path,
+        lookup=lookup,
+        source=spec["source"],
+        query_url=spec["url"],
+        gaps=gaps,
+        source_count=expected,
+        dropped=dropped,
+        tile_count=tiles,
+    )
+
+
 def county_override(fips: str) -> dict | None:
+    if fips == "13113":  # Fayette GA — not Fayette KY/PA/IN or Fayetteville NC/AR
+        return {
+            "kind": "fayette-ga",
+            "url": FAYETTE_PARCELS_URL,
+            "where": (
+                "(acres>=5 AND acres<=150) OR "
+                "((acres IS NULL OR acres<=0) AND Shape.STArea()>=217800 AND Shape.STArea()<=6534000)"
+            ),
+            "outFields": ["PARCEL_NO", "acres", "Zoning", "Shape.STArea()"],
+            "source": "ga-fayette-parcels",
+            "coverage": "complete-gte-5ac",
+            "gaps": [
+                "Fayette County, Georgia public GIS. Brooks, Woolsey, and county FLU stay gaps.",
+            ],
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -663,7 +1418,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, or Fayette pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -925,17 +1680,19 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Fayette county services | Cobb and Fayette are complete 5–150 acre extracts. DeKalb is a polygon-acre sample. Fayette uses parcelsRO geometry (deed acres when >0, otherwise StatePlane area/43560), TaxParcels_public, SAGES situs, ZoningRO, and city zoning for Fayetteville, Peachtree City, and Tyrone. Brooks, Woolsey, and county FLU stay gaps. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when a public layer carries it (DeKalb on the parcel, Fayette from ZoningRO and the Fayetteville, Peachtree City, and Tyrone city layers). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "fayette-ga":
+        return download_fayette(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

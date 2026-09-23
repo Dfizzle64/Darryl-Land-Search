@@ -27,6 +27,8 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "13113":
+    "https://qpublic.schneidercorp.com/Application.aspx?AppID=942&LayerID=18406&PageTypeID=2&PageID=8204",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -59,7 +61,9 @@ export function parcelAppraiserUrl(options: {
                   ? "Sumter"
                   : fips === "12127"
                     ? "Volusia"
-                    : "county";
+                    : fips === "13113"
+                      ? "Fayette"
+                      : "county";
   return {
     href,
     label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,

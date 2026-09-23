@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T23:48:55Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 8149,
+  "parcelCount": 12874,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -248,20 +248,26 @@
       "name": "Fayette",
       "fips": "13113",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 4725,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-fayette-parcels",
+      "queryUrl": "https://gis.fayettecountyga.gov/arcgis/rest/services/Pictometry/parcelsRO/MapServer/0/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Acreage uses parcelsRO acres when >0, otherwise StatePlane feet Shape.STArea()/43560. Deeded acres are sparse.",
+        "Zoning on 4363 of 4725: ZoningRO unincorporated 3476, parcelsRO fallback 298, Fayetteville 133, Peachtree City Zoning2021 289, Tyrone TAXDIST=3 167. Brooks 188 and Woolsey 43 left blank \u2014 no city zoning REST.",
+        "Future land use on Fayetteville 147 and Peachtree City Proposed_L 259 only. County FLU is token-gated and left null. Tyrone, Brooks, Woolsey, and unincorporated FLU are null.",
+        "Owner/mailing/assessed from TaxParcels_public on PARCEL_NO=PARCELID (4432 owners, 4428 assessed). No market value: CNTASSDVAL is assessed, and CNTTXBLVAL is not used as FMV.",
+        "Situs from Parcels_Data_SAGES single_line_address (4725). Postal City is not the municipality.",
+        "Last sale on 289 parcels (Peachtree City SALEPRICE 112, county Sales_Analysis saleamnt>0 177). Partial snapshot; saletype/QUAL are blank. No qualified multi-sale history.",
+        "qPublic AppID=942, LayerID=18406. Brooks, Woolsey, and county future land use stay gaps."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13113/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13113/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 4901
     },
     {
       "name": "Forsyth",

@@ -81,6 +81,51 @@ describe("market parcel gating and acreage", () => {
     expect(MARKET_PARCEL_TILE).toEqual(ORLANDO_PARCEL_TILE);
   });
 
+  it("keeps Fayette County, Georgia parcels in the acreage band and the county", () => {
+    const tiles = path.join(process.cwd(), "data/fixtures/market-parcels/counties/13113/tiles");
+    if (!existsSync(tiles)) return;
+    const files = readdirSync(tiles).filter((name) => name.endsWith(".geojson"));
+    expect(files.length).toBeGreaterThan(0);
+    let kept = 0;
+    let zoned = 0;
+    let flu = 0;
+    const jurisdictions = new Set<string>();
+    for (const file of files) {
+      const collection = JSON.parse(readFileSync(path.join(tiles, file), "utf8")) as ParcelCollection;
+      for (const feature of collection.features) {
+        const props = feature.properties;
+        expect(inMarketAcreageBand(props.acreage)).toBe(true);
+        expect(props.countyFips).toBe("13113");
+        expect(props.state).toBe("Georgia");
+        expect(props.marketIds).toContain("Atlanta");
+        expect(props.countyName).toBe("Fayette");
+        const [lon, lat] = props.centroid;
+        expect(lon).toBeGreaterThanOrEqual(-84.7);
+        expect(lon).toBeLessThanOrEqual(-84.3);
+        expect(lat).toBeGreaterThanOrEqual(33.2);
+        expect(lat).toBeLessThanOrEqual(33.6);
+        expect(props.appraiserUrl ?? "").toContain("AppID=942");
+        expect(props.appraiserUrl ?? "").toContain("LayerID=18406");
+        expect(props.tax.marketValue).toBeNull();
+        if (props.zoningCode) zoned += 1;
+        if (props.flu?.code) {
+          flu += 1;
+          expect(["Fayetteville", "Peachtree City"]).toContain(props.flu.jurisdiction);
+        }
+        if (props.jurisdictionCode) jurisdictions.add(props.jurisdictionCode);
+        if (props.jurisdictionCode === "Brooks" || props.jurisdictionCode === "Woolsey") {
+          expect(props.zoningCode).toBeNull();
+          expect(props.flu).toBeNull();
+        }
+        kept += 1;
+      }
+    }
+    expect(kept).toBeGreaterThan(1000);
+    expect(zoned).toBeGreaterThan(0);
+    expect(flu).toBeGreaterThan(0);
+    expect(jurisdictions.has("Unincorporated") || jurisdictions.has("Fayetteville")).toBe(true);
+  });
+
   it("keeps seeded market fixtures inside the acreage band when a pull exists", () => {
     const indexPath = path.join(process.cwd(), "data/fixtures/market-parcels/index.json");
     if (!existsSync(indexPath)) return;

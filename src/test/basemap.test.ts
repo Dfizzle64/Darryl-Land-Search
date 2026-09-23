@@ -1,10 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
+  ESRI_HYBRID_ATTRIBUTION,
+  ESRI_PLACES_TILES,
+  ESRI_TRANSPORTATION_TILES,
   ESRI_WORLD_IMAGERY_ATTRIBUTION,
   ESRI_WORLD_IMAGERY_TILES,
   OVERLAY_LAYER_IDS,
+  VOYAGER_STREETS_ATTRIBUTION,
+  VOYAGER_STREETS_TILES,
+  basemapAttribution,
   excludedFillPaint,
   excludedLinePaint,
+  hybridImageryTileUrl,
   OZ_TRACT_SWATCH,
   oz2FillPaint,
   oz2LinePaint,
@@ -13,6 +20,8 @@ import {
   parcelFillPaint,
   parcelLinePaint,
   parcelMatchFilter,
+  rasterLayerVisibility,
+  streetsTileUrl,
   trafficLinePaint,
 } from "../lib/basemap";
 
@@ -48,7 +57,42 @@ describe("basemap helpers", () => {
       "parcels-line",
       "aoi-fill",
       "aoi-line",
+      "measure-casing",
+      "measure-line",
+      "measure-vertices",
     ]);
+  });
+
+  it("uses keyless navigation streets and an imagery-plus-labels hybrid", () => {
+    expect(VOYAGER_STREETS_TILES).toBe("https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png");
+    expect(VOYAGER_STREETS_ATTRIBUTION).toMatch(/CARTO/);
+    expect(VOYAGER_STREETS_ATTRIBUTION).toMatch(/OpenStreetMap/);
+    expect(streetsTileUrl(null)).toBe(VOYAGER_STREETS_TILES);
+    expect(hybridImageryTileUrl(null)).toBe(ESRI_WORLD_IMAGERY_TILES);
+    expect(ESRI_TRANSPORTATION_TILES).toContain("World_Transportation");
+    expect(ESRI_PLACES_TILES).toContain("World_Boundaries_and_Places");
+    expect(ESRI_HYBRID_ATTRIBUTION).toMatch(/Esri/);
+    expect(streetsTileUrl("demo-key")).toContain("maps/streets-v2/256/");
+    expect(streetsTileUrl("demo-key")).toContain("key=demo-key");
+    expect(hybridImageryTileUrl("demo-key")).toContain("maps/hybrid/256/");
+    expect(basemapAttribution("streets", null)).toMatch(/CARTO/);
+    expect(basemapAttribution("satellite", null)).toMatch(/Esri/);
+    expect(basemapAttribution("streets", "demo-key")).toMatch(/MapTiler/);
+    expect(rasterLayerVisibility("streets", true)).toEqual({
+      "basemap-streets": "visible",
+      "basemap-satellite": "none",
+      "basemap-hybrid-roads": "none",
+      "basemap-hybrid-places": "none",
+    });
+    expect(rasterLayerVisibility("satellite", true)).toEqual({
+      "basemap-streets": "none",
+      "basemap-satellite": "visible",
+      "basemap-hybrid-roads": "visible",
+      "basemap-hybrid-places": "visible",
+    });
+    expect(rasterLayerVisibility("satellite", false)["basemap-hybrid-roads"]).toBe("none");
+    expect(rasterLayerVisibility("dark", true)["basemap-streets"]).toBe("none");
+    expect(rasterLayerVisibility("dark", true)["basemap-satellite"]).toBe("none");
   });
 
   it("lowers parcel fill opacity and brightens outlines on satellite", () => {
@@ -60,6 +104,11 @@ describe("basemap helpers", () => {
     expect(JSON.stringify(parcelLinePaint("satellite")["line-width"])).toContain("1.7");
     expect(JSON.stringify(parcelLinePaint("satellite")["line-width"])).toContain("0.55");
     expect(JSON.stringify(parcelLinePaint("streets")["line-width"])).toContain("0.35");
+    expect(JSON.stringify(parcelLinePaint("streets")["line-color"])).toContain("#0f5132");
+    expect(JSON.stringify(parcelLinePaint("dark")["line-color"])).toContain("#b7e3cf");
+    expect(JSON.stringify(oz2LinePaint("streets")["line-color"])).toContain("#9a3412");
+    expect(ozLinePaint("streets")["line-color"]).toBe("#9a3412");
+    expect(ozLinePaint("dark")["line-color"]).toBe("#f6d0b0");
     expect(parcelMatchFilter).toEqual(["==", ["get", "filterMatch"], 1]);
     expect(Number(excludedFillPaint("satellite")["fill-opacity"])).toBeLessThan(0.2);
     expect(Number(excludedLinePaint("satellite")["line-opacity"])).toBeGreaterThan(

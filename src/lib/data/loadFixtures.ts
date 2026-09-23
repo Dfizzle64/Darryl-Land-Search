@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { flattenMultifamilyTokens } from "../zoning";
+import { annotateOrangeDesignatedCounty, annotateTractCounty } from "../tractCounty";
 import type {
   EligibleMarketsCatalog,
   EligiblePackTractCollection,
@@ -66,12 +67,20 @@ export async function loadFluConfig(): Promise<FluConfig> {
 
 export async function loadOpportunityZones(): Promise<OpportunityZoneCollection> {
   const raw = await readFile(path.join(DATA_DIR, "fixtures/opportunity-zones.geojson"), "utf8");
-  return JSON.parse(raw) as OpportunityZoneCollection;
+  const collection = JSON.parse(raw) as OpportunityZoneCollection;
+  annotateOrangeDesignatedCounty(collection.features);
+  return collection;
 }
 
 export async function loadOz2Tracts(): Promise<Oz2TractCollection> {
-  const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-eligible.geojson"), "utf8");
-  return JSON.parse(raw) as Oz2TractCollection;
+  const [raw, tableRaw] = await Promise.all([
+    readFile(path.join(DATA_DIR, "fixtures/oz2-eligible.geojson"), "utf8"),
+    readFile(path.join(DATA_DIR, "fixtures/oz2-eligible-tracts.json"), "utf8"),
+  ]);
+  const collection = JSON.parse(raw) as Oz2TractCollection;
+  const table = JSON.parse(tableRaw) as { tracts?: { tractGeoid: string; county?: string; state?: string }[] };
+  annotateTractCounty(collection.features, table.tracts ?? []);
+  return collection;
 }
 
 export async function loadRuralMarketsCatalog(): Promise<RuralMarketsCatalog> {
@@ -80,8 +89,14 @@ export async function loadRuralMarketsCatalog(): Promise<RuralMarketsCatalog> {
 }
 
 export async function loadRuralMarketTracts(): Promise<RuralMarketTractCollection> {
-  const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-rural-markets.geojson"), "utf8");
-  return JSON.parse(raw) as RuralMarketTractCollection;
+  const [raw, catalogRaw] = await Promise.all([
+    readFile(path.join(DATA_DIR, "fixtures/oz2-rural-markets.geojson"), "utf8"),
+    readFile(path.join(DATA_DIR, "fixtures/oz2-rural-markets.json"), "utf8"),
+  ]);
+  const collection = JSON.parse(raw) as RuralMarketTractCollection;
+  const catalog = JSON.parse(catalogRaw) as { rows?: { geoid: string; county?: string; state?: string }[] };
+  annotateTractCounty(collection.features, catalog.rows ?? []);
+  return collection;
 }
 
 export async function loadUrbanMarketsCatalog(): Promise<EligibleMarketsCatalog> {

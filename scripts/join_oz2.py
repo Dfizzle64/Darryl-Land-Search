@@ -546,11 +546,14 @@ def main() -> None:
     for geoid in sorted(eligible):
         feature = tiger[geoid]
         props = feature["properties"]
+        county_name = str(eligible[geoid].get("county") or "")
+        if county_name.endswith(" County"):
+            county_name = county_name[: -len(" County")].strip()
+        props["county"] = county_name or None
+        props["state"] = eligible[geoid].get("state")
         props["rural"] = eligible[geoid]["rural"]
         props["designation"] = "eligible-for-nomination"
         props["source"] = "rev-proc-2026-14"
-        props.pop("state", None)
-        props.pop("county", None)
         zones.append(feature)
     rural_zone = next(zone for zone in zones if zone["properties"]["tractGeoid"] == EXPECTED_RURAL_GEOID)
 

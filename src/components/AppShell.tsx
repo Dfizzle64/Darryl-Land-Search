@@ -462,8 +462,9 @@ export function AppShell({
     setFiltersOpen(false);
   };
 
-  const selectTract = (geoid: string) => {
+  const selectTract = (geoid: string | null) => {
     setSelectedTractGeoid(geoid);
+    if (!geoid) return;
     setSelectedId(null);
     setSitesOpen(false);
     setFiltersOpen(false);

@@ -37,6 +37,24 @@ body {
   filter: invert(1) hue-rotate(180deg);
 }
 
+/* Keep +/- off the desktop sites panel (w-80 + right-3). MapLibre's own rule sets right: 0 later in the cascade. */
+@media (min-width: 1280px) {
+  .maplibregl-map .maplibregl-ctrl-bottom-right {
+    right: 22.5rem !important;
+    z-index: 30;
+  }
+}
+
+/* Chrome sits on the map. Only buttons and links take hits; wheel and pinch pass through. */
+.map-chrome,
+.map-chrome * {
+  pointer-events: none;
+}
+
+.map-chrome :is(button, a, input, select, textarea, label) {
+  pointer-events: auto;
+}
+
 .drawer-scroll::-webkit-scrollbar,
 .sidebar-scroll::-webkit-scrollbar,
 .sites-scroll::-webkit-scrollbar {

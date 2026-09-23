@@ -131,7 +131,7 @@ export const parcelExcludedFilter: FilterSpecification = ["==", ["get", "filterM
 export const parcelHiddenFilter: FilterSpecification = ["==", ["get", "filterMatch"], -1];
 
 /**
- * Mid zoom (just past the auto-on gate) stays light: lower fill, thinner line.
+ * Neighborhood zoom (the auto-on gate) stays light: lower fill, thinner line.
  * Close zoom uses the original street/satellite weights. Selection stays strong.
  * Zoom interpolation has to be the top-level expression. MapLibre rejects ["zoom"] nested in a case.
  */
@@ -150,7 +150,8 @@ function parcelZoomStops(
     hover,
     base,
   ];
-  return ["interpolate", ["linear"], ["zoom"], 11, at(quiet), 12.5, at(mid), 14.5, at(full)];
+  // First stop is neighborhood zoom (the auto-on gate), not the old 11 stop.
+  return ["interpolate", ["linear"], ["zoom"], 10, at(quiet), 12.5, at(mid), 14.5, at(full)];
 }
 
 export function parcelFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {

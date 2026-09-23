@@ -32,7 +32,7 @@ export function AoiControls({
   return (
     <div
       data-aoi-controls
-      className="pointer-events-auto absolute inset-x-3 top-14 z-30 flex flex-col items-end gap-2 sm:inset-x-auto sm:right-4 sm:top-4 sm:max-w-[22rem] xl:right-[22rem]"
+      className="map-chrome absolute inset-x-3 top-14 z-30 flex flex-col items-end gap-2 sm:inset-x-auto sm:right-4 sm:top-4 sm:max-w-[22rem] xl:right-[22rem]"
     >
       <div className="flex max-w-full flex-wrap items-center justify-end gap-1.5">
         {aoi ? (

@@ -7,6 +7,7 @@ complete Orlando extract (Orange, Osceola, Polk) are referenced, not re-download
   python3 scripts/seed_market_parcels.py
   python3 scripts/seed_market_parcels.py --market Tampa
   python3 scripts/seed_market_parcels.py --county Hardee --market Tampa
+  python3 scripts/seed_market_parcels.py --fips 37057 --refresh
   python3 scripts/seed_market_parcels.py --refresh
 
 Tile origin matches ORLANDO_PARCEL_TILE in src/lib/orlandoParcels.ts.
@@ -418,6 +419,9 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        year_field = spec.get("saleYearField")
+        month_field = spec.get("saleMonthField") or "SALE_MO1"
+        qualified_field = spec.get("saleQualifiedField") or "QUAL_CD1"
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -435,8 +439,8 @@ def normalize_rows(
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
-            sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
+            sale_date=sale_date(attrs.get(year_field), attrs.get(month_field)) if year_field else None,
+            sale_qualified=clean(attrs.get(qualified_field)) if year_field else None,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
             taxable=num(attrs.get(spec["taxableField"])) if spec.get("taxableField") else None,
@@ -446,6 +450,10 @@ def normalize_rows(
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        if spec.get("owner2Field"):
+            feature["properties"]["ownerName2"] = clean(attrs.get(spec["owner2Field"]))
+        if spec.get("cityCodeField"):
+            feature["properties"]["jurisdictionCode"] = clean(attrs.get(spec["cityCodeField"]))
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -567,6 +575,65 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    # North Carolina Davidson (Winston-Salem / Charlotte). Not Tennessee 47037.
+    if fips == "37057":
+        return {
+            "kind": "arcgis",
+            "url": "https://webgis.co.davidson.nc.us/arcgis/rest/services/OpenGov/OpenGov/MapServer/6/query",
+            "where": "LegalLandType='AC' AND LegalLandUnits>=5 AND LegalLandUnits<=150",
+            "outFields": [
+                "PIN",
+                "Name1",
+                "Name2",
+                "Address1",
+                "Address2",
+                "City",
+                "State",
+                "ZipCode",
+                "PropertyAddress",
+                "LegalLandUnits",
+                "SaleYear1",
+                "SaleMonth1",
+                "SalePrice1",
+                "QualifiedCode1",
+                "TotalMarketValue",
+                "TotalAssessedValue",
+                "LandZoning",
+                "CityCode",
+            ],
+            "idField": "PIN",
+            "acresField": "LegalLandUnits",
+            "ownerField": "Name1",
+            "owner2Field": "Name2",
+            "situsField": "PropertyAddress",
+            "cityCodeField": "CityCode",
+            "zoningField": "LandZoning",
+            "salePriceField": "SalePrice1",
+            "saleYearField": "SaleYear1",
+            "saleMonthField": "SaleMonth1",
+            "saleQualifiedField": "QualifiedCode1",
+            "marketValueField": "TotalMarketValue",
+            "assessedField": "TotalAssessedValue",
+            "mail1Field": "Address1",
+            "mail2Field": "Address2",
+            "mailCityField": "City",
+            "mailStateField": "State",
+            "mailZipField": "ZipCode",
+            "source": "nc-davidson-opengov-37057",
+            "coverage": "complete-gte-5ac",
+            "enrich": "davidson-nc",
+            "cacheKey": "davidson-nc-opengov-v2",
+            "gaps": [
+                "Davidson County, North Carolina (FIPS 37057), not Davidson County, Tennessee. Acreage is legal acres on OpenGov TaxParcels where LegalLandType is AC and LegalLandUnits is 5 through 150.",
+                "NC OneMap is not this extract. OneMap gisacres can lag the county roll and its sale date is empty for Davidson.",
+                "Municipalities come from CityCode checked against city-limit polygons: 07 Lexington, 28 Thomasville, 32 Denton, 33 Wallburg, 34 Midway, 39 High Point. A null CityCode is unincorporated.",
+                "Lexington zoning is the city AGOL layer joined on PIN. Thomasville zoning is a PTRC polygon join. Wallburg zoning and future land use are the 2026 LDP clip. Midway, Denton, and High Point have no dedicated public zoning FeatureServer.",
+                "No countywide future land use service. FLU stays empty outside a Wallburg hit. Labels such as LEXINGTON CITY ZONING are placeholders and are not stored as district codes.",
+                "Zoning strings are public district codes, not an Orange County multifamily knowledge-base match.",
+                "OZ 2.0 eligibility is Rev. Proc. 2026-14 nomination eligibility on 2020 tracts. It is not a designated Qualified Opportunity Zone. Designation is a separate HUD 2010-tract join.",
+                "Sale day is not on the roll; the stored date is the first of the sale month. Owner phones and emails are not collected.",
+            ],
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -785,6 +852,23 @@ def orlando_county(fips: str) -> dict | None:
     return None
 
 
+def write_json_keeping_timestamp(path: Path, payload: dict) -> None:
+    """Skip a rewrite when the only difference is generatedAt."""
+    text = json.dumps(payload, indent=2) + "\n"
+    if path.exists():
+        try:
+            previous = json.loads(path.read_text())
+        except json.JSONDecodeError:
+            previous = None
+        if isinstance(previous, dict):
+            stamped = dict(previous)
+            stamped["generatedAt"] = payload.get("generatedAt")
+            if stamped == payload:
+                return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text)
+
+
 def rebuild_indexes(catalog: dict) -> None:
     rows = load_county_rows()
     MARKET_DIR.mkdir(parents=True, exist_ok=True)
@@ -847,8 +931,7 @@ def rebuild_indexes(catalog: dict) -> None:
         }
         rel = f"data/fixtures/market-parcels/markets/{slug(market['id'])}/meta.json"
         market_path = ROOT / rel
-        market_path.parent.mkdir(parents=True, exist_ok=True)
-        market_path.write_text(json.dumps(meta, indent=2) + "\n")
+        write_json_keeping_timestamp(market_path, meta)
         index_markets[market["id"]] = {
             "tier": market["tier"],
             "parcelCount": parcel_count,
@@ -890,7 +973,7 @@ def rebuild_indexes(catalog: dict) -> None:
         "orlando": "unchanged — see data/fixtures/orlando-parcels",
         "markets": index_markets,
     }
-    (OUT_DIR / "index.json").write_text(json.dumps(index, indent=2) + "\n")
+    write_json_keeping_timestamp(OUT_DIR / "index.json", index)
     coverage = "\n".join(coverage_lines + detail_lines) + "\n"
     (OUT_DIR / "coverage.md").write_text(coverage)
     docs = ROOT / "docs" / "market-parcels.md"
@@ -921,7 +1004,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Davidson County (37057, North Carolina — not Tennessee) uses the county OpenGov tax parcels instead |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -929,7 +1012,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when a public layer already carries a district code (DeKalb, and Davidson County NC municipal layers where they exist). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets. OZ 2.0 eligibility is not a designated Qualified Opportunity Zone.
 
 ## Coverage
 """
@@ -939,14 +1022,19 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
+    cache_key = spec.get("cacheKey")
     if cache_path.exists() and not spec.get("ignoreCache"):
         cached = json.loads(cache_path.read_text())
-        if cached.get("features"):
+        if cached.get("features") and (not cache_key or cached.get("cacheKey") == cache_key):
             print(f"  cache hit {len(cached['features'])}", flush=True)
             features = cached["features"]
             for feature in features:
                 feature["properties"]["marketIds"] = markets
             path, lookup, tiles = write_tiles(county, features)
+            gaps = list(spec.get("gaps") or [])
+            for note in cached.get("extraGaps") or []:
+                if note not in gaps:
+                    gaps.append(note)
             return county_row(
                 county,
                 markets,
@@ -957,7 +1045,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=gaps,
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
@@ -1013,14 +1101,26 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     ids = fetch_object_ids(spec["url"], spec["where"])
     raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
     features, dropped = normalize_rows(raw, county, markets, spec)
+    extra_gaps: list[str] = []
+    if spec.get("enrich") == "davidson-nc":
+        from davidson_nc_parcels import enrich_davidson_nc_parcels
+
+        features, extra_gaps, enrich_dropped = enrich_davidson_nc_parcels(features)
+        dropped += enrich_dropped
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
-    )
+    payload: dict[str, Any] = {"sourceCount": expected, "dropped": dropped, "features": features}
+    if cache_key:
+        payload["cacheKey"] = cache_key
+    if extra_gaps:
+        payload["extraGaps"] = extra_gaps
+    cache_path.write_text(json.dumps(payload, separators=(",", ":")))
     coverage = spec["coverage"]
     gaps = list(spec.get("gaps") or [])
+    for note in extra_gaps:
+        if note not in gaps:
+            gaps.append(note)
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,
@@ -1108,6 +1208,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--market", action="append", default=[])
     parser.add_argument("--county", action="append", default=[])
+    parser.add_argument("--fips", action="append", default=[], help="Five-digit FIPS. Use 37057 for Davidson County, NC.")
     parser.add_argument("--tier", choices=["primary", "other", "all"], default="all")
     parser.add_argument("--refresh", action="store_true")
     parser.add_argument("--workers", type=int, default=3)
@@ -1116,6 +1217,7 @@ def main() -> None:
     catalog = json.loads(CATALOG_PATH.read_text())
     selected = set(args.market)
     county_filter = {name.lower() for name in args.county}
+    fips_filter = set(args.fips)
     grouped: dict[str, dict] = {}
     for market in catalog["markets"]:
         if args.tier != "all" and market["tier"] != args.tier:
@@ -1124,6 +1226,8 @@ def main() -> None:
             continue
         for county in market["counties"]:
             if county_filter and county["name"].lower() not in county_filter:
+                continue
+            if fips_filter and county["fips"] not in fips_filter:
                 continue
             slot = grouped.setdefault(county["fips"], {"county": county, "markets": []})
             if market["id"] not in slot["markets"]:

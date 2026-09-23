@@ -27,6 +27,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "37057": "https://taxsearch.co.davidson.nc.us/RealEstateSearch",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -35,6 +36,12 @@ export function parcelAppraiserUrl(options: {
   appraiserUrl?: string | null;
 }): { href: string; label: string } {
   const fips = options.countyFips ?? null;
+  if (fips === "37057") {
+    return {
+      href: options.appraiserUrl || DEFAULT_APPRAISER_URLS["37057"],
+      label: "Open Davidson County, North Carolina tax search",
+    };
+  }
   if (fips === "12095" || (!fips && !options.appraiserUrl)) {
     return {
       href: ocpaParcelUrl(options.parcelId),
@@ -111,6 +118,34 @@ export function formatMailing(address: {
     .map((line) => line?.trim())
     .filter((line): line is string => Boolean(line));
   return lines.length ? lines.join("\n") : null;
+}
+
+const STATE_ABBREV: Record<string, string> = {
+  Florida: "FL",
+  "North Carolina": "NC",
+  Tennessee: "TN",
+  Georgia: "GA",
+  "South Carolina": "SC",
+  Alabama: "AL",
+  Mississippi: "MS",
+  Arkansas: "AR",
+};
+
+/** Place line for the parcel drawer. Florida keeps the historical county fallback. */
+export function parcelPlaceLine(properties: {
+  situsCity?: string | null;
+  situsZip?: string | null;
+  countyName?: string | null;
+  state?: string | null;
+}): string {
+  const locality = [properties.situsCity, properties.situsZip].filter(Boolean).join(" ");
+  const state = properties.state;
+  if (!state || state === "Florida" || state === "FL") {
+    return locality || (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+  }
+  const abbrev = STATE_ABBREV[state] || state;
+  const countyBit = properties.countyName ? `${properties.countyName} County, ${abbrev}` : abbrev;
+  return [locality, countyBit].filter(Boolean).join(" · ");
 }
 
 export function formatRoadLabel(road: {

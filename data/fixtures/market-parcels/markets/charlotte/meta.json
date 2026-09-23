@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T23:11:55Z",
   "market": "Charlotte",
   "tier": "primary",
-  "parcelCount": 119168,
+  "parcelCount": 119546,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -116,20 +116,33 @@
       "name": "Davidson",
       "fips": "37057",
       "state": "North Carolina",
-      "featureCount": 11685,
+      "featureCount": 12063,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37057",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-davidson-opengov-37057",
+      "queryUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/OpenGov/OpenGov/MapServer/6/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "12102 source rows collapsed to 12063 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Davidson County, North Carolina (FIPS 37057), not Davidson County, Tennessee. Acreage is legal acres on OpenGov TaxParcels where LegalLandType is AC and LegalLandUnits is 5 through 150.",
+        "NC OneMap is not this extract. OneMap gisacres can lag the county roll and its sale date is empty for Davidson.",
+        "Municipalities come from CityCode checked against city-limit polygons: 07 Lexington, 28 Thomasville, 32 Denton, 33 Wallburg, 34 Midway, 39 High Point. A null CityCode is unincorporated.",
+        "Lexington zoning is the city AGOL layer joined on PIN. Thomasville zoning is a PTRC polygon join. Wallburg zoning and future land use are the 2026 LDP clip. Midway, Denton, and High Point have no dedicated public zoning FeatureServer.",
+        "No countywide future land use service. FLU stays empty outside a Wallburg hit. Labels such as LEXINGTON CITY ZONING are placeholders and are not stored as district codes.",
+        "Zoning strings are public district codes, not an Orange County multifamily knowledge-base match.",
+        "OZ 2.0 eligibility is Rev. Proc. 2026-14 nomination eligibility on 2020 tracts. It is not a designated Qualified Opportunity Zone. Designation is a separate HUD 2010-tract join.",
+        "Sale day is not on the roll; the stored date is the first of the sale month. Owner phones and emails are not collected.",
+        "Municipality counts on the 5\u2013150 acre roll: Denton 34, High Point 47, Lexington 242, Midway 153, Thomasville 222, Unincorporated 11226, Wallburg 139.",
+        "Lexington city zoning matched 148 of 242 CityCode 07 parcels on PIN.",
+        "Thomasville PTRC zoning covered 221 of 222 CityCode 28 parcels.",
+        "Wallburg clip matched zoning on 136 parcels and future land use on 136.",
+        "OZ 2.0 eligible parcels: 947. Current designated QOZ parcels: 76. Those counts are allowed to differ; eligibility was not written into the designated field."
       ],
       "path": "data/fixtures/market-parcels/counties/37057/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37057/lookup.json",
       "tileCount": 5,
-      "sourceCount": 11767
+      "sourceCount": 12102
     },
     {
       "name": "Gaston",

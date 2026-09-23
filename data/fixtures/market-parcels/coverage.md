@@ -10,10 +10,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
-| Charlotte | primary | 119,168 | 12 | 0 | 3 |
+| Charlotte | primary | 119,546 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -24,7 +24,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Chattanooga | other | 10,537 | 2 | 0 | 8 |
 | Knoxville | other | 38,433 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
-| Winston-Salem | other | 91,784 | 9 | 0 | 0 |
+| Winston-Salem | other | 92,162 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
 
 ## Counties
@@ -127,7 +127,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Catawba | North Carolina | 37035 | complete-gte-5ac | 8,502 | nc-onemap-37035 |
 | Chester | South Carolina | 45023 | gap | 0 | unavailable |
 | Cleveland | North Carolina | 37045 | complete-gte-5ac | 9,310 | nc-onemap-37045 |
-| Davidson | North Carolina | 37057 | complete-gte-5ac | 11,685 | nc-onemap-37057 |
+| Davidson | North Carolina | 37057 | complete-gte-5ac | 12,063 | nc-davidson-opengov-37057 |
 | Gaston | North Carolina | 37071 | complete-gte-5ac | 6,816 | nc-onemap-37071 |
 | Iredell | North Carolina | 37097 | complete-gte-5ac | 10,771 | nc-onemap-37097 |
 | Lancaster | South Carolina | 45057 | gap | 0 | unavailable |
@@ -176,7 +176,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 
@@ -321,7 +321,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Davidson | North Carolina | 37057 | complete-gte-5ac | 11,685 | nc-onemap-37057 |
+| Davidson | North Carolina | 37057 | complete-gte-5ac | 12,063 | nc-davidson-opengov-37057 |
 | Davie | North Carolina | 37059 | complete-gte-5ac | 5,721 | nc-onemap-37059 |
 | Forsyth | North Carolina | 37067 | complete-gte-5ac | 8,134 | nc-onemap-37067 |
 | Guilford | North Carolina | 37081 | complete-gte-5ac | 12,953 | nc-onemap-37081 |

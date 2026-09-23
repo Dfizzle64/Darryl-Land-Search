@@ -10,6 +10,7 @@ import {
   formatUsd,
   isEntityOwner,
   parcelAppraiserUrl,
+  parcelPlaceLine,
   sunbizSearchUrl,
 } from "@/lib/format";
 import { describeFluMatch } from "@/lib/flu";
@@ -94,9 +95,7 @@ export function ParcelDrawer({
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
-  const placeLine =
-    [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+  const placeLine = parcelPlaceLine(properties);
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,

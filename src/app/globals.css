@@ -48,12 +48,15 @@ body {
 }
 
 @layer components {
-  /* One opaque scrim for map chrome. Reads on light Streets, Satellite hybrid, and Dark. */
+  /* One opaque scrim for map chrome. White inner ring reads on Dark and imagery; black outer ring reads on light Streets. */
   .map-scrim {
     background-color: #0c1218;
     color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.72);
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+    border-color: #ffffff;
+    box-shadow:
+      0 0 0 2px #ffffff,
+      0 0 0 4px #0c1218,
+      0 12px 28px rgba(0, 0, 0, 0.55);
   }
 
   .map-scrim-active {

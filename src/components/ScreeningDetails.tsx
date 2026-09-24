@@ -24,7 +24,13 @@ function SchoolRow({ school }: { school: SchoolRating }) {
     <li className="border-t border-white/10 pt-2 first:border-t-0 first:pt-0">
       <p className="text-white">
         {school.zoned ? <span className="mr-2 text-clay-400">Zoned</span> : null}
-        {school.rating ? <span className="mr-2 font-semibold">{school.rating}</span> : <span className="mr-2 text-ink-500">No grade</span>}
+        {school.ratingKind === "ccrpi" && school.rating ? (
+          <span className="mr-2 font-semibold">CCRPI {school.rating}</span>
+        ) : school.rating ? (
+          <span className="mr-2 font-semibold">{school.rating}</span>
+        ) : (
+          <span className="mr-2 text-ink-500">No grade</span>
+        )}
         {school.name}
       </p>
       <p className="text-xs text-ink-300">

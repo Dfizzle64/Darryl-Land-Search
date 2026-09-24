@@ -3,6 +3,7 @@ import { access, readFile } from "node:fs/promises";
 import { featureIntersectsBbox, tileFileName, tileIndicesForBbox } from "../orlandoParcels";
 import { featuresInAcreageBand, type MarketParcelIndex, type MarketParcelsMeta } from "../marketParcels";
 import type { ParcelCollection, ParcelFeature, ParcelProperties, SearchMarketId } from "../types";
+import { attachDekalbSiteScreening } from "../dekalbBatch40";
 import { annotateParcelSignals, loadOrangeSignalIndex } from "../orangeSignals";
 import { finalizeOrlandoParcelPage, type OrlandoParcelPage, type OrlandoParcelQuery } from "./orlandoParcelStore";
 
@@ -58,6 +59,7 @@ function normalizeParcel(feature: ParcelFeature): ParcelFeature {
   if (props.incomeBlockGroup === undefined) props.incomeBlockGroup = null;
   if (props.nearestRoad === undefined) props.nearestRoad = null;
   feature.properties = props;
+  attachDekalbSiteScreening(feature);
   return feature;
 }
 

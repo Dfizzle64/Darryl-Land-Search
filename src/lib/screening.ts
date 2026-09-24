@@ -65,9 +65,12 @@ export type SchoolRating = {
   city: string | null;
   state: string | null;
   level: string | null;
-  /** A–F, or a published improvement rating such as Commendable. Null means unpublished here. */
+  /**
+   * A–F letter, a published improvement rating such as Commendable, or a Georgia
+   * CCRPI single score. Null means unpublished here. CCRPI is not a letter grade.
+   */
   rating: string | null;
-  ratingKind: "letter" | "improvement" | null;
+  ratingKind: "letter" | "improvement" | "ccrpi" | null;
   year: string | null;
   summary: string;
   source: string | null;
@@ -76,7 +79,7 @@ export type SchoolRating = {
   distanceMiles: number | null;
   lon: number;
   lat: number;
-  /** Attendance zone (OCPS or CMS), not merely the nearest campus. */
+  /** Attendance zone (OCPS, CMS, or DCSD), not merely the nearest campus. */
   zoned?: boolean;
 };
 
@@ -148,6 +151,29 @@ export const CMS_ZONES_URL = CMS_SCHOOL_POINTS;
 export const CMS_GRADES_SOURCE =
   "North Carolina DPI School Performance Grades, 2025-26, Charlotte-Mecklenburg Schools (LEA 600), subgroup ALL";
 export const CMS_GRADES_URL = "https://accrpt.tops.ncsu.edu/docs/spgdisag_datasets/SPG_Disag_2025-26.zip";
+
+/** DeKalb County School District attendance zones. FeatureServer only — no MapServer export. */
+export const DCSD_ELEM_ZONES =
+  "https://services3.arcgis.com/3TzhpgpIaE4cOUGc/arcgis/rest/services/Elementary_School_Attendance_Areas/FeatureServer/0";
+export const DCSD_MIDDLE_ZONES =
+  "https://services3.arcgis.com/3TzhpgpIaE4cOUGc/arcgis/rest/services/Middle_School_Areas/FeatureServer/0";
+export const DCSD_HIGH_ZONES =
+  "https://services3.arcgis.com/3TzhpgpIaE4cOUGc/arcgis/rest/services/High_School_Attendance_Areas/FeatureServer/0";
+/** DeKalb County, padded. School-zone polygons stay off outside this box. */
+export const DEKALB_BBOX = [-84.42, 33.52, -83.96, 34.02] as const;
+export const GOSA_CCRPI_SOURCE =
+  "GOSA Georgia School Grades 2025 (CCRPI single score). Georgia does not publish A–F letter grades.";
+export const GOSA_CCRPI_URL = "https://download.gosa.ga.gov/SchoolGrades/2025SchoolGrades_data.zip";
+export const DEKALB_UTILITY_SOURCE =
+  "DeKalb County Department of Watershed Management jurisdiction (no public service-area polygon)";
+export const DEKALB_UTILITY_URL = "https://dekalbcountyga.gov/departments/watershed-management";
+export const ATLANTA_DWM_SOURCE =
+  "City of Atlanta Department of Watershed Management jurisdiction (municipal boundary proxy; service-area layer did not hit)";
+export const ATLANTA_DWM_URL = "https://www.atlantawatershed.org/";
+export const DEKALB_GAS_SOURCE = "DeKalb County and City of Atlanta open GIS — no gas service-area layer";
+export const DEKALB_GAS_URL = "https://dcgis-dekalbgis.hub.arcgis.com/";
+export const DEKALB_SCHOOLS_NOTE =
+  "Zoned elementary, middle, and high schools are DeKalb County School District attendance zones, not the nearest campus. Two parcels inside the City of Atlanta still zone to Druid Hills DCSD because those attendance polygons cover them. Scores are GOSA 2025 CCRPI single scores. Georgia does not publish A–F letter grades, and none are invented here.";
 
 export const HIFLD_POWER_SERVICE =
   "https://services3.arcgis.com/OYP7N6mAJJCyH6hd/ArcGIS/rest/services/Electric_Retail_Service_Territories_HIFLD/FeatureServer/0";
@@ -533,7 +559,7 @@ export function toSchoolRating(input: {
   state: string | null;
   level: string | null;
   rating: string | null;
-  ratingKind: "letter" | "improvement" | null;
+  ratingKind: "letter" | "improvement" | "ccrpi" | null;
   year: string | null;
   source: string | null;
   sourceUrl: string | null;
@@ -553,7 +579,7 @@ export function toSchoolRating(input: {
 export function describeSchoolRating(input: {
   state: string | null;
   rating: string | null;
-  ratingKind: "letter" | "improvement" | null;
+  ratingKind: "letter" | "improvement" | "ccrpi" | null;
   year: string | null;
   source: string | null;
 }): string {
@@ -561,6 +587,9 @@ export function describeSchoolRating(input: {
     input.state === "FL"
       ? " Confidence is medium until the FL DOE School Grades Excel can be ingested."
       : "";
+  if (input.rating && input.ratingKind === "ccrpi") {
+    return `GOSA CCRPI single score ${input.rating}${input.year ? ` (${input.year})` : ""}. Georgia does not publish A–F letter grades. ${input.source ?? ""}`.trim();
+  }
   if (input.rating && input.ratingKind === "letter") {
     return `Public rating ${input.rating}${input.year ? ` (${input.year})` : ""}. ${input.source ?? ""}${floridaConfidence}`.trim();
   }
@@ -624,15 +653,15 @@ export function mailingGap(address: MailingAddress | null | undefined): string |
 
 export const UTILITY_LAYER_NOTE = {
   water:
-    "Water polygons are Orange County’s public service-area layer only. Charlotte Water publishes no service-area polygon. Inside the City of Charlotte the drawer uses the municipal boundary as a jurisdiction proxy, and unincorporated Mecklenburg stays unverified. Every other county is unknown.",
+    "Water polygons are Orange County’s public service-area layer only. Charlotte Water publishes no service-area polygon. Inside the City of Charlotte the drawer uses the municipal boundary as a jurisdiction proxy, and unincorporated Mecklenburg stays unverified. DeKalb batch-40 parcels name DeKalb DWM, or Atlanta DWM for two City of Atlanta parcels, as a jurisdiction proxy because no public service polygon is published. Every other county is unknown.",
   sewer:
-    "Sewer polygons are Orange County’s public wastewater service-area layer only. Charlotte has no public sewer polygon either — same jurisdiction proxy as water, with unincorporated Mecklenburg unverified.",
+    "Sewer polygons are Orange County’s public wastewater service-area layer only. Charlotte has no public sewer polygon either — same jurisdiction proxy as water, with unincorporated Mecklenburg unverified. DeKalb batch-40 parcels use the same DWM jurisdiction proxy as water. That is not a drawn sewer polygon.",
   power:
-    "In Orange County this is open-data electric service areas (layer 68). Outside that county it is the HIFLD retail-territory layer, which in Mecklenburg includes Duke Energy Carolinas and EnergyUnited EMC and can overlap a municipal retailer. Neither layer is a connection or a will-serve. Gas has no public polygon.",
+    "In Orange County this is open-data electric service areas (layer 68). Outside that county it is the HIFLD retail-territory layer, which in Mecklenburg includes Duke Energy Carolinas and EnergyUnited EMC and can overlap a municipal retailer. DeKalb batch-40 parcels join one HIFLD name when Georgia Power overlaps Snapping Shoals EMC or Walton EMC. The joined name is the cooperative. Neither layer is a connection or a will-serve. Gas has no public polygon.",
   flood:
     "FEMA NFHL effective flood zones. The drawer reports the zone at the centroid. A static BFE is shown only when NFHL publishes one. The -9999 sentinel is not an elevation. The community id comes from the NFHL political layer. That layer does not include a Community Rating System class.",
   wetlands:
     "National Wetlands Inventory, which covers Florida and the other states in this app. Polygons draw at closer zoom because the service scale limit is about 1:100,000.",
   schools:
-    "Orange County draws OCPS attendance zones. Mecklenburg County draws CMS elementary, middle, and high attendance zones, with 2025-26 NCDPI school performance grades for LEA 600. Other North Carolina dots stay on the 2024-25 researcher file. Florida letters are the 2025-26 Know Your Schools report card — the School Grades Excel file returns 403 from many hosts, so it is not re-downloaded here. Other states plot NCES locations and link the state report card. No grade is invented.",
+    "Orange County draws OCPS attendance zones. Mecklenburg County draws CMS elementary, middle, and high attendance zones, with 2025-26 NCDPI school performance grades for LEA 600. DeKalb County draws DCSD attendance zones from the district FeatureServers. DeKalb batch-40 parcels show GOSA 2025 CCRPI single scores for the zoned DCSD schools — Georgia does not publish A–F letters, and none are invented. Other North Carolina dots stay on the 2024-25 researcher file. Florida letters are the 2025-26 Know Your Schools report card — the School Grades Excel file returns 403 from many hosts, so it is not re-downloaded here. Other states plot NCES locations and link the state report card. No grade is invented.",
 } as const;

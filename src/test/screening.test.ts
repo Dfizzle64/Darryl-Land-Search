@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { entitySearchLink, parcelAppraiserUrl } from "../lib/format";
 import fs from "node:fs";
+import { attachDekalbSiteScreening, dekalbBatchParcel, dekalbScreeningOverlay, loadDekalbBatch40 } from "../lib/dekalbBatch40";
+import { dcsdZonePolygons } from "../lib/screeningFetch";
 import {
   bboxSpan,
   cmsAgencyCode,
@@ -17,6 +19,7 @@ import {
   toSchoolRating,
   type SchoolRating,
 } from "../lib/screening";
+import type { ParcelProperties } from "../lib/types";
 
 function school(partial: Partial<SchoolRating> & Pick<SchoolRating, "id" | "name" | "lon" | "lat">): SchoolRating {
   return {
@@ -222,6 +225,161 @@ describe("screening layers", () => {
     );
     expect(nearby.map((item) => item.id)).toEqual(["near", "mid"]);
     expect(bboxSpan([-81.5, 28.4, -81.2, 28.6])).toBeLessThan(1.2);
+  });
+});
+
+describe("DeKalb batch-40 screening join", () => {
+  it("joins school, flood, and utility onto the 40 Atlanta DeKalb parcels", () => {
+    const file = loadDekalbBatch40();
+    expect(file?.countyFips).toBe("13089");
+    expect(file?.market).toBe("Atlanta");
+    expect(file?.parcelCount).toBe(40);
+    expect(file?.omitted).toEqual(["opportunityZone", "income", "aadt"]);
+    expect(file?.letterGrades).toBe("not_published_by_ga_post_2022_23");
+    const lookup = JSON.parse(fs.readFileSync("data/fixtures/market-parcels/counties/13089/lookup.json", "utf8")) as Record<string, string>;
+    const zones: Record<string, number> = {};
+    const waterProxies: Record<string, number> = {};
+    let publishedBfe = 0;
+    let floodways = 0;
+    let shallow = 0;
+    let electricOverlap = 0;
+    let atlantaAssignment = 0;
+    for (const [id, record] of Object.entries(file?.parcels ?? {})) {
+      expect(lookup[id]).toBeTruthy();
+      expect(record).not.toHaveProperty("opportunityZone");
+      expect(record).not.toHaveProperty("aadt");
+      expect(record).not.toHaveProperty("geoid");
+      const overlay = dekalbScreeningOverlay(record, -84.3, 33.8);
+      const zone = overlay.flood.zone ?? "missing";
+      zones[zone] = (zones[zone] ?? 0) + 1;
+      waterProxies[record.water.proxy] = (waterProxies[record.water.proxy] ?? 0) + 1;
+      expect(overlay.flood.summary).not.toMatch(/-9999/);
+      expect(overlay.flood.summary).not.toMatch(/Community Rating System class \d/);
+      expect(overlay.flood.summary).not.toMatch(/CID \d/);
+      expect(overlay.flood.staticBfe).toBeNull();
+      expect(overlay.flood.summary).toMatch(/No published static base flood elevation/);
+      publishedBfe += overlay.flood.staticBfe == null ? 0 : 1;
+      if (overlay.flood.floodway) floodways += 1;
+      if (overlay.flood.subtype?.includes("0.2")) shallow += 1;
+      const gas = overlay.utilities.find((utility) => utility.kind === "gas");
+      expect(gas?.status).toBe("unknown");
+      expect(gas?.providers).toEqual([]);
+      expect(gas?.summary).toMatch(/No public gas/);
+      expect(gas?.summary).not.toMatch(/Atlanta Gas Light|Georgia Natural Gas/);
+      const sewer = overlay.utilities.find((utility) => utility.kind === "sewer");
+      expect(record.sewer.gap).toBe(false);
+      expect(sewer?.status).toBe("ok");
+      expect(sewer?.providers).toEqual([record.sewer.provider]);
+      expect(sewer?.summary).toMatch(/jurisdiction proxy|documented county watershed jurisdiction/);
+      expect(sewer?.summary).toMatch(/not a connection or a will-serve/);
+      const water = overlay.utilities.find((utility) => utility.kind === "water");
+      expect(water?.providers).toEqual([record.water.provider]);
+      expect(record.water.fromBoundary).toBe(false);
+      expect(water?.summary).toMatch(/jurisdiction proxy|documented county watershed jurisdiction/);
+      const power = overlay.utilities.find((utility) => utility.kind === "power");
+      expect(power?.providers).toEqual([record.electric.provider]);
+      if (record.electric.also.length) {
+        electricOverlap += 1;
+        expect(power?.summary).toMatch(/HIFLD also contains/);
+        expect(record.electric.also).toEqual(["Georgia Power"]);
+        expect(record.electric.provider).not.toBe("Georgia Power");
+      }
+      if (record.assignment === "dcsd_over_nces_atlanta") atlantaAssignment += 1;
+      expect(overlay.schools).toHaveLength(3);
+      expect(overlay.schoolsNote).toMatch(/does not publish A–F/);
+      expect(overlay.schoolsNote).toMatch(/Druid Hills/);
+      for (const school of overlay.schools) {
+        expect(school.ratingKind).toBe("ccrpi");
+        expect(school.zoned).toBe(true);
+        expect(school.rating).toMatch(/^\d+\.\d$/);
+        expect(["A", "B", "C", "D", "F"]).not.toContain(school.rating);
+        expect(school.summary).toMatch(/GOSA CCRPI single score/);
+        expect(school.summary).toMatch(/does not publish A–F letter grades/);
+        expect(school.summary).not.toMatch(/Public rating [ABCDF]/);
+      }
+      const joined = attachDekalbSiteScreening({
+        properties: {
+          parcelId: id,
+          countyFips: "13089",
+          opportunityZone: null,
+          incomeTract: null,
+          nearestRoad: null,
+        } as ParcelProperties,
+      });
+      expect(joined.properties.siteScreening?.floodZone).toBe(zone);
+      expect(joined.properties.siteScreening?.staticBfe).toBeNull();
+      expect(joined.properties.siteScreening?.gasProvider).toBeNull();
+      expect(joined.properties.siteScreening?.sewerGap).toBe(false);
+      expect(joined.properties.siteScreening?.waterFromBoundary).toBe(false);
+      expect(joined.properties.opportunityZone).toBeNull();
+      expect(joined.properties.incomeTract).toBeNull();
+      expect(joined.properties.nearestRoad).toBeNull();
+    }
+    expect(zones).toEqual({ X: 31, AE: 9 });
+    expect(file?.floodZoneCounts).toEqual({ AE: 9, X: 31 });
+    expect(waterProxies).toEqual({ "dekalb-dwm": 38, "atlanta-dwm": 2 });
+    expect(publishedBfe).toBe(0);
+    expect(floodways).toBe(5);
+    expect(shallow).toBe(1);
+    expect(electricOverlap).toBe(12);
+    expect(atlantaAssignment).toBe(2);
+    expect(dekalbBatchParcel("not-a-dekalb-parcel")).toBeNull();
+    const otherCounty = attachDekalbSiteScreening({
+      properties: { parcelId: "18 053 01 001", countyFips: "13067" } as ParcelProperties,
+    });
+    expect(otherCounty.properties.siteScreening).toBeUndefined();
+    const outsideBatch = Object.keys(lookup).find((id) => !file?.parcels[id]);
+    expect(outsideBatch).toBeTruthy();
+    const untouched = attachDekalbSiteScreening({
+      properties: { parcelId: outsideBatch, countyFips: "13089" } as ParcelProperties,
+    });
+    expect(untouched.properties.siteScreening).toBeUndefined();
+  });
+
+  it("keeps Druid Hills DCSD, a floodway without a BFE, and an electric overlap distinct", () => {
+    const fernbank = dekalbBatchParcel("18 053 01 001");
+    const fernbankPoint = dekalbScreeningOverlay(fernbank!, -84.32, 33.79);
+    expect(fernbank?.assignment).toBe("dcsd_over_nces_atlanta");
+    expect(fernbank?.district).toMatch(/attendance polygons over NCES Atlanta/);
+    expect(fernbankPoint.schools.map((school) => school.name)).toEqual([
+      "Fernbank Elementary School",
+      "Druid Hills Middle School",
+      "Druid Hills High School",
+    ]);
+    expect(fernbankPoint.schools[0]).toMatchObject({ rating: "93.9", ratingKind: "ccrpi" });
+    expect(fernbankPoint.flood.zone).toBe("X");
+    expect(fernbankPoint.flood.staticBfe).toBeNull();
+    expect(fernbank?.water.proxy).toBe("atlanta-dwm");
+    expect(fernbankPoint.utilities.find((utility) => utility.kind === "water")?.summary).toMatch(/City of Atlanta/);
+    expect(fernbankPoint.utilities.find((utility) => utility.kind === "water")?.summary).toMatch(/jurisdiction proxy/);
+    const briar = dekalbScreeningOverlay(dekalbBatchParcel("18 059 01 004")!, -84.31, 33.78);
+    expect(briar.flood.zone).toBe("AE");
+    expect(briar.flood.floodway).toBe(false);
+    expect(briar.flood.staticBfe).toBeNull();
+    expect(briar.schools[0]).toMatchObject({ name: "Briar Vista Elementary School", rating: "76.3" });
+    expect(briar.schools[1].name).toBe("Druid Hills Middle School");
+    const floodway = dekalbScreeningOverlay(dekalbBatchParcel("16 017 01 002")!, -84.2, 33.65);
+    expect(floodway.flood.zone).toBe("AE");
+    expect(floodway.flood.floodway).toBe(true);
+    expect(floodway.flood.staticBfe).toBeNull();
+    expect(floodway.utilities.find((utility) => utility.kind === "power")?.providers).toEqual(["Snapping Shoals EMC"]);
+    const walton = dekalbBatchParcel("18 030 02 055");
+    expect(walton?.electric.provider).toBe("Walton EMC");
+    expect(walton?.electric.also).toEqual(["Georgia Power"]);
+    expect(walton?.water.proxy).toBe("dekalb-dwm");
+    expect(describeSchoolRating({ state: "GA", rating: "93.9", ratingKind: "ccrpi", year: "2025", source: "GOSA" })).toMatch(
+      /does not publish A–F/,
+    );
+    expect(describeSchoolRating({ state: "GA", rating: null, ratingKind: null, year: null, source: null })).toMatch(/Georgia school report card/);
+  });
+
+  it("does not load DCSD zones outside DeKalb or at statewide zoom", async () => {
+    const florida = await dcsdZonePolygons([-81.6, 28.3, -81.2, 28.6]);
+    expect(florida.features).toEqual([]);
+    expect(florida.meta.status).toBe("unknown");
+    const state = await dcsdZonePolygons([-85, 30, -80, 35]);
+    expect(state.features).toEqual([]);
+    expect(state.meta.status).toBe("zoom");
   });
 });
 

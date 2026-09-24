@@ -257,6 +257,28 @@ function addScreeningLayers(map: MapLibreMap, mode: BasemapMode) {
     ["sewer", "#7a5cff"],
     ["power", "#e0b15a"],
   ] as const;
+  map.addSource("dcsd-zones", { type: "geojson", data: EMPTY_COLLECTION });
+  map.addLayer({
+    id: "dcsd-zones-fill",
+    type: "fill",
+    source: "dcsd-zones",
+    layout: { visibility: "none" },
+    paint: {
+      "fill-color": ["match", ["get", "level"], "Elementary", "#1f7a4d", "Middle", "#3d7dff", "High", "#c4473a", "#1f7a4d"],
+      "fill-opacity": mode === "satellite" ? 0.22 : 0.16,
+    },
+  });
+  map.addLayer({
+    id: "dcsd-zones-line",
+    type: "line",
+    source: "dcsd-zones",
+    layout: { visibility: "none" },
+    paint: {
+      "line-color": ["match", ["get", "level"], "Elementary", "#1f7a4d", "Middle", "#3d7dff", "High", "#c4473a", "#1f7a4d"],
+      "line-width": 1.25,
+      "line-opacity": 0.9,
+    },
+  });
   for (const [kind, color] of utilities) {
     const paint = utilityPaint(color, mode);
     map.addSource(kind, { type: "geojson", data: EMPTY_COLLECTION });
@@ -1065,7 +1087,16 @@ export function SiteMap({
     show(["sewer-fill", "sewer-line"], screening.sewer);
     show(["power-fill", "power-line"], screening.power);
     show(
-      ["schools-circle", "school-zone-raster", "school-ms-raster", "school-cms-es-raster", "school-cms-ms-raster", "school-cms-hs-raster"],
+      [
+        "schools-circle",
+        "school-zone-raster",
+        "school-ms-raster",
+        "school-cms-es-raster",
+        "school-cms-ms-raster",
+        "school-cms-hs-raster",
+        "dcsd-zones-fill",
+        "dcsd-zones-line",
+      ],
       screening.schools,
     );
   }, [screening, status, basemap]);
@@ -1099,6 +1130,7 @@ export function SiteMap({
         }
       };
       void pull(`/api/screening/schools?bbox=${bbox}`, "schools", screening.schools);
+      void pull(`/api/screening/dcsd-zones?bbox=${bbox}`, "dcsd-zones", screening.schools);
       void pull(`/api/screening/utilities?layer=water&bbox=${bbox}`, "water", screening.water);
       void pull(`/api/screening/utilities?layer=sewer&bbox=${bbox}`, "sewer", screening.sewer);
       void pull(`/api/screening/utilities?layer=power&bbox=${bbox}`, "power", screening.power);
@@ -1407,7 +1439,7 @@ export function SiteMap({
           {screening.schools ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-full align-middle" style={{ backgroundColor: "#1f7a4d" }} />
-              Schools · letter grade, OCPS zones in Orange County, CMS zones in Mecklenburg
+              Schools · letter grade where published, CCRPI on DeKalb batch parcels, OCPS / CMS / DCSD zones
             </p>
           ) : null}
           {screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power ? (

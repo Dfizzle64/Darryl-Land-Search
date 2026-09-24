@@ -319,6 +319,7 @@ export function AppShell({
   const screeningKey = screeningFocus?.key ?? null;
   const screeningLon = screeningFocus?.lon ?? null;
   const screeningLat = screeningFocus?.lat ?? null;
+  const screeningParcelId = selected?.properties.countyFips === "13089" ? selected.properties.parcelId : null;
   useEffect(() => {
     if (screeningKey == null || screeningLon == null || screeningLat == null) {
       setScreeningPoint(null);
@@ -328,7 +329,9 @@ export function AppShell({
     const controller = new AbortController();
     setScreeningStatus("loading");
     setScreeningPoint(null);
-    fetch(`/api/screening/point?lng=${screeningLon}&lat=${screeningLat}`, { signal: controller.signal })
+    const params = new URLSearchParams({ lng: String(screeningLon), lat: String(screeningLat) });
+    if (screeningParcelId) params.set("parcelId", screeningParcelId);
+    fetch(`/api/screening/point?${params}`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error("screening failed");
         return (await response.json()) as ScreeningPoint;
@@ -342,7 +345,7 @@ export function AppShell({
         setScreeningStatus("error");
       });
     return () => controller.abort();
-  }, [screeningKey, screeningLon, screeningLat]);
+  }, [screeningKey, screeningLon, screeningLat, screeningParcelId]);
   const fluUnknownCount = useMemo(
     () => activeParcels.features.filter((feature) => !feature.properties.flu?.code).length,
     [activeParcels.features],

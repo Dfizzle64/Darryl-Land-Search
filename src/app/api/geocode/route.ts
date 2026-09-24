@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
-import { censusMatchPoint, parseLatLng } from "@/lib/jumpTo";
+import { ADDRESS_NOT_FOUND, censusMatchPoint, coordinateError, parseLatLng } from "@/lib/jumpTo";
 
 export async function GET(request: Request) {
   const query = new URL(request.url).searchParams.get("q")?.trim() ?? "";
+  const invalid = coordinateError(query);
+  if (invalid) return NextResponse.json({ error: invalid }, { status: 400 });
   const local = parseLatLng(query);
   if (local) return NextResponse.json({ ...local, kind: "coordinates" });
   if (query.length < 5) {
@@ -18,7 +20,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Address lookup failed." }, { status: 502 });
     }
     const point = censusMatchPoint(await response.json());
-    if (!point) return NextResponse.json({ error: "No match for that address." }, { status: 404 });
+    if (!point) return NextResponse.json({ error: ADDRESS_NOT_FOUND }, { status: 404 });
     return NextResponse.json({ ...point, kind: "address" });
   } catch {
     return NextResponse.json({ error: "Address lookup failed." }, { status: 502 });

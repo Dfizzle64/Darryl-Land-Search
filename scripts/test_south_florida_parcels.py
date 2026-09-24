@@ -29,8 +29,7 @@ from south_florida_parcels import (  # noqa: E402
 
 
 def test_four_counties_and_acre_band() -> None:
-    assert FIPS == ("12086", "12011", "12099")
-    assert "12087" not in FIPS
+    assert FIPS == ("12086", "12087", "12011", "12099")
     assert MIN_ACRES == 5.0 and MAX_ACRES == 150.0
     assert in_band(5) and in_band(150) and not in_band(4.999) and not in_band(150.001)
     assert acres_from_sqft(217800) == 5

@@ -3,10 +3,11 @@
 type JumpToBarProps = {
   busy: boolean;
   note: string | null;
+  error: string | null;
   onJump: (query: string) => void;
 };
 
-export function JumpToBar({ busy, note, onJump }: JumpToBarProps) {
+export function JumpToBar({ busy, note, error, onJump }: JumpToBarProps) {
   return (
     <form
       className="flex flex-wrap items-center gap-1"
@@ -23,6 +24,8 @@ export function JumpToBar({ busy, note, onJump }: JumpToBarProps) {
         <input
           name="jump"
           aria-label="Jump to address or coordinates"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error || note ? "jump-to-status" : undefined}
           placeholder="Address or lat, long"
           className="ml-1 w-44 rounded-full border border-white/15 bg-ink-800 px-3 py-1.5 text-sm text-white placeholder:text-ink-500 sm:w-56"
         />
@@ -34,7 +37,15 @@ export function JumpToBar({ busy, note, onJump }: JumpToBarProps) {
       >
         {busy ? "Finding…" : "Go"}
       </button>
-      {note ? <span className="max-w-[18rem] text-[11px] leading-snug text-ink-400">{note}</span> : null}
+      {error ? (
+        <span id="jump-to-status" role="alert" className="max-w-[18rem] text-[11px] leading-snug text-clay-300">
+          {error}
+        </span>
+      ) : note ? (
+        <span id="jump-to-status" className="max-w-[18rem] text-[11px] leading-snug text-ink-400">
+          {note}
+        </span>
+      ) : null}
     </form>
   );
 }

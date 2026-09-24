@@ -3680,8 +3680,8 @@
     },
     "South Florida": {
       "tier": "shelf",
-      "parcelCount": 34542,
-      "completeCountyCount": 1,
+      "parcelCount": 41034,
+      "completeCountyCount": 2,
       "sampleCountyCount": 2,
       "gapCountyCount": 0,
       "path": "data/fixtures/market-parcels/markets/south-florida/meta.json",
@@ -3710,6 +3710,19 @@
           "gaps": [
             "Wave 0 is South Florida only. Miami-Dade parcels are MD_LandInformation MapServer/26. Acreage is LOT_SIZE square feet divided by 43560, 5.0–150.0 inclusive.",
             "PRIMARY_ZONE is a property-appraiser neighborhood code, not a zoning district. Zoning is Zone_Poly_U (unincorporated) or MunicipalZone. It is not copied from PRIMARY_ZONE."
+          ]
+        },
+        {
+          "name": "Monroe",
+          "state": "Florida",
+          "fips": "12087",
+          "featureCount": 6492,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Monroe parcels are mcgis4 Parcels MapServer/0. The server certificate does not verify with the default OpenSSL trust store, so ingest retries that host without certificate verification. qPublic HTML often returns Cloudflare 403 to bots. The record link is still the human URL.",
+            "Acreage is the WGS84 polygon area. Shape.STArea() is rejected in SQL on this service. AREA1 is inconsistent for condos and is not the stored acreage."
           ]
         },
         {

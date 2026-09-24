@@ -1,15 +1,17 @@
 /**
- * Wave 0 South Florida. Miami-Dade, Broward, and Palm Beach. Monroe is deferred.
+ * Wave 0 South Florida. Miami-Dade, Monroe, Broward, and Palm Beach.
  * Eligible tracts are not invented.
  * Broward is partial: BCPA geometry is folio-only. The FDOR CAMA join was not applied.
+ * Palm Beach kept the parcels that survived geometry normalize, not the full object-id count.
  */
 
-/** Monroe (12087) is deferred to a follow-up and is not on this shelf. */
-export const SOUTH_FLORIDA_FIPS = ["12086", "12011", "12099"] as const;
+export const SOUTH_FLORIDA_FIPS = ["12086", "12087", "12011", "12099"] as const;
 
 export type SouthFloridaFips = (typeof SOUTH_FLORIDA_FIPS)[number];
 
 const MIAMI_PA = "https://apps.miamidadepa.gov/ComparableSales/#/?folio=";
+const MONROE_PA =
+  "https://qpublic.schneidercorp.com/Application.aspx?AppID=605&LayerID=9946&PageTypeID=4&PageID=7635&KeyValue=";
 const BROWARD_PA = "https://bcpa.net/RecInfo.asp?URL_Folio=";
 const PALM_PA = "https://pbcpao.gov/Property/Details?parcelId=";
 
@@ -20,6 +22,7 @@ export function isSouthFloridaFips(fips: string | null | undefined): fips is Sou
 export function southFloridaAppraiserLink(
   fips: string | null | undefined,
   parcelId: string,
+  stored?: string | null,
 ): { href: string; label: string } | null {
   if (!isSouthFloridaFips(fips)) return null;
   if (fips === "12086") {
@@ -28,6 +31,13 @@ export function southFloridaAppraiserLink(
       href: `${MIAMI_PA}${encodeURIComponent(folio)}`,
       label: "Open Miami-Dade comparable sales for this folio",
     };
+  }
+  if (fips === "12087") {
+    const href =
+      stored && /schneidercorp\.com/i.test(stored) && stored.includes("KeyValue=")
+        ? stored
+        : `${MONROE_PA}${encodeURIComponent(parcelId)}`;
+    return { href, label: "Open Monroe County property record" };
   }
   if (fips === "12011") {
     return {
@@ -76,6 +86,8 @@ export function fluEmptyForSouthFlorida(countyFips: string | null | undefined, f
 const MIAMI_UNINC = "https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/18";
 const MIAMI_CITY = "https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/19";
 const MIAMI_PARCELS = "https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/26";
+const MONROE_ZONING = "https://mcgis4.monroecounty-fl.gov/public/rest/services/APO_GIS/MapServer/19";
+const MONROE_PARCELS = "https://mcgis4.monroecounty-fl.gov/public/rest/services/Parcels/MapServer/0";
 const BROWARD_BMSD =
   "https://services.arcgis.com/JMAJrTsHNLrSsWf5/ArcGIS/rest/services/Broward_Municipal_Service_District_Zoning/FeatureServer/2";
 const BROWARD_MOSAIC = "https://gisweb-adapters.bcpa.net/arcgis/rest/services/BCPA_EXTERNAL_JAN26/MapServer/9";
@@ -94,6 +106,7 @@ function gisViewerHref(fips: SouthFloridaFips, jurisdiction: string | null | und
     if (!zoned) return MIAMI_PARCELS;
     return jurisdiction === "Unincorporated" ? MIAMI_UNINC : MIAMI_CITY;
   }
+  if (fips === "12087") return zoned ? MONROE_ZONING : MONROE_PARCELS;
   if (fips === "12011") {
     if (!zoned) return BROWARD_PARCELS;
     return jurisdiction === "Unincorporated" ? BROWARD_BMSD : BROWARD_MOSAIC;
@@ -106,6 +119,7 @@ function gisViewerLabel(fips: SouthFloridaFips, jurisdiction: string | null | un
     if (!zoned) return "Miami-Dade parcel layer";
     return jurisdiction === "Unincorporated" ? "Miami-Dade unincorporated zoning" : "Miami-Dade municipal zoning";
   }
+  if (fips === "12087") return zoned ? "Monroe land-use districts" : "Monroe parcel layer";
   if (fips === "12011") {
     if (!zoned) return "Broward parcel layer";
     return jurisdiction === "Unincorporated"

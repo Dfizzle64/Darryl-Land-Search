@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Wave 0 South Florida parcel extract. Three counties on this shelf.
+"""Wave 0 South Florida parcel extract.
 
-Miami-Dade 12086, Broward 12011 (partial), and Palm Beach 12099.
-Monroe 12087 is deferred. Acreage is 5.0–150.0 inclusive. Utilities, school
-grades, base flood elevations, and Opportunity Zone status are not joined.
+Miami-Dade 12086, Monroe 12087, Broward 12011 (partial), and Palm Beach 12099.
+Acreage is 5.0–150.0 inclusive. Utilities, school grades, base flood
+elevations, and Opportunity Zone status are not joined.
 
 Broward BCPA MapServer/16 is folio and geometry. The FDOR CO_NO=16 join was
 not applied. BMSD zoning is unincorporated only.
@@ -27,8 +27,7 @@ MIN_SQFT = 217800.0
 MAX_SQFT = 6534000.0
 SQFT_PER_ACRE = 43560.0
 
-# Monroe (12087) is deferred. The finished extract is not on this shelf.
-FIPS = ("12086", "12011", "12099")
+FIPS = ("12086", "12087", "12011", "12099")
 
 # Generous envelopes. They reject namesake counties, not shoreline slivers.
 COUNTY_BBOX = {
@@ -1214,7 +1213,7 @@ def refresh_south_florida_index() -> None:
         "coreMaxAcres": MAX_ACRES,
         "tile": {"originLon": seed.ORIGIN_LON, "originLat": seed.ORIGIN_LAT, "tileDeg": seed.TILE_DEG},
         "notes": [
-            "Wave 0 on this shelf is Miami-Dade, Broward, and Palm Beach. Monroe is deferred.",
+            "Wave 0 is South Florida only: Miami-Dade, Monroe, Broward, and Palm Beach.",
             "Loaded only when this market is selected.",
             "Acreage is 5.0–150.0 inclusive. Utilities are not joined.",
             "Broward is partial. BCPA MapServer/16 is folio and geometry. The FDOR CAMA join was not applied.",
@@ -1251,6 +1250,7 @@ def refresh_south_florida_index() -> None:
 
 COUNTIES = {
     "12086": {"name": "Miami-Dade", "state": "Florida", "fips": "12086"},
+    "12087": {"name": "Monroe", "state": "Florida", "fips": "12087"},
     "12011": {"name": "Broward", "state": "Florida", "fips": "12011"},
     "12099": {"name": "Palm Beach", "state": "Florida", "fips": "12099"},
 }

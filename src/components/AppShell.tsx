@@ -15,6 +15,8 @@ import { AOI_PARCEL_LIMIT, featuresIntersectingBbox, type AoiLock } from "@/lib/
 import {
   bboxContains,
   parcelAtPoint,
+  ADDRESS_NOT_FOUND,
+  coordinateError,
   parseLatLng,
   pointInBounds,
   SOUTH_FLORIDA_BOUNDS,
@@ -169,6 +171,7 @@ export function AppShell({
   const [error, setError] = useState<string | null>(null);
   const [flyTarget, setFlyTarget] = useState<MapFlyTarget | null>(null);
   const [jumpNote, setJumpNote] = useState<string | null>(null);
+  const [jumpError, setJumpError] = useState<string | null>(null);
   const [jumpBusy, setJumpBusy] = useState(false);
   const [parcelLoadStamp, setParcelLoadStamp] = useState(0);
   const [pick, setPick] = useState<{ lng: number; lat: number; key: number; loadStamp: number } | null>(null);
@@ -578,13 +581,19 @@ export function AppShell({
   const jumpToQuery = async (query: string) => {
     setJumpBusy(true);
     setJumpNote(null);
+    setJumpError(null);
     try {
+      const invalid = coordinateError(query);
+      if (invalid) {
+        setJumpError(invalid);
+        return;
+      }
       let point = parseLatLng(query);
       if (!point) {
         const response = await fetch(`/api/geocode?q=${encodeURIComponent(query)}`);
         const body = (await response.json()) as { lng?: number; lat?: number; error?: string };
         if (!response.ok || !Number.isFinite(body.lng) || !Number.isFinite(body.lat)) {
-          setJumpNote(body.error || "No match for that address.");
+          setJumpError(body.error || ADDRESS_NOT_FOUND);
           return;
         }
         point = { lng: body.lng as number, lat: body.lat as number };
@@ -608,7 +617,7 @@ export function AppShell({
       setFlyTarget({ lng: point.lng, lat: point.lat, key });
       setPick({ lng: point.lng, lat: point.lat, key, loadStamp: parcelLoadStamp });
     } catch {
-      setJumpNote("Address lookup failed.");
+      setJumpError(ADDRESS_NOT_FOUND);
     } finally {
       setJumpBusy(false);
     }
@@ -621,6 +630,7 @@ export function AppShell({
       setSelectedId(hit.properties.id);
       setSelectedTractGeoid(null);
       setJumpNote(null);
+      setJumpError(null);
       setPick(null);
       return;
     }
@@ -729,7 +739,7 @@ export function AppShell({
           >
             How OZ 2.0 works
           </button>
-          <JumpToBar busy={jumpBusy} note={jumpNote} onJump={(query) => void jumpToQuery(query)} />
+          <JumpToBar busy={jumpBusy} note={jumpNote} error={jumpError} onJump={(query) => void jumpToQuery(query)} />
           <div className="flex items-center gap-1 text-[11px] text-ink-500">
             <span>Market</span>
             <MarketMenu value={market} onChange={changeMarket} />

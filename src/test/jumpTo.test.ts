@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  ADDRESS_NOT_FOUND,
   censusMatchPoint,
+  coordinateError,
   geometryContains,
   parcelAtPoint,
   parseLatLng,
@@ -10,12 +12,17 @@ import {
 
 describe("jump-to address bar", () => {
   it("parses lat, long and longitude-first pairs", () => {
+    expect(parseLatLng("26.1224, -80.1373")).toEqual({ lat: 26.1224, lng: -80.1373 });
+    expect(parseLatLng("26.1224 -80.1373")).toEqual({ lat: 26.1224, lng: -80.1373 });
     expect(parseLatLng("25.7617, -80.1918")).toEqual({ lat: 25.7617, lng: -80.1918 });
-    expect(parseLatLng("25.7617 -80.1918")).toEqual({ lat: 25.7617, lng: -80.1918 });
     expect(parseLatLng("-80.1918, 25.7617")).toEqual({ lat: 25.7617, lng: -80.1918 });
     expect(parseLatLng("123 Main St, Miami, FL")).toBeNull();
     expect(parseLatLng("25.7")).toBeNull();
     expect(parseLatLng("200, 400")).toBeNull();
+    expect(coordinateError("200, 400")).toBe("Those coordinates are not valid.");
+    expect(coordinateError("26.1224, -80.1373")).toBeNull();
+    expect(coordinateError("123 Main St, Fort Lauderdale, FL")).toBeNull();
+    expect(ADDRESS_NOT_FOUND).toBe("Couldn't find that address.");
   });
 
   it("reads a Census oneline match", () => {

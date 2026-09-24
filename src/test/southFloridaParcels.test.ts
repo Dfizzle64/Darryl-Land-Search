@@ -14,6 +14,7 @@ import { OTHER_MARKETS } from "../lib/types";
 
 const COUNTIES = [
   { fips: "12086", name: "Miami-Dade", source: "fl-miami-dade-landinformation-26", coverage: "complete-gte-5ac" },
+  { fips: "12087", name: "Monroe", source: "fl-monroe-apo-parcels-0", coverage: "complete-gte-5ac" },
   { fips: "12011", name: "Broward", source: "fl-broward-bcpa-jan26-16", coverage: "partial" },
   { fips: "12099", name: "Palm Beach", source: "fl-palm-beach-parcel-info-4", coverage: "partial" },
 ] as const;
@@ -28,10 +29,20 @@ describe("Wave 0 South Florida registration", () => {
   it("builds property-appraiser deep links from the cards", () => {
     expect(parcelIdLabel("12086")).toBe("Folio");
     expect(parcelIdLabel("12011")).toBe("Folio");
+    expect(parcelIdLabel("12087")).toBe("RE Number");
     const miami = parcelAppraiserUrl({ parcelId: "30-4131-053-0060", countyFips: "12086" });
     expect(miami.href).toBe("https://apps.miamidadepa.gov/ComparableSales/#/?folio=3041310530060");
     expect(miami.href).not.toContain("papa");
-    expect(southFloridaAppraiserLink("12087", "00000010-000200")).toBeNull();
+    const monroe = southFloridaAppraiserLink("12087", "00000010-000200", null);
+    expect(monroe?.href).toContain("AppID=605");
+    expect(monroe?.href).toContain("KeyValue=00000010-000200");
+    const stored = parcelAppraiserUrl({
+      parcelId: "00000010-000200",
+      countyFips: "12087",
+      appraiserUrl:
+        "https://qpublic.schneidercorp.com/Application.aspx?AppID=605&LayerID=9946&PageTypeID=4&PageID=7635&KeyValue=00000010-000200",
+    });
+    expect(stored.href).toContain("KeyValue=00000010-000200");
     expect(parcelAppraiserUrl({ parcelId: "474135010090", countyFips: "12011" }).href).toBe(
       "https://bcpa.net/RecInfo.asp?URL_Folio=474135010090",
     );
@@ -71,7 +82,7 @@ describe("Wave 0 South Florida registration", () => {
       zoningCode: "A-1",
     });
     expect(browardBmsd?.href).toMatch(/Broward_Municipal_Service_District_Zoning\/FeatureServer\/2$/);
-    expect(southFloridaGisViewer({ countyFips: "12087", zoningCode: "SC" })).toBeNull();
+    expect(southFloridaGisViewer({ countyFips: "12087", zoningCode: "SC" })?.href).toMatch(/APO_GIS\/MapServer\/19$/);
     expect(southFloridaGisViewer({ countyFips: "12099", zoningCode: "AR" })?.href).toMatch(
       /Planning_Open_Data\/MapServer\/9$/,
     );
@@ -117,7 +128,7 @@ describe("Wave 0 South Florida registration", () => {
     };
     const shelf = index.markets["South Florida"];
     expect(shelf?.tier).toBe("shelf");
-    expect(shelf?.counties.map((county) => county.fips).sort()).toEqual(["12011", "12086", "12099"]);
+    expect(shelf?.counties.map((county) => county.fips).sort()).toEqual(["12011", "12086", "12087", "12099"]);
     for (const county of COUNTIES) {
       const file = path.join("data/fixtures/market-parcels/counties", county.fips, "county.json");
       expect(existsSync(file)).toBe(true);
@@ -142,6 +153,7 @@ describe("Wave 0 South Florida registration", () => {
       expect(row.queryUrl).not.toMatch(/maps\.monroecounty\.gov|gis\.bcpa\.net|papa|BMSDParcelAddress/);
       const gaps = row.gaps.join(" ");
       if (county.fips === "12011") expect(gaps).toMatch(/FDOR|folio and geometry/);
+      if (county.fips === "12087") expect(gaps).toMatch(/TLS|certificate/i);
       if (county.fips === "12099") expect(gaps).toMatch(/TLS/);
       if (county.fips === "12086") expect(gaps).toMatch(/PRIMARY_ZONE/);
     }

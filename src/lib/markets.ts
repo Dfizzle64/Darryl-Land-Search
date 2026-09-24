@@ -166,6 +166,7 @@ const PARCEL_ONLY_MARKETS: Partial<Record<SearchMarketId, MarketSummary>> = {
     counties: [
       { county: "Broward", state: "Florida", count: 0, outerEdge: false },
       { county: "Miami-Dade", state: "Florida", count: 0, outerEdge: false },
+      { county: "Monroe", state: "Florida", count: 0, outerEdge: false },
       { county: "Palm Beach", state: "Florida", count: 0, outerEdge: false },
     ],
   },

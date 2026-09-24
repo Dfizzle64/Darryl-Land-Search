@@ -62,6 +62,16 @@ export function parseLatLng(input: string): JumpPoint | null {
   return null;
 }
 
+const COORD_PAIR = /^\s*[-+]?\d+(?:\.\d+)?(?:\s*,\s*|\s+)[-+]?\d+(?:\.\d+)?\s*$/;
+
+/** Two numbers that are not a latitude/longitude. Addresses return null. */
+export function coordinateError(input: string): string | null {
+  if (!COORD_PAIR.test(input) || parseLatLng(input)) return null;
+  return "Those coordinates are not valid.";
+}
+
+export const ADDRESS_NOT_FOUND = "Couldn't find that address.";
+
 export function censusMatchPoint(body: unknown): JumpPoint | null {
   const matches = (body as { result?: { addressMatches?: unknown[] } } | null)?.result?.addressMatches;
   const first = Array.isArray(matches) ? matches[0] : null;

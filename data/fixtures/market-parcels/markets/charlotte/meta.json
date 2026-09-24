@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T01:06:16Z",
   "market": "Charlotte",
   "tier": "primary",
-  "parcelCount": 119168,
+  "parcelCount": 106650,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,39 +20,43 @@
       "name": "Anson",
       "fips": "37007",
       "state": "North Carolina",
-      "featureCount": 5814,
+      "featureCount": 5820,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37007",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-anson-vector-37007",
+      "queryUrl": "https://ansoncountygis.com/arcgis/rest/services/Vector/MapServer/10/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "Peachland and Polkton zoning layers are empty. McFarlan has no public zoning service. Those towns stay unmatched.",
+        "CountyZoning=Mun. is not a zone class; town layers supply the code. LandUsePlan=MUN is not future land use. No town FLU service is published.",
+        "Zoning joined on 5730 of 5820 parcels. Land-use plan joined on 5316. Peachland/Polkton/McFarlan footprints left unmatched: 76."
       ],
       "path": "data/fixtures/market-parcels/counties/37007/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37007/lookup.json",
       "tileCount": 6,
-      "sourceCount": 5815
+      "sourceCount": 5820
     },
     {
       "name": "Cabarrus",
       "fips": "37025",
       "state": "North Carolina",
-      "featureCount": 6974,
+      "featureCount": 6983,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37025",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-cabarrus-tax-parcels-37025",
+      "queryUrl": "https://location.cabarruscounty.us/arcgisservices/rest/services/OpenData/Tax_Parcels/MapServer/1/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "Situs is not on Tax_Parcels polygons; it is joined from AA ParcelAddresses by PIN14. gis.cabarruscounty.us redirects to the map and is not the REST host.",
+        "No countywide future land use service. Concord 2030 and Kannapolis Character Areas are joined. Harrisburg, Midland, Mount Pleasant, Locust, and the Huntersville edge have no public FLU layer.",
+        "Zoning joined on 6976 of 6983 parcels. Situs joined on 6187. Future land use joined on 1363 (Concord and Kannapolis only)."
       ],
       "path": "data/fixtures/market-parcels/counties/37025/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37025/lookup.json",
       "tileCount": 8,
-      "sourceCount": 7516
+      "sourceCount": 7144
     },
     {
       "name": "Catawba",
@@ -116,58 +120,161 @@
       "name": "Davidson",
       "fips": "37057",
       "state": "North Carolina",
-      "featureCount": 11685,
+      "featureCount": 12063,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37057",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-davidson-opengov-37057",
+      "queryUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/OpenGov/OpenGov/MapServer/6/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "12102 source rows collapsed to 12063 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Davidson County, North Carolina (FIPS 37057), not Davidson County, Tennessee. Acreage is legal acres on OpenGov TaxParcels where LegalLandType is AC and LegalLandUnits is 5 through 150.",
+        "NC OneMap is not this extract. OneMap gisacres can lag the county roll and its sale date is empty for Davidson.",
+        "Municipalities come from CityCode checked against city-limit polygons: 07 Lexington, 28 Thomasville, 32 Denton, 33 Wallburg, 34 Midway, 39 High Point. A null CityCode is unincorporated.",
+        "Lexington zoning is the city AGOL layer joined on PIN. Thomasville zoning is a PTRC polygon join. Wallburg zoning and future land use are the 2026 LDP clip. Midway, Denton, and High Point have no dedicated public zoning FeatureServer.",
+        "No countywide future land use service. FLU stays empty outside a Wallburg hit. Labels such as LEXINGTON CITY ZONING are placeholders and are not stored as district codes.",
+        "Zoning strings are public district codes, not an Orange County multifamily knowledge-base match.",
+        "OZ 2.0 eligibility is Rev. Proc. 2026-14 nomination eligibility on 2020 tracts. It is not a designated Qualified Opportunity Zone. Designation is a separate HUD 2010-tract join.",
+        "Sale day is not on the roll; the stored date is the first of the sale month. Owner phones and emails are not collected.",
+        "Municipality counts on the 5\u2013150 acre roll: Denton 34, High Point 47, Lexington 242, Midway 153, Thomasville 222, Unincorporated 11226, Wallburg 139.",
+        "Lexington city zoning matched 148 of 242 CityCode 07 parcels on PIN.",
+        "Thomasville PTRC zoning covered 221 of 222 CityCode 28 parcels.",
+        "Wallburg clip matched zoning on 136 parcels and future land use on 136.",
+        "OZ 2.0 eligible parcels: 947. Current designated QOZ parcels: 76. Those counts are allowed to differ; eligibility was not written into the designated field."
       ],
       "path": "data/fixtures/market-parcels/counties/37057/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37057/lookup.json",
       "tileCount": 5,
-      "sourceCount": 11767
+      "sourceCount": 12102
     },
     {
       "name": "Gaston",
       "fips": "37071",
       "state": "North Carolina",
-      "featureCount": 6816,
+      "featureCount": 6815,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37071",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-gaston-publicgis-37071",
+      "queryUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Parcels/MapServer/11/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "No public future land use service. Envision Gaston 2050 is policy-only. High Shoals, Spencer Mountain, and Dellview have municipal boundaries and no zoning layer.",
+        "Zoning is a spatial join to PublicGIS/Zoning in the county CRS. Gastonia cogserver is a different State Plane vintage and is not the join source. Many sale amounts are zero.",
+        "Zoning joined on 6745 of 6815 parcels in the 5\u2013150 acre band."
       ],
       "path": "data/fixtures/market-parcels/counties/37071/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37071/lookup.json",
       "tileCount": 5,
-      "sourceCount": 6819
+      "sourceCount": 6818
     },
     {
       "name": "Iredell",
       "fips": "37097",
       "state": "North Carolina",
-      "featureCount": 10771,
+      "featureCount": 10768,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37097",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-iredell-taxsql-37097",
+      "queryUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/TaxSQL_Parcels/FeatureServer/0/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "No multi-year sale history on parcels. TaxSQL_Parcels has the last sale only. Tax/Sales_2024 is a single-year extract and is not a sale-history table.",
+        "FLU outside Mooresville is mostly a gap. Statesville Land Development Plan 2045 is PDF-only. Troutman, Harmony, Love Valley, and the Davidson Iredell tip have no public FLU FeatureServer. Horizon Plan 2030 Municipal Planning Area values are stubs and are not joined as city FLU.",
+        "The TaxSQL Market field is an adjustment factor, not dollar tax.marketValue. Assessed value is Total_Value.",
+        "Situs has no ZIP. CityLocationDescription supplies a municipality only when it names one. Mailing CITY can be out of county and is not copied onto the situs.",
+        "Municipal zoning is a spatial join. Mooresville uses the town PlanningServices layer. Statesville, Troutman, Harmony, Love Valley, and the Davidson Iredell tip use county Zoning MapServer layers 1, 2, 4, 5, and 6. Unincorporated zoning is layer 0. The parcel Zoning attribute is used only when no polygon contains the representative point.",
+        "Mooresville FLU is FCLU F2019_LU_1. Unincorporated FLU is Horizon Plan 2030 FUTURE_LANDUSE when the value is not a Municipal Planning Area stub.",
+        "No stable taxweb parcel deep link. The viewer link is MapGeo ?query={PIN} with a trailing .000 stripped. Tax search stays on the BasicSearch form.",
+        "NC OneMap FeatureServer/1 where cntyfips='097' is the parcel fallback if TaxSQL_Parcels is down. County and town layers share WKID 102719/2264; tiles are stored in WGS84.",
+        "Owner phones and emails are not on these public layers."
       ],
       "path": "data/fixtures/market-parcels/counties/37097/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37097/lookup.json",
       "tileCount": 9,
-      "sourceCount": 10771
+      "sourceCount": 10768,
+      "municipalities": [
+        {
+          "name": "Mooresville",
+          "independentGis": true,
+          "zoningUrl": "https://gis.mooresvillenc.gov/gisadmin/rest/services/PlanningServices/MapServer/1",
+          "fluUrl": "https://gis.mooresvillenc.gov/gisadmin/rest/services/Planning/FCLU/FeatureServer/0",
+          "fluGap": null,
+          "join": "spatial city zoning/FLU to county parcels (WKID 102719/2264)",
+          "zoningFeatures": 594,
+          "zoningJoined": 687,
+          "fluJoined": 687,
+          "fluFeatures": 15
+        },
+        {
+          "name": "Statesville",
+          "independentGis": false,
+          "zoningUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/1",
+          "fluUrl": null,
+          "fluGap": "Land Development Plan 2045 is PDF-only. No public FLU FeatureServer.",
+          "join": "spatial city zoning/FLU to county parcels (WKID 102719/2264)",
+          "zoningFeatures": 363,
+          "zoningJoined": 654,
+          "fluJoined": 0
+        },
+        {
+          "name": "Troutman",
+          "independentGis": false,
+          "zoningUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/2",
+          "fluUrl": null,
+          "fluGap": "No town FLU FeatureServer. Horizon Municipal Planning Area is a stub.",
+          "join": "spatial city zoning/FLU to county parcels (WKID 102719/2264)",
+          "zoningFeatures": 200,
+          "zoningJoined": 288,
+          "fluJoined": 0
+        },
+        {
+          "name": "Harmony",
+          "independentGis": false,
+          "zoningUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/4",
+          "fluUrl": null,
+          "fluGap": "No town FLU FeatureServer.",
+          "join": "spatial city zoning/FLU to county parcels (WKID 102719/2264)",
+          "zoningFeatures": 14,
+          "zoningJoined": 29,
+          "fluJoined": 0
+        },
+        {
+          "name": "Love Valley",
+          "independentGis": false,
+          "zoningUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/5",
+          "fluUrl": null,
+          "fluGap": "No town FLU FeatureServer.",
+          "join": "spatial city zoning/FLU to county parcels (WKID 102719/2264)",
+          "zoningFeatures": 3,
+          "zoningJoined": 14,
+          "fluJoined": 0
+        },
+        {
+          "name": "Davidson",
+          "independentGis": false,
+          "zoningUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/6",
+          "fluUrl": null,
+          "fluGap": "Iredell tip only. No Iredell-side FLU FeatureServer. Mecklenburg Davidson zoning is not applied to Iredell parcels.",
+          "join": "spatial city zoning/FLU to county parcels (WKID 102719/2264)",
+          "zoningFeatures": 3,
+          "zoningJoined": 5,
+          "fluJoined": 0
+        }
+      ],
+      "unincorporated": {
+        "zoningUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/0",
+        "fluUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/7",
+        "zoningFeatures": 958,
+        "fluFeatures": 219,
+        "zoningJoined": 9091,
+        "fluJoined": 9079,
+        "note": "Horizon Plan 2030 for unincorporated FLU. Municipal Planning Area values are stubs and are not joined."
+      },
+      "zoningJoinedCount": 10768,
+      "fluJoinedCount": 9766
     },
     {
       "name": "Lancaster",
@@ -192,59 +299,67 @@
       "name": "Lincoln",
       "fips": "37109",
       "state": "North Carolina",
-      "featureCount": 6543,
+      "featureCount": 6563,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37109",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-lincoln-operational-37109",
+      "queryUrl": "https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_OperationalSP/MapServer/6/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "Maiden zoning and future land use are a gap on Lincoln County REST. The town is mostly in Catawba County; Lincoln publishes about one Maiden zoning polygon.",
+        "County Blueprint 2043 future land use is joined outside Lincolnton and Maiden. Lincolnton uses the city land-use layer. Parcel ZONING can be overlay-prefixed, so district polygons supply the code.",
+        "Zoning joined on 6562 of 6563 parcels. Future land use joined on 5972. Maiden footprints left unmatched: 1."
       ],
       "path": "data/fixtures/market-parcels/counties/37109/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37109/lookup.json",
       "tileCount": 7,
-      "sourceCount": 6543
+      "sourceCount": 6564
     },
     {
       "name": "Mecklenburg",
       "fips": "37119",
       "state": "North Carolina",
-      "featureCount": 21331,
+      "featureCount": 8402,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37119",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "meck-taxparcel-camadata-37119",
+      "queryUrl": "https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/MapServer/0/query",
       "gaps": [
-        "33035 source rows collapsed to 21331 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "33567 TaxParcel_camadata rows with gisacres 5\u2013150 collapse onto 8402 parcel outlines (8277 joined to owner, tax, and sale; 8316 unique nc_pin values in that account pull). Condo and townhouse accounts that share an nc_pin are one polygon.",
+        "Outlines are Mecklenburg Tax/ParcelsViewer polygons. TaxParcel_camadata does not return geometry.",
+        "zone_class joined from ParcelsZoningZipcode for 8392 of 8402 parcels. There is no single countywide zoning service. Charlotte zoning polygons do not cover Cornelius, Davidson, Huntersville, Matthews, Mint Hill, Pineville, or Stallings. Town codes are stored only when this parcel join published them. Split zones are combined on zoningCode.",
+        "Charlotte 2040 Place Types joined for 5873 of 8402 parcels. The rest are outside that city layer, which does not cover Mecklenburg towns. The legacy area-plan future land use overlay is not used as current policy.",
+        "The drawer keeps one TaxParcelSales row per parcel (latest positive price, otherwise the newest row) and uses CAMA saledate/saleprice when that layer has no row. 5354 outlines have a positive price and 8077 have a date or price. The full sale history (about 1.6 million rows) is not stored. Grantor and grantee are not copied.",
+        "gisacres is GIS acreage, not deed acreage. Owner phones and emails are not on these public layers and are not scraped. POLARIS links use pid: https://polaris3g.mecklenburgcountync.gov/pid/{pid}."
       ],
       "path": "data/fixtures/market-parcels/counties/37119/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37119/lookup.json",
       "tileCount": 7,
-      "sourceCount": 33035
+      "sourceCount": 33567
     },
     {
       "name": "Rowan",
       "fips": "37159",
       "state": "North Carolina",
-      "featureCount": 10347,
+      "featureCount": 10375,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37159",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-rowan-open-data-37159",
+      "queryUrl": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Open_Data_Downloads/MapServer/37/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "No countywide future land use service. Salisbury FLUM and Kannapolis Character Areas are joined. Other towns and unincorporated Rowan have no public FLU layer.",
+        "Zoning is split by municipality on Alll_Zoning. Cleveland is on that service (Municipal_Zoning omits it). No separate assessed-versus-taxable field beyond total value.",
+        "Zoning joined on 10370 of 10375 parcels. Future land use joined on 726 (Salisbury and Kannapolis only)."
       ],
       "path": "data/fixtures/market-parcels/counties/37159/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37159/lookup.json",
       "tileCount": 6,
-      "sourceCount": 10356
+      "sourceCount": 10385
     },
     {
       "name": "Stanly",
@@ -269,20 +384,23 @@
       "name": "Union",
       "fips": "37179",
       "state": "North Carolina",
-      "featureCount": 13051,
+      "featureCount": 13025,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37179",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-union-atlas-37179",
+      "queryUrl": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/215/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "No countywide future land use service. Secrest Short Cut and employment-center scraps are not joined as county FLU.",
+        "FMV_LAND and FMV_IMPRV are zero on OperationalLayers parcels; tax totals only. Hemby Bridge has no zoning layer. Mint Hill in Union is negligible and is not joined.",
+        "About 78k parcels stub CountyZoning=CITY. Zoning is routed by ParcelCentroids ZoningAdmin to town layers. Legacy gis.unioncountync.gov returns 404; the atlas host is used. Stallings is joined by account number (its service is State Plane).",
+        "Zoning joined on 12874 of 13025 parcels in the 5\u2013150 acre band."
       ],
       "path": "data/fixtures/market-parcels/counties/37179/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37179/lookup.json",
       "tileCount": 6,
-      "sourceCount": 13178
+      "sourceCount": 13149
     },
     {
       "name": "York",

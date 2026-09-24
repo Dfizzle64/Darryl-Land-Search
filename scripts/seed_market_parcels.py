@@ -571,6 +571,17 @@ def county_override(fips: str) -> dict | None:
         from dekalb_parcels import dekalb_spec
 
         return dekalb_spec()
+    if fips == "13045":  # Carroll GA — OA snapshot while the county parcel service is blocked
+        from carroll_parcels import carroll_spec
+
+        return carroll_spec()
+    if fips == "13297":  # Walton GA — character-area landbase, thin city zoning, almost no CAMA
+        return {
+            "kind": "walton",
+            "source": "ga-walton-choosewalton-parcels",
+            "url": "https://services.arcgis.com/ftUt0Vfnzfo0Cs96/arcgis/rest/services/Walton_County_Zoning/FeatureServer/29/query",
+            "coverage": "complete-gte-5ac",
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -644,7 +655,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, Walton, or Carroll pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -799,11 +810,11 @@ def rebuild_indexes(catalog: dict) -> None:
     coverage_lines = [
         "# Market parcel coverage",
         "",
-        "Acreage band is **5.0–150.0 inclusive**. Orlando is not re-scraped. Complete Orlando counties that also sit in another shed (Orange, Osceola, Polk) are reused in place.",
+        "Acreage band is **5.0–150.0 inclusive**. Lake, Osceola, Seminole, and Sumter Orlando tiles were reseeded from county GIS. Polk market parcels use the property-appraiser extract. Orange still points at the Orlando tiles.",
         "",
         "Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map requests the selected market's viewport tiles only.",
         "",
-        "| Market | Tier | Parcels | Complete counties | Sample counties | Gaps |",
+        "| Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |",
         "| --- | --- | ---: | ---: | ---: | ---: |",
     ]
     detail_lines = ["", "## Counties", ""]
@@ -816,7 +827,7 @@ def rebuild_indexes(catalog: dict) -> None:
             market_rows.append(row)
         parcel_count = sum(int(row.get("featureCount") or 0) for row in market_rows)
         complete = [row for row in market_rows if row.get("coverage") == "complete-gte-5ac" and row.get("featureCount")]
-        sample = [row for row in market_rows if row.get("coverage") == "sample" and row.get("featureCount")]
+        sample = [row for row in market_rows if row.get("coverage") in {"sample", "partial"} and row.get("featureCount")]
         gaps = [row for row in market_rows if not row.get("featureCount")]
         meta = {
             "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -887,11 +898,9 @@ def rebuild_indexes(catalog: dict) -> None:
 
 INTRO_DOC = """# Market parcels (every MSA except Orlando)
 
-Orlando keeps `scripts/seed_orlando_parcels.py` and `data/fixtures/orlando-parcels`. This pull does not rewrite those tiles.
+Orlando keeps `scripts/seed_orlando_parcels.py` and `data/fixtures/orlando-parcels`. Lake, Osceola, Seminole, and Sumter in that store were reseeded from public county GIS. Polk's market extract is the property-appraiser layer under `data/fixtures/market-parcels`. The Orlando Polk tiles were not replaced.
 
-Other markets use the same 0.25° tile grid (origin longitude -83, latitude 27) under `data/fixtures/market-parcels/counties/{fips}/tiles`. The home page does not embed the polygons. `GET /api/parcels?market={Market}&bbox=w,s,e,n` reads only the tiles for **that market** that intersect the viewport. Outlines stay off until neighborhood zoom (about 10.5), an area is locked, or Show parcels is on — the same gate as Orlando.
-
-Orange, Osceola, and Polk already have a complete 5.0–150.0 acre Orlando extract. Tampa and Melbourne point at those tiles instead of downloading them again.
+Other markets use the same 0.25° tile grid (origin longitude -83, latitude 27) under `data/fixtures/market-parcels/counties/{fips}/tiles`, or they point at an Orlando tile folder when the county is shared. The home page does not embed the polygons. `GET /api/parcels?market={Market}&bbox=w,s,e,n` reads only the tiles for **that market** that intersect the viewport. Outlines stay off until neighborhood zoom (about 10.5), an area is locked, or Show parcels is on — the same gate as Orlando.
 
 ## Refresh
 
@@ -906,34 +915,29 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 ## Sources
 
-| State | Endpoint | What shipped |
-| --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
-| Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
-| Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services | Cobb complete on `ACRES`. DeKalb is a complete 5–150 acre extract from Tax_Parcels_Assessment_View layer 2 (`ACREAGE`). City zoning and future land use are joined where a public layer exists. Other Georgia counties are gaps |
-| South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
-| Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
+Finished extracts in this batch were merged from public county and state GIS branches. Each `county.json` records the service URL, the feature count, and what was not joined. The coverage table is the inventory. A gap means no finished extract was included. Zoning and future land use are stored only where that county's source or a joined municipal layer published them.
 
-Zoning is joined when a public layer supports it. DeKalb municipalities are first-class: Decatur (Georgia, not Illinois), Brookhaven, Dunwoody, Doraville, Tucker, and Stonecrest supply zoning and future land use. Chamblee is future land use only. Atlanta's citywide layers are joined only inside DeKalb's Atlanta boundary. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake stay blank. County Zoning_District and LandUse fill unincorporated DeKalb only. Those codes are not scored as Orange County multifamily districts. There is no public DeKalb sale table. Prefer **All parcels** in these markets.
+DeKalb County, Georgia is the complete assessment extract already merged on main (`ga-dekalb-assessment-view-2`). City zoning and future land use are joined where that extract published them. That service has no sale table.
 
-### DeKalb County, Georgia
+Marshall County, Alabama is the web5 Marshall/Public/37 5–150 acre extract. Zoning is null. Baldwin County keeps the existing parcel shelf and adds Daphne Class zoning, Daphne Future_Dev, and Fairhope base zoning. Fairhope AO/MO names are overlay notes, not zoning codes. Shelby County keeps the existing parcel shelf and adds Alabaster ZoneCode. Walker, Washington, and Escambia County, Alabama stay gaps. Morgan County stays the existing VAM extract already on this branch. No Opportunity Zone designation was added.
 
-Parcels come from `Tax_Parcels_Assessment_View` FeatureServer layer 2 (about 246,000 countywide; the 5.0–150.0 acre band is `ACREAGE`). Owner, mailing address, site address, `TOTAPR1` (appraised), and `CNTASSDVAL` (assessed) are on that roll. `CVTTXDSCRP` is the tax district description, not a sale and not future land use. The hosted `Tax_Parcels` layer has no acre field and is not the source.
+Carroll County, Georgia uses the OpenAddresses job 910028 parcel snapshot because the live county parcel service is blocked. Acreage is GIS area. Carrollton and Carroll-side Villa Rica supply the city CAMA, zoning, and future land use that matched a Carroll parcel id. County zoning and future land use remain PDFs. Sales are the commercial/industrial subset only. No Opportunity Zone designation was added.
 
-No sale price, sale date, or qualified flag is published on that service. Delinquent-tax layers are not sales.
-
-City layers are extent-checked in WGS84. A layer centered on Decatur, Illinois, or on DeKalb County in Alabama, Illinois, Indiana, or Tennessee, is skipped. Decatur, Georgia is `decatur_admin` on ArcGIS Online.
-
-OZ 2.0 tracts that are eligible for nomination are not designated QOZs. This extract does not copy eligibility onto `opportunityZone`.
+Walton County, Georgia is the choosewalton 5–150 GIS-acre landbase. FLU and Description are character areas, not Euclidean zoning. Monroe CAMA matches a handful of shared parcel numbers. City zoning covers Monroe, Loganville, and Social Circle only. Countywide owner, tax, sales, and Euclidean zoning stay gaps. Nothing in that extract is an Opportunity Zone designation.
 
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "carroll":
+        from carroll_parcels import download_carroll_county
+
+        return download_carroll_county(county, markets, spec)
+    if spec.get("kind") == "walton":
+        from walton_parcels import download_walton_county
+
+        return download_walton_county(county, markets, spec)
     if spec.get("kind") == "dekalb":
         from dekalb_parcels import download_dekalb
 

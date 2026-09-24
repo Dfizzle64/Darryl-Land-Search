@@ -5,7 +5,7 @@
   "markets": [
     "Nashville"
   ],
-  "featureCount": 4797,
+  "featureCount": 8443,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
@@ -13,11 +13,97 @@
   "source": "tn-impact-47043",
   "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
   "gaps": [
-    "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+    "Zoning polygons are joined only inside the resolved jurisdiction. City of Dickson Current_Zo 408/408, White Bluff Zone_Curre 92/92, county Zone_Curre 7696/7700. Burns (72), Charlotte (90), Vanleer (47), and Slayden (34) have no public zoning FeatureServer (Burns is a 2016 PDF), so those parcels stay unzoned. IMPACT Themes ZONING was non-blank on 3 parcels and was not copied. County Zone_Curre is 164 district polygons; A1 is only 6 of them, and those large polygons cover most rural acreage.",
+    "No adopted future-land-use FeatureServer. The 2043 Comp Plan draft and UGB/PGA layers are growth context only and were not written as parcel FLU. Sale date and price are often blank or zero. REST exposes appraisal (APPRAISAL), not assessed or taxable value.",
+    "Geometry is IMPACT Parcels COUNTY_ID=22, PARCEL_TYPE=1, CALC_ACRE 5\u2013150 inclusive. Attributes are Parcel_Layer_Themes JUR='022' joined on GISLINK using the latest TAXYR. FIPS 47043 is the GEOID; 022 is the Comptroller county number, not the FIPS suffix. A previous extract used COUNTY_ID=43 and was replaced. Seven polygons in the acreage band share GISLINK 'TVA', have no Themes row, and were not stored under an invented parcel id.",
+    "Dickinson ND, Dixon CA, and Charlotte County FL were not used. Opportunity Zone designation was not inferred from nomination eligibility."
   ],
   "path": "data/fixtures/market-parcels/counties/47043/tiles",
   "lookup": "data/fixtures/market-parcels/counties/47043/lookup.json",
-  "sourceCount": 4988,
-  "dropped": 139,
-  "tileCount": 4
+  "sourceCount": 8450,
+  "dropped": 7,
+  "tileCount": 9,
+  "ingest": {
+    "impactCountyId": 22,
+    "jur": "022",
+    "geoidFips": "47043",
+    "parcelType": 1,
+    "acreageField": "CALC_ACRE",
+    "acreageBand": [
+      5.0,
+      150.0
+    ],
+    "geometryQueryCount": 8450,
+    "kept": 8443,
+    "themesRowsDeduped": 28415,
+    "themesMatched": 8443,
+    "themesUnmatched": 0,
+    "themesTaxYearsOnKept": {
+      "2026": 7607,
+      "2027": 836
+    },
+    "ownerCount": 8443,
+    "situsCount": 8443,
+    "mailingCount": 8443,
+    "saleCount": 5447,
+    "appraisalCount": 8441,
+    "camaZoningNonBlankIgnored": 3,
+    "citynumPolygonDisagree": 132,
+    "jurisdictions": {
+      "Dickson County": {
+        "parcels": 7700,
+        "zoningJoined": 7696,
+        "source": "Dickson County Dickson_County_Zoning Zone_Curre"
+      },
+      "Vanleer": {
+        "parcels": 47,
+        "zoningJoined": 0,
+        "source": "honest REST gap"
+      },
+      "White Bluff": {
+        "parcels": 92,
+        "zoningJoined": 92,
+        "source": "White Bluff WhiteBluff_Zoning Zone_Curre"
+      },
+      "Charlotte": {
+        "parcels": 90,
+        "zoningJoined": 0,
+        "source": "honest REST gap"
+      },
+      "Slayden": {
+        "parcels": 34,
+        "zoningJoined": 0,
+        "source": "honest REST gap"
+      },
+      "Dickson": {
+        "parcels": 408,
+        "zoningJoined": 408,
+        "source": "City of Dickson City_of_Dickson_Zoning_View Current_Zo"
+      },
+      "Burns": {
+        "parcels": 72,
+        "zoningJoined": 0,
+        "source": "honest REST gap"
+      }
+    },
+    "zoningJoined": 8196,
+    "zoningJoinRate": 0.9707,
+    "zoningMethods": {
+      "interior": 8185,
+      "overlap": 11,
+      "miss": 4,
+      "gap-town": 243
+    },
+    "fluJoined": 0,
+    "opportunityZoneDesignated": 0,
+    "assessedValueInvented": false,
+    "rejectedTwins": [
+      "Dickinson ND gis.dickinsongov.com",
+      "Dixon CA City_of_Dixon_Zoning",
+      "Charlotte County FL"
+    ],
+    "droppedDuplicateId": 0,
+    "droppedOutsideCounty": 0,
+    "droppedBadGeometry": 0
+  }
 }

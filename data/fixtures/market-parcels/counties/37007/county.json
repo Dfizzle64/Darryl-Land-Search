@@ -5,19 +5,21 @@
   "markets": [
     "Charlotte"
   ],
-  "featureCount": 5814,
+  "featureCount": 5820,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "nc-onemap-37007",
-  "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+  "source": "nc-anson-vector-37007",
+  "queryUrl": "https://ansoncountygis.com/arcgis/rest/services/Vector/MapServer/10/query",
   "gaps": [
-    "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+    "Peachland and Polkton zoning layers are empty. McFarlan has no public zoning service. Those towns stay unmatched.",
+    "CountyZoning=Mun. is not a zone class; town layers supply the code. LandUsePlan=MUN is not future land use. No town FLU service is published.",
+    "Zoning joined on 5730 of 5820 parcels. Land-use plan joined on 5316. Peachland/Polkton/McFarlan footprints left unmatched: 76."
   ],
   "path": "data/fixtures/market-parcels/counties/37007/tiles",
   "lookup": "data/fixtures/market-parcels/counties/37007/lookup.json",
-  "sourceCount": 5815,
-  "dropped": 1,
+  "sourceCount": 5820,
+  "dropped": 0,
   "tileCount": 6
 }

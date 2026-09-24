@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T01:06:16Z",
   "market": "Memphis",
   "tier": "other",
-  "parcelCount": 35611,
+  "parcelCount": 45278,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -155,21 +155,31 @@
       "name": "Shelby",
       "fips": "47157",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 9667,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47157",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-shelby-current-parcels",
+      "queryUrl": "https://scgis.shelbycountytn.gov/serverhigh/rest/services/Parcel/CurrentParcels/MapServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Shelby County is not an IMPACT county. The Comptroller IMPACT parcel service is not used. Public CurrentParcels has no land, building, or total appraised or assessed value fields, so tax values stay null.",
+        "No native acreage field. Stored acres are the absolute area of the returned WGS84 rings in a local equirectangular projection (111320*cos(latitude) meters per degree of longitude and 110540 meters per degree of latitude), divided by 4046.8564224. Shape.STArea() is only a widened Web Mercator prefilter (15000 to 1400000), not the stored acreage. The inclusive 5.0\u2013150.0 acre band is applied after that derivation.",
+        "scgis.shelbycountytn.gov requires OpenSSL legacy renegotiation (OP_LEGACY_SERVER_CONNECT / UnsafeLegacyServerConnect). The seeder enables that flag only for shelbycountytn.gov hosts.",
+        "Memphis zoning polygons from old_zoning_dissolved_WEB (CorrZone) joined by centroid for MUNI=MEMPHIS (3539 of 3574). Misses keep the parcel ZONING attribute. City zoning is joined onto countywide parcels and is not a countywide entitlement.",
+        "Collierville Zoning_Features ZONECLASS joined on PARCELID for MUNI=COLLIERVILLE (502 of 507). Misses keep the parcel ZONING attribute. City zoning is preferred inside the city limits.",
+        "Unincorporated parcels use a Memphis/Shelby UDC polygon when the centroid falls inside one (3844 of 3937); otherwise the parcel ZONING attribute.",
+        "Bartlett zoning is an embedded web-map feature collection, not a FeatureServer. Germantown, Arlington, Lakeland, and Millington have no verified anonymous zoning FeatureServer. ReGIS Zoning/Zoning returns 499 Token Required. Those municipalities use the CurrentParcels ZONING attribute.",
+        "Memphis 3.0 Future Land Use joined on PARCELID for MUNI=MEMPHIS only (3367 of 3574). FLU_2025Update_Final_WEB is not substituted; its layer name still includes Draft4 and adoption cutover is not confirmed. Parcel LANDUSE is existing use, not future land use.",
+        "No public future-land-use FeatureServer for unincorporated Shelby or for Arlington, Bartlett, Collierville, Germantown, Lakeland, or Millington. Memphis FLU is not applied outside Memphis.",
+        "Last sale is the latest CERTParcel RSALES row with a positive PRICE for PARID (5350 parcels). Register of Deeds instrument links stay on that table.",
+        "Assessor property-details URLs can return HTTP 403 to automated clients. The interactive assessor site is the supported path.",
+        "Proposed UDC zoning FeatureServers (FINAL_Simple_WEB and related drafts) are not treated as adopted entitlement."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47157/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47157/lookup.json",
+      "tileCount": 11,
+      "sourceCount": 18041
     },
     {
       "name": "Tate",

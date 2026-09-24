@@ -5,20 +5,36 @@
   "markets": [
     "Pensacola"
   ],
-  "featureCount": 7011,
+  "featureCount": 8928,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-doh-ehwaters-12113",
-  "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/56/query",
+  "source": "fl-panhandle-12113",
+  "queryUrl": "https://cloud.santarosa.fl.gov/arcgis/rest/services/santarosa/SRC_Basemap_Districts_Overlay/MapServer/1/query",
   "gaps": [
-    "7967 source rows collapsed to 7011 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-    "No zoning or FLU on the Florida DOH extract."
+    "Joined zoning on 8901 of 8928 parcels and FLU on 8900. Owner 8834, situs 6356, sale price 0, sale date 0.",
+    "16194 source rows became 8928 parcel ids. 0 split pieces with a new shape were merged. 16865 repeated rows with the same polygon (stacked units or duplicate ids) were collapsed to one feature. Acreage and tax values are not summed across those rows. Rows that failed the WGS84 or county-extent check were dropped.",
+    "No lastSale on Basemap Parcels/1. Market value is TotalValue and is not summed across repeated rows. dorCode is PropertyUse text, not a numeric FDOR code.",
+    "This basemap has no stable object id. returnCountOnly counts repeated rows (stacked units and duplicate ids), not unique ParNum values. Identical polygons are stored once. A kept situs may be one unit address, not a rollup of units.",
+    "County zoning is Hosted/ZONE district. County FLU is Hosted/OpenDataFlum category. Milton, Gulf Breeze, and Jay override inside their city layers. Hits: county layer 25755, Milton 1834, Gulf Breeze 913, Jay 101.",
+    "Milton zoning is City_of_Milton_Zoning zone_code. Milton FLU was not verified; county FLUM remains for those parcels.",
+    "Gulf Breeze joins Hosted/Gulf_Breeze_Zoning on par_num = ParNum, with a spatial fallback. The public layer keyed 10 parcel ids. It is not a complete citywide district mosaic. Unmatched parcels are not assumed to be Gulf Breeze, because no separate city-limits layer was on the card. They keep county ZONE/FLUM when those intersect.",
+    "Jay zoning is TownOfJayZoning zone (district is the description). No Jay FLU layer was verified.",
+    "Pace and Navarre Beach are not separate cities on this card.",
+    "Appraiser link is https://srcpa.gov/search. No verified per-parcel deep link is on the layer. Search uses ParNum.",
+    "Mailing city/state/zip are parsed from MailingCityStZip. The combined MailingAddr blob repeats the owner name and is not stored.",
+    "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077)."
   ],
   "path": "data/fixtures/market-parcels/counties/12113/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12113/lookup.json",
-  "sourceCount": 7967,
+  "sourceCount": 16194,
   "dropped": 0,
-  "tileCount": 8
+  "tileCount": 8,
+  "zoningJoinedCount": 8901,
+  "fluJoinedCount": 8900,
+  "salePriceCount": 0,
+  "saleDateCount": 0,
+  "situsCount": 6356,
+  "ownerCount": 8834
 }

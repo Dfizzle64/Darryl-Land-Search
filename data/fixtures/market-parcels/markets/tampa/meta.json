@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T01:06:16Z",
   "market": "Tampa",
   "tier": "primary",
-  "parcelCount": 98259,
+  "parcelCount": 124315,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,15 +20,21 @@
       "name": "Citrus",
       "fips": "12017",
       "state": "Florida",
-      "featureCount": 5810,
+      "featureCount": 5807,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12017",
+      "source": "fl-citrus-doh-municipal-12017",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/8/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Parcel polygons, owner, situs, and tax values are Florida DOH EHWATER layer 8. Citrus County lots have no acre or owner field, and lot PRCLKEY is empty, so zoning is a centroid join.",
+        "Municipality is the corporate-limit layer (Inverness or Crystal River). PHY_CITY is the postal city and is not the city limit.",
+        "County zoning and land use values CITY are placeholders and are not stored.",
+        "Inverness parcels: 86. Zoning is INV_FLU and future land use is FLU on the city layer.",
+        "Crystal River parcels left without city zoning: 88.",
+        "No public Crystal River zoning or FLU FeatureServer was verified.",
+        "County zoning codes are not Orange County multifamily districts."
       ],
       "path": "data/fixtures/market-parcels/counties/12017/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12017/lookup.json",
@@ -39,59 +45,74 @@
       "name": "Hardee",
       "fips": "12049",
       "state": "Florida",
-      "featureCount": 5055,
+      "featureCount": 5303,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12049",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/23/query",
+      "source": "fl-hardee-infomap-12049",
+      "queryUrl": "https://gis.hardeecounty.net/arcgis/rest/services/InfoMap/MapServer/5/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Parcels are InfoMap Owner Parcels (TOTACRES). SWFWMD parcel_search was not needed.",
+        "County zoning and future land use are a spatial intersect (no parcel id on those layers).",
+        "Wauchula, Bowling Green, and Zolfo Springs zoning and FLU join on PARCEL / Parcel_Id when it matches PIN_DSP, otherwise by intersect. They do not cover unincorporated Hardee.",
+        "InfoMap has the last situs and owner. It has no sale price or assessed value.",
+        "Hardee county spatial join: zoning 5188/5303, FLU 5297/5303. City override zoning 112, FLU 112 (Wauchula, Bowling Green, Zolfo Springs)."
       ],
       "path": "data/fixtures/market-parcels/counties/12049/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12049/lookup.json",
       "tileCount": 6,
-      "sourceCount": 5055
+      "sourceCount": 5303
     },
     {
       "name": "Hernando",
       "fips": "12053",
       "state": "Florida",
-      "featureCount": 7180,
+      "featureCount": 6601,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12053",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/25/query",
+      "source": "fl-hernando-parcels-12053",
+      "queryUrl": "https://services2.arcgis.com/x5zvhhxfUuRDntRe/ArcGIS/rest/services/Parcels/FeatureServer/0/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Upgrade off Florida DOH. Parcels, owner, situs, and values are Hernando County Parcels (gis.V_PARCELS).",
+        "Municipality is CER_JURISDICTION: B is Brooksville and C is unincorporated. Situs city Brooksville, Spring Hill, or Weeki Wachee is not the city limit.",
+        "Spring Hill is an unincorporated place. Weeki Wachee levy code CWWE is not stored as a municipality.",
+        "County zoning joins on KEY_NUMBER. The value CITY is a placeholder and is not a zoning district.",
+        "Brooksville parcels left without city zoning: 200 (placeholder rows 174).",
+        "County future land use skips polygons whose FLU code is city. Those are the Brooksville hole, not a city FLU map.",
+        "No public Brooksville or Weeki Wachee zoning/FLU FeatureServer was verified."
       ],
       "path": "data/fixtures/market-parcels/counties/12053/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12053/lookup.json",
       "tileCount": 6,
-      "sourceCount": 7193
+      "sourceCount": 6601
     },
     {
       "name": "Hillsborough",
       "fips": "12057",
       "state": "Florida",
-      "featureCount": 13351,
+      "featureCount": 13838,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12057",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/27/query",
+      "source": "fl-hillsborough-parcelpublishing-12",
+      "queryUrl": "https://maps.hillsboroughcounty.org/arcgis1a/rest/services/SDEMapServices/ParcelPublishing/FeatureServer/12/query",
       "gaps": [
-        "15626 source rows collapsed to 13351 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "No zoning or FLU on the Florida DOH extract."
+        "Hillsborough sale flag VI is vacant/improved, not an FDOR qualified (Q/U) sale.",
+        "Unincorporated zoning is RegulatoryZoning/8. Tampa, Temple Terrace, and Plant City zoning are city layers joined onto county parcels.",
+        "Temple Terrace zoning joins on FOLIO. Tampa and Plant City zoning are spatial. Future land use is Planning/4 filtered by JURISDICTION.",
+        "MUNI letters were verified from the PIN prefix: A is Tampa, T is Temple Terrace, P is Plant City, U is unincorporated."
       ],
       "path": "data/fixtures/market-parcels/counties/12057/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12057/lookup.json",
-      "tileCount": 9,
-      "sourceCount": 15626
+      "tileCount": 10,
+      "sourceCount": 13838,
+      "zoningJoinedCount": 13786,
+      "fluJoinedCount": 13785,
+      "rejected": []
     },
     {
       "name": "Manatee",
@@ -117,58 +138,82 @@
       "name": "Pasco",
       "fips": "12101",
       "state": "Florida",
-      "featureCount": 10590,
+      "featureCount": 12372,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12101",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/50/query",
+      "source": "fl-pasco-pascomapper-7",
+      "queryUrl": "https://pascogis.pascocountyfl.net/giswebmm/rest/services/PascoMapper/Parcels/MapServer/7/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Pasco parcels are PascoMapper/7 (countywide). Hosted County_Master_Property_List FeatureServer/0 is a ~2,266-feature subset and is not used.",
+        "Unincorporated zoning and FLU are Landuse_Planning district polygons. County ZN_TYPE values NPR, PR, and SA are city placeholders, not districts.",
+        "New Port Richey, Port Richey, San Antonio, Dade City, Zephyrhills, and St. Leo have no verified public city zoning/FLU FeatureServer."
       ],
       "path": "data/fixtures/market-parcels/counties/12101/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12101/lookup.json",
       "tileCount": 8,
-      "sourceCount": 10885
+      "sourceCount": 12557,
+      "zoningJoinedCount": 11834,
+      "fluJoinedCount": 12033,
+      "rejected": [
+        "https://pascogis.pascocountyfl.net/giswebeserver/rest/services/Hosted/County_Master_Property_List/FeatureServer/0"
+      ]
     },
     {
       "name": "Pinellas",
       "fips": "12103",
       "state": "Florida",
-      "featureCount": 18638,
+      "featureCount": 42230,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12103",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/51/query",
+      "source": "fl-pinellas-publicwebgis-1",
+      "queryUrl": "https://egis.pinellas.gov/gis/rest/services/PublicWebGIS/Parcels/MapServer/1/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Pinellas public parcels have taxable, land, and improvement values but no just/market value.",
+        "Unincorporated zoning and FLU are PublicWebGIS Landuse_Zoning and are not applied inside cities.",
+        "St. Petersburg and Clearwater have city zoning and FLU. Largo has FLU only. Other Pinellas municipalities have no verified zoning/FLU layer."
       ],
       "path": "data/fixtures/market-parcels/counties/12103/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12103/lookup.json",
       "tileCount": 6,
-      "sourceCount": 18639
+      "sourceCount": 42236,
+      "zoningJoinedCount": 18812,
+      "fluJoinedCount": 25989,
+      "rejected": [
+        "https://egis.pinellas.gov/gis/rest/services/AGO/Planning_LandUse/MapServer"
+      ]
     },
     {
       "name": "Polk",
       "fips": "12105",
       "state": "Florida",
-      "featureCount": 19734,
+      "featureCount": 20263,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "reused-orlando-complete-5-150",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/52/query",
+      "source": "fl-polk-property-appraiser-134",
+      "queryUrl": "https://gis.polk-county.net/hosting/rest/services/All-In-One_Viewer/Property_Appraiser/MapServer/134/query",
       "gaps": [
-        "Reused the Orlando complete 5.0\u2013150.0 acre tiles. Not re-scraped."
+        "Polk market parcels are Property_Appraiser MapServer/134. Orlando shed tiles are unchanged.",
+        "No countywide zoning-district polygons are published. County FLU 2030 (FLUNAME / FLU_LDC) is land use only and is not stored as zoning.",
+        "Property Appraiser parcels have no sale fields. A sale is copied from the FDOR/DOH extract when the parcel id matches.",
+        "Lakeland zoning and future land use are city AGOL polygons (LABEL / DESIGNATIO) joined onto county parcels inside the city. Winter Haven has no verified public zoning FeatureServer."
       ],
-      "path": "data/fixtures/orlando-parcels/tiles/12105",
-      "lookup": "data/fixtures/orlando-parcels/lookup/12105.json",
+      "path": "data/fixtures/market-parcels/counties/12105/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12105/lookup.json",
       "tileCount": 17,
-      "sourceCount": 21292
+      "sourceCount": 20263,
+      "zoningJoinedCount": 890,
+      "fluJoinedCount": 20262,
+      "rejected": [
+        "Polk zoning-district polygons \u2014 none published on Land_Use_and_Zoning",
+        "https://gismims.lakelandgov.net/portal/rest/services/Public/Lakeland10_Zoning/FeatureServer/0",
+        "https://gismims.lakelandgov.net/portal/rest/services/Public/Lakeland10_FutureLandUse/FeatureServer/0"
+      ]
     },
     {
       "name": "Sarasota",
@@ -182,7 +227,8 @@
       "source": "fl-doh-ehwaters-12115",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/57/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "No zoning or FLU on the Florida DOH extract.",
+        "Optional SWFL county. Tiles are shared with Tampa and are not downloaded a second time."
       ],
       "path": "data/fixtures/market-parcels/counties/12115/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12115/lookup.json",

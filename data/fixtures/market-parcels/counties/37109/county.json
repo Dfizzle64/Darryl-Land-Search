@@ -5,19 +5,21 @@
   "markets": [
     "Charlotte"
   ],
-  "featureCount": 6543,
+  "featureCount": 6563,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "nc-onemap-37109",
-  "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+  "source": "nc-lincoln-operational-37109",
+  "queryUrl": "https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_OperationalSP/MapServer/6/query",
   "gaps": [
-    "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+    "Maiden zoning and future land use are a gap on Lincoln County REST. The town is mostly in Catawba County; Lincoln publishes about one Maiden zoning polygon.",
+    "County Blueprint 2043 future land use is joined outside Lincolnton and Maiden. Lincolnton uses the city land-use layer. Parcel ZONING can be overlay-prefixed, so district polygons supply the code.",
+    "Zoning joined on 6562 of 6563 parcels. Future land use joined on 5972. Maiden footprints left unmatched: 1."
   ],
   "path": "data/fixtures/market-parcels/counties/37109/tiles",
   "lookup": "data/fixtures/market-parcels/counties/37109/lookup.json",
-  "sourceCount": 6543,
-  "dropped": 0,
+  "sourceCount": 6564,
+  "dropped": 1,
   "tileCount": 7
 }

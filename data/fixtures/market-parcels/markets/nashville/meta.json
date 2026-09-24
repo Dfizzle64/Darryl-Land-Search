@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T01:06:16Z",
   "market": "Nashville",
   "tier": "primary",
-  "parcelCount": 31132,
+  "parcelCount": 109348,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -58,45 +58,62 @@
       "name": "Cheatham",
       "fips": "47021",
       "state": "Tennessee",
-      "featureCount": 3790,
+      "featureCount": 5426,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47021",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "apsu-cheatgis-47021",
+      "queryUrl": "https://apnsgis4.apsu.edu/arcgis/rest/services/Cheatham/CheatGIS/MapServer/9/query",
       "gaps": [
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Future land use is an honest REST gap for Cheatham County, Ashland City, Pleasant View, Kingston Springs, and Pegram. CheatGIS urban growth and Cheatham Growth layers are guidance only and are not parcel FLU or zoning entitlement.",
+        "Zoning is a cities-first polygon join on APSU CheatGIS: Ashland City, Pleasant View, Kingston Springs, and Pegram inside their community limits, then unincorporated Cheatham zoning. City district codes are not applied outside those limits. The parcel zoning attribute is often blank and is not the district.",
+        "Rejected twins: Ashland County, Wisconsin; Ashland County, Ohio; City of Ashland, Kentucky; and Chatham County misspellings. IMPACT COUNTY_ID is 11 and JUR is 011 (Comptroller), not FIPS 021. This extract is APSU CheatGIS MapServer/9, parcel_typ 1, calc_acre 5\u2013150.",
+        "5428 CheatGIS rows in the parcel_typ=1 and calc_acre 5\u2013150 query collapsed to 5426 GIS links. 12 kept rows have a blank or non-11 county_id but an 011 GIS link on the Cheatham service."
       ],
       "path": "data/fixtures/market-parcels/counties/47021/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47021/lookup.json",
-      "tileCount": 6,
-      "sourceCount": 3932
+      "tileCount": 5,
+      "sourceCount": 5428
     },
     {
       "name": "Davidson",
       "fips": "47037",
       "state": "Tennessee",
-      "featureCount": 8286,
+      "featureCount": 9478,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47037",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-metro-davidson-parcels",
+      "queryUrl": "https://maps.nashville.gov/arcgis/rest/services/Cadastral/Parcels/MapServer/0/query",
       "gaps": [
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "9481 source rows collapsed to 9478 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Davidson County is not a Tennessee Comptroller IMPACT county. Polygons, owner, mailing, situs, sale, appraisal, and the parcel Zoning attribute come from Metro GIS Cadastral/Parcels MapServer layer 0 (APN). No IMPACT assessment feed was used. Authoritative record cards are on Davidson WebPro.",
+        "Planning/CCM layer 2 PolicyCode and PolicyDesc are NashvilleNext community character policy, joined by polygon intersection. That is preferred future policy guidance, not a zoning entitlement and not Future Land Use. Parcels that cross a policy boundary keep the additional policies on the label.",
+        "PropDate is the layer alias Property Date and OwnDate is Owner Instrument Date. The sale date is that best-available proxy, not a guaranteed last-sale date. Confirm history in WebPro. SaleCode and SaleSrc are copied through; a blank ValidSale stays blank and is not treated as a qualified sale.",
+        "Outside satellite cities, displayed zoning is the Metro parcel Zoning attribute with *ZZ placeholder tokens removed. *ZZ is not a Metro Zoning Ordinance district. Metro Zoning/Zoning is rechecked at ingest and is not required for this extract.",
+        "Satellite cities (Belle Meade, Berry Hill, Forest Hills, Goodlettsville, Oak Hill, Ridgetop) come from Boundaries/Jurisdictions MapServer layer 2 Name. The most local code wins. Goodlettsville zoning is ZONINGARGISMAP FeatureServer layer 2 ZONECLASS / ZONEDESC, joined only to the Davidson portion of the city. Belle Meade, Berry Hill, Forest Hills, Oak Hill, and Ridgetop have no public zoning FeatureServer, so their city zoning stays blank instead of copying the Metro parcel attribute or *ZZ. Satellite-city future land use is a gap: NashvilleNext CCM is Metro guidance and is cleared inside satellite limits.",
+        "Zoning overlays from ZoningOverlayDistricts are supplemental constraints (historic, urban design, airport impact, and similar), not the base zone.",
+        "Median household income and FDOT AADT are not joined. Those sidecars are Florida extracts, so Davidson stays unknown.",
+        "DeededAcreage is kept when the layer sends it. StatedArea is not converted, because the layer does not document its unit.",
+        "Satellite City join on the 5\u2013150 acre extract: Metro Nashville 9068; Belle Meade 33, Berry Hill 10, Forest Hills 138, Goodlettsville 134, Oak Hill 89, Ridgetop 6 of 9478.",
+        "Goodlettsville ZONECLASS matched 134 of 134 Davidson parcels in that city.",
+        "NashvilleNext CCM stays on 9068 Metro parcels. Satellite parcels are blank: no public city FLU layer, and CCM is not their comprehensive plan.",
+        "Metro zoning overlays remain on 1936 parcels outside satellite cities. They do not replace the parcel Zoning attribute.",
+        "Metro Zoning/Zoning MapServer returned ArcGIS code 500 at ingest (Error handling service request :Illegal access: this web application instance has been stopped already. Could not load [META-INF/services/javax.xml.parsers.Docu). Outside satellite cities the parcel Zoning attribute is the zoning source. The 500 service is not a hard dependency.",
+        "Goodlettsville interchange and commercial-core overlays intersect 8 Davidson parcels. They are supplemental, not the base zone."
       ],
       "path": "data/fixtures/market-parcels/counties/47037/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47037/lookup.json",
-      "tileCount": 8,
-      "sourceCount": 8485
+      "tileCount": 7,
+      "sourceCount": 9481
     },
     {
       "name": "Dickson",
       "fips": "47043",
       "state": "Tennessee",
-      "featureCount": 4797,
+      "featureCount": 8443,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
@@ -104,12 +121,15 @@
       "source": "tn-impact-47043",
       "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
       "gaps": [
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Zoning polygons are joined only inside the resolved jurisdiction. City of Dickson Current_Zo 408/408, White Bluff Zone_Curre 92/92, county Zone_Curre 7696/7700. Burns (72), Charlotte (90), Vanleer (47), and Slayden (34) have no public zoning FeatureServer (Burns is a 2016 PDF), so those parcels stay unzoned. IMPACT Themes ZONING was non-blank on 3 parcels and was not copied. County Zone_Curre is 164 district polygons; A1 is only 6 of them, and those large polygons cover most rural acreage.",
+        "No adopted future-land-use FeatureServer. The 2043 Comp Plan draft and UGB/PGA layers are growth context only and were not written as parcel FLU. Sale date and price are often blank or zero. REST exposes appraisal (APPRAISAL), not assessed or taxable value.",
+        "Geometry is IMPACT Parcels COUNTY_ID=22, PARCEL_TYPE=1, CALC_ACRE 5\u2013150 inclusive. Attributes are Parcel_Layer_Themes JUR='022' joined on GISLINK using the latest TAXYR. FIPS 47043 is the GEOID; 022 is the Comptroller county number, not the FIPS suffix. A previous extract used COUNTY_ID=43 and was replaced. Seven polygons in the acreage band share GISLINK 'TVA', have no Themes row, and were not stored under an invented parcel id.",
+        "Dickinson ND, Dixon CA, and Charlotte County FL were not used. Opportunity Zone designation was not inferred from nomination eligibility."
       ],
       "path": "data/fixtures/market-parcels/counties/47043/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47043/lookup.json",
-      "tileCount": 4,
-      "sourceCount": 4988
+      "tileCount": 9,
+      "sourceCount": 8450
     },
     {
       "name": "Hickman",
@@ -174,81 +194,167 @@
       "name": "Maury",
       "fips": "47119",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 9033,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47119",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-columbia-agol-47119",
+      "queryUrl": "https://services6.arcgis.com/ubRvNDgGwwJuZMcL/arcgis/rest/services/Parcels/FeatureServer/1/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "9034 source rows collapsed to 9033 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Maury is Tennessee IMPACT jurisdiction 060 (COUNTY_ID 60). IMPACT has calculated acres and a GIS link but no owner, situs, or zoning. This extract uses City of Columbia AGOL Parcels layer 1, parcel type 1, calculated acres 5.0\u2013150.0 (about 9,000 parcels). The roll has a street address and a mailing city, not a situs city.",
+        "Future land use is not on Spring Hill, Mount Pleasant, or unincorporated Maury. Columbia FLU is joined only where Columbia zoning hits. Rev. Proc. 2026-14 eligibility is not a designated QOZ.",
+        "Zoning is a parcel-centroid join, in this order: Columbia zoning districts, Spring Hill Zoning_Spring_Hill_view only where a Maury parcel centroid falls in a zone (217 parcels; the city layer also covers Williamson, and those parcels are not in this county), Mount Pleasant MP_Zoning (GISLINK), then unincorporated MCParcelZonelLayer (published service name; field cZoneDistr). Joined Columbia 467, Spring Hill 217, Mount Pleasant 193, unincorporated 8135, unmatched 21. The assessor ZONING column on the parcel roll is blank and is not used. These codes are not an Orange County multifamily knowledge-base match.",
+        "Future land use is Columbia FLU Classifications 2024 only, and only on parcels whose centroid falls in Columbia zoning (462 joined). Spring Hill, Mount Pleasant, and unincorporated Maury have no FLU join.",
+        "411 parcels fall in the three Nashville rural-eligible Maury tracts (47119010500, 47119010700, 47119011004) from Rev. Proc. 2026-14. That stamp is eligible-for-nomination, not a designated QOZ. opportunityZone is left unset. Tennessee has no public certified 2027 QOZ list. The Nashville urban-eligible pack has no Maury tracts, so other parcels are not-eligible."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47119/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47119/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 9034
     },
     {
       "name": "Montgomery",
       "fips": "47125",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 7038,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47125",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-mcgtn-cama-47125",
+      "queryUrl": "https://gis.montgomerytn.gov/gisserver/rest/services/mcgtn_parcels/MapServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "11003 PARCEL_TYPE=1 rows in the 5.0\u2013150.0 acre band collapsed to 7038 GISLINK ids. Extra rows are CAMA building cards on the same polygon. One feature is kept per GISLINK (largest CalcAcreage, then building card 1).",
+        "Montgomery County, Tennessee (FIPS 47125, Clarksville) is not on Comptroller IMPACT (COUNTY_ID 125 returns no 5\u2013150 acre rows). Parcels are the county CAMA service mcgtn_parcels on gis.montgomerytn.gov. Filter is PARCEL_TYPE=1 and CalcAcreage 5.0\u2013150.0. COUNTY_ID on this layer is 63, the Comptroller county number, not FIPS 125.",
+        "City of Clarksville is TaxingDistrictCode 135. TaxingDistrictCode 000 is unincorporated Montgomery County. PropertyCity CLARKSVILLE is a post office and includes unincorporated parcels, so it is not the city limit. Clarksville, Indiana is a different city and is not in this extract; centroids outside the Montgomery TN extent are dropped.",
+        "Zoning is the CMCRPC district stored on the CAMA parcel (Zoning), which matches the public Zoning map service. Districts are not classified in the multifamily knowledge base. Prefer All parcels. The CMCRPC zoning map also has a Fort Campbell polygon; this extract is taxable PARCEL_TYPE=1 parcels only.",
+        "Clarksville-Montgomery County Growth Plan 2040 is adopted policy for the urban growth boundary, planned growth areas, and rural area. It is not current zoning and is not joined as future land use.",
+        "Opportunity Zone fields are left unset. OZ 2.0 eligibility on the tract overlay means eligible for nomination, not a designated QOZ. Designated zones are HUD/Treasury geography and are not inferred from eligibility.",
+        "No tax bill on this layer. Market value is MktAppraisedValue and assessed value is AssessedValue. Greenbelt use value is not copied into taxable. A sale price of $0 is treated as not available. There is no situs ZIP field; mailing ZIP is kept. Sale qualification codes are not interpreted."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47125/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47125/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 11003
     },
     {
       "name": "Robertson",
       "fips": "47147",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 8581,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
       "source": "tn-impact-47147",
       "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "IMPACT COUNTY_ID 74 / JUR 074. The FIPS suffix 147 returns no parcels on this service. Geometry is Parcels/0 parcel type 1, CALC_ACRE 5\u2013150 (8581 source rows, 8581 kept). Attributes joined from Parcel_Layer_Themes/12 on GISLINK (8581 matches).",
+        "Weekly Assessment_Data_074.dbf is the attribute fallback when Parcel_Layer_Themes/12 is blocked. The Comptroller ships that table inside the county shapefile from the parcel-data request form; there is no stable anonymous file URL, and paid parcel vendors are not used. This pull used Themes/12, so the DBF was not required.",
+        "Municipalities are first-class. City zoning wins inside APSU community limits and is not replaced by county zoning. Springfield Current Zoning (city AGOL, described as updated 2025-07-15). Greenbrier, Tennessee Zoning Public View (April 2022): RD is published as Mobile Home Park and R8 as High Density Residential. West Virginia GreenbrierService (magisterial districts, EPSG:26854) is rejected. White House city server zoning. CompPlan Future_LU joined inside White House. Millersville zoning is the city AGOL view Millersville_Zoning_view (ZONE_2021). The Pennsylvania Millersville map (Lancaster/Dauphin) is rejected. Adams and Orlinda zoning polygons on the APSU service were last edited 2009-05-06; Cedar Hill zoning is dated 2014-08-04. Unincorporated zoning is the APSU RobertsonZoning overlay (service description edited 2014-07-30), joined on GISLINK.",
+        "No public zoning polygons for Coopertown, Cross Plains, or Ridgetop. Portland is an incorporated community on the same APSU layer and also has no public zoning service in this pull. County zoning is not substituted inside those four cities.",
+        "OZ 2.0 on these parcels is Rev. Proc. 2026-14 nomination eligibility for four rural Robertson tracts. Eligible means eligible for nomination, not a designated Qualified Opportunity Zone. opportunityZone is left unset. This pull does not certify a 2018 or 2027 QOZ.",
+        "252 parcels have a centroid in a Rev. Proc. 2026-14 rural-eligible tract. 0 source rows were dropped for geometry or duplicate ids."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47147/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47147/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 8581,
+      "municipalities": [
+        {
+          "name": "Springfield",
+          "prefix": "SPF",
+          "zoning": "public",
+          "vintage": "2025-07-15"
+        },
+        {
+          "name": "Greenbrier",
+          "prefix": "GBR",
+          "zoning": "public",
+          "vintage": "2022-04",
+          "note": "RD is Mobile Home Park on the city layer; R8 is High Density Residential."
+        },
+        {
+          "name": "White House",
+          "prefix": "WHT",
+          "zoning": "public",
+          "flu": "CompPlan Future_LU"
+        },
+        {
+          "name": "Millersville",
+          "prefix": "MLV",
+          "zoning": "public",
+          "note": "AGOL Millersville_Zoning_view"
+        },
+        {
+          "name": "Adams",
+          "prefix": "ADM",
+          "zoning": "dated",
+          "vintage": "2009-05-06"
+        },
+        {
+          "name": "Orlinda",
+          "prefix": "ORD",
+          "zoning": "dated",
+          "vintage": "2009-05-06"
+        },
+        {
+          "name": "Cedar Hill",
+          "prefix": "CDH",
+          "zoning": "dated",
+          "vintage": "2014-08-04"
+        },
+        {
+          "name": "Unincorporated Robertson",
+          "prefix": "RBC",
+          "zoning": "dated",
+          "vintage": "2014-07-30"
+        },
+        {
+          "name": "Coopertown",
+          "zoning": "gap"
+        },
+        {
+          "name": "Cross Plains",
+          "zoning": "gap"
+        },
+        {
+          "name": "Ridgetop",
+          "zoning": "gap"
+        },
+        {
+          "name": "Portland",
+          "zoning": "gap"
+        }
+      ]
     },
     {
       "name": "Rutherford",
       "fips": "47149",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 9677,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47149",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-rutherford-agol-parcels",
+      "queryUrl": "https://services5.arcgis.com/A5C0MR9xfkxVRwat/arcgis/rest/services/Parcel_Data/FeatureServer/1/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "9866 source rows collapsed to 9677 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Rutherford is not an IMPACT county. Parcels come from the public AGOL Parcel_Data FeatureServer (PARCEL_TYPE=1, CALCACRES 5\u2013150). ParcelID is the display id; GISLINK is kept for joins. COUNTY/COUNTYID 075 is the comptroller county number, not FIPS.",
+        "Assessor WebPro Quick Search is the property-record portal. No stable public deep link was verified \u2014 search by ParcelID. Alias portal rcpatn.com. Do not use the token-gated maps.rutherfordcountytn.gov Assessor folder.",
+        "City zoning is joined on countywide parcels after CITYCODE: Murfreesboro 515 (GovUnits SubZoning), Smyrna 674 (town MapServer, county mirror fallback), La Vergne 400 (county mirror Zoning_Typ). Unincorporated 000 uses county Planning_Zoning_Subdivisions ZONEABBRV. Eagleville 227 has no public zoning FeatureServer; the parcel ZONING attribute is the only label.",
+        "La Vergne adopted a zoning ordinance dated 2025-10-09 that says the legal zoning map is the city GIS layer. The county mirror still carries the prior district set. Re-validate before treating Zoning_Typ as post-adoption entitlement.",
+        "FLU is Murfreesboro RSA 2023 (flut_pri, plan guidance, not an entitlement) inside CITYCODE 515, and county Character Areas (guidance) for unincorporated parcels via GISLINK. No public Smyrna, La Vergne, or Eagleville future-land-use FeatureServer was verified.",
+        "Zoning and Murfreesboro FLU use a centroid-in-polygon join. Character Areas join on GISLINK. Multifamily tokens cover Murfreesboro RM-12/RM-16, Smyrna R-5/R-6, and county RMF only. Other districts stay unscored.",
+        "Join counts \u2014 zoning Murfreesboro 450, Smyrna 306, La Vergne 242, county 8614, Eagleville attribute 0, parcel-attribute fallback 0, zoning miss 65; FLU RSA 445, Character Areas 6786, FLU gap 2446."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47149/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47149/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 9866
     },
     {
       "name": "Smith",
@@ -274,21 +380,123 @@
       "name": "Sumner",
       "fips": "47165",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 15982,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47165",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-sumner-911-parcels-cama",
+      "queryUrl": "https://services8.arcgis.com/8jhIZBvwlxdbJdGN/arcgis/rest/services/ParcelsCAMA/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Parcels are Sumner 911 AGOL ParcelsCAMA FeatureServer/0 filtered to PARCEL_TYP=1 and CALC_ACRE 5\u2013150 (15982 kept). Comptroller IMPACT COUNTY_ID=83 (https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0) and the stale Dec-2023 hosted CAMA (https://maps.cot.tn.gov/hosting/rest/services/Hosted/SUMNER_Dec2023_Parcels_CAMA_A/FeatureServer/0) were not used. Source rows include the same PARID in TAXYR 2026 and 2027. One record per PARID is kept, preferring the later tax year.",
+        "Municipal zoning joined on 4786 of 15982 parcels. Hendersonville MFR parcels: 328. Portland RM-1 parcels: 11. City counts: Unincorporated 10835, Gallatin 2273, Hendersonville 1277, Millersville 552, Portland 336, Goodlettsville 320, White House 206, Westmoreland 161, Mitchellville 22. Westmoreland and Mitchellville have no public zoning REST. Unincorporated Sumner has no county zoning REST. The CAMA ZONING field is not used as a district.",
+        "Future land use joined on 2479 parcels. Gallatin FLU is Community Character. White House FLU is CompPlan Future_LU. Hendersonville, Portland, Millersville, Goodlettsville, Westmoreland, Mitchellville, and unincorporated Sumner have no public FLU layer joined. Joined FLU codes are not in flu-config.json, so they stay unknown rather than multifamily.",
+        "Goodlettsville zoning is Zoning_District_2025 on the city AGOL org that also hosts Davidson County parcels. Metro Nashville Zoning MapServer was down and was not used. White House zoning is the city WhiteHouseTN_Zoning FeatureServer layer 3, not the thinner AGOL ZoningDistricts copy. Portland zoning is planimetric annexation polygons (Zoning_Dis). Hendersonville zoning is HvilleTN_Zoning_UPDATED MapServer layer 3. Millersville zoning is Millersville_Zoning_view layer 5 (ZONE_2021).",
+        "Rev. Proc. 2026-14 nomination eligibility is not a designated Qualified Opportunity Zone. Neither a current QOZ flag nor an eligibility flag is stored on these parcels.",
+        "Owner, mailing, situs street, last sale, and total appraisal come from ParcelsCAMA. A sale price or appraisal of 0 is stored as no value. Situs ZIP is not on this layer and is not copied from the mailing address. The public property search is https://tn.sumner.geopowered.com/. Owner phones and emails are not on these layers. Municipal zoning codes are not an Orange County multifamily knowledge-base match."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47165/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47165/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 17465,
+      "municipalities": [
+        {
+          "name": "Gallatin",
+          "zoningUrl": "https://arcweb.gallatin-tn.gov/arcgis/rest/services/Features/Zoning/FeatureServer/1",
+          "fluUrl": "https://arcweb.gallatin-tn.gov/arcgis/rest/services/Features/Community_Character/FeatureServer/0",
+          "parcels": 2273,
+          "zoningJoined": 2268,
+          "fluJoined": 2273,
+          "zoningGap": null,
+          "fluGap": null,
+          "note": null
+        },
+        {
+          "name": "Hendersonville",
+          "zoningUrl": "https://gis.hvilletn.org/gisapi/rest/services/HvilleTN_Zoning_UPDATED/MapServer/3",
+          "fluUrl": null,
+          "parcels": 1277,
+          "zoningJoined": 1277,
+          "fluJoined": 0,
+          "zoningGap": null,
+          "fluGap": "No public future land use layer for this municipality.",
+          "note": "ZONECODE includes MFR (Multi-Family Residential)."
+        },
+        {
+          "name": "Portland",
+          "zoningUrl": "https://services2.arcgis.com/T3IV683iYKk0vYAI/arcgis/rest/services/Planimetric_Parcels/FeatureServer/0",
+          "fluUrl": null,
+          "parcels": 336,
+          "zoningJoined": 331,
+          "fluJoined": 0,
+          "zoningGap": null,
+          "fluGap": "No public future land use layer for this municipality.",
+          "note": "City planimetric annexation polygons. Zoning_Dis includes RM-1 (High Density Residential)."
+        },
+        {
+          "name": "White House",
+          "zoningUrl": "https://gis.cityofwhitehouse.com/arcgis/rest/services/WhiteHouseTN_Zoning/FeatureServer/3",
+          "fluUrl": "https://gis.cityofwhitehouse.com/arcgis/rest/services/WhiteHouseTN_CompPlan/FeatureServer/2",
+          "parcels": 206,
+          "zoningJoined": 204,
+          "fluJoined": 206,
+          "zoningGap": null,
+          "fluGap": null,
+          "note": "On-prem WhiteHouseTN_Zoning layer 3. The thinner AGOL ZoningDistricts service is not the overlay."
+        },
+        {
+          "name": "Millersville",
+          "zoningUrl": "https://services.arcgis.com/jcrrmnzMsBOEAFJp/arcgis/rest/services/Millersville_Zoning_view/FeatureServer/5",
+          "fluUrl": null,
+          "parcels": 552,
+          "zoningJoined": 390,
+          "fluJoined": 0,
+          "zoningGap": null,
+          "fluGap": "No public future land use layer for this municipality.",
+          "note": null
+        },
+        {
+          "name": "Goodlettsville",
+          "zoningUrl": "https://services8.arcgis.com/qSbT66zM7qttH0fv/arcgis/rest/services/Zoning_District_2025/FeatureServer/0",
+          "fluUrl": null,
+          "parcels": 320,
+          "zoningJoined": 316,
+          "fluJoined": 0,
+          "zoningGap": null,
+          "fluGap": "No public future land use layer for this municipality.",
+          "note": "Goodlettsville AGOL org that also hosts Davidson County parcels. Metro Nashville Zoning MapServer was not used."
+        },
+        {
+          "name": "Westmoreland",
+          "zoningUrl": null,
+          "fluUrl": null,
+          "parcels": 161,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "zoningGap": "No public zoning REST for this municipality.",
+          "fluGap": "No public future land use layer for this municipality.",
+          "note": null
+        },
+        {
+          "name": "Mitchellville",
+          "zoningUrl": null,
+          "fluUrl": null,
+          "parcels": 22,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "zoningGap": "No public zoning REST for this municipality.",
+          "fluGap": "No public future land use layer for this municipality.",
+          "note": null
+        }
+      ],
+      "unincorporated": {
+        "parcels": 10835,
+        "zoningUrl": null,
+        "fluUrl": null,
+        "note": "No public Sumner County unincorporated zoning REST. The CAMA ZONING attribute is not a municipal district."
+      },
+      "zoningJoinedCount": 4786,
+      "fluJoinedCount": 2479
     },
     {
       "name": "Trousdale",
@@ -314,41 +522,50 @@
       "name": "Williamson",
       "fips": "47187",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 10760,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47187",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-williamson-datapull-47187",
+      "queryUrl": "http://arcgis2.williamsoncounty-tn.gov/arcgis/rest/services/IDT/DataPull/MapServer/10/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Williamson is not Comptroller IMPACT. 10760 parcels kept from IDT/DataPull layer 10 (source rows 11136, geometry/acreage drops 0) using CALC_ACRE 5\u2013150 inclusive. 376 extra GISLINK rows collapsed to the larger CALC_ACRE. AC and ACc are secondary assessor acres, not the filter. Query format is Esri JSON (no geoJSON); rings were converted to GeoJSON.",
+        "Jurisdiction is Corporate Limits layer 2 when the centroid is inside a city, otherwise the CITY tax code. Resolved {'UNINCORPORATED': 8534, 'NOLENSVILLE': 221, 'BRENTWOOD': 578, 'FAIRVIEW': 294, 'FRANKLIN': 688, 'THOMPSONS STATION': 370, 'SPRING HILL': 75}. Limits overrode a mapped city code on 0 parcels. CITY 000264 and blank codes are not treated as Franklin unless Corporate Limits say so.",
+        "City-only zoning on countywide parcels: zoning joined 10141 ({'UNINCORPORATED': 8526, 'BRENTWOOD': 572, 'FAIRVIEW': 292, 'FRANKLIN': 676, 'SPRING HILL': 75}); FLU joined 980 ({'FAIRVIEW': 293, 'FRANKLIN': 687}). Franklin FLU is Envision Design Concepts (DCABBREV) inside Franklin only. Fairview FLU is Fairview 2040 FUT_LU inside Fairview only. Brentwood, Spring Hill, Nolensville, Thompson's Station, and unincorporated Williamson have no joined FLU.",
+        "Zoning REST used: Franklin ZoningWebMercator/9 ZONECLASS, Brentwood AdministrativeAreas/9 Zoning, Fairview_Zoning_Public Zoning, Spring Hill Zoning_Spring_Hill_view/2 Zone (Williamson parcels only), unincorporated IDT/DataPull layer 0 ZONES. Overlay layers and the 1988/2013 county zoning archives are not joined. Nolensville portal https://nolensvilletn.interactivegis.com/map/. Thompson's Station portal https://thompsons-station.gov/mapping-gis.",
+        "Assessor card is Inigo search (https://inigo.williamson-tn.org/property_search/). parcel/{lrsn} needs a page CSRF, so appraiserUrl is the search landing. Owner mailing is the assessor address only. No email or phone enrichment. Williamson zoning and FLU codes are stored raw and are not in the Orange County multifamily list."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47187/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47187/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 11136
     },
     {
       "name": "Wilson",
       "fips": "47189",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 10671,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
       "source": "tn-impact-47189",
       "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Unincorporated Wilson zoning and future land use have no public FeatureServer (county PDF maps only; the $75 shapefile was not purchased). Zoning and FLU stay null outside Lebanon and Mt. Juliet.",
+        "Watertown zoning is the 2017 ordinance PDF only. No anonymous city-limit or zoning FeatureServer was verified. CITYNUM 758 parcels keep IMPACT geometry with null zoning and FLU.",
+        "Lebanon zone and Mt. Juliet Zone_Curre / FLU_Lisa are city-only. They are applied only when the parcel centroid is inside that city limit. CAMA ZONING is not used as an entitlement.",
+        "Rejected gis.wilson-co.com and county-data-wilsoncounty.opendata.arcgis.com \u2014 those are Wilson County, North Carolina.",
+        "Rejected token-gated GEOJobe PSA layers (WilsonTN_PSA and related utility proxies, including Lebanon Parcels_Address).",
+        "Comptroller COUNTY_ID is 95 (JUR 095), not Census FIPS 189. Attributes come from IMPACT Parcel_Layer_Themes layer 12 joined on GISLINK using the latest TAXYR.",
+        "HUD Opportunity Zones has no designated tract in Wilson County (GEOID 47189). Rev. Proc. 2026-14 rural eligibility is stored only on oz2Eligibility for the Nashville rural pack and is not a designated QOZ.",
+        "Assessed and taxable values are not on the public IMPACT extract. marketValue is APPRAISAL when it is positive; otherwise null."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47189/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47189/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 10671
     }
   ]
 }

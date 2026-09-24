@@ -16,6 +16,7 @@ import {
   tileIndicesForBbox,
 } from "../lib/orlandoParcels";
 import { signedArea } from "../lib/parcelGeometry";
+import { parcelAppraiserUrl } from "../lib/format";
 import type { OrlandoParcelsMeta, ParcelCollection, ParcelFeature } from "../lib/types";
 
 const FULL_MINIMUMS: Record<string, number> = {
@@ -24,6 +25,7 @@ const FULL_MINIMUMS: Record<string, number> = {
   Osceola: 5500,
   Polk: 18000,
   Seminole: 4000,
+  Sumter: 5000,
 };
 
 function featuresForCounty(county: OrlandoParcelsMeta["counties"][number]): ParcelFeature[] {
@@ -66,8 +68,9 @@ describe("Orlando shed parcels", () => {
     expect(ORLANDO_PARCEL_TILE).toEqual({ originLon: -83, originLat: 27, tileDeg: 0.25 });
     expect(tileIndicesForBbox([-81.5, 28.4, -81.2, 28.7])).toEqual({ ix0: 6, ix1: 7, iy0: 5, iy1: 6 });
     expect(isFull5AcCounty("Polk")).toBe(true);
+    expect(isFull5AcCounty("Sumter")).toBe(true);
     expect(isFull5AcCounty("Brevard")).toBe(false);
-    expect([...ORLANDO_FULL_5AC_COUNTIES]).toEqual(["Lake", "Orange", "Osceola", "Polk", "Seminole"]);
+    expect([...ORLANDO_FULL_5AC_COUNTIES]).toEqual(["Lake", "Orange", "Osceola", "Polk", "Seminole", "Sumter"]);
     const thinned = spatiallyThinFeatures(
       [
         { properties: { centroid: [-81.5, 28.5] as [number, number], acreage: 9 } },
@@ -80,7 +83,7 @@ describe("Orlando shed parcels", () => {
     expect(thinned.map((item) => item.properties.acreage).sort()).toEqual([6, 9]);
   });
 
-  it("ships complete 5–150 acre fixtures for the five core counties and samples for the rest", () => {
+  it("ships complete 5–150 acre fixtures for the complete counties and samples for the rest", () => {
     const meta = JSON.parse(readFileSync("data/fixtures/orlando-parcels/meta.json", "utf8")) as OrlandoParcelsMeta;
     expect(meta.market).toBe("Orlando");
     expect(meta.counties).toHaveLength(9);
@@ -132,6 +135,80 @@ describe("Orlando shed parcels", () => {
       }
     }
     expect(clockwiseOuters).toBe(0);
+    const osceola = meta.counties.find((county) => county.name === "Osceola");
+    const lake = meta.counties.find((county) => county.name === "Lake");
+    expect(osceola?.source).toBe("osceola-parcels");
+    expect(lake?.source).toBe("lakecounty-tax-parcels");
+    expect(osceola?.zoningJoinedCount ?? 0).toBeGreaterThan(1000);
+    expect(osceola?.fluJoinedCount ?? 0).toBeGreaterThan(1000);
+    expect(lake?.zoningJoinedCount ?? 0).toBeGreaterThan(1000);
+    expect(lake?.fluJoinedCount ?? 0).toBeGreaterThan(1000);
+    const osceolaFeatures = featuresForCounty(osceola!);
+    const lakeFeatures = featuresForCounty(lake!);
+    expect(osceolaFeatures.filter((feature) => feature.properties.ownerName).length).toBeGreaterThan(osceolaFeatures.length * 0.9);
+    expect(lakeFeatures.filter((feature) => feature.properties.ownerName).length).toBeGreaterThan(lakeFeatures.length * 0.9);
+    expect(osceolaFeatures.filter((feature) => feature.properties.tax.marketValue != null).length).toBeGreaterThan(
+      osceolaFeatures.length * 0.9,
+    );
+    expect(lakeFeatures.filter((feature) => feature.properties.tax.marketValue != null).length).toBeGreaterThan(
+      lakeFeatures.length * 0.9,
+    );
+    expect(osceolaFeatures.filter((feature) => feature.properties.zoningCode).length).toBeGreaterThan(1000);
+    expect(lakeFeatures.filter((feature) => feature.properties.zoningCode).length).toBeGreaterThan(1000);
+    expect(osceolaFeatures.filter((feature) => feature.properties.flu?.code).length).toBeGreaterThan(1000);
+    expect(lakeFeatures.filter((feature) => feature.properties.flu?.code).length).toBeGreaterThan(1000);
+    expect(osceolaFeatures.some((feature) => feature.properties.appraiserUrl?.includes("Pin="))).toBe(true);
+    expect(lakeFeatures.some((feature) => feature.properties.appraiserUrl?.includes("AltKey="))).toBe(true);
+    expect(osceolaFeatures.every((feature) => feature.properties.source === "osceola-parcels-12097")).toBe(true);
+    expect(lakeFeatures.every((feature) => feature.properties.source === "lakecounty-tax-parcels-12069")).toBe(true);
+    expect(
+      osceolaFeatures.some(
+        (feature) => feature.properties.zoningDistrict === "St. Cloud" || feature.properties.flu?.source === "st-cloud-flu-98",
+      ),
+    ).toBe(true);
+    const seminole = meta.counties.find((county) => county.name === "Seminole");
+    const sumter = meta.counties.find((county) => county.name === "Sumter");
+    expect(seminole?.source).toBe("doh-ehwaters+seminole-land-use");
+    expect(sumter?.source).toBe("swfwmd-sumter-parcels");
+    expect(seminole?.zoningJoinedCount ?? 0).toBeGreaterThan(1000);
+    expect(seminole?.fluJoinedCount ?? 0).toBeGreaterThan(1000);
+    expect(sumter?.zoningJoinedCount ?? 0).toBeGreaterThan(1000);
+    expect(sumter?.fluJoinedCount ?? 0).toBeGreaterThan(1000);
+    const seminoleFeatures = featuresForCounty(seminole!);
+    const sumterFeatures = featuresForCounty(sumter!);
+    expect(seminoleFeatures.every((feature) => feature.properties.source?.includes("seminole-land-use"))).toBe(true);
+    expect(sumterFeatures.every((feature) => feature.properties.source === "swfwmd-sumter-parcels-12119")).toBe(true);
+    expect(sumterFeatures.filter((feature) => feature.properties.ownerName).length).toBeGreaterThan(sumterFeatures.length * 0.9);
+    expect(sumterFeatures.filter((feature) => feature.properties.tax.marketValue != null).length).toBeGreaterThan(
+      sumterFeatures.length * 0.9,
+    );
+    expect(sumterFeatures.some((feature) => feature.properties.appraiserUrl?.includes("sumterpa.com"))).toBe(true);
+    expect(seminoleFeatures.some((feature) => feature.properties.flu?.jurisdiction === "Oviedo")).toBe(true);
+    expect(seminoleFeatures.some((feature) => feature.properties.flu?.jurisdiction === "Altamonte Springs")).toBe(true);
+    for (const feature of [...seminoleFeatures, ...sumterFeatures]) {
+      const [lon, lat] = feature.properties.centroid ?? [];
+      expect(lon).toBeGreaterThan(-88);
+      expect(lon).toBeLessThan(-79);
+      expect(lat).toBeGreaterThan(24);
+      expect(lat).toBeLessThan(31.5);
+    }
+    expect(
+      parcelAppraiserUrl({
+        parcelId: "A02-002",
+        countyFips: "12119",
+        appraiserUrl: "https://app.sumterpa.com/gis/D_ShowDetail.html?KEY=A02-002&PIN=A02-002",
+      }).href,
+    ).toBe("https://app.sumterpa.com/gis/D_ShowDetail.html?KEY=A02-002&PIN=A02-002");
+    expect(
+      parcelAppraiserUrl({ parcelId: "012527000000140000", countyFips: "12097" }).href,
+    ).toBe("https://maps.property-appraiser.org/?Pin=012527000000140000");
+    expect(
+      parcelAppraiserUrl({
+        parcelId: "331828000300004500",
+        countyFips: "12069",
+        appraiserUrl: "http://www.lakecopropappr.com/property-details.aspx?AltKey=2668024",
+      }).href,
+    ).toBe("https://www.lakecopropappr.com/property-details.aspx?AltKey=2668024");
     const orange = meta.counties.find((county) => county.name === "Orange");
     expect(orange?.zoningJoinedCount ?? 0).toBeGreaterThan(7000);
     expect(orange?.fluJoinedCount ?? 0).toBeGreaterThan(1000);

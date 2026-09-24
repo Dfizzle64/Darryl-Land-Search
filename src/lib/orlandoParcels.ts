@@ -49,16 +49,16 @@ export const ORLANDO_PARCEL_TILE = {
   tileDeg: 0.25,
 } as const;
 
-/** Inclusive acreage band for the five complete counties (FDOR land area). */
+/** Inclusive acreage band for the complete counties (public acreage or FDOR land area). */
 export const ORLANDO_CORE_ACREAGE = { min: 5, max: 150 } as const;
 
 /** FDOR LND_SQFOOT bounds for that band (acres × 43,560). */
 export const ORLANDO_CORE_SQFT = { min: 217_800, max: 6_534_000 } as const;
 
 /** Counties whose fixtures are every public parcel from 5.0 through 150.0 acres. */
-export const ORLANDO_FULL_5AC_COUNTIES = ["Lake", "Orange", "Osceola", "Polk", "Seminole"] as const;
+export const ORLANDO_FULL_5AC_COUNTIES = ["Lake", "Orange", "Osceola", "Polk", "Seminole", "Sumter"] as const;
 
-export const ORLANDO_SAMPLE_COUNTIES = ["Brevard", "Marion", "Sumter", "Volusia"] as const;
+export const ORLANDO_SAMPLE_COUNTIES = ["Brevard", "Marion", "Volusia"] as const;
 
 export function isFull5AcCounty(county: string | null | undefined): boolean {
   return Boolean(county && (ORLANDO_FULL_5AC_COUNTIES as readonly string[]).includes(county));

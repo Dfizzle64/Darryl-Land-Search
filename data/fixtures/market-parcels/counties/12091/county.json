@@ -5,19 +5,32 @@
   "markets": [
     "Pensacola"
   ],
-  "featureCount": 5854,
+  "featureCount": 9956,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-doh-ehwaters-12091",
-  "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/45/query",
+  "source": "fl-panhandle-12091",
+  "queryUrl": "https://okgis.myokaloosa.com/arcgis/rest/services/internet_webgis/MapServer/17/query",
   "gaps": [
-    "No zoning or FLU on the Florida DOH extract."
+    "Joined zoning on 9449 of 9956 parcels and FLU on 9470. Owner 9956, situs 0, sale price 9562, sale date 9749.",
+    "Situs is a gap on internet_webgis PARCELS/17. Mailing address is stored. No separate situs fields.",
+    "County Zoning/515 and Future Land Use/44 are unincorporated only. They are not treated as city law. Unincorporated zoning/FLU hits 7208. Destin zoning hits 2035. Fort Walton Beach hits 227.",
+    "Destin zoning is Zoning_JulyB_WFL1/0 (geo-verified Destin FL, about -86.52 to -86.40). Destin FLU is LandUse_DND25_WFL1/2 (LU_CODE). The FGDL statewide Zoning service is not used.",
+    "Fort Walton Beach zoning is gis.fwb.org Maps/Zoning/0. FLU prefers Maps/FLU/0 and falls back to the FLU attributes on the zoning layer.",
+    "Crestview, Niceville, Valparaiso, Mary Esther, Laurel Hill, Cinco Bayou, and Shalimar have no verified public city FeatureServer this pass. Unincorporated county codes are not copied onto those cities.",
+    "Appraiser link is the Okaloosa PA portal. The layer does not publish a verified per-parcel URL. Search uses PATPCL_PIN.",
+    "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077)."
   ],
   "path": "data/fixtures/market-parcels/counties/12091/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12091/lookup.json",
-  "sourceCount": 5854,
+  "sourceCount": 9956,
   "dropped": 0,
-  "tileCount": 9
+  "tileCount": 9,
+  "zoningJoinedCount": 9449,
+  "fluJoinedCount": 9470,
+  "salePriceCount": 9562,
+  "saleDateCount": 9749,
+  "situsCount": 0,
+  "ownerCount": 9956
 }

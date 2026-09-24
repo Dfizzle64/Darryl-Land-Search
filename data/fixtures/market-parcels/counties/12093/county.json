@@ -5,19 +5,48 @@
   "markets": [
     "Vero Beach"
   ],
-  "featureCount": 3176,
+  "featureCount": 3053,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-doh-ehwaters-12093",
-  "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/46/query",
+  "source": "fl-okeechobee-planning-12093",
+  "queryUrl": "https://services3.arcgis.com/jE4lvuOFtdtz6Lbl/arcgis/rest/services/Parcels_2022/FeatureServer/2/query",
   "gaps": [
-    "No zoning or FLU on the Florida DOH extract."
+    "Rejected City of Ocoee (maps.ocoee.org, Orange County). These parcels are Okeechobee County, from the county planning Parcels_2022 service.",
+    "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
+    "Optional county, included because the county planning services are public and the extent is Okeechobee County. There is no acreage column. Acres are computed from the polygon and then limited to 5.0\u2013150.0.",
+    "The City of Okeechobee is not split out. County zoning is not a city ordinance.",
+    "No sale price, sale date, or tax values are on the parcel service. The appraiser link is the public GIS page, not a parcel deep link.",
+    "Zoning polygons with ACRES>=5 are the join. A zone smaller than 5 acres is not applied.",
+    "No owner phone or email is copied."
   ],
   "path": "data/fixtures/market-parcels/counties/12093/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12093/lookup.json",
-  "sourceCount": 3176,
+  "sourceCount": 3053,
   "dropped": 0,
-  "tileCount": 8
+  "tileCount": 8,
+  "municipalities": [
+    {
+      "name": "Okeechobee",
+      "independentGis": false,
+      "zoningUrl": null,
+      "fluUrl": null,
+      "fluGap": "The City of Okeechobee has no separate public zoning or FLU service. County zoning is not labeled as the city ordinance. Situs city Okeechobee is a post office name and is not a city-limits join.",
+      "join": null,
+      "zoningJoined": 0,
+      "fluJoined": 0
+    }
+  ],
+  "unincorporated": {
+    "zoningUrl": "https://services3.arcgis.com/jE4lvuOFtdtz6Lbl/arcgis/rest/services/Zoning/FeatureServer/0",
+    "fluUrl": "https://services3.arcgis.com/jE4lvuOFtdtz6Lbl/arcgis/rest/services/Future_Land_Use/FeatureServer/83",
+    "zoningFeatures": 4102,
+    "fluFeatures": 108,
+    "zoningJoined": 3010,
+    "fluJoined": 3046,
+    "note": "No public city-limits layer was found, so county zoning and FLU are joined for the whole county extent and tagged Okeechobee County."
+  },
+  "zoningJoinedCount": 3010,
+  "fluJoinedCount": 3046
 }

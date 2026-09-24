@@ -5,20 +5,26 @@
   "markets": [
     "Nashville"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 9677,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "tn-impact-47149",
-  "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+  "source": "tn-rutherford-agol-parcels",
+  "queryUrl": "https://services5.arcgis.com/A5C0MR9xfkxVRwat/arcgis/rest/services/Parcel_Data/FeatureServer/1/query",
   "gaps": [
-    "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-    "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+    "9866 source rows collapsed to 9677 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "Rutherford is not an IMPACT county. Parcels come from the public AGOL Parcel_Data FeatureServer (PARCEL_TYPE=1, CALCACRES 5\u2013150). ParcelID is the display id; GISLINK is kept for joins. COUNTY/COUNTYID 075 is the comptroller county number, not FIPS.",
+    "Assessor WebPro Quick Search is the property-record portal. No stable public deep link was verified \u2014 search by ParcelID. Alias portal rcpatn.com. Do not use the token-gated maps.rutherfordcountytn.gov Assessor folder.",
+    "City zoning is joined on countywide parcels after CITYCODE: Murfreesboro 515 (GovUnits SubZoning), Smyrna 674 (town MapServer, county mirror fallback), La Vergne 400 (county mirror Zoning_Typ). Unincorporated 000 uses county Planning_Zoning_Subdivisions ZONEABBRV. Eagleville 227 has no public zoning FeatureServer; the parcel ZONING attribute is the only label.",
+    "La Vergne adopted a zoning ordinance dated 2025-10-09 that says the legal zoning map is the city GIS layer. The county mirror still carries the prior district set. Re-validate before treating Zoning_Typ as post-adoption entitlement.",
+    "FLU is Murfreesboro RSA 2023 (flut_pri, plan guidance, not an entitlement) inside CITYCODE 515, and county Character Areas (guidance) for unincorporated parcels via GISLINK. No public Smyrna, La Vergne, or Eagleville future-land-use FeatureServer was verified.",
+    "Zoning and Murfreesboro FLU use a centroid-in-polygon join. Character Areas join on GISLINK. Multifamily tokens cover Murfreesboro RM-12/RM-16, Smyrna R-5/R-6, and county RMF only. Other districts stay unscored.",
+    "Join counts \u2014 zoning Murfreesboro 450, Smyrna 306, La Vergne 242, county 8614, Eagleville attribute 0, parcel-attribute fallback 0, zoning miss 65; FLU RSA 445, Character Areas 6786, FLU gap 2446."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": 0,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/47149/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47149/lookup.json",
+  "sourceCount": 9866,
+  "dropped": 0,
+  "tileCount": 8
 }

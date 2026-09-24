@@ -415,7 +415,7 @@ export function AppShell({
       return;
     }
     // Live DOH fill is only for the thinner sample counties, and only once the
-    // view is tighter than the neighborhood gate. The five core counties already
+    // view is tighter than the neighborhood gate. The complete counties already
     // ship every parcel from 5 through 150 acres.
     const useLive = orlandoParcelsOn && zoom >= 11.5 && Boolean(county) && !isFull5AcCounty(county);
     const limit = useLive ? 900 : zoom >= 13 ? 3500 : zoom >= 11.5 ? 2200 : 1600;

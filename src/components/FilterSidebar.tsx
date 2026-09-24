@@ -400,8 +400,10 @@ export function FilterSidebar({
           </label>
           <Note label="Acreage notes">
             <p>
-              Slider runs 0–{ACREAGE_SLIDER.max} acres. Larger parcels still match. Complete counties keep the inclusive
-              5.0–150.0 acre band. This slider does not hide tracts.
+              Slider runs 0–{ACREAGE_SLIDER.max} acres. Larger parcels still match any threshold at or below{" "}
+              {ACREAGE_SLIDER.max} ac. Lake, Orange, Osceola, Polk, Seminole, and Sumter fixtures include every public parcel
+              from 5.0 through 150.0 acres. Parcels under 5 or over 150 are excluded. Brevard, Marion, and Volusia are still
+              smaller samples. Eligible tracts have no acreage attribute, so this slider does not hide tracts.
             </p>
           </Note>
           <Toggle

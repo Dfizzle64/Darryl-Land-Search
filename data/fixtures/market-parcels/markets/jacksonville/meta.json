@@ -1,0 +1,145 @@
+{
+  "generatedAt": "2026-09-24T01:06:16Z",
+  "market": "Jacksonville",
+  "tier": "other",
+  "parcelCount": 26301,
+  "coreMinAcres": 5.0,
+  "coreMaxAcres": 150.0,
+  "tile": {
+    "originLon": -83.0,
+    "originLat": 27.0,
+    "tileDeg": 0.25
+  },
+  "notes": [
+    "Loaded only when this market is selected.",
+    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Orange, Osceola, and Polk point at the existing Orlando complete extract."
+  ],
+  "counties": [
+    {
+      "name": "Baker",
+      "fips": "12003",
+      "state": "Florida",
+      "featureCount": 3314,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-baker-parcels-web2-12003",
+      "queryUrl": "https://services6.arcgis.com/HSWu3dhzHf7nZfIa/arcgis/rest/services/parcels_web2/FeatureServer/0/query",
+      "gaps": [
+        "Baker 2024_sales requires a token and was not joined.",
+        "Tax values on parcels_web2 use unlabeled cama0827 columns and were not mapped.",
+        "Macclenny and Glen St. Mary have no separate public zoning service. County zoning and FLU are applied countywide.",
+        "Zoning joined on 3312 of 3314 parcels.",
+        "FLU joined on 3301 of 3314 parcels.",
+        "Sales joined on 238 of 3314 parcels from the public year sales layers."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12003/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12003/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 3331
+    },
+    {
+      "name": "Clay",
+      "fips": "12019",
+      "state": "Florida",
+      "featureCount": 4688,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-clay-parcels-lgim-12019",
+      "queryUrl": "https://maps.clayutility.org/server/rest/services/Parcels_LGIM/MapServer/0/query",
+      "gaps": [
+        "Acreage is GISACRES from the Clay utility parcel layer, joined to county Parcel CAMA attributes on PIN.",
+        "County parcel REST has no sale price, sale date, or tax values. Green Cove Springs existing land use supplies those inside the city only.",
+        "County CAMA attributes joined for 4688 parcels.",
+        "Green Cove Springs zoning applied to 74 parcels.",
+        "Orange Park parcels left without city zoning: 39.",
+        "Keystone Heights parcels left without city zoning: 11.",
+        "Penney Farms parcels left without city zoning: 27."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12019/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12019/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 4689
+    },
+    {
+      "name": "Duval",
+      "fips": "12031",
+      "state": "Florida",
+      "featureCount": 7768,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-coj-citybiz-parcels-12031",
+      "queryUrl": "https://maps.coj.net/coj/rest/services/CityBiz/Parcels/MapServer/0/query",
+      "gaps": [
+        "Sale price is not on CityBiz/Parcels. The property appraiser sales download is the price source and is not joined here.",
+        "CAMA_VAL is the market value when it is at least $1,000. Smaller placeholders fall back to land plus building value. Assessed and taxable value are not on this layer.",
+        "ZON_LABEL and LND_LABEL are consolidated Jacksonville attributes, not official zoning for Jacksonville Beach, Atlantic Beach, Neptune Beach, or Baldwin.",
+        "No public Jacksonville zoning-district service was verified. Paid NLR zoning was not used.",
+        "Jacksonville Beach zoning applied to 60 parcels.",
+        "Atlantic Beach parcels left without city zoning: 22.",
+        "Neptune Beach parcels left without city zoning: 19.",
+        "Baldwin parcels left without city zoning: 57."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12031/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12031/lookup.json",
+      "tileCount": 11,
+      "sourceCount": 7771
+    },
+    {
+      "name": "Nassau",
+      "fips": "12089",
+      "state": "Florida",
+      "featureCount": 5587,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-nassau-taxmap-12089",
+      "queryUrl": "https://maps.ncpafl.com/ncflpa_arcgis/rest/services/nassau/NassauCountyPublicTaxMap/MapServer/144/query",
+      "gaps": [
+        "8117 source rows collapsed to 5587 parcel ids. Repeated PINs on the tax map were kept once.",
+        "Last sale is not on MapServer/144. Yearly sales sublayers were not joined.",
+        "Assessed and taxable values are the non-school county figures (cap_val_nonSCH and tax_val_nonSCH). School and city columns are not summed.",
+        "Unincorporated zoning and FLU are replaced inside Fernandina Beach, Hilliard, and Callahan.",
+        "Fernandina Beach parcels in the 5\u2013150 acre band: 833.",
+        "Hilliard parcels in the 5\u2013150 acre band: 109.",
+        "Callahan parcels in the 5\u2013150 acre band: 37. Callahan has no separate zoning layer."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12089/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12089/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 8117
+    },
+    {
+      "name": "St. Johns",
+      "fips": "12109",
+      "state": "Florida",
+      "featureCount": 4944,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-sjc-hosted-parcel-12109",
+      "queryUrl": "https://www.gis.sjcfl.us/portal_sjcgis/rest/services/Hosted/Parcel/FeatureServer/0/query",
+      "gaps": [
+        "No acreage field on Hosted/Parcel. Acres are computed from WGS84 rings after a Web Mercator SHAPE__Area prefilter.",
+        "Sale price and tax values are not on the public parcel layer.",
+        "Unincorporated zoning does not cover St. Augustine, St. Augustine Beach, or Marineland.",
+        "St. Augustine parcels in the 5\u2013150 acre band: 219.",
+        "St. Augustine Beach parcels in the 5\u2013150 acre band: 27. St. Augustine Beach FLU is a gap.",
+        "Marineland parcels left without city zoning: 6.",
+        "Ponte Vedra overlay labeled on 46 unincorporated parcels."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12109/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12109/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 9961
+    }
+  ]
+}

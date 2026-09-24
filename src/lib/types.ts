@@ -120,30 +120,46 @@ export type MarketId = (typeof MARKETS)[number];
 
 /**
  * Smaller MSAs, visually secondary to the seven primary markets.
- * Florida markets stay together: east coast south to north, then the panhandle.
- * The rest of the order matches the research handoff.
+ * Florida markets stay together: SWFL and the Heartland shelf, east coast south to north,
+ * then North-Central Florida, Big Bend, and the panhandle. Jackson is Jackson, Tennessee.
+ * Heartland, Tuscaloosa, and Montgomery are parcel shelves with no eligible-tract rows.
  */
 export const OTHER_MARKETS = [
+  "SWFL",
+  "Heartland",
   "Vero Beach",
   "Melbourne",
   "Jacksonville",
+  "North-Central Florida",
+  "Big Bend",
   "Pensacola",
   "Birmingham",
   "Mobile",
   "Huntsville",
+  "Tuscaloosa",
+  "Montgomery",
   "Savannah",
   "Columbia",
   "Greenville",
   "Chattanooga",
   "Knoxville",
   "Memphis",
+  "Jackson",
   "Winston-Salem",
   "Wilmington",
 ] as const;
 
 export type OtherMarketId = (typeof OTHER_MARKETS)[number];
 
-export type SearchMarketId = MarketId | OtherMarketId;
+/**
+ * Parcel extracts that are not in the OZ 2.0 screening packs.
+ * Eligible is not designated, and these markets do not invent tract rows.
+ */
+export const PARCEL_MARKETS = ["Asheville"] as const;
+
+export type ParcelMarketId = (typeof PARCEL_MARKETS)[number];
+
+export type SearchMarketId = MarketId | OtherMarketId | ParcelMarketId;
 
 /** Rural, urban (non-rural eligible), or both. */
 export type TractClassView = "both" | "rural" | "urban";
@@ -247,7 +263,7 @@ export type MarketSummary = {
   counties: MarketCountySummary[];
 };
 
-/** Urban 7-market pack, or the 15 smaller MSAs (rural and urban together). */
+/** Urban 7-market pack, or the smaller MSAs (rural and urban together). */
 export type EligibleTractRow = {
   market: SearchMarketId;
   state: string;
@@ -389,6 +405,8 @@ export type ParcelProperties = {
   propertyName: string | null;
   zoningCode: string | null;
   zoningDistrict: string | null;
+  /** City overlay name (Fairhope AO/MO). Never a substitute for zoningCode. */
+  zoningOverlay?: string | null;
   jurisdictionPrefix: string | null;
   dorCode: string | null;
   acreage: number | null;

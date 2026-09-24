@@ -1,0 +1,26 @@
+{
+  "name": "Wakulla",
+  "fips": "12129",
+  "state": "Florida",
+  "markets": [
+    "Big Bend"
+  ],
+  "featureCount": 4784,
+  "coverage": "sample",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "fl-wakulla-county-parcels-12129",
+  "queryUrl": "https://services9.arcgis.com/vAltLjtfYIJc7pDt/arcgis/rest/services/Wakulla_County_Parcels/FeatureServer/0/query",
+  "gaps": [
+    "Partial. The county parcel layer has MAP_ACRES and PARCEL_ID only. No owner, situs, or county zoning.",
+    "County future land use is joined from the planning Future Land Use layer. Sopchoppy zoning (ZoningCat on Sopchoppy_FLUM_WFL1) is joined when the centroid falls inside it. St. Marks has no public zoning FeatureServer. Eligible tracts in this county stay eligible and are not designated QOZs.",
+    "Property appraiser search is https://mywakullapa.com/.",
+    "Join counts: flu=4776, sopchoppy=35, county=4749"
+  ],
+  "path": "data/fixtures/market-parcels/counties/12129/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12129/lookup.json",
+  "sourceCount": 4801,
+  "dropped": 1,
+  "tileCount": 8
+}

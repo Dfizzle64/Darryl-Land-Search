@@ -3,6 +3,7 @@
 import { MfPriorityFilter } from "./MfPriorityFilter";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { ZoningKnowledgePanel } from "./ZoningKnowledgePanel";
+import { UTILITY_LAYER_NOTE, type ScreeningToggles } from "@/lib/screening";
 import { ACREAGE_SLIDER, DEFAULT_FILTERS, SHED_CAVEAT, type FilterState, type FluConfig, type LandUseFilter, type MfPriorityView, type OzFilter, type SearchMarketId, type ZoningConfig } from "@/lib/types";
 
 type FilterSidebarProps = {
@@ -21,6 +22,8 @@ type FilterSidebarProps = {
   onShowOz: (value: boolean) => void;
   showOz2: boolean;
   onShowOz2: (value: boolean) => void;
+  screening: ScreeningToggles;
+  onScreening: (key: keyof ScreeningToggles, value: boolean) => void;
   open: boolean;
   onClose: () => void;
   meta: Record<string, unknown>;
@@ -185,6 +188,8 @@ export function FilterSidebar({
   onShowOz,
   showOz2,
   onShowOz2,
+  screening,
+  onScreening,
   open,
   onClose,
   meta,
@@ -316,6 +321,19 @@ export function FilterSidebar({
             onChange={onShowOz}
             hint="Orange County pilot only. Current HUD/Treasury QOZ tracts (2010 geography), copper fill with a dashed outline. Eligible is not designated."
           />
+        </section>
+
+        <section className="mt-5 space-y-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Site screening</h2>
+          <p className="text-xs text-ink-500">
+            Off by default. These are public map layers, not parcel filters, and they do not change which sites match.
+          </p>
+          <Toggle label="Flood zones" checked={screening.flood} onChange={(value) => onScreening("flood", value)} hint={UTILITY_LAYER_NOTE.flood} />
+          <Toggle label="Wetlands" checked={screening.wetlands} onChange={(value) => onScreening("wetlands", value)} hint={UTILITY_LAYER_NOTE.wetlands} />
+          <Toggle label="School ratings" checked={screening.schools} onChange={(value) => onScreening("schools", value)} hint={UTILITY_LAYER_NOTE.schools} />
+          <Toggle label="Water service areas" checked={screening.water} onChange={(value) => onScreening("water", value)} hint={UTILITY_LAYER_NOTE.water} />
+          <Toggle label="Sewer service areas" checked={screening.sewer} onChange={(value) => onScreening("sewer", value)} hint={UTILITY_LAYER_NOTE.sewer} />
+          <Toggle label="Electric retail territories" checked={screening.power} onChange={(value) => onScreening("power", value)} hint={UTILITY_LAYER_NOTE.power} />
         </section>
 
         <section className="mt-5 space-y-3">

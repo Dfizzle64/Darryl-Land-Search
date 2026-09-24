@@ -103,6 +103,19 @@ export function rasterLayerVisibility(
 }
 
 export const OVERLAY_LAYER_IDS = [
+  "flood-raster",
+  "wetlands-raster",
+  "school-zone-raster",
+  "school-ms-raster",
+  "school-cms-es-raster",
+  "school-cms-ms-raster",
+  "school-cms-hs-raster",
+  "water-fill",
+  "water-line",
+  "sewer-fill",
+  "sewer-line",
+  "power-fill",
+  "power-line",
   "rural-fill",
   "rural-line",
   "eligible-fill",
@@ -121,6 +134,7 @@ export const OVERLAY_LAYER_IDS = [
   "parcels-line-excluded",
   "parcels-fill",
   "parcels-line",
+  "schools-circle",
   "aoi-fill",
   "aoi-line",
   "measure-casing",

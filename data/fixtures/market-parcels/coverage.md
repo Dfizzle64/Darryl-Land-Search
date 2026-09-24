@@ -6,7 +6,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 85,505 | 15 | 0 | 20 |
+| Atlanta | primary | 93,811 | 17 | 0 | 18 |
 | Tampa | primary | 124,315 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 109,348 | 13 | 0 | 4 |
@@ -21,14 +21,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Birmingham | other | 38,101 | 3 | 0 | 6 |
 | Mobile | other | 42,446 | 3 | 0 | 2 |
 | Huntsville | other | 29,598 | 4 | 0 | 3 |
-| Savannah | other | 3,283 | 1 | 0 | 7 |
+| Savannah | other | 11,549 | 3 | 0 | 5 |
 | Columbia | other | 14,613 | 1 | 1 | 8 |
 | Greenville | other | 31,164 | 2 | 0 | 6 |
-| Chattanooga | other | 14,591 | 2 | 0 | 8 |
+| Chattanooga | other | 15,498 | 2 | 0 | 8 |
 | Knoxville | other | 39,939 | 7 | 0 | 6 |
 | Memphis | other | 45,278 | 8 | 0 | 3 |
 | Jackson | other | 6,384 | 1 | 0 | 0 |
-| Winston-Salem | other | 92,188 | 9 | 0 | 0 |
+| Winston-Salem | other | 92,199 | 9 | 0 | 0 |
 | Wilmington | other | 47,320 | 6 | 0 | 0 |
 | Heartland | shelf | 21,163 | 4 | 1 | 0 |
 | North-Central Florida | other | 52,695 | 7 | 0 | 0 |
@@ -70,12 +70,12 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Meriwether | Georgia | 13199 | gap | 0 | unavailable |
 | Monroe | Georgia | 13207 | gap | 0 | unavailable |
 | Morgan | Georgia | 13211 | gap | 0 | unavailable |
-| Newton | Georgia | 13217 | gap | 0 | unavailable |
+| Newton | Georgia | 13217 | complete-gte-5ac | 4,474 | ga-newton-uofmd-parcels |
 | Paulding | Georgia | 13223 | complete-gte-5ac | 5,094 | ga-paulding-parcels |
 | Pickens | Georgia | 13227 | gap | 0 | unavailable |
 | Pike | Georgia | 13231 | gap | 0 | unavailable |
 | Rockdale | Georgia | 13247 | complete-gte-5ac | 2,555 | ga-rockdale-parcels |
-| Spalding | Georgia | 13255 | gap | 0 | unavailable |
+| Spalding | Georgia | 13255 | complete-gte-5ac | 3,832 | ga-spalding-parcels-public |
 | Walton | Georgia | 13297 | complete-gte-5ac | 5,824 | ga-walton-choosewalton-parcels |
 
 ### Tampa
@@ -272,10 +272,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Beaufort | South Carolina | 45013 | gap | 0 | unavailable |
-| Bryan | Georgia | 13029 | gap | 0 | unavailable |
+| Bryan | Georgia | 13029 | complete-gte-5ac | 2,138 | ga-bryan-property-details |
 | Bulloch | Georgia | 13031 | gap | 0 | unavailable |
 | Chatham | Georgia | 13051 | complete-gte-5ac | 3,283 | sagis-chatham-ga-parcel-digest |
-| Effingham | Georgia | 13103 | gap | 0 | unavailable |
+| Effingham | Georgia | 13103 | complete-gte-5ac | 6,128 | ga-effingham-parcels-2024 |
 | Jasper | South Carolina | 45053 | gap | 0 | unavailable |
 | Liberty | Georgia | 13179 | gap | 0 | unavailable |
 | Screven | Georgia | 13251 | gap | 0 | unavailable |
@@ -312,7 +312,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Bradley | Tennessee | 47011 | complete-gte-5ac | 5,429 | tn-impact-47011 |
+| Bradley | Tennessee | 47011 | complete-gte-5ac | 6,336 | tn-cleveland-parcels-impact-47011 |
 | Catoosa | Georgia | 13047 | gap | 0 | unavailable |
 | Dade | Georgia | 13083 | gap | 0 | unavailable |
 | Hamilton | Tennessee | 47065 | complete-gte-5ac | 9,162 | tn-hamilton-live-parcels |
@@ -375,7 +375,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Rockingham | North Carolina | 37157 | complete-gte-5ac | 9,378 | nc-onemap-37157 |
 | Stokes | North Carolina | 37169 | complete-gte-5ac | 8,844 | nc-stokes-alllayers-24 |
 | Surry | North Carolina | 37171 | complete-gte-5ac | 10,547 | nc-onemap-37171 |
-| Yadkin | North Carolina | 37197 | complete-gte-5ac | 8,091 | nc-onemap-37197 |
+| Yadkin | North Carolina | 37197 | complete-gte-5ac | 8,102 | nc-yadkin-county-gis |
 
 ### Wilmington
 

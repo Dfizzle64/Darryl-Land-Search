@@ -5,19 +5,42 @@
   "markets": [
     "Savannah"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 2138,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "ga-bryan-property-details",
+  "queryUrl": "https://bryangis.bryan-county.org/arcgis/rest/services/PropertyDetails/MapServer/0/query",
   "gaps": [
-    "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+    "Kept 2138 Bryan County, Georgia parcels in the inclusive 5\u2013150 acre band from PropertyDetails MapServer/0 (2232 source rows, 94 extra parts with the same PARCEL_NO collapsed). TOTALACRES is the deeded acreage field.",
+    "Owner mailing CITY/STATE/ADDRESS2 are nationwide mailing addresses and are not a municipality filter. Situs city is the MunicipalBoundaries spatial hit (Richmond Hill or Pembroke) only.",
+    "ZONINGCODE is the parcel zoning string, including city-style codes. The value CITY is a stub and is not stored. County Zoning/0 is dissolved UDO polygons and was not preferred over the parcel code.",
+    "Future land use is a centroid join to 2023ComprehensivePlan MapServer/4 LANDUSEDESC. Richmond Hill and Pembroke have no city future-land-use FeatureServer.",
+    "No public REST sale price or sale date. Beacon/qPublic AppID=639 LayerID=11303 sales search is HTML only and was not scraped. HISTYR/HISTVAL are assessment years, not sales.",
+    "MAVCURR and the other MAV assessed fields are on the layer and were not used because the live assessed values are empty. tax.marketValue is CURR_VAL when it is positive. Assessed and taxable values stay null.",
+    "PropertyDetails does not support pagination. Rows were read by object id. The stale Parcels/MapServer URL and the thinner Evolve parcel layer were not used.",
+    "Rejected Bryan County, Texas, Bryan County, Oklahoma, and SAGIS (Chatham-only). Opportunity Zone and OZ 2.0 fields were not assigned."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/13029/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13029/lookup.json",
+  "sourceCount": 2232,
+  "dropped": 94,
+  "tileCount": 5,
+  "stats": {
+    "sourceRows": 2232,
+    "kept": 2138,
+    "duplicateGroups": 94,
+    "droppedGeometry": 0,
+    "droppedOutsideBryanGa": 0,
+    "droppedBand": 0,
+    "zoningJoined": 2114,
+    "zoningStubCity": 3,
+    "fluJoined": 1888,
+    "marketValueFilled": 2138,
+    "situsFilled": 2013,
+    "richmondHill": 155,
+    "pembroke": 98
+  },
+  "appraiserSearchUrl": "https://qpublic.net/ga/bryan/"
 }

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T01:06:16Z",
+  "generatedAt": "2026-09-24T01:22:21Z",
   "market": "Chattanooga",
   "tier": "other",
-  "parcelCount": 14591,
+  "parcelCount": 15498,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,20 +20,23 @@
       "name": "Bradley",
       "fips": "47011",
       "state": "Tennessee",
-      "featureCount": 5429,
+      "featureCount": 6336,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47011",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-cleveland-parcels-impact-47011",
+      "queryUrl": "https://utility.arcgis.com/usrsvcs/servers/93852593c94f4e178f338703adc6bca3/rest/services/Operational/OperationalLayersPRO/MapServer/2/query",
       "gaps": [
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "City of Cleveland stays in Bradley County (Census FIPS 47011, Chattanooga). 7801 City of Cleveland GIS Parcels_Impact rows (JUR 006, parcel type 1, CALC_ACRE 5\u2013150) collapsed to 6336 GISLINK parcels at the latest TAXYR. GEOID prefix is 47011, not Comptroller 006 and not 47107 (McMinn County).",
+        "Cleveland Zoning Districts ZONECLASS is joined only inside the Cleveland municipal boundary (508 of 508 Cleveland parcels). Charleston (17) and unincorporated Bradley (5811) have no zoning polygon service; CAMA ZONING is a first-pass label only. 10 CITYNUM 138 parcels sit outside the city limits and did not receive ZONECLASS.",
+        "County zoning and Charleston zoning are PDF or municipal-code gaps. Future land use REST is a gap; the Cleveland urban growth boundary is not parcel FLU. Opportunity Zone flags are not invented by this ingest.",
+        "Assessed and taxable values are left null. Market value is the IMPACT appraisal. Stacked CAMA cards that share a GISLINK keep the latest tax year, preferring the base 000 card."
       ],
       "path": "data/fixtures/market-parcels/counties/47011/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47011/lookup.json",
-      "tileCount": 5,
-      "sourceCount": 5522
+      "tileCount": 6,
+      "sourceCount": 7801
     },
     {
       "name": "Catoosa",

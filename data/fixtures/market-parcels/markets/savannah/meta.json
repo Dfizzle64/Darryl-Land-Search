@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T01:06:16Z",
+  "generatedAt": "2026-09-24T01:22:21Z",
   "market": "Savannah",
   "tier": "other",
-  "parcelCount": 3283,
+  "parcelCount": 11549,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -39,20 +39,27 @@
       "name": "Bryan",
       "fips": "13029",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 2138,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-bryan-property-details",
+      "queryUrl": "https://bryangis.bryan-county.org/arcgis/rest/services/PropertyDetails/MapServer/0/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Kept 2138 Bryan County, Georgia parcels in the inclusive 5\u2013150 acre band from PropertyDetails MapServer/0 (2232 source rows). TOTALACRES is the deeded acreage field.",
+        "Owner mailing CITY/STATE/ADDRESS2 are nationwide mailing addresses and are not a municipality filter. Situs city is the MunicipalBoundaries spatial hit (Richmond Hill or Pembroke) only.",
+        "ZONINGCODE is the parcel zoning string, including city-style codes. The value CITY is a stub and is not stored. County Zoning/0 is dissolved UDO polygons and was not preferred over the parcel code.",
+        "Future land use is a centroid join to 2023ComprehensivePlan MapServer/4 LANDUSEDESC. Richmond Hill and Pembroke have no city future-land-use FeatureServer.",
+        "No public REST sale price or sale date. Beacon/qPublic AppID=639 LayerID=11303 sales search is HTML only and was not scraped. HISTYR/HISTVAL are assessment years, not sales.",
+        "MAVCURR and the other MAV assessed fields are on the layer and were not used because the live assessed values are empty. tax.marketValue is CURR_VAL when it is positive. Assessed and taxable values stay null.",
+        "PropertyDetails does not support pagination. Rows were read by object id. The stale Parcels/MapServer URL and the thinner Evolve parcel layer were not used.",
+        "Rejected Bryan County, Texas, Bryan County, Oklahoma, and SAGIS (Chatham-only). Opportunity Zone and OZ 2.0 fields were not assigned."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13029/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13029/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 2232
     },
     {
       "name": "Bulloch",
@@ -106,20 +113,27 @@
       "name": "Effingham",
       "fips": "13103",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 6128,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-effingham-parcels-2024",
+      "queryUrl": "https://services.arcgis.com/9scQWTgPOi3GxJRr/arcgis/rest/services/Parcels2024/FeatureServer/0/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Kept 6128 Effingham County, Georgia parcels in the inclusive 5\u2013150 acre band from Parcels2024 (6130 source rows). TOTALACRES is the acreage field.",
+        "Parcels2024 has SalesDate and no SALEPRICE or CURR_VAL. lastSale.price and tax.marketValue are joined from ParcelUpdate on PARCEL_NO, then from FLUM_20240903_BOC_APPR_2 when ParcelUpdate has no positive value. Newer parcels can miss that join.",
+        "REASON is on Parcels2024 and is not a documented sale-quality flag, so lastSale.qualified stays null. There is no multi-sale history on the REST layer.",
+        "No assessed or taxable value is on the public REST layers. esttax is stored as tax.taxes when it is positive. tax.assessedValue and tax.taxableValue stay null.",
+        "Zoning is parcel-attributed ZCODE. No separate Euclidean zoning polygon service was found. Rincon, Guyton, and Springfield zoning maps are PDF or county ZCODE; no city zoning FeatureServer was used.",
+        "Future land use is EFF_REV2 on FLUM_20240903_BOC_APPR_2 joined by PARCEL_NO. That layer has fewer polygons than Parcels2024, so some parcels have no FLU.",
+        "Situs city is a spatial hit on County_Municipal_Boundaries (Rincon, Guyton, Springfield). The parcel city field is owner mailing and is not a municipality filter. Meldrim has no city polygon.",
+        "Rejected Effingham County, Illinois, SAGIS/Chatham ParcelDigest, and paid parcel vendors. Opportunity Zone and OZ 2.0 fields were not assigned."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13103/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13103/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 6130
     },
     {
       "name": "Jasper",

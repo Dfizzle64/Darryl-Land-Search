@@ -4,6 +4,7 @@ import {
   countyKey,
   filterRuralRows,
   formatCountyLabel,
+  otherMarketDisplayOrder,
   showOrangeCountyPilot,
   southCarolinaStatusHelp,
   viewBounds,
@@ -11,6 +12,8 @@ import {
 } from "../lib/markets";
 import {
   MARKETS,
+  OTHER_MARKETS,
+  PARCEL_MARKETS,
   RURAL_ELIGIBLE_STATUS_CHIP,
   SC_GOVERNOR_FILED_STATUS,
   SHED_CAVEAT,
@@ -33,6 +36,50 @@ const EXPECTED_ROWS: Record<MarketId, number> = {
 function loadCatalog(): RuralMarketsCatalog {
   return JSON.parse(readFileSync("data/fixtures/oz2-rural-markets.json", "utf8")) as RuralMarketsCatalog;
 }
+
+describe("other market display order", () => {
+  it("sorts Other MSAs A to Z without reordering the source arrays", () => {
+    const source = [...OTHER_MARKETS, ...PARCEL_MARKETS];
+    expect(otherMarketDisplayOrder()).toEqual([
+      "Asheville",
+      "Big Bend",
+      "Birmingham",
+      "Chattanooga",
+      "Columbia",
+      "Greenville",
+      "Heartland",
+      "Huntsville",
+      "Jackson",
+      "Jacksonville",
+      "Knoxville",
+      "Melbourne",
+      "Memphis",
+      "Mobile",
+      "Montgomery",
+      "North-Central Florida",
+      "Pensacola",
+      "Savannah",
+      "SWFL",
+      "Tuscaloosa",
+      "Vero Beach",
+      "Wilmington",
+      "Winston-Salem",
+    ]);
+    expect(OTHER_MARKETS[0]).toBe("SWFL");
+    expect(OTHER_MARKETS[1]).toBe("Heartland");
+    expect(PARCEL_MARKETS).toEqual(["Asheville"]);
+    expect(MARKETS).toEqual([
+      "Atlanta",
+      "Tampa",
+      "Orlando",
+      "Charleston",
+      "Nashville",
+      "Charlotte",
+      "Raleigh-Durham",
+    ]);
+    expect(source).not.toEqual(otherMarketDisplayOrder());
+  });
+});
 
 describe("seven-market rural OZ 2.0 pack", () => {
   const catalog = loadCatalog();

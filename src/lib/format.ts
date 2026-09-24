@@ -18,15 +18,40 @@ export function comptrollerRecordsUrl(): string {
 }
 
 const DEFAULT_APPRAISER_URLS: Record<string, string> = {
+  "12001": "https://www.acpafl.org/",
+  "12007": "https://www.bradfordappraiser.com/",
   "12009": "https://www.bcpao.us/PropertySearch/#/nav/Search",
+  "12017": "https://www.citruspa.org/",
+  "12041": "https://www.qpublic.net/fl/gilchrist/",
+  "12053": "https://hernandocountypa-florida.us/",
   "12069": "https://www.lakecopropappr.com/",
+  "12075": "https://www.qpublic.net/fl/levy/",
   "12083": "https://www.pa.marion.fl.us/",
   "12095": "https://ocpaweb.ocpafl.org/site/parcelsearch",
   "12097": "https://www.property-appraiser.org/",
   "12105": "https://www.polkpa.org/",
+  "12107": "https://pa.putnam-fl.com/",
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+};
+
+const APPRAISER_COUNTY_LABELS: Record<string, string> = {
+  "12001": "Alachua",
+  "12007": "Bradford",
+  "12009": "Brevard",
+  "12017": "Citrus",
+  "12041": "Gilchrist",
+  "12053": "Hernando",
+  "12069": "Lake",
+  "12075": "Levy",
+  "12083": "Marion",
+  "12097": "Osceola",
+  "12105": "Polk",
+  "12107": "Putnam",
+  "12117": "Seminole",
+  "12119": "Sumter",
+  "12127": "Volusia",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -42,24 +67,7 @@ export function parcelAppraiserUrl(options: {
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);
-  const countyLabel =
-    fips === "12009"
-      ? "Brevard"
-      : fips === "12069"
-        ? "Lake"
-        : fips === "12083"
-          ? "Marion"
-          : fips === "12097"
-            ? "Osceola"
-            : fips === "12105"
-              ? "Polk"
-              : fips === "12117"
-                ? "Seminole"
-                : fips === "12119"
-                  ? "Sumter"
-                  : fips === "12127"
-                    ? "Volusia"
-                    : "county";
+  const countyLabel = (fips && APPRAISER_COUNTY_LABELS[fips]) || "county";
   return {
     href,
     label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,

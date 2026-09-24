@@ -12,6 +12,7 @@ Orange, Osceola, and Polk already have a complete 5.0–150.0 acre Orlando extra
 npm run seed:parcels:markets
 python3 scripts/seed_market_parcels.py --market Charlotte
 python3 scripts/seed_market_parcels.py --market Tampa --county Hardee
+python3 scripts/seed_market_parcels.py --market "North-Central Florida" --refresh --workers 1
 python3 scripts/seed_market_parcels.py --refresh
 ```
 
@@ -21,7 +22,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 | State | Endpoint | What shipped |
 | --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
+| Florida | Florida DOH EHWATER Parcels, plus North-Central county GIS | DOH complete 5–150 acre extract where the county is not already an Orlando complete county. North-Central Florida uses Alachua Parcels35, Hernando county parcels, and Citrus/Putnam DOH polygons with municipal joins. Levy, Gilchrist, and Bradford stay DOH-only partials. Marion is not rewritten |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
@@ -30,7 +31,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning outside Orange County is not a multifamily knowledge-base match. North-Central Florida joins public zoning where a county or city layer was verified. DeKalb still uses the zoning field on its parcel layer. Prefer **All parcels** in these markets.
 
 ## Coverage
 
@@ -43,13 +44,13 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
-| Tampa | primary | 98,259 | 10 | 0 | 0 |
+| Tampa | primary | 97,677 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -62,6 +63,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
+| North-Central Florida | other | 52,695 | 7 | 0 | 0 |
 
 ## Counties
 
@@ -109,9 +111,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Citrus | Florida | 12017 | complete-gte-5ac | 5,810 | fl-doh-ehwaters-12017 |
+| Citrus | Florida | 12017 | complete-gte-5ac | 5,807 | fl-citrus-doh-municipal-12017 |
 | Hardee | Florida | 12049 | complete-gte-5ac | 5,055 | fl-doh-ehwaters-12049 |
-| Hernando | Florida | 12053 | complete-gte-5ac | 7,180 | fl-doh-ehwaters-12053 |
+| Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
 | Hillsborough | Florida | 12057 | complete-gte-5ac | 13,351 | fl-doh-ehwaters-12057 |
 | Manatee | Florida | 12081 | complete-gte-5ac | 7,239 | fl-doh-ehwaters-12081 |
 | Pasco | Florida | 12101 | complete-gte-5ac | 10,590 | fl-doh-ehwaters-12101 |
@@ -212,7 +214,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 
@@ -377,4 +379,16 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,256 | nc-onemap-37129 |
 | Onslow | North Carolina | 37133 | complete-gte-5ac | 6,747 | nc-onemap-37133 |
 | Pender | North Carolina | 37141 | complete-gte-5ac | 7,275 | nc-onemap-37141 |
+
+### North-Central Florida
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Alachua | Florida | 12001 | complete-gte-5ac | 15,539 | fl-alachua-parcels35-12001 |
+| Bradford | Florida | 12007 | complete-gte-5ac | 593 | fl-doh-ehwaters-12007 |
+| Citrus | Florida | 12017 | complete-gte-5ac | 5,807 | fl-citrus-doh-municipal-12017 |
+| Gilchrist | Florida | 12041 | complete-gte-5ac | 6,395 | fl-doh-ehwaters-12041 |
+| Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
+| Levy | Florida | 12075 | complete-gte-5ac | 10,200 | fl-doh-ehwaters-12075 |
+| Putnam | Florida | 12107 | complete-gte-5ac | 7,560 | fl-putnam-doh-municipal-12107 |
 

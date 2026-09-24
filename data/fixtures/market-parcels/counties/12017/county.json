@@ -3,21 +3,28 @@
   "fips": "12017",
   "state": "Florida",
   "markets": [
-    "Tampa"
+    "Tampa",
+    "North-Central Florida"
   ],
-  "featureCount": 5810,
+  "featureCount": 5807,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-doh-ehwaters-12017",
+  "source": "fl-citrus-doh-municipal-12017",
   "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/8/query",
   "gaps": [
-    "No zoning or FLU on the Florida DOH extract."
+    "Parcel polygons, owner, situs, and tax values are Florida DOH EHWATER layer 8. Citrus County lots have no acre or owner field, and lot PRCLKEY is empty, so zoning is a centroid join.",
+    "Municipality is the corporate-limit layer (Inverness or Crystal River). PHY_CITY is the postal city and is not the city limit.",
+    "County zoning and land use values CITY are placeholders and are not stored.",
+    "Inverness parcels: 86. Zoning is INV_FLU and future land use is FLU on the city layer.",
+    "Crystal River parcels left without city zoning: 88.",
+    "No public Crystal River zoning or FLU FeatureServer was verified.",
+    "County zoning codes are not Orange County multifamily districts."
   ],
   "path": "data/fixtures/market-parcels/counties/12017/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12017/lookup.json",
   "sourceCount": 5813,
-  "dropped": 0,
+  "dropped": 3,
   "tileCount": 9
 }

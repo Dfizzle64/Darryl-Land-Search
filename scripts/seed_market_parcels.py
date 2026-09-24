@@ -66,9 +66,20 @@ FL_DOH_LAYER = {
     "12111": 55,
     "12113": 56,
     "12115": 57,
+    "12007": 3,
+    "12041": 19,
+    "12075": 36,
+    "12107": 53,
     "12119": 59,
     "12127": 63,
     "12131": 65,
+}
+
+# Acreage extract only. Municipal zoning and FLU were not on a verified public service.
+PARTIAL_DOH_GAPS = {
+    "12007": "Partial. Bradford parcels are the Florida DOH 5–150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality.",
+    "12041": "Partial. Gilchrist parcels are the Florida DOH 5–150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality.",
+    "12075": "Partial. Levy parcels are the Florida DOH 5–150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality.",
 }
 
 NC_URL = "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query"
@@ -266,9 +277,16 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    owner2: str | None = None,
+    zoning_district: str | None = None,
+    jurisdiction: str | None = None,
+    taxes: float | None = None,
+    flu: dict | None = None,
+    appraiser_url: str | None = None,
+    data_gaps: list | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
-    return {
+    feature = {
         "type": "Feature",
         "id": feature_id,
         "properties": {
@@ -281,12 +299,12 @@ def empty_feature(
             "situsAddress": situs,
             "situsCity": city,
             "situsZip": zip_code,
-            "jurisdictionCode": None,
+            "jurisdictionCode": jurisdiction,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
-            "zoningDistrict": None,
+            "zoningDistrict": zoning_district,
             "jurisdictionPrefix": None,
             "dorCode": dor,
             "acreage": round(acreage, 4),
@@ -296,7 +314,7 @@ def empty_feature(
                 "marketValue": market_value,
                 "assessedValue": assessed,
                 "taxableValue": taxable,
-                "taxes": None,
+                "taxes": taxes,
             },
             "mailingAddress": {
                 "line1": mail1,
@@ -308,13 +326,18 @@ def empty_feature(
             "incomeTract": None,
             "incomeBlockGroup": None,
             "nearestRoad": None,
-            "flu": None,
+            "flu": flu,
             "opportunityZone": None,
             "oz2Eligibility": None,
             "source": source,
         },
         "geometry": geometry,
     }
+    if appraiser_url:
+        feature["properties"]["appraiserUrl"] = appraiser_url
+    if data_gaps:
+        feature["properties"]["dataGaps"] = data_gaps
+    return feature
 
 
 def count_where(url: str, where: str) -> int:
@@ -481,7 +504,7 @@ def fl_spec(fips: str) -> dict:
         "mailZipField": "OWN_ZIPCD",
         "source": f"fl-doh-ehwaters-{fips}",
         "coverage": "complete-gte-5ac",
-        "gaps": ["No zoning or FLU on the Florida DOH extract."],
+        "gaps": [PARTIAL_DOH_GAPS[fips]] if fips in PARTIAL_DOH_GAPS else ["No zoning or FLU on the Florida DOH extract."],
     }
 
 
@@ -566,7 +589,32 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+NORTH_CENTRAL_FIPS = {"12001", "12053", "12017", "12107"}
+
+NORTH_CENTRAL_SOURCE = {
+    "12001": "fl-alachua-parcels35-12001",
+    "12053": "fl-hernando-parcels-12053",
+    "12017": "fl-citrus-doh-municipal-12017",
+    "12107": "fl-putnam-doh-municipal-12107",
+}
+
+NORTH_CENTRAL_URL = {
+    "12001": "https://services1.arcgis.com/MiBZ4u97DWldovjI/ArcGIS/rest/services/Parcels35/FeatureServer/0/query",
+    "12053": "https://services2.arcgis.com/x5zvhhxfUuRDntRe/ArcGIS/rest/services/Parcels/FeatureServer/0/query",
+    "12017": f"{DOH_BASE}/8/query",
+    "12107": f"{DOH_BASE}/53/query",
+}
+
+
 def county_override(fips: str) -> dict | None:
+    if fips in NORTH_CENTRAL_FIPS:
+        return {
+            "kind": "north-central",
+            "url": NORTH_CENTRAL_URL[fips],
+            "source": NORTH_CENTRAL_SOURCE[fips],
+            "coverage": "complete-gte-5ac",
+            "gaps": [],
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -911,6 +959,7 @@ Orange, Osceola, and Polk already have a complete 5.0–150.0 acre Orlando extra
 npm run seed:parcels:markets
 python3 scripts/seed_market_parcels.py --market Charlotte
 python3 scripts/seed_market_parcels.py --market Tampa --county Hardee
+python3 scripts/seed_market_parcels.py --market "North-Central Florida" --refresh --workers 1
 python3 scripts/seed_market_parcels.py --refresh
 ```
 
@@ -920,7 +969,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 | State | Endpoint | What shipped |
 | --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
+| Florida | Florida DOH EHWATER Parcels, plus North-Central county GIS | DOH complete 5–150 acre extract where the county is not already an Orlando complete county. North-Central Florida uses Alachua Parcels35, Hernando county parcels, and Citrus/Putnam DOH polygons with municipal joins. Levy, Gilchrist, and Bradford stay DOH-only partials. Marion is not rewritten |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
@@ -929,7 +978,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning outside Orange County is not a multifamily knowledge-base match. North-Central Florida joins public zoning where a county or city layer was verified. DeKalb still uses the zoning field on its parcel layer. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -1166,7 +1215,15 @@ def main() -> None:
     def run(job: tuple) -> None:
         _priority, _name, county, markets, spec = job
         try:
-            download_county(county, markets, spec)
+            if spec.get("kind") == "north-central":
+                import sys
+
+                sys.path.insert(0, str(ROOT / "scripts"))
+                import north_central_parcels
+
+                north_central_parcels.pull(sys.modules[__name__], county, markets, spec)
+            else:
+                download_county(county, markets, spec)
         except Exception as exc:  # noqa: BLE001
             print(f"  failed {county['name']} {county['fips']}: {exc}", flush=True)
             county_row(

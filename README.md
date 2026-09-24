@@ -23,7 +23,7 @@ npm run seed:flu     # re-join FLU onto the existing parcel fixture
 npm run seed:oz      # designated QOZ polygons, then OZ 2.0 eligibility (Rev. Proc. 2026-14 + Notice 2025-50)
 npm run seed:oz2     # refresh OZ 2.0 nomination tracts only (needs pypdf; see below)
 npm run seed:oz2-markets  # seven-market rural-eligible tracts from the CSV + TIGER 2020
-npm run seed:oz2-eligible # seven-market urban tracts + 15 other MSAs (rural and urban) + TIGER 2020
+npm run seed:oz2-eligible # seven-market urban tracts + 16 other MSAs (rural and urban) + TIGER 2020
 npm run seed:sc-mf        # South Carolina multifamily priority shortlist from its CSV
 npm run seed:parcels:orlando  # full 5–150 acre parcels for Lake, Orange, Osceola, Polk, Seminole
 npm run seed:signals          # Florida ACS income + FDOT AADT sidecars (not copied onto tiles)
@@ -195,13 +195,14 @@ Urban status chips read **Eligible — not designated**. The rural chip stays **
 
 ## Other metros
 
-**Other MSAs (15)** in the market menu opens 15 smaller MSAs: Vero Beach, Melbourne, Jacksonville, Pensacola, Birmingham, Mobile, Huntsville, Savannah, Columbia, Greenville, Chattanooga, Knoxville, Memphis, Winston-Salem, and Wilmington. They are visually secondary to the seven. Each one has rural and urban eligible tracts from `data/oz2-other-msas-eligible.csv` (1,386 rows, 1,341 unique GEOIDs; 491 rural and 895 urban). County rings are in `data/oz2-other-msas-counties.md`. Markets other than Jacksonville load 5–150 acre parcel tiles when that extract exists (`docs/market-parcels.md`). Jacksonville stays a tract overlay until those tiles are seeded.
+**Other MSAs (16)** in the market menu opens 16 smaller MSAs: Vero Beach, Melbourne, Jacksonville, North-Central Florida, Pensacola, Birmingham, Mobile, Huntsville, Savannah, Columbia, Greenville, Chattanooga, Knoxville, Memphis, Winston-Salem, and Wilmington. They are visually secondary to the seven. Each one has rural and urban eligible tracts from `data/oz2-other-msas-eligible.csv` (1,448 rows, 1,403 unique GEOIDs; 530 rural and 918 urban). County rings are in `data/oz2-other-msas-counties.md`. Those markets load 5–150 acre parcel tiles when that extract exists (`docs/market-parcels.md`). North-Central Florida is Gainesville-centered (Alachua, Bradford, Citrus, Gilchrist, Hernando, Levy, Putnam). Hernando and Citrus are also on the Tampa list. Marion stays on the Orlando sample and is not in this market. Gilchrist has no Rev. Proc. 2026-14 eligible tract. Status stays **Eligible — not designated**.
 
 | Market | Total | Rural | Urban |
 | --- | ---: | ---: | ---: |
 | Vero Beach | 62 | 25 | 37 |
 | Melbourne | 175 | 24 | 151 |
 | Jacksonville | 98 | 8 | 90 |
+| North-Central Florida | 62 | 39 | 23 |
 | Pensacola | 49 | 22 | 27 |
 | Birmingham | 152 | 42 | 110 |
 | Mobile | 66 | 15 | 51 |
@@ -243,7 +244,7 @@ That script reads the rural CSV, checks the row counts above, and joins [Census 
 npm run seed:oz2-eligible
 ```
 
-That script reads the urban seven-market CSV and the other-MSA CSV, checks the counts in the tables above (including the rural/urban splits), and joins the same TIGER 2020 tracts. It writes `data/fixtures/oz2-urban-markets.json`, `data/fixtures/oz2-other-msas.json`, and `data/fixtures/oz2-eligible-packs.geojson` (2,285 polygons). Status stays **Eligible — not designated**. Pass `--offline` to reuse polygons already on disk. It does not download parcels for the other metros.
+That script reads the urban seven-market CSV and the other-MSA CSV, checks the counts in the tables above (including the rural/urban splits), and joins the same TIGER 2020 tracts. It writes `data/fixtures/oz2-urban-markets.json`, `data/fixtures/oz2-other-msas.json`, and `data/fixtures/oz2-eligible-packs.geojson` (2,347 polygons). Status stays **Eligible — not designated**. Pass `--offline` to reuse polygons already on disk. It does not download parcels for the other metros.
 
 ```bash
 npm run seed:sc-mf

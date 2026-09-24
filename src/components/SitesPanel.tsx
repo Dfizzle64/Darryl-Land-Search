@@ -136,7 +136,16 @@ export function SitesPanel({
                   </div>
                   <p className="mt-0.5 truncate text-sm text-white">{props.situsAddress || props.parcelId}</p>
                   <p className="truncate text-[11px] text-ink-500">
-                    {[props.situsCity, formatAcres(props.acreage), props.zoningCode].filter(Boolean).join(" · ")}
+                    {[
+                      props.jurisdictionCode,
+                      props.situsCity && props.situsCity.toLowerCase() !== props.jurisdictionCode?.toLowerCase()
+                        ? props.situsCity
+                        : null,
+                      formatAcres(props.acreage),
+                      props.zoningCode,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </p>
                   <p className="mt-1 truncate text-[11px] text-ink-300">
                     {props.flu?.code ? `FLU ${props.flu.label || props.flu.code}` : "FLU not joined"}

@@ -122,4 +122,48 @@ describe("market parcel gating and acreage", () => {
       if (checked >= 25) break;
     }
   });
+
+  it("ships North-Central Florida without treating partial counties or eligible tracts as designated", () => {
+    const indexPath = path.join(process.cwd(), "data/fixtures/market-parcels/index.json");
+    const seeded = JSON.parse(readFileSync(indexPath, "utf8")) as MarketParcelIndex;
+    const market = seeded.markets["North-Central Florida"];
+    expect(market?.parcelCount).toBe(52695);
+    expect(market?.counties.map((county) => county.name).sort()).toEqual([
+      "Alachua",
+      "Bradford",
+      "Citrus",
+      "Gilchrist",
+      "Hernando",
+      "Levy",
+      "Putnam",
+    ]);
+    expect(market?.counties.some((county) => county.name === "Marion")).toBe(false);
+    const partial = ["Bradford", "Gilchrist", "Levy"];
+    for (const name of partial) {
+      const county = market?.counties.find((item) => item.name === name);
+      expect(county?.gaps?.join(" ")).toMatch(/Partial\./);
+      expect(county?.gaps?.join(" ")).toMatch(/PHY_CITY is a postal city/);
+    }
+    const placeholder = new Set(["CITY", "MUNICIPAL", "MUNI", "CITY LIMITS", "CITY LIMITS OF INV. OR C.R."]);
+    for (const fips of ["12001", "12017", "12053", "12107"]) {
+      const tiles = path.join(process.cwd(), "data/fixtures/market-parcels/counties", fips, "tiles");
+      const files = readdirSync(tiles).filter((name) => name.endsWith(".geojson"));
+      expect(files.length).toBeGreaterThan(0);
+      for (const file of files) {
+        const collection = JSON.parse(readFileSync(path.join(tiles, file), "utf8")) as ParcelCollection;
+        for (const feature of collection.features) {
+          expect(inMarketAcreageBand(feature.properties.acreage)).toBe(true);
+          const zoning = feature.properties.zoningCode?.trim().toUpperCase();
+          expect(zoning ? placeholder.has(zoning) : false).toBe(false);
+          const flu = feature.properties.flu?.code?.trim().toLowerCase();
+          expect(flu === "city").toBe(false);
+          expect(feature.properties.marketIds?.includes("Orlando")).toBe(false);
+          expect(feature.properties.marketIds?.includes("North-Central Florida")).toBe(true);
+          if (fips === "12017" || fips === "12053") {
+            expect(feature.properties.marketIds?.includes("Tampa")).toBe(true);
+          }
+        }
+      }
+    }
+  });
 });

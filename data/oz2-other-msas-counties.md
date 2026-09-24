@@ -69,7 +69,27 @@ Status labeling: **Eligible — not designated**. SC markets include Governor-fi
   - Nassau (Florida): 1 (Y=1, N=0)
   - St. Johns (Florida): 2 (Y=2, N=0)
 - **Uncertain / outer-edge counties:** none (MSA core)
-- **Exclusions / notes:** Putnam, Flagler, Bradford, and Union (Florida) and Camden (Georgia) are outside the OMB 2023 MSA and are not in this market. No tract is marked designated or certified.
+- **Exclusions / notes:** Putnam, Flagler, Bradford, and Union (Florida) and Camden (Georgia) are outside the OMB 2023 MSA and are not in this market. Putnam and Bradford are on the North-Central Florida list instead. No tract is marked designated or certified.
+
+## North-Central Florida
+
+- **City center:** Downtown Gainesville (Alachua)
+- **OMB MSA core:** Gainesville, FL (OMB 2023: Alachua, Gilchrist)
+- **Eligible tract count:** **62** (rural Y=39, non-rural N=23)
+- **Rationale:** Gainesville MSA plus the inland and Nature Coast ring commonly treated as North-Central Florida: Levy and Citrus on the Gulf side, Hernando (also on the Tampa list), Putnam up the St. Johns, and Bradford toward Jacksonville. Marion is already the Orlando central sample and is not repeated here.
+- **Counties included:**
+  - Florida: Alachua, Bradford, Citrus, Gilchrist, Hernando, Levy, Putnam
+- **Eligible by county (rural / non-rural):**
+  - Alachua (Florida): 24 (Y=1, N=23)
+  - Bradford (Florida): 2 (Y=2, N=0) _(outer/uncertain)_
+  - Citrus (Florida): 10 (Y=10, N=0)
+  - Hernando (Florida): 12 (Y=12, N=0)
+  - Levy (Florida): 5 (Y=5, N=0)
+  - Putnam (Florida): 9 (Y=9, N=0) _(outer/uncertain)_
+- **Included counties with 0 eligible tracts:**
+  - Gilchrist (Florida)
+- **Uncertain / outer-edge counties:** Bradford, Putnam
+- **Exclusions / notes:** Marion is not in this market (unchanged Orlando sample). Hernando and Citrus are also listed under Tampa; those tract rows are not removed from Tampa. Gilchrist is in the OMB Gainesville MSA and has no Rev. Proc. 2026-14 appendix tract. Every row is eligible for nomination, not a designated QOZ. Levy, Gilchrist, and Bradford parcel extracts are DOH acreage only — no municipal zoning or future land use.
 
 ## Pensacola
 
@@ -339,6 +359,7 @@ Status labeling: **Eligible — not designated**. SC markets include Governor-fi
 | Vero Beach | 62 | 25 | 37 |
 | Melbourne | 175 | 24 | 151 |
 | Jacksonville | 98 | 8 | 90 |
+| North-Central Florida | 62 | 39 | 23 |
 | Pensacola | 49 | 22 | 27 |
 | Birmingham | 152 | 42 | 110 |
 | Mobile | 66 | 15 | 51 |
@@ -351,8 +372,8 @@ Status labeling: **Eligible — not designated**. SC markets include Governor-fi
 | Memphis | 175 | 44 | 131 |
 | Winston-Salem | 105 | 24 | 81 |
 | Wilmington | 55 | 31 | 24 |
-| **CSV rows** | **1386** | **491** | **895** |
-| **Unique GEOIDs** | **1341** |  |  |
+| **CSV rows** | **1448** | **530** | **918** |
+| **Unique GEOIDs** | **1403** |  |  |
 
 Dual-list notes: Melbourne overlaps Vero Beach (Brevard/Indian River) and Orlando primary pack counties; Winston-Salem shares Davidson NC with Charlotte primary pack; Pensacola/Mobile both list Baldwin AL (intentional dual-market). Columbia and Charleston both can list Orangeburg SC.
 

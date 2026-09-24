@@ -56,6 +56,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "13139": "https://qpublic.schneidercorp.com/Application.aspx?App=HallCountyGA&Layer=Parcels&PageType=Search",
   "13035": "https://qpublic.schneidercorp.com/Application.aspx?App=ButtsCountyGA&Layer=Parcels&PageType=Search",
   "13103": "https://qpublic.schneidercorp.com/Application.aspx?App=EffinghamCountyGA&Layer=Parcels&PageType=Search",
+  "13029": "https://qpublic.net/ga/bryan/",
   "13157": "https://qpublic.schneidercorp.com/Application.aspx?App=JacksonCountyGA&Layer=Parcels&PageType=Search",
   "13297": "https://qpublic.schneidercorp.com/Application.aspx?App=waltonCountyGA&Layer=Parcels&PageType=Search",
   "37089": "https://lrcpwa.ncptscloud.com/henderson/parcel-search",
@@ -103,6 +104,7 @@ const APPRAISER_LINKS: Record<string, { href: string; label: string }> = {
   "13139": { href: DEFAULT_APPRAISER_URLS["13139"], label: "Open Hall County qPublic search" },
   "13035": { href: DEFAULT_APPRAISER_URLS["13035"], label: "Open Butts County qPublic search" },
   "13103": { href: DEFAULT_APPRAISER_URLS["13103"], label: "Open Effingham County qPublic search" },
+  "13029": { href: DEFAULT_APPRAISER_URLS["13029"], label: "Open Bryan County qPublic search" },
   "13157": { href: DEFAULT_APPRAISER_URLS["13157"], label: "Open Jackson County qPublic search" },
   "13297": { href: DEFAULT_APPRAISER_URLS["13297"], label: "Open Walton Property Appraiser search" },
   "37089": { href: DEFAULT_APPRAISER_URLS["37089"], label: "Open Henderson County property appraiser" },
@@ -168,6 +170,12 @@ export function parcelAppraiserUrl(options: {
     return {
       href: options.appraiserUrl || named?.href || null,
       label: options.appraiserUrl ? "Open this parcel in Effingham County qPublic" : named?.label || "Open Effingham County qPublic search",
+    };
+  }
+  if (fips === "13029") {
+    return {
+      href: options.appraiserUrl || named?.href || null,
+      label: options.appraiserUrl ? "Open this parcel in Bryan County qPublic" : named?.label || "Open Bryan County qPublic search",
     };
   }
   if (fips === "13035") {

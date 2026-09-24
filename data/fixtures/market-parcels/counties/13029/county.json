@@ -5,19 +5,30 @@
   "markets": [
     "Savannah"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 2138,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "ga-bryan-property-details",
+  "queryUrl": "https://bryangis.bryan-county.org/arcgis/rest/services/PropertyDetails/MapServer/0/query",
   "gaps": [
-    "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+    "Bryan County parcels are PropertyDetails/MapServer/0. Acreage is TOTALACRES, inclusive 5\u2013150. Features were requested in WGS84 and kept only inside the Bryan County, Georgia box.",
+    "Mailing city is not a municipality. Pembroke and Richmond Hill come from MunicipalBoundaries. TAXDISTRIC is not the city filter.",
+    "Unincorporated zoning is Zoning/MapServer/0 ZONECLASS. Inside Pembroke and Richmond Hill the parcel ZONINGCODE is used. There is no city zoning FeatureServer. CITY is a stub. A slash that is not a published district is a split and is not stored. A city zoning map PDF can differ from ZONINGCODE.",
+    "Future land use is 2023ComprehensivePlan/MapServer/4 LANDUSEDESC for unincorporated parcels. Pembroke and Richmond Hill have no city future-land-use service, so city future land use was not invented. Legacy comprehensive-plan city-limit stubs were not used.",
+    "Sales stay null. Beacon AppID=639 was not scraped. HISTYR and HISTVAL are assessment history, not sales. MAVCURR is unused on this layer, so assessed value and taxable value stay null. CURR_VAL is the market value.",
+    "Bryan County, Texas, Bryan County, Oklahoma, Chatham County SAGIS, and ARC LandPro were not used.",
+    "This extract does not assign Opportunity Zone designations.",
+    "2232 source rows in the TOTALACRES 5\u2013150 query; 2138 parcel ids kept.",
+    "94 extra rows with the same parcel id were merged into the kept polygon.",
+    "Municipal boundaries: Pembroke 98, Richmond Hill 156, unincorporated 1884.",
+    "Zoning: Bryan County 1884, Pembroke 95, Richmond Hill 155. Unzoned 4. Parcel CITY stubs 3. Parcel attributes with a non-district slash 51.",
+    "Future land use joined on 1880 unincorporated parcels. Current value on 2138."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/13029/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13029/lookup.json",
+  "sourceCount": 2232,
+  "dropped": 94,
+  "tileCount": 5
 }

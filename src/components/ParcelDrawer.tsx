@@ -106,6 +106,7 @@ export function ParcelDrawer({
   const dekalb = properties.countyFips === "13089";
   const hall = properties.countyFips === "13139";
   const effingham = properties.countyFips === "13103";
+  const bryan = properties.countyFips === "13029";
   const bradley = properties.countyFips === "47011";
   const butts = properties.countyFips === "13035";
   const jackson = properties.countyFips === "13157";
@@ -113,7 +114,9 @@ export function ParcelDrawer({
   const zoningEmpty =
     properties.countyFips === "12095"
       ? "Not on the OCPA parcel"
-      : effingham
+      : bryan
+        ? "No Pembroke, Richmond Hill, or Bryan County zoning joined for this parcel"
+        : effingham
         ? "No Effingham County zoning code on this parcel"
         : butts
           ? "No City of Jackson, Flovilla, Jenkinsburg, or Butts County zoning joined for this parcel"
@@ -172,7 +175,9 @@ export function ParcelDrawer({
           label="Future Land Use"
           value={fluLine}
           empty={
-            effingham
+            bryan
+              ? "No Bryan County 2023 future land use joined for this parcel"
+              : effingham
               ? "No Effingham County future land use joined for this parcel"
               : bradley
                 ? "Bradley County future land use is not on a public polygon layer"

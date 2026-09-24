@@ -21,7 +21,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Birmingham | other | 38,101 | 3 | 0 | 6 |
 | Mobile | other | 42,446 | 3 | 0 | 2 |
 | Huntsville | other | 29,598 | 4 | 0 | 3 |
-| Savannah | other | 9,411 | 2 | 0 | 6 |
+| Savannah | other | 11,549 | 3 | 0 | 5 |
 | Columbia | other | 14,613 | 1 | 1 | 8 |
 | Greenville | other | 31,164 | 2 | 0 | 6 |
 | Chattanooga | other | 15,498 | 2 | 0 | 8 |
@@ -272,7 +272,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Beaufort | South Carolina | 45013 | gap | 0 | unavailable |
-| Bryan | Georgia | 13029 | gap | 0 | unavailable |
+| Bryan | Georgia | 13029 | complete-gte-5ac | 2,138 | ga-bryan-property-details |
 | Bulloch | Georgia | 13031 | gap | 0 | unavailable |
 | Chatham | Georgia | 13051 | complete-gte-5ac | 3,283 | sagis-chatham-ga-parcel-digest |
 | Effingham | Georgia | 13103 | complete-gte-5ac | 6,128 | ga-effingham-parcels-2024 |

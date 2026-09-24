@@ -618,6 +618,10 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    if fips == "13029":  # Bryan GA — PropertyDetails, county zoning, 2023 FLU
+        from bryan_parcels import bryan_spec
+
+        return bryan_spec()
     if fips == "13103":  # Effingham GA — Parcels2024, parcel ZCODE, FLUM join
         from effingham_parcels import effingham_spec
 
@@ -730,7 +734,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, Walton, Carroll, Spalding, Hall, Jackson, Butts, or Effingham pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, Walton, Carroll, Spalding, Hall, Jackson, Butts, Bryan, or Effingham pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -1012,6 +1016,8 @@ Bradley County, Tennessee is the Cleveland GIS Parcels_Impact extract. Census FI
 
 Effingham County, Georgia is the Parcels2024 extract in the Savannah market. Acreage is TOTALACRES in the inclusive 5–150 band. Zoning is the parcel ZCODE. Rincon, Guyton, and Springfield boundaries are joined, and those cities have no public zoning or future-land-use service. Future land use is FLUM EFF_REV2 where the parcel id matches. Sale price and current value come from ParcelUpdate when that older table has the parcel. Effingham County, Illinois was not used. No Opportunity Zone designation was added.
 
+Bryan County, Georgia is the PropertyDetails extract in the Savannah market, paired with Effingham. Acreage is TOTALACRES in the inclusive 5–150 band. Unincorporated zoning is the county Zoning layer. Pembroke and Richmond Hill use the parcel zoning code, and CITY stubs are not districts. Future land use is the 2023 comprehensive plan outside those cities. City future land use and sales stay null. Bryan County, Texas, Bryan County, Oklahoma, and Chatham County SAGIS were not used. No Opportunity Zone designation was added.
+
 ## Coverage
 """
 
@@ -1049,6 +1055,10 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         from effingham_parcels import download_effingham_county
 
         return download_effingham_county(county, markets, spec)
+    if spec.get("kind") == "bryan":
+        from bryan_parcels import download_bryan_county
+
+        return download_bryan_county(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

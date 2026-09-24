@@ -5,19 +5,32 @@
   "markets": [
     "Atlanta"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 6904,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "ga-hall-addr-pcl-1",
+  "queryUrl": "https://hallgis.hallcounty.org/arcgis/rest/services/HallCo_Addr_Pcl_Rds/MapServer/1/query",
   "gaps": [
-    "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+    "Hall County parcels are hallgis.hallcounty.org HallCo_Addr_Pcl_Rds/MapServer/1. Acreage is deeded DEED_ACRE, inclusive 5\u2013150. CALC_ACRE is not the filter. The service is State Plane Georgia West; features were requested in WGS84 and kept only inside the Hall County, Georgia box.",
+    "Owner and mailing are blank when NO_RELEASE is 1. Those names were not backfilled from qPublic.",
+    "SITE_CITY is the postal community, not a city-limits filter. Gainesville postal addresses include unincorporated parcels.",
+    "CUR_VALUE is the published fair-market string. Assessed value and taxable value are not on this layer. LAND_VALUE is not copied to market value.",
+    "No public sale history. Last sale stays null. qPublic AppID=724 was not scraped.",
+    "Zoning is a centroid join. City layers win: Gainesville ZoningTab/14, Flowery Branch /13, Oakwood /16, then unincorporated Hall County ZoningTab/15. ZN_CLASS MUNI is not a zoning code.",
+    "Lula, Clermont, Gillsville, Braselton, Buford, and Rest Haven publish MUNI stubs only. Their Euclidean zoning stays null. Braselton, Buford, Lula, Gillsville, and Rest Haven are multi-county; this extract is the Hall County footprint only.",
+    "Future land use is HC_FutureLandUse_2024/0 joined on pin. Inside Gainesville city limits, Gnvl_FutureLandUse/3 FLU_2022 replaces it. Flowery Branch, Gillsville, Braselton, Buford, and Rest Haven have no city future-land-use service. County future land use inside those cities is the county comp-plan polygon, not a city-adopted map.",
+    "Hall County, Nebraska, Gainesville, Florida, and ARC LandPro were not used.",
+    "This extract does not assign Opportunity Zone designations.",
+    "6904 source rows in the DEED_ACRE 5\u2013150 query; 6904 parcel ids kept.",
+    "Owner and mailing suppressed on 4 NO_RELEASE parcels.",
+    "Zoning centroids: GAINESVILLE 418, FLOWERY BRANCH 115, OAKWOOD 151, HALL COUNTY 5954; 266 parcels left unzoned.",
+    "Future land use: Gainesville FLU_2022 on 413 parcels; county HC_FLU_2024 on 5785; 706 with no future land use."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/13139/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13139/lookup.json",
+  "sourceCount": 6904,
+  "dropped": 0,
+  "tileCount": 7
 }

@@ -29,6 +29,8 @@ Walton County, Georgia is the choosewalton 5–150 GIS-acre landbase. FLU and De
 
 Spalding County, Georgia is the public Parcels_Public_View. Acreage is GIS area in Georgia West State Plane feet, inclusive 5–150. The layer publishes parcel id and jurisdiction only, so owner, situs, tax, and last sale stay null. County zoning is joined outside Griffin. Griffin city parcels stay unzoned. Future land use is a PDF. Sunny Side is not treated as a city. University of Maryland / Regrid and ARC LandPro were not used. No Opportunity Zone designation was added.
 
+Hall County, Georgia is the official hallgis HallCo_Addr_Pcl_Rds/MapServer/1 extract. Acreage is deeded DEED_ACRE in the inclusive 5–150 band. Owner and mailing are blank where NO_RELEASE is 1. CUR_VALUE is the published market value; land value is not copied into it. Sales stay null. Zoning is Gainesville, Flowery Branch, and Oakwood, then unincorporated Hall County. MUNI stubs for Lula, Clermont, Gillsville, Braselton, Buford, and Rest Haven are not zoning codes. Future land use is HC_FLU_2024, replaced by Gainesville FLU_2022 inside that city. Hall County, Nebraska, Gainesville, Florida, and ARC LandPro were not used. No Opportunity Zone designation was added.
+
 ## Coverage
 
 # Market parcel coverage
@@ -39,7 +41,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 89,337 | 16 | 0 | 19 |
+| Atlanta | primary | 96,241 | 17 | 0 | 18 |
 | Tampa | primary | 124,315 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 109,348 | 13 | 0 | 4 |
@@ -92,7 +94,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Fulton | Georgia | 13121 | complete-gte-5ac | 8,274 | ga-fulton-pmv-mapserver-11 |
 | Gordon | Georgia | 13129 | gap | 0 | unavailable |
 | Gwinnett | Georgia | 13135 | complete-gte-5ac | 6,653 | ga-gwinnett-gc-parcel |
-| Hall | Georgia | 13139 | gap | 0 | unavailable |
+| Hall | Georgia | 13139 | complete-gte-5ac | 6,904 | ga-hall-addr-pcl-1 |
 | Haralson | Georgia | 13143 | gap | 0 | unavailable |
 | Heard | Georgia | 13149 | gap | 0 | unavailable |
 | Henry | Georgia | 13151 | complete-gte-5ac | 7,418 | ga-henry-parcels |

@@ -697,6 +697,10 @@ def county_override(fips: str) -> dict | None:
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
             ],
         }
+    if fips == "13139":  # Hall GA — official hallgis parcels, deed acres
+        from hall_parcels import hall_spec
+
+        return hall_spec()
     if fips == "13255":  # Spalding GA — public view, GIS acres, county zoning outside Griffin
         from spalding_parcels import spalding_spec
 
@@ -707,7 +711,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, Walton, Carroll, or Spalding pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, Walton, Carroll, Spalding, or Hall pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -979,6 +983,8 @@ Walton County, Georgia is the choosewalton 5–150 GIS-acre landbase. FLU and De
 
 Spalding County, Georgia is the public Parcels_Public_View. Acreage is GIS area in Georgia West State Plane feet, inclusive 5–150. The layer publishes parcel id and jurisdiction only, so owner, situs, tax, and last sale stay null. County zoning is joined outside Griffin. Griffin city parcels stay unzoned. Future land use is a PDF. Sunny Side is not treated as a city. University of Maryland / Regrid and ARC LandPro were not used. No Opportunity Zone designation was added.
 
+Hall County, Georgia is the official hallgis HallCo_Addr_Pcl_Rds/MapServer/1 extract. Acreage is deeded DEED_ACRE in the inclusive 5–150 band. Owner and mailing are blank where NO_RELEASE is 1. CUR_VALUE is the published market value; land value is not copied into it. Sales stay null. Zoning is Gainesville, Flowery Branch, and Oakwood, then unincorporated Hall County. MUNI stubs for Lula, Clermont, Gillsville, Braselton, Buford, and Rest Haven are not zoning codes. Future land use is HC_FLU_2024, replaced by Gainesville FLU_2022 inside that city. Hall County, Nebraska, Gainesville, Florida, and ARC LandPro were not used. No Opportunity Zone designation was added.
+
 ## Coverage
 """
 
@@ -996,6 +1002,10 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         from dekalb_parcels import download_dekalb
 
         return download_dekalb(county, markets, spec)
+    if spec.get("kind") == "hall":
+        from hall_parcels import download_hall_county
+
+        return download_hall_county(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

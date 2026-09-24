@@ -139,6 +139,8 @@ Pinellas and Pasco keep those DOH shelves. City zoning and future land use are s
 
 Manatee and Sarasota keep those DOH shelves. City zoning is on 221 Manatee parcels and 566 Sarasota parcels. Future land use is on 247 Manatee parcels and 124 Sarasota parcels. Bradenton, Palmetto, Longboat Key, and the City of Sarasota have both. North Port and Venice are zoning only. Anna Maria, Bradenton Beach, and Holmes Beach stay blank. Sources are in `docs/muni-overlay-consolidator.md`. County parcels were not re-downloaded.
 
+Charlotte County, Florida (FIPS 12015) is not on these shelves. Punta Gorda city zoning and future land use are cataloged and were not stamped, because no county parcels were downloaded. County `CITY` stubs are not stored.
+
 ### Charleston
 
 | County | State | FIPS | Coverage | Parcels | Source |

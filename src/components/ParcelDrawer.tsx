@@ -21,6 +21,7 @@ import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "@/lib/
 import { fluEmptyForPolk, zoningEmptyForPolk } from "@/lib/polkMunicipal";
 import { fluEmptyForSeminole, zoningEmptyForSeminole } from "@/lib/seminoleMunicipal";
 import { fluEmptyForMartinIrc, zoningEmptyForMartinIrc } from "@/lib/martinIrcMunicipal";
+import { fluEmptyForCharlotte, zoningEmptyForCharlotte } from "@/lib/charlotteMunicipal";
 import { fluEmptyForManateeSarasota, zoningEmptyForManateeSarasota } from "@/lib/manateeSarasotaMunicipal";
 import { brevardFluReason, formatJoinedZoning } from "@/lib/brevardMunicipal";
 import { fluEmptyForMunicipal, zoningEmptyForCounty } from "@/lib/volusiaFlaglerMunicipal";
@@ -109,7 +110,9 @@ export function ParcelDrawer({
     ? "No FDOT count segment within 15 km"
     : "FDOT AADT is Florida only";
   const dekalb = properties.countyFips === "13089";
-  const zoningEmpty = zoningEmptyForManateeSarasota(
+  const zoningEmpty = zoningEmptyForCharlotte(
+    properties.countyFips,
+    zoningEmptyForManateeSarasota(
     properties.countyFips,
     properties.countyFips === "12009"
     ? "No city zoning layer covers this parcel."
@@ -126,6 +129,7 @@ export function ParcelDrawer({
         : dekalb
           ? "No municipal or county zoning joined for this parcel"
           : "Not in this county's public parcel extract",
+    ),
     ),
     ),
     ),
@@ -190,7 +194,9 @@ export function ParcelDrawer({
         <Field
           label="Future Land Use"
           value={fluLine}
-          empty={fluEmptyForManateeSarasota(
+          empty={fluEmptyForCharlotte(
+            properties.countyFips,
+            fluEmptyForManateeSarasota(
             properties.countyFips,
             properties.countyFips === "12009"
             ? brevardFluReason("", null, properties.municipal, "12009")
@@ -202,6 +208,7 @@ export function ParcelDrawer({
             properties.countyFips,
             properties.municipal?.fluGap ? fluEmptyForMunicipal(properties.municipal.fluGap) : null,
             dekalb ? "No future land use joined for this parcel" : "Not joined for this county",
+            ),
             ),
             ),
             ),

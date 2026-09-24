@@ -12,6 +12,7 @@ npm run seed:seminole-municipal
 npm run seed:martin-irc-municipal
 npm run seed:brevard-municipal
 npm run seed:manatee-sarasota-municipal
+npm run seed:charlotte-municipal
 npm run seed:sc-muni
 ```
 
@@ -221,6 +222,14 @@ Shelf totals: Manatee zoning 221 and future land use 247; Sarasota zoning 566 an
 Anna Maria, Bradenton Beach, and Holmes Beach stay blank. PDF maps and parcel `AM_`, `BB_`, and `HB_` fields are not a city service. Manatee County Planning zoning is not copied into those cities or into Bradenton and Palmetto.
 
 City of Sarasota uses the native city services. The county `Hosted/CitySarasotaZoning` copy is not used. `Hosted/CityVeniceZoningView` is token-gated, so the public zoning layer is used and Venice future land use is left blank. County `FLUBoundary` is not stored as city future land use. Northport, Alabama ArcGIS org `3u10F1chkeawsUZY` is rejected.
+
+## Charlotte County, Florida (FIPS 12015)
+
+Catalog: `data/charlotte-municipal.json`. Join script: `scripts/join_charlotte_municipal.py`. Punta Gorda is the only incorporated city. Its zoning is `ZoningOfficial_View` FeatureServer 0 `Zoning_Cla` (154 polygons; one has no class and is not indexed) and its future land use is `FLU_All_2045` FeatureServer 5 `LUName` (117 polygons). Both extents sit inside Charlotte County, Florida (about lon −82.10 to −82.01, lat 26.84 to 26.95).
+
+This checkout has no Charlotte County parcel shelf, and none was downloaded. The city layers were indexed and stamped onto zero parcels. Opportunity Zone fields, school grades, and base flood elevations were not written.
+
+County zoning `ZONE_` value `CITY` (21 polygons) and county future land use `NEWLU` value `City` (571 polygons) are city stubs, not districts. The county `PG_Zoning` copy is not used. Charlotte, North Carolina, Punta Gorda, Belize, and the `BO_Charlotte_*` prefer-official layers are rejected.
 
 ## Not in this pass
 

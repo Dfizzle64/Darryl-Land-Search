@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T01:06:16Z",
+  "generatedAt": "2026-09-24T01:22:21Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 85505,
+  "parcelCount": 93811,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -878,20 +878,28 @@
       "name": "Newton",
       "fips": "13217",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 4474,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-newton-uofmd-parcels",
+      "queryUrl": "https://services1.arcgis.com/qTQ6qYkHpxlu0G82/arcgis/rest/services/Newton_Parcels/FeatureServer/0/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "2022 University of Maryland AGOL redistribute of Newton County GA parcels (org qTQ6qYkHpxlu0G82, item 40743c9b9c87460a94aaff77c787a705). Not an official Newton County FeatureServer. County digital Tax Parcel, Zoning, and FLU data is a paid dataset.",
+        "Acreage is deeded TotalAcres, 5\u2013150 acres inclusive. Owner name and situs house number are scrubbed on this redistribute and are left blank. Situs is street name and type plus postal city and ZIP only. ParcelCity is a postal community, not a city-limits filter.",
+        "SaleDate and SalesPrice run through 2021. Qualifying is blank, so lastSale.qualified is null. Improvement and total market values are zero on this snapshot, so tax market, assessed, and taxable values stay null instead of copying land-only LandValue.",
+        "No public Euclidean zoning for unincorporated Newton County. Covington Zoning_FLUM_Trails MapServer query is blocked and is not joined. Oxford's 2012 zoning webmap is not a FeatureServer and is not joined.",
+        "Future land use is a centroid join to NEGRC: county character areas layer 454, and city layers Covington 447, Oxford 450, Porterdale 451, Mansfield 448, Newborn 449, and Social Circle 469. A city polygon wins over the county layer.",
+        "Social Circle Euclidean zoning is a centroid join to choosewalton Social_Circle_Zoning layer 35 (the city also lies in Walton). Covington, Oxford, Porterdale, Mansfield, and Newborn zoning stay null.",
+        "Opportunity Zone and OZ 2.0 fields are not assigned by this pull.",
+        "NEGRC future land use joined by centroid on 4470 of 4474 parcels (city layers before county character areas).",
+        "Social Circle Euclidean zoning joined by centroid on 5 of 4474 parcels. Other zoning left null."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13217/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13217/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 4474
     },
     {
       "name": "Paulding",
@@ -988,20 +996,27 @@
       "name": "Spalding",
       "fips": "13255",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 3832,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-spalding-parcels-public",
+      "queryUrl": "https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/Parcels_Public_View/FeatureServer/1/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Spalding County Parcels public view is PARCEL_ID and JURISDICTION only. Owner, mailing, situs, tax, and last sale are null on this extract.",
+        "GIS acres are computed from State Plane Georgia West feet (102667/2240) polygon area / 43560. Band is 5.0\u2013150.0 inclusive.",
+        "County zoning LABEL is joined only where JURISDICTION is COUNTY (unincorporated Spalding, including Orchard Hill and former Sunny Side). JURISDICTION CITY is Griffin and is left unzoned: the county zoning layer does not cover Griffin, and no verified Griffin zoning FeatureServer was used.",
+        "Future land use is the Comp Plan 2042 PDF only. FLU is null.",
+        "Sales and tax are qPublic AppID=766 HTML only and were not scraped. Last sale and tax values are null.",
+        "Sunny Side's charter was repealed effective 2024-01-01. It is not treated as an incorporated municipality.",
+        "Rejected substitutes were not used: University of Maryland Regrid ga_spalding extract and ARC LandPro.",
+        "County zoning labels joined on 3624 JURISDICTION=COUNTY parcels. 199 Griffin CITY parcels in the acreage band were left unzoned. 9 COUNTY parcels had no county zoning intersect."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13255/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13255/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 33700
     },
     {
       "name": "Walton",

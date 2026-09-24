@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T01:06:16Z",
+  "generatedAt": "2026-09-24T01:22:21Z",
   "market": "Winston-Salem",
   "tier": "other",
-  "parcelCount": 92188,
+  "parcelCount": 92199,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -364,20 +364,27 @@
       "name": "Yadkin",
       "fips": "37197",
       "state": "North Carolina",
-      "featureCount": 8091,
+      "featureCount": 8102,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37197",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-yadkin-county-gis",
+      "queryUrl": "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/1/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "8174 source rows collapsed to 8102 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Parcels are Yadkin County GIS CountyGISmap/MapServer/1, filtered on TOTAL_ACRES 5.0\u2013150.0. NC OneMap cntyfips='197' is a count cross-check only; gisacres is not the stored acreage.",
+        "Zoning is county-hosted. Town layers are first-class: Boonville MapServer/41, East Bend /42, Jonesville /43, Yadkinville /44. County zoning is /40. A county TZ placeholder is not stored as the district when a town layer hits, and TZ is never stored by itself. Town Limits with ETJ are /45. Joined codes are not an Orange County multifamily knowledge-base match.",
+        "Future land use is a PDF-only gap. CountyGISmap/MapServer/38 Land Use is USDA cropland (Corn, Soybeans, Fallow/Idle Cropland, and other CLASS_NAME values), not the adopted future land use map. Those classes are not joined as planning FLU. 2023 Future Land Use Map: https://www.yadkincountync.gov/DocumentCenter/View/6126/Future-Land-Use-Map- 2023 Comprehensive Land Use Plan: https://www.yadkincountync.gov/DocumentCenter/View/5990/Yadkin-County-Comprehensive-Land-Use-Plan-2023-",
+        "Opportunity zones: inOpportunityZone is only the HUD designated 2010 QOZ. oz2Eligibility is Rev. Proc. 2026-14 nomination eligibility on 2020 tracts. Eligible is not a designated QOZ.",
+        "NC OneMap cntyfips='197' and gisacres 5\u2013150 returned 8,163 polygons. Stored features: 8,102 from county TOTAL_ACRES.",
+        "Zoning joined on 8,102/8,102 parcels (YAD 7474, BVN 181, EBD 26, JVL 193, YVL 228). County TZ placeholders skipped on 627 centroid hits. Town district wins over county TZ.",
+        "Designated QOZ centroids: 895 in 2010 tract(s) 37197050501 (HUD). OZ 2.0 eligible centroids: 2,084 in 2020 tract(s) 37197050401, 37197050502. Parcels in both geographies: 0. Eligible is not a designated QOZ."
       ],
       "path": "data/fixtures/market-parcels/counties/37197/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37197/lookup.json",
       "tileCount": 6,
-      "sourceCount": 8163
+      "sourceCount": 8174
     }
   ]
 }

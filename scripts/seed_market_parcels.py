@@ -631,6 +631,42 @@ def county_override(fips: str) -> dict | None:
             "coverage": "complete-gte-5ac",
             "gaps": ["Jefferson County public parcels. Owner and situs are sparse on this layer. No zoning join."],
         }
+    if fips == "13217":  # Newton GA — UofMD redistribute plus NEGRC FLU, copied from #46
+        return {
+            "kind": "shipped",
+            "source": "ga-newton-uofmd-parcels",
+            "url": "https://services1.arcgis.com/qTQ6qYkHpxlu0G82/arcgis/rest/services/Newton_Parcels/FeatureServer/0/query",
+            "coverage": "complete-gte-5ac",
+        }
+    if fips == "13255":  # Spalding GA — public view plus county zoning, copied from #47
+        return {
+            "kind": "shipped",
+            "source": "ga-spalding-parcels-public",
+            "url": "https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/Parcels_Public_View/FeatureServer/1/query",
+            "coverage": "complete-gte-5ac",
+        }
+    if fips == "47011":  # Bradley TN — Cleveland GIS, Census FIPS 47011, not 47107. Replaces IMPACT tiles.
+        return {
+            "kind": "shipped",
+            "source": "tn-cleveland-parcels-impact-47011",
+            "url": "https://utility.arcgis.com/usrsvcs/servers/93852593c94f4e178f338703adc6bca3/rest/services/Operational/OperationalLayersPRO/MapServer/2/query",
+            "coverage": "complete-gte-5ac",
+        }
+    if fips == "37197":  # Yadkin NC — county GIS, not the OneMap shelf
+        return {
+            "kind": "shipped",
+            "source": "nc-yadkin-county-gis",
+            "url": "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/1/query",
+            "coverage": "complete-gte-5ac",
+        }
+    if fips == "13029":  # Bryan GA
+        from bryan_parcels import bryan_spec
+
+        return bryan_spec()
+    if fips == "13103":  # Effingham GA
+        from effingham_parcels import effingham_spec
+
+        return effingham_spec()
     if fips == "45045":  # Greenville SC
         return {
             "kind": "arcgis",
@@ -925,11 +961,21 @@ Carroll County, Georgia uses the OpenAddresses job 910028 parcel snapshot becaus
 
 Walton County, Georgia is the choosewalton 5–150 GIS-acre landbase. FLU and Description are character areas, not Euclidean zoning. Monroe CAMA matches a handful of shared parcel numbers. City zoning covers Monroe, Loganville, and Social Circle only. Countywide owner, tax, sales, and Euclidean zoning stay gaps. Nothing in that extract is an Opportunity Zone designation.
 
+Newton County, Georgia is the University of Maryland AGOL redistribute (not an official county FeatureServer). Sales stop in 2021. County Euclidean zoning stays null except a Social Circle centroid join. Future land use is the NEGRC centroid join. Spalding County, Georgia is the public parcel view: owner, situs, sales, tax, and future land use stay null, and Griffin is left unzoned. Bradley County, Tennessee uses Census FIPS 47011 and the Cleveland GIS Parcels_Impact layer. The older Comptroller IMPACT tiles for that FIPS were the wrong geography and are replaced. Yadkin County, North Carolina uses the county GIS parcel layer instead of NC OneMap. Bryan County, Georgia uses PropertyDetails. Sales are a Beacon gap, and assessed values on that layer are empty. Effingham County, Georgia uses Parcels2024. Sale price and market value are joined from ParcelUpdate or the 2024 FLUM. No Opportunity Zone designation was added for these counties.
+
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "bryan":
+        from bryan_parcels import download_bryan
+
+        return download_bryan(county, markets, spec)
+    if spec.get("kind") == "effingham":
+        from effingham_parcels import download_effingham
+
+        return download_effingham(county, markets, spec)
     if spec.get("kind") == "carroll":
         from carroll_parcels import download_carroll_county
 
@@ -1148,6 +1194,13 @@ def main() -> None:
         markets = full_markets[fips]
         spec = spec_for(slot["county"])
         existing = COUNTY_DIR / fips / "county.json"
+        if spec.get("kind") == "shipped":
+            if not existing.exists():
+                raise RuntimeError(f"{fips} is a shipped parcel shelf and county.json is missing")
+            row = json.loads(existing.read_text())
+            row["markets"] = markets
+            (COUNTY_DIR / fips / "county.json").write_text(json.dumps(row, indent=2) + "\n")
+            continue
         if spec["kind"] == "gap":
             if not existing.exists() or args.refresh:
                 write_gap(slot["county"], markets, spec)

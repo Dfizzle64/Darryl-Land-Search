@@ -54,6 +54,11 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "01117": "https://ptc.shelbyal.com/propsearch",
   "13045": "https://qpublic.schneidercorp.com/Application.aspx?AppID=663&LayerID=15076&PageTypeID=1",
   "13297": "https://qpublic.schneidercorp.com/Application.aspx?App=waltonCountyGA&Layer=Parcels&PageType=Search",
+  "13217": "https://qpublic.schneidercorp.com/Application.aspx?App=NewtonCountyGA&Layer=Parcels&PageType=Search",
+  "13255": "https://qpublic.schneidercorp.com/Application.aspx?AppID=766&PageTypeID=2",
+  "13029": "https://qpublic.net/ga/bryan/",
+  "13103": "https://qpublic.schneidercorp.com/Application.aspx?App=EffinghamCountyGA&Layer=Parcels&PageType=Search",
+  "47011": "https://assessment.cot.tn.gov/tpad/",
   "37089": "https://lrcpwa.ncptscloud.com/henderson/parcel-search",
 };
 
@@ -97,6 +102,11 @@ const APPRAISER_LINKS: Record<string, { href: string; label: string }> = {
   "13089": { href: DEFAULT_APPRAISER_URLS["13089"], label: "Open DeKalb Property Appraiser search" },
   "13045": { href: DEFAULT_APPRAISER_URLS["13045"], label: "Open Carroll County qPublic search" },
   "13297": { href: DEFAULT_APPRAISER_URLS["13297"], label: "Open Walton Property Appraiser search" },
+  "13217": { href: DEFAULT_APPRAISER_URLS["13217"], label: "Open Newton County qPublic search" },
+  "13255": { href: DEFAULT_APPRAISER_URLS["13255"], label: "Open Spalding County qPublic search" },
+  "13029": { href: DEFAULT_APPRAISER_URLS["13029"], label: "Open Bryan County qPublic search" },
+  "13103": { href: DEFAULT_APPRAISER_URLS["13103"], label: "Open Effingham County qPublic search" },
+  "47011": { href: DEFAULT_APPRAISER_URLS["47011"], label: "Open Bradley County parcel in TPAD" },
   "37089": { href: DEFAULT_APPRAISER_URLS["37089"], label: "Open Henderson County property appraiser" },
 };
 
@@ -148,6 +158,18 @@ export function parcelAppraiserUrl(options: {
     return {
       href: options.appraiserUrl || named?.href || null,
       label: named?.label || "Open Walton Property Appraiser search",
+    };
+  }
+  if (fips === "47011") {
+    return {
+      href: options.appraiserUrl || named?.href || null,
+      label: "Open Bradley County parcel in TPAD",
+    };
+  }
+  if (fips === "13217" || fips === "13255" || fips === "13029" || fips === "13103") {
+    return {
+      href: options.appraiserUrl || named?.href || null,
+      label: named?.label || "Open county property appraiser",
     };
   }
   if (fips === "37089" || fips === "13077") {

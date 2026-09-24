@@ -675,6 +675,15 @@ def gap_reason(county: dict) -> str:
 
 def spec_for(county: dict) -> dict:
     fips = county["fips"]
+    # Dickson FIPS 043 is IMPACT COUNTY_ID 22. The generic Tennessee spec uses the
+    # FIPS suffix as COUNTY_ID and would overwrite this county with the wrong roll.
+    if fips == "47043":
+        return {
+            "kind": "delegated",
+            "source": "tn-impact-47043",
+            "url": TN_URL,
+            "script": "scripts/seed_dickson_parcels.py",
+        }
     if fips in ORLANDO_REUSE:
         return {"kind": "reuse-orlando"}
     override = county_override(fips)
@@ -912,6 +921,7 @@ npm run seed:parcels:markets
 python3 scripts/seed_market_parcels.py --market Charlotte
 python3 scripts/seed_market_parcels.py --market Tampa --county Hardee
 python3 scripts/seed_market_parcels.py --refresh
+python3 scripts/seed_dickson_parcels.py
 ```
 
 A finished county is skipped unless `--refresh` is passed. Cached normalized features, when present, live under `/tmp/dls-market-parcels`.
@@ -929,7 +939,9 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb), plus the Dickson County extract below. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+Dickson County, Tennessee is seeded by `scripts/seed_dickson_parcels.py`, not the generic Tennessee pull. IMPACT `COUNTY_ID` is **22** (`JUR=022`), while GEOIDs stay FIPS **47043**. Attributes come from Parcel_Layer_Themes joined on `GISLINK` (latest `TAXYR`). Zoning polygons are City of Dickson `Current_Zo`, White Bluff `Zone_Curre`, and county `Zone_Curre` after city-limits resolution. Burns, Charlotte, Vanleer, Slayden, and future land use stay null.
 
 ## Coverage
 """
@@ -1149,6 +1161,13 @@ def main() -> None:
         if spec["kind"] == "reuse-orlando":
             if not existing.exists() or args.refresh:
                 write_reuse(slot["county"], markets)
+            continue
+        if spec["kind"] == "delegated":
+            print(
+                f"Skipping {slot['county']['name']} {fips}: refresh with {spec['script']} "
+                "(IMPACT COUNTY_ID=22 / JUR=022, not FIPS 043).",
+                flush=True,
+            )
             continue
         if existing.exists() and not args.refresh:
             row = json.loads(existing.read_text())

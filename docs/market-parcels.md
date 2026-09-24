@@ -13,6 +13,7 @@ npm run seed:parcels:markets
 python3 scripts/seed_market_parcels.py --market Charlotte
 python3 scripts/seed_market_parcels.py --market Tampa --county Hardee
 python3 scripts/seed_market_parcels.py --refresh
+python3 scripts/seed_dickson_parcels.py
 ```
 
 A finished county is skipped unless `--refresh` is passed. Cached normalized features, when present, live under `/tmp/dls-market-parcels`.
@@ -30,7 +31,9 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb), plus the Dickson County extract below. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+Dickson County, Tennessee is seeded by `scripts/seed_dickson_parcels.py`, not the generic Tennessee pull. IMPACT `COUNTY_ID` is **22** (`JUR=022`), while GEOIDs stay FIPS **47043**. Attributes come from Parcel_Layer_Themes joined on `GISLINK` (latest `TAXYR`). Zoning polygons are City of Dickson `Current_Zo`, White Bluff `Zone_Curre`, and county `Zone_Curre` after city-limits resolution. Burns, Charlotte, Vanleer, Slayden, and future land use stay null.
 
 ## Coverage
 
@@ -45,7 +48,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
-| Nashville | primary | 31,132 | 6 | 0 | 11 |
+| Nashville | primary | 34,778 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
@@ -140,7 +143,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Cannon | Tennessee | 47015 | complete-gte-5ac | 6,376 | tn-impact-47015 |
 | Cheatham | Tennessee | 47021 | complete-gte-5ac | 3,790 | tn-impact-47021 |
 | Davidson | Tennessee | 47037 | complete-gte-5ac | 8,286 | tn-impact-47037 |
-| Dickson | Tennessee | 47043 | complete-gte-5ac | 4,797 | tn-impact-47043 |
+| Dickson | Tennessee | 47043 | complete-gte-5ac | 8,443 | tn-impact-47043 |
 | Hickman | Tennessee | 47081 | complete-gte-5ac | 3,672 | tn-impact-47081 |
 | Macon | Tennessee | 47111 | gap | 0 | tn-impact-47111 |
 | Marshall | Tennessee | 47117 | gap | 0 | tn-impact-47117 |

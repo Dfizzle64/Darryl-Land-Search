@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T00:57:03Z",
+  "generatedAt": "2026-09-24T01:01:43Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 76288,
+  "parcelCount": 85505,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -110,20 +110,25 @@
       "name": "Carroll",
       "fips": "13045",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 9217,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "oa-carroll-ga-910028",
+      "queryUrl": "https://v2.openaddresses.io/batch-prod/job/910028/source.geojson.gz",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Kept 9217 Carroll County, Georgia parcels in the inclusive 5\u2013150 GIS-acre band from OpenAddresses job 910028 (55412 polygons, pid only). The live Carroll_Parcels_20240923_ExportFeatures service is blocked. GIS acres are equirectangular polygon area. Duplicate pid groups: 20. Below 5 acres: 46005. Above 150 acres: 164.",
+        "Carrollton CITY_PARCEL matched 320 kept parcels. Villa Rica Map/1 Carroll extract matched 228. Owner filled 539. Current value filled 543. There is no countywide owner, mailing, or tax roll on the OpenAddresses snapshot. Assessed value, taxable value, and tax amount were not on the public layers used here.",
+        "City zoning joined Carrollton 317 and Villa Rica Proposed_Z 175; unmatched 8725. Villa Rica is clipped to parcel ids on this Carroll landbase so Douglas-side rows are excluded. County Euclidean zoning is the 2025 PDF only. Temple, Bremen, Mount Zion, Bowdon, Whitesburg, and Roopville have no public zoning service.",
+        "Future land use joined Carrollton F2023FLU 39 and Villa Rica districts 227; unmatched 8951. County future land use is the 2023 PDF only. FAXNUMBER was not collected.",
+        "Sales joined from Carroll_Sales_ExportFeatures for 143 kept parcels. That layer is a commercial/industrial subset, not residential sales history. Soft situs from OpenAddresses address points: 8564. City situs: 548.",
+        "Opportunity Zone and OZ 2.0 were not assigned. Rejected Carroll County, Maryland, Carroll County, Ohio, Carrollton Texas, Carrollton Kentucky, and ARC LandPro. This extract is Carroll County, Georgia (FIPS 13045)."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13045/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13045/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 55412
     },
     {
       "name": "Cherokee",

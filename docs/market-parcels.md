@@ -21,6 +21,8 @@ Finished extracts in this batch were merged from public county and state GIS bra
 
 DeKalb County, Georgia is the complete assessment extract already merged on main (`ga-dekalb-assessment-view-2`). City zoning and future land use are joined where that extract published them. That service has no sale table.
 
+Carroll County, Georgia uses the OpenAddresses job 910028 parcel snapshot because the live county parcel service is blocked. Acreage is GIS area. Carrollton and Carroll-side Villa Rica supply the city CAMA, zoning, and future land use that matched a Carroll parcel id. County zoning and future land use remain PDFs. Sales are the commercial/industrial subset only. No Opportunity Zone designation was added.
+
 Walton County, Georgia is the choosewalton 5–150 GIS-acre landbase. FLU and Description are character areas, not Euclidean zoning. Monroe CAMA matches a handful of shared parcel numbers. City zoning covers Monroe, Loganville, and Social Circle only. Countywide owner, tax, sales, and Euclidean zoning stay gaps. Nothing in that extract is an Opportunity Zone designation.
 
 ## Coverage
@@ -33,7 +35,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 76,288 | 14 | 0 | 21 |
+| Atlanta | primary | 85,505 | 15 | 0 | 20 |
 | Tampa | primary | 124,315 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 109,348 | 13 | 0 | 4 |
@@ -73,7 +75,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Barrow | Georgia | 13013 | complete-gte-5ac | 4,251 | ga-barrow-parcels |
 | Bartow | Georgia | 13015 | complete-gte-5ac | 7,077 | ga-bartow-land |
 | Butts | Georgia | 13035 | gap | 0 | unavailable |
-| Carroll | Georgia | 13045 | gap | 0 | unavailable |
+| Carroll | Georgia | 13045 | complete-gte-5ac | 9,217 | oa-carroll-ga-910028 |
 | Cherokee | Georgia | 13057 | gap | 0 | unavailable |
 | Clayton | Georgia | 13063 | gap | 0 | unavailable |
 | Cobb | Georgia | 13067 | complete-gte-5ac | 4,770 | ga-cobb-taxassessorsdaily |

@@ -571,6 +571,10 @@ def county_override(fips: str) -> dict | None:
         from dekalb_parcels import dekalb_spec
 
         return dekalb_spec()
+    if fips == "13045":  # Carroll GA — OA snapshot while the county parcel service is blocked
+        from carroll_parcels import carroll_spec
+
+        return carroll_spec()
     if fips == "13297":  # Walton GA — character-area landbase, thin city zoning, almost no CAMA
         return {
             "kind": "walton",
@@ -651,7 +655,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, or Walton pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, Walton, or Carroll pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -915,6 +919,8 @@ Finished extracts in this batch were merged from public county and state GIS bra
 
 DeKalb County, Georgia is the complete assessment extract already merged on main (`ga-dekalb-assessment-view-2`). City zoning and future land use are joined where that extract published them. That service has no sale table.
 
+Carroll County, Georgia uses the OpenAddresses job 910028 parcel snapshot because the live county parcel service is blocked. Acreage is GIS area. Carrollton and Carroll-side Villa Rica supply the city CAMA, zoning, and future land use that matched a Carroll parcel id. County zoning and future land use remain PDFs. Sales are the commercial/industrial subset only. No Opportunity Zone designation was added.
+
 Walton County, Georgia is the choosewalton 5–150 GIS-acre landbase. FLU and Description are character areas, not Euclidean zoning. Monroe CAMA matches a handful of shared parcel numbers. City zoning covers Monroe, Loganville, and Social Circle only. Countywide owner, tax, sales, and Euclidean zoning stay gaps. Nothing in that extract is an Opportunity Zone designation.
 
 ## Coverage
@@ -922,6 +928,10 @@ Walton County, Georgia is the choosewalton 5–150 GIS-acre landbase. FLU and De
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "carroll":
+        from carroll_parcels import download_carroll_county
+
+        return download_carroll_county(county, markets, spec)
     if spec.get("kind") == "walton":
         from walton_parcels import download_walton_county
 

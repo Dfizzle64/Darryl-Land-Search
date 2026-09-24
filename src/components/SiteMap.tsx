@@ -42,7 +42,8 @@ import {
   measureFeatureCollection,
   type LngLat,
 } from "@/lib/measure";
-import { eligibleClassCut, southCarolinaStatusHelp } from "@/lib/markets";
+import { eligibleClassCut, southCarolinaOverlayMode } from "@/lib/markets";
+import { scNominatedOverlayFilter, showOzTractInScMarkets } from "@/lib/scNominatedTracts";
 import {
   arcgisExportTileUrl,
   CCSD_ZONE_MAP,
@@ -60,7 +61,7 @@ import {
 } from "@/lib/screening";
 import { tractClickFromFeature, tractPopupRuralLine, type TractClickDetails } from "@/lib/tractCounty";
 import { tractIncomeLayerFilter } from "@/lib/tractIncome";
-import { ORANGE_COUNTY_CENTER, MF_PRIORITY_LEGEND_BLURB, MF_PRIORITY_TIER_A_MEANING, MF_PRIORITY_TIER_B_MEANING, RURAL_ELIGIBLE_LEGEND_BLURB, URBAN_ELIGIBLE_LEGEND_BLURB, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
+import { ORANGE_COUNTY_CENTER, MF_PRIORITY_LEGEND_BLURB, MF_PRIORITY_TIER_A_MEANING, MF_PRIORITY_TIER_B_MEANING, RURAL_ELIGIBLE_LEGEND_BLURB, SC_NOMINATED_RURAL_LEGEND_BLURB, SC_NOMINATED_URBAN_LEGEND_BLURB, URBAN_ELIGIBLE_LEGEND_BLURB, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
 
 type LngLatBounds = [[number, number], [number, number]];
 
@@ -164,6 +165,7 @@ function ruralLayerFilter(
   if (classCut === "urban") parts.push(["==", ["get", "rural"], false]);
   if (classCut === "rural") parts.push(["==", ["get", "rural"], true]);
   if (geoids) parts.push(geoidMatch(geoids));
+  parts.push(scNominatedOverlayFilter() as maplibregl.FilterSpecification);
   if (parts.length === 1) return parts[0];
   return ["all", ...parts] as maplibregl.FilterSpecification;
 }
@@ -740,6 +742,7 @@ export function SiteMap({
               properties: (feature?.properties ?? null) as Record<string, unknown> | null,
             });
             if (!details) return;
+            if (details.kind === "eligible" && !showOzTractInScMarkets({ state: details.state, geoid: details.geoid })) return;
             const parcelHit = queryRendered(map, event.point, interactive);
             if (parcelHit.length > 0) {
               popupRef.current?.remove();
@@ -1069,8 +1072,9 @@ export function SiteMap({
         : classCut === "none"
           ? ["==", ["get", "tractGeoid"], "__none__"]
           : ["==", ["get", "rural"], classCut === "rural"];
-    setFilterSafe(map, "oz2-fill", andFilter(oz2Filter, incomeFilter));
-    setFilterSafe(map, "oz2-line", andFilter(oz2Filter, incomeFilter));
+    const oz2Shown = andFilter(oz2Filter, scNominatedOverlayFilter() as maplibregl.FilterSpecification);
+    setFilterSafe(map, "oz2-fill", andFilter(oz2Shown, incomeFilter));
+    setFilterSafe(map, "oz2-line", andFilter(oz2Shown, incomeFilter));
     const ruralFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, restrictGeoids);
     setFilterSafe(map, "rural-fill", andFilter(ruralFilter, incomeFilter));
     setFilterSafe(map, "rural-line", andFilter(ruralFilter, incomeFilter));
@@ -1305,7 +1309,9 @@ export function SiteMap({
     mapRef.current?.resize();
   }, [selectedId, selectedTractGeoid]);
 
-  const scStatusHelp = southCarolinaStatusHelp(market, countyState);
+  const overlayMode = southCarolinaOverlayMode(market, countyState);
+  const tractToggleName =
+    overlayMode === "nominated-only" ? "nominated census tracts" : overlayMode === "mixed" ? "census tracts" : "eligible census tracts";
   const layerOn = parcelLayerVisible ?? showParcels;
   const legendScope = { market, county, state: countyState, states: marketStates };
 
@@ -1336,7 +1342,7 @@ export function SiteMap({
               type="button"
               data-tract-toggle
               aria-pressed={showOz2}
-              aria-label={showOz2 ? "Hide eligible census tracts" : "Show eligible census tracts"}
+              aria-label={showOz2 ? `Hide ${tractToggleName}` : `Show ${tractToggleName}`}
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
@@ -1433,29 +1439,59 @@ export function SiteMap({
                   </button>
                 ))}
               </div>
-              <p className="text-[10px] uppercase tracking-[0.14em] text-ink-300">OZ eligibility</p>
-              <p>
-                <span
-                  className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
-                  style={{ backgroundColor: OZ_TRACT_SWATCH.rural }}
-                />
-                Rural eligible — not designated
-                <span className="mt-0.5 block text-xs text-ink-100">{RURAL_ELIGIBLE_LEGEND_BLURB}</span>
+              <p className="text-[10px] uppercase tracking-[0.14em] text-ink-300">
+                {overlayMode === "nominated-only" ? "South Carolina nominations" : "OZ eligibility"}
               </p>
-              <p>
-                <span
-                  className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
-                  style={{ backgroundColor: OZ_TRACT_SWATCH.urban }}
-                />
-                Urban eligible — not designated
-                <span className="mt-0.5 block text-xs text-ink-100">{URBAN_ELIGIBLE_LEGEND_BLURB}</span>
-              </p>
-              {scStatusHelp ? (
-                <p className="text-xs text-ink-100">
-                  Governor-nominated / awaiting Treasury — official South Carolina list only. Not designated. No tax
-                  benefit from nomination alone.
-                </p>
-              ) : null}
+              {overlayMode === "nominated-only" ? (
+                <>
+                  <p>
+                    <span
+                      className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
+                      style={{ backgroundColor: OZ_TRACT_SWATCH.rural }}
+                    />
+                    Rural · Governor-nominated
+                    <span className="mt-0.5 block text-xs text-ink-100">{SC_NOMINATED_RURAL_LEGEND_BLURB}</span>
+                  </p>
+                  <p>
+                    <span
+                      className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
+                      style={{ backgroundColor: OZ_TRACT_SWATCH.urban }}
+                    />
+                    Urban · Governor-nominated
+                    <span className="mt-0.5 block text-xs text-ink-100">{SC_NOMINATED_URBAN_LEGEND_BLURB}</span>
+                  </p>
+                  <p className="text-xs text-ink-100">
+                    Eligible tracts that were not nominated are not shown. Not a designated QOZ. Nomination alone is not
+                    a tax benefit.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p>
+                    <span
+                      className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
+                      style={{ backgroundColor: OZ_TRACT_SWATCH.rural }}
+                    />
+                    Rural eligible — not designated
+                    <span className="mt-0.5 block text-xs text-ink-100">{RURAL_ELIGIBLE_LEGEND_BLURB}</span>
+                  </p>
+                  <p>
+                    <span
+                      className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
+                      style={{ backgroundColor: OZ_TRACT_SWATCH.urban }}
+                    />
+                    Urban eligible — not designated
+                    <span className="mt-0.5 block text-xs text-ink-100">{URBAN_ELIGIBLE_LEGEND_BLURB}</span>
+                  </p>
+                  {overlayMode === "mixed" ? (
+                    <p className="text-xs text-ink-100">
+                      South Carolina tracts on this map are Governor-nominated only. Eligible tracts that were not
+                      nominated are not shown in South Carolina. Other states in this market stay on the eligible list
+                      and are not designated.
+                    </p>
+                  ) : null}
+                </>
+              )}
               {showMfLegend ? (
                 <div className="space-y-1.5 border-t border-white/20 pt-1.5">
                   <p className="text-[10px] uppercase tracking-[0.14em] text-ink-300">MF priority</p>

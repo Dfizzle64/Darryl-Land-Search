@@ -3,7 +3,7 @@
 import { ScreeningDetails } from "./ScreeningDetails";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import type { ScreeningPoint } from "@/lib/screening";
-import { displayStatusChip, formatCountyLabel } from "@/lib/markets";
+import { displayStatusChip, formatCountyLabel, type ScOzOverlayMode } from "@/lib/markets";
 import { formatTractCounty } from "@/lib/tractCounty";
 import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME } from "@/lib/orlandoParcels";
 import { MF_PRIORITY_DISCLAIMER, NOM_WATCH_CAVEAT, tractPlaceLabel } from "@/lib/scMfPriority";
@@ -13,6 +13,7 @@ import { SC_NOMINATED_NOT_A_QOZ, SHED_CAVEAT, type EligibleTractRow } from "@/li
 type TractDrawerProps = {
   tract: EligibleTractRow | null;
   statusHelp?: string | null;
+  overlayMode?: ScOzOverlayMode;
   screeningPoint?: ScreeningPoint | null;
   screeningStatus?: "idle" | "loading" | "error";
   onClose: () => void;
@@ -23,6 +24,7 @@ type TractDrawerProps = {
 export function TractDrawer({
   tract,
   statusHelp = null,
+  overlayMode = "eligible",
   screeningPoint = null,
   screeningStatus = "idle",
   onClose,
@@ -34,8 +36,9 @@ export function TractDrawer({
       <aside className={pane ? "h-full overflow-y-auto bg-ink-900/80 p-5" : "hidden"}>
         <p className="font-display text-2xl text-white">Tract details</p>
         <p className="mt-2 text-sm leading-relaxed text-ink-300">
-          Select an eligible tract to see its county, state, GEOID, rural flag, status, and place or corridor notes.
-          These tracts are eligible for nomination. They are not certified 2027 Qualified Opportunity Zones.
+          {overlayMode === "nominated-only"
+            ? "Select a Governor-nominated tract to see its county, state, GEOID, rural flag, status, and place or corridor notes. Eligible tracts that were not nominated are not shown. These tracts are awaiting Treasury. They are not certified 2027 Qualified Opportunity Zones."
+            : "Select an eligible tract to see its county, state, GEOID, rural flag, status, and place or corridor notes. These tracts are eligible for nomination. They are not certified 2027 Qualified Opportunity Zones."}
         </p>
         {statusHelp ? (
           <SouthCarolinaStatusNote note={statusHelp} className="mt-3 text-xs leading-relaxed text-ink-300" />

@@ -297,6 +297,19 @@ export function viewIncludesSouthCarolina(market: SearchMarketId, state: string 
   return false;
 }
 
+export type ScOzOverlayMode = "nominated-only" | "mixed" | "eligible";
+
+/**
+ * How the OZ 2.0 overlay should read in this view.
+ * Entirely SC markets, and a county locked to South Carolina, are nominated-only.
+ * Charlotte and Savannah with no state lock still show the other state’s eligible tracts.
+ */
+export function southCarolinaOverlayMode(market: SearchMarketId, state: string | null): ScOzOverlayMode {
+  if (!viewIncludesSouthCarolina(market, state)) return "eligible";
+  if (ENTIRELY_SOUTH_CAROLINA_MARKETS.has(market) || isSouthCarolinaState(state)) return "nominated-only";
+  return "mixed";
+}
+
 /**
  * Help copy for a view that includes South Carolina tracts. Null for FL/GA/NC/TN-only views.
  * Does not name individual GEOIDs. Nomination is not designation.
@@ -304,12 +317,12 @@ export function viewIncludesSouthCarolina(market: SearchMarketId, state: string 
 export function southCarolinaStatusHelp(market: SearchMarketId, state: string | null): string | null {
   if (!viewIncludesSouthCarolina(market, state)) return null;
   const nominated =
-    "Tracts on South Carolina’s official 112-GEOID list (announced Sep 23, 2026; Final Recommendations PDF dated Sep 22) read Governor-nominated / awaiting Treasury. Other eligible tracts stay Eligible — not designated. Nothing here is a certified QOZ, and nomination alone is not a tax benefit.";
+    "South Carolina shows only the Governor’s nominated tracts (official 112-GEOID list, announced Sep 23, 2026; Final Recommendations PDF dated Sep 22). Those tracts read Governor-nominated / awaiting Treasury. Eligible tracts that were not nominated are not shown. They are not designated QOZs, and nomination alone is not a tax benefit.";
   if (market === "Charlotte" && !isSouthCarolinaState(state)) {
-    return `York, Lancaster, and Chester, South Carolina: ${nominated} North Carolina tracts in this market stay eligible and are not designated.`;
+    return `York, Lancaster, and Chester, South Carolina: ${nominated} North Carolina tracts in this market stay on the federal eligible list and are not designated.`;
   }
   if (market === "Savannah" && !isSouthCarolinaState(state)) {
-    return `Beaufort and Jasper, South Carolina: ${nominated} Georgia tracts in this market stay eligible and are not designated.`;
+    return `Beaufort and Jasper, South Carolina: ${nominated} Georgia tracts in this market stay on the federal eligible list and are not designated.`;
   }
   return nominated;
 }

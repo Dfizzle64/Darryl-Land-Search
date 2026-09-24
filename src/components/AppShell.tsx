@@ -32,11 +32,13 @@ import {
   rowMatchesTractClass,
   showOrangeCountyPilot,
   showOrlandoParcels,
+  southCarolinaOverlayMode,
   southCarolinaStatusHelp,
   summarizeCounties,
   viewBounds,
   viewIncludesSouthCarolina,
 } from "@/lib/markets";
+import { displayedOzTracts } from "@/lib/scNominatedTracts";
 import { showMarketParcels, type MarketParcelIndex } from "@/lib/marketParcels";
 import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcels";
 import { rankSites } from "@/lib/score";
@@ -167,14 +169,14 @@ export function AppShell({
   const activeMfView: MfPriorityView = scView && tractClass !== "urban" ? mfView : "all";
   const annotatedRows = useMemo(() => annotateRuralRows(ruralCatalog.rows, mfPriority), [ruralCatalog.rows, mfPriority]);
   const ruralSide = useMemo(() => {
-    if (!isPrimaryMarket(market)) {
-      return filterEligibleRows(otherCatalog.rows, market, county, countyState).filter((row) => row.rural === "Y");
-    }
-    return filterRuralRows(annotatedRows, market, county, countyState);
+    const rows = !isPrimaryMarket(market)
+      ? filterEligibleRows(otherCatalog.rows, market, county, countyState).filter((row) => row.rural === "Y")
+      : filterRuralRows(annotatedRows, market, county, countyState);
+    return displayedOzTracts(rows);
   }, [annotatedRows, county, countyState, market, otherCatalog.rows]);
   const urbanSide = useMemo(() => {
     const source = isPrimaryMarket(market) ? urbanCatalog.rows : otherCatalog.rows;
-    return filterEligibleRows(source, market, county, countyState).filter((row) => row.rural === "N");
+    return displayedOzTracts(filterEligibleRows(source, market, county, countyState).filter((row) => row.rural === "N"));
   }, [county, countyState, market, otherCatalog.rows, urbanCatalog.rows]);
   const classRows = useMemo(() => {
     const rows: EligibleTractRow[] = [];
@@ -225,6 +227,7 @@ export function AppShell({
   const visibilityHint = parcelVisibilityHint(parcelPreference, parcelLayerVisible);
   const filterKey = parcelFilterKey(filters);
   const statusHelp = southCarolinaStatusHelp(market, countyState);
+  const overlayMode = southCarolinaOverlayMode(market, countyState);
   const bounds = useMemo(
     () =>
       viewBounds(summary, activeMfView === "all" ? classRows : visibleTracts, county, countyState, {
@@ -595,15 +598,16 @@ export function AppShell({
     filters.incomeGeography === "tract" &&
     (filters.minIncome > 0 || !filters.includeUnknownIncome) &&
     classRowsShown.length < classRows.length;
+  const tractNoun = overlayMode === "nominated-only" ? "nominated" : "eligible";
   const tractEmptyMessage = incomeDroppedTracts
-    ? "No eligible tracts pass the median-income filter. Only Orange County tracts have a joined ACS median income. Tracts without that attribute stay visible when Include unknown income is on."
+    ? `No ${tractNoun} tracts pass the median-income filter. Only Orange County tracts have a joined ACS median income. Tracts without that attribute stay visible when Include unknown income is on.`
     : activeMfView === "all"
       ? tractClass === "urban"
-        ? "No urban eligible tracts in this county filter."
+        ? `No urban ${tractNoun} tracts in this county filter.`
         : tractClass === "rural"
-          ? "No rural eligible tracts in this county filter."
-          : "No eligible tracts in this county filter."
-      : "No SC multifamily priority tracts in this county. The shortlist is a subset of rural-eligible tracts, not a nomination.";
+          ? `No rural ${tractNoun} tracts in this county filter.`
+          : `No ${tractNoun} tracts in this county filter.`
+      : "No SC multifamily priority tracts in this county. On the map that shortlist is limited to Governor-nominated tracts, and it is not a nomination list.";
   const priorityFilter = scView && tractClass !== "urban"
     ? { priorityView: mfView, priorityCounts, onPriorityView: setMfView }
     : { priorityView: undefined, priorityCounts: undefined, onPriorityView: undefined };
@@ -945,6 +949,7 @@ export function AppShell({
                 priorityCounts={priorityFilter.priorityCounts}
                 onPriorityView={priorityFilter.onPriorityView}
                 emptyMessage={tractEmptyMessage}
+                overlayMode={overlayMode}
               />
             )}
           </div>
@@ -981,6 +986,7 @@ export function AppShell({
                 layout="pane"
                 tract={selectedTract}
                 statusHelp={statusHelp}
+                overlayMode={overlayMode}
                 screeningPoint={screeningPoint}
                 screeningStatus={screeningStatus}
                 onClose={() => setSelectedTractGeoid(null)}
@@ -1003,6 +1009,7 @@ export function AppShell({
             <TractDrawer
               tract={selectedTract}
               statusHelp={statusHelp}
+              overlayMode={overlayMode}
               screeningPoint={screeningPoint}
               screeningStatus={screeningStatus}
               onClose={() => setSelectedTractGeoid(null)}
@@ -1040,6 +1047,7 @@ export function AppShell({
                 priorityCounts={priorityFilter.priorityCounts}
                 onPriorityView={priorityFilter.onPriorityView}
                 emptyMessage={tractEmptyMessage}
+                overlayMode={overlayMode}
               />
             )}
           </div>

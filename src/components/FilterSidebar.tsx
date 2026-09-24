@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { MfPriorityFilter } from "./MfPriorityFilter";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { ZoningKnowledgePanel } from "./ZoningKnowledgePanel";
+import { southCarolinaOverlayMode } from "@/lib/markets";
 import { screeningLayerNotes } from "@/lib/screeningLayerHelp";
 import type { ScreeningToggles } from "@/lib/screening";
 import { ACREAGE_SLIDER, DEFAULT_FILTERS, SHED_CAVEAT, type FilterState, type FluConfig, type LandUseFilter, type MfPriorityView, type OzFilter, type SearchMarketId, type ZoningConfig } from "@/lib/types";
@@ -225,6 +226,36 @@ export function FilterSidebar({
 }: FilterSidebarProps) {
   const generatedAt = typeof meta.generatedAt === "string" ? meta.generatedAt.slice(0, 10) : null;
   const layerNotes = screeningLayerNotes({ market, county, state: countyState, states: marketStates });
+  const overlayMode = southCarolinaOverlayMode(market, countyState);
+  const ozOptions = OZ_OPTIONS.map((option) => {
+    if (overlayMode === "eligible") return option;
+    if (option.value === "rural-eligible") {
+      return {
+        ...option,
+        label: overlayMode === "nominated-only" ? "Nominated, rural" : option.label,
+        hint:
+          overlayMode === "nominated-only"
+            ? "Centroid is in a South Carolina Governor-nominated tract marked Rural. Not a designated 2027 QOZ."
+            : "In South Carolina, only Governor-nominated rural tracts match. Other states still use the Rev. Proc. 2026-14 rural-eligible list. Not a designated 2027 QOZ.",
+      };
+    }
+    if (option.value === "non-rural-eligible") {
+      return {
+        ...option,
+        label: overlayMode === "nominated-only" ? "Nominated, not rural" : option.label,
+        hint:
+          overlayMode === "nominated-only"
+            ? "Centroid is in a South Carolina Governor-nominated tract marked Non-rural. Not a designated 2027 QOZ."
+            : "In South Carolina, only Governor-nominated tracts match. Other states still use the Rev. Proc. 2026-14 non-rural eligible list. Not a designated 2027 QOZ.",
+      };
+    }
+    return option;
+  });
+  const tractHeading = overlayMode === "nominated-only" ? "Nominated sheds" : overlayMode === "mixed" ? "Tract sheds" : "Eligible sheds";
+  const tractCountLabel =
+    overlayMode === "nominated-only" ? "nominated" : overlayMode === "mixed" ? "" : "eligible";
+  const tractToggleLabel =
+    overlayMode === "nominated-only" ? "Nominated tracts" : overlayMode === "mixed" ? "OZ tracts" : "Eligible tracts";
 
   return (
     <>
@@ -257,9 +288,9 @@ export function FilterSidebar({
         </section>
 
         <section className="mt-5 space-y-2 rounded-2xl border border-white/10 bg-ink-800/70 p-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Eligible sheds</h2>
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">{tractHeading}</h2>
           <p className="text-sm text-white">
-            {market}: {tractCount.toLocaleString()} eligible {tractCount === 1 ? "tract" : "tracts"}
+            {market}: {tractCount.toLocaleString()} {`${tractCountLabel ? `${tractCountLabel} ` : ""}${tractCount === 1 ? "tract" : "tracts"}`}
           </p>
           <p className="text-xs text-ink-300">
             {ruralTractCount.toLocaleString()} rural · {urbanTractCount.toLocaleString()} urban
@@ -272,7 +303,11 @@ export function FilterSidebar({
           ) : null}
           <Note label="Shed notes">
             <p>
-              Rural eligible — not designated: Tract on Treasury OZ 2.0 eligible list, tagged entirely rural. Not yet a QOZ. No OZ 2.0 tax benefits apply today from this label. Urban eligible — not designated: Same eligible list, not tagged entirely rural. Also not yet a QOZ.
+              {overlayMode === "nominated-only"
+                ? "South Carolina shows Governor-nominated tracts only. Rural and urban are attributes on that list. They are awaiting Treasury and are not a QOZ. Eligible tracts that were not nominated are not shown. No OZ 2.0 tax benefits apply today from this label."
+                : overlayMode === "mixed"
+                  ? "Rural eligible — not designated and urban eligible — not designated still describe tracts outside South Carolina. South Carolina tracts in this count are Governor-nominated only. Eligible tracts that were not nominated are not shown in South Carolina."
+                  : "Rural eligible — not designated: Tract on Treasury OZ 2.0 eligible list, tagged entirely rural. Not yet a QOZ. No OZ 2.0 tax benefits apply today from this label. Urban eligible — not designated: Same eligible list, not tagged entirely rural. Also not yet a QOZ."}
             </p>
             <p>{SHED_CAVEAT}</p>
             <p>{parcelNote}</p>
@@ -283,7 +318,9 @@ export function FilterSidebar({
             {!orlandoParcels ? (
               <p>
                 {parcelCoverageNote
-                  ? "No parcel polygons were stored for this market. The map stays on eligible tracts."
+                  ? overlayMode === "nominated-only"
+                    ? "No parcel polygons were stored for this market. The map stays on nominated tracts."
+                    : "No parcel polygons were stored for this market. The map stays on eligible tracts."
                   : "Parcel polygons for this market are not seeded yet."}
               </p>
             ) : null}
@@ -300,7 +337,7 @@ export function FilterSidebar({
           {filters.considerOpportunityZone ? (
             <fieldset className="space-y-2">
               <legend className="sr-only">Opportunity Zone filter</legend>
-              {OZ_OPTIONS.map((option) => (
+              {ozOptions.map((option) => (
                 <label key={option.value} className="flex cursor-pointer items-start gap-2 rounded-xl border border-white/5 bg-ink-950/30 px-2 py-2">
                   <input
                     type="radio"
@@ -314,10 +351,16 @@ export function FilterSidebar({
               ))}
             </fieldset>
           ) : null}
-          <Toggle label="Eligible tracts" checked={showOz2} onChange={onShowOz2} />
+          <Toggle label={tractToggleLabel} checked={showOz2} onChange={onShowOz2} />
           <Toggle label="Designated QOZ overlay" checked={showOz} onChange={onShowOz} />
           <Note label="What these mean">
-            <p>Parcel filter only. Eligible tracts are Rev. Proc. 2026-14 nomination geography, not a designated 2027 QOZ.</p>
+            <p>
+              {overlayMode === "nominated-only"
+                ? "Parcel filter only. South Carolina tracts in this filter are the Governor-nominated list, not the broader federal eligible set, and not a designated 2027 QOZ."
+                : overlayMode === "mixed"
+                  ? "Parcel filter only. South Carolina matches are Governor-nominated tracts only. Other states use Rev. Proc. 2026-14 eligibility, not a designated 2027 QOZ."
+                  : "Parcel filter only. Eligible tracts are Rev. Proc. 2026-14 nomination geography, not a designated 2027 QOZ."}
+            </p>
             <p>{layerNotes.eligibleTracts}</p>
             <p>{layerNotes.designatedOz}</p>
           </Note>

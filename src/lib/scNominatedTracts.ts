@@ -3,6 +3,11 @@ import { SC_GOVERNOR_NOMINATED_STATUS } from "./types";
 
 export const SC_NOMINATED_SOURCE_CSV = "data/oz/sc-oz2-nominated-official-sccommerce-2026-09-23.csv";
 
+/** Census state FIPS. An 11-digit tract GEOID starts with these two digits. */
+export const SOUTH_CAROLINA_FIPS = "45";
+
+export const SOUTH_CAROLINA_STATE_NAME = "South Carolina";
+
 const STALE_SC_NOTE =
   "Eligible — not designated (SC Governor-filed Sep 10, 2026; nominated GEOID list not public)";
 
@@ -56,6 +61,49 @@ export function scGovernorNominatedGeoids(): ReadonlySet<string> {
 
 export function isScGovernorNominatedGeoid(geoid: string | null | undefined): boolean {
   return Boolean(geoid && SC_GOVERNOR_NOMINATED_GEOIDS.has(geoid));
+}
+
+export function isSouthCarolinaFips(geoid: string | null | undefined): boolean {
+  return Boolean(geoid && geoid.startsWith(SOUTH_CAROLINA_FIPS));
+}
+
+/**
+ * South Carolina tract identity. State name and FIPS both count so a missing
+ * label cannot keep an eligible-only SC tract on the map.
+ */
+export function isSouthCarolinaOzTract(input: { state?: string | null; geoid?: string | null }): boolean {
+  return input.state === SOUTH_CAROLINA_STATE_NAME || isSouthCarolinaFips(input.geoid);
+}
+
+/**
+ * Display rule: South Carolina shows the Governor-nominated list only.
+ * Every other state keeps the federal eligible set.
+ */
+export function showOzTractInScMarkets(input: { state?: string | null; geoid?: string | null }): boolean {
+  if (!isSouthCarolinaOzTract(input)) return true;
+  return isScGovernorNominatedGeoid(input.geoid);
+}
+
+export function displayedOzTracts<T extends { state?: string | null; geoid?: string | null }>(rows: T[]): T[] {
+  return rows.filter((row) => showOzTractInScMarkets(row));
+}
+
+/**
+ * MapLibre filter matching `showOzTractInScMarkets`.
+ * Keep the tract when its GEOID is nominated, or when it is neither
+ * state "South Carolina" nor FIPS 45.
+ */
+export function scNominatedOverlayFilter(): unknown[] {
+  const geoids = [...SC_GOVERNOR_NOMINATED_GEOIDS].sort();
+  return [
+    "any",
+    ["in", ["get", "tractGeoid"], ["literal", geoids]],
+    [
+      "all",
+      ["!=", ["coalesce", ["get", "state"], ""], SOUTH_CAROLINA_STATE_NAME],
+      ["!=", ["slice", ["to-string", ["coalesce", ["get", "tractGeoid"], ""]], 0, 2], SOUTH_CAROLINA_FIPS],
+    ],
+  ];
 }
 
 /** Soft-upgrade only. Eligible chips stay in place when the GEOID is not on the official list. */

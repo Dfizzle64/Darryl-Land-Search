@@ -428,6 +428,62 @@ describe("filterParcels", () => {
     expect(parcels[0].properties.oz2Eligibility?.designation).toBe("eligible-for-nomination");
   });
 
+  it("keeps Florida eligible parcels and drops South Carolina tracts that are not nominated", () => {
+    const parcels = [
+      feature({
+        id: "fl-rural",
+        parcelId: "fl-rural",
+        oz2Eligibility: {
+          eligible: true,
+          rural: true,
+          tractGeoid: "12095016605",
+          tractName: null,
+          designation: "eligible-for-nomination",
+          source: "rev-proc-2026-14",
+        },
+      }),
+      feature({
+        id: "sc-nominated",
+        parcelId: "sc-nominated",
+        oz2Eligibility: {
+          eligible: true,
+          rural: true,
+          tractGeoid: "45015020712",
+          tractName: null,
+          designation: "eligible-for-nomination",
+          source: "rev-proc-2026-14",
+        },
+      }),
+      feature({
+        id: "sc-eligible-only",
+        parcelId: "sc-eligible-only",
+        oz2Eligibility: {
+          eligible: true,
+          rural: true,
+          tractGeoid: "45035010301",
+          tractName: null,
+          designation: "eligible-for-nomination",
+          source: "rev-proc-2026-14",
+        },
+      }),
+      feature({
+        id: "nc-rural",
+        parcelId: "nc-rural",
+        oz2Eligibility: {
+          eligible: true,
+          rural: true,
+          tractGeoid: "37119005702",
+          tractName: null,
+          designation: "eligible-for-nomination",
+          source: "rev-proc-2026-14",
+        },
+      }),
+    ];
+    expect(
+      filterParcels(parcels, { ...baseFilters, ozFilter: "rural-eligible" }, config, fluConfig).map((item) => item.properties.id),
+    ).toEqual(["fl-rural", "sc-nominated", "nc-rural"]);
+  });
+
   it("ignores opportunity zone and zoning constraints until those switches are on", () => {
     const parcels = [
       feature({

@@ -556,6 +556,9 @@ def nc_spec(fips: str) -> dict:
 
 
 def tn_spec(fips: str) -> dict:
+    # IMPACT COUNTY_ID is the Comptroller county number, not the FIPS suffix.
+    # Bradley County is Census FIPS 47011 and Comptroller JUR 006. That pull
+    # lives in county_override so this generic path is not used for it.
     county_id = int(fips[2:])
     return {
         "kind": "arcgis",
@@ -615,6 +618,10 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    if fips == "47011":  # Bradley TN — Cleveland GIS, not IMPACT COUNTY_ID 11
+        from bradley_parcels import bradley_spec
+
+        return bradley_spec()
     if fips == "13089":  # DeKalb GA — assessment roll plus municipal zoning/FLU
         from dekalb_parcels import dekalb_spec
 
@@ -997,6 +1004,8 @@ Jackson County, Georgia is the county Tax_Parcels/FeatureServer/9 extract. Acrea
 
 Butts County, Georgia is the SchneiderCorp ButtsCountyGA_WFS/MapServer/0 extract. Acreage is TOTALACRES in the inclusive 5–150 band. CURR_VAL is the current value and ESTTAX is the estimated tax. Sales stay null because SALES_AREA is a neighborhood code. Zoning is City of Jackson, Flovilla, and Jenkinsburg, then unincorporated Butts County. Future land use is a comprehensive-plan PDF. Butte County, California, Jackson, Mississippi, and ARC LandPro were not used. No Opportunity Zone designation was added.
 
+Bradley County, Tennessee is the Cleveland GIS Parcels_Impact extract. Census FIPS is 47011. Comptroller county 006 is the layer filter, not the FIPS. The older IMPACT COUNTY_ID=11 tiles, whose centroids sat near longitude -87, are replaced. Cleveland zoning applies only inside the city limits. Charleston and unincorporated Bradley keep the assessor label. Future land use stays null. Hamilton County is unchanged. No Opportunity Zone designation was added.
+
 ## Coverage
 """
 
@@ -1026,6 +1035,10 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         from butts_parcels import download_butts_county
 
         return download_butts_county(county, markets, spec)
+    if spec.get("kind") == "tn-bradley":
+        from bradley_parcels import download_bradley
+
+        return download_bradley(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

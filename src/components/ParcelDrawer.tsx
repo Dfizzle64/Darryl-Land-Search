@@ -105,6 +105,7 @@ export function ParcelDrawer({
     : "FDOT AADT is Florida only";
   const dekalb = properties.countyFips === "13089";
   const hall = properties.countyFips === "13139";
+  const bradley = properties.countyFips === "47011";
   const butts = properties.countyFips === "13035";
   const jackson = properties.countyFips === "13157";
   const maysville = jackson && properties.situsCity === "Maysville";
@@ -168,17 +169,19 @@ export function ParcelDrawer({
           label="Future Land Use"
           value={fluLine}
           empty={
-            butts
-              ? "Butts County future land use is a comprehensive-plan PDF"
-              : maysville
-                ? "Maysville has no city future land use layer"
-                : jackson
-                  ? "No Jackson County or city future land use joined for this parcel"
-                  : hall
-                    ? "No Hall County or Gainesville future land use joined for this parcel"
-                    : dekalb
-                      ? "No future land use joined for this parcel"
-                      : "Not joined for this county"
+            bradley
+              ? "Bradley County future land use is not on a public polygon layer"
+              : butts
+                ? "Butts County future land use is a comprehensive-plan PDF"
+                : maysville
+                  ? "Maysville has no city future land use layer"
+                  : jackson
+                    ? "No Jackson County or city future land use joined for this parcel"
+                    : hall
+                      ? "No Hall County or Gainesville future land use joined for this parcel"
+                      : dekalb
+                        ? "No future land use joined for this parcel"
+                        : "Not joined for this county"
           }
         />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />

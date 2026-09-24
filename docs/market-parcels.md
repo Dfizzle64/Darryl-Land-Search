@@ -35,6 +35,8 @@ Jackson County, Georgia is the county Tax_Parcels/FeatureServer/9 extract. Acrea
 
 Butts County, Georgia is the SchneiderCorp ButtsCountyGA_WFS/MapServer/0 extract. Acreage is TOTALACRES in the inclusive 5–150 band. CURR_VAL is the current value and ESTTAX is the estimated tax. Sales stay null because SALES_AREA is a neighborhood code. Zoning is City of Jackson, Flovilla, and Jenkinsburg, then unincorporated Butts County. Future land use is a comprehensive-plan PDF. Butte County, California, Jackson, Mississippi, and ARC LandPro were not used. No Opportunity Zone designation was added.
 
+Bradley County, Tennessee is the Cleveland GIS Parcels_Impact extract. Census FIPS is 47011. Comptroller county 006 is the layer filter, not the FIPS. The older IMPACT COUNTY_ID=11 tiles, whose centroids sat near longitude -87, are replaced. Cleveland zoning applies only inside the city limits. Charleston and unincorporated Bradley keep the assessor label. Future land use stays null. Hamilton County is unchanged. No Opportunity Zone designation was added.
+
 ## Coverage
 
 # Market parcel coverage
@@ -63,7 +65,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Savannah | other | 3,283 | 1 | 0 | 7 |
 | Columbia | other | 14,613 | 1 | 1 | 8 |
 | Greenville | other | 31,164 | 2 | 0 | 6 |
-| Chattanooga | other | 14,591 | 2 | 0 | 8 |
+| Chattanooga | other | 15,498 | 2 | 0 | 8 |
 | Knoxville | other | 39,939 | 7 | 0 | 6 |
 | Memphis | other | 45,278 | 8 | 0 | 3 |
 | Jackson | other | 6,384 | 1 | 0 | 0 |
@@ -351,7 +353,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Bradley | Tennessee | 47011 | complete-gte-5ac | 5,429 | tn-impact-47011 |
+| Bradley | Tennessee | 47011 | complete-gte-5ac | 6,336 | tn-cleveland-parcels-impact-47011 |
 | Catoosa | Georgia | 13047 | gap | 0 | unavailable |
 | Dade | Georgia | 13083 | gap | 0 | unavailable |
 | Hamilton | Tennessee | 47065 | complete-gte-5ac | 9,162 | tn-hamilton-live-parcels |

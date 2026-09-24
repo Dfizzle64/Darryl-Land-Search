@@ -24,7 +24,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Savannah | other | 3,283 | 1 | 0 | 7 |
 | Columbia | other | 14,613 | 1 | 1 | 8 |
 | Greenville | other | 31,164 | 2 | 0 | 6 |
-| Chattanooga | other | 14,591 | 2 | 0 | 8 |
+| Chattanooga | other | 15,498 | 2 | 0 | 8 |
 | Knoxville | other | 39,939 | 7 | 0 | 6 |
 | Memphis | other | 45,278 | 8 | 0 | 3 |
 | Jackson | other | 6,384 | 1 | 0 | 0 |
@@ -312,7 +312,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Bradley | Tennessee | 47011 | complete-gte-5ac | 5,429 | tn-impact-47011 |
+| Bradley | Tennessee | 47011 | complete-gte-5ac | 6,336 | tn-cleveland-parcels-impact-47011 |
 | Catoosa | Georgia | 13047 | gap | 0 | unavailable |
 | Dade | Georgia | 13083 | gap | 0 | unavailable |
 | Hamilton | Tennessee | 47065 | complete-gte-5ac | 9,162 | tn-hamilton-live-parcels |

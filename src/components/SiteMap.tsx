@@ -61,7 +61,7 @@ import {
 } from "@/lib/screening";
 import { tractClickFromFeature, tractPopupRuralLine, type TractClickDetails } from "@/lib/tractCounty";
 import { tractIncomeLayerFilter } from "@/lib/tractIncome";
-import { ORANGE_COUNTY_CENTER, SC_GOVERNOR_FILED_STATUS, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
+import { ORANGE_COUNTY_CENTER, MF_PRIORITY_LEGEND_BLURB, MF_PRIORITY_TIER_A_MEANING, MF_PRIORITY_TIER_B_MEANING, RURAL_ELIGIBLE_LEGEND_BLURB, SC_GOVERNOR_FILED_STATUS, URBAN_ELIGIBLE_LEGEND_BLURB, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
 
 type LngLatBounds = [[number, number], [number, number]];
 
@@ -1427,12 +1427,14 @@ export function SiteMap({
                   </button>
                 ))}
               </div>
+              <p className="text-[10px] uppercase tracking-[0.14em] text-ink-300">OZ eligibility</p>
               <p>
                 <span
                   className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
                   style={{ backgroundColor: OZ_TRACT_SWATCH.rural }}
                 />
                 Rural eligible — not designated
+                <span className="mt-0.5 block text-xs text-ink-100">{RURAL_ELIGIBLE_LEGEND_BLURB}</span>
               </p>
               <p>
                 <span
@@ -1440,19 +1442,19 @@ export function SiteMap({
                   style={{ backgroundColor: OZ_TRACT_SWATCH.urban }}
                 />
                 Urban eligible — not designated
-              </p>
-              <p className="text-xs text-ink-100">
-                Eligible — not designated. Rural and urban are list attributes, not a 2027 QOZ.
-                {showMfLegend ? " SC MF priority is a separate shortlist, not a designation." : ""}
+                <span className="mt-0.5 block text-xs text-ink-100">{URBAN_ELIGIBLE_LEGEND_BLURB}</span>
               </p>
               {showMfLegend ? (
-                <>
+                <div className="space-y-1.5 border-t border-white/20 pt-1.5">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-ink-300">MF priority</p>
+                  <p className="text-xs text-ink-100">{MF_PRIORITY_LEGEND_BLURB}</p>
                   <p>
                     <span
                       className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
                       style={{ backgroundColor: MF_PRIORITY_SWATCH.tierA }}
                     />
                     SC MF priority · Tier A
+                    <span className="mt-0.5 block text-xs text-ink-100">{MF_PRIORITY_TIER_A_MEANING}</span>
                   </p>
                   <p>
                     <span
@@ -1460,8 +1462,9 @@ export function SiteMap({
                       style={{ backgroundColor: MF_PRIORITY_SWATCH.tierB }}
                     />
                     SC MF priority · Tier B
+                    <span className="mt-0.5 block text-xs text-ink-100">{MF_PRIORITY_TIER_B_MEANING}</span>
                   </p>
-                </>
+                </div>
               ) : null}
             </>
           ) : null}

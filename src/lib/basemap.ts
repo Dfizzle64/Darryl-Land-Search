@@ -245,12 +245,13 @@ export function trafficLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecif
 /**
  * Census-tract overlay swatches. Rural eligible is walnut/bronze so it stays off
  * the orange Streets roads and off the copper designated-QOZ overlay. Satellite
- * and dark basemaps shift that brown lighter; streets keeps the deeper walnut.
- * Urban eligible tracts, including Orlando, use one blue. Parcel fills stay green.
+ * uses a warmer bronze at low opacity with a light outline so the fill does not
+ * melt into dirt or roofs. Dark uses a cooler brown. Urban eligible tracts,
+ * including Orlando, stay one blue. Parcel fills stay green.
  */
 export const OZ_TRACT_SWATCH = {
   /** Walnut — OZ 2.0 rural-eligible tracts. Darker than the copper designated overlay. */
-  rural: "#a56b3c",
+  rural: "#8b5a2b",
   /** Same blue as urban. Orlando no longer uses a separate amber overlay. */
   eligible: "#3d7dff",
   /** Blue — urban / non-rural eligible tracts in every market, including Orlando. */
@@ -261,15 +262,15 @@ export const OZ_TRACT_SWATCH = {
 
 /** Basemap-specific rural fill/outline so walnut stays readable on imagery and on streets. */
 export function ruralTractFill(mode: BasemapMode): { color: string; opacity: number } {
-  if (mode === "satellite") return { color: "#e4c4a0", opacity: 0.48 };
-  if (mode === "dark") return { color: "#d2b48c", opacity: 0.42 };
-  return { color: OZ_TRACT_SWATCH.rural, opacity: 0.34 };
+  if (mode === "satellite") return { color: "#c9843f", opacity: 0.2 };
+  if (mode === "dark") return { color: "#a98460", opacity: 0.3 };
+  return { color: OZ_TRACT_SWATCH.rural, opacity: 0.32 };
 }
 
 export function ruralTractLine(mode: BasemapMode): { color: string; width: number; opacity: number } {
-  if (mode === "satellite") return { color: "#fff8f0", width: 2.8, opacity: 0.96 };
-  if (mode === "streets") return { color: "#3f2a1c", width: 2.5, opacity: 0.92 };
-  return { color: "#f6e6d4", width: 2.5, opacity: 0.92 };
+  if (mode === "satellite") return { color: "#ffe6c2", width: 3.4, opacity: 1 };
+  if (mode === "streets") return { color: "#2f1c10", width: 2.8, opacity: 0.96 };
+  return { color: "#f4e0c8", width: 2.8, opacity: 0.96 };
 }
 
 /** Highlight for the SC multifamily shortlist. Neither color means designated. */

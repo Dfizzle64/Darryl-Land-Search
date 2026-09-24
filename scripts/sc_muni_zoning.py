@@ -100,7 +100,7 @@ REJECTED = [
 
 HONEST_GAPS = [
     "Sullivan's Island: official zoning is PDF / Instant app only. Unofficial Zoning_2025 was not joined.",
-    "James Island: PDF/static maps only. No municipal zoning REST.",
+    "James Island: PDF/static maps only. No municipal zoning REST. County External/ENERGOV is a municipal overlay, not the ZLDR zoning layer, and is not used as James Island zoning.",
     "Mauldin, Simpsonville, and Travelers Rest: no city FeatureServer. County JCODE on GCGIA Zoning/13 is the public layer. SimpsonvilleZoning AGOL is Shelby County, Tennessee.",
     "Isle of Palms: district services are partial and have no ZONING field. PDD was not joined.",
     "Fountain Inn on the Laurens side and Greer on the Spartanburg side are not joined — those counties have no parcel extract.",
@@ -750,7 +750,7 @@ def join_features(fips: str, features: list[dict]) -> tuple[list[dict], list[str
                 ("Mount Pleasant", ["mount-pleasant"], "usable", "MPSC_Zoning_New/2. COUNTY and AWENDAW values dropped."),
                 ("Charleston County", ["charleston-county"], "usable", "energov_css/7 for the remainder. Not applied on Sullivan's Island, James Island, or Isle of Palms situs cities."),
                 ("Sullivan's Island", [], "gap", "No town REST. Unofficial Zoning_2025 not queried."),
-                ("James Island", [], "gap", "PDF/static only. No municipal zoning REST."),
+                ("James Island", [], "gap", "PDF/static only. No municipal zoning REST. County External/ENERGOV is a municipal overlay, not ZLDR."),
             ],
             [
                 "County FLU External_GIS_Website/60 and City of Charleston mapnetExternal/382 LAND_USE are joined. City FLU wins inside the city.",

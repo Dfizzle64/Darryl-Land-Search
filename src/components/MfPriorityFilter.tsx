@@ -43,10 +43,7 @@ export function MfPriorityFilter({ value, counts, onChange, compact = false }: M
         })}
       </div>
       {compact ? null : (
-        <p className="text-xs leading-relaxed text-ink-500">
-          {MF_PRIORITY_DISCLAIMER} Gold outlines are Tier A. Blue outlines are Tier B. Tract polygons have no center dot. The status chip
-          stays eligible and not designated.
-        </p>
+        <p className="text-xs leading-relaxed text-ink-500">{MF_PRIORITY_DISCLAIMER}</p>
       )}
     </fieldset>
   );

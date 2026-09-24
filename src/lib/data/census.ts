@@ -11,8 +11,11 @@ export interface IncomeProvider {
 }
 
 /**
- * Fixture income is already joined onto parcels. This adapter is the extension
- * point for live ACS. Census Bureau requires CENSUS_API_KEY as of 2026.
+ * Live ACS 5-year adapter. Southeast tract medians use 2020–2024
+ * (`/data/2024/acs/acs5`, vintage `acs5_2020_2024`):
+ * get=NAME,B19013_001E,B19013_001M&for=tract:*&in=state:XX&in=county:*
+ * Census Bureau requires CENSUS_API_KEY as of 2026. The committed fixture is
+ * that same B19013 table, not a county, ZIP, or CHAS substitute.
  */
 export class CensusAcsIncomeProvider implements IncomeProvider {
   id = "census-acs";
@@ -24,7 +27,7 @@ export class CensusAcsIncomeProvider implements IncomeProvider {
       throw new Error("Set CENSUS_API_KEY to query api.census.gov. Fixtures do not need a key.");
     }
     const forClause = geography === "tract" ? "tract:*" : "block group:*";
-    const url = new URL("https://api.census.gov/data/2023/acs/acs5");
+    const url = new URL("https://api.census.gov/data/2024/acs/acs5");
     url.searchParams.set("get", "NAME,B19013_001E,B19013_001M");
     url.searchParams.set("for", forClause);
     url.searchParams.set("in", "state:12 county:095");

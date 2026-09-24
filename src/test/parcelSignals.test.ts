@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_AADT_DISTANCE_METERS, buildOrangeSignalIndex, nearestRoad } from "../lib/orangeSignals";
+import { MAX_AADT_DISTANCE_METERS, ACS_TRACT_VINTAGE, buildOrangeSignalIndex, nearestRoad, parcelTractGeoid } from "../lib/orangeSignals";
 import type { ParcelFeature } from "../lib/types";
 import { annotateParcelSignals } from "../lib/orangeSignals";
 
@@ -80,7 +80,7 @@ describe("parcel income and AADT join", () => {
     expect(inside.properties.incomeTract?.medianHouseholdIncome).toBe(72000);
   });
 
-  it("does not attach a Florida AADT count to a Georgia parcel", () => {
+  it("joins a 2020 tract GEOID even when the centroid is outside the polygon", () => {
     const index = buildOrangeSignalIndex(
       {
         type: "FeatureCollection",
@@ -91,39 +91,101 @@ describe("parcel income and AADT join", () => {
               type: "Polygon",
               coordinates: [
                 [
-                  [-83.4, 30.7],
-                  [-83.2, 30.7],
-                  [-83.2, 30.9],
-                  [-83.4, 30.9],
-                  [-83.4, 30.7],
+                  [-81.5, 28.4],
+                  [-81.3, 28.4],
+                  [-81.3, 28.6],
+                  [-81.5, 28.6],
+                  [-81.5, 28.4],
                 ],
               ],
             },
             properties: {
-              geoid: "13185000100",
+              geoid: "12095000100",
               name: "Census Tract 1",
-              medianHouseholdIncome: 48000,
-              medianHouseholdIncomeMoe: 500,
+              medianHouseholdIncome: 72000,
+              medianHouseholdIncomeMoe: 1000,
+              vintage: ACS_TRACT_VINTAGE,
             },
           },
         ],
       },
       { type: "FeatureCollection", features: [] },
-      { type: "FeatureCollection", features: [road(-83.3, 30.8, 22000)] },
+      { type: "FeatureCollection", features: [] },
+    );
+    const byGeoid = {
+      type: "Feature",
+      geometry: { type: "Polygon", coordinates: [] },
+      properties: {
+        centroid: [-84, 33],
+        incomeTract: null,
+        oz2Eligibility: { tractGeoid: "12095000100" },
+      },
+    } as unknown as ParcelFeature;
+    expect(parcelTractGeoid(byGeoid.properties)).toBe("12095000100");
+    annotateParcelSignals(byGeoid, index);
+    expect(byGeoid.properties.incomeTract?.medianHouseholdIncome).toBe(72000);
+    expect(byGeoid.properties.incomeTract?.vintage).toBe(ACS_TRACT_VINTAGE);
+
+    const designatedOnly = {
+      type: "Feature",
+      geometry: { type: "Polygon", coordinates: [] },
+      properties: {
+        centroid: [-84, 33],
+        incomeTract: null,
+        opportunityZone: { tractGeoid: "12095000100" },
+        oz2Eligibility: null,
+      },
+    } as unknown as ParcelFeature;
+    annotateParcelSignals(designatedOnly, index);
+    expect(designatedOnly.properties.incomeTract).toBeNull();
+  });
+
+  it("joins income and a nearby count for a new-metro parcel outside Florida", () => {
+    const index = buildOrangeSignalIndex(
+      {
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [-83.45, 33.9],
+                  [-83.25, 33.9],
+                  [-83.25, 34.05],
+                  [-83.45, 34.05],
+                  [-83.45, 33.9],
+                ],
+              ],
+            },
+            properties: {
+              geoid: "13059000100",
+              name: "Census Tract 1, Clarke County, Georgia",
+              medianHouseholdIncome: 51000,
+              medianHouseholdIncomeMoe: 800,
+              vintage: ACS_TRACT_VINTAGE,
+            },
+          },
+        ],
+      },
+      { type: "FeatureCollection", features: [] },
+      { type: "FeatureCollection", features: [road(-83.35, 33.97, 18000)] },
     );
     const parcel = {
       type: "Feature",
       geometry: { type: "Polygon", coordinates: [] },
       properties: {
-        countyFips: "13185",
-        centroid: [-83.3, 30.8],
+        countyFips: "13059",
+        centroid: [-83.35, 33.97],
         incomeTract: null,
         incomeBlockGroup: null,
         nearestRoad: null,
       },
     } as unknown as ParcelFeature;
     annotateParcelSignals(parcel, index);
-    expect(parcel.properties.incomeTract?.medianHouseholdIncome).toBe(48000);
-    expect(parcel.properties.nearestRoad).toBeNull();
+    expect(parcel.properties.incomeTract?.medianHouseholdIncome).toBe(51000);
+    expect(parcel.properties.incomeTract?.vintage).toBe(ACS_TRACT_VINTAGE);
+    expect(parcel.properties.nearestRoad?.aadt).toBe(18000);
   });
 });

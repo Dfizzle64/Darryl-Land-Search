@@ -120,7 +120,7 @@ async function finalizeMarketParcelPage(
   features: ParcelFeature[],
   query: OrlandoParcelQuery,
 ): Promise<OrlandoParcelPage> {
-  // Same ACS B19013 tract join as Orlando. FDOT AADT stays on Florida county FIPS.
+  // Same income/AADT join as Orlando. Counties outside the Florida fixtures stay unknown.
   return finalizeOrlandoParcelPage(features, query);
 }
 

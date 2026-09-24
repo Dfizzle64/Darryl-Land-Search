@@ -30,9 +30,13 @@ REJECTED_HOSTS = ("gis3.cmpdd.org", "portal.cmpdd.org")
 QPUBLIC = "https://qpublic.schneidercorp.com/Application.aspx?App={app}&Layer=Parcels&PageType=Report&KeyValue="
 
 NO_OZ = "No Opportunity Zone designation, school letter grade, or base flood elevation was assigned."
+STATE_AADT = (
+    "Traffic counts use the priority-county state DOT layer already on main. "
+    "Florida FDOT segments are not copied onto these parcels. A count farther than 15 km stays unknown."
+)
 NO_AADT = (
-    "No public AADT layer is on these cards, and the FDOT count layer is Florida-only. "
-    "nearestRoad stays empty for these counties."
+    "No verified state DOT AADT join for this county. Florida FDOT segments are not copied here. "
+    "nearestRoad stays empty unless a later count layer is added."
 )
 
 
@@ -172,7 +176,7 @@ def specs() -> dict[str, dict]:
                 "Future land use is Greater Lowndes character_areas. The map date is about 2006; the 2021 plan and draft 2026 update may supersede it.",
                 "Mailing ZIP is essentially empty. Assessed MAV fields are present and unfilled. On-parcel sales are thin, and property_sales year layers stop at 2021.",
                 "Mailing city is not a municipality filter.",
-                NO_AADT,
+                STATE_AADT,
                 NO_OZ,
             ],
         },
@@ -242,7 +246,7 @@ def specs() -> dict[str, dict]:
                 "Future land use is MATS_Future_LandUse_2050. Certify against the adopted comprehensive plan.",
                 "No assessed value on this WinGAP extract. Sale prices of 0, 1, and 100 are dropped as nominal. Only the latest sale is on the polygon.",
                 "gis.maconbibb.us was down on the research pass and was not used.",
-                NO_AADT,
+                STATE_AADT,
                 NO_OZ,
             ],
         },
@@ -404,7 +408,7 @@ def specs() -> dict[str, dict]:
                 "City of Beaufort and Town of Port Royal have no public zoning FeatureServer on this pass. County CDC codes are not invented for them. Where the county polygon does not cover them, zoning stays empty.",
                 "Future land use is BC_FLU FutureLandUse joined on PIN. Hilton Head Landuse___Current is an existing-use inventory and was not stored as future land use.",
                 "Last sale only. No multi-sale table.",
-                NO_AADT,
+                STATE_AADT,
                 NO_OZ,
             ],
         },
@@ -480,7 +484,7 @@ def specs() -> dict[str, dict]:
                 "Pearl has future land use for 2026 and no city zoning layer. County zoning stays. Pearl future land use replaces the county future land use on a match.",
                 "Ridgeland has no verified public zoning REST on this pass. No Ridgeland code was invented.",
                 "No sale price on this layer. deed_date is the deed date, not a qualified sale price.",
-                NO_AADT,
+                STATE_AADT,
                 NO_OZ,
             ],
         ),
@@ -515,7 +519,7 @@ def specs() -> dict[str, dict]:
                 "Gluckstadt zoning is a December 2021 layer and was not fully field-mapped. It was not joined. County zone_2025 remains inside Gluckstadt.",
                 "City of Madison publishes existing and future land use in a viewer and no zoning layer on this pass. No city zoning was invented.",
                 "Ridgeland zoning was not found as public REST.",
-                NO_AADT,
+                STATE_AADT,
                 NO_OZ,
             ],
             acres="arcacres",
@@ -572,7 +576,7 @@ def specs() -> dict[str, dict]:
                 "Clinton zoning is Clinton_Feature_Layer/32 zoning2017. Clinton land use plan fields were not mapped on the card and were not joined.",
                 "Byram zoning was not found as public REST.",
                 "MARIS mail and deed fields are empty for Hinds. Owner, situs, and total value come from the state fabric. Assessed value stays empty. The landroll HTML search is the tax record.",
-                NO_AADT,
+                STATE_AADT,
                 NO_OZ,
             ],
         },

@@ -662,10 +662,27 @@ def main() -> None:
             ]
 
     patch_json(ROOT / "data" / "fixtures" / "orlando-parcels" / "meta.json", set_sample)
-    patch_json(
-        ROOT / "data" / "orlando-parcel-sources.json",
-        lambda data: [set_sample({"counties": data.get("counties", [])})],
+    # orlando-parcel-sources.json is kept as authored JSON. A full rewrite escapes
+    # punctuation in unrelated counties, so only the Volusia gap line is replaced.
+    sources = ROOT / "data" / "orlando-parcel-sources.json"
+    sources_text = sources.read_text()
+    volusia_gap = '"gaps": ["No zoning on DOH extract"]'
+    replacement = (
+        '"gaps": ["DOH extract has no zoning. City zoning and FLU are centroid-joined from municipal REST. '
+        f'This sample joined zoning {sample["zoning"]} and FLU {sample["flu"]}. '
+        'ZONCODE 999 stubs and the Seattle future land use service are not used."],\n'
+        f'      "zoningJoinedCount": {sample["zoning"]},\n'
+        f'      "fluJoinedCount": {sample["flu"]}'
     )
+    marker = '"name": "Volusia"'
+    start = sources_text.rfind(marker)
+    if start >= 0:
+        region = sources_text[start:]
+        if volusia_gap in region:
+            region = region.replace(volusia_gap, replacement, 1)
+            sources.write_text(sources_text[:start] + region)
+        elif '"zoningJoinedCount"' in region.split('"path"', 1)[0]:
+            pass
 
     summary = {
         "generatedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),

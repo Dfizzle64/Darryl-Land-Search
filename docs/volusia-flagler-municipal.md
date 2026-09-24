@@ -19,7 +19,7 @@ Both zoning and future land use come from that city's service.
 | City | County | Zoning | Future land use |
 | --- | --- | --- | --- |
 | Daytona Beach | Volusia | City Planning MapServer 10 `NewZoningClassification` | Planning MapServer 4 `LANDUSECODE` |
-| Port Orange | Volusia | AGOL zoning layer 14 `Zoning` | AGOL layer 6 `FLU` |
+| Port Orange | Volusia | AGOL zoning layer 14 `Zoning` | AGOL layer 6 `FLU`. `Name` / `name` are case or ordinance titles and are not stored |
 | Ormond Beach | Volusia | EnerGov layer 6 `ZONING` | EnerGov layer 5 `LAND_USE` |
 | Deltona | Volusia | Zoning layer 1 `ZONING` | Land use designation layer 0 |
 | DeLand | Volusia | ZoningDistricts layer 9 `Zoning_Dis` | FLU layer 4 `FLU_NAME` |

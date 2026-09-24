@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T00:18:34Z",
+  "generatedAt": "2026-09-24T00:23:17Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -451,7 +451,7 @@
     },
     "Tampa": {
       "tier": "primary",
-      "parcelCount": 124315,
+      "parcelCount": 124897,
       "completeCountyCount": 10,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
@@ -461,13 +461,12 @@
           "name": "Citrus",
           "state": "Florida",
           "fips": "12017",
-          "featureCount": 5807,
+          "featureCount": 5810,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Parcel polygons, owner, situs, and tax values are Florida DOH EHWATER layer 8. Citrus County lots have no acre or owner field, and lot PRCLKEY is empty, so zoning is a centroid join.",
-            "Municipality is the corporate-limit layer (Inverness or Crystal River). PHY_CITY is the postal city and is not the city limit."
+            "No zoning or FLU on the Florida DOH extract."
           ]
         },
         {
@@ -487,13 +486,12 @@
           "name": "Hernando",
           "state": "Florida",
           "fips": "12053",
-          "featureCount": 6601,
+          "featureCount": 7180,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Upgrade off Florida DOH. Parcels, owner, situs, and values are Hernando County Parcels (gis.V_PARCELS).",
-            "Municipality is CER_JURISDICTION: B is Brooksville and C is unincorporated. Situs city Brooksville, Spring Hill, or Weeki Wachee is not the city limit."
+            "No zoning or FLU on the Florida DOH extract."
           ]
         },
         {
@@ -1687,107 +1685,6 @@
           "gaps": [
             "No acreage field on Hosted/Parcel. Acres are computed from WGS84 rings after a Web Mercator SHAPE__Area prefilter.",
             "Sale price and tax values are not on the public parcel layer."
-          ]
-        }
-      ]
-    },
-    "North-Central Florida": {
-      "tier": "other",
-      "parcelCount": 52695,
-      "completeCountyCount": 7,
-      "sampleCountyCount": 0,
-      "gapCountyCount": 0,
-      "path": "data/fixtures/market-parcels/markets/north-central-florida/meta.json",
-      "counties": [
-        {
-          "name": "Alachua",
-          "state": "Florida",
-          "fips": "12001",
-          "featureCount": 15539,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Jurisdiction is JurisNo on Parcels35, not the situs or mailing city. Gainesville postal addresses outside the city stay Unincorporated Alachua County.",
-            "Zoning and FLU are stored only when ZONECODE/FluCode starts with the jurisdiction prefix (0100 county, 0103 Gainesville, and the same pattern for the other cities). A mismatched county code on a city parcel is left blank."
-          ]
-        },
-        {
-          "name": "Bradford",
-          "state": "Florida",
-          "fips": "12007",
-          "featureCount": 593,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "598 source rows collapsed to 593 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "Partial. Bradford parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
-          ]
-        },
-        {
-          "name": "Citrus",
-          "state": "Florida",
-          "fips": "12017",
-          "featureCount": 5807,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Parcel polygons, owner, situs, and tax values are Florida DOH EHWATER layer 8. Citrus County lots have no acre or owner field, and lot PRCLKEY is empty, so zoning is a centroid join.",
-            "Municipality is the corporate-limit layer (Inverness or Crystal River). PHY_CITY is the postal city and is not the city limit."
-          ]
-        },
-        {
-          "name": "Gilchrist",
-          "state": "Florida",
-          "fips": "12041",
-          "featureCount": 6395,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "6854 source rows collapsed to 6395 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "Partial. Gilchrist parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
-          ]
-        },
-        {
-          "name": "Hernando",
-          "state": "Florida",
-          "fips": "12053",
-          "featureCount": 6601,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Upgrade off Florida DOH. Parcels, owner, situs, and values are Hernando County Parcels (gis.V_PARCELS).",
-            "Municipality is CER_JURISDICTION: B is Brooksville and C is unincorporated. Situs city Brooksville, Spring Hill, or Weeki Wachee is not the city limit."
-          ]
-        },
-        {
-          "name": "Levy",
-          "state": "Florida",
-          "fips": "12075",
-          "featureCount": 10200,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "10984 source rows collapsed to 10200 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "Partial. Levy parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
-          ]
-        },
-        {
-          "name": "Putnam",
-          "state": "Florida",
-          "fips": "12107",
-          "featureCount": 7560,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Optional Putnam pull. Parcel polygons and tax attributes are Florida DOH EHWATER layer 53.",
-            "The property-appraiser COMMUNITY field is Unincorporated on essentially every row, so it is not used as a municipality."
           ]
         }
       ]

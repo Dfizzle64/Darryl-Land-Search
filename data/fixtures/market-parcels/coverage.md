@@ -7,7 +7,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
 | Atlanta | primary | 59,104 | 10 | 1 | 24 |
-| Tampa | primary | 124,315 | 10 | 0 | 0 |
+| Tampa | primary | 124,897 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 104,066 | 13 | 0 | 4 |
 | Charlotte | primary | 106,650 | 12 | 0 | 3 |
@@ -17,7 +17,6 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Vero Beach | other | 23,009 | 5 | 0 | 0 |
 | Melbourne | other | 41,026 | 5 | 0 | 0 |
 | Jacksonville | other | 26,301 | 5 | 0 | 0 |
-| North-Central Florida | other | 52,695 | 7 | 0 | 0 |
 | Big Bend | other | 21,551 | 1 | 3 | 3 |
 | Pensacola | other | 59,902 | 6 | 0 | 0 |
 | Birmingham | other | 38,101 | 3 | 0 | 7 |
@@ -79,9 +78,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Citrus | Florida | 12017 | complete-gte-5ac | 5,807 | fl-citrus-doh-municipal-12017 |
+| Citrus | Florida | 12017 | complete-gte-5ac | 5,810 | fl-doh-ehwaters-12017 |
 | Hardee | Florida | 12049 | complete-gte-5ac | 5,303 | fl-hardee-infomap-12049 |
-| Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
+| Hernando | Florida | 12053 | complete-gte-5ac | 7,180 | fl-doh-ehwaters-12053 |
 | Hillsborough | Florida | 12057 | complete-gte-5ac | 13,838 | fl-hillsborough-parcelpublishing-12 |
 | Manatee | Florida | 12081 | complete-gte-5ac | 7,239 | fl-doh-ehwaters-12081 |
 | Pasco | Florida | 12101 | complete-gte-5ac | 12,372 | fl-pasco-pascomapper-7 |
@@ -214,18 +213,6 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Duval | Florida | 12031 | complete-gte-5ac | 7,768 | fl-coj-citybiz-parcels-12031 |
 | Nassau | Florida | 12089 | complete-gte-5ac | 5,587 | fl-nassau-taxmap-12089 |
 | St. Johns | Florida | 12109 | complete-gte-5ac | 4,944 | fl-sjc-hosted-parcel-12109 |
-
-### North-Central Florida
-
-| County | State | FIPS | Coverage | Parcels | Source |
-| --- | --- | --- | --- | ---: | --- |
-| Alachua | Florida | 12001 | complete-gte-5ac | 15,539 | fl-alachua-parcels35-12001 |
-| Bradford | Florida | 12007 | complete-gte-5ac | 593 | fl-doh-ehwaters-12007 |
-| Citrus | Florida | 12017 | complete-gte-5ac | 5,807 | fl-citrus-doh-municipal-12017 |
-| Gilchrist | Florida | 12041 | complete-gte-5ac | 6,395 | fl-doh-ehwaters-12041 |
-| Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
-| Levy | Florida | 12075 | complete-gte-5ac | 10,200 | fl-doh-ehwaters-12075 |
-| Putnam | Florida | 12107 | complete-gte-5ac | 7,560 | fl-putnam-doh-municipal-12107 |
 
 ### Big Bend
 

@@ -59,6 +59,7 @@ import {
   ORANGE_OPEN_DATA,
   type ScreeningToggles,
 } from "@/lib/screening";
+import { type MapFlyTarget } from "@/lib/jumpTo";
 import { tractClickFromFeature, tractPopupRuralLine, type TractClickDetails } from "@/lib/tractCounty";
 import { tractIncomeLayerFilter } from "@/lib/tractIncome";
 import { ORANGE_COUNTY_CENTER, MF_PRIORITY_LEGEND_BLURB, MF_PRIORITY_TIER_A_MEANING, MF_PRIORITY_TIER_B_MEANING, RURAL_ELIGIBLE_LEGEND_BLURB, SC_NOMINATED_RURAL_LEGEND_BLURB, SC_NOMINATED_URBAN_LEGEND_BLURB, URBAN_ELIGIBLE_LEGEND_BLURB, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
@@ -107,6 +108,7 @@ type SiteMapProps = {
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   onSelectTract: (geoid: string | null) => void;
+  flyTo?: MapFlyTarget | null;
   onViewportIdle?: (bbox: [number, number, number, number], zoom: number) => void;
   onZoom?: (zoom: number) => void;
   aoi?: AoiLock | null;
@@ -611,6 +613,7 @@ export function SiteMap({
   onSelect,
   onHover,
   onSelectTract,
+  flyTo = null,
   onViewportIdle,
   onZoom,
   aoi = null,
@@ -1270,6 +1273,19 @@ export function SiteMap({
     fittedBoundsKey.current = signature;
     map.fitBounds(bounds, { padding: 56, duration: 650, maxZoom: 11 });
   }, [bounds, boundsKey, status]);
+
+  const flewToPoint = useRef<number | null>(null);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready" || !flyTo) return;
+    if (flewToPoint.current === flyTo.key) return;
+    flewToPoint.current = flyTo.key;
+    map.easeTo({
+      center: [flyTo.lng, flyTo.lat],
+      zoom: Math.max(map.getZoom(), 14),
+      duration: 700,
+    });
+  }, [flyTo, status]);
 
   useEffect(() => {
     const map = mapRef.current;

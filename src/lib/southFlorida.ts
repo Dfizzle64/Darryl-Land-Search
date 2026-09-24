@@ -81,6 +81,66 @@ export function fluEmptyForSouthFlorida(countyFips: string | null | undefined, f
   return fallback;
 }
 
+const MIAMI_UNINC = "https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/18";
+const MIAMI_CITY = "https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/19";
+const MIAMI_PARCELS = "https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/26";
+const MONROE_ZONING = "https://mcgis4.monroecounty-fl.gov/public/rest/services/APO_GIS/MapServer/19";
+const MONROE_PARCELS = "https://mcgis4.monroecounty-fl.gov/public/rest/services/Parcels/MapServer/0";
+const BROWARD_BMSD =
+  "https://services.arcgis.com/JMAJrTsHNLrSsWf5/ArcGIS/rest/services/Broward_Municipal_Service_District_Zoning/FeatureServer/2";
+const BROWARD_MOSAIC = "https://gisweb-adapters.bcpa.net/arcgis/rest/services/BCPA_EXTERNAL_JAN26/MapServer/9";
+const BROWARD_PARCELS = "https://gisweb-adapters.bcpa.net/arcgis/rest/services/BCPA_EXTERNAL_JAN26/MapServer/16";
+const PALM_ZONING = "https://maps.co.palm-beach.fl.us/arcgis/rest/services/OpenData/Planning_Open_Data/MapServer/9";
+const PALM_PARCELS = "https://gis.pbcgov.org/arcgis/rest/services/Parcels/PARCEL_INFO/FeatureServer/4";
+
+export type GisViewerLink = { href: string; label: string };
+
+function trustedGisViewer(url: string): boolean {
+  return /^https:\/\//i.test(url) && !/papa|maps\.monroecounty\.gov|gis\.bcpa\.net|BMSDParcelAddress/i.test(url);
+}
+
+function gisViewerHref(fips: SouthFloridaFips, jurisdiction: string | null | undefined, zoned: boolean): string {
+  if (fips === "12086") {
+    if (!zoned) return MIAMI_PARCELS;
+    return jurisdiction === "Unincorporated" ? MIAMI_UNINC : MIAMI_CITY;
+  }
+  if (fips === "12087") return zoned ? MONROE_ZONING : MONROE_PARCELS;
+  if (fips === "12011") {
+    if (!zoned) return BROWARD_PARCELS;
+    return jurisdiction === "Unincorporated" ? BROWARD_BMSD : BROWARD_MOSAIC;
+  }
+  return zoned ? PALM_ZONING : PALM_PARCELS;
+}
+
+function gisViewerLabel(fips: SouthFloridaFips, jurisdiction: string | null | undefined, zoned: boolean): string {
+  if (fips === "12086") {
+    if (!zoned) return "Miami-Dade parcel layer";
+    return jurisdiction === "Unincorporated" ? "Miami-Dade unincorporated zoning" : "Miami-Dade municipal zoning";
+  }
+  if (fips === "12087") return zoned ? "Monroe land-use districts" : "Monroe parcel layer";
+  if (fips === "12011") {
+    if (!zoned) return "Broward parcel layer";
+    return jurisdiction === "Unincorporated"
+      ? "Broward unincorporated BMSD zoning"
+      : "Broward city zoning mosaic (partial, not a Fort Lauderdale ordinance)";
+  }
+  return zoned ? "Palm Beach unincorporated zoning" : "Palm Beach parcel layer";
+}
+
+/** Jurisdiction GIS layer from the Wave 0 cards. Stored `gisViewerUrl` wins when it is one of those hosts. */
+export function southFloridaGisViewer(input: {
+  countyFips?: string | null;
+  jurisdictionCode?: string | null;
+  zoningCode?: string | null;
+  gisViewerUrl?: string | null;
+}): GisViewerLink | null {
+  if (!isSouthFloridaFips(input.countyFips)) return null;
+  const zoned = Boolean(input.zoningCode);
+  const stored = input.gisViewerUrl?.trim() ?? "";
+  const href = stored && trustedGisViewer(stored) ? stored : gisViewerHref(input.countyFips, input.jurisdictionCode, zoned);
+  return { href, label: gisViewerLabel(input.countyFips, input.jurisdictionCode, zoned) };
+}
+
 export function saleEmptyForSouthFlorida(countyFips: string | null | undefined): string | null {
   if (countyFips === "12086") {
     return "No sale on this parcel row. Last sale is not on the Miami-Dade parcel layer. The folio API is the sales source and was not copied here.";

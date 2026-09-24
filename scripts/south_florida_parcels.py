@@ -267,6 +267,31 @@ def usable_code(value: Any) -> str | None:
     return text
 
 
+def layer_home(query_url: str) -> str:
+    if query_url.endswith("/query"):
+        return query_url[: -len("/query")]
+    return query_url
+
+
+def gis_viewer_url(fips: str, jurisdiction: str | None, *, zoned: bool) -> str:
+    """REST home of the zoning layer that won, or the county parcel service when zoning missed."""
+    parcels = {
+        "12086": layer_home(MIAMI_PARCELS),
+        "12087": layer_home(MONROE_PARCELS),
+        "12011": layer_home(BROWARD_PARCELS),
+        "12099": layer_home(PALM_PARCELS),
+    }[fips]
+    if not zoned:
+        return parcels
+    if fips == "12086":
+        return layer_home(MIAMI_ZONE_COUNTY if jurisdiction == "Unincorporated" else MIAMI_ZONE_CITY)
+    if fips == "12087":
+        return layer_home(MONROE_ZONING)
+    if fips == "12011":
+        return layer_home(BROWARD_BMSD_ZONING if jurisdiction == "Unincorporated" else BROWARD_MOSAIC)
+    return layer_home(PALM_ZONING)
+
+
 def appraiser_url(fips: str, parcel_id: str) -> str:
     token = urllib.parse.quote(parcel_id, safe="")
     if fips == "12086":
@@ -570,6 +595,7 @@ def _base_feature(
     )
     feature["properties"]["ownerName2"] = owner2
     feature["properties"]["appraiserUrl"] = appraiser_url(county["fips"], parcel_id)
+    feature["properties"]["gisViewerUrl"] = gis_viewer_url(county["fips"], None, zoned=False)
     feature["properties"]["dataGaps"] = list(gaps or [])
     feature["properties"]["opportunityZone"] = None
     feature["properties"]["oz2Eligibility"] = None
@@ -586,6 +612,9 @@ def _set_zoning(feature: dict, code: str | None, jurisdiction: str, label: str |
     pretty = label if label and label != text else text
     props["zoningDistrict"] = f"{jurisdiction}:{pretty}"
     props["jurisdictionCode"] = jurisdiction
+    fips = props.get("countyFips")
+    if fips in SPECS:
+        props["gisViewerUrl"] = gis_viewer_url(fips, jurisdiction, zoned=True)
     return True
 
 

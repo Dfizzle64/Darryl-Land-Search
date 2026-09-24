@@ -16,6 +16,19 @@ Wave 0 is South Florida only. This shelf is Miami-Dade, Monroe, Broward, and Pal
 - Broward: `https://bcpa.net/RecInfo.asp?URL_Folio={FOLIO}`
 - Palm Beach: `https://pbcpao.gov/Property/Details?parcelId={PARID}`. The legacy `pbcgov.org/papa` detail URL is not used.
 
+## Jurisdiction GIS viewers
+
+The parcel drawer links the layer that supplied zoning. When zoning misses, the link is the county parcel service. These are the card REST homes, without `/query`. Fort Lauderdale does not have its own joined layer. A Broward city hit uses the partial mosaic, and the label says that mosaic is not a Fort Lauderdale ordinance.
+
+- Miami-Dade municipal: `MD_LandInformation/MapServer/19`. Unincorporated: `MapServer/18`. Parcel fallback: `MapServer/26`.
+- Monroe land-use districts: `APO_GIS/MapServer/19`. Parcel fallback: `Parcels/MapServer/0`.
+- Broward BMSD (unincorporated): `Broward_Municipal_Service_District_Zoning/FeatureServer/2`. City mosaic: `BCPA_EXTERNAL_JAN26/MapServer/9`. Parcel fallback: `MapServer/16`.
+- Palm Beach unincorporated zoning: `Planning_Open_Data/MapServer/9`. Parcel fallback: `PARCEL_INFO/FeatureServer/4`.
+
+## Jump to an address
+
+The header accepts a street address or `lat, long`. A street address uses the Census oneline geocoder. The map flies to the point. When a loaded parcel polygon contains that point, the drawer selects it. A point inside the South Florida shelf switches to that market when the current market does not already contain it.
+
 ## Zoning and future land use
 
 - Miami-Dade zoning is unincorporated `MapServer/18` (`ZONE`) and the municipal mosaic `MapServer/19`. `PRIMARY_ZONE` on the parcel is a neighborhood code and is not stored as zoning. Future land use is CDMP `MapServer/7`.

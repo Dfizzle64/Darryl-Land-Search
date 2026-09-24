@@ -484,6 +484,11 @@ export type ParcelProperties = {
   filterMatch?: 0 | 1;
   /** County property appraiser / parcel search landing page when known. */
   appraiserUrl?: string | null;
+  /**
+   * Jurisdiction GIS layer that supplied zoning, or the county parcel service when zoning missed.
+   * Wave 0 South Florida uses the card REST layer (no `/query`). Other markets omit it.
+   */
+  gisViewerUrl?: string | null;
   /** Honest per-county gaps (no zoning, etc.). */
   dataGaps?: string[];
   /**

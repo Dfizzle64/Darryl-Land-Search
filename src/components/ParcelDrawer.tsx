@@ -35,7 +35,7 @@ import { fluEmptyForCharlotte, zoningEmptyForCharlotte } from "@/lib/charlotteMu
 import { fluEmptyForManateeSarasota, zoningEmptyForManateeSarasota } from "@/lib/manateeSarasotaMunicipal";
 import { brevardFluReason, formatJoinedZoning } from "@/lib/brevardMunicipal";
 import { fluEmptyForMunicipal, zoningEmptyForCounty } from "@/lib/volusiaFlaglerMunicipal";
-import { fluEmptyForSouthFlorida, saleEmptyForSouthFlorida, zoningEmptyForSouthFlorida } from "@/lib/southFlorida";
+import { fluEmptyForSouthFlorida, saleEmptyForSouthFlorida, southFloridaGisViewer, zoningEmptyForSouthFlorida } from "@/lib/southFlorida";
 import { describeZoningMatch } from "@/lib/zoning";
 
 type ParcelDrawerProps = {
@@ -164,6 +164,12 @@ export function ParcelDrawer({
     countyFips: properties.countyFips,
     appraiserUrl: properties.appraiserUrl,
   });
+  const gisViewer = southFloridaGisViewer({
+    countyFips: properties.countyFips,
+    jurisdictionCode: properties.jurisdictionCode,
+    zoningCode: properties.zoningCode,
+    gisViewerUrl: properties.gisViewerUrl,
+  });
   const gaps = properties.dataGaps?.length ? properties.dataGaps : null;
 
   return (
@@ -188,6 +194,11 @@ export function ParcelDrawer({
           ) : (
             <p className="mt-2 text-sm text-ink-500">Property appraiser not available</p>
           )}
+          {gisViewer ? (
+            <a className="mt-1 block text-sm text-moss-400 underline-offset-2 hover:underline" href={gisViewer.href} target="_blank" rel="noreferrer">
+              {gisViewer.label}
+            </a>
+          ) : null}
         </div>
         <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-3 py-1 text-sm">
           Close

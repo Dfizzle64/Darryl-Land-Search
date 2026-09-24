@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FilterSidebar } from "./FilterSidebar";
+import { JumpToBar } from "./JumpToBar";
 import { OzExplainer } from "./OzExplainer";
 import { MarketMenu } from "./MarketMenu";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
@@ -11,6 +12,14 @@ import { SitesPanel } from "./SitesPanel";
 import { TractDrawer } from "./TractDrawer";
 import { TractPanel } from "./TractPanel";
 import { AOI_PARCEL_LIMIT, featuresIntersectingBbox, type AoiLock } from "@/lib/aoi";
+import {
+  bboxContains,
+  parcelAtPoint,
+  parseLatLng,
+  pointInBounds,
+  SOUTH_FLORIDA_BOUNDS,
+  type MapFlyTarget,
+} from "@/lib/jumpTo";
 import { appliedParcelFilters, emptyStateHint, filterParcels, parcelFilterKey, stampFilterMatch, writeParcelFilters } from "@/lib/filters";
 import {
   isParcelVisibilityPreference,
@@ -158,6 +167,11 @@ export function AppShell({
   const [parcelsLoading, setParcelsLoading] = useState(true);
   const [parcelSource, setParcelSource] = useState<"fixture" | "live">("fixture");
   const [error, setError] = useState<string | null>(null);
+  const [flyTarget, setFlyTarget] = useState<MapFlyTarget | null>(null);
+  const [jumpNote, setJumpNote] = useState<string | null>(null);
+  const [jumpBusy, setJumpBusy] = useState(false);
+  const [parcelLoadStamp, setParcelLoadStamp] = useState(0);
+  const [pick, setPick] = useState<{ lng: number; lat: number; key: number; loadStamp: number } | null>(null);
 
   const primaryMarket = isPrimaryMarket(market);
   // Stable across zoom updates. A fresh object here rebuilds map bounds and fitBounds snaps the camera back.
@@ -455,6 +469,7 @@ export function AppShell({
       if (requestId !== viewportRequest.current || aoiRef.current) return;
       const features = featuresIntersectingBbox([...(body.features ?? []), ...(body.excluded ?? [])], bbox);
       setViewportParcels({ type: "FeatureCollection", features });
+      setParcelLoadStamp((stamp) => stamp + 1);
       setViewportStats({
         totalInBbox: body.meta?.totalInBbox ?? features.length,
         totalMatching: body.meta?.totalMatching ?? body.features?.length ?? features.length,
@@ -560,6 +575,67 @@ export function AppShell({
     setFiltersOpen(false);
   };
 
+  const jumpToQuery = async (query: string) => {
+    setJumpBusy(true);
+    setJumpNote(null);
+    try {
+      let point = parseLatLng(query);
+      if (!point) {
+        const response = await fetch(`/api/geocode?q=${encodeURIComponent(query)}`);
+        const body = (await response.json()) as { lng?: number; lat?: number; error?: string };
+        if (!response.ok || !Number.isFinite(body.lng) || !Number.isFinite(body.lat)) {
+          setJumpNote(body.error || "No match for that address.");
+          return;
+        }
+        point = { lng: body.lng as number, lat: body.lat as number };
+      }
+      const pad = 0.03;
+      lastViewport.current = {
+        bbox: [point.lng - pad, point.lat - pad, point.lng + pad, point.lat + pad],
+        zoom: 14,
+      };
+      const inSouthFlorida = pointInBounds(point.lng, point.lat, SOUTH_FLORIDA_BOUNDS);
+      const inCurrent = pointInBounds(point.lng, point.lat, summary.bounds);
+      if (!inCurrent && inSouthFlorida && market !== "South Florida") {
+        changeMarket("South Florida");
+      } else if (county || countyState) {
+        setCounty(null);
+        setCountyState(null);
+        setSelectedId(null);
+        setViewportParcels(null);
+      }
+      const key = Date.now();
+      setFlyTarget({ lng: point.lng, lat: point.lat, key });
+      setPick({ lng: point.lng, lat: point.lat, key, loadStamp: parcelLoadStamp });
+    } catch {
+      setJumpNote("Address lookup failed.");
+    } finally {
+      setJumpBusy(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!pick) return;
+    const hit = parcelAtPoint(activeParcels.features, pick.lng, pick.lat);
+    if (hit) {
+      setSelectedId(hit.properties.id);
+      setSelectedTractGeoid(null);
+      setJumpNote(null);
+      setPick(null);
+      return;
+    }
+    if (!shedParcelsOn) {
+      setJumpNote("Flew to that point.");
+      setPick(null);
+      return;
+    }
+    if (parcelsLoading || parcelLoadStamp === pick.loadStamp) return;
+    const view = lastViewport.current;
+    if (!view || !bboxContains(view.bbox, pick.lng, pick.lat)) return;
+    setJumpNote("Flew to that point. No loaded parcel contains it.");
+    setPick(null);
+  }, [pick, activeParcels.features, parcelsLoading, parcelLoadStamp, shedParcelsOn]);
+
   const selectTract = (geoid: string | null) => {
     setSelectedTractGeoid(geoid);
     if (!geoid) return;
@@ -653,6 +729,7 @@ export function AppShell({
           >
             How OZ 2.0 works
           </button>
+          <JumpToBar busy={jumpBusy} note={jumpNote} onJump={(query) => void jumpToQuery(query)} />
           <div className="flex items-center gap-1 text-[11px] text-ink-500">
             <span>Market</span>
             <MarketMenu value={market} onChange={changeMarket} />
@@ -849,6 +926,7 @@ export function AppShell({
             onSelect={selectSite}
             onHover={setHoveredId}
             onSelectTract={selectTract}
+            flyTo={flyTarget}
             onViewportIdle={shedParcelsOn ? loadViewportParcels : undefined}
             onZoom={setMapZoom}
             aoi={shedParcelsOn ? aoi : null}

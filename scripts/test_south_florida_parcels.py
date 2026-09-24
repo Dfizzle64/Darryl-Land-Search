@@ -18,6 +18,7 @@ from south_florida_parcels import (  # noqa: E402
     SPECS,
     acres_from_sqft,
     appraiser_url,
+    gis_viewer_url,
     in_band,
     in_county,
     miami_where,
@@ -70,6 +71,17 @@ def test_deep_links_and_rejected_hosts() -> None:
     assert "papa" not in palm
     for needle in ("maps.monroecounty.gov", "gis.bcpa.net", "pbcgov.org/papa", "BMSDParcelAddress"):
         assert needle in REJECTED_URLS
+    assert gis_viewer_url("12086", "MIAMI", zoned=True).endswith("/MapServer/19")
+    assert gis_viewer_url("12086", "Unincorporated", zoned=True).endswith("/MapServer/18")
+    assert gis_viewer_url("12086", None, zoned=False).endswith("/MapServer/26")
+    assert gis_viewer_url("12087", "Monroe", zoned=True).endswith("/APO_GIS/MapServer/19")
+    assert "Broward_Municipal_Service_District_Zoning/FeatureServer/2" in gis_viewer_url(
+        "12011", "Unincorporated", zoned=True
+    )
+    assert gis_viewer_url("12011", "Broward municipal mosaic", zoned=True).endswith("/MapServer/9")
+    assert gis_viewer_url("12099", "Unincorporated", zoned=True).endswith("/MapServer/9")
+    assert gis_viewer_url("12099", None, zoned=False).endswith("/FeatureServer/4")
+    assert "/query" not in gis_viewer_url("12011", None, zoned=False)
 
 
 def test_primary_zone_and_blank_codes_are_not_zoning() -> None:

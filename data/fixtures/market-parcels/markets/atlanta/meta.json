@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T00:24:42Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 8149,
+  "parcelCount": 15226,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -58,20 +58,26 @@
       "name": "Bartow",
       "fips": "13015",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 7077,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-bartow-land",
+      "queryUrl": "https://www.bartowgis.org/arcgis/rest/services/AGOServices/BartowLand/FeatureServer/2/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "13412 BartowLand features with TOTALACRES from 5 through 150 inclusive dissolved to 7077 PARCELIDs. Acreage is TOTALACRES once per parcel, not the sum of parts. 70 parcels kept more than one distinct ring group.",
+        "County zoning join: 6352 of 7077 parcels (89.8%) received a BartowZoning STZONECODE other than Incorporated. 713 parcels fall in the Incorporated city stub and have null zoningCode. 12 parcels did not hit a zoning polygon.",
+        "Sales gap: BartowLand has no sale fields. qPublic AppID=791 Sales Search is HTML only and was not scraped. lastSale price, date, and qualified stay null.",
+        "FLU gap: no county-wide public future-land-use REST. The 2018 Future Land Use Map is a PDF (AGOL item 3c2f76d2227643c392c24600163cfbda). Existing land use was not stored as FLU.",
+        "Municipalities are tax-district geography only (Tax_District_Desc on situsCity). City zoning and city FLU REST are gaps for Cartersville, Adairsville, Emerson, Euharlee, Kingston, White, and Taylorsville.",
+        "Rejected twins: City of Bartow, Florida (Florida SR 2882) and Atlanta Regional Commission LandPro_2012. Thinner AGOL ParcelInfo/11 and Parcels/12 were not used.",
+        "tax.assessedValue and tax.taxableValue are null. tax.marketValue is Total_Taxable_FMV when it is positive. Opportunity Zone and nomination-eligibility fields are null. Eligible is not designated."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13015/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13015/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 13412
     },
     {
       "name": "Butts",

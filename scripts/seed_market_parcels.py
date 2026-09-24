@@ -26,6 +26,17 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
+from bartow_parcels import (
+    assign_zoning,
+    bartow_gaps,
+    choose_acreage,
+    compose_situs,
+    in_bartow_bounds,
+    pick_attributes,
+    positive_money,
+    unique_rings,
+    ZoningGrid,
+)
 from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -266,6 +277,7 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    owner2: str | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
     return {
@@ -283,7 +295,7 @@ def empty_feature(
             "situsZip": zip_code,
             "jurisdictionCode": None,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
             "zoningDistrict": None,
@@ -334,7 +346,13 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    extra: dict | None = None,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
@@ -345,18 +363,20 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
     for start in range(0, total, batch):
         chunk = ids[start : start + batch]
         query = dict(params)
+        if extra:
+            query.update(extra)
         query["objectIds"] = ",".join(str(i) for i in chunk)
         query["f"] = "json"
         try:
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), extra=extra))
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), extra=extra))
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -376,12 +396,161 @@ def sale_date(year: Any, month: Any) -> str | None:
     return f"{int(y):04d}-{month_num:02d}-01"
 
 
+def parcel_id_from_attrs(attrs: dict, spec: dict) -> str | None:
+    parcel_id = clean(attrs.get(spec["idField"])) if spec.get("idField") else None
+    if not parcel_id:
+        for key in spec.get("idFallbacks") or []:
+            parcel_id = clean(attrs.get(key))
+            if parcel_id:
+                break
+    if not parcel_id:
+        oid = attrs.get("OBJECTID") or attrs.get("objectid")
+        parcel_id = clean(oid)
+    return parcel_id
+
+
+def centroid_allowed(center: tuple[float, float] | None, spec: dict) -> bool:
+    if not plausible_centroid(center):
+        return False
+    bounds = spec.get("bounds")
+    if not bounds or not center:
+        return True
+    return in_bartow_bounds(center[0], center[1], tuple(bounds))
+
+
+def scaled_acres(attrs: dict, spec: dict) -> float | None:
+    acres = num(attrs.get(spec["acresField"])) if spec.get("acresField") else None
+    scale = spec.get("acresScale") or 1
+    if acres is not None and scale != 1:
+        acres = acres / scale
+    return acres
+
+
+def feature_from_attrs(
+    attrs: dict,
+    *,
+    county: dict,
+    markets: list[str],
+    spec: dict,
+    parcel_id: str,
+    acres: float,
+    geometry: dict,
+    center: tuple[float, float],
+) -> dict:
+    price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
+    if price is not None and price <= 0:
+        price = None
+    market_value = num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None
+    if spec.get("positiveMarketValue"):
+        market_value = positive_money(market_value)
+    if spec.get("situsNumberField") or spec.get("situsStreetField"):
+        situs = compose_situs(
+            attrs.get(spec.get("situsNumberField")),
+            attrs.get(spec.get("situsStreetField")),
+            attrs.get(spec.get("situsUnitField")),
+        )
+    else:
+        situs = clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None
+    # Sales, FLU, and opportunity zones stay null unless this spec names sale fields.
+    # Eligible tracts are not designations, so oz fields are never filled here.
+    return empty_feature(
+        fips=county["fips"],
+        county=county["name"],
+        state=county["state"],
+        markets=markets,
+        parcel_id=parcel_id,
+        acreage=acres,
+        geometry=geometry,
+        center=center,
+        source=spec["source"],
+        owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
+        owner2=clean(attrs.get(spec["owner2Field"])) if spec.get("owner2Field") else None,
+        situs=situs,
+        city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
+        zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
+        zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
+        dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
+        sale_price=price,
+        sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
+        sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
+        market_value=market_value,
+        assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
+        taxable=num(attrs.get(spec["taxableField"])) if spec.get("taxableField") else None,
+        mail1=clean(attrs.get(spec["mail1Field"])) if spec.get("mail1Field") else None,
+        mail2=clean(attrs.get(spec["mail2Field"])) if spec.get("mail2Field") else None,
+        mail_city=clean(attrs.get(spec["mailCityField"])) if spec.get("mailCityField") else None,
+        mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
+        mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
+    )
+
+
+def normalize_dissolved_rows(
+    raw: list[dict],
+    county: dict,
+    markets: list[str],
+    spec: dict,
+) -> tuple[list[dict], int, int]:
+    """Group stacked PARCELID parts. Keep TOTALACRES once and union distinct rings."""
+    grouped: dict[str, list[tuple[dict, list]]] = defaultdict(list)
+    dropped = 0
+    for item in raw:
+        attrs = item.get("attributes") or {}
+        rings = (item.get("geometry") or {}).get("rings")
+        parcel_id = parcel_id_from_attrs(attrs, spec)
+        if not rings or not parcel_id:
+            dropped += 1
+            continue
+        grouped[parcel_id].append((attrs, rings))
+    features: list[dict] = []
+    distinct_parts = 0
+    for parcel_id, parts in grouped.items():
+        acres = choose_acreage([scaled_acres(attrs, spec) for attrs, _rings in parts])
+        if not in_band(acres):
+            dropped += len(parts)
+            continue
+        merged, part_count = unique_rings([rings for _attrs, rings in parts])
+        geometry, _computed = rings_to_feature_geometry({"rings": merged})
+        if not geometry:
+            dropped += len(parts)
+            continue
+        center = centroid_of(geometry)
+        if not centroid_allowed(center, spec):
+            dropped += len(parts)
+            continue
+        if part_count > 1:
+            distinct_parts += 1
+        attrs = pick_attributes(
+            [part_attrs for part_attrs, _rings in parts],
+            acres,
+            spec.get("acresField") or "",
+            spec.get("ownerField"),
+        )
+        features.append(
+            feature_from_attrs(
+                attrs,
+                county=county,
+                markets=markets,
+                spec=spec,
+                parcel_id=parcel_id,
+                acres=acres,  # type: ignore[arg-type]
+                geometry=geometry,
+                center=center,  # type: ignore[arg-type]
+            )
+        )
+    features.sort(key=lambda row: (-(row["properties"].get("acreage") or 0), row["properties"]["parcelId"]))
+    return features, dropped, distinct_parts
+
+
 def normalize_rows(
     raw: list[dict],
     county: dict,
     markets: list[str],
     spec: dict,
 ) -> tuple[list[dict], int]:
+    if spec.get("dissolveById"):
+        features, dropped, distinct_parts = normalize_dissolved_rows(raw, county, markets, spec)
+        spec["_distinctPartParcels"] = distinct_parts
+        return features, dropped
     by_id: dict[str, dict] = {}
     dropped = 0
     for item in raw:
@@ -391,61 +560,29 @@ def normalize_rows(
             dropped += 1
             continue
         center = centroid_of(geometry)
-        if not plausible_centroid(center):
+        if not centroid_allowed(center, spec):
             dropped += 1
             continue
-        acres = num(attrs.get(spec["acresField"])) if spec.get("acresField") else None
-        scale = spec.get("acresScale") or 1
-        if acres is not None and scale != 1:
-            acres = acres / scale
+        acres = scaled_acres(attrs, spec)
         if spec.get("computeAcres") or acres is None:
             acres = computed
         if not in_band(acres):
             dropped += 1
             continue
-        parcel_id = clean(attrs.get(spec["idField"])) if spec.get("idField") else None
-        if not parcel_id:
-            for key in spec.get("idFallbacks") or []:
-                parcel_id = clean(attrs.get(key))
-                if parcel_id:
-                    break
-        if not parcel_id:
-            oid = attrs.get("OBJECTID") or attrs.get("objectid")
-            parcel_id = clean(oid)
+        parcel_id = parcel_id_from_attrs(attrs, spec)
         if not parcel_id:
             dropped += 1
             continue
-        price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
-        if price is not None and price <= 0:
-            price = None
-        feature = empty_feature(
-            fips=county["fips"],
-            county=county["name"],
-            state=county["state"],
+        feature = feature_from_attrs(
+            attrs,
+            county=county,
             markets=markets,
+            spec=spec,
             parcel_id=parcel_id,
-            acreage=acres,
+            acres=acres,
             geometry=geometry,
             center=center,  # type: ignore[arg-type]
-            source=spec["source"],
-            owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
-            situs=clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None,
-            city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
-            zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
-            zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
-            dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
-            sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
-            sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
-            market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
-            assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
-            taxable=num(attrs.get(spec["taxableField"])) if spec.get("taxableField") else None,
-            mail1=clean(attrs.get(spec["mail1Field"])) if spec.get("mail1Field") else None,
-            mail2=clean(attrs.get(spec["mail2Field"])) if spec.get("mail2Field") else None,
-            mail_city=clean(attrs.get(spec["mailCityField"])) if spec.get("mailCityField") else None,
-            mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
-            mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
-        )
+            )
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -657,6 +794,60 @@ def county_override(fips: str) -> dict | None:
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
             ],
         }
+    if fips == "13015":  # Bartow GA — on-prem BartowLand, not AGOL twins or City of Bartow FL
+        return {
+            "kind": "arcgis",
+            "url": "https://www.bartowgis.org/arcgis/rest/services/AGOServices/BartowLand/FeatureServer/2/query",
+            "where": "TOTALACRES>=5 AND TOTALACRES<=150",
+            "outFields": [
+                "PARCELID",
+                "Owner1",
+                "Owner2",
+                "Mailing_Address_1",
+                "Mailing_Address_2",
+                "Mailing_City",
+                "Mailing_State",
+                "Mailing_Zip",
+                "HOUSE_NO",
+                "STREET_NAM",
+                "UNIT",
+                "Property_Zip",
+                "Tax_District",
+                "Tax_District_Desc",
+                "TOTALACRES",
+                "Total_Taxable_FMV",
+            ],
+            "idField": "PARCELID",
+            "acresField": "TOTALACRES",
+            "dissolveById": True,
+            "ownerField": "Owner1",
+            "owner2Field": "Owner2",
+            "situsNumberField": "HOUSE_NO",
+            "situsStreetField": "STREET_NAM",
+            "situsUnitField": "UNIT",
+            "cityField": "Tax_District_Desc",
+            "zipField": "Property_Zip",
+            "mail1Field": "Mailing_Address_1",
+            "mail2Field": "Mailing_Address_2",
+            "mailCityField": "Mailing_City",
+            "mailStateField": "Mailing_State",
+            "mailZipField": "Mailing_Zip",
+            "marketValueField": "Total_Taxable_FMV",
+            "positiveMarketValue": True,
+            "bounds": (-85.08, 34.04, -84.60, 34.45),
+            "source": "ga-bartow-land",
+            "coverage": "complete-gte-5ac",
+            "zoningJoin": {
+                "url": "https://www.bartowgis.org/arcgis/rest/services/AGOServices/BartowZoning/FeatureServer/0/query",
+                "where": "1=1",
+                "field": "STZONECODE",
+                "cacheName": "13015-zoning",
+                "maxAllowableOffset": "0.00005",
+                "geometryPrecision": "5",
+                "batch": 100,
+            },
+            "gaps": [],
+        }
     return None
 
 
@@ -740,6 +931,7 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    extra: dict | None = None,
 ) -> dict:
     row = {
         "name": county["name"],
@@ -760,6 +952,8 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    if extra:
+        row.update(extra)
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
     (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
     return row
@@ -925,14 +1119,41 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | County ArcGIS services | Cobb complete on county acres. DeKalb is a polygon-acre sample. Bartow complete on TOTALACRES, with county zoning joined from BartowZoning. Incorporated is a city stub, not a zoning code. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or a public zoning polygon layer can be joined at the parcel point (Bartow). Incorporated city stubs are not stored as zoning codes. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
+
+
+def load_zoning_index(zoning: dict) -> ZoningGrid:
+    cache_path = CACHE_DIR / f"{zoning.get('cacheName') or 'zoning'}.json"
+    if cache_path.exists():
+        raw = json.loads(cache_path.read_text())
+        print(f"  zoning cache {len(raw)}", flush=True)
+    else:
+        url = zoning["url"]
+        ids = fetch_object_ids(url, zoning.get("where") or "1=1")
+        print(f"  zoning polygons {len(ids)}", flush=True)
+        extra = {}
+        if zoning.get("maxAllowableOffset") is not None:
+            extra["maxAllowableOffset"] = zoning["maxAllowableOffset"]
+            extra["geometryPrecision"] = zoning.get("geometryPrecision", "5")
+        raw = fetch_by_ids(url, ids, [zoning["field"]], batch=int(zoning.get("batch") or 100), extra=extra or None)
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(json.dumps(raw))
+    index = ZoningGrid()
+    kept = 0
+    for item in raw:
+        attrs = item.get("attributes") or {}
+        rings = (item.get("geometry") or {}).get("rings")
+        if index.add(attrs.get(zoning["field"]), rings):
+            kept += 1
+    print(f"  zoning indexed {kept}", flush=True)
+    return index
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
@@ -941,12 +1162,29 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
     if cache_path.exists() and not spec.get("ignoreCache"):
         cached = json.loads(cache_path.read_text())
-        if cached.get("features"):
+        zoning_cached = cached.get("zoning")
+        cache_ok = bool(cached.get("features")) and (spec.get("source") != "ga-bartow-land" or zoning_cached)
+        if cache_ok:
             print(f"  cache hit {len(cached['features'])}", flush=True)
             features = cached["features"]
             for feature in features:
                 feature["properties"]["marketIds"] = markets
             path, lookup, tiles = write_tiles(county, features)
+            gaps = list(spec.get("gaps") or [])
+            extra = None
+            if spec.get("source") == "ga-bartow-land" and zoning_cached:
+                gaps = bartow_gaps(
+                    source_rows=int(cached.get("sourceCount") or 0),
+                    kept=len(features),
+                    distinct_parts=int(cached.get("distinctPartParcels") or 0),
+                    zoning=zoning_cached,
+                )
+                extra = {
+                    "zoningJoined": zoning_cached.get("joined"),
+                    "zoningCityStub": zoning_cached.get("stub"),
+                    "zoningMissed": zoning_cached.get("missed"),
+                    "distinctPartParcels": cached.get("distinctPartParcels"),
+                }
             return county_row(
                 county,
                 markets,
@@ -957,10 +1195,11 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=gaps,
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
+                extra=extra,
             )
     try:
         expected = count_where(spec["url"], spec["where"])
@@ -1010,22 +1249,61 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
             source_count=0,
         )
     print(f"  source rows {expected}", flush=True)
-    ids = fetch_object_ids(spec["url"], spec["where"])
-    raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
+    raw_cache = CACHE_DIR / f"{fips}-raw.json"
+    if raw_cache.exists():
+        raw = json.loads(raw_cache.read_text())
+        print(f"  raw cache {len(raw)}", flush=True)
+    else:
+        ids = fetch_object_ids(spec["url"], spec["where"])
+        raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        raw_cache.write_text(json.dumps(raw))
     features, dropped = normalize_rows(raw, county, markets, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    zoning_stats = None
+    if spec.get("zoningJoin") and features:
+        zoning_stats = assign_zoning(features, load_zoning_index(spec["zoningJoin"]))
+        print(
+            f"  zoning joined {zoning_stats['joined']} stub {zoning_stats['stub']} missed {zoning_stats['missed']}",
+            flush=True,
+        )
+    distinct_parts = int(spec.get("_distinctPartParcels") or 0)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+        json.dumps(
+            {
+                "sourceCount": expected,
+                "dropped": dropped,
+                "features": features,
+                "distinctPartParcels": distinct_parts,
+                "zoning": zoning_stats,
+            },
+            separators=(",", ":"),
+        )
     )
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
-    if expected and len(features) < expected and not spec.get("computeAcres"):
-        gaps.insert(
-            0,
-            f"{expected} source rows collapsed to {len(features)} parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    extra = None
+    if spec.get("source") == "ga-bartow-land" and zoning_stats:
+        gaps = bartow_gaps(
+            source_rows=expected,
+            kept=len(features),
+            distinct_parts=distinct_parts,
+            zoning=zoning_stats,
         )
+        extra = {
+            "zoningJoined": zoning_stats["joined"],
+            "zoningCityStub": zoning_stats["stub"],
+            "zoningMissed": zoning_stats["missed"],
+            "distinctPartParcels": distinct_parts,
+        }
+    else:
+        gaps = list(spec.get("gaps") or [])
+        if expected and len(features) < expected and not spec.get("computeAcres"):
+            gaps.insert(
+                0,
+                f"{expected} source rows collapsed to {len(features)} parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            )
     if not features:
         coverage = "gap"
         gaps.insert(0, f"Source count was {expected} but none survived the 5–150 acre and WGS84 checks.")
@@ -1047,6 +1325,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         source_count=expected,
         dropped=dropped,
         tile_count=tiles,
+        extra=extra,
     )
 
 

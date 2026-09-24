@@ -20,7 +20,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Pensacola | other | 59,902 | 6 | 0 | 0 |
 | Birmingham | other | 38,101 | 3 | 0 | 6 |
 | Mobile | other | 42,446 | 3 | 0 | 2 |
-| Huntsville | other | 18,584 | 3 | 0 | 4 |
+| Huntsville | other | 29,598 | 4 | 0 | 3 |
 | Savannah | other | 3,283 | 1 | 0 | 7 |
 | Columbia | other | 14,613 | 1 | 1 | 8 |
 | Greenville | other | 31,164 | 2 | 0 | 6 |
@@ -264,7 +264,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Limestone | Alabama | 01083 | complete-gte-5ac | 5,445 | al-limestone-remap-1 |
 | Lincoln | Tennessee | 47103 | gap | 0 | tn-impact-47103 |
 | Madison | Alabama | 01089 | complete-gte-5ac | 12,312 | al-madison-public-isv-185 |
-| Marshall | Alabama | 01095 | gap | 0 | unavailable |
+| Marshall | Alabama | 01095 | complete-gte-5ac | 11,014 | al-marshall-public-37 |
 | Morgan | Alabama | 01103 | complete-gte-5ac | 827 | al-morgan-vam-10 |
 
 ### Savannah

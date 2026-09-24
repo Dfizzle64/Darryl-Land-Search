@@ -405,6 +405,8 @@ export type ParcelProperties = {
   propertyName: string | null;
   zoningCode: string | null;
   zoningDistrict: string | null;
+  /** City overlay name (Fairhope AO/MO). Never a substitute for zoningCode. */
+  zoningOverlay?: string | null;
   jurisdictionPrefix: string | null;
   dorCode: string | null;
   acreage: number | null;

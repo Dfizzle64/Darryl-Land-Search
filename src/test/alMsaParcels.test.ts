@@ -21,7 +21,7 @@ describe("Tuscaloosa and Montgomery MSA parcels", () => {
     const baldwin = index.markets.Mobile.counties.find((county) => county.fips === "01003");
     const shelby = index.markets.Birmingham.counties.find((county) => county.fips === "01117");
     const jefferson = index.markets.Birmingham.counties.find((county) => county.fips === "01073");
-    expect(marshall?.featureCount).toBe(0);
+    expect(marshall?.featureCount).toBe(11014);
     expect(baldwin?.featureCount).toBe(17987);
     expect(shelby?.featureCount).toBe(11994);
     expect(jefferson?.featureCount).toBe(15641);

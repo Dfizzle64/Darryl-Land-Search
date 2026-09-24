@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T01:01:43Z",
+  "generatedAt": "2026-09-24T01:06:16Z",
   "market": "Huntsville",
   "tier": "other",
-  "parcelCount": 18584,
+  "parcelCount": 29598,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -126,20 +126,27 @@
       "name": "Marshall",
       "fips": "01095",
       "state": "Alabama",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 11014,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "al-marshall-public-37",
+      "queryUrl": "https://web5.kcsgis.com/kcsgis/rest/services/Marshall/Public/MapServer/37/query",
       "gaps": [
-        "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+        "12207 source rows collapsed to 11014 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Marshall County parcels are web5.kcsgis.com Marshall/Public/MapServer/37 (66,601 countywide). Acreage is CalcAcres, inclusive 5\u2013150. DeededAcres is often 0 or null and is not the filter.",
+        "Host is web5 only. web3 Marshall/Public returns 404, web4 has no Marshall/Public service, and web6 does not publish this layer.",
+        "Huntsville CombinedParcels/MapServer/9 (~137 features) is a fringe sample and is not the inventory.",
+        "Public/37 has no ZoningCode. Albertville and Guntersville municipal zoning were not on this card, so zoning is left null.",
+        "No last-sale price. DeedSigned (fallback DeedRecorded) is stored as lastSale.date when the epoch converts.",
+        "SitusAddCity is a coded small integer without a published domain, so city is left null rather than storing the code.",
+        "This extract does not assign Opportunity Zone designations. Eligible tracts are not designated zones."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/01095/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01095/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 12207
     },
     {
       "name": "Morgan",

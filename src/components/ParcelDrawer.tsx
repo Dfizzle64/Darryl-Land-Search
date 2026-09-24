@@ -192,6 +192,11 @@ export function ParcelDrawer({
       <div className="mt-5 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Zoning</p>
         <p className="mt-1 text-ink-100">{zoning.reason}</p>
+        {properties.zoningOverlay ? (
+          <p className="mt-2 text-ink-300">
+            Overlay: {properties.zoningOverlay}. This note is not the base zoning district.
+          </p>
+        ) : null}
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Future Land Use</p>

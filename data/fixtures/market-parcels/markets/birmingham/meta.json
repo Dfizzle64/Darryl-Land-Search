@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T01:01:43Z",
+  "generatedAt": "2026-09-24T01:06:16Z",
   "market": "Birmingham",
   "tier": "other",
   "parcelCount": 38101,
@@ -126,12 +126,15 @@
       "source": "al-shelby-cadastral-2025",
       "queryUrl": "https://maps.shelbyal.com/gisserver/rest/services/LegacyServices/Cadastral_2025/MapServer/91/query",
       "gaps": [
-        "Municipal overlay: county parcel source unchanged (Cadastral_2025/91). Hoover 324, Helena 294, Pelham 424, Vestavia Hills 0. Alabaster has no public zoning REST (the public webmap is wards only) and was not joined.",
         "12123 source rows collapsed to 11994 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "Shelby County Cadastral_2025 Parcel Boundary (LegacyServices MapServer/91), tax year 2025. Acreage is preferred when it is set; otherwise ACRES.",
-        "CaptureServices C_PARCEL FeatureServer/93 is geometry without owner, tax, or sale and was not used.",
-        "On the 5\u2013150 acre band this layer has owner and land market value (LN_VL1). Sale price, situs street, parcel zoning, and assessed value are empty. Instrument date is stored when INST_DATE1 is set. There is no qualified-sale flag.",
-        "Birmingham city GIS mirrors some Shelby parcels and was not used."
+        "Municipal join: Alabaster zoning 404 (key 403, spatial 1).",
+        "Shelby County parcels are LegacyServices Cadastral_2025 MapServer/91, tax year 2025. Acreage is used when it is set; otherwise ACRES. Inclusive 5\u2013150.",
+        "CaptureServices C_PARCEL is geometry without owner, tax, or sale and is not used. Birmingham city GIS mirrors of Shelby parcels are not the county source.",
+        "Alabaster zoning is Zoning_Current_VIEWONLY FeatureServer/6. ZoneCode joins to Shelby Assess_Num, with a centroid fallback. Coverage is city-only. ZoneDescription is the district label.",
+        "Zone_Layer_VIEW layer 78 returns HTTP 400 on query and is not used. Zoning_Conditional (one polygon) is not base zoning.",
+        "On this band the county layer's own Zoning field is empty. Sale price is stored only when SALES_PRICE is positive. Instrument date is stored when INST_DATE1 converts. There is no qualified-sale flag.",
+        "Walker County, Decatur AL (MapGeo; not Decatur, Illinois), Washington County AL, and Escambia County AL are outside this pull.",
+        "This extract does not assign Opportunity Zone designations."
       ],
       "path": "data/fixtures/market-parcels/counties/01117/tiles",
       "lookup": "data/fixtures/market-parcels/counties/01117/lookup.json",

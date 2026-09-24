@@ -195,6 +195,12 @@ def contains_point(geometry: dict | None, x: float, y: float) -> bool:
     return any(_inside_polygon(x, y, poly) for poly in polygon_parts(geometry))
 
 
+def point_in_geometry(lon: float, lat: float, geometry: dict | None) -> bool:
+    if not geometry:
+        return False
+    return any(_inside_polygon(lon, lat, poly) for poly in polygon_parts(geometry))
+
+
 def representative_point(geometry: dict) -> tuple[float, float] | None:
     """A point inside the largest part. Vertex averages fall outside concave rings."""
     parts = polygon_parts(geometry)

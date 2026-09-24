@@ -38,6 +38,9 @@ export const OZ_EXPLAINER_SECTIONS: OzExplainerSection[] = [
       "Step 3 — Designation: Treasury certifies the final 2027 QOZs after reviewing nominations.",
       "Timing: The federal nomination window centers on late September 2026 (an extension can run into late October). Designated zones are meant to take effect January 1, 2027.",
       "Until certification, an eligible tract that was not nominated stays “Eligible — not designated.”",
+      "Governor-nominated / awaiting Treasury = the state filed that tract with Treasury; still not a certified 2027 QOZ.",
+      "Soft-upgrade only when the state’s official nomination list is public (SC: Commerce Final Recommendations PDF, 112 tracts). Secondary scrapes alone aren’t enough.",
+      "Designated / QOZ = Treasury certification only — none of our markets yet; target effective Jan 1, 2027.",
     ],
   },
   {
@@ -55,9 +58,9 @@ export const OZ_EXPLAINER_SECTIONS: OzExplainerSection[] = [
     heading: "What the map chips mean",
     bullets: [
       "Eligible — not designated: on the federal eligible list, and not one of the 112 South Carolina nominations.",
-      "Governor-nominated / awaiting Treasury: the GEOID is on that official 112. Still not designated. Still not a QOZ. Nomination alone is not a tax benefit.",
-      "Designated / QOZ: Treasury has certified the tract. None of the 2027 zones are certified yet, so this chip is not used.",
-      "Eligible ≠ nominated ≠ certified. A census tract is not a buildable site.",
+      "Governor-nominated / awaiting Treasury = the state filed that tract with Treasury; still not a certified 2027 QOZ.",
+      "Soft-upgrade only when the state’s official nomination list is public (SC: Commerce Final Recommendations PDF, 112 tracts). Secondary scrapes alone aren’t enough.",
+      "Designated / QOZ = Treasury certification only — none of our markets yet; target effective Jan 1, 2027.",
     ],
   },
   {

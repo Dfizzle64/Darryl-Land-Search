@@ -26,6 +26,14 @@ describe("OZ 2.0 explainer copy", () => {
     expect(text).toContain("not a new list");
     expect(text).toContain("Nomination alone is not a tax benefit");
     expect(text).toContain("Eligible ≠ nominated ≠ certified");
+    expect(text).toContain("the state filed that tract with Treasury; still not a certified 2027 QOZ");
+    expect(text).toContain(
+      "Soft-upgrade only when the state’s official nomination list is public (SC: Commerce Final Recommendations PDF, 112 tracts). Secondary scrapes alone aren’t enough.",
+    );
+    expect(text).toContain("Designated / QOZ = Treasury certification only — none of our markets yet; target effective Jan 1, 2027.");
+    expect(OZ_EXPLAINER_SECTIONS.find((section) => section.heading === "Disclaimer")?.paragraphs?.[0]).toMatch(
+      /^Eligible ≠ nominated ≠ certified\./,
+    );
     expect(text).toContain("This app does not provide tax advice");
     expect(text.toLowerCase()).not.toContain("mf priority");
     expect(text.toLowerCase()).not.toContain("tier a");

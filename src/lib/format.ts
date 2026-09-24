@@ -40,6 +40,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
   "13077": "https://qpublic.schneidercorp.com/Application.aspx?AppID=704&LayerID=11412&PageTypeID=1",
+  "13089": "https://propertyappraisal.dekalbcountyga.gov/",
 };
 
 /**
@@ -68,6 +69,7 @@ const APPRAISER_LINKS: Record<string, { href: string; label: string }> = {
   "12119": { href: DEFAULT_APPRAISER_URLS["12119"], label: "Open Sumter Property Appraiser search" },
   "12127": { href: DEFAULT_APPRAISER_URLS["12127"], label: "Open Volusia Property Appraiser search" },
   "13077": { href: DEFAULT_APPRAISER_URLS["13077"], label: "Open Coweta County property appraiser (qPublic)" },
+  "13089": { href: DEFAULT_APPRAISER_URLS["13089"], label: "Open DeKalb Property Appraiser search" },
 };
 
 export function parcelAppraiserUrl(options: {
@@ -215,6 +217,22 @@ export function formatSale(sale: { date: string | null; price: number | null }):
   const price = sale.price != null && sale.price > 0 ? formatUsd(sale.price) : null;
   if (date && price) return `${date}\n${price}`;
   return date ?? price ?? "Not available";
+}
+
+export function formatParcelPlace(properties: {
+  situsCity?: string | null;
+  situsZip?: string | null;
+  countyName?: string | null;
+  state?: string | null;
+}): string {
+  const cityZip = [properties.situsCity, properties.situsZip].filter(Boolean).join(" ");
+  if (cityZip) return cityZip;
+  if (properties.countyName) {
+    const stateLabel =
+      properties.state === "Georgia" ? "Georgia" : properties.state && properties.state !== "Florida" ? properties.state : "FL";
+    return `${properties.countyName} County, ${stateLabel}`;
+  }
+  return properties.state || "Florida";
 }
 
 export function formatMailing(address: {

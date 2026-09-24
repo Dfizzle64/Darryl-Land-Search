@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T00:37:11Z",
+  "generatedAt": "2026-09-24T00:38:00Z",
   "market": "Wilmington",
   "tier": "other",
   "parcelCount": 47320,
@@ -40,7 +40,8 @@
       "path": "data/fixtures/market-parcels/counties/37019/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37019/lookup.json",
       "tileCount": 10,
-      "sourceCount": 7610
+      "sourceCount": 7610,
+      "fluJoinedCount": 6368
     },
     {
       "name": "Columbus",
@@ -105,7 +106,69 @@
       "path": "data/fixtures/market-parcels/counties/37129/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37129/lookup.json",
       "tileCount": 5,
-      "sourceCount": 2286
+      "sourceCount": 2286,
+      "municipalities": [
+        {
+          "name": "Wilmington",
+          "independentGis": true,
+          "zoningUrl": "https://gis.wilmingtonnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/0",
+          "fluUrl": null,
+          "fluGap": "Create Wilmington future land use has no feature service. Planning/LandUse is existing land use, not FLU.",
+          "join": "city zoning first, then county Zoning/1; PlanNHC place types stay outside city limits",
+          "zoningFeatures": 328,
+          "zoningJoined": 661,
+          "fluJoined": 0,
+          "parcelCount": 682
+        },
+        {
+          "name": "Carolina Beach",
+          "independentGis": true,
+          "zoningUrl": "https://cw.carolinabeach.org/arcgis/rest/services/GISViewer/GIS_Viewer/MapServer/21",
+          "fluUrl": null,
+          "fluGap": "No public Carolina Beach FLU feature service.",
+          "join": "city zoning first, then county Zoning/1; PlanNHC place types stay outside city limits",
+          "zoningFeatures": 29,
+          "zoningJoined": 12,
+          "fluJoined": 0,
+          "parcelCount": 12
+        },
+        {
+          "name": "Wrightsville Beach",
+          "independentGis": true,
+          "zoningUrl": "https://services3.arcgis.com/XyPkMiF0OxEhc77I/arcgis/rest/services/WrightsvilleBeachZoning/FeatureServer/0",
+          "fluUrl": null,
+          "fluGap": "No public Wrightsville Beach FLU feature service.",
+          "join": "city zoning first, then county Zoning/1; PlanNHC place types stay outside city limits",
+          "zoningFeatures": 256,
+          "zoningJoined": 11,
+          "fluJoined": 0,
+          "parcelCount": 12
+        },
+        {
+          "name": "Kure Beach",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": "No public Kure Beach FLU feature service.",
+          "join": "city zoning first, then county Zoning/1; PlanNHC place types stay outside city limits",
+          "zoningFeatures": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "parcelCount": 3
+        }
+      ],
+      "unincorporated": {
+        "zoningUrl": "https://gis.nhcgov.com/server/rest/services/Layers/Zoning/FeatureServer/1",
+        "fluUrl": "https://gis.nhcgov.com/server/rest/services/Thematic/PlanNHC_FLUM/MapServer/8",
+        "zoningFeatures": 1832,
+        "fluFeatures": 88,
+        "zoningJoined": 1527,
+        "fluJoined": 1541,
+        "parcelCount": 1554,
+        "note": "PlanNHC place types for unincorporated land. Municipal stamps CITY, WB, CB, and KB are not zoning districts."
+      },
+      "zoningJoinedCount": 2211,
+      "fluJoinedCount": 1541
     },
     {
       "name": "Onslow",
@@ -151,7 +214,9 @@
       "path": "data/fixtures/market-parcels/counties/37141/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37141/lookup.json",
       "tileCount": 8,
-      "sourceCount": 7493
+      "sourceCount": 7493,
+      "zoningJoinedCount": 7295,
+      "fluJoinedCount": 7354
     }
   ]
 }

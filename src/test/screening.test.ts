@@ -228,8 +228,12 @@ describe("screening layers", () => {
 describe("public contact links", () => {
   it("does not send a known non-Orange parcel to the Orange appraiser", () => {
     const dekalb = parcelAppraiserUrl({ parcelId: "123", countyFips: "13089" });
-    expect(dekalb.href).toBeNull();
-    expect(dekalb.label).toMatch(/No county property-appraiser search is cataloged/);
+    expect(dekalb.href).toBe("https://propertyappraisal.dekalbcountyga.gov/");
+    expect(dekalb.href).not.toContain("ocpa");
+    expect(dekalb.label).toContain("DeKalb");
+    const uncataloged = parcelAppraiserUrl({ parcelId: "123", countyFips: "01001" });
+    expect(uncataloged.href).toBeNull();
+    expect(uncataloged.label).toMatch(/No county property-appraiser search is cataloged/);
     const orange = parcelAppraiserUrl({ parcelId: "282312000000000", countyFips: "12095" });
     expect(orange.href).toContain("ocpafl.org");
     expect(orange.href).toContain("282312000000000");

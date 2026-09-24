@@ -197,6 +197,13 @@ describe("fluAllowsMultifamily", () => {
   it("returns null when FLU is missing rather than inventing a match", () => {
     expect(fluAllowsMultifamily(null, fluConfig)).toBeNull();
   });
+
+  it("does not treat a DeKalb future-land-use code as Orange County multifamily", () => {
+    expect(
+      fluAllowsMultifamily({ code: "MD", label: "Medium", jurisdiction: "Decatur", source: "decatur-ga" }, fluConfig),
+    ).toBeNull();
+    expect(fluAllowsMultifamily({ code: "MD", label: "Medium", jurisdiction: "ORG", source: "org" }, fluConfig)).toBe(true);
+  });
 });
 
 describe("filterParcels", () => {

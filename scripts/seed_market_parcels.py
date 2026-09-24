@@ -567,6 +567,10 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    if fips == "13089":  # DeKalb GA — assessment roll plus municipal zoning/FLU
+        from dekalb_parcels import dekalb_spec
+
+        return dekalb_spec()
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -584,29 +588,6 @@ def county_override(fips: str) -> dict | None:
             "source": "ga-cobb-parcels",
             "coverage": "complete-gte-5ac",
             "gaps": ["Cobb County open parcels. No zoning join on this layer."],
-        }
-    if fips == "13089":  # DeKalb GA
-        return {
-            "kind": "arcgis",
-            "url": "https://dcgis.dekalbcountyga.gov/hosted/rest/services/Tax_Parcels/FeatureServer/0/query",
-            "where": "Shape__Area>=20000 AND Shape__Area<=2000000",
-            "outFields": ["PARCELID", "SITEADDRESS", "OWNERNME1", "ZONING", "CITY", "ZIP", "PSTLADDRESS", "PSTLCITY", "PSTLSTATE", "PSTLZIP5"],
-            "idField": "PARCELID",
-            "computeAcres": True,
-            "ownerField": "OWNERNME1",
-            "situsField": "SITEADDRESS",
-            "cityField": "CITY",
-            "zipField": "ZIP",
-            "zoningField": "ZONING",
-            "mail1Field": "PSTLADDRESS",
-            "mailCityField": "PSTLCITY",
-            "mailStateField": "PSTLSTATE",
-            "mailZipField": "PSTLZIP5",
-            "source": "ga-dekalb-tax-parcels",
-            "coverage": "sample",
-            "gaps": [
-                "DeKalb's public layer has no deed-acre field. Acres are computed from the polygon inside a Shape__Area window, so this county is a large sample, not a certified complete roll.",
-            ],
         }
     if fips == "45035":  # Dorchester SC
         return {
@@ -740,6 +721,7 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    extra: dict | None = None,
 ) -> dict:
     row = {
         "name": county["name"],
@@ -760,6 +742,8 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    if extra:
+        row.update(extra)
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
     (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
     return row
@@ -786,6 +770,29 @@ def orlando_county(fips: str) -> dict | None:
 
 
 def rebuild_indexes(catalog: dict) -> None:
+    def public_county(row: dict) -> dict:
+        item = {
+            "name": row["name"],
+            "fips": row["fips"],
+            "state": row["state"],
+            "featureCount": row.get("featureCount") or 0,
+            "coverage": row.get("coverage"),
+            "partition": row.get("partition"),
+            "minAcres": MIN_ACRES,
+            "maxAcres": MAX_ACRES,
+            "source": row.get("source"),
+            "queryUrl": row.get("queryUrl"),
+            "gaps": row.get("gaps") or [],
+            "path": row.get("path"),
+            "lookup": row.get("lookup"),
+            "tileCount": row.get("tileCount"),
+            "sourceCount": row.get("sourceCount"),
+        }
+        for key in ("municipalities", "unincorporated", "zoningJoinedCount", "fluJoinedCount", "sales", "rejected"):
+            if row.get(key) is not None:
+                item[key] = row[key]
+        return item
+
     rows = load_county_rows()
     MARKET_DIR.mkdir(parents=True, exist_ok=True)
     index_markets: dict[str, dict] = {}
@@ -824,26 +831,7 @@ def rebuild_indexes(catalog: dict) -> None:
                 "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
                 "Orange, Osceola, and Polk point at the existing Orlando complete extract.",
             ],
-            "counties": [
-                {
-                    "name": row["name"],
-                    "fips": row["fips"],
-                    "state": row["state"],
-                    "featureCount": row.get("featureCount") or 0,
-                    "coverage": row.get("coverage"),
-                    "partition": row.get("partition"),
-                    "minAcres": MIN_ACRES,
-                    "maxAcres": MAX_ACRES,
-                    "source": row.get("source"),
-                    "queryUrl": row.get("queryUrl"),
-                    "gaps": row.get("gaps") or [],
-                    "path": row.get("path"),
-                    "lookup": row.get("lookup"),
-                    "tileCount": row.get("tileCount"),
-                    "sourceCount": row.get("sourceCount"),
-                }
-                for row in sorted(market_rows, key=lambda item: item["name"])
-            ],
+            "counties": [public_county(row) for row in sorted(market_rows, key=lambda item: item["name"])],
         }
         rel = f"data/fixtures/market-parcels/markets/{slug(market['id'])}/meta.json"
         market_path = ROOT / rel
@@ -918,11 +906,17 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 Finished extracts in this batch were merged from public county and state GIS branches. Each `county.json` records the service URL, the feature count, and what was not joined. The coverage table is the inventory. A gap means no finished extract was included. Zoning and future land use are stored only where that county's source or a joined municipal layer published them.
 
+DeKalb County, Georgia is the complete assessment extract already merged on main (`ga-dekalb-assessment-view-2`). City zoning and future land use are joined where that extract published them. That service has no sale table.
+
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "dekalb":
+        from dekalb_parcels import download_dekalb
+
+        return download_dekalb(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

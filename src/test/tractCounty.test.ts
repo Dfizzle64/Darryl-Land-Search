@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadOpportunityZones, loadOz2Tracts, loadRuralMarketTracts } from "../lib/data/loadFixtures";
-import { formatTractCounty, tractClickFromFeature } from "../lib/tractCounty";
+import { formatTractCounty, tractClickFromFeature, tractPopupRuralLine } from "../lib/tractCounty";
 import { RURAL_ELIGIBLE_STATUS_CHIP } from "../lib/types";
 
 describe("tract county on click", () => {
@@ -24,6 +24,7 @@ describe("tract county on click", () => {
     expect(details?.geoid).toBe("12095010400");
     expect(details?.status).toBe("Eligible for nomination, not rural — not designated");
     expect(details?.ruralLabel).toBe("Rural: no");
+    expect(tractPopupRuralLine(details?.ruralLabel ?? "")).toBeNull();
     expect(details?.opensRuralDrawer).toBe(false);
     expect(details?.status.toLowerCase()).not.toContain("designated qoz");
   });
@@ -36,6 +37,7 @@ describe("tract county on click", () => {
     expect(details?.opensRuralDrawer).toBe(true);
     expect(details?.status).toBe(RURAL_ELIGIBLE_STATUS_CHIP);
     expect(details?.ruralLabel).toBe("Rural: yes");
+    expect(tractPopupRuralLine("Rural: yes")).toBeNull();
   });
 
   it("keeps designated tracts on the Notice 2025-50 rural flag", () => {
@@ -48,6 +50,7 @@ describe("tract county on click", () => {
     expect(details?.status).toMatch(/current designated QOZ/i);
     expect(details?.status).toMatch(/not a 2027 designation/i);
     expect(details?.ruralLabel).toBe("Notice 2025-50 rural: no");
+    expect(tractPopupRuralLine(details?.ruralLabel ?? "")).toBe("Notice 2025-50 rural: no");
   });
 
   it("stamps county and state onto Orange eligible, designated, and rural tract features", async () => {

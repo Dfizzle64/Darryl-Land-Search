@@ -119,7 +119,7 @@ export function SitesPanel({
                     </p>
                     <span className="flex gap-1">
                       {oz2?.eligible && oz2.rural === true ? (
-                        <span className="rounded-full border border-[#6d28d9]/70 px-1.5 py-px text-[10px] text-[#ddd6fe]">
+                        <span className="rounded-full border border-[#a56b3c]/70 px-1.5 py-px text-[10px] text-[#f6e6d4]">
                           {RURAL_ELIGIBLE_STATUS_CHIP}
                         </span>
                       ) : oz2?.eligible ? (

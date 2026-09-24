@@ -178,7 +178,7 @@ Offline files: `data/fixtures/oz2-eligible.geojson`, `oz2-eligible-tracts.json`,
 
 The parcel drawer shows eligible / not eligible, the official rural flag, and the GEOID, and says the tract has not been nominated or certified. A rural-eligible parcel uses the status chip **Eligible (rural) — not designated**.
 
-Clicking a census tract overlay shows the county and state with the GEOID, status, and rural flag. Eligible tracts (rural and urban) open the tract drawer, which labels county and state. Eligible tracts that are not rural, and current designated QOZ tracts, also open a map popup. County comes from the tract properties: the Orange eligible table for the OZ 2.0 overlay, Orange County (FIPS 12095) for the designated overlay, and the market pack for rural and urban tracts. That label is not a 2027 designation.
+Clicking a census tract overlay shows the county and state with the GEOID and status. The status sentence already says whether an eligible tract is rural, so the popup does not repeat a Rural: yes/no line. Designated tracts still show the Notice 2025-50 rural flag. Eligible tracts (rural and urban) open the tract drawer, which labels county and state. Eligible tracts that are not rural, and current designated QOZ tracts, also open a map popup. County comes from the tract properties: the Orange eligible table for the OZ 2.0 overlay, Orange County (FIPS 12095) for the designated overlay, and the market pack for rural and urban tracts. That label is not a 2027 designation.
 
 ## Seven Southeast markets (rural and urban eligible)
 

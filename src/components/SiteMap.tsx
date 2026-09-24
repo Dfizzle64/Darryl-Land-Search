@@ -58,7 +58,7 @@ import {
   ORANGE_OPEN_DATA,
   type ScreeningToggles,
 } from "@/lib/screening";
-import { tractClickFromFeature, type TractClickDetails } from "@/lib/tractCounty";
+import { tractClickFromFeature, tractPopupRuralLine, type TractClickDetails } from "@/lib/tractCounty";
 import { tractIncomeLayerFilter } from "@/lib/tractIncome";
 import { ORANGE_COUNTY_CENTER, SC_GOVERNOR_FILED_STATUS, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
 
@@ -503,11 +503,16 @@ function showTractPopup(map: MapLibreMap, lngLat: maplibregl.LngLatLike, details
   status.style.margin = "2px 0 0";
   status.style.color = POPUP_TEXT;
   status.textContent = details.status;
-  const rural = document.createElement("p");
-  rural.style.margin = "2px 0 0";
-  rural.style.color = POPUP_TEXT;
-  rural.textContent = details.ruralLabel;
-  root.append(kicker, place, geoid, status, rural);
+  const lines = [kicker, place, geoid, status];
+  const ruralLine = tractPopupRuralLine(details.ruralLabel);
+  if (ruralLine) {
+    const rural = document.createElement("p");
+    rural.style.margin = "2px 0 0";
+    rural.style.color = POPUP_TEXT;
+    rural.textContent = ruralLine;
+    lines.push(rural);
+  }
+  root.append(...lines);
   return new maplibregl.Popup({
     closeButton: true,
     maxWidth: "280px",
@@ -1387,6 +1392,10 @@ export function SiteMap({
                   style={{ backgroundColor: OZ_TRACT_SWATCH.urban }}
                 />
                 Urban eligible — not designated
+              </p>
+              <p className="text-xs text-ink-100">
+                Eligible — not designated. Rural and urban are list attributes, not a 2027 QOZ.
+                {showMfLegend ? " SC MF priority is a separate shortlist, not a designation." : ""}
               </p>
               {showMfLegend ? (
                 <>

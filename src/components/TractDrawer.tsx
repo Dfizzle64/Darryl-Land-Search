@@ -70,7 +70,7 @@ export function TractDrawer({
       <p
         className={`mt-4 inline-block rounded-full border px-2 py-1 text-xs ${
           rural
-            ? "border-[#6d28d9]/70 bg-[#6d28d9]/15 text-[#ddd6fe]"
+            ? "border-[#a56b3c]/70 bg-[#a56b3c]/15 text-[#f6e6d4]"
             : "border-[#3d7dff]/70 bg-[#3d7dff]/15 text-[#d6e4ff]"
         }`}
       >

@@ -75,6 +75,22 @@ def florida_parcel_fips() -> list[str]:
     return sorted(found)
 
 
+def income_county_fips() -> list[str]:
+    """Florida parcel counties, plus Atlanta and Charleston.
+
+    Those two markets use the same query-time tract join as Orlando. A reseed
+    that only rewrote Florida would make their income slider a no-op again.
+    """
+    found = set(florida_parcel_fips())
+    for market in ("atlanta", "charleston"):
+        meta_path = FIX / "market-parcels" / "markets" / market / "meta.json"
+        meta = json.loads(meta_path.read_text())
+        for county in meta.get("counties") or []:
+            if (county.get("featureCount") or 0) > 0 and county.get("fips"):
+                found.add(str(county["fips"]))
+    return sorted(found)
+
+
 def round_coords(node):
     if isinstance(node, (int, float)):
         return node
@@ -187,7 +203,7 @@ def fetch_aadt() -> list[dict]:
 
 
 def main() -> None:
-    fips_list = florida_parcel_fips()
+    fips_list = income_county_fips()
     if "12095" not in fips_list:
         raise RuntimeError("Orange County FIPS missing from parcel fixtures")
     print(f"Florida parcel counties: {len(fips_list)}")
@@ -260,7 +276,7 @@ def main() -> None:
                     "Income and AADT are not stored on parcel tiles.",
                     "A parcel more than 15 km from the nearest FDOT segment stays unknown.",
                     "Block-group income remains the Orange County pilot fixture.",
-                    "Counties outside Florida have no income or AADT join.",
+                    "Tract median income is joined for Florida parcel counties plus Atlanta and Charleston parcel counties. Other states stay unknown. AADT stays FDOT (Florida).",
                 ],
             },
             indent=2,

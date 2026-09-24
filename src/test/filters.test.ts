@@ -242,6 +242,17 @@ describe("filterParcels", () => {
     expect(filterParcels(parcels, { ...baseFilters, minIncome: 60000, includeUnknownIncome: false }, config, fluConfig)).toHaveLength(0);
   });
 
+  it("keeps parcels at or above an engaged minimum and drops unknown income", () => {
+    const low = feature({ id: "low", parcelId: "low", incomeTract: { geoid: "a", name: "a", medianHouseholdIncome: 50000, medianHouseholdIncomeMoe: 1 } });
+    const high = feature({ id: "high", parcelId: "high", incomeTract: { geoid: "b", name: "b", medianHouseholdIncome: 210000, medianHouseholdIncomeMoe: 1 } });
+    const missing = feature({ id: "missing", parcelId: "missing", incomeTract: null });
+    const filters = { ...baseFilters, minIncome: 200000, includeUnknownIncome: false };
+    expect(filterParcels([low, high, missing], filters, config, fluConfig).map((item) => item.properties.id)).toEqual(["high"]);
+    expect(
+      filterParcels([low, high, missing], { ...filters, includeUnknownIncome: true }, config, fluConfig).map((item) => item.properties.id),
+    ).toEqual(["high", "missing"]);
+  });
+
   it("filters by minimum acreage and unknown acreage", () => {
     const parcels = [
       feature({ id: "small", parcelId: "small", acreage: 0.4 }),

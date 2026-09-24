@@ -5,9 +5,10 @@ import type { BBox, IncomeInfo, NearestRoad, ParcelFeature } from "./types";
 /**
  * ACS median household income and FDOT AADT joined at query time.
  * Tiles do not store these fields (they would duplicate the same tract and
- * road onto every parcel). The income fixture covers Florida counties that
- * have parcel extracts. AADT segments are statewide FDOT counts. Points
- * outside that coverage stay unknown, and Include unknown keeps them.
+ * road onto every parcel). The income fixture is ACS B19013 for Florida
+ * parcel counties plus Atlanta and Charleston parcel counties, joined by
+ * centroid-in-tract on `medianHouseholdIncome`. AADT segments are statewide
+ * FDOT counts. Points outside that coverage stay unknown.
  */
 
 const DATA_DIR = path.join(process.cwd(), "data", "fixtures");

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FilterSidebar } from "./FilterSidebar";
+import { OzExplainer } from "./OzExplainer";
 import { MarketMenu } from "./MarketMenu";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { ParcelDrawer } from "./ParcelDrawer";
@@ -138,6 +139,7 @@ export function AppShell({
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sitesOpen, setSitesOpen] = useState(false);
   const [rankingExpanded, setRankingExpanded] = useState(false);
+  const [ozHelpOpen, setOzHelpOpen] = useState(false);
   const [inventoryTab, setInventoryTab] = useState<InventoryTab>("sites");
   const [mfView, setMfView] = useState<MfPriorityView>("all");
   const [viewportParcels, setViewportParcels] = useState<ParcelCollection | null>(null);
@@ -547,7 +549,6 @@ export function AppShell({
     setSelectedTractGeoid(null);
     setSitesOpen(false);
     setFiltersOpen(false);
-    setRankingOpen(true);
   };
 
   const selectTract = (geoid: string | null) => {
@@ -556,7 +557,6 @@ export function AppShell({
     setSelectedId(null);
     setSitesOpen(false);
     setFiltersOpen(false);
-    setRankingOpen(true);
   };
 
   const changeMarket = (next: SearchMarketId) => {
@@ -636,6 +636,13 @@ export function AppShell({
           </h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            className="rounded-full border border-white/20 bg-ink-800 px-3 py-1.5 text-sm text-white"
+            onClick={() => setOzHelpOpen(true)}
+          >
+            How OZ 2.0 works
+          </button>
           <div className="flex items-center gap-1 text-[11px] text-ink-500">
             <span>Market</span>
             <MarketMenu value={market} onChange={changeMarket} />
@@ -850,16 +857,6 @@ export function AppShell({
           <button
             type="button"
             data-ranking-toggle
-            aria-expanded={rankingExpanded}
-            aria-label={rankingExpanded ? "Hide ranked sites" : "Show ranked sites"}
-            className="absolute right-0 top-1/2 z-30 hidden h-14 w-7 -translate-y-1/2 items-center justify-center rounded-l-lg border border-r-0 border-white/20 bg-ink-900 text-lg text-white shadow-[0_8px_24px_rgba(0,0,0,0.45)] hover:bg-ink-800 lg:flex"
-            onClick={() => setRankingOpen(!rankingExpanded)}
-          >
-            <span aria-hidden="true">{rankingExpanded ? "›" : "‹"}</span>
-          </button>
-          <button
-            type="button"
-            data-ranking-toggle
             aria-expanded={sitesOpen}
             aria-label="Show ranked sites"
             className="absolute right-0 top-1/2 z-30 flex h-14 w-7 -translate-y-1/2 items-center justify-center rounded-l-lg border border-r-0 border-white/20 bg-ink-900 text-lg text-white shadow-[0_8px_24px_rgba(0,0,0,0.45)] hover:bg-ink-800 lg:hidden"
@@ -872,7 +869,9 @@ export function AppShell({
           </button>
         </main>
         <aside
-          className={`${rankingExpanded ? "lg:flex" : ""} hidden min-h-0 w-[24rem] shrink-0 flex-col border-l border-white/10 bg-ink-900`}
+          id="ranked-sites-panel"
+          data-ranking-panel
+          className={`${rankingExpanded ? "lg:flex" : ""} hidden min-h-0 w-[22rem] shrink-0 flex-col border-l border-white/10 bg-ink-900`}
         >
           <div className="shrink-0 border-b border-white/10 px-3 py-3">
             <div className="flex items-start justify-between gap-2">
@@ -914,36 +913,52 @@ export function AppShell({
               </div>
             ) : null}
           </div>
-          <div className="min-h-0 flex-[1.35]">
-              {showSites ? (
-                <SitesPanel
-                  variant="sheet"
-                  sites={rankedVisible}
-                  matchedTotal={filterMatchTotal}
-                  selectedId={selectedId}
-                  hoveredId={hoveredId}
-                  incomeGeography={filters.incomeGeography}
-                  landUseFilter={appliedFilters.landUseFilter}
-                  fluUnknownCount={fluUnknownCount}
-                  onSelect={selectSite}
-                  onHover={setHoveredId}
-                  onCollapse={() => setRankingOpen(false)}
-                />
-              ) : (
-                <TractPanel
-                  variant="sheet"
-                  tracts={visibleTracts}
-                  selectedGeoid={selectedTractGeoid}
-                  onSelect={selectTract}
-                  onCollapse={() => setRankingOpen(false)}
-                  priorityView={priorityFilter.priorityView}
-                  priorityCounts={priorityFilter.priorityCounts}
-                  onPriorityView={priorityFilter.onPriorityView}
-                  emptyMessage={tractEmptyMessage}
-                />
-              )}
-            </div>
-          <div className="min-h-[12rem] flex-1 overflow-hidden border-t border-white/10">
+          <div className="min-h-0 flex-1">
+            {showSites ? (
+              <SitesPanel
+                variant="sheet"
+                sites={rankedVisible}
+                matchedTotal={filterMatchTotal}
+                selectedId={selectedId}
+                hoveredId={hoveredId}
+                incomeGeography={filters.incomeGeography}
+                landUseFilter={appliedFilters.landUseFilter}
+                fluUnknownCount={fluUnknownCount}
+                onSelect={selectSite}
+                onHover={setHoveredId}
+                onCollapse={() => setRankingOpen(false)}
+              />
+            ) : (
+              <TractPanel
+                variant="sheet"
+                tracts={visibleTracts}
+                selectedGeoid={selectedTractGeoid}
+                onSelect={selectTract}
+                onCollapse={() => setRankingOpen(false)}
+                priorityView={priorityFilter.priorityView}
+                priorityCounts={priorityFilter.priorityCounts}
+                onPriorityView={priorityFilter.onPriorityView}
+                emptyMessage={tractEmptyMessage}
+              />
+            )}
+          </div>
+        </aside>
+        <aside
+          data-selection-panel
+          className="relative hidden min-h-0 w-[24rem] shrink-0 flex-col border-l border-white/10 bg-ink-900 lg:flex"
+        >
+          <button
+            type="button"
+            data-ranking-toggle
+            aria-expanded={rankingExpanded}
+            aria-controls="ranked-sites-panel"
+            aria-label={rankingExpanded ? "Hide ranked sites" : "Show ranked sites"}
+            className="absolute left-0 top-1/2 z-30 hidden h-14 w-7 -translate-x-full -translate-y-1/2 items-center justify-center rounded-l-lg border border-r-0 border-white/20 bg-ink-900 text-lg text-white shadow-[0_8px_24px_rgba(0,0,0,0.45)] hover:bg-ink-800 lg:flex"
+            onClick={() => setRankingOpen(!rankingExpanded)}
+          >
+            <span aria-hidden="true">{rankingExpanded ? "›" : "‹"}</span>
+          </button>
+          <div className="min-h-0 flex-1 overflow-hidden">
             {selected ? (
               <ParcelDrawer
                 layout="pane"
@@ -1024,6 +1039,7 @@ export function AppShell({
           </div>
         </div>
       ) : null}
+      <OzExplainer open={ozHelpOpen} onClose={() => setOzHelpOpen(false)} />
     </div>
   );
 }

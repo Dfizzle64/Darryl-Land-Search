@@ -73,6 +73,12 @@ function statusFor(kind: TractClickKind, rural: boolean | null): string {
   return "Eligible for nomination — not designated";
 }
 
+/** Eligible "Rural: yes/no" repeats the status sentence, so the tract popup omits it. */
+export function tractPopupRuralLine(ruralLabel: string): string | null {
+  if (ruralLabel.startsWith("Rural:")) return null;
+  return ruralLabel;
+}
+
 function ruralLabelFor(kind: TractClickKind, rural: boolean | null): string {
   if (kind === "designated") {
     if (rural === true) return "Notice 2025-50 rural: yes";

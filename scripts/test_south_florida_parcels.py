@@ -17,8 +17,11 @@ from south_florida_parcels import (  # noqa: E402
     REJECTED_URLS,
     SPECS,
     acres_from_sqft,
+    GIS_VIEWER,
+    GIS_VIEWER_ALT,
     appraiser_url,
     gis_viewer_url,
+    gis_viewer_url_alt,
     in_band,
     in_county,
     miami_where,
@@ -71,17 +74,16 @@ def test_deep_links_and_rejected_hosts() -> None:
     assert "papa" not in palm
     for needle in ("maps.monroecounty.gov", "gis.bcpa.net", "pbcgov.org/papa", "BMSDParcelAddress"):
         assert needle in REJECTED_URLS
-    assert gis_viewer_url("12086", "MIAMI", zoned=True).endswith("/MapServer/19")
-    assert gis_viewer_url("12086", "Unincorporated", zoned=True).endswith("/MapServer/18")
-    assert gis_viewer_url("12086", None, zoned=False).endswith("/MapServer/26")
-    assert gis_viewer_url("12087", "Monroe", zoned=True).endswith("/APO_GIS/MapServer/19")
-    assert "Broward_Municipal_Service_District_Zoning/FeatureServer/2" in gis_viewer_url(
-        "12011", "Unincorporated", zoned=True
-    )
-    assert gis_viewer_url("12011", "Broward municipal mosaic", zoned=True).endswith("/MapServer/9")
-    assert gis_viewer_url("12099", "Unincorporated", zoned=True).endswith("/MapServer/9")
-    assert gis_viewer_url("12099", None, zoned=False).endswith("/FeatureServer/4")
-    assert "/query" not in gis_viewer_url("12011", None, zoned=False)
+    assert gis_viewer_url("12086", "MIAMI", zoned=True) == GIS_VIEWER["12086"]
+    assert gis_viewer_url("12086") == "https://experience.arcgis.com/experience/74e9a9f78b094ba2b17d86a0bfeb2eeb"
+    assert gis_viewer_url("12087") == GIS_VIEWER["12087"]
+    assert "maps.monroecounty.gov" not in gis_viewer_url("12087")
+    assert gis_viewer_url("12011", "Unincorporated", zoned=True) == "https://geohub-bcgis.opendata.arcgis.com/"
+    assert gis_viewer_url("12099") == "https://pbcgov.maps.arcgis.com/home/index.html"
+    assert gis_viewer_url_alt("12086") == GIS_VIEWER_ALT["12086"]
+    assert gis_viewer_url_alt("12011") == "https://web.bcpa.net/bcpaclient/#/Record-Search"
+    assert "/MapServer/" not in gis_viewer_url("12011")
+    assert "/query" not in gis_viewer_url("12099")
 
 
 def test_primary_zone_and_blank_codes_are_not_zoning() -> None:

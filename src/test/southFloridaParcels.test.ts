@@ -3,11 +3,11 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { parcelAppraiserUrl, parcelIdLabel } from "../lib/format";
 import { MARKET_PARCEL_ACREAGE } from "../lib/marketParcels";
+import { jurisdictionGisViewers } from "../lib/jurisdictionLinks";
 import {
   fluEmptyForSouthFlorida,
   saleEmptyForSouthFlorida,
   southFloridaAppraiserLink,
-  southFloridaGisViewer,
   zoningEmptyForSouthFlorida,
 } from "../lib/southFlorida";
 import { OTHER_MARKETS } from "../lib/types";
@@ -51,56 +51,40 @@ describe("Wave 0 South Florida registration", () => {
     expect(palm.href).not.toContain("pbcgov.org/papa");
   });
 
-  it("opens the jurisdiction GIS layer from the cards", () => {
-    const miamiCity = southFloridaGisViewer({
+  it("opens the public GIS viewer and alternate from the cards", () => {
+    const miami = jurisdictionGisViewers({
       countyFips: "12086",
-      jurisdictionCode: "MIAMI",
-      zoningCode: "T6-8-O",
+      gisViewerUrl: "https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/19",
     });
-    expect(miamiCity?.href).toBe(
-      "https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/19",
+    expect(miami?.primary.href).toBe("https://experience.arcgis.com/experience/74e9a9f78b094ba2b17d86a0bfeb2eeb");
+    expect(miami?.alt?.href).toBe("https://mdc.maps.arcgis.com/home/index.html");
+    const monroe = jurisdictionGisViewers({ countyFips: "12087" });
+    expect(monroe?.primary.href).toBe(
+      "https://monroecounty-fl.maps.arcgis.com/apps/webappviewer/index.html?id=2e52d422378e4b48a471d02959265ecc",
     );
-    expect(miamiCity?.label).toMatch(/municipal zoning/);
-    const miamiCounty = southFloridaGisViewer({
-      countyFips: "12086",
-      jurisdictionCode: "Unincorporated",
-      zoningCode: "GU",
-    });
-    expect(miamiCounty?.href).toMatch(/MapServer\/18$/);
-    const miamiMiss = southFloridaGisViewer({ countyFips: "12086", zoningCode: null });
-    expect(miamiMiss?.href).toMatch(/MapServer\/26$/);
-    const browardCity = southFloridaGisViewer({
+    expect(monroe?.alt?.href).toBe("https://www.monroecounty-fl.gov/gis");
+    expect(monroe?.primary.href).not.toMatch(/maps\.monroecounty\.gov/);
+    const broward = jurisdictionGisViewers({
       countyFips: "12011",
-      jurisdictionCode: "Broward municipal mosaic",
-      zoningCode: "CB",
+      gisViewerUrl: "https://gisweb-adapters.bcpa.net/arcgis/rest/services/BCPA_EXTERNAL_JAN26/MapServer/9",
     });
-    expect(browardCity?.href).toMatch(/MapServer\/9$/);
-    expect(browardCity?.label).toMatch(/not a Fort Lauderdale ordinance/);
-    const browardBmsd = southFloridaGisViewer({
-      countyFips: "12011",
-      jurisdictionCode: "Unincorporated",
-      zoningCode: "A-1",
-    });
-    expect(browardBmsd?.href).toMatch(/Broward_Municipal_Service_District_Zoning\/FeatureServer\/2$/);
-    expect(southFloridaGisViewer({ countyFips: "12087", zoningCode: "SC" })?.href).toMatch(/APO_GIS\/MapServer\/19$/);
-    expect(southFloridaGisViewer({ countyFips: "12099", zoningCode: "AR" })?.href).toMatch(
-      /Planning_Open_Data\/MapServer\/9$/,
-    );
-    expect(southFloridaGisViewer({ countyFips: "12099", zoningCode: null })?.href).toMatch(/FeatureServer\/4$/);
-    const stored = southFloridaGisViewer({
+    expect(broward?.primary.href).toBe("https://geohub-bcgis.opendata.arcgis.com/");
+    expect(broward?.alt?.href).toBe("https://web.bcpa.net/bcpaclient/#/Record-Search");
+    expect(broward?.primary.label).not.toMatch(/Fort Lauderdale ordinance/);
+    const palm = jurisdictionGisViewers({
       countyFips: "12099",
-      zoningCode: "AR",
-      gisViewerUrl: "https://maps.co.palm-beach.fl.us/arcgis/rest/services/OpenData/Planning_Open_Data/MapServer/9",
+      gisViewerUrl: "https://pbcgov.org/papa/PropertyDetail",
     });
-    expect(stored?.href).toMatch(/MapServer\/9$/);
-    expect(southFloridaGisViewer({ countyFips: "12095", zoningCode: "AR" })).toBeNull();
+    expect(palm?.primary.href).toBe("https://pbcgov.maps.arcgis.com/home/index.html");
+    expect(palm?.primary.href).not.toMatch(/papa/);
+    expect(palm?.alt?.href).toBe("https://pbcgov.maps.arcgis.com/apps/webappviewer/index.html");
+    expect(jurisdictionGisViewers({ countyFips: "12095", gisViewerUrl: "https://gis.example.gov/arcgis/rest/services/Parcels/MapServer/0" })).toBeNull();
     expect(
-      southFloridaGisViewer({
-        countyFips: "12099",
-        zoningCode: "AR",
-        gisViewerUrl: "https://pbcgov.org/papa/PropertyDetail",
-      })?.href,
-    ).not.toMatch(/papa/);
+      jurisdictionGisViewers({
+        countyFips: "13089",
+        gisViewerUrl: "https://experience.arcgis.com/experience/example",
+      })?.primary.href,
+    ).toBe("https://experience.arcgis.com/experience/example");
   });
 
   it("states the Broward, Monroe, and Palm Beach gaps without inventing screening fields", () => {

@@ -33,7 +33,7 @@ Newton County, Georgia is the University of Maryland AGOL redistribute (not an o
 
 Valdosta, Macon, Athens, Hilton Head, and Jackson MS are parcel shelves with no eligible-tract rows. Sources, zoning and future-land-use gaps, and the counties left off this pull are in `docs/new-metro-parcels.md`. Beaufort County also fills the previous Savannah gap. Tract income is ACS 5-year 2020–2024 B19013. Those counties use the same statewide AADT join as the rest of the footprint. Nothing in these extracts is an Opportunity Zone designation, a school letter grade, or a base flood elevation.
 
-South Florida is a Wave 0 parcel shelf: Miami-Dade, Monroe, Broward, and Palm Beach. Sources, zoning, future land use, property-appraiser links, the jump-to address bar, and the Broward CAMA / Monroe TLS / Palm Beach gaps are in `docs/south-florida-parcels.md`. Broward and Palm Beach stay partial. No eligible-tract rows were added.
+South Florida is a Wave 0 parcel shelf: Miami-Dade, Monroe, Broward, and Palm Beach. Sources, zoning, future land use, property-appraiser links, public GIS viewers, the jump-to address bar, and the Broward CAMA / Monroe TLS / Palm Beach gaps are in `docs/south-florida-parcels.md`. Broward and Palm Beach stay partial. No eligible-tract rows were added.
 
 ## Coverage
 

@@ -267,29 +267,30 @@ def usable_code(value: Any) -> str | None:
     return text
 
 
-def layer_home(query_url: str) -> str:
-    if query_url.endswith("/query"):
-        return query_url[: -len("/query")]
-    return query_url
+# Public viewers from the research cards. Zoning REST homes stay on the join, not this link.
+GIS_VIEWER = {
+    "12086": "https://experience.arcgis.com/experience/74e9a9f78b094ba2b17d86a0bfeb2eeb",
+    "12087": "https://monroecounty-fl.maps.arcgis.com/apps/webappviewer/index.html?id=2e52d422378e4b48a471d02959265ecc",
+    "12011": "https://geohub-bcgis.opendata.arcgis.com/",
+    "12099": "https://pbcgov.maps.arcgis.com/home/index.html",
+}
+GIS_VIEWER_ALT = {
+    "12086": "https://mdc.maps.arcgis.com/home/index.html",
+    "12087": "https://www.monroecounty-fl.gov/gis",
+    "12011": "https://web.bcpa.net/bcpaclient/#/Record-Search",
+    "12099": "https://pbcgov.maps.arcgis.com/apps/webappviewer/index.html",
+}
 
 
-def gis_viewer_url(fips: str, jurisdiction: str | None, *, zoned: bool) -> str:
-    """REST home of the zoning layer that won, or the county parcel service when zoning missed."""
-    parcels = {
-        "12086": layer_home(MIAMI_PARCELS),
-        "12087": layer_home(MONROE_PARCELS),
-        "12011": layer_home(BROWARD_PARCELS),
-        "12099": layer_home(PALM_PARCELS),
-    }[fips]
-    if not zoned:
-        return parcels
-    if fips == "12086":
-        return layer_home(MIAMI_ZONE_COUNTY if jurisdiction == "Unincorporated" else MIAMI_ZONE_CITY)
-    if fips == "12087":
-        return layer_home(MONROE_ZONING)
-    if fips == "12011":
-        return layer_home(BROWARD_BMSD_ZONING if jurisdiction == "Unincorporated" else BROWARD_MOSAIC)
-    return layer_home(PALM_ZONING)
+def gis_viewer_url(fips: str, jurisdiction: str | None = None, *, zoned: bool = False) -> str:
+    """Card `gisViewerUrl`. Jurisdiction and zoning do not change the public viewer."""
+    del jurisdiction, zoned
+    return GIS_VIEWER[fips]
+
+
+def gis_viewer_url_alt(fips: str) -> str | None:
+    """Card `gisViewerUrlAlt`, when the card has one."""
+    return GIS_VIEWER_ALT.get(fips)
 
 
 def appraiser_url(fips: str, parcel_id: str) -> str:
@@ -607,7 +608,8 @@ def _base_feature(
     )
     feature["properties"]["ownerName2"] = owner2
     feature["properties"]["appraiserUrl"] = appraiser_url(county["fips"], parcel_id)
-    feature["properties"]["gisViewerUrl"] = gis_viewer_url(county["fips"], None, zoned=False)
+    feature["properties"]["gisViewerUrl"] = gis_viewer_url(county["fips"])
+    feature["properties"]["gisViewerUrlAlt"] = gis_viewer_url_alt(county["fips"])
     feature["properties"]["dataGaps"] = list(gaps or [])
     feature["properties"]["opportunityZone"] = None
     feature["properties"]["oz2Eligibility"] = None
@@ -624,9 +626,6 @@ def _set_zoning(feature: dict, code: str | None, jurisdiction: str, label: str |
     pretty = label if label and label != text else text
     props["zoningDistrict"] = f"{jurisdiction}:{pretty}"
     props["jurisdictionCode"] = jurisdiction
-    fips = props.get("countyFips")
-    if fips in SPECS:
-        props["gisViewerUrl"] = gis_viewer_url(fips, jurisdiction, zoned=True)
     return True
 
 

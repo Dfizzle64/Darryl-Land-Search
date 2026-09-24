@@ -18,12 +18,12 @@ Wave 0 is South Florida only: Miami-Dade, Monroe, Broward, and Palm Beach. Acrea
 
 ## Jurisdiction GIS viewers
 
-The parcel drawer links the layer that supplied zoning. When zoning misses, the link is the county parcel service. These are the card REST homes, without `/query`. Fort Lauderdale does not have its own joined layer. A Broward city hit uses the partial mosaic, and the label says that mosaic is not a Fort Lauderdale ordinance.
+The parcel drawer opens two public links. The property-appraiser link above already contains the parcel id. The GIS viewer is the card `gisViewerUrl`, with `gisViewerUrlAlt` when the card has one. A new shelf adds the same pair to `src/lib/jurisdictionLinks.ts`. Zoning REST layers stay on the join. They are not the viewer link. Fort Lauderdale does not get its own viewer URL.
 
-- Miami-Dade municipal: `MD_LandInformation/MapServer/19`. Unincorporated: `MapServer/18`. Parcel fallback: `MapServer/26`.
-- Monroe land-use districts: `APO_GIS/MapServer/19`. Parcel fallback: `Parcels/MapServer/0`.
-- Broward BMSD (unincorporated): `Broward_Municipal_Service_District_Zoning/FeatureServer/2`. City mosaic: `BCPA_EXTERNAL_JAN26/MapServer/9`. Parcel fallback: `MapServer/16`.
-- Palm Beach unincorporated zoning: `Planning_Open_Data/MapServer/9`. Parcel fallback: `PARCEL_INFO/FeatureServer/4`.
+- Miami-Dade: `https://experience.arcgis.com/experience/74e9a9f78b094ba2b17d86a0bfeb2eeb` (alt `https://mdc.maps.arcgis.com/home/index.html`)
+- Monroe: `https://monroecounty-fl.maps.arcgis.com/apps/webappviewer/index.html?id=2e52d422378e4b48a471d02959265ecc` (alt `https://www.monroecounty-fl.gov/gis`)
+- Broward: `https://geohub-bcgis.opendata.arcgis.com/` (alt `https://web.bcpa.net/bcpaclient/#/Record-Search`)
+- Palm Beach: `https://pbcgov.maps.arcgis.com/home/index.html` (alt `https://pbcgov.maps.arcgis.com/apps/webappviewer/index.html`)
 
 ## Jump to an address
 

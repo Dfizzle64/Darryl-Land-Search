@@ -35,7 +35,8 @@ import { fluEmptyForCharlotte, zoningEmptyForCharlotte } from "@/lib/charlotteMu
 import { fluEmptyForManateeSarasota, zoningEmptyForManateeSarasota } from "@/lib/manateeSarasotaMunicipal";
 import { brevardFluReason, formatJoinedZoning } from "@/lib/brevardMunicipal";
 import { fluEmptyForMunicipal, zoningEmptyForCounty } from "@/lib/volusiaFlaglerMunicipal";
-import { fluEmptyForSouthFlorida, saleEmptyForSouthFlorida, southFloridaGisViewer, zoningEmptyForSouthFlorida } from "@/lib/southFlorida";
+import { jurisdictionGisViewers } from "@/lib/jurisdictionLinks";
+import { fluEmptyForSouthFlorida, saleEmptyForSouthFlorida, zoningEmptyForSouthFlorida } from "@/lib/southFlorida";
 import { describeZoningMatch } from "@/lib/zoning";
 
 type ParcelDrawerProps = {
@@ -164,11 +165,10 @@ export function ParcelDrawer({
     countyFips: properties.countyFips,
     appraiserUrl: properties.appraiserUrl,
   });
-  const gisViewer = southFloridaGisViewer({
+  const gisViewers = jurisdictionGisViewers({
     countyFips: properties.countyFips,
-    jurisdictionCode: properties.jurisdictionCode,
-    zoningCode: properties.zoningCode,
     gisViewerUrl: properties.gisViewerUrl,
+    gisViewerUrlAlt: properties.gisViewerUrlAlt,
   });
   const gaps = properties.dataGaps?.length ? properties.dataGaps : null;
 
@@ -194,10 +194,17 @@ export function ParcelDrawer({
           ) : (
             <p className="mt-2 text-sm text-ink-500">Property appraiser not available</p>
           )}
-          {gisViewer ? (
-            <a className="mt-1 block text-sm text-moss-400 underline-offset-2 hover:underline" href={gisViewer.href} target="_blank" rel="noreferrer">
-              {gisViewer.label}
-            </a>
+          {gisViewers ? (
+            <>
+              <a className="mt-1 block text-sm text-moss-400 underline-offset-2 hover:underline" href={gisViewers.primary.href} target="_blank" rel="noreferrer">
+                {gisViewers.primary.label}
+              </a>
+              {gisViewers.alt ? (
+                <a className="mt-1 block text-sm text-moss-400 underline-offset-2 hover:underline" href={gisViewers.alt.href} target="_blank" rel="noreferrer">
+                  {gisViewers.alt.label}
+                </a>
+              ) : null}
+            </>
           ) : null}
         </div>
         <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-3 py-1 text-sm">
@@ -350,6 +357,18 @@ export function ParcelDrawer({
         ) : (
           <p className="text-ink-500">Property appraiser not available</p>
         )}
+        {gisViewers ? (
+          <>
+            <a className="block text-moss-400 underline-offset-2 hover:underline" href={gisViewers.primary.href} target="_blank" rel="noreferrer">
+              {gisViewers.primary.label}
+            </a>
+            {gisViewers.alt ? (
+              <a className="block text-moss-400 underline-offset-2 hover:underline" href={gisViewers.alt.href} target="_blank" rel="noreferrer">
+                {gisViewers.alt.label}
+              </a>
+            ) : null}
+          </>
+        ) : null}
         {entityLink ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={entityLink.href} target="_blank" rel="noreferrer">
             {entityLink.label}

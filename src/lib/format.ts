@@ -1,5 +1,3 @@
-import { STATE_ABBR } from "./markets";
-
 const ENTITY_RE = /\b(LLC|L\.L\.C|INC|INCORPORATED|LP|L\.P|LLP|CORP|CORPORATION|LTD|TRUST|HOLDINGS|PARTNERS|COMPANY|CO)\b/i;
 
 export function isEntityOwner(name: string | null | undefined): boolean {
@@ -249,20 +247,6 @@ export function formatSale(sale: { date: string | null; price: number | null }):
   const price = sale.price != null && sale.price > 0 ? formatUsd(sale.price) : null;
   if (date && price) return `${date}\n${price}`;
   return date ?? price ?? "Not available";
-}
-
-/** City and ZIP when present. Otherwise county plus the parcel's state. Missing state stays Florida. */
-export function parcelPlaceLine(options: {
-  situsCity?: string | null;
-  situsZip?: string | null;
-  countyName?: string | null;
-  state?: string | null;
-}): string {
-  const cityLine = [options.situsCity, options.situsZip].filter(Boolean).join(" ");
-  if (cityLine) return cityLine;
-  const abbr = options.state ? (STATE_ABBR[options.state] ?? options.state) : "FL";
-  if (options.countyName) return `${options.countyName} County, ${abbr}`;
-  return abbr === "FL" ? "Florida" : options.state || abbr;
 }
 
 export function formatParcelPlace(properties: {

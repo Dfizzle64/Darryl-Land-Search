@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { isOtherMarketId } from "@/lib/markets";
+import { isOtherMarketId, isParcelMarketId } from "@/lib/markets";
 import { MARKETS, OTHER_MARKETS, PARCEL_MARKETS, type SearchMarketId } from "@/lib/types";
 
 type MarketMenuProps = {
@@ -10,8 +10,9 @@ type MarketMenuProps = {
 };
 
 export function MarketMenu({ value, onChange }: MarketMenuProps) {
+  const moreMarkets: SearchMarketId[] = [...OTHER_MARKETS, ...PARCEL_MARKETS];
   const [open, setOpen] = useState(false);
-  const [otherOpen, setOtherOpen] = useState(() => isOtherMarketId(value));
+  const [otherOpen, setOtherOpen] = useState(() => isOtherMarketId(value) || isParcelMarketId(value));
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export function MarketMenu({ value, onChange }: MarketMenuProps) {
         className="rounded-full border border-white/30 bg-ink-800 px-3 py-1.5 text-sm text-white"
         onClick={() => {
           setOpen((current) => !current);
-          if (isOtherMarketId(value)) setOtherOpen(true);
+          if (isOtherMarketId(value) || isParcelMarketId(value)) setOtherOpen(true);
         }}
       >
         {value}
@@ -80,14 +81,14 @@ export function MarketMenu({ value, onChange }: MarketMenuProps) {
           >
             <span>
               <span className="block text-[10px] uppercase tracking-[0.16em] text-clay-300">More markets</span>
-              <span className="text-sm font-medium text-white">Other MSAs ({OTHER_MARKETS.length + PARCEL_MARKETS.length})</span>
+              <span className="text-sm font-medium text-white">Other MSAs ({moreMarkets.length})</span>
             </span>
             <span className="text-sm text-clay-300" aria-hidden>
               {otherOpen ? "▾" : "▸"}
             </span>
           </button>
           {otherOpen
-            ? [...OTHER_MARKETS, ...PARCEL_MARKETS].map((market) => (
+            ? moreMarkets.map((market) => (
                 <button
                   key={market}
                   type="button"

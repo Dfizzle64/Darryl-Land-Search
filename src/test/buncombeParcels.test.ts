@@ -1,7 +1,7 @@
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { parcelAppraiserUrl, parcelPlaceLine } from "../lib/format";
+import { formatParcelPlace, parcelAppraiserUrl } from "../lib/format";
 import { catalogForMarket, isOtherMarketId, isParcelMarketId, isPrimaryMarket, isSearchMarketId } from "../lib/markets";
 import {
   buncombePropCardUrl,
@@ -72,12 +72,12 @@ describe("Buncombe sale, situs, and property card", () => {
     expect(link.href).toBe("https://prc-buncombe.spatialest.com/#/property/963470749800000");
     expect(link.label).toBe("Open Buncombe property card");
     expect(
-      parcelPlaceLine({ situsCity: null, situsZip: null, countyName: "Buncombe", state: "North Carolina" }),
-    ).toBe("Buncombe County, NC");
-    expect(parcelPlaceLine({ situsCity: "Weaverville", situsZip: null, countyName: "Buncombe", state: "North Carolina" })).toBe(
+      formatParcelPlace({ situsCity: null, situsZip: null, countyName: "Buncombe", state: "North Carolina" }),
+    ).toBe("Buncombe County, North Carolina");
+    expect(formatParcelPlace({ situsCity: "Weaverville", situsZip: null, countyName: "Buncombe", state: "North Carolina" })).toBe(
       "Weaverville",
     );
-    expect(parcelPlaceLine({ situsCity: null, countyName: "Orange", state: "Florida" })).toBe("Orange County, FL");
+    expect(formatParcelPlace({ situsCity: null, countyName: "Orange", state: "Florida" })).toBe("Orange County, FL");
   });
 
   it("adds Asheville as a parcel market without treating it as an OZ screening market", () => {

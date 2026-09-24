@@ -6,6 +6,7 @@ import {
   formatAcres,
   formatMailing,
   formatNumber,
+  formatParcelPlace,
   formatRoadLabel,
   formatSale,
   formatUsd,
@@ -120,11 +121,7 @@ export function ParcelDrawer({
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
-  const stateLabel = properties.state?.trim() || (properties.countyFips?.startsWith("12") || !properties.countyFips ? "FL" : null);
-  const placeLine =
-    [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    [properties.countyName ? `${properties.countyName} County` : null, stateLabel].filter(Boolean).join(", ") ||
-    "Location not in this extract";
+  const placeLine = formatParcelPlace(properties);
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,

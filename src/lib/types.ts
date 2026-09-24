@@ -411,7 +411,7 @@ export type ParcelProperties = {
   incomeBlockGroup: IncomeInfo | null;
   nearestRoad: NearestRoad | null;
   flu: FluInfo | null;
-  /** Volusia / Flagler city overlay that produced zoning or FLU. Absent outside those joins. */
+  /** City overlay that produced zoning or FLU (Volusia, Flagler, or Polk). Absent outside those joins. */
   municipal?: MunicipalOverlayNote | null;
   opportunityZone: OpportunityZoneInfo | null;
   oz2Eligibility: Oz2EligibilityInfo | null;

@@ -6,6 +6,7 @@ Refresh commands:
 
 ```bash
 npm run seed:volusia-flagler-municipal
+npm run seed:polk-municipal
 npm run seed:sc-muni
 ```
 
@@ -64,6 +65,20 @@ The Melbourne shelf (12,567 Volusia parcels) now has zoning on 2,942 parcels and
 | Daytona Beach Shores | 3 | 0 |
 
 Palm Coast, Flagler Beach, Bunnell, Marineland, Beverly Beach, and unincorporated Flagler are on the Palm Coast host and were not stamped. Pierson, New Smyrna Beach, Lake Helen, DeBary, and Orange City use the CountywideZoning `OriginalZoningCode` bridge only, so future land use stays empty. Daytona Beach Shores is zoning only. Rejected: Seattle future land use, Volusia Open Data zoning layer 36 (`ZONCODE` 999), and DeBary MapServer 21 as a future land use source.
+
+## Polk County, Florida (FIPS 12105)
+
+Catalog: `data/polk-municipal.json`. Details: `docs/polk-municipal.md`. Join: parcel id when the city layer carries a Polk id, otherwise the parcel centroid, onto the existing 19,734 Orlando tiles. No new county shelf. County LDC zoning districts are still a gap. County `FLUNAME` is not copied into zoning, and county future land use is not stamped.
+
+| City | Zoning parcels | FLU parcels |
+| --- | ---: | ---: |
+| Lakeland | 795 | 815 |
+| Bartow | 318 | 318 |
+| Auburndale | 262 | 281 |
+| Lake Alfred | 173 | 173 |
+| Lake Hamilton | 148 | 148 |
+
+Winter Haven, Haines City, Davenport, Fort Meade, Dundee, Eagle Lake, Frostproof, Mulberry, Polk City, Hillcrest Heights, and Highland Park stay blank. Lake Wales is token-blocked. Rejected namesakes: Iowa Polk City, New Jersey Highland Park, Georgia Mulberry, the Georgia Bartow GIS host, and UK Dundee. Auburndale `POLK_FLU` and `NO ZONING INSIDE CITY` are not stored. Lake Alfred's June 2025 ULDC layer is not mixed in with the Ord. 742 codes.
 
 ## South Carolina municipal zoning
 

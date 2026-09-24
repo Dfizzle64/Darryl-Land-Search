@@ -13,7 +13,7 @@ Orange is the public OCPA cadastre. The other complete counties are Florida DOH 
 | Lake | 12069 | 17,470 | 17,845 | 375 extra parts merged. No zoning/FLU. 1,234 rural-eligible centroids |
 | Orange | 12095 | 11,709 | 11,887 | OCPA shapes. 320 extra parts merged. 36 multipart accounts summed past 150 and dropped. Zoning on 9,789. FLU on 8,238 |
 | Osceola | 12097 | 5,997 | 6,028 | 31 extra parts merged. No zoning/FLU. 1,481 rural-eligible centroids |
-| Polk | 12105 | 19,734 | 19,738 | 4 extra parts merged. No zoning/FLU. 4,253 rural-eligible centroids |
+| Polk | 12105 | 19,734 | 19,738 | 4 extra parts merged. City zoning on 1,696 and FLU on 1,735 for five cities. County LDC zoning is still a gap. 4,253 rural-eligible centroids |
 | Seminole | 12117 | 4,788 | 4,788 | No zoning/FLU. No rural-eligible OZ 2.0 tracts in the pack |
 | Brevard | 12009 | 120 | — | Thinner sample (not capped at 150) |
 | Marion | 12083 | 120 | — | Thinner sample (not capped at 150) |

@@ -1,0 +1,241 @@
+{
+  "version": 1,
+  "county": "Polk",
+  "countyFips": "12105",
+  "doNotInventOpportunityZones": true,
+  "doNotInventCountyLdcZoning": true,
+  "stubCodes": ["POLK_FLU", "NO ZONING INSIDE CITY"],
+  "bbox": [-82.2, 27.7, -81.3, 28.3],
+  "countyLdcZoning": {
+    "status": "gap",
+    "note": "Polk County Land Use and Zoning layers are future land use and overlays. There is no countywide LDC zoning-district polygon. FLUNAME is not copied into zoningCode."
+  },
+  "countyFluNotStamped": {
+    "url": "https://gis.polk-county.net/hosting/rest/services/PublicViewer/Map_Land_Use_and_Zoning/MapServer/9",
+    "reason": "County future land use stays off these parcels. It is not a city district and it is not a zoning code."
+  },
+  "rejected": [
+    {
+      "id": "polk-city-iowa",
+      "name": "Polk City, Iowa",
+      "url": "Polk_City_Zoning_VIEW",
+      "reason": "Centroid is about (-93.73, 41.77). That is Polk City, Iowa, not Polk City, Florida."
+    },
+    {
+      "id": "highland-park-nj",
+      "name": "Highland Park, New Jersey",
+      "url": "HP_Zoning",
+      "reason": "Centroid is about (-74.43, 40.50). That is Highland Park, New Jersey."
+    },
+    {
+      "id": "mulberry-ga",
+      "name": "Mulberry, Georgia",
+      "url": "City_of_Mulberry_Zoning",
+      "reason": "Centroid is about (-83.87, 34.07). That is Mulberry, Georgia."
+    },
+    {
+      "id": "bartow-ga",
+      "name": "Bartow County, Georgia",
+      "url": "https://www.bartowgis.org/arcgis/rest/services/BartowZoning",
+      "reason": "Centroid is about (-84.93, 34.36). bartowgis.org is Georgia, not the City of Bartow, Florida."
+    },
+    {
+      "id": "dundee-uk",
+      "name": "Dundee, Scotland",
+      "url": "dundee-lez",
+      "reason": "United Kingdom low-emission and housing layers. Not the Town of Dundee, Florida."
+    },
+    {
+      "id": "polk-mn-parcels",
+      "name": "Polk County parcels, Minnesota",
+      "url": "https://services7.arcgis.com/1PZmkk2mSW5b055Q/ArcGIS/rest/services/Polk_County_Parcels/FeatureServer/0",
+      "reason": "Geometries land in Minnesota. Not used as a Polk County, Florida parcel source."
+    }
+  ],
+  "gaps": [
+    {
+      "id": "winter-haven",
+      "name": "Winter Haven",
+      "status": "gap",
+      "reason": "Official maps are Gridics. No public FeatureServer."
+    },
+    {
+      "id": "haines-city",
+      "name": "Haines City",
+      "status": "gap",
+      "reason": "Zoning inquiry form and a 2019 PDF. No city FeatureServer."
+    },
+    {
+      "id": "davenport",
+      "name": "Davenport",
+      "status": "gap",
+      "reason": "Zoning map PDF series. No FeatureServer."
+    },
+    {
+      "id": "fort-meade",
+      "name": "Fort Meade",
+      "status": "gap",
+      "reason": "No public zoning or future land use FeatureServer."
+    },
+    {
+      "id": "dundee",
+      "name": "Dundee",
+      "status": "gap",
+      "reason": "CFRPC web map points at a Dundee_FLU FeatureServer that is gone."
+    },
+    {
+      "id": "eagle-lake",
+      "name": "Eagle Lake",
+      "status": "gap",
+      "reason": "No city FeatureServer."
+    },
+    {
+      "id": "frostproof",
+      "name": "Frostproof",
+      "status": "gap",
+      "reason": "No city zoning or future land use FeatureServer."
+    },
+    {
+      "id": "mulberry",
+      "name": "Mulberry",
+      "status": "gap",
+      "reason": "No Polk County FeatureServer. The Georgia Mulberry layer is rejected."
+    },
+    {
+      "id": "polk-city",
+      "name": "Polk City",
+      "status": "gap",
+      "reason": "No Polk County FeatureServer. The Iowa Polk City layer is rejected."
+    },
+    {
+      "id": "hillcrest-heights",
+      "name": "Hillcrest Heights",
+      "status": "gap",
+      "reason": "No FeatureServer."
+    },
+    {
+      "id": "highland-park",
+      "name": "Highland Park",
+      "status": "gap",
+      "reason": "No Polk County FeatureServer. The New Jersey Highland Park layer is rejected."
+    },
+    {
+      "id": "lake-wales",
+      "name": "Lake Wales",
+      "status": "blocked",
+      "reason": "AGOL zoning and future land use require a token. The city site publishes PDF maps."
+    }
+  ],
+  "places": [
+    {
+      "id": "lakeland",
+      "name": "Lakeland",
+      "countyFips": "12105",
+      "status": "usable",
+      "rank": 1,
+      "prefix": "LKL",
+      "join": "spatial",
+      "notes": "AGOL mirror. gismims.lakelandgov.net is not used. Context PARCEL_ID is neighborhood context, not zoning.",
+      "zoning": {
+        "url": "https://services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/Zoning/FeatureServer/0",
+        "fields": ["LABEL"],
+        "labelFields": ["DESIGNATIO"]
+      },
+      "flu": {
+        "url": "https://services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/Future_Land_Use/FeatureServer/0",
+        "fields": ["LABEL"],
+        "labelFields": ["DESIGNATIO"]
+      }
+    },
+    {
+      "id": "bartow",
+      "name": "Bartow",
+      "countyFips": "12105",
+      "status": "usable",
+      "rank": 2,
+      "prefix": "BAR",
+      "join": "attribute-then-spatial",
+      "idField": "Parcel_Id",
+      "notes": "Dated 8_25_2026 layers. NA is the city's published new-annex code, not a filled-in district. bartowgis.org is Georgia and is rejected.",
+      "zoning": {
+        "url": "https://services8.arcgis.com/1wJDvJrOmH0GVxt1/arcgis/rest/services/Bartow_Zoning_8_25_2026/FeatureServer/1",
+        "fields": ["ZON"],
+        "labelFields": []
+      },
+      "flu": {
+        "url": "https://services8.arcgis.com/1wJDvJrOmH0GVxt1/arcgis/rest/services/Bartow_Future_Land_Use_8_25_2026/FeatureServer/2",
+        "fields": ["FLU"],
+        "labelFields": []
+      }
+    },
+    {
+      "id": "auburndale",
+      "name": "Auburndale",
+      "countyFips": "12105",
+      "status": "usable",
+      "rank": 3,
+      "prefix": "AUB",
+      "join": "attribute-then-spatial",
+      "idField": "PARCELID",
+      "notes": "Parcel ids shorter than 15 digits are stubs and are not joined. POLK_FLU is a county stub and is not copied as city future land use. NO ZONING INSIDE CITY is the city's own empty value and is left blank.",
+      "zoning": {
+        "url": "https://services3.arcgis.com/o0eokD8valYePyMB/arcgis/rest/services/Auburndale_Zoning/FeatureServer/3",
+        "fields": ["ZN_ABREV"],
+        "labelFields": []
+      },
+      "flu": {
+        "url": "https://services3.arcgis.com/o0eokD8valYePyMB/arcgis/rest/services/Auburndale_FLU/FeatureServer/0",
+        "fields": ["FLU_ABREV"],
+        "labelFields": []
+      }
+    },
+    {
+      "id": "lake-alfred",
+      "name": "Lake Alfred",
+      "countyFips": "12105",
+      "status": "usable",
+      "rank": 4,
+      "prefix": "LAL",
+      "join": "attribute-then-spatial",
+      "idField": "Parcel_Id",
+      "notes": "Ord. 742 district codes on Lake_Alfred_Zoning. The June 2025 ULDC layer is not wired, so the two vocabularies are not mixed.",
+      "notWired": [
+        {
+          "url": "https://services3.arcgis.com/VaAx8WnigGGWjIPd/arcgis/rest/services/City_of_Lake_ALfred_Planning_WFL1/FeatureServer/0",
+          "reason": "June 2025 ULDC codes in ZON_20 and FLU_20. Left unused."
+        }
+      ],
+      "zoning": {
+        "url": "https://services3.arcgis.com/VaAx8WnigGGWjIPd/arcgis/rest/services/Lake_Alfred_Zoning/FeatureServer/0",
+        "fields": ["ZON"],
+        "labelFields": []
+      },
+      "flu": {
+        "url": "https://services3.arcgis.com/VaAx8WnigGGWjIPd/arcgis/rest/services/Lake_Alfred_Zoning/FeatureServer/0",
+        "fields": ["FLU"],
+        "labelFields": []
+      }
+    },
+    {
+      "id": "lake-hamilton",
+      "name": "Lake Hamilton",
+      "countyFips": "12105",
+      "status": "usable",
+      "rank": 5,
+      "prefix": "LHM",
+      "join": "attribute-then-spatial",
+      "idField": "Parcel_Id",
+      "notes": "CFRPC layers. Both services carry zoning and future land use. This pass reads ZON from the zoning service and FLU from the future land use service. NA stays the published code.",
+      "zoning": {
+        "url": "https://services5.arcgis.com/gutFqkMq9XlLck8D/arcgis/rest/services/Lake_Hamilton_Zoning/FeatureServer/0",
+        "fields": ["ZON"],
+        "labelFields": []
+      },
+      "flu": {
+        "url": "https://services5.arcgis.com/gutFqkMq9XlLck8D/arcgis/rest/services/Lake_Hamilton_Future_Land_Use/FeatureServer/0",
+        "fields": ["FLU"],
+        "labelFields": []
+      }
+    }
+  ]
+}

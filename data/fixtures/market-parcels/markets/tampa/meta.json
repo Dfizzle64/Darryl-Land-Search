@@ -163,12 +163,15 @@
       "source": "reused-orlando-complete-5-150",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/52/query",
       "gaps": [
-        "Reused the Orlando complete 5.0\u2013150.0 acre tiles. Not re-scraped."
+        "Reused the Orlando complete 5.0\u2013150.0 acre tiles. Not re-scraped.",
+        "City zoning and future land use are joined for Lakeland, Bartow, Auburndale, Lake Alfred, and Lake Hamilton onto the existing 5\u2013150 acre parcels (1696 zoning, 1735 future land use). Lakeland is a centroid join. The other four cities use a Polk parcel id when the city layer has one, then the centroid. Polk County has no LDC zoning-district polygon, and county FLUNAME is not copied into zoning. County future land use is not stamped. Winter Haven, Haines City, Davenport, Fort Meade, Dundee, Eagle Lake, Frostproof, Mulberry, Polk City, Hillcrest Heights, and Highland Park stay blank. Lake Wales is token-blocked. Iowa Polk City, New Jersey Highland Park, Georgia Mulberry, the Georgia Bartow GIS host, and UK Dundee are rejected."
       ],
       "path": "data/fixtures/orlando-parcels/tiles/12105",
       "lookup": "data/fixtures/orlando-parcels/lookup/12105.json",
       "tileCount": 17,
-      "sourceCount": 21292
+      "sourceCount": 21292,
+      "zoningJoinedCount": 1696,
+      "fluJoinedCount": 1735
     },
     {
       "name": "Sarasota",

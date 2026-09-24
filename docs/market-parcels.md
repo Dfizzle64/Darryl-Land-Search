@@ -34,6 +34,8 @@ Zoning is joined when a public layer supports it. DeKalb municipalities are firs
 
 Volusia parcels in the Melbourne extract also get city zoning and future land use where a municipal polygon covers the centroid (`docs/volusia-flagler-municipal.md`). Flagler city layers are cataloged on the Palm Coast host. This repo has no Flagler parcel baseline, so those overlays are not stamped onto new parcels. The Volusia join is not a multifamily knowledge-base match outside Orange County.
 
+Polk parcels in the Orlando extract get city zoning and future land use for Lakeland, Bartow, Auburndale, Lake Alfred, and Lake Hamilton (`docs/polk-municipal.md`). Polk County still has no LDC zoning-district layer. County future land use is not copied in as a zoning code. Winter Haven and the other listed Polk cities stay blank.
+
 South Carolina municipal zoning is `scripts/sc_muni_zoning.py` (`npm run seed:sc-muni`). It attribute-joins Dorchester without adding parcels. Berkeley, Charleston, and Greenville source switches are in `county_override` and were not run in this checkout, so those shelves are unchanged. City layers win over county layers. Opportunity-zone fields are not written. Sullivan's Island, James Island, Mauldin, Simpsonville, and Travelers Rest stay gaps. Isle of Palms is partial. Laurens-side Fountain Inn and Spartanburg-side Greer are not joined. The city-by-city list, including Cobb and DeKalb batch-40 screening, is in `docs/muni-overlay-consolidator.md`.
 
 ### DeKalb County, Georgia

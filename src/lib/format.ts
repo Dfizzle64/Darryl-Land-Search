@@ -1,5 +1,3 @@
-import { treasureCoastAppraiserLabel } from "./treasureCoast";
-
 const ENTITY_RE = /\b(LLC|L\.L\.C|INC|INCORPORATED|LP|L\.P|LLP|CORP|CORPORATION|LTD|TRUST|HOLDINGS|PARTNERS|COMPANY|CO)\b/i;
 
 export function isEntityOwner(name: string | null | undefined): boolean {
@@ -98,11 +96,10 @@ export function parcelAppraiserUrl(options: {
     };
   }
   const named = fips ? APPRAISER_LINKS[fips] : undefined;
-  const treasureLabel = treasureCoastAppraiserLabel(fips);
-  if (fips === "13077" || treasureLabel) {
+  if (fips === "13077") {
     return {
       href: options.appraiserUrl || named?.href || null,
-      label: treasureLabel || named?.label || "Open county property appraiser",
+      label: named?.label || "Open county property appraiser",
     };
   }
   if (options.appraiserUrl) {

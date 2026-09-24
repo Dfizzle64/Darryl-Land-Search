@@ -6,93 +6,19 @@
     "Vero Beach",
     "Melbourne"
   ],
-  "featureCount": 3779,
+  "featureCount": 3416,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-ircpa-parcels-12061",
-  "queryUrl": "https://gisportal.ircgov.com/server3/rest/services/IRCPA/Parcels_MS/MapServer/0/query",
+  "source": "fl-doh-ehwaters-12061",
+  "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/29/query",
   "gaps": [
-    "Rejected Tuscaloosa IRC AGOL. A layer titled IRC whose extent is Tuscaloosa County, Alabama is not Indian River County. Parcels are the Indian River property appraiser service on gisportal.ircgov.com.",
-    "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
-    "Fellsmere, Indian River Shores, and Orchid are municipalities on the county boundary layer and have no public zoning or FLU FeatureServer. Their parcels stay blank rather than inheriting unincorporated districts.",
-    "County COS/COS_Zoning is the Sebastian mirror on the county server. The city zoning and FLU services are the ones joined.",
-    "COVB on gisportal.ircgov.com requires a token. Vero Beach zoning and FLU come from the city's public FeatureServers.",
-    "Assessed and taxable value are not on the property-appraiser parcel service. CAMA_VALUE is stored as tax.marketValue and TAXES as tax.taxes. SALE_VI_CD is not treated as a qualified-sale flag.",
-    "No owner phone or email fields are copied."
+    "No zoning or FLU on the Florida DOH extract."
   ],
   "path": "data/fixtures/market-parcels/counties/12061/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12061/lookup.json",
-  "sourceCount": 3779,
+  "sourceCount": 3505,
   "dropped": 0,
-  "tileCount": 6,
-  "municipalities": [
-    {
-      "name": "Fellsmere",
-      "independentGis": false,
-      "zoningUrl": null,
-      "fluUrl": null,
-      "fluGap": null,
-      "join": null,
-      "zoningJoined": 0,
-      "fluJoined": 0,
-      "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
-    },
-    {
-      "name": "Indian River Shores",
-      "independentGis": false,
-      "zoningUrl": null,
-      "fluUrl": null,
-      "fluGap": null,
-      "join": null,
-      "zoningJoined": 0,
-      "fluJoined": 0,
-      "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
-    },
-    {
-      "name": "Orchid",
-      "independentGis": false,
-      "zoningUrl": null,
-      "fluUrl": null,
-      "fluGap": null,
-      "join": null,
-      "zoningJoined": 0,
-      "fluJoined": 0,
-      "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
-    },
-    {
-      "name": "Sebastian",
-      "independentGis": true,
-      "zoningUrl": "https://services3.arcgis.com/NkT47EHQsmn9GxB3/arcgis/rest/services/City_of_Sebastian_Zoning_Web_Map_WFL1/FeatureServer/3",
-      "fluUrl": "https://services3.arcgis.com/NkT47EHQsmn9GxB3/arcgis/rest/services/Future_Land_Use/FeatureServer/0",
-      "fluGap": null,
-      "join": "spatial",
-      "zoningJoined": 152,
-      "fluJoined": 151,
-      "note": null
-    },
-    {
-      "name": "Vero Beach",
-      "independentGis": true,
-      "zoningUrl": "https://services1.arcgis.com/mK9abRqiJFkUgbPZ/arcgis/rest/services/ZoningDistricts/FeatureServer/0",
-      "fluUrl": "https://services1.arcgis.com/mK9abRqiJFkUgbPZ/arcgis/rest/services/ZoningFutureLandUse/FeatureServer/0",
-      "fluGap": null,
-      "join": "spatial",
-      "zoningJoined": 105,
-      "fluJoined": 105,
-      "note": null
-    }
-  ],
-  "unincorporated": {
-    "zoningUrl": "https://gisportal.ircgov.com/server3/rest/services/Planning/IRC_Zoning_MS/MapServer/0",
-    "fluUrl": "https://gisportal.ircgov.com/server3/rest/services/Planning/IRC_Future_Land_Use_MS/MapServer/0",
-    "zoningFeatures": 638,
-    "fluFeatures": 294,
-    "zoningJoined": 3362,
-    "fluJoined": 3366,
-    "note": "IRC_Zoning_MS is the unincorporated area. It does not cover Vero Beach or Sebastian."
-  },
-  "zoningJoinedCount": 3619,
-  "fluJoinedCount": 3622
+  "tileCount": 6
 }

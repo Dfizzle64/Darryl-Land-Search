@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T00:28:25Z",
+  "generatedAt": "2026-09-24T00:37:11Z",
   "market": "Vero Beach",
   "tier": "other",
-  "parcelCount": 23009,
+  "parcelCount": 20964,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,124 +20,98 @@
       "name": "Brevard",
       "fips": "12009",
       "state": "Florida",
-      "featureCount": 6802,
+      "featureCount": 5746,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-brevard-accela-12009",
-      "queryUrl": "https://gis.brevardfl.gov/gissrv/rest/services/Accela/AccelaGIS_Layers_WKID2881/MapServer/5/query",
+      "source": "fl-doh-ehwaters-12009",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/4/query",
       "gaps": [
-        "Rejected Melbourne, Australia. Brevard Accela covers Brevard County, Florida (about longitude -81 to -80.4 and latitude 27.8 to 28.8), not Victoria.",
-        "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
-        "Incorporated Brevard cities (the General map City layer) have no public city zoning or FLU FeatureServer in this pull. Melbourne, Palm Bay, Titusville, Cocoa, and the other cities stay blank. Accela is not used as their ordinance.",
-        "Parcel_by_Municipality_Ownership is municipal-owned parcels, not city limits, and is not the municipality layer.",
-        "The Accela parcel layer has land and building values but no just value, taxable value, sale price, or sale date. Those tax fields stay empty. The appraiser link is the BCPAO search page, not a parcel deep link.",
-        "Situs CITY on the parcel is a post-office place (Mims, Merritt Island, and similar) and is not the legal city. Legal cities come from the City polygon.",
-        "No owner phone or email is copied."
+        "6989 source rows collapsed to 5746 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "No zoning or FLU on the Florida DOH extract."
       ],
       "path": "data/fixtures/market-parcels/counties/12009/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12009/lookup.json",
-      "tileCount": 11,
-      "sourceCount": 6802
+      "tileCount": 10,
+      "sourceCount": 6989
     },
     {
       "name": "Indian River",
       "fips": "12061",
       "state": "Florida",
-      "featureCount": 3779,
+      "featureCount": 3416,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-ircpa-parcels-12061",
-      "queryUrl": "https://gisportal.ircgov.com/server3/rest/services/IRCPA/Parcels_MS/MapServer/0/query",
+      "source": "fl-doh-ehwaters-12061",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/29/query",
       "gaps": [
-        "Rejected Tuscaloosa IRC AGOL. A layer titled IRC whose extent is Tuscaloosa County, Alabama is not Indian River County. Parcels are the Indian River property appraiser service on gisportal.ircgov.com.",
-        "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
-        "Fellsmere, Indian River Shores, and Orchid are municipalities on the county boundary layer and have no public zoning or FLU FeatureServer. Their parcels stay blank rather than inheriting unincorporated districts.",
-        "County COS/COS_Zoning is the Sebastian mirror on the county server. The city zoning and FLU services are the ones joined.",
-        "COVB on gisportal.ircgov.com requires a token. Vero Beach zoning and FLU come from the city's public FeatureServers.",
-        "Assessed and taxable value are not on the property-appraiser parcel service. CAMA_VALUE is stored as tax.marketValue and TAXES as tax.taxes. SALE_VI_CD is not treated as a qualified-sale flag.",
-        "No owner phone or email fields are copied."
+        "No zoning or FLU on the Florida DOH extract."
       ],
       "path": "data/fixtures/market-parcels/counties/12061/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12061/lookup.json",
       "tileCount": 6,
-      "sourceCount": 3779
+      "sourceCount": 3505
     },
     {
       "name": "Martin",
       "fips": "12085",
       "state": "Florida",
-      "featureCount": 3790,
+      "featureCount": 3802,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-martin-geoweb-12085",
-      "queryUrl": "https://geoweb.martin.fl.us/arcgis/rest/services/Administrative_Areas/base_map/MapServer/10/query",
+      "source": "fl-doh-ehwaters-12085",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/41/query",
       "gaps": [
-        "Rejected a thin Martin AGOL clip as the county roll. Parcels are geoweb.martin.fl.us base_map layer 10, which covers the county, not an Indiantown-sized extract.",
-        "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
-        "Jupiter Island, Sewall's Point, and Ocean Breeze have no public zoning or FLU service. County polygons that only name the town are not used as their districts.",
-        "Stuart FLU was not on the city zoning service. Indiantown publishes zoning and not a separate FLU layer. County FLU is unincorporated only.",
-        "The parcel layer has owner, situs, mailing, and AREA_ACRES. It has no sale price, sale date, or tax values.",
-        "No owner phone or email is copied."
+        "No zoning or FLU on the Florida DOH extract."
       ],
       "path": "data/fixtures/market-parcels/counties/12085/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12085/lookup.json",
       "tileCount": 8,
-      "sourceCount": 3790
+      "sourceCount": 3802
     },
     {
       "name": "Okeechobee",
       "fips": "12093",
       "state": "Florida",
-      "featureCount": 3053,
+      "featureCount": 3176,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-okeechobee-planning-12093",
-      "queryUrl": "https://services3.arcgis.com/jE4lvuOFtdtz6Lbl/arcgis/rest/services/Parcels_2022/FeatureServer/2/query",
+      "source": "fl-doh-ehwaters-12093",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/46/query",
       "gaps": [
-        "Rejected City of Ocoee (maps.ocoee.org, Orange County). These parcels are Okeechobee County, from the county planning Parcels_2022 service.",
-        "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
-        "Optional county, included because the county planning services are public and the extent is Okeechobee County. There is no acreage column. Acres are computed from the polygon and then limited to 5.0\u2013150.0.",
-        "The City of Okeechobee is not split out. County zoning is not a city ordinance.",
-        "No sale price, sale date, or tax values are on the parcel service. The appraiser link is the public GIS page, not a parcel deep link.",
-        "Zoning polygons with ACRES>=5 are the join. A zone smaller than 5 acres is not applied.",
-        "No owner phone or email is copied."
+        "No zoning or FLU on the Florida DOH extract."
       ],
       "path": "data/fixtures/market-parcels/counties/12093/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12093/lookup.json",
       "tileCount": 8,
-      "sourceCount": 3053
+      "sourceCount": 3176
     },
     {
       "name": "St. Lucie",
       "fips": "12111",
       "state": "Florida",
-      "featureCount": 5585,
+      "featureCount": 4824,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-slc-parcels-12111",
-      "queryUrl": "https://slcgis.stlucieco.gov/hosting/rest/services/Parcel_Boundaries/MapServer/0/query",
+      "source": "fl-doh-ehwaters-12111",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/55/query",
       "gaps": [
-        "Rejected Fort Pierce Zoning FeatureServer/0. That layer is Current Project Development (projects), not zoning. City zoning is FeatureServer/7.",
-        "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
-        "St. Lucie Village is on the municipal boundary layer and has no public zoning or FLU service. Those parcels are not given county districts.",
-        "Fort Pierce and Port St. Lucie zoning are the city layers. County zoning is unincorporated only.",
-        "The parcel service has no sale date or price. TotalAppraisedValue is stored as tax.marketValue. Assessed, taxable, and a separate tax amount are not on this layer.",
-        "Confidential owner flags blank the owner name. No phone or email is copied."
+        "5361 source rows collapsed to 4824 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "No zoning or FLU on the Florida DOH extract."
       ],
       "path": "data/fixtures/market-parcels/counties/12111/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12111/lookup.json",
       "tileCount": 7,
-      "sourceCount": 5585
+      "sourceCount": 5361
     }
   ]
 }

@@ -5,92 +5,19 @@
   "markets": [
     "Vero Beach"
   ],
-  "featureCount": 3790,
+  "featureCount": 3802,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-martin-geoweb-12085",
-  "queryUrl": "https://geoweb.martin.fl.us/arcgis/rest/services/Administrative_Areas/base_map/MapServer/10/query",
+  "source": "fl-doh-ehwaters-12085",
+  "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/41/query",
   "gaps": [
-    "Rejected a thin Martin AGOL clip as the county roll. Parcels are geoweb.martin.fl.us base_map layer 10, which covers the county, not an Indiantown-sized extract.",
-    "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
-    "Jupiter Island, Sewall's Point, and Ocean Breeze have no public zoning or FLU service. County polygons that only name the town are not used as their districts.",
-    "Stuart FLU was not on the city zoning service. Indiantown publishes zoning and not a separate FLU layer. County FLU is unincorporated only.",
-    "The parcel layer has owner, situs, mailing, and AREA_ACRES. It has no sale price, sale date, or tax values.",
-    "No owner phone or email is copied."
+    "No zoning or FLU on the Florida DOH extract."
   ],
   "path": "data/fixtures/market-parcels/counties/12085/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12085/lookup.json",
-  "sourceCount": 3790,
+  "sourceCount": 3802,
   "dropped": 0,
-  "tileCount": 8,
-  "municipalities": [
-    {
-      "name": "Indiantown",
-      "independentGis": true,
-      "zoningUrl": "https://services6.arcgis.com/fwjLUNzkr85qH0zV/arcgis/rest/services/voi_zoning_public/FeatureServer/0",
-      "fluUrl": null,
-      "fluGap": "No public FLU layer for this municipality.",
-      "join": "spatial",
-      "zoningJoined": 110,
-      "fluJoined": 0,
-      "note": null
-    },
-    {
-      "name": "Jupiter Island",
-      "independentGis": false,
-      "zoningUrl": null,
-      "fluUrl": null,
-      "fluGap": null,
-      "join": null,
-      "zoningJoined": 0,
-      "fluJoined": 0,
-      "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
-    },
-    {
-      "name": "Ocean Breeze",
-      "independentGis": false,
-      "zoningUrl": null,
-      "fluUrl": null,
-      "fluGap": null,
-      "join": null,
-      "zoningJoined": 0,
-      "fluJoined": 0,
-      "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
-    },
-    {
-      "name": "Sewall's Point",
-      "independentGis": false,
-      "zoningUrl": null,
-      "fluUrl": null,
-      "fluGap": null,
-      "join": null,
-      "zoningJoined": 0,
-      "fluJoined": 0,
-      "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
-    },
-    {
-      "name": "Stuart",
-      "independentGis": true,
-      "zoningUrl": "https://services.arcgis.com/RyoFD3Lw9KSERnvQ/arcgis/rest/services/COS_Zoning/FeatureServer/0",
-      "fluUrl": null,
-      "fluGap": "No public FLU layer for this municipality.",
-      "join": "spatial",
-      "zoningJoined": 139,
-      "fluJoined": 0,
-      "note": null
-    }
-  ],
-  "unincorporated": {
-    "zoningUrl": "https://geoweb.martin.fl.us/arcgis/rest/services/Administrative_Areas/Future_Landuse_Zoning/MapServer/1",
-    "fluUrl": "https://geoweb.martin.fl.us/arcgis/rest/services/Administrative_Areas/Future_Landuse_Zoning/MapServer/0",
-    "zoningFeatures": 3432,
-    "fluFeatures": 2820,
-    "zoningJoined": 3463,
-    "fluJoined": 3461,
-    "note": "County zoning values that are only a municipality name (STUART and the other towns) are stubs and are not joined. Stuart uses the city zoning service. Indiantown uses the village zoning service."
-  },
-  "zoningJoinedCount": 3712,
-  "fluJoinedCount": 3461
+  "tileCount": 8
 }

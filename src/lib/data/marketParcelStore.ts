@@ -4,6 +4,7 @@ import { featureIntersectsBbox, tileFileName, tileIndicesForBbox } from "../orla
 import { featuresInAcreageBand, type MarketParcelIndex, type MarketParcelsMeta } from "../marketParcels";
 import type { ParcelCollection, ParcelFeature, ParcelProperties, SearchMarketId } from "../types";
 import { annotateParcelSignals, loadOrangeSignalIndex } from "../orangeSignals";
+import { annotateMissingOz2Eligibility } from "../oz2CentroidJoin";
 import { finalizeOrlandoParcelPage, type OrlandoParcelPage, type OrlandoParcelQuery } from "./orlandoParcelStore";
 
 const INDEX_PATH = path.join(process.cwd(), "data/fixtures/market-parcels/index.json");
@@ -181,6 +182,7 @@ export async function getMarketFixtureParcel(id: string): Promise<ParcelFeature 
 
 async function annotateLoadedParcel(feature: ParcelFeature | null): Promise<ParcelFeature | null> {
   if (!feature) return null;
+  await annotateMissingOz2Eligibility([feature]);
   annotateParcelSignals(feature, await loadOrangeSignalIndex());
   return feature;
 }

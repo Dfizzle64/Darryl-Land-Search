@@ -83,6 +83,7 @@ type SiteMapProps = {
   parcelLayerVisible?: boolean;
   parcelVisibilityHint?: string;
   onToggleParcelLayer?: () => void;
+  onToggleTractOverlay?: () => void;
   showOrangePilot: boolean;
   parcelsLoading?: boolean;
   market: SearchMarketId;
@@ -536,6 +537,7 @@ export function SiteMap({
   parcelLayerVisible,
   parcelVisibilityHint,
   onToggleParcelLayer,
+  onToggleTractOverlay,
   showOrangePilot,
   parcelsLoading = false,
   market,
@@ -1265,6 +1267,26 @@ export function SiteMap({
           />
           {showParcels && onToggleParcelLayer ? (
             <ParcelLayerToggle visible={layerOn} hint={parcelVisibilityHint ?? ""} onToggle={onToggleParcelLayer} />
+          ) : null}
+          {onToggleTractOverlay ? (
+            <button
+              type="button"
+              data-tract-toggle
+              aria-pressed={showOz2}
+              aria-label={showOz2 ? "Hide eligible census tracts" : "Show eligible census tracts"}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onToggleTractOverlay();
+              }}
+              className={`rounded-full border px-3.5 py-2 text-sm font-semibold ${
+                showOz2
+                  ? "map-scrim text-white"
+                  : "border-ink-950 bg-clay-500 text-ink-950 shadow-[0_10px_28px_rgba(0,0,0,0.55)] hover:bg-clay-400"
+              }`}
+            >
+              {showOz2 ? "Hide tracts" : "Show tracts"}
+            </button>
           ) : null}
         </div>
       ) : null}

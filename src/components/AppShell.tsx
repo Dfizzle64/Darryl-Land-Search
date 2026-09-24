@@ -808,6 +808,7 @@ export function AppShell({
             showTraffic={showTraffic}
             showOz={showOz}
             showOz2={showOz2}
+            onToggleTractOverlay={() => setShowOz2((current) => !current)}
             screening={screening}
             showParcels={shedParcelsOn}
             parcelLayerVisible={parcelLayerVisible}

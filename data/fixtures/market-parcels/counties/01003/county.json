@@ -6,19 +6,29 @@
     "Pensacola",
     "Mobile"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 17987,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "al-baldwin-public-isv",
+  "queryUrl": "https://web6.kcsgis.com/kcsgis/rest/services/Baldwin/Baldwin_Public_ISV/MapServer/31/query",
   "gaps": [
-    "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+    "17989 source rows collapsed to 17987 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "Municipal join: Daphne zoning 294 (key 293, spatial 1); Fairhope zoning 184 (key 177, spatial 7); Baldwin County Zoning/42 baseline 6991; Fairhope AO/MO overlay enrichment 156 parcels (overlay names are not zoning codes); Daphne FLU 668 (key 621, spatial 47); Daphne cleared county Zoning/42 on 288 parcels that only matched the city FLU layer.",
+    "Baldwin County parcels are web6 Baldwin_Public_ISV/MapServer/31. Acreage is CalcAcre, inclusive 5\u2013150. The al05baldrevenue Baldwin/Public URL is not used.",
+    "Parcel ZoningCode is usually empty. County Zoning/42 (ZONE_1) is the unincorporated baseline and is replaced inside Daphne and Fairhope.",
+    "Daphne zoning is Zoning_Current_view FeatureServer/0. Class is the zoning code (R1, B2, PUD). The Zoning field is the long label. Join is PID, PIN, or PARCELID, then centroid. Coverage is city-only.",
+    "Daphne FLU is Placetypes_for_Future_Development_APRIL_2026 FeatureServer/2 field Future_Dev. Land_Use is the label. The older Envision_Placetype_Map layer is not used. Overlays_view is not base zoning.",
+    "Fairhope base zoning is Master_COF_ZoningDistrict FeatureServer/0 field Zoning (R-1, R-2, B-1, B-2, M-1, PUD, and the rest of that layer). AO and MO overlays are enrichment only and are not stored as zoning codes.",
+    "ZoningDistricts_Public on services7 org BJisQXdgVScP0JMy is a California State Plane extent and is not used.",
+    "No last-sale price. DeedSigned (fallback DeedRecorded) is stored as lastSale.date when the epoch converts.",
+    "SitusAddCity is a coded small integer, so city is left null. Gulf Shores, Orange Beach, and Foley are not part of this re-chase.",
+    "This extract does not assign Opportunity Zone designations."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/01003/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01003/lookup.json",
+  "sourceCount": 17989,
+  "dropped": 0,
+  "tileCount": 16
 }

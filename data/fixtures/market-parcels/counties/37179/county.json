@@ -5,19 +5,22 @@
   "markets": [
     "Charlotte"
   ],
-  "featureCount": 13051,
+  "featureCount": 13025,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "nc-onemap-37179",
-  "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+  "source": "nc-union-atlas-37179",
+  "queryUrl": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/215/query",
   "gaps": [
-    "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+    "No countywide future land use service. Secrest Short Cut and employment-center scraps are not joined as county FLU.",
+    "FMV_LAND and FMV_IMPRV are zero on OperationalLayers parcels; tax totals only. Hemby Bridge has no zoning layer. Mint Hill in Union is negligible and is not joined.",
+    "About 78k parcels stub CountyZoning=CITY. Zoning is routed by ParcelCentroids ZoningAdmin to town layers. Legacy gis.unioncountync.gov returns 404; the atlas host is used. Stallings is joined by account number (its service is State Plane).",
+    "Zoning joined on 12874 of 13025 parcels in the 5\u2013150 acre band."
   ],
   "path": "data/fixtures/market-parcels/counties/37179/tiles",
   "lookup": "data/fixtures/market-parcels/counties/37179/lookup.json",
-  "sourceCount": 13178,
-  "dropped": 0,
+  "sourceCount": 13149,
+  "dropped": 124,
   "tileCount": 6
 }

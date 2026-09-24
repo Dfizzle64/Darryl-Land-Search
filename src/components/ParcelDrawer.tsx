@@ -6,6 +6,7 @@ import {
   formatAcres,
   formatMailing,
   formatNumber,
+  formatParcelPlace,
   formatRoadLabel,
   formatSale,
   formatUsd,
@@ -120,11 +121,7 @@ export function ParcelDrawer({
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
-  const stateLabel = properties.state?.trim() || (properties.countyFips?.startsWith("12") || !properties.countyFips ? "FL" : null);
-  const placeLine =
-    [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    [properties.countyName ? `${properties.countyName} County` : null, stateLabel].filter(Boolean).join(", ") ||
-    "Location not in this extract";
+  const placeLine = formatParcelPlace(properties);
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -195,6 +192,11 @@ export function ParcelDrawer({
       <div className="mt-5 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Zoning</p>
         <p className="mt-1 text-ink-100">{zoning.reason}</p>
+        {properties.zoningOverlay ? (
+          <p className="mt-2 text-ink-300">
+            Overlay: {properties.zoningOverlay}. This note is not the base zoning district.
+          </p>
+        ) : null}
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Future Land Use</p>

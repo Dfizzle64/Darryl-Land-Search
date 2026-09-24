@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T01:06:16Z",
   "market": "Charleston",
   "tier": "primary",
-  "parcelCount": 6774,
+  "parcelCount": 22649,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,39 +20,52 @@
       "name": "Berkeley",
       "fips": "45015",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 7886,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-berkeley-addr-muni",
+      "queryUrl": "https://gis.berkeleycountysc.gov/arcgis/rest/services/custom/Addr_muni/MapServer/1/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Public parcels are custom/Addr_muni MapServer/1 (no token), filtered on TotalAcres 5\u2013150. The AGOL parcels_berkeley_county FeatureServer returns HTTP 499 Token Required and is not used.",
+        "Situs is GIS_Address when populated (about half of this acreage band). StreetAddress1, City, and Zip are owner mailing, not situs. GIS_Num and GIS_Street fill situs only when GIS_Address is empty.",
+        "Validity is stored as the county sale code and is not translated.",
+        "LandMarket, BuildingMarket, and TotalTaxValue (shown as assessed value) are on the parcel. County zoning on API/internet_map_with_api MapServer/33 is a separate layer and is not joined. Goose Creek, Hanahan, and Moncks Corner zoning field maps are incomplete.",
+        "Last sale only. Owner and mailing address are the public GIS attributes only. Emails and phone numbers are not scraped."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45015/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45015/lookup.json",
+      "tileCount": 10,
+      "sourceCount": 7886
     },
     {
       "name": "Charleston",
       "fips": "45019",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 7989,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-charleston-energov-ent",
+      "queryUrl": "https://gisccapps.charlestoncounty.org/arcgis/rest/services/ENERGOV/energov_ent/MapServer/12/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Mount Pleasant town zoning joined 513 parcels (MPSC_Zoning_New MapServer/2, PARCEL_ID = PID, COUNTY and AWENDAW excluded). Town future land use centroid-joined 916 parcels (MPSC_Land_Use_New MapServer/3, New_FLU).",
+        "Public parcels are ENERGOV/energov_ent MapServer/12 (no token), filtered on ACREAGE 5\u2013150. GIS_VIEWER/Parcel_Search and GIS_VIEWER/Public_Search return HTTP 499 Token Required and are not used.",
+        "Parcel id is PID. GPIN is on the layer but was blank for every 5\u2013150 acre row checked on 2026-09-23.",
+        "LAND_APPR is the land appraisal. Total appraisal and improvement value live on public ProVal ParcelMap (qualified SDE field names) and are not joined.",
+        "Last sale is DOC_DATE and SALE_PRICE only, not a multi-sale history.",
+        "Mount Pleasant zoning is town MPSC_Zoning_New MapServer/2, joined on PARCEL_ID = PID. ZONINGVALU values COUNTY and AWENDAW are excluded. Town future land use is MPSC_Land_Use_New MapServer/3 (New_FLU), joined by parcel centroid. County Public_Works/Public_Works_Viewer/46 is the older Mt Pleasant zoning layer and is not used.",
+        "Isle of Palms has no single public zoning service. Sullivan's Island and James Island publish PDF or static maps only. Those districts stay gaps.",
+        "Folly Beach has a public AGOL zoning layer owned by College of Charleston / SCGIS, not the city. That third-party layer is not ingested.",
+        "City of Charleston and North Charleston publish their own zoning services. They are not joined onto this county extract.",
+        "Owner and mailing address are the public GIS attributes only. Emails and phone numbers are not scraped."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45019/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45019/lookup.json",
+      "tileCount": 10,
+      "sourceCount": 8001
     },
     {
       "name": "Clarendon",
@@ -102,9 +115,13 @@
       "minAcres": 5.0,
       "maxAcres": 150.0,
       "source": "sc-dorchester-parcels-public",
-      "queryUrl": "https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/Parcels_Public/MapServer/0/query",
+      "queryUrl": "https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/Parcels_Public/FeatureServer/0/query",
       "gaps": [
-        "Dorchester public parcels. Situs is not on this layer. No zoning join."
+        "6821 source rows collapsed to 6774 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Public parcels are General_Data/Parcels_Public FeatureServer/0 (no token), filtered on GIS_ACREAGE 5\u2013150. Parcel id stays the dashed TMS. TMS13 is stored as the alternate id.",
+        "Situs is PROPERTY_LOCATION. Zoning is ZONINGCODE on the parcel. This public layer has no market, assessed, or land-appraisal fields; those values stay on the county CAMA inquiry.",
+        "Last sale is SALE_DATE and SALE_PRICE only. Zoning_PUBLIC has no FeatureServer SOE (use MapServer/0 if a polygon overlay is needed later). County_Lands_Pub is a filtered subset and is not used.",
+        "Owner and mailing address are the public GIS attributes only. Emails and phone numbers are not scraped."
       ],
       "path": "data/fixtures/market-parcels/counties/45035/tiles",
       "lookup": "data/fixtures/market-parcels/counties/45035/lookup.json",

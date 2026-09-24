@@ -5,19 +5,23 @@
   "markets": [
     "Birmingham"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 10466,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "al-stclair-owner-parcels",
+  "queryUrl": "https://map.stclairco.com/arcgis/rest/services/PublicParcelViewerStPln/MapServer/57/query",
   "gaps": [
-    "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+    "10469 source rows collapsed to 10466 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "St. Clair Owner Parcels (PublicParcelViewerStPln MapServer/57). Owner, deeded acres, situs, sale, and tax values come from that public layer.",
+    "Zoning and future land use are joined only from Owner_Parcel_Zone_View (zoned subset) through OwnerParcel_Ingen GlobalID. Parcels outside that subset stay blank.",
+    "The FeatureServer SOE on this host is not used.",
+    "Zone_View subset joined zoning on 1779 parcels and FLU on 459. Parcels outside that zoned subset stay blank."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/01115/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01115/lookup.json",
+  "sourceCount": 10469,
+  "dropped": 0,
+  "tileCount": 7
 }

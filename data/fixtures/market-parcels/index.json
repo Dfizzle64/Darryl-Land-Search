@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T23:50:16Z",
+  "generatedAt": "2026-09-24T01:06:16Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -11,10 +11,10 @@
   "markets": {
     "Atlanta": {
       "tier": "primary",
-      "parcelCount": 8181,
-      "completeCountyCount": 2,
+      "parcelCount": 85505,
+      "completeCountyCount": 15,
       "sampleCountyCount": 0,
-      "gapCountyCount": 33,
+      "gapCountyCount": 20,
       "path": "data/fixtures/market-parcels/markets/atlanta/meta.json",
       "counties": [
         {
@@ -33,24 +33,26 @@
           "name": "Barrow",
           "state": "Georgia",
           "fips": "13013",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 4251,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "4277 source rows collapsed to 4251 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Acreage is GIS area only (BarrowParcelswOwner_Project/FeatureServer/1 Shape__Area / 4046.8564224, Web Mercator). No deeded-acre field is published."
           ]
         },
         {
           "name": "Bartow",
           "state": "Georgia",
           "fips": "13015",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 7077,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "13412 BartowLand features with TOTALACRES from 5 through 150 inclusive dissolved to 7077 PARCELIDs. Acreage is TOTALACRES once per parcel, not the sum of parts. 70 parcels kept more than one distinct ring group.",
+            "County zoning join: 6352 of 7077 parcels (89.8%) received a BartowZoning STZONECODE other than Incorporated. 713 parcels fall in the Incorporated city stub and have null zoningCode. 12 parcels did not hit a zoning polygon."
           ]
         },
         {
@@ -69,12 +71,13 @@
           "name": "Carroll",
           "state": "Georgia",
           "fips": "13045",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 9217,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "Kept 9217 Carroll County, Georgia parcels in the inclusive 5\u2013150 GIS-acre band from OpenAddresses job 910028 (55412 polygons, pid only). The live Carroll_Parcels_20240923_ExportFeatures service is blocked. GIS acres are equirectangular polygon area. Duplicate pid groups: 20. Below 5 acres: 46005. Above 150 acres: 164.",
+            "Carrollton CITY_PARCEL matched 320 kept parcels. Villa Rica Map/1 Carroll extract matched 228. Owner filled 539. Current value filled 543. There is no countywide owner, mailing, or tax roll on the OpenAddresses snapshot. Assessed value, taxable value, and tax amount were not on the public layers used here."
           ]
         },
         {
@@ -105,24 +108,26 @@
           "name": "Cobb",
           "state": "Georgia",
           "fips": "13067",
-          "featureCount": 4780,
+          "featureCount": 4770,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Cobb County open parcels. No zoning join on this layer."
+            "4859 source rows collapsed to 4770 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Parcels are Cobb Tax Assessors Daily MapServer/0 (CobbParcels on gis.cobbcounty.gov), filtered on ACRES 5.0\u2013150.0. A live count was 279,635 parcels and 4,859 in that band. ACRE_DEEDED is a different field (about 4,681 in the band) and was not the filter. The older cobbpublic Parcels MapServer/3 on gis.cobbcounty.org was not used."
           ]
         },
         {
           "name": "Coweta",
           "state": "Georgia",
           "fips": "13077",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 8090,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "Primary polygons are Coweta WinGapParcels. Acres and municipality are joined from Hosted ParcelPropertyValues. The 5.0\u2013150.0 acre band uses that acres field.",
+            "CurrentValue is the assessor current value. Assessed value is not a separate published field."
           ]
         },
         {
@@ -154,48 +159,52 @@
           "name": "Douglas",
           "state": "Georgia",
           "fips": "13097",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 4231,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "4254 LandRecords rows matched ACREAGE_GIS 5\u2013150. 4231 Douglas County, Georgia tax parcels were kept. Placeholder PINs and any geometry outside the Douglas County bbox were dropped.",
+            "Acreage is ACREAGE_GIS, not the TOTAL_ACRES string. Band is 5.0\u2013150.0 inclusive."
           ]
         },
         {
           "name": "Fayette",
           "state": "Georgia",
           "fips": "13113",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 4725,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "Acreage uses parcelsRO acres when >0, otherwise StatePlane feet Shape.STArea()/43560. Deeded acres are sparse.",
+            "Zoning on 4363 of 4725: ZoningRO unincorporated 3476, parcelsRO fallback 298, Fayetteville 133, Peachtree City Zoning2021 289, Tyrone TAXDIST=3 167. Brooks 188 and Woolsey 43 left blank \u2014 no city zoning REST."
           ]
         },
         {
           "name": "Forsyth",
           "state": "Georgia",
           "fips": "13117",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 3925,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "No lastSale.price, lastSale.date, or lastSale.qualified on any public Forsyth County GA REST layer. Sale history is qPublic HTML only (AppID=1027), not a GIS join.",
+            "FLU is partial: EnerGov CharacterArea is 11 coarse 2022 comprehensive-plan polygons (Big Creek, Campground, Chestatee/Jot Em Down, Etowah, Haw Creek and Daves Creek, Lanier, McFarland, North Georgia 400, Sawnee Mountain, South Georgia 400, Vickery Creek), joined to 3758 of 3925 parcels. This is not parcel-level future land use. Cumming city FLU is a comprehensive-plan PDF, not REST."
           ]
         },
         {
           "name": "Fulton",
           "state": "Georgia",
           "fips": "13121",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 8274,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "Hosted CurrentParcels FeatureServer (services5\u2026/CurrentParcels) is a north-Fulton subset (~29.8k of ~373k), not county-wide. This extract uses Property Map Viewer MapServer/11 (LandAcres, county-wide).",
+            "No county-wide zoning layer. City zoning/FLU is joined where a public layer exists. Gaps with no public zoning/FLU REST: Hapeville, Palmetto (do not use Palmetto FL layers), Chattahoochee Hills, and Mountain Park. Fulton Industrial District (MapServer/34, ~37 polygons) is not county zoning. Unincorporated Fulton stays blank."
           ]
         },
         {
@@ -214,12 +223,13 @@
           "name": "Gwinnett",
           "state": "Georgia",
           "fips": "13135",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 6653,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "6655 source rows collapsed to 6653 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Parcels are Gwinnett GC_Parcel MapServer/6. AGOL Property_and_Tax FeatureServer/0 is geometry and PIN only and is not the parcel source."
           ]
         },
         {
@@ -262,12 +272,13 @@
           "name": "Henry",
           "state": "Georgia",
           "fips": "13151",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 7418,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "7669 source rows collapsed to 7418 parcel ids because the parcel id repeats. None failed the acreage band or the WGS84 centroid check. The acreage query covered the county.",
+            "Henry 5\u2013150 acre join: zoning 6424/7418 (GMC McDonough 314, McDonough clip 13, Stockbridge clip 248, Locust Grove clip 159, county ZONING 5238, CityZoning stub 364, Hampton CityZoning stub 88, CITY with blank CityZoning 205, no zoning row 789, other unmatched 0). FLU 4777/7418; FLU2023=CITY left blank on 1020; no FLU row 1621. McDonough owner names 198. Special overlays noted 55. Centroids outside Henry extent dropped 0."
           ]
         },
         {
@@ -370,12 +381,13 @@
           "name": "Paulding",
           "state": "Georgia",
           "fips": "13223",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 5094,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "5099 source rows collapsed to 5094 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Paulding Map Auto Updated FeatureServer/25. Acreage is DeedAc (5.0\u2013150.0 inclusive). CalcAc is 0 on this layer and is not the filter. Parcel id is GPIN. Thin attributes are GPIN, DeedAc, TaxDist, OWNKEY, SubdivID, and SubdivLotNum. OWNKEY is an owner key, not a name."
           ]
         },
         {
@@ -406,12 +418,13 @@
           "name": "Rockdale",
           "state": "Georgia",
           "fips": "13247",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 2555,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "Source query returned 2698 rows in the 5.0\u2013150.0 acre band. 2555 parcels kept. 26 centroids were outside Rockdale County, Georgia, 6 failed geometry or the acreage check, and 111 duplicate parcel ids were collapsed to the larger part.",
+            "Rockdale County, Georgia AGOL Parcels/9. Positive Acreage is stored; Calc_Ac is used only when Acreage is null or zero. The band is 5.0\u2013150.0 acres inclusive."
           ]
         },
         {
@@ -430,19 +443,20 @@
           "name": "Walton",
           "state": "Georgia",
           "fips": "13297",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 5824,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "Kept 5824 Walton County, Georgia parcels in the inclusive 5\u2013150 GIS-acre band from choosewalton Walton_County_Zoning/29 (6187 source rows). Duplicate Parcel_No rings were dissolved (344 duplicate groups, 344 extra rings). Blank Parcel_No rows dropped: 9. Shared UTILITY ids dropped: 10.",
+            "Monroe City Parcels CAMA matched 12 of 5824 kept parcels (owner filled 12, curr_val filled 12). The Monroe layer has 6043 city parcels. Most Monroe Parcel_No values are M* or NM* and do not equal the county C* or N* numbers, so only shared Parcel_No values were joined. waltongis walton_parcels_view is token/subscription blocked (499/403), so there is no countywide owner, mailing, or tax."
           ]
         }
       ]
     },
     "Tampa": {
       "tier": "primary",
-      "parcelCount": 98259,
+      "parcelCount": 124315,
       "completeCountyCount": 10,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
@@ -452,49 +466,52 @@
           "name": "Citrus",
           "state": "Florida",
           "fips": "12017",
-          "featureCount": 5810,
+          "featureCount": 5807,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Parcel polygons, owner, situs, and tax values are Florida DOH EHWATER layer 8. Citrus County lots have no acre or owner field, and lot PRCLKEY is empty, so zoning is a centroid join.",
+            "Municipality is the corporate-limit layer (Inverness or Crystal River). PHY_CITY is the postal city and is not the city limit."
           ]
         },
         {
           "name": "Hardee",
           "state": "Florida",
           "fips": "12049",
-          "featureCount": 5055,
+          "featureCount": 5303,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Parcels are InfoMap Owner Parcels (TOTACRES). SWFWMD parcel_search was not needed.",
+            "County zoning and future land use are a spatial intersect (no parcel id on those layers)."
           ]
         },
         {
           "name": "Hernando",
           "state": "Florida",
           "fips": "12053",
-          "featureCount": 7180,
+          "featureCount": 6601,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Upgrade off Florida DOH. Parcels, owner, situs, and values are Hernando County Parcels (gis.V_PARCELS).",
+            "Municipality is CER_JURISDICTION: B is Brooksville and C is unincorporated. Situs city Brooksville, Spring Hill, or Weeki Wachee is not the city limit."
           ]
         },
         {
           "name": "Hillsborough",
           "state": "Florida",
           "fips": "12057",
-          "featureCount": 13351,
+          "featureCount": 13838,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "15626 source rows collapsed to 13351 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "No zoning or FLU on the Florida DOH extract."
+            "Hillsborough sale flag VI is vacant/improved, not an FDOR qualified (Q/U) sale.",
+            "Unincorporated zoning is RegulatoryZoning/8. Tampa, Temple Terrace, and Plant City zoning are city layers joined onto county parcels."
           ]
         },
         {
@@ -514,36 +531,39 @@
           "name": "Pasco",
           "state": "Florida",
           "fips": "12101",
-          "featureCount": 10590,
+          "featureCount": 12372,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Pasco parcels are PascoMapper/7 (countywide). Hosted County_Master_Property_List FeatureServer/0 is a ~2,266-feature subset and is not used.",
+            "Unincorporated zoning and FLU are Landuse_Planning district polygons. County ZN_TYPE values NPR, PR, and SA are city placeholders, not districts."
           ]
         },
         {
           "name": "Pinellas",
           "state": "Florida",
           "fips": "12103",
-          "featureCount": 18638,
+          "featureCount": 42230,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Pinellas public parcels have taxable, land, and improvement values but no just/market value.",
+            "Unincorporated zoning and FLU are PublicWebGIS Landuse_Zoning and are not applied inside cities."
           ]
         },
         {
           "name": "Polk",
           "state": "Florida",
           "fips": "12105",
-          "featureCount": 19734,
+          "featureCount": 20263,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Reused the Orlando complete 5.0\u2013150.0 acre tiles. Not re-scraped."
+            "Polk market parcels are Property_Appraiser MapServer/134. Orlando shed tiles are unchanged.",
+            "No countywide zoning-district polygons are published. County FLU 2030 (FLUNAME / FLU_LDC) is land use only and is not stored as zoning."
           ]
         },
         {
@@ -555,7 +575,8 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "No zoning or FLU on the Florida DOH extract.",
+            "Optional SWFL county. Tiles are shared with Tampa and are not downloaded a second time."
           ]
         },
         {
@@ -575,34 +596,36 @@
     },
     "Charleston": {
       "tier": "primary",
-      "parcelCount": 6774,
-      "completeCountyCount": 1,
+      "parcelCount": 22649,
+      "completeCountyCount": 3,
       "sampleCountyCount": 0,
-      "gapCountyCount": 6,
+      "gapCountyCount": 4,
       "path": "data/fixtures/market-parcels/markets/charleston/meta.json",
       "counties": [
         {
           "name": "Berkeley",
           "state": "South Carolina",
           "fips": "45015",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 7886,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Public parcels are custom/Addr_muni MapServer/1 (no token), filtered on TotalAcres 5\u2013150. The AGOL parcels_berkeley_county FeatureServer returns HTTP 499 Token Required and is not used.",
+            "Situs is GIS_Address when populated (about half of this acreage band). StreetAddress1, City, and Zip are owner mailing, not situs. GIS_Num and GIS_Street fill situs only when GIS_Address is empty."
           ]
         },
         {
           "name": "Charleston",
           "state": "South Carolina",
           "fips": "45019",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 7989,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Mount Pleasant town zoning joined 513 parcels (MPSC_Zoning_New MapServer/2, PARCEL_ID = PID, COUNTY and AWENDAW excluded). Town future land use centroid-joined 916 parcels (MPSC_Land_Use_New MapServer/3, New_FLU).",
+            "Public parcels are ENERGOV/energov_ent MapServer/12 (no token), filtered on ACREAGE 5\u2013150. GIS_VIEWER/Parcel_Search and GIS_VIEWER/Public_Search return HTTP 499 Token Required and are not used."
           ]
         },
         {
@@ -638,7 +661,8 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Dorchester public parcels. Situs is not on this layer. No zoning join."
+            "6821 source rows collapsed to 6774 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Public parcels are General_Data/Parcels_Public FeatureServer/0 (no token), filtered on GIS_ACREAGE 5\u2013150. Parcel id stays the dashed TMS. TMS13 is stored as the alternate id."
           ]
         },
         {
@@ -669,10 +693,10 @@
     },
     "Nashville": {
       "tier": "primary",
-      "parcelCount": 31132,
-      "completeCountyCount": 6,
+      "parcelCount": 109348,
+      "completeCountyCount": 13,
       "sampleCountyCount": 0,
-      "gapCountyCount": 11,
+      "gapCountyCount": 4,
       "path": "data/fixtures/market-parcels/markets/nashville/meta.json",
       "counties": [
         {
@@ -703,36 +727,39 @@
           "name": "Cheatham",
           "state": "Tennessee",
           "fips": "47021",
-          "featureCount": 3790,
+          "featureCount": 5426,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Future land use is an honest REST gap for Cheatham County, Ashland City, Pleasant View, Kingston Springs, and Pegram. CheatGIS urban growth and Cheatham Growth layers are guidance only and are not parcel FLU or zoning entitlement.",
+            "Zoning is a cities-first polygon join on APSU CheatGIS: Ashland City, Pleasant View, Kingston Springs, and Pegram inside their community limits, then unincorporated Cheatham zoning. City district codes are not applied outside those limits. The parcel zoning attribute is often blank and is not the district."
           ]
         },
         {
           "name": "Davidson",
           "state": "Tennessee",
           "fips": "47037",
-          "featureCount": 8286,
+          "featureCount": 9478,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "9481 source rows collapsed to 9478 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Davidson County is not a Tennessee Comptroller IMPACT county. Polygons, owner, mailing, situs, sale, appraisal, and the parcel Zoning attribute come from Metro GIS Cadastral/Parcels MapServer layer 0 (APN). No IMPACT assessment feed was used. Authoritative record cards are on Davidson WebPro."
           ]
         },
         {
           "name": "Dickson",
           "state": "Tennessee",
           "fips": "47043",
-          "featureCount": 4797,
+          "featureCount": 8443,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Zoning polygons are joined only inside the resolved jurisdiction. City of Dickson Current_Zo 408/408, White Bluff Zone_Curre 92/92, county Zone_Curre 7696/7700. Burns (72), Charlotte (90), Vanleer (47), and Slayden (34) have no public zoning FeatureServer (Burns is a 2016 PDF), so those parcels stay unzoned. IMPACT Themes ZONING was non-blank on 3 parcels and was not copied. County Zone_Curre is 164 district polygons; A1 is only 6 of them, and those large polygons cover most rural acreage.",
+            "No adopted future-land-use FeatureServer. The 2043 Comp Plan draft and UGB/PGA layers are growth context only and were not written as parcel FLU. Sale date and price are often blank or zero. REST exposes appraisal (APPRAISAL), not assessed or taxable value."
           ]
         },
         {
@@ -777,52 +804,52 @@
           "name": "Maury",
           "state": "Tennessee",
           "fips": "47119",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 9033,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "9034 source rows collapsed to 9033 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Maury is Tennessee IMPACT jurisdiction 060 (COUNTY_ID 60). IMPACT has calculated acres and a GIS link but no owner, situs, or zoning. This extract uses City of Columbia AGOL Parcels layer 1, parcel type 1, calculated acres 5.0\u2013150.0 (about 9,000 parcels). The roll has a street address and a mailing city, not a situs city."
           ]
         },
         {
           "name": "Montgomery",
           "state": "Tennessee",
           "fips": "47125",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 7038,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "11003 PARCEL_TYPE=1 rows in the 5.0\u2013150.0 acre band collapsed to 7038 GISLINK ids. Extra rows are CAMA building cards on the same polygon. One feature is kept per GISLINK (largest CalcAcreage, then building card 1).",
+            "Montgomery County, Tennessee (FIPS 47125, Clarksville) is not on Comptroller IMPACT (COUNTY_ID 125 returns no 5\u2013150 acre rows). Parcels are the county CAMA service mcgtn_parcels on gis.montgomerytn.gov. Filter is PARCEL_TYPE=1 and CalcAcreage 5.0\u2013150.0. COUNTY_ID on this layer is 63, the Comptroller county number, not FIPS 125."
           ]
         },
         {
           "name": "Robertson",
           "state": "Tennessee",
           "fips": "47147",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 8581,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "IMPACT COUNTY_ID 74 / JUR 074. The FIPS suffix 147 returns no parcels on this service. Geometry is Parcels/0 parcel type 1, CALC_ACRE 5\u2013150 (8581 source rows, 8581 kept). Attributes joined from Parcel_Layer_Themes/12 on GISLINK (8581 matches).",
+            "Weekly Assessment_Data_074.dbf is the attribute fallback when Parcel_Layer_Themes/12 is blocked. The Comptroller ships that table inside the county shapefile from the parcel-data request form; there is no stable anonymous file URL, and paid parcel vendors are not used. This pull used Themes/12, so the DBF was not required."
           ]
         },
         {
           "name": "Rutherford",
           "state": "Tennessee",
           "fips": "47149",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 9677,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "9866 source rows collapsed to 9677 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Rutherford is not an IMPACT county. Parcels come from the public AGOL Parcel_Data FeatureServer (PARCEL_TYPE=1, CALCACRES 5\u2013150). ParcelID is the display id; GISLINK is kept for joins. COUNTY/COUNTYID 075 is the comptroller county number, not FIPS."
           ]
         },
         {
@@ -842,13 +869,13 @@
           "name": "Sumner",
           "state": "Tennessee",
           "fips": "47165",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 15982,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Parcels are Sumner 911 AGOL ParcelsCAMA FeatureServer/0 filtered to PARCEL_TYP=1 and CALC_ACRE 5\u2013150 (15982 kept). Comptroller IMPACT COUNTY_ID=83 (https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0) and the stale Dec-2023 hosted CAMA (https://maps.cot.tn.gov/hosting/rest/services/Hosted/SUMNER_Dec2023_Parcels_CAMA_A/FeatureServer/0) were not used. Source rows include the same PARID in TAXYR 2026 and 2027. One record per PARID is kept, preferring the later tax year.",
+            "Municipal zoning joined on 4786 of 15982 parcels. Hendersonville MFR parcels: 328. Portland RM-1 parcels: 11. City counts: Unincorporated 10835, Gallatin 2273, Hendersonville 1277, Millersville 552, Portland 336, Goodlettsville 320, White House 206, Westmoreland 161, Mitchellville 22. Westmoreland and Mitchellville have no public zoning REST. Unincorporated Sumner has no county zoning REST. The CAMA ZONING field is not used as a district."
           ]
         },
         {
@@ -868,33 +895,33 @@
           "name": "Williamson",
           "state": "Tennessee",
           "fips": "47187",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 10760,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Williamson is not Comptroller IMPACT. 10760 parcels kept from IDT/DataPull layer 10 (source rows 11136, geometry/acreage drops 0) using CALC_ACRE 5\u2013150 inclusive. 376 extra GISLINK rows collapsed to the larger CALC_ACRE. AC and ACc are secondary assessor acres, not the filter. Query format is Esri JSON (no geoJSON); rings were converted to GeoJSON.",
+            "Jurisdiction is Corporate Limits layer 2 when the centroid is inside a city, otherwise the CITY tax code. Resolved {'UNINCORPORATED': 8534, 'NOLENSVILLE': 221, 'BRENTWOOD': 578, 'FAIRVIEW': 294, 'FRANKLIN': 688, 'THOMPSONS STATION': 370, 'SPRING HILL': 75}. Limits overrode a mapped city code on 0 parcels. CITY 000264 and blank codes are not treated as Franklin unless Corporate Limits say so."
           ]
         },
         {
           "name": "Wilson",
           "state": "Tennessee",
           "fips": "47189",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 10671,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Unincorporated Wilson zoning and future land use have no public FeatureServer (county PDF maps only; the $75 shapefile was not purchased). Zoning and FLU stay null outside Lebanon and Mt. Juliet.",
+            "Watertown zoning is the 2017 ordinance PDF only. No anonymous city-limit or zoning FeatureServer was verified. CITYNUM 758 parcels keep IMPACT geometry with null zoning and FLU."
           ]
         }
       ]
     },
     "Charlotte": {
       "tier": "primary",
-      "parcelCount": 119168,
+      "parcelCount": 106650,
       "completeCountyCount": 12,
       "sampleCountyCount": 0,
       "gapCountyCount": 3,
@@ -904,24 +931,26 @@
           "name": "Anson",
           "state": "North Carolina",
           "fips": "37007",
-          "featureCount": 5814,
+          "featureCount": 5820,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "Peachland and Polkton zoning layers are empty. McFarlan has no public zoning service. Those towns stay unmatched.",
+            "CountyZoning=Mun. is not a zone class; town layers supply the code. LandUsePlan=MUN is not future land use. No town FLU service is published."
           ]
         },
         {
           "name": "Cabarrus",
           "state": "North Carolina",
           "fips": "37025",
-          "featureCount": 6974,
+          "featureCount": 6983,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "Situs is not on Tax_Parcels polygons; it is joined from AA ParcelAddresses by PIN14. gis.cabarruscounty.us redirects to the map and is not the REST host.",
+            "No countywide future land use service. Concord 2030 and Kannapolis Character Areas are joined. Harrisburg, Midland, Mount Pleasant, Locust, and the Huntersville edge have no public FLU layer."
           ]
         },
         {
@@ -965,36 +994,39 @@
           "name": "Davidson",
           "state": "North Carolina",
           "fips": "37057",
-          "featureCount": 11685,
+          "featureCount": 12063,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "12102 source rows collapsed to 12063 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Davidson County, North Carolina (FIPS 37057), not Davidson County, Tennessee. Acreage is legal acres on OpenGov TaxParcels where LegalLandType is AC and LegalLandUnits is 5 through 150."
           ]
         },
         {
           "name": "Gaston",
           "state": "North Carolina",
           "fips": "37071",
-          "featureCount": 6816,
+          "featureCount": 6815,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "No public future land use service. Envision Gaston 2050 is policy-only. High Shoals, Spencer Mountain, and Dellview have municipal boundaries and no zoning layer.",
+            "Zoning is a spatial join to PublicGIS/Zoning in the county CRS. Gastonia cogserver is a different State Plane vintage and is not the join source. Many sale amounts are zero."
           ]
         },
         {
           "name": "Iredell",
           "state": "North Carolina",
           "fips": "37097",
-          "featureCount": 10771,
+          "featureCount": 10768,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "No multi-year sale history on parcels. TaxSQL_Parcels has the last sale only. Tax/Sales_2024 is a single-year extract and is not a sale-history table.",
+            "FLU outside Mooresville is mostly a gap. Statesville Land Development Plan 2045 is PDF-only. Troutman, Harmony, Love Valley, and the Davidson Iredell tip have no public FLU FeatureServer. Horizon Plan 2030 Municipal Planning Area values are stubs and are not joined as city FLU."
           ]
         },
         {
@@ -1013,37 +1045,39 @@
           "name": "Lincoln",
           "state": "North Carolina",
           "fips": "37109",
-          "featureCount": 6543,
+          "featureCount": 6563,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "Maiden zoning and future land use are a gap on Lincoln County REST. The town is mostly in Catawba County; Lincoln publishes about one Maiden zoning polygon.",
+            "County Blueprint 2043 future land use is joined outside Lincolnton and Maiden. Lincolnton uses the city land-use layer. Parcel ZONING can be overlay-prefixed, so district polygons supply the code."
           ]
         },
         {
           "name": "Mecklenburg",
           "state": "North Carolina",
           "fips": "37119",
-          "featureCount": 21331,
+          "featureCount": 8402,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "33035 source rows collapsed to 21331 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "33567 TaxParcel_camadata rows with gisacres 5\u2013150 collapse onto 8402 parcel outlines (8277 joined to owner, tax, and sale; 8316 unique nc_pin values in that account pull). Condo and townhouse accounts that share an nc_pin are one polygon.",
+            "Outlines are Mecklenburg Tax/ParcelsViewer polygons. TaxParcel_camadata does not return geometry."
           ]
         },
         {
           "name": "Rowan",
           "state": "North Carolina",
           "fips": "37159",
-          "featureCount": 10347,
+          "featureCount": 10375,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "No countywide future land use service. Salisbury FLUM and Kannapolis Character Areas are joined. Other towns and unincorporated Rowan have no public FLU layer.",
+            "Zoning is split by municipality on Alll_Zoning. Cleveland is on that service (Municipal_Zoning omits it). No separate assessed-versus-taxable field beyond total value."
           ]
         },
         {
@@ -1062,12 +1096,13 @@
           "name": "Union",
           "state": "North Carolina",
           "fips": "37179",
-          "featureCount": 13051,
+          "featureCount": 13025,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "No countywide future land use service. Secrest Short Cut and employment-center scraps are not joined as county FLU.",
+            "FMV_LAND and FMV_IMPRV are zero on OperationalLayers parcels; tax totals only. Hemby Bridge has no zoning layer. Mint Hill in Union is negligible and is not joined."
           ]
         },
         {
@@ -1086,7 +1121,7 @@
     },
     "Raleigh-Durham": {
       "tier": "primary",
-      "parcelCount": 153279,
+      "parcelCount": 151530,
       "completeCountyCount": 17,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
@@ -1120,12 +1155,13 @@
           "name": "Durham",
           "state": "North Carolina",
           "fips": "37063",
-          "featureCount": 4934,
+          "featureCount": 4940,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "Primary id is REID. PIN is unstable (Durham Tax Office) and is not used as parcelId. NC OneMap parno tracks PIN.",
+            "Durham City and unincorporated Durham County share the joint City\u2013County UDO (Planning/MapServer/12) and Place Type future land use (Planning/MapServer/25). A non-null Durham ZONING attribute is kept; null attributes are filled by a centroid spatial join."
           ]
         },
         {
@@ -1204,13 +1240,13 @@
           "name": "Orange",
           "state": "North Carolina",
           "fips": "37135",
-          "featureCount": 11139,
+          "featureCount": 9375,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is 0 for this county. Acres were computed from the polygon and then limited to 5.0\u2013150.0.",
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "Acreage is county GIS CALC_ACRES in the inclusive 5\u2013150 band. Deed SIZE can differ and is not the filter.",
+            "Situs is not on parcel polygons. Address points are joined by PIN from WebIdentifyServiceAnalysis/1. LRCAMA/WebCamaAddresses fills PINs that layer missed. PrimaryFlag YES is preferred."
           ]
         },
         {
@@ -1253,12 +1289,13 @@
           "name": "Wake",
           "state": "North Carolina",
           "fips": "37183",
-          "featureCount": 12427,
+          "featureCount": 12436,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "Wake 5\u2013150 acre extract: 12436 parcels; owner 12428; mailing 12428; situs 12428; sale 3423; tax value 12396; zoning 12311; future land use 6864.",
+            "No countywide future land use layer. FLU is joined only from the municipal public layers that exist."
           ]
         },
         {
@@ -1301,9 +1338,71 @@
         }
       ]
     },
+    "SWFL": {
+      "tier": "other",
+      "parcelCount": 32749,
+      "completeCountyCount": 4,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/swfl/meta.json",
+      "counties": [
+        {
+          "name": "Charlotte",
+          "state": "Florida",
+          "fips": "12015",
+          "featureCount": 4565,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "5780 source rows collapsed to 4565 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Partial SWFL county. Parcel polygons are the public Florida DOH EHWATER 5.0\u2013150.0 acre land-area extract."
+          ]
+        },
+        {
+          "name": "Collier",
+          "state": "Florida",
+          "fips": "12021",
+          "featureCount": 13889,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Collier sales are not on the ParcelJoin REST layer (Parcels Join, FeatureServer layer 42). Sale price and date are omitted. They were not filled from a paid vendor.",
+            "ParcelJoin has owner and total acres only. No situs, city, zip, zoning, or assessed value. Naples, Marco Island, and Everglades City are listed in data/swfl-municipalities.json and are not spatially joined."
+          ]
+        },
+        {
+          "name": "Lee",
+          "state": "Florida",
+          "fips": "12071",
+          "featureCount": 9992,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "10006 source rows collapsed to 9992 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Lee County public ParcelAddress on gismapserver.leegov.com. EagleView's Lee County FL Parcels service is a republish and was not used."
+          ]
+        },
+        {
+          "name": "Sarasota",
+          "state": "Florida",
+          "fips": "12115",
+          "featureCount": 4303,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "No zoning or FLU on the Florida DOH extract.",
+            "Optional SWFL county. Tiles are shared with Tampa and are not downloaded a second time."
+          ]
+        }
+      ]
+    },
     "Vero Beach": {
       "tier": "other",
-      "parcelCount": 20964,
+      "parcelCount": 23009,
       "completeCountyCount": 5,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
@@ -1313,69 +1412,72 @@
           "name": "Brevard",
           "state": "Florida",
           "fips": "12009",
-          "featureCount": 5746,
+          "featureCount": 6802,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "6989 source rows collapsed to 5746 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected Melbourne, Australia. Brevard Accela covers Brevard County, Florida (about longitude -81 to -80.4 and latitude 27.8 to 28.8), not Victoria.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         },
         {
           "name": "Indian River",
           "state": "Florida",
           "fips": "12061",
-          "featureCount": 3416,
+          "featureCount": 3779,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected Tuscaloosa IRC AGOL. A layer titled IRC whose extent is Tuscaloosa County, Alabama is not Indian River County. Parcels are the Indian River property appraiser service on gisportal.ircgov.com.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         },
         {
           "name": "Martin",
           "state": "Florida",
           "fips": "12085",
-          "featureCount": 3802,
+          "featureCount": 3790,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected a thin Martin AGOL clip as the county roll. Parcels are geoweb.martin.fl.us base_map layer 10, which covers the county, not an Indiantown-sized extract.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         },
         {
           "name": "Okeechobee",
           "state": "Florida",
           "fips": "12093",
-          "featureCount": 3176,
+          "featureCount": 3053,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected City of Ocoee (maps.ocoee.org, Orange County). These parcels are Okeechobee County, from the county planning Parcels_2022 service.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         },
         {
           "name": "St. Lucie",
           "state": "Florida",
           "fips": "12111",
-          "featureCount": 4824,
+          "featureCount": 5585,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "5361 source rows collapsed to 4824 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected Fort Pierce Zoning FeatureServer/0. That layer is Current Project Development (projects), not zoning. City zoning is FeatureServer/7.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         }
       ]
     },
     "Melbourne": {
       "tier": "other",
-      "parcelCount": 39435,
+      "parcelCount": 41026,
       "completeCountyCount": 5,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
@@ -1385,25 +1487,26 @@
           "name": "Brevard",
           "state": "Florida",
           "fips": "12009",
-          "featureCount": 5746,
+          "featureCount": 6802,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "6989 source rows collapsed to 5746 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected Melbourne, Australia. Brevard Accela covers Brevard County, Florida (about longitude -81 to -80.4 and latitude 27.8 to 28.8), not Victoria.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         },
         {
           "name": "Indian River",
           "state": "Florida",
           "fips": "12061",
-          "featureCount": 3416,
+          "featureCount": 3779,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected Tuscaloosa IRC AGOL. A layer titled IRC whose extent is Tuscaloosa County, Alabama is not Indian River County. Parcels are the Indian River property appraiser service on gisportal.ircgov.com.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         },
         {
@@ -1423,12 +1526,12 @@
           "name": "Osceola",
           "state": "Florida",
           "fips": "12097",
-          "featureCount": 5997,
+          "featureCount": 6169,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Reused the Orlando complete 5.0\u2013150.0 acre tiles. Not re-scraped."
+            "Market rows point at the Orlando tile folder. Those tiles were reseeded from Osceola public parcels."
           ]
         },
         {
@@ -1445,84 +1548,276 @@
         }
       ]
     },
+    "Jacksonville": {
+      "tier": "other",
+      "parcelCount": 26301,
+      "completeCountyCount": 5,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/jacksonville/meta.json",
+      "counties": [
+        {
+          "name": "Baker",
+          "state": "Florida",
+          "fips": "12003",
+          "featureCount": 3314,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Baker 2024_sales requires a token and was not joined.",
+            "Tax values on parcels_web2 use unlabeled cama0827 columns and were not mapped."
+          ]
+        },
+        {
+          "name": "Clay",
+          "state": "Florida",
+          "fips": "12019",
+          "featureCount": 4688,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Acreage is GISACRES from the Clay utility parcel layer, joined to county Parcel CAMA attributes on PIN.",
+            "County parcel REST has no sale price, sale date, or tax values. Green Cove Springs existing land use supplies those inside the city only."
+          ]
+        },
+        {
+          "name": "Duval",
+          "state": "Florida",
+          "fips": "12031",
+          "featureCount": 7768,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Sale price is not on CityBiz/Parcels. The property appraiser sales download is the price source and is not joined here.",
+            "CAMA_VAL is the market value when it is at least $1,000. Smaller placeholders fall back to land plus building value. Assessed and taxable value are not on this layer."
+          ]
+        },
+        {
+          "name": "Nassau",
+          "state": "Florida",
+          "fips": "12089",
+          "featureCount": 5587,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "8117 source rows collapsed to 5587 parcel ids. Repeated PINs on the tax map were kept once.",
+            "Last sale is not on MapServer/144. Yearly sales sublayers were not joined."
+          ]
+        },
+        {
+          "name": "St. Johns",
+          "state": "Florida",
+          "fips": "12109",
+          "featureCount": 4944,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "No acreage field on Hosted/Parcel. Acres are computed from WGS84 rings after a Web Mercator SHAPE__Area prefilter.",
+            "Sale price and tax values are not on the public parcel layer."
+          ]
+        }
+      ]
+    },
+    "Big Bend": {
+      "tier": "other",
+      "parcelCount": 21551,
+      "completeCountyCount": 1,
+      "sampleCountyCount": 3,
+      "gapCountyCount": 3,
+      "path": "data/fixtures/market-parcels/markets/big-bend/meta.json",
+      "counties": [
+        {
+          "name": "Dixie",
+          "state": "Florida",
+          "fips": "12029",
+          "featureCount": 0,
+          "coverage": "gap",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Gap. No county-hosted parcel polygon service for Dixie County. The property appraiser portal (https://www.qpublic.net/fl/dixie/) is qPublic/Schneider or a search page, not an open parcel GIS, and was not used as a geometry source.",
+            "Statewide FDOR cadastral, Florida DOH EHWATER, and SRWMD republished rolls exist and were not wired. No municipal zoning FeatureServer was confirmed. Eligible tracts in this county stay eligible and are not designated QOZs."
+          ]
+        },
+        {
+          "name": "Gadsden",
+          "state": "Florida",
+          "fips": "12039",
+          "featureCount": 5917,
+          "coverage": "sample",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Partial. Parcels are Apalachee RPC Gadsden_FLUM2 layer Par_071218 (a 2018 roll), not a live county host. Deed acres are a zero-padded string. Rows stored as 0 are omitted instead of guessed from the polygon.",
+            "Quincy zoning is a PDF at https://www.myquincy.net/building-planning/page/maps, not a FeatureServer. Quincy FLUM categories are joined as future land use inside those polygons and are not zoning codes. Havana zoning districts are joined from the city zoning layer. Midway, Gretna, Chattahoochee, and Greensboro publish FLUM only and are not joined. The roll's situs city is a post office and is not the zoning jurisdiction. Eligible tracts in this county stay eligible and are not designated QOZs."
+          ]
+        },
+        {
+          "name": "Jefferson",
+          "state": "Florida",
+          "fips": "12065",
+          "featureCount": 5165,
+          "coverage": "sample",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Partial. Jefferson County Property Appraiser parcels have COGO_ACRES and a parcel id. No owner or situs.",
+            "Monticello city zoning and city future land use are joined inside the city outline. Unincorporated Jefferson County has no public zoning FeatureServer. Eligible tracts in this county stay eligible and are not designated QOZs."
+          ]
+        },
+        {
+          "name": "Leon",
+          "state": "Florida",
+          "fips": "12073",
+          "featureCount": 5685,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Usable countywide 5\u2013150 acre extract from TLC_OverlayParcel_D_WM/MapServer/0 (TAXID and CALC_ACREA). Property Appraiser link is https://search.leonpa.gov/Property/Details/{TAXID}. Eligible tracts in this county stay eligible and are not designated QOZs.",
+            "Tallahassee and unincorporated Leon County are separate jurisdictions. The city-limits polygon sets Tallahassee. Zoning polygons keep City versus County. PropInfo supplies situs, future land use, and tax. AccelaXAPO supplies owner and mailing address."
+          ]
+        },
+        {
+          "name": "Madison",
+          "state": "Florida",
+          "fips": "12079",
+          "featureCount": 0,
+          "coverage": "gap",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Gap. No county-hosted parcel polygon service for Madison County. The property appraiser portal (https://madisonpa.com/) is qPublic/Schneider or a search page, not an open parcel GIS, and was not used as a geometry source.",
+            "Statewide FDOR cadastral, Florida DOH EHWATER, and SRWMD republished rolls exist and were not wired. No municipal zoning FeatureServer was confirmed. Eligible tracts in this county stay eligible and are not designated QOZs."
+          ]
+        },
+        {
+          "name": "Taylor",
+          "state": "Florida",
+          "fips": "12123",
+          "featureCount": 0,
+          "coverage": "gap",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Gap. No county-hosted parcel polygon service for Taylor County. The property appraiser portal (https://qpublic.net/fl/taylor/) is qPublic/Schneider or a search page, not an open parcel GIS, and was not used as a geometry source.",
+            "Statewide FDOR cadastral, Florida DOH EHWATER, and SRWMD republished rolls exist and were not wired. No municipal zoning FeatureServer was confirmed. Eligible tracts in this county stay eligible and are not designated QOZs."
+          ]
+        },
+        {
+          "name": "Wakulla",
+          "state": "Florida",
+          "fips": "12129",
+          "featureCount": 4784,
+          "coverage": "sample",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Partial. The county parcel layer has MAP_ACRES and PARCEL_ID only. No owner, situs, or county zoning.",
+            "County future land use is joined from the planning Future Land Use layer. Sopchoppy zoning (ZoningCat on Sopchoppy_FLUM_WFL1) is joined when the centroid falls inside it. St. Marks has no public zoning FeatureServer. Eligible tracts in this county stay eligible and are not designated QOZs."
+          ]
+        }
+      ]
+    },
     "Pensacola": {
       "tier": "other",
-      "parcelCount": 30141,
-      "completeCountyCount": 4,
+      "parcelCount": 59902,
+      "completeCountyCount": 6,
       "sampleCountyCount": 0,
-      "gapCountyCount": 1,
+      "gapCountyCount": 0,
       "path": "data/fixtures/market-parcels/markets/pensacola/meta.json",
       "counties": [
         {
           "name": "Baldwin",
           "state": "Alabama",
           "fips": "01003",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 17987,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "17989 source rows collapsed to 17987 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Municipal join: Daphne zoning 294 (key 293, spatial 1); Fairhope zoning 184 (key 177, spatial 7); Baldwin County Zoning/42 baseline 6991; Fairhope AO/MO overlay enrichment 156 parcels (overlay names are not zoning codes); Daphne FLU 668 (key 621, spatial 47); Daphne cleared county Zoning/42 on 288 parcels that only matched the city FLU layer."
+          ]
+        },
+        {
+          "name": "Bay",
+          "state": "Florida",
+          "fips": "12005",
+          "featureCount": 4861,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Joined zoning on 4768 of 4861 parcels and FLU on 4777. Owner 4861, situs 4861, sale price 4083, sale date 4363.",
+            "5667 source rows became 4861 parcel ids. 830 split pieces with a new shape were merged. 2 repeated rows with the same polygon (stacked units or duplicate ids) were collapsed to one feature. Acreage and tax values are not summed across those rows. Rows that failed the WGS84 or county-extent check were dropped."
           ]
         },
         {
           "name": "Escambia",
           "state": "Florida",
           "fips": "12033",
-          "featureCount": 9097,
+          "featureCount": 9240,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Joined zoning on 8487 of 9240 parcels and FLU on 8487. Owner 9240, situs 8879, sale price 0, sale date 0.",
+            "No lastSale price or date on Individual_Layers/parcels. SOHYEAR is not a sale date and is not stored."
           ]
         },
         {
           "name": "Okaloosa",
           "state": "Florida",
           "fips": "12091",
-          "featureCount": 5854,
+          "featureCount": 9956,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Joined zoning on 9449 of 9956 parcels and FLU on 9470. Owner 9956, situs 0, sale price 9562, sale date 9749.",
+            "Situs is a gap on internet_webgis PARCELS/17. Mailing address is stored. No separate situs fields."
           ]
         },
         {
           "name": "Santa Rosa",
           "state": "Florida",
           "fips": "12113",
-          "featureCount": 7011,
+          "featureCount": 8928,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "7967 source rows collapsed to 7011 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "No zoning or FLU on the Florida DOH extract."
+            "Joined zoning on 8901 of 8928 parcels and FLU on 8900. Owner 8834, situs 6356, sale price 0, sale date 0.",
+            "16194 source rows became 8928 parcel ids. 0 split pieces with a new shape were merged. 16865 repeated rows with the same polygon (stacked units or duplicate ids) were collapsed to one feature. Acreage and tax values are not summed across those rows. Rows that failed the WGS84 or county-extent check were dropped."
           ]
         },
         {
           "name": "Walton",
           "state": "Florida",
           "fips": "12131",
-          "featureCount": 8179,
+          "featureCount": 8930,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "9815 source rows collapsed to 8179 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "No zoning or FLU on the Florida DOH extract."
+            "Joined zoning on 8801 of 8930 parcels and FLU on 8867. Owner 8852, situs 0, sale price 0, sale date 8492.",
+            "9632 source rows became 8930 parcel ids. 756 split pieces with a new shape were merged. 18 repeated rows with the same polygon (stacked units or duplicate ids) were collapsed to one feature. Acreage and tax values are not summed across those rows. Rows that failed the WGS84 or county-extent check were dropped."
           ]
         }
       ]
     },
     "Birmingham": {
       "tier": "other",
-      "parcelCount": 15641,
-      "completeCountyCount": 1,
+      "parcelCount": 38101,
+      "completeCountyCount": 3,
       "sampleCountyCount": 0,
-      "gapCountyCount": 9,
+      "gapCountyCount": 6,
       "path": "data/fixtures/market-parcels/markets/birmingham/meta.json",
       "counties": [
         {
@@ -1582,50 +1877,40 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "68985 source rows collapsed to 15641 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "Jefferson County public parcels. Owner and situs are sparse on this layer. No zoning join."
+            "Municipal overlay: county parcel source unchanged (JCC Basemap/Parcels). Birmingham zoning 1658, Birmingham FLU 1639, Hoover 267, Homewood 38, Vestavia Hills 161 (676 blank VH_ZONING left unknown).",
+            "Gap-fill only. This Jefferson extract is the existing county service. Birmingham city GIS parcel mirrors of Shelby were not used as parcels."
           ]
         },
         {
           "name": "Shelby",
           "state": "Alabama",
           "fips": "01117",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 11994,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "12123 source rows collapsed to 11994 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Municipal join: Alabaster zoning 404 (key 403, spatial 1)."
           ]
         },
         {
           "name": "St. Clair",
           "state": "Alabama",
           "fips": "01115",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 10466,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "10469 source rows collapsed to 10466 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "St. Clair Owner Parcels (PublicParcelViewerStPln MapServer/57). Owner, deeded acres, situs, sale, and tax values come from that public layer."
           ]
         },
         {
           "name": "Talladega",
           "state": "Alabama",
           "fips": "01121",
-          "featureCount": 0,
-          "coverage": "gap",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
-          ]
-        },
-        {
-          "name": "Tuscaloosa",
-          "state": "Alabama",
-          "fips": "01125",
           "featureCount": 0,
           "coverage": "gap",
           "minAcres": 5.0,
@@ -1650,22 +1935,23 @@
     },
     "Mobile": {
       "tier": "other",
-      "parcelCount": 7189,
-      "completeCountyCount": 1,
+      "parcelCount": 42446,
+      "completeCountyCount": 3,
       "sampleCountyCount": 0,
-      "gapCountyCount": 4,
+      "gapCountyCount": 2,
       "path": "data/fixtures/market-parcels/markets/mobile/meta.json",
       "counties": [
         {
           "name": "Baldwin",
           "state": "Alabama",
           "fips": "01003",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 17987,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "17989 source rows collapsed to 17987 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Municipal join: Daphne zoning 294 (key 293, spatial 1); Fairhope zoning 184 (key 177, spatial 7); Baldwin County Zoning/42 baseline 6991; Fairhope AO/MO overlay enrichment 156 parcels (overlay names are not zoning codes); Daphne FLU 668 (key 621, spatial 47); Daphne cleared county Zoning/42 on 288 parcels that only matched the city FLU layer."
           ]
         },
         {
@@ -1696,12 +1982,13 @@
           "name": "Mobile",
           "state": "Alabama",
           "fips": "01097",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 17270,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "CaptureCAMA geometry joined on parcel number for 17050 of 17270 AGOL rows in the 5\u2013150 acre band. 220 rows had no CaptureCAMA Parcel_Num match and used AGOL geometry when a ring was returned.",
+            "Attributes (owner, tax, situs, URL_Revenue) come from AGOL Mobile_County_Facilities/FeatureServer/0, which is countywide despite the service name. The layer description dates the ownership join to 2023/06/21."
           ]
         },
         {
@@ -1720,10 +2007,10 @@
     },
     "Huntsville": {
       "tier": "other",
-      "parcelCount": 0,
-      "completeCountyCount": 0,
+      "parcelCount": 29598,
+      "completeCountyCount": 4,
       "sampleCountyCount": 0,
-      "gapCountyCount": 7,
+      "gapCountyCount": 3,
       "path": "data/fixtures/market-parcels/markets/huntsville/meta.json",
       "counties": [
         {
@@ -1754,12 +2041,13 @@
           "name": "Limestone",
           "state": "Alabama",
           "fips": "01083",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 5445,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "5728 source rows collapsed to 5445 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Limestone Remap (MapServer/1) is the countywide owner, situs, tax, and acreage source. Layer 0 is the older roll and is not used. No sale fields."
           ]
         },
         {
@@ -1779,46 +2067,49 @@
           "name": "Madison",
           "state": "Alabama",
           "fips": "01089",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 12312,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "12322 source rows collapsed to 12312 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Madison County Public ISV layer 185 is the ownership, tax, acreage, and deed source. There is no sale price field."
           ]
         },
         {
           "name": "Marshall",
           "state": "Alabama",
           "fips": "01095",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 11014,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "12207 source rows collapsed to 11014 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Marshall County parcels are web5.kcsgis.com Marshall/Public/MapServer/37 (66,601 countywide). Acreage is CalcAcres, inclusive 5\u2013150. DeededAcres is often 0 or null and is not the filter."
           ]
         },
         {
           "name": "Morgan",
           "state": "Alabama",
           "fips": "01103",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 827,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+            "1516 source rows collapsed to 827 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Morgan County parcels come from KCS VAM AL52 layer 10 (owner, situs, tax, and sale). Strings are fixed-width padded and trimmed."
           ]
         }
       ]
     },
     "Savannah": {
       "tier": "other",
-      "parcelCount": 0,
-      "completeCountyCount": 0,
+      "parcelCount": 3283,
+      "completeCountyCount": 1,
       "sampleCountyCount": 0,
-      "gapCountyCount": 8,
+      "gapCountyCount": 7,
       "path": "data/fixtures/market-parcels/markets/savannah/meta.json",
       "counties": [
         {
@@ -1861,12 +2152,13 @@
           "name": "Chatham",
           "state": "Georgia",
           "fips": "13051",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 3283,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "3296 source rows collapsed to 3283 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Zoning polygon join (OpenData CODE 01\u201309) hit 3281 of 3283 parcels (1 polygon hit had a blank ZONE). FLU join hit 1987 of 2005 Savannah/unincorporated parcels. 1278 parcels are in other municipalities with no public FLU."
           ]
         },
         {
@@ -1921,10 +2213,10 @@
     },
     "Columbia": {
       "tier": "other",
-      "parcelCount": 0,
-      "completeCountyCount": 0,
-      "sampleCountyCount": 0,
-      "gapCountyCount": 10,
+      "parcelCount": 14613,
+      "completeCountyCount": 1,
+      "sampleCountyCount": 1,
+      "gapCountyCount": 8,
       "path": "data/fixtures/market-parcels/markets/columbia/meta.json",
       "counties": [
         {
@@ -1979,12 +2271,13 @@
           "name": "Lexington",
           "state": "South Carolina",
           "fips": "45063",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 13975,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Municipal zoning is joined from public layers: West Columbia and Cayce (spatial, Lexington PlanZoning), Chapin (TMS), and City of Columbia ZoningInfo where CityLimit is Y (TMS). County PlanZoning NameAbbr fills parcels that still have no code. The parcel Zoning attribute is often blank inside municipalities.",
+            "Town of Lexington, Irmo, Batesburg-Leesville, Springdale, South Congaree, Swansea, and Gaston have no verified public municipal zoning service. Countywide future land use is not published; City of Columbia FLU is joined only when the centroid falls in that city layer. Last sale is one sale on the parcel (Valid is the source code, including NOT VALID)."
           ]
         },
         {
@@ -2015,12 +2308,13 @@
           "name": "Richland",
           "state": "South Carolina",
           "fips": "45079",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 638,
+          "coverage": "sample",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "City of Columbia only (CityLimit=Y on the Richland side of LandRecords). This is not a Richland County-wide parcel roll. Richland County has no public ArcGIS FeatureServer or MapServer for countywide parcels; GeoServer WFS is disabled and county GIS is sold under license. This pull does not use richlandmaps.com PHP parcel endpoints.",
+            "City LandRecords has no sale or tax fields. Acreage is Shape_Area in South Carolina State Plane feet divided by 43560, limited to 5.0\u2013150.0. Forest Acres, Blythewood, Arcadia Lakes, Eastover, and Irmo have no verified public municipal parcel service. Lexington-side city parcels stay on the Lexington County extract, which carries CAMA."
           ]
         },
         {
@@ -2051,10 +2345,10 @@
     },
     "Greenville": {
       "tier": "other",
-      "parcelCount": 1570,
-      "completeCountyCount": 0,
-      "sampleCountyCount": 1,
-      "gapCountyCount": 7,
+      "parcelCount": 31164,
+      "completeCountyCount": 2,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 6,
       "path": "data/fixtures/market-parcels/markets/greenville/meta.json",
       "counties": [
         {
@@ -2085,12 +2379,13 @@
           "name": "Greenville",
           "state": "South Carolina",
           "fips": "45045",
-          "featureCount": 1570,
-          "coverage": "sample",
+          "featureCount": 14959,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Published by City of Greenville GIS. The 5\u2013150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll."
+            "Zoning joined for 14959 of 14959 parcels (gcgia-zoning-13 14248, greenville-city-regulation-7 455, greer-udo 256).",
+            "Countywide GCGIA Tax Parcel (FeatureServer/10), PIN, TACRES 5\u2013150. Owner, mailing, situs (STRNUM+LOCATE), last deed sale, and tax amounts are on the polygon. Zoning is not."
           ]
         },
         {
@@ -2145,19 +2440,20 @@
           "name": "Spartanburg",
           "state": "South Carolina",
           "fips": "45083",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 16205,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Zoning joined for 609 of 16205 parcels (greer-udo 219, inman-zoning 25, lyman-tol-layer 91, none 15596, spartanburg-parcel-info 10, spartanburg-zoning-2026 258, wellford-zoning 6).",
+            "Spartanburg County EnerGov zoning (Display_Map/12) is three coarse districts and was not copied onto parcels."
           ]
         }
       ]
     },
     "Chattanooga": {
       "tier": "other",
-      "parcelCount": 10537,
+      "parcelCount": 14591,
       "completeCountyCount": 2,
       "sampleCountyCount": 0,
       "gapCountyCount": 8,
@@ -2203,12 +2499,13 @@
           "name": "Hamilton",
           "state": "Tennessee",
           "fips": "47065",
-          "featureCount": 5108,
+          "featureCount": 9162,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Zoning joined on 9043 of 9162 parcels. Plan Hamilton place type joined on 6262 unincorporated parcels. City counts: Chattanooga 1752, Collegedale 215, East Ridge 76, Lakesite 26, Lookout Mountain 5, Red Bank 64, Ridgeside 1, Signal Mountain 75, Soddy Daisy 472, Unincorporated Hamilton 6391, Walden 85.",
+            "Hamilton County is not an IMPACT county. Parcels are Hamilton County Live_Parcels MapServer layer 0 filtered on CALCACRES 5\u2013150, not Comptroller IMPACT."
           ]
         },
         {
@@ -2291,7 +2588,7 @@
     },
     "Knoxville": {
       "tier": "other",
-      "parcelCount": 38433,
+      "parcelCount": 39939,
       "completeCountyCount": 7,
       "sampleCountyCount": 0,
       "gapCountyCount": 6,
@@ -2313,12 +2610,13 @@
           "name": "Blount",
           "state": "Tennessee",
           "fips": "47009",
-          "featureCount": 6102,
+          "featureCount": 8183,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "8193 source rows collapsed to 8183 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Blount County TN (FIPS 47009) is an IMPACT/TPAD county. Comptroller JUR is 005 and COUNTY_ID is 5, not the FIPS suffix. Parcels are the public AGOL BlountParcels layer (PARCEL_TYP=1, CALC_ACRE 5\u2013150) with owner, mailing, situs, sale, and appraisal. The geometry-only statewide IMPACT Parcels layer is not the attribute source. Token-gated ParcelPublishing (499) and the county GIS premium extract are not used. Blount County, Alabama (kcsgis Blount/Public) is the wrong state and is not used."
           ]
         },
         {
@@ -2386,12 +2684,13 @@
           "name": "Knox",
           "state": "Tennessee",
           "fips": "47093",
-          "featureCount": 5144,
+          "featureCount": 4569,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "City of Knoxville future land use (PRLU) and the One Year Plan are not available to anonymous query. FLU stays null inside the city.",
+            "Town of Farragut has no public future-land-use FeatureServer. FLU stays null in Farragut."
           ]
         },
         {
@@ -2463,10 +2762,10 @@
     },
     "Memphis": {
       "tier": "other",
-      "parcelCount": 35611,
-      "completeCountyCount": 7,
+      "parcelCount": 45278,
+      "completeCountyCount": 8,
       "sampleCountyCount": 0,
-      "gapCountyCount": 4,
+      "gapCountyCount": 3,
       "path": "data/fixtures/market-parcels/markets/memphis/meta.json",
       "counties": [
         {
@@ -2559,13 +2858,13 @@
           "name": "Shelby",
           "state": "Tennessee",
           "fips": "47157",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 9667,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Shelby County is not an IMPACT county. The Comptroller IMPACT parcel service is not used. Public CurrentParcels has no land, building, or total appraised or assessed value fields, so tax values stay null.",
+            "No native acreage field. Stored acres are the absolute area of the returned WGS84 rings in a local equirectangular projection (111320*cos(latitude) meters per degree of longitude and 110540 meters per degree of latitude), divided by 4046.8564224. Shape.STArea() is only a widened Web Mercator prefilter (15000 to 1400000), not the stored acreage. The inclusive 5.0\u2013150.0 acre band is applied after that derivation."
           ]
         },
         {
@@ -2607,9 +2906,32 @@
         }
       ]
     },
+    "Jackson": {
+      "tier": "other",
+      "parcelCount": 6384,
+      "completeCountyCount": 1,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/jackson/meta.json",
+      "counties": [
+        {
+          "name": "Madison",
+          "state": "Tennessee",
+          "fips": "47113",
+          "featureCount": 6384,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Joined 6384 parcels. Owner 6351, situs 6351, sale 2878, appraisal 6333. Jackson zoning 848 / FLU 848 (MF 44). Three Way zoning 73 / FLU 73. Medon parcels 7 (county zoning hits 6, FLU 0). Unincorporated zoning 5454. CAMA miss 33.",
+            "Anonymous production pull is GeoJobe AGOL Cadastral/45 Parcels_57 joined to table/46 Cama MadisonTN on GISLINK. Comptroller IMPACT Parcels (COUNTY_ID=57 / JUR=057) is the official sibling and can 403, so it is not the fetch path."
+          ]
+        }
+      ]
+    },
     "Winston-Salem": {
       "tier": "other",
-      "parcelCount": 91784,
+      "parcelCount": 92188,
       "completeCountyCount": 9,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
@@ -2619,36 +2941,39 @@
           "name": "Davidson",
           "state": "North Carolina",
           "fips": "37057",
-          "featureCount": 11685,
+          "featureCount": 12063,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "12102 source rows collapsed to 12063 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Davidson County, North Carolina (FIPS 37057), not Davidson County, Tennessee. Acreage is legal acres on OpenGov TaxParcels where LegalLandType is AC and LegalLandUnits is 5 through 150."
           ]
         },
         {
           "name": "Davie",
           "state": "North Carolina",
           "fips": "37059",
-          "featureCount": 5721,
+          "featureCount": 5728,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "5786 source rows collapsed to 5728 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Davie County GIS tax parcels (public WebTemplate2026 layer 26). TOTAL_ACRES is the county GIS acreage \u2014 it matched NC OneMap gisacres on checked pins \u2014 not the deed figure written in LegalDescription. The extract is 5.0\u2013150.0 acres inclusive."
           ]
         },
         {
           "name": "Forsyth",
           "state": "North Carolina",
           "fips": "37067",
-          "featureCount": 8134,
+          "featureCount": 8135,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "MapForsyth Parcels_Hosted TOTALVALUE is a string assessed total with no land/building split. NC OneMap cntyfips 067 landval and improvval fill that split when the PIN matches. OneMap parval is not stored as a market value.",
+            "LASTQUALIFIEDSALEPRICE is 0 on most 5\u2013150 acre parcels. A qualified SalesApp transfer (XFER_QUALCODE Q, positive price, latest date) fills the sale. Disqualified (DQ) transfers are not used. CURRENTDEEDDATE is a deed date when no qualified sale is found."
           ]
         },
         {
@@ -2691,12 +3016,13 @@
           "name": "Stokes",
           "state": "North Carolina",
           "fips": "37169",
-          "featureCount": 8826,
+          "featureCount": 8844,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "OZ 2.0 eligibility is not a designated QOZ. Rev. Proc. 2026-14 tracts 37169070101, 37169070302 stay on oz2Eligibility as eligible-for-nomination. Designated status is only the HUD 2010 join (37169070501). 1596 centroids are eligible; 285 are in a current designated tract; 0 sit in both geographies with different GEOIDs.",
+            "Stored acreage is Stokes CALCULATED_ACREAGE (GIS), the same figure NC OneMap publishes as gisacres. DEEDED_ACREAGE in the numeric 5\u2013150 band is 9,026 and is not the filter. County query returned 8,865 rows; 8,844 unique PINs were kept. The other 21 rows were duplicate PINs or failed the ring or centroid check."
           ]
         },
         {
@@ -2727,7 +3053,7 @@
     },
     "Wilmington": {
       "tier": "other",
-      "parcelCount": 46720,
+      "parcelCount": 47320,
       "completeCountyCount": 6,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
@@ -2737,12 +3063,13 @@
           "name": "Brunswick",
           "state": "North Carolina",
           "fips": "37019",
-          "featureCount": 7020,
+          "featureCount": 7533,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "Sale price is not published on Brunswick SeamlessParcels or NC OneMap. lastSale.date is DeedDate only; lastSale.price and qualified are null.",
+            "OZ 2.0 eligible tracts (Rev. Proc. 2026-14) are not designated QOZs. opportunityZone is only the HUD 2010 designated polygon join."
           ]
         },
         {
@@ -2774,12 +3101,13 @@
           "name": "New Hanover",
           "state": "North Carolina",
           "fips": "37129",
-          "featureCount": 2256,
+          "featureCount": 2263,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "Geometry is New Hanover Parcels/FeatureServer/0 where ACRES is 5.0\u2013150.0. NC OneMap cntyfips='129' is the fallback if that layer fails.",
+            "IASTAX/1 is joined on MAPIDKEY. APRTOT is the appraised total, not tax.marketValue, a taxable value, or a tax bill. SALE_PRICE of 0 is missing. There is no qualified-sale flag and no multi-year sale history."
           ]
         },
         {
@@ -2798,12 +3126,345 @@
           "name": "Pender",
           "state": "North Carolina",
           "fips": "37141",
-          "featureCount": 7275,
+          "featureCount": 7355,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+            "Town of Atkinson has no public zoning layer. LayersPro municipal zoning is Burgaw (39), St. Helena (40), Surf City (41), Topsail Beach (42), and Watha (43). County UDO is not applied inside Atkinson corporate limits. 25 parcels in the 5\u2013150 acre extract have a centroid in the Atkinson corporate limit and are left unzoned.",
+            "Rev. Proc. 2026-14 eligibility is not a 2027 QOZ designation. Centroids in pack tracts 37141920204 and 37141920403 (1376 parcels) are stored as eligible-for-nomination only. opportunityZone is not set from that list. Notice 2025-50 rural designated tracts 37141920601 and 37141920602 are current designated QOZs and are not copied onto oz2Eligibility."
+          ]
+        }
+      ]
+    },
+    "Heartland": {
+      "tier": "shelf",
+      "parcelCount": 21163,
+      "completeCountyCount": 4,
+      "sampleCountyCount": 1,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/heartland/meta.json",
+      "counties": [
+        {
+          "name": "DeSoto",
+          "state": "Florida",
+          "fips": "12027",
+          "featureCount": 4677,
+          "coverage": "partial",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Parcels are SWFWMD parcel_search DeSoto (CNTYFIPS 027). ACRES is empty; AREANO is the acreage. This is not DeSoto County, Kansas, and not DeSoto County, Mississippi (28033).",
+            "Arcadia zoning and future land use are attribute-joined on PARCEL_ID inside the city only."
+          ]
+        },
+        {
+          "name": "Glades",
+          "state": "Florida",
+          "fips": "12043",
+          "featureCount": 2256,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Parcels are AGOL glades_parcels_2026_06_01. Acreage is the acreage field.",
+            "Zoning (GladesCounty_Zoning_03192026 layer 4) and FLU (GladesCounty_FLU_03192026) are spatial. Neither layer has a parcel id."
+          ]
+        },
+        {
+          "name": "Hardee",
+          "state": "Florida",
+          "fips": "12049",
+          "featureCount": 5303,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Parcels are InfoMap Owner Parcels (TOTACRES). SWFWMD parcel_search was not needed.",
+            "County zoning and future land use are a spatial intersect (no parcel id on those layers)."
+          ]
+        },
+        {
+          "name": "Hendry",
+          "state": "Florida",
+          "fips": "12051",
+          "featureCount": 3070,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Parcels are Parcels_Feb2024 (February 2024 vintage), not a later Hendry roll. Acreage is MAP_ACRES.",
+            "County zoning is an attribute join on PIN / PARCELNO. Current_Zo values LABELLE and CLEWISTON are city names, not districts, and stay blank."
+          ]
+        },
+        {
+          "name": "Highlands",
+          "state": "Florida",
+          "fips": "12055",
+          "featureCount": 5857,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Acreage is PAO Calculated_Acres, 5.0\u2013150.0 inclusive. The root Parcels FeatureServer was not used (it is token-gated, not the public PAO layer).",
+            "County Zoning.ZON and FLUM.FLUM are attribute-joined on PARCELNO = STRAP_NUM. STRAP is not the zoning key."
+          ]
+        }
+      ]
+    },
+    "North-Central Florida": {
+      "tier": "other",
+      "parcelCount": 52695,
+      "completeCountyCount": 7,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/north-central-florida/meta.json",
+      "counties": [
+        {
+          "name": "Alachua",
+          "state": "Florida",
+          "fips": "12001",
+          "featureCount": 15539,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Jurisdiction is JurisNo on Parcels35, not the situs or mailing city. Gainesville postal addresses outside the city stay Unincorporated Alachua County.",
+            "Zoning and FLU are stored only when ZONECODE/FluCode starts with the jurisdiction prefix (0100 county, 0103 Gainesville, and the same pattern for the other cities). A mismatched county code on a city parcel is left blank."
+          ]
+        },
+        {
+          "name": "Bradford",
+          "state": "Florida",
+          "fips": "12007",
+          "featureCount": 593,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "598 source rows collapsed to 593 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Partial. Bradford parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
+          ]
+        },
+        {
+          "name": "Citrus",
+          "state": "Florida",
+          "fips": "12017",
+          "featureCount": 5807,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Parcel polygons, owner, situs, and tax values are Florida DOH EHWATER layer 8. Citrus County lots have no acre or owner field, and lot PRCLKEY is empty, so zoning is a centroid join.",
+            "Municipality is the corporate-limit layer (Inverness or Crystal River). PHY_CITY is the postal city and is not the city limit."
+          ]
+        },
+        {
+          "name": "Gilchrist",
+          "state": "Florida",
+          "fips": "12041",
+          "featureCount": 6395,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "6854 source rows collapsed to 6395 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Partial. Gilchrist parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
+          ]
+        },
+        {
+          "name": "Hernando",
+          "state": "Florida",
+          "fips": "12053",
+          "featureCount": 6601,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Upgrade off Florida DOH. Parcels, owner, situs, and values are Hernando County Parcels (gis.V_PARCELS).",
+            "Municipality is CER_JURISDICTION: B is Brooksville and C is unincorporated. Situs city Brooksville, Spring Hill, or Weeki Wachee is not the city limit."
+          ]
+        },
+        {
+          "name": "Levy",
+          "state": "Florida",
+          "fips": "12075",
+          "featureCount": 10200,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "10984 source rows collapsed to 10200 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Partial. Levy parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
+          ]
+        },
+        {
+          "name": "Putnam",
+          "state": "Florida",
+          "fips": "12107",
+          "featureCount": 7560,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Optional Putnam pull. Parcel polygons and tax attributes are Florida DOH EHWATER layer 53.",
+            "The property-appraiser COMMUNITY field is Unincorporated on essentially every row, so it is not used as a municipality."
+          ]
+        }
+      ]
+    },
+    "Asheville": {
+      "tier": "other",
+      "parcelCount": 16793,
+      "completeCountyCount": 2,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/asheville/meta.json",
+      "counties": [
+        {
+          "name": "Buncombe",
+          "state": "North Carolina",
+          "fips": "37021",
+          "featureCount": 10523,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Biltmore Forest zoning is PDF-only (biltmoreforest.org planning maps). City CBF parcels stay blank. County zoning is not applied inside the town.",
+            "SalePrice was non-zero on 3796 parcels and kept on 310. A price is kept only when it is within 25% of excise stamps divided by 0.002, or when stamps are 0, the price is at least $25,000, and it sits between 20% of land value and 4\u00d7 total market value. Other SalePrice values are null. DeedDate is still stored. Prices are not reconstructed from stamps."
+          ]
+        },
+        {
+          "name": "Henderson",
+          "state": "North Carolina",
+          "fips": "37089",
+          "featureCount": 6270,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "6272 source rows kept 6270 parcel ids. 2 duplicate PINs collapsed to the larger part.",
+            "Parcel Zoning_aggregated is often the stub Cities inside municipalities and is not used as zoning."
+          ]
+        }
+      ]
+    },
+    "Tuscaloosa": {
+      "tier": "other",
+      "parcelCount": 11596,
+      "completeCountyCount": 1,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 3,
+      "path": "data/fixtures/market-parcels/markets/tuscaloosa/meta.json",
+      "counties": [
+        {
+          "name": "Greene",
+          "state": "Alabama",
+          "fips": "01063",
+          "featureCount": 0,
+          "coverage": "gap",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Greene County has Flagship/CaptureCAMA HTML only. No usable public parcel REST in this pull. Polygons were not invented."
+          ]
+        },
+        {
+          "name": "Hale",
+          "state": "Alabama",
+          "fips": "01065",
+          "featureCount": 0,
+          "coverage": "gap",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Hale County has Flagship/CaptureCAMA HTML only. No usable public parcel REST in this pull. Polygons were not invented."
+          ]
+        },
+        {
+          "name": "Pickens",
+          "state": "Alabama",
+          "fips": "01107",
+          "featureCount": 0,
+          "coverage": "gap",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Pickens County has Flagship/CaptureCAMA HTML only. No usable public parcel REST in this pull. Polygons were not invented."
+          ]
+        },
+        {
+          "name": "Tuscaloosa",
+          "state": "Alabama",
+          "fips": "01125",
+          "featureCount": 11596,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "11646 source rows collapsed to 11596 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "No sale price on the public parcel layer. lastSale.price stays null."
+          ]
+        }
+      ]
+    },
+    "Montgomery": {
+      "tier": "other",
+      "parcelCount": 26759,
+      "completeCountyCount": 3,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 1,
+      "path": "data/fixtures/market-parcels/markets/montgomery/meta.json",
+      "counties": [
+        {
+          "name": "Autauga",
+          "state": "Alabama",
+          "fips": "01001",
+          "featureCount": 7047,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "7530 source rows collapsed to 7047 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "No sale price on the public parcel layer. lastSale.price stays null."
+          ]
+        },
+        {
+          "name": "Elmore",
+          "state": "Alabama",
+          "fips": "01051",
+          "featureCount": 9758,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "14848 source rows collapsed to 9758 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "No sale price on the public parcel layer. lastSale.price stays null."
+          ]
+        },
+        {
+          "name": "Lowndes",
+          "state": "Alabama",
+          "fips": "01085",
+          "featureCount": 0,
+          "coverage": "gap",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Lowndes County is in the Montgomery, AL MSA. No public parcel card was verified in this pull. Polygons were not invented."
+          ]
+        },
+        {
+          "name": "Montgomery",
+          "state": "Alabama",
+          "fips": "01101",
+          "featureCount": 9954,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "10026 source rows collapsed to 9954 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "No sale price on the public parcel layer. lastSale.price stays null."
           ]
         }
       ]

@@ -5,19 +5,28 @@
   "markets": [
     "Huntsville"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 5445,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "al-limestone-remap-1",
+  "queryUrl": "https://gis.limestonecounty-al.gov/arcgis/rest/services/Limestone_Parcels/MapServer/1/query",
   "gaps": [
-    "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+    "5728 source rows collapsed to 5445 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "Limestone Remap (MapServer/1) is the countywide owner, situs, tax, and acreage source. Layer 0 is the older roll and is not used. No sale fields.",
+    "Owner and address strings are fixed-width padded and trimmed before display.",
+    "Huntsville and City of Madison zoning are joined by centroid where those cities cross into Limestone. There is no county zoning layer.",
+    "City zoning is a centroid join: 343 parcels in Huntsville ZoningDistricts/5 and 77 in the City of Madison DV_PlanningPro1 union (layers 57+58+59+73). Huntsville and City of Madison both span Madison County and Limestone County. maps.madisonal.gov Layers/MapServer returns 404 and is not used."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/01083/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01083/lookup.json",
+  "sourceCount": 5728,
+  "dropped": 67,
+  "tileCount": 3,
+  "zoningJoinedCount": 420,
+  "zoningByCity": {
+    "Huntsville": 343,
+    "City of Madison": 77
+  }
 }

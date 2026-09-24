@@ -5,19 +5,21 @@
   "markets": [
     "Charlotte"
   ],
-  "featureCount": 6816,
+  "featureCount": 6815,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "nc-onemap-37071",
-  "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+  "source": "nc-gaston-publicgis-37071",
+  "queryUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Parcels/MapServer/11/query",
   "gaps": [
-    "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+    "No public future land use service. Envision Gaston 2050 is policy-only. High Shoals, Spencer Mountain, and Dellview have municipal boundaries and no zoning layer.",
+    "Zoning is a spatial join to PublicGIS/Zoning in the county CRS. Gastonia cogserver is a different State Plane vintage and is not the join source. Many sale amounts are zero.",
+    "Zoning joined on 6745 of 6815 parcels in the 5\u2013150 acre band."
   ],
   "path": "data/fixtures/market-parcels/counties/37071/tiles",
   "lookup": "data/fixtures/market-parcels/counties/37071/lookup.json",
-  "sourceCount": 6819,
-  "dropped": 0,
+  "sourceCount": 6818,
+  "dropped": 3,
   "tileCount": 5
 }

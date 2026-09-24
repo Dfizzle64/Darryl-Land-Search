@@ -5,20 +5,70 @@
   "markets": [
     "Vero Beach"
   ],
-  "featureCount": 4824,
+  "featureCount": 5585,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-doh-ehwaters-12111",
-  "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/55/query",
+  "source": "fl-slc-parcels-12111",
+  "queryUrl": "https://slcgis.stlucieco.gov/hosting/rest/services/Parcel_Boundaries/MapServer/0/query",
   "gaps": [
-    "5361 source rows collapsed to 4824 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-    "No zoning or FLU on the Florida DOH extract."
+    "Rejected Fort Pierce Zoning FeatureServer/0. That layer is Current Project Development (projects), not zoning. City zoning is FeatureServer/7.",
+    "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
+    "St. Lucie Village is on the municipal boundary layer and has no public zoning or FLU service. Those parcels are not given county districts.",
+    "Fort Pierce and Port St. Lucie zoning are the city layers. County zoning is unincorporated only.",
+    "The parcel service has no sale date or price. TotalAppraisedValue is stored as tax.marketValue. Assessed, taxable, and a separate tax amount are not on this layer.",
+    "Confidential owner flags blank the owner name. No phone or email is copied."
   ],
   "path": "data/fixtures/market-parcels/counties/12111/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12111/lookup.json",
-  "sourceCount": 5361,
+  "sourceCount": 5585,
   "dropped": 0,
-  "tileCount": 7
+  "tileCount": 7,
+  "municipalities": [
+    {
+      "name": "Fort Pierce",
+      "independentGis": true,
+      "zoningUrl": "https://services1.arcgis.com/oDRzuf2MGmdEHAbQ/arcgis/rest/services/Zoning/FeatureServer/7",
+      "fluUrl": "https://services1.arcgis.com/oDRzuf2MGmdEHAbQ/arcgis/rest/services/FutureLandUse/FeatureServer/0",
+      "fluGap": null,
+      "join": "spatial",
+      "zoningJoined": 397,
+      "fluJoined": 397,
+      "note": null
+    },
+    {
+      "name": "Port St. Lucie",
+      "independentGis": true,
+      "zoningUrl": "https://services1.arcgis.com/YdUP5V6WwzeG8T8r/arcgis/rest/services/Zoning/FeatureServer/1",
+      "fluUrl": "https://services1.arcgis.com/YdUP5V6WwzeG8T8r/arcgis/rest/services/LandUse/FeatureServer/0",
+      "fluGap": null,
+      "join": "spatial",
+      "zoningJoined": 1439,
+      "fluJoined": 1442,
+      "note": null
+    },
+    {
+      "name": "St. Lucie Village",
+      "independentGis": false,
+      "zoningUrl": null,
+      "fluUrl": null,
+      "fluGap": null,
+      "join": null,
+      "zoningJoined": 0,
+      "fluJoined": 0,
+      "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+    }
+  ],
+  "unincorporated": {
+    "zoningUrl": "https://slcgis.stlucieco.gov/hosting/rest/services/LandUse/Zoning/MapServer/0",
+    "fluUrl": "https://slcgis.stlucieco.gov/hosting/rest/services/LandUse/FutureLandUse/MapServer/0",
+    "zoningFeatures": 3809,
+    "fluFeatures": 3791,
+    "zoningJoined": 3484,
+    "fluJoined": 3560,
+    "note": "County zoning and FLU are the parcel-level MapServer, limited to the 5\u2013150 acre band. The dissolved AGOL ZoningDistrictsCombined layer is not the zoning source."
+  },
+  "zoningJoinedCount": 5320,
+  "fluJoinedCount": 5399
 }

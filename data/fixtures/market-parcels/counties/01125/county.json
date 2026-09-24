@@ -3,21 +3,42 @@
   "fips": "01125",
   "state": "Alabama",
   "markets": [
-    "Birmingham"
+    "Tuscaloosa"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 11596,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "al-tuscaloosa-parcels",
+  "queryUrl": "https://services.arcgis.com/AWzSDaKZ41uuVges/ArcGIS/rest/services/Parcels/FeatureServer/0/query",
   "gaps": [
-    "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+    "11646 source rows collapsed to 11596 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "No sale price on the public parcel layer. lastSale.price stays null.",
+    "Acreage filter uses rtMAP_ACRE. rtDEED_ACR is often 0 and is not the filter.",
+    "deedDATE is stored as lastSale.date when present. There is no sale price field.",
+    "City of Tuscaloosa zoning is Zoning_Districts/3. Framework_Zoning_Map is a draft and was not joined.",
+    "Northport zoning is NorthportZoning_Dec2024, joined on pclNUM digits to Name/pclnum, then by centroid.",
+    "Northport future land use is FLU_240408, joined by centroid.",
+    "Hale, Pickens, and Greene counties are Flagship/CaptureCAMA HTML only in this pull. No usable public parcel REST. Polygons were not invented. Bibb County stays a Birmingham parcel gap for the same reason."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/01125/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01125/lookup.json",
+  "sourceCount": 11646,
+  "dropped": 11,
+  "tileCount": 11,
+  "join": {
+    "featureCount": 11596,
+    "zoningJoined": 1046,
+    "zoningRate": 0.0902,
+    "byJurisdiction": {
+      "City of Tuscaloosa": 805,
+      "Northport": 241
+    },
+    "fluJoined": 703,
+    "fluRate": 0.0606,
+    "prattvilleJoined": 0,
+    "salePriceNonNull": 0,
+    "saleDateNonNull": 10996
+  }
 }

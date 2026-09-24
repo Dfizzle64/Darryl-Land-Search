@@ -5,20 +5,53 @@
   "markets": [
     "Tampa"
   ],
-  "featureCount": 13351,
+  "featureCount": 13838,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-doh-ehwaters-12057",
-  "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/27/query",
+  "source": "fl-hillsborough-parcelpublishing-12",
+  "queryUrl": "https://maps.hillsboroughcounty.org/arcgis1a/rest/services/SDEMapServices/ParcelPublishing/FeatureServer/12/query",
   "gaps": [
-    "15626 source rows collapsed to 13351 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-    "No zoning or FLU on the Florida DOH extract."
+    "Hillsborough sale flag VI is vacant/improved, not an FDOR qualified (Q/U) sale.",
+    "Unincorporated zoning is RegulatoryZoning/8. Tampa, Temple Terrace, and Plant City zoning are city layers joined onto county parcels.",
+    "Temple Terrace zoning joins on FOLIO. Tampa and Plant City zoning are spatial. Future land use is Planning/4 filtered by JURISDICTION.",
+    "MUNI letters were verified from the PIN prefix: A is Tampa, T is Temple Terrace, P is Plant City, U is unincorporated."
   ],
   "path": "data/fixtures/market-parcels/counties/12057/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12057/lookup.json",
-  "sourceCount": 15626,
+  "sourceCount": 13838,
   "dropped": 0,
-  "tileCount": 9
+  "tileCount": 10,
+  "zoningJoinedCount": 13786,
+  "fluJoinedCount": 13785,
+  "municipalityCounts": {
+    "Unincorporated Hillsborough": 12024,
+    "Tampa": 1199,
+    "Plant City": 507,
+    "Temple Terrace": 108
+  },
+  "overlays": [
+    {
+      "role": "county-zoning",
+      "url": "https://maps.hillsboroughcounty.org/arcgis1a/rest/services/SDEMapServices/RegulatoryZoning/FeatureServer/8"
+    },
+    {
+      "role": "flu",
+      "url": "https://maps.hillsboroughcounty.org/arcgis1a/rest/services/SDEMapServices/Planning/FeatureServer/4"
+    },
+    {
+      "role": "tampa-zoning",
+      "url": "https://arcgis.tampagov.net/arcgis/rest/services/OpenData/Planning/MapServer/28"
+    },
+    {
+      "role": "temple-terrace-zoning",
+      "url": "https://gis.tpcmaps.org/arcgis/rest/services/Rezoning/Zoning/MapServer/0"
+    },
+    {
+      "role": "plant-city-zoning",
+      "url": "https://gis.tpcmaps.org/arcgis/rest/services/Rezoning/Zoning/MapServer/2"
+    }
+  ],
+  "rejected": []
 }

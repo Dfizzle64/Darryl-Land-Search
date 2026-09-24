@@ -5,19 +5,21 @@
   "markets": [
     "Knoxville"
   ],
-  "featureCount": 5144,
+  "featureCount": 4569,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "tn-impact-47093",
-  "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+  "source": "kgis-parcel-search",
+  "queryUrl": "https://www.kgis.org/gisportal/sharing/servers/871856067a1243bd899774b2072381c5/rest/services/Parcel_Search_Layer/MapServer/0/query",
   "gaps": [
-    "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+    "City of Knoxville future land use (PRLU) and the One Year Plan are not available to anonymous query. FLU stays null inside the city.",
+    "Town of Farragut has no public future-land-use FeatureServer. FLU stays null in Farragut.",
+    "Direct www.kgis.org/arcgis GlobalSearch and Property MapServers still return HTTP 401. This extract uses the public Parcel_Search_Layer portal proxy. Comptroller IMPACT is not used."
   ],
   "path": "data/fixtures/market-parcels/counties/47093/tiles",
   "lookup": "data/fixtures/market-parcels/counties/47093/lookup.json",
-  "sourceCount": 5294,
-  "dropped": 123,
-  "tileCount": 5
+  "sourceCount": 4569,
+  "dropped": 0,
+  "tileCount": 7
 }

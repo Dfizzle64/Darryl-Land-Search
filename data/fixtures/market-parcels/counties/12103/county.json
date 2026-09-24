@@ -5,19 +5,80 @@
   "markets": [
     "Tampa"
   ],
-  "featureCount": 18638,
+  "featureCount": 42230,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-doh-ehwaters-12103",
-  "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/51/query",
+  "source": "fl-pinellas-publicwebgis-1",
+  "queryUrl": "https://egis.pinellas.gov/gis/rest/services/PublicWebGIS/Parcels/MapServer/1/query",
   "gaps": [
-    "No zoning or FLU on the Florida DOH extract."
+    "Pinellas public parcels have taxable, land, and improvement values but no just/market value.",
+    "Unincorporated zoning and FLU are PublicWebGIS Landuse_Zoning and are not applied inside cities.",
+    "St. Petersburg and Clearwater have city zoning and FLU. Largo has FLU only. Other Pinellas municipalities have no verified zoning/FLU layer."
   ],
   "path": "data/fixtures/market-parcels/counties/12103/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12103/lookup.json",
-  "sourceCount": 18639,
+  "sourceCount": 42236,
   "dropped": 0,
-  "tileCount": 6
+  "tileCount": 6,
+  "zoningJoinedCount": 18812,
+  "fluJoinedCount": 25989,
+  "municipalityCounts": {
+    "St. Petersburg": 10452,
+    "Largo": 7938,
+    "Clearwater": 7312,
+    "Unincorporated Pinellas": 5191,
+    "Seminole": 2171,
+    "Pinellas Park": 1746,
+    "Dunedin": 1654,
+    "Tarpon Springs": 1625,
+    "Oldsmar": 1085,
+    "Unknown": 676,
+    "South Pasadena": 467,
+    "Belleair": 304,
+    "Treasure Island": 293,
+    "Madeira Beach": 292,
+    "North Redington Beach": 264,
+    "St. Pete Beach": 209,
+    "Indian Shores": 167,
+    "Gulfport": 164,
+    "Safety Harbor": 111,
+    "Indian Rocks Beach": 102,
+    "Kenneth City": 6,
+    "Belleair Bluffs": 1
+  },
+  "overlays": [
+    {
+      "role": "uninc-zoning",
+      "url": "https://egis.pinellas.gov/gis/rest/services/PublicWebGIS/Landuse_Zoning/MapServer/1"
+    },
+    {
+      "role": "uninc-flu",
+      "url": "https://egis.pinellas.gov/gis/rest/services/PublicWebGIS/Landuse_Zoning/MapServer/0"
+    },
+    {
+      "role": "st-petersburg-zoning",
+      "url": "https://egis.stpete.org/arcgis/rest/services/ServicesDOTS/Zoning/MapServer/0"
+    },
+    {
+      "role": "st-petersburg-flu",
+      "url": "https://egis.stpete.org/arcgis/rest/services/ServicesDOTS/Zoning/MapServer/2"
+    },
+    {
+      "role": "clearwater-zoning",
+      "url": "https://gis.myclearwater.com/arcgis/rest/services/ArcGISMapServices/Zoning_WGS84/MapServer/1"
+    },
+    {
+      "role": "clearwater-flu",
+      "url": "https://gis.myclearwater.com/arcgis/rest/services/ArcGISMapServices/FLU_w_PPC_Colors_WGS84/MapServer/0"
+    },
+    {
+      "role": "largo-flu",
+      "url": "https://maps.largo.com/arcgis/rest/services/VUEWorks_GIS_Map_Production/MapServer/1162"
+    }
+  ],
+  "rejected": [
+    "https://egis.pinellas.gov/gis/rest/services/AGO/Planning_LandUse/MapServer"
+  ]
 }

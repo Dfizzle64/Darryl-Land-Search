@@ -5,19 +5,26 @@
   "markets": [
     "Atlanta"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 2555,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "ga-rockdale-parcels",
+  "queryUrl": "https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/Parcels/FeatureServer/9/query",
   "gaps": [
-    "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+    "Source query returned 2698 rows in the 5.0\u2013150.0 acre band. 2555 parcels kept. 26 centroids were outside Rockdale County, Georgia, 6 failed geometry or the acreage check, and 111 duplicate parcel ids were collapsed to the larger part.",
+    "Rockdale County, Georgia AGOL Parcels/9. Positive Acreage is stored; Calc_Ac is used only when Acreage is null or zero. The band is 5.0\u2013150.0 acres inclusive.",
+    "Valuation is a fair-market proxy only. Assessed value, taxable value, and taxes are not on this layer and were left null.",
+    "Owner and mailing address come from City of Conyers SmartGovParcels joined on PARCEL_NO. Parcels outside that extract are null. No assessor site was scraped.",
+    "Sales are not published on these layers. lastSale date, price, and qualified flag are null.",
+    "Outside Conyers, zoning is RockdaleCountyZoning County_Zoning and future land use is Future_LandUse. Inside the city limits, Zoning/8 and FLU2025 are preferred. gis.rockdalecountyga.gov was not used (token 499).",
+    "Conyers SmartGovParcels matched owner or mailing on 268 of 2555 kept parcels (6281 city parcel ids). Unmatched parcels stay null.",
+    "Conyers city limits contain 273 kept parcels. Zoning/8 matched 188; county city-zoning fallback matched 2; FLU2025 matched 272. Unincorporated county zoning matched 2205; county future land use matched 2259. 160 kept parcels have no zoning code on those layers, and 24 have no future land use polygon."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/13247/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13247/lookup.json",
+  "sourceCount": 2698,
+  "dropped": 32,
+  "tileCount": 4
 }

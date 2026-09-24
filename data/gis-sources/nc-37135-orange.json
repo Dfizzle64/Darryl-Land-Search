@@ -1,0 +1,495 @@
+{
+  "county": "Orange",
+  "state": "NC",
+  "msa": "Raleigh-Durham MSA (Triangle)",
+  "fips": "37135",
+  "cntyfips": "135",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "viewerLinkTemplate": "https://gis.orangecountync.gov/orangencgis/default.htm",
+  "appraiserSearchUrl": "https://property.spatialest.com/nc/orange/#/",
+  "appraiserDeepLinkTemplate": "https://property.spatialest.com/nc/orange/#/property/{PIN}",
+  "pinLookupUrlTemplate": "https://web.orangecountync.gov/pinmanagementweb/?pin={PIN}",
+  "taxBillSearchUrl": "https://web.co.orange.nc.us/publicwebaccess/",
+  "joinKeys": ["PIN", "PINLINK", "ACCOUNT", "parno"],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": ["PIN", "PINLINK", "ACCOUNT", "parno"],
+      "bestLayer": "WebParcelService/Parcels"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "WebParcelService/Parcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": ["CALC_ACRES", "SIZE", "UOM", "recareano"],
+      "usefulRangeAcres": [5, 150],
+      "approxCountInRange": 9375,
+      "approxCountSizeA": 9505,
+      "bestLayer": "WebParcelService/Parcels",
+      "caveat": "UOM uses 'A' for acres (not 'AC'). OneMap use recareano; gisacres empty for Orange."
+    },
+    "ownerName": {
+      "present": true,
+      "fields": ["OWNER1", "OWNER1_LAST+OWNER1_FIRST", "OWNER2*", "ownname"],
+      "bestLayer": "WebParcelService/Parcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": ["ADDRESS1", "ADDRESS2", "CITY", "STATE", "ZIPCODE", "mailadd"],
+      "bestLayer": "WebParcelService/Parcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": true,
+      "fields": ["Add_St", "NG_FullAddress", "HouseNum+Name+Type", "MailingCity", "ZipCode", "siteadd"],
+      "bestLayer": "WebIdentifyServiceAnalysis/Addresses",
+      "caveat": "Not on parcel polygons — join by PIN. OneMap siteadd empty for Orange."
+    },
+    "lastSale": {
+      "present": true,
+      "fields": ["DATESOLD", "DATESOLDTXT", "STAMPVALUE", "TAXSTAMPS", "saledate"],
+      "bestLayer": "WebParcelService/Parcels",
+      "caveat": "STAMPVALUE is tax-stamp proxy for price; no multi-sale history FeatureServer found"
+    },
+    "taxValues": {
+      "present": true,
+      "fields": ["VALUATION", "LANDVALUE", "BLDGVALUE", "USEVALUE", "parval", "landval", "improvval"],
+      "bestLayer": "WebParcelService/Parcels"
+    },
+    "zoning": {
+      "present": true,
+      "fields": ["Zoning", "ZONING", "ZoningType", "Zonings", "Zoning_Admin"],
+      "bestLayer": "per municipality + WebZoningService County",
+      "split": "County unincorporated vs Chapel Hill / Carrboro / Hillsborough (Mebane/Durham edge)"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": ["Legend", "LANDUSE", "MH_LU"],
+      "bestLayer": "county Future_Land_Use_Map + Chapel Hill 2050 + Hillsborough Land Use",
+      "caveat": "Carrboro FLU REST gap"
+    },
+    "viewerLink": {
+      "present": true,
+      "template": "https://gis.orangecountync.gov/orangencgis/default.htm",
+      "spatialest": "https://property.spatialest.com/nc/orange/#/property/{PIN}",
+      "pinApp": "https://web.orangecountync.gov/pinmanagementweb/?pin={PIN}",
+      "taxSearch": "https://web.co.orange.nc.us/publicwebaccess/",
+      "keyField": "PIN"
+    }
+  },
+  "portals": [
+    {
+      "name": "Orange County Interactive GIS",
+      "url": "https://gis.orangecountync.gov/orangencgis/default.htm",
+      "notes": "ARIES/Highland Mapping viewer; PIN/owner/address/account search; Tax Card"
+    },
+    {
+      "name": "County ArcGIS REST",
+      "url": "https://gis.orangecountync.gov/arcgis/rest/services",
+      "notes": "WebParcelService, WebZoningService, Future_Land_Use_Map, WebIdentify*"
+    },
+    {
+      "name": "GIS Downloads",
+      "url": "https://web.orangecountync.gov/gisdownloads/",
+      "notes": "Parcels.zip, Zoning_and_Overlays.zip, Addresses.zip, MunicipalGDB"
+    },
+    {
+      "name": "Property Record Portal (Spatialest)",
+      "url": "https://property.spatialest.com/nc/orange/#/",
+      "notes": "Appraiser-style property cards; deep link by PIN"
+    },
+    {
+      "name": "PIN Management Web",
+      "url": "https://web.orangecountync.gov/pinmanagementweb/",
+      "notes": "Ownership/history; ?pin={PIN}"
+    },
+    {
+      "name": "Chapel Hill OpenData REST",
+      "url": "https://gis-portal.townofchapelhill.org/server/rest/services/OpenData",
+      "notes": "Zoning_Districts, Overlay_Zoning_Districts, OrangeCountyParcels"
+    },
+    {
+      "name": "Carrboro GIS REST",
+      "url": "https://gis.carrboronc.gov/server/rest/services",
+      "notes": "SP/ZoningSP base/overlay/conditional"
+    },
+    {
+      "name": "Hillsborough Zoning AGOL",
+      "url": "https://services5.arcgis.com/m711BZ7Df3seMOYp/arcgis/rest/services/ZoningLayersII/FeatureServer",
+      "notes": "Town zoning districts + overlays"
+    },
+    {
+      "name": "NC OneMap",
+      "url": "https://www.nconemap.gov",
+      "notes": "Statewide parcels; filter cntyfips=135"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Town of Chapel Hill",
+      "districtLabel": "CHAPEL HILL",
+      "zoningAdminValues": ["Chapel Hill", "Chapel Hill, County", "County, Chapel Hill", "Carrboro, Chapel Hill"],
+      "zoning": [
+        {
+          "name": "OpenData Zoning Districts",
+          "url": "https://gis-portal.townofchapelhill.org/server/rest/services/OpenData/Zoning_Districts/FeatureServer/0",
+          "field": "ZONING",
+          "featureCount": 313,
+          "wkid": 102719,
+          "latestWkid": 2264
+        },
+        {
+          "name": "OpenData Overlay Zoning Districts",
+          "url": "https://gis-portal.townofchapelhill.org/server/rest/services/OpenData/Overlay_Zoning_Districts/FeatureServer/0",
+          "field": "ZONING",
+          "featureCount": 18,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "Future Land Use Map 2050",
+          "url": "https://services2.arcgis.com/7KRXAKALbBGlCW77/arcgis/rest/services/Future_Land_Use_Map_2050/FeatureServer/8",
+          "fields": ["LANDUSE", "DU_S", "Description"],
+          "featureCount": 408,
+          "wkid": 102100,
+          "latestWkid": 3857
+        }
+      ],
+      "parcelsOptional": {
+        "name": "OpenData OrangeCountyParcels",
+        "url": "https://gis-portal.townofchapelhill.org/server/rest/services/OpenData/OrangeCountyParcels/FeatureServer/0",
+        "featureCount": 60463,
+        "wkid": 102719,
+        "latestWkid": 2264,
+        "notes": "Countywide mirror; prefer county WebParcelService"
+      },
+      "joinNotes": "City zoning (2264) + county parcels (2264) spatial join on PIN / geometry. FLU 2050 is 3857 — reproject before overlay. County parcel Zonings empty for Chapel Hill."
+    },
+    {
+      "name": "Town of Carrboro",
+      "districtLabel": "CARRBORO",
+      "zoningAdminValues": ["Carrboro", "Carrboro, County", "Carrboro, Chapel Hill"],
+      "zoning": [
+        {
+          "name": "ZoningSP base",
+          "url": "https://gis.carrboronc.gov/server/rest/services/SP/ZoningSP/MapServer/30",
+          "field": "ZONING",
+          "featureCount": 81,
+          "wkid": 102719,
+          "latestWkid": 2264
+        },
+        {
+          "name": "ZoningSP Conditional/PUD",
+          "url": "https://gis.carrboronc.gov/server/rest/services/SP/ZoningSP/MapServer/20",
+          "field": "ZONING",
+          "featureCount": 18,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "notes": "PINs field for optional attribute join"
+        },
+        {
+          "name": "ZoningSP Overlay",
+          "url": "https://gis.carrboronc.gov/server/rest/services/SP/ZoningSP/MapServer/10",
+          "field": "ZONING",
+          "featureCount": 6,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Carrboro ZoningSP + county parcels (2264). FLU REST gap. Do not use Chapel Hill Carrboro_Data 'Zoning Jurisdiction' (boundary only)."
+    },
+    {
+      "name": "Town of Hillsborough",
+      "districtLabel": "HILLSBOROUGH",
+      "zoningAdminValues": ["Hillsborough", "Hillsborough, County", "County, Hillsborough"],
+      "zoning": [
+        {
+          "name": "ZoningLayersII Zoning",
+          "url": "https://services5.arcgis.com/m711BZ7Df3seMOYp/arcgis/rest/services/ZoningLayersII/FeatureServer/3",
+          "field": "ZoningType",
+          "featureCount": 207,
+          "wkid": 102719,
+          "latestWkid": 2264
+        },
+        {
+          "name": "ZoningLayersII Overlays",
+          "url": "https://services5.arcgis.com/m711BZ7Df3seMOYp/arcgis/rest/services/ZoningLayersII/FeatureServer/2",
+          "field": "ZoningType",
+          "featureCount": 3,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "Hillsborough Land Use",
+          "url": "https://services5.arcgis.com/m711BZ7Df3seMOYp/arcgis/rest/services/HillsboroughLandUseII/FeatureServer/3",
+          "fields": ["MH_LU", "MH_LUtemp"],
+          "featureCount": 31,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "joinNotes": "Hillsborough zoning/FLU + county parcels (2264). County Jur=Hillsborough layer is limits/ETJ only."
+    },
+    {
+      "name": "City of Mebane",
+      "districtLabel": "MEBANE",
+      "notes": "Mostly Alamance; Orange edge. County zoning has ME shells only.",
+      "zoning": [],
+      "flu": [],
+      "joinNotes": "Edge / gap for district codes on Orange hosts — filter Zoning_Admin / MunicipalBoundary."
+    },
+    {
+      "name": "City of Durham",
+      "districtLabel": "DURHAM",
+      "notes": "Tiny Orange footprint (~20 parcels on Zoning_Admin)",
+      "zoning": [],
+      "flu": [],
+      "joinNotes": "Prefer Durham County GIS for district zoning if needed."
+    }
+  ],
+  "layers": [
+    {
+      "purpose": ["parcels", "tax", "ownership", "sales"],
+      "name": "WebParcelService/Parcels",
+      "id": 0,
+      "url": "https://gis.orangecountync.gov/arcgis/rest/services/WebParcelService/MapServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 59643,
+      "acreage5to150": 9375,
+      "acreageSizeA5to150": 9505,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + CALC_ACRES/SIZE 5-150 + sample OWNER1/VALUATION/DATESOLD/STAMPVALUE/Zonings",
+      "fields": {
+        "PIN": "10-digit parcel id (preferred)",
+        "PINLINK": "PIN link key",
+        "ACCOUNT": "Tax account number",
+        "CALC_ACRES": "GIS acres",
+        "SIZE": "Deed/size units",
+        "UOM": "A=acres",
+        "OWNER1": "Owner display name",
+        "OWNER1_LAST": "Owner 1 last",
+        "OWNER1_FIRST": "Owner 1 first",
+        "ADDRESS1": "Mailing street",
+        "CITY": "Mailing city",
+        "STATE": "Mailing state",
+        "ZIPCODE": "Mailing ZIP",
+        "DATESOLD": "Last sale date (epoch ms)",
+        "DATESOLDTXT": "Last sale date text",
+        "STAMPVALUE": "Tax-stamp sale price proxy",
+        "TAXSTAMPS": "Tax stamp count",
+        "VALUATION": "Total valuation",
+        "LANDVALUE": "Land value",
+        "BLDGVALUE": "Building value",
+        "USEVALUE": "Present-use value",
+        "Zonings": "Zoning code (County only)",
+        "Zoning_Admin": "Zoning jurisdiction admin"
+      },
+      "notes": "PRIMARY wire-first. No situs. MaxRecordCount 2000."
+    },
+    {
+      "purpose": ["parcels", "tax", "ownership", "sales"],
+      "name": "WebIdentifyServiceAnalysis/Parcels",
+      "id": 0,
+      "url": "https://gis.orangecountync.gov/arcgis/rest/services/WebIdentifyServiceAnalysis/MapServer/0",
+      "alternateUrls": [
+        "https://gis.orangecountync.gov/arcgis/rest/services/WebIdentifyService/MapServer/6"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 60449,
+      "acreage5to150": 9953,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + field metadata + sample",
+      "notes": "Slightly larger count; lacks Zonings/PINLINK/ACCOUNT vs WebParcelService."
+    },
+    {
+      "purpose": ["other"],
+      "name": "WebIdentifyServiceAnalysis/Addresses",
+      "id": 1,
+      "url": "https://gis.orangecountync.gov/arcgis/rest/services/WebIdentifyServiceAnalysis/MapServer/1",
+      "alternateUrls": [
+        "https://gis.orangecountync.gov/arcgis/rest/services/LRCAMA/WebCamaAddresses/MapServer/0",
+        "https://gis.orangecountync.gov/arcgis/rest/services/WebMainService/MapServer/29"
+      ],
+      "geometry": "esriGeometryPoint",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 81837,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample Add_St/PIN",
+      "notes": "PRIMARY situs join by PIN. LRCAMA alternate count 86431."
+    },
+    {
+      "purpose": ["zoning"],
+      "name": "WebZoningService/Zoning",
+      "id": 22,
+      "url": "https://gis.orangecountync.gov/arcgis/rest/services/WebZoningService/MapServer/22",
+      "alternateUrls": [
+        "https://gis.orangecountync.gov/arcgis/rest/services/WebMainService/MapServer/51",
+        "https://gis.orangecountync.gov/arcgis/rest/services/WebIdentifyServiceAnalysis/MapServer/21",
+        "https://services9.arcgis.com/B3YuzcpeophF9xOv/arcgis/rest/services/Orange_County_2025_Zoning/FeatureServer/0"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 362,
+      "verified": true,
+      "verifiedHow": "returnCountOnly by Jur + sample Zoning/Zoning_Def",
+      "notes": "County districts usable; municipal rows are CH/CA/HI/ME shells only."
+    },
+    {
+      "purpose": ["flu"],
+      "name": "Future_Land_Use_Map/Land Use Element Base Data",
+      "id": 12,
+      "url": "https://gis.orangecountync.gov/arcgis/rest/services/Future_Land_Use_Map/MapServer/12",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 143,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + distinct Legend values",
+      "notes": "County FLU / transition framework."
+    },
+    {
+      "purpose": ["parcels", "tax", "ownership", "sales"],
+      "name": "NC1Map_Parcels",
+      "id": 1,
+      "url": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 59366,
+      "acreage5to150": 9502,
+      "acreageField": "recareano",
+      "filter": "cntyfips='135'",
+      "verified": true,
+      "verifiedHow": "returnCountOnly cntyfips=135 + recareano 5-150 + sample attrs",
+      "notes": "gisacres=0 and siteadd empty for Orange. Fallback only."
+    },
+    {
+      "purpose": ["zoning"],
+      "name": "Chapel Hill Zoning_Districts",
+      "id": 0,
+      "url": "https://gis-portal.townofchapelhill.org/server/rest/services/OpenData/Zoning_Districts/FeatureServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 313,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + distinct ZONING sample",
+      "coverage": "city-only"
+    },
+    {
+      "purpose": ["flu"],
+      "name": "Chapel Hill Future_Land_Use_Map_2050",
+      "id": 8,
+      "url": "https://services2.arcgis.com/7KRXAKALbBGlCW77/arcgis/rest/services/Future_Land_Use_Map_2050/FeatureServer/8",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102100,
+      "latestWkid": 3857,
+      "featureCount": 408,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + distinct LANDUSE + sample Description",
+      "coverage": "city-only",
+      "notes": "Reproject 3857→2264 before spatial join to county parcels."
+    },
+    {
+      "purpose": ["zoning"],
+      "name": "Carrboro ZoningSP/Zoning",
+      "id": 30,
+      "url": "https://gis.carrboronc.gov/server/rest/services/SP/ZoningSP/MapServer/30",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 81,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample ZONING/DEFINITION",
+      "coverage": "city-only",
+      "relatedLayers": [
+        "https://gis.carrboronc.gov/server/rest/services/SP/ZoningSP/MapServer/20",
+        "https://gis.carrboronc.gov/server/rest/services/SP/ZoningSP/MapServer/10"
+      ]
+    },
+    {
+      "purpose": ["zoning"],
+      "name": "Hillsborough ZoningLayersII/Zoning",
+      "id": 3,
+      "url": "https://services5.arcgis.com/m711BZ7Df3seMOYp/arcgis/rest/services/ZoningLayersII/FeatureServer/3",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 207,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + distinct ZoningType",
+      "coverage": "city-only"
+    },
+    {
+      "purpose": ["flu"],
+      "name": "HillsboroughLandUseII/Hillsborough Land Use",
+      "id": 3,
+      "url": "https://services5.arcgis.com/m711BZ7Df3seMOYp/arcgis/rest/services/HillsboroughLandUseII/FeatureServer/3",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 31,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + distinct MH_LU",
+      "coverage": "city-only"
+    },
+    {
+      "purpose": ["other"],
+      "name": "WebMainService/Municipal Boundary",
+      "id": 52,
+      "url": "https://gis.orangecountync.gov/arcgis/rest/services/WebMainService/MapServer/52",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 84,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample NAME/CITYCODE",
+      "notes": "Route municipal zoning/FLU joins."
+    }
+  ],
+  "gaps": [
+    "Situs missing on primary Tax Parcels polygons — join Addresses by PIN",
+    "County Zoning MapServer has district codes only for unincorporated; CH/CA/HI are jurisdiction shells",
+    "Parcel Zonings attribute empty for Chapel Hill/Carrboro/Hillsborough",
+    "No public Carrboro FLU FeatureServer",
+    "Sale price is STAMPVALUE (tax-stamp proxy); no multi-transfer sales layer",
+    "NC OneMap gisacres=0 and siteadd empty for Orange — use recareano",
+    "Chapel Hill FLU 2050 CRS 3857 vs county 2264",
+    "Mebane/Durham edge district zoning not on Orange hosts",
+    "MaxRecordCount 2000 on county layers — paginate",
+    "No phones/emails; no paid vendor data"
+  ],
+  "wireFirst": {
+    "parcels": "https://gis.orangecountync.gov/arcgis/rest/services/WebParcelService/MapServer/0",
+    "situsJoin": "https://gis.orangecountync.gov/arcgis/rest/services/WebIdentifyServiceAnalysis/MapServer/1",
+    "countyZoning": "https://gis.orangecountync.gov/arcgis/rest/services/WebZoningService/MapServer/22",
+    "countyFlu": "https://gis.orangecountync.gov/arcgis/rest/services/Future_Land_Use_Map/MapServer/12",
+    "oneMapFallback": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1?where=cntyfips%3D%27135%27",
+    "acreageFilter": "CALC_ACRES BETWEEN 5 AND 150",
+    "notes": "Route municipal zoning/FLU by Zoning_Admin; cities are first-class."
+  },
+  "verifiedAt": "2026-09-23",
+  "verifiedBy": "Grok Bot GIS Researcher",
+  "verifiedLayerCount": 12
+}

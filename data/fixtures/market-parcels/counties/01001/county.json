@@ -1,0 +1,41 @@
+{
+  "name": "Autauga",
+  "fips": "01001",
+  "state": "Alabama",
+  "markets": [
+    "Montgomery"
+  ],
+  "featureCount": 7047,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "al-autauga-parcels",
+  "queryUrl": "https://services1.arcgis.com/fWUhmUATXl9W5CJW/arcgis/rest/services/Autauga_Parcels/FeatureServer/0/query",
+  "gaps": [
+    "7530 source rows collapsed to 7047 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "No sale price on the public parcel layer. lastSale.price stays null.",
+    "Autauga_Parcels on the Prattville AGOL org is the owner and tax source. The county Ering map is geometry-only and was not used.",
+    "No Autauga county zoning REST. Prattville zoning is joined by centroid where it overlaps.",
+    "Prattville zoning is ZONING_JULY_2017 (internal layer name Zoning_2022). Vintage is unclear: sampled DATE_ZONED values are often May 1, 1987, with some later ordinances. Joined only where the polygon overlaps Autauga or Elmore parcels. Partial until a current official zoning service is confirmed.",
+    "Prattville Future_Land_Use_Layer has 13 coarse polygons and was not joined as site-level FLU."
+  ],
+  "path": "data/fixtures/market-parcels/counties/01001/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01001/lookup.json",
+  "sourceCount": 7530,
+  "dropped": 167,
+  "tileCount": 6,
+  "join": {
+    "featureCount": 7047,
+    "zoningJoined": 589,
+    "zoningRate": 0.0836,
+    "byJurisdiction": {
+      "Prattville": 589
+    },
+    "fluJoined": 0,
+    "fluRate": 0.0,
+    "prattvilleJoined": 589,
+    "salePriceNonNull": 0,
+    "saleDateNonNull": 0
+  }
+}

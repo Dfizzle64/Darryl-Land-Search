@@ -36,9 +36,9 @@ META = FIX / "signals-meta.json"
 # About 90 m. Screening joins at 15 km, so this does not invent a count.
 LINE_TOLERANCE = 0.0008
 
-# NCDOT station county name -> FIPS. AADT_2022 is a string (HPMS 2022 on AGOL).
-# Blank strings are not counts. 2023–2025 station files on NCDOT Connect are not
-# on this FeatureServer.
+# NCDOT station county name -> FIPS. Gap counties use the 2024 stations layer
+# (County is title case, AADT_2024 is a string). Durham, Mecklenburg, and Wake
+# stay on the prior AADT_2022 layer and are not re-fetched by --only NC.
 NC = {
     "ALAMANCE": "37001",
     "ANSON": "37007",
@@ -86,6 +86,22 @@ NC = {
     "WILSON": "37195",
     "YADKIN": "37197",
 }
+
+# Already live on PR #56. Do not replace these features.
+NC_LIVE = {
+    "DURHAM": "37063",
+    "MECKLENBURG": "37119",
+    "WAKE": "37183",
+}
+NC_GAPS = {name: fips for name, fips in NC.items() if fips not in NC_LIVE.values()}
+NC_2024_QUERY = (
+    "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/"
+    "NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0/query"
+)
+NC_2022_QUERY = (
+    "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/"
+    "NCDOT_AADT_Stations/FeatureServer/0/query"
+)
 
 # SCDOT CountyName is stored uppercase.
 SC = {
@@ -343,11 +359,16 @@ SOURCES = {
     },
     "NC": {
         "agency": "NCDOT",
-        "field": "AADT_2022",
-        "year": 2022,
-        "url": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "field": "AADT_2024",
+        "year": 2024,
+        "url": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "countyField": "County",
         "valueType": "string",
-        "vintage": "HPMS 2022 on the FeatureServer. NCDOT Connect 2023/2024/2025 station files are not ingested.",
+        "vintage": "2024 stations published September 2025 for the 42 gap counties. AADT_2024 is a string; blanks are trimmed and dropped. Durham 37063, Mecklenburg 37119, and Wake 37183 stay on NCDOT_AADT_Stations field AADT_2022 (HPMS 2022).",
+        "keptLiveField": "AADT_2022",
+        "keptLiveYear": 2022,
+        "keptLiveUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "keptLiveFips": ["37063", "37119", "37183"],
     },
     "GA": {
         "agency": "GDOT",
@@ -529,19 +550,39 @@ def props(aadt: int, year: int | None, roadway: str | None, agency: str, state: 
     return kept
 
 
-def fetch_nc() -> list[dict]:
-    url = "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query"
-    names = "','".join(sorted(NC))
+def nc_title(name: str) -> str:
+    return " ".join(part.capitalize() for part in name.split())
+
+
+def roadway_label(value) -> str | None:
+    if value is None or value == "":
+        return None
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    text = str(value).strip()
+    return text or None
+
+
+def _nc_stations(
+    url: str,
+    where: str,
+    field: str,
+    year: int,
+    label: str,
+    allowed: dict[str, str],
+    out_fields: str,
+) -> list[dict]:
     rows = page_query(
         url,
         {
-            "where": f"COUNTY IN ('{names}')",
-            "outFields": "FID,COUNTY,AADT_2022,ROUTE",
+            "where": where,
+            "outFields": out_fields,
             "returnGeometry": "true",
             "outSR": 4326,
-            "resultRecordCount": 1000,
+            "orderByFields": "FID",
+            "resultRecordCount": 2000,
         },
-        "NC",
+        label,
     )
     out = []
     seen = set()
@@ -551,14 +592,68 @@ def fetch_nc() -> list[dict]:
         if oid in seen:
             continue
         seen.add(oid)
-        raw_count = attrs.get("AADT_2022")
+        raw_count = attrs.get(field)
         count = as_count(raw_count.strip() if isinstance(raw_count, str) else raw_count)
-        fips = NC.get(str(attrs.get("COUNTY") or "").strip().upper())
+        county = str(attrs.get("County") or attrs.get("COUNTY") or "").strip().upper()
+        fips = allowed.get(county)
         if count is None or not fips:
             continue
-        feature = point_feature(item, attrs, props(count, 2022, attrs.get("ROUTE") or None, "NCDOT", "North Carolina", fips))
+        feature = point_feature(
+            item,
+            attrs,
+            props(count, year, roadway_label(attrs.get("Route") or attrs.get("ROUTE")), "NCDOT", "North Carolina", fips),
+        )
         if feature:
             out.append(feature)
+    return out
+
+
+def fetch_nc_live() -> list[dict]:
+    """The three counties already live on AADT_2022. Used only by a full rebuild."""
+    names = "','".join(sorted(NC_LIVE))
+    out = _nc_stations(
+        NC_2022_QUERY,
+        f"COUNTY IN ('{names}')",
+        "AADT_2022",
+        2022,
+        "NC live",
+        NC_LIVE,
+        "FID,COUNTY,AADT_2022,ROUTE",
+    )
+    print(f"  NC live stations {len(out)}")
+    return out
+
+
+def fetch_nc_gaps() -> list[dict]:
+    """42 gap counties on the 2024 stations layer. County is title case."""
+    out: list[dict] = []
+    for name, fips in sorted(NC_GAPS.items(), key=lambda item: item[1]):
+        title = nc_title(name)
+        before = len(out)
+        out.extend(
+            _nc_stations(
+                NC_2024_QUERY,
+                f"County='{title}'",
+                "AADT_2024",
+                2024,
+                f"NC {fips}",
+                {name: fips},
+                "FID,County,AADT_2024,Route",
+            )
+        )
+        where = f"County='{title}' AND CAST(AADT_2024 AS FLOAT) > 0"
+        counted = fetch_json(NC_2024_QUERY, {"where": where, "returnCountOnly": "true", "f": "json"})
+        expected = int(counted.get("count") or 0)
+        got = len(out) - before
+        print(f"  NC {fips} {title} {got}/{expected}")
+        if got != expected:
+            raise RuntimeError(f"NC {fips} {title} kept {got}, layer reports {expected}")
+    print(f"  NC gap stations {len(out)}")
+    return out
+
+
+def fetch_nc() -> list[dict]:
+    out = fetch_nc_live() + fetch_nc_gaps()
     print(f"  NC stations {len(out)}")
     return out
 
@@ -869,7 +964,7 @@ def stamp_florida() -> dict[str, int]:
 def coverage_notes() -> list[str]:
     return [
         "Florida AADT is FDOT RCI FeatureServer/0 (gis.fdot.gov), field AADT, YEAR_=2025, for every footprint county including Orange and Hillsborough. The service is EPSG:26917; the fixture requested outSR 4326. Nearest segment to the parcel centroid within 15 km.",
-        "North Carolina uses NCDOT AADT Stations, field AADT_2022. That field is a string; blanks are trimmed and dropped. The FeatureServer is still HPMS 2022. NCDOT Connect publishes 2023, 2024, and 2025 station files that are not on this REST layer, so they are not ingested.",
+        "North Carolina gap counties use NCDOT 2024 AADT Stations (published September 2025), field AADT_2024. County is title case. That field is a string; blanks are trimmed and dropped. Durham, Mecklenburg, and Wake stay on NCDOT_AADT_Stations, field AADT_2022 (HPMS 2022), and were not re-fetched.",
         "South Carolina uses SCDOT 2025 Statewide Traffic Points, field FactoredAA, year FactoredA1 2025, filtered by CountyName. The layer has 11,570 stations statewide. Charleston, Dorchester, Berkeley, and Beaufort stay on this same layer. The 2025 lines layer is not used.",
         "Mississippi uses the HDR AGOL republish of Mississippi RCI layer RC_AADT_2019, field ADT_21 (counts through 2021). COUNTYNMBR is the alphabetical county number, not FIPS. This is not an MDOT-hosted FeatureServer. The MDOT 2025 traffic-count application has no public FeatureServer. Segments with ADT_21 of zero, or with no shape, are left out.",
         "Georgia uses the DeKalb County GIS republish of GDOT stations (GDOT_AADT FeatureServer/1), field aadt, including Bibb, Cobb, DeKalb, Fulton, and Lowndes. The layer has no year field, so the year is unknown. ITOS MapServer/21 is not used. "
@@ -939,6 +1034,43 @@ def replace_state(state_name: str, features: list[dict]) -> None:
     print(f"replaced {state_name} with {len(features)} counts; fixture {len(data['features'])}")
 
 
+def refresh_nc_gaps() -> None:
+    """Replace the 42 gap counties with AADT_2024. Keep the three live counties' features."""
+    print("NC gaps")
+    gaps = fetch_nc_gaps()
+    require_counts(gaps, NC_GAPS.values(), "NC gaps")
+    data = json.loads(OUT.read_text())
+    live_fips = set(NC_LIVE.values())
+    kept_live = []
+    other = []
+    for feature in data.get("features") or []:
+        props_ = feature.get("properties") or {}
+        if props_.get("state") != "North Carolina":
+            other.append(feature)
+            continue
+        fips = props_.get("countyFips")
+        if fips in live_fips:
+            if props_.get("year") != 2022:
+                raise RuntimeError(f"NC {fips} is year {props_.get('year')}, expected the existing 2022 extract")
+            kept_live.append(feature)
+    live_counts: dict[str, int] = {}
+    for feature in kept_live:
+        fips = feature["properties"]["countyFips"]
+        live_counts[fips] = live_counts.get(fips, 0) + 1
+    expected_live = {"37063": 111, "37119": 1793, "37183": 217}
+    if live_counts != expected_live:
+        raise RuntimeError(f"NC live extract changed: {live_counts}")
+    for feature in gaps:
+        if feature["properties"].get("year") != 2024:
+            raise RuntimeError("NC gap feature is not year 2024")
+        if feature["properties"]["countyFips"] in live_fips:
+            raise RuntimeError("NC gap pull included a live county")
+    data["features"] = other + kept_live + gaps
+    OUT.write_text(json.dumps(data, separators=(",", ":")))
+    apply_state_meta(data["features"])
+    print(f"replaced NC gaps with {len(gaps)} counts; kept {len(kept_live)} live; fixture {len(data['features'])}")
+
+
 def refresh_mississippi() -> None:
     """Replace Mississippi features only. Other states stay in the fixture."""
     print("MS")
@@ -973,7 +1105,10 @@ def main() -> None:
             require_counts(ar, AR, "AR")
             replace_state("Arkansas", ar)
             return
-        raise SystemExit("Only --only MS, GA, TN, or AR is supported. A full run rebuilds every state.")
+        if which == "NC":
+            refresh_nc_gaps()
+            return
+        raise SystemExit("Only --only MS, GA, TN, AR, or NC is supported. A full run rebuilds every state.")
     print("NC")
     nc = fetch_nc()
     require_counts(nc, NC.values(), "NC")

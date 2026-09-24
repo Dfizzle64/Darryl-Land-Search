@@ -96,10 +96,26 @@ describe("footprint county traffic fixture", () => {
     }
     const sources = meta.stateAadtSources as Record<
       string,
-      { field: string; year?: number; layer?: string; vintage?: string; url?: string }
+      {
+        field: string;
+        year?: number;
+        layer?: string;
+        vintage?: string;
+        url?: string;
+        keptLiveField?: string;
+        keptLiveYear?: number;
+        keptLiveFips?: string[];
+      }
     >;
-    expect(sources.NC.field).toBe("AADT_2022");
-    expect(sources.NC.year).toBe(2022);
+    expect(sources.NC.field).toBe("AADT_2024");
+    expect(sources.NC.year).toBe(2024);
+    expect(sources.NC.url).toContain("NCDOT__2024_AADT_Stations_published_September_2025");
+    expect(sources.NC.keptLiveField).toBe("AADT_2022");
+    expect(sources.NC.keptLiveYear).toBe(2022);
+    expect(sources.NC.keptLiveFips).toEqual(["37063", "37119", "37183"]);
+    expect(byCounty["37063"]).toBe(111);
+    expect(byCounty["37119"]).toBe(1793);
+    expect(byCounty["37183"]).toBe(217);
     expect(sources.SC.field).toBe("FactoredAA");
     expect(sources.SC.year).toBe(2025);
     expect(sources.GA.field).toBe("aadt");
@@ -111,8 +127,10 @@ describe("footprint county traffic fixture", () => {
     expect(sources.MS.field).toBe("ADT_21");
     expect(sources.MS.year).toBe(2021);
     expect(sources.MS.layer).toBe("RC_AADT_2019");
+    expect(sources.NC.vintage).toMatch(/AADT_2024/);
     expect(sources.NC.vintage).toMatch(/HPMS 2022/);
     const notes = (meta.notes as string[]).join("\n");
+    expect(notes).toMatch(/AADT_2024/);
     expect(notes).toMatch(/HPMS 2022/);
     expect(notes).toMatch(/11,570/);
     expect(notes).toMatch(/HDR AGOL/);

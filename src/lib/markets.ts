@@ -5,6 +5,7 @@ import {
   OTHER_MARKETS,
   PARCEL_MARKETS,
   RURAL_ELIGIBLE_STATUS_CHIP,
+  SC_GOVERNOR_FILED_STATUS,
   type EligibleMarketsCatalog,
   type EligibleTractRow,
   type MarketCountySummary,
@@ -223,12 +224,12 @@ export function viewIncludesSouthCarolina(market: SearchMarketId, state: string 
 export function southCarolinaStatusHelp(market: SearchMarketId, state: string | null): string | null {
   if (!viewIncludesSouthCarolina(market, state)) return null;
   if (market === "Charlotte" && !isSouthCarolinaState(state)) {
-    return "York, Lancaster, and Chester, South Carolina: the governor filed OZ 2.0 nominations on Sep 10, 2026. The list is not public yet, so those tracts stay eligible and are not designated. North Carolina tracts in this market stay eligible and are not designated.";
+    return `${SC_GOVERNOR_FILED_STATUS} In this shed that filing covers York, Lancaster, and Chester. North Carolina tracts stay on the eligible list and are not designated QOZs.`;
   }
   if (market === "Savannah" && !isSouthCarolinaState(state)) {
-    return "Beaufort and Jasper, South Carolina: the governor filed OZ 2.0 nominations on Sep 10, 2026. The list is not public yet, so those tracts stay eligible and are not designated. Georgia tracts in this market stay eligible and are not designated.";
+    return `${SC_GOVERNOR_FILED_STATUS} In this shed that filing covers Beaufort and Jasper. Georgia tracts stay on the eligible list and are not designated QOZs.`;
   }
-  return "South Carolina’s governor filed OZ 2.0 nominations with Treasury on Sep 10, 2026. The nominated tract list is not public yet, so these tracts stay eligible and are not designated.";
+  return SC_GOVERNOR_FILED_STATUS;
 }
 
 export function filterEligibleRows(

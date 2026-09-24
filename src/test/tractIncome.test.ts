@@ -34,17 +34,20 @@ describe("tract income", () => {
     expect(filterTractRowsByIncome(rows, lookup, { ...filters, minIncome: 0 })).toHaveLength(3);
   });
 
-  it("stamps ACS income onto eligible tracts in Florida parcel counties and leaves other states unstamped", async () => {
+  it("stamps ACS income onto eligible tracts in live parcel states", async () => {
+    const live = new Set(["01", "05", "12", "13", "28", "37", "45", "47"]);
     const [income, packs] = await Promise.all([loadOrangeTractIncomeMap(), loadEligiblePackTracts()]);
     const stamped = packs.features.filter((feature) => typeof feature.properties.medianHouseholdIncome === "number");
     expect(stamped.length).toBeGreaterThan(10);
     const orange = stamped.filter((feature) => feature.properties.tractGeoid.startsWith("12095"));
     expect(orange.length).toBeGreaterThan(10);
+    const georgia = packs.features.find((feature) => feature.properties.tractGeoid.startsWith("13"));
+    expect(georgia).toBeTruthy();
+    expect(typeof georgia?.properties.medianHouseholdIncome).toBe("number");
     expect(
       stamped.every((feature) => income.get(feature.properties.tractGeoid) === feature.properties.medianHouseholdIncome),
     ).toBe(true);
-    const outsideFlorida = packs.features.find((feature) => !feature.properties.tractGeoid.startsWith("12"));
-    expect(outsideFlorida).toBeTruthy();
-    expect(outsideFlorida?.properties.medianHouseholdIncome).toBeUndefined();
+    const outside = packs.features.find((feature) => !live.has(feature.properties.tractGeoid.slice(0, 2)));
+    if (outside) expect(outside.properties.medianHouseholdIncome).toBeUndefined();
   });
 });

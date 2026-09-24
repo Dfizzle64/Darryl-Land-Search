@@ -8,7 +8,7 @@ import type {
 } from "./types";
 
 export const MF_PRIORITY_DISCLAIMER =
-  "Likelihood / underwriting priority among rural-eligible tracts. Not a nominated list and not a designation.";
+  "INTERNAL multifamily hunt ranking among rural-eligible tracts (Charleston + York/Lancaster/Chester scope). NOT SC Commerce, NOT a nomination list, NOT OZ designation. Tier A = chase first. Tier B = secondary / still map-worthy.";
 
 export const NOM_WATCH_CAVEAT =
   "Nom-watch in the notes is an inference from corridor growth, not a confirmed nomination.";

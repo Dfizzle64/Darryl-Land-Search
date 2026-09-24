@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
-"""Sidecar ACS income and FDOT AADT for Florida parcel counties.
+"""Sidecar ACS income and FDOT AADT.
 
-Parcel tiles do not store these fields. Copying a tract median onto every
-parcel in that tract would bloat the extracts without adding a new fact.
-`/api/parcels` joins this sidecar at query time.
+Parcel tiles do not store these fields. `/api/parcels` joins them at query time.
 
   python3 scripts/seed_fl_signals.py
 
-Income is Census Reporter ACS 5-year B19013 for every Florida county that
-already has a parcel extract. AADT is the public FDOT historical count layer
-for 2025 (all segments). The map overlay stays the 15,000+ subset.
+Income is ACS 5-year 2020–2024 B19013 for every state with a live parcel
+extract (`scripts/seed_se_acs_income.py`). AADT is the public FDOT historical
+count layer for 2025 (Florida). The map overlay stays the 15,000+ subset.
 """
 
 from __future__ import annotations
@@ -203,34 +201,9 @@ def fetch_aadt() -> list[dict]:
 
 
 def main() -> None:
-    fips_list = income_county_fips()
-    if "12095" not in fips_list:
-        raise RuntimeError("Orange County FIPS missing from parcel fixtures")
-    print(f"Florida parcel counties: {len(fips_list)}")
-    income_features: list[dict] = []
-    failed: list[str] = []
-    for fips in fips_list:
-        try:
-            rows = fetch_county_income(fips)
-        except Exception as exc:  # noqa: BLE001
-            print(f"  {fips} failed: {exc}")
-            failed.append(fips)
-            continue
-        print(f"  {fips} tracts {len(rows)}")
-        income_features.extend(rows)
-        time.sleep(0.15)
-    if failed:
-        raise RuntimeError(f"Income download failed for {failed}")
-    if not any(feature["properties"]["geoid"].startswith("12095") for feature in income_features):
-        raise RuntimeError("Orange County tracts missing from the income sidecar")
-    known = sum(1 for feature in income_features if feature["properties"].get("medianHouseholdIncome") is not None)
-    INCOME_OUT.write_text(
-        json.dumps(
-            {"type": "FeatureCollection", "name": "florida-parcel-counties-acs-b19013", "features": income_features},
-            separators=(",", ":"),
-        )
-    )
-    print(f"income tracts {len(income_features)} with a median {known}")
+    from seed_se_acs_income import seed_income
+
+    seed_income()
 
     print(f"FDOT AADT {AADT_YEAR}")
     segments = fetch_aadt()
@@ -258,31 +231,23 @@ def main() -> None:
             separators=(",", ":"),
         )
     )
-    META_OUT.write_text(
-        json.dumps(
-            {
-                "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                "incomeSource": REPORTER_DATA,
-                "incomeTable": "B19013",
-                "incomeCounties": fips_list,
-                "incomeTractCount": len(income_features),
-                "incomeKnownCount": known,
-                "aadtSource": FDOT_QUERY.replace("/query", ""),
-                "aadtYear": AADT_YEAR,
-                "aadtSegmentCount": len(segments),
-                "majorRoadOverlayCount": len(overlay),
-                "majorRoadMinAadt": MAJOR_AADT,
-                "notes": [
-                    "Income and AADT are not stored on parcel tiles.",
-                    "A parcel more than 15 km from the nearest FDOT segment stays unknown.",
-                    "Block-group income remains the Orange County pilot fixture.",
-                    "Tract median income is joined for Florida parcel counties plus Atlanta and Charleston parcel counties. Other states stay unknown. AADT stays FDOT (Florida).",
-                ],
-            },
-            indent=2,
-        )
-        + "\n"
+    meta = json.loads(META_OUT.read_text()) if META_OUT.exists() else {}
+    notes = list(meta.get("notes") or [])
+    aadt_note = "A parcel more than 15 km from the nearest FDOT segment stays unknown. AADT stays FDOT (Florida)."
+    if aadt_note not in notes:
+        notes.append(aadt_note)
+    meta.update(
+        {
+            "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "aadtSource": FDOT_QUERY.replace("/query", ""),
+            "aadtYear": AADT_YEAR,
+            "aadtSegmentCount": len(segments),
+            "majorRoadOverlayCount": len(overlay),
+            "majorRoadMinAadt": MAJOR_AADT,
+            "notes": notes,
+        }
     )
+    META_OUT.write_text(json.dumps(meta, indent=2) + "\n")
     print(f"segments {len(segments)} major overlay {len(overlay)}")
 
 

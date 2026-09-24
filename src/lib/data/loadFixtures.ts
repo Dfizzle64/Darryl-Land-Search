@@ -24,15 +24,14 @@ let orangeTractIncome: Promise<Map<string, number>> | null = null;
 
 export function loadOrangeTractIncomeMap(): Promise<Map<string, number>> {
   if (!orangeTractIncome) {
-    orangeTractIncome = readFile(path.join(DATA_DIR, "fixtures/income-tracts.geojson"), "utf8").then((raw) => {
-      const collection = JSON.parse(raw) as {
-        features?: Array<{ properties?: { geoid?: string; medianHouseholdIncome?: number | null } }>;
+    orangeTractIncome = readFile(path.join(DATA_DIR, "fixtures/acs-b19013-tracts.json"), "utf8").then((raw) => {
+      const table = JSON.parse(raw) as {
+        tracts?: Record<string, { e?: number | null }>;
       };
       const lookup = new Map<string, number>();
-      for (const feature of collection.features ?? []) {
-        const geoid = feature.properties?.geoid;
-        const income = feature.properties?.medianHouseholdIncome;
-        if (geoid && typeof income === "number" && Number.isFinite(income)) lookup.set(geoid, income);
+      for (const [geoid, row] of Object.entries(table.tracts ?? {})) {
+        const income = row?.e;
+        if (geoid && typeof income === "number" && Number.isFinite(income) && income > 0) lookup.set(geoid, income);
       }
       return lookup;
     });

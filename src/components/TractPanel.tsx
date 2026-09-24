@@ -98,7 +98,7 @@ export function TractPanel({
                   <span
                     className={`inline-block rounded-full border px-1.5 py-px text-[10px] ${
                       rural
-                        ? "border-[#a56b3c]/70 bg-[#a56b3c]/15 text-[#f6e6d4]"
+                        ? "border-[#8b5a2b]/70 bg-[#8b5a2b]/15 text-[#f6e6d4]"
                         : "border-[#3d7dff]/70 bg-[#3d7dff]/15 text-[#d6e4ff]"
                     }`}
                   >

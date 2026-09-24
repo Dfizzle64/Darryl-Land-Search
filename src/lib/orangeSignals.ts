@@ -5,10 +5,10 @@ import type { BBox, IncomeInfo, NearestRoad, ParcelFeature } from "./types";
 /**
  * ACS median household income and FDOT AADT joined at query time.
  * Tiles do not store these fields (they would duplicate the same tract and
- * road onto every parcel). The income fixture is ACS B19013 for Florida
- * parcel counties plus Atlanta and Charleston parcel counties, joined by
- * centroid-in-tract on `medianHouseholdIncome`. AADT segments are statewide
- * FDOT counts. Points outside that coverage stay unknown.
+ * road onto every parcel). Tract income is ACS 5-year 2020–2024 B19013
+ * (`acs5_2020_2024`, 2024 inflation-adjusted dollars) for AL, FL, GA, MS, NC,
+ * SC, and TN. The join prefers an 11-digit 2020 tract GEOID. Centroid-in-tract
+ * is only the fallback when the parcel has no GEOID. AADT segments stay FDOT.
  */
 
 const DATA_DIR = path.join(process.cwd(), "data", "fixtures");
@@ -16,6 +16,9 @@ const M_PER_DEG = 111_320;
 /** Nearest FDOT segment farther than this is unknown, not a distant highway. */
 export const MAX_AADT_DISTANCE_METERS = 15_000;
 const ROAD_CELL_DEG = 0.2;
+const TRACT_CELL_DEG = 0.25;
+/** Published on every joined tract median. 2024 inflation-adjusted dollars. */
+export const ACS_TRACT_VINTAGE = "acs5_2020_2024";
 
 export type SignalPolygon = {
   bbox: BBox;
@@ -37,6 +40,9 @@ export type SignalRoad = {
 export type OrangeSignalIndex = {
   coverage: BBox;
   tracts: SignalPolygon[];
+  tractGrid: Map<string, number[]>;
+  /** 11-digit 2020 tract GEOID → ACS B19013. Attribute join uses this before centroid. */
+  byGeoid: Map<string, IncomeInfo>;
   blockGroups: SignalPolygon[];
   roads: SignalRoad[];
   roadGrid: Map<string, number[]>;
@@ -47,6 +53,7 @@ const EMPTY_INCOME: IncomeInfo = {
   name: null,
   medianHouseholdIncome: null,
   medianHouseholdIncomeMoe: null,
+  vintage: null,
 };
 
 let indexPromise: Promise<OrangeSignalIndex> | null = null;
@@ -188,15 +195,106 @@ function ringBbox(ring: number[][]): BBox {
   return [west, south, east, north];
 }
 
+function finiteIncome(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : null;
+}
+
 function incomeFromProps(props: GeoJSON.GeoJsonProperties): IncomeInfo {
-  const income = props?.medianHouseholdIncome;
+  const income = finiteIncome(props?.medianHouseholdIncome);
   const moe = props?.medianHouseholdIncomeMoe;
   return {
     geoid: typeof props?.geoid === "string" ? props.geoid : null,
     name: typeof props?.name === "string" ? props.name : null,
-    medianHouseholdIncome: typeof income === "number" && Number.isFinite(income) ? income : null,
-    medianHouseholdIncomeMoe: typeof moe === "number" && Number.isFinite(moe) ? moe : null,
+    medianHouseholdIncome: income,
+    medianHouseholdIncomeMoe: income != null && typeof moe === "number" && Number.isFinite(moe) && moe >= 0 ? moe : null,
+    vintage: typeof props?.vintage === "string" ? props.vintage : null,
   };
+}
+
+/** 2020 tract GEOID only. Designated QOZ ids are 2010 geography and are not an ACS join key. */
+export function parcelTractGeoid(properties: {
+  oz2Eligibility?: { tractGeoid?: string | null } | null;
+}): string | null {
+  const geoid = properties.oz2Eligibility?.tractGeoid;
+  return typeof geoid === "string" && /^\d{11}$/.test(geoid) ? geoid : null;
+}
+
+export function incomeMapFromAcsTable(table: {
+  vintage?: string;
+  tracts?: Record<string, { e?: number | null; m?: number | null; n?: string | null }>;
+}): Map<string, IncomeInfo> {
+  const vintage = typeof table.vintage === "string" ? table.vintage : ACS_TRACT_VINTAGE;
+  const map = new Map<string, IncomeInfo>();
+  for (const [geoid, row] of Object.entries(table.tracts ?? {})) {
+    if (!/^\d{11}$/.test(geoid)) continue;
+    const income = finiteIncome(row?.e);
+    const moe = row?.m;
+    map.set(geoid, {
+      geoid,
+      name: typeof row?.n === "string" ? row.n : null,
+      medianHouseholdIncome: income,
+      medianHouseholdIncomeMoe: income != null && typeof moe === "number" && Number.isFinite(moe) && moe >= 0 ? moe : null,
+      vintage,
+    });
+  }
+  return map;
+}
+
+function indexPolygons(polygons: SignalPolygon[], cell = TRACT_CELL_DEG): Map<string, number[]> {
+  const grid = new Map<string, number[]>();
+  polygons.forEach((polygon, index) => {
+    const [west, south, east, north] = polygon.bbox;
+    const ix0 = Math.floor(west / cell);
+    const ix1 = Math.floor(east / cell);
+    const iy0 = Math.floor(south / cell);
+    const iy1 = Math.floor(north / cell);
+    for (let ix = ix0; ix <= ix1; ix += 1) {
+      for (let iy = iy0; iy <= iy1; iy += 1) {
+        const key = `${ix}:${iy}`;
+        const bucket = grid.get(key);
+        if (bucket) bucket.push(index);
+        else grid.set(key, [index]);
+      }
+    }
+  });
+  return grid;
+}
+
+function lookupIncomeGrid(
+  x: number,
+  y: number,
+  polygons: SignalPolygon[],
+  grid?: Map<string, number[]>,
+): IncomeInfo | null {
+  if (!grid?.size) return lookupIncome(x, y, polygons);
+  const ix = Math.floor(x / TRACT_CELL_DEG);
+  const iy = Math.floor(y / TRACT_CELL_DEG);
+  for (const index of grid.get(`${ix}:${iy}`) ?? []) {
+    const polygon = polygons[index];
+    if (polygon && pointInPolygon(x, y, polygon)) return polygon.info;
+  }
+  return null;
+}
+
+/** Parcel-tile gap notes written before this join. Income is no longer Florida-only. */
+export function refreshStaleIncomeGaps(gaps: string[] | undefined): string[] | undefined {
+  if (!gaps?.length) return gaps;
+  let changed = false;
+  const next = gaps.map((gap) => {
+    if (
+      gap === "Income and FDOT AADT are not joined outside Florida." ||
+      /Those sidecars are Florida extracts/i.test(gap)
+    ) {
+      changed = true;
+      return "FDOT AADT is Florida only. Tract median household income is ACS 5-year 2020–2024 B19013.";
+    }
+    if (gap.includes("Income and traffic are not joined.")) {
+      changed = true;
+      return gap.replace("Income and traffic are not joined.", "FDOT AADT is Florida only.");
+    }
+    return gap;
+  });
+  return changed ? next : gaps;
 }
 
 function polygonsFromCollection(collection: GeoJSON.FeatureCollection): SignalPolygon[] {
@@ -257,13 +355,22 @@ export function buildOrangeSignalIndex(
   tracts: GeoJSON.FeatureCollection,
   blockGroups: GeoJSON.FeatureCollection,
   traffic: GeoJSON.FeatureCollection<GeoJSON.LineString>,
+  geoidTable?: Map<string, IncomeInfo>,
 ): OrangeSignalIndex {
   const tractPolygons = polygonsFromCollection(tracts);
   const blockGroupPolygons = polygonsFromCollection(blockGroups);
   const roads = roadsFromCollection(traffic);
+  const byGeoid = geoidTable ? new Map(geoidTable) : new Map<string, IncomeInfo>();
+  if (!geoidTable) {
+    for (const polygon of tractPolygons) {
+      if (polygon.info.geoid && !byGeoid.has(polygon.info.geoid)) byGeoid.set(polygon.info.geoid, polygon.info);
+    }
+  }
   return {
     coverage: unionBbox([...tractPolygons.map((item) => item.bbox), ...roads.map((item) => item.bbox)]),
     tracts: tractPolygons,
+    tractGrid: indexPolygons(tractPolygons),
+    byGeoid,
     blockGroups: blockGroupPolygons,
     roads,
     roadGrid: indexRoads(roads),
@@ -276,18 +383,32 @@ export function coverageContains(index: OrangeSignalIndex, lon: number, lat: num
 }
 
 /**
- * Fill missing Orange income and AADT on a parcel already in memory.
- * Points outside the Orange signal coverage are left unknown.
+ * Fill missing tract income and AADT on a parcel already in memory.
+ * A 2020 tract GEOID is joined directly. Centroid-in-tract is the fallback
+ * when that GEOID is absent. Points outside the tract polygons stay unknown.
  */
 export function annotateParcelSignals(feature: ParcelFeature, index: OrangeSignalIndex): void {
+  if (feature.properties.dataGaps?.length) {
+    feature.properties.dataGaps = refreshStaleIncomeGaps(feature.properties.dataGaps);
+  }
+  const geoid = parcelTractGeoid(feature.properties);
+  if (feature.properties.incomeTract == null && geoid) {
+    feature.properties.incomeTract = index.byGeoid.get(geoid) ?? {
+      geoid,
+      name: null,
+      medianHouseholdIncome: null,
+      medianHouseholdIncomeMoe: null,
+      vintage: ACS_TRACT_VINTAGE,
+    };
+  }
   const centroid = feature.properties.centroid;
   if (!centroid || !coverageContains(index, centroid[0], centroid[1])) return;
   const [lon, lat] = centroid;
   if (feature.properties.incomeTract == null) {
-    feature.properties.incomeTract = lookupIncome(lon, lat, index.tracts) ?? EMPTY_INCOME;
+    feature.properties.incomeTract = lookupIncomeGrid(lon, lat, index.tracts, index.tractGrid) ?? { ...EMPTY_INCOME };
   }
   if (feature.properties.incomeBlockGroup == null) {
-    feature.properties.incomeBlockGroup = lookupIncome(lon, lat, index.blockGroups) ?? EMPTY_INCOME;
+    feature.properties.incomeBlockGroup = lookupIncome(lon, lat, index.blockGroups) ?? { ...EMPTY_INCOME };
   }
   if (feature.properties.nearestRoad == null) {
     feature.properties.nearestRoad = nearestRoad(lon, lat, index.roads, index.roadGrid);
@@ -298,15 +419,23 @@ export async function loadOrangeSignalIndex(): Promise<OrangeSignalIndex> {
   if (!indexPromise) {
     indexPromise = (async () => {
       const segmentsPath = path.join(DATA_DIR, "aadt-segments.geojson");
-      const [tractsRaw, blockGroupsRaw, trafficRaw] = await Promise.all([
+      const [tractsRaw, blockGroupsRaw, trafficRaw, stateAadtRaw, acsRaw] = await Promise.all([
         readFile(path.join(DATA_DIR, "income-tracts.geojson"), "utf8"),
         readFile(path.join(DATA_DIR, "income-block-groups.geojson"), "utf8"),
         readFile(segmentsPath, "utf8").catch(() => readFile(path.join(DATA_DIR, "traffic.geojson"), "utf8")),
+        readFile(path.join(DATA_DIR, "aadt-state-dots.geojson"), "utf8").catch(() => ""),
+        readFile(path.join(DATA_DIR, "acs-b19013-tracts.json"), "utf8"),
       ]);
+      const traffic = JSON.parse(trafficRaw) as GeoJSON.FeatureCollection<GeoJSON.LineString>;
+      if (stateAadtRaw) {
+        const extra = JSON.parse(stateAadtRaw) as GeoJSON.FeatureCollection<GeoJSON.LineString>;
+        traffic.features.push(...(extra.features ?? []));
+      }
       return buildOrangeSignalIndex(
         JSON.parse(tractsRaw) as GeoJSON.FeatureCollection,
         JSON.parse(blockGroupsRaw) as GeoJSON.FeatureCollection,
-        JSON.parse(trafficRaw) as GeoJSON.FeatureCollection<GeoJSON.LineString>,
+        traffic,
+        incomeMapFromAcsTable(JSON.parse(acsRaw) as Parameters<typeof incomeMapFromAcsTable>[0]),
       );
     })();
   }

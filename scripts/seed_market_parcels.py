@@ -618,6 +618,10 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    if fips == "13103":  # Effingham GA — Parcels2024, parcel ZCODE, FLUM join
+        from effingham_parcels import effingham_spec
+
+        return effingham_spec()
     if fips == "47011":  # Bradley TN — Cleveland GIS, not IMPACT COUNTY_ID 11
         from bradley_parcels import bradley_spec
 
@@ -726,7 +730,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, Walton, Carroll, Spalding, Hall, Jackson, or Butts pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, Walton, Carroll, Spalding, Hall, Jackson, Butts, or Effingham pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -1006,6 +1010,8 @@ Butts County, Georgia is the SchneiderCorp ButtsCountyGA_WFS/MapServer/0 extract
 
 Bradley County, Tennessee is the Cleveland GIS Parcels_Impact extract. Census FIPS is 47011. Comptroller county 006 is the layer filter, not the FIPS. The older IMPACT COUNTY_ID=11 tiles, whose centroids sat near longitude -87, are replaced. Cleveland zoning applies only inside the city limits. Charleston and unincorporated Bradley keep the assessor label. Future land use stays null. Hamilton County is unchanged. No Opportunity Zone designation was added.
 
+Effingham County, Georgia is the Parcels2024 extract in the Savannah market. Acreage is TOTALACRES in the inclusive 5–150 band. Zoning is the parcel ZCODE. Rincon, Guyton, and Springfield boundaries are joined, and those cities have no public zoning or future-land-use service. Future land use is FLUM EFF_REV2 where the parcel id matches. Sale price and current value come from ParcelUpdate when that older table has the parcel. Effingham County, Illinois was not used. No Opportunity Zone designation was added.
+
 ## Coverage
 """
 
@@ -1039,6 +1045,10 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         from bradley_parcels import download_bradley
 
         return download_bradley(county, markets, spec)
+    if spec.get("kind") == "effingham":
+        from effingham_parcels import download_effingham_county
+
+        return download_effingham_county(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

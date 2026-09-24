@@ -21,7 +21,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Birmingham | other | 38,101 | 3 | 0 | 6 |
 | Mobile | other | 42,446 | 3 | 0 | 2 |
 | Huntsville | other | 29,598 | 4 | 0 | 3 |
-| Savannah | other | 3,283 | 1 | 0 | 7 |
+| Savannah | other | 9,411 | 2 | 0 | 6 |
 | Columbia | other | 14,613 | 1 | 1 | 8 |
 | Greenville | other | 31,164 | 2 | 0 | 6 |
 | Chattanooga | other | 15,498 | 2 | 0 | 8 |
@@ -275,7 +275,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Bryan | Georgia | 13029 | gap | 0 | unavailable |
 | Bulloch | Georgia | 13031 | gap | 0 | unavailable |
 | Chatham | Georgia | 13051 | complete-gte-5ac | 3,283 | sagis-chatham-ga-parcel-digest |
-| Effingham | Georgia | 13103 | gap | 0 | unavailable |
+| Effingham | Georgia | 13103 | complete-gte-5ac | 6,128 | ga-effingham-parcels-2024 |
 | Jasper | South Carolina | 45053 | gap | 0 | unavailable |
 | Liberty | Georgia | 13179 | gap | 0 | unavailable |
 | Screven | Georgia | 13251 | gap | 0 | unavailable |

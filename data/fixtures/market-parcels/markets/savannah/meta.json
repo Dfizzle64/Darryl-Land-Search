@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T01:43:05Z",
+  "generatedAt": "2026-09-24T01:46:58Z",
   "market": "Savannah",
   "tier": "other",
-  "parcelCount": 3283,
+  "parcelCount": 9411,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -106,20 +106,30 @@
       "name": "Effingham",
       "fips": "13103",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 6128,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-effingham-parcels-2024",
+      "queryUrl": "https://services.arcgis.com/9scQWTgPOi3GxJRr/arcgis/rest/services/Parcels2024/FeatureServer/0/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Effingham County parcels are Parcels2024/FeatureServer/0. Acreage is TOTALACRES, inclusive 5\u2013150. ACRES is not the filter. Features were requested in WGS84 and kept only inside the Effingham County, Georgia box.",
+        "Mailing city is not a municipality. Rincon, Guyton, and Springfield come from County_Municipal_Boundaries. Bloomingdale, Savannah, and Meldrim postal names are not city limits.",
+        "Zoning is the parcel ZCODE. There is no separate Euclidean zoning service. Rincon, Guyton, and Springfield have no public city zoning FeatureServer, so no city zoning code was invented. A city zoning map PDF can differ from ZCODE.",
+        "Future land use is FLUM_20240903_BOC_APPR_2 EFF_REV2 joined on PARCEL_NO. That layer is smaller than Parcels2024, so some parcels have no future land use. City future-land-use services were not published and were not invented.",
+        "Parcels2024 has SalesDate and esttax, and no sale price or current value. SALEPRICE and CURR_VAL are joined from ParcelUpdate when that parcel id is present. Missing joins stay null. Assessed value and taxable value are not on these layers. qPublic was not scraped.",
+        "Effingham County, Illinois, Chatham County SAGIS, and ARC LandPro were not used.",
+        "This extract does not assign Opportunity Zone designations.",
+        "6130 source rows in the TOTALACRES 5\u2013150 query; 6128 parcel ids kept.",
+        "Municipal boundaries: Guyton 38, Rincon 149, Springfield 83, unincorporated 5858.",
+        "ZCODE filled on 6128 parcels. Future land use joined on 5444.",
+        "ParcelUpdate joined a sale price on 2147 parcels, a sale date is on 5924, and a current value on 5161."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13103/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13103/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 6130
     },
     {
       "name": "Jasper",

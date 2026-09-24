@@ -105,6 +105,7 @@ export function ParcelDrawer({
     : "FDOT AADT is Florida only";
   const dekalb = properties.countyFips === "13089";
   const hall = properties.countyFips === "13139";
+  const effingham = properties.countyFips === "13103";
   const bradley = properties.countyFips === "47011";
   const butts = properties.countyFips === "13035";
   const jackson = properties.countyFips === "13157";
@@ -112,8 +113,10 @@ export function ParcelDrawer({
   const zoningEmpty =
     properties.countyFips === "12095"
       ? "Not on the OCPA parcel"
-      : butts
-        ? "No City of Jackson, Flovilla, Jenkinsburg, or Butts County zoning joined for this parcel"
+      : effingham
+        ? "No Effingham County zoning code on this parcel"
+        : butts
+          ? "No City of Jackson, Flovilla, Jenkinsburg, or Butts County zoning joined for this parcel"
         : maysville
         ? "Maysville has no Euclidean zoning on the Jackson County layer"
         : jackson
@@ -169,8 +172,10 @@ export function ParcelDrawer({
           label="Future Land Use"
           value={fluLine}
           empty={
-            bradley
-              ? "Bradley County future land use is not on a public polygon layer"
+            effingham
+              ? "No Effingham County future land use joined for this parcel"
+              : bradley
+                ? "Bradley County future land use is not on a public polygon layer"
               : butts
                 ? "Butts County future land use is a comprehensive-plan PDF"
                 : maysville

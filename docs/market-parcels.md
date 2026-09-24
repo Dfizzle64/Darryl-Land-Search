@@ -32,6 +32,8 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 Zoning is joined when a public layer supports it. DeKalb municipalities are first-class: Decatur (Georgia, not Illinois), Brookhaven, Dunwoody, Doraville, Tucker, and Stonecrest supply zoning and future land use. Chamblee is future land use only. Atlanta's citywide layers are joined only inside DeKalb's Atlanta boundary. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake stay blank. County Zoning_District and LandUse fill unincorporated DeKalb only. Those codes are not scored as Orange County multifamily districts. There is no public DeKalb sale table. Prefer **All parcels** in these markets.
 
+Volusia parcels in the Melbourne extract also get city zoning and future land use where a municipal polygon covers the centroid (`docs/volusia-flagler-municipal.md`). Flagler city layers are cataloged on the Palm Coast host. This repo has no Flagler parcel baseline, so those overlays are not stamped onto new parcels. The Volusia join is not a multifamily knowledge-base match outside Orange County.
+
 ### DeKalb County, Georgia
 
 Parcels come from `Tax_Parcels_Assessment_View` FeatureServer layer 2 (about 246,000 countywide; the 5.0–150.0 acre band is `ACREAGE`). Owner, mailing address, site address, `TOTAPR1` (appraised), and `CNTASSDVAL` (assessed) are on that roll. `CVTTXDSCRP` is the tax district description, not a sale and not future land use. The hosted `Tax_Parcels` layer has no acre field and is not the source.
@@ -41,7 +43,6 @@ No sale price, sale date, or qualified flag is published on that service. Delinq
 City layers are extent-checked in WGS84. A layer centered on Decatur, Illinois, or on DeKalb County in Alabama, Illinois, Indiana, or Tennessee, is skipped. Decatur, Georgia is `decatur_admin` on ArcGIS Online.
 
 OZ 2.0 tracts that are eligible for nomination are not designated QOZs. This extract does not copy eligibility onto `opportunityZone`.
-
 ## Coverage
 
 # Market parcel coverage

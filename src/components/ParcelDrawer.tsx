@@ -18,6 +18,7 @@ import { describeFluMatch } from "@/lib/flu";
 import { describeRezoningCandidate } from "@/lib/filters";
 import { describeOpportunityZone, describeOz2Eligibility } from "@/lib/opportunityZone";
 import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "@/lib/types";
+import { fluEmptyForMunicipal, zoningEmptyForCounty } from "@/lib/volusiaFlaglerMunicipal";
 import { describeZoningMatch } from "@/lib/zoning";
 
 type ParcelDrawerProps = {
@@ -103,13 +104,19 @@ export function ParcelDrawer({
     ? "No FDOT count segment within 15 km"
     : "FDOT AADT is Florida only";
   const dekalb = properties.countyFips === "13089";
-  const zoningEmpty =
+  const zoningEmpty = zoningEmptyForCounty(
+    properties.countyFips,
     properties.countyFips === "12095"
       ? "Not on the OCPA parcel"
       : dekalb
         ? "No municipal or county zoning joined for this parcel"
-        : "Not in this county's public parcel extract";
-  const zoningLine = formatZoningWithCity(properties.zoningCode, properties.zoningDistrict);
+        : "Not in this county's public parcel extract",
+  );
+  const zoningLine = properties.zoningCode
+    ? properties.municipal?.zoningLabel && properties.municipal.zoningLabel !== properties.zoningCode
+      ? `${properties.zoningCode} — ${properties.municipal.zoningLabel}`
+      : formatZoningWithCity(properties.zoningCode, properties.zoningDistrict)
+    : null;
   const mailing = formatMailing(properties.mailingAddress) ?? mailingGap(properties.mailingAddress);
   const entityName = isEntityOwner(properties.ownerName)
     ? properties.ownerName
@@ -158,7 +165,13 @@ export function ParcelDrawer({
         <Field
           label="Future Land Use"
           value={fluLine}
-          empty={dekalb ? "No future land use joined for this parcel" : "Not joined for this county"}
+          empty={
+            properties.municipal?.fluGap
+              ? fluEmptyForMunicipal(properties.municipal.fluGap)
+              : dekalb
+                ? "No future land use joined for this parcel"
+                : "Not joined for this county"
+          }
         />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
@@ -198,7 +211,9 @@ export function ParcelDrawer({
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Future Land Use</p>
-        <p className="mt-1 text-ink-100">{flu.reason}</p>
+        <p className="mt-1 text-ink-100">
+          {!properties.flu?.code && properties.municipal?.fluGap ? properties.municipal.fluGap : flu.reason}
+        </p>
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Designated Opportunity Zone</p>

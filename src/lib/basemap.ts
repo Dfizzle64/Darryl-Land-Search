@@ -243,14 +243,14 @@ export function trafficLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecif
 }
 
 /**
- * Census-tract overlay swatches. Rural is violet so it does not sit on the
- * orange arterial roads of the Streets basemap. Urban eligible tracts, including
- * Orlando, use one blue. Parcel fills stay green. Satellite paint uses brighter
- * variants of the same hues.
+ * Census-tract overlay swatches. Rural eligible is walnut/bronze so it stays off
+ * the orange Streets roads and off the copper designated-QOZ overlay. Satellite
+ * and dark basemaps shift that brown lighter; streets keeps the deeper walnut.
+ * Urban eligible tracts, including Orlando, use one blue. Parcel fills stay green.
  */
 export const OZ_TRACT_SWATCH = {
-  /** Violet — OZ 2.0 rural-eligible tracts. Not orange, so Streets roads stay distinct. */
-  rural: "#6d28d9",
+  /** Walnut — OZ 2.0 rural-eligible tracts. Darker than the copper designated overlay. */
+  rural: "#a56b3c",
   /** Same blue as urban. Orlando no longer uses a separate amber overlay. */
   eligible: "#3d7dff",
   /** Blue — urban / non-rural eligible tracts in every market, including Orlando. */
@@ -258,6 +258,19 @@ export const OZ_TRACT_SWATCH = {
   /** Copper accent — current designated QOZ tracts (dashed outline on the map). */
   designated: "#c46a2f",
 } as const;
+
+/** Basemap-specific rural fill/outline so walnut stays readable on imagery and on streets. */
+export function ruralTractFill(mode: BasemapMode): { color: string; opacity: number } {
+  if (mode === "satellite") return { color: "#e4c4a0", opacity: 0.48 };
+  if (mode === "dark") return { color: "#d2b48c", opacity: 0.42 };
+  return { color: OZ_TRACT_SWATCH.rural, opacity: 0.34 };
+}
+
+export function ruralTractLine(mode: BasemapMode): { color: string; width: number; opacity: number } {
+  if (mode === "satellite") return { color: "#fff8f0", width: 2.8, opacity: 0.96 };
+  if (mode === "streets") return { color: "#3f2a1c", width: 2.5, opacity: 0.92 };
+  return { color: "#f6e6d4", width: 2.5, opacity: 0.92 };
+}
 
 /** Highlight for the SC multifamily shortlist. Neither color means designated. */
 export const MF_PRIORITY_SWATCH = {
@@ -284,13 +297,12 @@ export function ozLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecificati
 }
 
 export function oz2FillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
-  const rural = mode === "satellite" ? "#c084fc" : OZ_TRACT_SWATCH.rural;
+  const rural = ruralTractFill(mode);
   const other = mode === "satellite" ? "#8eb6ff" : OZ_TRACT_SWATCH.urban;
-  const ruralOpacity = mode === "satellite" ? 0.42 : 0.32;
   const otherOpacity = mode === "satellite" ? 0.32 : 0.22;
   return {
-    "fill-color": ["case", ["==", ["get", "rural"], true], rural, other],
-    "fill-opacity": ["case", ["==", ["get", "rural"], true], ruralOpacity, otherOpacity],
+    "fill-color": ["case", ["==", ["get", "rural"], true], rural.color, other],
+    "fill-opacity": ["case", ["==", ["get", "rural"], true], rural.opacity, otherOpacity],
   };
 }
 
@@ -312,33 +324,32 @@ export function mfPriorityLinePaint(mode: BasemapMode, tier: "A" | "B"): NonNull
 }
 
 export function eligiblePackFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
-  const rural = mode === "satellite" ? "#c084fc" : OZ_TRACT_SWATCH.rural;
+  const rural = ruralTractFill(mode);
   const urban = mode === "satellite" ? "#8eb6ff" : OZ_TRACT_SWATCH.urban;
-  const ruralOpacity = mode === "satellite" ? 0.42 : 0.32;
   const urbanOpacity = mode === "satellite" ? 0.38 : 0.28;
   return {
-    "fill-color": ["case", ["==", ["get", "rural"], true], rural, urban],
-    "fill-opacity": ["case", ["==", ["get", "rural"], true], ruralOpacity, urbanOpacity],
+    "fill-color": ["case", ["==", ["get", "rural"], true], rural.color, urban],
+    "fill-opacity": ["case", ["==", ["get", "rural"], true], rural.opacity, urbanOpacity],
   };
 }
 
 export function eligiblePackLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecification["paint"]> {
-  const rural = mode === "satellite" ? "#f5f3ff" : "#4c1d95";
+  const rural = ruralTractLine(mode);
   const urban = mode === "satellite" ? "#d6e6ff" : "#c5d8ff";
   return {
-    "line-color": ["case", ["==", ["get", "rural"], true], rural, urban],
-    "line-width": ["case", ["==", ["get", "rural"], true], mode === "satellite" ? 2.8 : 2.5, mode === "satellite" ? 1.6 : 1.25],
-    "line-opacity": mode === "satellite" ? 0.96 : 0.9,
+    "line-color": ["case", ["==", ["get", "rural"], true], rural.color, urban],
+    "line-width": ["case", ["==", ["get", "rural"], true], rural.width, mode === "satellite" ? 1.6 : 1.25],
+    "line-opacity": rural.opacity,
   };
 }
 
 export function oz2LinePaint(mode: BasemapMode): NonNullable<LineLayerSpecification["paint"]> {
-  const rural = mode === "satellite" ? "#f5f3ff" : mode === "streets" ? "#4c1d95" : "#e9d5ff";
+  const rural = ruralTractLine(mode);
   const other = mode === "satellite" ? "#d6e6ff" : mode === "streets" ? "#1d4ed8" : "#c5d8ff";
   return {
-    "line-color": ["case", ["==", ["get", "rural"], true], rural, other],
-    "line-width": ["case", ["==", ["get", "rural"], true], mode === "satellite" ? 2.8 : 2.5, mode === "satellite" ? 1.35 : 1.05],
-    "line-opacity": mode === "satellite" ? 0.96 : 0.88,
+    "line-color": ["case", ["==", ["get", "rural"], true], rural.color, other],
+    "line-width": ["case", ["==", ["get", "rural"], true], rural.width, mode === "satellite" ? 1.35 : 1.05],
+    "line-opacity": rural.opacity,
   };
 }
 

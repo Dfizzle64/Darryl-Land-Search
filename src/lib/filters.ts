@@ -171,6 +171,8 @@ export function parcelMatchesFilters(
 
   const income = parcelIncome(feature, filters.incomeGeography);
   if (income == null) {
+    // A set minimum is restrictive: null / missing medians fail unless Include unknown is on.
+    if (filters.minIncome > 0) return filters.includeUnknownIncome;
     if (!filters.includeUnknownIncome) return false;
   } else if (income < filters.minIncome) {
     return false;
@@ -220,6 +222,16 @@ function finiteNumber(value: string | null, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+/**
+ * Missing income fails a minimum that is actually set, unless the request
+ * explicitly includes unknowns. An omitted flag with no minimum stays inclusive
+ * so the idle map does not hide parcels.
+ */
+export function unknownIncomeParam(flag: string | null, minIncome: string | null): boolean {
+  if (flag != null) return flag !== "0";
+  return finiteNumber(minIncome, DEFAULT_FILTERS.minIncome) <= 0;
+}
+
 /** Query-string form shared by the map client and `/api/parcels`. */
 export function writeParcelFilters(
   params: URLSearchParams,
@@ -256,7 +268,7 @@ export function parcelFiltersFromSearchParams(params: { get(name: string): strin
     includeUnknownAcreage: params.get("unkAcres") !== "0",
     minIncome: finiteNumber(params.get("minIncome"), DEFAULT_FILTERS.minIncome),
     incomeGeography: geo === "blockGroup" ? "blockGroup" : "tract",
-    includeUnknownIncome: params.get("unkIncome") !== "0",
+    includeUnknownIncome: unknownIncomeParam(params.get("unkIncome"), params.get("minIncome")),
     minAadt: finiteNumber(params.get("minAadt"), DEFAULT_FILTERS.minAadt),
     includeUnknownAadt: params.get("unkAadt") !== "0",
   };

@@ -28,7 +28,7 @@ const FLOOD =
   "FEMA NFHL effective flood zones at the centroid. A static BFE is shown only when NFHL publishes one. This layer has no Community Rating System class.";
 const WETLANDS = "National Wetlands Inventory. Polygons draw at closer zoom.";
 const ELIGIBLE =
-  "Violet tracts are rural-eligible. Blue tracts are urban eligible. Eligible is not a designated 2027 QOZ.";
+  "Brown tracts are rural-eligible. Blue tracts are urban eligible. Eligible is not a designated 2027 QOZ. SC MF priority is a separate shortlist, not a designation.";
 const POWER_GENERIC = "HIFLD electric retail territories. Not a connection or a will-serve. Gas has no public polygon.";
 const POWER_ORANGE = "Orange County open-data electric service areas. Not a connection or a will-serve. Gas has no public polygon.";
 const POWER_MECK =

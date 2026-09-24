@@ -131,7 +131,7 @@ describe("basemap helpers", () => {
     expect(JSON.stringify(parcelLinePaint("streets")["line-width"])).toContain("1.15");
     expect(JSON.stringify(parcelLinePaint("streets")["line-color"])).toContain("#0f5132");
     expect(JSON.stringify(parcelLinePaint("dark")["line-color"])).toContain("#b7e3cf");
-    expect(JSON.stringify(oz2LinePaint("streets")["line-color"])).toContain("#4c1d95");
+    expect(JSON.stringify(oz2LinePaint("streets")["line-color"])).toContain("#3f2a1c");
     expect(JSON.stringify(oz2LinePaint("streets")["line-color"])).toContain("#1d4ed8");
     expect(ozLinePaint("streets")["line-color"]).toBe("#9a3412");
     expect(ozLinePaint("dark")["line-color"]).toBe("#f6d0b0");
@@ -163,7 +163,7 @@ describe("basemap helpers", () => {
     );
   });
 
-  it("paints rural tracts violet, urban tracts one blue, and parcel fills green", () => {
+  it("paints rural tracts walnut, urban tracts one blue, and parcel fills green", () => {
     const parcelFill = JSON.stringify(parcelFillPaint("streets")["fill-color"]);
     expect(parcelFill).toContain("#3f9d74");
 
@@ -173,22 +173,28 @@ describe("basemap helpers", () => {
     const designated = OZ_TRACT_SWATCH.designated;
     expect(eligible).toBe(urban);
     expect(new Set([rural, urban, designated]).size).toBe(3);
+    expect(rural).toBe("#a56b3c");
     expect(rural).not.toMatch(/f15a08|f0b429|ff7a29/i);
     expect(urban).toBe("#3d7dff");
 
     const tractPaint = [
       JSON.stringify(oz2FillPaint("streets")),
       JSON.stringify(oz2FillPaint("satellite")),
+      JSON.stringify(oz2FillPaint("dark")),
       JSON.stringify(ozFillPaint("streets")),
       JSON.stringify(ozFillPaint("satellite")),
     ].join(" ");
     expect(tractPaint).toContain(rural);
     expect(tractPaint).toContain(urban);
-    expect(tractPaint).toContain("#c084fc");
+    expect(tractPaint).toContain("#e4c4a0");
+    expect(tractPaint).toContain("#d2b48c");
     expect(tractPaint).toContain("#8eb6ff");
+    expect(tractPaint).not.toContain("#6d28d9");
+    expect(tractPaint).not.toContain("#c084fc");
     expect(tractPaint).not.toMatch(/#f15a08|#f0b429|#ffd56a|#ff7a29|#3f9d74/i);
-    expect(JSON.stringify(oz2FillPaint("streets")["fill-opacity"])).toContain("0.32");
+    expect(JSON.stringify(oz2FillPaint("streets")["fill-opacity"])).toContain("0.34");
     expect(JSON.stringify(oz2FillPaint("streets")["fill-opacity"])).toContain("0.22");
+    expect(JSON.stringify(oz2FillPaint("satellite")["fill-opacity"])).toContain("0.48");
     expect(JSON.stringify(oz2LinePaint("streets")["line-width"])).toContain("2.5");
     expect(JSON.stringify(oz2LinePaint("streets")["line-width"])).toContain("1.05");
   });

@@ -272,7 +272,7 @@ export function FilterSidebar({
           ) : null}
           <Note label="Shed notes">
             <p>
-              Violet is rural-eligible. Blue is urban eligible, including Orlando. Eligible is not designated.
+              Brown is rural-eligible. Blue is urban eligible, including Orlando. Eligible is not designated.
             </p>
             <p>{SHED_CAVEAT}</p>
             <p>{parcelNote}</p>
@@ -445,7 +445,17 @@ export function FilterSidebar({
               max={200000}
               step={5000}
               value={filters.minIncome}
-              onChange={(event) => onChange({ ...filters, minIncome: Number(event.target.value) })}
+              onChange={(event) => {
+                const minIncome = Number(event.target.value);
+                const engaging = filters.minIncome <= 0 && minIncome > 0;
+                const clearing = minIncome <= 0;
+                onChange({
+                  ...filters,
+                  minIncome,
+                  // Engaging the minimum excludes parcels with no joined median. Clearing it restores the idle default.
+                  includeUnknownIncome: engaging ? false : clearing ? true : filters.includeUnknownIncome,
+                });
+              }}
               className="mt-2 w-full accent-clay-400"
             />
             <span className="mt-1 block text-ink-300">
@@ -459,8 +469,10 @@ export function FilterSidebar({
           />
           <Note label="Income notes">
             <p>
-              Florida extracts pick up ACS tract median income where it is published. Unknown income stays visible while
-              Include unknown income is on. Block-group income is Orange County only. No income is invented.
+              Census tract median household income (ACS B19013) is joined the same way for Orlando, Atlanta, and
+              Charleston parcel counties. Other markets stay unknown. Setting a minimum hides parcels below it and
+              parcels with no joined median, unless Include unknown income is on. Block-group income is Orange County
+              only. No income is invented.
             </p>
           </Note>
         </section>

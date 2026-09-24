@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { parcelFiltersFromSearchParams, stampFilterMatch, writeParcelFilters } from "../lib/filters";
+import { parcelFiltersFromSearchParams, stampFilterMatch, unknownIncomeParam, writeParcelFilters } from "../lib/filters";
 import { loadFluConfig, loadZoningConfig } from "../lib/data/loadFixtures";
+import { queryMarketFixtureParcels } from "../lib/data/marketParcelStore";
 import { queryOrlandoFixtureParcels } from "../lib/data/orlandoParcelStore";
 import { selectParcelPage } from "../lib/orlandoParcels";
 import { parcelMatchFilter } from "../lib/basemap";
@@ -83,6 +84,17 @@ describe("parcel query filters", () => {
     expect(params.get("filter")).toBe("1");
     expect(params.get("includeExcluded")).toBe("1");
     expect(parcelFiltersFromSearchParams(params)).toEqual(filters);
+  });
+
+  it("excludes unknown income when a minimum is set and the toggle is omitted", () => {
+    expect(unknownIncomeParam(null, "200000")).toBe(false);
+    expect(unknownIncomeParam(null, "0")).toBe(true);
+    expect(unknownIncomeParam(null, null)).toBe(true);
+    expect(unknownIncomeParam("1", "200000")).toBe(true);
+    expect(unknownIncomeParam("0", null)).toBe(false);
+    const engaged = parcelFiltersFromSearchParams(new URLSearchParams({ minIncome: "200000" }));
+    expect(engaged.minIncome).toBe(200000);
+    expect(engaged.includeUnknownIncome).toBe(false);
   });
 
   it("stamps a property the map can filter without an id list", async () => {
@@ -168,5 +180,35 @@ describe("parcel query filters", () => {
     });
     expect(busy.totalMatching).toBeLessThan(open.totalMatching);
     expect(busy.collection.features.every((feature) => (feature.properties.nearestRoad?.aadt ?? 0) >= 80000)).toBe(true);
+  });
+
+  it("joins Atlanta tract medians the same way Orlando does and applies the income minimum", async () => {
+    const [zoningConfig, fluConfig] = await Promise.all([loadZoningConfig(), loadFluConfig()]);
+    const bbox = [-83.76, 34.04, -83.72, 34.08] as [number, number, number, number];
+    const open = await queryMarketFixtureParcels("Atlanta", {
+      bbox,
+      county: "Barrow",
+      state: "Georgia",
+      limit: 800,
+      filters: { ...DEFAULT_FILTERS, landUseFilter: "off" },
+      zoningConfig,
+      fluConfig,
+    });
+    expect(open.totalMatching).toBeGreaterThan(0);
+    expect(open.collection.features.some((feature) => (feature.properties.incomeTract?.medianHouseholdIncome ?? 0) > 0)).toBe(true);
+
+    const rich = await queryMarketFixtureParcels("Atlanta", {
+      bbox,
+      county: "Barrow",
+      state: "Georgia",
+      limit: 800,
+      filters: { ...DEFAULT_FILTERS, landUseFilter: "off", minIncome: 200000, includeUnknownIncome: false },
+      zoningConfig,
+      fluConfig,
+    });
+    expect(rich.totalMatching).toBeLessThan(open.totalMatching);
+    expect(
+      rich.collection.features.every((feature) => (feature.properties.incomeTract?.medianHouseholdIncome ?? 0) >= 200000),
+    ).toBe(true);
   });
 });

@@ -259,19 +259,3 @@ export function formatRoadLabel(road: {
   if (road.roadwayId) return `FDOT ${road.roadwayId}`;
   return "Nearest FDOT count segment";
 }
-
-export function formatParcelPlace(properties: {
-  situsCity?: string | null;
-  situsZip?: string | null;
-  countyName?: string | null;
-  state?: string | null;
-}): string {
-  const cityZip = [properties.situsCity, properties.situsZip].filter(Boolean).join(" ");
-  if (cityZip) return cityZip;
-  if (properties.countyName) {
-    const stateLabel =
-      properties.state === "Georgia" ? "Georgia" : properties.state && properties.state !== "Florida" ? properties.state : "FL";
-    return `${properties.countyName} County, ${stateLabel}`;
-  }
-  return properties.state || "Florida";
-}

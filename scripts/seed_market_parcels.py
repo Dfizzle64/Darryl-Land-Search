@@ -542,6 +542,8 @@ def fl_spec(fips: str) -> dict:
         "gaps": [
             "City zoning and future land use are joined by npm run seed:brevard-municipal. Re-run that join after this county is re-seeded. County zoning is not copied into cities. Palm Bay and Titusville stay on their prior cards and are not applied here."
             if fips == "12009"
+            else "City zoning and future land use are joined by npm run seed:manatee-sarasota-municipal. Re-run that join after this county is re-seeded. North Port and Venice future land use stay gaps. Anna Maria, Bradenton Beach, and Holmes Beach stay blank. County zoning is not copied into cities."
+            if fips in {"12081", "12115"}
             else "No zoning or FLU on the Florida DOH extract."
         ],
     }

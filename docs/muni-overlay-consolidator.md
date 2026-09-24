@@ -11,6 +11,7 @@ npm run seed:pinellas-pasco-muni
 npm run seed:seminole-municipal
 npm run seed:martin-irc-municipal
 npm run seed:brevard-municipal
+npm run seed:manatee-sarasota-municipal
 npm run seed:sc-muni
 ```
 
@@ -201,6 +202,25 @@ Shelf totals: zoning 979, future land use 973. The Orlando shed sample (mostly T
 | Cocoa Beach | 24 | 24 | Unofficial 2021 `CBParcelsMaster2021`. The drawer flags that vintage |
 
 Palm Bay and Titusville stay on their prior cards and are not applied here. Cape Canaveral, Indialantic, Melbourne Beach, Grant-Valkaria, Palm Shores, Melbourne Village, and Malabar have no public city service. County `Zoning_WKID2881`, county future land use, Accela zoning, West Melbourne `County_FLU_Areas`, and West Melbourne school-zone layers are not copied in. `gis.melbourneflorida.org` and Melbourne, Australia are rejected.
+
+## Manatee and Sarasota Counties, Florida (FIPS 12081 and 12115)
+
+Catalog: `data/manatee-sarasota-municipal.json`. Join script: `scripts/join_manatee_sarasota_municipal.py`. Stamped onto the existing Florida DOH shelves (`fl-doh-ehwaters-12081`, 7,239 parcels; `fl-doh-ehwaters-12115`, 4,303 parcels). County parcels were not re-downloaded. Join is spatial: the centroid plus up to four points inside the parcel, and the smallest containing polygon wins. Opportunity Zone fields, school grades, and base flood elevations were not written.
+
+Shelf totals: Manatee zoning 221 and future land use 247; Sarasota zoning 566 and future land use 124. A situs city on this acreage band is often wider than the municipal polygon, so a miss stays blank. Unincorporated labels such as Myakka City, Parrish, Ellenton, Nokomis, Englewood, and Osprey are not stamped.
+
+| City | Situs parcels | Zoning | Future land use | Layer |
+| --- | ---: | ---: | ---: | --- |
+| Bradenton | 2,080 | 129 | 152 | City `Zoning` `ZONING` and `FLU_CoB` `FLULABEL` |
+| Palmetto | 648 | 73 | 76 | City `Zoning` `ZONE` and `FLU` `FLU` |
+| Longboat Key | 28 | 28 | 28 | Town zoning polygons `ZONING` and `Future_Land_Use` `FLU`. 19 parcels are in Manatee and 9 are in Sarasota |
+| Sarasota | 2,547 | 120 | 115 | Native `Zoning_Districts_(View_Only)` `ZONECLASS` and `FutureLandUse` layer 3 `LANDUSECODE` |
+| North Port | 428 | 367 | 0 | Sarasota County `Hosted/CityNorthPortZoning`. City future land use is still a gap |
+| Venice | 657 | 70 | 0 | Sarasota County `Hosted/CityVeniceZoning`. City future land use is still a gap |
+
+Anna Maria, Bradenton Beach, and Holmes Beach stay blank. PDF maps and parcel `AM_`, `BB_`, and `HB_` fields are not a city service. Manatee County Planning zoning is not copied into those cities or into Bradenton and Palmetto.
+
+City of Sarasota uses the native city services. The county `Hosted/CitySarasotaZoning` copy is not used. `Hosted/CityVeniceZoningView` is token-gated, so the public zoning layer is used and Venice future land use is left blank. County `FLUBoundary` is not stored as city future land use. Northport, Alabama ArcGIS org `3u10F1chkeawsUZY` is rejected.
 
 ## Not in this pass
 

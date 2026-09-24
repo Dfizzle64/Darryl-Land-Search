@@ -137,6 +137,8 @@ Pinellas and Pasco keep those DOH shelves. City zoning and future land use are s
 | Sarasota | Florida | 12115 | complete-gte-5ac | 4,303 | fl-doh-ehwaters-12115 |
 | Sumter | Florida | 12119 | complete-gte-5ac | 6,359 | fl-doh-ehwaters-12119 |
 
+Manatee and Sarasota keep those DOH shelves. City zoning is on 221 Manatee parcels and 566 Sarasota parcels. Future land use is on 247 Manatee parcels and 124 Sarasota parcels. Bradenton, Palmetto, Longboat Key, and the City of Sarasota have both. North Port and Venice are zoning only. Anna Maria, Bradenton Beach, and Holmes Beach stay blank. Sources are in `docs/muni-overlay-consolidator.md`. County parcels were not re-downloaded.
+
 ### Charleston
 
 | County | State | FIPS | Coverage | Parcels | Source |

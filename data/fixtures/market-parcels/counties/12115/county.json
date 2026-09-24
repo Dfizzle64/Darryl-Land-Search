@@ -13,11 +13,17 @@
   "source": "fl-doh-ehwaters-12115",
   "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/57/query",
   "gaps": [
-    "No zoning or FLU on the Florida DOH extract."
+    "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12115, 566 zoning codes and 124 future land use codes). County parcels were not re-downloaded.",
+    "City of Sarasota zoning is Zoning Districts and future land use is FutureLandUse layer 3. The county Hosted/CitySarasotaZoning copy is not used.",
+    "North Port and Venice use Sarasota County Hosted zoning. City future land use for those two cities is still a gap.",
+    "Longboat Key uses the town layers. Anna Maria is not in this county.",
+    "Rejected: Northport, Alabama ArcGIS org 3u10F1chkeawsUZY, the token-gated Venice zoning view, and county FLUBoundary."
   ],
   "path": "data/fixtures/market-parcels/counties/12115/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12115/lookup.json",
   "sourceCount": 4303,
   "dropped": 0,
-  "tileCount": 6
+  "tileCount": 6,
+  "zoningJoinedCount": 566,
+  "fluJoinedCount": 124
 }

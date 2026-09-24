@@ -1,0 +1,178 @@
+{
+  "doNotInventOpportunityZones": true,
+  "doNotInventSchoolGrades": true,
+  "doNotInventBaseFloodElevations": true,
+  "doNotRedownloadCountyParcels": true,
+  "maxCitySpanDegrees": 0.4,
+  "stubCodes": ["CITY", "COUNTY", "NONE", "NULL", "UN", "NO DATA"],
+  "blockedUrlFragments": ["3u10F1chkeawsUZY", "CityVeniceZoningView", "Hosted/CountyZoning", "Hosted/FLUBoundary", "Hosted/CitySarasotaZoning", "geoport.venicefl.gov"],
+  "counties": {
+    "12081": {
+      "name": "Manatee",
+      "source": "fl-doh-ehwaters-12081",
+      "featureCount": 7239,
+      "box": [-82.85, 27.2, -82.05, 27.7]
+    },
+    "12115": {
+      "name": "Sarasota",
+      "source": "fl-doh-ehwaters-12115",
+      "featureCount": 4303,
+      "box": [-82.7, 26.9, -82.0, 27.45]
+    }
+  },
+  "places": [
+    {
+      "id": "bradenton",
+      "municipality": "Bradenton",
+      "fips": ["12081"],
+      "situs": ["BRADENTON"],
+      "fluStatus": "city",
+      "zoning": {
+        "role": "bradenton-zoning",
+        "url": "https://services6.arcgis.com/wl0q8tN2gn8MMx1p/arcgis/rest/services/Zoning/FeatureServer/0",
+        "fields": ["ZONING"],
+        "code": "ZONING",
+        "desc": null,
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "bradenton-flu",
+        "url": "https://services6.arcgis.com/wl0q8tN2gn8MMx1p/arcgis/rest/services/FLU_CoB/FeatureServer/0",
+        "fields": ["FLULABEL", "FLU_DESC"],
+        "code": "FLULABEL",
+        "desc": "FLU_DESC",
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "palmetto",
+      "municipality": "Palmetto",
+      "fips": ["12081"],
+      "situs": ["PALMETTO"],
+      "fluStatus": "city",
+      "zoning": {
+        "role": "palmetto-zoning",
+        "url": "https://services1.arcgis.com/L2Neyx2ylSeTBS0F/arcgis/rest/services/Zoning/FeatureServer/0",
+        "fields": ["ZONE", "DESC_"],
+        "code": "ZONE",
+        "desc": "DESC_",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "palmetto-flu",
+        "url": "https://services1.arcgis.com/L2Neyx2ylSeTBS0F/arcgis/rest/services/FLU/FeatureServer/0",
+        "fields": ["FLU"],
+        "code": "FLU",
+        "desc": null,
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "longboat-key",
+      "municipality": "Longboat Key",
+      "fips": ["12081", "12115"],
+      "situs": ["LONGBOAT KEY"],
+      "fluStatus": "city",
+      "zoning": {
+        "role": "longboat-key-zoning",
+        "url": "https://services2.arcgis.com/Lu7Uh8HEPwu0SbYS/arcgis/rest/services/Longboat_Key_Zoning_Polygons/FeatureServer/0",
+        "fields": ["ZONING", "ZONING_NAME"],
+        "code": "ZONING",
+        "desc": "ZONING_NAME",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "longboat-key-flu",
+        "url": "https://services2.arcgis.com/Lu7Uh8HEPwu0SbYS/arcgis/rest/services/Future_Land_Use/FeatureServer/0",
+        "fields": ["FLU"],
+        "code": "FLU",
+        "desc": null,
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "sarasota",
+      "municipality": "Sarasota",
+      "fips": ["12115"],
+      "situs": ["SARASOTA"],
+      "fluStatus": "city",
+      "zoning": {
+        "role": "sarasota-zoning",
+        "url": "https://services3.arcgis.com/AWDwYUpli8WqpWxQ/arcgis/rest/services/Zoning_Districts_(View_Only)/FeatureServer/0",
+        "fields": ["ZONECLASS", "ZONEDESC"],
+        "code": "ZONECLASS",
+        "desc": "ZONEDESC",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "sarasota-flu",
+        "url": "https://services3.arcgis.com/AWDwYUpli8WqpWxQ/arcgis/rest/services/FutureLandUse/FeatureServer/3",
+        "fields": ["LANDUSECODE", "LANDUSEDESC"],
+        "code": "LANDUSECODE",
+        "desc": "LANDUSEDESC",
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "north-port",
+      "municipality": "North Port",
+      "fips": ["12115"],
+      "situs": ["NORTH PORT"],
+      "fluStatus": "gap",
+      "zoning": {
+        "role": "north-port-zoning",
+        "url": "https://ags3.scgov.net/server/rest/services/Hosted/CityNorthPortZoning/FeatureServer/0",
+        "fields": ["zoningcode", "zoningdescription"],
+        "code": "zoningcode",
+        "desc": "zoningdescription",
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "venice",
+      "municipality": "Venice",
+      "fips": ["12115"],
+      "situs": ["VENICE"],
+      "fluStatus": "gap",
+      "zoning": {
+        "role": "venice-zoning",
+        "url": "https://ags3.scgov.net/server/rest/services/Hosted/CityVeniceZoning/FeatureServer/0",
+        "fields": ["zoningcode", "zoningdescription"],
+        "code": "zoningcode",
+        "desc": "zoningdescription",
+        "where": "1=1"
+      }
+    }
+  ],
+  "partials": [
+    {
+      "municipality": "Anna Maria",
+      "fips": "12081",
+      "situs": ["ANNA MARIA"],
+      "cityRest": null,
+      "note": "PDF and parcel AM_ fields only. No city zoning service was invented."
+    },
+    {
+      "municipality": "Bradenton Beach",
+      "fips": "12081",
+      "situs": ["BRADENTON BEACH"],
+      "cityRest": null,
+      "note": "PDF and parcel BB_ fields only. No city zoning service was invented."
+    },
+    {
+      "municipality": "Holmes Beach",
+      "fips": "12081",
+      "situs": ["HOLMES BEACH"],
+      "cityRest": null,
+      "note": "PDF and parcel HB_ fields only. No city zoning service was invented."
+    }
+  ],
+  "rejected": [
+    "Rejected namesake: ArcGIS org 3u10F1chkeawsUZY is Northport, Alabama, not North Port, Florida.",
+    "Sarasota County Hosted/CitySarasotaZoning is a county copy. The city native Zoning Districts and FutureLandUse layers are used instead.",
+    "Hosted/CityVeniceZoningView is token-gated. The public Hosted/CityVeniceZoning layer is used for zoning only.",
+    "Venice geoport FLU and Sarasota County FLUBoundary are not stored as city future land use. North Port and Venice future land use stay gaps.",
+    "Manatee County Planning zoning is not copied into Bradenton, Palmetto, or the barrier islands.",
+    "Anna Maria, Bradenton Beach, and Holmes Beach have no public city FeatureServer."
+  ]
+}

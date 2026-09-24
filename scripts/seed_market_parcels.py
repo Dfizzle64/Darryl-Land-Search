@@ -26,6 +26,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
+from datetime import datetime, timezone
+
 from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -266,6 +268,7 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    jurisdiction: str | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
     return {
@@ -281,7 +284,7 @@ def empty_feature(
             "situsAddress": situs,
             "situsCity": city,
             "situsZip": zip_code,
-            "jurisdictionCode": None,
+            "jurisdictionCode": jurisdiction,
             "ownerName": owner,
             "ownerName2": None,
             "propertyName": None,
@@ -334,14 +337,22 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    *,
+    return_geometry: bool = True,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
         "outFields": ",".join(out_fields),
-        "returnGeometry": "true",
-        "outSR": "4326",
+        "returnGeometry": "true" if return_geometry else "false",
     }
+    if return_geometry:
+        params["outSR"] = "4326"
     for start in range(0, total, batch):
         chunk = ids[start : start + batch]
         query = dict(params)
@@ -351,12 +362,28 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(
+                        url,
+                        chunk,
+                        out_fields,
+                        batch=max(20, len(chunk) // 2),
+                        return_geometry=return_geometry,
+                    )
+                )
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(
+                        url,
+                        chunk,
+                        out_fields,
+                        batch=max(20, len(chunk) // 2),
+                        return_geometry=return_geometry,
+                    )
+                )
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -365,6 +392,24 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             print(f"    {done}/{total}", flush=True)
         time.sleep(0.05)
     return features
+
+
+def epoch_to_iso(value: Any) -> str | None:
+    """ArcGIS epoch millis or seconds to YYYY-MM-DD. Rejects values outside 1900–2100."""
+    parsed = num(value)
+    if parsed is None:
+        return None
+    if abs(parsed) > 10_000_000_000:
+        parsed = parsed / 1000.0
+    if parsed < -2_208_988_800 or parsed > 4_102_444_800:
+        return None
+    try:
+        stamp = datetime.fromtimestamp(parsed, timezone.utc)
+    except (OverflowError, OSError, ValueError):
+        return None
+    if 1900 <= stamp.year <= 2100:
+        return stamp.date().isoformat()
+    return None
 
 
 def sale_date(year: Any, month: Any) -> str | None:
@@ -418,6 +463,15 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        situs = clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None
+        if not situs and spec.get("situsParts"):
+            parts = [clean(attrs.get(key)) for key in spec["situsParts"]]
+            situs = " ".join(part for part in parts if part) or None
+        sold = None
+        if spec.get("saleYearField"):
+            sold = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
+        elif spec.get("saleDateField"):
+            sold = epoch_to_iso(attrs.get(spec["saleDateField"]))
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -429,13 +483,13 @@ def normalize_rows(
             center=center,  # type: ignore[arg-type]
             source=spec["source"],
             owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
-            situs=clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None,
+            situs=situs,
             city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
             zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
+            sale_date=sold,
             sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
@@ -445,7 +499,11 @@ def normalize_rows(
             mail_city=clean(attrs.get(spec["mailCityField"])) if spec.get("mailCityField") else None,
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
+            jurisdiction=clean(attrs.get(spec["jurisdictionField"])) if spec.get("jurisdictionField") else None,
         )
+        alt = clean(attrs.get(spec["altIdField"])) if spec.get("altIdField") else None
+        if alt:
+            feature["properties"]["_altParcelId"] = alt
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -589,19 +647,108 @@ def county_override(fips: str) -> dict | None:
             "coverage": "complete-gte-5ac",
             "gaps": ["Cobb County open parcels. No zoning join on this layer."],
         }
+    if fips == "45015":  # Berkeley SC
+        return {
+            "kind": "arcgis",
+            "url": "https://gis.berkeleycountysc.gov/arcgis/rest/services/custom/Addr_muni/MapServer/1/query",
+            "where": "TotalAcres>=5 AND TotalAcres<=150",
+            "outFields": [
+                "ParcelID",
+                "O_TMS",
+                "OwnerName",
+                "TotalAcres",
+                "GIS_Address",
+                "GIS_Num",
+                "GIS_Street",
+                "Jurisdiction",
+                "SalePrice",
+                "SaleDate",
+                "StreetAddress1",
+                "City",
+                "StateProvince",
+                "Zip",
+            ],
+            "idField": "ParcelID",
+            "altIdField": "O_TMS",
+            "acresField": "TotalAcres",
+            "ownerField": "OwnerName",
+            "situsField": "GIS_Address",
+            "situsParts": ["GIS_Num", "GIS_Street"],
+            "jurisdictionField": "Jurisdiction",
+            "salePriceField": "SalePrice",
+            "saleDateField": "SaleDate",
+            "mail1Field": "StreetAddress1",
+            "mailCityField": "City",
+            "mailStateField": "StateProvince",
+            "mailZipField": "Zip",
+            "source": "sc-berkeley-addr-muni",
+            "coverage": "complete-gte-5ac",
+            "gaps": ["Berkeley Addr_muni parcels. Goose Creek, Hanahan, and Moncks Corner zoning join by O_TMS."],
+        }
+    if fips == "45019":  # Charleston SC
+        return {
+            "kind": "arcgis",
+            "url": "https://gisccapps.charlestoncounty.org/arcgis/rest/services/ENERGOV/energov_ent/MapServer/12/query",
+            "where": "ACREAGE>=5 AND ACREAGE<=150",
+            "outFields": [
+                "PID",
+                "OWNER1",
+                "ACREAGE",
+                "PROP_ST_NO",
+                "PROP_ST_NAME",
+                "PROP_CITY",
+                "PROP_ZIP",
+                "CLASS_CODE",
+                "SALE_PRICE",
+                "DOC_DATE",
+            ],
+            "idField": "PID",
+            "acresField": "ACREAGE",
+            "ownerField": "OWNER1",
+            "situsParts": ["PROP_ST_NO", "PROP_ST_NAME"],
+            "cityField": "PROP_CITY",
+            "zipField": "PROP_ZIP",
+            "dorField": "CLASS_CODE",
+            "salePriceField": "SALE_PRICE",
+            "saleDateField": "DOC_DATE",
+            "source": "sc-charleston-energov-ent",
+            "coverage": "complete-gte-5ac",
+            "gaps": [
+                "Charleston energov_ent/12 is public. Parcel_Search and Public_Search stay token-walled and are not used.",
+            ],
+        }
     if fips == "45035":  # Dorchester SC
         return {
             "kind": "arcgis",
             "url": "https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/Parcels_Public/MapServer/0/query",
             "where": "GIS_ACREAGE>=5 AND GIS_ACREAGE<=150",
-            "outFields": ["TMS", "OWNER", "GIS_ACREAGE", "TAXED_ACRES", "MAILING_ADDRESS", "CITY_STATE_ZIP"],
+            "outFields": [
+                "TMS",
+                "OWNER",
+                "GIS_ACREAGE",
+                "TAXED_ACRES",
+                "MAILING_ADDRESS",
+                "CITY_STATE_ZIP",
+                "PROPERTY_LOCATION",
+                "ZONINGCODE",
+                "JURISDICTION",
+                "SALE_PRICE",
+                "SALE_DATE",
+            ],
             "idField": "TMS",
             "acresField": "GIS_ACREAGE",
             "ownerField": "OWNER",
+            "situsField": "PROPERTY_LOCATION",
+            "zoningField": "ZONINGCODE",
+            "jurisdictionField": "JURISDICTION",
+            "salePriceField": "SALE_PRICE",
+            "saleDateField": "SALE_DATE",
             "mail1Field": "MAILING_ADDRESS",
             "source": "sc-dorchester-parcels-public",
             "coverage": "complete-gte-5ac",
-            "gaps": ["Dorchester public parcels. Situs is not on this layer. No zoning join."],
+            "gaps": [
+                "Dorchester public parcels. Acreage band is GIS_ACREAGE 5–150 inclusive. No assessed market value on this layer. No county FLU FeatureServer on the card.",
+            ],
         }
     if fips == "01073":  # Jefferson AL
         return {
@@ -620,22 +767,42 @@ def county_override(fips: str) -> dict | None:
             "coverage": "complete-gte-5ac",
             "gaps": ["Jefferson County public parcels. Owner and situs are sparse on this layer. No zoning join."],
         }
-    if fips == "45045":  # Greenville SC
+    if fips == "45045":  # Greenville SC — county tax parcels, not the city GIS sample
         return {
             "kind": "arcgis",
-            "url": "https://citygis.greenvillesc.gov/arcgis/rest/services/GeneralData/GeneralData_WGS84/MapServer/2/query",
-            "where": "GIS_ACRES>=5 AND GIS_ACRES<=150",
-            "outFields": ["PIN", "GIS_ACRES", "NAMECO", "POWNNM", "STREET", "CITY", "ZIP5"],
+            "url": "https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/10/query",
+            "where": "TACRES>=5 AND TACRES<=150",
+            "outFields": [
+                "PIN",
+                "OWNAM1",
+                "TACRES",
+                "STRNUM",
+                "LOCATE",
+                "LANDUSE",
+                "SLPRICE",
+                "DEEDDATE",
+                "JURIS",
+                "STREET",
+                "CITY",
+                "STATE",
+                "ZIP5",
+            ],
             "idField": "PIN",
-            "acresField": "GIS_ACRES",
-            "ownerField": "NAMECO",
-            "situsField": "STREET",
-            "cityField": "CITY",
-            "zipField": "ZIP5",
-            "source": "sc-greenville-city-gis",
-            "coverage": "sample",
+            "acresField": "TACRES",
+            "ownerField": "OWNAM1",
+            "situsParts": ["STRNUM", "LOCATE"],
+            "dorField": "LANDUSE",
+            "jurisdictionField": "JURIS",
+            "salePriceField": "SLPRICE",
+            "saleDateField": "DEEDDATE",
+            "mail1Field": "STREET",
+            "mailCityField": "CITY",
+            "mailStateField": "STATE",
+            "mailZipField": "ZIP5",
+            "source": "sc-greenville-county-tax-parcels",
+            "coverage": "complete-gte-5ac",
             "gaps": [
-                "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
+                "Greenville County Tax Parcel GCGIA/10. TACRES 5–150 inclusive. Replaces the City of Greenville GIS sample.",
             ],
         }
     return None
@@ -646,7 +813,7 @@ def gap_reason(county: dict) -> str:
     if state == "Georgia":
         return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
     if state == "South Carolina":
-        return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. Berkeley, Charleston, Dorchester, and Greenville are the wired polygon counties. This county was not on a verified open polygon endpoint."
     if state == "Alabama":
         return "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
     if state == "Tennessee":
@@ -914,10 +1081,10 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services | Cobb complete on `ACRES`. DeKalb is a complete 5–150 acre extract from Tax_Parcels_Assessment_View layer 2 (`ACREAGE`). City zoning and future land use are joined where a public layer exists. Other Georgia counties are gaps |
-| South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
+| South Carolina | Berkeley Addr_muni, Charleston energov_ent, Dorchester Parcels_Public, Greenville County Tax Parcel | The seed script wires those four counties and joins city zoning where a public layer is usable. This checkout does not replace Berkeley, Charleston, or Greenville parcel tiles. Dorchester keeps the existing 5–150 acre set. Other South Carolina counties stay gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined when a public layer supports it. DeKalb municipalities are first-class: Decatur (Georgia, not Illinois), Brookhaven, Dunwoody, Doraville, Tucker, and Stonecrest supply zoning and future land use. Chamblee is future land use only. Atlanta's citywide layers are joined only inside DeKalb's Atlanta boundary. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake stay blank. County Zoning_District and LandUse fill unincorporated DeKalb only. Those codes are not scored as Orange County multifamily districts. There is no public DeKalb sale table. Prefer **All parcels** in these markets.
+Zoning is joined when a public layer supports it. DeKalb municipalities are first-class: Decatur (Georgia, not Illinois), Brookhaven, Dunwoody, Doraville, Tucker, and Stonecrest supply zoning and future land use. Chamblee is future land use only. Atlanta's citywide layers are joined only inside DeKalb's Atlanta boundary. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake stay blank. County Zoning_District and LandUse fill unincorporated DeKalb only. Those codes are not scored as Orange County multifamily districts. There is no public DeKalb sale table. South Carolina city zoning joins onto the county extract (`scripts/sc_muni_zoning.py`) and is not an Opportunity Zone designation. Prefer **All parcels** in these markets.
 
 ### DeKalb County, Georgia
 
@@ -931,6 +1098,15 @@ OZ 2.0 tracts that are eligible for nomination are not designated QOZs. This ext
 
 ## Coverage
 """
+
+# Counties whose parcel extract receives a public municipal zoning / FLU join.
+SC_MUNI_FIPS = {"45015", "45019", "45035", "45045"}
+
+
+def apply_sc_muni_zoning(fips: str, features: list[dict]) -> tuple[list[dict], list[str]]:
+    from sc_muni_zoning import join_features
+
+    return join_features(fips, features)
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
@@ -948,6 +1124,14 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
             features = cached["features"]
             for feature in features:
                 feature["properties"]["marketIds"] = markets
+            gaps = list(spec.get("gaps") or [])
+            if county["fips"] in SC_MUNI_FIPS and not cached.get("scZoningJoined"):
+                features, joined_gaps = apply_sc_muni_zoning(county["fips"], features)
+                if joined_gaps:
+                    gaps = joined_gaps
+                cached["features"] = features
+                cached["scZoningJoined"] = True
+                cache_path.write_text(json.dumps({"sourceCount": cached.get("sourceCount"), "dropped": cached.get("dropped"), "scZoningJoined": True, "features": features}, separators=(",", ":")))
             path, lookup, tiles = write_tiles(county, features)
             return county_row(
                 county,
@@ -959,7 +1143,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=gaps,
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
@@ -1017,12 +1201,27 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     features, dropped = normalize_rows(raw, county, markets, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
-    )
     coverage = spec["coverage"]
     gaps = list(spec.get("gaps") or [])
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "scZoningJoined": False, "features": features},
+            separators=(",", ":"),
+        )
+    )
+    if fips in SC_MUNI_FIPS and features:
+        features, joined_gaps = apply_sc_muni_zoning(fips, features)
+        if joined_gaps:
+            gaps = joined_gaps
+        if not all(in_band(feature["properties"].get("acreage")) for feature in features):
+            raise RuntimeError(f"{fips} zoning join changed the 5–150 acre band")
+        cache_path.write_text(
+            json.dumps(
+                {"sourceCount": expected, "dropped": dropped, "scZoningJoined": True, "features": features},
+                separators=(",", ":"),
+            )
+        )
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,

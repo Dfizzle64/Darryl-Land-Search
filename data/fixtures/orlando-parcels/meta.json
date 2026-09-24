@@ -15,7 +15,7 @@
   "notes": [
     "Lake, Osceola, Polk, and Seminole are complete DOH extracts of parcels from 5.0 through 150.0 acres (LND_SQFOOT / 43560). Orange is the OCPA cadastre in that same acreage band.",
     "Brevard, Marion, Sumter, and Volusia remain thinner viewport samples in this build.",
-    "Core counties are partitioned into 0.25\u00b0 tiles. The map loads a viewport through /api/parcels.",
+    "Core counties are partitioned into 0.25° tiles. The map loads a viewport through /api/parcels.",
     "Orange geometry, owner, mailing, sale, tax, and zoning come from OCPA. FLU is Orange County + Orlando only.",
     "Median household income and FDOT AADT are joined at query time from sidecar fixtures, not stored on tiles.",
     "Re-pull with npm run seed:parcels:orlando."
@@ -54,7 +54,7 @@
       "source": "doh-ehwaters",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/33/query",
       "gaps": [
-        "Acreage band is 5.0\u2013150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
+        "Acreage band is 5.0–150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
         "No zoning or future land use on the Florida DOH EHWATER extract. Owner, sale, and tax are the public FDOR fields when that roll has them.",
         "OZ 2.0 here is the seven-market rural-eligible tract pack only, not every eligible tract in the county.",
         "Median household income and FDOT AADT are joined at query time for Florida counties, not stored on each tile."
@@ -101,7 +101,7 @@
       "source": "ocpa-webmap",
       "queryUrl": "https://vgispublic.ocpafl.org/server/rest/services/Webmap/PARCEL/MapServer/4/query",
       "gaps": [
-        "Acreage band is 5.0\u2013150.0 acres on the public OCPA parcel layer. Multipart tax accounts sum their piece acres and drop out above 150.",
+        "Acreage band is 5.0–150.0 acres on the public OCPA parcel layer. Multipart tax accounts sum their piece acres and drop out above 150.",
         "Geometry, owner, mailing, sale, tax, and zoning come from OCPA. Parcels that exist only on the older DOH extract are not drawn.",
         "FLU is centroid-joined to Orange County open-data layer 21 and Orlando layer 83. Other cities often stay unknown.",
         "Median household income and FDOT AADT are not copied onto each tile. /api/parcels joins them at query time."
@@ -133,7 +133,7 @@
       "source": "doh-ehwaters",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/48/query",
       "gaps": [
-        "Acreage band is 5.0\u2013150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
+        "Acreage band is 5.0–150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
         "No zoning or future land use on the Florida DOH EHWATER extract. Owner, sale, and tax are the public FDOR fields when that roll has them.",
         "OZ 2.0 here is the seven-market rural-eligible tract pack only, not every eligible tract in the county.",
         "Median household income and FDOT AADT are joined at query time for Florida counties, not stored on each tile."
@@ -162,7 +162,7 @@
       "source": "doh-ehwaters",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/52/query",
       "gaps": [
-        "Acreage band is 5.0\u2013150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
+        "Acreage band is 5.0–150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
         "No zoning or future land use on the Florida DOH EHWATER extract. Owner, sale, and tax are the public FDOR fields when that roll has them.",
         "OZ 2.0 here is the seven-market rural-eligible tract pack only, not every eligible tract in the county.",
         "Median household income and FDOT AADT are joined at query time for Florida counties, not stored on each tile."
@@ -191,7 +191,7 @@
       "source": "doh-ehwaters",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/58/query",
       "gaps": [
-        "Acreage band is 5.0\u2013150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
+        "Acreage band is 5.0–150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
         "No zoning or future land use on the Florida DOH EHWATER extract. Owner, sale, and tax are the public FDOR fields when that roll has them.",
         "OZ 2.0 here is the seven-market rural-eligible tract pack only, not every eligible tract in the county.",
         "Median household income and FDOT AADT are joined at query time for Florida counties, not stored on each tile."
@@ -230,15 +230,15 @@
       "featureCount": 120,
       "ruralEligibleParcelCount": 0,
       "oz2EligibleParcelCount": 0,
-      "zoningJoinedCount": 0,
-      "fluJoinedCount": 0,
+      "zoningJoinedCount": 79,
+      "fluJoinedCount": 58,
       "coverage": "sample",
       "partition": "file",
       "minAcres": 1.0,
       "source": "doh-ehwaters",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/63/query",
       "gaps": [
-        "No zoning on DOH extract"
+        "DOH extract has no zoning. City zoning and FLU are centroid-joined from municipal REST. This sample joined zoning 79 and FLU 58. ZONCODE 999 stubs and the Seattle future land use service are not used."
       ],
       "path": "data/fixtures/orlando-parcels/12127.geojson"
     }

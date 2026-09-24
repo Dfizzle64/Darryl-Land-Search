@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
@@ -229,5 +229,76 @@ describe("Volusia and Flagler municipal catalog", () => {
     expect(uninc?.flu?.url).toMatch(/AGISO_FlaglerFLU\/MapServer\/0$/);
     expect(zoningEmptyForCounty("12127", "fallback")).toBe("No municipal zoning polygon covers this parcel.");
     expect(zoningEmptyForCounty("12095", "Not on the OCPA parcel")).toBe("Not on the OCPA parcel");
+  });
+});
+
+describe("joined Volusia parcels", () => {
+  const summary = JSON.parse(
+    readFileSync(path.join(process.cwd(), "data/fixtures/volusia-flagler-municipal-join.json"), "utf8"),
+  ) as {
+    opportunityZonesInvented: number;
+    rejectedNotUsed: string[];
+    baselines: {
+      "market-12127": { zoning: number; flu: number };
+      "flagler-12035": { present: boolean; parcels: number };
+    };
+    byPlace: Record<string, { zoning: number; flu: number }>;
+  };
+
+  it("stamps city codes and leaves partial future land use blank", () => {
+    expect(summary.opportunityZonesInvented).toBe(0);
+    expect(summary.baselines["market-12127"].zoning).toBeGreaterThan(2000);
+    expect(summary.baselines["market-12127"].flu).toBeGreaterThan(1000);
+    expect(summary.baselines["flagler-12035"].present).toBe(false);
+    expect(summary.baselines["flagler-12035"].parcels).toBe(0);
+    for (const id of [
+      "daytona-beach",
+      "port-orange",
+      "ormond-beach",
+      "deltona",
+      "deland",
+      "edgewater",
+      "south-daytona",
+      "holly-hill",
+      "oak-hill",
+      "ponce-inlet",
+    ]) {
+      expect(summary.byPlace[id]?.zoning).toBeGreaterThan(0);
+      expect(summary.byPlace[id]?.flu).toBeGreaterThan(0);
+    }
+    for (const id of ["daytona-beach-shores", "debary", "new-smyrna-beach", "orange-city", "lake-helen", "pierson"]) {
+      expect(summary.byPlace[id]?.zoning).toBeGreaterThan(0);
+      expect(summary.byPlace[id]?.flu).toBe(0);
+    }
+    expect(summary.rejectedNotUsed.some((url) => url.includes("Future_Land_Use__2035"))).toBe(true);
+    expect(summary.rejectedNotUsed.some((url) => url.includes("Open_Data_4/FeatureServer/36"))).toBe(true);
+    expect(summary.rejectedNotUsed.some((url) => url.includes("Debary/MapServer/21"))).toBe(true);
+  });
+
+  it("does not write stub districts, rejected layers, or city FLU for partial places", () => {
+    const tiles = readdirSync(path.join(process.cwd(), "data/fixtures/market-parcels/counties/12127/tiles")).filter((name) =>
+      name.endsWith(".geojson"),
+    );
+    let stamped = 0;
+    for (const name of tiles) {
+      const collection = JSON.parse(
+        readFileSync(path.join(process.cwd(), "data/fixtures/market-parcels/counties/12127/tiles", name), "utf8"),
+      ) as { features: { properties: Record<string, unknown> }[] };
+      for (const feature of collection.features) {
+        const props = feature.properties;
+        const municipal = props.municipal as { placeId?: string; fluGap?: string | null; zoningLayer?: string | null; fluLayer?: string | null } | undefined;
+        if (!municipal) continue;
+        stamped += 1;
+        expect(props.zoningCode).not.toBe("999");
+        const flu = props.flu as { code?: string; source?: string } | null;
+        if (municipal.fluGap) expect(flu?.code ?? null).toBeNull();
+        for (const layer of [municipal.zoningLayer, municipal.fluLayer, flu?.source]) {
+          expect(layer ?? "").not.toContain("Future_Land_Use__2035");
+          expect(layer ?? "").not.toContain("Open_Data_4/FeatureServer/36");
+          expect(layer ?? "").not.toContain("Debary/MapServer/21");
+        }
+      }
+    }
+    expect(stamped).toBeGreaterThan(2000);
   });
 });

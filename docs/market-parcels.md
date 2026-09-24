@@ -22,7 +22,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Yadkin uses the county GIS parcel layer instead |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -30,7 +30,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or, for Yadkin County, from the county-hosted zoning layers. Town zoning (Boonville, East Bend, Jonesville, Yadkinville) is first-class and replaces the county `TZ` placeholder. Yadkin’s Land Use layer is USDA cropland, not future land use; the 2023 FLUM is PDF-only and is not joined. Joined zoning outside Orange County is not a multifamily knowledge-base match. Prefer **All parcels** in these markets. Opportunity Zone eligibility is not a designated QOZ.
 
 ## Coverage
 
@@ -60,7 +60,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Chattanooga | other | 10,537 | 2 | 0 | 8 |
 | Knoxville | other | 38,433 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
-| Winston-Salem | other | 91,784 | 9 | 0 | 0 |
+| Winston-Salem | other | 91,795 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
 
 ## Counties
@@ -365,7 +365,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Rockingham | North Carolina | 37157 | complete-gte-5ac | 9,378 | nc-onemap-37157 |
 | Stokes | North Carolina | 37169 | complete-gte-5ac | 8,826 | nc-onemap-37169 |
 | Surry | North Carolina | 37171 | complete-gte-5ac | 10,547 | nc-onemap-37171 |
-| Yadkin | North Carolina | 37197 | complete-gte-5ac | 8,091 | nc-onemap-37197 |
+| Yadkin | North Carolina | 37197 | complete-gte-5ac | 8,102 | nc-yadkin-county-gis |
 
 ### Wilmington
 

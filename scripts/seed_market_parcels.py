@@ -250,6 +250,7 @@ def empty_feature(
     center: tuple[float, float],
     source: str,
     owner: str | None = None,
+    owner2: str | None = None,
     situs: str | None = None,
     city: str | None = None,
     zip_code: str | None = None,
@@ -283,7 +284,7 @@ def empty_feature(
             "situsZip": zip_code,
             "jurisdictionCode": None,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
             "zoningDistrict": None,
@@ -367,6 +368,37 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
     return features
 
 
+def epoch_to_iso(value: Any) -> str | None:
+    parsed = num(value)
+    if parsed is None or parsed <= 0:
+        return None
+    seconds = parsed / 1000 if parsed > 10_000_000_000 else parsed
+    if seconds < 0 or seconds > 4_102_444_800:  # through 2100
+        return None
+    try:
+        text = time.strftime("%Y-%m-%d", time.gmtime(seconds))
+    except (OverflowError, OSError, ValueError):
+        return None
+    year = int(text[:4])
+    if year < 1950 or year > 2035:
+        return None
+    return text
+
+
+def sum_money(attrs: dict, fields: list[str]) -> float | None:
+    total = 0.0
+    found = False
+    for key in fields:
+        part = num(attrs.get(key))
+        if part is None or part <= 0:
+            continue
+        total += part
+        found = True
+    if not found:
+        return None
+    return round(total, 2)
+
+
 def sale_date(year: Any, month: Any) -> str | None:
     y = num(year)
     if y is None or y < 1900 or y > 2100:
@@ -418,6 +450,21 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        if spec.get("saleEpochField"):
+            sold_on = epoch_to_iso(attrs.get(spec["saleEpochField"]))
+            qualified = clean(attrs.get(spec["saleQualifiedField"])) if spec.get("saleQualifiedField") else None
+        elif spec.get("saleYearField"):
+            sold_on = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
+            qualified = clean(attrs.get("QUAL_CD1"))
+        else:
+            sold_on = None
+            qualified = None
+        if spec.get("marketValueSum"):
+            market_value = sum_money(attrs, spec["marketValueSum"])
+        elif spec.get("marketValueField"):
+            market_value = num(attrs.get(spec["marketValueField"]))
+        else:
+            market_value = None
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -435,9 +482,10 @@ def normalize_rows(
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
-            sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
-            market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
+            sale_date=sold_on,
+            sale_qualified=qualified,
+            market_value=market_value,
+            owner2=clean(attrs.get(spec["owner2Field"])) if spec.get("owner2Field") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
             taxable=num(attrs.get(spec["taxableField"])) if spec.get("taxableField") else None,
             mail1=clean(attrs.get(spec["mail1Field"])) if spec.get("mail1Field") else None,
@@ -657,6 +705,10 @@ def county_override(fips: str) -> dict | None:
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
             ],
         }
+    if fips == "37197":  # Yadkin NC
+        from yadkin_parcels import yadkin_parcel_spec
+
+        return yadkin_parcel_spec()
     return None
 
 
@@ -740,6 +792,7 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    extras: dict | None = None,
 ) -> dict:
     row = {
         "name": county["name"],
@@ -760,6 +813,8 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    if extras:
+        row.update(extras)
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
     (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
     return row
@@ -921,7 +976,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Yadkin uses the county GIS parcel layer instead |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -929,7 +984,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or, for Yadkin County, from the county-hosted zoning layers. Town zoning (Boonville, East Bend, Jonesville, Yadkinville) is first-class and replaces the county `TZ` placeholder. Yadkin’s Land Use layer is USDA cropland, not future land use; the 2023 FLUM is PDF-only and is not joined. Joined zoning outside Orange County is not a multifamily knowledge-base match. Prefer **All parcels** in these markets. Opportunity Zone eligibility is not a designated QOZ.
 
 ## Coverage
 """
@@ -957,10 +1012,11 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=list(spec.get("gaps") or []) + list(cached.get("gapLines") or []),
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
+                extras=cached.get("extras"),
             )
     try:
         expected = count_where(spec["url"], spec["where"])
@@ -1009,18 +1065,54 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
             gaps=[reason, *(spec.get("gaps") or [])],
             source_count=0,
         )
-    print(f"  source rows {expected}", flush=True)
-    ids = fetch_object_ids(spec["url"], spec["where"])
-    raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
-    features, dropped = normalize_rows(raw, county, markets, spec)
+    norm_path = CACHE_DIR / f"{fips}.normalized.json"
+    features = None
+    dropped = 0
+    if spec.get("enrich") and norm_path.exists():
+        print(f"  reusing normalized cache {norm_path}", flush=True)
+        cached_norm = json.loads(norm_path.read_text())
+        features = cached_norm.get("features") or []
+        expected = int(cached_norm.get("sourceCount") or expected)
+        dropped = int(cached_norm.get("dropped") or 0)
+    if features is None:
+        print(f"  source rows {expected}", flush=True)
+        ids = fetch_object_ids(spec["url"], spec["where"])
+        raw = fetch_by_ids(spec["url"], ids, spec["outFields"], batch=int(spec.get("batch") or 120))
+        features, dropped = normalize_rows(raw, county, markets, spec)
+        if spec.get("enrich"):
+            CACHE_DIR.mkdir(parents=True, exist_ok=True)
+            norm_path.write_text(
+                json.dumps(
+                    {"sourceCount": expected, "dropped": dropped, "features": features},
+                    separators=(",", ":"),
+                )
+            )
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    extras = None
+    gap_lines: list[str] = []
+    if spec.get("enrich") == "yadkin" and features:
+        from yadkin_parcels import enrich_yadkin
+
+        print("  joining Yadkin zoning, town limits, and opportunity zones", flush=True)
+        enriched = enrich_yadkin(features)
+        gap_lines = list(enriched.pop("gapLines") or [])
+        extras = {"yadkin": enriched}
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+        json.dumps(
+            {
+                "sourceCount": expected,
+                "dropped": dropped,
+                "features": features,
+                "extras": extras,
+                "gapLines": gap_lines,
+            },
+            separators=(",", ":"),
+        )
     )
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
+    gaps = list(spec.get("gaps") or []) + gap_lines
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,
@@ -1047,6 +1139,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         source_count=expected,
         dropped=dropped,
         tile_count=tiles,
+        extras=extras,
     )
 
 

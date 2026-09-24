@@ -24,7 +24,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Chattanooga | other | 10,537 | 2 | 0 | 8 |
 | Knoxville | other | 38,433 | 7 | 0 | 6 |
 | Memphis | other | 35,611 | 7 | 0 | 4 |
-| Winston-Salem | other | 91,784 | 9 | 0 | 0 |
+| Winston-Salem | other | 91,795 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
 
 ## Counties
@@ -329,7 +329,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Rockingham | North Carolina | 37157 | complete-gte-5ac | 9,378 | nc-onemap-37157 |
 | Stokes | North Carolina | 37169 | complete-gte-5ac | 8,826 | nc-onemap-37169 |
 | Surry | North Carolina | 37171 | complete-gte-5ac | 10,547 | nc-onemap-37171 |
-| Yadkin | North Carolina | 37197 | complete-gte-5ac | 8,091 | nc-onemap-37197 |
+| Yadkin | North Carolina | 37197 | complete-gte-5ac | 8,102 | nc-yadkin-county-gis |
 
 ### Wilmington
 

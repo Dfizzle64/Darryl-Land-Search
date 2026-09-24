@@ -107,7 +107,7 @@ Wired in the seed script and not downloaded here (those shelves belong with the 
 | Folly Beach, Summerville, Charleston, North Charleston, Mount Pleasant | Charleston | PID or spatial city layers | — |
 | Isle of Palms | Charleston | District services only | Partial. PDD not joined |
 | Charleston County | Charleston | Remainder, not on Sullivan's Island, James Island, or Isle of Palms | — |
-| Sullivan's Island, James Island | Charleston | — | PDF or static maps only. No municipal zoning REST. |
+| Sullivan's Island, James Island | Charleston | — | PDF or static maps only. No municipal zoning REST. County External/ENERGOV is a municipal overlay, not the ZLDR zoning layer, and is not used as James Island zoning. |
 | Fountain Inn, City of Greenville, Greer | Greenville | Spatial or attribute city layers on county parcels | Fountain Inn has no city FLU |
 | Mauldin, Simpsonville, Travelers Rest | Greenville | County JCODE only | No city REST. Simpsonville AGOL is Shelby County, Tennessee and is rejected |
 | Greenville County | Greenville | Unincorporated county zoning | — |

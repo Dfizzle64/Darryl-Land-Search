@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T00:47:37Z",
+  "generatedAt": "2026-09-24T00:57:03Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 70464,
+  "parcelCount": 76288,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -1002,20 +1002,25 @@
       "name": "Walton",
       "fips": "13297",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 5824,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-walton-choosewalton-parcels",
+      "queryUrl": "https://services.arcgis.com/ftUt0Vfnzfo0Cs96/arcgis/rest/services/Walton_County_Zoning/FeatureServer/29/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Kept 5824 Walton County, Georgia parcels in the inclusive 5\u2013150 GIS-acre band from choosewalton Walton_County_Zoning/29 (6187 source rows). Duplicate Parcel_No rings were dissolved (344 duplicate groups, 344 extra rings). Blank Parcel_No rows dropped: 9. Shared UTILITY ids dropped: 10.",
+        "Monroe City Parcels CAMA matched 12 of 5824 kept parcels (owner filled 12, curr_val filled 12). The Monroe layer has 6043 city parcels. Most Monroe Parcel_No values are M* or NM* and do not equal the county C* or N* numbers, so only shared Parcel_No values were joined. waltongis walton_parcels_view is token/subscription blocked (499/403), so there is no countywide owner, mailing, or tax.",
+        "City Euclidean zoning spatial join: Monroe 8, Loganville 3, Social Circle 6, Monroe CAMA zoning fallback 5, unmatched 5802. LG* and SC* names were not used as Parcel_No keys. County Euclidean zoning (A-1/R-1 and the rest of the county ordinance) is qPublic HTML only.",
+        "FLU and Description on the county landbase are character areas (Suburban, Neighborhood Residential, Conservation, Rural Residential and Agriculture, Highway Corridor, Employment Center, Village Center), not Euclidean zoning. City character/FLU replaced that label where the centroid hit: Monroe character 0, Loganville NEGRC 7, Social Circle NEGRC 8, Walnut Grove NEGRC 12, county character kept 5797.",
+        "No public sale price or date. Monroe sale fields are unused. No countywide tax roll. Assessed value, taxable value, and tax amount were not on the public layers used here. Opportunity Zone and OZ 2.0 were not assigned.",
+        "Rejected Walton County, Florida Beacon AppID=835 and ARC LandPro. This extract is Walton County, Georgia (FIPS 13297). Loganville zoning polygons can extend into Gwinnett; only Walton landbase parcels are included."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13297/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13297/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 6187
     }
   ]
 }

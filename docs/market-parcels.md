@@ -23,14 +23,14 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels; Cheatham uses APSU CheatGIS | Complete where `CALC_ACRE` returns rows. Cheatham (FIPS 47021) is Comptroller COUNTY_ID 11 / JUR 011, so it is pulled from APSU CheatGIS MapServer/9 (parcel type 1, calc_acre 5–150) with cities-first zoning. Several large counties are absent from IMPACT and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb), plus Cheatham County's cities-first APSU polygon join (Ashland City, Pleasant View, Kingston Springs, Pegram, then unincorporated county). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 
@@ -45,7 +45,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
-| Nashville | primary | 31,132 | 6 | 0 | 11 |
+| Nashville | primary | 32,768 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
@@ -138,7 +138,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Bedford | Tennessee | 47003 | complete-gte-5ac | 4,211 | tn-impact-47003 |
 | Cannon | Tennessee | 47015 | complete-gte-5ac | 6,376 | tn-impact-47015 |
-| Cheatham | Tennessee | 47021 | complete-gte-5ac | 3,790 | tn-impact-47021 |
+| Cheatham | Tennessee | 47021 | complete-gte-5ac | 5,426 | apsu-cheatgis-47021 |
 | Davidson | Tennessee | 47037 | complete-gte-5ac | 8,286 | tn-impact-47037 |
 | Dickson | Tennessee | 47043 | complete-gte-5ac | 4,797 | tn-impact-47043 |
 | Hickman | Tennessee | 47081 | complete-gte-5ac | 3,672 | tn-impact-47081 |

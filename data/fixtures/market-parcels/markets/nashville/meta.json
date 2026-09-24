@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T00:33:16Z",
   "market": "Nashville",
   "tier": "primary",
-  "parcelCount": 31132,
+  "parcelCount": 32768,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -58,20 +58,23 @@
       "name": "Cheatham",
       "fips": "47021",
       "state": "Tennessee",
-      "featureCount": 3790,
+      "featureCount": 5426,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47021",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "apsu-cheatgis-47021",
+      "queryUrl": "https://apnsgis4.apsu.edu/arcgis/rest/services/Cheatham/CheatGIS/MapServer/9/query",
       "gaps": [
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Future land use is an honest REST gap for Cheatham County, Ashland City, Pleasant View, Kingston Springs, and Pegram. CheatGIS urban growth and Cheatham Growth layers are guidance only and are not parcel FLU or zoning entitlement.",
+        "Zoning is a cities-first polygon join on APSU CheatGIS: Ashland City, Pleasant View, Kingston Springs, and Pegram inside their community limits, then unincorporated Cheatham zoning. City district codes are not applied outside those limits. The parcel zoning attribute is often blank and is not the district.",
+        "Rejected twins: Ashland County, Wisconsin; Ashland County, Ohio; City of Ashland, Kentucky; and Chatham County misspellings. IMPACT COUNTY_ID is 11 and JUR is 011 (Comptroller), not FIPS 021. This extract is APSU CheatGIS MapServer/9, parcel_typ 1, calc_acre 5\u2013150.",
+        "5428 CheatGIS rows in the parcel_typ=1 and calc_acre 5\u2013150 query collapsed to 5426 GIS links. 12 kept rows have a blank or non-11 county_id but an 011 GIS link on the Cheatham service."
       ],
       "path": "data/fixtures/market-parcels/counties/47021/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47021/lookup.json",
-      "tileCount": 6,
-      "sourceCount": 3932
+      "tileCount": 5,
+      "sourceCount": 5428
     },
     {
       "name": "Davidson",

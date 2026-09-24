@@ -9,7 +9,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Atlanta | primary | 8,149 | 1 | 1 | 33 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
-| Nashville | primary | 31,132 | 6 | 0 | 11 |
+| Nashville | primary | 32,768 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
@@ -102,7 +102,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Bedford | Tennessee | 47003 | complete-gte-5ac | 4,211 | tn-impact-47003 |
 | Cannon | Tennessee | 47015 | complete-gte-5ac | 6,376 | tn-impact-47015 |
-| Cheatham | Tennessee | 47021 | complete-gte-5ac | 3,790 | tn-impact-47021 |
+| Cheatham | Tennessee | 47021 | complete-gte-5ac | 5,426 | apsu-cheatgis-47021 |
 | Davidson | Tennessee | 47037 | complete-gte-5ac | 8,286 | tn-impact-47037 |
 | Dickson | Tennessee | 47043 | complete-gte-5ac | 4,797 | tn-impact-47043 |
 | Hickman | Tennessee | 47081 | complete-gte-5ac | 3,672 | tn-impact-47081 |

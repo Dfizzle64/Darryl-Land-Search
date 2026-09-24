@@ -508,6 +508,8 @@ def nc_spec(fips: str) -> dict:
 
 
 def tn_spec(fips: str) -> dict:
+    # FIPS suffix is the IMPACT COUNTY_ID for the counties this seeder already pulled.
+    # Cheatham is the exception (FIPS 47021, Comptroller COUNTY_ID 11) and is not handled here.
     county_id = int(fips[2:])
     return {
         "kind": "arcgis",
@@ -567,6 +569,17 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    if fips == "47021":  # Cheatham TN — Comptroller 011, not FIPS 021
+        return {
+            "kind": "cheatham",
+            "url": "https://apnsgis4.apsu.edu/arcgis/rest/services/Cheatham/CheatGIS/MapServer/9/query",
+            "source": "apsu-cheatgis-47021",
+            "coverage": "complete-gte-5ac",
+            "gaps": [
+                "Future land use is an honest REST gap for Cheatham County, Ashland City, Pleasant View, Kingston Springs, and Pegram. CheatGIS urban growth and Cheatham Growth layers are guidance only and are not parcel FLU or zoning entitlement.",
+                "Zoning is a cities-first polygon join on APSU CheatGIS: Ashland City, Pleasant View, Kingston Springs, and Pegram inside their community limits, then unincorporated Cheatham zoning. City district codes are not applied outside those limits. The parcel zoning attribute is often blank and is not the district.",
+            ],
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -922,14 +935,14 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
-| Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
+| Tennessee | Comptroller IMPACT Parcels; Cheatham uses APSU CheatGIS | Complete where `CALC_ACRE` returns rows. Cheatham (FIPS 47021) is Comptroller COUNTY_ID 11 / JUR 011, so it is pulled from APSU CheatGIS MapServer/9 (parcel type 1, calc_acre 5–150) with cities-first zoning. Several large counties are absent from IMPACT and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb), plus Cheatham County's cities-first APSU polygon join (Ashland City, Pleasant View, Kingston Springs, Pegram, then unincorporated county). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -1142,6 +1155,17 @@ def main() -> None:
         markets = full_markets[fips]
         spec = spec_for(slot["county"])
         existing = COUNTY_DIR / fips / "county.json"
+        if spec.get("kind") == "cheatham":
+            if not existing.exists() or args.refresh:
+                from seed_cheatham import seed_cheatham
+
+                seed_cheatham(markets)
+            elif existing.exists():
+                row = json.loads(existing.read_text())
+                if row.get("featureCount") and row.get("coverage") in {"complete-gte-5ac", "sample"}:
+                    row["markets"] = markets
+                    existing.write_text(json.dumps(row, indent=2) + "\n")
+            continue
         if spec["kind"] == "gap":
             if not existing.exists() or args.refresh:
                 write_gap(slot["county"], markets, spec)

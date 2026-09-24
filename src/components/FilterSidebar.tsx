@@ -4,7 +4,8 @@ import type { ReactNode } from "react";
 import { MfPriorityFilter } from "./MfPriorityFilter";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { ZoningKnowledgePanel } from "./ZoningKnowledgePanel";
-import { UTILITY_LAYER_NOTE, type ScreeningToggles } from "@/lib/screening";
+import { screeningLayerNotes } from "@/lib/screeningLayerHelp";
+import type { ScreeningToggles } from "@/lib/screening";
 import { ACREAGE_SLIDER, DEFAULT_FILTERS, SHED_CAVEAT, type FilterState, type FluConfig, type LandUseFilter, type MfPriorityView, type OzFilter, type SearchMarketId, type ZoningConfig } from "@/lib/types";
 
 type FilterSidebarProps = {
@@ -32,6 +33,9 @@ type FilterSidebarProps = {
   orlandoParcels: boolean;
   parcelCoverageNote?: string | null;
   market: SearchMarketId;
+  county: string | null;
+  countyState: string | null;
+  marketStates: string[];
   tractCount: number;
   ruralTractCount: number;
   urbanTractCount: number;
@@ -207,6 +211,9 @@ export function FilterSidebar({
   orlandoParcels,
   parcelCoverageNote = null,
   market,
+  county,
+  countyState,
+  marketStates,
   tractCount,
   ruralTractCount,
   urbanTractCount,
@@ -217,6 +224,7 @@ export function FilterSidebar({
   onPriorityView,
 }: FilterSidebarProps) {
   const generatedAt = typeof meta.generatedAt === "string" ? meta.generatedAt.slice(0, 10) : null;
+  const layerNotes = screeningLayerNotes({ market, county, state: countyState, states: marketStates });
 
   return (
     <>
@@ -310,7 +318,8 @@ export function FilterSidebar({
           <Toggle label="Designated QOZ overlay" checked={showOz} onChange={onShowOz} />
           <Note label="What these mean">
             <p>Parcel filter only. Eligible tracts are Rev. Proc. 2026-14 nomination geography, not a designated 2027 QOZ.</p>
-            <p>Violet is rural-eligible. Blue is urban eligible, including Orlando. The designated overlay is the current HUD/Treasury QOZ layer and stays off unless you turn it on.</p>
+            <p>{layerNotes.eligibleTracts}</p>
+            <p>{layerNotes.designatedOz}</p>
           </Note>
         </section>
 
@@ -324,12 +333,12 @@ export function FilterSidebar({
           <Toggle label="Electric" checked={screening.power} onChange={(value) => onScreening("power", value)} />
           <Note label="Layer notes">
             <p>Off by default. These draw on the map and do not change which parcels match. No grade, BFE, or service connection is invented.</p>
-            <p>{UTILITY_LAYER_NOTE.flood}</p>
-            <p>{UTILITY_LAYER_NOTE.wetlands}</p>
-            <p>{UTILITY_LAYER_NOTE.schools}</p>
-            <p>{UTILITY_LAYER_NOTE.water}</p>
-            <p>{UTILITY_LAYER_NOTE.sewer}</p>
-            <p>{UTILITY_LAYER_NOTE.power}</p>
+            <p>{layerNotes.flood}</p>
+            <p>{layerNotes.wetlands}</p>
+            <p>{layerNotes.schools}</p>
+            <p>{layerNotes.water}</p>
+            <p>{layerNotes.sewer}</p>
+            <p>{layerNotes.power}</p>
           </Note>
         </section>
 

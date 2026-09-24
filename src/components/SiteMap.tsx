@@ -5,6 +5,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./mapPopup.css";
 import { useEffect, useRef, useState } from "react";
 import { aoiFeatureCollection, normalizeBbox, type AoiLock } from "@/lib/aoi";
+import { screeningLegendLine } from "@/lib/screeningLayerHelp";
 import { applyMapGestures } from "@/lib/mapGestures";
 import { BasemapToggle } from "./BasemapToggle";
 import { AoiControls } from "./AoiControls";
@@ -91,6 +92,7 @@ type SiteMapProps = {
   onTractClass: (view: TractClassView) => void;
   county: string | null;
   countyState: string | null;
+  marketStates: string[];
   bounds: LngLatBounds;
   boundsKey: string;
   ozFilter: OzFilter;
@@ -545,6 +547,7 @@ export function SiteMap({
   onTractClass,
   county,
   countyState,
+  marketStates,
   bounds,
   boundsKey,
   ozFilter,
@@ -1245,6 +1248,7 @@ export function SiteMap({
 
   const scStatusHelp = southCarolinaStatusHelp(market, countyState);
   const layerOn = parcelLayerVisible ?? showParcels;
+  const legendScope = { market, county, state: countyState, states: marketStates };
 
   return (
     <div ref={shellRef} className="relative h-full w-full">
@@ -1423,25 +1427,25 @@ export function SiteMap({
           {screening.water ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle" style={{ backgroundColor: "#3d7dff" }} />
-              Water service area (Orange County only)
+              {screeningLegendLine("water", legendScope)}
             </p>
           ) : null}
           {screening.sewer ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle" style={{ backgroundColor: "#7a5cff" }} />
-              Sewer service area (Orange County only)
+              {screeningLegendLine("sewer", legendScope)}
             </p>
           ) : null}
           {screening.power ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle" style={{ backgroundColor: "#e0b15a" }} />
-              Electric service area (Orange County; retail territory elsewhere)
+              {screeningLegendLine("power", legendScope)}
             </p>
           ) : null}
           {screening.schools ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-full align-middle" style={{ backgroundColor: "#1f7a4d" }} />
-              Schools · letter grade, OCPS zones in Orange County, CMS zones in Mecklenburg
+              {screeningLegendLine("schools", legendScope)}
             </p>
           ) : null}
           {screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power ? (

@@ -5,19 +5,30 @@
   "markets": [
     "Atlanta"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 2738,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "ga-butts-wfs-0",
+  "queryUrl": "https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/0/query",
   "gaps": [
-    "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+    "Butts County parcels are wfs.schneidercorp.com ButtsCountyGA_WFS/MapServer/0. Acreage is TOTALACRES, inclusive 5\u2013150. DEED_ACRES is not the filter. The service is State Plane Georgia West; features were requested in WGS84 and kept only inside the Butts County, Georgia box.",
+    "PropCity is the municipality flag. County means unincorporated. OwnerCity is the mailing city and is not a municipality filter. PropZip is sparse on this layer. Site Structure Address Post_Code was not joined, so most situs ZIP values stay null.",
+    "CURR_VAL is the published current value. ESTTAX is the published estimated tax. Assessed value and taxable value are not on this layer.",
+    "SALES_AREA is a neighborhood code, not a deed. Last sale stays null. qPublic App=ButtsCountyGA was not scraped.",
+    "City zoning is a centroid join: City of Jackson MapServer/4, Flovilla MapServer/5 (layer title Flowvilla), then Jenkinsburg MapServer/6. A city PropCity with no city polygon uses Zoning_01. Unincorporated parcels use Zoning_01 when that code is filled, then dissolved County Zoning MapServer/3. Zoning_02 and Zoning_03 split codes are not stored.",
+    "Future land use is the Butts County Comprehensive Plan PDF. No future-land-use service was joined. City of Jackson's comprehensive plan is also a PDF.",
+    "Butte County, California, Jackson, Mississippi, Jackson County, Georgia, and ARC LandPro were not used.",
+    "This extract does not assign Opportunity Zone designations.",
+    "2752 source rows in the TOTALACRES 5\u2013150 query; 2738 parcel ids kept.",
+    "Zoning joins: BUTTS 2554, FLOVILLA 45, JACKSON 98, JENKINSBURG 41.",
+    "Zoning sources: city-attribute 1, city-polygon 183, county-attribute 2553, county-polygon 1.",
+    "142 kept parcels have Zoning_02 or Zoning_03 split codes that were not stored."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/13035/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13035/lookup.json",
+  "sourceCount": 2752,
+  "dropped": 14,
+  "tileCount": 4
 }

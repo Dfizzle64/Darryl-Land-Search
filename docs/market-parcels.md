@@ -33,6 +33,8 @@ Hall County, Georgia is the official hallgis HallCo_Addr_Pcl_Rds/MapServer/1 ext
 
 Jackson County, Georgia is the county Tax_Parcels/FeatureServer/9 extract. Acreage is TOTALACRES in the inclusive 5–150 band. Market value is the sum of the published fair-market components. Sales stay null. City Euclidean zoning covers Jefferson, Commerce, Hoschton, Pendergrass, Arcade, Nicholson, and Talmo. Braselton zoning is the partial county table. Maysville stays unzoned. Future land use is the county parcel layer, replaced by NEGRC city layers where those polygons have a label. Jackson County, Missouri, Michigan, and Wisconsin, Jefferson Parish, Louisiana, and ARC LandPro were not used. No Opportunity Zone designation was added.
 
+Butts County, Georgia is the SchneiderCorp ButtsCountyGA_WFS/MapServer/0 extract. Acreage is TOTALACRES in the inclusive 5–150 band. CURR_VAL is the current value and ESTTAX is the estimated tax. Sales stay null because SALES_AREA is a neighborhood code. Zoning is City of Jackson, Flovilla, and Jenkinsburg, then unincorporated Butts County. Future land use is a comprehensive-plan PDF. Butte County, California, Jackson, Mississippi, and ARC LandPro were not used. No Opportunity Zone designation was added.
+
 ## Coverage
 
 # Market parcel coverage
@@ -43,7 +45,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 102,915 | 18 | 0 | 17 |
+| Atlanta | primary | 105,653 | 19 | 0 | 16 |
 | Tampa | primary | 124,315 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 109,348 | 13 | 0 | 4 |
@@ -82,7 +84,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Banks | Georgia | 13011 | gap | 0 | unavailable |
 | Barrow | Georgia | 13013 | complete-gte-5ac | 4,251 | ga-barrow-parcels |
 | Bartow | Georgia | 13015 | complete-gte-5ac | 7,077 | ga-bartow-land |
-| Butts | Georgia | 13035 | gap | 0 | unavailable |
+| Butts | Georgia | 13035 | complete-gte-5ac | 2,738 | ga-butts-wfs-0 |
 | Carroll | Georgia | 13045 | complete-gte-5ac | 9,217 | oa-carroll-ga-910028 |
 | Cherokee | Georgia | 13057 | gap | 0 | unavailable |
 | Clayton | Georgia | 13063 | gap | 0 | unavailable |

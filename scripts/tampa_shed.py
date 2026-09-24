@@ -48,7 +48,7 @@ LAKELAND_FLU_URL = (
 # west, south, east, north. A city overlay must sit inside this box and span less than 1.5°.
 FLORIDA_CITY_BBOX = (-87.8, 24.3, -79.7, 31.1)
 
-PASCO_CITY_STUBS = {"NPR", "PR", "SA"}
+PASCO_CITY_STUBS = {"NPR", "PR", "SA", "DC", "ZH"}
 
 # Verified from PIN prefix and situs, not from an unverified card note that swaps A and T.
 # A- / strap ending A is Tampa. T- is Temple Terrace. P- is Plant City. U- is unincorporated.
@@ -131,14 +131,18 @@ HC_GAPS = [
 
 PASCO_GAPS = [
     "Pasco parcels are PascoMapper/7 (countywide). Hosted County_Master_Property_List FeatureServer/0 is a ~2,266-feature subset and is not used.",
-    "Unincorporated zoning and FLU are Landuse_Planning district polygons. County ZN_TYPE values NPR, PR, and SA are city placeholders, not districts.",
-    "New Port Richey, Port Richey, San Antonio, Dade City, Zephyrhills, and St. Leo have no verified public city zoning/FLU FeatureServer.",
+    "Unincorporated zoning and FLU are Landuse_Planning district polygons. County ZN_TYPE values NPR, PR, SA, DC, and ZH are city placeholders, not districts.",
+    "New Port Richey zoning and FLU are the city WFL1 layers, joined on HPARCEL when present and spatially otherwise. Zephyrhills zoning and FLU are the citywide Euclidean layers, joined spatially.",
+    "Port Richey, Dade City, San Antonio, and St. Leo have no verified public city zoning/FLU FeatureServer. Parcel attribute strings stay hints.",
 ]
 
 PINELLAS_GAPS = [
     "Pinellas public parcels have taxable, land, and improvement values but no just/market value.",
     "Unincorporated zoning and FLU are PublicWebGIS Landuse_Zoning and are not applied inside cities.",
-    "St. Petersburg and Clearwater have city zoning and FLU. Largo has FLU only. Other Pinellas municipalities have no verified zoning/FLU layer.",
+    "St. Petersburg and Clearwater have city zoning and FLU. Largo has future land use only. Largo mowing and community-standards layers are not LDC zoning districts.",
+    "Dunedin, Pinellas Park, Tarpon Springs, Safety Harbor, and Oldsmar join city zoning and future land use onto county parcels. Pinellas Park uses PARCELID when the city layer has it, then the centroid. Oldsmar's county situs label is wider than the city zoning polygons; parcels outside those polygons stay empty.",
+    "Seminole, South Pasadena, Treasure Island, Kenneth City, North Redington Beach, Indian Shores, Belleair, Indian Rocks Beach, Redington Shores, and Madeira Beach use Pinellas County GIS city zoning views. Their city future land use is a gap. The countywide plan map is not stored as a city FLUM.",
+    "Gulfport, Belleair Beach, Belleair Bluffs, Redington Beach, and St. Pete Beach have no verified city zoning or future land use layer.",
 ]
 
 POLK_GAPS = [
@@ -1170,10 +1174,16 @@ def build_pasco(county: dict, markets: list[str], spec: dict, redownload: bool) 
     require(munis.get("Unincorporated Pasco", 0) >= 1000, "Pasco unincorporated parcels missing")
     require(zoning_joined >= 2000, f"Pasco official zoning joins {zoning_joined}")
     require(any(name != "Unincorporated Pasco" and count >= 10 for name, count in munis.items()), "Pasco cities unlabeled")
-    city_stub_as_code = sum(1 for feature in features if (feature["properties"].get("zoningCode") or "").upper() in PASCO_CITY_STUBS)
+    from pinellas_pasco_muni import apply_municipal_overlays
+
+    city_overlays = apply_municipal_overlays(features, "12101", redownload=redownload)
+    zoning_joined, flu_joined, munis = tally(features)
+    city_stub_as_code = sum(
+        1 for feature in features if (feature["properties"].get("zoningCode") or "").upper() in {"NPR", "PR", "SA", "DC", "ZH"}
+    )
     require(city_stub_as_code == 0, "Pasco city stub codes were stored as zoning districts")
     print(f"  Pasco kept {len(features)} zoning {zoning_joined} flu {flu_joined}", flush=True)
-    return write_county(
+    row = write_county(
         county,
         markets,
         spec,
@@ -1187,9 +1197,14 @@ def build_pasco(county: dict, markets: list[str], spec: dict, redownload: bool) 
         overlays=[
             {"role": "zoning", "url": "https://pascogis.pascocountyfl.net/giswebmm/rest/services/FeatureDatasets/Landuse_Planning/MapServer/4"},
             {"role": "flu", "url": "https://pascogis.pascocountyfl.net/giswebmm/rest/services/FeatureDatasets/Landuse_Planning/MapServer/1"},
+            *city_overlays["overlays"],
         ],
-        rejected=[PASCO_SUBSET_URL],
+        rejected=[PASCO_SUBSET_URL, *city_overlays["rejected"]],
     )
+    row["municipalOverlayJoins"] = city_overlays["stats"]
+    target = _seed().COUNTY_DIR / county["fips"] / "county.json"
+    target.write_text(json.dumps(row, indent=2) + "\n")
+    return row
 
 
 def pinellas_place(value: Any) -> str | None:
@@ -1423,6 +1438,9 @@ def build_pinellas(county: dict, markets: list[str], spec: dict, redownload: boo
     features = finish_features(built)
     for feature in features:
         require(feature["properties"]["tax"]["marketValue"] is None, "Pinellas market value must stay empty")
+    from pinellas_pasco_muni import apply_municipal_overlays
+
+    city_overlays = apply_municipal_overlays(features, "12103", redownload=redownload)
     zoning_joined, flu_joined, munis = tally(features)
     require(35000 <= len(features) <= 50000, f"Pinellas count {len(features)}")
     require(zoning_joined >= 2000, f"Pinellas zoning joins {zoning_joined}")
@@ -1430,7 +1448,7 @@ def build_pinellas(county: dict, markets: list[str], spec: dict, redownload: boo
     for label in ("St. Petersburg", "Clearwater", "Largo", "Unincorporated Pinellas"):
         require(munis.get(label, 0) >= 20, f"Pinellas municipality {label} count {munis.get(label, 0)}")
     print(f"  Pinellas kept {len(features)} zoning {zoning_joined} flu {flu_joined}", flush=True)
-    return write_county(
+    row = write_county(
         county,
         markets,
         spec,
@@ -1449,9 +1467,17 @@ def build_pinellas(county: dict, markets: list[str], spec: dict, redownload: boo
             {"role": "clearwater-zoning", "url": "https://gis.myclearwater.com/arcgis/rest/services/ArcGISMapServices/Zoning_WGS84/MapServer/1"},
             {"role": "clearwater-flu", "url": "https://gis.myclearwater.com/arcgis/rest/services/ArcGISMapServices/FLU_w_PPC_Colors_WGS84/MapServer/0"},
             {"role": "largo-flu", "url": "https://maps.largo.com/arcgis/rest/services/VUEWorks_GIS_Map_Production/MapServer/1162"},
+            *city_overlays["overlays"],
         ],
-        rejected=["https://egis.pinellas.gov/gis/rest/services/AGO/Planning_LandUse/MapServer"],
+        rejected=[
+            "https://egis.pinellas.gov/gis/rest/services/AGO/Planning_LandUse/MapServer",
+            *city_overlays["rejected"],
+        ],
     )
+    row["municipalOverlayJoins"] = city_overlays["stats"]
+    target = _seed().COUNTY_DIR / county["fips"] / "county.json"
+    target.write_text(json.dumps(row, indent=2) + "\n")
+    return row
 
 
 def polk_situs(attrs: dict) -> str | None:

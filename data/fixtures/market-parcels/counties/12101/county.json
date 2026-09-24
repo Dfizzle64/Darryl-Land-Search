@@ -14,16 +14,17 @@
   "queryUrl": "https://pascogis.pascocountyfl.net/giswebmm/rest/services/PascoMapper/Parcels/MapServer/7/query",
   "gaps": [
     "Pasco parcels are PascoMapper/7 (countywide). Hosted County_Master_Property_List FeatureServer/0 is a ~2,266-feature subset and is not used.",
-    "Unincorporated zoning and FLU are Landuse_Planning district polygons. County ZN_TYPE values NPR, PR, and SA are city placeholders, not districts.",
-    "New Port Richey, Port Richey, San Antonio, Dade City, Zephyrhills, and St. Leo have no verified public city zoning/FLU FeatureServer."
+    "Unincorporated zoning and FLU are Landuse_Planning district polygons. County ZN_TYPE values NPR, PR, SA, DC, and ZH are city placeholders, not districts.",
+    "New Port Richey zoning and FLU are the city WFL1 layers, joined on HPARCEL when present and spatially otherwise. Zephyrhills zoning and FLU are the citywide Euclidean layers, joined spatially.",
+    "Port Richey, Dade City, San Antonio, and St. Leo have no verified public city zoning/FLU FeatureServer. Parcel attribute strings stay hints."
   ],
   "path": "data/fixtures/market-parcels/counties/12101/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12101/lookup.json",
   "sourceCount": 12557,
   "dropped": 29,
   "tileCount": 8,
-  "zoningJoinedCount": 11834,
-  "fluJoinedCount": 12033,
+  "zoningJoinedCount": 12068,
+  "fluJoinedCount": 12177,
   "municipalityCounts": {
     "Unincorporated Pasco": 11855,
     "Zephyrhills": 186,
@@ -41,9 +42,44 @@
     {
       "role": "flu",
       "url": "https://pascogis.pascocountyfl.net/giswebmm/rest/services/FeatureDatasets/Landuse_Planning/MapServer/1"
+    },
+    {
+      "role": "new-port-richey-zoning",
+      "url": "https://services7.arcgis.com/5fOG6RMXXiEvqNzn/arcgis/rest/services/NPR_2026_Community_Development_Map_WFL1/FeatureServer/10"
+    },
+    {
+      "role": "new-port-richey-flu",
+      "url": "https://services7.arcgis.com/5fOG6RMXXiEvqNzn/arcgis/rest/services/NPR_2026_Community_Development_Map_WFL1/FeatureServer/11"
+    },
+    {
+      "role": "zephyrhills-zoning",
+      "url": "https://services6.arcgis.com/Q4fB6OTUhdN4M9BR/arcgis/rest/services/Zhills_EnGov_Map_11_2025/FeatureServer/4"
+    },
+    {
+      "role": "zephyrhills-flu",
+      "url": "https://services6.arcgis.com/Q4fB6OTUhdN4M9BR/arcgis/rest/services/Zhills_EnGov_Map_11_2025/FeatureServer/5"
     }
   ],
   "rejected": [
-    "https://pascogis.pascocountyfl.net/giswebeserver/rest/services/Hosted/County_Master_Property_List/FeatureServer/0"
-  ]
+    "https://pascogis.pascocountyfl.net/giswebeserver/rest/services/Hosted/County_Master_Property_List/FeatureServer/0",
+    "Rejected namesake: AGOL Zoning_Flu (Weeki Wachee situs, Hernando County FIPS 12053), not Pinellas or Pasco.",
+    "Rejected namesake: AGOL Zoning_view zone_code R1-8 (centroid about -122.31, 40.46, Anderson County, California).",
+    "Rejected namesake: maps.gulfport-ms.gov GPT_Zoning (Gulfport, Mississippi), not Gulfport, Florida.",
+    "Pasco county ZN_TYPE values NPR, PR, SA, DC, and ZH are city placeholders, not district maps.",
+    "Zephyrhills traditional city center zoning (Zhills_EnGov_Map_11_2025/3) is a second citywide map and is not stacked on the Euclidean layer."
+  ],
+  "municipalOverlayJoins": {
+    "New Port Richey": {
+      "parcels": 65,
+      "zoningJoined": 64,
+      "fluJoined": 64,
+      "fluStatus": "city"
+    },
+    "Zephyrhills": {
+      "parcels": 186,
+      "zoningJoined": 181,
+      "fluJoined": 183,
+      "fluStatus": "city"
+    }
+  }
 }

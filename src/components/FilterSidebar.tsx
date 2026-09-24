@@ -272,7 +272,7 @@ export function FilterSidebar({
           ) : null}
           <Note label="Shed notes">
             <p>
-              Brown is rural-eligible. Blue is urban eligible, including Orlando. Eligible is not designated.
+              Rural eligible — not designated: Tract on Treasury OZ 2.0 eligible list, tagged entirely rural. Not yet a QOZ. No OZ 2.0 tax benefits apply today from this label. Urban eligible — not designated: Same eligible list, not tagged entirely rural. Also not yet a QOZ.
             </p>
             <p>{SHED_CAVEAT}</p>
             <p>{parcelNote}</p>

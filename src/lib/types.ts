@@ -191,10 +191,19 @@ export const RURAL_ELIGIBLE_STATUS_CHIP = "Eligible (rural) — not designated";
 export const ELIGIBLE_NOT_DESIGNATED_STATUS = "Eligible — not designated";
 
 /**
- * Secondary status for South Carolina tracts after the Sep 10, 2026 governor filing.
- * The nominated GEOID list is not public, so this is not a designation.
+ * Map legend copy. Eligible is the Rev. Proc. 2026-14 list. Designation has not
+ * happened. MF priority is an internal hunt, not that list.
  */
-export const SC_GOVERNOR_FILED_STATUS = "Governor-filed — list not public yet / not designated";
+export const RURAL_ELIGIBLE_LEGEND_BLURB =
+  "Tract on Treasury OZ 2.0 eligible list, tagged entirely rural. Not yet a QOZ. No OZ 2.0 tax benefits apply today from this label.";
+export const URBAN_ELIGIBLE_LEGEND_BLURB =
+  "Same eligible list, not tagged entirely rural. Also not yet a QOZ.";
+export const MF_PRIORITY_LEGEND_BLURB =
+  "INTERNAL multifamily hunt ranking among rural-eligible tracts (Charleston + York/Lancaster/Chester scope). NOT SC Commerce, NOT a nomination list, NOT OZ designation.";
+export const MF_PRIORITY_TIER_A_MEANING = "Tier A = chase first";
+export const MF_PRIORITY_TIER_B_MEANING = "Tier B = secondary / still map-worthy";
+export const SC_GOVERNOR_FILED_STATUS =
+  "SC: Governor filed nominations with Treasury (Sep 10, 2026 per SC Commerce). Official nominated tract list is not publicly posted. Tracts on this map are not designated QOZs.";
 
 export const SC_COMMERCE_OZ_URL = "https://www.sccommerce.com/opportunity-zone";
 

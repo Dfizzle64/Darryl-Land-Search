@@ -177,7 +177,9 @@ describe("South Carolina governor-filed status copy", () => {
   const catalog = loadCatalog();
 
   it("keeps the eligible chip and adds governor-filed help only for South Carolina views", () => {
-    expect(SC_GOVERNOR_FILED_STATUS).toBe("Governor-filed — list not public yet / not designated");
+    expect(SC_GOVERNOR_FILED_STATUS).toBe(
+      "SC: Governor filed nominations with Treasury (Sep 10, 2026 per SC Commerce). Official nominated tract list is not publicly posted. Tracts on this map are not designated QOZs.",
+    );
     expect(SC_GOVERNOR_FILED_STATUS).not.toMatch(/^designated/i);
 
     expect(viewIncludesSouthCarolina("Charleston", null)).toBe(true);

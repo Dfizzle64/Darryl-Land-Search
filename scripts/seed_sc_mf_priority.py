@@ -24,14 +24,18 @@ FIXTURES = ROOT / "data" / "fixtures"
 OUT_PATH = FIXTURES / "sc-oz2-mf-priority.json"
 
 STATUS_CHIP = "Eligible (rural) — not designated"
-GOVERNOR_FILED = "Governor-filed — list not public yet / not designated"
+GOVERNOR_FILED = (
+    "SC: Governor filed nominations with Treasury (Sep 10, 2026 per SC Commerce). "
+    "Official nominated tract list is not publicly posted. Tracts on this map are not designated QOZs."
+)
 SOURCE_STATUS = (
     "Eligible rural — SC Gov filed statewide Sep 10 2026 / not designated; "
     "this GEOID not confirmed nominated"
 )
 DISCLAIMER = (
-    "Likelihood / underwriting priority among rural-eligible tracts. "
-    "Not a nominated list and not a designation."
+    "INTERNAL multifamily hunt ranking among rural-eligible tracts "
+    "(Charleston + York/Lancaster/Chester scope). NOT SC Commerce, NOT a nomination list, "
+    "NOT OZ designation. Tier A = chase first. Tier B = secondary / still map-worthy."
 )
 EXPECTED_COLUMNS = [
     "market",

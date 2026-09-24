@@ -224,7 +224,7 @@ The status chip on this pack is **Eligible — not designated** for both rural a
 
 Every tract in the rural pack is **Eligible (rural) — not designated**. The chip uses that phrase. Florida, Georgia, Tennessee, and North Carolina had no public certified 2027 QOZ lists when the table was built (Sep 21, 2026). Do not read the orange overlay as a certified Opportunity Zone. Urban and other-MSA tracts use **Eligible — not designated** and are not certified either.
 
-South Carolina is the exception on wording only. [SC Commerce](https://www.sccommerce.com/opportunity-zone) says Governor McMaster submitted OZ 2.0 nominations to Treasury on September 10, 2026. The page does not publish a GEOID list (the “list can be found here” sentence is not a link), and the ArcGIS map still describes eligibility. Charleston, and Charlotte’s South Carolina fringe (York, Lancaster, and Chester), therefore show a second line: **Governor-filed — list not public yet / not designated**. The chip and filters stay eligible / not designated. No tract is marked nominated or certified.
+South Carolina is the exception on wording only. [SC Commerce](https://www.sccommerce.com/opportunity-zone) says Governor McMaster submitted OZ 2.0 nominations to Treasury on September 10, 2026. The page does not publish a GEOID list. The map footer is: **SC: Governor filed nominations with Treasury (Sep 10, 2026 per SC Commerce). Official nominated tract list is not publicly posted. Tracts on this map are not designated QOZs.** The chip and filters stay eligible / not designated. No tract is marked nominated or certified. SC MF priority is a separate internal hunt layer, not an eligibility label.
 
 ### South Carolina multifamily priority shortlist
 

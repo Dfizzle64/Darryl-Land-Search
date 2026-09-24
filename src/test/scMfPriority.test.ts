@@ -82,8 +82,9 @@ describe("South Carolina multifamily priority shortlist", () => {
     expect(priority.rows.every((row) => row.rural === "Y" && row.state === "South Carolina")).toBe(true);
     expect(priority.sourceCsv).toBe("data/sc-oz2-mf-priority-shortlist.csv");
     expect(JSON.stringify(priority)).not.toMatch(/certified 2027/i);
-    expect(priority.disclaimer.toLowerCase()).toContain("not a nominated");
-    expect(priority.disclaimer.toLowerCase()).toContain("not a designation");
+    expect(priority.disclaimer).toContain("NOT a nomination list");
+    expect(priority.disclaimer).toContain("NOT OZ designation");
+    expect(priority.disclaimer).toContain("Tier A = chase first");
   });
 
   it("matches the CSV places, tiers, and notes, including the top GEOIDs", () => {

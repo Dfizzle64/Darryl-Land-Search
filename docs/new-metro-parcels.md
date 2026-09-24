@@ -1,6 +1,6 @@
 # Valdosta, Macon, Athens, Hilton Head, and Jackson MS
 
-Parcel shelves for five metros. Acreage is **5.0–150.0 inclusive**. No Opportunity Zone designation, school letter grade, or base flood elevation is stored. Tract income is ACS 5-year 2020–2024 B19013, the same query-time join as the other live markets. Centroid fallback polygons were added for these counties. State DOT AADT from the priority-county layer applies in Lowndes, Bibb, Beaufort, Hinds, Madison, and Rankin. Clarke, Copiah, Simpson, Warren, and Yazoo have no verified count layer. Florida FDOT segments are not copied onto these parcels.
+Parcel shelves for five metros. Acreage is **5.0–150.0 inclusive**. No Opportunity Zone designation, school letter grade, or base flood elevation is stored. Tract income is ACS 5-year 2020–2024 B19013, the same query-time join as the other live markets. Centroid fallback polygons were added for these counties. State DOT AADT uses the statewide join for this footprint, including Lowndes, Bibb, Clarke, Beaufort, Hinds, Madison, Rankin, Copiah, Simpson, Warren, and Yazoo. Florida FDOT segments are not copied onto these parcels.
 
 Mississippi layers are `https://gis.cmpdd.org/...`. `gis3.cmpdd.org` and `portal.cmpdd.org` are not used. The CMPDD certificate is a leaf-only GoDaddy chain; `scripts/certs/godaddy-g2.pem` is the public intermediate that completes it.
 

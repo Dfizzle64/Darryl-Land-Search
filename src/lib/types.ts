@@ -53,6 +53,19 @@ export type FluInfo = {
   source: string | null;
 };
 
+/** City zoning / FLU overlay stamped by a municipal join. Not an Opportunity Zone. */
+export type MunicipalParcelNote = {
+  placeId: string;
+  placeName: string;
+  zoningLayer: string | null;
+  fluLayer: string | null;
+  zoningLabel: string | null;
+  fluGap: string | null;
+  unofficial?: boolean;
+  vintage?: string | null;
+  join?: "attribute" | "spatial";
+};
+
 export type OpportunityZoneInfo = {
   inOpportunityZone: boolean;
   tractGeoid: string | null;
@@ -400,6 +413,8 @@ export type ParcelProperties = {
   incomeBlockGroup: IncomeInfo | null;
   nearestRoad: NearestRoad | null;
   flu: FluInfo | null;
+  /** City overlay that supplied zoning or future land use, when one was joined. */
+  municipal?: MunicipalParcelNote | null;
   opportunityZone: OpportunityZoneInfo | null;
   oz2Eligibility: Oz2EligibilityInfo | null;
   /**

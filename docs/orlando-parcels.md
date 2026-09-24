@@ -87,4 +87,4 @@ Orange cadastre:
 - Orange inclusion uses OCPA `ACREAGE`, including sibling shapes under 5 acres that belong to the same parcel id. Those pieces are summed and the parcel is dropped when the sum is outside 5.0–150.0. Other complete counties still use DOH `LND_SQFOOT`.
 - A public ArcGIS Online layer named Polk County parcels is the wrong state (Minnesota). It is not used.
 - Brevard’s property-appraiser MapServer has returned HTTP 403 from this environment. The sample uses DOH.
-- Brevard, Marion, Sumter, and Volusia are still windowed samples around rural tracts, not every 5–150 acre parcel. Those samples are not capped at 150 acres.
+- Brevard, Marion, Sumter, and Volusia are still windowed samples around rural tracts, not every 5–150 acre parcel. Those samples are not capped at 150 acres. The Brevard sample is stamped with the same city zoning and FLU join as the market tiles when a centroid falls in a wired city (`docs/brevard-municipal.md`). Titusville and Palm Bay are not applied in that join.

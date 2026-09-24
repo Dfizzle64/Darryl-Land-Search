@@ -14,6 +14,7 @@ import {
 } from "@/lib/format";
 import { mailingGap, type ScreeningPoint } from "@/lib/screening";
 import { ScreeningDetails } from "./ScreeningDetails";
+import { brevardFluReason, formatJoinedZoning } from "@/lib/brevardMunicipal";
 import { describeFluMatch } from "@/lib/flu";
 import { describeRezoningCandidate } from "@/lib/filters";
 import { describeOpportunityZone, describeOz2Eligibility } from "@/lib/opportunityZone";
@@ -106,10 +107,15 @@ export function ParcelDrawer({
   const zoningEmpty =
     properties.countyFips === "12095"
       ? "Not on the OCPA parcel"
-      : dekalb
-        ? "No municipal or county zoning joined for this parcel"
-        : "Not in this county's public parcel extract";
-  const zoningLine = formatZoningWithCity(properties.zoningCode, properties.zoningDistrict);
+      : properties.countyFips === "12009"
+        ? "No city zoning layer covers this parcel."
+        : dekalb
+          ? "No municipal or county zoning joined for this parcel"
+          : "Not in this county's public parcel extract";
+  const zoningLine =
+    properties.countyFips === "12009"
+      ? formatJoinedZoning(properties.zoningCode, properties.municipal)
+      : formatZoningWithCity(properties.zoningCode, properties.zoningDistrict);
   const mailing = formatMailing(properties.mailingAddress) ?? mailingGap(properties.mailingAddress);
   const entityName = isEntityOwner(properties.ownerName)
     ? properties.ownerName
@@ -118,8 +124,18 @@ export function ParcelDrawer({
       : null;
   const entityLink = entityName ? entitySearchLink(properties.state, entityName, properties.countyFips) : null;
   const fluLine = properties.flu?.code
-    ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
+    ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}${
+        properties.countyFips === "12009" && properties.municipal?.unofficial
+          ? ` · unofficial ${properties.municipal.vintage || "vintage"}`
+          : ""
+      }`
     : null;
+  const fluEmpty =
+    properties.countyFips === "12009"
+      ? brevardFluReason("", null, properties.municipal, "12009")
+      : dekalb
+        ? "No future land use joined for this parcel"
+        : "Not joined for this county";
   const stateLabel = properties.state?.trim() || (properties.countyFips?.startsWith("12") || !properties.countyFips ? "FL" : null);
   const placeLine =
     [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
@@ -155,11 +171,7 @@ export function ParcelDrawer({
           <Field label="Tax district" value={properties.dorCode} empty="Tax district not on this parcel" />
         ) : null}
         <Field label="Zoning" value={zoningLine} empty={zoningEmpty} />
-        <Field
-          label="Future Land Use"
-          value={fluLine}
-          empty={dekalb ? "No future land use joined for this parcel" : "Not joined for this county"}
-        />
+        <Field label="Future Land Use" value={fluLine} empty={fluEmpty} />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
           label="OZ 2.0"
@@ -198,7 +210,9 @@ export function ParcelDrawer({
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Future Land Use</p>
-        <p className="mt-1 text-ink-100">{flu.reason}</p>
+        <p className="mt-1 text-ink-100">
+          {brevardFluReason(flu.reason, properties.flu?.code, properties.municipal, properties.countyFips)}
+        </p>
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Designated Opportunity Zone</p>

@@ -481,7 +481,11 @@ def fl_spec(fips: str) -> dict:
         "mailZipField": "OWN_ZIPCD",
         "source": f"fl-doh-ehwaters-{fips}",
         "coverage": "complete-gte-5ac",
-        "gaps": ["No zoning or FLU on the Florida DOH extract."],
+        "gaps": [
+            "City zoning and future land use are joined by npm run seed:brevard-municipal. Re-run that join after this county is re-seeded. County zoning is not copied into cities. Palm Bay and Titusville stay on their prior cards and are not applied here."
+            if fips == "12009"
+            else "No zoning or FLU on the Florida DOH extract."
+        ],
     }
 
 

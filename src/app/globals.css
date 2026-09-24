@@ -56,6 +56,25 @@ body {
   color: #ffffff !important;
 }
 
+/* Imperial scale, pinned to the map's bottom-right. Sits left of the zoom buttons
+   and above the attribution chip so it misses the legend and the ranking rail. */
+.maplibregl-map > .dls-map-scale {
+  position: absolute;
+  right: 3.25rem;
+  bottom: 6.75rem;
+  z-index: 2;
+  pointer-events: none;
+  background-color: #0c1218 !important;
+  border: 2px solid #ffffff !important;
+  border-top: 2px solid #ffffff !important;
+  box-shadow: 0 0 0 2px #0c1218;
+  color: #ffffff !important;
+  font-size: 11px;
+  line-height: 1.35;
+  margin: 0 !important;
+  padding: 0 6px 1px;
+}
+
 @layer components {
   /* One opaque scrim for map chrome. White inner ring reads on Dark and imagery; black outer ring reads on light Streets. */
   .map-scrim {

@@ -115,6 +115,8 @@ export const OVERLAY_LAYER_IDS = [
   "sewer-line",
   "power-fill",
   "power-line",
+  "census-tract-fill",
+  "census-tract-line",
   "rural-fill",
   "rural-line",
   "eligible-fill",
@@ -167,8 +169,8 @@ function parcelZoomStops(
     hover,
     base,
   ];
-  // First stop is neighborhood zoom (the auto-on gate), not the old 11 stop.
-  return ["interpolate", ["linear"], ["zoom"], 10, at(quiet), 12.5, at(mid), 14.5, at(full)];
+  // First stop is the parcel-visible zoom. Tract outlines own the view below that.
+  return ["interpolate", ["linear"], ["zoom"], 13, at(quiet), 14.25, at(mid), 15.5, at(full)];
 }
 
 export function parcelFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
@@ -344,6 +346,13 @@ export function eligiblePackLinePaint(mode: BasemapMode): NonNullable<LineLayerS
   };
 }
 
+/** Neutral 2020 tract boundary. OZ color stays on the eligible and rural layers. */
+export function censusTractLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecification["paint"]> {
+  if (mode === "satellite") return { "line-color": "#f8fafc", "line-width": 1.15, "line-opacity": 0.92 };
+  if (mode === "dark") return { "line-color": "#d5dde6", "line-width": 1.05, "line-opacity": 0.85 };
+  return { "line-color": "#243140", "line-width": 1.1, "line-opacity": 0.82 };
+}
+
 export function oz2LinePaint(mode: BasemapMode): NonNullable<LineLayerSpecification["paint"]> {
   const rural = ruralTractLine(mode);
   const other = mode === "satellite" ? "#d6e6ff" : mode === "streets" ? "#1d4ed8" : "#c5d8ff";
@@ -447,6 +456,7 @@ export function applyBasemap(map: MapLibreMap, mode: BasemapMode) {
   setPaint(map, "oz-line", ozLinePaint(mode));
   setPaint(map, "oz2-fill", oz2FillPaint(mode));
   setPaint(map, "oz2-line", oz2LinePaint(mode));
+  setPaint(map, "census-tract-line", censusTractLinePaint(mode));
   setPaint(map, "rural-fill", oz2FillPaint(mode));
   setPaint(map, "rural-line", oz2LinePaint(mode));
   setPaint(map, "eligible-fill", eligiblePackFillPaint(mode));

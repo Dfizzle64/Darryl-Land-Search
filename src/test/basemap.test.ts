@@ -50,6 +50,8 @@ describe("basemap helpers", () => {
       "sewer-line",
       "power-fill",
       "power-line",
+      "census-tract-fill",
+      "census-tract-line",
       "rural-fill",
       "rural-line",
       "eligible-fill",

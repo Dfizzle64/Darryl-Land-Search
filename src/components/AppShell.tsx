@@ -5,6 +5,7 @@ import { FilterSidebar } from "./FilterSidebar";
 import { JumpToBar } from "./JumpToBar";
 import { OzExplainer } from "./OzExplainer";
 import { MarketMenu } from "./MarketMenu";
+import { groupMarketsByState } from "@/lib/marketGroups";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { ParcelDrawer } from "./ParcelDrawer";
 import { SiteMap } from "./SiteMap";
@@ -135,6 +136,10 @@ export function AppShell({
   meta,
 }: AppShellProps) {
   const [filters, setFilters] = useState<FilterState>({ ...DEFAULT_FILTERS, landUseFilter: "off" });
+  const marketGroups = useMemo(
+    () => groupMarketsByState(ruralCatalog, urbanCatalog, otherCatalog),
+    [otherCatalog, ruralCatalog, urbanCatalog],
+  );
   const [market, setMarket] = useState<SearchMarketId>("Orlando");
   const [tractClass, setTractClass] = useState<TractClassView>("both");
   const [county, setCounty] = useState<string | null>(null);
@@ -432,9 +437,8 @@ export function AppShell({
   const loadViewportParcels = async (bbox: [number, number, number, number], zoom: number) => {
     lastViewport.current = { bbox, zoom };
     if (!shedParcelsOn || aoiRef.current) return;
-    // Shed scale stays unloaded in auto mode. Show parcels forces a query at any
-    // zoom. Once the camera is past the gate, keep querying even if outlines are
-    // hidden so the ranked list still filters.
+    // Tract zoom stays unloaded. Once the camera is close enough for parcels,
+    // keep querying even if outlines are hidden so the ranked list still filters.
     if (!shouldQueryParcelsForZoom(preferenceRef.current, zoom)) {
       viewportRequest.current += 1;
       setViewportParcels(EMPTY_PARCELS);
@@ -742,7 +746,7 @@ export function AppShell({
           <JumpToBar busy={jumpBusy} note={jumpNote} error={jumpError} onJump={(query) => void jumpToQuery(query)} />
           <div className="flex items-center gap-1 text-[11px] text-ink-500">
             <span>Market</span>
-            <MarketMenu value={market} onChange={changeMarket} />
+            <MarketMenu value={market} groups={marketGroups} onChange={changeMarket} />
           </div>
           <label className="text-[11px] text-ink-500">
             County

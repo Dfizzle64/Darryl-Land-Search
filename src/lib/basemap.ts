@@ -1,5 +1,4 @@
 import type {
-  CircleLayerSpecification,
   FillLayerSpecification,
   ExpressionSpecification,
   FilterSpecification,
@@ -124,7 +123,6 @@ export const OVERLAY_LAYER_IDS = [
   "mf-priority-a-line",
   "mf-priority-b-fill",
   "mf-priority-b-line",
-  "rural-pins",
   "oz2-fill",
   "oz2-line",
   "oz-fill",
@@ -174,9 +172,11 @@ function parcelZoomStops(
 }
 
 export function parcelFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
-  const quiet = mode === "satellite" ? 0.1 : 0.16;
-  const mid = mode === "satellite" ? 0.16 : 0.28;
-  const full = mode === "satellite" ? 0.26 : 0.52;
+  // Neighborhood zoom stays readable. Close zoom drops the fill so streets and
+  // imagery show through; the outline carries the boundary.
+  const quiet = mode === "satellite" ? 0.12 : 0.2;
+  const mid = mode === "satellite" ? 0.08 : 0.14;
+  const full = mode === "satellite" ? 0.05 : 0.08;
   return {
     "fill-color": [
       "case",
@@ -190,8 +190,8 @@ export function parcelFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecifi
       quiet,
       mid,
       full,
-      mode === "satellite" ? 0.5 : 0.78,
-      mode === "satellite" ? 0.38 : 0.62,
+      mode === "satellite" ? 0.32 : 0.45,
+      mode === "satellite" ? 0.2 : 0.3,
     ),
   };
 }
@@ -207,7 +207,7 @@ export function parcelLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecifi
         "#ffffff",
         "#f3f7f5",
       ],
-      "line-width": parcelZoomStops(0.55, 0.9, 1.7, 2.6, 1.6),
+      "line-width": parcelZoomStops(1.3, 1.9, 2.6, 3.2, 2.2),
     };
   }
   const onLightStreets = mode === "streets";
@@ -218,7 +218,7 @@ export function parcelLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecifi
       onLightStreets ? "#9a3412" : "#f8e1b5",
       onLightStreets ? "#0f5132" : "#b7e3cf",
     ],
-    "line-width": parcelZoomStops(0.35, 0.6, 1, 2.2, 1.3),
+    "line-width": parcelZoomStops(1.15, 1.7, 2.4, 2.8, 2),
   };
 }
 
@@ -243,15 +243,17 @@ export function trafficLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecif
 }
 
 /**
- * Census-tract overlay swatches (street basemap). Orange/amber so tracts stay
- * distinct from green parcel fills. Satellite paint uses brighter variants.
+ * Census-tract overlay swatches. Rural is violet so it does not sit on the
+ * orange arterial roads of the Streets basemap. Urban eligible tracts, including
+ * Orlando, use one blue. Parcel fills stay green. Satellite paint uses brighter
+ * variants of the same hues.
  */
 export const OZ_TRACT_SWATCH = {
-  /** Stronger, warmer orange — OZ 2.0 rural-eligible tracts. */
-  rural: "#f15a08",
-  /** Lighter amber — Orange County OZ 2.0 tracts that are not rural. */
-  eligible: "#f0b429",
-  /** Blue — urban / non-rural eligible tracts outside the Orange County amber overlay. */
+  /** Violet — OZ 2.0 rural-eligible tracts. Not orange, so Streets roads stay distinct. */
+  rural: "#6d28d9",
+  /** Same blue as urban. Orlando no longer uses a separate amber overlay. */
+  eligible: "#3d7dff",
+  /** Blue — urban / non-rural eligible tracts in every market, including Orlando. */
   urban: "#3d7dff",
   /** Copper accent — current designated QOZ tracts (dashed outline on the map). */
   designated: "#c46a2f",
@@ -282,8 +284,8 @@ export function ozLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecificati
 }
 
 export function oz2FillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
-  const rural = mode === "satellite" ? "#ff7a29" : OZ_TRACT_SWATCH.rural;
-  const other = mode === "satellite" ? "#ffd56a" : OZ_TRACT_SWATCH.eligible;
+  const rural = mode === "satellite" ? "#c084fc" : OZ_TRACT_SWATCH.rural;
+  const other = mode === "satellite" ? "#8eb6ff" : OZ_TRACT_SWATCH.urban;
   const ruralOpacity = mode === "satellite" ? 0.42 : 0.32;
   const otherOpacity = mode === "satellite" ? 0.32 : 0.22;
   return {
@@ -310,7 +312,7 @@ export function mfPriorityLinePaint(mode: BasemapMode, tier: "A" | "B"): NonNull
 }
 
 export function eligiblePackFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
-  const rural = mode === "satellite" ? "#ff7a29" : OZ_TRACT_SWATCH.rural;
+  const rural = mode === "satellite" ? "#c084fc" : OZ_TRACT_SWATCH.rural;
   const urban = mode === "satellite" ? "#8eb6ff" : OZ_TRACT_SWATCH.urban;
   const ruralOpacity = mode === "satellite" ? 0.42 : 0.32;
   const urbanOpacity = mode === "satellite" ? 0.38 : 0.28;
@@ -321,7 +323,7 @@ export function eligiblePackFillPaint(mode: BasemapMode): NonNullable<FillLayerS
 }
 
 export function eligiblePackLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecification["paint"]> {
-  const rural = mode === "satellite" ? "#ffe6d4" : "#ffd0b0";
+  const rural = mode === "satellite" ? "#f5f3ff" : "#4c1d95";
   const urban = mode === "satellite" ? "#d6e6ff" : "#c5d8ff";
   return {
     "line-color": ["case", ["==", ["get", "rural"], true], rural, urban],
@@ -331,8 +333,8 @@ export function eligiblePackLinePaint(mode: BasemapMode): NonNullable<LineLayerS
 }
 
 export function oz2LinePaint(mode: BasemapMode): NonNullable<LineLayerSpecification["paint"]> {
-  const rural = mode === "satellite" ? "#ffe6d4" : mode === "streets" ? "#9a3412" : "#ffd0b0";
-  const other = mode === "satellite" ? "#fff3d4" : mode === "streets" ? "#b45309" : "#ffe7ad";
+  const rural = mode === "satellite" ? "#f5f3ff" : mode === "streets" ? "#4c1d95" : "#e9d5ff";
+  const other = mode === "satellite" ? "#d6e6ff" : mode === "streets" ? "#1d4ed8" : "#c5d8ff";
   return {
     "line-color": ["case", ["==", ["get", "rural"], true], rural, other],
     "line-width": ["case", ["==", ["get", "rural"], true], mode === "satellite" ? 2.8 : 2.5, mode === "satellite" ? 1.35 : 1.05],
@@ -441,36 +443,4 @@ export function applyBasemap(map: MapLibreMap, mode: BasemapMode) {
   setPaint(map, "mf-priority-a-line", mfPriorityLinePaint(mode, "A"));
   setPaint(map, "mf-priority-b-fill", mfPriorityFillPaint(mode, "B"));
   setPaint(map, "mf-priority-b-line", mfPriorityLinePaint(mode, "B"));
-  setPaint(map, "rural-pins", ruralPinPaint(mode));
-}
-
-export function ruralPinPaint(mode: BasemapMode): NonNullable<CircleLayerSpecification["paint"]> {
-  const rural = mode === "satellite" ? "#ff7a29" : OZ_TRACT_SWATCH.rural;
-  const urban = mode === "satellite" ? "#8eb6ff" : OZ_TRACT_SWATCH.urban;
-  const fallback: ExpressionSpecification = ["case", ["==", ["get", "rural"], false], urban, rural];
-  return {
-    "circle-color": [
-      "match",
-      ["coalesce", ["get", "mfTier"], ""],
-      "A",
-      MF_PRIORITY_SWATCH.tierA,
-      "B",
-      MF_PRIORITY_SWATCH.tierB,
-      fallback,
-    ],
-    "circle-radius": [
-      "interpolate",
-      ["linear"],
-      ["zoom"],
-      6,
-      ["match", ["coalesce", ["get", "mfTier"], ""], "A", 4.5, "B", 4, 3],
-      10,
-      ["match", ["coalesce", ["get", "mfTier"], ""], "A", 7, "B", 6, 5],
-      13,
-      ["match", ["coalesce", ["get", "mfTier"], ""], "A", 9, "B", 8, 7],
-    ],
-    "circle-stroke-color": mode === "satellite" ? "#fff6ee" : "#2a160c",
-    "circle-stroke-width": ["match", ["coalesce", ["get", "mfTier"], ""], "A", 2.2, "B", 1.8, 1.25],
-    "circle-opacity": 0.95,
-  };
 }

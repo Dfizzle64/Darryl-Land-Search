@@ -70,7 +70,7 @@ export function TractDrawer({
       <p
         className={`mt-4 inline-block rounded-full border px-2 py-1 text-xs ${
           rural
-            ? "border-[#f15a08]/70 bg-[#f15a08]/15 text-[#ffc7a3]"
+            ? "border-[#6d28d9]/70 bg-[#6d28d9]/15 text-[#ddd6fe]"
             : "border-[#3d7dff]/70 bg-[#3d7dff]/15 text-[#d6e4ff]"
         }`}
       >
@@ -184,7 +184,7 @@ export function TractDrawer({
           ? ` ${tract.county} County includes public parcels from 5.0 through 150.0 acres. Parcels under 5 or over 150 are excluded. Zoom in if the view says it is showing a spread of a larger set.`
           : tract.state === "Florida" && ORLANDO_FIPS_BY_NAME[tract.county]
             ? ` ${tract.county} County still uses a thinner public-GIS sample in this build, not every parcel of 5 acres and up.`
-            : " This county has no parcel extract in the app — the map shows the tract polygon and a pin."}
+            : " This county has no parcel extract in the app — the map shows the tract polygon."}
       </p>
     </aside>
   );

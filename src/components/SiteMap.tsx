@@ -2,8 +2,10 @@
 
 import maplibregl, { type GeoJSONSource, type Map as MapLibreMap, type MapMouseEvent, type MapTouchEvent } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import "./mapPopup.css";
 import { useEffect, useRef, useState } from "react";
 import { aoiFeatureCollection, normalizeBbox, type AoiLock } from "@/lib/aoi";
+import { screeningLegendLine } from "@/lib/screeningLayerHelp";
 import { applyMapGestures } from "@/lib/mapGestures";
 import { BasemapToggle } from "./BasemapToggle";
 import { AoiControls } from "./AoiControls";
@@ -31,7 +33,6 @@ import {
   parcelHiddenFilter,
   parcelLinePaint,
   parcelMatchFilter,
-  ruralPinPaint,
   trafficLinePaint,
   type BasemapMode,
 } from "@/lib/basemap";
@@ -83,6 +84,7 @@ type SiteMapProps = {
   parcelLayerVisible?: boolean;
   parcelVisibilityHint?: string;
   onToggleParcelLayer?: () => void;
+  onToggleTractOverlay?: () => void;
   showOrangePilot: boolean;
   parcelsLoading?: boolean;
   market: SearchMarketId;
@@ -90,6 +92,7 @@ type SiteMapProps = {
   onTractClass: (view: TractClassView) => void;
   county: string | null;
   countyState: string | null;
+  marketStates: string[];
   bounds: LngLatBounds;
   boundsKey: string;
   ozFilter: OzFilter;
@@ -346,12 +349,6 @@ function addOverlayLayers(
     paint: mfPriorityLinePaint(mode, "B"),
   });
   map.addLayer({
-    id: "rural-pins",
-    type: "circle",
-    source: "rural-pins",
-    paint: ruralPinPaint(mode),
-  });
-  map.addLayer({
     id: "oz2-fill",
     type: "fill",
     source: "oz2-tracts",
@@ -480,19 +477,43 @@ function addOverlayLayers(
   });
 }
 
+const POPUP_TEXT = "#12202b";
+
 function showTractPopup(map: MapLibreMap, lngLat: maplibregl.LngLatLike, details: TractClickDetails) {
   const root = document.createElement("div");
+  root.style.color = POPUP_TEXT;
+  const kicker = document.createElement("p");
+  kicker.textContent = "Census tract";
+  kicker.style.margin = "0 0 2px";
+  kicker.style.fontSize = "11px";
+  kicker.style.letterSpacing = "0.08em";
+  kicker.style.textTransform = "uppercase";
+  kicker.style.color = "#3d4a57";
   const place = document.createElement("p");
+  place.style.margin = "0";
   place.style.fontWeight = "600";
+  place.style.color = POPUP_TEXT;
   place.textContent = details.placeLabel;
   const geoid = document.createElement("p");
+  geoid.style.margin = "2px 0 0";
+  geoid.style.fontWeight = "600";
+  geoid.style.color = POPUP_TEXT;
   geoid.textContent = `GEOID ${details.geoid}`;
   const status = document.createElement("p");
+  status.style.margin = "2px 0 0";
+  status.style.color = POPUP_TEXT;
   status.textContent = details.status;
   const rural = document.createElement("p");
+  rural.style.margin = "2px 0 0";
+  rural.style.color = POPUP_TEXT;
   rural.textContent = details.ruralLabel;
-  root.append(place, geoid, status, rural);
-  return new maplibregl.Popup({ closeButton: true, maxWidth: "280px", closeOnClick: false })
+  root.append(kicker, place, geoid, status, rural);
+  return new maplibregl.Popup({
+    closeButton: true,
+    maxWidth: "280px",
+    closeOnClick: false,
+    className: "dls-map-popup",
+  })
     .setLngLat(lngLat)
     .setDOMContent(root)
     .addTo(map);
@@ -518,6 +539,7 @@ export function SiteMap({
   parcelLayerVisible,
   parcelVisibilityHint,
   onToggleParcelLayer,
+  onToggleTractOverlay,
   showOrangePilot,
   parcelsLoading = false,
   market,
@@ -525,6 +547,7 @@ export function SiteMap({
   onTractClass,
   county,
   countyState,
+  marketStates,
   bounds,
   boundsKey,
   ozFilter,
@@ -628,8 +651,12 @@ export function SiteMap({
             const root = document.createElement("div");
             const name = document.createElement("p");
             name.style.fontWeight = "600";
+            name.style.color = "#12202b";
+            name.style.margin = "0";
             name.textContent = String(props.name ?? "School");
             const summary = document.createElement("p");
+            summary.style.color = "#12202b";
+            summary.style.margin = "2px 0 0";
             summary.textContent = String(props.summary ?? "");
             root.append(name, summary);
             const href = typeof props.reportCardUrl === "string" ? props.reportCardUrl : "";
@@ -638,11 +665,12 @@ export function SiteMap({
               link.href = href;
               link.target = "_blank";
               link.rel = "noreferrer";
+              link.style.color = "#12202b";
               link.textContent = "Official report card";
               root.append(link);
             }
             popupRef.current?.remove();
-            popupRef.current = new maplibregl.Popup({ closeButton: true, maxWidth: "280px" })
+            popupRef.current = new maplibregl.Popup({ closeButton: true, maxWidth: "280px", className: "dls-map-popup" })
               .setLngLat(event.lngLat)
               .setDOMContent(root)
               .addTo(map);
@@ -655,7 +683,7 @@ export function SiteMap({
             const id = event.features?.[0]?.properties?.id;
             if (typeof id === "string") callbacksRef.current.onSelect(id);
           });
-          const tractLayers = ["mf-priority-a-fill", "mf-priority-b-fill", "eligible-fill", "rural-fill", "rural-pins", "oz2-fill", "oz-fill"];
+          const tractLayers = ["mf-priority-a-fill", "mf-priority-b-fill", "eligible-fill", "rural-fill", "oz2-fill", "oz-fill"];
           map.on("click", tractLayers, (event) => {
             if (drawingRef.current || measuringRef.current) return;
             const feature = event.features?.[0];
@@ -979,7 +1007,6 @@ export function SiteMap({
     setVisibilitySafe(map, "rural-line", showRuralLayer ? "visible" : "none");
     setVisibilitySafe(map, "eligible-fill", showEligibleLayer ? "visible" : "none");
     setVisibilitySafe(map, "eligible-line", showEligibleLayer ? "visible" : "none");
-    setVisibilitySafe(map, "rural-pins", showOz2 ? "visible" : "none");
     for (const layerId of ["mf-priority-a-fill", "mf-priority-a-line", "mf-priority-b-fill", "mf-priority-b-line"]) {
       setVisibilitySafe(map, layerId, showRuralLayer ? "visible" : "none");
     }
@@ -1047,7 +1074,6 @@ export function SiteMap({
     setVisibilitySafe(map, "rural-line", showRuralLayer ? "visible" : "none");
     setVisibilitySafe(map, "eligible-fill", showEligibleLayer ? "visible" : "none");
     setVisibilitySafe(map, "eligible-line", showEligibleLayer ? "visible" : "none");
-    setVisibilitySafe(map, "rural-pins", showOz2 ? "visible" : "none");
     for (const layerId of ["mf-priority-a-fill", "mf-priority-a-line", "mf-priority-b-fill", "mf-priority-b-line"]) {
       setVisibilitySafe(map, layerId, showRuralLayer ? "visible" : "none");
     }
@@ -1222,6 +1248,7 @@ export function SiteMap({
 
   const scStatusHelp = southCarolinaStatusHelp(market, countyState);
   const layerOn = parcelLayerVisible ?? showParcels;
+  const legendScope = { market, county, state: countyState, states: marketStates };
 
   return (
     <div ref={shellRef} className="relative h-full w-full">
@@ -1244,6 +1271,26 @@ export function SiteMap({
           />
           {showParcels && onToggleParcelLayer ? (
             <ParcelLayerToggle visible={layerOn} hint={parcelVisibilityHint ?? ""} onToggle={onToggleParcelLayer} />
+          ) : null}
+          {onToggleTractOverlay ? (
+            <button
+              type="button"
+              data-tract-toggle
+              aria-pressed={showOz2}
+              aria-label={showOz2 ? "Hide eligible census tracts" : "Show eligible census tracts"}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onToggleTractOverlay();
+              }}
+              className={`rounded-full border px-3.5 py-2 text-sm font-semibold ${
+                showOz2
+                  ? "map-scrim text-white"
+                  : "border-ink-950 bg-clay-500 text-ink-950 shadow-[0_10px_28px_rgba(0,0,0,0.55)] hover:bg-clay-400"
+              }`}
+            >
+              {showOz2 ? "Hide tracts" : "Show tracts"}
+            </button>
           ) : null}
         </div>
       ) : null}
@@ -1341,15 +1388,6 @@ export function SiteMap({
                 />
                 Urban eligible — not designated
               </p>
-              {showOrangePilot ? (
-                <p>
-                  <span
-                    className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle"
-                    style={{ backgroundColor: OZ_TRACT_SWATCH.eligible }}
-                  />
-                  Orange County urban eligible (amber overlay)
-                </p>
-              ) : null}
               {showMfLegend ? (
                 <>
                   <p>
@@ -1370,7 +1408,7 @@ export function SiteMap({
               ) : null}
             </>
           ) : null}
-          <p className="text-xs text-ink-100">Pins mark tract internal points. 90-minute sheds are approximate county rings, not drive-time isochrones.</p>
+          <p className="text-xs text-ink-100">90-minute sheds are approximate county rings, not drive-time isochrones. Tract polygons have no center dot.</p>
           {scStatusHelp ? (
             <SouthCarolinaStatusNote note={SC_GOVERNOR_FILED_STATUS} className="text-ink-300" />
           ) : null}
@@ -1389,25 +1427,25 @@ export function SiteMap({
           {screening.water ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle" style={{ backgroundColor: "#3d7dff" }} />
-              Water service area (Orange County only)
+              {screeningLegendLine("water", legendScope)}
             </p>
           ) : null}
           {screening.sewer ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle" style={{ backgroundColor: "#7a5cff" }} />
-              Sewer service area (Orange County only)
+              {screeningLegendLine("sewer", legendScope)}
             </p>
           ) : null}
           {screening.power ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle" style={{ backgroundColor: "#e0b15a" }} />
-              Electric service area (Orange County; retail territory elsewhere)
+              {screeningLegendLine("power", legendScope)}
             </p>
           ) : null}
           {screening.schools ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-full align-middle" style={{ backgroundColor: "#1f7a4d" }} />
-              Schools · letter grade, OCPS zones in Orange County, CMS zones in Mecklenburg
+              {screeningLegendLine("schools", legendScope)}
             </p>
           ) : null}
           {screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power ? (

@@ -1,9 +1,11 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { MfPriorityFilter } from "./MfPriorityFilter";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import { ZoningKnowledgePanel } from "./ZoningKnowledgePanel";
-import { UTILITY_LAYER_NOTE, type ScreeningToggles } from "@/lib/screening";
+import { screeningLayerNotes } from "@/lib/screeningLayerHelp";
+import type { ScreeningToggles } from "@/lib/screening";
 import { ACREAGE_SLIDER, DEFAULT_FILTERS, SHED_CAVEAT, type FilterState, type FluConfig, type LandUseFilter, type MfPriorityView, type OzFilter, type SearchMarketId, type ZoningConfig } from "@/lib/types";
 
 type FilterSidebarProps = {
@@ -31,6 +33,9 @@ type FilterSidebarProps = {
   orlandoParcels: boolean;
   parcelCoverageNote?: string | null;
   market: SearchMarketId;
+  county: string | null;
+  countyState: string | null;
+  marketStates: string[];
   tractCount: number;
   ruralTractCount: number;
   urbanTractCount: number;
@@ -80,6 +85,15 @@ function YesNo({
         })}
       </div>
     </div>
+  );
+}
+
+function Note({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <details className="text-xs text-ink-400">
+      <summary className="cursor-pointer text-ink-300">{label}</summary>
+      <div className="mt-1 space-y-1 leading-relaxed text-ink-500">{children}</div>
+    </details>
   );
 }
 
@@ -197,6 +211,9 @@ export function FilterSidebar({
   orlandoParcels,
   parcelCoverageNote = null,
   market,
+  county,
+  countyState,
+  marketStates,
   tractCount,
   ruralTractCount,
   urbanTractCount,
@@ -207,6 +224,7 @@ export function FilterSidebar({
   onPriorityView,
 }: FilterSidebarProps) {
   const generatedAt = typeof meta.generatedAt === "string" ? meta.generatedAt.slice(0, 10) : null;
+  const layerNotes = screeningLayerNotes({ market, county, state: countyState, states: marketStates });
 
   return (
     <>
@@ -244,48 +262,38 @@ export function FilterSidebar({
             {market}: {tractCount.toLocaleString()} eligible {tractCount === 1 ? "tract" : "tracts"}
           </p>
           <p className="text-xs text-ink-300">
-            {ruralTractCount.toLocaleString()} rural · {urbanTractCount.toLocaleString()} urban. Orange is rural. Blue
-            is urban. Status is eligible — not designated.
+            {ruralTractCount.toLocaleString()} rural · {urbanTractCount.toLocaleString()} urban
           </p>
-          <p className="text-xs leading-relaxed text-ink-500">{SHED_CAVEAT}</p>
-          {statusHelp ? (
-            <SouthCarolinaStatusNote note={statusHelp} className="text-xs leading-relaxed text-ink-300" />
-          ) : null}
-          <p className="text-xs leading-relaxed text-ink-500">{parcelNote}</p>
-          {orlandoParcels && !orangePilot ? (
-            <p className="text-xs leading-relaxed text-ink-300">
-              Zoning and FLU knowledge is Orange County–first. Outside Orange, prefer All parcels — missing zoning is
-              treated honestly, not guessed.
-            </p>
-          ) : null}
-          {parcelCoverageNote ? (
-            <p className="text-xs leading-relaxed text-ink-300">{parcelCoverageNote}</p>
-          ) : null}
-          {orlandoParcels && !orangePilot ? (
-            <p className="text-xs leading-relaxed text-ink-300">
-              Parcel outlines stay off until neighborhood zoom, an area is locked, or Show parcels is on. Only this
-              market&apos;s tiles load.
-            </p>
-          ) : null}
-          {!orlandoParcels ? (
-            <p className="text-xs leading-relaxed text-ink-300">
-              {parcelCoverageNote
-                ? "No parcel polygons were stored for this market. The map stays on eligible tracts."
-                : "Parcel polygons for this market are not seeded yet. Switch to Orlando to browse the nine-county shed extract."}
-            </p>
-          ) : null}
+          {statusHelp ? <SouthCarolinaStatusNote note={statusHelp} className="text-xs leading-relaxed text-ink-300" /> : null}
           {onPriorityView && priorityView && priorityCounts ? (
             <div className="border-t border-white/10 pt-2">
-              <MfPriorityFilter value={priorityView} counts={priorityCounts} onChange={onPriorityView} />
+              <MfPriorityFilter compact value={priorityView} counts={priorityCounts} onChange={onPriorityView} />
             </div>
           ) : null}
+          <Note label="Shed notes">
+            <p>
+              Violet is rural-eligible. Blue is urban eligible, including Orlando. Eligible is not designated.
+            </p>
+            <p>{SHED_CAVEAT}</p>
+            <p>{parcelNote}</p>
+            {parcelCoverageNote ? <p>{parcelCoverageNote}</p> : null}
+            {orlandoParcels && !orangePilot ? (
+              <p>Zoning and future land use are joined for Orange County. Missing zoning elsewhere is not guessed.</p>
+            ) : null}
+            {!orlandoParcels ? (
+              <p>
+                {parcelCoverageNote
+                  ? "No parcel polygons were stored for this market. The map stays on eligible tracts."
+                  : "Parcel polygons for this market are not seeded yet."}
+              </p>
+            ) : null}
+          </Note>
         </section>
 
         <section className="mt-5 space-y-3">
           <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Opportunity Zones</h2>
           <YesNo
-            label="Consider opportunity zone in parcels"
-            hint="No leaves parcel results unfiltered by Opportunity Zone. Yes shows the parcel OZ choices below."
+            label="Opportunity Zone"
             value={filters.considerOpportunityZone}
             onChange={(considerOpportunityZone) => onChange({ ...filters, considerOpportunityZone })}
           />
@@ -301,46 +309,43 @@ export function FilterSidebar({
                     checked={filters.ozFilter === option.value}
                     onChange={() => onChange({ ...filters, ozFilter: option.value })}
                   />
-                  <span>
-                    <span className="block text-sm text-white">{option.label}</span>
-                    <span className="mt-0.5 block text-xs text-ink-500">{option.hint}</span>
-                  </span>
+                  <span className="block text-sm text-white">{option.label}</span>
                 </label>
               ))}
             </fieldset>
           ) : null}
-          <Toggle
-            label="Show OZ 2.0 eligible tracts"
-            checked={showOz2}
-            onChange={onShowOz2}
-            hint="Orange tracts are rural-eligible. Blue tracts are urban eligible. In Orange County, Florida, the amber overlay is the county urban set. None of these are designated."
-          />
-          <Toggle
-            label="Show designated Opportunity Zone overlay"
-            checked={showOz}
-            onChange={onShowOz}
-            hint="Orange County pilot only. Current HUD/Treasury QOZ tracts (2010 geography), copper fill with a dashed outline. Eligible is not designated."
-          />
+          <Toggle label="Eligible tracts" checked={showOz2} onChange={onShowOz2} />
+          <Toggle label="Designated QOZ overlay" checked={showOz} onChange={onShowOz} />
+          <Note label="What these mean">
+            <p>Parcel filter only. Eligible tracts are Rev. Proc. 2026-14 nomination geography, not a designated 2027 QOZ.</p>
+            <p>{layerNotes.eligibleTracts}</p>
+            <p>{layerNotes.designatedOz}</p>
+          </Note>
         </section>
 
         <section className="mt-5 space-y-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Site screening</h2>
-          <p className="text-xs text-ink-500">
-            Off by default. These are public map layers, not parcel filters, and they do not change which sites match.
-          </p>
-          <Toggle label="Flood zones" checked={screening.flood} onChange={(value) => onScreening("flood", value)} hint={UTILITY_LAYER_NOTE.flood} />
-          <Toggle label="Wetlands" checked={screening.wetlands} onChange={(value) => onScreening("wetlands", value)} hint={UTILITY_LAYER_NOTE.wetlands} />
-          <Toggle label="School ratings" checked={screening.schools} onChange={(value) => onScreening("schools", value)} hint={UTILITY_LAYER_NOTE.schools} />
-          <Toggle label="Water service areas" checked={screening.water} onChange={(value) => onScreening("water", value)} hint={UTILITY_LAYER_NOTE.water} />
-          <Toggle label="Sewer service areas" checked={screening.sewer} onChange={(value) => onScreening("sewer", value)} hint={UTILITY_LAYER_NOTE.sewer} />
-          <Toggle label="Electric retail territories" checked={screening.power} onChange={(value) => onScreening("power", value)} hint={UTILITY_LAYER_NOTE.power} />
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Map layers</h2>
+          <Toggle label="Flood" checked={screening.flood} onChange={(value) => onScreening("flood", value)} />
+          <Toggle label="Wetlands" checked={screening.wetlands} onChange={(value) => onScreening("wetlands", value)} />
+          <Toggle label="Schools" checked={screening.schools} onChange={(value) => onScreening("schools", value)} />
+          <Toggle label="Water" checked={screening.water} onChange={(value) => onScreening("water", value)} />
+          <Toggle label="Sewer" checked={screening.sewer} onChange={(value) => onScreening("sewer", value)} />
+          <Toggle label="Electric" checked={screening.power} onChange={(value) => onScreening("power", value)} />
+          <Note label="Layer notes">
+            <p>Off by default. These draw on the map and do not change which parcels match. No grade, BFE, or service connection is invented.</p>
+            <p>{layerNotes.flood}</p>
+            <p>{layerNotes.wetlands}</p>
+            <p>{layerNotes.schools}</p>
+            <p>{layerNotes.water}</p>
+            <p>{layerNotes.sewer}</p>
+            <p>{layerNotes.power}</p>
+          </Note>
         </section>
 
         <section className="mt-5 space-y-3">
           <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Zoning</h2>
           <YesNo
-            label="Consider zoning in parcels"
-            hint="No ignores zoning, future land use, and rezoning rules. Yes shows those parcel choices below."
+            label="Zoning"
             value={filters.considerZoning}
             onChange={(considerZoning) => onChange({ ...filters, considerZoning })}
           />
@@ -357,10 +362,7 @@ export function FilterSidebar({
                       checked={filters.landUseFilter === option.value}
                       onChange={() => onChange({ ...filters, landUseFilter: option.value })}
                     />
-                    <span>
-                      <span className="block text-sm text-white">{option.label}</span>
-                      <span className="mt-0.5 block text-xs text-ink-500">{option.hint}</span>
-                    </span>
+                  <span className="block text-sm text-white">{option.label}</span>
                   </label>
                 ))}
               </fieldset>
@@ -368,14 +370,20 @@ export function FilterSidebar({
                 label="Include planned development"
                 checked={filters.includePlannedDevelopment}
                 onChange={(includePlannedDevelopment) => onChange({ ...filters, includePlannedDevelopment })}
-                hint="PD / PUD / PURD is maybe — entitlements are site-specific"
               />
               <Toggle
                 label="Include conditional zoning"
                 checked={filters.includeConditionalZoning}
                 onChange={(includeConditionalZoning) => onChange({ ...filters, includeConditionalZoning })}
-                hint="Live Local commercial/industrial, limited multiplex, some mixed-use overlays"
               />
+              <Note label="Zoning notes">
+                {LAND_USE_OPTIONS.map((option) => (
+                  <p key={option.value}>
+                    {option.label}: {option.hint}
+                  </p>
+                ))}
+                <p>Planned development is site-specific. Conditional zoning covers Live Local and similar overlays. Missing zoning is not guessed.</p>
+              </Note>
             </>
           ) : null}
         </section>
@@ -399,12 +407,14 @@ export function FilterSidebar({
                 : `${filters.minAcreage.toLocaleString("en-US", { maximumFractionDigits: 2 })} ac+`}
             </span>
           </label>
-          <p className="text-xs text-ink-500">
-            Slider runs 0–{ACREAGE_SLIDER.max} acres. Larger parcels still match any threshold at or below{" "}
-            {ACREAGE_SLIDER.max} ac. Lake, Orange, Osceola, Polk, Seminole, and Sumter fixtures include every public parcel
-            from 5.0 through 150.0 acres. Parcels under 5 or over 150 are excluded. Brevard, Marion, and Volusia are still
-            smaller samples. Eligible tracts have no acreage attribute, so this slider does not hide tracts.
-          </p>
+          <Note label="Acreage notes">
+            <p>
+              Slider runs 0–{ACREAGE_SLIDER.max} acres. Larger parcels still match any threshold at or below{" "}
+              {ACREAGE_SLIDER.max} ac. Lake, Orange, Osceola, Polk, Seminole, and Sumter fixtures include every public parcel
+              from 5.0 through 150.0 acres. Parcels under 5 or over 150 are excluded. Brevard, Marion, and Volusia are still
+              smaller samples. Eligible tracts have no acreage attribute, so this slider does not hide tracts.
+            </p>
+          </Note>
           <Toggle
             label="Include unknown acreage"
             checked={filters.includeUnknownAcreage}
@@ -447,12 +457,12 @@ export function FilterSidebar({
             checked={filters.includeUnknownIncome}
             onChange={(includeUnknownIncome) => onChange({ ...filters, includeUnknownIncome })}
           />
-          <p className="text-xs text-ink-500">
-            Florida parcels in the current view pick up ACS tract median income (B19013) where that county has a parcel
-            extract. The minimum hides parcels whose known income is below it. While Include unknown income is checked,
-            parcels and tracts with no joined median stay on the map — uncheck it to hide them. Block group income is
-            joined for Orange County parcels only. Tract geography uses the same minimum on eligible-tract overlays.
-          </p>
+          <Note label="Income notes">
+            <p>
+              Florida extracts pick up ACS tract median income where it is published. Unknown income stays visible while
+              Include unknown income is on. Block-group income is Orange County only. No income is invented.
+            </p>
+          </Note>
         </section>
 
         <section className="mt-5 space-y-3">
@@ -477,45 +487,34 @@ export function FilterSidebar({
             checked={filters.includeUnknownAadt}
             onChange={(includeUnknownAadt) => onChange({ ...filters, includeUnknownAadt })}
           />
-          <p className="text-xs text-ink-500">
-            Florida parcels pick up the nearest FDOT count segment within 15 km, including counts under 15,000. A parcel
-            farther away, or outside Florida, stays unknown. While Include unknown AADT is checked, those parcels stay
-            visible — uncheck it to hide them. Eligible tracts have no AADT, so this slider does not hide tracts.
-          </p>
-          <Toggle
-            label="Show major-road AADT overlay"
-            checked={showTraffic}
-            onChange={onShowTraffic}
-            hint="FDOT segments with 15,000+ AADT"
-          />
+          <Toggle label="Road counts" checked={showTraffic} onChange={onShowTraffic} />
+          <Note label="Traffic notes">
+            <p>
+              Florida parcels use the nearest FDOT count within 15 km. Outside that, AADT stays unknown. The road overlay
+              is FDOT segments at 15,000 or more. Tracts have no AADT.
+            </p>
+          </Note>
         </section>
 
         <section className="mt-5 space-y-3">
           <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Map</h2>
-          <Toggle
-            label="Show parcels that fail filters"
-            checked={showExcluded}
-            onChange={onShowExcluded}
-            hint="Failed parcels render as faded outlines"
-          />
+          <Toggle label="Parcels that fail filters" checked={showExcluded} onChange={onShowExcluded} />
         </section>
 
-        <ZoningKnowledgePanel
-          zoningConfig={zoningConfig}
-          fluConfig={fluConfig}
-          fluJoinedCount={fluJoinedCount}
-          parcelCount={totalCount}
-        />
-
-        <p className="mt-6 text-[11px] leading-relaxed text-ink-500">
-          Fixture snapshot {generatedAt ?? "unknown"}. Orlando shed parcels are partitioned public GIS extracts (DOH
-          EHWATER / Orange County Property Appraiser). Zoning and FLU joins are richest for Orange County; other counties
-          degrade when a field is missing. Opportunity Zones shown in copper with a dashed outline are current designated
-          QOZs in the Orange pilot. Rural tracts are orange and urban eligible tracts are blue. Both are Rev. Proc.
-          2026-14 nomination eligibility — Eligible — not designated. The seven-market rural chip still reads Eligible
-          (rural) — not designated. Amber, in Orange County only, is that county’s urban overlay. {SHED_CAVEAT} Income
-          and AADT joins are Orange-pilot first.
-        </p>
+        <Note label="Zoning reference">
+          <ZoningKnowledgePanel
+            zoningConfig={zoningConfig}
+            fluConfig={fluConfig}
+            fluJoinedCount={fluJoinedCount}
+            parcelCount={totalCount}
+          />
+        </Note>
+        <Note label="About this data">
+          <p>
+            Snapshot {generatedAt ?? "unknown"}. Public parcel rows only. Designated QOZ copper outlines are the current
+            HUD layer, not a 2027 designation. Income and traffic joins stay unknown where the public source has no row.
+          </p>
+        </Note>
       </aside>
     </>
   );

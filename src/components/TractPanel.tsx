@@ -53,7 +53,7 @@ export function TractPanel({
             {tracts.length.toLocaleString()} {tracts.length === 1 ? "tract" : "tracts"}
           </p>
           <p className="mt-0.5 text-[11px] leading-relaxed text-ink-500">
-            Rev. Proc. 2026-14 nomination eligibility only. Orange is rural. Blue is urban. Status stays eligible —
+            Rev. Proc. 2026-14 nomination eligibility only. Violet is rural. Blue is urban. Status stays eligible —
             not designated.
             {tracts.some((tract) => showsGovernorFiledSoftCopy(tract)) || priorityView
               ? ` South Carolina tracts: ${SC_GOVERNOR_FILED_STATUS}.`
@@ -98,7 +98,7 @@ export function TractPanel({
                   <span
                     className={`inline-block rounded-full border px-1.5 py-px text-[10px] ${
                       rural
-                        ? "border-[#f15a08]/70 bg-[#f15a08]/15 text-[#ffc7a3]"
+                        ? "border-[#6d28d9]/70 bg-[#6d28d9]/15 text-[#ddd6fe]"
                         : "border-[#3d7dff]/70 bg-[#3d7dff]/15 text-[#d6e4ff]"
                     }`}
                   >

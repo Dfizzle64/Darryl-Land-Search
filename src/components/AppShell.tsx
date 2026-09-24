@@ -537,11 +537,17 @@ export function AppShell({
     if (!scView && mfView !== "all") setMfView("all");
   }, [scView, mfView]);
 
+  const setRankingOpen = (next: boolean) => {
+    setRankingExpanded(next);
+    window.sessionStorage.setItem(RANKING_STORAGE_KEY, next ? "1" : "0");
+  };
+
   const selectSite = (id: string) => {
     setSelectedId(id);
     setSelectedTractGeoid(null);
     setSitesOpen(false);
     setFiltersOpen(false);
+    setRankingOpen(true);
   };
 
   const selectTract = (geoid: string | null) => {
@@ -550,6 +556,7 @@ export function AppShell({
     setSelectedId(null);
     setSitesOpen(false);
     setFiltersOpen(false);
+    setRankingOpen(true);
   };
 
   const changeMarket = (next: SearchMarketId) => {
@@ -633,27 +640,6 @@ export function AppShell({
             <span>Market</span>
             <MarketMenu value={market} onChange={changeMarket} />
           </div>
-          <div className="flex items-center gap-1" role="group" aria-label="Rural or urban eligible tracts">
-            {(
-              [
-                ["both", "Both"],
-                ["rural", "Rural"],
-                ["urban", "Urban"],
-              ] as const
-            ).map(([value, label]) => (
-              <button
-                key={value}
-                type="button"
-                aria-pressed={tractClass === value}
-                className={`rounded-full border px-2.5 py-1 text-xs ${
-                  tractClass === value ? "border-white/40 bg-ink-800 text-white" : "border-white/10 text-ink-400"
-                }`}
-                onClick={() => setTractClass(value)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
           <label className="text-[11px] text-ink-500">
             County
             <select
@@ -706,14 +692,14 @@ export function AppShell({
               <span className="block text-[11px]">
                 {marketCoverage
                   ? `Tract overlay · no 5–150 acre polygons in this pull (${marketCoverage.gapCountyCount} counties documented)`
-                  : "Tract overlay and pins · parcels stay on the Orlando shed"}
+                  : "Tract overlay · parcels stay on the Orlando shed"}
               </span>
             )}
           </p>
           {shedParcelsOn ? (
             <button
               type="button"
-              className="rounded-full border border-white/15 bg-ink-800 px-3 py-1.5 text-sm xl:hidden"
+              className="rounded-full border border-white/15 bg-ink-800 px-3 py-1.5 text-sm lg:hidden"
               onClick={() => {
                 setInventoryTab("sites");
                 setSitesOpen(true);
@@ -724,7 +710,7 @@ export function AppShell({
           ) : null}
           <button
             type="button"
-            className="rounded-full border border-white/15 bg-ink-800 px-3 py-1.5 text-sm xl:hidden"
+            className="rounded-full border border-white/15 bg-ink-800 px-3 py-1.5 text-sm lg:hidden"
             onClick={() => {
               setInventoryTab("tracts");
               setSitesOpen(true);
@@ -783,6 +769,9 @@ export function AppShell({
               : null
           }
           market={market}
+          county={county}
+          countyState={countyState}
+          marketStates={[...new Set(summary.counties.map((item) => item.state))]}
           tractCount={classRowsShown.length}
           ruralTractCount={ruralShown.length}
           urbanTractCount={urbanShown.length}
@@ -808,6 +797,7 @@ export function AppShell({
             showTraffic={showTraffic}
             showOz={showOz}
             showOz2={showOz2}
+            onToggleTractOverlay={() => setShowOz2((current) => !current)}
             screening={screening}
             showParcels={shedParcelsOn}
             parcelLayerVisible={parcelLayerVisible}
@@ -828,6 +818,7 @@ export function AppShell({
             onTractClass={setTractClass}
             county={county}
             countyState={countyState}
+            marketStates={[...new Set(summary.counties.map((item) => item.state))]}
             bounds={bounds}
             boundsKey={boundsKey}
             ozFilter={appliedFilters.ozFilter}
@@ -856,8 +847,33 @@ export function AppShell({
               </div>
             </div>
           ) : null}
+          <button
+            type="button"
+            data-ranking-toggle
+            aria-expanded={rankingExpanded}
+            aria-label={rankingExpanded ? "Hide ranked sites" : "Show ranked sites"}
+            className="absolute right-0 top-1/2 z-30 hidden h-14 w-7 -translate-y-1/2 items-center justify-center rounded-l-lg border border-r-0 border-white/20 bg-ink-900 text-lg text-white shadow-[0_8px_24px_rgba(0,0,0,0.45)] hover:bg-ink-800 lg:flex"
+            onClick={() => setRankingOpen(!rankingExpanded)}
+          >
+            <span aria-hidden="true">{rankingExpanded ? "›" : "‹"}</span>
+          </button>
+          <button
+            type="button"
+            data-ranking-toggle
+            aria-expanded={sitesOpen}
+            aria-label="Show ranked sites"
+            className="absolute right-0 top-1/2 z-30 flex h-14 w-7 -translate-y-1/2 items-center justify-center rounded-l-lg border border-r-0 border-white/20 bg-ink-900 text-lg text-white shadow-[0_8px_24px_rgba(0,0,0,0.45)] hover:bg-ink-800 lg:hidden"
+            onClick={() => {
+              setInventoryTab(shedParcelsOn ? "sites" : "tracts");
+              setSitesOpen(true);
+            }}
+          >
+            <span aria-hidden="true">‹</span>
+          </button>
         </main>
-        <aside className="hidden min-h-0 w-[24rem] shrink-0 flex-col border-l border-white/10 bg-ink-900 lg:flex">
+        <aside
+          className={`${rankingExpanded ? "lg:flex" : ""} hidden min-h-0 w-[24rem] shrink-0 flex-col border-l border-white/10 bg-ink-900`}
+        >
           <div className="shrink-0 border-b border-white/10 px-3 py-3">
             <div className="flex items-start justify-between gap-2">
               <div>
@@ -873,14 +889,10 @@ export function AppShell({
               <button
                 type="button"
                 className="rounded-full border border-white/20 bg-ink-800 px-3 py-1 text-sm text-white"
-                aria-expanded={rankingExpanded}
-                onClick={() => {
-                  const next = !rankingExpanded;
-                  setRankingExpanded(next);
-                  window.sessionStorage.setItem(RANKING_STORAGE_KEY, next ? "1" : "0");
-                }}
+                aria-label="Hide ranked sites"
+                onClick={() => setRankingOpen(false)}
               >
-                {rankingExpanded ? "Collapse" : "Expand"}
+                ›
               </button>
             </div>
             {shedParcelsOn ? (
@@ -902,8 +914,7 @@ export function AppShell({
               </div>
             ) : null}
           </div>
-          {rankingExpanded ? (
-            <div className="min-h-0 flex-[1.35]">
+          <div className="min-h-0 flex-[1.35]">
               {showSites ? (
                 <SitesPanel
                   variant="sheet"
@@ -916,10 +927,7 @@ export function AppShell({
                   fluUnknownCount={fluUnknownCount}
                   onSelect={selectSite}
                   onHover={setHoveredId}
-                  onCollapse={() => {
-                    setRankingExpanded(false);
-                    window.sessionStorage.setItem(RANKING_STORAGE_KEY, "0");
-                  }}
+                  onCollapse={() => setRankingOpen(false)}
                 />
               ) : (
                 <TractPanel
@@ -927,10 +935,7 @@ export function AppShell({
                   tracts={visibleTracts}
                   selectedGeoid={selectedTractGeoid}
                   onSelect={selectTract}
-                  onCollapse={() => {
-                    setRankingExpanded(false);
-                    window.sessionStorage.setItem(RANKING_STORAGE_KEY, "0");
-                  }}
+                  onCollapse={() => setRankingOpen(false)}
                   priorityView={priorityFilter.priorityView}
                   priorityCounts={priorityFilter.priorityCounts}
                   onPriorityView={priorityFilter.onPriorityView}
@@ -938,8 +943,7 @@ export function AppShell({
                 />
               )}
             </div>
-          ) : null}
-          <div className={rankingExpanded ? "min-h-[12rem] flex-1 overflow-hidden border-t border-white/10" : "min-h-0 flex-1 overflow-hidden"}>
+          <div className="min-h-[12rem] flex-1 overflow-hidden border-t border-white/10">
             {selected ? (
               <ParcelDrawer
                 layout="pane"
@@ -987,7 +991,7 @@ export function AppShell({
       </div>
 
       {sitesOpen ? (
-        <div className="fixed inset-0 z-40 xl:hidden">
+        <div className="fixed inset-0 z-40 lg:hidden">
           <button type="button" className="absolute inset-0 bg-black/50" aria-label="Close list" onClick={() => setSitesOpen(false)} />
           <div className="absolute inset-x-0 bottom-0 flex h-[75vh] flex-col rounded-t-3xl border border-white/10 bg-ink-900 shadow-2xl">
             {showSites ? (

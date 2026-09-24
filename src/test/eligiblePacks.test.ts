@@ -56,6 +56,11 @@ const OTHER_ROWS: Record<OtherMarketId, { total: number; rural: number; urban: n
   Jackson: { total: 0, rural: 0, urban: 0 },
   "Winston-Salem": { total: 105, rural: 24, urban: 81 },
   Wilmington: { total: 55, rural: 31, urban: 24 },
+  Valdosta: { total: 0, rural: 0, urban: 0 },
+  Macon: { total: 0, rural: 0, urban: 0 },
+  Athens: { total: 0, rural: 0, urban: 0 },
+  "Hilton Head": { total: 0, rural: 0, urban: 0 },
+  "Jackson MS": { total: 0, rural: 0, urban: 0 },
 };
 
 function loadUrban(): EligibleMarketsCatalog {
@@ -114,7 +119,7 @@ describe("other MSA eligible pack", () => {
   });
 
   it("matches each smaller market and does not treat them as primary", () => {
-    expect(OTHER_MARKETS).toHaveLength(22);
+    expect(OTHER_MARKETS).toHaveLength(27);
     expect(OTHER_MARKETS[0]).toBe("SWFL");
     expect(OTHER_MARKETS[1]).toBe("Heartland");
     expect(OTHER_MARKETS[2]).toBe("Vero Beach");

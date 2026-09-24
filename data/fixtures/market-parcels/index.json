@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T01:22:21Z",
+  "generatedAt": "2026-09-24T04:29:15Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -2117,22 +2117,23 @@
     },
     "Savannah": {
       "tier": "other",
-      "parcelCount": 11549,
-      "completeCountyCount": 3,
+      "parcelCount": 16305,
+      "completeCountyCount": 4,
       "sampleCountyCount": 0,
-      "gapCountyCount": 5,
+      "gapCountyCount": 4,
       "path": "data/fixtures/market-parcels/markets/savannah/meta.json",
       "counties": [
         {
           "name": "Beaufort",
           "state": "South Carolina",
           "fips": "45013",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 4756,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+            "Beaufort County, South Carolina (FIPS 45013). EnerGov/MapServer/1. GisFile_Acres is text and is cast for the 5–150 band. The legacy Parcels/LiveParcels service was 404 and was not used.",
+            "County zoning is Zoning/MapServer/9 FBCode where the centroid falls in that polygon. It is the unincorporated Community Development Code."
           ]
         },
         {
@@ -2144,7 +2145,7 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Kept 2138 Bryan County, Georgia parcels in the inclusive 5–150 acre band from PropertyDetails MapServer/0 (2232 source rows). TOTALACRES is the deeded acreage field.",
+            "Kept 2138 Bryan County, Georgia parcels in the inclusive 5–150 acre band from PropertyDetails MapServer/0 (2232 source rows, 94 extra parts with the same PARCEL_NO collapsed). TOTALACRES is the deeded acreage field.",
             "Owner mailing CITY/STATE/ADDRESS2 are nationwide mailing addresses and are not a municipality filter. Situs city is the MunicipalBoundaries spatial hit (Richmond Hill or Pembroke) only."
           ]
         },
@@ -3480,6 +3481,199 @@
           "gaps": [
             "10026 source rows collapsed to 9954 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
             "No sale price on the public parcel layer. lastSale.price stays null."
+          ]
+        }
+      ]
+    },
+    "Valdosta": {
+      "tier": "other",
+      "parcelCount": 5815,
+      "completeCountyCount": 1,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/valdosta/meta.json",
+      "counties": [
+        {
+          "name": "Lowndes",
+          "state": "Georgia",
+          "fips": "13185",
+          "featureCount": 5815,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Lowndes County, Georgia (FIPS 13185, Valdosta). VALOR TaxOffice/TaxParcels FeatureServer/0. TOTALACRES 5–150 inclusive. Not Lowndes County, Mississippi or Alabama.",
+            "Zoning is PlanningDevelopment/Zoning_Detailed ZOTXT. Parcel ZONINGCODE remains only where the polygon join misses. Lake Park, Dasher, and Remerton have no city zoning FeatureServer."
+          ]
+        }
+      ]
+    },
+    "Macon": {
+      "tier": "other",
+      "parcelCount": 3257,
+      "completeCountyCount": 1,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/macon/meta.json",
+      "counties": [
+        {
+          "name": "Bibb",
+          "state": "Georgia",
+          "fips": "13021",
+          "featureCount": 3257,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Bibb County, Georgia (FIPS 13021) is consolidated Macon-Bibb. ParcelCAMA_Current_2025. TOTALACRES_1 5–150 inclusive. Not Bibb County, Alabama, and not Macon County, Georgia.",
+            "City of Macon and Payne City dissolved in 2014. There is no separate city parcel layer."
+          ]
+        }
+      ]
+    },
+    "Athens": {
+      "tier": "other",
+      "parcelCount": 2039,
+      "completeCountyCount": 1,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/athens/meta.json",
+      "counties": [
+        {
+          "name": "Clarke",
+          "state": "Georgia",
+          "fips": "13059",
+          "featureCount": 2039,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Clarke County, Georgia (FIPS 13059, Athens-Clarke). ACC_Parcels on enigma.accgov.com. ACRES 5–150 inclusive. Not Clarke County, Virginia or Alabama, and not Athens, Ohio or Texas.",
+            "Zoning is PlanningViewer2025/14 CurrentZn. Future land use is PlanningViewer2025/41 Updated_FL."
+          ]
+        }
+      ]
+    },
+    "Hilton Head": {
+      "tier": "other",
+      "parcelCount": 4756,
+      "completeCountyCount": 1,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/hilton-head/meta.json",
+      "counties": [
+        {
+          "name": "Beaufort",
+          "state": "South Carolina",
+          "fips": "45013",
+          "featureCount": 4756,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Beaufort County, South Carolina (FIPS 45013). EnerGov/MapServer/1. GisFile_Acres is text and is cast for the 5–150 band. The legacy Parcels/LiveParcels service was 404 and was not used.",
+            "County zoning is Zoning/MapServer/9 FBCode where the centroid falls in that polygon. It is the unincorporated Community Development Code."
+          ]
+        }
+      ]
+    },
+    "Jackson MS": {
+      "tier": "other",
+      "parcelCount": 57020,
+      "completeCountyCount": 7,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/jackson-ms/meta.json",
+      "counties": [
+        {
+          "name": "Copiah",
+          "state": "Mississippi",
+          "fips": "28029",
+          "featureCount": 6731,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Copiah County, Mississippi (FIPS 28029). CMPDD Copiah_County_Feature_Layer/3 on gis.cmpdd.org. gisacres 5–150 inclusive.",
+            "No county zoning or future land use REST. Both stay empty."
+          ]
+        },
+        {
+          "name": "Hinds",
+          "state": "Mississippi",
+          "fips": "28049",
+          "featureCount": 11375,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Hinds County, Mississippi (FIPS 28049). MARIS MS_Parcels_August_2024 West filtered by STCNTYFIPS='28049'. GISACRES 5–150 inclusive. CNTYNAME and unpadded CNTYFIPS filters return nothing and were not used.",
+            "Hinds has no county zoning or future land use REST. Unincorporated parcels stay unzoned. No code was invented for them."
+          ]
+        },
+        {
+          "name": "Madison",
+          "state": "Mississippi",
+          "fips": "28089",
+          "featureCount": 10002,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Madison County, Mississippi (FIPS 28089). CMPDD Madison_County_Map/36 on gis.cmpdd.org. Not Madison County, Tennessee.",
+            "Zoning is FeatureServer/27 zone_2025. Future land use is FeatureServer/33 fulu."
+          ]
+        },
+        {
+          "name": "Rankin",
+          "state": "Mississippi",
+          "fips": "28121",
+          "featureCount": 12150,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Rankin County, Mississippi (FIPS 28121). CMPDD Hosted Rankin_County_Feature_Layer/8 on gis.cmpdd.org. arcacres 5–150 inclusive.",
+            "County zoning is FeatureServer/16 zoning2025. County future land use is FeatureServer/32 fulu2025."
+          ]
+        },
+        {
+          "name": "Simpson",
+          "state": "Mississippi",
+          "fips": "28127",
+          "featureCount": 7372,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Simpson County, Mississippi (FIPS 28127). CMPDD Simpson_County_Feature_Layer/3. gisacres 5–150 inclusive.",
+            "Future land use is Simpson_FULU_2023 fulu_2023."
+          ]
+        },
+        {
+          "name": "Warren",
+          "state": "Mississippi",
+          "fips": "28149",
+          "featureCount": 3473,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Warren County, Mississippi (FIPS 28149). CMPDD Warren_County_Feature_Layer/4. gisacres 5–150 inclusive.",
+            "Future land use is FeatureServer/7 fulu, joined by centroid. Integer codes are the published renderer labels (0 is Agricultural/Vacant). County zoning is a gap and the parcel zoning attribute was not copied."
+          ]
+        },
+        {
+          "name": "Yazoo",
+          "state": "Mississippi",
+          "fips": "28163",
+          "featureCount": 5917,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Yazoo County, Mississippi (FIPS 28163). CMPDD Yazoo_County_2026_layers/2. gisacres 5–150 inclusive.",
+            "County zoning is FeatureServer/18 zoning_2026. County future land use is FeatureServer/5 fulu_2026."
           ]
         }
       ]

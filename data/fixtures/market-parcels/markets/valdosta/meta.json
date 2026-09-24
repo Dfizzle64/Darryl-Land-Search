@@ -1,0 +1,47 @@
+{
+  "generatedAt": "2026-09-24T04:29:15Z",
+  "market": "Valdosta",
+  "tier": "other",
+  "parcelCount": 5815,
+  "coreMinAcres": 5.0,
+  "coreMaxAcres": 150.0,
+  "tile": {
+    "originLon": -83.0,
+    "originLat": 27.0,
+    "tileDeg": 0.25
+  },
+  "notes": [
+    "Loaded only when this market is selected.",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
+    "Orange, Osceola, and Polk point at the existing Orlando complete extract."
+  ],
+  "counties": [
+    {
+      "name": "Lowndes",
+      "fips": "13185",
+      "state": "Georgia",
+      "featureCount": 5815,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "ga-lowndes-valor-taxparcels",
+      "queryUrl": "https://www.valorgis.com/arcgis/rest/services/TaxOffice/TaxParcels/FeatureServer/0/query",
+      "gaps": [
+        "Lowndes County, Georgia (FIPS 13185, Valdosta). VALOR TaxOffice/TaxParcels FeatureServer/0. TOTALACRES 5–150 inclusive. Not Lowndes County, Mississippi or Alabama.",
+        "Zoning is PlanningDevelopment/Zoning_Detailed ZOTXT. Parcel ZONINGCODE remains only where the polygon join misses. Lake Park, Dasher, and Remerton have no city zoning FeatureServer.",
+        "Future land use is Greater Lowndes character_areas. The map date is about 2006; the 2021 plan and draft 2026 update may supersede it.",
+        "Mailing ZIP is essentially empty. Assessed MAV fields are present and unfilled. On-parcel sales are thin, and property_sales year layers stop at 2021.",
+        "Mailing city is not a municipality filter.",
+        "Traffic counts use the priority-county state DOT layer already on main. Florida FDOT segments are not copied onto these parcels. A count farther than 15 km stays unknown.",
+        "No Opportunity Zone designation, school letter grade, or base flood elevation was assigned."
+      ],
+      "path": "data/fixtures/market-parcels/counties/13185/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13185/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 6774,
+      "zoningJoinedCount": 5814,
+      "fluJoinedCount": 5814
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-09-24T04:29:15Z",
+  "market": "Hilton Head",
+  "tier": "other",
+  "parcelCount": 4756,
+  "coreMinAcres": 5.0,
+  "coreMaxAcres": 150.0,
+  "tile": {
+    "originLon": -83.0,
+    "originLat": 27.0,
+    "tileDeg": 0.25
+  },
+  "notes": [
+    "Loaded only when this market is selected.",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
+    "Orange, Osceola, and Polk point at the existing Orlando complete extract."
+  ],
+  "counties": [
+    {
+      "name": "Beaufort",
+      "fips": "45013",
+      "state": "South Carolina",
+      "featureCount": 4756,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "sc-beaufort-energov-parcels",
+      "queryUrl": "https://gis.beaufortcountysc.gov/server/rest/services/EnerGov/MapServer/1/query",
+      "gaps": [
+        "Beaufort County, South Carolina (FIPS 45013). EnerGov/MapServer/1. GisFile_Acres is text and is cast for the 5–150 band. The legacy Parcels/LiveParcels service was 404 and was not used.",
+        "County zoning is Zoning/MapServer/9 FBCode where the centroid falls in that polygon. It is the unincorporated Community Development Code.",
+        "Town of Hilton Head Island zoning is EnergovLayers/7 NEW_ZONE and replaces the county code inside the town.",
+        "Town of Bluffton zoning and future land use come from Hosted/AddressParcels where jurisdiction is Bluffton. That layer is southern Beaufort only and is not the county parcel source.",
+        "City of Beaufort and Town of Port Royal have no public zoning FeatureServer on this pass. County CDC codes are not invented for them. Where the county polygon does not cover them, zoning stays empty.",
+        "Future land use is BC_FLU FutureLandUse joined on PIN. Hilton Head Landuse___Current is an existing-use inventory and was not stored as future land use.",
+        "Last sale only. No multi-sale table.",
+        "Traffic counts use the priority-county state DOT layer already on main. Florida FDOT segments are not copied onto these parcels. A count farther than 15 km stays unknown.",
+        "No Opportunity Zone designation, school letter grade, or base flood elevation was assigned."
+      ],
+      "path": "data/fixtures/market-parcels/counties/45013/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45013/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 4771,
+      "zoningJoinedCount": 4356,
+      "fluJoinedCount": 3822
+    }
+  ]
+}

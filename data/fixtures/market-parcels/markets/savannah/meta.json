@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T01:22:21Z",
+  "generatedAt": "2026-09-24T04:29:15Z",
   "market": "Savannah",
   "tier": "other",
-  "parcelCount": 11549,
+  "parcelCount": 16305,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -20,20 +20,30 @@
       "name": "Beaufort",
       "fips": "45013",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 4756,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-beaufort-energov-parcels",
+      "queryUrl": "https://gis.beaufortcountysc.gov/server/rest/services/EnerGov/MapServer/1/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Beaufort County, South Carolina (FIPS 45013). EnerGov/MapServer/1. GisFile_Acres is text and is cast for the 5–150 band. The legacy Parcels/LiveParcels service was 404 and was not used.",
+        "County zoning is Zoning/MapServer/9 FBCode where the centroid falls in that polygon. It is the unincorporated Community Development Code.",
+        "Town of Hilton Head Island zoning is EnergovLayers/7 NEW_ZONE and replaces the county code inside the town.",
+        "Town of Bluffton zoning and future land use come from Hosted/AddressParcels where jurisdiction is Bluffton. That layer is southern Beaufort only and is not the county parcel source.",
+        "City of Beaufort and Town of Port Royal have no public zoning FeatureServer on this pass. County CDC codes are not invented for them. Where the county polygon does not cover them, zoning stays empty.",
+        "Future land use is BC_FLU FutureLandUse joined on PIN. Hilton Head Landuse___Current is an existing-use inventory and was not stored as future land use.",
+        "Last sale only. No multi-sale table.",
+        "Traffic counts use the priority-county state DOT layer already on main. Florida FDOT segments are not copied onto these parcels. A count farther than 15 km stays unknown.",
+        "No Opportunity Zone designation, school letter grade, or base flood elevation was assigned."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45013/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45013/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 4771,
+      "zoningJoinedCount": 4356,
+      "fluJoinedCount": 3822
     },
     {
       "name": "Bryan",
@@ -47,7 +57,7 @@
       "source": "ga-bryan-property-details",
       "queryUrl": "https://bryangis.bryan-county.org/arcgis/rest/services/PropertyDetails/MapServer/0/query",
       "gaps": [
-        "Kept 2138 Bryan County, Georgia parcels in the inclusive 5\u2013150 acre band from PropertyDetails MapServer/0 (2232 source rows). TOTALACRES is the deeded acreage field.",
+        "Kept 2138 Bryan County, Georgia parcels in the inclusive 5–150 acre band from PropertyDetails MapServer/0 (2232 source rows, 94 extra parts with the same PARCEL_NO collapsed). TOTALACRES is the deeded acreage field.",
         "Owner mailing CITY/STATE/ADDRESS2 are nationwide mailing addresses and are not a municipality filter. Situs city is the MunicipalBoundaries spatial hit (Richmond Hill or Pembroke) only.",
         "ZONINGCODE is the parcel zoning string, including city-style codes. The value CITY is a stub and is not stored. County Zoning/0 is dissolved UDO polygons and was not preferred over the parcel code.",
         "Future land use is a centroid join to 2023ComprehensivePlan MapServer/4 LANDUSEDESC. Richmond Hill and Pembroke have no city future-land-use FeatureServer.",
@@ -93,9 +103,9 @@
       "queryUrl": "https://pub.sagis.org/arcgis/rest/services/Pictometry/ParcelDigest/MapServer/0/query",
       "gaps": [
         "3296 source rows collapsed to 3283 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "Zoning polygon join (OpenData CODE 01\u201309) hit 3281 of 3283 parcels (1 polygon hit had a blank ZONE). FLU join hit 1987 of 2005 Savannah/unincorporated parcels. 1278 parcels are in other municipalities with no public FLU.",
+        "Zoning polygon join (OpenData CODE 01–09) hit 3281 of 3283 parcels (1 polygon hit had a blank ZONE). FLU join hit 1987 of 2005 Savannah/unincorporated parcels. 1278 parcels are in other municipalities with no public FLU.",
         "Source is SAGIS Pictometry ParcelDigest MapServer/0 for Chatham County, Georgia (FIPS 13051). Chatham County, North Carolina was rejected.",
-        "Countywide zoning is OpenData Boundaries FeatureServer/4, CODE 01\u201309 (unincorporated through Vernonburg). EnerGov MapServer/40 is unincorporated only and was not used as countywide. AGOL Zoning_BND_AGOL is Savannah only and was not used as countywide.",
+        "Countywide zoning is OpenData Boundaries FeatureServer/4, CODE 01–09 (unincorporated through Vernonburg). EnerGov MapServer/40 is unincorporated only and was not used as countywide. AGOL Zoning_BND_AGOL is Savannah only and was not used as countywide.",
         "ParcelDigest ZONEID / ZONE_DESC is an estimated assign and was not stored as zoningCode.",
         "Future land use (OpenData Boundaries FeatureServer/3) is Savannah and unincorporated only. Pooler, Garden City, Port Wentworth, Bloomingdale, Tybee Island, Thunderbolt, and Vernonburg have no public FLU on this service.",
         "1 zoning polygon(s) have a null municipality CODE (C-M marsh conservation is the known case) and are not given a city prefix.",
@@ -121,7 +131,7 @@
       "source": "ga-effingham-parcels-2024",
       "queryUrl": "https://services.arcgis.com/9scQWTgPOi3GxJRr/arcgis/rest/services/Parcels2024/FeatureServer/0/query",
       "gaps": [
-        "Kept 6128 Effingham County, Georgia parcels in the inclusive 5\u2013150 acre band from Parcels2024 (6130 source rows). TOTALACRES is the acreage field.",
+        "Kept 6128 Effingham County, Georgia parcels in the inclusive 5–150 acre band from Parcels2024 (6130 source rows). TOTALACRES is the acreage field.",
         "Parcels2024 has SalesDate and no SALEPRICE or CURR_VAL. lastSale.price and tax.marketValue are joined from ParcelUpdate on PARCEL_NO, then from FLUM_20240903_BOC_APPR_2 when ParcelUpdate has no positive value. Newer parcels can miss that join.",
         "REASON is on Parcels2024 and is not a documented sale-quality flag, so lastSale.qualified stays null. There is no multi-sale history on the REST layer.",
         "No assessed or taxable value is on the public REST layers. esttax is stored as tax.taxes when it is positive. tax.assessedValue and tax.taxableValue stay null.",

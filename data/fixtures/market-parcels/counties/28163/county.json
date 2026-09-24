@@ -1,0 +1,38 @@
+{
+  "name": "Yazoo",
+  "fips": "28163",
+  "state": "Mississippi",
+  "markets": [
+    "Jackson MS"
+  ],
+  "featureCount": 5917,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ms-yazoo-cmpdd-2026-parcels",
+  "queryUrl": "https://gis.cmpdd.org/server/rest/services/Hosted/Yazoo_County_2026_layers/FeatureServer/2/query",
+  "gaps": [
+    "Yazoo County, Mississippi (FIPS 28163). CMPDD Yazoo_County_2026_layers/2. gisacres 5–150 inclusive.",
+    "County zoning is FeatureServer/18 zoning_2026. County future land use is FeatureServer/5 fulu_2026.",
+    "Yazoo City zoning, future land use, and sale price replace the county values on a parcel-id match. salepric is the municipal sale field.",
+    "No verified state DOT AADT join for this county. Florida FDOT segments are not copied here. nearestRoad stays empty unless a later count layer is added.",
+    "No Opportunity Zone designation, school letter grade, or base flood elevation was assigned."
+  ],
+  "path": "data/fixtures/market-parcels/counties/28163/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/28163/lookup.json",
+  "sourceCount": 6818,
+  "dropped": 673,
+  "tileCount": 8,
+  "zoningJoinedCount": 5916,
+  "fluJoinedCount": 5916,
+  "join": {
+    "zoningJoined": 5916,
+    "fluJoined": 5916,
+    "salePriceNonNull": 21,
+    "byJurisdiction": {
+      "Yazoo City": 584
+    },
+    "outsideBox": 0
+  }
+}

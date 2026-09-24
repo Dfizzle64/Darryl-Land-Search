@@ -139,4 +139,53 @@ describe("parcel income and AADT join", () => {
     annotateParcelSignals(designatedOnly, index);
     expect(designatedOnly.properties.incomeTract).toBeNull();
   });
+
+  it("joins income and a nearby count for a new-metro parcel outside Florida", () => {
+    const index = buildOrangeSignalIndex(
+      {
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [-83.45, 33.9],
+                  [-83.25, 33.9],
+                  [-83.25, 34.05],
+                  [-83.45, 34.05],
+                  [-83.45, 33.9],
+                ],
+              ],
+            },
+            properties: {
+              geoid: "13059000100",
+              name: "Census Tract 1, Clarke County, Georgia",
+              medianHouseholdIncome: 51000,
+              medianHouseholdIncomeMoe: 800,
+              vintage: ACS_TRACT_VINTAGE,
+            },
+          },
+        ],
+      },
+      { type: "FeatureCollection", features: [] },
+      { type: "FeatureCollection", features: [road(-83.35, 33.97, 18000)] },
+    );
+    const parcel = {
+      type: "Feature",
+      geometry: { type: "Polygon", coordinates: [] },
+      properties: {
+        countyFips: "13059",
+        centroid: [-83.35, 33.97],
+        incomeTract: null,
+        incomeBlockGroup: null,
+        nearestRoad: null,
+      },
+    } as unknown as ParcelFeature;
+    annotateParcelSignals(parcel, index);
+    expect(parcel.properties.incomeTract?.medianHouseholdIncome).toBe(51000);
+    expect(parcel.properties.incomeTract?.vintage).toBe(ACS_TRACT_VINTAGE);
+    expect(parcel.properties.nearestRoad?.aadt).toBe(18000);
+  });
 });

@@ -21,7 +21,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Birmingham | other | 38,101 | 3 | 0 | 6 |
 | Mobile | other | 42,446 | 3 | 0 | 2 |
 | Huntsville | other | 29,598 | 4 | 0 | 3 |
-| Savannah | other | 11,549 | 3 | 0 | 5 |
+| Savannah | other | 16,305 | 4 | 0 | 4 |
 | Columbia | other | 14,613 | 1 | 1 | 8 |
 | Greenville | other | 31,164 | 2 | 0 | 6 |
 | Chattanooga | other | 15,498 | 2 | 0 | 8 |
@@ -35,6 +35,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Asheville | other | 16,793 | 2 | 0 | 0 |
 | Tuscaloosa | other | 11,596 | 1 | 0 | 3 |
 | Montgomery | other | 26,759 | 3 | 0 | 1 |
+| Valdosta | other | 5,815 | 1 | 0 | 0 |
+| Macon | other | 3,257 | 1 | 0 | 0 |
+| Athens | other | 2,039 | 1 | 0 | 0 |
+| Hilton Head | other | 4,756 | 1 | 0 | 0 |
+| Jackson MS | other | 57,020 | 7 | 0 | 0 |
 
 ## Counties
 
@@ -271,7 +276,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Beaufort | South Carolina | 45013 | gap | 0 | unavailable |
+| Beaufort | South Carolina | 45013 | complete-gte-5ac | 4,756 | sc-beaufort-energov-parcels |
 | Bryan | Georgia | 13029 | complete-gte-5ac | 2,138 | ga-bryan-property-details |
 | Bulloch | Georgia | 13031 | gap | 0 | unavailable |
 | Chatham | Georgia | 13051 | complete-gte-5ac | 3,283 | sagis-chatham-ga-parcel-digest |
@@ -434,4 +439,40 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Elmore | Alabama | 01051 | complete-gte-5ac | 9,758 | al-elmore-parcels |
 | Lowndes | Alabama | 01085 | gap | 0 | unavailable |
 | Montgomery | Alabama | 01101 | complete-gte-5ac | 9,954 | al-montgomery-parcels |
+
+### Valdosta
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Lowndes | Georgia | 13185 | complete-gte-5ac | 5,815 | ga-lowndes-valor-taxparcels |
+
+### Macon
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Bibb | Georgia | 13021 | complete-gte-5ac | 3,257 | ga-bibb-parcelcama-2025 |
+
+### Athens
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Clarke | Georgia | 13059 | complete-gte-5ac | 2,039 | ga-clarke-acc-parcels |
+
+### Hilton Head
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Beaufort | South Carolina | 45013 | complete-gte-5ac | 4,756 | sc-beaufort-energov-parcels |
+
+### Jackson MS
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Copiah | Mississippi | 28029 | complete-gte-5ac | 6,731 | ms-copiah-cmpdd-parcels |
+| Hinds | Mississippi | 28049 | complete-gte-5ac | 11,375 | ms-hinds-maris-august-2024 |
+| Madison | Mississippi | 28089 | complete-gte-5ac | 10,002 | ms-madison-cmpdd-parcels |
+| Rankin | Mississippi | 28121 | complete-gte-5ac | 12,150 | ms-rankin-cmpdd-parcels |
+| Simpson | Mississippi | 28127 | complete-gte-5ac | 7,372 | ms-simpson-cmpdd-parcels |
+| Warren | Mississippi | 28149 | complete-gte-5ac | 3,473 | ms-warren-cmpdd-parcels |
+| Yazoo | Mississippi | 28163 | complete-gte-5ac | 5,917 | ms-yazoo-cmpdd-2026-parcels |
 

@@ -76,6 +76,21 @@ TN_URL = "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureSe
 MS_URL = "https://mgis19.mdeq.ms.gov/arcgis/rest/services/GeologyParcelAndFloodGIS/Parcels_Statewide_2023/FeatureServer/3/query"
 AR_URL = "https://gis.arkansas.gov/arcgis/rest/services/FEATURESERVICES/Planning_Cadastre/FeatureServer/6/query"
 
+# Rockdale County, Georgia (FIPS 13247). Public AGOL only.
+# gis.rockdalecountyga.gov returns token 499 and is intentionally unused.
+ROCKDALE_PARCELS_URL = "https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/Parcels/FeatureServer/9/query"
+ROCKDALE_ZONING_URL = "https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/RockdaleCountyZoning/FeatureServer/1/query"
+ROCKDALE_FLU_URL = "https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/Future_LandUse/FeatureServer/3/query"
+ROCKDALE_BOUNDARY_URL = "https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/RockdaleCounty_Boundary/FeatureServer/0/query"
+CONYERS_PARCELS_URL = "https://maps.conyersga.com/arcgis/rest/services/SmartGovParcels/MapServer/2/query"
+CONYERS_ZONING_URL = "https://maps.conyersga.com/arcgis/rest/services/Zoning/MapServer/8/query"
+CONYERS_FLU_URL = "https://maps.conyersga.com/arcgis/rest/services/FLU2025/MapServer/0/query"
+CONYERS_LIMITS_URL = "https://maps.conyersga.com/arcgis/rest/services/Zoning/MapServer/6/query"
+CONYERS_LIMITS_FALLBACK_URL = "https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/Conyers_City_Limits/FeatureServer/11/query"
+# Atlanta-east box. Excludes Rockdale WI (~42.7N) and Rockdale IL (~41.5N).
+ROCKDALE_GA_BOX = (-84.35, 33.40, -83.70, 33.95)
+ROCKDALE_WHERE = "(Acreage>=5 AND Acreage<=150) OR ((Acreage IS NULL OR Acreage<=0) AND Calc_Ac>=5 AND Calc_Ac<=150)"
+
 DOH_FIELDS = [
     "PARCEL_ID",
     "OWN_NAME",
@@ -236,6 +251,70 @@ def plausible_centroid(center: tuple[float, float] | None) -> bool:
         return False
     lon, lat = center
     return -93.5 < lon < -75 and 24 < lat < 37.6
+
+
+def point_in_ring(x: float, y: float, ring: list) -> bool:
+    inside = False
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = ring[i][0], ring[i][1]
+        xj, yj = ring[j][0], ring[j][1]
+        if ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / ((yj - yi) or 1e-12) + xi):
+            inside = not inside
+        j = i
+    return inside
+
+
+def point_in_geojson(x: float, y: float, geometry: dict | None) -> bool:
+    if not geometry:
+        return False
+    if geometry.get("type") == "Polygon":
+        polygons = [geometry.get("coordinates") or []]
+    elif geometry.get("type") == "MultiPolygon":
+        polygons = geometry.get("coordinates") or []
+    else:
+        return False
+    for poly in polygons:
+        if not poly or not point_in_ring(x, y, poly[0]):
+            continue
+        if any(point_in_ring(x, y, hole) for hole in poly[1:]):
+            continue
+        return True
+    return False
+
+
+def geometry_bbox(geometry: dict) -> tuple[float, float, float, float] | None:
+    xs: list[float] = []
+    ys: list[float] = []
+
+    def walk(node: Any) -> None:
+        if not node:
+            return
+        if isinstance(node[0], (int, float)):
+            xs.append(float(node[0]))
+            ys.append(float(node[1]))
+            return
+        for child in node:
+            walk(child)
+
+    walk(geometry.get("coordinates"))
+    if not xs:
+        return None
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def geometry_area_m2(geometry: dict) -> float:
+    if geometry.get("type") == "Polygon":
+        polygons = [geometry.get("coordinates") or []]
+    elif geometry.get("type") == "MultiPolygon":
+        polygons = geometry.get("coordinates") or []
+    else:
+        return 0.0
+    total = 0.0
+    for poly in polygons:
+        if poly and poly[0]:
+            total += abs(ring_signed_m2(poly[0]))
+    return total
 
 
 def empty_feature(
@@ -566,7 +645,536 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+def squish(value: Any) -> str | None:
+    text = clean(value)
+    if not text:
+        return None
+    return " ".join(text.split())
+
+
+def parcel_key(value: Any) -> str | None:
+    text = squish(value)
+    return text.upper() if text else None
+
+
+def in_rockdale_ga_box(lon: float, lat: float) -> bool:
+    west, south, east, north = ROCKDALE_GA_BOX
+    return west <= lon <= east and south <= lat <= north
+
+
+def fetch_attribute_rows(url: str, where: str, out_fields: list[str], order_field: str, page: int = 1000) -> list[dict]:
+    """Page attributes. Conyers MapServer returns HTTP 404 for long objectIds lists."""
+    rows: list[dict] = []
+    seen: set[int] = set()
+    offset = 0
+    label = url.split("/rest/services/")[-1][:72]
+    while offset < 100000:
+        data = fetch_json(
+            url,
+            {
+                "where": where,
+                "outFields": ",".join(out_fields),
+                "returnGeometry": "false",
+                "orderByFields": order_field,
+                "resultOffset": str(offset),
+                "resultRecordCount": str(page),
+                "f": "json",
+            },
+            timeout=180,
+        )
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        feats = data.get("features") or []
+        if not feats:
+            break
+        for feat in feats:
+            attrs = feat.get("attributes") or {}
+            oid = attrs.get("OBJECTID", attrs.get("OID", attrs.get("OBJECTID_1")))
+            if isinstance(oid, int):
+                if oid in seen:
+                    raise RuntimeError(f"Attribute page repeated {order_field} {oid} from {label}")
+                seen.add(oid)
+            rows.append(attrs)
+        offset += len(feats)
+        if offset == len(feats) or offset % 5000 == 0:
+            print(f"    attributes {offset} from {label}", flush=True)
+        if len(feats) < page and not data.get("exceededTransferLimit"):
+            break
+        time.sleep(0.04)
+    print(f"    attributes {len(rows)} from {label}", flush=True)
+    return rows
+
+
+def fetch_geo_features(url: str, out_fields: str) -> list[dict]:
+    features: list[dict] = []
+    offset = 0
+    while offset < 20000:
+        data = fetch_json(
+            url,
+            {
+                "where": "1=1",
+                "outFields": out_fields,
+                "returnGeometry": "true",
+                "outSR": "4326",
+                "resultOffset": str(offset),
+                "resultRecordCount": "1000",
+                "f": "json",
+            },
+            timeout=180,
+        )
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        page = data.get("features") or []
+        features.extend(page)
+        if not page or not data.get("exceededTransferLimit"):
+            break
+        offset += len(page)
+    parsed: list[dict] = []
+    for item in features:
+        geometry, _acres = rings_to_feature_geometry(item.get("geometry"))
+        if not geometry:
+            continue
+        box = geometry_bbox(geometry)
+        if not box:
+            continue
+        parsed.append(
+            {
+                "attributes": item.get("attributes") or {},
+                "geometry": geometry,
+                "bbox": box,
+                "area": geometry_area_m2(geometry),
+            }
+        )
+    return parsed
+
+
+def overlay_at(lon: float, lat: float, overlays: list[dict]) -> dict | None:
+    hits = []
+    for item in overlays:
+        minx, miny, maxx, maxy = item["bbox"]
+        if lon < minx or lon > maxx or lat < miny or lat > maxy:
+            continue
+        if point_in_geojson(lon, lat, item["geometry"]):
+            hits.append(item)
+    if not hits:
+        return None
+    hits.sort(key=lambda item: item["area"])
+    return hits[0]
+
+
+def index_by_parcel(rows: list[dict], *prefer: str) -> dict[str, dict]:
+    indexed: dict[str, dict] = {}
+    for row in rows:
+        key = parcel_key(row.get("PARCEL_NO"))
+        if not key:
+            continue
+        current = indexed.get(key)
+        if current is None:
+            indexed[key] = row
+            continue
+        for field in prefer:
+            if not squish(current.get(field)) and squish(row.get(field)):
+                indexed[key] = row
+                break
+    return indexed
+
+
+def conyers_zone(description: Any) -> tuple[str | None, str | None]:
+    """Split a published Conyers label. The code and the parenthetical text are both on the layer."""
+    text = squish(description)
+    if not text or text.isdigit():
+        return None, None
+    if "(" in text and ")" in text:
+        code = squish(text.split("(", 1)[0])
+        inner = squish(text.split("(", 1)[1].rsplit(")", 1)[0])
+        if code and not code.isdigit():
+            return code, inner
+    return text, None
+
+
+def county_zone_code(value: Any) -> str | None:
+    text = squish(value)
+    if not text or text.upper() == "OOC" or text.isdigit():
+        return None
+    return text
+
+
+def flu_payload(code: Any, label: Any, jurisdiction: str, source: str) -> dict | None:
+    zoning_code = squish(code)
+    if not zoning_code or zoning_code.upper() in {"CITY", "OOC"} or zoning_code.isdigit():
+        return None
+    label_text = squish(label)
+    if not label_text or not any(ch.isalpha() for ch in label_text):
+        label_text = zoning_code
+    return {"code": zoning_code, "label": label_text, "jurisdiction": jurisdiction, "source": source}
+
+
+def rockdale_situs(attrs: dict) -> str | None:
+    situs = squish(attrs.get("BOA_Addres"))
+    if situs:
+        return situs
+    parts = [squish(attrs.get(key)) for key in ("Address", "Road_name", "St_Type")]
+    return squish(" ".join(part for part in parts if part))
+
+
+def rockdale_acres(attrs: dict) -> float | None:
+    acreage = num(attrs.get("Acreage"))
+    calculated = num(attrs.get("Calc_Ac"))
+    if acreage is not None and acreage > 0:
+        return acreage
+    return calculated
+
+
+def rockdale_fmv(attrs: dict) -> float | None:
+    value = num(attrs.get("Valuation"))
+    if value is None or value <= 0:
+        return None
+    return value
+
+
+def mailing_from_smartgov(row: dict) -> dict[str, str | None]:
+    lines = [squish(row.get(key)) for key in ("ADDRESS1", "ADDRESS2", "ADDRESS3")]
+    lines = [line for line in lines if line]
+    mail1 = lines[0] if lines else None
+    mail2 = ", ".join(lines[1:]) if len(lines) > 1 else None
+    first = squish(row.get("FIRSTNAME"))
+    middle = squish(row.get("MIDDLE"))
+    last = squish(row.get("LASTNAME"))
+    if first or middle:
+        owner = squish(" ".join(part for part in (first, middle, last) if part))
+    else:
+        owner = last
+    zip_code = zip_str(row.get("ZIP"))
+    alt_zip = zip_str(row.get("ZIP_1"))
+    if not (zip_code and len(zip_code) == 5 and zip_code.isdigit()):
+        zip_code = alt_zip if alt_zip and len(alt_zip) == 5 and alt_zip.isdigit() else zip_code or alt_zip
+    return {
+        "owner": owner,
+        "mail1": mail1,
+        "mail2": mail2,
+        "city": squish(row.get("CITY")),
+        "state": squish(row.get("STATE")),
+        "zip": zip_code,
+    }
+
+
+def assert_rockdale_boundary(overlays: list[dict]) -> dict:
+    if len(overlays) != 1:
+        raise RuntimeError(f"Expected one Rockdale County boundary polygon, found {len(overlays)}")
+    item = overlays[0]
+    attrs = item["attributes"]
+    geoid = squish(attrs.get("GEOID10"))
+    statefp = squish(attrs.get("STATEFP10"))
+    countyfp = squish(attrs.get("COUNTYFP10"))
+    name = squish(attrs.get("NAME10")) or ""
+    if geoid != "13247" or statefp != "13" or countyfp != "247" or "ROCKDALE" not in name.upper():
+        raise RuntimeError(f"Boundary is not Rockdale County, Georgia: {attrs}")
+    box = item["bbox"]
+    if not in_rockdale_ga_box((box[0] + box[2]) / 2, (box[1] + box[3]) / 2):
+        raise RuntimeError(f"Rockdale boundary centroid is outside Atlanta-east Georgia: {box}")
+    # ~132 square miles. Reject a WI/IL lookalike or a statewide polygon.
+    acres = item["area"] / 4046.8564224
+    if not 70_000 <= acres <= 120_000:
+        raise RuntimeError(f"Rockdale boundary area {acres:.0f} acres is not the Georgia county")
+    return item
+
+
+def load_conyers_limits() -> list[dict]:
+    errors: list[str] = []
+    for url in (CONYERS_LIMITS_URL, CONYERS_LIMITS_FALLBACK_URL):
+        try:
+            overlays = fetch_geo_features(url, "*")
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"{url}: {exc}")
+            continue
+        if not overlays:
+            errors.append(f"{url}: empty")
+            continue
+        acres = sum(item["area"] for item in overlays) / 4046.8564224
+        center = overlays[0]["bbox"]
+        mid = ((center[0] + center[2]) / 2, (center[1] + center[3]) / 2)
+        if in_rockdale_ga_box(mid[0], mid[1]) and 1_500 <= acres <= 40_000:
+            print(f"  Conyers city limits {acres:.0f} acres via {url.split('/rest/services/')[-1][:60]}", flush=True)
+            return overlays
+        errors.append(f"{url}: {acres:.0f} acres at {mid}")
+    raise RuntimeError("Conyers city limits failed the Rockdale GA check: " + "; ".join(errors))
+
+
+def join_rockdale_attributes(features: list[dict]) -> dict[str, int]:
+    print("  joining Conyers owner, zoning, and future land use", flush=True)
+    owners = index_by_parcel(
+        fetch_attribute_rows(
+            CONYERS_PARCELS_URL,
+            "1=1",
+            ["OBJECTID", "PARCEL_NO", "LASTNAME", "FIRSTNAME", "MIDDLE", "ADDRESS1", "ADDRESS2", "ADDRESS3", "CITY", "STATE", "ZIP", "ZIP_1"],
+            "OBJECTID",
+        ),
+        "LASTNAME",
+    )
+    city_zoning = index_by_parcel(
+        fetch_attribute_rows(CONYERS_ZONING_URL, "1=1", ["OBJECTID", "PARCEL_NO", "Zone_Description"], "OBJECTID"),
+        "Zone_Description",
+    )
+    county_zoning = index_by_parcel(
+        fetch_attribute_rows(ROCKDALE_ZONING_URL, "1=1", ["OID", "PARCEL_NO", "County_Zoning", "City_Zoning"], "OID"),
+        "County_Zoning",
+    )
+    city_flu = fetch_geo_features(CONYERS_FLU_URL, "City_Land_,Desription")
+    county_flu = fetch_geo_features(ROCKDALE_FLU_URL, "Composite,Land_Use")
+    limits = load_conyers_limits()
+    if not city_flu or not county_flu:
+        raise RuntimeError("Rockdale future land use layers returned no polygons in WGS84")
+    stats = {
+        "smartgovRows": len(owners),
+        "ownerMatched": 0,
+        "insideCity": 0,
+        "cityZoning": 0,
+        "cityZoningFallback": 0,
+        "countyZoning": 0,
+        "cityFlu": 0,
+        "countyFlu": 0,
+    }
+    for feature in features:
+        props = feature["properties"]
+        lon, lat = props["centroid"]
+        key = parcel_key(props.get("parcelId"))
+        owner = owners.get(key or "")
+        if owner:
+            mail = mailing_from_smartgov(owner)
+            if mail["owner"] or mail["mail1"]:
+                props["ownerName"] = mail["owner"]
+                props["mailingAddress"] = {
+                    "line1": mail["mail1"],
+                    "line2": mail["mail2"],
+                    "city": mail["city"],
+                    "state": mail["state"],
+                    "zip": mail["zip"],
+                }
+                stats["ownerMatched"] += 1
+        inside = any(point_in_geojson(lon, lat, item["geometry"]) for item in limits)
+        if inside:
+            stats["insideCity"] += 1
+            code, district = conyers_zone((city_zoning.get(key or "") or {}).get("Zone_Description"))
+            if code:
+                props["zoningCode"] = code
+                props["zoningDistrict"] = district
+                stats["cityZoning"] += 1
+            elif key in county_zoning:
+                fallback = county_zone_code(county_zoning[key].get("City_Zoning")) or county_zone_code(
+                    county_zoning[key].get("County_Zoning")
+                )
+                if fallback:
+                    props["zoningCode"] = fallback
+                    props["zoningDistrict"] = None
+                    stats["cityZoningFallback"] += 1
+            flu_hit = overlay_at(lon, lat, city_flu)
+            flu = flu_payload(
+                (flu_hit or {}).get("attributes", {}).get("City_Land_") if flu_hit else None,
+                (flu_hit or {}).get("attributes", {}).get("Desription") if flu_hit else None,
+                "Conyers",
+                "conyers-flu2025",
+            )
+            if flu:
+                props["flu"] = flu
+                stats["cityFlu"] += 1
+            else:
+                county_hit = overlay_at(lon, lat, county_flu)
+                county_payload = flu_payload(
+                    (county_hit or {}).get("attributes", {}).get("Composite") if county_hit else None,
+                    (county_hit or {}).get("attributes", {}).get("Land_Use") if county_hit else None,
+                    "Rockdale County",
+                    "rockdale-future-land-use",
+                )
+                if county_payload:
+                    props["flu"] = county_payload
+                    stats["countyFlu"] += 1
+        else:
+            zone = county_zone_code((county_zoning.get(key or "") or {}).get("County_Zoning"))
+            if zone:
+                props["zoningCode"] = zone
+                props["zoningDistrict"] = None
+                stats["countyZoning"] += 1
+            county_hit = overlay_at(lon, lat, county_flu)
+            county_payload = flu_payload(
+                (county_hit or {}).get("attributes", {}).get("Composite") if county_hit else None,
+                (county_hit or {}).get("attributes", {}).get("Land_Use") if county_hit else None,
+                "Rockdale County",
+                "rockdale-future-land-use",
+            )
+            if county_payload:
+                props["flu"] = county_payload
+                stats["countyFlu"] += 1
+        props["lastSale"] = {"date": None, "price": None, "qualified": None}
+        props["tax"]["assessedValue"] = None
+        props["tax"]["taxableValue"] = None
+        props["tax"]["taxes"] = None
+    return stats
+
+
+def rockdale_gaps(spec: dict, *, expected: int, kept: int, dropped: int, geo_dropped: int, stats: dict[str, int]) -> list[str]:
+    collapsed = max(0, expected - kept - dropped)
+    other_dropped = max(0, dropped - geo_dropped)
+    zoning_miss = max(0, kept - stats["cityZoning"] - stats["cityZoningFallback"] - stats["countyZoning"])
+    flu_miss = max(0, kept - stats["cityFlu"] - stats["countyFlu"])
+    return [
+        (
+            f"Source query returned {expected} rows in the 5.0–150.0 acre band. {kept} parcels kept. "
+            f"{geo_dropped} centroids were outside Rockdale County, Georgia, {other_dropped} failed geometry or the acreage check, "
+            f"and {collapsed} duplicate parcel ids were collapsed to the larger part."
+        ),
+        *list(spec.get("gaps") or []),
+        (
+            f"Conyers SmartGovParcels matched owner or mailing on {stats['ownerMatched']} of {kept} kept parcels "
+            f"({stats['smartgovRows']} city parcel ids). Unmatched parcels stay null."
+        ),
+        (
+            f"Conyers city limits contain {stats['insideCity']} kept parcels. "
+            f"Zoning/8 matched {stats['cityZoning']}; county city-zoning fallback matched {stats['cityZoningFallback']}; "
+            f"FLU2025 matched {stats['cityFlu']}. "
+            f"Unincorporated county zoning matched {stats['countyZoning']}; county future land use matched {stats['countyFlu']}. "
+            f"{zoning_miss} kept parcels have no zoning code on those layers, and {flu_miss} have no future land use polygon."
+        ),
+    ]
+
+
+def rockdale_spec() -> dict:
+    return {
+        "kind": "rockdale",
+        "url": ROCKDALE_PARCELS_URL,
+        "where": ROCKDALE_WHERE,
+        "outFields": ["PARCEL_NO", "Acreage", "Calc_Ac", "Valuation", "BOA_Addres", "Address", "Road_name", "St_Type", "Parcel_Cit", "ZiipCode"],
+        "idField": "PARCEL_NO",
+        "acresField": "_acres",
+        "situsField": "_situs",
+        "cityField": "Parcel_Cit",
+        "zipField": "ZiipCode",
+        "marketValueField": "_fmv",
+        "source": "ga-rockdale-parcels",
+        "coverage": "complete-gte-5ac",
+        "gaps": [
+            "Rockdale County, Georgia AGOL Parcels/9. Positive Acreage is stored; Calc_Ac is used only when Acreage is null or zero. The band is 5.0–150.0 acres inclusive.",
+            "Valuation is a fair-market proxy only. Assessed value, taxable value, and taxes are not on this layer and were left null.",
+            "Owner and mailing address come from City of Conyers SmartGovParcels joined on PARCEL_NO. Parcels outside that extract are null. No assessor site was scraped.",
+            "Sales are not published on these layers. lastSale date, price, and qualified flag are null.",
+            "Outside Conyers, zoning is RockdaleCountyZoning County_Zoning and future land use is Future_LandUse. Inside the city limits, Zoning/8 and FLU2025 are preferred. gis.rockdalecountyga.gov was not used (token 499).",
+        ],
+    }
+
+
+def download_rockdale(county: dict, markets: list[str], spec: dict) -> dict:
+    if county["fips"] != "13247" or county["state"] != "Georgia":
+        raise RuntimeError(f"Refusing Rockdale ingest for {county['name']} {county['state']} {county['fips']}")
+    fips = county["fips"]
+    cache_path = CACHE_DIR / f"{fips}.json"
+    print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
+    if cache_path.exists() and not spec.get("ignoreCache"):
+        cached = json.loads(cache_path.read_text())
+        if cached.get("features") and cached.get("rockdaleGa"):
+            print(f"  cache hit {len(cached['features'])}", flush=True)
+            features = cached["features"]
+            for feature in features:
+                feature["properties"]["marketIds"] = markets
+            path, lookup, tiles = write_tiles(county, features)
+            return county_row(
+                county,
+                markets,
+                feature_count=len(features),
+                coverage=spec["coverage"] if features else "gap",
+                partition="tiles" if features else "none",
+                path=path if features else None,
+                lookup=lookup if features else None,
+                source=spec["source"],
+                query_url=spec["url"],
+                gaps=list(cached.get("gaps") or spec.get("gaps") or []),
+                source_count=cached.get("sourceCount"),
+                dropped=cached.get("dropped"),
+                tile_count=tiles,
+            )
+    boundary = assert_rockdale_boundary(fetch_geo_features(ROCKDALE_BOUNDARY_URL, "GEOID10,STATEFP10,COUNTYFP10,NAME10"))
+    expected = count_where(spec["url"], spec["where"])
+    print(f"  source rows {expected}", flush=True)
+    if expected <= 0:
+        raise RuntimeError("Rockdale parcel query returned no 5–150 acre rows")
+    raw = fetch_by_ids(spec["url"], fetch_object_ids(spec["url"], spec["where"]), spec["outFields"])
+    for item in raw:
+        attrs = item.setdefault("attributes", {})
+        attrs["_acres"] = rockdale_acres(attrs)
+        attrs["_situs"] = rockdale_situs(attrs)
+        attrs["_fmv"] = rockdale_fmv(attrs)
+    features, dropped = normalize_rows(raw, county, markets, spec)
+    kept_features: list[dict] = []
+    geo_dropped = 0
+    for feature in features:
+        lon, lat = feature["properties"]["centroid"]
+        if not in_rockdale_ga_box(lon, lat) or not point_in_geojson(lon, lat, boundary["geometry"]):
+            geo_dropped += 1
+            continue
+        kept_features.append(feature)
+    features = kept_features
+    dropped += geo_dropped
+    stats = join_rockdale_attributes(features) if features else {
+        "smartgovRows": 0,
+        "ownerMatched": 0,
+        "insideCity": 0,
+        "cityZoning": 0,
+        "cityZoningFallback": 0,
+        "countyZoning": 0,
+        "cityFlu": 0,
+        "countyFlu": 0,
+    }
+    for feature in features:
+        props = feature["properties"]
+        if props["state"] != "Georgia" or props["countyFips"] != "13247":
+            raise RuntimeError(f"Non-Georgia feature emitted: {props.get('id')}")
+        if not in_band(props.get("acreage")):
+            raise RuntimeError(f"{props.get('id')} is outside 5–150 acres")
+        sale = props["lastSale"]
+        tax = props["tax"]
+        if sale.get("date") or sale.get("price") or sale.get("qualified"):
+            raise RuntimeError(f"{props.get('id')} has a sale value")
+        if tax.get("assessedValue") is not None or tax.get("taxableValue") is not None or tax.get("taxes") is not None:
+            raise RuntimeError(f"{props.get('id')} invented an assessed or taxable value")
+        if props.get("zoningCode") and str(props["zoningCode"]).isdigit():
+            raise RuntimeError(f"{props.get('id')} stored a numeric zoning code")
+    gaps = rockdale_gaps(spec, expected=expected, kept=len(features), dropped=dropped, geo_dropped=geo_dropped, stats=stats)
+    coverage = spec["coverage"] if features else "gap"
+    if not features:
+        gaps.insert(0, f"Source count was {expected} but none survived the Rockdale County, Georgia checks.")
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "features": features, "gaps": gaps, "rockdaleGa": True},
+            separators=(",", ":"),
+        )
+    )
+    path, lookup, tiles = (None, None, 0)
+    if features:
+        path, lookup, tiles = write_tiles(county, features)
+    print(
+        f"  kept {len(features)} ({coverage}); city {stats['insideCity']}; "
+        f"owners {stats['ownerMatched']}; zoning city {stats['cityZoning']} county {stats['countyZoning']}",
+        flush=True,
+    )
+    return county_row(
+        county,
+        markets,
+        feature_count=len(features),
+        coverage=coverage,
+        partition="tiles" if features else "none",
+        path=path,
+        lookup=lookup,
+        source=spec["source"],
+        query_url=spec["url"],
+        gaps=gaps,
+        source_count=expected,
+        dropped=dropped,
+        tile_count=tiles,
+    )
+
+
 def county_override(fips: str) -> dict | None:
+    if fips == "13247":  # Rockdale GA
+        return rockdale_spec()
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -663,7 +1271,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, or Rockdale pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -925,17 +1533,19 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Rockdale county services | Cobb complete. DeKalb is a polygon-acre sample. Rockdale is a complete 5–150 acre extract from county AGOL parcels, with Conyers owner and city zoning joined where those layers match. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or a public zoning polygon is joined (Rockdale). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "rockdale":
+        return download_rockdale(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

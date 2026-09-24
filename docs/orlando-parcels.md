@@ -13,8 +13,8 @@ Lake and Osceola are county property-appraiser / open-data cadastres. Sumter is 
 | Lake | 12069 | 16,753 | 16,826 | 66 extra parts merged. 7 multipart accounts summed past 150 and dropped. Zoning on 13,633. FLU on 13,602. 1,134 rural-eligible centroids |
 | Orange | 12095 | 11,709 | 11,887 | OCPA shapes. 320 extra parts merged. 36 multipart accounts summed past 150 and dropped. Zoning on 9,789. FLU on 8,238 |
 | Osceola | 12097 | 6,169 | 6,170 | 1 extra part merged. Zoning on 6,081, including 400 St. Cloud overrides. FLU on 6,032, including 1,376 St. Cloud overrides. 1,511 rural-eligible centroids |
-| Polk | 12105 | 19,734 | 19,738 | 4 extra parts merged. No zoning/FLU. 4,253 rural-eligible centroids |
-| Seminole | 12117 | 4,788 | 4,788 | DOH geometry. Zoning on 4,012. FLU on 4,013. Altamonte Springs zoning on 138. Oviedo zoning on 146. 67 parcels still carry the county `CITY` stub. No rural-eligible OZ 2.0 tracts in the pack |
+| Polk | 12105 | 19,734 | 19,738 | 4 extra parts merged. City zoning on 1,696 and FLU on 1,735 for Lakeland, Bartow, Auburndale, Lake Alfred, and Lake Hamilton. County LDC zoning is still a gap. 4,253 rural-eligible centroids |
+| Seminole | 12117 | 4,788 | 4,788 | DOH geometry plus county land use. City overlays for Casselberry, Winter Springs, Lake Mary, Sanford, Oviedo, and Altamonte Springs are kept where that join hit. Longwood has no city layer. No rural-eligible OZ 2.0 tracts in the pack |
 | Sumter | 12119 | 6,602 | 6,602 | SWFWMD `AREANO`. Zoning on 6,578. FLU on 6,575. 2026 qualified sales matched 65 parcels. 2,268 rural-eligible centroids |
 | Brevard | 12009 | 120 | — | Thinner sample (not capped at 150) |
 | Marion | 12083 | 120 | — | Thinner sample (not capped at 150) |
@@ -121,8 +121,8 @@ Marion was checked and not seeded: [ParcelsAndSubdivisions/0](https://gis.marion
 
 ## Gaps
 
-- Polk has no zoning or FLU on the DOH extract. Land-use filters should stay on **All parcels** there. Missing zoning is not treated as multifamily. Polk future-land-use polygons were not seeded in this pass.
-- Seminole zoning and FLU come from the county Land Use service. A code of `CITY` is the municipal stub. Altamonte Springs and Oviedo replace it. Sanford, Lake Mary, Winter Springs, Longwood, and Casselberry stay `CITY`.
+- Polk's Orlando tiles keep city zoning and future land use for Lakeland, Bartow, Auburndale, Lake Alfred, and Lake Hamilton. County LDC zoning is still a gap, and county future land use is not stored as zoning. Land-use filters should stay on **All parcels** where a parcel has no zoning code. Missing zoning is not treated as multifamily.
+- Seminole zoning and FLU come from the county Land Use service. City overlays replace that code where Casselberry, Winter Springs, Lake Mary, Sanford, Oviedo, or Altamonte Springs published a district. Longwood has no city layer. A remaining `CITY` stub is the county placeholder, not a district invented here.
 - Lake, Osceola, Seminole, Sumter, and the city overlay codes are displayed, and they are not in `data/zoning-config.json` or `data/flu-config.json`. Multifamily filters treat those codes as unknown rather than inventing a match.
 - Lake open data has just value and last tax amount. It does not have assessed value, taxable value, a qualified-sale flag, or a situs city. City FLU layers are not county-wide and are not joined.
 - Osceola taxable value is prior-roll `PrevTaxabl`. `EstimatedT` is an estimate, not a certified bill. `Q_U` is stored and is not used to drop sales. A zoning miss uses parcel `Zone1` when that field is set. St. Cloud overrides county zoning and FLU on a matching PIN and is not a county extract.
@@ -134,4 +134,5 @@ Marion was checked and not seeded: [ParcelsAndSubdivisions/0](https://gis.marion
 - Orange inclusion uses OCPA `ACREAGE`, including sibling shapes under 5 acres that belong to the same parcel id. Those pieces are summed and the parcel is dropped when the sum is outside 5.0–150.0. Lake, Osceola, and Sumter use the county acreage field the same way. Polk and Seminole still use DOH `LND_SQFOOT`.
 - A public ArcGIS Online layer named Polk County parcels is the wrong state (Minnesota). It is not used.
 - Brevard’s property-appraiser MapServer has returned HTTP 403 from this environment. The sample uses DOH.
-- Brevard, Marion, and Volusia are still windowed samples around rural tracts, not every 5–150 acre parcel. Those samples are not capped at 150 acres. Kissimmee, Clermont, Lakeland, and Sanford city zoning stay follow-ups.
+- Brevard, Marion, and Volusia are still windowed samples around rural tracts, not every 5–150 acre parcel. Those samples are not capped at 150 acres. The Brevard sample keeps a city zoning or FLU stamp when the parcel id matches `docs/brevard-municipal.md`. Titusville and Palm Bay are not applied in that join.
+- Volusia city zoning and future land use on the sample (and on the Melbourne extract) come from municipal REST, not from the DOH parcel attributes. See `docs/volusia-flagler-municipal.md`. Open Data zoning layer 36 city rows (`ZONCODE` 999) are not used.

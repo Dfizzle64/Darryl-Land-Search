@@ -21,6 +21,8 @@ Finished extracts in this batch were merged from public county and state GIS bra
 
 DeKalb County, Georgia is the complete assessment extract already merged on main (`ga-dekalb-assessment-view-2`). City zoning and future land use are joined where that extract published them. That service has no sale table.
 
+Municipal zoning, future land use, and Cobb/DeKalb batch-40 screening stay in [`muni-overlay-consolidator.md`](muni-overlay-consolidator.md). Those city codes are copied onto this shelf only when the parcel id still matches. The overlay does not add an Opportunity Zone, a school letter grade, or a base flood elevation. Polk's Orlando tiles still carry Lakeland, Bartow, Auburndale, Lake Alfred, and Lake Hamilton (`docs/polk-municipal.md`). Volusia city layers are in `docs/volusia-flagler-municipal.md`. Flagler has no parcel baseline here.
+
 Marshall County, Alabama is the web5 Marshall/Public/37 5–150 acre extract. Zoning is null. Baldwin County keeps the existing parcel shelf and adds Daphne Class zoning, Daphne Future_Dev, and Fairhope base zoning. Fairhope AO/MO names are overlay notes, not zoning codes. Shelby County keeps the existing parcel shelf and adds Alabaster ZoneCode. Walker, Washington, and Escambia County, Alabama stay gaps. Morgan County stays the existing VAM extract already on this branch. No Opportunity Zone designation was added.
 
 Carroll County, Georgia uses the OpenAddresses job 910028 parcel snapshot because the live county parcel service is blocked. Acreage is GIS area. Carrollton and Carroll-side Villa Rica supply the city CAMA, zoning, and future land use that matched a Carroll parcel id. County zoning and future land use remain PDFs. Sales are the commercial/industrial subset only. No Opportunity Zone designation was added.
@@ -126,6 +128,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Sarasota | Florida | 12115 | complete-gte-5ac | 4,303 | fl-doh-ehwaters-12115 |
 | Sumter | Florida | 12119 | complete-gte-5ac | 6,359 | fl-doh-ehwaters-12119 |
 
+Manatee and Sarasota keep those DOH shelves. City zoning is on 221 Manatee parcels and 566 Sarasota parcels. Future land use is on 247 Manatee parcels and 124 Sarasota parcels. Bradenton, Palmetto, Longboat Key, and the City of Sarasota have both. North Port and Venice are zoning only. Anna Maria, Bradenton Beach, and Holmes Beach stay blank. Sources are in `docs/muni-overlay-consolidator.md`. County parcels were not re-downloaded.
+
+Charlotte County, Florida (FIPS 12015) is not on these shelves. Punta Gorda city zoning and future land use are cataloged and were not stamped, because no county parcels were downloaded. County `CITY` stubs are not stored.
+
 ### Charleston
 
 | County | State | FIPS | Coverage | Parcels | Source |
@@ -221,6 +227,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Okeechobee | Florida | 12093 | complete-gte-5ac | 3,053 | fl-okeechobee-planning-12093 |
 | St. Lucie | Florida | 12111 | complete-gte-5ac | 5,585 | fl-slc-parcels-12111 |
 
+Martin and Indian River keep those DOH shelves. City zoning and future land use are stamped on top: Martin 203 zoning and 201 future land use; Indian River 191 zoning and 104 future land use. Stuart, Indiantown, and Vero Beach have both. Sebastian is zoning only. Ocean Breeze, Sewall's Point, Jupiter Island, Fellsmere, Indian River Shores, and Orchid stay blank. Sources are in `docs/muni-overlay-consolidator.md`. County parcels were not re-downloaded.
+
 ### Melbourne
 
 | County | State | FIPS | Coverage | Parcels | Source |
@@ -230,6 +238,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 6,169 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
+
+Brevard city zoning and future land use are cataloged in [`brevard-municipal.md`](brevard-municipal.md). Codes from that join are copied onto this Accela shelf only when the parcel id still matches. Cocoa Beach stays the unofficial 2021 layer when that stamp matches. Palm Bay and Titusville are not filled from a county code.
 
 ### Jacksonville
 
@@ -263,6 +273,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Okaloosa | Florida | 12091 | complete-gte-5ac | 9,956 | fl-panhandle-12091 |
 | Santa Rosa | Florida | 12113 | complete-gte-5ac | 8,928 | fl-panhandle-12113 |
 | Walton | Florida | 12131 | complete-gte-5ac | 8,930 | fl-panhandle-12131 |
+
+City zoning on these four shelves is in `docs/muni-overlay-consolidator.md`. Escambia has Pensacola zoning on 810 parcels. Okaloosa has Destin and Fort Walton Beach zoning and future land use on 270 parcels. Santa Rosa has 85 zoning codes and 9 future land use codes (Milton and Jay zoning, Gulf Breeze both). Walton has 135 zoning codes and 158 future land use codes (DeFuniak Springs both, Paxton future land use). Panama City Beach city layers sit in Bay County and miss the Walton PCB parcels. Bay County has no parcel shelf here, so Panama City, Callaway, Mexico Beach, Lynn Haven, Parker, and Springfield are indexed only. Freeport numeric codes stay blank. Crestview, Niceville, Valparaiso, Mary Esther, Laurel Hill, Shalimar, Cinco Bayou, Century, and Pensacola Beach stay blank. County parcels were not re-downloaded.
 
 ### Birmingham
 

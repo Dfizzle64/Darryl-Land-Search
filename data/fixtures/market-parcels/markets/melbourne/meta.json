@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -335,7 +335,7 @@
       "source": "reused-orlando-ocpa-5-150",
       "queryUrl": "https://vgispublic.ocpafl.org/server/rest/services/Webmap/PARCEL/MapServer/4/query",
       "gaps": [
-        "Reused the Orlando OCPA 5.0\u2013150.0 acre tiles. Not a second download.",
+        "Reused the Orlando OCPA 5.0–150.0 acre tiles. Not a second download.",
         "Geometry, owner, mailing, sale, tax, and zoning come from OCPA."
       ],
       "path": "data/fixtures/orlando-parcels/tiles/12095",
@@ -374,12 +374,15 @@
       "source": "fl-doh-ehwaters-12127",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/63/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "No zoning or FLU on the Florida DOH extract.",
+        "City zoning and future land use are joined from municipal REST where a city polygon covers the centroid. Melbourne extract joined zoning on 2942 parcels and FLU on 1914 parcels. Volusia Open Data zoning layer 36 (ZONCODE 999) is not used. DeBary, New Smyrna Beach, Orange City, Lake Helen, and Pierson use CountywideZoning OriginalZoningCode only, not a city FLUM. Daytona Beach Shores and Beverly Beach are zoning-only. Flagler city layers are hosted on gis.palmcoast.gov; this repo has no Flagler parcel baseline."
       ],
       "path": "data/fixtures/market-parcels/counties/12127/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12127/lookup.json",
       "tileCount": 13,
-      "sourceCount": 12567
+      "sourceCount": 12567,
+      "zoningJoinedCount": 2942,
+      "fluJoinedCount": 1914
     }
   ]
 }

@@ -1,0 +1,429 @@
+{
+  "generatedFrom": "Panhandle municipal leftovers. City layers were extent-checked on 2026-09-24. County parcels were not downloaded. Bay County has no parcel shelf on this branch.",
+  "doNotInventOpportunityZones": true,
+  "doNotInventSchoolGrades": true,
+  "doNotInventBaseFloodElevations": true,
+  "doNotRedownloadCountyParcels": true,
+  "maxCitySpanDegrees": 0.5,
+  "stubCodes": ["CITY", "COUNTY", "NONE", "NULL", "UN", "BAY COUNTY"],
+  "blockedUrlFragments": [
+    "gis.cityofpensacola.com",
+    "GcvM6vDlR2gM4x31",
+    "AccelaMain",
+    "internet_webgis/MapServer/515",
+    "internet_webgis/MapServer/44",
+    "EnerGov/FeatureServer/19",
+    "EnerGov/FeatureServer/15",
+    "Hosted/ZONE/FeatureServer",
+    "OpenDataFlum",
+    "WeeklyUpdatesFreeport"
+  ],
+  "counties": {
+    "12033": {
+      "name": "Escambia",
+      "state": "Florida",
+      "source": "fl-doh-ehwaters-12033",
+      "featureCount": 9097,
+      "parcelBaseline": true,
+      "box": [-87.64, 30.26, -86.96, 31.01],
+      "gapNotes": [
+        "Pensacola zoning is maps.cityofpensacola.com Zoning_WebMap_MIL1 layer 16. City future land use is still a gap.",
+        "gis.cityofpensacola.com still returns HTTP 523. Escambia Accela zoning and future land use are not copied in.",
+        "Century stays blank."
+      ]
+    },
+    "12091": {
+      "name": "Okaloosa",
+      "state": "Florida",
+      "source": "fl-doh-ehwaters-12091",
+      "featureCount": 5854,
+      "parcelBaseline": true,
+      "box": [-86.85, 30.3, -86.3, 31.05],
+      "gapNotes": [
+        "Destin and Fort Walton Beach use the city layers.",
+        "Crestview, Niceville, Valparaiso, Mary Esther, Laurel Hill, Shalimar, and Cinco Bayou stay blank. County zoning is not copied into those cities."
+      ]
+    },
+    "12113": {
+      "name": "Santa Rosa",
+      "state": "Florida",
+      "source": "fl-doh-ehwaters-12113",
+      "featureCount": 7011,
+      "parcelBaseline": true,
+      "box": [-87.45, 30.3, -86.7, 31.05],
+      "gapNotes": [
+        "Milton and Jay are zoning only. Gulf Breeze zoning and future land use come from the city parcel layer.",
+        "Milton and Jay future land use stay gaps. County FLUM is not copied in."
+      ]
+    },
+    "12131": {
+      "name": "Walton",
+      "state": "Florida",
+      "source": "fl-doh-ehwaters-12131",
+      "featureCount": 8179,
+      "parcelBaseline": true,
+      "box": [-86.45, 30.2, -85.9, 31.05],
+      "gapNotes": [
+        "DeFuniak Springs zoning and future land use are the city WeeklyUpdates layers. Paxton future land use is FLU_CLASS. Paxton zoning stays a gap.",
+        "Panama City Beach city layers were checked. They sit in Bay County and do not cover the Walton PCB situs parcels.",
+        "Freeport zoning is a numeric code with a blank description and was not stored."
+      ]
+    },
+    "12005": {
+      "name": "Bay",
+      "state": "Florida",
+      "source": null,
+      "featureCount": 0,
+      "parcelBaseline": false,
+      "box": [-86.05, 29.9, -85.35, 30.6],
+      "gapNotes": []
+    }
+  },
+  "places": [
+    {
+      "id": "panama-city",
+      "municipality": "Panama City",
+      "fips": ["12005"],
+      "extentFips": ["12005"],
+      "situs": ["PANAMA CITY"],
+      "coverage": "both",
+      "mustHit": false,
+      "zoning": {
+        "role": "panama-city-zoning",
+        "url": "https://services3.arcgis.com/RfAh242jlP6Nb5vP/arcgis/rest/services/Zoning_CPC/FeatureServer/0",
+        "code": "LABEL",
+        "desc": "ZONE_TYPE",
+        "fields": ["LABEL", "ZONE_TYPE"],
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "panama-city-flu",
+        "url": "https://services3.arcgis.com/RfAh242jlP6Nb5vP/arcgis/rest/services/FutureLandUse_CPC/FeatureServer/0",
+        "code": "LANDUSE",
+        "desc": null,
+        "fields": ["LANDUSE"],
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "pensacola",
+      "municipality": "Pensacola",
+      "fips": ["12033"],
+      "extentFips": ["12033"],
+      "situs": ["PENSACOLA"],
+      "coverage": "zoning",
+      "mustHit": true,
+      "zoning": {
+        "role": "pensacola-zoning",
+        "url": "https://maps.cityofpensacola.com/arcgis/rest/services/Zoning_WebMap_MIL1/MapServer/16",
+        "code": "ZONING",
+        "desc": null,
+        "fields": ["ZONING"],
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "callaway",
+      "municipality": "Callaway",
+      "fips": ["12005"],
+      "extentFips": ["12005"],
+      "situs": ["CALLAWAY"],
+      "coverage": "both",
+      "mustHit": false,
+      "zoning": {
+        "role": "callaway-zoning",
+        "url": "https://gis.baycountyfl.gov/arcgis/rest/services/LandUsePlanning/MapServer/1",
+        "code": "ZONING",
+        "desc": null,
+        "fields": ["ZONING", "SUB_ZONING"],
+        "where": "SUB_ZONING=2"
+      },
+      "flu": {
+        "role": "callaway-flu",
+        "url": "https://gis.baycountyfl.gov/arcgis/rest/services/LandUsePlanning/MapServer/2",
+        "code": "FLU_CODE",
+        "desc": null,
+        "fields": ["FLU_CODE", "SUB_FLU"],
+        "where": "SUB_FLU=2"
+      }
+    },
+    {
+      "id": "mexico-beach",
+      "municipality": "Mexico Beach",
+      "fips": ["12005"],
+      "extentFips": ["12005"],
+      "situs": ["MEXICO BEACH"],
+      "coverage": "both",
+      "mustHit": false,
+      "zoning": {
+        "role": "mexico-beach-zoning",
+        "url": "https://gis.baycountyfl.gov/arcgis/rest/services/LandUsePlanning/MapServer/1",
+        "code": "ZONING",
+        "desc": null,
+        "fields": ["ZONING", "SUB_ZONING"],
+        "where": "SUB_ZONING=4"
+      },
+      "flu": {
+        "role": "mexico-beach-flu",
+        "url": "https://gis.baycountyfl.gov/arcgis/rest/services/LandUsePlanning/MapServer/2",
+        "code": "FLU_CODE",
+        "desc": null,
+        "fields": ["FLU_CODE", "SUB_FLU"],
+        "where": "SUB_FLU=4"
+      }
+    },
+    {
+      "id": "lynn-haven",
+      "municipality": "Lynn Haven",
+      "fips": ["12005"],
+      "extentFips": ["12005"],
+      "situs": ["LYNN HAVEN"],
+      "coverage": "flu",
+      "mustHit": false,
+      "flu": {
+        "role": "lynn-haven-flu",
+        "url": "https://gis.baycountyfl.gov/arcgis/rest/services/LandUsePlanning/MapServer/2",
+        "code": "FLU_CODE",
+        "desc": null,
+        "fields": ["FLU_CODE", "SUB_FLU"],
+        "where": "SUB_FLU=3"
+      }
+    },
+    {
+      "id": "parker",
+      "municipality": "Parker",
+      "fips": ["12005"],
+      "extentFips": ["12005"],
+      "situs": ["PARKER"],
+      "coverage": "flu",
+      "mustHit": false,
+      "flu": {
+        "role": "parker-flu",
+        "url": "https://gis.baycountyfl.gov/arcgis/rest/services/LandUsePlanning/MapServer/2",
+        "code": "FLU_CODE",
+        "desc": null,
+        "fields": ["FLU_CODE", "SUB_FLU"],
+        "where": "SUB_FLU=7"
+      }
+    },
+    {
+      "id": "springfield",
+      "municipality": "Springfield",
+      "fips": ["12005"],
+      "extentFips": ["12005"],
+      "situs": ["SPRINGFIELD"],
+      "coverage": "flu",
+      "mustHit": false,
+      "flu": {
+        "role": "springfield-flu",
+        "url": "https://gis.baycountyfl.gov/arcgis/rest/services/LandUsePlanning/MapServer/2",
+        "code": "FLU_CODE",
+        "desc": null,
+        "fields": ["FLU_CODE", "SUB_FLU"],
+        "where": "SUB_FLU=8"
+      }
+    },
+    {
+      "id": "destin",
+      "municipality": "Destin",
+      "fips": ["12091"],
+      "extentFips": ["12091"],
+      "situs": ["DESTIN"],
+      "coverage": "both",
+      "mustHit": true,
+      "zoning": {
+        "role": "destin-zoning",
+        "url": "https://services9.arcgis.com/pzsl4efLIySC22jh/arcgis/rest/services/Zoning_JulyB_WFL1/FeatureServer/0",
+        "code": "Zone_ABBR",
+        "desc": "Zone_",
+        "fields": ["Zone_ABBR", "Zone_"],
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "destin-flu",
+        "url": "https://services9.arcgis.com/pzsl4efLIySC22jh/arcgis/rest/services/LandUse_DND25_WFL1/FeatureServer/2",
+        "code": "LU_CODE",
+        "desc": "DESCRIPTIO",
+        "fields": ["LU_CODE", "DESCRIPTIO"],
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "fort-walton-beach",
+      "municipality": "Fort Walton Beach",
+      "fips": ["12091"],
+      "extentFips": ["12091"],
+      "situs": ["FORT WALTON BEACH", "FT WALTON BCH", "FT WALTON BEACH"],
+      "coverage": "both",
+      "mustHit": true,
+      "zoning": {
+        "role": "fwb-zoning",
+        "url": "https://gis.fwb.org/arcgis/rest/services/Maps/Zoning/MapServer/0",
+        "code": "Zoning",
+        "desc": "Zoning_Desc",
+        "fields": ["Zoning", "Zoning_Desc"],
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "fwb-flu",
+        "url": "https://gis.fwb.org/arcgis/rest/services/Maps/FLU/MapServer/0",
+        "code": "FLU",
+        "desc": "FLU_Desc",
+        "fields": ["FLU", "FLU_Desc"],
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "panama-city-beach",
+      "municipality": "Panama City Beach",
+      "fips": ["12131"],
+      "extentFips": ["12005"],
+      "situs": ["PCB"],
+      "coverage": "both",
+      "mustHit": false,
+      "zoning": {
+        "role": "pcb-zoning",
+        "url": "https://services7.arcgis.com/HMHYRsYOvuxpp8zD/arcgis/rest/services/Land_Use_and_Zoning/FeatureServer/47",
+        "code": "ZONING",
+        "desc": null,
+        "fields": ["ZONING", "SUB_ZONING"],
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "pcb-flu",
+        "url": "https://services7.arcgis.com/HMHYRsYOvuxpp8zD/arcgis/rest/services/Land_Use_and_Zoning/FeatureServer/49",
+        "code": "FLU_CODE",
+        "desc": null,
+        "fields": ["FLU_CODE", "SUB_FLU"],
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "defuniak-springs",
+      "municipality": "DeFuniak Springs",
+      "fips": ["12131"],
+      "extentFips": ["12131"],
+      "situs": ["DFS"],
+      "coverage": "both",
+      "mustHit": true,
+      "zoning": {
+        "role": "dfs-zoning",
+        "url": "https://services1.arcgis.com/TaXHPwWfIMuzJ7Ov/arcgis/rest/services/WeeklyUpdatesDFS/FeatureServer/7",
+        "code": "ZONING",
+        "desc": null,
+        "fields": ["ZONING", "PARCELNO"],
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "dfs-flu",
+        "url": "https://services1.arcgis.com/TaXHPwWfIMuzJ7Ov/arcgis/rest/services/WeeklyUpdatesDFS/FeatureServer/6",
+        "code": "FLU",
+        "desc": null,
+        "fields": ["FLU", "PARCELNO"],
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "paxton",
+      "municipality": "Paxton",
+      "fips": ["12131"],
+      "extentFips": ["12131"],
+      "situs": ["PAXTON", ""],
+      "coverage": "flu",
+      "mustHit": false,
+      "noteMisses": false,
+      "flu": {
+        "role": "paxton-flu",
+        "url": "https://services1.arcgis.com/TaXHPwWfIMuzJ7Ov/arcgis/rest/services/WeeklyUpdatesPaxton/FeatureServer/6",
+        "code": "FLU_CLASS",
+        "desc": null,
+        "fields": ["FLU_CLASS"],
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "milton",
+      "municipality": "Milton",
+      "fips": ["12113"],
+      "extentFips": ["12113"],
+      "situs": ["MILTON"],
+      "coverage": "zoning",
+      "mustHit": true,
+      "zoning": {
+        "role": "milton-zoning",
+        "url": "https://cloud.santarosa.fl.gov/arcgis/rest/services/Hosted/City_of_Milton_Zoning/FeatureServer/0",
+        "code": "zone_code",
+        "desc": "zone_distr",
+        "fields": ["zone_code", "zone_distr"],
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "gulf-breeze",
+      "municipality": "Gulf Breeze",
+      "fips": ["12113"],
+      "extentFips": ["12113"],
+      "situs": ["GULF BREEZE"],
+      "coverage": "both",
+      "mustHit": true,
+      "zoning": {
+        "role": "gulf-breeze-zoning",
+        "url": "https://cloud.santarosa.fl.gov/arcgis/rest/services/Hosted/Gulf_Breeze_Zoning/FeatureServer/0",
+        "code": "zoning",
+        "desc": null,
+        "fields": ["zoning", "flum", "par_num"],
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "gulf-breeze-flu",
+        "url": "https://cloud.santarosa.fl.gov/arcgis/rest/services/Hosted/Gulf_Breeze_Zoning/FeatureServer/0",
+        "code": "flum",
+        "desc": null,
+        "fields": ["zoning", "flum", "par_num"],
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "jay",
+      "municipality": "Jay",
+      "fips": ["12113"],
+      "extentFips": ["12113"],
+      "situs": ["JAY"],
+      "coverage": "zoning",
+      "mustHit": false,
+      "zoning": {
+        "role": "jay-zoning",
+        "url": "https://cloud.santarosa.fl.gov/arcgis/rest/services/Hosted/TownOfJayZoning/FeatureServer/0",
+        "code": "zone",
+        "desc": "district",
+        "fields": ["zone", "district"],
+        "where": "1=1"
+      }
+    }
+  ],
+  "partials": [
+    {
+      "municipality": "Freeport",
+      "fips": "12131",
+      "situs": ["FREEPORT", "FREEPORT`"],
+      "note": "Freeport zoning is a numeric code with a blank description and was not stored."
+    }
+  ],
+  "gapSitus": {
+    "12033": ["CENTURY", "PENSACOLA BEACH"],
+    "12091": ["CRESTVIEW", "NICEVILLE", "VALPARAISO", "MARY ESTHER", "LAUREL HILL", "SHALIMAR", "CINCO BAYOU"],
+    "12131": ["LAUREL HILL", "LAUREL HILL  FL", "LAURELL HILL"]
+  },
+  "rejected": [
+    "gis.cityofpensacola.com Planning/Zoning still returns HTTP 523. The live zoning layer is maps.cityofpensacola.com Zoning_WebMap_MIL1 layer 16.",
+    "Escambia AccelaMain zoning and future land use are not a Pensacola city layer.",
+    "FGDL statewide Zoning FeatureServer GcvM6vDlR2gM4x31 is not Destin.",
+    "Okaloosa county zoning MapServer 515 and future land use MapServer 44 are not copied into the gap cities.",
+    "Walton EnerGov county zoning and future land use are not copied into Freeport or Paxton.",
+    "Santa Rosa county Hosted/ZONE and OpenDataFlum are not Milton, Jay, or Gulf Breeze future land use.",
+    "Bay LandUsePlanning SUB_ZONING 1 and SUB_FLU 1 are unincorporated county and are not stamped.",
+    "Panama City uses Zoning_CPC and FutureLandUse_CPC, not the county SUB_ZONING 5 filter.",
+    "Lynn Haven, Parker, and Springfield zoning filters are not used. Those three cities are future land use only.",
+    "Freeport WeeklyUpdates integers are not district names."
+  ]
+}

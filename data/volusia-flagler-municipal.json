@@ -1,0 +1,487 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-24",
+  "title": "Volusia and Flagler municipal zoning and future land use",
+  "doNotInventOpportunityZones": true,
+  "stubZoningCodes": ["999"],
+  "flaglerHost": {
+    "host": "https://gis.palmcoast.gov",
+    "note": "Flagler County does not publish a public county zoning or future land use FeatureServer. Palm Coast, Flagler Beach, Bunnell, Beverly Beach, Marineland, and unincorporated Flagler layers used here are hosted by the City of Palm Coast on gis.palmcoast.gov (AGISO_FlaglerZoning, AGISO_FlaglerFLU, and the Palm Coast zoning/FLUM services)."
+  },
+  "countywideZoning": {
+    "url": "https://maps5.vcgov.org/arcgis/rest/services/CountywideZoning/FeatureServer/2",
+    "fields": ["OriginalZoningCode"],
+    "labelFields": ["Z_DESCRIP"],
+    "filterField": "JURISD",
+    "vintage": "C_DATE 1/25/2024",
+    "note": "Partial bridge for cities with no city-native zoning service, plus a fallback for Daytona Beach Shores when the city zoning layer misses. Not a city future land use map. Do not use for cities that have their own zoning service."
+  },
+  "rejected": [
+    {
+      "id": "seattle-future-land-use",
+      "url": "https://services.arcgis.com/ZOyb2t4B0UYuYNYH/arcgis/rest/services/Future_Land_Use__2035/FeatureServer/0",
+      "reason": "Sample centroid is about (-122.34, 47.71), Seattle, Washington. Not Daytona Beach, Florida."
+    },
+    {
+      "id": "volusia-open-data-zoning-36",
+      "url": "https://maps5.vcgov.org/arcgis/rest/services/Open_Data/Open_Data_4/FeatureServer/36",
+      "reason": "City rows are ZONCODE 999 stubs. Never use them as municipal districts. Unincorporated county zoning on this layer is out of scope for this city overlay."
+    },
+    {
+      "id": "debary-mapserver-21-flu",
+      "url": "https://maps5.vcgov.org/arcgis/rest/services/Debary/MapServer/21",
+      "reason": "Same extent and count as county Open Data FLU layer 32. A county dump, not a DeBary city future land use map."
+    }
+  ],
+  "avoid": [
+    {
+      "id": "ormond-beach-thin-zoning",
+      "url": "https://services5.arcgis.com/tHety5Dlgpjia0CW/arcgis/rest/services/Zoning/FeatureServer/160",
+      "reason": "About 27 polygons. Incomplete next to EnerGov layer 6 (about 545)."
+    },
+    {
+      "id": "port-orange-maps5",
+      "url": "https://maps5.vcgov.org/arcgis/rest/services/Port_Orange/MapServer",
+      "reason": "Parcels and basemap only. Not Port Orange zoning or future land use."
+    },
+    {
+      "id": "debary-mapserver-22",
+      "url": "https://maps5.vcgov.org/arcgis/rest/services/Debary/MapServer/22",
+      "reason": "CountywideZoning filtered to DeBary. The join uses CountywideZoning FeatureServer 2 with a JURISD filter instead of this mirror."
+    }
+  ],
+  "places": [
+    {
+      "id": "daytona-beach",
+      "name": "Daytona Beach",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "usable",
+      "rank": 1,
+      "prefix": "DB",
+      "join": "spatial",
+      "zoning": {
+        "url": "https://gis2.codb.us/arcgis/rest/services/DepartmentDivision/Planning/MapServer/10",
+        "fields": ["NewZoningClassification", "ZONECLASS"],
+        "labelFields": ["NewZoningDistrict", "ZONEDESC"]
+      },
+      "flu": {
+        "url": "https://gis2.codb.us/arcgis/rest/services/DepartmentDivision/Planning/MapServer/4",
+        "fields": ["LANDUSECODE"],
+        "labelFields": ["LANDUSEDESC"]
+      }
+    },
+    {
+      "id": "port-orange",
+      "name": "Port Orange",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "usable",
+      "rank": 2,
+      "prefix": "PO",
+      "join": "spatial",
+      "notes": "Zoning Name and FLU name are case or ordinance titles, not the district. The joined values are Zoning and FLU.",
+      "zoning": {
+        "url": "https://services1.arcgis.com/EHJIZRZ77WzgIElO/arcgis/rest/services/Zoning_and_Future_Land_Use/FeatureServer/14",
+        "fields": ["Zoning"],
+        "labelFields": []
+      },
+      "flu": {
+        "url": "https://services1.arcgis.com/EHJIZRZ77WzgIElO/arcgis/rest/services/Zoning_and_Future_Land_Use/FeatureServer/6",
+        "fields": ["FLU"],
+        "labelFields": []
+      }
+    },
+    {
+      "id": "ormond-beach",
+      "name": "Ormond Beach",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "usable",
+      "rank": 3,
+      "prefix": "OB",
+      "join": "spatial",
+      "zoning": {
+        "url": "https://services5.arcgis.com/tHety5Dlgpjia0CW/arcgis/rest/services/OB_EnerGov_GIS_Map_WFL1/FeatureServer/6",
+        "fields": ["ZONING", "ZONE_SUFFI", "HTE_CODE"],
+        "labelFields": ["DESCRIPTIO"]
+      },
+      "flu": {
+        "url": "https://services5.arcgis.com/tHety5Dlgpjia0CW/arcgis/rest/services/OB_EnerGov_GIS_Map_WFL1/FeatureServer/5",
+        "fields": ["LAND_USE", "LAND_USE_1", "HTE_CODE"],
+        "labelFields": []
+      }
+    },
+    {
+      "id": "deltona",
+      "name": "Deltona",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "usable",
+      "rank": 4,
+      "prefix": "DLT",
+      "join": "spatial",
+      "zoning": {
+        "url": "https://services8.arcgis.com/6cL9bvCl36WFhJd3/arcgis/rest/services/Zoning/FeatureServer/1",
+        "fields": ["ZONING"],
+        "labelFields": ["ZONE_Desc", "PUD_Name"]
+      },
+      "flu": {
+        "url": "https://services8.arcgis.com/6cL9bvCl36WFhJd3/arcgis/rest/services/Deltona_Land_Use_Designation/FeatureServer/0",
+        "fields": ["F_L1103", "DESCRIPTIO"],
+        "labelFields": ["DESCRIPTIO", "LONG_DESC"]
+      }
+    },
+    {
+      "id": "deland",
+      "name": "DeLand",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "usable",
+      "rank": 5,
+      "prefix": "DL",
+      "join": "spatial",
+      "zoning": {
+        "url": "https://services.deland.org/arcgis/rest/services/Planning/ZoningDistricts/FeatureServer/9",
+        "fields": ["Zoning_Dis"],
+        "labelFields": ["PD_Name", "GENL_ZCODE"]
+      },
+      "flu": {
+        "url": "https://services.deland.org/arcgis/rest/services/Planning/FLU/FeatureServer/4",
+        "fields": ["FLU_NAME"],
+        "labelFields": ["County_LU"]
+      }
+    },
+    {
+      "id": "edgewater",
+      "name": "Edgewater",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "usable",
+      "rank": 6,
+      "prefix": "EW",
+      "join": "spatial",
+      "zoning": {
+        "url": "https://services2.arcgis.com/xZwXnY96uEdldZnm/arcgis/rest/services/EdgewaterDevelopment_view/FeatureServer/3",
+        "fields": ["ZONING"],
+        "labelFields": ["DESCRIPTION"]
+      },
+      "flu": {
+        "url": "https://services2.arcgis.com/xZwXnY96uEdldZnm/arcgis/rest/services/EdgewaterDevelopment_view/FeatureServer/2",
+        "fields": ["FLU"],
+        "labelFields": ["DESCRIPTION"]
+      }
+    },
+    {
+      "id": "south-daytona",
+      "name": "South Daytona",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "usable",
+      "rank": 7,
+      "prefix": "SD",
+      "join": "spatial",
+      "zoning": {
+        "url": "https://services5.arcgis.com/h14Tqp6TJAoptlsA/arcgis/rest/services/Zoning/FeatureServer/0",
+        "fields": ["ZONING"],
+        "labelFields": ["DESCRIPTIO"]
+      },
+      "flu": {
+        "url": "https://services5.arcgis.com/h14Tqp6TJAoptlsA/arcgis/rest/services/Future_Land_Use/FeatureServer/0",
+        "fields": ["USE_"],
+        "labelFields": ["Ordinance"]
+      }
+    },
+    {
+      "id": "holly-hill",
+      "name": "Holly Hill",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "usable",
+      "rank": 8,
+      "prefix": "HH",
+      "join": "attribute-then-spatial",
+      "zoning": {
+        "url": "https://maps5.vcgov.org/arcgis/rest/services/Holly_Hill/MapServer/4",
+        "fields": ["ZONDIST"],
+        "labelFields": ["REZONE_ORD"],
+        "attributeUrl": "https://services9.arcgis.com/ufEGYmj7s376pCud/arcgis/rest/services/Zoning_District_Map_WFL1/FeatureServer/1",
+        "idFields": ["PID", "ALTKEY"]
+      },
+      "flu": {
+        "url": "https://maps5.vcgov.org/arcgis/rest/services/Holly_Hill/MapServer/5",
+        "fields": ["FLU_code"],
+        "labelFields": ["FLU_code"]
+      }
+    },
+    {
+      "id": "oak-hill",
+      "name": "Oak Hill",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "usable",
+      "rank": 9,
+      "prefix": "OH",
+      "join": "spatial",
+      "zoning": {
+        "url": "https://maps5.vcgov.org/arcgis/rest/services/CityServices/Oak_Hill_Zoning_and_Land_Use/MapServer/0",
+        "fields": ["ZONING"],
+        "labelFields": ["LABEL"]
+      },
+      "flu": {
+        "url": "https://maps5.vcgov.org/arcgis/rest/services/CityServices/Oak_Hill_Zoning_and_Land_Use/MapServer/1",
+        "fields": ["LUNAME", "LUCODE"],
+        "labelFields": ["LUNAME"]
+      }
+    },
+    {
+      "id": "ponce-inlet",
+      "name": "Ponce Inlet",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "usable",
+      "rank": 10,
+      "prefix": "PIN",
+      "join": "spatial",
+      "zoning": {
+        "url": "https://maps5.vcgov.org/arcgis/rest/services/Ponce_Inlet/MapServer/3",
+        "fields": ["JUR_ZONING"],
+        "labelFields": ["Z_DESCRIP"]
+      },
+      "flu": {
+        "url": "https://maps5.vcgov.org/arcgis/rest/services/Ponce_Inlet/MapServer/4",
+        "fields": ["Land_Use"],
+        "labelFields": ["Land_Use"]
+      }
+    },
+    {
+      "id": "palm-coast",
+      "name": "Palm Coast",
+      "county": "Flagler",
+      "countyFips": "12035",
+      "kind": "city",
+      "status": "usable",
+      "rank": 11,
+      "prefix": "PC",
+      "join": "spatial",
+      "zoning": {
+        "url": "https://gis.palmcoast.gov/hosting/rest/services/DataForThePublic/PalmCoastFL_Zoning_Labeled/FeatureServer/0",
+        "fields": ["LAYER"],
+        "labelFields": ["OriginalZone"]
+      },
+      "flu": {
+        "url": "https://gis.palmcoast.gov/hosting/rest/services/DataForThePublic/PalmCoastFL_FLUM_Labeled/FeatureServer/0",
+        "fields": ["FLUCATEGOR"],
+        "labelFields": ["FLUCATEGOR"]
+      }
+    },
+    {
+      "id": "flagler-beach",
+      "name": "Flagler Beach",
+      "county": "Flagler",
+      "countyFips": "12035",
+      "kind": "city",
+      "status": "usable",
+      "rank": 12,
+      "prefix": "FB",
+      "join": "spatial",
+      "zoning": {
+        "url": "https://gis.palmcoast.gov/hosting/rest/services/External/AGISO_FlaglerZoning/MapServer/1",
+        "fields": ["ZONING_CO", "ZONING"],
+        "labelFields": ["ZONING"]
+      },
+      "flu": {
+        "url": "https://gis.palmcoast.gov/hosting/rest/services/External/AGISO_FlaglerFLU/MapServer/1",
+        "fields": ["FLU"],
+        "labelFields": ["FLU"]
+      }
+    },
+    {
+      "id": "bunnell",
+      "name": "Bunnell",
+      "county": "Flagler",
+      "countyFips": "12035",
+      "kind": "city",
+      "status": "usable",
+      "rank": 13,
+      "prefix": "BN",
+      "join": "spatial",
+      "zoning": {
+        "url": "https://gis.palmcoast.gov/hosting/rest/services/External/AGISO_FlaglerZoning/MapServer/2",
+        "fields": ["Zone_Code"],
+        "labelFields": ["Zone_Desc"]
+      },
+      "flu": {
+        "url": "https://gis.palmcoast.gov/hosting/rest/services/External/AGISO_FlaglerFLU/MapServer/2",
+        "fields": ["FLU_Code"],
+        "labelFields": ["FLU_Descri"]
+      }
+    },
+    {
+      "id": "marineland",
+      "name": "Marineland",
+      "county": "Flagler",
+      "countyFips": "12035",
+      "kind": "city",
+      "status": "usable",
+      "rank": 14,
+      "prefix": "ML",
+      "join": "spatial",
+      "notes": "The zoning layer's district value is stored in a field named FLU. Treat that value as the zoning label. Future land use is a separate AGISO_FlaglerFLU layer.",
+      "zoning": {
+        "url": "https://gis.palmcoast.gov/hosting/rest/services/External/AGISO_FlaglerZoning/MapServer/4",
+        "fields": ["FLU"],
+        "labelFields": ["FLU"]
+      },
+      "flu": {
+        "url": "https://gis.palmcoast.gov/hosting/rest/services/External/AGISO_FlaglerFLU/MapServer/3",
+        "fields": ["FLU"],
+        "labelFields": ["FLU"]
+      }
+    },
+    {
+      "id": "flagler-unincorporated",
+      "name": "Flagler County (unincorporated)",
+      "county": "Flagler",
+      "countyFips": "12035",
+      "kind": "unincorporated",
+      "status": "usable",
+      "rank": 50,
+      "prefix": "FLG",
+      "join": "spatial",
+      "notes": "Used only when no incorporated Flagler city polygon covers the parcel. Hosted on gis.palmcoast.gov.",
+      "zoning": {
+        "url": "https://gis.palmcoast.gov/hosting/rest/services/External/AGISO_FlaglerZoning/MapServer/0",
+        "fields": ["ZONECODE"],
+        "labelFields": ["ZONENAME"]
+      },
+      "flu": {
+        "url": "https://gis.palmcoast.gov/hosting/rest/services/External/AGISO_FlaglerFLU/MapServer/0",
+        "fields": ["Label", "LandUse"],
+        "labelFields": ["LandUse", "Label"]
+      }
+    },
+    {
+      "id": "daytona-beach-shores",
+      "name": "Daytona Beach Shores",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "partial",
+      "rank": 20,
+      "prefix": "DBS",
+      "join": "spatial",
+      "countywideFallback": "Daytona Beach Shores",
+      "zoning": {
+        "url": "https://services6.arcgis.com/wSHn8VcM5aAU3EIu/arcgis/rest/services/Zoning_(View)/FeatureServer/0",
+        "fields": ["ZoningCode"],
+        "labelFields": ["ZoningDesc"]
+      },
+      "flu": null,
+      "fluGap": "Daytona Beach Shores publishes zoning only. No public city future land use service was found, so FLU is left blank."
+    },
+    {
+      "id": "beverly-beach",
+      "name": "Beverly Beach",
+      "county": "Flagler",
+      "countyFips": "12035",
+      "kind": "city",
+      "status": "partial",
+      "rank": 21,
+      "prefix": "BB",
+      "join": "spatial",
+      "zoning": {
+        "url": "https://gis.palmcoast.gov/hosting/rest/services/External/AGISO_FlaglerZoning/MapServer/3",
+        "fields": ["ZONECODE"],
+        "labelFields": ["ZONENAME"]
+      },
+      "flu": null,
+      "fluGap": "Beverly Beach has zoning on AGISO_FlaglerZoning. AGISO_FlaglerFLU has no Beverly Beach layer, so FLU is left blank."
+    },
+    {
+      "id": "debary",
+      "name": "DeBary",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "partial",
+      "rank": 30,
+      "prefix": "DEB",
+      "join": "countywide",
+      "countywideJurisd": "DeBary",
+      "zoning": null,
+      "flu": null,
+      "fluGap": "DeBary has no city future land use service. Zoning is CountywideZoning OriginalZoningCode for JURISD DeBary. Debary MapServer layer 21 is a county FLU dump and is not used."
+    },
+    {
+      "id": "new-smyrna-beach",
+      "name": "New Smyrna Beach",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "partial",
+      "rank": 31,
+      "prefix": "NSB",
+      "join": "countywide",
+      "countywideJurisd": "New Smyrna Beach",
+      "zoning": null,
+      "flu": null,
+      "fluGap": "New Smyrna Beach has no city zoning or future land use service. Zoning is CountywideZoning OriginalZoningCode only. That is not a city FLUM."
+    },
+    {
+      "id": "orange-city",
+      "name": "Orange City",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "partial",
+      "rank": 32,
+      "prefix": "OCH",
+      "join": "countywide",
+      "countywideJurisd": "Orange City",
+      "zoning": null,
+      "flu": null,
+      "fluGap": "Orange City has no city zoning or future land use service. Zoning is CountywideZoning OriginalZoningCode only. That is not a city FLUM."
+    },
+    {
+      "id": "lake-helen",
+      "name": "Lake Helen",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "partial",
+      "rank": 33,
+      "prefix": "LHE",
+      "join": "countywide",
+      "countywideJurisd": "Lake Helen",
+      "zoning": null,
+      "flu": null,
+      "fluGap": "Lake Helen has no city zoning or future land use service. Zoning is CountywideZoning OriginalZoningCode only. That is not a city FLUM."
+    },
+    {
+      "id": "pierson",
+      "name": "Pierson",
+      "county": "Volusia",
+      "countyFips": "12127",
+      "kind": "city",
+      "status": "partial",
+      "rank": 34,
+      "prefix": "PIE",
+      "join": "countywide",
+      "countywideJurisd": "Pierson",
+      "zoning": null,
+      "flu": null,
+      "fluGap": "Pierson has no city zoning or future land use service. Zoning is CountywideZoning OriginalZoningCode only. That is not a city FLUM."
+    }
+  ]
+}

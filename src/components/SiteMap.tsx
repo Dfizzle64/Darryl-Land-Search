@@ -46,6 +46,7 @@ import {
 import { eligibleClassCut, southCarolinaStatusHelp } from "@/lib/markets";
 import {
   arcgisExportTileUrl,
+  CCSD_ZONE_MAP,
   CMS_ELEM_MAP,
   CMS_HIGH_MAP,
   CMS_MIDDLE_MAP,
@@ -255,11 +256,47 @@ function addScreeningLayers(map: MapLibreMap, mode: BasemapMode) {
       paint: { "raster-opacity": 0.4 },
     });
   }
+  map.addSource("school-ccsd-raster", {
+    type: "raster",
+    tiles: [arcgisExportTileUrl(CCSD_ZONE_MAP, "0,1,2")],
+    tileSize: 256,
+    attribution: "Cobb County School District attendance zones",
+  });
+  map.addLayer({
+    id: "school-ccsd-raster",
+    type: "raster",
+    source: "school-ccsd-raster",
+    minzoom: 9,
+    layout: { visibility: "none" },
+    paint: { "raster-opacity": 0.4 },
+  });
   const utilities = [
     ["water", "#3d7dff"],
     ["sewer", "#7a5cff"],
     ["power", "#e0b15a"],
   ] as const;
+  map.addSource("dcsd-zones", { type: "geojson", data: EMPTY_COLLECTION });
+  map.addLayer({
+    id: "dcsd-zones-fill",
+    type: "fill",
+    source: "dcsd-zones",
+    layout: { visibility: "none" },
+    paint: {
+      "fill-color": ["match", ["get", "level"], "Elementary", "#1f7a4d", "Middle", "#3d7dff", "High", "#c4473a", "#1f7a4d"],
+      "fill-opacity": mode === "satellite" ? 0.22 : 0.16,
+    },
+  });
+  map.addLayer({
+    id: "dcsd-zones-line",
+    type: "line",
+    source: "dcsd-zones",
+    layout: { visibility: "none" },
+    paint: {
+      "line-color": ["match", ["get", "level"], "Elementary", "#1f7a4d", "Middle", "#3d7dff", "High", "#c4473a", "#1f7a4d"],
+      "line-width": 1.25,
+      "line-opacity": 0.9,
+    },
+  });
   for (const [kind, color] of utilities) {
     const paint = utilityPaint(color, mode);
     map.addSource(kind, { type: "geojson", data: EMPTY_COLLECTION });
@@ -1091,7 +1128,17 @@ export function SiteMap({
     show(["sewer-fill", "sewer-line"], screening.sewer);
     show(["power-fill", "power-line"], screening.power);
     show(
-      ["schools-circle", "school-zone-raster", "school-ms-raster", "school-cms-es-raster", "school-cms-ms-raster", "school-cms-hs-raster"],
+      [
+        "schools-circle",
+        "school-zone-raster",
+        "school-ms-raster",
+        "school-cms-es-raster",
+        "school-cms-ms-raster",
+        "school-cms-hs-raster",
+        "school-ccsd-raster",
+        "dcsd-zones-fill",
+        "dcsd-zones-line",
+      ],
       screening.schools,
     );
   }, [screening, status, basemap]);
@@ -1125,6 +1172,7 @@ export function SiteMap({
         }
       };
       void pull(`/api/screening/schools?bbox=${bbox}`, "schools", screening.schools);
+      void pull(`/api/screening/dcsd-zones?bbox=${bbox}`, "dcsd-zones", screening.schools);
       void pull(`/api/screening/utilities?layer=water&bbox=${bbox}`, "water", screening.water);
       void pull(`/api/screening/utilities?layer=sewer&bbox=${bbox}`, "sewer", screening.sewer);
       void pull(`/api/screening/utilities?layer=power&bbox=${bbox}`, "power", screening.power);

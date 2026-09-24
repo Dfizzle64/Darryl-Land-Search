@@ -1,0 +1,171 @@
+{
+  "doNotInventOpportunityZones": true,
+  "doNotRedownloadCountyParcels": true,
+  "countyFips": "12117",
+  "source": "doh-ehwaters",
+  "box": [-81.55, 28.55, -81.05, 28.95],
+  "maxCitySpanDegrees": 0.4,
+  "stubCodes": ["SEMINOLE COUNTY", "CITY", "NONE", "NULL", "UN"],
+  "blockedUrlFragments": [
+    "DSZoning",
+    "0EfLIvtSLPR9PKI2",
+    "Zoning_Flu",
+    "n4VF6lyYfB5kizho",
+    "giswebtechguru",
+    "GcvM6vDlR2gM4x31",
+    "InteractiveMap/50",
+    "EnerGov_WFL1",
+    "LM_Zoning",
+    "LM_FLU",
+    "Zoning_FLU_Query_AGO_2021",
+    "Land_Use/MapServer/0"
+  ],
+  "places": [
+    {
+      "id": "casselberry",
+      "municipality": "Casselberry",
+      "situs": ["CASSELBERRY"],
+      "idField": "PARCEL",
+      "zoning": {
+        "role": "casselberry-zoning",
+        "url": "https://maps.casselberry.org/mapping/rest/services/CommDev/Casselberry_Zoning/FeatureServer/0",
+        "fields": ["PARCEL", "ZONING"],
+        "code": "ZONING",
+        "desc": null,
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "casselberry-flu",
+        "url": "https://maps.casselberry.org/mapping/rest/services/CommDev/Casselberry_FLU/FeatureServer/3",
+        "fields": ["PARCEL", "FLU"],
+        "code": "FLU",
+        "desc": null,
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "winter-springs",
+      "municipality": "Winter Springs",
+      "situs": ["WINTER SPRINGS"],
+      "idField": "PIN",
+      "zoning": {
+        "role": "winter-springs-zoning",
+        "url": "https://services5.arcgis.com/hbtBppF7t3PpouVf/arcgis/rest/services/City_of_Winter_Springs_Zoning/FeatureServer/3",
+        "fields": ["PIN", "TYPE"],
+        "code": "TYPE",
+        "desc": null,
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "winter-springs-flu",
+        "url": "https://services5.arcgis.com/hbtBppF7t3PpouVf/arcgis/rest/services/Future_Land_Use_WFL1/FeatureServer/1",
+        "fields": ["PIN", "TYPE"],
+        "code": "TYPE",
+        "desc": null,
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "lake-mary",
+      "municipality": "Lake Mary",
+      "situs": ["LAKE MARY"],
+      "zoning": {
+        "role": "lake-mary-zoning",
+        "url": "https://services1.arcgis.com/v0YMSb0ovdJoIQKg/arcgis/rest/services/PW_Zoning_Landuse_Query_AGO/FeatureServer/3",
+        "fields": ["Zoning", "Description"],
+        "code": "Zoning",
+        "desc": "Description",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "lake-mary-flu",
+        "url": "https://services1.arcgis.com/v0YMSb0ovdJoIQKg/arcgis/rest/services/PW_Zoning_Landuse_Query_AGO/FeatureServer/4",
+        "fields": ["FLUCODE", "Description"],
+        "code": "FLUCODE",
+        "desc": "Description",
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "sanford",
+      "municipality": "Sanford",
+      "situs": ["SANFORD"],
+      "zoning": {
+        "role": "sanford-zoning",
+        "url": "https://gis.sanfordfl.gov/server/rest/services/Zoning/MapServer/0",
+        "fields": ["ZONECODE", "ZONEDESC"],
+        "code": "ZONECODE",
+        "desc": "ZONEDESC",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "sanford-flu",
+        "url": "https://gis.sanfordfl.gov/server/rest/services/Land_Use/MapServer/2",
+        "fields": ["LANDUSECODE", "LANDUSEDESC"],
+        "code": "LANDUSECODE",
+        "desc": "LANDUSEDESC",
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "oviedo",
+      "municipality": "Oviedo",
+      "situs": ["OVIEDO"],
+      "zoning": {
+        "role": "oviedo-zoning",
+        "url": "https://maps.cityofoviedo.net/arcgis/rest/services/Oviedo_Service_Data/DevelopmentServices/MapServer/11",
+        "fields": ["ZONECLASS", "ZONEDESC"],
+        "code": "ZONECLASS",
+        "desc": "ZONEDESC",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "oviedo-flu",
+        "url": "https://maps.cityofoviedo.net/arcgis/rest/services/Oviedo_Service_Data/DevelopmentServices/MapServer/10",
+        "fields": ["LANDUSECODE", "LANDUSEDESC"],
+        "code": "LANDUSECODE",
+        "desc": "LANDUSEDESC",
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "altamonte-springs",
+      "municipality": "Altamonte Springs",
+      "situs": ["ALTAMONTE SPRINGS"],
+      "zoning": {
+        "role": "altamonte-springs-zoning",
+        "url": "https://webgis.altamonte.org/gis/rest/services/EnerGov/EnerGovService/MapServer/39",
+        "fields": ["ZONING", "Labels"],
+        "code": "ZONING",
+        "desc": "Labels",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "altamonte-springs-flu",
+        "url": "https://webgis.altamonte.org/gis/rest/services/EnerGov/EnerGovService/MapServer/44",
+        "fields": ["PRP_LABEL", "Labels"],
+        "code": "PRP_LABEL",
+        "desc": "Labels",
+        "where": "1=1"
+      }
+    }
+  ],
+  "gaps": [
+    {
+      "municipality": "Longwood",
+      "situs": ["LONGWOOD"],
+      "note": "Longwood publishes no anonymous zoning or future land use service. Request-only maps and the giswebtechguru host are not district layers."
+    }
+  ],
+  "rejected": [
+    "Rejected namesake: AGOL Zoning_Flu (Hernando County), not Seminole.",
+    "Rejected: Lake County InteractiveMap zoning and LocalGov CityZoning.",
+    "Rejected: Winter Park EnerGov (Orange County), not Winter Springs.",
+    "Retired and not called: Oviedo AGOL DSZoning FeatureServer 11 and 10 on org 0EfLIvtSLPR9PKI2.",
+    "Seminole county Land_Use FeatureServer 0 and 1 are not stamped. Zoning value CITY inside cities is a placeholder, not a district.",
+    "Casselberry zoning value SEMINOLE COUNTY is not stored as a city district.",
+    "Winter Springs EnerGov_WFL1, Lake Mary LM_Zoning and LM_FLU, and the 2021 Lake Mary twin are not stacked on the preferred layers.",
+    "Sanford Land_Use MapServer 0 is a zoning twin and is not used. Future land use is Land_Use MapServer 2.",
+    "FDOR product Zoning on org GcvM6vDlR2gM4x31 is the wrong layer."
+  ]
+}

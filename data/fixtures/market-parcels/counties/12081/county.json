@@ -14,11 +14,16 @@
   "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/39/query",
   "gaps": [
     "8098 source rows collapsed to 7239 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-    "No zoning or FLU on the Florida DOH extract."
+    "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12081, 221 zoning codes and 247 future land use codes). County parcels were not re-downloaded.",
+    "Bradenton and Palmetto zoning and future land use are city layers. Longboat Key uses the town zoning polygons and future land use layer.",
+    "Anna Maria, Bradenton Beach, and Holmes Beach stay blank. PDF maps and parcel AM_, BB_, and HB_ fields are not a city service.",
+    "Rejected: Northport, Alabama ArcGIS org 3u10F1chkeawsUZY. Manatee County Planning zoning is not copied into these cities."
   ],
   "path": "data/fixtures/market-parcels/counties/12081/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12081/lookup.json",
   "sourceCount": 8098,
   "dropped": 2,
-  "tileCount": 8
+  "tileCount": 8,
+  "zoningJoinedCount": 221,
+  "fluJoinedCount": 247
 }

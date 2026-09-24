@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -118,7 +118,7 @@
       "source": "oa-carroll-ga-910028",
       "queryUrl": "https://v2.openaddresses.io/batch-prod/job/910028/source.geojson.gz",
       "gaps": [
-        "Kept 9217 Carroll County, Georgia parcels in the inclusive 5\u2013150 GIS-acre band from OpenAddresses job 910028 (55412 polygons, pid only). The live Carroll_Parcels_20240923_ExportFeatures service is blocked. GIS acres are equirectangular polygon area. Duplicate pid groups: 20. Below 5 acres: 46005. Above 150 acres: 164.",
+        "Kept 9217 Carroll County, Georgia parcels in the inclusive 5–150 GIS-acre band from OpenAddresses job 910028 (55412 polygons, pid only). The live Carroll_Parcels_20240923_ExportFeatures service is blocked. GIS acres are equirectangular polygon area. Duplicate pid groups: 20. Below 5 acres: 46005. Above 150 acres: 164.",
         "Carrollton CITY_PARCEL matched 320 kept parcels. Villa Rica Map/1 Carroll extract matched 228. Owner filled 539. Current value filled 543. There is no countywide owner, mailing, or tax roll on the OpenAddresses snapshot. Assessed value, taxable value, and tax amount were not on the public layers used here.",
         "City zoning joined Carrollton 317 and Villa Rica Proposed_Z 175; unmatched 8725. Villa Rica is clipped to parcel ids on this Carroll landbase so Douglas-side rows are excluded. County Euclidean zoning is the 2025 PDF only. Temple, Bremen, Mount Zion, Bowdon, Whitesburg, and Roopville have no public zoning service.",
         "Future land use joined Carrollton F2023FLU 39 and Villa Rica districts 227; unmatched 8951. County future land use is the 2023 PDF only. FAXNUMBER was not collected.",
@@ -181,9 +181,9 @@
       "queryUrl": "https://gis.cobbcounty.gov/gisserver/rest/services/tax/taxassessorsdaily/MapServer/0/query",
       "gaps": [
         "4859 source rows collapsed to 4770 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "Parcels are Cobb Tax Assessors Daily MapServer/0 (CobbParcels on gis.cobbcounty.gov), filtered on ACRES 5.0\u2013150.0. A live count was 279,635 parcels and 4,859 in that band. ACRE_DEEDED is a different field (about 4,681 in the band) and was not the filter. The older cobbpublic Parcels MapServer/3 on gis.cobbcounty.org was not used.",
+        "Parcels are Cobb Tax Assessors Daily MapServer/0 (CobbParcels on gis.cobbcounty.gov), filtered on ACRES 5.0–150.0. A live count was 279,635 parcels and 4,859 in that band. ACRE_DEEDED is a different field (about 4,681 in the band) and was not the filter. The older cobbpublic Parcels MapServer/3 on gis.cobbcounty.org was not used.",
         "Owner, mailing, situs street, FMV_TOTAL (market), and ASV_TOTAL (assessed) come from that layer. There is no situs ZIP on the county layer except where the Marietta parcel view supplies ZIP_CODE. There is no taxable value and no tax bill. CLASS is the assessor use code, not zoning. TAXDIST is not a municipality name.",
-        "Zoning for unincorporated Cobb is comdev/CobbZoningData MapServer/6 (Zoning Districts, about 8,468 polygons). It does not cover Marietta, Smyrna, Kennesaw, Powder Springs, Acworth, or Austell. A live intersect also missed every Mableton centroid in this 5\u2013150 acre extract (the layer's WGS84 extent begins near latitude 33.805, and points inside Mableton returned no district). Mableton has no separate public zoning service, so Mableton zoning stays blank. Marietta, Smyrna (Georgia), Kennesaw, and Powder Springs use their own public REST services.",
+        "Zoning for unincorporated Cobb is comdev/CobbZoningData MapServer/6 (Zoning Districts, about 8,468 polygons). It does not cover Marietta, Smyrna, Kennesaw, Powder Springs, Acworth, or Austell. A live intersect also missed every Mableton centroid in this 5–150 acre extract (the layer's WGS84 extent begins near latitude 33.805, and points inside Mableton returned no district). Mableton has no separate public zoning service, so Mableton zoning stays blank. Marietta, Smyrna (Georgia), Kennesaw, and Powder Springs use their own public REST services.",
         "No public zoning or future land use REST service: Acworth and Austell. Those parcels stay blank. City ordinance text was not invented. Mableton zoning stays blank for the reason above.",
         "Future land use for unincorporated Cobb is comdev/Future_Land_Use FeatureServer/0 (about 2,849 polygons, code FLU_ABBR2). That layer did not intersect Mableton centroids in this band, and Mableton has no city FLU service, so Mableton FLU stays blank. Marietta FLU is the parcel view FLU field. Smyrna, Georgia FLU is FLU_Overlay (FLU_2040). Kennesaw FLU is the city Future_Land_Use layer. Powder Springs uses character areas (F2022_CA) as the public FLU stand-in.",
         "Sales are tax/taxassessorsmapwm MapServer/41 ParcelSales (about 939,000 rows), joined on PIN. STEB=FMV is the qualified filter (about 391,000 rows). The latest positive-price FMV row is kept. Other STEB codes are not treated as qualified and are not stored.",
@@ -200,8 +200,9 @@
         "Kennesaw Future_Land_Use matched 126 parcels.",
         "Powder Springs Zoning FeatureServer (95 polygons) matched 127 parcels.",
         "Powder Springs character areas (F2022_CA, the public FLU stand-in) matched 125 parcels. The same layer filled zoning on 0 parcels the district polygons missed.",
-        "Acworth (113 parcels in the 5\u2013150 acre band) and Austell (109) have no public zoning or FLU REST service. Those fields stay blank. No city ordinance text was invented for them.",
-        "ParcelSales MapServer/41 joined on PIN. STEB=FMV and price > 0 is the qualified filter. The latest qualified sale was kept on 1173 of 4770 parcels. Other STEB codes were not stored."
+        "Acworth (113 parcels in the 5–150 acre band) and Austell (109) have no public zoning or FLU REST service. Those fields stay blank. No city ordinance text was invented for them.",
+        "ParcelSales MapServer/41 joined on PIN. STEB=FMV and price > 0 is the qualified filter. The latest qualified sale was kept on 1173 of 4770 parcels. Other STEB codes were not stored.",
+        "Batch-40 join on 40 parcels: CCSD or Marietta schools with GOSA 2025 CCRPI scores (no A–F letters), NFHL flood zones, and water, sewer, and electric. Gas stays unknown. Five sewer Not Anticipated parcels stay gaps. Opportunity Zone, income, and AADT are not in this join."
       ],
       "path": "data/fixtures/market-parcels/counties/13067/tiles",
       "lookup": "data/fixtures/market-parcels/counties/13067/lookup.json",
@@ -220,7 +221,7 @@
       "source": "ga-coweta-wingap-parcels",
       "queryUrl": "https://coweta-gis-web.coweta.ga.us/arcgis/rest/services/WinGapParcels/MapServer/0/query",
       "gaps": [
-        "Primary polygons are Coweta WinGapParcels. Acres and municipality are joined from Hosted ParcelPropertyValues. The 5.0\u2013150.0 acre band uses that acres field.",
+        "Primary polygons are Coweta WinGapParcels. Acres and municipality are joined from Hosted ParcelPropertyValues. The 5.0–150.0 acre band uses that acres field.",
         "CurrentValue is the assessor current value. Assessed value is not a separate published field.",
         "Sales are not on WinGapParcels or ParcelPropertyValues. lastSale is left null.",
         "County zoning is Zoning/MapServer/0. A Newnan point falls outside those polygons, so Newnan parcels are not given a county district.",
@@ -228,7 +229,7 @@
         "Newnan zoning and future land use come from the City of Newnan Future Land Use layer only when the centroid is inside an in-city polygon.",
         "Senoia, Grantville, Moreland, Turin, Sharpsburg, Haralson, Palmetto, Chattahoochee Hills have no public city zoning or FLU service in this pull. City zoning and FLU stay empty there.",
         "Assessor search is qPublic AppID 704 (LayerID 11412), the link Coweta County publishes for the tax parcel viewer.",
-        "ParcelPropertyValues 5\u2013150 acre rows: 8114. WinGap geometry matched 8090. Kept 8090. Newnan municipality parcels 303; Newnan FLU joined 302; Newnan zoning joined 302."
+        "ParcelPropertyValues 5–150 acre rows: 8114. WinGap geometry matched 8090. Kept 8090. Newnan municipality parcels 303; Newnan FLU joined 302; Newnan zoning joined 302."
       ],
       "path": "data/fixtures/market-parcels/counties/13077/tiles",
       "lookup": "data/fixtures/market-parcels/counties/13077/lookup.json",
@@ -272,7 +273,8 @@
         "County Zoning_District and LandUse fill unincorporated DeKalb only. They are not copied onto city parcels. The parcel ZONING attribute is a fallback for unincorporated parcels the county polygon missed.",
         "Parcel CITY is the situs postal city, not the municipality. jurisdictionCode comes from Municipal_Boundary.",
         "OZ 2.0 eligibility is not a designated QOZ. This extract does not write opportunityZone from an eligible tract.",
-        "Owner phone and email are not on the public assessment layer. TOTAPR1 is the appraised value and CNTASSDVAL is the county assessed value."
+        "Owner phone and email are not on the public assessment layer. TOTAPR1 is the appraised value and CNTASSDVAL is the county assessed value.",
+        "Batch-40 join on 40 parcels: DCSD schools with GOSA 2025 CCRPI scores (no A–F letters), including two City of Atlanta parcels zoned to Druid Hills. NFHL flood zones are 31 X and 9 AE, with no published static BFE. Water and sewer name DeKalb DWM, or Atlanta DWM inside the City of Atlanta, as a jurisdiction proxy. Electric is HIFLD. Gas stays unknown. Opportunity Zone, income, and AADT are not in this join."
       ],
       "path": "data/fixtures/market-parcels/counties/13089/tiles",
       "lookup": "data/fixtures/market-parcels/counties/13089/lookup.json",
@@ -496,8 +498,8 @@
       "source": "ga-douglas-landrecords",
       "queryUrl": "https://maps.douglascountyga.gov/arcgis/rest/services/LandRecords/LandRecords/MapServer/0/query",
       "gaps": [
-        "4254 LandRecords rows matched ACREAGE_GIS 5\u2013150. 4231 Douglas County, Georgia tax parcels were kept. Placeholder PINs and any geometry outside the Douglas County bbox were dropped.",
-        "Acreage is ACREAGE_GIS, not the TOTAL_ACRES string. Band is 5.0\u2013150.0 inclusive.",
+        "4254 LandRecords rows matched ACREAGE_GIS 5–150. 4231 Douglas County, Georgia tax parcels were kept. Placeholder PINs and any geometry outside the Douglas County bbox were dropped.",
+        "Acreage is ACREAGE_GIS, not the TOTAL_ACRES string. Band is 5.0–150.0 inclusive.",
         "No public assessed or taxable value. CURR_VAL is fair market value. ACC is not the Georgia 40% assessed value.",
         "Austell has no official city zoning or future land use service. Tax district 06 parcels keep null zoning and FLU.",
         "Douglasville uses DV_ZONING_CODE and DV_FLU_CODE. Villa Rica uses city Proposed_Z on PIN and a spatial future-land-use join. County values of 'city' are municipal stubs and are not stored.",
@@ -524,7 +526,7 @@
       "queryUrl": "https://gis.fayettecountyga.gov/arcgis/rest/services/Pictometry/parcelsRO/MapServer/0/query",
       "gaps": [
         "Acreage uses parcelsRO acres when >0, otherwise StatePlane feet Shape.STArea()/43560. Deeded acres are sparse.",
-        "Zoning on 4363 of 4725: ZoningRO unincorporated 3476, parcelsRO fallback 298, Fayetteville 133, Peachtree City Zoning2021 289, Tyrone TAXDIST=3 167. Brooks 188 and Woolsey 43 left blank \u2014 no city zoning REST.",
+        "Zoning on 4363 of 4725: ZoningRO unincorporated 3476, parcelsRO fallback 298, Fayetteville 133, Peachtree City Zoning2021 289, Tyrone TAXDIST=3 167. Brooks 188 and Woolsey 43 left blank — no city zoning REST.",
         "Future land use on Fayetteville 147 and Peachtree City Proposed_L 259 only. County FLU is token-gated and left null. Tyrone, Brooks, Woolsey, and unincorporated FLU are null.",
         "Owner/mailing/assessed from TaxParcels_public on PARCEL_NO=PARCELID (4432 owners, 4428 assessed). No market value: CNTASSDVAL is assessed, and CNTTXBLVAL is not used as FMV.",
         "Situs from Parcels_Data_SAGES single_line_address (4725). Postal City is not the municipality.",
@@ -550,7 +552,7 @@
       "gaps": [
         "No lastSale.price, lastSale.date, or lastSale.qualified on any public Forsyth County GA REST layer. Sale history is qPublic HTML only (AppID=1027), not a GIS join.",
         "FLU is partial: EnerGov CharacterArea is 11 coarse 2022 comprehensive-plan polygons (Big Creek, Campground, Chestatee/Jot Em Down, Etowah, Haw Creek and Daves Creek, Lanier, McFarland, North Georgia 400, Sawnee Mountain, South Georgia 400, Vickery Creek), joined to 3758 of 3925 parcels. This is not parcel-level future land use. Cumming city FLU is a comprehensive-plan PDF, not REST.",
-        "Cumming is the only incorporated city (MunicipalBoundary NAME=Cumming, LOCALFIPS 20932). 147 parcels in the 5\u2013150 acre band fall inside the city. Zoning there uses the parcel ZONING attribute. County Zoning_Districts ZONECLASS=CUMMING is a stub (138 polygons) and is not used as a district code. No Cumming-owned zoning or FLU FeatureServer.",
+        "Cumming is the only incorporated city (MunicipalBoundary NAME=Cumming, LOCALFIPS 20932). 147 parcels in the 5–150 acre band fall inside the city. Zoning there uses the parcel ZONING attribute. County Zoning_Districts ZONECLASS=CUMMING is a stub (138 polygons) and is not used as a district code. No Cumming-owned zoning or FLU FeatureServer.",
         "ownerName is not on Public Tax_Parcel. Joined EnerGov TaxParcels/1 OWNERNME1 on PARCELID for 3925 of 3925 parcels.",
         "CNTASSDVAL is stored as tax.marketValue (the field alias says assessed, but values behave as fair-market). CNTTXBLVAL is tax.taxableValue (about 40% of market value when there is no exemption). There is no tax.assessedValue field. LNDVALUE is tax.landMarketValue.",
         "Appraiser search: https://www.qpublic.net/ga/forsyth/search.html. Parcel deep link pattern (often HTTP 403 to automated clients): https://qpublic.schneidercorp.com/Application.aspx?AppID=1027&LayerID=21667&PageTypeID=4&PageID=9230&KeyValue={PARCELID with spaces as +}. Tax bills: https://forsythproperty.assurancegov.com/Property/Search.",
@@ -577,7 +579,7 @@
       "source": "ga-fulton-pmv-mapserver-11",
       "queryUrl": "https://gismaps.fultoncountyga.gov/arcgispub2/rest/services/PropertyMapViewer/PropertyMapViewer/MapServer/11/query",
       "gaps": [
-        "Hosted CurrentParcels FeatureServer (services5\u2026/CurrentParcels) is a north-Fulton subset (~29.8k of ~373k), not county-wide. This extract uses Property Map Viewer MapServer/11 (LandAcres, county-wide).",
+        "Hosted CurrentParcels FeatureServer (services5…/CurrentParcels) is a north-Fulton subset (~29.8k of ~373k), not county-wide. This extract uses Property Map Viewer MapServer/11 (LandAcres, county-wide).",
         "No county-wide zoning layer. City zoning/FLU is joined where a public layer exists. Gaps with no public zoning/FLU REST: Hapeville, Palmetto (do not use Palmetto FL layers), Chattahoochee Hills, and Mountain Park. Fulton Industrial District (MapServer/34, ~37 polygons) is not county zoning. Unincorporated Fulton stays blank.",
         "No sale date or qualified flag on MapServer/11. Tyler_YearlySales stops at 2022 (price and tax year only, many zero prices) and was not joined.",
         "No situs city or ZIP on MapServer/11. Mailing is OwnerAddr1 plus OwnerAddr2; city/state/ZIP is parsed when OwnerAddr2 is CITY ST ZIP. No distinct taxable value; TotAssess is assessed (about 40% of TotAppr). Each joined zoning code is labeled with its city and is not scored as Orange County multifamily zoning.",
@@ -640,7 +642,7 @@
       "gaps": [
         "6655 source rows collapsed to 6653 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
         "Parcels are Gwinnett GC_Parcel MapServer/6. AGOL Property_and_Tax FeatureServer/0 is geometry and PIN only and is not the parcel source.",
-        "Acreage is CALCULATEDACREAGE 5\u2013150. Deeded acreage is often 0 and was not used.",
+        "Acreage is CALCULATEDACREAGE 5–150. Deeded acreage is often 0 and was not used.",
         "Zoning polygons are county-wide Property_and_Tax FeatureServer/1 (TYPE and JURISDICTION), including unincorporated. The parcel CAMA ZONING string is only the fallback.",
         "Lawrenceville, Duluth, and Peachtree Corners replace TYPE with the city's own REST zoning where the parcel joins. Duluth uses the UDC_Zoning domain (RA-200 through PUD), not the joined county CAMA code.",
         "Other municipalities (Suwanee, Norcross, Snellville, Buford, Sugar Hill, Lilburn, Dacula, Grayson, Berkeley Lake, Loganville, Auburn, Braselton, Mulberry, Rest Haven) have no independent public zoning REST. They use the county zoning layer filtered by JURISDICTION.",
@@ -649,7 +651,7 @@
         "TOTVAL1 and TAXTOT1 are parsed from strings. There is no tax.taxableValue.",
         "Buford, Loganville, Auburn, and Braselton cross county lines. This extract covers the Gwinnett footprint only.",
         "Appraiser search is qPublic AppID 1282. Automated clients often get a CDN 403; the page is public for people.",
-        "Parcels in this 5\u2013150 acre extract by zoning jurisdiction: BERKELEY LAKE 21, BRASELTON 39, BUFORD 272, DACULA 74, DULUTH 168, GRAYSON 36, LAWRENCEVILLE 246, LILBURN 94, LOGANVILLE 28, MULBERRY 477, NORCROSS 132, PEACHTREE CORNERS 283, REST HAVEN 3, SNELLVILLE 114, SUGAR HILL 161, SUWANEE 193, UNINCORPORATED 4232, UNKNOWN 80.",
+        "Parcels in this 5–150 acre extract by zoning jurisdiction: BERKELEY LAKE 21, BRASELTON 39, BUFORD 272, DACULA 74, DULUTH 168, GRAYSON 36, LAWRENCEVILLE 246, LILBURN 94, LOGANVILLE 28, MULBERRY 477, NORCROSS 132, PEACHTREE CORNERS 283, REST HAVEN 3, SNELLVILLE 114, SUGAR HILL 161, SUWANEE 193, UNINCORPORATED 4232, UNKNOWN 80.",
         "County zoning polygon hit 6573 of 6653 parcels. City REST zoning replaced the county code for Lawrenceville 241, Duluth 168, Peachtree Corners 283. Character-area FLU joined for 679 parcels in those three cities. Land Value Table prices above $1 joined for 2560 parcels. qualified is always null."
       ],
       "path": "data/fixtures/market-parcels/counties/13135/tiles",
@@ -727,7 +729,7 @@
       "queryUrl": "https://arcgis.co.henry.ga.us/server/rest/services/Parcels/MapServer/12/query",
       "gaps": [
         "7669 source rows collapsed to 7418 parcel ids because the parcel id repeats. None failed the acreage band or the WGS84 centroid check. The acreage query covered the county.",
-        "Henry 5\u2013150 acre join: zoning 6424/7418 (GMC McDonough 314, McDonough clip 13, Stockbridge clip 248, Locust Grove clip 159, county ZONING 5238, CityZoning stub 364, Hampton CityZoning stub 88, CITY with blank CityZoning 205, no zoning row 789, other unmatched 0). FLU 4777/7418; FLU2023=CITY left blank on 1020; no FLU row 1621. McDonough owner names 198. Special overlays noted 55. Centroids outside Henry extent dropped 0.",
+        "Henry 5–150 acre join: zoning 6424/7418 (GMC McDonough 314, McDonough clip 13, Stockbridge clip 248, Locust Grove clip 159, county ZONING 5238, CityZoning stub 364, Hampton CityZoning stub 88, CITY with blank CityZoning 205, no zoning row 789, other unmatched 0). FLU 4777/7418; FLU2023=CITY left blank on 1020; no FLU row 1621. McDonough owner names 198. Special overlays noted 55. Centroids outside Henry extent dropped 0.",
         "County Parcels/MapServer/12 has situs and ACREAGE_1. It does not publish ownerName, mailing address, tax values, or last sale. CAMA is qPublic HTML (AppID=1035, LayerID=22139, PageTypeID=4, PageID=15803, KeyValue=PARCEL_NO). The deep link is stored on each parcel.",
         "Zoning is joined from Current_Zoning_and_Future_Land_Use/MapServer/0 on PARCEL_NO. Unincorporated parcels use ZONING. When ZONING is CITY the county CityZoning stub is the fallback. McDonough prefers GMC mcd_Planning_view/FeatureServer/1 district polygons (centroid in polygon), then county McDonough/FeatureServer/3. Stockbridge uses county Stockbridge/FeatureServer/2. Locust Grove uses county Locust_Grove/FeatureServer/1. Hampton has no city REST; CityZoning stub only. Flippen is unincorporated and has no city layer.",
         "Rejected services8.arcgis.com/gbzZfTaSTnfRdQPt (CITYNAME=Mustang, ST_FIPS=40, Oklahoma) as a wrong-state Hampton lookalike. It is not queried.",
@@ -887,7 +889,7 @@
       "queryUrl": "https://services1.arcgis.com/qTQ6qYkHpxlu0G82/arcgis/rest/services/Newton_Parcels/FeatureServer/0/query",
       "gaps": [
         "2022 University of Maryland AGOL redistribute of Newton County GA parcels (org qTQ6qYkHpxlu0G82, item 40743c9b9c87460a94aaff77c787a705). Not an official Newton County FeatureServer. County digital Tax Parcel, Zoning, and FLU data is a paid dataset.",
-        "Acreage is deeded TotalAcres, 5\u2013150 acres inclusive. Owner name and situs house number are scrubbed on this redistribute and are left blank. Situs is street name and type plus postal city and ZIP only. ParcelCity is a postal community, not a city-limits filter.",
+        "Acreage is deeded TotalAcres, 5–150 acres inclusive. Owner name and situs house number are scrubbed on this redistribute and are left blank. Situs is street name and type plus postal city and ZIP only. ParcelCity is a postal community, not a city-limits filter.",
         "SaleDate and SalesPrice run through 2021. Qualifying is blank, so lastSale.qualified is null. Improvement and total market values are zero on this snapshot, so tax market, assessed, and taxable values stay null instead of copying land-only LandValue.",
         "No public Euclidean zoning for unincorporated Newton County. Covington Zoning_FLUM_Trails MapServer query is blocked and is not joined. Oxford's 2012 zoning webmap is not a FeatureServer and is not joined.",
         "Future land use is a centroid join to NEGRC: county character areas layer 454, and city layers Covington 447, Oxford 450, Porterdale 451, Mansfield 448, Newborn 449, and Social Circle 469. A city polygon wins over the county layer.",
@@ -914,13 +916,13 @@
       "queryUrl": "https://services8.arcgis.com/7YXQzPPGs9Uc4qKl/arcgis/rest/services/Paulding_Map_Auto_Updated_WFL3/FeatureServer/25/query",
       "gaps": [
         "5099 source rows collapsed to 5094 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "Paulding Map Auto Updated FeatureServer/25. Acreage is DeedAc (5.0\u2013150.0 inclusive). CalcAc is 0 on this layer and is not the filter. Parcel id is GPIN. Thin attributes are GPIN, DeedAc, TaxDist, OWNKEY, SubdivID, and SubdivLotNum. OWNKEY is an owner key, not a name.",
+        "Paulding Map Auto Updated FeatureServer/25. Acreage is DeedAc (5.0–150.0 inclusive). CalcAc is 0 on this layer and is not the filter. Parcel id is GPIN. Thin attributes are GPIN, DeedAc, TaxDist, OWNKEY, SubdivID, and SubdivLotNum. OWNKEY is an owner key, not a name.",
         "Owner name, mailing address, tax values, and last sale are not on the public REST layer. qPublic HTML was not scraped. The county search page is linked; it is not a per-parcel record pull.",
         "Zoning is a centroid join to Paulding_County_GA_Zoning_Map_WFL1 FeatureServer/3 ZoningCode (~42k polygons). The layer keeps preceding zoning underneath newer cases. The smallest polygon with a code wins. Denied, withdrawn, and pending statuses are skipped. There is no separate Dallas, Hiram, or Braswell zoning FeatureServer on this join.",
         "County future land use is not a public FeatureServer. Dallas FLU is DallasFLU2017 Character_ (the character area), extent-checked to Paulding County, Georgia, and joined only where TaxDist is 1100 (Dallas). CA_Descrip is often blank and sometimes a different class, so it is not stored. Hiram and Braswell future land use are not on a public REST layer.",
         "Municipality is the TaxDist proxy: 1000 Paulding County, 1100 Dallas, 1200 Hiram, 1300 Braswell. City Limits FeatureServer/12 (Dallas, Hiram, Braswell) is a boundary check and does not override TaxDist. Null TaxDist may take the city boundary name.",
         "The parcel extent is checked against Paulding County, Georgia (about -84.87, 33.83). Paulding, Ohio is rejected and not queried.",
-        "Paulding 5\u2013150 acre join: zoning 4862/5094 (zoning polygons read 41973, skipped blank or closed status 145). Dallas FLU 110; Dallas centroids with no FLU polygon 7. TaxDist municipalities: Braswell 32, Dallas 117, Hiram 81, Paulding County 4861, Unknown 3. City-limit boundary filled a null TaxDist on 0. TaxDist 1000 centroids inside a city polygon 2 (TaxDist kept). TaxDist city disagreed with the city-limit polygon on 0 (TaxDist kept). City-limit extent -84.973,33.831,-84.724,33.995.",
+        "Paulding 5–150 acre join: zoning 4862/5094 (zoning polygons read 41973, skipped blank or closed status 145). Dallas FLU 110; Dallas centroids with no FLU polygon 7. TaxDist municipalities: Braswell 32, Dallas 117, Hiram 81, Paulding County 4861, Unknown 3. City-limit boundary filled a null TaxDist on 0. TaxDist 1000 centroids inside a city polygon 2 (TaxDist kept). TaxDist city disagreed with the city-limit polygon on 0 (TaxDist kept). City-limit extent -84.973,33.831,-84.724,33.995.",
         "DallasFLU2017 extent -84.940,33.870,-84.724,33.984 is inside Paulding County, Georgia (605 character-area polygons)."
       ],
       "path": "data/fixtures/market-parcels/counties/13223/tiles",
@@ -978,8 +980,8 @@
       "source": "ga-rockdale-parcels",
       "queryUrl": "https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/Parcels/FeatureServer/9/query",
       "gaps": [
-        "Source query returned 2698 rows in the 5.0\u2013150.0 acre band. 2555 parcels kept. 26 centroids were outside Rockdale County, Georgia, 6 failed geometry or the acreage check, and 111 duplicate parcel ids were collapsed to the larger part.",
-        "Rockdale County, Georgia AGOL Parcels/9. Positive Acreage is stored; Calc_Ac is used only when Acreage is null or zero. The band is 5.0\u2013150.0 acres inclusive.",
+        "Source query returned 2698 rows in the 5.0–150.0 acre band. 2555 parcels kept. 26 centroids were outside Rockdale County, Georgia, 6 failed geometry or the acreage check, and 111 duplicate parcel ids were collapsed to the larger part.",
+        "Rockdale County, Georgia AGOL Parcels/9. Positive Acreage is stored; Calc_Ac is used only when Acreage is null or zero. The band is 5.0–150.0 acres inclusive.",
         "Valuation is a fair-market proxy only. Assessed value, taxable value, and taxes are not on this layer and were left null.",
         "Owner and mailing address come from City of Conyers SmartGovParcels joined on PARCEL_NO. Parcels outside that extract are null. No assessor site was scraped.",
         "Sales are not published on these layers. lastSale date, price, and qualified flag are null.",
@@ -1005,7 +1007,7 @@
       "queryUrl": "https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/Parcels_Public_View/FeatureServer/1/query",
       "gaps": [
         "Spalding County Parcels public view is PARCEL_ID and JURISDICTION only. Owner, mailing, situs, tax, and last sale are null on this extract.",
-        "GIS acres are computed from State Plane Georgia West feet (102667/2240) polygon area / 43560. Band is 5.0\u2013150.0 inclusive.",
+        "GIS acres are computed from State Plane Georgia West feet (102667/2240) polygon area / 43560. Band is 5.0–150.0 inclusive.",
         "County zoning LABEL is joined only where JURISDICTION is COUNTY (unincorporated Spalding, including Orchard Hill and former Sunny Side). JURISDICTION CITY is Griffin and is left unzoned: the county zoning layer does not cover Griffin, and no verified Griffin zoning FeatureServer was used.",
         "Future land use is the Comp Plan 2042 PDF only. FLU is null.",
         "Sales and tax are qPublic AppID=766 HTML only and were not scraped. Last sale and tax values are null.",
@@ -1030,7 +1032,7 @@
       "source": "ga-walton-choosewalton-parcels",
       "queryUrl": "https://services.arcgis.com/ftUt0Vfnzfo0Cs96/arcgis/rest/services/Walton_County_Zoning/FeatureServer/29/query",
       "gaps": [
-        "Kept 5824 Walton County, Georgia parcels in the inclusive 5\u2013150 GIS-acre band from choosewalton Walton_County_Zoning/29 (6187 source rows). Duplicate Parcel_No rings were dissolved (344 duplicate groups, 344 extra rings). Blank Parcel_No rows dropped: 9. Shared UTILITY ids dropped: 10.",
+        "Kept 5824 Walton County, Georgia parcels in the inclusive 5–150 GIS-acre band from choosewalton Walton_County_Zoning/29 (6187 source rows). Duplicate Parcel_No rings were dissolved (344 duplicate groups, 344 extra rings). Blank Parcel_No rows dropped: 9. Shared UTILITY ids dropped: 10.",
         "Monroe City Parcels CAMA matched 12 of 5824 kept parcels (owner filled 12, curr_val filled 12). The Monroe layer has 6043 city parcels. Most Monroe Parcel_No values are M* or NM* and do not equal the county C* or N* numbers, so only shared Parcel_No values were joined. waltongis walton_parcels_view is token/subscription blocked (499/403), so there is no countywide owner, mailing, or tax.",
         "City Euclidean zoning spatial join: Monroe 8, Loganville 3, Social Circle 6, Monroe CAMA zoning fallback 5, unmatched 5802. LG* and SC* names were not used as Parcel_No keys. County Euclidean zoning (A-1/R-1 and the rest of the county ordinance) is qPublic HTML only.",
         "FLU and Description on the county landbase are character areas (Suburban, Neighborhood Residential, Conservation, Rural Residential and Agriculture, Highway Corridor, Employment Center, Village Center), not Euclidean zoning. City character/FLU replaced that label where the centroid hit: Monroe character 0, Loganville NEGRC 7, Social Circle NEGRC 8, Walnut Grove NEGRC 12, county character kept 5797.",

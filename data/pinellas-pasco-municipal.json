@@ -1,0 +1,219 @@
+{
+  "doNotInventOpportunityZones": true,
+  "doNotRedownloadCountyParcels": true,
+  "join": "Parcel id when the city layer id matches the DOH strap after punctuation is removed. Otherwise the parcel centroid. County parcel polygons are not downloaded.",
+  "counties": {
+    "12103": {
+      "name": "Pinellas",
+      "source": "fl-doh-ehwaters-12103",
+      "box": [-82.95, 27.55, -82.55, 28.25]
+    },
+    "12101": {
+      "name": "Pasco",
+      "source": "fl-doh-ehwaters-12101",
+      "box": [-82.95, 28.05, -81.9, 28.55]
+    }
+  },
+  "maxCitySpanDegrees": 0.35,
+  "stubCodes": ["NPR", "PR", "SA", "DC", "ZH", "UN"],
+  "blockedUrlFragments": [
+    "gulfport-ms.gov",
+    "Zhills_EnGov_Map_11_2025/FeatureServer/3",
+    "Countywide_Plan_Map",
+    "weekiwachee",
+    "Zoning_Flu"
+  ],
+  "wired": [
+    {
+      "municipality": "Dunedin",
+      "fips": "12103",
+      "situs": ["DUNEDIN"],
+      "fluStatus": "city",
+      "zoning": {
+        "role": "dunedin-zoning",
+        "url": "https://gis.dunedingov.com/server/rest/services/CommunityDevelopment/ZoningDistrict/FeatureServer/0",
+        "fields": ["ZONECLASS", "ZONEDESC"],
+        "code": "ZONECLASS",
+        "desc": "ZONEDESC",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "dunedin-flu",
+        "url": "https://gis.dunedingov.com/server/rest/services/CommunityDevelopment/LandUseCurrent/FeatureServer/0",
+        "fields": ["LANDUSECODE", "LANDUSEDESC"],
+        "code": "LANDUSECODE",
+        "desc": "LANDUSEDESC",
+        "where": "1=1"
+      }
+    },
+    {
+      "municipality": "Pinellas Park",
+      "fips": "12103",
+      "situs": ["PINELLAS PARK"],
+      "fluStatus": "city",
+      "idField": "PARCELID",
+      "zoning": {
+        "role": "pinellas-park-zoning",
+        "url": "https://services6.arcgis.com/fH2ZwfxOgb5eaBS4/arcgis/rest/services/Planning_Development_2_WFL1/FeatureServer/19",
+        "fields": ["PARCELID", "CATEGORY", "DESCRIPTION"],
+        "code": "CATEGORY",
+        "desc": "DESCRIPTION",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "pinellas-park-flu",
+        "url": "https://services6.arcgis.com/fH2ZwfxOgb5eaBS4/arcgis/rest/services/Planning_Development_2_WFL1/FeatureServer/9",
+        "fields": ["PARCELID", "CATEGORY", "DESCRIPTION"],
+        "code": "CATEGORY",
+        "desc": "DESCRIPTION",
+        "where": "1=1"
+      }
+    },
+    {
+      "municipality": "Tarpon Springs",
+      "fips": "12103",
+      "situs": ["TARPON SPRINGS"],
+      "fluStatus": "city",
+      "zoning": {
+        "role": "tarpon-springs-zoning",
+        "url": "https://gis.ctsfl.us/arcgis/rest/services/Hosted/Zoning_2025/FeatureServer/3",
+        "fields": ["curr_code", "curr_zone"],
+        "code": "curr_code",
+        "desc": "curr_zone",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "tarpon-springs-flu",
+        "url": "https://gis.ctsfl.us/arcgis/rest/services/Hosted/Future_Land_Use_2025/FeatureServer/0",
+        "fields": ["flu", "fluname"],
+        "code": "flu",
+        "desc": "fluname",
+        "where": "1=1"
+      }
+    },
+    {
+      "municipality": "Safety Harbor",
+      "fips": "12103",
+      "situs": ["SAFETY HARBOR"],
+      "fluStatus": "city",
+      "zoning": {
+        "role": "safety-harbor-zoning",
+        "url": "https://services3.arcgis.com/mmHgYti6dbsFdG2U/arcgis/rest/services/SafetyHarborZoning_11272023/FeatureServer/0",
+        "fields": ["Zoning", "ZoningDesc"],
+        "code": "Zoning",
+        "desc": "ZoningDesc",
+        "where": "Zoning <> 'UN'"
+      },
+      "flu": {
+        "role": "safety-harbor-flu",
+        "url": "https://services3.arcgis.com/mmHgYti6dbsFdG2U/arcgis/rest/services/SH_FLU_May2025/FeatureServer/0",
+        "fields": ["Zone", "Type"],
+        "code": "Zone",
+        "desc": "Type",
+        "where": "1=1"
+      }
+    },
+    {
+      "municipality": "Oldsmar",
+      "fips": "12103",
+      "situs": ["OLDSMAR"],
+      "fluStatus": "city",
+      "zoning": {
+        "role": "oldsmar-zoning",
+        "url": "https://services8.arcgis.com/4LjX8EYY898im7w3/arcgis/rest/services/Public_Zoning/FeatureServer/0",
+        "fields": ["ZONING", "FLUM", "PublicParcelID"],
+        "code": "ZONING",
+        "desc": null,
+        "flum": "FLUM",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "oldsmar-flu",
+        "url": "https://services8.arcgis.com/4LjX8EYY898im7w3/arcgis/rest/services/Landuse/FeatureServer/0",
+        "fields": ["FLU", "FLU_NAME"],
+        "code": "FLU",
+        "desc": "FLU_NAME",
+        "where": "1=1"
+      }
+    },
+    {
+      "municipality": "New Port Richey",
+      "fips": "12101",
+      "situs": ["NEW PORT RICHEY"],
+      "fluStatus": "city",
+      "idField": "HPARCEL",
+      "zoning": {
+        "role": "new-port-richey-zoning",
+        "url": "https://services7.arcgis.com/5fOG6RMXXiEvqNzn/arcgis/rest/services/NPR_2026_Community_Development_Map_WFL1/FeatureServer/10",
+        "fields": ["HPARCEL", "Zoning2025"],
+        "code": "Zoning2025",
+        "desc": null,
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "new-port-richey-flu",
+        "url": "https://services7.arcgis.com/5fOG6RMXXiEvqNzn/arcgis/rest/services/NPR_2026_Community_Development_Map_WFL1/FeatureServer/11",
+        "fields": ["HPARCEL", "FLU"],
+        "code": "FLU",
+        "desc": null,
+        "where": "1=1"
+      }
+    },
+    {
+      "municipality": "Zephyrhills",
+      "fips": "12101",
+      "situs": ["ZEPHYRHILLS"],
+      "fluStatus": "city",
+      "zoning": {
+        "role": "zephyrhills-zoning",
+        "url": "https://services6.arcgis.com/Q4fB6OTUhdN4M9BR/arcgis/rest/services/Zhills_EnGov_Map_11_2025/FeatureServer/4",
+        "fields": ["CODE", "ZONING"],
+        "code": "CODE",
+        "desc": "ZONING",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "zephyrhills-flu",
+        "url": "https://services6.arcgis.com/Q4fB6OTUhdN4M9BR/arcgis/rest/services/Zhills_EnGov_Map_11_2025/FeatureServer/5",
+        "fields": ["CODE", "CATEGORY"],
+        "code": "CODE",
+        "desc": "CATEGORY",
+        "where": "1=1"
+      }
+    }
+  ],
+  "partials": [
+    {"municipality": "Seminole", "situs": ["SEMINOLE"], "service": "Pinellas_Seminole_Zoning_view"},
+    {"municipality": "South Pasadena", "situs": ["SOUTH PASADENA"], "service": "Pinellas_South_Pasadena_Zoning_view"},
+    {"municipality": "Treasure Island", "situs": ["TREASURE ISLAND"], "service": "Pinellas_Treasure_Island_Zoning_view"},
+    {"municipality": "Kenneth City", "situs": ["KENNETH CITY"], "service": "Pinellas_Kenneth_City_Zoning_view"},
+    {"municipality": "North Redington Beach", "situs": ["NORTH REDINGTON BEACH", "N REDINGTON BEACH"], "service": "Pinellas_N_Red_Beach_Zoning_view"},
+    {"municipality": "Indian Shores", "situs": ["INDIAN SHORES"], "service": "Pinellas_Indian_Shores_Zoning_view"},
+    {"municipality": "Belleair", "situs": ["BELLEAIR"], "service": "Pinellas_Belleair_Zoning_view"},
+    {"municipality": "Indian Rocks Beach", "situs": ["INDIAN ROCKS BEACH"], "service": "Pinellas_Indian_Rocks_Beach_Zoning_view"},
+    {"municipality": "Redington Shores", "situs": ["REDINGTON SHORES"], "service": "Pinellas_Redington_Shores_Zoning_view"},
+    {"municipality": "Madeira Beach", "situs": ["MADEIRA BEACH"], "service": "Pinellas_Madeira_Beach_Zoning_view"}
+  ],
+  "partialFluGap": "Zoning is the Pinellas County GIS city zoning view. City future land use is not published here. The countywide plan map was not stored as a city FLUM.",
+  "gaps": [
+    {"municipality": "Largo", "fips": "12103", "situs": ["LARGO"], "note": "No zoning layer. Future land use is not on this DOH shelf and is not invented from mowing or community-standards layers."},
+    {"municipality": "Gulfport", "fips": "12103", "situs": ["GULFPORT"], "note": "No verified city zoning or future land use layer."},
+    {"municipality": "Belleair Beach", "fips": "12103", "situs": ["BELLEAIR BEACH"], "note": "No verified city zoning or future land use layer."},
+    {"municipality": "Belleair Bluffs", "fips": "12103", "situs": ["BELLEAIR BLUFFS"], "note": "No verified city zoning or future land use layer."},
+    {"municipality": "Redington Beach", "fips": "12103", "situs": ["REDINGTON BEACH"], "note": "No verified city zoning or future land use layer."},
+    {"municipality": "St. Pete Beach", "fips": "12103", "situs": ["ST PETE BEACH", "ST. PETE BEACH"], "note": "No verified city zoning or future land use layer."},
+    {"municipality": "Port Richey", "fips": "12101", "situs": ["PORT RICHEY"], "note": "No verified city zoning or future land use layer."},
+    {"municipality": "Dade City", "fips": "12101", "situs": ["DADE CITY"], "note": "No verified city zoning or future land use layer."},
+    {"municipality": "San Antonio", "fips": "12101", "situs": ["SAN ANTONIO"], "note": "No verified city zoning or future land use layer."},
+    {"municipality": "St. Leo", "fips": "12101", "situs": ["ST LEO", "ST. LEO"], "note": "No verified city zoning or future land use layer."}
+  ],
+  "rejected": [
+    "Rejected namesake: AGOL Zoning_Flu (Weeki Wachee situs, Hernando County FIPS 12053), not Pinellas or Pasco.",
+    "Rejected namesake: AGOL Zoning_view zone_code R1-8 (centroid about -122.31, 40.46, Anderson County, California).",
+    "Rejected namesake: maps.gulfport-ms.gov GPT_Zoning (Gulfport, Mississippi), not Gulfport, Florida.",
+    "Pasco county ZN_TYPE values NPR, PR, SA, DC, and ZH are city placeholders, not district maps.",
+    "Pinellas unincorporated Landuse_Zoning is not used as a city district map.",
+    "Pinellas Countywide Plan Map categories are not stored as a city future land use map.",
+    "Zephyrhills traditional city center zoning (Zhills_EnGov_Map_11_2025/3) is a second citywide map and is not stacked on the Euclidean layer."
+  ]
+}

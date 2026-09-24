@@ -1,0 +1,186 @@
+{
+  "generatedAt": "2026-09-24T00:51:27Z",
+  "band": {
+    "min": 5.0,
+    "max": 150.0,
+    "inclusive": true
+  },
+  "opportunityZones": "Parcel opportunityZone and oz2Eligibility are not modified. Eligible is not designated.",
+  "rejected": [
+    {
+      "name": "SimpsonvilleZoning AGOL",
+      "reason": "Owner triples hosts Shelby County, Tennessee (shelbypz.com). Wrong-geography twin of Simpsonville, SC. Not queried."
+    },
+    {
+      "name": "Fountain Inn ZoningFireSewer/2",
+      "reason": "Codes R-7.5/R-20/UNZONED on a county-scale extent. Not the Fountain Inn UDO. Not queried."
+    },
+    {
+      "name": "Fountain Inn consultant New_Zoning swipe map",
+      "reason": "Third-party MPM_stewartinc host. City Zoning_2026 is the usable layer. Not queried."
+    },
+    {
+      "name": "Sullivan's Island Zoning_2025",
+      "reason": "Unofficial AGOL (the_charliosouljah), not town-hosted. Not queried."
+    },
+    {
+      "name": "Folly Beach CofC/SCGIS AGOL",
+      "reason": "Alternate of county FollyViewer/19. County layer is the usable source. Not queried."
+    },
+    {
+      "name": "AGOL Greenville_Base_Data tax parcels",
+      "reason": "City-extent subset, not countywide. Not queried."
+    },
+    {
+      "name": "Isle of Palms PDD FeatureServer",
+      "reason": "Card count looks oversized versus a typical PDD inventory. Left as a gap pending QA. Not queried."
+    }
+  ],
+  "honestGaps": [
+    "Sullivan's Island: official zoning is PDF / Instant app only. Unofficial Zoning_2025 was not joined.",
+    "James Island: PDF/static maps only. No municipal zoning REST.",
+    "Mauldin, Simpsonville, and Travelers Rest: no city FeatureServer. County JCODE on GCGIA Zoning/13 is the public layer. SimpsonvilleZoning AGOL is Shelby County, Tennessee.",
+    "Isle of Palms: district services are partial and have no ZONING field. PDD was not joined.",
+    "Fountain Inn on the Laurens side and Greer on the Spartanburg side are not joined \u2014 those counties have no parcel extract.",
+    "Berkeley and Dorchester have no field-mapped future-land-use layer on these cards.",
+    "Eligible tracts are not designated Opportunity Zones. This join does not write opportunityZone or oz2Eligibility."
+  ],
+  "counties": {
+    "45035": {
+      "fips": "45035",
+      "name": "Dorchester",
+      "parcels": 6774,
+      "zoningJoined": 6772,
+      "fluJoined": 0,
+      "bySource": {
+        "dorchester-county": 6519,
+        "summerville-dorchester": 253
+      },
+      "cities": {
+        "Summerville": {
+          "joined": 253,
+          "status": "usable",
+          "note": "Town Zone_Class filtered to County=DORCHESTER, joined on TMS over county ZONINGCODE."
+        },
+        "Dorchester County": {
+          "joined": 6519,
+          "status": "usable",
+          "note": "ZONINGCODE on Parcels_Public for parcels outside the town join."
+        }
+      },
+      "samples": [
+        {
+          "source": "dorchester-county",
+          "parcelId": "141-00-00-055",
+          "zoningCode": "AR_DC",
+          "acreage": 149.2906
+        },
+        {
+          "source": "summerville-dorchester",
+          "parcelId": "999-00-00-002",
+          "zoningCode": "UC-MX",
+          "acreage": 11.9569
+        }
+      ],
+      "codes": {
+        "dorchester-county": [
+          "AR-ARHOD_DC",
+          "AR_DC",
+          "B-1_NC",
+          "B-2_NC",
+          "CC_SG",
+          "CG-ARHOD_DC",
+          "CG_DC",
+          "CLI2_DC",
+          "CLI_DC",
+          "CN_DC",
+          "CV-ARHOD_DC",
+          "CV_DC",
+          "EE",
+          "GC_RE",
+          "HC_HV",
+          "IR_HV",
+          "I_DC",
+          "LC_HV",
+          "LC_RE",
+          "LC_SG",
+          "LIO_RI",
+          "M-1_NC",
+          "MUC-ARHOD_DC",
+          "MUC_DC",
+          "MULTI",
+          "NC_RI",
+          "OI_DC",
+          "ON_NC",
+          "OTHER",
+          "PD-ARHOD_DC",
+          "PDD_NC",
+          "PD_DC",
+          "PD_RI",
+          "PI_DC",
+          "PL_SV",
+          "PUD/DA_SV",
+          "PUD_SV",
+          "R-1(A)-ARHOD_DC",
+          "R-1(A)_DC",
+          "R-1(M)(A)_DC",
+          "R-1(M)_DC",
+          "R-1_DC",
+          "R-1_NC",
+          "R-2(M)_DC",
+          "R-2_DC",
+          "R-2_NC",
+          "R-3_DC",
+          "R-3_NC",
+          "R-4_DC",
+          "RMD_RE",
+          "RMD_SG",
+          "RMU_RE",
+          "RMU_RI",
+          "RMU_SG",
+          "RR-ARHOD_DC",
+          "RRR_RE",
+          "RR_HV",
+          "SFR_HV",
+          "SFR_SG",
+          "SR_DC",
+          "TC_RI",
+          "TN_RI",
+          "TRM-ARHOD_DC",
+          "TRM_DC",
+          "WI_SG"
+        ],
+        "summerville-dorchester": [
+          "AC",
+          "G-B",
+          "GR-2",
+          "GR-5",
+          "HI",
+          "LI",
+          "MF-R",
+          "MH-R",
+          "N-B",
+          "N-R",
+          "Null",
+          "OTHER",
+          "PL",
+          "PUD",
+          "PUD/DA",
+          "TBD",
+          "UC-MX"
+        ]
+      },
+      "queried": [
+        "https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/Parcels_Public/MapServer/0/query",
+        "https://services8.arcgis.com/0zSnoqwLCR3i1Yfw/arcgis/rest/services/Zoning_View_Layer/FeatureServer/4/query"
+      ],
+      "gaps": [
+        "Inclusive 5\u2013150 acre extract kept (6774 parcels). Zoning joined on 6772. FLU joined on 0.",
+        "Summerville: 253 (usable). Town Zone_Class filtered to County=DORCHESTER, joined on TMS over county ZONINGCODE.",
+        "Dorchester County: 6519 (usable). ZONINGCODE on Parcels_Public for parcels outside the town join.",
+        "Existing 5\u2013150 acre parcel set was kept. Situs filled from PROPERTY_LOCATION when the extract had none.",
+        "No assessed market value on the public parcel layer. No FLU layer on this card."
+      ]
+    }
+  }
+}

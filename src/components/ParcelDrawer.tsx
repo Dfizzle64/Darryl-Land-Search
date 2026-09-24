@@ -20,6 +20,14 @@ import { describeFluMatch } from "@/lib/flu";
 import { describeRezoningCandidate } from "@/lib/filters";
 import { describeOpportunityZone, describeOz2Eligibility } from "@/lib/opportunityZone";
 import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "@/lib/types";
+import { fluEmptyForPolk, zoningEmptyForPolk } from "@/lib/polkMunicipal";
+import { fluEmptyForSeminole, zoningEmptyForSeminole } from "@/lib/seminoleMunicipal";
+import { fluEmptyForMartinIrc, zoningEmptyForMartinIrc } from "@/lib/martinIrcMunicipal";
+import { fluEmptyForPanhandle, zoningEmptyForPanhandle } from "@/lib/panhandleMunicipal";
+import { fluEmptyForCharlotte, zoningEmptyForCharlotte } from "@/lib/charlotteMunicipal";
+import { fluEmptyForManateeSarasota, zoningEmptyForManateeSarasota } from "@/lib/manateeSarasotaMunicipal";
+import { brevardFluReason, formatJoinedZoning } from "@/lib/brevardMunicipal";
+import { fluEmptyForMunicipal, zoningEmptyForCounty } from "@/lib/volusiaFlaglerMunicipal";
 import { describeZoningMatch } from "@/lib/zoning";
 
 type ParcelDrawerProps = {
@@ -105,8 +113,35 @@ export function ParcelDrawer({
     ? "No FDOT count segment within 15 km"
     : "FDOT AADT is Florida only";
   const dekalb = properties.countyFips === "13089";
-  const zoningEmpty = missingPublicParcelValue("zoning", properties.countyFips);
-  const zoningLine = formatZoningWithCity(properties.zoningCode, properties.zoningDistrict);
+  const zoningEmpty = zoningEmptyForPanhandle(
+    properties.countyFips,
+    zoningEmptyForCharlotte(
+      properties.countyFips,
+      zoningEmptyForManateeSarasota(
+        properties.countyFips,
+        properties.countyFips === "12009"
+          ? "No city zoning layer covers this parcel."
+          : zoningEmptyForMartinIrc(
+              properties.countyFips,
+              zoningEmptyForSeminole(
+                properties.countyFips,
+                zoningEmptyForPolk(
+                  properties.countyFips,
+                  zoningEmptyForCounty(properties.countyFips, missingPublicParcelValue("zoning", properties.countyFips)),
+                ),
+              ),
+            ),
+      ),
+    ),
+  );
+  const zoningLine =
+    properties.countyFips === "12009"
+      ? formatJoinedZoning(properties.zoningCode, properties.municipal)
+      : properties.zoningCode
+        ? properties.municipal?.zoningLabel && properties.municipal.zoningLabel !== properties.zoningCode
+          ? `${properties.zoningCode} — ${properties.municipal.zoningLabel}`
+          : formatZoningWithCity(properties.zoningCode, properties.zoningDistrict)
+        : null;
   const mailing = formatMailing(properties.mailingAddress) ?? mailingGap(properties.mailingAddress);
   const entityName = isEntityOwner(properties.ownerName)
     ? properties.ownerName
@@ -115,7 +150,11 @@ export function ParcelDrawer({
       : null;
   const entityLink = entityName ? entitySearchLink(properties.state, entityName, properties.countyFips) : null;
   const fluLine = properties.flu?.code
-    ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
+    ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}${
+        properties.countyFips === "12009" && properties.municipal?.unofficial
+          ? ` · unofficial ${properties.municipal.vintage || "vintage"}`
+          : ""
+      }`
     : null;
   const placeLine = formatParcelPlace(properties);
   const appraiser = parcelAppraiserUrl({
@@ -151,7 +190,28 @@ export function ParcelDrawer({
         <Field
           label="Future Land Use"
           value={fluLine}
-          empty={dekalb ? "No future land use joined for this parcel" : "Not joined for this county"}
+          empty={fluEmptyForPanhandle(
+            properties.countyFips,
+            fluEmptyForCharlotte(
+            properties.countyFips,
+            fluEmptyForManateeSarasota(
+            properties.countyFips,
+            properties.countyFips === "12009"
+            ? brevardFluReason("", null, properties.municipal, "12009")
+            : fluEmptyForMartinIrc(
+            properties.countyFips,
+            fluEmptyForSeminole(
+            properties.countyFips,
+            fluEmptyForPolk(
+            properties.countyFips,
+            properties.municipal?.fluGap ? fluEmptyForMunicipal(properties.municipal.fluGap) : null,
+            dekalb ? "No future land use joined for this parcel" : "Not joined for this county",
+            ),
+            ),
+            ),
+            ),
+            ),
+          )}
         />
         <Field
           label="Designated Opportunity Zone"
@@ -211,7 +271,14 @@ export function ParcelDrawer({
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Future Land Use</p>
-        <p className="mt-1 text-ink-100">{flu.reason}</p>
+        <p className="mt-1 text-ink-100">
+          {brevardFluReason(
+            !properties.flu?.code && properties.municipal?.fluGap ? properties.municipal.fluGap : flu.reason,
+            properties.flu?.code,
+            properties.municipal,
+            properties.countyFips,
+          )}
+        </p>
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Designated Opportunity Zone</p>

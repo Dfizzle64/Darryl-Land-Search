@@ -53,6 +53,21 @@ export type FluInfo = {
   source: string | null;
 };
 
+/** City zoning / FLU overlay stamped onto an existing parcel. Not an Opportunity Zone. */
+export type MunicipalOverlayNote = {
+  placeId: string;
+  placeName: string;
+  zoningLayer: string | null;
+  fluLayer: string | null;
+  zoningLabel: string | null;
+  /** Set when this city has no future land use service. County FLU is not filled in. */
+  fluGap: string | null;
+  /** Cocoa Beach uses an unofficial 2021 layer. Other cities omit this. */
+  unofficial?: boolean;
+  vintage?: string | null;
+  join?: "attribute" | "spatial";
+};
+
 export type OpportunityZoneInfo = {
   inOpportunityZone: boolean;
   tractGeoid: string | null;
@@ -418,6 +433,8 @@ export type ParcelProperties = {
   incomeBlockGroup: IncomeInfo | null;
   nearestRoad: NearestRoad | null;
   flu: FluInfo | null;
+  /** City overlay that produced zoning or FLU (Volusia, Flagler, or Polk). Absent outside those joins. */
+  municipal?: MunicipalOverlayNote | null;
   opportunityZone: OpportunityZoneInfo | null;
   oz2Eligibility: Oz2EligibilityInfo | null;
   /**
@@ -429,7 +446,33 @@ export type ParcelProperties = {
   appraiserUrl?: string | null;
   /** Honest per-county gaps (no zoning, etc.). */
   dataGaps?: string[];
+  /**
+   * Cobb or DeKalb batch-40 school, flood, and utility join. Absent on every other parcel.
+   * Gas is always null. This is not an Opportunity Zone, income, or AADT field.
+   */
+  siteScreening?: SiteScreeningJoin;
   source: string;
+};
+
+/** Fields joined from a Cobb or DeKalb batch-40 screening fixture. */
+export type SiteScreeningJoin = {
+  floodZone: string | null;
+  floodSubtype: string | null;
+  /** Feet, only when NFHL published a static BFE. Never invented. */
+  staticBfe: number | null;
+  schools: Array<{
+    level: string;
+    name: string;
+    /** GOSA CCRPI single score. Not an A–F letter. */
+    ccrpi: number;
+    distanceMiles: number | null;
+  }>;
+  waterProvider: string | null;
+  waterFromBoundary: boolean;
+  sewerProvider: string | null;
+  sewerGap: boolean;
+  electricProvider: string | null;
+  gasProvider: null;
 };
 
 export type BBox = [west: number, south: number, east: number, north: number];

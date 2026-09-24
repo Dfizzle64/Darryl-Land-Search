@@ -10,6 +10,7 @@ export async function GET(request: Request) {
   if (!Number.isFinite(lng) || !Number.isFinite(lat) || lng < -180 || lng > 180 || lat < -90 || lat > 90) {
     return NextResponse.json({ error: "lng and lat are required." }, { status: 400 });
   }
-  const point = await screeningAtPoint(lng, lat);
+  const parcelId = url.searchParams.get("parcelId");
+  const point = await screeningAtPoint(lng, lat, parcelId);
   return NextResponse.json(point);
 }

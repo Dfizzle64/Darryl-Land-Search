@@ -8,6 +8,10 @@ import {
   CMS_GRADES_URL,
   CMS_HIGH_ZONES,
   CMS_MIDDLE_ZONES,
+  DCSD_ELEM_ZONES,
+  DCSD_HIGH_ZONES,
+  DCSD_MIDDLE_ZONES,
+  DEKALB_BBOX,
   CMS_SCHOOL_POINTS,
   CMS_ZONES_SOURCE,
   CMS_ZONES_URL,
@@ -47,6 +51,8 @@ import {
   type TractAtPoint,
   type UtilityKind,
 } from "./screening";
+import { cobbBatchParcel, cobbScreeningOverlay } from "./cobbBatch40";
+import { dekalbBatchParcel, dekalbScreeningOverlay } from "./dekalbBatch40";
 
 const FIXTURE_PATH = path.join(process.cwd(), "data/fixtures/screening/school-ratings.json");
 const CMS_FIXTURE_PATH = path.join(process.cwd(), "data/fixtures/screening/cms-spg-2025-26.json");
@@ -594,16 +600,19 @@ export async function schoolsNear(lon: number, lat: number): Promise<{ schools: 
   }
 }
 
-export async function screeningAtPoint(lon: number, lat: number): Promise<ScreeningPoint> {
+export async function screeningAtPoint(lon: number, lat: number, parcelId?: string | null): Promise<ScreeningPoint> {
+  const cobb = cobbBatchParcel(parcelId);
+  const dekalb = cobb ? null : dekalbBatchParcel(parcelId);
+  const batchOverlay = cobb ? cobbScreeningOverlay(cobb, lon, lat) : dekalb ? dekalbScreeningOverlay(dekalb, lon, lat) : null;
   const [flood, wetland, water, sewer, power, gas, schools, tract] = await Promise.allSettled([
-    floodAtPoint(lon, lat),
+    batchOverlay ? Promise.resolve(batchOverlay.flood) : floodAtPoint(lon, lat),
     wetlandAtPoint(lon, lat),
-    utilityAtPoint("water", lon, lat),
-    utilityAtPoint("sewer", lon, lat),
-    utilityAtPoint("power", lon, lat),
-    utilityAtPoint("gas", lon, lat),
-    schoolsNear(lon, lat),
-    meckTractAtPoint(lon, lat),
+    batchOverlay ? Promise.resolve(batchOverlay.utilities[0]) : utilityAtPoint("water", lon, lat),
+    batchOverlay ? Promise.resolve(batchOverlay.utilities[1]) : utilityAtPoint("sewer", lon, lat),
+    batchOverlay ? Promise.resolve(batchOverlay.utilities[2]) : utilityAtPoint("power", lon, lat),
+    batchOverlay ? Promise.resolve(batchOverlay.utilities[3]) : utilityAtPoint("gas", lon, lat),
+    batchOverlay ? Promise.resolve({ schools: batchOverlay.schools, note: batchOverlay.schoolsNote }) : schoolsNear(lon, lat),
+    batchOverlay ? Promise.resolve(null) : meckTractAtPoint(lon, lat),
   ]);
   const schoolResult =
     schools.status === "fulfilled"
@@ -645,6 +654,61 @@ function slimGeometry(payload: unknown, nameField: string): GeoJSON.Feature[] {
     const name = textAttr(attrs, nameField, "NAME", "SERVEDBY", "COMPANY") ?? "Unnamed provider";
     return [{ type: "Feature" as const, geometry: record.geometry, properties: { name } }];
   });
+}
+
+const DCSD_ZONE_LAYERS = [
+  { service: DCSD_ELEM_ZONES, fields: "DDP_ES_Nam,ES_Name", level: "Elementary" },
+  { service: DCSD_MIDDLE_ZONES, fields: "DDP_MS_Name,MS_Name", level: "Middle" },
+  { service: DCSD_HIGH_ZONES, fields: "DDP_HS_Nam,HS_Name", level: "High" },
+] as const;
+
+function dcsdZoneFeatures(payload: unknown, fields: string, level: string): GeoJSON.Feature[] {
+  const [fullName, shortName] = fields.split(",");
+  return featuresOf(payload).slice(0, 200).flatMap((feature) => {
+    if (!feature || typeof feature !== "object") return [];
+    const record = feature as { geometry?: GeoJSON.Geometry | null; properties?: Record<string, unknown>; attributes?: Record<string, unknown> };
+    if (!record.geometry) return [];
+    const attrs = record.properties ?? record.attributes ?? {};
+    const name = textAttr(attrs, fullName, shortName) ?? "Unnamed school";
+    return [{ type: "Feature" as const, geometry: record.geometry, properties: { name, level } }];
+  });
+}
+
+/** DCSD attendance polygons. Empty outside DeKalb and when the view is larger than a county. */
+export async function dcsdZonePolygons(bbox: BBox): Promise<ScreeningCollection> {
+  if (bboxSpan(bbox) > MAX_VECTOR_SPAN) {
+    return EMPTY_COLLECTION("zoom", "Zoom in to about a county before DeKalb school zones load.");
+  }
+  if (!bboxesIntersect(bbox, DEKALB_BBOX)) {
+    return EMPTY_COLLECTION("unknown", "DeKalb County School District zones draw only inside DeKalb County.");
+  }
+  try {
+    const groups = await Promise.all(
+      DCSD_ZONE_LAYERS.map(async (layer) => {
+        const params = new URLSearchParams({
+          geometry: bbox.join(","),
+          geometryType: "esriGeometryEnvelope",
+          inSR: "4326",
+          spatialRel: "esriSpatialRelIntersects",
+          outFields: layer.fields,
+          returnGeometry: "true",
+          outSR: "4326",
+          maxAllowableOffset: "0.002",
+          geometryPrecision: "4",
+          f: "geojson",
+        });
+        const payload = await getJson(`${layer.service.replace(/\/$/, "")}/query?${params}`);
+        return dcsdZoneFeatures(payload, layer.fields, layer.level);
+      }),
+    );
+    return {
+      type: "FeatureCollection",
+      features: groups.flat(),
+      meta: { status: "ok", summary: "DeKalb County School District attendance zones." },
+    };
+  } catch {
+    return EMPTY_COLLECTION("unavailable", "DeKalb school zones did not load.");
+  }
 }
 
 export async function utilityPolygons(kind: UtilityKind, bbox: BBox): Promise<ScreeningCollection> {

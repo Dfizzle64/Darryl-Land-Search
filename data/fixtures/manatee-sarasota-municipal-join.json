@@ -1,0 +1,121 @@
+{
+  "opportunityZonesInvented": 0,
+  "schoolGradesInvented": 0,
+  "baseFloodElevationsInvented": 0,
+  "countyParcelsRedownloaded": false,
+  "counties": [
+    {
+      "fips": "12081",
+      "name": "Manatee",
+      "source": "fl-doh-ehwaters-12081",
+      "featureCount": 7239,
+      "zoningJoinedCount": 221,
+      "fluJoinedCount": 247,
+      "opportunityZoneCount": 0,
+      "tilesRewritten": 5
+    },
+    {
+      "fips": "12115",
+      "name": "Sarasota",
+      "source": "fl-doh-ehwaters-12115",
+      "featureCount": 4303,
+      "zoningJoinedCount": 566,
+      "fluJoinedCount": 124,
+      "opportunityZoneCount": 0,
+      "tilesRewritten": 5
+    }
+  ],
+  "byPlace": {
+    "Bradenton": {
+      "parcels": 2080,
+      "zoningJoined": 129,
+      "fluJoined": 152,
+      "fluStatus": "city"
+    },
+    "Palmetto": {
+      "parcels": 648,
+      "zoningJoined": 73,
+      "fluJoined": 76,
+      "fluStatus": "city"
+    },
+    "Longboat Key": {
+      "parcels": 28,
+      "zoningJoined": 28,
+      "fluJoined": 28,
+      "fluStatus": "city"
+    },
+    "Sarasota": {
+      "parcels": 2547,
+      "zoningJoined": 120,
+      "fluJoined": 115,
+      "fluStatus": "city"
+    },
+    "North Port": {
+      "parcels": 428,
+      "zoningJoined": 367,
+      "fluJoined": 0,
+      "fluStatus": "gap"
+    },
+    "Venice": {
+      "parcels": 657,
+      "zoningJoined": 70,
+      "fluJoined": 0,
+      "fluStatus": "gap"
+    }
+  },
+  "overlays": [
+    {
+      "role": "bradenton-zoning",
+      "url": "https://services6.arcgis.com/wl0q8tN2gn8MMx1p/arcgis/rest/services/Zoning/FeatureServer/0"
+    },
+    {
+      "role": "bradenton-flu",
+      "url": "https://services6.arcgis.com/wl0q8tN2gn8MMx1p/arcgis/rest/services/FLU_CoB/FeatureServer/0"
+    },
+    {
+      "role": "palmetto-zoning",
+      "url": "https://services1.arcgis.com/L2Neyx2ylSeTBS0F/arcgis/rest/services/Zoning/FeatureServer/0"
+    },
+    {
+      "role": "palmetto-flu",
+      "url": "https://services1.arcgis.com/L2Neyx2ylSeTBS0F/arcgis/rest/services/FLU/FeatureServer/0"
+    },
+    {
+      "role": "longboat-key-zoning",
+      "url": "https://services2.arcgis.com/Lu7Uh8HEPwu0SbYS/arcgis/rest/services/Longboat_Key_Zoning_Polygons/FeatureServer/0"
+    },
+    {
+      "role": "longboat-key-flu",
+      "url": "https://services2.arcgis.com/Lu7Uh8HEPwu0SbYS/arcgis/rest/services/Future_Land_Use/FeatureServer/0"
+    },
+    {
+      "role": "sarasota-zoning",
+      "url": "https://services3.arcgis.com/AWDwYUpli8WqpWxQ/arcgis/rest/services/Zoning_Districts_(View_Only)/FeatureServer/0"
+    },
+    {
+      "role": "sarasota-flu",
+      "url": "https://services3.arcgis.com/AWDwYUpli8WqpWxQ/arcgis/rest/services/FutureLandUse/FeatureServer/3"
+    },
+    {
+      "role": "north-port-zoning",
+      "url": "https://ags3.scgov.net/server/rest/services/Hosted/CityNorthPortZoning/FeatureServer/0"
+    },
+    {
+      "role": "venice-zoning",
+      "url": "https://ags3.scgov.net/server/rest/services/Hosted/CityVeniceZoning/FeatureServer/0"
+    }
+  ],
+  "partials": [
+    "Anna Maria",
+    "Bradenton Beach",
+    "Holmes Beach"
+  ],
+  "rejected": [
+    "Rejected namesake: ArcGIS org 3u10F1chkeawsUZY is Northport, Alabama, not North Port, Florida.",
+    "Sarasota County Hosted/CitySarasotaZoning is a county copy. The city native Zoning Districts and FutureLandUse layers are used instead.",
+    "Hosted/CityVeniceZoningView is token-gated. The public Hosted/CityVeniceZoning layer is used for zoning only.",
+    "Venice geoport FLU and Sarasota County FLUBoundary are not stored as city future land use. North Port and Venice future land use stay gaps.",
+    "Manatee County Planning zoning is not copied into Bradenton, Palmetto, or the barrier islands.",
+    "Anna Maria, Bradenton Beach, and Holmes Beach have no public city FeatureServer."
+  ]
+}

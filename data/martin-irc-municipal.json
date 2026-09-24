@@ -1,0 +1,142 @@
+{
+  "doNotInventOpportunityZones": true,
+  "doNotRedownloadCountyParcels": true,
+  "maxCitySpanDegrees": 0.25,
+  "stubCodes": ["JUPITER ISLAND", "INDIANTOWN", "OCEAN BREEZE", "SEWALLS POINT", "SEWALL'S POINT", "NO DATA", "CITY", "COUNTY", "NONE", "NULL", "UN"],
+  "blockedUrlFragments": ["maps.ocoee.org", "Ocoee", "/COVB/", "Zoning_Flu", "pbcgov", "clearviewgeographic"],
+  "counties": {
+    "12085": {
+      "name": "Martin",
+      "source": "fl-doh-ehwaters-12085",
+      "featureCount": 3802,
+      "box": [-80.75, 26.9, -80.05, 27.35]
+    },
+    "12061": {
+      "name": "Indian River",
+      "source": "fl-doh-ehwaters-12061",
+      "featureCount": 3416,
+      "box": [-80.9, 27.55, -80.25, 27.9]
+    }
+  },
+  "places": [
+    {
+      "id": "stuart",
+      "municipality": "Stuart",
+      "fips": "12085",
+      "situs": ["STUART", "STUART, FL"],
+      "fluStatus": "city",
+      "idField": "PCN",
+      "zoning": {
+        "role": "stuart-zoning",
+        "url": "https://services.arcgis.com/RyoFD3Lw9KSERnvQ/arcgis/rest/services/COS_Zoning/FeatureServer/0",
+        "fields": ["PCN", "ZONING", "ZONING_SUB"],
+        "code": "ZONING",
+        "desc": "ZONING_SUB",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "stuart-flu",
+        "url": "https://services.arcgis.com/RyoFD3Lw9KSERnvQ/arcgis/rest/services/Future_Land_Use/FeatureServer/0",
+        "fields": ["PCN", "LAND_USE"],
+        "code": "LAND_USE",
+        "desc": null,
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "indiantown",
+      "municipality": "Indiantown",
+      "fips": "12085",
+      "situs": ["INDIANTOWN", "INDIANTOWN, FL", "INDAINTOWN"],
+      "fluStatus": "city",
+      "zoning": {
+        "role": "indiantown-zoning",
+        "url": "https://services6.arcgis.com/fwjLUNzkr85qH0zV/arcgis/rest/services/voi_zoning_public/FeatureServer/0",
+        "fields": ["Abbrev", "zoning"],
+        "code": "Abbrev",
+        "desc": "zoning",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "indiantown-flu",
+        "url": "https://services6.arcgis.com/fwjLUNzkr85qH0zV/arcgis/rest/services/voi_flu_public/FeatureServer/0",
+        "fields": ["FLU"],
+        "code": "FLU",
+        "desc": null,
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "vero-beach",
+      "municipality": "Vero Beach",
+      "fips": "12061",
+      "situs": ["VERO BEACH"],
+      "fluStatus": "city",
+      "zoning": {
+        "role": "vero-beach-zoning",
+        "url": "https://services1.arcgis.com/mK9abRqiJFkUgbPZ/arcgis/rest/services/ZoningDistricts/FeatureServer/0",
+        "fields": ["Code", "Description"],
+        "code": "Code",
+        "desc": "Description",
+        "where": "1=1"
+      },
+      "flu": {
+        "role": "vero-beach-flu",
+        "url": "https://services1.arcgis.com/mK9abRqiJFkUgbPZ/arcgis/rest/services/ZoningFutureLandUse/FeatureServer/0",
+        "fields": ["Code", "Description"],
+        "code": "Code",
+        "desc": "Description",
+        "where": "1=1"
+      }
+    },
+    {
+      "id": "sebastian",
+      "municipality": "Sebastian",
+      "fips": "12061",
+      "situs": ["SEBASTIAN"],
+      "fluStatus": "gap",
+      "zoning": {
+        "role": "sebastian-zoning",
+        "url": "https://gisportal.ircgov.com/server3/rest/services/COS/COS_Zoning/MapServer/0",
+        "fields": ["ZONING", "ZONE_NAME"],
+        "code": "ZONING",
+        "desc": "ZONE_NAME",
+        "where": "1=1"
+      }
+    }
+  ],
+  "partials": [
+    {
+      "municipality": "Ocean Breeze",
+      "fips": "12085",
+      "situs": ["OCEAN BREEZE"],
+      "cityRest": null,
+      "note": "No town zoning service. Martin County Future_Landuse_Zoning is queried only for these parcels. Town-name stubs and NO DATA are not stored.",
+      "zoning": {
+        "role": "martin-county-zoning",
+        "url": "https://geoweb.martin.fl.us/arcgis/rest/services/Administrative_Areas/Future_Landuse_Zoning/MapServer/1",
+        "code": "ZONING"
+      },
+      "flu": {
+        "role": "martin-county-flu",
+        "url": "https://geoweb.martin.fl.us/arcgis/rest/services/Administrative_Areas/Future_Landuse_Zoning/MapServer/0",
+        "code": "FUTURE_LANDUSE"
+      }
+    }
+  ],
+  "gaps": [
+    {"municipality": "Sewall's Point", "fips": "12085", "situs": ["SEWALL'S POINT", "SEWALLS POINT"]},
+    {"municipality": "Jupiter Island", "fips": "12085", "situs": ["JUPITER ISLAND"]},
+    {"municipality": "Fellsmere", "fips": "12061", "situs": ["FELLSMERE"]},
+    {"municipality": "Indian River Shores", "fips": "12061", "situs": ["INDIAN RIVER SHORES"]},
+    {"municipality": "Orchid", "fips": "12061", "situs": ["ORCHID"]}
+  ],
+  "rejected": [
+    "Rejected namesake: maps.ocoee.org ParcelsFLUZoning (Ocoee, Orange County), not Okeechobee or Martin.",
+    "Indian River portal COVB folder is token-gated and is not called. Vero Beach uses the city AGOL layers.",
+    "Palm Beach County zoning and ClearviewGeographic stacks are not Jupiter Island zoning.",
+    "Martin County zoning values JUPITER ISLAND, INDIANTOWN, OCEAN BREEZE, and SEWALLS POINT are town-name stubs, not districts. FUTURE_LANDUSE NO DATA is not stored.",
+    "Sebastian future land use is not published in the COS folder. Fellsmere, Indian River Shores, and Orchid have no public city FeatureServer.",
+    "Stuart zoning twins ZoningMerged and Zoning_Parcels are not stacked on COS_Zoning."
+  ]
+}

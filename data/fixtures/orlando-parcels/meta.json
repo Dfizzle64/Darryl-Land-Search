@@ -13,11 +13,11 @@
   },
   "sourcesDoc": "data/orlando-parcel-sources.json",
   "notes": [
-    "Lake is the county Open Data tax-parcel layer and Osceola is the county Parcels FeatureServer, both complete for 5.0\u2013150.0 acres, with zoning and future land use centroid-joined. St. Cloud zoning and FLU override Osceola on a matching PIN.",
+    "Lake is the county Open Data tax-parcel layer and Osceola is the county Parcels FeatureServer, both complete for 5.0–150.0 acres, with zoning and future land use centroid-joined. St. Cloud zoning and FLU override Osceola on a matching PIN.",
     "Seminole keeps DOH parcel geometry and joins Seminole Land Use zoning and FLU. Altamonte Springs and Oviedo override the county code inside those cities. Sumter is the SWFWMD parcel mirror for the same acreage band, with qualified sales joined on PIN.",
     "Orange is the OCPA cadastre in that same acreage band. Polk remains a complete DOH extract (LND_SQFOOT / 43560) with no zoning layer.",
     "Brevard, Marion, and Volusia remain thinner viewport samples. Marion's county parcel, PARCELID FLU, and zoning layers were verified and are not seeded in this build.",
-    "Complete counties are partitioned into 0.25\u00b0 tiles. The map loads a viewport through /api/parcels.",
+    "Complete counties are partitioned into 0.25° tiles. The map loads a viewport through /api/parcels.",
     "Lake Mary AGOL is not a Seminole county substitute. Winter Springs EnerGov is not Osceola. Edgewood on maps.etcog.org is Edgewood, Texas. The Georgia Sumter parcel service and the Minnesota AGOL item labeled Polk County parcels are not used. Orange city overlays stay on a separate change.",
     "Median household income and FDOT AADT are joined at query time from sidecar fixtures, not stored on tiles.",
     "Re-pull with npm run seed:parcels:orlando."
@@ -38,7 +38,8 @@
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/4/query",
       "gaps": [
         "No zoning on DOH extract",
-        "BCPAO live endpoint may require allowlisted clients"
+        "BCPAO live endpoint may require allowlisted clients",
+        "DOH sample. City zoning and FLU are centroid-joined from municipal REST. This sample joined zoning 0 and FLU 0. Titusville and Palm Bay are not applied here. County zoning is not a city substitute."
       ],
       "path": "data/fixtures/orlando-parcels/12009.geojson"
     },
@@ -108,7 +109,7 @@
       "source": "ocpa-webmap",
       "queryUrl": "https://vgispublic.ocpafl.org/server/rest/services/Webmap/PARCEL/MapServer/4/query",
       "gaps": [
-        "Acreage band is 5.0\u2013150.0 acres on the public OCPA parcel layer. Multipart tax accounts sum their piece acres and drop out above 150.",
+        "Acreage band is 5.0–150.0 acres on the public OCPA parcel layer. Multipart tax accounts sum their piece acres and drop out above 150.",
         "Geometry, owner, mailing, sale, tax, and zoning come from OCPA. Parcels that exist only on the older DOH extract are not drawn.",
         "FLU is centroid-joined to Orange County open-data layer 21 and Orlando layer 83. Other cities often stay unknown.",
         "Median household income and FDOT AADT are not copied onto each tile. /api/parcels joins them at query time."
@@ -177,18 +178,19 @@
       "featureCount": 19734,
       "ruralEligibleParcelCount": 4253,
       "oz2EligibleParcelCount": 4253,
-      "zoningJoinedCount": 0,
-      "fluJoinedCount": 0,
+      "zoningJoinedCount": 1696,
+      "fluJoinedCount": 1735,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "source": "doh-ehwaters",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/52/query",
       "gaps": [
-        "Acreage band is 5.0\u2013150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
+        "Acreage band is 5.0–150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
         "No zoning or future land use on the Florida DOH EHWATER extract. Owner, sale, and tax are the public FDOR fields when that roll has them.",
         "OZ 2.0 here is the seven-market rural-eligible tract pack only, not every eligible tract in the county.",
-        "Median household income and FDOT AADT are joined at query time for Florida counties, not stored on each tile."
+        "Median household income and FDOT AADT are joined at query time for Florida counties, not stored on each tile.",
+        "City zoning and future land use are joined for Lakeland, Bartow, Auburndale, Lake Alfred, and Lake Hamilton onto the existing 5–150 acre parcels (1696 zoning, 1735 future land use). Lakeland is a centroid join. The other four cities use a Polk parcel id when the city layer has one, then the centroid. Polk County has no LDC zoning-district polygon, and county FLUNAME is not copied into zoning. County future land use is not stamped. Winter Haven, Haines City, Davenport, Fort Meade, Dundee, Eagle Lake, Frostproof, Mulberry, Polk City, Hillcrest Heights, and Highland Park stay blank. Lake Wales is token-blocked. Iowa Polk City, New Jersey Highland Park, Georgia Mulberry, the Georgia Bartow GIS host, and UK Dundee are rejected."
       ],
       "path": "data/fixtures/orlando-parcels/tiles/12105",
       "maxAcres": 150.0,
@@ -214,12 +216,14 @@
       "source": "doh-ehwaters+seminole-land-use",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/58/query",
       "gaps": [
-        "Parcel geometry, owner, mailing, sale, and tax stay on the Florida DOH EHWATER extract for 5.0\u2013150.0 acres.",
+        "Parcel geometry, owner, mailing, sale, and tax stay on the Florida DOH EHWATER extract for 5.0–150.0 acres.",
         "Zoning is a centroid join to Seminole Land Use FeatureServer/1. Future land use is FeatureServer/0. A code of CITY is the county stub inside a municipality.",
         "Altamonte Springs and Oviedo city zoning and FLU override the county code when the parcel centroid falls in those layers. Sanford, Lake Mary, Winter Springs, Longwood, and Casselberry stay on the CITY stub.",
         "The Lake Mary AGOL zoning service is city-only and is not a county substitute. Hernando Zoning_Flu is the wrong county.",
         "Seminole, Altamonte, and Oviedo codes are not in the Orange zoning or FLU knowledge base, so multifamily filters treat them as unknown.",
-        "Seminole has no rural-eligible OZ 2.0 tracts in the seven-market pack."
+        "Seminole has no rural-eligible OZ 2.0 tracts in the seven-market pack.",
+        "City zoning and future land use are joined for Casselberry, Winter Springs, Lake Mary, Sanford, Oviedo, and Altamonte Springs onto the existing DOH parcels (1001 zoning, 991 future land use). Casselberry joins on PARCEL and Winter Springs on PIN, then a point inside the parcel. The other four cities are spatial. Oviedo uses maps.cityofoviedo.net DevelopmentServices MapServer 11 and 10. The retired AGOL DSZoning service is not called.",
+        "City zoning and future land use from the municipal overlay are kept for Casselberry, Winter Springs, Lake Mary, Sanford, Oviedo, and Altamonte Springs where that join hit. Longwood has no city layer. County land use remains where the overlay did not publish a city code."
       ],
       "path": "data/fixtures/orlando-parcels/tiles/12117",
       "maxAcres": 150.0,
@@ -290,15 +294,16 @@
       "featureCount": 120,
       "ruralEligibleParcelCount": 0,
       "oz2EligibleParcelCount": 0,
-      "zoningJoinedCount": 0,
-      "fluJoinedCount": 0,
+      "zoningJoinedCount": 79,
+      "fluJoinedCount": 58,
       "coverage": "sample",
       "partition": "file",
       "minAcres": 1.0,
       "source": "doh-ehwaters",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/63/query",
       "gaps": [
-        "No zoning on DOH extract"
+        "No zoning on DOH extract",
+        "DOH extract has no zoning. City zoning and FLU are centroid-joined from municipal REST. This sample joined zoning 79 and FLU 58. ZONCODE 999 stubs and the Seattle future land use service are not used."
       ],
       "path": "data/fixtures/orlando-parcels/12127.geojson"
     }

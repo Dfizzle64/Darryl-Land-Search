@@ -94,14 +94,24 @@ describe("footprint county traffic fixture", () => {
       if (deferred.has(fips)) continue;
       expect(byCounty[fips], fips).toBeGreaterThan(0);
     }
-    const sources = meta.stateAadtSources as Record<string, { field: string; year?: number }>;
+    const sources = meta.stateAadtSources as Record<
+      string,
+      { field: string; year?: number; layer?: string; vintage?: string; url?: string }
+    >;
     expect(sources.NC.field).toBe("AADT_2022");
     expect(sources.NC.year).toBe(2022);
     expect(sources.SC.field).toBe("FactoredAA");
+    expect(sources.SC.year).toBe(2025);
     expect(sources.GA.field).toBe("AADT");
     expect(sources.TN.field).toBe("AADT");
     expect(sources.MS.field).toBe("ADT_21");
     expect(sources.MS.year).toBe(2021);
+    expect(sources.MS.layer).toBe("RC_AADT_2019");
+    expect(sources.NC.vintage).toMatch(/HPMS 2022/);
+    const notes = (meta.notes as string[]).join("\n");
+    expect(notes).toMatch(/HPMS 2022/);
+    expect(notes).toMatch(/11,570/);
+    expect(notes).toMatch(/HDR AGOL/);
     expect(sources.AL.field).toBe("AADT");
     expect(sources.AL.year).toBe(2024);
     expect(sources.AR.field).toBe("MostRecentADT");

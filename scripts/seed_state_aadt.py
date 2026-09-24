@@ -38,7 +38,9 @@ META = FIX / "signals-meta.json"
 # About 90 m. Screening joins at 15 km, so this does not invent a count.
 LINE_TOLERANCE = 0.0008
 
-# NCDOT station county name -> FIPS. Latest year field on the layer is AADT_2022.
+# NCDOT station county name -> FIPS. AADT_2022 is a string (HPMS 2022 on AGOL).
+# Blank strings are not counts. 2023–2025 station files on NCDOT Connect are not
+# on this FeatureServer.
 NC = {
     "ALAMANCE": "37001",
     "ANSON": "37007",
@@ -222,8 +224,10 @@ TN = {
 }
 
 # Mississippi RCI COUNTYNMBR is not FIPS. It is the 1-based ASCII alphabetical
-# county index. Hinds 25, Madison 45, Rankin 61. Checked at interior points,
-# including Copiah 15, DeSoto 17, Warren 75, and Yazoo 82.
+# county index (1=Adams … 82=Yazoo). HDR AGOL republish of layer RC_AADT_2019,
+# field ADT_21. Not an MDOT-hosted FeatureServer.
+# Benton 5, Copiah 15, DeSoto 17, George 20, Hinds 25, Madison 45, Marshall 47,
+# Rankin 61, Simpson 64, Tate 69, Tunica 72, Warren 75, Yazoo 82.
 MS = {
     "28009": 5,
     "28029": 15,
@@ -342,6 +346,8 @@ SOURCES = {
         "field": "AADT_2022",
         "year": 2022,
         "url": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueType": "string",
+        "vintage": "HPMS 2022 on the FeatureServer. NCDOT Connect 2023/2024/2025 station files are not ingested.",
     },
     "GA": {
         "agency": "GDOT",
@@ -353,7 +359,11 @@ SOURCES = {
         "agency": "SCDOT",
         "field": "FactoredAA",
         "year": 2025,
+        "yearField": "FactoredA1",
+        "countyField": "CountyName",
         "url": "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0",
+        "geometry": "points",
+        "statewideCount": 11570,
     },
     "TN": {
         "agency": "TDOT",
@@ -365,7 +375,10 @@ SOURCES = {
         "agency": "Mississippi RCI",
         "field": "ADT_21",
         "year": 2021,
+        "layer": "RC_AADT_2019",
+        "host": "HDR AGOL republish",
         "url": "https://services.arcgis.com/04HiymDgLlsbhaV4/arcgis/rest/services/Mississippi_RCI/FeatureServer/3",
+        "countyField": "COUNTYNMBR",
     },
     "AL": {
         "agency": "ALDOT",
@@ -416,6 +429,8 @@ def simplify_line(path: list) -> list[list[float]]:
 
 
 def as_count(value) -> int | None:
+    if isinstance(value, str):
+        value = value.strip()
     if value is None or value == "":
         return None
     try:
@@ -527,8 +542,9 @@ def fetch_nc() -> list[dict]:
         if oid in seen:
             continue
         seen.add(oid)
-        count = as_count(attrs.get("AADT_2022"))
-        fips = NC.get(str(attrs.get("COUNTY") or "").upper())
+        raw_count = attrs.get("AADT_2022")
+        count = as_count(raw_count.strip() if isinstance(raw_count, str) else raw_count)
+        fips = NC.get(str(attrs.get("COUNTY") or "").strip().upper())
         if count is None or not fips:
             continue
         feature = point_feature(item, attrs, props(count, 2022, attrs.get("ROUTE") or None, "NCDOT", "North Carolina", fips))
@@ -561,7 +577,7 @@ def fetch_sc() -> list[dict]:
             continue
         seen.add(oid)
         count = as_count(attrs.get("FactoredAA"))
-        fips = SC.get(attrs.get("CountyName"))
+        fips = SC.get(str(attrs.get("CountyName") or "").strip().upper())
         if count is None or not fips:
             continue
         feature = point_feature(
@@ -613,41 +629,55 @@ def fetch_tn() -> list[dict]:
 
 
 def fetch_ms() -> list[dict]:
+    """One county at a time.
+
+    Rows with ADT_21 > 0 and a null shape are omitted. They cannot be joined
+    to a parcel centroid. A combined COUNTYNMBR IN (...) page is not used.
+    """
     url = "https://services.arcgis.com/04HiymDgLlsbhaV4/arcgis/rest/services/Mississippi_RCI/FeatureServer/3/query"
-    reverse = {code: fips for fips, code in MS.items()}
-    nums = ",".join(str(code) for code in sorted(reverse))
     out: list[dict] = []
     seen: set = set()
+    for fips, code in sorted(MS.items(), key=lambda item: item[1]):
+        before = len(out)
 
-    def consume(batch: list[dict]) -> None:
-        for item in batch:
-            attrs = item.get("attributes") or {}
-            oid = attrs.get("OBJECTID")
-            if oid in seen:
-                continue
-            seen.add(oid)
-            count = as_count(attrs.get("ADT_21"))
-            try:
-                code = int(attrs.get("COUNTYNMBR") or 0)
-            except (TypeError, ValueError):
-                code = 0
-            fips = reverse.get(code)
-            if count is None or not fips:
-                continue
-            out.extend(line_features(item, props(count, 2021, None, "Mississippi RCI", "Mississippi", fips)))
+        def consume(batch: list[dict], fips: str = fips) -> None:
+            for item in batch:
+                attrs = item.get("attributes") or {}
+                oid = attrs.get("OBJECTID")
+                if oid in seen:
+                    continue
+                seen.add(oid)
+                count = as_count(attrs.get("ADT_21"))
+                if count is None:
+                    continue
+                out.extend(line_features(item, props(count, 2021, None, "Mississippi RCI", "Mississippi", fips)))
 
-    page_query(
-        url,
-        {
-            "where": f"COUNTYNMBR IN ({nums}) AND ADT_21>0",
-            "outFields": "COUNTYNMBR,ADT_21,OBJECTID",
-            "returnGeometry": "true",
-            "outSR": 4326,
-            "resultRecordCount": 2000,
-        },
-        "MS",
-        consume,
-    )
+        page_query(
+            url,
+            {
+                "where": f"COUNTYNMBR={code} AND ADT_21>0 AND Shape IS NOT NULL",
+                "outFields": "COUNTYNMBR,ADT_21,OBJECTID",
+                "returnGeometry": "true",
+                "outSR": 4326,
+                "orderByFields": "OBJECTID",
+                "resultRecordCount": 2000,
+            },
+            f"MS {fips}",
+            consume,
+        )
+        counted = fetch_json(
+            url,
+            {
+                "where": f"COUNTYNMBR={code} AND ADT_21>0 AND Shape IS NOT NULL",
+                "returnCountOnly": "true",
+                "f": "json",
+            },
+        )
+        expected = int(counted.get("count") or 0)
+        got = len(out) - before
+        print(f"  MS {fips} COUNTYNMBR={code} {got}/{expected}")
+        if got != expected:
+            raise RuntimeError(f"MS {fips} COUNTYNMBR={code} kept {got}, layer reports {expected}")
     print(f"  MS segments {len(out)}")
     return out
 
@@ -886,6 +916,59 @@ def stamp_florida() -> dict[str, int]:
     return counts
 
 
+def coverage_notes() -> list[str]:
+    return [
+        "Florida AADT is FDOT RCI FeatureServer/0 (gis.fdot.gov), field AADT, YEAR_=2025, for every footprint county including Orange and Hillsborough. The service is EPSG:26917; the fixture requested outSR 4326. Nearest segment to the parcel centroid within 15 km.",
+        "North Carolina uses NCDOT AADT Stations, field AADT_2022. That field is a string; blanks are trimmed and dropped. The FeatureServer is still HPMS 2022. NCDOT Connect publishes 2023, 2024, and 2025 station files that are not on this REST layer, so they are not ingested.",
+        "South Carolina uses SCDOT 2025 Statewide Traffic Points, field FactoredAA, year FactoredA1 2025, filtered by CountyName. The layer has 11,570 stations statewide. Charleston, Dorchester, Berkeley, and Beaufort stay on this same layer. The 2025 lines layer is not used.",
+        "Mississippi uses the HDR AGOL republish of Mississippi RCI layer RC_AADT_2019, field ADT_21 (counts through 2021). COUNTYNMBR is the alphabetical county number, not FIPS. This is not an MDOT-hosted FeatureServer. The MDOT 2025 traffic-count application has no public FeatureServer. Segments with ADT_21 of zero, or with no shape, are left out.",
+        "North Carolina, South Carolina, Tennessee, Mississippi, Alabama, and Arkansas footprint counties use the state DOT layer filtered to those counties. "
+        "Georgia uses GDOT MapServer/21. That layer has no county field and only a few hundred statewide segments, so a segment is kept only when its midpoint falls in that county's TIGER tract. Counties with no such segment stay unknown. "
+        "Tennessee COUNTY_NUMBER and Mississippi COUNTYNMBR and Alabama LUCountyID are alphabetical county codes, not FIPS. "
+        "Arkansas keeps Comment = Actual Station only. Estimated Station, Estimated CCS, and Cross County rows are omitted. "
+        "Line geometry is generalized to about 90 m. Counts are the published values.",
+        "A parcel more than 15 km from the nearest count stays unknown. Outside Florida the drawer label is Nearest AADT, not FDOT.",
+    ]
+
+
+def apply_state_meta(features: list[dict], fl_counts: dict[str, int] | None = None) -> None:
+    by_fips: dict[str, int] = {}
+    for feature in features:
+        fips = feature["properties"]["countyFips"]
+        by_fips[fips] = by_fips.get(fips, 0) + 1
+    ga_deferred = [
+        {
+            "fips": fips,
+            "state": "GA",
+            "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated.",
+        }
+        for fips in sorted(GA)
+        if fips not in by_fips
+    ]
+    meta = json.loads(META.read_text()) if META.exists() else {}
+    notes = [
+        note
+        for note in (meta.get("notes") or [])
+        if not any(
+            marker in note
+            for marker in ("AADT", "FDOT", "FactoredAA", "ADT_21", "HPMS 2022", "statewide segments")
+        )
+    ]
+    notes.extend(coverage_notes())
+    update = {
+        "stateAadtSource": "SE footprint state DOT layers, 2026-09-24",
+        "stateAadtCount": len(features),
+        "stateAadtByCounty": dict(sorted(by_fips.items())),
+        "stateAadtSources": SOURCES,
+        "aadtDeferred": ga_deferred,
+        "notes": notes,
+    }
+    if fl_counts is not None:
+        update["flAadtByCounty"] = dict(sorted(fl_counts.items()))
+    meta.update(update)
+    META.write_text(json.dumps(meta, indent=2) + "\n")
+
+
 def require_counts(features: list[dict], expected: dict | set, label: str) -> None:
     found = {feature["properties"]["countyFips"] for feature in features}
     missing = [fips for fips in expected if fips not in found]
@@ -893,7 +976,32 @@ def require_counts(features: list[dict], expected: dict | set, label: str) -> No
         raise RuntimeError(f"{label} returned no counts for {missing}")
 
 
+def refresh_mississippi() -> None:
+    """Replace Mississippi features only. Other states stay in the fixture."""
+    print("MS")
+    ms = fetch_ms()
+    require_counts(ms, MS, "MS")
+    data = json.loads(OUT.read_text())
+    kept = [
+        feature
+        for feature in data.get("features") or []
+        if (feature.get("properties") or {}).get("state") != "Mississippi"
+    ]
+    data["features"] = kept + ms
+    OUT.write_text(json.dumps(data, separators=(",", ":")))
+    apply_state_meta(data["features"])
+    print(f"replaced Mississippi with {len(ms)} segments; fixture {len(data['features'])}")
+
+
 def main() -> None:
+    import sys
+
+    if "--only" in sys.argv:
+        which = sys.argv[sys.argv.index("--only") + 1].upper()
+        if which != "MS":
+            raise SystemExit("Only --only MS is supported. A full run rebuilds every state.")
+        refresh_mississippi()
+        return
     print("NC")
     nc = fetch_nc()
     require_counts(nc, NC.values(), "NC")
@@ -923,47 +1031,10 @@ def main() -> None:
             separators=(",", ":"),
         )
     )
-    by_fips: dict[str, int] = {}
-    for feature in features:
-        fips = feature["properties"]["countyFips"]
-        by_fips[fips] = by_fips.get(fips, 0) + 1
-    ga_deferred = [
-        {
-            "fips": fips,
-            "state": "GA",
-            "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated.",
-        }
-        for fips in sorted(GA)
-        if fips not in by_fips
-    ]
     print("FL sidecar")
     fl_counts = stamp_florida()
-    meta = json.loads(META.read_text()) if META.exists() else {}
-    notes = [note for note in (meta.get("notes") or []) if "AADT" not in note and "FDOT" not in note]
-    notes.append(
-        "Florida AADT is FDOT RCI FeatureServer/0 (gis.fdot.gov), field AADT, YEAR_=2025, for every footprint county including Orange and Hillsborough. The service is EPSG:26917; the fixture requested outSR 4326."
-    )
-    notes.append(
-        "North Carolina, South Carolina, Tennessee, Mississippi, Alabama, and Arkansas footprint counties use the state DOT layer filtered to those counties. "
-        "Georgia uses GDOT MapServer/21. That layer has no county field and only a few hundred statewide segments, so a segment is kept only when its midpoint falls in that county's TIGER tract. Counties with no such segment stay unknown. "
-        "Tennessee COUNTY_NUMBER and Mississippi COUNTYNMBR and Alabama LUCountyID are alphabetical county codes, not FIPS. "
-        "Arkansas keeps Comment = Actual Station only. Estimated Station, Estimated CCS, and Cross County rows are omitted. "
-        "Line geometry is generalized to about 90 m. Counts are the published values."
-    )
-    notes.append("A parcel more than 15 km from the nearest count stays unknown. Outside Florida the drawer label is Nearest AADT, not FDOT.")
-    meta.update(
-        {
-            "stateAadtSource": "SE footprint state DOT layers, 2026-09-24",
-            "stateAadtCount": len(features),
-            "stateAadtByCounty": dict(sorted(by_fips.items())),
-            "stateAadtSources": SOURCES,
-            "flAadtByCounty": dict(sorted(fl_counts.items())),
-            "aadtDeferred": ga_deferred,
-            "notes": notes,
-        }
-    )
-    META.write_text(json.dumps(meta, indent=2) + "\n")
-    print(f"wrote {len(features)} counts, {OUT.stat().st_size} bytes, GA deferred {len(ga_deferred)}")
+    apply_state_meta(features, fl_counts)
+    print(f"wrote {len(features)} counts, {OUT.stat().st_size} bytes")
     for fips in (
         "37119",
         "37183",

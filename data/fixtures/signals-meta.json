@@ -192,9 +192,12 @@
     "Join prefers the parcel's 11-digit 2020 tract GEOID. Centroid-in-tract is only the fallback when that GEOID is missing.",
     "BEA county income, IRS SOI ZIP income, and HUD CHAS are not the tract household-income field.",
     "Block-group income remains the Orange County pilot fixture.",
+    "Florida AADT is FDOT RCI FeatureServer/0 (gis.fdot.gov), field AADT, YEAR_=2025, for every footprint county including Orange and Hillsborough. The service is EPSG:26917; the fixture requested outSR 4326. Nearest segment to the parcel centroid within 15 km.",
+    "North Carolina uses NCDOT AADT Stations, field AADT_2022. That field is a string; blanks are trimmed and dropped. The FeatureServer is still HPMS 2022. NCDOT Connect publishes 2023, 2024, and 2025 station files that are not on this REST layer, so they are not ingested.",
+    "South Carolina uses SCDOT 2025 Statewide Traffic Points, field FactoredAA, year FactoredA1 2025, filtered by CountyName. The layer has 11,570 stations statewide. Charleston, Dorchester, Berkeley, and Beaufort stay on this same layer. The 2025 lines layer is not used.",
+    "Mississippi uses the HDR AGOL republish of Mississippi RCI layer RC_AADT_2019, field ADT_21 (counts through 2021). COUNTYNMBR is the alphabetical county number, not FIPS. This is not an MDOT-hosted FeatureServer. The MDOT 2025 traffic-count application has no public FeatureServer. Segments with ADT_21 of zero, or with no shape, are left out.",
     "North Carolina, South Carolina, Tennessee, Mississippi, Alabama, and Arkansas footprint counties use the state DOT layer filtered to those counties. Georgia uses GDOT MapServer/21. That layer has no county field and only a few hundred statewide segments, so a segment is kept only when its midpoint falls in that county's TIGER tract. Counties with no such segment stay unknown. Tennessee COUNTY_NUMBER and Mississippi COUNTYNMBR and Alabama LUCountyID are alphabetical county codes, not FIPS. Arkansas keeps Comment = Actual Station only. Estimated Station, Estimated CCS, and Cross County rows are omitted. Line geometry is generalized to about 90 m. Counts are the published values.",
     "A parcel more than 15 km from the nearest count stays unknown. Outside Florida the drawer label is Nearest AADT, not FDOT.",
-    "Florida AADT is FDOT RCI FeatureServer/0 (gis.fdot.gov), field AADT, YEAR_=2025, for every footprint county including Orange and Hillsborough. The service is EPSG:26917; this extract requested outSR 4326. Nearest segment to the parcel centroid within 15 km.",
     "Valdosta, Macon, Athens, Hilton Head, and Jackson MS tract polygons were added for centroid fallback. Estimates stay ACS 5-year 2020\u20132024 B19013. Those counties use the same statewide AADT join as the rest of the footprint."
   ],
   "incomeApi": "https://api.census.gov/data/2024/acs/acs5?get=NAME,B19013_001E,B19013_001M&for=tract:*&in=state:XX&in=county:*",
@@ -415,14 +418,16 @@
       "field": "AADT",
       "year": 2025,
       "url": "https://gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0",
-      "yearField": "YEAR_",
-      "crs": "EPSG:26917"
+      "crs": "EPSG:26917",
+      "yearField": "YEAR_"
     },
     "NC": {
       "agency": "NCDOT",
       "field": "AADT_2022",
       "year": 2022,
-      "url": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0"
+      "url": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+      "valueType": "string",
+      "vintage": "HPMS 2022 on the FeatureServer. NCDOT Connect 2023/2024/2025 station files are not ingested."
     },
     "GA": {
       "agency": "GDOT",
@@ -434,7 +439,11 @@
       "agency": "SCDOT",
       "field": "FactoredAA",
       "year": 2025,
-      "url": "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0"
+      "yearField": "FactoredA1",
+      "countyField": "CountyName",
+      "url": "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0",
+      "geometry": "points",
+      "statewideCount": 11570
     },
     "TN": {
       "agency": "TDOT",
@@ -446,7 +455,10 @@
       "agency": "Mississippi RCI",
       "field": "ADT_21",
       "year": 2021,
-      "url": "https://services.arcgis.com/04HiymDgLlsbhaV4/arcgis/rest/services/Mississippi_RCI/FeatureServer/3"
+      "layer": "RC_AADT_2019",
+      "host": "HDR AGOL republish",
+      "url": "https://services.arcgis.com/04HiymDgLlsbhaV4/arcgis/rest/services/Mississippi_RCI/FeatureServer/3",
+      "countyField": "COUNTYNMBR"
     },
     "AL": {
       "agency": "ALDOT",

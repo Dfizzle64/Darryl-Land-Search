@@ -34,7 +34,7 @@ npm run seed:schools # Florida + North Carolina public school-grade fixture
 
 Orlando parcel architecture, county source URLs, and field mapping: [`docs/orlando-parcels.md`](docs/orlando-parcels.md) and [`data/orlando-parcel-sources.json`](data/orlando-parcel-sources.json).
 
-Other MSAs use the same tile grid and the same zoom / area-lock / Show parcels gate. They load only while that market is selected. Refresh and the complete-vs-sample-vs-gap table: [`docs/market-parcels.md`](docs/market-parcels.md).
+Other MSAs use the same tile grid and the same zoom / area-lock / Show parcels gate. They load only while that market is selected. Refresh and the complete-vs-sample-vs-gap table: [`docs/market-parcels.md`](docs/market-parcels.md). DeKalb County, Georgia uses Tax_Parcels_Assessment_View layer 2 for the full 5–150 acre band. City zoning and future land use are joined for Decatur, Brookhaven, Dunwoody, Doraville, Tucker, Stonecrest, and the DeKalb portion of Atlanta. Chamblee is future land use only. There is no public sale table.
 
 No API keys are required for the default fixture mode. Copy `.env.example` to `.env.local` only if you want to point at live feeds.
 

@@ -32,6 +32,17 @@ type ParcelDrawerProps = {
   layout?: "page" | "pane";
 };
 
+/** City-prefixed districts are `{place}:{code}` with no space. Orange districts stay the raw code. */
+function formatZoningWithCity(code: string | null, district: string | null): string | null {
+  if (!code) return null;
+  const suffix = `:${code}`;
+  if (district?.endsWith(suffix)) {
+    const place = district.slice(0, -suffix.length);
+    if (place && !place.includes(":")) return `${code} · ${place}`;
+  }
+  return code;
+}
+
 function Field({ label, value, empty }: { label: string; value: string | null | undefined; empty?: string }) {
   return (
     <div>
@@ -91,10 +102,14 @@ export function ParcelDrawer({
   const aadtEmpty = florida
     ? "No FDOT count segment within 15 km"
     : "FDOT AADT is Florida only";
+  const dekalb = properties.countyFips === "13089";
   const zoningEmpty =
     properties.countyFips === "12095"
       ? "Not on the OCPA parcel"
-      : "Not in this county's public parcel extract";
+      : dekalb
+        ? "No municipal or county zoning joined for this parcel"
+        : "Not in this county's public parcel extract";
+  const zoningLine = formatZoningWithCity(properties.zoningCode, properties.zoningDistrict);
   const mailing = formatMailing(properties.mailingAddress) ?? mailingGap(properties.mailingAddress);
   const entityName = isEntityOwner(properties.ownerName)
     ? properties.ownerName
@@ -136,8 +151,15 @@ export function ParcelDrawer({
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
-        <Field label="Zoning" value={properties.zoningCode} empty={zoningEmpty} />
-        <Field label="Future Land Use" value={fluLine} empty="Not joined for this county" />
+        {dekalb ? (
+          <Field label="Tax district" value={properties.dorCode} empty="Tax district not on this parcel" />
+        ) : null}
+        <Field label="Zoning" value={zoningLine} empty={zoningEmpty} />
+        <Field
+          label="Future Land Use"
+          value={fluLine}
+          empty={dekalb ? "No future land use joined for this parcel" : "Not joined for this county"}
+        />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
           label="OZ 2.0"

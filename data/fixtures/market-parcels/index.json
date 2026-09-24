@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-23T23:50:16Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -11,9 +11,9 @@
   "markets": {
     "Atlanta": {
       "tier": "primary",
-      "parcelCount": 8149,
-      "completeCountyCount": 1,
-      "sampleCountyCount": 1,
+      "parcelCount": 8181,
+      "completeCountyCount": 2,
+      "sampleCountyCount": 0,
       "gapCountyCount": 33,
       "path": "data/fixtures/market-parcels/markets/atlanta/meta.json",
       "counties": [
@@ -141,12 +141,13 @@
           "name": "DeKalb",
           "state": "Georgia",
           "fips": "13089",
-          "featureCount": 3369,
-          "coverage": "sample",
+          "featureCount": 3401,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "DeKalb's public layer has no deed-acre field. Acres are computed from the polygon inside a Shape__Area window, so this county is a large sample, not a certified complete roll."
+            "No sale price, sale date, or qualified flag. Tax_Parcels_Assessment_View has no sale history. Delinquent-tax layers are not sales and are not joined.",
+            "Municipal zoning and future land use are joined where a public layer exists (Decatur, Brookhaven, Dunwoody, Doraville, Tucker, Stonecrest, and Atlanta inside DeKalb). Chamblee is future land use only. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake have no public zoning or FLU service and stay blank."
           ]
         },
         {

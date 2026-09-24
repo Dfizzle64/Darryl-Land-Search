@@ -29,7 +29,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 51,046 | 10 | 0 | 25 |
+| Atlanta | primary | 59,136 | 11 | 0 | 24 |
 | Tampa | primary | 124,315 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 104,066 | 13 | 0 | 4 |
@@ -37,8 +37,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Raleigh-Durham | primary | 151,530 | 17 | 0 | 0 |
 | SWFL | other | 32,749 | 4 | 0 | 0 |
 | Heartland | shelf | 21,163 | 4 | 1 | 0 |
-| Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 39,607 | 5 | 0 | 0 |
+| Vero Beach | other | 23,009 | 5 | 0 | 0 |
+| Melbourne | other | 41,026 | 5 | 0 | 0 |
 | Jacksonville | other | 26,301 | 5 | 0 | 0 |
 | North-Central Florida | other | 52,695 | 7 | 0 | 0 |
 | Big Bend | other | 21,551 | 1 | 3 | 3 |
@@ -70,7 +70,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Cherokee | Georgia | 13057 | gap | 0 | unavailable |
 | Clayton | Georgia | 13063 | gap | 0 | unavailable |
 | Cobb | Georgia | 13067 | complete-gte-5ac | 4,770 | ga-cobb-taxassessorsdaily |
-| Coweta | Georgia | 13077 | gap | 0 | unavailable |
+| Coweta | Georgia | 13077 | complete-gte-5ac | 8,090 | ga-coweta-wingap-parcels |
 | Dawson | Georgia | 13085 | gap | 0 | unavailable |
 | DeKalb | Georgia | 13089 | complete-gte-5ac | 3,401 | ga-dekalb-assessment-view-2 |
 | Douglas | Georgia | 13097 | complete-gte-5ac | 4,231 | ga-douglas-landrecords |
@@ -212,18 +212,18 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
-| Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Martin | Florida | 12085 | complete-gte-5ac | 3,802 | fl-doh-ehwaters-12085 |
-| Okeechobee | Florida | 12093 | complete-gte-5ac | 3,176 | fl-doh-ehwaters-12093 |
-| St. Lucie | Florida | 12111 | complete-gte-5ac | 4,824 | fl-doh-ehwaters-12111 |
+| Brevard | Florida | 12009 | complete-gte-5ac | 6,802 | fl-brevard-accela-12009 |
+| Indian River | Florida | 12061 | complete-gte-5ac | 3,779 | fl-ircpa-parcels-12061 |
+| Martin | Florida | 12085 | complete-gte-5ac | 3,790 | fl-martin-geoweb-12085 |
+| Okeechobee | Florida | 12093 | complete-gte-5ac | 3,053 | fl-okeechobee-planning-12093 |
+| St. Lucie | Florida | 12111 | complete-gte-5ac | 5,585 | fl-slc-parcels-12111 |
 
 ### Melbourne
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
-| Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
+| Brevard | Florida | 12009 | complete-gte-5ac | 6,802 | fl-brevard-accela-12009 |
+| Indian River | Florida | 12061 | complete-gte-5ac | 3,779 | fl-ircpa-parcels-12061 |
 | Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 6,169 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |

@@ -1,3 +1,5 @@
+import { treasureCoastAppraiserLabel } from "./treasureCoast";
+
 const ENTITY_RE = /\b(LLC|L\.L\.C|INC|INCORPORATED|LP|L\.P|LLP|CORP|CORPORATION|LTD|TRUST|HOLDINGS|PARTNERS|COMPANY|CO)\b/i;
 
 export function isEntityOwner(name: string | null | undefined): boolean {
@@ -27,14 +29,19 @@ export function comptrollerRecordsUrl(): string {
 
 const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12009": "https://www.bcpao.us/PropertySearch/#/nav/Search",
+  "12061": "https://www.ircpa.org/",
   "12069": "https://www.lakecopropappr.com/",
   "12083": "https://www.pa.marion.fl.us/",
+  "12085": "https://www.pamartinfl.gov/",
+  "12093": "https://www.okeechobeepa.com/gis/",
   "12095": "https://ocpaweb.ocpafl.org/site/parcelsearch",
   "12097": "https://www.property-appraiser.org/",
   "12105": "https://www.polkpa.org/",
+  "12111": "https://www.paslc.gov/",
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "13077": "https://qpublic.schneidercorp.com/Application.aspx?AppID=704&LayerID=11412&PageTypeID=1",
 };
 
 /**
@@ -45,9 +52,12 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
 const APPRAISER_LINKS: Record<string, { href: string; label: string }> = {
   "12009": { href: DEFAULT_APPRAISER_URLS["12009"], label: "Open Brevard Property Appraiser search" },
   "12031": { href: "https://www.coj.net/departments/property-appraiser", label: "Open Duval County Property Appraiser" },
+  "12061": { href: DEFAULT_APPRAISER_URLS["12061"], label: "Open Indian River County Property Appraiser" },
   "12057": { href: "https://www.hcpafl.org/", label: "Open Hillsborough County Property Appraiser" },
   "12069": { href: DEFAULT_APPRAISER_URLS["12069"], label: "Open Lake Property Appraiser search" },
   "12083": { href: DEFAULT_APPRAISER_URLS["12083"], label: "Open Marion Property Appraiser search" },
+  "12085": { href: DEFAULT_APPRAISER_URLS["12085"], label: "Open Martin County property record" },
+  "12093": { href: DEFAULT_APPRAISER_URLS["12093"], label: "Open Okeechobee County Property Appraiser GIS" },
   "12091": { href: "https://www.okaloosapa.com/", label: "Open Okaloosa County Property Appraiser" },
   "12095": { href: "https://ocpaweb.ocpafl.org/site/parcelsearch", label: "Open in Orange County Property Appraiser" },
   "12097": { href: DEFAULT_APPRAISER_URLS["12097"], label: "Open Osceola Property Appraiser search" },
@@ -59,6 +69,7 @@ const APPRAISER_LINKS: Record<string, { href: string; label: string }> = {
   "12117": { href: DEFAULT_APPRAISER_URLS["12117"], label: "Open Seminole Property Appraiser search" },
   "12119": { href: DEFAULT_APPRAISER_URLS["12119"], label: "Open Sumter Property Appraiser search" },
   "12127": { href: DEFAULT_APPRAISER_URLS["12127"], label: "Open Volusia Property Appraiser search" },
+  "13077": { href: DEFAULT_APPRAISER_URLS["13077"], label: "Open Coweta County property appraiser (qPublic)" },
 };
 
 export function parcelAppraiserUrl(options: {
@@ -84,6 +95,14 @@ export function parcelAppraiserUrl(options: {
     return {
       href: options.appraiserUrl,
       label: "Open Sumter Property Appraiser record",
+    };
+  }
+  const named = fips ? APPRAISER_LINKS[fips] : undefined;
+  const treasureLabel = treasureCoastAppraiserLabel(fips);
+  if (fips === "13077" || treasureLabel) {
+    return {
+      href: options.appraiserUrl || named?.href || null,
+      label: treasureLabel || named?.label || "Open county property appraiser",
     };
   }
   if (options.appraiserUrl) {
@@ -224,4 +243,20 @@ export function formatRoadLabel(road: {
   if (road.from) return road.from;
   if (road.roadwayId) return `FDOT ${road.roadwayId}`;
   return "Nearest FDOT count segment";
+}
+
+export function formatParcelPlace(properties: {
+  situsCity?: string | null;
+  situsZip?: string | null;
+  countyName?: string | null;
+  state?: string | null;
+}): string {
+  const cityZip = [properties.situsCity, properties.situsZip].filter(Boolean).join(" ");
+  if (cityZip) return cityZip;
+  if (properties.countyName) {
+    const stateLabel =
+      properties.state === "Georgia" ? "Georgia" : properties.state && properties.state !== "Florida" ? properties.state : "FL";
+    return `${properties.countyName} County, ${stateLabel}`;
+  }
+  return properties.state || "Florida";
 }

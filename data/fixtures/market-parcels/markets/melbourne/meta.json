@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T00:09:22Z",
+  "generatedAt": "2026-09-24T00:13:53Z",
   "market": "Melbourne",
   "tier": "other",
-  "parcelCount": 39607,
+  "parcelCount": 41026,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,40 +20,51 @@
       "name": "Brevard",
       "fips": "12009",
       "state": "Florida",
-      "featureCount": 5746,
+      "featureCount": 6802,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12009",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/4/query",
+      "source": "fl-brevard-accela-12009",
+      "queryUrl": "https://gis.brevardfl.gov/gissrv/rest/services/Accela/AccelaGIS_Layers_WKID2881/MapServer/5/query",
       "gaps": [
-        "6989 source rows collapsed to 5746 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "No zoning or FLU on the Florida DOH extract."
+        "Rejected Melbourne, Australia. Brevard Accela covers Brevard County, Florida (about longitude -81 to -80.4 and latitude 27.8 to 28.8), not Victoria.",
+        "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
+        "Incorporated Brevard cities (the General map City layer) have no public city zoning or FLU FeatureServer in this pull. Melbourne, Palm Bay, Titusville, Cocoa, and the other cities stay blank. Accela is not used as their ordinance.",
+        "Parcel_by_Municipality_Ownership is municipal-owned parcels, not city limits, and is not the municipality layer.",
+        "The Accela parcel layer has land and building values but no just value, taxable value, sale price, or sale date. Those tax fields stay empty. The appraiser link is the BCPAO search page, not a parcel deep link.",
+        "Situs CITY on the parcel is a post-office place (Mims, Merritt Island, and similar) and is not the legal city. Legal cities come from the City polygon.",
+        "No owner phone or email is copied."
       ],
       "path": "data/fixtures/market-parcels/counties/12009/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12009/lookup.json",
-      "tileCount": 10,
-      "sourceCount": 6989
+      "tileCount": 11,
+      "sourceCount": 6802
     },
     {
       "name": "Indian River",
       "fips": "12061",
       "state": "Florida",
-      "featureCount": 3416,
+      "featureCount": 3779,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12061",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/29/query",
+      "source": "fl-ircpa-parcels-12061",
+      "queryUrl": "https://gisportal.ircgov.com/server3/rest/services/IRCPA/Parcels_MS/MapServer/0/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Rejected Tuscaloosa IRC AGOL. A layer titled IRC whose extent is Tuscaloosa County, Alabama is not Indian River County. Parcels are the Indian River property appraiser service on gisportal.ircgov.com.",
+        "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
+        "Fellsmere, Indian River Shores, and Orchid are municipalities on the county boundary layer and have no public zoning or FLU FeatureServer. Their parcels stay blank rather than inheriting unincorporated districts.",
+        "County COS/COS_Zoning is the Sebastian mirror on the county server. The city zoning and FLU services are the ones joined.",
+        "COVB on gisportal.ircgov.com requires a token. Vero Beach zoning and FLU come from the city's public FeatureServers.",
+        "Assessed and taxable value are not on the property-appraiser parcel service. CAMA_VALUE is stored as tax.marketValue and TAXES as tax.taxes. SALE_VI_CD is not treated as a qualified-sale flag.",
+        "No owner phone or email fields are copied."
       ],
       "path": "data/fixtures/market-parcels/counties/12061/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12061/lookup.json",
       "tileCount": 6,
-      "sourceCount": 3505
+      "sourceCount": 3779
     },
     {
       "name": "Orange",

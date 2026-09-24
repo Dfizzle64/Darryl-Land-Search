@@ -35,14 +35,18 @@ const URBAN_ROWS: Record<MarketId, number> = {
 
 const OTHER_ROWS: Record<OtherMarketId, { total: number; rural: number; urban: number }> = {
   SWFL: { total: 75, rural: 11, urban: 64 },
+  Heartland: { total: 0, rural: 0, urban: 0 },
   "Vero Beach": { total: 62, rural: 25, urban: 37 },
   Melbourne: { total: 175, rural: 24, urban: 151 },
   Jacksonville: { total: 98, rural: 8, urban: 90 },
+  "North-Central Florida": { total: 62, rural: 39, urban: 23 },
   "Big Bend": { total: 57, rural: 24, urban: 33 },
   Pensacola: { total: 49, rural: 22, urban: 27 },
   Birmingham: { total: 152, rural: 42, urban: 110 },
   Mobile: { total: 66, rural: 15, urban: 51 },
   Huntsville: { total: 58, rural: 31, urban: 27 },
+  Tuscaloosa: { total: 0, rural: 0, urban: 0 },
+  Montgomery: { total: 0, rural: 0, urban: 0 },
   Savannah: { total: 64, rural: 31, urban: 33 },
   Columbia: { total: 105, rural: 62, urban: 43 },
   Greenville: { total: 105, rural: 70, urban: 35 },
@@ -96,13 +100,13 @@ describe("urban eligible pack for the seven markets", () => {
 describe("other MSA eligible pack", () => {
   const catalog = loadOther();
 
-  it("keeps 1518 rows, 1473 GEOIDs, 526 rural and 992 urban", () => {
+  it("keeps 1580 rows, 1535 GEOIDs, 565 rural and 1015 urban", () => {
     expect(catalog.pack).toBe("other-msas");
-    expect(catalog.rowCount).toBe(1518);
-    expect(catalog.uniqueGeoidCount).toBe(1473);
-    expect(catalog.ruralRowCount).toBe(526);
-    expect(catalog.urbanRowCount).toBe(992);
-    expect(new Set(catalog.rows.map((row) => row.geoid)).size).toBe(1473);
+    expect(catalog.rowCount).toBe(1580);
+    expect(catalog.uniqueGeoidCount).toBe(1535);
+    expect(catalog.ruralRowCount).toBe(565);
+    expect(catalog.urbanRowCount).toBe(1015);
+    expect(new Set(catalog.rows.map((row) => row.geoid)).size).toBe(1535);
     expect(catalog.statusChip).toBe(ELIGIBLE_NOT_DESIGNATED_STATUS);
     expect(catalog.rows.every((row) => row.status === ELIGIBLE_NOT_DESIGNATED_STATUS)).toBe(true);
     expect(catalog.rows.every((row) => row.rural === "Y" || row.rural === "N")).toBe(true);
@@ -110,11 +114,13 @@ describe("other MSA eligible pack", () => {
   });
 
   it("matches each smaller market and does not treat them as primary", () => {
-    expect(OTHER_MARKETS).toHaveLength(18);
+    expect(OTHER_MARKETS).toHaveLength(22);
     expect(OTHER_MARKETS[0]).toBe("SWFL");
-    expect(OTHER_MARKETS[1]).toBe("Vero Beach");
-    expect(OTHER_MARKETS[3]).toBe("Jacksonville");
-    expect(OTHER_MARKETS[4]).toBe("Big Bend");
+    expect(OTHER_MARKETS[1]).toBe("Heartland");
+    expect(OTHER_MARKETS[2]).toBe("Vero Beach");
+    expect(OTHER_MARKETS[4]).toBe("Jacksonville");
+    expect(OTHER_MARKETS[5]).toBe("North-Central Florida");
+    expect(OTHER_MARKETS[6]).toBe("Big Bend");
     expect(OTHER_MARKETS).toContain("Jackson");
     for (const market of OTHER_MARKETS) {
       const rows = filterEligibleRows(catalog.rows, market, null, null);
@@ -248,8 +254,8 @@ describe("eligible pack polygons", () => {
       readFileSync("data/fixtures/oz2-eligible-packs.geojson", "utf8"),
     ) as EligiblePackTractCollection;
     const geoids = new Set([...urban.rows.map((row) => row.geoid), ...other.rows.map((row) => row.geoid)]);
-    expect(geoids.size).toBe(2404);
-    expect(collection.features).toHaveLength(2404);
+    expect(geoids.size).toBe(2466);
+    expect(collection.features).toHaveLength(2466);
     expect(new Set(collection.features.map((feature) => feature.properties.tractGeoid))).toEqual(geoids);
     expect(
       collection.features.every(

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T00:38:00Z",
+  "generatedAt": "2026-09-24T00:47:37Z",
   "market": "Tampa",
   "tier": "primary",
-  "parcelCount": 124649,
+  "parcelCount": 124315,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,15 +20,21 @@
       "name": "Citrus",
       "fips": "12017",
       "state": "Florida",
-      "featureCount": 5810,
+      "featureCount": 5807,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12017",
+      "source": "fl-citrus-doh-municipal-12017",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/8/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Parcel polygons, owner, situs, and tax values are Florida DOH EHWATER layer 8. Citrus County lots have no acre or owner field, and lot PRCLKEY is empty, so zoning is a centroid join.",
+        "Municipality is the corporate-limit layer (Inverness or Crystal River). PHY_CITY is the postal city and is not the city limit.",
+        "County zoning and land use values CITY are placeholders and are not stored.",
+        "Inverness parcels: 86. Zoning is INV_FLU and future land use is FLU on the city layer.",
+        "Crystal River parcels left without city zoning: 88.",
+        "No public Crystal River zoning or FLU FeatureServer was verified.",
+        "County zoning codes are not Orange County multifamily districts."
       ],
       "path": "data/fixtures/market-parcels/counties/12017/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12017/lookup.json",
@@ -39,39 +45,49 @@
       "name": "Hardee",
       "fips": "12049",
       "state": "Florida",
-      "featureCount": 5055,
+      "featureCount": 5303,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12049",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/23/query",
+      "source": "fl-hardee-infomap-12049",
+      "queryUrl": "https://gis.hardeecounty.net/arcgis/rest/services/InfoMap/MapServer/5/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Parcels are InfoMap Owner Parcels (TOTACRES). SWFWMD parcel_search was not needed.",
+        "County zoning and future land use are a spatial intersect (no parcel id on those layers).",
+        "Wauchula, Bowling Green, and Zolfo Springs zoning and FLU join on PARCEL / Parcel_Id when it matches PIN_DSP, otherwise by intersect. They do not cover unincorporated Hardee.",
+        "InfoMap has the last situs and owner. It has no sale price or assessed value.",
+        "Hardee county spatial join: zoning 5188/5303, FLU 5297/5303. City override zoning 112, FLU 112 (Wauchula, Bowling Green, Zolfo Springs)."
       ],
       "path": "data/fixtures/market-parcels/counties/12049/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12049/lookup.json",
       "tileCount": 6,
-      "sourceCount": 5055
+      "sourceCount": 5303
     },
     {
       "name": "Hernando",
       "fips": "12053",
       "state": "Florida",
-      "featureCount": 7180,
+      "featureCount": 6601,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12053",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/25/query",
+      "source": "fl-hernando-parcels-12053",
+      "queryUrl": "https://services2.arcgis.com/x5zvhhxfUuRDntRe/ArcGIS/rest/services/Parcels/FeatureServer/0/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Upgrade off Florida DOH. Parcels, owner, situs, and values are Hernando County Parcels (gis.V_PARCELS).",
+        "Municipality is CER_JURISDICTION: B is Brooksville and C is unincorporated. Situs city Brooksville, Spring Hill, or Weeki Wachee is not the city limit.",
+        "Spring Hill is an unincorporated place. Weeki Wachee levy code CWWE is not stored as a municipality.",
+        "County zoning joins on KEY_NUMBER. The value CITY is a placeholder and is not a zoning district.",
+        "Brooksville parcels left without city zoning: 200 (placeholder rows 174).",
+        "County future land use skips polygons whose FLU code is city. Those are the Brooksville hole, not a city FLU map.",
+        "No public Brooksville or Weeki Wachee zoning/FLU FeatureServer was verified."
       ],
       "path": "data/fixtures/market-parcels/counties/12053/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12053/lookup.json",
       "tileCount": 6,
-      "sourceCount": 7193
+      "sourceCount": 6601
     },
     {
       "name": "Hillsborough",

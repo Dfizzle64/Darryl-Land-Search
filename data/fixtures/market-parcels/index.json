@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T00:38:00Z",
+  "generatedAt": "2026-09-24T00:47:37Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -11,10 +11,10 @@
   "markets": {
     "Atlanta": {
       "tier": "primary",
-      "parcelCount": 56581,
-      "completeCountyCount": 10,
+      "parcelCount": 70464,
+      "completeCountyCount": 13,
       "sampleCountyCount": 0,
-      "gapCountyCount": 25,
+      "gapCountyCount": 22,
       "path": "data/fixtures/market-parcels/markets/atlanta/meta.json",
       "counties": [
         {
@@ -33,24 +33,26 @@
           "name": "Barrow",
           "state": "Georgia",
           "fips": "13013",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 4251,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "4277 source rows collapsed to 4251 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Acreage is GIS area only (BarrowParcelswOwner_Project/FeatureServer/1 Shape__Area / 4046.8564224, Web Mercator). No deeded-acre field is published."
           ]
         },
         {
           "name": "Bartow",
           "state": "Georgia",
           "fips": "13015",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 7077,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "13412 BartowLand features with TOTALACRES from 5 through 150 inclusive dissolved to 7077 PARCELIDs. Acreage is TOTALACRES once per parcel, not the sum of parts. 70 parcels kept more than one distinct ring group.",
+            "County zoning join: 6352 of 7077 parcels (89.8%) received a BartowZoning STZONECODE other than Incorporated. 713 parcels fall in the Incorporated city stub and have null zoningCode. 12 parcels did not hit a zoning polygon."
           ]
         },
         {
@@ -415,12 +417,13 @@
           "name": "Rockdale",
           "state": "Georgia",
           "fips": "13247",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 2555,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+            "Source query returned 2698 rows in the 5.0\u2013150.0 acre band. 2555 parcels kept. 26 centroids were outside Rockdale County, Georgia, 6 failed geometry or the acreage check, and 111 duplicate parcel ids were collapsed to the larger part.",
+            "Rockdale County, Georgia AGOL Parcels/9. Positive Acreage is stored; Calc_Ac is used only when Acreage is null or zero. The band is 5.0\u2013150.0 acres inclusive."
           ]
         },
         {
@@ -451,7 +454,7 @@
     },
     "Tampa": {
       "tier": "primary",
-      "parcelCount": 124649,
+      "parcelCount": 124315,
       "completeCountyCount": 10,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
@@ -461,36 +464,39 @@
           "name": "Citrus",
           "state": "Florida",
           "fips": "12017",
-          "featureCount": 5810,
+          "featureCount": 5807,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Parcel polygons, owner, situs, and tax values are Florida DOH EHWATER layer 8. Citrus County lots have no acre or owner field, and lot PRCLKEY is empty, so zoning is a centroid join.",
+            "Municipality is the corporate-limit layer (Inverness or Crystal River). PHY_CITY is the postal city and is not the city limit."
           ]
         },
         {
           "name": "Hardee",
           "state": "Florida",
           "fips": "12049",
-          "featureCount": 5055,
+          "featureCount": 5303,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Parcels are InfoMap Owner Parcels (TOTACRES). SWFWMD parcel_search was not needed.",
+            "County zoning and future land use are a spatial intersect (no parcel id on those layers)."
           ]
         },
         {
           "name": "Hernando",
           "state": "Florida",
           "fips": "12053",
-          "featureCount": 7180,
+          "featureCount": 6601,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Upgrade off Florida DOH. Parcels, owner, situs, and values are Hernando County Parcels (gis.V_PARCELS).",
+            "Municipality is CER_JURISDICTION: B is Brooksville and C is unincorporated. Situs city Brooksville, Spring Hill, or Weeki Wachee is not the city limit."
           ]
         },
         {
@@ -685,7 +691,7 @@
     },
     "Nashville": {
       "tier": "primary",
-      "parcelCount": 104066,
+      "parcelCount": 109348,
       "completeCountyCount": 13,
       "sampleCountyCount": 0,
       "gapCountyCount": 4,
@@ -719,12 +725,13 @@
           "name": "Cheatham",
           "state": "Tennessee",
           "fips": "47021",
-          "featureCount": 3790,
+          "featureCount": 5426,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Future land use is an honest REST gap for Cheatham County, Ashland City, Pleasant View, Kingston Springs, and Pegram. CheatGIS urban growth and Cheatham Growth layers are guidance only and are not parcel FLU or zoning entitlement.",
+            "Zoning is a cities-first polygon join on APSU CheatGIS: Ashland City, Pleasant View, Kingston Springs, and Pegram inside their community limits, then unincorporated Cheatham zoning. City district codes are not applied outside those limits. The parcel zoning attribute is often blank and is not the district."
           ]
         },
         {
@@ -744,12 +751,13 @@
           "name": "Dickson",
           "state": "Tennessee",
           "fips": "47043",
-          "featureCount": 4797,
+          "featureCount": 8443,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Zoning polygons are joined only inside the resolved jurisdiction. City of Dickson Current_Zo 408/408, White Bluff Zone_Curre 92/92, county Zone_Curre 7696/7700. Burns (72), Charlotte (90), Vanleer (47), and Slayden (34) have no public zoning FeatureServer (Burns is a 2016 PDF), so those parcels stay unzoned. IMPACT Themes ZONING was non-blank on 3 parcels and was not copied. County Zone_Curre is 164 district polygons; A1 is only 6 of them, and those large polygons cover most rural acreage.",
+            "No adopted future-land-use FeatureServer. The 2043 Comp Plan draft and UGB/PGA layers are growth context only and were not written as parcel FLU. Sale date and price are often blank or zero. REST exposes appraisal (APPRAISAL), not assessed or taxable value."
           ]
         },
         {
@@ -1392,7 +1400,7 @@
     },
     "Vero Beach": {
       "tier": "other",
-      "parcelCount": 20964,
+      "parcelCount": 23009,
       "completeCountyCount": 5,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
@@ -1402,69 +1410,72 @@
           "name": "Brevard",
           "state": "Florida",
           "fips": "12009",
-          "featureCount": 5746,
+          "featureCount": 6802,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "6989 source rows collapsed to 5746 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected Melbourne, Australia. Brevard Accela covers Brevard County, Florida (about longitude -81 to -80.4 and latitude 27.8 to 28.8), not Victoria.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         },
         {
           "name": "Indian River",
           "state": "Florida",
           "fips": "12061",
-          "featureCount": 3416,
+          "featureCount": 3779,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected Tuscaloosa IRC AGOL. A layer titled IRC whose extent is Tuscaloosa County, Alabama is not Indian River County. Parcels are the Indian River property appraiser service on gisportal.ircgov.com.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         },
         {
           "name": "Martin",
           "state": "Florida",
           "fips": "12085",
-          "featureCount": 3802,
+          "featureCount": 3790,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected a thin Martin AGOL clip as the county roll. Parcels are geoweb.martin.fl.us base_map layer 10, which covers the county, not an Indiantown-sized extract.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         },
         {
           "name": "Okeechobee",
           "state": "Florida",
           "fips": "12093",
-          "featureCount": 3176,
+          "featureCount": 3053,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected City of Ocoee (maps.ocoee.org, Orange County). These parcels are Okeechobee County, from the county planning Parcels_2022 service.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         },
         {
           "name": "St. Lucie",
           "state": "Florida",
           "fips": "12111",
-          "featureCount": 4824,
+          "featureCount": 5585,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "5361 source rows collapsed to 4824 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected Fort Pierce Zoning FeatureServer/0. That layer is Current Project Development (projects), not zoning. City zoning is FeatureServer/7.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         }
       ]
     },
     "Melbourne": {
       "tier": "other",
-      "parcelCount": 39607,
+      "parcelCount": 41026,
       "completeCountyCount": 5,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
@@ -1474,25 +1485,26 @@
           "name": "Brevard",
           "state": "Florida",
           "fips": "12009",
-          "featureCount": 5746,
+          "featureCount": 6802,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "6989 source rows collapsed to 5746 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected Melbourne, Australia. Brevard Accela covers Brevard County, Florida (about longitude -81 to -80.4 and latitude 27.8 to 28.8), not Victoria.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         },
         {
           "name": "Indian River",
           "state": "Florida",
           "fips": "12061",
-          "featureCount": 3416,
+          "featureCount": 3779,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
+            "Rejected Tuscaloosa IRC AGOL. A layer titled IRC whose extent is Tuscaloosa County, Alabama is not Indian River County. Parcels are the Indian River property appraiser service on gisportal.ircgov.com.",
+            "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay."
           ]
         },
         {
@@ -1803,7 +1815,7 @@
       "parcelCount": 38101,
       "completeCountyCount": 3,
       "sampleCountyCount": 0,
-      "gapCountyCount": 7,
+      "gapCountyCount": 6,
       "path": "data/fixtures/market-parcels/markets/birmingham/meta.json",
       "counties": [
         {
@@ -1897,18 +1909,6 @@
           "name": "Talladega",
           "state": "Alabama",
           "fips": "01121",
-          "featureCount": 0,
-          "coverage": "gap",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
-          ]
-        },
-        {
-          "name": "Tuscaloosa",
-          "state": "Alabama",
-          "fips": "01125",
           "featureCount": 0,
           "coverage": "gap",
           "minAcres": 5.0,
@@ -3130,6 +3130,338 @@
           "gaps": [
             "Town of Atkinson has no public zoning layer. LayersPro municipal zoning is Burgaw (39), St. Helena (40), Surf City (41), Topsail Beach (42), and Watha (43). County UDO is not applied inside Atkinson corporate limits. 25 parcels in the 5\u2013150 acre extract have a centroid in the Atkinson corporate limit and are left unzoned.",
             "Rev. Proc. 2026-14 eligibility is not a 2027 QOZ designation. Centroids in pack tracts 37141920204 and 37141920403 (1376 parcels) are stored as eligible-for-nomination only. opportunityZone is not set from that list. Notice 2025-50 rural designated tracts 37141920601 and 37141920602 are current designated QOZs and are not copied onto oz2Eligibility."
+          ]
+        }
+      ]
+    },
+    "Heartland": {
+      "tier": "shelf",
+      "parcelCount": 21163,
+      "completeCountyCount": 4,
+      "sampleCountyCount": 1,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/heartland/meta.json",
+      "counties": [
+        {
+          "name": "DeSoto",
+          "state": "Florida",
+          "fips": "12027",
+          "featureCount": 4677,
+          "coverage": "partial",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Parcels are SWFWMD parcel_search DeSoto (CNTYFIPS 027). ACRES is empty; AREANO is the acreage. This is not DeSoto County, Kansas, and not DeSoto County, Mississippi (28033).",
+            "Arcadia zoning and future land use are attribute-joined on PARCEL_ID inside the city only."
+          ]
+        },
+        {
+          "name": "Glades",
+          "state": "Florida",
+          "fips": "12043",
+          "featureCount": 2256,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Parcels are AGOL glades_parcels_2026_06_01. Acreage is the acreage field.",
+            "Zoning (GladesCounty_Zoning_03192026 layer 4) and FLU (GladesCounty_FLU_03192026) are spatial. Neither layer has a parcel id."
+          ]
+        },
+        {
+          "name": "Hardee",
+          "state": "Florida",
+          "fips": "12049",
+          "featureCount": 5303,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Parcels are InfoMap Owner Parcels (TOTACRES). SWFWMD parcel_search was not needed.",
+            "County zoning and future land use are a spatial intersect (no parcel id on those layers)."
+          ]
+        },
+        {
+          "name": "Hendry",
+          "state": "Florida",
+          "fips": "12051",
+          "featureCount": 3070,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Parcels are Parcels_Feb2024 (February 2024 vintage), not a later Hendry roll. Acreage is MAP_ACRES.",
+            "County zoning is an attribute join on PIN / PARCELNO. Current_Zo values LABELLE and CLEWISTON are city names, not districts, and stay blank."
+          ]
+        },
+        {
+          "name": "Highlands",
+          "state": "Florida",
+          "fips": "12055",
+          "featureCount": 5857,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Acreage is PAO Calculated_Acres, 5.0\u2013150.0 inclusive. The root Parcels FeatureServer was not used (it is token-gated, not the public PAO layer).",
+            "County Zoning.ZON and FLUM.FLUM are attribute-joined on PARCELNO = STRAP_NUM. STRAP is not the zoning key."
+          ]
+        }
+      ]
+    },
+    "North-Central Florida": {
+      "tier": "other",
+      "parcelCount": 52695,
+      "completeCountyCount": 7,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/north-central-florida/meta.json",
+      "counties": [
+        {
+          "name": "Alachua",
+          "state": "Florida",
+          "fips": "12001",
+          "featureCount": 15539,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Jurisdiction is JurisNo on Parcels35, not the situs or mailing city. Gainesville postal addresses outside the city stay Unincorporated Alachua County.",
+            "Zoning and FLU are stored only when ZONECODE/FluCode starts with the jurisdiction prefix (0100 county, 0103 Gainesville, and the same pattern for the other cities). A mismatched county code on a city parcel is left blank."
+          ]
+        },
+        {
+          "name": "Bradford",
+          "state": "Florida",
+          "fips": "12007",
+          "featureCount": 593,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "598 source rows collapsed to 593 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Partial. Bradford parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
+          ]
+        },
+        {
+          "name": "Citrus",
+          "state": "Florida",
+          "fips": "12017",
+          "featureCount": 5807,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Parcel polygons, owner, situs, and tax values are Florida DOH EHWATER layer 8. Citrus County lots have no acre or owner field, and lot PRCLKEY is empty, so zoning is a centroid join.",
+            "Municipality is the corporate-limit layer (Inverness or Crystal River). PHY_CITY is the postal city and is not the city limit."
+          ]
+        },
+        {
+          "name": "Gilchrist",
+          "state": "Florida",
+          "fips": "12041",
+          "featureCount": 6395,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "6854 source rows collapsed to 6395 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Partial. Gilchrist parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
+          ]
+        },
+        {
+          "name": "Hernando",
+          "state": "Florida",
+          "fips": "12053",
+          "featureCount": 6601,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Upgrade off Florida DOH. Parcels, owner, situs, and values are Hernando County Parcels (gis.V_PARCELS).",
+            "Municipality is CER_JURISDICTION: B is Brooksville and C is unincorporated. Situs city Brooksville, Spring Hill, or Weeki Wachee is not the city limit."
+          ]
+        },
+        {
+          "name": "Levy",
+          "state": "Florida",
+          "fips": "12075",
+          "featureCount": 10200,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "10984 source rows collapsed to 10200 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "Partial. Levy parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
+          ]
+        },
+        {
+          "name": "Putnam",
+          "state": "Florida",
+          "fips": "12107",
+          "featureCount": 7560,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Optional Putnam pull. Parcel polygons and tax attributes are Florida DOH EHWATER layer 53.",
+            "The property-appraiser COMMUNITY field is Unincorporated on essentially every row, so it is not used as a municipality."
+          ]
+        }
+      ]
+    },
+    "Asheville": {
+      "tier": "other",
+      "parcelCount": 16793,
+      "completeCountyCount": 2,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/asheville/meta.json",
+      "counties": [
+        {
+          "name": "Buncombe",
+          "state": "North Carolina",
+          "fips": "37021",
+          "featureCount": 10523,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Biltmore Forest zoning is PDF-only (biltmoreforest.org planning maps). City CBF parcels stay blank. County zoning is not applied inside the town.",
+            "SalePrice was non-zero on 3796 parcels and kept on 310. A price is kept only when it is within 25% of excise stamps divided by 0.002, or when stamps are 0, the price is at least $25,000, and it sits between 20% of land value and 4\u00d7 total market value. Other SalePrice values are null. DeedDate is still stored. Prices are not reconstructed from stamps."
+          ]
+        },
+        {
+          "name": "Henderson",
+          "state": "North Carolina",
+          "fips": "37089",
+          "featureCount": 6270,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "6272 source rows kept 6270 parcel ids. 2 duplicate PINs collapsed to the larger part.",
+            "Parcel Zoning_aggregated is often the stub Cities inside municipalities and is not used as zoning."
+          ]
+        }
+      ]
+    },
+    "Tuscaloosa": {
+      "tier": "other",
+      "parcelCount": 11596,
+      "completeCountyCount": 1,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 3,
+      "path": "data/fixtures/market-parcels/markets/tuscaloosa/meta.json",
+      "counties": [
+        {
+          "name": "Greene",
+          "state": "Alabama",
+          "fips": "01063",
+          "featureCount": 0,
+          "coverage": "gap",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Greene County has Flagship/CaptureCAMA HTML only. No usable public parcel REST in this pull. Polygons were not invented."
+          ]
+        },
+        {
+          "name": "Hale",
+          "state": "Alabama",
+          "fips": "01065",
+          "featureCount": 0,
+          "coverage": "gap",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Hale County has Flagship/CaptureCAMA HTML only. No usable public parcel REST in this pull. Polygons were not invented."
+          ]
+        },
+        {
+          "name": "Pickens",
+          "state": "Alabama",
+          "fips": "01107",
+          "featureCount": 0,
+          "coverage": "gap",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Pickens County has Flagship/CaptureCAMA HTML only. No usable public parcel REST in this pull. Polygons were not invented."
+          ]
+        },
+        {
+          "name": "Tuscaloosa",
+          "state": "Alabama",
+          "fips": "01125",
+          "featureCount": 11596,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "11646 source rows collapsed to 11596 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "No sale price on the public parcel layer. lastSale.price stays null."
+          ]
+        }
+      ]
+    },
+    "Montgomery": {
+      "tier": "other",
+      "parcelCount": 26759,
+      "completeCountyCount": 3,
+      "sampleCountyCount": 0,
+      "gapCountyCount": 1,
+      "path": "data/fixtures/market-parcels/markets/montgomery/meta.json",
+      "counties": [
+        {
+          "name": "Autauga",
+          "state": "Alabama",
+          "fips": "01001",
+          "featureCount": 7047,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "7530 source rows collapsed to 7047 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "No sale price on the public parcel layer. lastSale.price stays null."
+          ]
+        },
+        {
+          "name": "Elmore",
+          "state": "Alabama",
+          "fips": "01051",
+          "featureCount": 9758,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "14848 source rows collapsed to 9758 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "No sale price on the public parcel layer. lastSale.price stays null."
+          ]
+        },
+        {
+          "name": "Lowndes",
+          "state": "Alabama",
+          "fips": "01085",
+          "featureCount": 0,
+          "coverage": "gap",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Lowndes County is in the Montgomery, AL MSA. No public parcel card was verified in this pull. Polygons were not invented."
+          ]
+        },
+        {
+          "name": "Montgomery",
+          "state": "Alabama",
+          "fips": "01101",
+          "featureCount": 9954,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "10026 source rows collapsed to 9954 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+            "No sale price on the public parcel layer. lastSale.price stays null."
           ]
         }
       ]

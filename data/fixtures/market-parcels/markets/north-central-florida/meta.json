@@ -1,0 +1,183 @@
+{
+  "generatedAt": "2026-09-24T00:47:37Z",
+  "market": "North-Central Florida",
+  "tier": "other",
+  "parcelCount": 52695,
+  "coreMinAcres": 5.0,
+  "coreMaxAcres": 150.0,
+  "tile": {
+    "originLon": -83.0,
+    "originLat": 27.0,
+    "tileDeg": 0.25
+  },
+  "notes": [
+    "Loaded only when this market is selected.",
+    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Orange, Osceola, and Polk point at the existing Orlando complete extract."
+  ],
+  "counties": [
+    {
+      "name": "Alachua",
+      "fips": "12001",
+      "state": "Florida",
+      "featureCount": 15539,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-alachua-parcels35-12001",
+      "queryUrl": "https://services1.arcgis.com/MiBZ4u97DWldovjI/ArcGIS/rest/services/Parcels35/FeatureServer/0/query",
+      "gaps": [
+        "Jurisdiction is JurisNo on Parcels35, not the situs or mailing city. Gainesville postal addresses outside the city stay Unincorporated Alachua County.",
+        "Zoning and FLU are stored only when ZONECODE/FluCode starts with the jurisdiction prefix (0100 county, 0103 Gainesville, and the same pattern for the other cities). A mismatched county code on a city parcel is left blank.",
+        "Zoning prefix mismatches left blank: 214.",
+        "Address1/city/zip on Parcels35 are the owner mailing address. Situs comes from AddressPoints.",
+        "Assessed value is not on Parcels35. JustValue is stored as market value. TaxAmount is the tax bill when present.",
+        "Gainesville's separate FLU service requires a token and was not used. City FLU is the parcel FluCode when the prefix matches.",
+        "City zoning codes are labels, not Orange County multifamily districts.",
+        "Parcels with an unrecognized JurisNo: 29."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12001/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12001/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 15563
+    },
+    {
+      "name": "Bradford",
+      "fips": "12007",
+      "state": "Florida",
+      "featureCount": 593,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-doh-ehwaters-12007",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/3/query",
+      "gaps": [
+        "598 source rows collapsed to 593 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Partial. Bradford parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12007/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12007/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 598
+    },
+    {
+      "name": "Citrus",
+      "fips": "12017",
+      "state": "Florida",
+      "featureCount": 5807,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-citrus-doh-municipal-12017",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/8/query",
+      "gaps": [
+        "Parcel polygons, owner, situs, and tax values are Florida DOH EHWATER layer 8. Citrus County lots have no acre or owner field, and lot PRCLKEY is empty, so zoning is a centroid join.",
+        "Municipality is the corporate-limit layer (Inverness or Crystal River). PHY_CITY is the postal city and is not the city limit.",
+        "County zoning and land use values CITY are placeholders and are not stored.",
+        "Inverness parcels: 86. Zoning is INV_FLU and future land use is FLU on the city layer.",
+        "Crystal River parcels left without city zoning: 88.",
+        "No public Crystal River zoning or FLU FeatureServer was verified.",
+        "County zoning codes are not Orange County multifamily districts."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12017/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12017/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 5813
+    },
+    {
+      "name": "Gilchrist",
+      "fips": "12041",
+      "state": "Florida",
+      "featureCount": 6395,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-doh-ehwaters-12041",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/19/query",
+      "gaps": [
+        "6854 source rows collapsed to 6395 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Partial. Gilchrist parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12041/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12041/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 6854
+    },
+    {
+      "name": "Hernando",
+      "fips": "12053",
+      "state": "Florida",
+      "featureCount": 6601,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-hernando-parcels-12053",
+      "queryUrl": "https://services2.arcgis.com/x5zvhhxfUuRDntRe/ArcGIS/rest/services/Parcels/FeatureServer/0/query",
+      "gaps": [
+        "Upgrade off Florida DOH. Parcels, owner, situs, and values are Hernando County Parcels (gis.V_PARCELS).",
+        "Municipality is CER_JURISDICTION: B is Brooksville and C is unincorporated. Situs city Brooksville, Spring Hill, or Weeki Wachee is not the city limit.",
+        "Spring Hill is an unincorporated place. Weeki Wachee levy code CWWE is not stored as a municipality.",
+        "County zoning joins on KEY_NUMBER. The value CITY is a placeholder and is not a zoning district.",
+        "Brooksville parcels left without city zoning: 200 (placeholder rows 174).",
+        "County future land use skips polygons whose FLU code is city. Those are the Brooksville hole, not a city FLU map.",
+        "No public Brooksville or Weeki Wachee zoning/FLU FeatureServer was verified."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12053/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12053/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 6601
+    },
+    {
+      "name": "Levy",
+      "fips": "12075",
+      "state": "Florida",
+      "featureCount": 10200,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-doh-ehwaters-12075",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/36/query",
+      "gaps": [
+        "10984 source rows collapsed to 10200 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Partial. Levy parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12075/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12075/lookup.json",
+      "tileCount": 11,
+      "sourceCount": 10984
+    },
+    {
+      "name": "Putnam",
+      "fips": "12107",
+      "state": "Florida",
+      "featureCount": 7560,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-putnam-doh-municipal-12107",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/53/query",
+      "gaps": [
+        "Optional Putnam pull. Parcel polygons and tax attributes are Florida DOH EHWATER layer 53.",
+        "The property-appraiser COMMUNITY field is Unincorporated on essentially every row, so it is not used as a municipality.",
+        "Municipal zoning is a centroid join to ReferenceMap/Zoning_R city layers when those layers published a zone field.",
+        "Unincorporated zoning and future land use services returned an error and were not joined.",
+        "Crescent City, Interlachen, Pomona Park, and Welaka future land use was not on a verified public layer separate from zoning.",
+        "Stored jurisdiction counts: {'Unincorporated Putnam County': 7220, 'Palatka': 108, 'Interlachen': 95, 'Pomona Park': 75, 'Crescent City': 40, 'Welaka': 22}.",
+        "PHY_CITY remains the postal city. It is not the municipality.",
+        "Palatka future-land-use service did not load. Palatka FLU was left blank.",
+        "8810 source rows stored as 7560 parcels (0 failed the acreage or county-extent check; the rest were duplicate parcel ids)."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12107/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12107/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 8810
+    }
+  ]
+}

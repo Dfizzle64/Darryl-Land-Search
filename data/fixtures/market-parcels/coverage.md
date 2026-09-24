@@ -6,19 +6,19 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 56,581 | 10 | 0 | 25 |
-| Tampa | primary | 124,649 | 10 | 0 | 0 |
+| Atlanta | primary | 70,464 | 13 | 0 | 22 |
+| Tampa | primary | 124,315 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
-| Nashville | primary | 104,066 | 13 | 0 | 4 |
+| Nashville | primary | 109,348 | 13 | 0 | 4 |
 | Charlotte | primary | 106,650 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 151,530 | 17 | 0 | 0 |
 | SWFL | other | 32,749 | 4 | 0 | 0 |
-| Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 39,607 | 5 | 0 | 0 |
+| Vero Beach | other | 23,009 | 5 | 0 | 0 |
+| Melbourne | other | 41,026 | 5 | 0 | 0 |
 | Jacksonville | other | 26,301 | 5 | 0 | 0 |
 | Big Bend | other | 21,551 | 1 | 3 | 3 |
 | Pensacola | other | 59,902 | 6 | 0 | 0 |
-| Birmingham | other | 38,101 | 3 | 0 | 7 |
+| Birmingham | other | 38,101 | 3 | 0 | 6 |
 | Mobile | other | 42,446 | 3 | 0 | 2 |
 | Huntsville | other | 18,584 | 3 | 0 | 4 |
 | Savannah | other | 3,283 | 1 | 0 | 7 |
@@ -30,6 +30,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Jackson | other | 6,384 | 1 | 0 | 0 |
 | Winston-Salem | other | 92,188 | 9 | 0 | 0 |
 | Wilmington | other | 47,320 | 6 | 0 | 0 |
+| Heartland | shelf | 21,163 | 4 | 1 | 0 |
+| North-Central Florida | other | 52,695 | 7 | 0 | 0 |
+| Asheville | other | 16,793 | 2 | 0 | 0 |
+| Tuscaloosa | other | 11,596 | 1 | 0 | 3 |
+| Montgomery | other | 26,759 | 3 | 0 | 1 |
 
 ## Counties
 
@@ -38,8 +43,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Banks | Georgia | 13011 | gap | 0 | unavailable |
-| Barrow | Georgia | 13013 | gap | 0 | unavailable |
-| Bartow | Georgia | 13015 | gap | 0 | unavailable |
+| Barrow | Georgia | 13013 | complete-gte-5ac | 4,251 | ga-barrow-parcels |
+| Bartow | Georgia | 13015 | complete-gte-5ac | 7,077 | ga-bartow-land |
 | Butts | Georgia | 13035 | gap | 0 | unavailable |
 | Carroll | Georgia | 13045 | gap | 0 | unavailable |
 | Cherokee | Georgia | 13057 | gap | 0 | unavailable |
@@ -69,7 +74,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Paulding | Georgia | 13223 | complete-gte-5ac | 5,094 | ga-paulding-parcels |
 | Pickens | Georgia | 13227 | gap | 0 | unavailable |
 | Pike | Georgia | 13231 | gap | 0 | unavailable |
-| Rockdale | Georgia | 13247 | gap | 0 | unavailable |
+| Rockdale | Georgia | 13247 | complete-gte-5ac | 2,555 | ga-rockdale-parcels |
 | Spalding | Georgia | 13255 | gap | 0 | unavailable |
 | Walton | Georgia | 13297 | gap | 0 | unavailable |
 
@@ -77,9 +82,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Citrus | Florida | 12017 | complete-gte-5ac | 5,810 | fl-doh-ehwaters-12017 |
-| Hardee | Florida | 12049 | complete-gte-5ac | 5,055 | fl-doh-ehwaters-12049 |
-| Hernando | Florida | 12053 | complete-gte-5ac | 7,180 | fl-doh-ehwaters-12053 |
+| Citrus | Florida | 12017 | complete-gte-5ac | 5,807 | fl-citrus-doh-municipal-12017 |
+| Hardee | Florida | 12049 | complete-gte-5ac | 5,303 | fl-hardee-infomap-12049 |
+| Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
 | Hillsborough | Florida | 12057 | complete-gte-5ac | 13,838 | fl-hillsborough-parcelpublishing-12 |
 | Manatee | Florida | 12081 | complete-gte-5ac | 7,239 | fl-doh-ehwaters-12081 |
 | Pasco | Florida | 12101 | complete-gte-5ac | 12,372 | fl-pasco-pascomapper-7 |
@@ -106,9 +111,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Bedford | Tennessee | 47003 | complete-gte-5ac | 4,211 | tn-impact-47003 |
 | Cannon | Tennessee | 47015 | complete-gte-5ac | 6,376 | tn-impact-47015 |
-| Cheatham | Tennessee | 47021 | complete-gte-5ac | 3,790 | tn-impact-47021 |
+| Cheatham | Tennessee | 47021 | complete-gte-5ac | 5,426 | apsu-cheatgis-47021 |
 | Davidson | Tennessee | 47037 | complete-gte-5ac | 9,478 | tn-metro-davidson-parcels |
-| Dickson | Tennessee | 47043 | complete-gte-5ac | 4,797 | tn-impact-47043 |
+| Dickson | Tennessee | 47043 | complete-gte-5ac | 8,443 | tn-impact-47043 |
 | Hickman | Tennessee | 47081 | complete-gte-5ac | 3,672 | tn-impact-47081 |
 | Macon | Tennessee | 47111 | gap | 0 | tn-impact-47111 |
 | Marshall | Tennessee | 47117 | gap | 0 | tn-impact-47117 |
@@ -177,18 +182,18 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
-| Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Martin | Florida | 12085 | complete-gte-5ac | 3,802 | fl-doh-ehwaters-12085 |
-| Okeechobee | Florida | 12093 | complete-gte-5ac | 3,176 | fl-doh-ehwaters-12093 |
-| St. Lucie | Florida | 12111 | complete-gte-5ac | 4,824 | fl-doh-ehwaters-12111 |
+| Brevard | Florida | 12009 | complete-gte-5ac | 6,802 | fl-brevard-accela-12009 |
+| Indian River | Florida | 12061 | complete-gte-5ac | 3,779 | fl-ircpa-parcels-12061 |
+| Martin | Florida | 12085 | complete-gte-5ac | 3,790 | fl-martin-geoweb-12085 |
+| Okeechobee | Florida | 12093 | complete-gte-5ac | 3,053 | fl-okeechobee-planning-12093 |
+| St. Lucie | Florida | 12111 | complete-gte-5ac | 5,585 | fl-slc-parcels-12111 |
 
 ### Melbourne
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
-| Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
+| Brevard | Florida | 12009 | complete-gte-5ac | 6,802 | fl-brevard-accela-12009 |
+| Indian River | Florida | 12061 | complete-gte-5ac | 3,779 | fl-ircpa-parcels-12061 |
 | Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 6,169 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
@@ -238,7 +243,6 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Shelby | Alabama | 01117 | complete-gte-5ac | 11,994 | al-shelby-cadastral-2025 |
 | St. Clair | Alabama | 01115 | complete-gte-5ac | 10,466 | al-stclair-owner-parcels |
 | Talladega | Alabama | 01121 | gap | 0 | unavailable |
-| Tuscaloosa | Alabama | 01125 | gap | 0 | unavailable |
 | Walker | Alabama | 01127 | gap | 0 | unavailable |
 
 ### Mobile
@@ -383,4 +387,51 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,263 | nc-new-hanover-parcels-37129 |
 | Onslow | North Carolina | 37133 | complete-gte-5ac | 6,747 | nc-onemap-37133 |
 | Pender | North Carolina | 37141 | complete-gte-5ac | 7,355 | nc-pender-energov-37141 |
+
+### Heartland
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| DeSoto | Florida | 12027 | partial | 4,677 | fl-desoto-swfwmd-12027 |
+| Glades | Florida | 12043 | complete-gte-5ac | 2,256 | fl-glades-agol-2026-06-12043 |
+| Hardee | Florida | 12049 | complete-gte-5ac | 5,303 | fl-hardee-infomap-12049 |
+| Hendry | Florida | 12051 | complete-gte-5ac | 3,070 | fl-hendry-parcels-feb2024-12051 |
+| Highlands | Florida | 12055 | complete-gte-5ac | 5,857 | fl-highlands-pao-12055 |
+
+### North-Central Florida
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Alachua | Florida | 12001 | complete-gte-5ac | 15,539 | fl-alachua-parcels35-12001 |
+| Bradford | Florida | 12007 | complete-gte-5ac | 593 | fl-doh-ehwaters-12007 |
+| Citrus | Florida | 12017 | complete-gte-5ac | 5,807 | fl-citrus-doh-municipal-12017 |
+| Gilchrist | Florida | 12041 | complete-gte-5ac | 6,395 | fl-doh-ehwaters-12041 |
+| Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
+| Levy | Florida | 12075 | complete-gte-5ac | 10,200 | fl-doh-ehwaters-12075 |
+| Putnam | Florida | 12107 | complete-gte-5ac | 7,560 | fl-putnam-doh-municipal-12107 |
+
+### Asheville
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Buncombe | North Carolina | 37021 | complete-gte-5ac | 10,523 | nc-buncombe-opendata-37021 |
+| Henderson | North Carolina | 37089 | complete-gte-5ac | 6,270 | nc-henderson-parcels-37089 |
+
+### Tuscaloosa
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Greene | Alabama | 01063 | gap | 0 | unavailable |
+| Hale | Alabama | 01065 | gap | 0 | unavailable |
+| Pickens | Alabama | 01107 | gap | 0 | unavailable |
+| Tuscaloosa | Alabama | 01125 | complete-gte-5ac | 11,596 | al-tuscaloosa-parcels |
+
+### Montgomery
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Autauga | Alabama | 01001 | complete-gte-5ac | 7,047 | al-autauga-parcels |
+| Elmore | Alabama | 01051 | complete-gte-5ac | 9,758 | al-elmore-parcels |
+| Lowndes | Alabama | 01085 | gap | 0 | unavailable |
+| Montgomery | Alabama | 01101 | complete-gte-5ac | 9,954 | al-montgomery-parcels |
 

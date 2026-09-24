@@ -120,19 +120,24 @@ export type MarketId = (typeof MARKETS)[number];
 
 /**
  * Smaller MSAs, visually secondary to the seven primary markets.
- * Florida markets stay together: SWFL, then the east coast south to north,
- * then Big Bend and the panhandle. Jackson is Jackson, Tennessee.
+ * Florida markets stay together: SWFL and the Heartland shelf, east coast south to north,
+ * then North-Central Florida, Big Bend, and the panhandle. Jackson is Jackson, Tennessee.
+ * Heartland, Tuscaloosa, and Montgomery are parcel shelves with no eligible-tract rows.
  */
 export const OTHER_MARKETS = [
   "SWFL",
+  "Heartland",
   "Vero Beach",
   "Melbourne",
   "Jacksonville",
+  "North-Central Florida",
   "Big Bend",
   "Pensacola",
   "Birmingham",
   "Mobile",
   "Huntsville",
+  "Tuscaloosa",
+  "Montgomery",
   "Savannah",
   "Columbia",
   "Greenville",
@@ -146,7 +151,15 @@ export const OTHER_MARKETS = [
 
 export type OtherMarketId = (typeof OTHER_MARKETS)[number];
 
-export type SearchMarketId = MarketId | OtherMarketId;
+/**
+ * Parcel extracts that are not in the OZ 2.0 screening packs.
+ * Eligible is not designated, and these markets do not invent tract rows.
+ */
+export const PARCEL_MARKETS = ["Asheville"] as const;
+
+export type ParcelMarketId = (typeof PARCEL_MARKETS)[number];
+
+export type SearchMarketId = MarketId | OtherMarketId | ParcelMarketId;
 
 /** Rural, urban (non-rural eligible), or both. */
 export type TractClassView = "both" | "rural" | "urban";

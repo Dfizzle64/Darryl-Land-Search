@@ -1,3 +1,5 @@
+import { STATE_ABBR } from "./markets";
+
 const ENTITY_RE = /\b(LLC|L\.L\.C|INC|INCORPORATED|LP|L\.P|LLP|CORP|CORPORATION|LTD|TRUST|HOLDINGS|PARTNERS|COMPANY|CO)\b/i;
 
 export function isEntityOwner(name: string | null | undefined): boolean {
@@ -39,8 +41,17 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "12001": "https://www.acpafl.org/",
+  "12007": "https://www.bradfordappraiser.com/",
+  "12017": "https://www.citruspa.org/",
+  "12041": "https://www.qpublic.net/fl/gilchrist/",
+  "12053": "https://hernandocountypa-florida.us/",
+  "12075": "https://www.qpublic.net/fl/levy/",
+  "12107": "https://pa.putnam-fl.com/",
+  "13013": "https://qpublic.schneidercorp.com/Application.aspx?AppID=635&LayerID=11218&PageTypeID=2&PageID=0",
   "13077": "https://qpublic.schneidercorp.com/Application.aspx?AppID=704&LayerID=11412&PageTypeID=1",
   "13089": "https://propertyappraisal.dekalbcountyga.gov/",
+  "37089": "https://lrcpwa.ncptscloud.com/henderson/parcel-search",
 };
 
 /**
@@ -68,8 +79,17 @@ const APPRAISER_LINKS: Record<string, { href: string; label: string }> = {
   "12117": { href: DEFAULT_APPRAISER_URLS["12117"], label: "Open Seminole Property Appraiser search" },
   "12119": { href: DEFAULT_APPRAISER_URLS["12119"], label: "Open Sumter Property Appraiser search" },
   "12127": { href: DEFAULT_APPRAISER_URLS["12127"], label: "Open Volusia Property Appraiser search" },
+  "12001": { href: DEFAULT_APPRAISER_URLS["12001"], label: "Open Alachua Property Appraiser search" },
+  "12007": { href: DEFAULT_APPRAISER_URLS["12007"], label: "Open Bradford Property Appraiser search" },
+  "12017": { href: DEFAULT_APPRAISER_URLS["12017"], label: "Open Citrus Property Appraiser search" },
+  "12041": { href: DEFAULT_APPRAISER_URLS["12041"], label: "Open Gilchrist Property Appraiser search" },
+  "12053": { href: DEFAULT_APPRAISER_URLS["12053"], label: "Open Hernando Property Appraiser search" },
+  "12075": { href: DEFAULT_APPRAISER_URLS["12075"], label: "Open Levy Property Appraiser search" },
+  "12107": { href: DEFAULT_APPRAISER_URLS["12107"], label: "Open Putnam Property Appraiser search" },
+  "13013": { href: DEFAULT_APPRAISER_URLS["13013"], label: "Open Barrow County qPublic search" },
   "13077": { href: DEFAULT_APPRAISER_URLS["13077"], label: "Open Coweta County property appraiser (qPublic)" },
   "13089": { href: DEFAULT_APPRAISER_URLS["13089"], label: "Open DeKalb Property Appraiser search" },
+  "37089": { href: DEFAULT_APPRAISER_URLS["37089"], label: "Open Henderson County property appraiser" },
 };
 
 export function parcelAppraiserUrl(options: {
@@ -98,7 +118,19 @@ export function parcelAppraiserUrl(options: {
     };
   }
   const named = fips ? APPRAISER_LINKS[fips] : undefined;
-  if (fips === "13077") {
+  if (fips === "37021" || options.appraiserUrl?.includes("prc-buncombe.spatialest.com")) {
+    return {
+      href: options.appraiserUrl || `https://prc-buncombe.spatialest.com/#/property/${encodeURIComponent(options.parcelId)}`,
+      label: "Open Buncombe property card",
+    };
+  }
+  if (fips === "13013") {
+    return {
+      href: options.appraiserUrl || named?.href || null,
+      label: options.appraiserUrl ? "Open this parcel in Barrow County qPublic" : named?.label || "Open Barrow County qPublic search",
+    };
+  }
+  if (fips === "37089" || fips === "13077") {
     return {
       href: options.appraiserUrl || named?.href || null,
       label: named?.label || "Open county property appraiser",
@@ -217,6 +249,20 @@ export function formatSale(sale: { date: string | null; price: number | null }):
   const price = sale.price != null && sale.price > 0 ? formatUsd(sale.price) : null;
   if (date && price) return `${date}\n${price}`;
   return date ?? price ?? "Not available";
+}
+
+/** City and ZIP when present. Otherwise county plus the parcel's state. Missing state stays Florida. */
+export function parcelPlaceLine(options: {
+  situsCity?: string | null;
+  situsZip?: string | null;
+  countyName?: string | null;
+  state?: string | null;
+}): string {
+  const cityLine = [options.situsCity, options.situsZip].filter(Boolean).join(" ");
+  if (cityLine) return cityLine;
+  const abbr = options.state ? (STATE_ABBR[options.state] ?? options.state) : "FL";
+  if (options.countyName) return `${options.countyName} County, ${abbr}`;
+  return abbr === "FL" ? "Florida" : options.state || abbr;
 }
 
 export function formatParcelPlace(properties: {

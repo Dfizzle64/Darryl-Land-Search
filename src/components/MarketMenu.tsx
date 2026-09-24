@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { isOtherMarketId } from "@/lib/markets";
-import { MARKETS, OTHER_MARKETS, type SearchMarketId } from "@/lib/types";
+import { MARKETS, OTHER_MARKETS, PARCEL_MARKETS, type SearchMarketId } from "@/lib/types";
 
 type MarketMenuProps = {
   value: SearchMarketId;
@@ -80,14 +80,14 @@ export function MarketMenu({ value, onChange }: MarketMenuProps) {
           >
             <span>
               <span className="block text-[10px] uppercase tracking-[0.16em] text-clay-300">More markets</span>
-              <span className="text-sm font-medium text-white">Other MSAs ({OTHER_MARKETS.length})</span>
+              <span className="text-sm font-medium text-white">Other MSAs ({OTHER_MARKETS.length + PARCEL_MARKETS.length})</span>
             </span>
             <span className="text-sm text-clay-300" aria-hidden>
               {otherOpen ? "▾" : "▸"}
             </span>
           </button>
           {otherOpen
-            ? OTHER_MARKETS.map((market) => (
+            ? [...OTHER_MARKETS, ...PARCEL_MARKETS].map((market) => (
                 <button
                   key={market}
                   type="button"

@@ -1,3 +1,5 @@
+import { southFloridaAppraiserLink } from "./southFlorida";
+
 const ENTITY_RE = /\b(LLC|L\.L\.C|INC|INCORPORATED|LP|L\.P|LLP|CORP|CORPORATION|LTD|TRUST|HOLDINGS|PARTNERS|COMPANY|CO)\b/i;
 
 export function isEntityOwner(name: string | null | undefined): boolean {
@@ -38,7 +40,10 @@ export function lakeAltKey(url: string | null | undefined): string | null {
  * Lake's shelf field is ParcelNumber; the PA record is opened with Alt Key.
  */
 const PARCEL_ID_LABELS: Record<string, string> = {
+  "12011": "Folio",
   "12069": "Parcel Number",
+  "12086": "Folio",
+  "12087": "RE Number",
   "12095": "Parcel ID",
   "12097": "PIN",
   "12105": "Parcel ID",
@@ -173,6 +178,8 @@ export function parcelAppraiserUrl(options: {
   appraiserUrl?: string | null;
 }): { href: string | null; label: string } {
   const fips = options.countyFips ?? null;
+  const southFlorida = southFloridaAppraiserLink(fips, options.parcelId, options.appraiserUrl);
+  if (southFlorida) return southFlorida;
   if (fips === "12097") {
     const stored = options.appraiserUrl;
     return {

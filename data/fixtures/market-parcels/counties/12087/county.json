@@ -1,0 +1,29 @@
+{
+  "name": "Monroe",
+  "fips": "12087",
+  "state": "Florida",
+  "markets": [
+    "South Florida"
+  ],
+  "featureCount": 6492,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "fl-monroe-apo-parcels-0",
+  "queryUrl": "https://mcgis4.monroecounty-fl.gov/public/rest/services/Parcels/MapServer/0/query",
+  "gaps": [
+    "Monroe parcels are mcgis4 Parcels MapServer/0. The server certificate does not verify with the default OpenSSL trust store, so ingest retries that host without certificate verification. qPublic HTML often returns Cloudflare 403 to bots. The record link is still the human URL.",
+    "Acreage is the WGS84 polygon area. Shape.STArea() is rejected in SQL on this service. AREA1 is inconsistent for condos and is not the stored acreage.",
+    "SALE1 can include bulk or condo package prices. PC is stored as dorCode. Its mapping to the Florida DOR use code is not confirmed.",
+    "City zoning (Key West, Marathon, and the other municipalities) was not inventoried. County Land Use Districts and the FLUM are the joined layers.",
+    "maps.monroecounty.gov Hosted Parcels_Public is Monroe County, New York, and was not used.",
+    "Monroe TLS verification failed. Ingest used the documented certificate fallback for mcgis4.monroecounty-fl.gov.",
+    "Monroe zoning joined 5473/6492. FLUM joined 6273/6492."
+  ],
+  "path": "data/fixtures/market-parcels/counties/12087/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12087/lookup.json",
+  "sourceCount": 6492,
+  "dropped": 0,
+  "tileCount": 22
+}

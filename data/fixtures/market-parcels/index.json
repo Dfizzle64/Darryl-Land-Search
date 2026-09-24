@@ -3677,6 +3677,68 @@
           ]
         }
       ]
+    },
+    "South Florida": {
+      "tier": "shelf",
+      "parcelCount": 41034,
+      "completeCountyCount": 2,
+      "sampleCountyCount": 2,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/south-florida/meta.json",
+      "counties": [
+        {
+          "name": "Broward",
+          "state": "Florida",
+          "fips": "12011",
+          "featureCount": 7549,
+          "coverage": "partial",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Partial. BCPA MapServer/16 (BCPA_EXTERNAL_JAN26) is folio and geometry only. Acreage is the polygon area, 5.0–150.0 inclusive. gis.bcpa.net does not resolve. The service name rotates yearly.",
+            "Countywide CAMA is not on that layer. The FDOR CO_NO=16 join (PARCEL_ID=FOLIO) did not return from batched queries, so owner, sale, and value are not on these rows. BMSDParcelAddress is an unincorporated subset and is not the county roll."
+          ]
+        },
+        {
+          "name": "Miami-Dade",
+          "state": "Florida",
+          "fips": "12086",
+          "featureCount": 15563,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Wave 0 is South Florida only. Miami-Dade parcels are MD_LandInformation MapServer/26. Acreage is LOT_SIZE square feet divided by 43560, 5.0–150.0 inclusive.",
+            "PRIMARY_ZONE is a property-appraiser neighborhood code, not a zoning district. Zoning is Zone_Poly_U (unincorporated) or MunicipalZone. It is not copied from PRIMARY_ZONE."
+          ]
+        },
+        {
+          "name": "Monroe",
+          "state": "Florida",
+          "fips": "12087",
+          "featureCount": 6492,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Monroe parcels are mcgis4 Parcels MapServer/0. The server certificate does not verify with the default OpenSSL trust store, so ingest retries that host without certificate verification. qPublic HTML often returns Cloudflare 403 to bots. The record link is still the human URL.",
+            "Acreage is the WGS84 polygon area. Shape.STArea() is rejected in SQL on this service. AREA1 is inconsistent for condos and is not the stored acreage."
+          ]
+        },
+        {
+          "name": "Palm Beach",
+          "state": "Florida",
+          "fips": "12099",
+          "featureCount": 11430,
+          "coverage": "partial",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Partial. PARCEL_INFO reports about 146,014 object ids with ACRES from 5.0 through 150.0. This extract kept the parcels that survived geometry normalize and parcel-id dedupe, not that full object-id count.",
+            "Palm Beach parcels are PARCEL_INFO FeatureServer/4. Acreage is ACRES, 5.0–150.0 inclusive. PROPERTY_USE is a text use description, not a numeric DOR_UC."
+          ]
+        }
+      ]
     }
   }
 }

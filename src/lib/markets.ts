@@ -153,6 +153,23 @@ const PARCEL_ONLY_MARKETS: Partial<Record<SearchMarketId, MarketSummary>> = {
       { county: "Yazoo", state: "Mississippi", count: 0, outerEdge: true },
     ],
   },
+  "South Florida": {
+    market: "South Florida",
+    rowCount: 0,
+    ruralCount: 0,
+    urbanCount: 0,
+    bounds: [
+      [-83.05, 24.4],
+      [-79.95, 27.05],
+    ],
+    center: [-81.5, 25.75],
+    counties: [
+      { county: "Broward", state: "Florida", count: 0, outerEdge: false },
+      { county: "Miami-Dade", state: "Florida", count: 0, outerEdge: false },
+      { county: "Monroe", state: "Florida", count: 0, outerEdge: false },
+      { county: "Palm Beach", state: "Florida", count: 0, outerEdge: false },
+    ],
+  },
   Heartland: {
     market: "Heartland",
     rowCount: 0,

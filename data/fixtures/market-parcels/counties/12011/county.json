@@ -1,0 +1,28 @@
+{
+  "name": "Broward",
+  "fips": "12011",
+  "state": "Florida",
+  "markets": [
+    "South Florida"
+  ],
+  "featureCount": 7549,
+  "coverage": "partial",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "fl-broward-bcpa-jan26-16",
+  "queryUrl": "https://gisweb-adapters.bcpa.net/arcgis/rest/services/BCPA_EXTERNAL_JAN26/MapServer/16/query",
+  "gaps": [
+    "Partial. BCPA MapServer/16 (BCPA_EXTERNAL_JAN26) is folio and geometry only. Acreage is the polygon area, 5.0–150.0 inclusive. gis.bcpa.net does not resolve. The service name rotates yearly.",
+    "Countywide CAMA is not on that layer. The FDOR CO_NO=16 join (PARCEL_ID=FOLIO) did not return from batched queries, so owner, sale, and value are not on these rows. BMSDParcelAddress is an unincorporated subset and is not the county roll.",
+    "BMSD zoning covers unincorporated Broward only. The city zoning mosaic (MapServer/9) is partial: many ZONE_NAME values are blank, N/A, or WATER, and it is not a city ordinance. Authoritative city zoning was not invented.",
+    "County land use (MapServer/10) stores numeric SLUC1 codes, not plain-language future-land-use labels. BCPA sales layers were not queried.",
+    "FDOR CO_NO=16 was not joined. Batched PARCEL_ID queries did not return, so this partial extract is folio and geometry from BCPA MapServer/16.",
+    "Broward zoning joined 7178/7549 (BMSD wins inside the unincorporated district). Numeric SLUC1 future land use joined 7425/7549."
+  ],
+  "path": "data/fixtures/market-parcels/counties/12011/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12011/lookup.json",
+  "sourceCount": 7549,
+  "dropped": 0,
+  "tileCount": 12
+}

@@ -137,13 +137,14 @@ export type MarketId = (typeof MARKETS)[number];
 
 /**
  * Smaller MSAs, visually secondary to the seven primary markets.
- * Florida markets stay together: SWFL and the Heartland shelf, east coast south to north,
- * then North-Central Florida, Big Bend, and the panhandle. Jackson is Jackson, Tennessee.
- * Heartland, Tuscaloosa, and Montgomery are parcel shelves with no eligible-tract rows.
+ * Florida markets stay together: South Florida, SWFL, and the Heartland shelf, east coast
+ * south to north, then North-Central Florida, Big Bend, and the panhandle. Jackson is Jackson, Tennessee.
+ * South Florida (Wave 0: Miami-Dade, Monroe, Broward, and Palm Beach), Heartland, Tuscaloosa, and Montgomery are parcel shelves with no eligible-tract rows.
  * Valdosta, Macon, Athens, Hilton Head, and Jackson MS are parcel shelves too.
  * Jackson MS is Jackson, Mississippi. Jackson remains Jackson, Tennessee.
  */
 export const OTHER_MARKETS = [
+  "South Florida",
   "SWFL",
   "Heartland",
   "Vero Beach",
@@ -483,6 +484,14 @@ export type ParcelProperties = {
   filterMatch?: 0 | 1;
   /** County property appraiser / parcel search landing page when known. */
   appraiserUrl?: string | null;
+  /**
+   * Public jurisdiction GIS viewer from the research card (`gisViewerUrl`).
+   * A REST MapServer or FeatureServer URL is not this field. The drawer catalog
+   * wins for counties that have a card viewer, including an optional alternate.
+   */
+  gisViewerUrl?: string | null;
+  /** Optional second public GIS viewer (`gisViewerUrlAlt`) from the same card. */
+  gisViewerUrlAlt?: string | null;
   /** Honest per-county gaps (no zoning, etc.). */
   dataGaps?: string[];
   /**

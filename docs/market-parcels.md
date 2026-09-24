@@ -131,6 +131,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Manatee | Florida | 12081 | complete-gte-5ac | 7,239 | fl-doh-ehwaters-12081 |
 | Pasco | Florida | 12101 | complete-gte-5ac | 10,590 | fl-doh-ehwaters-12101 |
 | Pinellas | Florida | 12103 | complete-gte-5ac | 18,638 | fl-doh-ehwaters-12103 |
+
+Pinellas and Pasco keep those DOH shelves. City zoning and future land use are stamped on top: Pinellas 3,901 zoning and 3,211 future land use; Pasco 142 zoning and 140 future land use. Sources and the cities left blank are in `docs/muni-overlay-consolidator.md`. County parcels were not re-downloaded.
 | Polk | Florida | 12105 | complete-gte-5ac | 19,734 | reused-orlando-complete-5-150 |
 | Sarasota | Florida | 12115 | complete-gte-5ac | 4,303 | fl-doh-ehwaters-12115 |
 | Sumter | Florida | 12119 | complete-gte-5ac | 6,359 | fl-doh-ehwaters-12119 |

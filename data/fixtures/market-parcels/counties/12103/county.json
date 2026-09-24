@@ -13,11 +13,202 @@
   "source": "fl-doh-ehwaters-12103",
   "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/51/query",
   "gaps": [
-    "No zoning or FLU on the Florida DOH extract."
+    "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12103, 3901 city zoning codes and 3211 city future land use codes on this shelf). County parcels were not re-downloaded.",
+    "Dunedin, Pinellas Park, Tarpon Springs, Safety Harbor, and Oldsmar have city zoning and future land use. Join is the city parcel id when it matches the DOH strap, otherwise a point inside the parcel.",
+    "Seminole, South Pasadena, Treasure Island, Kenneth City, North Redington Beach, Indian Shores, Belleair, Indian Rocks Beach, and Madeira Beach use the Pinellas County GIS city zoning view where the parcel intersects it. City future land use stays blank. The countywide plan map is not stored. North Redington Beach has no situs parcels on this 5\u2013150 acre shelf. Redington Shores is on that same view, and its two situs parcels on this shelf do not intersect the zoning polygons.",
+    "Largo zoning is a gap. Largo future land use is not on this shelf and was not invented from mowing or community-standards layers.",
+    "Gulfport, Belleair Beach, Belleair Bluffs, Redington Beach, and St. Pete Beach have no verified city zoning or future land use layer.",
+    "St. Petersburg and Clearwater zoning were not copied from the Tampa parcel re-extract. They stay blank on this shelf.",
+    "Rejected namesakes: Hernando Zoning_Flu (Weeki Wachee), Anderson County California Zoning_view, and Gulfport, Mississippi GPT_Zoning."
   ],
   "path": "data/fixtures/market-parcels/counties/12103/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12103/lookup.json",
   "sourceCount": 18639,
   "dropped": 0,
-  "tileCount": 6
+  "tileCount": 6,
+  "overlays": [
+    {
+      "role": "dunedin-zoning",
+      "url": "https://gis.dunedingov.com/server/rest/services/CommunityDevelopment/ZoningDistrict/FeatureServer/0"
+    },
+    {
+      "role": "dunedin-flu",
+      "url": "https://gis.dunedingov.com/server/rest/services/CommunityDevelopment/LandUseCurrent/FeatureServer/0"
+    },
+    {
+      "role": "pinellas-park-zoning",
+      "url": "https://services6.arcgis.com/fH2ZwfxOgb5eaBS4/arcgis/rest/services/Planning_Development_2_WFL1/FeatureServer/19"
+    },
+    {
+      "role": "pinellas-park-flu",
+      "url": "https://services6.arcgis.com/fH2ZwfxOgb5eaBS4/arcgis/rest/services/Planning_Development_2_WFL1/FeatureServer/9"
+    },
+    {
+      "role": "tarpon-springs-zoning",
+      "url": "https://gis.ctsfl.us/arcgis/rest/services/Hosted/Zoning_2025/FeatureServer/3"
+    },
+    {
+      "role": "tarpon-springs-flu",
+      "url": "https://gis.ctsfl.us/arcgis/rest/services/Hosted/Future_Land_Use_2025/FeatureServer/0"
+    },
+    {
+      "role": "safety-harbor-zoning",
+      "url": "https://services3.arcgis.com/mmHgYti6dbsFdG2U/arcgis/rest/services/SafetyHarborZoning_11272023/FeatureServer/0"
+    },
+    {
+      "role": "safety-harbor-flu",
+      "url": "https://services3.arcgis.com/mmHgYti6dbsFdG2U/arcgis/rest/services/SH_FLU_May2025/FeatureServer/0"
+    },
+    {
+      "role": "oldsmar-zoning",
+      "url": "https://services8.arcgis.com/4LjX8EYY898im7w3/arcgis/rest/services/Public_Zoning/FeatureServer/0"
+    },
+    {
+      "role": "oldsmar-flu",
+      "url": "https://services8.arcgis.com/4LjX8EYY898im7w3/arcgis/rest/services/Landuse/FeatureServer/0"
+    },
+    {
+      "role": "seminole-zoning",
+      "url": "https://services.arcgis.com/f5HgUpxURgEzTccH/arcgis/rest/services/Pinellas_Seminole_Zoning_view/FeatureServer/0"
+    },
+    {
+      "role": "south-pasadena-zoning",
+      "url": "https://services.arcgis.com/f5HgUpxURgEzTccH/arcgis/rest/services/Pinellas_South_Pasadena_Zoning_view/FeatureServer/0"
+    },
+    {
+      "role": "treasure-island-zoning",
+      "url": "https://services.arcgis.com/f5HgUpxURgEzTccH/arcgis/rest/services/Pinellas_Treasure_Island_Zoning_view/FeatureServer/0"
+    },
+    {
+      "role": "kenneth-city-zoning",
+      "url": "https://services.arcgis.com/f5HgUpxURgEzTccH/arcgis/rest/services/Pinellas_Kenneth_City_Zoning_view/FeatureServer/0"
+    },
+    {
+      "role": "north-redington-beach-zoning",
+      "url": "https://services.arcgis.com/f5HgUpxURgEzTccH/arcgis/rest/services/Pinellas_N_Red_Beach_Zoning_view/FeatureServer/0"
+    },
+    {
+      "role": "indian-shores-zoning",
+      "url": "https://services.arcgis.com/f5HgUpxURgEzTccH/arcgis/rest/services/Pinellas_Indian_Shores_Zoning_view/FeatureServer/0"
+    },
+    {
+      "role": "belleair-zoning",
+      "url": "https://services.arcgis.com/f5HgUpxURgEzTccH/arcgis/rest/services/Pinellas_Belleair_Zoning_view/FeatureServer/0"
+    },
+    {
+      "role": "indian-rocks-beach-zoning",
+      "url": "https://services.arcgis.com/f5HgUpxURgEzTccH/arcgis/rest/services/Pinellas_Indian_Rocks_Beach_Zoning_view/FeatureServer/0"
+    },
+    {
+      "role": "redington-shores-zoning",
+      "url": "https://services.arcgis.com/f5HgUpxURgEzTccH/arcgis/rest/services/Pinellas_Redington_Shores_Zoning_view/FeatureServer/0"
+    },
+    {
+      "role": "madeira-beach-zoning",
+      "url": "https://services.arcgis.com/f5HgUpxURgEzTccH/arcgis/rest/services/Pinellas_Madeira_Beach_Zoning_view/FeatureServer/0"
+    }
+  ],
+  "rejected": [
+    "Rejected namesake: AGOL Zoning_Flu (Weeki Wachee situs, Hernando County FIPS 12053), not Pinellas or Pasco.",
+    "Rejected namesake: AGOL Zoning_view zone_code R1-8 (centroid about -122.31, 40.46, Anderson County, California).",
+    "Rejected namesake: maps.gulfport-ms.gov GPT_Zoning (Gulfport, Mississippi), not Gulfport, Florida.",
+    "Pasco county ZN_TYPE values NPR, PR, SA, DC, and ZH are city placeholders, not district maps.",
+    "Pinellas unincorporated Landuse_Zoning is not used as a city district map.",
+    "Pinellas Countywide Plan Map categories are not stored as a city future land use map.",
+    "Zephyrhills traditional city center zoning (Zhills_EnGov_Map_11_2025/3) is a second citywide map and is not stacked on the Euclidean layer."
+  ],
+  "zoningJoinedCount": 3901,
+  "fluJoinedCount": 3211,
+  "municipalOverlayJoins": {
+    "Dunedin": {
+      "parcels": 842,
+      "zoningJoined": 809,
+      "fluJoined": 812,
+      "fluStatus": "city"
+    },
+    "Pinellas Park": {
+      "parcels": 1604,
+      "zoningJoined": 1570,
+      "fluJoined": 1570,
+      "fluStatus": "city"
+    },
+    "Tarpon Springs": {
+      "parcels": 935,
+      "zoningJoined": 708,
+      "fluJoined": 707,
+      "fluStatus": "city"
+    },
+    "Safety Harbor": {
+      "parcels": 58,
+      "zoningJoined": 43,
+      "fluJoined": 49,
+      "fluStatus": "city"
+    },
+    "Oldsmar": {
+      "parcels": 97,
+      "zoningJoined": 71,
+      "fluJoined": 73,
+      "fluStatus": "city"
+    },
+    "Seminole": {
+      "parcels": 1268,
+      "zoningJoined": 665,
+      "fluJoined": 0,
+      "fluStatus": "gap"
+    },
+    "South Pasadena": {
+      "parcels": 16,
+      "zoningJoined": 12,
+      "fluJoined": 0,
+      "fluStatus": "gap"
+    },
+    "Treasure Island": {
+      "parcels": 8,
+      "zoningJoined": 7,
+      "fluJoined": 0,
+      "fluStatus": "gap"
+    },
+    "Kenneth City": {
+      "parcels": 6,
+      "zoningJoined": 3,
+      "fluJoined": 0,
+      "fluStatus": "gap"
+    },
+    "North Redington Beach": {
+      "parcels": 0,
+      "zoningJoined": 0,
+      "fluJoined": 0,
+      "fluStatus": "gap"
+    },
+    "Indian Shores": {
+      "parcels": 4,
+      "zoningJoined": 2,
+      "fluJoined": 0,
+      "fluStatus": "gap"
+    },
+    "Belleair": {
+      "parcels": 12,
+      "zoningJoined": 4,
+      "fluJoined": 0,
+      "fluStatus": "gap"
+    },
+    "Indian Rocks Beach": {
+      "parcels": 3,
+      "zoningJoined": 2,
+      "fluJoined": 0,
+      "fluStatus": "gap"
+    },
+    "Redington Shores": {
+      "parcels": 2,
+      "zoningJoined": 0,
+      "fluJoined": 0,
+      "fluStatus": "gap"
+    },
+    "Madeira Beach": {
+      "parcels": 7,
+      "zoningJoined": 5,
+      "fluJoined": 0,
+      "fluStatus": "gap"
+    }
+  }
 }

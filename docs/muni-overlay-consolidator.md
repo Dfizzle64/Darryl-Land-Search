@@ -7,6 +7,7 @@ Refresh commands:
 ```bash
 npm run seed:volusia-flagler-municipal
 npm run seed:polk-municipal
+npm run seed:pinellas-pasco-muni
 npm run seed:sc-muni
 ```
 
@@ -109,8 +110,37 @@ Berkeley and Charleston stay coverage gaps (0 parcels). Greenville stays the cit
 
 Rejected and not queried: SimpsonvilleZoning AGOL, Fountain Inn `ZoningFireSewer/2`, the Fountain Inn consultant swipe map, Sullivan's Island unofficial `Zoning_2025`, the Folly Beach CofC alternate, the AGOL Greenville base-data subset, and the Isle of Palms PDD service.
 
+## Pinellas and Pasco, Florida
+
+Catalog: `data/pinellas-pasco-municipal.json`. Join script: `scripts/pinellas_pasco_muni.py`. Stamped onto the existing Florida DOH 5–150 acre shelves (`fl-doh-ehwaters-12103`, 18,638 parcels; `fl-doh-ehwaters-12101`, 10,590 parcels). County parcels were not re-downloaded, and the Tampa shed re-extract is not in this pull request. Join is the city parcel id when it matches the DOH strap, otherwise a point inside the parcel. Opportunity Zone fields were not written.
+
+Pinellas now has zoning on 3,901 parcels and future land use on 3,211. Pasco has zoning on 142 and future land use on 140. A situs city on this acreage band is often wider than the municipal polygon, so a miss stays blank.
+
+| City | County | Zoning parcels | FLU parcels |
+| --- | --- | ---: | ---: |
+| Dunedin | Pinellas | 809 | 812 |
+| Pinellas Park | Pinellas | 1,570 | 1,570 |
+| Tarpon Springs | Pinellas | 708 | 707 |
+| Safety Harbor | Pinellas | 43 | 49 |
+| Oldsmar | Pinellas | 71 | 73 |
+| Seminole | Pinellas | 665 | 0 |
+| South Pasadena | Pinellas | 12 | 0 |
+| Treasure Island | Pinellas | 7 | 0 |
+| Kenneth City | Pinellas | 3 | 0 |
+| Indian Shores | Pinellas | 2 | 0 |
+| Belleair | Pinellas | 4 | 0 |
+| Indian Rocks Beach | Pinellas | 2 | 0 |
+| Madeira Beach | Pinellas | 5 | 0 |
+| New Port Richey | Pasco | 34 | 34 |
+| Zephyrhills | Pasco | 108 | 106 |
+
+North Redington Beach is on the county zoning view and has no situs parcels in this acreage band. Redington Shores is on that view too; its two situs parcels do not intersect the zoning polygons. Seminole through Madeira Beach are county zoning only. City future land use stays blank, and the countywide plan map is not stored.
+
+Largo zoning is a gap. Largo future land use is not on this shelf and was not invented. Gulfport, Belleair Beach, Belleair Bluffs, Redington Beach, and St. Pete Beach stay blank. St. Petersburg and Clearwater stay blank here; their city layers were not copied from the Tampa parcel re-extract. Port Richey, Dade City, San Antonio, and St. Leo stay blank. Zephyrhills uses the Euclidean layers only. The traditional city center layer is not stacked. County `ZN_TYPE` placeholders `NPR`, `PR`, `SA`, `DC`, and `ZH` are not stored.
+
+Rejected and not queried: Hernando `Zoning_Flu` (Weeki Wachee), Anderson County, California `Zoning_view`, and Gulfport, Mississippi `GPT_Zoning`.
+
 ## Not in this pass
 
-- Pinellas and Pasco municipal zoning are inside the Tampa shed parcel re-extract (`cursor/tampa-shed-parcels-7119`, also folded into the Southeast parcel batch). That work replaces county parcel shelves, so it stays with that batch. This checkout does not copy those tiles.
 - Brevard city future land use for Melbourne, West Melbourne, Rockledge, Satellite Beach, and Cocoa is not on a finished overlay branch. The Treasure Coast parcel pull records those cities as having no separate public zoning service in that extract, and that pull is a new county shelf.
 - New county parcel extracts for any other market.

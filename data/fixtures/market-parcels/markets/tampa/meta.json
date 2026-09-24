@@ -125,12 +125,18 @@
       "source": "fl-doh-ehwaters-12101",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/50/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12101, 142 city zoning codes and 140 city future land use codes on this shelf). County parcels were not re-downloaded.",
+        "New Port Richey zoning and future land use are the city WFL1 layers. Zephyrhills uses the citywide Euclidean layers. The traditional city center layer is not stacked.",
+        "Port Richey, Dade City, San Antonio, and St. Leo stay blank.",
+        "County ZN_TYPE placeholders NPR, PR, SA, DC, and ZH are not stored as districts.",
+        "Rejected namesakes: Hernando Zoning_Flu (Weeki Wachee), Anderson County California Zoning_view, and Gulfport, Mississippi GPT_Zoning."
       ],
       "path": "data/fixtures/market-parcels/counties/12101/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12101/lookup.json",
       "tileCount": 8,
-      "sourceCount": 10885
+      "sourceCount": 10885,
+      "zoningJoinedCount": 142,
+      "fluJoinedCount": 140
     },
     {
       "name": "Pinellas",
@@ -144,12 +150,20 @@
       "source": "fl-doh-ehwaters-12103",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/51/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12103, 3901 city zoning codes and 3211 city future land use codes on this shelf). County parcels were not re-downloaded.",
+        "Dunedin, Pinellas Park, Tarpon Springs, Safety Harbor, and Oldsmar have city zoning and future land use. Join is the city parcel id when it matches the DOH strap, otherwise a point inside the parcel.",
+        "Seminole, South Pasadena, Treasure Island, Kenneth City, North Redington Beach, Indian Shores, Belleair, Indian Rocks Beach, and Madeira Beach use the Pinellas County GIS city zoning view where the parcel intersects it. City future land use stays blank. The countywide plan map is not stored. North Redington Beach has no situs parcels on this 5\u2013150 acre shelf. Redington Shores is on that same view, and its two situs parcels on this shelf do not intersect the zoning polygons.",
+        "Largo zoning is a gap. Largo future land use is not on this shelf and was not invented from mowing or community-standards layers.",
+        "Gulfport, Belleair Beach, Belleair Bluffs, Redington Beach, and St. Pete Beach have no verified city zoning or future land use layer.",
+        "St. Petersburg and Clearwater zoning were not copied from the Tampa parcel re-extract. They stay blank on this shelf.",
+        "Rejected namesakes: Hernando Zoning_Flu (Weeki Wachee), Anderson County California Zoning_view, and Gulfport, Mississippi GPT_Zoning."
       ],
       "path": "data/fixtures/market-parcels/counties/12103/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12103/lookup.json",
       "tileCount": 6,
-      "sourceCount": 18639
+      "sourceCount": 18639,
+      "zoningJoinedCount": 3901,
+      "fluJoinedCount": 3211
     },
     {
       "name": "Polk",

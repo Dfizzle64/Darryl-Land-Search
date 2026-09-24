@@ -6,8 +6,11 @@ Parcel tiles do not store these fields. `/api/parcels` joins them at query time.
   python3 scripts/seed_fl_signals.py
 
 Income is ACS 5-year 2020–2024 B19013 for every state with a live parcel
-extract (`scripts/seed_se_acs_income.py`). AADT is the public FDOT historical
-count layer for 2025 (Florida). The map overlay stays the 15,000+ subset.
+extract (`scripts/seed_se_acs_income.py`). AADT is FDOT RCI FeatureServer/0,
+field AADT, YEAR_=2025. The service is EPSG:26917; the extract requests
+outSR 4326. The map overlay stays the 15,000+ subset.
+
+  python3 scripts/seed_fl_signals.py --aadt-only
 """
 
 from __future__ import annotations
@@ -29,12 +32,11 @@ META_OUT = FIX / "signals-meta.json"
 
 REPORTER_DATA = "https://api.censusreporter.org/1.0/data/show/latest"
 REPORTER_GEO = "https://api.censusreporter.org/1.0/geo/show/tiger2023"
-FDOT_QUERY = (
-    "https://services1.arcgis.com/O1JpcwDW8sjYuddV/arcgis/rest/services/"
-    "Annual_Average_Daily_Traffic_Historical_TDA/FeatureServer/0/query"
-)
+FDOT_QUERY = "https://gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0/query"
 AADT_YEAR = 2025
 MAJOR_AADT = 15000
+# Layer maxRecordCount is 1000. A larger page is truncated and the next offset skips rows.
+AADT_PAGE = 1000
 
 
 def fetch_json(url: str, params: dict | None = None, timeout: int = 120, retries: int = 4) -> dict:
@@ -160,7 +162,7 @@ def fetch_aadt() -> list[dict]:
                 "returnGeometry": "true",
                 "outSR": 4326,
                 "resultOffset": offset,
-                "resultRecordCount": 2000,
+                "resultRecordCount": AADT_PAGE,
                 "f": "json",
             },
             timeout=180,
@@ -176,6 +178,7 @@ def fetch_aadt() -> list[dict]:
             line = simplify_line(paths[0])
             if len(line) < 2:
                 continue
+            roadway = attrs.get("ROADWAY")
             features.append(
                 {
                     "type": "Feature",
@@ -183,29 +186,46 @@ def fetch_aadt() -> list[dict]:
                     "properties": {
                         "aadt": attrs.get("AADT"),
                         "year": attrs.get("YEAR_"),
-                        "roadwayId": (attrs.get("ROADWAY") or "").strip() or None,
-                        "from": (attrs.get("DESC_FRM") or "").strip() or None,
-                        "to": (attrs.get("DESC_TO") or "").strip() or None,
-                        "county": (attrs.get("COUNTY") or "").strip() or None,
+                        "roadwayId": str(roadway).strip() if roadway not in (None, "") else None,
+                        "from": (str(attrs.get("DESC_FRM") or "")).strip() or None,
+                        "to": (str(attrs.get("DESC_TO") or "")).strip() or None,
+                        "county": (str(attrs.get("COUNTY") or "")).strip() or None,
                     },
                 }
             )
         print(f"  AADT {len(features)}")
-        if not data.get("exceededTransferLimit") and len(batch) < 2000:
-            break
-        if not batch:
+        if not batch or len(batch) < AADT_PAGE:
             break
         offset += len(batch)
         time.sleep(0.05)
     return features
 
 
-def main() -> None:
-    from seed_se_acs_income import seed_income
+def _norm_county(name: str) -> str:
+    return "".join(ch for ch in name.lower() if ch.isalnum())
 
-    seed_income()
 
-    print(f"FDOT AADT {AADT_YEAR}")
+def require_footprint(segments: list[dict]) -> dict[str, int]:
+    """Every Florida footprint county on the RCI layer, including Orange and Hillsborough."""
+    from seed_state_aadt import FL
+
+    by_norm = {_norm_county(name): fips for fips, name in FL.items()}
+    counts: dict[str, int] = {}
+    for feature in segments:
+        props = feature.get("properties") or {}
+        fips = by_norm.get(_norm_county(str(props.get("county") or "")))
+        aadt = props.get("aadt")
+        if not fips or not isinstance(aadt, (int, float)) or aadt <= 0:
+            continue
+        counts[fips] = counts.get(fips, 0) + 1
+    missing = [f"{fips} {FL[fips]}" for fips in FL if fips not in counts]
+    if missing:
+        raise RuntimeError(f"FDOT RCI has no 2025 segments for {missing}")
+    return counts
+
+
+def write_aadt() -> None:
+    print(f"FDOT RCI AADT {AADT_YEAR} {FDOT_QUERY}")
     segments = fetch_aadt()
     if len(segments) < 10000:
         raise RuntimeError(f"FDOT returned only {len(segments)} segments")
@@ -231,11 +251,40 @@ def main() -> None:
             separators=(",", ":"),
         )
     )
+    counts = require_footprint(segments)
     meta = json.loads(META_OUT.read_text()) if META_OUT.exists() else {}
-    notes = list(meta.get("notes") or [])
-    aadt_note = "A parcel more than 15 km from the nearest FDOT segment stays unknown. AADT stays FDOT (Florida)."
-    if aadt_note not in notes:
-        notes.append(aadt_note)
+    notes = []
+    for note in meta.get("notes") or []:
+        if "RCI FeatureServer/0 returned HTTP 500" in note:
+            continue
+        if note.startswith("Florida AADT is the existing FDOT 2025 historical"):
+            continue
+        notes.append(note)
+    rci_note = (
+        "Florida AADT is FDOT RCI FeatureServer/0 (gis.fdot.gov), field AADT, YEAR_=2025, "
+        "for every footprint county including Orange and Hillsborough. The service is EPSG:26917; "
+        "this extract requested outSR 4326. Nearest segment to the parcel centroid within 15 km."
+    )
+    if rci_note not in notes:
+        notes.append(rci_note)
+    notes = [
+        note
+        for note in notes
+        if note != "A parcel more than 15 km from the nearest FDOT segment stays unknown. AADT stays FDOT (Florida)."
+    ]
+    sources = dict(meta.get("stateAadtSources") or {})
+    florida = dict(sources.get("FL") or {})
+    florida.update(
+        {
+            "agency": "FDOT",
+            "field": "AADT",
+            "year": AADT_YEAR,
+            "yearField": "YEAR_",
+            "url": FDOT_QUERY.replace("/query", ""),
+            "crs": "EPSG:26917",
+        }
+    )
+    sources["FL"] = florida
     meta.update(
         {
             "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -244,11 +293,23 @@ def main() -> None:
             "aadtSegmentCount": len(segments),
             "majorRoadOverlayCount": len(overlay),
             "majorRoadMinAadt": MAJOR_AADT,
+            "flAadtByCounty": dict(sorted(counts.items())),
+            "stateAadtSources": sources,
             "notes": notes,
         }
     )
     META_OUT.write_text(json.dumps(meta, indent=2) + "\n")
-    print(f"segments {len(segments)} major overlay {len(overlay)}")
+    print(f"segments {len(segments)} major overlay {len(overlay)} footprint counties {len(counts)}")
+
+
+def main() -> None:
+    import sys
+
+    if "--aadt-only" not in sys.argv:
+        from seed_se_acs_income import seed_income
+
+        seed_income()
+    write_aadt()
 
 
 if __name__ == "__main__":

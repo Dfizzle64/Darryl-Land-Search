@@ -50,6 +50,17 @@ export function isSearchMarketId(value: string): value is SearchMarketId {
 }
 
 /**
+ * Display order for the Market menu's Other MSAs section.
+ * Primary MARKETS stay in config order. This copy is alphabetical by label
+ * and does not change ids, slugs, or the source arrays.
+ */
+export function otherMarketDisplayOrder(): SearchMarketId[] {
+  return [...OTHER_MARKETS, ...PARCEL_MARKETS].sort((a, b) =>
+    a.localeCompare(b, "en", { sensitivity: "base" }),
+  );
+}
+
+/**
  * Asheville is Henderson plus Buncombe parcels. No eligible-tract rows are added,
  * and nothing in this summary is a designated Opportunity Zone.
  * Heartland is the Florida shelf. It also has no eligible-tract rows.

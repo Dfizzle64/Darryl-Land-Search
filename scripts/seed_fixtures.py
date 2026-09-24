@@ -25,7 +25,7 @@ OUT = ROOT / "data" / "fixtures"
 OUT.mkdir(parents=True, exist_ok=True)
 
 OCPA_URL = "https://vgispublic.ocpafl.org/server/rest/services/Webmap/PARCEL/MapServer/4/query"
-FDOT_URL = "https://services1.arcgis.com/O1JpcwDW8sjYuddV/arcgis/rest/services/Annual_Average_Daily_Traffic_Historical_TDA/FeatureServer/0/query"
+FDOT_URL = "https://gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0/query"
 CENSUS_REPORTER_DATA = "https://api.censusreporter.org/1.0/data/show/latest"
 CENSUS_REPORTER_GEO = "https://api.censusreporter.org/1.0/geo/show/tiger2023"
 

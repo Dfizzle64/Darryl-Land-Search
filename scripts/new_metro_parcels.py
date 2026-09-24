@@ -31,13 +31,10 @@ QPUBLIC = "https://qpublic.schneidercorp.com/Application.aspx?App={app}&Layer=Pa
 
 NO_OZ = "No Opportunity Zone designation, school letter grade, or base flood elevation was assigned."
 STATE_AADT = (
-    "Traffic counts use the priority-county state DOT layer already on main. "
+    "Traffic counts use the statewide state DOT layer for this footprint. "
     "Florida FDOT segments are not copied onto these parcels. A count farther than 15 km stays unknown."
 )
-NO_AADT = (
-    "No verified state DOT AADT join for this county. Florida FDOT segments are not copied here. "
-    "nearestRoad stays empty unless a later count layer is added."
-)
+NO_AADT = STATE_AADT
 
 
 def install_gis_ssl() -> None:

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { isOtherMarketId, isParcelMarketId } from "@/lib/markets";
-import { MARKETS, OTHER_MARKETS, PARCEL_MARKETS, type SearchMarketId } from "@/lib/types";
+import { isOtherMarketId, isParcelMarketId, otherMarketDisplayOrder } from "@/lib/markets";
+import { MARKETS, type SearchMarketId } from "@/lib/types";
 
 type MarketMenuProps = {
   value: SearchMarketId;
@@ -10,7 +10,7 @@ type MarketMenuProps = {
 };
 
 export function MarketMenu({ value, onChange }: MarketMenuProps) {
-  const moreMarkets: SearchMarketId[] = [...OTHER_MARKETS, ...PARCEL_MARKETS];
+  const moreMarkets: SearchMarketId[] = otherMarketDisplayOrder();
   const [open, setOpen] = useState(false);
   const [otherOpen, setOtherOpen] = useState(() => isOtherMarketId(value) || isParcelMarketId(value));
   const rootRef = useRef<HTMLDivElement | null>(null);

@@ -208,7 +208,11 @@ export const RURAL_ELIGIBLE_LEGEND_BLURB =
 export const URBAN_ELIGIBLE_LEGEND_BLURB =
   "Same eligible list, not tagged entirely rural. Also not yet a QOZ.";
 export const MF_PRIORITY_LEGEND_BLURB =
-  "INTERNAL multifamily hunt ranking among rural-eligible tracts (Charleston + York/Lancaster/Chester scope). NOT SC Commerce, NOT a nomination list, NOT OZ designation.";
+  "INTERNAL multifamily hunt ranking. In South Carolina it is drawn only on Governor-nominated tracts. NOT SC Commerce, NOT a nomination list, NOT OZ designation.";
+export const SC_NOMINATED_RURAL_LEGEND_BLURB =
+  "Rural tract on South Carolina’s Governor-nominated list. Awaiting Treasury. Not a QOZ. Nomination alone is not a tax benefit.";
+export const SC_NOMINATED_URBAN_LEGEND_BLURB =
+  "Urban tract on South Carolina’s Governor-nominated list. Awaiting Treasury. Not a QOZ. Nomination alone is not a tax benefit.";
 export const MF_PRIORITY_TIER_A_MEANING = "Tier A = chase first";
 export const MF_PRIORITY_TIER_B_MEANING = "Tier B = secondary / still map-worthy";
 export const SC_GOVERNOR_FILED_STATUS =

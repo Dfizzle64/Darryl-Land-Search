@@ -1,4 +1,6 @@
+import { southCarolinaOverlayMode } from "./markets";
 import { STATE_REPORT_CARDS } from "./screening";
+import type { SearchMarketId } from "./types";
 
 export type ScreeningHelpScope = {
   market: string;
@@ -28,7 +30,9 @@ const FLOOD =
   "FEMA NFHL effective flood zones at the centroid. A static BFE is shown only when NFHL publishes one. This layer has no Community Rating System class.";
 const WETLANDS = "National Wetlands Inventory. Polygons draw at closer zoom.";
 const ELIGIBLE =
-  "Rural eligible — not designated: Tract on Treasury OZ 2.0 eligible list, tagged entirely rural. Not yet a QOZ. No OZ 2.0 tax benefits apply today from this label. Urban eligible — not designated: Same eligible list, not tagged entirely rural. Also not yet a QOZ. A South Carolina GEOID on the official governor list reads Governor-nominated / awaiting Treasury. That is not designation. SC MF priority is a separate shortlist, not a designation.";
+  "Rural eligible — not designated: Tract on Treasury OZ 2.0 eligible list, tagged entirely rural. Not yet a QOZ. No OZ 2.0 tax benefits apply today from this label. Urban eligible — not designated: Same eligible list, not tagged entirely rural. Also not yet a QOZ. SC MF priority is a separate shortlist, not a designation.";
+const SC_NOMINATED_LAYER =
+  "South Carolina shows Governor-nominated tracts only (official list). Rural and urban are attributes on that list. They read Governor-nominated / awaiting Treasury. They are not designated QOZs. Eligible tracts that were not nominated are not shown. SC MF priority is a separate shortlist, not a designation.";
 const POWER_GENERIC = "HIFLD electric retail territories. Not a connection or a will-serve. Gas has no public polygon.";
 const POWER_ORANGE = "Orange County open-data electric service areas. Not a connection or a will-serve. Gas has no public polygon.";
 const POWER_MECK =
@@ -137,6 +141,15 @@ function designatedNote(scope: ScreeningHelpScope): string {
   return unavailable(scope);
 }
 
+function eligibleTractNote(scope: ScreeningHelpScope): string {
+  const mode = southCarolinaOverlayMode(scope.market as SearchMarketId, scope.state);
+  if (mode === "nominated-only") return SC_NOMINATED_LAYER;
+  if (mode === "mixed") {
+    return `${ELIGIBLE} South Carolina tracts in this view are Governor-nominated only. Eligible tracts that were not nominated are not shown in South Carolina. Other states in this market stay on the federal eligible list.`;
+  }
+  return ELIGIBLE;
+}
+
 export function screeningLayerNotes(scope: ScreeningHelpScope): ScreeningLayerNotes {
   return {
     flood: FLOOD,
@@ -145,7 +158,7 @@ export function screeningLayerNotes(scope: ScreeningHelpScope): ScreeningLayerNo
     water: waterNote(scope, "water"),
     sewer: waterNote(scope, "sewer"),
     power: powerNote(scope),
-    eligibleTracts: ELIGIBLE,
+    eligibleTracts: eligibleTractNote(scope),
     designatedOz: designatedNote(scope),
   };
 }

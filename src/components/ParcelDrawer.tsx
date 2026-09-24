@@ -25,7 +25,7 @@ import { mailingGap, type ScreeningPoint } from "@/lib/screening";
 import { ScreeningDetails } from "./ScreeningDetails";
 import { describeFluMatch } from "@/lib/flu";
 import { describeRezoningCandidate } from "@/lib/filters";
-import { describeOpportunityZone, describeOz2Eligibility } from "@/lib/opportunityZone";
+import { describeOpportunityZone, describeOz2Eligibility, oz2ParcelFieldValue } from "@/lib/opportunityZone";
 import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "@/lib/types";
 import { fluEmptyForPolk, zoningEmptyForPolk } from "@/lib/polkMunicipal";
 import { fluEmptyForSeminole, zoningEmptyForSeminole } from "@/lib/seminoleMunicipal";
@@ -237,13 +237,7 @@ export function ParcelDrawer({
         />
         <Field
           label="OZ 2.0"
-          value={
-            oz2.eligible == null
-              ? null
-              : oz2.eligible
-                ? `${oz2.statusChip ?? (oz2.rural === false ? "Eligible, not rural" : "Eligible")} · census tract GEOID ${properties.oz2Eligibility?.tractGeoid ?? "unknown"}`
-                : "Not eligible"
-          }
+          value={oz2ParcelFieldValue(oz2, properties.oz2Eligibility?.tractGeoid)}
           empty="OZ 2.0 eligibility is not joined for this parcel. That is not a designation."
         />
         <Field label="Last sale" value={formatSale(properties.lastSale)} empty={missingPublicParcelValue("sale")} />

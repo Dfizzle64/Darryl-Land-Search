@@ -13,7 +13,7 @@ County matching is **state-aware** (e.g., Charlotte includes NC Union only — n
 
 Status labeling for all rows: **Eligible — not designated**. As of Sep 21, 2026, Florida, Georgia, South Carolina, Tennessee, and North Carolina have **no public certified 2027 QOZ lists**.
 
-**Sep 24, 2026 update:** Governor McMaster’s September 23, 2026 announcement and the SC Commerce Final Recommendations PDF dated September 22, 2026 publish 112 nominated GEOIDs (`data/oz/sc-oz2-nominated-official-sccommerce-2026-09-23.csv`). Only those GEOIDs read **Governor-nominated / awaiting Treasury**. Other eligible tracts stay eligible / not designated. Florida, Georgia, North Carolina, and Tennessee rows are unchanged. No GEOID is marked designated.
+**Sep 24, 2026 update:** Governor McMaster’s September 23, 2026 announcement and the SC Commerce Final Recommendations PDF dated September 22, 2026 publish 112 nominated GEOIDs (`data/oz/sc-oz2-nominated-official-sccommerce-2026-09-23.csv`). South Carolina’s map shows only those GEOIDs, labeled **Governor-nominated / awaiting Treasury**. Eligible tracts that were not nominated are not shown in South Carolina. Florida, Georgia, North Carolina, and Tennessee rows stay on the eligible list. No GEOID is marked designated.
 
 **Multifamily priority (same date):** `data/sc-oz2-mf-priority-shortlist.csv` ranks 22 of these rural-eligible tracts (10 Tier A, 12 Tier B) for garden/wrap site search. That rank is not a nomination. Refresh with `npm run seed:sc-mf`.
 

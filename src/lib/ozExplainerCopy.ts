@@ -37,7 +37,7 @@ export const OZ_EXPLAINER_SECTIONS: OzExplainerSection[] = [
       "Step 2 — Nomination: Each state’s governor may nominate up to about 25% of that state’s eligible tracts.",
       "Step 3 — Designation: Treasury certifies the final 2027 QOZs after reviewing nominations.",
       "Timing: The federal nomination window centers on late September 2026 (an extension can run into late October). Designated zones are meant to take effect January 1, 2027.",
-      "Until certification, an eligible tract that was not nominated stays “Eligible — not designated.”",
+      "Until certification, an eligible tract that was not nominated stays “Eligible — not designated” where that federal list is still drawn. South Carolina draws the nominated list only.",
       "Governor-nominated / awaiting Treasury = the state filed that tract with Treasury; still not a certified 2027 QOZ.",
       "Soft-upgrade only when the state’s official nomination list is public (SC: Commerce Final Recommendations PDF, 112 tracts). Secondary scrapes alone aren’t enough.",
       "Designated / QOZ = Treasury certification only — none of our markets yet; target effective Jan 1, 2027.",
@@ -47,7 +47,8 @@ export const OZ_EXPLAINER_SECTIONS: OzExplainerSection[] = [
     heading: "South Carolina nominations",
     paragraphs: [
       "South Carolina’s governor submitted nominations to Treasury. The announcement is September 23, 2026. SC Commerce’s Final Recommendations PDF is dated September 22, 2026.",
-      "That filing is 112 census tracts: 84 rural and 28 non-rural. This map soft-upgrades those same GEOIDs from the primary source. It is not a new list.",
+      "That filing is 112 census tracts: 84 rural and 28 non-rural. In South Carolina this map shows only those same GEOIDs from the primary source. It is not a new list.",
+      "Eligible tracts that were not nominated are not shown in South Carolina. Other states still show the federal eligible list.",
     ],
     links: [
       { href: SC_GOVERNOR_OZ_RELEASE_URL, label: "Governor’s September 23, 2026 announcement" },
@@ -57,7 +58,8 @@ export const OZ_EXPLAINER_SECTIONS: OzExplainerSection[] = [
   {
     heading: "What the map chips mean",
     bullets: [
-      "Eligible — not designated: on the federal eligible list, and not one of the 112 South Carolina nominations.",
+      "Eligible — not designated: on the federal eligible list outside South Carolina. South Carolina does not show that chip.",
+      "In South Carolina the map, tract list, and tract filters show Governor-nominated / awaiting Treasury only. Eligible tracts that were not nominated are not shown.",
       "Governor-nominated / awaiting Treasury = the state filed that tract with Treasury; still not a certified 2027 QOZ.",
       "Soft-upgrade only when the state’s official nomination list is public (SC: Commerce Final Recommendations PDF, 112 tracts). Secondary scrapes alone aren’t enough.",
       "Designated / QOZ = Treasury certification only — none of our markets yet; target effective Jan 1, 2027.",

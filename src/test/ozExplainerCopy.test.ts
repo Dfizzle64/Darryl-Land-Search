@@ -20,6 +20,9 @@ describe("OZ 2.0 explainer copy", () => {
     expect(text).toContain("Nothing on this map is a certified QOZ");
     expect(text).toContain("Eligible — not designated");
     expect(text).toContain("Governor-nominated / awaiting Treasury");
+    expect(text).toContain("Eligible tracts that were not nominated are not shown");
+    expect(text).toContain("South Carolina draws the nominated list only");
+    expect(text).not.toContain("Other eligible tracts stay");
     expect(text).toContain("September 23, 2026");
     expect(text).toContain("September 22, 2026");
     expect(text).toContain("same GEOIDs");

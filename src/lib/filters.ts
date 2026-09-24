@@ -1,5 +1,6 @@
 import { fluAllowsMultifamily } from "./flu";
 import { parcelInOpportunityZone, parcelOz2Eligibility } from "./opportunityZone";
+import { showOzTractInScMarkets } from "./scNominatedTracts";
 import { zoningAllowsMultifamily } from "./zoning";
 import {
   DEFAULT_FILTERS,
@@ -147,8 +148,12 @@ function ozPasses(feature: ParcelFeature, filters: FilterState): boolean {
   }
   const oz2 = parcelOz2Eligibility(feature);
   if (!oz2) return false;
-  if (filters.ozFilter === "rural-eligible") return oz2.eligible === true && oz2.rural === true;
-  if (filters.ozFilter === "non-rural-eligible") return oz2.eligible === true && oz2.rural === false;
+  if (filters.ozFilter === "rural-eligible" || filters.ozFilter === "non-rural-eligible") {
+    if (oz2.eligible !== true) return false;
+    if (!showOzTractInScMarkets({ geoid: oz2.tractGeoid })) return false;
+    if (filters.ozFilter === "rural-eligible") return oz2.rural === true;
+    return oz2.rural === false;
+  }
   return true;
 }
 
@@ -322,10 +327,10 @@ export function emptyStateHint(filters: FilterState, matched: number, fluUnknown
     return "No matching parcels sit in a current designated Qualified Opportunity Zone under the other filters. Clear the OZ filter or lower acreage / income / AADT thresholds.";
   }
   if (filters.ozFilter === "rural-eligible") {
-    return "No parcel centroid in this view falls in a Rev. Proc. 2026-14 rural-eligible tract. That status is eligible for nomination, not a designated 2027 QOZ. Try a wider view, or clear the Opportunity Zone filter.";
+    return "No parcel centroid in this view falls in a Rev. Proc. 2026-14 rural-eligible tract. In South Carolina only Governor-nominated rural tracts match. That status is not a designated 2027 QOZ. Try a wider view, or clear the Opportunity Zone filter.";
   }
   if (filters.ozFilter === "non-rural-eligible") {
-    return "No matching parcels have a centroid in an OZ 2.0 eligible tract that Rev. Proc. 2026-14 marks Non-rural. Try All parcels, or clear the OZ filter.";
+    return "No matching parcels have a centroid in an OZ 2.0 tract that Rev. Proc. 2026-14 marks Non-rural. In South Carolina only Governor-nominated tracts match. Try All parcels, or clear the OZ filter.";
   }
   if (filters.landUseFilter === "non-mf") {
     return "No non-multifamily parcels match the other filters. Lower acreage, income, or AADT, or switch to All parcels.";

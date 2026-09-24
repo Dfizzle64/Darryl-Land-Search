@@ -1,4 +1,4 @@
-import { isScGovernorNominatedGeoid } from "./scNominatedTracts";
+import { isScGovernorNominatedGeoid, showOzTractInScMarkets } from "./scNominatedTracts";
 import {
   RURAL_ELIGIBLE_STATUS_CHIP,
   SC_GOVERNOR_NOMINATED_STATUS,
@@ -14,6 +14,22 @@ export function parcelOpportunityZone(feature: ParcelFeature): OpportunityZoneIn
 
 export function parcelOz2Eligibility(feature: ParcelFeature): Oz2EligibilityInfo | null {
   return feature.properties.oz2Eligibility ?? null;
+}
+
+function isSouthCarolinaOmitted(geoid: string | null | undefined): boolean {
+  return !showOzTractInScMarkets({ geoid });
+}
+
+/** Parcel-card line. Omitted South Carolina tracts are not labeled eligible. */
+export function oz2ParcelFieldValue(
+  described: { eligible: boolean | null; rural: boolean | null; label: string; statusChip: string | null; shown: boolean },
+  geoid: string | null | undefined,
+): string | null {
+  if (described.eligible == null) return null;
+  if (!described.shown) return described.label;
+  if (!described.eligible) return "Not eligible";
+  const chip = described.statusChip ?? (described.rural === false ? "Eligible, not rural" : "Eligible");
+  return `${chip} · census tract GEOID ${geoid ?? "unknown"}`;
 }
 
 /** true / false when joined; null when the join is missing. */
@@ -63,6 +79,8 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
   label: string;
   statusChip: string | null;
   detail: string;
+  /** False when a South Carolina tract is omitted because it is not Governor-nominated. */
+  shown: boolean;
 } {
   if (!info) {
     return {
@@ -70,12 +88,23 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
       rural: null,
       label: "OZ 2.0 unknown",
       statusChip: null,
+      shown: false,
       detail:
         "This parcel has not been joined to the Rev. Proc. 2026-14 list of census tracts eligible for nomination as 2027 Qualified Opportunity Zones.",
     };
   }
   const geoid = info.tractGeoid || "unknown GEOID";
   const name = info.tractName ? ` (${info.tractName})` : "";
+  if (info.eligible && isSouthCarolinaOmitted(info.tractGeoid)) {
+    return {
+      eligible: true,
+      rural: info.rural,
+      label: "Not on South Carolina’s nominated list",
+      statusChip: null,
+      shown: false,
+      detail: `GEOID ${geoid}${name} is not on South Carolina’s Governor-nominated list, so the map does not show it as an Opportunity Zone tract. That omission is not a designated QOZ and it is not a tax benefit.`,
+    };
+  }
   if (info.eligible && isScGovernorNominatedGeoid(info.tractGeoid)) {
     const ruralSentence =
       info.rural === true
@@ -88,6 +117,7 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
       rural: info.rural,
       label: info.rural === true ? "OZ 2.0 rural-eligible" : info.rural === false ? "OZ 2.0 eligible, not rural" : "OZ 2.0 eligible",
       statusChip: SC_GOVERNOR_NOMINATED_STATUS,
+      shown: true,
       detail: `Governor-nominated / awaiting Treasury — GEOID ${geoid}${name}. ${ruralSentence} South Carolina’s governor nominated this tract (announced Sep 23, 2026; Final Recommendations dated Sep 22). Treasury has not certified it. Status: ${SC_GOVERNOR_NOMINATED_STATUS}. ${SC_NOMINATED_NOT_A_QOZ}`,
     };
   }
@@ -97,6 +127,7 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
       rural: true,
       label: "OZ 2.0 rural-eligible",
       statusChip: RURAL_ELIGIBLE_STATUS_CHIP,
+      shown: true,
       detail: `Rural-eligible for nomination — GEOID ${geoid}${name}. Rev. Proc. 2026-14 lists this 2020 census tract as a low-income community comprised entirely of a rural area. It is eligible for nomination as a 2027 QOZ and has not been nominated or certified. Status: ${RURAL_ELIGIBLE_STATUS_CHIP}.`,
     };
   }
@@ -106,6 +137,7 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
       rural: false,
       label: "OZ 2.0 eligible, not rural",
       statusChip: null,
+      shown: true,
       detail: `Eligible for nomination, not rural — GEOID ${geoid}${name}. Rev. Proc. 2026-14 marks this tract Non-rural. It has not been nominated or certified as a 2027 QOZ.`,
     };
   }
@@ -115,6 +147,7 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
       rural: null,
       label: "OZ 2.0 eligible",
       statusChip: null,
+      shown: true,
       detail: `Eligible for nomination — GEOID ${geoid}${name}. The Rev. Proc. 2026-14 appendix did not include a Rural Status for this tract, so it is not labeled rural. It has not been nominated or certified as a 2027 QOZ.`,
     };
   }
@@ -123,6 +156,7 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
     rural: null,
     label: "Not OZ 2.0 eligible",
     statusChip: null,
+    shown: true,
     detail:
       "This parcel centroid is outside the Orange County census tracts Rev. Proc. 2026-14 lists as eligible for nomination. It is not a 2027 QOZ designation.",
   };

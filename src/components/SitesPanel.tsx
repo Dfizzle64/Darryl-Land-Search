@@ -119,7 +119,7 @@ export function SitesPanel({
                       <span className="ml-2 font-display text-lg tracking-normal text-white">{site.score.toFixed(1)}</span>
                     </p>
                     <span className="flex gap-1">
-                      {oz2.eligible && oz2.statusChip ? (
+                      {oz2.shown && oz2.eligible && oz2.statusChip ? (
                         <span
                           className={`rounded-full border px-1.5 py-px text-[10px] ${
                             oz2.statusChip === SC_GOVERNOR_NOMINATED_STATUS
@@ -129,7 +129,7 @@ export function SitesPanel({
                         >
                           {oz2.statusChip}
                         </span>
-                      ) : oz2.eligible ? (
+                      ) : oz2.shown && oz2.eligible ? (
                         <span className="rounded-full border border-white/20 px-1.5 py-px text-[10px] text-ink-100">
                           OZ 2.0
                         </span>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { MfPriorityFilter } from "./MfPriorityFilter";
-import { displayStatusChip, formatCountyLabel, isSouthCarolinaState } from "@/lib/markets";
+import { displayStatusChip, formatCountyLabel, type ScOzOverlayMode } from "@/lib/markets";
 import { tractPlaceLabel } from "@/lib/scMfPriority";
 import type { EligibleTractRow, MfPriorityView } from "@/lib/types";
 
@@ -17,6 +17,7 @@ type TractPanelProps = {
   priorityCounts?: { all: number; priority: number; A: number; B: number };
   onPriorityView?: (view: MfPriorityView) => void;
   emptyMessage?: string;
+  overlayMode?: ScOzOverlayMode;
 };
 
 export function TractPanel({
@@ -30,6 +31,7 @@ export function TractPanel({
   priorityCounts,
   onPriorityView,
   emptyMessage = "No eligible tracts in this county filter.",
+  overlayMode = "eligible",
 }: TractPanelProps) {
   const listRef = useRef<HTMLUListElement | null>(null);
 
@@ -45,19 +47,21 @@ export function TractPanel({
       : "flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-ink-900/95 shadow-2xl backdrop-blur-sm";
 
   return (
-    <section className={shell} aria-label="Eligible tracts">
+    <section className={shell} aria-label={overlayMode === "nominated-only" ? "Nominated tracts" : "Eligible tracts"}>
       <header className="flex items-start justify-between gap-3 border-b border-white/10 px-3 py-3">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.16em] text-ink-500">Eligible tracts</p>
+          <p className="text-[11px] uppercase tracking-[0.16em] text-ink-500">
+            {overlayMode === "nominated-only" ? "Nominated tracts" : "Eligible tracts"}
+          </p>
           <p className="font-display text-2xl text-white">
             {tracts.length.toLocaleString()} {tracts.length === 1 ? "tract" : "tracts"}
           </p>
           <p className="mt-0.5 text-[11px] leading-relaxed text-ink-500">
-            Rev. Proc. 2026-14 nomination eligibility. Brown is rural. Blue is urban. Eligible tracts stay Eligible —
-            not designated.
-            {tracts.some((tract) => isSouthCarolinaState(tract.state))
-              ? " South Carolina GEOIDs on the official list read Governor-nominated / awaiting Treasury. That is not a QOZ and not a tax benefit."
-              : ""}
+            {overlayMode === "nominated-only"
+              ? "South Carolina’s Governor-nominated list only. Brown is rural. Blue is urban. These tracts are awaiting Treasury. They are not designated QOZs, and nomination alone is not a tax benefit. Eligible tracts that were not nominated are not shown."
+              : overlayMode === "mixed"
+                ? "Outside South Carolina, Rev. Proc. 2026-14 tracts stay Eligible — not designated. Brown is rural. Blue is urban. South Carolina tracts in this list are Governor-nominated only. Eligible tracts that were not nominated are not shown in South Carolina."
+                : "Rev. Proc. 2026-14 nomination eligibility. Brown is rural. Blue is urban. Eligible tracts stay Eligible — not designated."}
           </p>
           {onPriorityView && priorityView && priorityCounts ? (
             <div className="mt-2">

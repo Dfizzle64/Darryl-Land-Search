@@ -247,7 +247,9 @@ describe("South Carolina governor-filed status copy", () => {
     const york = southCarolinaStatusHelp("Charlotte", "South Carolina");
     const charlotteAll = southCarolinaStatusHelp("Charlotte", null);
     expect(charleston).toMatch(/Governor-nominated \/ awaiting Treasury/);
+    expect(charleston).toMatch(/not shown/i);
     expect(charleston).toMatch(/not designated/i);
+    expect(charleston).not.toMatch(/other eligible tracts stay/i);
     expect(charleston).not.toMatch(/not public/i);
     expect(york).toMatch(/not designated/i);
     expect(charlotteAll).toMatch(/York, Lancaster, and Chester/);

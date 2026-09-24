@@ -200,6 +200,8 @@ export const ELIGIBLE_NOT_DESIGNATED_STATUS = "Eligible — not designated";
 /**
  * Map legend copy. Eligible is the Rev. Proc. 2026-14 list. Designation has not
  * happened. MF priority is an internal hunt, not that list.
+ * `SC_GOVERNOR_FILED_STATUS` is the stored shortlist line. Live chips use
+ * `SC_GOVERNOR_NOMINATED_STATUS` only for GEOIDs on the official 112.
  */
 export const RURAL_ELIGIBLE_LEGEND_BLURB =
   "Tract on Treasury OZ 2.0 eligible list, tagged entirely rural. Not yet a QOZ. No OZ 2.0 tax benefits apply today from this label.";
@@ -212,7 +214,22 @@ export const MF_PRIORITY_TIER_B_MEANING = "Tier B = secondary / still map-worthy
 export const SC_GOVERNOR_FILED_STATUS =
   "SC: Governor filed nominations with Treasury (Sep 10, 2026 per SC Commerce). Official nominated tract list is not publicly posted. Tracts on this map are not designated QOZs.";
 
+/**
+ * Soft upgrade for a GEOID on South Carolina’s official nominated list.
+ * Not a designation and not a tax benefit.
+ */
+export const SC_GOVERNOR_NOMINATED_STATUS = "Governor-nominated / awaiting Treasury";
+
+export const SC_NOMINATED_NOT_A_QOZ = "Not a designated QOZ. Nomination alone is not a tax benefit.";
+
 export const SC_COMMERCE_OZ_URL = "https://www.sccommerce.com/opportunity-zone";
+
+export const SC_GOVERNOR_OZ_RELEASE_URL =
+  "https://governor.sc.gov/news/2026-09/gov-mcmaster-completes-south-carolinas-opportunity-zone-submission-us-treasury";
+
+/** SC Commerce Final Recommendations PDF dated 2026-09-22, linked from the OZ page. */
+export const SC_COMMERCE_FINAL_RECOMMENDATIONS_URL =
+  "https://s3.amazonaws.com/cdn.sccommerce.com/scdoc-public/2026-09/Final%20Recommendations%20-%202026%209.22.26.pdf";
 
 export const SHED_CAVEAT =
   "90-minute sheds are approximate county rings, not drive-time isochrones. Outer-edge counties are flagged in tract notes.";

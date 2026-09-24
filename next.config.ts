@@ -2,6 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.csv$/,
+      resourceQuery: /raw/,
+      type: "asset/source",
+    });
+    return config;
+  },
   // Tile paths are chosen from meta.json at runtime, so the file tracer cannot
   // see them. Keep the Orlando parcel fixtures inside the parcel API functions.
   outputFileTracingIncludes: {

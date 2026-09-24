@@ -4,7 +4,8 @@ import { useEffect, useRef } from "react";
 import { formatAcres, formatUsd } from "@/lib/format";
 import type { RankedSite } from "@/lib/score";
 import { parcelAadt, parcelIncome } from "@/lib/filters";
-import { RURAL_ELIGIBLE_STATUS_CHIP, type FilterState } from "@/lib/types";
+import { describeOz2Eligibility } from "@/lib/opportunityZone";
+import { SC_GOVERNOR_NOMINATED_STATUS, type FilterState } from "@/lib/types";
 
 type SitesPanelProps = {
   sites: RankedSite[];
@@ -95,7 +96,7 @@ export function SitesPanel({
             const income = parcelIncome(site.feature, incomeGeography);
             const aadt = parcelAadt(site.feature);
             const oz = props.opportunityZone?.inOpportunityZone;
-            const oz2 = props.oz2Eligibility;
+            const oz2 = describeOz2Eligibility(props.oz2Eligibility);
             return (
               <li key={props.id}>
                 <button
@@ -118,11 +119,17 @@ export function SitesPanel({
                       <span className="ml-2 font-display text-lg tracking-normal text-white">{site.score.toFixed(1)}</span>
                     </p>
                     <span className="flex gap-1">
-                      {oz2?.eligible && oz2.rural === true ? (
-                        <span className="rounded-full border border-[#8b5a2b]/70 px-1.5 py-px text-[10px] text-[#f6e6d4]">
-                          {RURAL_ELIGIBLE_STATUS_CHIP}
+                      {oz2.eligible && oz2.statusChip ? (
+                        <span
+                          className={`rounded-full border px-1.5 py-px text-[10px] ${
+                            oz2.statusChip === SC_GOVERNOR_NOMINATED_STATUS
+                              ? "border-clay-400/80 text-clay-400"
+                              : "border-[#a56b3c]/70 text-[#f6e6d4]"
+                          }`}
+                        >
+                          {oz2.statusChip}
                         </span>
-                      ) : oz2?.eligible ? (
+                      ) : oz2.eligible ? (
                         <span className="rounded-full border border-white/20 px-1.5 py-px text-[10px] text-ink-100">
                           OZ 2.0
                         </span>

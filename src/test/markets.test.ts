@@ -228,7 +228,7 @@ describe("filterRuralRows", () => {
 describe("South Carolina governor-filed status copy", () => {
   const catalog = loadCatalog();
 
-  it("keeps the eligible chip and adds governor-filed help only for South Carolina views", () => {
+  it("keeps the eligible chip and adds governor-nominated help only for South Carolina views", () => {
     expect(SC_GOVERNOR_FILED_STATUS).toBe(
       "SC: Governor filed nominations with Treasury (Sep 10, 2026 per SC Commerce). Official nominated tract list is not publicly posted. Tracts on this map are not designated QOZs.",
     );
@@ -246,8 +246,9 @@ describe("South Carolina governor-filed status copy", () => {
     const charleston = southCarolinaStatusHelp("Charleston", null);
     const york = southCarolinaStatusHelp("Charlotte", "South Carolina");
     const charlotteAll = southCarolinaStatusHelp("Charlotte", null);
-    expect(charleston).toMatch(/not public/i);
+    expect(charleston).toMatch(/Governor-nominated \/ awaiting Treasury/);
     expect(charleston).toMatch(/not designated/i);
+    expect(charleston).not.toMatch(/not public/i);
     expect(york).toMatch(/not designated/i);
     expect(charlotteAll).toMatch(/York, Lancaster, and Chester/);
     expect(charlotteAll).toMatch(/North Carolina/);
@@ -256,6 +257,7 @@ describe("South Carolina governor-filed status copy", () => {
     for (const note of [charleston, york, charlotteAll]) {
       expect(note).not.toMatch(/\b\d{11}\b/);
       expect(note).not.toMatch(/certified 2027/i);
+      expect(note).toMatch(/not a tax benefit/i);
     }
   });
 

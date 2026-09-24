@@ -1,4 +1,12 @@
-import { RURAL_ELIGIBLE_STATUS_CHIP, type OpportunityZoneInfo, type Oz2EligibilityInfo, type ParcelFeature } from "./types";
+import { isScGovernorNominatedGeoid } from "./scNominatedTracts";
+import {
+  RURAL_ELIGIBLE_STATUS_CHIP,
+  SC_GOVERNOR_NOMINATED_STATUS,
+  SC_NOMINATED_NOT_A_QOZ,
+  type OpportunityZoneInfo,
+  type Oz2EligibilityInfo,
+  type ParcelFeature,
+} from "./types";
 
 export function parcelOpportunityZone(feature: ParcelFeature): OpportunityZoneInfo | null {
   return feature.properties.opportunityZone ?? null;
@@ -68,6 +76,21 @@ export function describeOz2Eligibility(info: Oz2EligibilityInfo | null | undefin
   }
   const geoid = info.tractGeoid || "unknown GEOID";
   const name = info.tractName ? ` (${info.tractName})` : "";
+  if (info.eligible && isScGovernorNominatedGeoid(info.tractGeoid)) {
+    const ruralSentence =
+      info.rural === true
+        ? "Rev. Proc. 2026-14 lists this 2020 census tract as a low-income community comprised entirely of a rural area."
+        : info.rural === false
+          ? "Rev. Proc. 2026-14 marks this tract Non-rural."
+          : "The Rev. Proc. 2026-14 appendix did not include a Rural Status for this tract, so it is not labeled rural.";
+    return {
+      eligible: true,
+      rural: info.rural,
+      label: info.rural === true ? "OZ 2.0 rural-eligible" : info.rural === false ? "OZ 2.0 eligible, not rural" : "OZ 2.0 eligible",
+      statusChip: SC_GOVERNOR_NOMINATED_STATUS,
+      detail: `Governor-nominated / awaiting Treasury — GEOID ${geoid}${name}. ${ruralSentence} South Carolina’s governor nominated this tract (announced Sep 23, 2026; Final Recommendations dated Sep 22). Treasury has not certified it. Status: ${SC_GOVERNOR_NOMINATED_STATUS}. ${SC_NOMINATED_NOT_A_QOZ}`,
+    };
+  }
   if (info.eligible && info.rural === true) {
     return {
       eligible: true,

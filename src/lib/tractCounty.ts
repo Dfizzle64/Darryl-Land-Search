@@ -1,4 +1,5 @@
-import { RURAL_ELIGIBLE_STATUS_CHIP } from "./types";
+import { isScGovernorNominatedGeoid } from "./scNominatedTracts";
+import { RURAL_ELIGIBLE_STATUS_CHIP, SC_GOVERNOR_NOMINATED_STATUS, SC_NOMINATED_NOT_A_QOZ } from "./types";
 
 export type TractClickKind = "eligible" | "designated";
 
@@ -12,6 +13,8 @@ export type TractClickDetails = {
   kind: TractClickKind;
   /** Rural-eligible catalog tracts open the tract drawer. Other clicks use the popup. */
   opensRuralDrawer: boolean;
+  /** Extra line under the status chip. Null when the chip is the whole status. */
+  statusDetail: string | null;
 };
 
 /** IRS appendix rows say "Orange County"; the rural pack stores "Orange". */
@@ -54,20 +57,23 @@ export function tractClickFromFeature(input: {
   const state = readString(properties.state);
   const rural = readBool(properties.rural);
   const opensRuralDrawer = kind === "eligible" && rural === true;
+  const nominated = kind === "eligible" && isScGovernorNominatedGeoid(geoid);
   return {
     geoid,
     county,
     state,
     placeLabel: formatTractCounty(county, state),
-    status: statusFor(kind, rural),
+    status: statusFor(kind, rural, geoid),
     ruralLabel: ruralLabelFor(kind, rural),
     kind,
     opensRuralDrawer,
+    statusDetail: nominated ? SC_NOMINATED_NOT_A_QOZ : null,
   };
 }
 
-function statusFor(kind: TractClickKind, rural: boolean | null): string {
+function statusFor(kind: TractClickKind, rural: boolean | null, geoid: string): string {
   if (kind === "designated") return "Current designated QOZ — not a 2027 designation";
+  if (isScGovernorNominatedGeoid(geoid)) return SC_GOVERNOR_NOMINATED_STATUS;
   if (rural === true) return RURAL_ELIGIBLE_STATUS_CHIP;
   if (rural === false) return "Eligible for nomination, not rural — not designated";
   return "Eligible for nomination — not designated";

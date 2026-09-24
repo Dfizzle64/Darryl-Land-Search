@@ -1,3 +1,4 @@
+import { isScGovernorNominatedGeoid } from "./scNominatedTracts";
 import {
   ELIGIBLE_NOT_DESIGNATED_STATUS,
   MARKETS,
@@ -5,7 +6,7 @@ import {
   OTHER_MARKETS,
   PARCEL_MARKETS,
   RURAL_ELIGIBLE_STATUS_CHIP,
-  SC_GOVERNOR_FILED_STATUS,
+  SC_GOVERNOR_NOMINATED_STATUS,
   type EligibleMarketsCatalog,
   type EligibleTractRow,
   type MarketCountySummary,
@@ -298,17 +299,19 @@ export function viewIncludesSouthCarolina(market: SearchMarketId, state: string 
 
 /**
  * Help copy for a view that includes South Carolina tracts. Null for FL/GA/NC/TN-only views.
- * Does not name nominated GEOIDs — the public list is not posted.
+ * Does not name individual GEOIDs. Nomination is not designation.
  */
 export function southCarolinaStatusHelp(market: SearchMarketId, state: string | null): string | null {
   if (!viewIncludesSouthCarolina(market, state)) return null;
+  const nominated =
+    "Tracts on South Carolina’s official 112-GEOID list (announced Sep 23, 2026; Final Recommendations PDF dated Sep 22) read Governor-nominated / awaiting Treasury. Other eligible tracts stay Eligible — not designated. Nothing here is a certified QOZ, and nomination alone is not a tax benefit.";
   if (market === "Charlotte" && !isSouthCarolinaState(state)) {
-    return `${SC_GOVERNOR_FILED_STATUS} In this shed that filing covers York, Lancaster, and Chester. North Carolina tracts stay on the eligible list and are not designated QOZs.`;
+    return `York, Lancaster, and Chester, South Carolina: ${nominated} North Carolina tracts in this market stay eligible and are not designated.`;
   }
   if (market === "Savannah" && !isSouthCarolinaState(state)) {
-    return `${SC_GOVERNOR_FILED_STATUS} In this shed that filing covers Beaufort and Jasper. Georgia tracts stay on the eligible list and are not designated QOZs.`;
+    return `Beaufort and Jasper, South Carolina: ${nominated} Georgia tracts in this market stay eligible and are not designated.`;
   }
-  return SC_GOVERNOR_FILED_STATUS;
+  return nominated;
 }
 
 export function filterEligibleRows(
@@ -346,7 +349,13 @@ export function eligibleClassCut(
   return "all";
 }
 
-export function displayStatusChip(row: { market: string; rural: "Y" | "N"; status?: string | null }): string {
+export function displayStatusChip(row: {
+  market: string;
+  rural: "Y" | "N";
+  geoid?: string | null;
+  status?: string | null;
+}): string {
+  if (isScGovernorNominatedGeoid(row.geoid)) return SC_GOVERNOR_NOMINATED_STATUS;
   if (row.rural === "Y" && isPrimaryMarket(row.market)) return RURAL_ELIGIBLE_STATUS_CHIP;
   return ELIGIBLE_NOT_DESIGNATED_STATUS;
 }

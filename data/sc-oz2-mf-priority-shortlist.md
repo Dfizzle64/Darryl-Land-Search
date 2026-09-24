@@ -127,7 +127,7 @@ From `data/oz2-7markets-90min-rural-eligible.csv` (Rev. Proc. 2026-14 Rural = en
 
 ## Explicitly not claimed / not chased here
 
-- **Any GEOID as “nominated”** — list not public  
+- **The shortlist itself as a nominated list** — nomination is the official 112-GEOID file, not this ranking. A GEOID here is Governor-nominated only when it is also on that file.  
 - Georgetown coastal / Francis Marion swamp mega-tracts  
 - Barrier islands / Edisto Beach tip  
 - Deep Orangeburg west / Clarendon / pure farm with no corridor story  

@@ -18,6 +18,7 @@ import { describeFluMatch } from "@/lib/flu";
 import { describeRezoningCandidate } from "@/lib/filters";
 import { describeOpportunityZone, describeOz2Eligibility } from "@/lib/opportunityZone";
 import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "@/lib/types";
+import { fluEmptyForMunicipal, zoningEmptyForCounty } from "@/lib/volusiaFlaglerMunicipal";
 import { describeZoningMatch } from "@/lib/zoning";
 
 type ParcelDrawerProps = {
@@ -91,10 +92,15 @@ export function ParcelDrawer({
   const aadtEmpty = florida
     ? "No FDOT count segment within 15 km"
     : "FDOT AADT is Florida only";
-  const zoningEmpty =
-    properties.countyFips === "12095"
-      ? "Not on the OCPA parcel"
-      : "Not in this county's public parcel extract";
+  const zoningEmpty = zoningEmptyForCounty(
+    properties.countyFips,
+    properties.countyFips === "12095" ? "Not on the OCPA parcel" : "Not in this county's public parcel extract",
+  );
+  const zoningLine = properties.zoningCode
+    ? properties.municipal?.zoningLabel && properties.municipal.zoningLabel !== properties.zoningCode
+      ? `${properties.zoningCode} — ${properties.municipal.zoningLabel}`
+      : properties.zoningCode
+    : null;
   const mailing = formatMailing(properties.mailingAddress) ?? mailingGap(properties.mailingAddress);
   const entityName = isEntityOwner(properties.ownerName)
     ? properties.ownerName
@@ -136,8 +142,8 @@ export function ParcelDrawer({
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
-        <Field label="Zoning" value={properties.zoningCode} empty={zoningEmpty} />
-        <Field label="Future Land Use" value={fluLine} empty="Not joined for this county" />
+        <Field label="Zoning" value={zoningLine} empty={zoningEmpty} />
+        <Field label="Future Land Use" value={fluLine} empty={fluEmptyForMunicipal(properties.municipal?.fluGap)} />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
           label="OZ 2.0"
@@ -176,7 +182,9 @@ export function ParcelDrawer({
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Future Land Use</p>
-        <p className="mt-1 text-ink-100">{flu.reason}</p>
+        <p className="mt-1 text-ink-100">
+          {!properties.flu?.code && properties.municipal?.fluGap ? properties.municipal.fluGap : flu.reason}
+        </p>
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Designated Opportunity Zone</p>

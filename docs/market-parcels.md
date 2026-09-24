@@ -30,7 +30,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb). Volusia parcels in the Melbourne extract also get city zoning and future land use where a municipal polygon covers the centroid (`docs/volusia-flagler-municipal.md`). Flagler city layers are cataloged on the Palm Coast host; this repo has no Flagler parcel baseline, so those overlays are not stamped onto new parcels. Neither join is a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 

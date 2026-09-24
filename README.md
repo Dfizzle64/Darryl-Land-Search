@@ -84,7 +84,7 @@ The app is no longer MF-zoning-only. Modes:
 | Either | Zoning match **or** FLU match |
 | Both | Zoning match **and** FLU match |
 
-FLU-only and rezoning modes do **not** treat missing FLU as a match. Other municipalities besides Orlando often have no joined FLU — that is an honest gap, not an empty county. The rezoning list shows a banner with the count of parcels that cannot be classified.
+FLU-only and rezoning modes do **not** treat missing FLU as a match. Other municipalities besides Orlando often have no joined FLU — that is an honest gap, not an empty county. Volusia and Flagler cities are the exception where a city REST layer exists: those codes are copied onto parcels already in the app, and cities with no FLU service stay blank. The rezoning list shows a banner with the count of parcels that cannot be classified. Joined city codes are not added to the multifamily knowledge base.
 
 ### Ranked site list
 

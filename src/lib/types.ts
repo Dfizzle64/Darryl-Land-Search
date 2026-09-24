@@ -53,6 +53,17 @@ export type FluInfo = {
   source: string | null;
 };
 
+/** City zoning / FLU overlay stamped onto an existing parcel. Not an Opportunity Zone. */
+export type MunicipalOverlayNote = {
+  placeId: string;
+  placeName: string;
+  zoningLayer: string | null;
+  fluLayer: string | null;
+  zoningLabel: string | null;
+  /** Set when this city has no future land use service. County FLU is not filled in. */
+  fluGap: string | null;
+};
+
 export type OpportunityZoneInfo = {
   inOpportunityZone: boolean;
   tractGeoid: string | null;
@@ -400,6 +411,8 @@ export type ParcelProperties = {
   incomeBlockGroup: IncomeInfo | null;
   nearestRoad: NearestRoad | null;
   flu: FluInfo | null;
+  /** Volusia / Flagler city overlay that produced zoning or FLU. Absent outside those joins. */
+  municipal?: MunicipalOverlayNote | null;
   opportunityZone: OpportunityZoneInfo | null;
   oz2Eligibility: Oz2EligibilityInfo | null;
   /**

@@ -88,3 +88,4 @@ Orange cadastre:
 - A public ArcGIS Online layer named Polk County parcels is the wrong state (Minnesota). It is not used.
 - Brevard’s property-appraiser MapServer has returned HTTP 403 from this environment. The sample uses DOH.
 - Brevard, Marion, Sumter, and Volusia are still windowed samples around rural tracts, not every 5–150 acre parcel. Those samples are not capped at 150 acres.
+- Volusia city zoning and future land use on the sample (and on the Melbourne 5–150 acre extract) come from municipal REST, not from the DOH parcel attributes. See `docs/volusia-flagler-municipal.md`. Open Data zoning layer 36 city rows (`ZONCODE` 999) are not used.

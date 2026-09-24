@@ -88,7 +88,19 @@ export function ParcelDrawer({
   const zoningEmpty =
     properties.countyFips === "12095"
       ? "Not on the OCPA parcel"
-      : "Not in this county's public parcel extract";
+      : properties.countyFips === "13217"
+        ? "No public Euclidean zoning joined (unincorporated gap; Social Circle overlay only)"
+        : "Not in this county's public parcel extract";
+  const fluEmpty =
+    properties.countyFips === "13217"
+      ? "No NEGRC future land use polygon at this centroid"
+      : "Not joined for this county";
+  const stateLabel =
+    properties.state === "Georgia"
+      ? "GA"
+      : properties.state === "Florida" || !properties.state
+        ? "FL"
+        : properties.state;
   const mailing = formatMailing(properties.mailingAddress);
   const entity = isEntityOwner(properties.ownerName) || isEntityOwner(properties.ownerName2);
   const fluLine = properties.flu?.code
@@ -96,7 +108,7 @@ export function ParcelDrawer({
     : null;
   const placeLine =
     [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+    (properties.countyName ? `${properties.countyName} County, ${stateLabel}` : stateLabel === "FL" ? "Florida" : stateLabel);
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -124,7 +136,7 @@ export function ParcelDrawer({
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
         <Field label="Zoning" value={properties.zoningCode} empty={zoningEmpty} />
-        <Field label="Future Land Use" value={fluLine} empty="Not joined for this county" />
+        <Field label="Future Land Use" value={fluLine} empty={fluEmpty} />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
           label="OZ 2.0"

@@ -26,11 +26,11 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Newton county services | Cobb complete. DeKalb is a polygon-acre sample. Newton is a complete 5–150 acre extract from a 2022 University of Maryland AGOL redistribute (sales through 2021; county zoning left null). Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when a public layer carries it (DeKalb's parcel field, or Newton's Social Circle city overlay). Unincorporated Newton Euclidean zoning stays null. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 
@@ -42,7 +42,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 8,149 | 1 | 1 | 33 |
+| Atlanta | primary | 12,623 | 2 | 1 | 32 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
@@ -97,7 +97,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Meriwether | Georgia | 13199 | gap | 0 | unavailable |
 | Monroe | Georgia | 13207 | gap | 0 | unavailable |
 | Morgan | Georgia | 13211 | gap | 0 | unavailable |
-| Newton | Georgia | 13217 | gap | 0 | unavailable |
+| Newton | Georgia | 13217 | complete-gte-5ac | 4,474 | ga-newton-uofmd-parcels |
 | Paulding | Georgia | 13223 | gap | 0 | unavailable |
 | Pickens | Georgia | 13227 | gap | 0 | unavailable |
 | Pike | Georgia | 13231 | gap | 0 | unavailable |

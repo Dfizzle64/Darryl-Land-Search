@@ -149,6 +149,238 @@ def in_band(acres: float | None) -> bool:
     return acres is not None and MIN_ACRES <= acres <= MAX_ACRES
 
 
+def parse_mdy(value: Any, through_year: int | None = None) -> str | None:
+    """MM-DD-YYYY (or YYYY-MM-DD) to ISO. Blank, '--', and years after through_year are omitted."""
+    text = clean(value)
+    if not text or text in {"--", "0", "00-00-0000"}:
+        return None
+    parts = text.replace("/", "-").split("-")
+    if len(parts) != 3:
+        return None
+    if len(parts[0]) == 4:
+        year, month, day = parts
+    elif len(parts[2]) == 4:
+        month, day, year = parts
+    else:
+        return None
+    try:
+        y, m, d = int(year), int(month), int(day)
+    except ValueError:
+        return None
+    if y < 1900 or y > 2100 or not (1 <= m <= 12 and 1 <= d <= 31):
+        return None
+    if through_year is not None and y > through_year:
+        return None
+    return f"{y:04d}-{m:02d}-{d:02d}"
+
+
+def compose_situs(attrs: dict, fields: list[str]) -> str | None:
+    parts: list[str] = []
+    for field in fields:
+        text = clean(attrs.get(field))
+        if text and text not in {"--"}:
+            parts.append(text)
+    return " ".join(parts) or None
+
+
+def point_in_ring(x: float, y: float, ring: list[tuple[float, float]]) -> bool:
+    inside = False
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = ring[i]
+        xj, yj = ring[j]
+        if (yi > y) != (yj > y):
+            denom = (yj - yi) or 1e-12
+            if x < (xj - xi) * (y - yi) / denom + xi:
+                inside = not inside
+        j = i
+    return inside
+
+
+def point_in_rings(x: float, y: float, rings: list[list[tuple[float, float]]]) -> bool:
+    if not rings or not point_in_ring(x, y, rings[0]):
+        return False
+    return not any(point_in_ring(x, y, hole) for hole in rings[1:])
+
+
+def fetch_layer(query_url: str, out_fields: list[str], page: int = 2000) -> list[dict]:
+    features: list[dict] = []
+    offset = 0
+    while True:
+        data = fetch_json(
+            query_url,
+            {
+                "where": "1=1",
+                "outFields": ",".join(out_fields),
+                "returnGeometry": "true",
+                "outSR": "4326",
+                "resultOffset": str(offset),
+                "resultRecordCount": str(page),
+                "f": "json",
+            },
+            timeout=180,
+        )
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        chunk = data.get("features") or []
+        features.extend(chunk)
+        if len(chunk) < page:
+            break
+        offset += len(chunk)
+    return features
+
+
+def orange_flu_codes() -> set[str]:
+    path = ROOT / "data" / "flu-config.json"
+    if not path.exists():
+        return set()
+    data = json.loads(path.read_text())
+    return {str(cat.get("code") or "").strip().upper() for cat in data.get("categories") or [] if cat.get("code")}
+
+
+def prepare_overlay_polygons(
+    raw: list[dict],
+    *,
+    code_field: str,
+    label_field: str,
+    jurisdiction: str,
+    source: str,
+    require_label: bool,
+) -> list[dict]:
+    prepared: list[dict] = []
+    for item in raw:
+        attrs = item.get("attributes") or {}
+        label = clean(attrs.get(label_field))
+        short = clean(attrs.get(code_field))
+        if require_label and not label:
+            continue
+        if not require_label and not short:
+            continue
+        raw_rings: list[list[tuple[float, float]]] = []
+        for ring in (item.get("geometry") or {}).get("rings") or []:
+            if len(ring) < 4:
+                continue
+            raw_rings.append([(float(x), float(y)) for x, y in ring])
+        # ArcGIS exteriors are clockwise (negative shoelace). Holes are the opposite.
+        parts: list[list[list[tuple[float, float]]]] = []
+        current: list[list[tuple[float, float]]] = []
+        for ring in raw_rings:
+            area = 0.0
+            for i in range(len(ring) - 1):
+                area += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1]
+            is_hole = area > 0
+            if is_hole and current:
+                current.append(ring)
+            else:
+                if current:
+                    parts.append(current)
+                current = [ring]
+        if current:
+            parts.append(current)
+        for part in parts:
+            points = [pt for ring in part for pt in ring]
+            if not points:
+                continue
+            xs = [p[0] for p in points]
+            ys = [p[1] for p in points]
+            outer = part[0]
+            area = 0.0
+            for i in range(len(outer) - 1):
+                area += outer[i][0] * outer[i + 1][1] - outer[i + 1][0] * outer[i][1]
+            prepared.append(
+                {
+                    "rings": part,
+                    "bbox": (min(xs), min(ys), max(xs), max(ys)),
+                    "area": abs(area / 2.0) or 1e-12,
+                    "label": label,
+                    "short": short,
+                    "jurisdiction": jurisdiction,
+                    "source": source,
+                }
+            )
+    return prepared
+
+
+def containing_polygon(prepared: list[dict], lon: float, lat: float) -> dict | None:
+    hits: list[dict] = []
+    for poly in prepared:
+        west, south, east, north = poly["bbox"]
+        if lon < west or lon > east or lat < south or lat > north:
+            continue
+        if point_in_rings(lon, lat, poly["rings"]):
+            hits.append(poly)
+    if not hits:
+        return None
+    return min(hits, key=lambda poly: poly["area"])
+
+
+def apply_overlays(features: list[dict], overlay_spec: dict) -> list[str]:
+    """Centroid-join city/county FLU and optional city zoning. Does not invent codes."""
+    notes: list[str] = []
+    blocked = orange_flu_codes()
+    city_polys: list[dict] = []
+    county_polys: list[dict] = []
+    for layer in overlay_spec.get("flu") or []:
+        print(f"  FLU {layer['source']}", flush=True)
+        raw = fetch_layer(layer["url"], [layer["codeField"], layer["labelField"]])
+        prepared = prepare_overlay_polygons(
+            raw,
+            code_field=layer["codeField"],
+            label_field=layer["labelField"],
+            jurisdiction=layer["jurisdiction"],
+            source=layer["source"],
+            require_label=True,
+        )
+        if layer.get("role") == "county":
+            county_polys.extend(prepared)
+        else:
+            city_polys.extend(prepared)
+        print(f"    {len(prepared)} labeled polygons", flush=True)
+    zoning_polys: list[dict] = []
+    for layer in overlay_spec.get("zoning") or []:
+        print(f"  zoning {layer['source']}", flush=True)
+        raw = fetch_layer(layer["url"], [layer["codeField"], layer["labelField"]])
+        prepared = prepare_overlay_polygons(
+            raw,
+            code_field=layer["codeField"],
+            label_field=layer["labelField"],
+            jurisdiction=layer.get("jurisdiction") or "",
+            source=layer["source"],
+            require_label=False,
+        )
+        zoning_polys.extend(prepared)
+        print(f"    {len(prepared)} zoning polygons", flush=True)
+    flu_hits = 0
+    zoning_hits = 0
+    for feature in features:
+        lon, lat = feature["properties"]["centroid"]
+        flu_hit = containing_polygon(city_polys, lon, lat) or containing_polygon(county_polys, lon, lat)
+        if flu_hit and flu_hit.get("label"):
+            label = flu_hit["label"]
+            code = f"{flu_hit['jurisdiction']}:{label}" if label.upper() in blocked else label
+            feature["properties"]["flu"] = {
+                "code": code,
+                "label": label,
+                "jurisdiction": flu_hit["jurisdiction"],
+                "source": flu_hit["source"],
+            }
+            flu_hits += 1
+        zone_hit = containing_polygon(zoning_polys, lon, lat) if zoning_polys else None
+        if zone_hit and zone_hit.get("short"):
+            code = zone_hit["short"]
+            feature["properties"]["zoningCode"] = code
+            feature["properties"]["zoningDistrict"] = zone_hit.get("label") or f"Social Circle {code} (choosewalton)"
+            feature["properties"]["jurisdictionPrefix"] = "SOC"
+            zoning_hits += 1
+    notes.append(
+        f"NEGRC future land use joined by centroid on {flu_hits} of {len(features)} parcels (city layers before county character areas)."
+    )
+    notes.append(
+        f"Social Circle Euclidean zoning joined by centroid on {zoning_hits} of {len(features)} parcels. Other zoning left null."
+    )
+    return notes
+
+
 def slug(market: str) -> str:
     return market.lower().replace(" ", "-")
 
@@ -394,6 +626,12 @@ def normalize_rows(
         if not plausible_centroid(center):
             dropped += 1
             continue
+        box = spec.get("bbox")
+        if box and center:
+            west, south, east, north = box
+            if not (west <= center[0] <= east and south <= center[1] <= north):
+                dropped += 1
+                continue
         acres = num(attrs.get(spec["acresField"])) if spec.get("acresField") else None
         scale = spec.get("acresScale") or 1
         if acres is not None and scale != 1:
@@ -418,6 +656,18 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        if spec.get("saleDateField"):
+            parsed_sale = parse_mdy(attrs.get(spec["saleDateField"]), spec.get("saleThroughYear"))
+        elif spec.get("saleYearField"):
+            parsed_sale = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
+        else:
+            parsed_sale = None
+        if spec.get("situsParts"):
+            situs = compose_situs(attrs, spec["situsParts"])
+        elif spec.get("situsField"):
+            situs = clean(attrs.get(spec["situsField"]))
+        else:
+            situs = None
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -429,13 +679,13 @@ def normalize_rows(
             center=center,  # type: ignore[arg-type]
             source=spec["source"],
             owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
-            situs=clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None,
+            situs=situs,
             city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
             zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
+            sale_date=parsed_sale,
             sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
@@ -446,6 +696,11 @@ def normalize_rows(
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        template = spec.get("appraiserUrlTemplate")
+        if template:
+            feature["properties"]["appraiserUrl"] = template.replace(
+                "{parcelId}", urllib.parse.quote(parcel_id, safe="-")
+            )
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -584,6 +839,124 @@ def county_override(fips: str) -> dict | None:
             "source": "ga-cobb-parcels",
             "coverage": "complete-gte-5ac",
             "gaps": ["Cobb County open parcels. No zoning join on this layer."],
+        }
+    if fips == "13217":  # Newton GA
+        return {
+            "kind": "arcgis",
+            "url": "https://services1.arcgis.com/qTQ6qYkHpxlu0G82/arcgis/rest/services/Newton_Parcels/FeatureServer/0/query",
+            "where": "TotalAcres>=5 AND TotalAcres<=150",
+            "outFields": [
+                "PARCEL_NO",
+                "StreetName",
+                "StreetType",
+                "ParcelCity",
+                "ParcelZip",
+                "Address1",
+                "Address2",
+                "City",
+                "State",
+                "ZipCode",
+                "SaleDate",
+                "SalesPrice",
+                "TotalAcres",
+                "StrataLand",
+            ],
+            "idField": "PARCEL_NO",
+            "acresField": "TotalAcres",
+            "situsParts": ["StreetName", "StreetType"],
+            "cityField": "ParcelCity",
+            "zipField": "ParcelZip",
+            "dorField": "StrataLand",
+            "salePriceField": "SalesPrice",
+            "saleDateField": "SaleDate",
+            "saleThroughYear": 2021,
+            "mail1Field": "Address1",
+            "mail2Field": "Address2",
+            "mailCityField": "City",
+            "mailStateField": "State",
+            "mailZipField": "ZipCode",
+            "bbox": [-84.08, 33.34, -83.64, 33.77],
+            "appraiserUrlTemplate": "https://qpublic.schneidercorp.com/Application.aspx?App=NewtonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+            "source": "ga-newton-uofmd-parcels",
+            "coverage": "complete-gte-5ac",
+            "overlays": {
+                "flu": [
+                    {
+                        "role": "city",
+                        "url": "https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/447/query",
+                        "codeField": "FDM_Short",
+                        "labelField": "FDM_Long",
+                        "jurisdiction": "COVINGTON",
+                        "source": "negrc-covington-flu-447",
+                    },
+                    {
+                        "role": "city",
+                        "url": "https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/450/query",
+                        "codeField": "FDM_Short",
+                        "labelField": "FDM_Long",
+                        "jurisdiction": "OXFORD",
+                        "source": "negrc-oxford-ca-450",
+                    },
+                    {
+                        "role": "city",
+                        "url": "https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/451/query",
+                        "codeField": "FDM_Short",
+                        "labelField": "FDM_Long",
+                        "jurisdiction": "PORTERDALE",
+                        "source": "negrc-porterdale-ca-451",
+                    },
+                    {
+                        "role": "city",
+                        "url": "https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/448/query",
+                        "codeField": "FDM_Short",
+                        "labelField": "FDM_Long",
+                        "jurisdiction": "MANSFIELD",
+                        "source": "negrc-mansfield-ca-448",
+                    },
+                    {
+                        "role": "city",
+                        "url": "https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/449/query",
+                        "codeField": "FDM_Short",
+                        "labelField": "FDM_Long",
+                        "jurisdiction": "NEWBORN",
+                        "source": "negrc-newborn-ca-449",
+                    },
+                    {
+                        "role": "city",
+                        "url": "https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/469/query",
+                        "codeField": "FDM_Short",
+                        "labelField": "FDM_Long",
+                        "jurisdiction": "SOCIAL CIRCLE",
+                        "source": "negrc-social-circle-ca-469",
+                    },
+                    {
+                        "role": "county",
+                        "url": "https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/454/query",
+                        "codeField": "FDM_Short",
+                        "labelField": "FDM_Long",
+                        "jurisdiction": "NEWTON",
+                        "source": "negrc-newton-ca-454",
+                    },
+                ],
+                "zoning": [
+                    {
+                        "url": "https://services.arcgis.com/ftUt0Vfnzfo0Cs96/arcgis/rest/services/Social_Circle_Zoning/FeatureServer/35/query",
+                        "codeField": "Zoning",
+                        "labelField": "Description",
+                        "jurisdiction": "SOC",
+                        "source": "choosewalton-social-circle-zoning-35",
+                    }
+                ],
+            },
+            "gaps": [
+                "2022 University of Maryland AGOL redistribute of Newton County GA parcels (org qTQ6qYkHpxlu0G82, item 40743c9b9c87460a94aaff77c787a705). Not an official Newton County FeatureServer. County digital Tax Parcel, Zoning, and FLU data is a paid dataset.",
+                "Acreage is deeded TotalAcres, 5–150 acres inclusive. Owner name and situs house number are scrubbed on this redistribute and are left blank. Situs is street name and type plus postal city and ZIP only. ParcelCity is a postal community, not a city-limits filter.",
+                "SaleDate and SalesPrice run through 2021. Qualifying is blank, so lastSale.qualified is null. Improvement and total market values are zero on this snapshot, so tax market, assessed, and taxable values stay null instead of copying land-only LandValue.",
+                "No public Euclidean zoning for unincorporated Newton County. Covington Zoning_FLUM_Trails MapServer query is blocked and is not joined. Oxford's 2012 zoning webmap is not a FeatureServer and is not joined.",
+                "Future land use is a centroid join to NEGRC: county character areas layer 454, and city layers Covington 447, Oxford 450, Porterdale 451, Mansfield 448, Newborn 449, and Social Circle 469. A city polygon wins over the county layer.",
+                "Social Circle Euclidean zoning is a centroid join to choosewalton Social_Circle_Zoning layer 35 (the city also lies in Walton). Covington, Oxford, Porterdale, Mansfield, and Newborn zoning stay null.",
+                "Opportunity Zone and OZ 2.0 fields are not assigned by this pull.",
+            ],
         }
     if fips == "13089":  # DeKalb GA
         return {
@@ -925,11 +1298,11 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Newton county services | Cobb complete. DeKalb is a polygon-acre sample. Newton is a complete 5–150 acre extract from a 2022 University of Maryland AGOL redistribute (sales through 2021; county zoning left null). Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when a public layer carries it (DeKalb's parcel field, or Newton's Social Circle city overlay). Unincorporated Newton Euclidean zoning stays null. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -1013,6 +1386,10 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     ids = fetch_object_ids(spec["url"], spec["where"])
     raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
     features, dropped = normalize_rows(raw, county, markets, spec)
+    if spec.get("overlays"):
+        gaps_from_overlays = apply_overlays(features, spec["overlays"])
+        spec = dict(spec)
+        spec["gaps"] = [*list(spec.get("gaps") or []), *gaps_from_overlays]
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)

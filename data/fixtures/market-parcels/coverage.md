@@ -6,7 +6,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 8,149 | 1 | 1 | 33 |
+| Atlanta | primary | 12,623 | 2 | 1 | 32 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
@@ -61,7 +61,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Meriwether | Georgia | 13199 | gap | 0 | unavailable |
 | Monroe | Georgia | 13207 | gap | 0 | unavailable |
 | Morgan | Georgia | 13211 | gap | 0 | unavailable |
-| Newton | Georgia | 13217 | gap | 0 | unavailable |
+| Newton | Georgia | 13217 | complete-gte-5ac | 4,474 | ga-newton-uofmd-parcels |
 | Paulding | Georgia | 13223 | gap | 0 | unavailable |
 | Pickens | Georgia | 13227 | gap | 0 | unavailable |
 | Pike | Georgia | 13231 | gap | 0 | unavailable |

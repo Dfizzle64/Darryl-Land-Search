@@ -51,6 +51,10 @@ const APPRAISER_LINKS: Record<string, { href: string; label: string }> = {
   "12117": { href: DEFAULT_APPRAISER_URLS["12117"], label: "Open Seminole Property Appraiser search" },
   "12119": { href: DEFAULT_APPRAISER_URLS["12119"], label: "Open Sumter Property Appraiser search" },
   "12127": { href: DEFAULT_APPRAISER_URLS["12127"], label: "Open Volusia Property Appraiser search" },
+  "13013": {
+    href: "https://qpublic.schneidercorp.com/Application.aspx?AppID=635&LayerID=11218&PageTypeID=2&PageID=0",
+    label: "Open Barrow County qPublic search",
+  },
 };
 
 export function parcelAppraiserUrl(options: {
@@ -60,6 +64,9 @@ export function parcelAppraiserUrl(options: {
 }): { href: string | null; label: string } {
   const fips = options.countyFips ?? null;
   if (options.appraiserUrl) {
+    if (fips === "13013") {
+      return { href: options.appraiserUrl, label: "Open this parcel in Barrow County qPublic" };
+    }
     return { href: options.appraiserUrl, label: "Open county property appraiser" };
   }
   if (fips === "12095") {

@@ -400,6 +400,8 @@ def normalize_rows(
             acres = acres / scale
         if spec.get("computeAcres") or acres is None:
             acres = computed
+        if acres is not None and spec.get("roundAcres"):
+            acres = round(float(acres), int(spec["roundAcres"]))
         if not in_band(acres):
             dropped += 1
             continue
@@ -446,6 +448,10 @@ def normalize_rows(
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        if spec.get("mailing") == "barrow-wingap":
+            from barrow_parcels import apply_barrow_mailing
+
+            apply_barrow_mailing(feature, attrs)
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -567,6 +573,10 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    if fips == "13013":  # Barrow GA
+        from barrow_parcels import barrow_spec
+
+        return barrow_spec()
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -663,7 +673,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, or Barrow pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -740,6 +750,7 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    annotations: dict | None = None,
 ) -> dict:
     row = {
         "name": county["name"],
@@ -760,6 +771,8 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    if annotations:
+        row["annotations"] = annotations
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
     (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
     return row
@@ -848,7 +861,16 @@ def rebuild_indexes(catalog: dict) -> None:
         rel = f"data/fixtures/market-parcels/markets/{slug(market['id'])}/meta.json"
         market_path = ROOT / rel
         market_path.parent.mkdir(parents=True, exist_ok=True)
-        market_path.write_text(json.dumps(meta, indent=2) + "\n")
+        if market_path.exists():
+            existing_meta = json.loads(market_path.read_text())
+            existing_body = {key: value for key, value in existing_meta.items() if key != "generatedAt"}
+            new_body = {key: value for key, value in meta.items() if key != "generatedAt"}
+            if existing_body == new_body:
+                meta = existing_meta
+            else:
+                market_path.write_text(json.dumps(meta, indent=2) + "\n")
+        else:
+            market_path.write_text(json.dumps(meta, indent=2) + "\n")
         index_markets[market["id"]] = {
             "tier": market["tier"],
             "parcelCount": parcel_count,
@@ -925,11 +947,11 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Barrow county services | Cobb complete. DeKalb is a polygon-acre sample. Barrow is a complete 5–150 acre extract using GIS acres from Shape__Area (no deeded acres). Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county parcel layer already carries a zoning field (DeKalb) or a public zoning layer can be PIN-joined (Barrow). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -961,6 +983,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
+                annotations=cached.get("annotations") if isinstance(cached.get("annotations"), dict) else None,
             )
     try:
         expected = count_where(spec["url"], spec["where"])
@@ -1013,14 +1036,25 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     ids = fetch_object_ids(spec["url"], spec["where"])
     raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
     features, dropped = normalize_rows(raw, county, markets, spec)
+    annotations: dict | None = None
+    gaps = list(spec.get("gaps") or [])
+    if spec.get("enrich") == "barrow":
+        from barrow_parcels import enrich_barrow_features
+
+        annotations, enrich_gaps = enrich_barrow_features(features, fetch_json)
+        for note in enrich_gaps:
+            if note not in gaps:
+                gaps.append(note)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "features": features, "annotations": annotations},
+            separators=(",", ":"),
+        )
     )
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,
@@ -1047,6 +1081,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         source_count=expected,
         dropped=dropped,
         tile_count=tiles,
+        annotations=annotations,
     )
 
 

@@ -230,6 +230,19 @@ describe("public contact links", () => {
     const dekalb = parcelAppraiserUrl({ parcelId: "123", countyFips: "13089" });
     expect(dekalb.href).toBeNull();
     expect(dekalb.label).toMatch(/No county property-appraiser search is cataloged/);
+    const barrow = parcelAppraiserUrl({ parcelId: "XX125  113", countyFips: "13013" });
+    expect(barrow.href).toContain("AppID=635");
+    expect(barrow.href).toContain("LayerID=11218");
+    expect(barrow.label).toMatch(/Barrow/);
+    const barrowParcel = parcelAppraiserUrl({
+      parcelId: "XX125  113",
+      countyFips: "13013",
+      appraiserUrl:
+        "https://qpublic.schneidercorp.com/Application.aspx?App=BarrowCountyGA&Layer=Parcels&PageType=Report&KeyValue=XX125%20%20113",
+    });
+    expect(barrowParcel.href).toContain("KeyValue=");
+    expect(barrowParcel.href).not.toContain("ocpafl.org");
+    expect(barrowParcel.label).toMatch(/Barrow County qPublic/);
     const orange = parcelAppraiserUrl({ parcelId: "282312000000000", countyFips: "12095" });
     expect(orange.href).toContain("ocpafl.org");
     expect(orange.href).toContain("282312000000000");

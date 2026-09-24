@@ -131,7 +131,7 @@ describe("basemap helpers", () => {
     expect(JSON.stringify(parcelLinePaint("streets")["line-width"])).toContain("1.15");
     expect(JSON.stringify(parcelLinePaint("streets")["line-color"])).toContain("#0f5132");
     expect(JSON.stringify(parcelLinePaint("dark")["line-color"])).toContain("#b7e3cf");
-    expect(JSON.stringify(oz2LinePaint("streets")["line-color"])).toContain("#3f2a1c");
+    expect(JSON.stringify(oz2LinePaint("streets")["line-color"])).toContain("#2f1c10");
     expect(JSON.stringify(oz2LinePaint("streets")["line-color"])).toContain("#1d4ed8");
     expect(ozLinePaint("streets")["line-color"]).toBe("#9a3412");
     expect(ozLinePaint("dark")["line-color"]).toBe("#f6d0b0");
@@ -151,9 +151,11 @@ describe("basemap helpers", () => {
     );
     const streetOz2Opacity = oz2FillPaint("streets")["fill-opacity"];
     const satelliteOz2Opacity = oz2FillPaint("satellite")["fill-opacity"];
-    expect(Array.isArray(streetOz2Opacity) ? streetOz2Opacity[3] : streetOz2Opacity).toBeLessThan(
-      Array.isArray(satelliteOz2Opacity) ? Number(satelliteOz2Opacity[3]) : Number(satelliteOz2Opacity),
-    );
+    const streetRuralOpacity = Array.isArray(streetOz2Opacity) ? Number(streetOz2Opacity[2]) : Number(streetOz2Opacity);
+    const satelliteRuralOpacity = Array.isArray(satelliteOz2Opacity)
+      ? Number(satelliteOz2Opacity[2])
+      : Number(satelliteOz2Opacity);
+    expect(satelliteRuralOpacity).toBeLessThan(streetRuralOpacity);
     expect(JSON.stringify(oz2FillPaint("streets")["fill-color"])).toContain(OZ_TRACT_SWATCH.rural);
     expect(JSON.stringify(oz2FillPaint("streets")["fill-color"])).toContain(OZ_TRACT_SWATCH.eligible);
     expect(ozFillPaint("streets")["fill-color"]).toBe(OZ_TRACT_SWATCH.designated);
@@ -173,7 +175,7 @@ describe("basemap helpers", () => {
     const designated = OZ_TRACT_SWATCH.designated;
     expect(eligible).toBe(urban);
     expect(new Set([rural, urban, designated]).size).toBe(3);
-    expect(rural).toBe("#a56b3c");
+    expect(rural).toBe("#8b5a2b");
     expect(rural).not.toMatch(/f15a08|f0b429|ff7a29/i);
     expect(urban).toBe("#3d7dff");
 
@@ -186,16 +188,17 @@ describe("basemap helpers", () => {
     ].join(" ");
     expect(tractPaint).toContain(rural);
     expect(tractPaint).toContain(urban);
-    expect(tractPaint).toContain("#e4c4a0");
-    expect(tractPaint).toContain("#d2b48c");
+    expect(tractPaint).toContain("#c9843f");
+    expect(tractPaint).toContain("#a98460");
     expect(tractPaint).toContain("#8eb6ff");
     expect(tractPaint).not.toContain("#6d28d9");
     expect(tractPaint).not.toContain("#c084fc");
     expect(tractPaint).not.toMatch(/#f15a08|#f0b429|#ffd56a|#ff7a29|#3f9d74/i);
-    expect(JSON.stringify(oz2FillPaint("streets")["fill-opacity"])).toContain("0.34");
+    expect(JSON.stringify(oz2FillPaint("streets")["fill-opacity"])).toContain("0.32");
     expect(JSON.stringify(oz2FillPaint("streets")["fill-opacity"])).toContain("0.22");
-    expect(JSON.stringify(oz2FillPaint("satellite")["fill-opacity"])).toContain("0.48");
-    expect(JSON.stringify(oz2LinePaint("streets")["line-width"])).toContain("2.5");
+    expect(JSON.stringify(oz2FillPaint("satellite")["fill-opacity"])).toContain("0.2");
+    expect(JSON.stringify(oz2LinePaint("satellite")["line-width"])).toContain("3.4");
+    expect(JSON.stringify(oz2LinePaint("streets")["line-width"])).toContain("2.8");
     expect(JSON.stringify(oz2LinePaint("streets")["line-width"])).toContain("1.05");
   });
 });

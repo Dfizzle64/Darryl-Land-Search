@@ -65,9 +65,12 @@ export type SchoolRating = {
   city: string | null;
   state: string | null;
   level: string | null;
-  /** A–F, or a published improvement rating such as Commendable. Null means unpublished here. */
+  /**
+   * A–F letter, a published improvement rating such as Commendable, or a Georgia
+   * CCRPI single score. Null means unpublished here. CCRPI is not a letter grade.
+   */
   rating: string | null;
-  ratingKind: "letter" | "improvement" | null;
+  ratingKind: "letter" | "improvement" | "ccrpi" | null;
   year: string | null;
   summary: string;
   source: string | null;
@@ -148,6 +151,21 @@ export const CMS_ZONES_URL = CMS_SCHOOL_POINTS;
 export const CMS_GRADES_SOURCE =
   "North Carolina DPI School Performance Grades, 2025-26, Charlotte-Mecklenburg Schools (LEA 600), subgroup ALL";
 export const CMS_GRADES_URL = "https://accrpt.tops.ncsu.edu/docs/spgdisag_datasets/SPG_Disag_2025-26.zip";
+
+/** Cobb County School District attendance zones. Marietta City has no public zone tile. */
+export const CCSD_ZONE_MAP =
+  "https://gis.cobbcounty.gov/gisserver/rest/services/cobbpublic/ccsdschoolzonemapwm/MapServer";
+export const GOSA_CCRPI_SOURCE =
+  "GOSA Georgia School Grades 2025 (CCRPI single score). Georgia does not publish A–F letter grades.";
+export const GOSA_CCRPI_URL = "https://download.gosa.ga.gov/SchoolGrades/2025SchoolGrades_data.zip";
+export const COBB_UTILITY_SOURCE =
+  "Cobb County water service boundaries, septic areas, and sewer-not-anticipated polygons";
+export const COBB_UTILITY_URL =
+  "https://gis.cobbcounty.gov/gisserver/rest/services/water/waterlivemap_refdatawm/MapServer";
+export const COBB_GAS_SOURCE = "Cobb County open GIS — no gas service-area layer";
+export const COBB_GAS_URL = "https://gis.cobbcounty.gov/";
+export const COBB_SCHOOLS_NOTE =
+  "Zoned elementary, middle, and high schools are Cobb County School District attendance zones or Marietta City Schools assignment, not the nearest campus. Scores are GOSA 2025 CCRPI single scores. Georgia does not publish A–F letter grades, and none are invented here.";
 
 export const HIFLD_POWER_SERVICE =
   "https://services3.arcgis.com/OYP7N6mAJJCyH6hd/ArcGIS/rest/services/Electric_Retail_Service_Territories_HIFLD/FeatureServer/0";
@@ -533,7 +551,7 @@ export function toSchoolRating(input: {
   state: string | null;
   level: string | null;
   rating: string | null;
-  ratingKind: "letter" | "improvement" | null;
+  ratingKind: "letter" | "improvement" | "ccrpi" | null;
   year: string | null;
   source: string | null;
   sourceUrl: string | null;
@@ -553,7 +571,7 @@ export function toSchoolRating(input: {
 export function describeSchoolRating(input: {
   state: string | null;
   rating: string | null;
-  ratingKind: "letter" | "improvement" | null;
+  ratingKind: "letter" | "improvement" | "ccrpi" | null;
   year: string | null;
   source: string | null;
 }): string {
@@ -561,6 +579,9 @@ export function describeSchoolRating(input: {
     input.state === "FL"
       ? " Confidence is medium until the FL DOE School Grades Excel can be ingested."
       : "";
+  if (input.rating && input.ratingKind === "ccrpi") {
+    return `GOSA CCRPI single score ${input.rating}${input.year ? ` (${input.year})` : ""}. Georgia does not publish A–F letter grades. ${input.source ?? ""}`.trim();
+  }
   if (input.rating && input.ratingKind === "letter") {
     return `Public rating ${input.rating}${input.year ? ` (${input.year})` : ""}. ${input.source ?? ""}${floridaConfidence}`.trim();
   }
@@ -624,15 +645,15 @@ export function mailingGap(address: MailingAddress | null | undefined): string |
 
 export const UTILITY_LAYER_NOTE = {
   water:
-    "Water polygons are Orange County’s public service-area layer only. Charlotte Water publishes no service-area polygon. Inside the City of Charlotte the drawer uses the municipal boundary as a jurisdiction proxy, and unincorporated Mecklenburg stays unverified. Every other county is unknown.",
+    "Water polygons are Orange County’s public service-area layer only. Charlotte Water publishes no service-area polygon. Inside the City of Charlotte the drawer uses the municipal boundary as a jurisdiction proxy, and unincorporated Mecklenburg stays unverified. Cobb batch-40 parcels name CCWS or a city service boundary in the drawer; that join is not a county-wide polygon. Every other county is unknown.",
   sewer:
-    "Sewer polygons are Orange County’s public wastewater service-area layer only. Charlotte has no public sewer polygon either — same jurisdiction proxy as water, with unincorporated Mecklenburg unverified.",
+    "Sewer polygons are Orange County’s public wastewater service-area layer only. Charlotte has no public sewer polygon either — same jurisdiction proxy as water, with unincorporated Mecklenburg unverified. Five Cobb batch parcels marked Sewer Not Anticipated stay gaps.",
   power:
-    "In Orange County this is open-data electric service areas (layer 68). Outside that county it is the HIFLD retail-territory layer, which in Mecklenburg includes Duke Energy Carolinas and EnergyUnited EMC and can overlap a municipal retailer. Neither layer is a connection or a will-serve. Gas has no public polygon.",
+    "In Orange County this is open-data electric service areas (layer 68). Outside that county it is the HIFLD retail-territory layer, which in Mecklenburg includes Duke Energy Carolinas and EnergyUnited EMC and can overlap a municipal retailer. Cobb batch-40 parcels join one HIFLD name when territories overlap. Neither layer is a connection or a will-serve. Gas has no public polygon.",
   flood:
     "FEMA NFHL effective flood zones. The drawer reports the zone at the centroid. A static BFE is shown only when NFHL publishes one. The -9999 sentinel is not an elevation. The community id comes from the NFHL political layer. That layer does not include a Community Rating System class.",
   wetlands:
     "National Wetlands Inventory, which covers Florida and the other states in this app. Polygons draw at closer zoom because the service scale limit is about 1:100,000.",
   schools:
-    "Orange County draws OCPS attendance zones. Mecklenburg County draws CMS elementary, middle, and high attendance zones, with 2025-26 NCDPI school performance grades for LEA 600. Other North Carolina dots stay on the 2024-25 researcher file. Florida letters are the 2025-26 Know Your Schools report card — the School Grades Excel file returns 403 from many hosts, so it is not re-downloaded here. Other states plot NCES locations and link the state report card. No grade is invented.",
+    "Orange County draws OCPS attendance zones. Mecklenburg County draws CMS elementary, middle, and high attendance zones, with 2025-26 NCDPI school performance grades for LEA 600. Cobb County draws CCSD attendance zones. Cobb batch-40 parcels show GOSA 2025 CCRPI single scores for the zoned Cobb or Marietta schools — Georgia does not publish A–F letters, and none are invented. Other North Carolina dots stay on the 2024-25 researcher file. Florida letters are the 2025-26 Know Your Schools report card — the School Grades Excel file returns 403 from many hosts, so it is not re-downloaded here. Other states plot NCES locations and link the state report card. No grade is invented.",
 } as const;

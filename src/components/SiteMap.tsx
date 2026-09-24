@@ -45,6 +45,7 @@ import {
 import { eligibleClassCut, southCarolinaStatusHelp } from "@/lib/markets";
 import {
   arcgisExportTileUrl,
+  CCSD_ZONE_MAP,
   CMS_ELEM_MAP,
   CMS_HIGH_MAP,
   CMS_MIDDLE_MAP,
@@ -252,6 +253,20 @@ function addScreeningLayers(map: MapLibreMap, mode: BasemapMode) {
       paint: { "raster-opacity": 0.4 },
     });
   }
+  map.addSource("school-ccsd-raster", {
+    type: "raster",
+    tiles: [arcgisExportTileUrl(CCSD_ZONE_MAP, "0,1,2")],
+    tileSize: 256,
+    attribution: "Cobb County School District attendance zones",
+  });
+  map.addLayer({
+    id: "school-ccsd-raster",
+    type: "raster",
+    source: "school-ccsd-raster",
+    minzoom: 9,
+    layout: { visibility: "none" },
+    paint: { "raster-opacity": 0.4 },
+  });
   const utilities = [
     ["water", "#3d7dff"],
     ["sewer", "#7a5cff"],
@@ -1065,7 +1080,7 @@ export function SiteMap({
     show(["sewer-fill", "sewer-line"], screening.sewer);
     show(["power-fill", "power-line"], screening.power);
     show(
-      ["schools-circle", "school-zone-raster", "school-ms-raster", "school-cms-es-raster", "school-cms-ms-raster", "school-cms-hs-raster"],
+      ["schools-circle", "school-zone-raster", "school-ms-raster", "school-cms-es-raster", "school-cms-ms-raster", "school-cms-hs-raster", "school-ccsd-raster"],
       screening.schools,
     );
   }, [screening, status, basemap]);
@@ -1407,7 +1422,7 @@ export function SiteMap({
           {screening.schools ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-full align-middle" style={{ backgroundColor: "#1f7a4d" }} />
-              Schools · letter grade, OCPS zones in Orange County, CMS zones in Mecklenburg
+              Schools · letter grade where published, CCRPI on Cobb batch parcels, OCPS / CMS / CCSD zones
             </p>
           ) : null}
           {screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power ? (

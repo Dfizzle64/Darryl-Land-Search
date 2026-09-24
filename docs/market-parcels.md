@@ -21,7 +21,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 | State | Endpoint | What shipped |
 | --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
+| Florida | Florida DOH EHWATER Parcels. Treasure Coast counties use the county GIS instead: Indian River property appraiser, St. Lucie parcel boundaries, Brevard Accela, Martin geoweb, and Okeechobee planning | Complete 5–150 acre extract where the county is not already an Orlando complete county. Indian River, St. Lucie, Brevard, Martin, and Okeechobee join municipal zoning and FLU where a city publishes a layer. See docs/treasure-coast-parcels.md |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
@@ -30,7 +30,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or when a Treasure Coast county joins a municipal or unincorporated zoning polygon. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets. Eligible OZ 2.0 tracts are not designated QOZs.
 
 ## Coverage
 
@@ -48,8 +48,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
 | Charlotte | primary | 119,168 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
-| Vero Beach | other | 20,964 | 5 | 0 | 0 |
-| Melbourne | other | 41,757 | 5 | 0 | 0 |
+| Vero Beach | other | 23,009 | 5 | 0 | 0 |
+| Melbourne | other | 40,854 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
 | Birmingham | other | 15,641 | 1 | 0 | 9 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
@@ -200,19 +200,19 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
-| Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Martin | Florida | 12085 | complete-gte-5ac | 3,802 | fl-doh-ehwaters-12085 |
-| Okeechobee | Florida | 12093 | complete-gte-5ac | 3,176 | fl-doh-ehwaters-12093 |
-| St. Lucie | Florida | 12111 | complete-gte-5ac | 4,824 | fl-doh-ehwaters-12111 |
+| Brevard | Florida | 12009 | complete-gte-5ac | 6,802 | fl-brevard-accela-12009 |
+| Indian River | Florida | 12061 | complete-gte-5ac | 3,779 | fl-ircpa-parcels-12061 |
+| Martin | Florida | 12085 | complete-gte-5ac | 3,790 | fl-martin-geoweb-12085 |
+| Okeechobee | Florida | 12093 | complete-gte-5ac | 3,053 | fl-okeechobee-planning-12093 |
+| St. Lucie | Florida | 12111 | complete-gte-5ac | 5,585 | fl-slc-parcels-12111 |
 
 ### Melbourne
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Brevard | Florida | 12009 | complete-gte-5ac | 5,746 | fl-doh-ehwaters-12009 |
-| Indian River | Florida | 12061 | complete-gte-5ac | 3,416 | fl-doh-ehwaters-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 14,031 | reused-orlando-complete-5-150 |
+| Brevard | Florida | 12009 | complete-gte-5ac | 6,802 | fl-brevard-accela-12009 |
+| Indian River | Florida | 12061 | complete-gte-5ac | 3,779 | fl-ircpa-parcels-12061 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
 

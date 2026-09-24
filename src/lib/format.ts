@@ -1,3 +1,5 @@
+import { treasureCoastAppraiserLabel } from "./treasureCoast";
+
 const ENTITY_RE = /\b(LLC|L\.L\.C|INC|INCORPORATED|LP|L\.P|LLP|CORP|CORPORATION|LTD|TRUST|HOLDINGS|PARTNERS|COMPANY|CO)\b/i;
 
 export function isEntityOwner(name: string | null | undefined): boolean {
@@ -19,6 +21,10 @@ export function comptrollerRecordsUrl(): string {
 
 const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12009": "https://www.bcpao.us/PropertySearch/#/nav/Search",
+  "12061": "https://www.ircpa.org/",
+  "12085": "https://www.pamartinfl.gov/",
+  "12093": "https://www.okeechobeepa.com/gis/",
+  "12111": "https://www.paslc.gov/",
   "12069": "https://www.lakecopropappr.com/",
   "12083": "https://www.pa.marion.fl.us/",
   "12095": "https://ocpaweb.ocpafl.org/site/parcelsearch",
@@ -39,6 +45,13 @@ export function parcelAppraiserUrl(options: {
     return {
       href: ocpaParcelUrl(options.parcelId),
       label: "Open in Orange County Property Appraiser",
+    };
+  }
+  const treasureLabel = treasureCoastAppraiserLabel(fips);
+  if (treasureLabel) {
+    return {
+      href: options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId),
+      label: treasureLabel,
     };
   }
   const href = options.appraiserUrl || (fips ? DEFAULT_APPRAISER_URLS[fips] : null) || ocpaParcelUrl(options.parcelId);

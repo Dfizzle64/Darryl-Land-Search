@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T00:23:17Z",
+  "generatedAt": "2026-09-24T00:26:11Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -451,7 +451,7 @@
     },
     "Tampa": {
       "tier": "primary",
-      "parcelCount": 124897,
+      "parcelCount": 124649,
       "completeCountyCount": 10,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
@@ -473,13 +473,12 @@
           "name": "Hardee",
           "state": "Florida",
           "fips": "12049",
-          "featureCount": 5303,
+          "featureCount": 5055,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Parcels are InfoMap Owner Parcels (TOTACRES). SWFWMD parcel_search was not needed.",
-            "County zoning and future land use are a spatial intersect (no parcel id on those layers)."
+            "No zoning or FLU on the Florida DOH extract."
           ]
         },
         {
@@ -1387,81 +1386,6 @@
           "gaps": [
             "No zoning or FLU on the Florida DOH extract.",
             "Optional SWFL county. Tiles are shared with Tampa and are not downloaded a second time."
-          ]
-        }
-      ]
-    },
-    "Heartland": {
-      "tier": "shelf",
-      "parcelCount": 21163,
-      "completeCountyCount": 4,
-      "sampleCountyCount": 1,
-      "gapCountyCount": 0,
-      "path": "data/fixtures/market-parcels/markets/heartland/meta.json",
-      "counties": [
-        {
-          "name": "DeSoto",
-          "state": "Florida",
-          "fips": "12027",
-          "featureCount": 4677,
-          "coverage": "partial",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Parcels are SWFWMD parcel_search DeSoto (CNTYFIPS 027). ACRES is empty; AREANO is the acreage. This is not DeSoto County, Kansas, and not DeSoto County, Mississippi (28033).",
-            "Arcadia zoning and future land use are attribute-joined on PARCEL_ID inside the city only."
-          ]
-        },
-        {
-          "name": "Glades",
-          "state": "Florida",
-          "fips": "12043",
-          "featureCount": 2256,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Parcels are AGOL glades_parcels_2026_06_01. Acreage is the acreage field.",
-            "Zoning (GladesCounty_Zoning_03192026 layer 4) and FLU (GladesCounty_FLU_03192026) are spatial. Neither layer has a parcel id."
-          ]
-        },
-        {
-          "name": "Hardee",
-          "state": "Florida",
-          "fips": "12049",
-          "featureCount": 5303,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Parcels are InfoMap Owner Parcels (TOTACRES). SWFWMD parcel_search was not needed.",
-            "County zoning and future land use are a spatial intersect (no parcel id on those layers)."
-          ]
-        },
-        {
-          "name": "Hendry",
-          "state": "Florida",
-          "fips": "12051",
-          "featureCount": 3070,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Parcels are Parcels_Feb2024 (February 2024 vintage), not a later Hendry roll. Acreage is MAP_ACRES.",
-            "County zoning is an attribute join on PIN / PARCELNO. Current_Zo values LABELLE and CLEWISTON are city names, not districts, and stay blank."
-          ]
-        },
-        {
-          "name": "Highlands",
-          "state": "Florida",
-          "fips": "12055",
-          "featureCount": 5857,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Acreage is PAO Calculated_Acres, 5.0\u2013150.0 inclusive. The root Parcels FeatureServer was not used (it is token-gated, not the public PAO layer).",
-            "County Zoning.ZON and FLUM.FLUM are attribute-joined on PARCELNO = STRAP_NUM. STRAP is not the zoning key."
           ]
         }
       ]

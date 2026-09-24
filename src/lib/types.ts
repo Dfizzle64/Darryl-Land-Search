@@ -120,13 +120,11 @@ export type MarketId = (typeof MARKETS)[number];
 
 /**
  * Smaller MSAs, visually secondary to the seven primary markets.
- * Florida markets stay together: SWFL and the Heartland shelf, east coast south to north,
+ * Florida markets stay together: SWFL, then the east coast south to north,
  * then Big Bend and the panhandle. Jackson is Jackson, Tennessee.
- * Heartland is a parcel shelf with no eligible-tract rows.
  */
 export const OTHER_MARKETS = [
   "SWFL",
-  "Heartland",
   "Vero Beach",
   "Melbourne",
   "Jacksonville",

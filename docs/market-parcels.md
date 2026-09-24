@@ -30,13 +30,12 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
 | Atlanta | primary | 59,104 | 10 | 1 | 24 |
-| Tampa | primary | 124,897 | 10 | 0 | 0 |
+| Tampa | primary | 124,649 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 104,066 | 13 | 0 | 4 |
 | Charlotte | primary | 106,650 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 151,530 | 17 | 0 | 0 |
 | SWFL | other | 32,749 | 4 | 0 | 0 |
-| Heartland | shelf | 21,163 | 4 | 1 | 0 |
 | Vero Beach | other | 23,009 | 5 | 0 | 0 |
 | Melbourne | other | 41,026 | 5 | 0 | 0 |
 | Jacksonville | other | 26,301 | 5 | 0 | 0 |
@@ -102,7 +101,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Citrus | Florida | 12017 | complete-gte-5ac | 5,810 | fl-doh-ehwaters-12017 |
-| Hardee | Florida | 12049 | complete-gte-5ac | 5,303 | fl-hardee-infomap-12049 |
+| Hardee | Florida | 12049 | complete-gte-5ac | 5,055 | fl-doh-ehwaters-12049 |
 | Hernando | Florida | 12053 | complete-gte-5ac | 7,180 | fl-doh-ehwaters-12053 |
 | Hillsborough | Florida | 12057 | complete-gte-5ac | 13,838 | fl-hillsborough-parcelpublishing-12 |
 | Manatee | Florida | 12081 | complete-gte-5ac | 7,239 | fl-doh-ehwaters-12081 |
@@ -196,16 +195,6 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Collier | Florida | 12021 | complete-gte-5ac | 13,889 | fl-collier-parceljoin |
 | Lee | Florida | 12071 | complete-gte-5ac | 9,992 | fl-lee-parceladdress |
 | Sarasota | Florida | 12115 | complete-gte-5ac | 4,303 | fl-doh-ehwaters-12115 |
-
-### Heartland
-
-| County | State | FIPS | Coverage | Parcels | Source |
-| --- | --- | --- | --- | ---: | --- |
-| DeSoto | Florida | 12027 | partial | 4,677 | fl-desoto-swfwmd-12027 |
-| Glades | Florida | 12043 | complete-gte-5ac | 2,256 | fl-glades-agol-2026-06-12043 |
-| Hardee | Florida | 12049 | complete-gte-5ac | 5,303 | fl-hardee-infomap-12049 |
-| Hendry | Florida | 12051 | complete-gte-5ac | 3,070 | fl-hendry-parcels-feb2024-12051 |
-| Highlands | Florida | 12055 | complete-gte-5ac | 5,857 | fl-highlands-pao-12055 |
 
 ### Vero Beach
 

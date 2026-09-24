@@ -35,7 +35,6 @@ const URBAN_ROWS: Record<MarketId, number> = {
 
 const OTHER_ROWS: Record<OtherMarketId, { total: number; rural: number; urban: number }> = {
   SWFL: { total: 75, rural: 11, urban: 64 },
-  Heartland: { total: 0, rural: 0, urban: 0 },
   "Vero Beach": { total: 62, rural: 25, urban: 37 },
   Melbourne: { total: 175, rural: 24, urban: 151 },
   Jacksonville: { total: 98, rural: 8, urban: 90 },
@@ -111,11 +110,11 @@ describe("other MSA eligible pack", () => {
   });
 
   it("matches each smaller market and does not treat them as primary", () => {
-    expect(OTHER_MARKETS).toHaveLength(19);
+    expect(OTHER_MARKETS).toHaveLength(18);
     expect(OTHER_MARKETS[0]).toBe("SWFL");
-    expect(OTHER_MARKETS[1]).toBe("Heartland");
-    expect(OTHER_MARKETS[4]).toBe("Jacksonville");
-    expect(OTHER_MARKETS[5]).toBe("Big Bend");
+    expect(OTHER_MARKETS[1]).toBe("Vero Beach");
+    expect(OTHER_MARKETS[3]).toBe("Jacksonville");
+    expect(OTHER_MARKETS[4]).toBe("Big Bend");
     expect(OTHER_MARKETS).toContain("Jackson");
     for (const market of OTHER_MARKETS) {
       const rows = filterEligibleRows(catalog.rows, market, null, null);

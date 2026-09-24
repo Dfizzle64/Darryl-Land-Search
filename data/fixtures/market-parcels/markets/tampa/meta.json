@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T00:23:17Z",
+  "generatedAt": "2026-09-24T00:26:11Z",
   "market": "Tampa",
   "tier": "primary",
-  "parcelCount": 124897,
+  "parcelCount": 124649,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -39,24 +39,20 @@
       "name": "Hardee",
       "fips": "12049",
       "state": "Florida",
-      "featureCount": 5303,
+      "featureCount": 5055,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-hardee-infomap-12049",
-      "queryUrl": "https://gis.hardeecounty.net/arcgis/rest/services/InfoMap/MapServer/5/query",
+      "source": "fl-doh-ehwaters-12049",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/23/query",
       "gaps": [
-        "Parcels are InfoMap Owner Parcels (TOTACRES). SWFWMD parcel_search was not needed.",
-        "County zoning and future land use are a spatial intersect (no parcel id on those layers).",
-        "Wauchula, Bowling Green, and Zolfo Springs zoning and FLU join on PARCEL / Parcel_Id when it matches PIN_DSP, otherwise by intersect. They do not cover unincorporated Hardee.",
-        "InfoMap has the last situs and owner. It has no sale price or assessed value.",
-        "Hardee county spatial join: zoning 5188/5303, FLU 5297/5303. City override zoning 112, FLU 112 (Wauchula, Bowling Green, Zolfo Springs)."
+        "No zoning or FLU on the Florida DOH extract."
       ],
       "path": "data/fixtures/market-parcels/counties/12049/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12049/lookup.json",
       "tileCount": 6,
-      "sourceCount": 5303
+      "sourceCount": 5055
     },
     {
       "name": "Hernando",

@@ -369,7 +369,16 @@ def fetch_attributes(url: str, where: str, fields: list[str], queried: list[str]
     return [item.get("attributes") or {} for item in raw]
 
 
-def fetch_spatial(url: str, where: str, fields: list[str], payload_fn: Callable[[dict], dict | None], queried: list[str]) -> GridIndex:
+def fetch_spatial(
+    url: str,
+    where: str,
+    fields: list[str],
+    payload_fn: Callable[[dict], dict | None],
+    queried: list[str],
+    *,
+    extra: dict | None = None,
+    skip_failed: bool = False,
+) -> GridIndex:
     from parcel_geometry import esri_rings_to_geojson
 
     assert_urls_allowed([url])
@@ -381,7 +390,17 @@ def fetch_spatial(url: str, where: str, fields: list[str], payload_fn: Callable[
     if count <= 0:
         return index
     ids = seed.fetch_object_ids(url, where)
-    raw = seed.fetch_by_ids(url, ids, fields, batch=60, return_geometry=True)
+    raw = seed.fetch_by_ids(
+        url,
+        ids,
+        fields,
+        batch=40,
+        return_geometry=True,
+        timeout=45,
+        retries=2,
+        extra=extra,
+        skip_failed=skip_failed,
+    )
     kept = 0
     for item in raw:
         geometry = esri_rings_to_geojson((item.get("geometry") or {}).get("rings") or [], tol=0.00003)
@@ -452,6 +471,8 @@ def join_greenville(features: list[dict], queried: list[str]) -> None:
             jurisdiction="Greenville County",
         ),
         queried,
+        extra={"maxAllowableOffset": "0.00008", "geometryPrecision": "5"},
+        skip_failed=True,
     )
     overlay_spatial(features, flu, field="flu")
 

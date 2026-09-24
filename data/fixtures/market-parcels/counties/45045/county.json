@@ -5,19 +5,29 @@
   "markets": [
     "Greenville"
   ],
-  "featureCount": 1570,
-  "coverage": "sample",
+  "featureCount": 14959,
+  "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "sc-greenville-city-gis",
-  "queryUrl": "https://citygis.greenvillesc.gov/arcgis/rest/services/GeneralData/GeneralData_WGS84/MapServer/2/query",
+  "source": "sc-greenville-county-tax-parcels",
+  "queryUrl": "https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/10/query",
   "gaps": [
-    "Published by City of Greenville GIS. The 5\u2013150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll."
+    "Inclusive 5\u2013150 acre extract kept (14959 parcels). Zoning joined on 14955. FLU joined on 14946.",
+    "Fountain Inn: 119 (usable). City Zoning_2026 dissolved districts, spatial join onto Greenville County parcels.",
+    "City of Greenville: 447 (usable). AddressSearch/Regulation/7 Development Code districts.",
+    "Greer: 238 (usable). Greer UDO Pro_Zoning on the Greenville County side.",
+    "Mauldin: 211 (no-city-rest). No city FeatureServer. County JCODE 45115 only.",
+    "Simpsonville: 131 (no-city-rest). No city FeatureServer. SimpsonvilleZoning AGOL is Shelby TN and was rejected.",
+    "Travelers Rest: 87 (no-city-rest). No city FeatureServer. County JCODE 72430 only.",
+    "Greenville County: 13721 (usable). Unincorporated county zoning on GCGIA/13.",
+    "Laurens-side Fountain Inn and Spartanburg-side Greer are not in this extract.",
+    "Fountain Inn consultant swipe map and ZoningFireSewer/2 were not queried.",
+    "No city FLU for Fountain Inn. County FLU/21 is joined."
   ],
   "path": "data/fixtures/market-parcels/counties/45045/tiles",
   "lookup": "data/fixtures/market-parcels/counties/45045/lookup.json",
-  "sourceCount": 1570,
+  "sourceCount": 14959,
   "dropped": 0,
-  "tileCount": 3
+  "tileCount": 9
 }

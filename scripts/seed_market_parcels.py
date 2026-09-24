@@ -344,6 +344,10 @@ def fetch_by_ids(
     batch: int = 120,
     *,
     return_geometry: bool = True,
+    timeout: int = 90,
+    retries: int = 3,
+    extra: dict | None = None,
+    skip_failed: bool = False,
 ) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
@@ -353,42 +357,40 @@ def fetch_by_ids(
     }
     if return_geometry:
         params["outSR"] = "4326"
-    for start in range(0, total, batch):
-        chunk = ids[start : start + batch]
+    if extra:
+        params.update(extra)
+
+    def pull(chunk: list[int]) -> list[dict]:
         query = dict(params)
         query["objectIds"] = ",".join(str(i) for i in chunk)
         query["f"] = "json"
-        try:
-            data = fetch_json(url, query, timeout=180)
-        except RuntimeError:
-            if len(chunk) > 30:
-                features.extend(
-                    fetch_by_ids(
-                        url,
-                        chunk,
-                        out_fields,
-                        batch=max(20, len(chunk) // 2),
-                        return_geometry=return_geometry,
-                    )
-                )
-                continue
-            raise
-        if data.get("error"):
-            if len(chunk) > 30:
-                features.extend(
-                    fetch_by_ids(
-                        url,
-                        chunk,
-                        out_fields,
-                        batch=max(20, len(chunk) // 2),
-                        return_geometry=return_geometry,
-                    )
-                )
-                continue
-            raise RuntimeError(json.dumps(data["error"])[:300])
-        features.extend(data.get("features") or [])
+        data = None
+        last_error: Exception | None = None
+        for attempt in range(2):
+            try:
+                data = fetch_json(url, query, timeout=timeout, retries=retries)
+            except RuntimeError as exc:
+                last_error = exc
+                data = None
+            if data and not data.get("error"):
+                return data.get("features") or []
+            if data and data.get("error"):
+                last_error = RuntimeError(json.dumps(data["error"])[:300])
+                data = None
+            time.sleep(1.0 * (attempt + 1))
+        if len(chunk) > 1:
+            mid = len(chunk) // 2
+            return pull(chunk[:mid]) + pull(chunk[mid:])
+        if skip_failed:
+            print(f"    skip object {chunk[0]}: {last_error}", flush=True)
+            return []
+        raise last_error or RuntimeError(f"Query failed for {url[:120]}")
+
+    for start in range(0, total, batch):
+        chunk = ids[start : start + batch]
+        features.extend(pull(chunk))
         done = min(start + len(chunk), total)
-        if done == len(chunk) or done == total or done % 480 == 0:
+        if done == total or done % 480 == 0:
             print(f"    {done}/{total}", flush=True)
         time.sleep(0.05)
     return features

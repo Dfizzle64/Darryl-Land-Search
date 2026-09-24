@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T01:28:39Z",
   "market": "Charleston",
   "tier": "primary",
-  "parcelCount": 6774,
+  "parcelCount": 22649,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,39 +20,39 @@
       "name": "Berkeley",
       "fips": "45015",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 7886,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-berkeley-addr-muni",
+      "queryUrl": "https://gis.berkeleycountysc.gov/arcgis/rest/services/custom/Addr_muni/MapServer/1/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Berkeley Addr_muni parcels. Goose Creek, Hanahan, and Moncks Corner zoning join by O_TMS."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45015/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45015/lookup.json",
+      "tileCount": 10,
+      "sourceCount": 7886
     },
     {
       "name": "Charleston",
       "fips": "45019",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 7989,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-charleston-energov-ent",
+      "queryUrl": "https://gisccapps.charlestoncounty.org/arcgis/rest/services/ENERGOV/energov_ent/MapServer/12/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Charleston energov_ent/12 is public. Parcel_Search and Public_Search stay token-walled and are not used."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45019/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45019/lookup.json",
+      "tileCount": 10,
+      "sourceCount": 8001
     },
     {
       "name": "Clarendon",
@@ -104,7 +104,11 @@
       "source": "sc-dorchester-parcels-public",
       "queryUrl": "https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/Parcels_Public/MapServer/0/query",
       "gaps": [
-        "Dorchester public parcels. Situs is not on this layer. No zoning join."
+        "Inclusive 5\u2013150 acre extract kept (6774 parcels). Zoning joined on 6772. FLU joined on 0.",
+        "Summerville: 253 (usable). Town Zone_Class filtered to County=DORCHESTER, joined on TMS over county ZONINGCODE.",
+        "Dorchester County: 6519 (usable). ZONINGCODE on Parcels_Public for parcels outside the town join.",
+        "Existing 5\u2013150 acre parcel set was kept. Situs filled from PROPERTY_LOCATION when the extract had none.",
+        "No assessed market value on the public parcel layer. No FLU layer on this card."
       ],
       "path": "data/fixtures/market-parcels/counties/45035/tiles",
       "lookup": "data/fixtures/market-parcels/counties/45035/lookup.json",

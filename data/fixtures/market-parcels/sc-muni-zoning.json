@@ -1,0 +1,887 @@
+{
+  "generatedAt": "2026-09-24T01:28:39Z",
+  "band": {
+    "min": 5.0,
+    "max": 150.0,
+    "inclusive": true
+  },
+  "opportunityZones": "Parcel opportunityZone and oz2Eligibility are not modified. Eligible is not designated.",
+  "rejected": [
+    {
+      "name": "SimpsonvilleZoning AGOL",
+      "reason": "Owner triples hosts Shelby County, Tennessee (shelbypz.com). Wrong-geography twin of Simpsonville, SC. Not queried."
+    },
+    {
+      "name": "Fountain Inn ZoningFireSewer/2",
+      "reason": "Codes R-7.5/R-20/UNZONED on a county-scale extent. Not the Fountain Inn UDO. Not queried."
+    },
+    {
+      "name": "Fountain Inn consultant New_Zoning swipe map",
+      "reason": "Third-party MPM_stewartinc host. City Zoning_2026 is the usable layer. Not queried."
+    },
+    {
+      "name": "Sullivan's Island Zoning_2025",
+      "reason": "Unofficial AGOL (the_charliosouljah), not town-hosted. Not queried."
+    },
+    {
+      "name": "Folly Beach CofC/SCGIS AGOL",
+      "reason": "Alternate of county FollyViewer/19. County layer is the usable source. Not queried."
+    },
+    {
+      "name": "AGOL Greenville_Base_Data tax parcels",
+      "reason": "City-extent subset, not countywide. Not queried."
+    },
+    {
+      "name": "Isle of Palms PDD FeatureServer",
+      "reason": "Card count looks oversized versus a typical PDD inventory. Left as a gap pending QA. Not queried."
+    }
+  ],
+  "honestGaps": [
+    "Sullivan's Island: official zoning is PDF / Instant app only. Unofficial Zoning_2025 was not joined.",
+    "James Island: PDF/static maps only. No municipal zoning REST.",
+    "Mauldin, Simpsonville, and Travelers Rest: no city FeatureServer. County JCODE on GCGIA Zoning/13 is the public layer. SimpsonvilleZoning AGOL is Shelby County, Tennessee.",
+    "Isle of Palms: district services are partial and have no ZONING field. PDD was not joined.",
+    "Fountain Inn on the Laurens side and Greer on the Spartanburg side are not joined \u2014 those counties have no parcel extract.",
+    "Berkeley and Dorchester have no field-mapped future-land-use layer on these cards.",
+    "Eligible tracts are not designated Opportunity Zones. This join does not write opportunityZone or oz2Eligibility."
+  ],
+  "counties": {
+    "45015": {
+      "fips": "45015",
+      "name": "Berkeley",
+      "parcels": 7886,
+      "zoningJoined": 7468,
+      "fluJoined": 0,
+      "bySource": {
+        "berkeley-county": 6995,
+        "hanahan": 90,
+        "goose-creek": 186,
+        "moncks-corner": 126,
+        "summerville-berkeley": 71
+      },
+      "cities": {
+        "Goose Creek": {
+          "joined": 186,
+          "status": "usable",
+          "note": "internet_map_with_api/37 ZONE joined on O_TMS."
+        },
+        "Hanahan": {
+          "joined": 90,
+          "status": "usable",
+          "note": "internet_map_with_api/38 ZONE joined on O_TMS."
+        },
+        "Moncks Corner": {
+          "joined": 126,
+          "status": "usable",
+          "note": "internet_map_with_api/45 ZONE joined on O_TMS."
+        },
+        "Summerville": {
+          "joined": 71,
+          "status": "usable",
+          "note": "Town layer filtered to County=BERKELEY."
+        },
+        "Berkeley County": {
+          "joined": 6995,
+          "status": "usable",
+          "note": "internet_map_with_api/33 where no city layer hit."
+        }
+      },
+      "samples": [
+        {
+          "source": "berkeley-county",
+          "parcelId": "063-00-00-001",
+          "zoningCode": "Flex1",
+          "acreage": 150.0
+        },
+        {
+          "source": "hanahan",
+          "parcelId": "265-02-00-015",
+          "zoningCode": "RT",
+          "acreage": 149.88
+        },
+        {
+          "source": "goose-creek",
+          "parcelId": "222-00-00-051",
+          "zoningCode": "PD",
+          "acreage": 140.05
+        },
+        {
+          "source": "moncks-corner",
+          "parcelId": "197-00-01-015",
+          "zoningCode": "PD-R",
+          "acreage": 122.4
+        },
+        {
+          "source": "summerville-berkeley",
+          "parcelId": "221-00-00-096",
+          "zoningCode": "PUD/DA",
+          "acreage": 86.87
+        }
+      ],
+      "codes": {
+        "berkeley-county": [
+          "EG",
+          "Flex1",
+          "GC",
+          "HI",
+          "LI",
+          "OI",
+          "OIGC",
+          "PD-MU",
+          "PD-OP/IP",
+          "PD-RC",
+          "R1",
+          "R1-MM",
+          "R1-R",
+          "R15",
+          "R2",
+          "R2-R",
+          "R2-R(F)",
+          "R3",
+          "R4",
+          "R5",
+          "RNC"
+        ],
+        "hanahan": [
+          "CG",
+          "CP",
+          "ID",
+          "PD",
+          "RM",
+          "RM-N",
+          "RO",
+          "RS",
+          "RT",
+          "TC",
+          "TR"
+        ],
+        "goose-creek": [
+          "C",
+          "FRD",
+          "GC",
+          "HI",
+          "LI",
+          "NSAC",
+          "PD",
+          "RM",
+          "RSF",
+          "VN"
+        ],
+        "moncks-corner": [
+          "C-1",
+          "C-2",
+          "D",
+          "M-1",
+          "M-2",
+          "MH-1",
+          "PD",
+          "PD-C",
+          "PD-R",
+          "R-1",
+          "R-2",
+          "R-3",
+          "R-4",
+          "TD"
+        ],
+        "summerville-berkeley": [
+          "G-B",
+          "LI",
+          "MF-R",
+          "PUD",
+          "PUD/DA"
+        ]
+      },
+      "queried": [
+        "https://gis.berkeleycountysc.gov/arcgis/rest/services/API/internet_map_with_api/MapServer/33/query",
+        "https://services8.arcgis.com/0zSnoqwLCR3i1Yfw/arcgis/rest/services/Zoning_View_Layer/FeatureServer/4/query",
+        "https://gis.berkeleycountysc.gov/arcgis/rest/services/API/internet_map_with_api/MapServer/37/query",
+        "https://gis.berkeleycountysc.gov/arcgis/rest/services/API/internet_map_with_api/MapServer/38/query",
+        "https://gis.berkeleycountysc.gov/arcgis/rest/services/API/internet_map_with_api/MapServer/45/query"
+      ],
+      "gaps": [
+        "Inclusive 5\u2013150 acre extract kept (7886 parcels). Zoning joined on 7468. FLU joined on 0.",
+        "Goose Creek: 186 (usable). internet_map_with_api/37 ZONE joined on O_TMS.",
+        "Hanahan: 90 (usable). internet_map_with_api/38 ZONE joined on O_TMS.",
+        "Moncks Corner: 126 (usable). internet_map_with_api/45 ZONE joined on O_TMS.",
+        "Summerville: 71 (usable). Town layer filtered to County=BERKELEY.",
+        "Berkeley County: 6995 (usable). internet_map_with_api/33 where no city layer hit.",
+        "Future land use on New_Parcel_Zoning was not field-mapped. No FLU join."
+      ]
+    },
+    "45019": {
+      "fips": "45019",
+      "name": "Charleston",
+      "parcels": 7989,
+      "zoningJoined": 7971,
+      "fluJoined": 5348,
+      "bySource": {
+        "charleston-county": 5880,
+        "charleston-city": 794,
+        "north-charleston": 697,
+        "folly-beach": 59,
+        "mount-pleasant": 513,
+        "isle-of-palms:Conservation-Recreation": 8,
+        "summerville-charleston": 16,
+        "isle-of-palms:SR-1": 1,
+        "isle-of-palms:GC-1": 3
+      },
+      "cities": {
+        "Folly Beach": {
+          "joined": 59,
+          "status": "usable",
+          "note": "Charleston County FOLLY/FollyViewer/19 joined on PID."
+        },
+        "Isle of Palms": {
+          "joined": 12,
+          "status": "partial",
+          "note": "District services stamped from the service name. PDD not joined."
+        },
+        "Summerville": {
+          "joined": 16,
+          "status": "usable",
+          "note": "Town Zoning_View_Layer filtered to County=CHARLESTON."
+        },
+        "City of Charleston": {
+          "joined": 794,
+          "status": "usable",
+          "note": "mapnetExternal/12 ZONE_BASE."
+        },
+        "North Charleston": {
+          "joined": 697,
+          "status": "usable",
+          "note": "DYlayers/Zoning ZONETYPE."
+        },
+        "Mount Pleasant": {
+          "joined": 513,
+          "status": "usable",
+          "note": "MPSC_Zoning_New/2. COUNTY and AWENDAW values dropped."
+        },
+        "Charleston County": {
+          "joined": 5880,
+          "status": "usable",
+          "note": "energov_css/7 for the remainder. Not applied on Sullivan's Island, James Island, or Isle of Palms situs cities."
+        },
+        "Sullivan's Island": {
+          "joined": 0,
+          "status": "gap",
+          "note": "No town REST. Unofficial Zoning_2025 not queried."
+        },
+        "James Island": {
+          "joined": 0,
+          "status": "gap",
+          "note": "PDF/static only. No municipal zoning REST."
+        }
+      },
+      "samples": [
+        {
+          "source": "charleston-county",
+          "parcelId": "1750000011",
+          "zoningCode": "RM",
+          "acreage": 150.0
+        },
+        {
+          "source": "charleston-city",
+          "parcelId": "3590000010",
+          "zoningCode": "C",
+          "acreage": 149.75
+        },
+        {
+          "source": "north-charleston",
+          "parcelId": "3930000007",
+          "zoningCode": "PDD",
+          "acreage": 149.13
+        },
+        {
+          "source": "folly-beach",
+          "parcelId": "3310000002",
+          "zoningCode": "CN",
+          "acreage": 143.41
+        },
+        {
+          "source": "mount-pleasant",
+          "parcelId": "5170000001",
+          "zoningCode": "CR-O",
+          "acreage": 135.02
+        },
+        {
+          "source": "isle-of-palms:Conservation-Recreation",
+          "parcelId": "5710000001",
+          "zoningCode": "Conservation-Recreation",
+          "acreage": 68.49
+        },
+        {
+          "source": "summerville-charleston",
+          "parcelId": "3880000048",
+          "zoningCode": "PUD",
+          "acreage": 63.68
+        },
+        {
+          "source": "isle-of-palms:SR-1",
+          "parcelId": "5710500140",
+          "zoningCode": "SR-1",
+          "acreage": 11.96
+        },
+        {
+          "source": "isle-of-palms:GC-1",
+          "parcelId": "5681200023",
+          "zoningCode": "GC-1",
+          "acreage": 9.28
+        }
+      ],
+      "codes": {
+        "charleston-county": [
+          "AG-10",
+          "AG-15",
+          "AG-8",
+          "AGR",
+          "CC",
+          "FBZD-1",
+          "GO",
+          "IN",
+          "MHP",
+          "MHS",
+          "MUNI",
+          "NR",
+          "OD_10M-O",
+          "OD_17N_10M",
+          "OD_17N_SEE",
+          "OD_ARRC_CC",
+          "OD_DUWAP",
+          "OD_FRC",
+          "OD_JA-MHC",
+          "OD_JO-MHC",
+          "OD_MP",
+          "OD_MP_SBA",
+          "OD_MRC",
+          "OD_PF",
+          "OD_SL",
+          "OD_STA",
+          "OD_UB",
+          "PD",
+          "R-4",
+          "RC",
+          "RM",
+          "RR",
+          "S-3",
+          "UR"
+        ],
+        "charleston-city": [
+          "AG-8",
+          "AG-S",
+          "BP",
+          "C",
+          "CW-PUD",
+          "DR-1",
+          "DR-12",
+          "DR-1F",
+          "DR-2",
+          "DR-2F",
+          "DR-3",
+          "DR-4",
+          "DR-6",
+          "DR-9",
+          "GB",
+          "GO",
+          "GP",
+          "HI",
+          "JC",
+          "LB",
+          "LI",
+          "MU-1/WH",
+          "MU-2/WH",
+          "PUD",
+          "RR-1",
+          "SR-1",
+          "SR-2",
+          "SR-3",
+          "SR-4",
+          "SR-5",
+          "SR-6",
+          "SR-7",
+          "STR",
+          "UP"
+        ],
+        "north-charleston": [
+          "AG",
+          "B-1",
+          "B-2",
+          "CRD",
+          "M-1",
+          "M-2",
+          "NBRD",
+          "ON",
+          "PDD",
+          "R-1",
+          "R-2",
+          "R-3"
+        ],
+        "folly-beach": [
+          "CC",
+          "CN",
+          "IC",
+          "RMF",
+          "RSF"
+        ],
+        "mount-pleasant": [
+          "AB-1",
+          "AB-2",
+          "CC",
+          "CL",
+          "CO",
+          "CR-O",
+          "OP-2",
+          "PD",
+          "PI-1",
+          "PI-2",
+          "R1",
+          "R2",
+          "R3",
+          "R4",
+          "RC-2",
+          "RM",
+          "RR",
+          "UND"
+        ],
+        "isle-of-palms:Conservation-Recreation": [
+          "Conservation-Recreation"
+        ],
+        "summerville-charleston": [
+          "G-B",
+          "GR-5",
+          "PL",
+          "PUD"
+        ],
+        "isle-of-palms:SR-1": [
+          "SR-1"
+        ],
+        "isle-of-palms:GC-1": [
+          "GC-1"
+        ]
+      },
+      "queried": [
+        "https://gisccapps.charlestoncounty.org/arcgis/rest/services/ENERGOV/energov_css/MapServer/7/query",
+        "https://arc.northcharleston.org/arcgis/rest/services/DYlayers/Zoning/MapServer/0/query",
+        "https://gis.charleston-sc.gov/arcgis2/rest/services/External/mapnetExternal/MapServer/12/query",
+        "https://maps.tompsc.com/arcgis/rest/services/Parcel_Search_New/MPSC_Zoning_New/MapServer/2/query",
+        "https://services8.arcgis.com/0zSnoqwLCR3i1Yfw/arcgis/rest/services/Zoning_View_Layer/FeatureServer/4/query",
+        "https://gisccapps.charlestoncounty.org/arcgis/rest/services/FOLLY/FollyViewer/MapServer/19/query",
+        "https://services7.arcgis.com/Cv3A9wUHusU2ofWZ/arcgis/rest/services/SR1_ExportFeaturesNew/FeatureServer/0/query",
+        "https://services7.arcgis.com/Cv3A9wUHusU2ofWZ/arcgis/rest/services/SR2_SetbackIncluded/FeatureServer/0/query",
+        "https://services7.arcgis.com/Cv3A9wUHusU2ofWZ/arcgis/rest/services/SR3_SetbackIncluded/FeatureServer/0/query",
+        "https://services7.arcgis.com/Cv3A9wUHusU2ofWZ/arcgis/rest/services/GC1/FeatureServer/0/query",
+        "https://services7.arcgis.com/Cv3A9wUHusU2ofWZ/arcgis/rest/services/GC2/FeatureServer/0/query",
+        "https://services7.arcgis.com/Cv3A9wUHusU2ofWZ/arcgis/rest/services/GC3/FeatureServer/0/query",
+        "https://services7.arcgis.com/Cv3A9wUHusU2ofWZ/arcgis/rest/services/LC_ExportFeatures/FeatureServer/0/query",
+        "https://services7.arcgis.com/Cv3A9wUHusU2ofWZ/arcgis/rest/services/Conservation_Recreation_District/FeatureServer/0/query",
+        "https://gisccapps.charlestoncounty.org/arcgis/rest/services/GIS_VIEWER/External_GIS_Website/MapServer/60/query",
+        "https://gis.charleston-sc.gov/arcgis2/rest/services/External/mapnetExternal/MapServer/382/query"
+      ],
+      "gaps": [
+        "Inclusive 5\u2013150 acre extract kept (7989 parcels). Zoning joined on 7971. FLU joined on 5348.",
+        "Folly Beach: 59 (usable). Charleston County FOLLY/FollyViewer/19 joined on PID.",
+        "Isle of Palms: 12 (partial). District services stamped from the service name. PDD not joined.",
+        "Summerville: 16 (usable). Town Zoning_View_Layer filtered to County=CHARLESTON.",
+        "City of Charleston: 794 (usable). mapnetExternal/12 ZONE_BASE.",
+        "North Charleston: 697 (usable). DYlayers/Zoning ZONETYPE.",
+        "Mount Pleasant: 513 (usable). MPSC_Zoning_New/2. COUNTY and AWENDAW values dropped.",
+        "Charleston County: 5880 (usable). energov_css/7 for the remainder. Not applied on Sullivan's Island, James Island, or Isle of Palms situs cities.",
+        "Sullivan's Island: 0 (gap). No town REST. Unofficial Zoning_2025 not queried.",
+        "James Island: 0 (gap). PDF/static only. No municipal zoning REST.",
+        "County FLU External_GIS_Website/60 and City of Charleston mapnetExternal/382 LAND_USE are joined. City FLU wins inside the city.",
+        "Token-walled Parcel_Search and Public_Search were not used."
+      ]
+    },
+    "45045": {
+      "fips": "45045",
+      "name": "Greenville",
+      "parcels": 14959,
+      "zoningJoined": 14955,
+      "fluJoined": 14946,
+      "bySource": {
+        "greenville-county:45045": 13721,
+        "greer": 238,
+        "greenville-county:72430": 87,
+        "greenville-city": 447,
+        "greenville-county:45115": 211,
+        "greenville-county:66580": 131,
+        "fountain-inn": 119,
+        "greenville-county:30985": 1
+      },
+      "cities": {
+        "Fountain Inn": {
+          "joined": 119,
+          "status": "usable",
+          "note": "City Zoning_2026 dissolved districts, spatial join onto Greenville County parcels."
+        },
+        "City of Greenville": {
+          "joined": 447,
+          "status": "usable",
+          "note": "AddressSearch/Regulation/7 Development Code districts."
+        },
+        "Greer": {
+          "joined": 238,
+          "status": "usable",
+          "note": "Greer UDO Pro_Zoning on the Greenville County side."
+        },
+        "Mauldin": {
+          "joined": 211,
+          "status": "no-city-rest",
+          "note": "No city FeatureServer. County JCODE 45115 only."
+        },
+        "Simpsonville": {
+          "joined": 131,
+          "status": "no-city-rest",
+          "note": "No city FeatureServer. SimpsonvilleZoning AGOL is Shelby TN and was rejected."
+        },
+        "Travelers Rest": {
+          "joined": 87,
+          "status": "no-city-rest",
+          "note": "No city FeatureServer. County JCODE 72430 only."
+        },
+        "Greenville County": {
+          "joined": 13721,
+          "status": "usable",
+          "note": "Unincorporated county zoning on GCGIA/13."
+        }
+      },
+      "samples": [
+        {
+          "source": "greenville-county:45045",
+          "parcelId": "0462010100102",
+          "zoningCode": "ESD-PM",
+          "acreage": 149.88
+        },
+        {
+          "source": "greer",
+          "parcelId": "0634010103301",
+          "zoningCode": "RR",
+          "acreage": 143.72
+        },
+        {
+          "source": "greenville-county:72430",
+          "parcelId": "0503030101300",
+          "zoningCode": "R-10",
+          "acreage": 142.45
+        },
+        {
+          "source": "greenville-city",
+          "parcelId": "0267000100305",
+          "zoningCode": "CM",
+          "acreage": 123.1
+        },
+        {
+          "source": "greenville-county:45115",
+          "parcelId": "M013010100500",
+          "zoningCode": "R-M1",
+          "acreage": 120.8
+        },
+        {
+          "source": "greenville-county:66580",
+          "parcelId": "0326000100200",
+          "zoningCode": "R-HI",
+          "acreage": 113.31
+        },
+        {
+          "source": "fountain-inn",
+          "parcelId": "0562020100201",
+          "zoningCode": "GR-1",
+          "acreage": 102.2
+        },
+        {
+          "source": "greenville-county:30985",
+          "parcelId": "0535030100300",
+          "zoningCode": "MD",
+          "acreage": 8.04
+        }
+      ],
+      "codes": {
+        "greenville-county:45045": [
+          "AG",
+          "BTD",
+          "C-1",
+          "C-2",
+          "C-3",
+          "ESD-PM",
+          "FRD",
+          "I-1",
+          "I-2",
+          "O-D",
+          "PD",
+          "PD-R",
+          "POD",
+          "R-10",
+          "R-12",
+          "R-15",
+          "R-20",
+          "R-20A",
+          "R-6",
+          "R-7.5",
+          "R-M",
+          "R-M10",
+          "R-M12",
+          "R-M14",
+          "R-M16",
+          "R-M20",
+          "R-M4",
+          "R-M5",
+          "R-M7",
+          "R-M8",
+          "R-MA",
+          "R-MHP",
+          "R-R1",
+          "R-R3",
+          "R-S",
+          "S-1",
+          "UNZONED"
+        ],
+        "greer": [
+          "CC",
+          "CG",
+          "DRD",
+          "GS",
+          "MD",
+          "ML",
+          "OP",
+          "PD",
+          "RC",
+          "RR",
+          "SN",
+          "TN"
+        ],
+        "greenville-county:72430": [
+          "C-2",
+          "FRD",
+          "I-1",
+          "PD-R",
+          "R-10",
+          "R-15",
+          "R-7.5",
+          "R-M",
+          "S-1",
+          "TH"
+        ],
+        "greenville-city": [
+          "BG",
+          "BH",
+          "CM",
+          "CV",
+          "IG",
+          "IX",
+          "MX-2",
+          "MX-3",
+          "MX-5",
+          "MX-D",
+          "MXS-D",
+          "PD",
+          "PK",
+          "RC-2",
+          "RC-3",
+          "RC-5",
+          "RH-A",
+          "RH-B",
+          "RH-C",
+          "RH-D",
+          "RN-B",
+          "RN-C"
+        ],
+        "greenville-county:45115": [
+          "C-1",
+          "C-2",
+          "I-1",
+          "PD",
+          "PD-R",
+          "R-10",
+          "R-12",
+          "R-15",
+          "R-20",
+          "R-M",
+          "R-M1",
+          "S-1",
+          "UVD"
+        ],
+        "greenville-county:66580": [
+          "B-G",
+          "B-I",
+          "ID",
+          "R-E",
+          "R-HI",
+          "R-LO",
+          "R-MID",
+          "R-OI"
+        ],
+        "fountain-inn": [
+          "C-2",
+          "D-MU",
+          "FRD",
+          "GR-1",
+          "GR-2",
+          "I-1",
+          "O-S",
+          "R-C",
+          "R-M",
+          "R-MHP",
+          "S-1"
+        ],
+        "greenville-county:30985": [
+          "MD"
+        ]
+      },
+      "queried": [
+        "https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/13/query",
+        "https://citygis.greenvillesc.gov/arcgis/rest/services/AddressSearch/Regulation/MapServer/7/query",
+        "https://services1.arcgis.com/bskBH6JV42oEWJvZ/arcgis/rest/services/Greer_UDO_ZoningMap/FeatureServer/0/query",
+        "https://services3.arcgis.com/YQLyddqtM8cTAr6Y/arcgis/rest/services/Zoning_2026/FeatureServer/1/query",
+        "https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/21/query"
+      ],
+      "gaps": [
+        "Inclusive 5\u2013150 acre extract kept (14959 parcels). Zoning joined on 14955. FLU joined on 14946.",
+        "Fountain Inn: 119 (usable). City Zoning_2026 dissolved districts, spatial join onto Greenville County parcels.",
+        "City of Greenville: 447 (usable). AddressSearch/Regulation/7 Development Code districts.",
+        "Greer: 238 (usable). Greer UDO Pro_Zoning on the Greenville County side.",
+        "Mauldin: 211 (no-city-rest). No city FeatureServer. County JCODE 45115 only.",
+        "Simpsonville: 131 (no-city-rest). No city FeatureServer. SimpsonvilleZoning AGOL is Shelby TN and was rejected.",
+        "Travelers Rest: 87 (no-city-rest). No city FeatureServer. County JCODE 72430 only.",
+        "Greenville County: 13721 (usable). Unincorporated county zoning on GCGIA/13.",
+        "Laurens-side Fountain Inn and Spartanburg-side Greer are not in this extract.",
+        "Fountain Inn consultant swipe map and ZoningFireSewer/2 were not queried.",
+        "No city FLU for Fountain Inn. County FLU/21 is joined."
+      ]
+    },
+    "45035": {
+      "fips": "45035",
+      "name": "Dorchester",
+      "parcels": 6774,
+      "zoningJoined": 6772,
+      "fluJoined": 0,
+      "bySource": {
+        "dorchester-county": 6519,
+        "summerville-dorchester": 253
+      },
+      "cities": {
+        "Summerville": {
+          "joined": 253,
+          "status": "usable",
+          "note": "Town Zone_Class filtered to County=DORCHESTER, joined on TMS over county ZONINGCODE."
+        },
+        "Dorchester County": {
+          "joined": 6519,
+          "status": "usable",
+          "note": "ZONINGCODE on Parcels_Public for parcels outside the town join."
+        }
+      },
+      "samples": [
+        {
+          "source": "dorchester-county",
+          "parcelId": "141-00-00-055",
+          "zoningCode": "AR_DC",
+          "acreage": 149.2906
+        },
+        {
+          "source": "summerville-dorchester",
+          "parcelId": "999-00-00-002",
+          "zoningCode": "UC-MX",
+          "acreage": 11.9569
+        }
+      ],
+      "codes": {
+        "dorchester-county": [
+          "AR-ARHOD_DC",
+          "AR_DC",
+          "B-1_NC",
+          "B-2_NC",
+          "CC_SG",
+          "CG-ARHOD_DC",
+          "CG_DC",
+          "CLI2_DC",
+          "CLI_DC",
+          "CN_DC",
+          "CV-ARHOD_DC",
+          "CV_DC",
+          "EE",
+          "GC_RE",
+          "HC_HV",
+          "IR_HV",
+          "I_DC",
+          "LC_HV",
+          "LC_RE",
+          "LC_SG",
+          "LIO_RI",
+          "M-1_NC",
+          "MUC-ARHOD_DC",
+          "MUC_DC",
+          "MULTI",
+          "NC_RI",
+          "OI_DC",
+          "ON_NC",
+          "OTHER",
+          "PD-ARHOD_DC",
+          "PDD_NC",
+          "PD_DC",
+          "PD_RI",
+          "PI_DC",
+          "PL_SV",
+          "PUD/DA_SV",
+          "PUD_SV",
+          "R-1(A)-ARHOD_DC",
+          "R-1(A)_DC",
+          "R-1(M)(A)_DC",
+          "R-1(M)_DC",
+          "R-1_DC",
+          "R-1_NC",
+          "R-2(M)_DC",
+          "R-2_DC",
+          "R-2_NC",
+          "R-3_DC",
+          "R-3_NC",
+          "R-4_DC",
+          "RMD_RE",
+          "RMD_SG",
+          "RMU_RE",
+          "RMU_RI",
+          "RMU_SG",
+          "RR-ARHOD_DC",
+          "RRR_RE",
+          "RR_HV",
+          "SFR_HV",
+          "SFR_SG",
+          "SR_DC",
+          "TC_RI",
+          "TN_RI",
+          "TRM-ARHOD_DC",
+          "TRM_DC",
+          "WI_SG"
+        ],
+        "summerville-dorchester": [
+          "AC",
+          "G-B",
+          "GR-2",
+          "GR-5",
+          "HI",
+          "LI",
+          "MF-R",
+          "MH-R",
+          "N-B",
+          "N-R",
+          "Null",
+          "OTHER",
+          "PL",
+          "PUD",
+          "PUD/DA",
+          "TBD",
+          "UC-MX"
+        ]
+      },
+      "queried": [
+        "https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/Parcels_Public/MapServer/0/query",
+        "https://services8.arcgis.com/0zSnoqwLCR3i1Yfw/arcgis/rest/services/Zoning_View_Layer/FeatureServer/4/query"
+      ],
+      "gaps": [
+        "Inclusive 5\u2013150 acre extract kept (6774 parcels). Zoning joined on 6772. FLU joined on 0.",
+        "Summerville: 253 (usable). Town Zone_Class filtered to County=DORCHESTER, joined on TMS over county ZONINGCODE.",
+        "Dorchester County: 6519 (usable). ZONINGCODE on Parcels_Public for parcels outside the town join.",
+        "Existing 5\u2013150 acre parcel set was kept. Situs filled from PROPERTY_LOCATION when the extract had none.",
+        "No assessed market value on the public parcel layer. No FLU layer on this card."
+      ]
+    }
+  }
+}

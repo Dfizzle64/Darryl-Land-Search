@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T00:13:53Z",
+  "generatedAt": "2026-09-24T00:18:34Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 59136,
+  "parcelCount": 59104,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -239,26 +239,20 @@
       "name": "DeKalb",
       "fips": "13089",
       "state": "Georgia",
-      "featureCount": 3401,
-      "coverage": "complete-gte-5ac",
+      "featureCount": 3369,
+      "coverage": "sample",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "ga-dekalb-assessment-view-2",
-      "queryUrl": "https://dcgis.dekalbcountyga.gov/mapping/rest/services/Tax_Parcels_Assessment_View/FeatureServer/2/query",
+      "source": "ga-dekalb-tax-parcels",
+      "queryUrl": "https://dcgis.dekalbcountyga.gov/hosted/rest/services/Tax_Parcels/FeatureServer/0/query",
       "gaps": [
-        "No sale price, sale date, or qualified flag. Tax_Parcels_Assessment_View has no sale history. Delinquent-tax layers are not sales and are not joined.",
-        "Municipal zoning and future land use are joined where a public layer exists (Decatur, Brookhaven, Dunwoody, Doraville, Tucker, Stonecrest, and Atlanta inside DeKalb). Chamblee is future land use only. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake have no public zoning or FLU service and stay blank.",
-        "City of Atlanta zoning and future land use are citywide. They are joined only where DeKalb's municipal boundary says Atlanta. Decatur, Illinois (decaturil.gov) and DeKalb counties in Alabama, Illinois, Indiana, and Tennessee are not FIPS 13089 and are not joined.",
-        "County Zoning_District and LandUse fill unincorporated DeKalb only. They are not copied onto city parcels. The parcel ZONING attribute is a fallback for unincorporated parcels the county polygon missed.",
-        "Parcel CITY is the situs postal city, not the municipality. jurisdictionCode comes from Municipal_Boundary.",
-        "OZ 2.0 eligibility is not a designated QOZ. This extract does not write opportunityZone from an eligible tract.",
-        "Owner phone and email are not on the public assessment layer. TOTAPR1 is the appraised value and CNTASSDVAL is the county assessed value."
+        "DeKalb's public layer has no deed-acre field. Acres are computed from the polygon inside a Shape__Area window, so this county is a large sample, not a certified complete roll."
       ],
       "path": "data/fixtures/market-parcels/counties/13089/tiles",
       "lookup": "data/fixtures/market-parcels/counties/13089/lookup.json",
       "tileCount": 4,
-      "sourceCount": 3410
+      "sourceCount": 4986
     },
     {
       "name": "Douglas",

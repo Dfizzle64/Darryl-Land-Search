@@ -15,7 +15,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
 | Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
-| Birmingham | other | 15,641 | 1 | 0 | 9 |
+| Birmingham | other | 15,641 | 1 | 0 | 8 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
 | Huntsville | other | 0 | 0 | 0 | 7 |
 | Savannah | other | 0 | 0 | 0 | 8 |
@@ -26,6 +26,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
+| Tuscaloosa | other | 11,596 | 1 | 0 | 3 |
+| Montgomery | other | 26,759 | 3 | 0 | 1 |
 
 ## Counties
 
@@ -202,7 +204,6 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Shelby | Alabama | 01117 | gap | 0 | unavailable |
 | St. Clair | Alabama | 01115 | gap | 0 | unavailable |
 | Talladega | Alabama | 01121 | gap | 0 | unavailable |
-| Tuscaloosa | Alabama | 01125 | gap | 0 | unavailable |
 | Walker | Alabama | 01127 | gap | 0 | unavailable |
 
 ### Mobile
@@ -341,4 +342,22 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,256 | nc-onemap-37129 |
 | Onslow | North Carolina | 37133 | complete-gte-5ac | 6,747 | nc-onemap-37133 |
 | Pender | North Carolina | 37141 | complete-gte-5ac | 7,275 | nc-onemap-37141 |
+
+### Tuscaloosa
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Greene | Alabama | 01063 | gap | 0 | unavailable |
+| Hale | Alabama | 01065 | gap | 0 | unavailable |
+| Pickens | Alabama | 01107 | gap | 0 | unavailable |
+| Tuscaloosa | Alabama | 01125 | complete-gte-5ac | 11,596 | al-tuscaloosa-parcels |
+
+### Montgomery
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Autauga | Alabama | 01001 | complete-gte-5ac | 7,047 | al-autauga-parcels |
+| Elmore | Alabama | 01051 | complete-gte-5ac | 9,758 | al-elmore-parcels |
+| Lowndes | Alabama | 01085 | gap | 0 | unavailable |
+| Montgomery | Alabama | 01101 | complete-gte-5ac | 9,954 | al-montgomery-parcels |
 

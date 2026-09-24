@@ -1,0 +1,40 @@
+{
+  "name": "Montgomery",
+  "fips": "01101",
+  "state": "Alabama",
+  "markets": [
+    "Montgomery"
+  ],
+  "featureCount": 9954,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "al-montgomery-parcels",
+  "queryUrl": "https://gis.montgomeryal.gov/server/rest/services/Parcels/FeatureServer/0/query",
+  "gaps": [
+    "10026 source rows collapsed to 9954 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "No sale price on the public parcel layer. lastSale.price stays null.",
+    "InstDate is null on the 5\u2013150 acre public roll, so lastSale.date is null as well.",
+    "Owner and address strings are trimmed. The New York AGOL Montgomery mirror (EbVsqZ18sv1kVJ3k, Amsterdam / SWIS) was rejected.",
+    "City zoning is gis.montgomeryal.gov Zoning/0, joined by centroid. No public city FLU layer was verified."
+  ],
+  "path": "data/fixtures/market-parcels/counties/01101/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01101/lookup.json",
+  "sourceCount": 10026,
+  "dropped": 62,
+  "tileCount": 8,
+  "join": {
+    "featureCount": 9954,
+    "zoningJoined": 5106,
+    "zoningRate": 0.513,
+    "byJurisdiction": {
+      "City of Montgomery": 5106
+    },
+    "fluJoined": 0,
+    "fluRate": 0.0,
+    "prattvilleJoined": 0,
+    "salePriceNonNull": 0,
+    "saleDateNonNull": 0
+  }
+}

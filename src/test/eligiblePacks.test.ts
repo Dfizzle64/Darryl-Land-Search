@@ -41,6 +41,8 @@ const OTHER_ROWS: Record<OtherMarketId, { total: number; rural: number; urban: n
   Birmingham: { total: 152, rural: 42, urban: 110 },
   Mobile: { total: 66, rural: 15, urban: 51 },
   Huntsville: { total: 58, rural: 31, urban: 27 },
+  Tuscaloosa: { total: 0, rural: 0, urban: 0 },
+  Montgomery: { total: 0, rural: 0, urban: 0 },
   Savannah: { total: 64, rural: 31, urban: 33 },
   Columbia: { total: 105, rural: 62, urban: 43 },
   Greenville: { total: 105, rural: 70, urban: 35 },
@@ -107,11 +109,20 @@ describe("other MSA eligible pack", () => {
   });
 
   it("matches each smaller market and does not treat them as primary", () => {
-    expect(OTHER_MARKETS).toHaveLength(15);
+    expect(OTHER_MARKETS).toHaveLength(17);
     expect(OTHER_MARKETS[2]).toBe("Jacksonville");
+    expect(OTHER_MARKETS).toContain("Tuscaloosa");
+    expect(OTHER_MARKETS).toContain("Montgomery");
     for (const market of OTHER_MARKETS) {
       const rows = filterEligibleRows(catalog.rows, market, null, null);
       const expected = OTHER_ROWS[market];
+      if (expected.total === 0) {
+        expect(rows).toHaveLength(0);
+        expect(catalog.markets.find((item) => item.market === market)?.rowCount).toBe(0);
+        expect(catalog.markets.find((item) => item.market === market)?.parcelOnly).toBe(true);
+        expect(catalog.rows.some((row) => row.market === market)).toBe(false);
+        continue;
+      }
       expect(rows).toHaveLength(expected.total);
       expect(rows.filter((row) => row.rural === "Y")).toHaveLength(expected.rural);
       expect(rows.filter((row) => row.rural === "N")).toHaveLength(expected.urban);
@@ -199,6 +210,8 @@ describe("eligible pack polygons", () => {
     ).toBe(true);
     const shared = collection.features.find((feature) => feature.properties.markets.includes("Melbourne") && feature.properties.markets.includes("Vero Beach"));
     expect(shared?.properties.rural).toBe(true);
+    expect(collection.features.some((feature) => feature.properties.markets.includes("Tuscaloosa"))).toBe(false);
+    expect(collection.features.some((feature) => feature.properties.markets.includes("Montgomery"))).toBe(false);
     const jacksonville = collection.features.filter((feature) => feature.properties.markets.includes("Jacksonville"));
     expect(jacksonville).toHaveLength(98);
     expect(jacksonville.every((feature) => feature.properties.markets.length === 1)).toBe(true);

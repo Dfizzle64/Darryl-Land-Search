@@ -26,6 +26,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
+from al_msa_parcels import al_county_spec, apply_al_joins, epoch_to_iso, summarize_joined, write_al_msa_doc
 from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -250,6 +251,7 @@ def empty_feature(
     center: tuple[float, float],
     source: str,
     owner: str | None = None,
+    owner2: str | None = None,
     situs: str | None = None,
     city: str | None = None,
     zip_code: str | None = None,
@@ -283,7 +285,7 @@ def empty_feature(
             "situsZip": zip_code,
             "jurisdictionCode": None,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
             "zoningDistrict": None,
@@ -418,6 +420,12 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        if spec.get("saleDateField"):
+            sold_on = epoch_to_iso(attrs.get(spec["saleDateField"]))
+        elif spec.get("saleYearField"):
+            sold_on = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
+        else:
+            sold_on = None
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -429,13 +437,14 @@ def normalize_rows(
             center=center,  # type: ignore[arg-type]
             source=spec["source"],
             owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
+            owner2=clean(attrs.get(spec["owner2Field"])) if spec.get("owner2Field") else None,
             situs=clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None,
             city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
             zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
+            sale_date=sold_on,
             sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
             market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
             assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
@@ -571,6 +580,9 @@ def county_override(fips: str) -> dict | None:
         from dekalb_parcels import dekalb_spec
 
         return dekalb_spec()
+    alabama = al_county_spec(fips)
+    if alabama:
+        return alabama
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -721,6 +733,7 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    join: dict | None = None,
     extra: dict | None = None,
 ) -> dict:
     row = {
@@ -742,6 +755,8 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    if join is not None:
+        row["join"] = join
     if extra:
         row.update(extra)
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
@@ -915,7 +930,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services | Cobb complete on `ACRES`. DeKalb is a complete 5–150 acre extract from Tax_Parcels_Assessment_View layer 2 (`ACREAGE`). City zoning and future land use are joined where a public layer exists. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
-| Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
+| Alabama | Jefferson County parcels; Tuscaloosa AGOL Parcels; Montgomery gis.montgomeryal.gov Parcels; Elmore KCS Public/133; Autauga_Parcels | Jefferson stays the Birmingham extract. Tuscaloosa County is on the Tuscaloosa market. Montgomery, Elmore, and Autauga are on the Montgomery market. Hale, Pickens, Greene, and Lowndes stay gaps. Bibb stays a Birmingham gap |
 
 Zoning is joined when a public layer supports it. DeKalb municipalities are first-class: Decatur (Georgia, not Illinois), Brookhaven, Dunwoody, Doraville, Tucker, and Stonecrest supply zoning and future land use. Chamblee is future land use only. Atlanta's citywide layers are joined only inside DeKalb's Atlanta boundary. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake stay blank. County Zoning_District and LandUse fill unincorporated DeKalb only. Those codes are not scored as Orange County multifamily districts. There is no public DeKalb sale table. Prefer **All parcels** in these markets.
 
@@ -928,6 +943,10 @@ No sale price, sale date, or qualified flag is published on that service. Delinq
 City layers are extent-checked in WGS84. A layer centered on Decatur, Illinois, or on DeKalb County in Alabama, Illinois, Indiana, or Tennessee, is skipped. Decatur, Georgia is `decatur_admin` on ArcGIS Online.
 
 OZ 2.0 tracts that are eligible for nomination are not designated QOZs. This extract does not copy eligibility onto `opportunityZone`.
+
+Tuscaloosa and Montgomery are parcel markets. No eligible-tract rows were added for them, and nothing in this pull is marked designated. City zoning is a centroid join, plus a Northport `pclNUM` key join. Zoning codes are not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+The New York AGOL item `EbVsqZ18sv1kVJ3k` / `Montgomery_County_Parcels` is Amsterdam, New York (SWIS fields) and is not used. Wetumpka zoning returns HTTP 499 and is not queried. Tuscaloosa `Framework_Zoning_Map` is a draft and is not joined. Prattville `ZONING_JULY_2017` is partial and the vintage is unclear. See `docs/tuscaloosa-montgomery-parcels.md`.
 
 ## Coverage
 """
@@ -949,6 +968,9 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
             for feature in features:
                 feature["properties"]["marketIds"] = markets
             path, lookup, tiles = write_tiles(county, features)
+            join = summarize_joined(features) if spec.get("joinProfile") else cached.get("join")
+            if join and join.get("salePriceNonNull"):
+                raise RuntimeError(f"{fips} cache has {join['salePriceNonNull']} sale prices")
             return county_row(
                 county,
                 markets,
@@ -963,6 +985,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
+                join=join,
             )
     try:
         expected = count_where(spec["url"], spec["where"])
@@ -1015,11 +1038,20 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
     ids = fetch_object_ids(spec["url"], spec["where"])
     raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
     features, dropped = normalize_rows(raw, county, markets, spec)
+    if spec.get("joinProfile"):
+        print(f"  joining {spec['joinProfile']} city zoning", flush=True)
+        apply_al_joins(features, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    join = summarize_joined(features) if spec.get("joinProfile") else None
+    if join and join["salePriceNonNull"]:
+        raise RuntimeError(f"{fips} invented {join['salePriceNonNull']} sale prices")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "features": features, "join": join},
+            separators=(",", ":"),
+        )
     )
     coverage = spec["coverage"]
     gaps = list(spec.get("gaps") or [])
@@ -1049,6 +1081,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         source_count=expected,
         dropped=dropped,
         tile_count=tiles,
+        join=join,
     )
 
 
@@ -1194,6 +1227,7 @@ def main() -> None:
                 future.result()
     with WRITE_LOCK:
         rebuild_indexes(catalog)
+        write_al_msa_doc(COUNTY_DIR, ROOT / "docs" / "tuscaloosa-montgomery-parcels.md")
     index = json.loads((OUT_DIR / "index.json").read_text())
     print("Done.", flush=True)
     for name, summary in index["markets"].items():

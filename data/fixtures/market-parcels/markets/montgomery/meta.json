@@ -1,0 +1,110 @@
+{
+  "generatedAt": "2026-09-24T00:34:48Z",
+  "market": "Montgomery",
+  "tier": "other",
+  "parcelCount": 26759,
+  "coreMinAcres": 5.0,
+  "coreMaxAcres": 150.0,
+  "tile": {
+    "originLon": -83.0,
+    "originLat": 27.0,
+    "tileDeg": 0.25
+  },
+  "notes": [
+    "Loaded only when this market is selected.",
+    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Orange, Osceola, and Polk point at the existing Orlando complete extract."
+  ],
+  "counties": [
+    {
+      "name": "Autauga",
+      "fips": "01001",
+      "state": "Alabama",
+      "featureCount": 7047,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "al-autauga-parcels",
+      "queryUrl": "https://services1.arcgis.com/fWUhmUATXl9W5CJW/arcgis/rest/services/Autauga_Parcels/FeatureServer/0/query",
+      "gaps": [
+        "7530 source rows collapsed to 7047 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "No sale price on the public parcel layer. lastSale.price stays null.",
+        "Autauga_Parcels on the Prattville AGOL org is the owner and tax source. The county Ering map is geometry-only and was not used.",
+        "No Autauga county zoning REST. Prattville zoning is joined by centroid where it overlaps.",
+        "Prattville zoning is ZONING_JULY_2017 (internal layer name Zoning_2022). Vintage is unclear: sampled DATE_ZONED values are often May 1, 1987, with some later ordinances. Joined only where the polygon overlaps Autauga or Elmore parcels. Partial until a current official zoning service is confirmed.",
+        "Prattville Future_Land_Use_Layer has 13 coarse polygons and was not joined as site-level FLU."
+      ],
+      "path": "data/fixtures/market-parcels/counties/01001/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01001/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 7530
+    },
+    {
+      "name": "Elmore",
+      "fips": "01051",
+      "state": "Alabama",
+      "featureCount": 9758,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "al-elmore-parcels",
+      "queryUrl": "https://web5.kcsgis.com/kcsgis/rest/services/Elmore/Public/MapServer/133/query",
+      "gaps": [
+        "14848 source rows collapsed to 9758 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "No sale price on the public parcel layer. lastSale.price stays null.",
+        "Public/133 is the county parcel source. Public_2022 was not used.",
+        "Millbrook zoning is Millbrook_GIS_View/2 (Zone_). Null Zone_ polygons are skipped.",
+        "Prattville zoning is ZONING_JULY_2017 (internal layer name Zoning_2022). Vintage is unclear: sampled DATE_ZONED values are often May 1, 1987, with some later ordinances. Joined only where the polygon overlaps Autauga or Elmore parcels. Partial until a current official zoning service is confirmed.",
+        "City of Wetumpka Zoning_Districts_Public returns token required (HTTP 499). The zoning web map is not a public FeatureServer query. It was not downloaded and no Wetumpka zoning was invented."
+      ],
+      "path": "data/fixtures/market-parcels/counties/01051/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01051/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 14848
+    },
+    {
+      "name": "Lowndes",
+      "fips": "01085",
+      "state": "Alabama",
+      "featureCount": 0,
+      "coverage": "gap",
+      "partition": "none",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "unavailable",
+      "queryUrl": null,
+      "gaps": [
+        "Lowndes County is in the Montgomery, AL MSA. No public parcel card was verified in this pull. Polygons were not invented."
+      ],
+      "path": null,
+      "lookup": null,
+      "tileCount": null,
+      "sourceCount": null
+    },
+    {
+      "name": "Montgomery",
+      "fips": "01101",
+      "state": "Alabama",
+      "featureCount": 9954,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "al-montgomery-parcels",
+      "queryUrl": "https://gis.montgomeryal.gov/server/rest/services/Parcels/FeatureServer/0/query",
+      "gaps": [
+        "10026 source rows collapsed to 9954 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "No sale price on the public parcel layer. lastSale.price stays null.",
+        "InstDate is null on the 5\u2013150 acre public roll, so lastSale.date is null as well.",
+        "Owner and address strings are trimmed. The New York AGOL Montgomery mirror (EbVsqZ18sv1kVJ3k, Amsterdam / SWIS) was rejected.",
+        "City zoning is gis.montgomeryal.gov Zoning/0, joined by centroid. No public city FLU layer was verified."
+      ],
+      "path": "data/fixtures/market-parcels/counties/01101/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01101/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 10026
+    }
+  ]
+}

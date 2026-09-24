@@ -28,7 +28,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services | Cobb complete on `ACRES`. DeKalb is a complete 5–150 acre extract from Tax_Parcels_Assessment_View layer 2 (`ACREAGE`). City zoning and future land use are joined where a public layer exists. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
-| Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
+| Alabama | Jefferson County parcels; Tuscaloosa AGOL Parcels; Montgomery gis.montgomeryal.gov Parcels; Elmore KCS Public/133; Autauga_Parcels | Jefferson stays the Birmingham extract. Tuscaloosa County is on the Tuscaloosa market. Montgomery, Elmore, and Autauga are on the Montgomery market. Hale, Pickens, Greene, and Lowndes stay gaps. Bibb stays a Birmingham gap |
 
 Zoning is joined when a public layer supports it. DeKalb municipalities are first-class: Decatur (Georgia, not Illinois), Brookhaven, Dunwoody, Doraville, Tucker, and Stonecrest supply zoning and future land use. Chamblee is future land use only. Atlanta's citywide layers are joined only inside DeKalb's Atlanta boundary. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake stay blank. County Zoning_District and LandUse fill unincorporated DeKalb only. Those codes are not scored as Orange County multifamily districts. There is no public DeKalb sale table. Prefer **All parcels** in these markets.
 
@@ -41,6 +41,10 @@ No sale price, sale date, or qualified flag is published on that service. Delinq
 City layers are extent-checked in WGS84. A layer centered on Decatur, Illinois, or on DeKalb County in Alabama, Illinois, Indiana, or Tennessee, is skipped. Decatur, Georgia is `decatur_admin` on ArcGIS Online.
 
 OZ 2.0 tracts that are eligible for nomination are not designated QOZs. This extract does not copy eligibility onto `opportunityZone`.
+
+Tuscaloosa and Montgomery are parcel markets. No eligible-tract rows were added for them, and nothing in this pull is marked designated. City zoning is a centroid join, plus a Northport `pclNUM` key join. Zoning codes are not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+
+The New York AGOL item `EbVsqZ18sv1kVJ3k` / `Montgomery_County_Parcels` is Amsterdam, New York (SWIS fields) and is not used. Wetumpka zoning returns HTTP 499 and is not queried. Tuscaloosa `Framework_Zoning_Map` is a draft and is not joined. Prattville `ZONING_JULY_2017` is partial and the vintage is unclear. See `docs/tuscaloosa-montgomery-parcels.md`.
 
 ## Coverage
 
@@ -61,7 +65,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
 | Melbourne | other | 39,435 | 5 | 0 | 0 |
 | Pensacola | other | 30,141 | 4 | 0 | 1 |
-| Birmingham | other | 15,641 | 1 | 0 | 9 |
+| Birmingham | other | 15,641 | 1 | 0 | 8 |
 | Mobile | other | 7,189 | 1 | 0 | 4 |
 | Huntsville | other | 0 | 0 | 0 | 7 |
 | Savannah | other | 0 | 0 | 0 | 8 |
@@ -72,6 +76,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
+| Tuscaloosa | other | 11,596 | 1 | 0 | 3 |
+| Montgomery | other | 26,759 | 3 | 0 | 1 |
 
 ## Counties
 
@@ -248,7 +254,6 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Shelby | Alabama | 01117 | gap | 0 | unavailable |
 | St. Clair | Alabama | 01115 | gap | 0 | unavailable |
 | Talladega | Alabama | 01121 | gap | 0 | unavailable |
-| Tuscaloosa | Alabama | 01125 | gap | 0 | unavailable |
 | Walker | Alabama | 01127 | gap | 0 | unavailable |
 
 ### Mobile
@@ -387,4 +392,22 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,256 | nc-onemap-37129 |
 | Onslow | North Carolina | 37133 | complete-gte-5ac | 6,747 | nc-onemap-37133 |
 | Pender | North Carolina | 37141 | complete-gte-5ac | 7,275 | nc-onemap-37141 |
+
+### Tuscaloosa
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Greene | Alabama | 01063 | gap | 0 | unavailable |
+| Hale | Alabama | 01065 | gap | 0 | unavailable |
+| Pickens | Alabama | 01107 | gap | 0 | unavailable |
+| Tuscaloosa | Alabama | 01125 | complete-gte-5ac | 11,596 | al-tuscaloosa-parcels |
+
+### Montgomery
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Autauga | Alabama | 01001 | complete-gte-5ac | 7,047 | al-autauga-parcels |
+| Elmore | Alabama | 01051 | complete-gte-5ac | 9,758 | al-elmore-parcels |
+| Lowndes | Alabama | 01085 | gap | 0 | unavailable |
+| Montgomery | Alabama | 01101 | complete-gte-5ac | 9,954 | al-montgomery-parcels |
 

@@ -131,6 +131,8 @@ export const OTHER_MARKETS = [
   "Birmingham",
   "Mobile",
   "Huntsville",
+  "Tuscaloosa",
+  "Montgomery",
   "Savannah",
   "Columbia",
   "Greenville",
@@ -245,9 +247,12 @@ export type MarketSummary = {
   bounds: [[number, number], [number, number]];
   center: [number, number];
   counties: MarketCountySummary[];
+  /** Parcel shelf with no eligible-tract rows. Not a designation. */
+  parcelOnly?: boolean;
+  eligibleTractNote?: string;
 };
 
-/** Urban 7-market pack, or the 15 smaller MSAs (rural and urban together). */
+/** Urban 7-market pack, or the smaller MSAs (rural and urban together). Tuscaloosa and Montgomery are parcel markets with zero eligible-tract rows. */
 export type EligibleTractRow = {
   market: SearchMarketId;
   state: string;

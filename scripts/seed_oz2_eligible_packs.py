@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Build offline fixtures for OZ 2.0 urban (7 markets) and other-MSA packs.
 
-Sources (Rev. Proc. 2026-14, approximate 90-minute county rings):
+Sources (Rev. Proc. 2026-14, approximate 90-minute county rings).
+
+Tuscaloosa and Montgomery are appended as parcel-only market stubs with zero
+eligible-tract rows. They are not in the CSV and are not designated.
 
   data/oz2-7markets-90min-urban-eligible.csv   — non-rural eligible, primary 7
   data/oz2-other-msas-eligible.csv             — rural + non-rural, 15 smaller MSAs
@@ -31,6 +34,8 @@ import urllib.request
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
+
+from al_msa_parcels import parcel_only_market_summaries
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -473,6 +478,7 @@ def main() -> None:
         raise RuntimeError(f"Expected 2285 polygons, built {len(features)}")
     urban_catalog = catalog_payload(urban_rows, PRIMARY_MARKETS, "data/oz2-7markets-90min-urban-eligible.csv", "urban-7")
     other_catalog = catalog_payload(other_rows, OTHER_MARKETS, "data/oz2-other-msas-eligible.csv", "other-msas")
+    other_catalog["markets"].extend(parcel_only_market_summaries())
     collection = {
         "type": "FeatureCollection",
         "name": "oz2-eligible-packs",

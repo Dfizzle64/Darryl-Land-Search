@@ -4,18 +4,20 @@ Acreage band is **5.0–150.0 inclusive**. Lake, Osceola, Seminole, and Sumter O
 
 Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map requests the selected market's viewport tiles only.
 
-| Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
+| Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 48,459 | 8 | 1 | 26 |
-| Tampa | primary | 124,649 | 10 | 0 | 0 |
+| Atlanta | primary | 51,046 | 10 | 0 | 25 |
+| Tampa | primary | 124,315 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 104,066 | 13 | 0 | 4 |
 | Charlotte | primary | 106,650 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 151,530 | 17 | 0 | 0 |
 | SWFL | other | 32,749 | 4 | 0 | 0 |
+| Heartland | shelf | 21,163 | 4 | 1 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
 | Melbourne | other | 39,607 | 5 | 0 | 0 |
 | Jacksonville | other | 26,301 | 5 | 0 | 0 |
+| North-Central Florida | other | 52,695 | 7 | 0 | 0 |
 | Big Bend | other | 21,551 | 1 | 3 | 3 |
 | Pensacola | other | 59,902 | 6 | 0 | 0 |
 | Birmingham | other | 38,101 | 3 | 0 | 7 |
@@ -47,7 +49,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Cobb | Georgia | 13067 | complete-gte-5ac | 4,770 | ga-cobb-taxassessorsdaily |
 | Coweta | Georgia | 13077 | gap | 0 | unavailable |
 | Dawson | Georgia | 13085 | gap | 0 | unavailable |
-| DeKalb | Georgia | 13089 | sample | 3,369 | ga-dekalb-tax-parcels |
+| DeKalb | Georgia | 13089 | complete-gte-5ac | 3,401 | ga-dekalb-assessment-view-2 |
 | Douglas | Georgia | 13097 | complete-gte-5ac | 4,231 | ga-douglas-landrecords |
 | Fayette | Georgia | 13113 | complete-gte-5ac | 4,725 | ga-fayette-parcels |
 | Forsyth | Georgia | 13117 | complete-gte-5ac | 3,925 | ga-forsyth-tax-parcels |
@@ -69,7 +71,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Paulding | Georgia | 13223 | complete-gte-5ac | 5,094 | ga-paulding-parcels |
 | Pickens | Georgia | 13227 | gap | 0 | unavailable |
 | Pike | Georgia | 13231 | gap | 0 | unavailable |
-| Rockdale | Georgia | 13247 | gap | 0 | unavailable |
+| Rockdale | Georgia | 13247 | complete-gte-5ac | 2,555 | ga-rockdale-parcels |
 | Spalding | Georgia | 13255 | gap | 0 | unavailable |
 | Walton | Georgia | 13297 | gap | 0 | unavailable |
 
@@ -77,9 +79,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Citrus | Florida | 12017 | complete-gte-5ac | 5,810 | fl-doh-ehwaters-12017 |
-| Hardee | Florida | 12049 | complete-gte-5ac | 5,055 | fl-doh-ehwaters-12049 |
-| Hernando | Florida | 12053 | complete-gte-5ac | 7,180 | fl-doh-ehwaters-12053 |
+| Citrus | Florida | 12017 | complete-gte-5ac | 5,807 | fl-citrus-doh-municipal-12017 |
+| Hardee | Florida | 12049 | complete-gte-5ac | 5,303 | fl-hardee-infomap-12049 |
+| Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
 | Hillsborough | Florida | 12057 | complete-gte-5ac | 13,838 | fl-hillsborough-parcelpublishing-12 |
 | Manatee | Florida | 12081 | complete-gte-5ac | 7,239 | fl-doh-ehwaters-12081 |
 | Pasco | Florida | 12101 | complete-gte-5ac | 12,372 | fl-pasco-pascomapper-7 |
@@ -173,6 +175,16 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Lee | Florida | 12071 | complete-gte-5ac | 9,992 | fl-lee-parceladdress |
 | Sarasota | Florida | 12115 | complete-gte-5ac | 4,303 | fl-doh-ehwaters-12115 |
 
+### Heartland
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| DeSoto | Florida | 12027 | partial | 4,677 | fl-desoto-swfwmd-12027 |
+| Glades | Florida | 12043 | complete-gte-5ac | 2,256 | fl-glades-agol-2026-06-12043 |
+| Hardee | Florida | 12049 | complete-gte-5ac | 5,303 | fl-hardee-infomap-12049 |
+| Hendry | Florida | 12051 | complete-gte-5ac | 3,070 | fl-hendry-parcels-feb2024-12051 |
+| Highlands | Florida | 12055 | complete-gte-5ac | 5,857 | fl-highlands-pao-12055 |
+
 ### Vero Beach
 
 | County | State | FIPS | Coverage | Parcels | Source |
@@ -202,6 +214,18 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Duval | Florida | 12031 | complete-gte-5ac | 7,768 | fl-coj-citybiz-parcels-12031 |
 | Nassau | Florida | 12089 | complete-gte-5ac | 5,587 | fl-nassau-taxmap-12089 |
 | St. Johns | Florida | 12109 | complete-gte-5ac | 4,944 | fl-sjc-hosted-parcel-12109 |
+
+### North-Central Florida
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Alachua | Florida | 12001 | complete-gte-5ac | 15,539 | fl-alachua-parcels35-12001 |
+| Bradford | Florida | 12007 | complete-gte-5ac | 593 | fl-doh-ehwaters-12007 |
+| Citrus | Florida | 12017 | complete-gte-5ac | 5,807 | fl-citrus-doh-municipal-12017 |
+| Gilchrist | Florida | 12041 | complete-gte-5ac | 6,395 | fl-doh-ehwaters-12041 |
+| Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
+| Levy | Florida | 12075 | complete-gte-5ac | 10,200 | fl-doh-ehwaters-12075 |
+| Putnam | Florida | 12107 | complete-gte-5ac | 7,560 | fl-putnam-doh-municipal-12107 |
 
 ### Big Bend
 

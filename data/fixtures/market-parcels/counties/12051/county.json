@@ -1,0 +1,26 @@
+{
+  "name": "Hendry",
+  "fips": "12051",
+  "state": "Florida",
+  "markets": [
+    "Heartland"
+  ],
+  "featureCount": 3070,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "fl-hendry-parcels-feb2024-12051",
+  "queryUrl": "https://services7.arcgis.com/8l7Qq5t0CPLAJwJK/arcgis/rest/services/Parcels_Feb2024/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are Parcels_Feb2024 (February 2024 vintage), not a later Hendry roll. Acreage is MAP_ACRES.",
+    "County zoning is an attribute join on PIN / PARCELNO. Current_Zo values LABELLE and CLEWISTON are city names, not districts, and stay blank.",
+    "Future land use is a spatial intersect. LaBelle city limits mark the city boundary only. No LaBelle zoning layer was joined.",
+    "Hendry Feb 2024 roll. Zoning attribute join 2575/3070. 152 city-name sentinels left blank. 121 parcels fall inside LaBelle city limits. FLU spatial 2902/3070."
+  ],
+  "path": "data/fixtures/market-parcels/counties/12051/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12051/lookup.json",
+  "sourceCount": 3070,
+  "dropped": 0,
+  "tileCount": 11
+}

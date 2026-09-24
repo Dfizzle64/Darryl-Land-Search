@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T00:02:58Z",
+  "generatedAt": "2026-09-24T00:09:22Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 48459,
+  "parcelCount": 51046,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -231,20 +231,26 @@
       "name": "DeKalb",
       "fips": "13089",
       "state": "Georgia",
-      "featureCount": 3369,
-      "coverage": "sample",
+      "featureCount": 3401,
+      "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "ga-dekalb-tax-parcels",
-      "queryUrl": "https://dcgis.dekalbcountyga.gov/hosted/rest/services/Tax_Parcels/FeatureServer/0/query",
+      "source": "ga-dekalb-assessment-view-2",
+      "queryUrl": "https://dcgis.dekalbcountyga.gov/mapping/rest/services/Tax_Parcels_Assessment_View/FeatureServer/2/query",
       "gaps": [
-        "DeKalb's public layer has no deed-acre field. Acres are computed from the polygon inside a Shape__Area window, so this county is a large sample, not a certified complete roll."
+        "No sale price, sale date, or qualified flag. Tax_Parcels_Assessment_View has no sale history. Delinquent-tax layers are not sales and are not joined.",
+        "Municipal zoning and future land use are joined where a public layer exists (Decatur, Brookhaven, Dunwoody, Doraville, Tucker, Stonecrest, and Atlanta inside DeKalb). Chamblee is future land use only. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake have no public zoning or FLU service and stay blank.",
+        "City of Atlanta zoning and future land use are citywide. They are joined only where DeKalb's municipal boundary says Atlanta. Decatur, Illinois (decaturil.gov) and DeKalb counties in Alabama, Illinois, Indiana, and Tennessee are not FIPS 13089 and are not joined.",
+        "County Zoning_District and LandUse fill unincorporated DeKalb only. They are not copied onto city parcels. The parcel ZONING attribute is a fallback for unincorporated parcels the county polygon missed.",
+        "Parcel CITY is the situs postal city, not the municipality. jurisdictionCode comes from Municipal_Boundary.",
+        "OZ 2.0 eligibility is not a designated QOZ. This extract does not write opportunityZone from an eligible tract.",
+        "Owner phone and email are not on the public assessment layer. TOTAPR1 is the appraised value and CNTASSDVAL is the county assessed value."
       ],
       "path": "data/fixtures/market-parcels/counties/13089/tiles",
       "lookup": "data/fixtures/market-parcels/counties/13089/lookup.json",
       "tileCount": 4,
-      "sourceCount": 4986
+      "sourceCount": 3410
     },
     {
       "name": "Douglas",
@@ -722,20 +728,27 @@
       "name": "Rockdale",
       "fips": "13247",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 2555,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-rockdale-parcels",
+      "queryUrl": "https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/Parcels/FeatureServer/9/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Source query returned 2698 rows in the 5.0\u2013150.0 acre band. 2555 parcels kept. 26 centroids were outside Rockdale County, Georgia, 6 failed geometry or the acreage check, and 111 duplicate parcel ids were collapsed to the larger part.",
+        "Rockdale County, Georgia AGOL Parcels/9. Positive Acreage is stored; Calc_Ac is used only when Acreage is null or zero. The band is 5.0\u2013150.0 acres inclusive.",
+        "Valuation is a fair-market proxy only. Assessed value, taxable value, and taxes are not on this layer and were left null.",
+        "Owner and mailing address come from City of Conyers SmartGovParcels joined on PARCEL_NO. Parcels outside that extract are null. No assessor site was scraped.",
+        "Sales are not published on these layers. lastSale date, price, and qualified flag are null.",
+        "Outside Conyers, zoning is RockdaleCountyZoning County_Zoning and future land use is Future_LandUse. Inside the city limits, Zoning/8 and FLU2025 are preferred. gis.rockdalecountyga.gov was not used (token 499).",
+        "Conyers SmartGovParcels matched owner or mailing on 268 of 2555 kept parcels (6281 city parcel ids). Unmatched parcels stay null.",
+        "Conyers city limits contain 273 kept parcels. Zoning/8 matched 188; county city-zoning fallback matched 2; FLU2025 matched 272. Unincorporated county zoning matched 2205; county future land use matched 2259. 160 kept parcels have no zoning code on those layers, and 24 have no future land use polygon."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13247/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13247/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 2698
     },
     {
       "name": "Spalding",

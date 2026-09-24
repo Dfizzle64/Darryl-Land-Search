@@ -796,7 +796,7 @@ def rebuild_indexes(catalog: dict) -> None:
         "",
         "Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map requests the selected market's viewport tiles only.",
         "",
-        "| Market | Tier | Parcels | Complete counties | Sample counties | Gaps |",
+        "| Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |",
         "| --- | --- | ---: | ---: | ---: | ---: |",
     ]
     detail_lines = ["", "## Counties", ""]
@@ -809,7 +809,7 @@ def rebuild_indexes(catalog: dict) -> None:
             market_rows.append(row)
         parcel_count = sum(int(row.get("featureCount") or 0) for row in market_rows)
         complete = [row for row in market_rows if row.get("coverage") == "complete-gte-5ac" and row.get("featureCount")]
-        sample = [row for row in market_rows if row.get("coverage") == "sample" and row.get("featureCount")]
+        sample = [row for row in market_rows if row.get("coverage") in {"sample", "partial"} and row.get("featureCount")]
         gaps = [row for row in market_rows if not row.get("featureCount")]
         meta = {
             "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),

@@ -5,19 +5,26 @@
   "markets": [
     "Greenville"
   ],
-  "featureCount": 1570,
-  "coverage": "sample",
+  "featureCount": 14959,
+  "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "sc-greenville-city-gis",
-  "queryUrl": "https://citygis.greenvillesc.gov/arcgis/rest/services/GeneralData/GeneralData_WGS84/MapServer/2/query",
+  "source": "sc-greenville-gcgia-tax-parcel",
+  "queryUrl": "https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/10/query",
   "gaps": [
-    "Published by City of Greenville GIS. The 5\u2013150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll."
+    "Zoning joined for 14959 of 14959 parcels (gcgia-zoning-13 14248, greenville-city-regulation-7 455, greer-udo 256).",
+    "Countywide GCGIA Tax Parcel (FeatureServer/10), PIN, TACRES 5\u2013150. Owner, mailing, situs (STRNUM+LOCATE), last deed sale, and tax amounts are on the polygon. Zoning is not.",
+    "Zoning is a spatial join: City of Greenville AddressSearch/Regulation MapServer/7 first, then City of Greer UDO (Pro_Zoning), otherwise GCGIA Zoning/13 by JCODE.",
+    "Mauldin (JCODE 45115), Simpsonville (66580), Travelers Rest (72430), and Fountain Inn (27070) are county Zoning/13 only. No separate city FeatureServer was verified. Fountain Inn also sits in Laurens; only the Greenville County portion is in this extract.",
+    "Unincorporated Greenville County is JCODE 45045 on the county zoning layer.",
+    "Rejected: AGOL Greenville_Base_Data/33 is a ~32k city-extent subset (wrong geography for a countywide roll). City Property/3 is a large city-hosted extract, not the county source. The previous GeneralData/2 sample is retired.",
+    "Last-deed sale only. GreenvilleNJ/Sales/MapServer/7 has older sales and is not joined. County FLU/21 is a character-area layer and is not joined. City of Greenville has no verified FLU REST. Greer FLU is public and is not joined.",
+    "Parcel JURIS is the tax jurisdiction code, not zoning JCODE. No phones or emails."
   ],
   "path": "data/fixtures/market-parcels/counties/45045/tiles",
   "lookup": "data/fixtures/market-parcels/counties/45045/lookup.json",
-  "sourceCount": 1570,
+  "sourceCount": 14959,
   "dropped": 0,
-  "tileCount": 3
+  "tileCount": 9
 }

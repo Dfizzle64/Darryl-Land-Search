@@ -5,19 +5,115 @@
   "markets": [
     "Charlotte"
   ],
-  "featureCount": 10771,
+  "featureCount": 10768,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "nc-onemap-37097",
-  "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+  "source": "nc-iredell-taxsql-37097",
+  "queryUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/TaxSQL_Parcels/FeatureServer/0/query",
   "gaps": [
-    "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+    "No multi-year sale history on parcels. TaxSQL_Parcels has the last sale only. Tax/Sales_2024 is a single-year extract and is not a sale-history table.",
+    "FLU outside Mooresville is mostly a gap. Statesville Land Development Plan 2045 is PDF-only. Troutman, Harmony, Love Valley, and the Davidson Iredell tip have no public FLU FeatureServer. Horizon Plan 2030 Municipal Planning Area values are stubs and are not joined as city FLU.",
+    "The TaxSQL Market field is an adjustment factor, not dollar tax.marketValue. Assessed value is Total_Value.",
+    "Situs has no ZIP. CityLocationDescription supplies a municipality only when it names one. Mailing CITY can be out of county and is not copied onto the situs.",
+    "Municipal zoning is a spatial join. Mooresville uses the town PlanningServices layer. Statesville, Troutman, Harmony, Love Valley, and the Davidson Iredell tip use county Zoning MapServer layers 1, 2, 4, 5, and 6. Unincorporated zoning is layer 0. The parcel Zoning attribute is used only when no polygon contains the representative point.",
+    "Mooresville FLU is FCLU F2019_LU_1. Unincorporated FLU is Horizon Plan 2030 FUTURE_LANDUSE when the value is not a Municipal Planning Area stub.",
+    "No stable taxweb parcel deep link. The viewer link is MapGeo ?query={PIN} with a trailing .000 stripped. Tax search stays on the BasicSearch form.",
+    "NC OneMap FeatureServer/1 where cntyfips='097' is the parcel fallback if TaxSQL_Parcels is down. County and town layers share WKID 102719/2264; tiles are stored in WGS84.",
+    "Owner phones and emails are not on these public layers."
   ],
   "path": "data/fixtures/market-parcels/counties/37097/tiles",
   "lookup": "data/fixtures/market-parcels/counties/37097/lookup.json",
-  "sourceCount": 10771,
+  "sourceCount": 10768,
   "dropped": 0,
-  "tileCount": 9
+  "tileCount": 9,
+  "crs": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "storedAs": 4326
+  },
+  "municipalities": [
+    {
+      "name": "Mooresville",
+      "independentGis": true,
+      "zoningUrl": "https://gis.mooresvillenc.gov/gisadmin/rest/services/PlanningServices/MapServer/1",
+      "fluUrl": "https://gis.mooresvillenc.gov/gisadmin/rest/services/Planning/FCLU/FeatureServer/0",
+      "fluGap": null,
+      "join": "spatial city zoning/FLU to county parcels (WKID 102719/2264)",
+      "zoningFeatures": 594,
+      "zoningJoined": 687,
+      "fluJoined": 687,
+      "fluFeatures": 15
+    },
+    {
+      "name": "Statesville",
+      "independentGis": false,
+      "zoningUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/1",
+      "fluUrl": null,
+      "fluGap": "Land Development Plan 2045 is PDF-only. No public FLU FeatureServer.",
+      "join": "spatial city zoning/FLU to county parcels (WKID 102719/2264)",
+      "zoningFeatures": 363,
+      "zoningJoined": 654,
+      "fluJoined": 0
+    },
+    {
+      "name": "Troutman",
+      "independentGis": false,
+      "zoningUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/2",
+      "fluUrl": null,
+      "fluGap": "No town FLU FeatureServer. Horizon Municipal Planning Area is a stub.",
+      "join": "spatial city zoning/FLU to county parcels (WKID 102719/2264)",
+      "zoningFeatures": 200,
+      "zoningJoined": 288,
+      "fluJoined": 0
+    },
+    {
+      "name": "Harmony",
+      "independentGis": false,
+      "zoningUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/4",
+      "fluUrl": null,
+      "fluGap": "No town FLU FeatureServer.",
+      "join": "spatial city zoning/FLU to county parcels (WKID 102719/2264)",
+      "zoningFeatures": 14,
+      "zoningJoined": 29,
+      "fluJoined": 0
+    },
+    {
+      "name": "Love Valley",
+      "independentGis": false,
+      "zoningUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/5",
+      "fluUrl": null,
+      "fluGap": "No town FLU FeatureServer.",
+      "join": "spatial city zoning/FLU to county parcels (WKID 102719/2264)",
+      "zoningFeatures": 3,
+      "zoningJoined": 14,
+      "fluJoined": 0
+    },
+    {
+      "name": "Davidson",
+      "independentGis": false,
+      "zoningUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/6",
+      "fluUrl": null,
+      "fluGap": "Iredell tip only. No Iredell-side FLU FeatureServer. Mecklenburg Davidson zoning is not applied to Iredell parcels.",
+      "join": "spatial city zoning/FLU to county parcels (WKID 102719/2264)",
+      "zoningFeatures": 3,
+      "zoningJoined": 5,
+      "fluJoined": 0
+    }
+  ],
+  "unincorporated": {
+    "zoningUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/0",
+    "fluUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/7",
+    "zoningFeatures": 958,
+    "fluFeatures": 219,
+    "zoningJoined": 9091,
+    "fluJoined": 9079,
+    "note": "Horizon Plan 2030 for unincorporated FLU. Municipal Planning Area values are stubs and are not joined."
+  },
+  "zoningJoinedCount": 10768,
+  "fluJoinedCount": 9766,
+  "attributeZoningCount": 0,
+  "viewerLinkTemplate": "https://iredellcountync.mapgeo.io/datasets/properties?query={pin}",
+  "appraiserSearchUrl": "https://taxweb.iredellcountync.gov/PublicAccess/BasicSearch.aspx"
 }

@@ -120,13 +120,15 @@ export type MarketId = (typeof MARKETS)[number];
 
 /**
  * Smaller MSAs, visually secondary to the seven primary markets.
- * Florida markets stay together: east coast south to north, then the panhandle.
- * The rest of the order matches the research handoff.
+ * Florida markets stay together: SWFL on the gulf, east coast south to north,
+ * then Big Bend, then the panhandle. Jackson is Jackson, Tennessee.
  */
 export const OTHER_MARKETS = [
+  "SWFL",
   "Vero Beach",
   "Melbourne",
   "Jacksonville",
+  "Big Bend",
   "Pensacola",
   "Birmingham",
   "Mobile",
@@ -137,6 +139,7 @@ export const OTHER_MARKETS = [
   "Chattanooga",
   "Knoxville",
   "Memphis",
+  "Jackson",
   "Winston-Salem",
   "Wilmington",
 ] as const;
@@ -247,7 +250,7 @@ export type MarketSummary = {
   counties: MarketCountySummary[];
 };
 
-/** Urban 7-market pack, or the 15 smaller MSAs (rural and urban together). */
+/** Urban 7-market pack, or the smaller MSAs (rural and urban together). */
 export type EligibleTractRow = {
   market: SearchMarketId;
   state: string;

@@ -5,19 +5,33 @@
   "markets": [
     "Nashville"
   ],
-  "featureCount": 8286,
+  "featureCount": 9478,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "tn-impact-47037",
-  "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+  "source": "tn-metro-davidson-parcels",
+  "queryUrl": "https://maps.nashville.gov/arcgis/rest/services/Cadastral/Parcels/MapServer/0/query",
   "gaps": [
-    "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+    "9481 source rows collapsed to 9478 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "Davidson County is not a Tennessee Comptroller IMPACT county. Polygons, owner, mailing, situs, sale, appraisal, and the parcel Zoning attribute come from Metro GIS Cadastral/Parcels MapServer layer 0 (APN). No IMPACT assessment feed was used. Authoritative record cards are on Davidson WebPro.",
+    "Planning/CCM layer 2 PolicyCode and PolicyDesc are NashvilleNext community character policy, joined by polygon intersection. That is preferred future policy guidance, not a zoning entitlement and not Future Land Use. Parcels that cross a policy boundary keep the additional policies on the label.",
+    "PropDate is the layer alias Property Date and OwnDate is Owner Instrument Date. The sale date is that best-available proxy, not a guaranteed last-sale date. Confirm history in WebPro. SaleCode and SaleSrc are copied through; a blank ValidSale stays blank and is not treated as a qualified sale.",
+    "Outside satellite cities, displayed zoning is the Metro parcel Zoning attribute with *ZZ placeholder tokens removed. *ZZ is not a Metro Zoning Ordinance district. Metro Zoning/Zoning is rechecked at ingest and is not required for this extract.",
+    "Satellite cities (Belle Meade, Berry Hill, Forest Hills, Goodlettsville, Oak Hill, Ridgetop) come from Boundaries/Jurisdictions MapServer layer 2 Name. The most local code wins. Goodlettsville zoning is ZONINGARGISMAP FeatureServer layer 2 ZONECLASS / ZONEDESC, joined only to the Davidson portion of the city. Belle Meade, Berry Hill, Forest Hills, Oak Hill, and Ridgetop have no public zoning FeatureServer, so their city zoning stays blank instead of copying the Metro parcel attribute or *ZZ. Satellite-city future land use is a gap: NashvilleNext CCM is Metro guidance and is cleared inside satellite limits.",
+    "Zoning overlays from ZoningOverlayDistricts are supplemental constraints (historic, urban design, airport impact, and similar), not the base zone.",
+    "Median household income and FDOT AADT are not joined. Those sidecars are Florida extracts, so Davidson stays unknown.",
+    "DeededAcreage is kept when the layer sends it. StatedArea is not converted, because the layer does not document its unit.",
+    "Satellite City join on the 5\u2013150 acre extract: Metro Nashville 9068; Belle Meade 33, Berry Hill 10, Forest Hills 138, Goodlettsville 134, Oak Hill 89, Ridgetop 6 of 9478.",
+    "Goodlettsville ZONECLASS matched 134 of 134 Davidson parcels in that city.",
+    "NashvilleNext CCM stays on 9068 Metro parcels. Satellite parcels are blank: no public city FLU layer, and CCM is not their comprehensive plan.",
+    "Metro zoning overlays remain on 1936 parcels outside satellite cities. They do not replace the parcel Zoning attribute.",
+    "Metro Zoning/Zoning MapServer returned ArcGIS code 500 at ingest (Error handling service request :Illegal access: this web application instance has been stopped already. Could not load [META-INF/services/javax.xml.parsers.Docu). Outside satellite cities the parcel Zoning attribute is the zoning source. The 500 service is not a hard dependency.",
+    "Goodlettsville interchange and commercial-core overlays intersect 8 Davidson parcels. They are supplemental, not the base zone."
   ],
   "path": "data/fixtures/market-parcels/counties/47037/tiles",
   "lookup": "data/fixtures/market-parcels/counties/47037/lookup.json",
-  "sourceCount": 8485,
-  "dropped": 196,
-  "tileCount": 8
+  "sourceCount": 9481,
+  "dropped": 0,
+  "tileCount": 7
 }

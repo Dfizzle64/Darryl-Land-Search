@@ -5,19 +5,29 @@
   "markets": [
     "Raleigh-Durham"
   ],
-  "featureCount": 12427,
+  "featureCount": 12436,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "nc-onemap-37183",
-  "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+  "source": "nc-wake-county-parcels",
+  "queryUrl": "https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0/query",
   "gaps": [
-    "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+    "Wake 5\u2013150 acre extract: 12436 parcels; owner 12428; mailing 12428; situs 12428; sale 3423; tax value 12396; zoning 12311; future land use 6864.",
+    "No countywide future land use layer. FLU is joined only from the municipal public layers that exist.",
+    "Rolesville and Zebulon have zoning and no public FLU REST layer. Angier, Durham-edge, Clayton-edge, RTP, and RDU Airport also have no verified public FLU layer.",
+    "Wake Forest land use is a coarse category layer, not a detailed future land use map. Garner FLU is an 8-polygon character typology. Morrisville FLU is a draft layer.",
+    "Knightdale FLU is joined on PIN_NUM because that layer is Web Mercator. Wendell FLU is joined on PIN_NUM.",
+    "Raleigh zoning is Planning/Zoning MapServer/23. The county Zoning FeatureServer omits Raleigh.",
+    "County zoning (MapServer/17) covers unincorporated PLANNING_JURISDICTION=WC only.",
+    "Morrisville zoning is a sparse public layer (about 32 polygons).",
+    "Last sale only (SALE_DATE and TOTSALPRICE). No multi-transfer sales history on this layer.",
+    "Tax figure is assessed value (TOTAL_VALUE_ASSD). Property/Parcels has no separate market value.",
+    "Owner phones and emails are not collected."
   ],
   "path": "data/fixtures/market-parcels/counties/37183/tiles",
   "lookup": "data/fixtures/market-parcels/counties/37183/lookup.json",
-  "sourceCount": 12427,
+  "sourceCount": 12436,
   "dropped": 0,
   "tileCount": 8
 }

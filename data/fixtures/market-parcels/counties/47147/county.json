@@ -5,20 +5,115 @@
   "markets": [
     "Nashville"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 8581,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
   "source": "tn-impact-47147",
   "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
   "gaps": [
-    "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-    "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+    "IMPACT COUNTY_ID 74 / JUR 074. The FIPS suffix 147 returns no parcels on this service. Geometry is Parcels/0 parcel type 1, CALC_ACRE 5\u2013150 (8581 source rows, 8581 kept). Attributes joined from Parcel_Layer_Themes/12 on GISLINK (8581 matches).",
+    "Weekly Assessment_Data_074.dbf is the attribute fallback when Parcel_Layer_Themes/12 is blocked. The Comptroller ships that table inside the county shapefile from the parcel-data request form; there is no stable anonymous file URL, and paid parcel vendors are not used. This pull used Themes/12, so the DBF was not required.",
+    "Municipalities are first-class. City zoning wins inside APSU community limits and is not replaced by county zoning. Springfield Current Zoning (city AGOL, described as updated 2025-07-15). Greenbrier, Tennessee Zoning Public View (April 2022): RD is published as Mobile Home Park and R8 as High Density Residential. West Virginia GreenbrierService (magisterial districts, EPSG:26854) is rejected. White House city server zoning. CompPlan Future_LU joined inside White House. Millersville zoning is the city AGOL view Millersville_Zoning_view (ZONE_2021). The Pennsylvania Millersville map (Lancaster/Dauphin) is rejected. Adams and Orlinda zoning polygons on the APSU service were last edited 2009-05-06; Cedar Hill zoning is dated 2014-08-04. Unincorporated zoning is the APSU RobertsonZoning overlay (service description edited 2014-07-30), joined on GISLINK.",
+    "No public zoning polygons for Coopertown, Cross Plains, or Ridgetop. Portland is an incorporated community on the same APSU layer and also has no public zoning service in this pull. County zoning is not substituted inside those four cities.",
+    "OZ 2.0 on these parcels is Rev. Proc. 2026-14 nomination eligibility for four rural Robertson tracts. Eligible means eligible for nomination, not a designated Qualified Opportunity Zone. opportunityZone is left unset. This pull does not certify a 2018 or 2027 QOZ.",
+    "252 parcels have a centroid in a Rev. Proc. 2026-14 rural-eligible tract. 0 source rows were dropped for geometry or duplicate ids."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": 0,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/47147/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47147/lookup.json",
+  "sourceCount": 8581,
+  "dropped": 0,
+  "tileCount": 6,
+  "impactCountyId": 74,
+  "impactJur": "074",
+  "parcelType": 1,
+  "rejectedSources": [
+    {
+      "id": "wv-greenbrier-service",
+      "url": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GreenbrierService/FeatureServer",
+      "reason": "GreenbrierService is Greenbrier County, West Virginia (magisterial districts, EPSG:26854). It is not the City of Greenbrier, Tennessee."
+    },
+    {
+      "id": "pa-millersville-map",
+      "url": "https://services1.arcgis.com/2B26wNHYx3IO9pri/arcgis/rest/services/Map/FeatureServer",
+      "reason": "This Map service is Millersville, Pennsylvania (Lancaster and Dauphin refugee layers). It is not the City of Millersville, Tennessee."
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Springfield",
+      "prefix": "SPF",
+      "zoning": "public",
+      "vintage": "2025-07-15"
+    },
+    {
+      "name": "Greenbrier",
+      "prefix": "GBR",
+      "zoning": "public",
+      "vintage": "2022-04",
+      "note": "RD is Mobile Home Park on the city layer; R8 is High Density Residential."
+    },
+    {
+      "name": "White House",
+      "prefix": "WHT",
+      "zoning": "public",
+      "flu": "CompPlan Future_LU"
+    },
+    {
+      "name": "Millersville",
+      "prefix": "MLV",
+      "zoning": "public",
+      "note": "AGOL Millersville_Zoning_view"
+    },
+    {
+      "name": "Adams",
+      "prefix": "ADM",
+      "zoning": "dated",
+      "vintage": "2009-05-06"
+    },
+    {
+      "name": "Orlinda",
+      "prefix": "ORD",
+      "zoning": "dated",
+      "vintage": "2009-05-06"
+    },
+    {
+      "name": "Cedar Hill",
+      "prefix": "CDH",
+      "zoning": "dated",
+      "vintage": "2014-08-04"
+    },
+    {
+      "name": "Unincorporated Robertson",
+      "prefix": "RBC",
+      "zoning": "dated",
+      "vintage": "2014-07-30"
+    },
+    {
+      "name": "Coopertown",
+      "zoning": "gap"
+    },
+    {
+      "name": "Cross Plains",
+      "zoning": "gap"
+    },
+    {
+      "name": "Ridgetop",
+      "zoning": "gap"
+    },
+    {
+      "name": "Portland",
+      "zoning": "gap"
+    }
+  ],
+  "sourcedPlaces": [
+    "ADAMS",
+    "CEDAR HILL",
+    "GREENBRIER",
+    "MILLERSVILLE",
+    "ORLINDA",
+    "SPRINGFIELD",
+    "WHITE HOUSE"
+  ]
 }

@@ -5,19 +5,21 @@
   "markets": [
     "Charlotte"
   ],
-  "featureCount": 10347,
+  "featureCount": 10375,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "nc-onemap-37159",
-  "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+  "source": "nc-rowan-open-data-37159",
+  "queryUrl": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Open_Data_Downloads/MapServer/37/query",
   "gaps": [
-    "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+    "No countywide future land use service. Salisbury FLUM and Kannapolis Character Areas are joined. Other towns and unincorporated Rowan have no public FLU layer.",
+    "Zoning is split by municipality on Alll_Zoning. Cleveland is on that service (Municipal_Zoning omits it). No separate assessed-versus-taxable field beyond total value.",
+    "Zoning joined on 10370 of 10375 parcels. Future land use joined on 726 (Salisbury and Kannapolis only)."
   ],
   "path": "data/fixtures/market-parcels/counties/37159/tiles",
   "lookup": "data/fixtures/market-parcels/counties/37159/lookup.json",
-  "sourceCount": 10356,
-  "dropped": 4,
+  "sourceCount": 10385,
+  "dropped": 10,
   "tileCount": 6
 }

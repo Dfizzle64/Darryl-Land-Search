@@ -5,19 +5,31 @@
   "markets": [
     "Pensacola"
   ],
-  "featureCount": 9097,
+  "featureCount": 9240,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-doh-ehwaters-12033",
-  "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/15/query",
+  "source": "fl-panhandle-12033",
+  "queryUrl": "https://gismaps.myescambia.com/arcgis/rest/services/Individual_Layers/parcels/MapServer/0/query",
   "gaps": [
-    "No zoning or FLU on the Florida DOH extract."
+    "Joined zoning on 8487 of 9240 parcels and FLU on 8487. Owner 9240, situs 8879, sale price 0, sale date 0.",
+    "No lastSale price or date on Individual_Layers/parcels. SOHYEAR is not a sale date and is not stored.",
+    "Pensacola city Planning/Zoning (https://gis.cityofpensacola.com/arcgis/rest/services/Planning/Zoning/MapServer) probe returned HTTP 523. City parcels keep Escambia Accela zoning (AccelaMain/20, field ZONING) and FLU 2030 (AccelaMain/22, field FLU_LABEL) until the city REST recovers. Pensacola CITYCD B/Z parcels in this extract: 329. No separate Pensacola FLU layer was verified.",
+    "Century (CITYCD F) has no public zoning/FLU FeatureServer. County Accela is used. Century parcels in this extract: 67.",
+    "Assessed value is CURRASDLAND + CURRASDBLDG + CURRASDXF. CAPPEDVALUE is not stored as the assessed total.",
+    "Appraiser URL is the parcel LINK field when present (escpa.org cama detail).",
+    "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077)."
   ],
   "path": "data/fixtures/market-parcels/counties/12033/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12033/lookup.json",
-  "sourceCount": 9149,
+  "sourceCount": 9240,
   "dropped": 0,
-  "tileCount": 9
+  "tileCount": 9,
+  "zoningJoinedCount": 8487,
+  "fluJoinedCount": 8487,
+  "salePriceCount": 0,
+  "saleDateCount": 0,
+  "situsCount": 8879,
+  "ownerCount": 9240
 }

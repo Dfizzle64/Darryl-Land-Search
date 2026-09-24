@@ -5,19 +5,25 @@
   "markets": [
     "Mobile"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 17270,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "al-mobile-agol-capturecama",
+  "queryUrl": "https://services2.arcgis.com/dJHAcAx6kccDBtM6/arcgis/rest/services/Mobile_County_Facilities/FeatureServer/0/query",
   "gaps": [
-    "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+    "CaptureCAMA geometry joined on parcel number for 17050 of 17270 AGOL rows in the 5\u2013150 acre band. 220 rows had no CaptureCAMA Parcel_Num match and used AGOL geometry when a ring was returned.",
+    "Attributes (owner, tax, situs, URL_Revenue) come from AGOL Mobile_County_Facilities/FeatureServer/0, which is countywide despite the service name. The layer description dates the ownership join to 2023/06/21.",
+    "Geometry prefers CaptureCAMA Mobile/Mobile03182025/MapServer/20 (parcel number join). CaptureCAMA attributes are parcel fabric and stated area only, so they are not the attribute source. AGOL geometry is the fallback when the parcel number does not match.",
+    "No last-sale price on the AGOL layer.",
+    "City of Mobile EG_Data_MS/1 is an alternate county-wide parcel host, not a city-only layer, and is not the parcel source.",
+    "No public county zoning FeatureServer was verified. FLU was not found on public Mobile REST (the city LandUse folder is token-walled).",
+    "City of Mobile zoning overlay (https://maps.cityofmobile.org/arcgis/rest/services/EG_Data_MS/MapServer/20/query) matched 2569 of 17270 parcels. City zoning replaces the county code only on those parcels."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/01097/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01097/lookup.json",
+  "sourceCount": 17270,
+  "dropped": 0,
+  "tileCount": 12
 }

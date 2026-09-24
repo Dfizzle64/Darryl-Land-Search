@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T00:02:58Z",
   "market": "Birmingham",
   "tier": "other",
-  "parcelCount": 15641,
+  "parcelCount": 38101,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -104,6 +104,8 @@
       "source": "al-jefferson-parcels",
       "queryUrl": "https://jccgis.jccal.org/server/rest/services/Basemap/Parcels/MapServer/0/query",
       "gaps": [
+        "Municipal overlay: county parcel source unchanged (JCC Basemap/Parcels). Birmingham zoning 1658, Birmingham FLU 1639, Hoover 267, Homewood 38, Vestavia Hills 161 (676 blank VH_ZONING left unknown).",
+        "Gap-fill only. This Jefferson extract is the existing county service. Birmingham city GIS parcel mirrors of Shelby were not used as parcels.",
         "68985 source rows collapsed to 15641 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
         "Jefferson County public parcels. Owner and situs are sparse on this layer. No zoning join."
       ],
@@ -116,39 +118,48 @@
       "name": "Shelby",
       "fips": "01117",
       "state": "Alabama",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 11994,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "al-shelby-cadastral-2025",
+      "queryUrl": "https://maps.shelbyal.com/gisserver/rest/services/LegacyServices/Cadastral_2025/MapServer/91/query",
       "gaps": [
-        "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+        "Municipal overlay: county parcel source unchanged (Cadastral_2025/91). Hoover 324, Helena 294, Pelham 424, Vestavia Hills 0. Alabaster has no public zoning REST (the public webmap is wards only) and was not joined.",
+        "12123 source rows collapsed to 11994 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Shelby County Cadastral_2025 Parcel Boundary (LegacyServices MapServer/91), tax year 2025. Acreage is preferred when it is set; otherwise ACRES.",
+        "CaptureServices C_PARCEL FeatureServer/93 is geometry without owner, tax, or sale and was not used.",
+        "On the 5\u2013150 acre band this layer has owner and land market value (LN_VL1). Sale price, situs street, parcel zoning, and assessed value are empty. Instrument date is stored when INST_DATE1 is set. There is no qualified-sale flag.",
+        "Birmingham city GIS mirrors some Shelby parcels and was not used."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/01117/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01117/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 12123
     },
     {
       "name": "St. Clair",
       "fips": "01115",
       "state": "Alabama",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 10466,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "al-stclair-owner-parcels",
+      "queryUrl": "https://map.stclairco.com/arcgis/rest/services/PublicParcelViewerStPln/MapServer/57/query",
       "gaps": [
-        "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+        "10469 source rows collapsed to 10466 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "St. Clair Owner Parcels (PublicParcelViewerStPln MapServer/57). Owner, deeded acres, situs, sale, and tax values come from that public layer.",
+        "Zoning and future land use are joined only from Owner_Parcel_Zone_View (zoned subset) through OwnerParcel_Ingen GlobalID. Parcels outside that subset stay blank.",
+        "The FeatureServer SOE on this host is not used.",
+        "Zone_View subset joined zoning on 1779 parcels and FLU on 459. Parcels outside that zoned subset stay blank."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/01115/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01115/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 10469
     },
     {
       "name": "Talladega",

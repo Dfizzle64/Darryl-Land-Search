@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T00:02:58Z",
   "market": "Wilmington",
   "tier": "other",
-  "parcelCount": 46720,
+  "parcelCount": 47320,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,20 +20,27 @@
       "name": "Brunswick",
       "fips": "37019",
       "state": "North Carolina",
-      "featureCount": 7020,
+      "featureCount": 7533,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37019",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "bcgis-seamless-37019",
+      "queryUrl": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/SeamlessParcels/FeatureServer/0/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "Sale price is not published on Brunswick SeamlessParcels or NC OneMap. lastSale.date is DeedDate only; lastSale.price and qualified are null.",
+        "OZ 2.0 eligible tracts (Rev. Proc. 2026-14) are not designated QOZs. opportunityZone is only the HUD 2010 designated polygon join.",
+        "Geometry and the 5.0\u2013150.0 acre band are Brunswick County SeamlessParcels layer 0 on CALCAC (calculated GIS acres). DeedAcreage is text and is not the filter.",
+        "Tax values are the public NC OneMap county parcel table (brunswick-parcels-05-28-2026.zip) for stcntyfips 37019 and cntyfips 019, joined on parcel number. Matched 7003 of 7533. parval is market value when the roll type is Market. Land and improvement values are not stored as assessed value. Taxable value, the tax bill, and sale price are not published. OneMap saledatetx is not used.",
+        "Municipal zoning is a centroid join to MuniZoning layers 0\u201318 and replaces the county Zoning attribute inside a municipality (1879 parcels). Unincorporated parcels keep SeamlessParcels.Zoning. 9 parcels have a municipal CityDescription but missed the zoning polygons. These codes are not Orange County multifamily districts.",
+        "Future land use is a centroid join to FutureLandUse layer 0 (6368 of 7533). Codes are stored as published and are not in the Orange County FLU knowledge base, so multifamily screening leaves them unknown. A FLU value that is only a municipality name is not a land-use designation. Municipal FLU maps are not a separate layer in this service.",
+        "SeamlessParcels mailing city is not the situs city. Situs city is the municipality from CityDescription or the MuniZoning polygon.",
+        "The county UseCode is not a Florida DOR code and is not copied onto the parcel."
       ],
       "path": "data/fixtures/market-parcels/counties/37019/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37019/lookup.json",
       "tileCount": 10,
-      "sourceCount": 7020
+      "sourceCount": 7610
     },
     {
       "name": "Columbus",
@@ -78,20 +85,27 @@
       "name": "New Hanover",
       "fips": "37129",
       "state": "North Carolina",
-      "featureCount": 2256,
+      "featureCount": 2263,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37129",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-new-hanover-parcels-37129",
+      "queryUrl": "https://gis.nhcgov.com/server/rest/services/Layers/Parcels/FeatureServer/0/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "Geometry is New Hanover Parcels/FeatureServer/0 where ACRES is 5.0\u2013150.0. NC OneMap cntyfips='129' is the fallback if that layer fails.",
+        "IASTAX/1 is joined on MAPIDKEY. APRTOT is the appraised total, not tax.marketValue, a taxable value, or a tax bill. SALE_PRICE of 0 is missing. There is no qualified-sale flag and no multi-year sale history.",
+        "Zoning is city-first. Wilmington Planning/Zoning/0, Carolina Beach GIS_Viewer/21, and Wrightsville Beach WrightsvilleBeachZoning/0 override county Zoning/1. County codes CITY, WB, CB, and KB are municipal stamps, not districts, and are not stored.",
+        "Kure Beach zoning polygons are not published. Those parcels stay unzoned instead of receiving a county stamp.",
+        "PlanNHC_FLUM/8 place types are joined only outside municipal limits. Create Wilmington future land use has no feature service. Wilmington Planning/LandUse is existing land use and is not joined as FLU. Carolina Beach, Wrightsville Beach, and Kure Beach have no public FLU feature service.",
+        "OZ 2.0 eligibility (Rev. Proc. 2026-14) is a separate centroid join from current HUD/Treasury designated QOZs. Eligible is not designated.",
+        "No stable etax parcel deep link. The link is the Property Assessment search home. Owner phones and emails are not on these layers. Situs has no ZIP.",
+        "23 duplicate PINs in the 5\u2013150 acre query collapsed to the larger outline. The acreage filter still covered the county."
       ],
       "path": "data/fixtures/market-parcels/counties/37129/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37129/lookup.json",
       "tileCount": 5,
-      "sourceCount": 2281
+      "sourceCount": 2286
     },
     {
       "name": "Onslow",
@@ -116,20 +130,28 @@
       "name": "Pender",
       "fips": "37141",
       "state": "North Carolina",
-      "featureCount": 7275,
+      "featureCount": 7355,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37141",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-pender-energov-37141",
+      "queryUrl": "https://gis.pendercountync.gov/arcgis/rest/services/Energov/MapServer/1/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "Town of Atkinson has no public zoning layer. LayersPro municipal zoning is Burgaw (39), St. Helena (40), Surf City (41), Topsail Beach (42), and Watha (43). County UDO is not applied inside Atkinson corporate limits. 25 parcels in the 5\u2013150 acre extract have a centroid in the Atkinson corporate limit and are left unzoned.",
+        "Rev. Proc. 2026-14 eligibility is not a 2027 QOZ designation. Centroids in pack tracts 37141920204 and 37141920403 (1376 parcels) are stored as eligible-for-nomination only. opportunityZone is not set from that list. Notice 2025-50 rural designated tracts 37141920601 and 37141920602 are current designated QOZs and are not copied onto oz2Eligibility.",
+        "Wallace corporate limits have no LayersPro zoning layer. 4 parcels in this 5\u2013150 acre extract have a centroid inside those limits and are left unzoned.",
+        "Joined zoning on 7295 parcels and Imagine Pender 2050 future land use on 7354 parcels by centroid.",
+        "Imagine Pender 2050 (LayersPro/35) is joined by centroid. Municipal/ETJ is the county plan's placeholder inside towns, not a separate municipal future-land-use layer.",
+        "Zoning and future-land-use codes are not in the Orange County multifamily knowledge base, so the land-use filter treats them as unknown rather than inventing entitlements.",
+        "NC OneMap NC1Map_Parcels cntyfips='141' is the statewide parcel filter for Pender. This extract uses county Energov MapServer/1 (ACRES 5\u2013150) instead of OneMap gisacres.",
+        "Energov ACRES is the tax-roll acre field used for the 5.0\u2013150.0 band. CALCACRES is GIS acreage and was not the filter.",
+        "7493 source rows collapsed to 7355 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county."
       ],
       "path": "data/fixtures/market-parcels/counties/37141/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37141/lookup.json",
-      "tileCount": 7,
-      "sourceCount": 7437
+      "tileCount": 8,
+      "sourceCount": 7493
     }
   ]
 }

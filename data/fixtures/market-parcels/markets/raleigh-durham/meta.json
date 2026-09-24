@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T00:02:58Z",
   "market": "Raleigh-Durham",
   "tier": "primary",
-  "parcelCount": 153279,
+  "parcelCount": 151530,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -58,20 +58,28 @@
       "name": "Durham",
       "fips": "37063",
       "state": "North Carolina",
-      "featureCount": 4934,
+      "featureCount": 4940,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37063",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "durham-property-37063",
+      "queryUrl": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "Primary id is REID. PIN is unstable (Durham Tax Office) and is not used as parcelId. NC OneMap parno tracks PIN.",
+        "Durham City and unincorporated Durham County share the joint City\u2013County UDO (Planning/MapServer/12) and Place Type future land use (Planning/MapServer/25). A non-null Durham ZONING attribute is kept; null attributes are filled by a centroid spatial join.",
+        "Chapel Hill, Morrisville, Raleigh, and Cary are first-class tip municipalities. Zoning is a centroid spatial join to that city's polygons when CITY/ETJ names the tip or the parcel ZONING attribute is null or tip-mixed. Durham UDO is not used as the only zoning for those tips.",
+        "Tip-municipality future land use is thin. Chapel Hill Future_Land_Uses is ImageServer only. Morrisville, Raleigh, and Cary have no verified polygon FLU for the Durham County footprint, so those parcels keep flu null.",
+        "Cary's public zoning layer exposes CLASS and NAME, not a ZONING field. Only a handful of Durham County parcels are in the Cary tip.",
+        "Last sale is package sale (PKG_SALE_DATE/PRICE) with land sale as fallback. There is no multi-transfer sales layer. A sale price of 0 is stored as missing.",
+        "If Property/MapServer/4 is unavailable, the seed falls back to NC OneMap FeatureServer/1 with cntyfips='063' (no sale price; parno is PIN).",
+        "Owner phones and emails are not collected. The appraiser deep link is taxcama PropertySummary by PARCEL_PK, otherwise REID. Viewer: https://maps.durhamnc.gov/",
+        "Wake (37183) and Orange (37135) stay on NC OneMap. Shared tip layers are registered for a follow-up and are not joined onto those counties in this pull."
       ],
       "path": "data/fixtures/market-parcels/counties/37063/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37063/lookup.json",
       "tileCount": 5,
-      "sourceCount": 4934
+      "sourceCount": 4940
     },
     {
       "name": "Franklin",
@@ -191,21 +199,30 @@
       "name": "Orange",
       "fips": "37135",
       "state": "North Carolina",
-      "featureCount": 11139,
+      "featureCount": 9375,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37135",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-orange-webparcel-37135",
+      "queryUrl": "https://gis.orangecountync.gov/arcgis/rest/services/WebParcelService/MapServer/0/query",
       "gaps": [
-        "NC OneMap gisacres is 0 for this county. Acres were computed from the polygon and then limited to 5.0\u2013150.0.",
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "Acreage is county GIS CALC_ACRES in the inclusive 5\u2013150 band. Deed SIZE can differ and is not the filter.",
+        "Situs is not on parcel polygons. Address points are joined by PIN from WebIdentifyServiceAnalysis/1. LRCAMA/WebCamaAddresses fills PINs that layer missed. PrimaryFlag YES is preferred.",
+        "County WebZoningService district codes are used only for unincorporated County. CH, CA, HI, ME, and DU are jurisdiction shells and are never stored as zoning.",
+        "Chapel Hill zoning is OpenData Zoning_Districts, Carrboro is ZoningSP/30 (conditional ZoningSP/20 when the PIN is listed), and Hillsborough is ZoningLayersII/3. Joined by a point inside the parcel.",
+        "FLU is city-first: Chapel Hill Future Land Use Map 2050 (requested in WGS84; source is Web Mercator) and Hillsborough Land Use. County Future_Land_Use_Map/12 covers unincorporated land and Mebane/Durham edge. Carrboro has no public FLU FeatureServer.",
+        "Last sale price is STAMPVALUE, a tax-stamp proxy, not deed consideration. There is no multi-sale history layer.",
+        "tax.marketValue is total VALUATION, tax.assessedValue is LANDVALUE, and tax.taxableValue is USEVALUE when the parcel is in present-use. Building value is not a separate field.",
+        "Mebane and Durham edge parcels have no Orange-hosted district zoning.",
+        "Overlay districts (Chapel Hill, Carrboro, Hillsborough) are not joined.",
+        "NC OneMap is fallback only (cntyfips 135, recareano). OneMap gisacres is 0 and siteadd is empty for Orange.",
+        "No phones or emails. Public GIS only."
       ],
       "path": "data/fixtures/market-parcels/counties/37135/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37135/lookup.json",
       "tileCount": 6,
-      "sourceCount": 59366
+      "sourceCount": 9375
     },
     {
       "name": "Person",
@@ -268,20 +285,30 @@
       "name": "Wake",
       "fips": "37183",
       "state": "North Carolina",
-      "featureCount": 12427,
+      "featureCount": 12436,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "nc-onemap-37183",
-      "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+      "source": "nc-wake-county-parcels",
+      "queryUrl": "https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0/query",
       "gaps": [
-        "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+        "Wake 5\u2013150 acre extract: 12436 parcels; owner 12428; mailing 12428; situs 12428; sale 3423; tax value 12396; zoning 12311; future land use 6864.",
+        "No countywide future land use layer. FLU is joined only from the municipal public layers that exist.",
+        "Rolesville and Zebulon have zoning and no public FLU REST layer. Angier, Durham-edge, Clayton-edge, RTP, and RDU Airport also have no verified public FLU layer.",
+        "Wake Forest land use is a coarse category layer, not a detailed future land use map. Garner FLU is an 8-polygon character typology. Morrisville FLU is a draft layer.",
+        "Knightdale FLU is joined on PIN_NUM because that layer is Web Mercator. Wendell FLU is joined on PIN_NUM.",
+        "Raleigh zoning is Planning/Zoning MapServer/23. The county Zoning FeatureServer omits Raleigh.",
+        "County zoning (MapServer/17) covers unincorporated PLANNING_JURISDICTION=WC only.",
+        "Morrisville zoning is a sparse public layer (about 32 polygons).",
+        "Last sale only (SALE_DATE and TOTSALPRICE). No multi-transfer sales history on this layer.",
+        "Tax figure is assessed value (TOTAL_VALUE_ASSD). Property/Parcels has no separate market value.",
+        "Owner phones and emails are not collected."
       ],
       "path": "data/fixtures/market-parcels/counties/37183/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37183/lookup.json",
       "tileCount": 8,
-      "sourceCount": 12427
+      "sourceCount": 12436
     },
     {
       "name": "Warren",

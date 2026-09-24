@@ -1,0 +1,29 @@
+{
+  "name": "Nassau",
+  "fips": "12089",
+  "state": "Florida",
+  "markets": [
+    "Jacksonville"
+  ],
+  "featureCount": 5587,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "fl-nassau-taxmap-12089",
+  "queryUrl": "https://maps.ncpafl.com/ncflpa_arcgis/rest/services/nassau/NassauCountyPublicTaxMap/MapServer/144/query",
+  "gaps": [
+    "8117 source rows collapsed to 5587 parcel ids. Repeated PINs on the tax map were kept once.",
+    "Last sale is not on MapServer/144. Yearly sales sublayers were not joined.",
+    "Assessed and taxable values are the non-school county figures (cap_val_nonSCH and tax_val_nonSCH). School and city columns are not summed.",
+    "Unincorporated zoning and FLU are replaced inside Fernandina Beach, Hilliard, and Callahan.",
+    "Fernandina Beach parcels in the 5\u2013150 acre band: 833.",
+    "Hilliard parcels in the 5\u2013150 acre band: 109.",
+    "Callahan parcels in the 5\u2013150 acre band: 37. Callahan has no separate zoning layer."
+  ],
+  "path": "data/fixtures/market-parcels/counties/12089/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12089/lookup.json",
+  "sourceCount": 8117,
+  "dropped": 0,
+  "tileCount": 8
+}

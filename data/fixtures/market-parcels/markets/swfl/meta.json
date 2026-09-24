@@ -1,0 +1,107 @@
+{
+  "generatedAt": "2026-09-24T00:02:58Z",
+  "market": "SWFL",
+  "tier": "other",
+  "parcelCount": 32749,
+  "coreMinAcres": 5.0,
+  "coreMaxAcres": 150.0,
+  "tile": {
+    "originLon": -83.0,
+    "originLat": 27.0,
+    "tileDeg": 0.25
+  },
+  "notes": [
+    "Loaded only when this market is selected.",
+    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Orange, Osceola, and Polk point at the existing Orlando complete extract."
+  ],
+  "counties": [
+    {
+      "name": "Charlotte",
+      "fips": "12015",
+      "state": "Florida",
+      "featureCount": 4565,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-doh-ehwaters-12015",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/7/query",
+      "gaps": [
+        "5780 source rows collapsed to 4565 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Partial SWFL county. Parcel polygons are the public Florida DOH EHWATER 5.0\u2013150.0 acre land-area extract.",
+        "Charlotte County CCGISLayers publishes county zoning and Punta Gorda zoning, not this parcel roll. Those zoning polygons are not joined.",
+        "No zoning or FLU on the Florida DOH extract."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12015/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12015/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 5780
+    },
+    {
+      "name": "Collier",
+      "fips": "12021",
+      "state": "Florida",
+      "featureCount": 13889,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-collier-parceljoin",
+      "queryUrl": "https://services2.arcgis.com/SlIq32SqARUHIhSx/arcgis/rest/services/Parcels/FeatureServer/42/query",
+      "gaps": [
+        "Collier sales are not on the ParcelJoin REST layer (Parcels Join, FeatureServer layer 42). Sale price and date are omitted. They were not filled from a paid vendor.",
+        "ParcelJoin has owner and total acres only. No situs, city, zip, zoning, or assessed value. Naples, Marco Island, and Everglades City are listed in data/swfl-municipalities.json and are not spatially joined.",
+        "Florida DOH EHWATER Collier layer 10 does carry NAL sales. This extract stays on county ParcelJoin so that missing-sales gap stays visible. FGDL zoning was not used."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12021/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12021/lookup.json",
+      "tileCount": 17,
+      "sourceCount": 13889
+    },
+    {
+      "name": "Lee",
+      "fips": "12071",
+      "state": "Florida",
+      "featureCount": 9992,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-lee-parceladdress",
+      "queryUrl": "https://gismapserver.leegov.com/gisserver910/rest/services/Layers/ParcelAddress/MapServer/0/query",
+      "gaps": [
+        "10006 source rows collapsed to 9992 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Lee County public ParcelAddress on gismapserver.leegov.com. EagleView's Lee County FL Parcels service is a republish and was not used.",
+        "Fort Myers native GIS at https://gis.fortmyers.gov/arcgis/rest/services is TLS-blocked (certificate issuer could not be verified) and was not ingested. City of Fort Myers rows are the county layer where MUNICODE is P.",
+        "Bonita Springs, Estero, and Fort Myers Beach have no independent parcel REST. They are county stubs on this layer (MUNICODE B, E, and W).",
+        "Sanibel zoning is blank on this county layer for almost every 5\u2013150 acre Sanibel parcel. Sanibel's public REST is a future-land-use map series, not a parcel zoning code, and was not joined. FGDL zoning was not used.",
+        "Lee S_1VI is a vacant/improved flag, not a qualified-sale code, so lastSale.qualified is left empty."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12071/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12071/lookup.json",
+      "tileCount": 11,
+      "sourceCount": 10006
+    },
+    {
+      "name": "Sarasota",
+      "fips": "12115",
+      "state": "Florida",
+      "featureCount": 4303,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-doh-ehwaters-12115",
+      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/57/query",
+      "gaps": [
+        "No zoning or FLU on the Florida DOH extract.",
+        "Optional SWFL county. Tiles are shared with Tampa and are not downloaded a second time."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12115/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12115/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 4303
+    }
+  ]
+}

@@ -319,7 +319,10 @@ export function AppShell({
   const screeningKey = screeningFocus?.key ?? null;
   const screeningLon = screeningFocus?.lon ?? null;
   const screeningLat = screeningFocus?.lat ?? null;
-  const screeningParcelId = selected?.properties.countyFips === "13067" ? selected.properties.parcelId : null;
+  const screeningParcelId =
+    selected?.properties.countyFips === "13067" || selected?.properties.countyFips === "13089"
+      ? selected.properties.parcelId
+      : null;
   useEffect(() => {
     if (screeningKey == null || screeningLon == null || screeningLat == null) {
       setScreeningPoint(null);

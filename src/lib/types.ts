@@ -412,14 +412,14 @@ export type ParcelProperties = {
   /** Honest per-county gaps (no zoning, etc.). */
   dataGaps?: string[];
   /**
-   * Cobb batch-40 school, flood, and utility join. Absent on every other parcel.
+   * Cobb or DeKalb batch-40 school, flood, and utility join. Absent on every other parcel.
    * Gas is always null. This is not an Opportunity Zone, income, or AADT field.
    */
   siteScreening?: SiteScreeningJoin;
   source: string;
 };
 
-/** Fields joined from the Cobb County batch-40 screening fixture. */
+/** Fields joined from a Cobb or DeKalb batch-40 screening fixture. */
 export type SiteScreeningJoin = {
   floodZone: string | null;
   floodSubtype: string | null;

@@ -4,6 +4,7 @@ import { featureIntersectsBbox, tileFileName, tileIndicesForBbox } from "../orla
 import { featuresInAcreageBand, type MarketParcelIndex, type MarketParcelsMeta } from "../marketParcels";
 import type { ParcelCollection, ParcelFeature, ParcelProperties, SearchMarketId } from "../types";
 import { attachCobbSiteScreening } from "../cobbBatch40";
+import { attachDekalbSiteScreening } from "../dekalbBatch40";
 import { annotateParcelSignals, loadOrangeSignalIndex } from "../orangeSignals";
 import { finalizeOrlandoParcelPage, type OrlandoParcelPage, type OrlandoParcelQuery } from "./orlandoParcelStore";
 
@@ -60,6 +61,7 @@ function normalizeParcel(feature: ParcelFeature): ParcelFeature {
   if (props.nearestRoad === undefined) props.nearestRoad = null;
   feature.properties = props;
   attachCobbSiteScreening(feature);
+  attachDekalbSiteScreening(feature);
   return feature;
 }
 

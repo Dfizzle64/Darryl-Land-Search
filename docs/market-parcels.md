@@ -31,6 +31,8 @@ Spalding County, Georgia is the public Parcels_Public_View. Acreage is GIS area 
 
 Hall County, Georgia is the official hallgis HallCo_Addr_Pcl_Rds/MapServer/1 extract. Acreage is deeded DEED_ACRE in the inclusive 5–150 band. Owner and mailing are blank where NO_RELEASE is 1. CUR_VALUE is the published market value; land value is not copied into it. Sales stay null. Zoning is Gainesville, Flowery Branch, and Oakwood, then unincorporated Hall County. MUNI stubs for Lula, Clermont, Gillsville, Braselton, Buford, and Rest Haven are not zoning codes. Future land use is HC_FLU_2024, replaced by Gainesville FLU_2022 inside that city. Hall County, Nebraska, Gainesville, Florida, and ARC LandPro were not used. No Opportunity Zone designation was added.
 
+Jackson County, Georgia is the county Tax_Parcels/FeatureServer/9 extract. Acreage is TOTALACRES in the inclusive 5–150 band. Market value is the sum of the published fair-market components. Sales stay null. City Euclidean zoning covers Jefferson, Commerce, Hoschton, Pendergrass, Arcade, Nicholson, and Talmo. Braselton zoning is the partial county table. Maysville stays unzoned. Future land use is the county parcel layer, replaced by NEGRC city layers where those polygons have a label. Jackson County, Missouri, Michigan, and Wisconsin, Jefferson Parish, Louisiana, and ARC LandPro were not used. No Opportunity Zone designation was added.
+
 ## Coverage
 
 # Market parcel coverage
@@ -41,7 +43,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 96,241 | 17 | 0 | 18 |
+| Atlanta | primary | 102,915 | 18 | 0 | 17 |
 | Tampa | primary | 124,315 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 109,348 | 13 | 0 | 4 |
@@ -98,7 +100,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Haralson | Georgia | 13143 | gap | 0 | unavailable |
 | Heard | Georgia | 13149 | gap | 0 | unavailable |
 | Henry | Georgia | 13151 | complete-gte-5ac | 7,418 | ga-henry-parcels |
-| Jackson | Georgia | 13157 | gap | 0 | unavailable |
+| Jackson | Georgia | 13157 | complete-gte-5ac | 6,674 | ga-jackson-tax-parcels-9 |
 | Jasper | Georgia | 13159 | gap | 0 | unavailable |
 | Lamar | Georgia | 13171 | gap | 0 | unavailable |
 | Lumpkin | Georgia | 13187 | gap | 0 | unavailable |

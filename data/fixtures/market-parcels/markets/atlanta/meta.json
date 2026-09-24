@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T01:25:57Z",
+  "generatedAt": "2026-09-24T01:34:34Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 96241,
+  "parcelCount": 102915,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -758,20 +758,32 @@
       "name": "Jackson",
       "fips": "13157",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 6674,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-jackson-tax-parcels-9",
+      "queryUrl": "https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/Tax_Parcels/FeatureServer/9/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Jackson County parcels are Tax_Parcels/FeatureServer/9. Acreage is TOTALACRES, inclusive 5\u2013150. acre_calc is not the filter. Features were requested in WGS84 and kept only inside the Jackson County, Georgia box.",
+        "Situs is HOUSE_NO plus STREET_NAM when the house number is greater than 0. CITY, STATE, and ZIP on this layer are the mailing address and are not a municipality filter. Situs ZIP is not on the parcel layer.",
+        "Market value is FMVRES + FMVCOM + FMVACC when that sum is greater than 0. Assessed value and taxable value are not on this layer.",
+        "No public sale history. Last sale stays null. qPublic AppID=797 was not scraped.",
+        "Zoning is joined on TAX_ID. A city-name value in ZONING is a stub, not a code. Jefferson, Commerce, Hoschton, Pendergrass, Arcade, Nicholson, and Talmo use the matching zoning_* field. Braselton prefers ZONINGLANDUSE.ZONING_BRASELTON when that value is a clean code, then zoning_braselton. The string <Null>, city names, and the Braselton field-name artifact are not codes. Maysville has no zoning_maysville field, so those parcels stay unzoned.",
+        "Braselton and Maysville are multi-county. This extract is the Jackson County footprint only. Braselton zoning is partial: the town has no public FeatureServer, and dirty ZONING_BRASELTON values were dropped.",
+        "Future land use is County_FutureLandUse_Polygons/15 joined on TAX_ID. A city-name FUTURELANDUSE value is a stub. Inside Jefferson, Commerce, Hoschton, Braselton, Pendergrass, Arcade, Nicholson, and Talmo, the matching NEGRC city layer replaces it when that polygon has a label. Pendergrass and Arcade NEGRC attributes are often blank, and those parcels fall back to a non-stub county future-land-use value. Maysville has no NEGRC future-land-use layer, and a Maysville centroid does not keep the county future-land-use value.",
+        "Jackson County, Missouri, Michigan, and Wisconsin, Jefferson Parish, Louisiana, Jefferson County, Georgia, and ARC LandPro were not used.",
+        "This extract does not assign Opportunity Zone designations.",
+        "6676 source rows in the TOTALACRES 5\u2013150 query; 6674 parcel ids kept.",
+        "Zoning joins: ARCADE 93, BRASELTON 95, COMMERCE 197, HOSCHTON 62, JACKSON 5478, JEFFERSON 410, NICHOLSON 81, PENDERGRASS 46, TALMO 71, none 141.",
+        "Dirty Braselton zoning values dropped from the land-use table: 14.",
+        "Future land use: jackson-flu-15 4620, negrc-arcade-414 93, negrc-braselton-417 96, negrc-commerce-418 202, negrc-hoschton-419 65, negrc-jefferson-420 406, negrc-nicholson-421 84, negrc-pendergrass-422 47, negrc-talmo-425 73, none 988."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13157/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13157/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 6676
     },
     {
       "name": "Jasper",

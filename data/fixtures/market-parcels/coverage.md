@@ -6,7 +6,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 96,241 | 17 | 0 | 18 |
+| Atlanta | primary | 102,915 | 18 | 0 | 17 |
 | Tampa | primary | 124,315 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 109,348 | 13 | 0 | 4 |
@@ -63,7 +63,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Haralson | Georgia | 13143 | gap | 0 | unavailable |
 | Heard | Georgia | 13149 | gap | 0 | unavailable |
 | Henry | Georgia | 13151 | complete-gte-5ac | 7,418 | ga-henry-parcels |
-| Jackson | Georgia | 13157 | gap | 0 | unavailable |
+| Jackson | Georgia | 13157 | complete-gte-5ac | 6,674 | ga-jackson-tax-parcels-9 |
 | Jasper | Georgia | 13159 | gap | 0 | unavailable |
 | Lamar | Georgia | 13171 | gap | 0 | unavailable |
 | Lumpkin | Georgia | 13187 | gap | 0 | unavailable |

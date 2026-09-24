@@ -105,14 +105,20 @@ export function ParcelDrawer({
     : "FDOT AADT is Florida only";
   const dekalb = properties.countyFips === "13089";
   const hall = properties.countyFips === "13139";
+  const jackson = properties.countyFips === "13157";
+  const maysville = jackson && properties.situsCity === "Maysville";
   const zoningEmpty =
     properties.countyFips === "12095"
       ? "Not on the OCPA parcel"
-      : hall
-        ? "No Gainesville, Flowery Branch, Oakwood, or Hall County zoning polygon at this centroid"
-        : dekalb
-          ? "No municipal or county zoning joined for this parcel"
-          : "Not in this county's public parcel extract";
+      : maysville
+        ? "Maysville has no Euclidean zoning on the Jackson County layer"
+        : jackson
+          ? "No Jefferson, Commerce, Hoschton, Pendergrass, Arcade, Nicholson, Talmo, Braselton, or Jackson County zoning joined for this parcel"
+          : hall
+            ? "No Gainesville, Flowery Branch, Oakwood, or Hall County zoning polygon at this centroid"
+            : dekalb
+              ? "No municipal or county zoning joined for this parcel"
+              : "Not in this county's public parcel extract";
   const zoningLine = formatZoningWithCity(properties.zoningCode, properties.zoningDistrict);
   const mailing = formatMailing(properties.mailingAddress) ?? mailingGap(properties.mailingAddress);
   const entityName = isEntityOwner(properties.ownerName)
@@ -159,11 +165,15 @@ export function ParcelDrawer({
           label="Future Land Use"
           value={fluLine}
           empty={
-            hall
-              ? "No Hall County or Gainesville future land use joined for this parcel"
-              : dekalb
-                ? "No future land use joined for this parcel"
-                : "Not joined for this county"
+            maysville
+              ? "Maysville has no city future land use layer"
+              : jackson
+                ? "No Jackson County or city future land use joined for this parcel"
+                : hall
+                  ? "No Hall County or Gainesville future land use joined for this parcel"
+                  : dekalb
+                    ? "No future land use joined for this parcel"
+                    : "Not joined for this county"
           }
         />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />

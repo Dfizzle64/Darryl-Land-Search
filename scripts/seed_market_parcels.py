@@ -701,6 +701,10 @@ def county_override(fips: str) -> dict | None:
         from hall_parcels import hall_spec
 
         return hall_spec()
+    if fips == "13157":  # Jackson GA — county Tax_Parcels, city zoning fields, NEGRC FLU
+        from jackson_parcels import jackson_spec
+
+        return jackson_spec()
     if fips == "13255":  # Spalding GA — public view, GIS acres, county zoning outside Griffin
         from spalding_parcels import spalding_spec
 
@@ -711,7 +715,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, Walton, Carroll, Spalding, or Hall pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, Walton, Carroll, Spalding, Hall, or Jackson pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -985,6 +989,8 @@ Spalding County, Georgia is the public Parcels_Public_View. Acreage is GIS area 
 
 Hall County, Georgia is the official hallgis HallCo_Addr_Pcl_Rds/MapServer/1 extract. Acreage is deeded DEED_ACRE in the inclusive 5–150 band. Owner and mailing are blank where NO_RELEASE is 1. CUR_VALUE is the published market value; land value is not copied into it. Sales stay null. Zoning is Gainesville, Flowery Branch, and Oakwood, then unincorporated Hall County. MUNI stubs for Lula, Clermont, Gillsville, Braselton, Buford, and Rest Haven are not zoning codes. Future land use is HC_FLU_2024, replaced by Gainesville FLU_2022 inside that city. Hall County, Nebraska, Gainesville, Florida, and ARC LandPro were not used. No Opportunity Zone designation was added.
 
+Jackson County, Georgia is the county Tax_Parcels/FeatureServer/9 extract. Acreage is TOTALACRES in the inclusive 5–150 band. Market value is the sum of the published fair-market components. Sales stay null. City Euclidean zoning covers Jefferson, Commerce, Hoschton, Pendergrass, Arcade, Nicholson, and Talmo. Braselton zoning is the partial county table. Maysville stays unzoned. Future land use is the county parcel layer, replaced by NEGRC city layers where those polygons have a label. Jackson County, Missouri, Michigan, and Wisconsin, Jefferson Parish, Louisiana, and ARC LandPro were not used. No Opportunity Zone designation was added.
+
 ## Coverage
 """
 
@@ -1006,6 +1012,10 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         from hall_parcels import download_hall_county
 
         return download_hall_county(county, markets, spec)
+    if spec.get("kind") == "jackson":
+        from jackson_parcels import download_jackson_county
+
+        return download_jackson_county(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

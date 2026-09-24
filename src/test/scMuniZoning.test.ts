@@ -68,67 +68,58 @@ describe("South Carolina municipal zoning joins", () => {
     }
   });
 
-  it("joins usable city layers and leaves Sullivan's Island, James Island, and IOP PDD empty", () => {
+  it("joins Dorchester zoning onto the existing parcel set and does not ship new county shelves", () => {
     const report = loadReport();
-    const greenville = report.counties["45045"];
-    const charleston = report.counties["45019"];
-    const berkeley = report.counties["45015"];
     const dorchester = report.counties["45035"];
-    expect(greenville.parcels).toBeGreaterThan(1570);
-    expect(greenville.cities["Fountain Inn"].joined).toBeGreaterThan(0);
-    expect(greenville.cities["Fountain Inn"].status).toBe("usable");
-    expect(greenville.cities["City of Greenville"].joined).toBeGreaterThan(0);
-    expect(greenville.cities["Greer"].joined).toBeGreaterThan(0);
-    expect(greenville.cities.Mauldin.status).toBe("no-city-rest");
-    expect(greenville.cities.Simpsonville.status).toBe("no-city-rest");
-    expect(greenville.cities["Travelers Rest"].status).toBe("no-city-rest");
-    expect(greenville.codes["fountain-inn"] ?? []).not.toContain("R-7.5");
-    expect(greenville.codes["fountain-inn"] ?? []).not.toContain("R-20");
-    expect(greenville.fluJoined).toBeGreaterThan(0);
-
-    expect(charleston.cities["Folly Beach"].joined).toBeGreaterThan(0);
-    expect(charleston.cities["Isle of Palms"].status).toBe("partial");
-    expect(charleston.cities["Isle of Palms"].joined).toBeGreaterThan(0);
-    expect(charleston.cities.Summerville.joined).toBeGreaterThan(0);
-    expect(charleston.cities["City of Charleston"].joined).toBeGreaterThan(0);
-    expect(charleston.cities["Sullivan's Island"].joined).toBe(0);
-    expect(charleston.cities["Sullivan's Island"].status).toBe("gap");
-    expect(charleston.cities["James Island"].joined).toBe(0);
-    expect(JSON.stringify(charleston.bySource)).not.toMatch(/PDD/);
-    expect(charleston.fluJoined).toBeGreaterThan(0);
-
-    expect(berkeley.cities["Goose Creek"].joined).toBeGreaterThan(0);
-    expect(berkeley.cities.Hanahan.joined).toBeGreaterThan(0);
-    expect(berkeley.cities["Moncks Corner"].joined).toBeGreaterThan(0);
-    expect(berkeley.fluJoined).toBe(0);
-
     expect(dorchester.parcels).toBe(6774);
     expect(dorchester.cities.Summerville.joined).toBeGreaterThan(0);
     expect(dorchester.cities["Dorchester County"].joined).toBeGreaterThan(0);
     expect(dorchester.zoningJoined).toBeGreaterThan(6000);
     expect(dorchester.fluJoined).toBe(0);
+    expect(report.counties["45015"]).toBeUndefined();
+    expect(report.counties["45019"]).toBeUndefined();
+    expect(report.counties["45045"]).toBeUndefined();
+
+    const script = readFileSync(path.join(process.cwd(), "scripts/sc_muni_zoning.py"), "utf8");
+    expect(script).toMatch(/def join_greenville/);
+    expect(script).toMatch(/def join_charleston/);
+    expect(script).toMatch(/def join_berkeley/);
+    expect(script).toMatch(/Sullivan's Island/);
+    expect(script).toMatch(/James Island/);
+    expect(script).toMatch(/Mauldin/);
+    expect(script).toMatch(/ZoningFireSewer\/2 were not queried/);
+
+    const seed = readFileSync(path.join(process.cwd(), "scripts/seed_market_parcels.py"), "utf8");
+    expect(seed).toMatch(/sc-berkeley-addr-muni/);
+    expect(seed).toMatch(/sc-charleston-energov-ent/);
+    expect(seed).toMatch(/sc-greenville-county-tax-parcels/);
+
+    const berkeley = JSON.parse(readFileSync(path.join(countyRoot, "45015/county.json"), "utf8")) as { source: string; coverage: string; featureCount: number };
+    const charleston = JSON.parse(readFileSync(path.join(countyRoot, "45019/county.json"), "utf8")) as { source: string; coverage: string; featureCount: number };
+    const greenville = JSON.parse(readFileSync(path.join(countyRoot, "45045/county.json"), "utf8")) as { source: string; coverage: string; featureCount: number };
+    expect(berkeley).toMatchObject({ source: "unavailable", coverage: "gap", featureCount: 0 });
+    expect(charleston).toMatchObject({ source: "unavailable", coverage: "gap", featureCount: 0 });
+    expect(greenville).toMatchObject({ source: "sc-greenville-city-gis", coverage: "sample", featureCount: 1570 });
   });
 
   it("keeps the inclusive acreage band and does not invent opportunity zones", () => {
     const report = loadReport();
-    for (const fips of ["45015", "45019", "45035", "45045"]) {
-      const tiles = path.join(countyRoot, fips, "tiles");
-      const files = readdirSync(tiles).filter((name) => name.endsWith(".geojson"));
-      expect(files.length).toBeGreaterThan(0);
-      let seen = 0;
-      for (const file of files) {
-        const collection = JSON.parse(readFileSync(path.join(tiles, file), "utf8")) as ParcelCollection;
-        for (const feature of collection.features) {
-          expect(inMarketAcreageBand(feature.properties.acreage)).toBe(true);
-          expect(feature.properties.countyFips).toBe(fips);
-          expect(feature.properties.opportunityZone).toBeNull();
-          expect(feature.properties.oz2Eligibility).toBeNull();
-          expect(feature.properties.marketIds?.includes("Orlando")).toBe(false);
-          seen += 1;
-        }
+    const tiles = path.join(countyRoot, "45035", "tiles");
+    const files = readdirSync(tiles).filter((name) => name.endsWith(".geojson"));
+    expect(files.length).toBeGreaterThan(0);
+    let seen = 0;
+    for (const file of files) {
+      const collection = JSON.parse(readFileSync(path.join(tiles, file), "utf8")) as ParcelCollection;
+      for (const feature of collection.features) {
+        expect(inMarketAcreageBand(feature.properties.acreage)).toBe(true);
+        expect(feature.properties.countyFips).toBe("45035");
+        expect(feature.properties.opportunityZone).toBeNull();
+        expect(feature.properties.oz2Eligibility).toBeNull();
+        expect(feature.properties.marketIds?.includes("Orlando")).toBe(false);
+        seen += 1;
       }
-      expect(seen).toBe(report.counties[fips].parcels);
     }
+    expect(seen).toBe(report.counties["45035"].parcels);
 
     const lookup = JSON.parse(readFileSync(path.join(countyRoot, "45035/lookup.json"), "utf8")) as Record<string, string>;
     const tile = lookup["118-00-00-092"];
@@ -137,12 +128,6 @@ describe("South Carolina municipal zoning joins", () => {
     ) as ParcelCollection;
     const kept = collection.features.find((feature) => feature.properties.parcelId === "118-00-00-092");
     expect(kept?.properties.acreage).toBe(149.9458);
-
-    const greenville = JSON.parse(readFileSync(path.join(countyRoot, "45045/county.json"), "utf8")) as { source: string; coverage: string };
-    expect(greenville.source).toBe("sc-greenville-county-tax-parcels");
-    expect(greenville.coverage).toBe("complete-gte-5ac");
-    const charleston = JSON.parse(readFileSync(path.join(countyRoot, "45019/county.json"), "utf8")) as { source: string; coverage: string };
-    expect(charleston.source).toBe("sc-charleston-energov-ent");
-    expect(charleston.coverage).toBe("complete-gte-5ac");
+    expect(kept?.properties.zoningCode).toBeTruthy();
   });
 });

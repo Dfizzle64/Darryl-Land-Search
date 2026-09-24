@@ -27,12 +27,14 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services | Cobb complete on `ACRES`. DeKalb is a complete 5–150 acre extract from Tax_Parcels_Assessment_View layer 2 (`ACREAGE`). City zoning and future land use are joined where a public layer exists. Other Georgia counties are gaps |
-| South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
+| South Carolina | Berkeley Addr_muni, Charleston energov_ent, Dorchester Parcels_Public, Greenville County Tax Parcel | Seed wiring joins city zoning where a public layer is usable. Shipped tiles are still Dorchester complete, Greenville city-GIS sample, and Berkeley/Charleston gaps. Other counties stay gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
 Zoning is joined when a public layer supports it. DeKalb municipalities are first-class: Decatur (Georgia, not Illinois), Brookhaven, Dunwoody, Doraville, Tucker, and Stonecrest supply zoning and future land use. Chamblee is future land use only. Atlanta's citywide layers are joined only inside DeKalb's Atlanta boundary. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake stay blank. County Zoning_District and LandUse fill unincorporated DeKalb only. Those codes are not scored as Orange County multifamily districts. There is no public DeKalb sale table. Prefer **All parcels** in these markets.
 
 Volusia parcels in the Melbourne extract also get city zoning and future land use where a municipal polygon covers the centroid (`docs/volusia-flagler-municipal.md`). Flagler city layers are cataloged on the Palm Coast host. This repo has no Flagler parcel baseline, so those overlays are not stamped onto new parcels. The Volusia join is not a multifamily knowledge-base match outside Orange County.
+
+South Carolina municipal zoning is `scripts/sc_muni_zoning.py` (`npm run seed:sc-muni`). It attribute-joins Dorchester without adding parcels. Berkeley, Charleston, and Greenville source switches are in `county_override` and were not run in this checkout, so those shelves are unchanged. City layers win over county layers. Opportunity-zone fields are not written. Sullivan's Island, James Island, Mauldin, Simpsonville, and Travelers Rest stay gaps. Isle of Palms is partial. Laurens-side Fountain Inn and Spartanburg-side Greer are not joined. The city-by-city list, including Cobb and DeKalb batch-40 screening, is in `docs/muni-overlay-consolidator.md`.
 
 ### DeKalb County, Georgia
 

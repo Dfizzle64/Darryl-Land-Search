@@ -111,7 +111,7 @@
           "maxAcres": 150.0,
           "gaps": [
             "Cobb County open parcels. No zoning join on this layer.",
-            "Batch-40 join on 40 parcels: CCSD or Marietta schools with GOSA 2025 CCRPI scores (no A–F letters), NFHL flood zones, and water, sewer, and electric. Gas stays unknown. Five sewer Not Anticipated parcels stay gaps. Opportunity Zone, income, and AADT are not in this join."
+            "Batch-40 join on 40 parcels: CCSD or Marietta schools with GOSA 2025 CCRPI scores (no A\u2013F letters), NFHL flood zones, and water, sewer, and electric. Gas stays unknown. Five sewer Not Anticipated parcels stay gaps. Opportunity Zone, income, and AADT are not in this join."
           ]
         },
         {
@@ -149,7 +149,7 @@
           "gaps": [
             "No sale price, sale date, or qualified flag. Tax_Parcels_Assessment_View has no sale history. Delinquent-tax layers are not sales and are not joined.",
             "Municipal zoning and future land use are joined where a public layer exists (Decatur, Brookhaven, Dunwoody, Doraville, Tucker, Stonecrest, and Atlanta inside DeKalb). Chamblee is future land use only. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake have no public zoning or FLU service and stay blank.",
-            "Batch-40 join on 40 parcels: DCSD schools with GOSA 2025 CCRPI scores (no A–F letters), including two City of Atlanta parcels zoned to Druid Hills. NFHL flood zones are 31 X and 9 AE, with no published static BFE. Water and sewer name DeKalb DWM, or Atlanta DWM inside the City of Atlanta, as a jurisdiction proxy. Electric is HIFLD. Gas stays unknown. Opportunity Zone, income, and AADT are not in this join."
+            "Batch-40 join on 40 parcels: DCSD schools with GOSA 2025 CCRPI scores (no A\u2013F letters), including two City of Atlanta parcels zoned to Druid Hills. NFHL flood zones are 31 X and 9 AE, with no published static BFE. Water and sewer name DeKalb DWM, or Atlanta DWM inside the City of Atlanta, as a jurisdiction proxy. Electric is HIFLD. Gas stays unknown. Opportunity Zone, income, and AADT are not in this join."
           ]
         },
         {
@@ -640,7 +640,11 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Dorchester public parcels. Situs is not on this layer. No zoning join."
+            "Inclusive 5\u2013150 acre extract kept (6774 parcels). Zoning joined on 6772. FLU joined on 0.",
+            "Summerville: 253 (usable). Town Zone_Class filtered to County=DORCHESTER, joined on TMS over county ZONINGCODE.",
+            "Dorchester County: 6519 (usable). ZONINGCODE on Parcels_Public for parcels outside the town join.",
+            "Existing 5\u2013150 acre parcel set was kept. Situs filled from PROPERTY_LOCATION when the extract had none.",
+            "No assessed market value on the public parcel layer. No FLU layer on this card."
           ]
         },
         {
@@ -1442,8 +1446,10 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract."
-          ]
+            "City zoning and future land use are joined from municipal REST where a city polygon covers the centroid. Melbourne extract joined zoning on 2942 parcels and FLU on 1914 parcels. Volusia Open Data zoning layer 36 (ZONCODE 999) is not used. DeBary, New Smyrna Beach, Orange City, Lake Helen, and Pierson use CountywideZoning OriginalZoningCode only, not a city FLUM. Daytona Beach Shores and Beverly Beach are zoning-only. Flagler city layers are hosted on gis.palmcoast.gov; this repo has no Flagler parcel baseline."
+          ],
+          "zoningJoinedCount": 2942,
+          "fluJoinedCount": 1914
         }
       ]
     },

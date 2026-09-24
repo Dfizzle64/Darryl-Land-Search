@@ -106,12 +106,14 @@
       "source": "fl-doh-ehwaters-12127",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/63/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "City zoning and future land use are joined from municipal REST where a city polygon covers the centroid. Melbourne extract joined zoning on 2942 parcels and FLU on 1914 parcels. Volusia Open Data zoning layer 36 (ZONCODE 999) is not used. DeBary, New Smyrna Beach, Orange City, Lake Helen, and Pierson use CountywideZoning OriginalZoningCode only, not a city FLUM. Daytona Beach Shores and Beverly Beach are zoning-only. Flagler city layers are hosted on gis.palmcoast.gov; this repo has no Flagler parcel baseline."
       ],
       "path": "data/fixtures/market-parcels/counties/12127/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12127/lookup.json",
       "tileCount": 13,
-      "sourceCount": 12567
+      "sourceCount": 12567,
+      "zoningJoinedCount": 2942,
+      "fluJoinedCount": 1914
     }
   ]
 }

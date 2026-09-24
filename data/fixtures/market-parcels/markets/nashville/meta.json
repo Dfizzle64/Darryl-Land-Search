@@ -95,7 +95,7 @@
         "Outside satellite cities, displayed zoning is the Metro parcel Zoning attribute with *ZZ placeholder tokens removed. *ZZ is not a Metro Zoning Ordinance district. Metro Zoning/Zoning is rechecked at ingest and is not required for this extract.",
         "Satellite cities (Belle Meade, Berry Hill, Forest Hills, Goodlettsville, Oak Hill, Ridgetop) come from Boundaries/Jurisdictions MapServer layer 2 Name. The most local code wins. Goodlettsville zoning is ZONINGARGISMAP FeatureServer layer 2 ZONECLASS / ZONEDESC, joined only to the Davidson portion of the city. Belle Meade, Berry Hill, Forest Hills, Oak Hill, and Ridgetop have no public zoning FeatureServer, so their city zoning stays blank instead of copying the Metro parcel attribute or *ZZ. Satellite-city future land use is a gap: NashvilleNext CCM is Metro guidance and is cleared inside satellite limits.",
         "Zoning overlays from ZoningOverlayDistricts are supplemental constraints (historic, urban design, airport impact, and similar), not the base zone.",
-        "Median household income and FDOT AADT are not joined. Those sidecars are Florida extracts, so Davidson stays unknown.",
+        "Median household income and AADT are joined at query time, not stored on each tile. Davidson AADT is the TDOT count within 15 km.",
         "DeededAcreage is kept when the layer sends it. StatedArea is not converted, because the layer does not document its unit.",
         "Satellite City join on the 5\u2013150 acre extract: Metro Nashville 9068; Belle Meade 33, Berry Hill 10, Forest Hills 138, Goodlettsville 134, Oak Hill 89, Ridgetop 6 of 9478.",
         "Goodlettsville ZONECLASS matched 134 of 134 Davidson parcels in that city.",

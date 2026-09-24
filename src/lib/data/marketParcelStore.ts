@@ -120,7 +120,7 @@ async function finalizeMarketParcelPage(
   features: ParcelFeature[],
   query: OrlandoParcelQuery,
 ): Promise<OrlandoParcelPage> {
-  // Same income/AADT join as Orlando. Counties outside the Florida fixtures stay unknown.
+  // Same income/AADT join as Orlando. A county with no published count within 15 km stays unknown.
   return finalizeOrlandoParcelPage(features, query);
 }
 

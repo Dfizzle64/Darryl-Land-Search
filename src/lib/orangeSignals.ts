@@ -8,7 +8,8 @@ import type { BBox, IncomeInfo, NearestRoad, ParcelFeature } from "./types";
  * road onto every parcel). Tract income is ACS 5-year 2020–2024 B19013
  * (`acs5_2020_2024`, 2024 inflation-adjusted dollars) for AL, FL, GA, MS, NC,
  * SC, and TN. The join prefers an 11-digit 2020 tract GEOID. Centroid-in-tract
- * is only the fallback when the parcel has no GEOID. AADT segments stay FDOT.
+ * is only the fallback when the parcel has no GEOID. Florida AADT is FDOT.
+ * Other Southeast footprint states use the state DOT fixture.
  */
 
 const DATA_DIR = path.join(process.cwd(), "data", "fixtures");
@@ -286,11 +287,14 @@ export function refreshStaleIncomeGaps(gaps: string[] | undefined): string[] | u
       /Those sidecars are Florida extracts/i.test(gap)
     ) {
       changed = true;
-      return "FDOT AADT is Florida only. Tract median household income is ACS 5-year 2020–2024 B19013.";
+      return "Nearest published AADT is joined at query time when a count is within 15 km. Tract median household income is ACS 5-year 2020–2024 B19013.";
     }
     if (gap.includes("Income and traffic are not joined.")) {
       changed = true;
-      return gap.replace("Income and traffic are not joined.", "FDOT AADT is Florida only.");
+      return gap.replace(
+        "Income and traffic are not joined.",
+        "Income and AADT are joined at query time when a published value is available.",
+      );
     }
     return gap;
   });
@@ -429,7 +433,8 @@ export async function loadOrangeSignalIndex(): Promise<OrangeSignalIndex> {
       const traffic = JSON.parse(trafficRaw) as GeoJSON.FeatureCollection<GeoJSON.LineString>;
       if (stateAadtRaw) {
         const extra = JSON.parse(stateAadtRaw) as GeoJSON.FeatureCollection<GeoJSON.LineString>;
-        traffic.features.push(...(extra.features ?? []));
+        // concat, not a spread push: the footprint fixture is hundreds of thousands of segments.
+        traffic.features = traffic.features.concat(extra.features ?? []);
       }
       return buildOrangeSignalIndex(
         JSON.parse(tractsRaw) as GeoJSON.FeatureCollection,

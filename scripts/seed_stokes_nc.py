@@ -729,7 +729,7 @@ def build_gaps(
         (
             "No public Stokes parcel-search deep link was confirmed, so appraiserUrl is empty. "
             "LAND_CLASS is not a Florida DOR use code. Sale qualification is not on the county layer. "
-            "Income and traffic are not joined. "
+            "Income and AADT are joined at query time, not stored on the tile. "
             f"County parcel pages use resultOffset at {parcel_page}, the AllLayers maxRecordCount."
         ),
     ]

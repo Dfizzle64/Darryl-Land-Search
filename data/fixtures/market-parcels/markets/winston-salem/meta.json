@@ -65,7 +65,7 @@
         "Address1/City/State/Zip on the parcel layer are owner mailing, not situs. No emails or phone numbers are stored.",
         "Zoning comes from the county Zoning Districts layer, which includes Davie County, Mocksville, Bermuda Run, and Cooleemee. It is not matched to the Orange County multifamily zoning list.",
         "Sale year and month are on the parcel layer. Sale price, taxable value, and the tax bill are not.",
-        "Income and FDOT AADT are not joined outside Florida.",
+        "Income and AADT are joined at query time from the published tract median and the nearest state DOT count within 15 km.",
         "NC OneMap situs joined on NCPIN for 4596 of 5728 parcels. Unmatched or blank site addresses stay blank.",
         "Zoning centroid-joined for 5724 of 5728 parcels from Davie County GIS Zoning Districts (county, Mocksville, Bermuda Run, Cooleemee).",
         "Future land use joined for 5314 county-plan parcels and 322 Mocksville parcels. The county layer's TOWN value is a placeholder, not a town future-land-use code. Bermuda Run and Cooleemee have no public FLU polygons on this service.",
@@ -334,7 +334,7 @@
         "Future land use is WebApp2026/MapServer/34 Land Use 2035 (requested page size 2000). Ungeneralized geometry pages above about 200 features return HTTP 500, so the polygons are simplified with maxAllowableOffset 0.00008 degrees (about 8 meters) before the centroid join. This is not a separate municipal FLU layer. 8,831 centroids hit a polygon; 13 have no FLU. King, Walnut Cove, Danbury, and other towns do not have a separate public FLU service wired here.",
         "City of King WebGIS CityOfKing/MapServer/7 is a QA crosswalk, not the county roll. Its maxRecordCount pages at 1000 (the service cap; below the 2000 used for county layers). 197 King rows are Stokes and inside 5\u2013150 calculated acres; 197 match a county PIN; 0 do not; 31 zoning codes disagree. 388 Forsyth County parcels on that layer are excluded.",
         "NC OneMap cntyfips='169' and gisacres 5\u2013150 is a QA crosswalk (page size 2000), not the geometry source. OneMap count 8,847 (8,826 unique parnos); 121 county PINs are absent there; 103 OneMap parnos are absent from the county extract; 79 shared PINs differ by more than 0.05 acres.",
-        "No public Stokes parcel-search deep link was confirmed, so appraiserUrl is empty. LAND_CLASS is not a Florida DOR use code. Sale qualification is not on the county layer. Income and traffic are not joined. County parcel pages use resultOffset at 2000, the AllLayers maxRecordCount."
+        "No public Stokes parcel-search deep link was confirmed, so appraiserUrl is empty. LAND_CLASS is not a Florida DOR use code. Sale qualification is not on the county layer. Income and AADT are joined at query time, not stored on the tile. County parcel pages use resultOffset at 2000, the AllLayers maxRecordCount."
       ],
       "path": "data/fixtures/market-parcels/counties/37169/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37169/lookup.json",

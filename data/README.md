@@ -111,6 +111,7 @@ npm run seed:oz2-markets  # seven-market rural tracts from the CSV + Census TIGE
 npm run seed:sc-mf        # SC multifamily priority shortlist from its CSV
 npm run seed:parcels:orlando  # Orange from OCPA; Lake, Osceola, Polk, Seminole from DOH, all 5–150 acres
 npm run seed:signals          # ACS tract income + FDOT AADT sidecars joined at query time
+python3 scripts/seed_state_aadt.py  # NC, GA, SC, TN, MS, AL, AR footprint counts; stamps Florida county coverage
 npm run seed:parcels:markets  # 5–150 acre tiles for the other MSAs; does not re-scrape Orlando
 npm run seed:zoning    # coverage report only; does not scrape Municode
 ```

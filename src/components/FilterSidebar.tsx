@@ -503,10 +503,10 @@ export function FilterSidebar({
           <Toggle label="Road counts" checked={showTraffic} onChange={onShowTraffic} />
           <Note label="Traffic notes">
             <p>
-              Florida parcels use the nearest FDOT count within 15 km. Priority counties in North Carolina, Georgia,
-              South Carolina, Tennessee, and Mississippi use that state’s published traffic counts, labeled Nearest AADT.
-              Alabama, Arkansas, and counties outside those priority sets stay unknown. The road overlay is still FDOT
-              segments at 15,000 or more. Tracts have no AADT.
+              Florida parcels use the nearest FDOT count within 15 km. Footprint counties in North Carolina, Georgia,
+              South Carolina, Tennessee, Mississippi, Alabama, and Arkansas use that state’s published traffic counts,
+              labeled Nearest AADT, where the state layer has a count. A county with no published segment stays unknown.
+              The road overlay is still FDOT segments at 15,000 or more. Tracts have no AADT.
             </p>
           </Note>
         </section>

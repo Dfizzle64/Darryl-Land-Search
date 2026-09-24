@@ -642,7 +642,7 @@ export function AppShell({
         <div>
           <p className="text-[11px] uppercase tracking-[0.22em] text-clay-400">{headerPlace}</p>
           <h1 className="font-display text-xl tracking-tight text-white md:text-2xl">
-            {shedParcelsOn ? "Multifamily site search" : "Eligible tracts"}
+            {shedParcelsOn ? "Multifamily site search" : overlayMode === "nominated-only" ? "Nominated tracts" : "Eligible tracts"}
           </h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -887,7 +887,7 @@ export function AppShell({
             <div className="flex items-start justify-between gap-2">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.16em] text-clay-400">
-                  {showSites ? "Ranked sites" : "Eligible tracts"}
+                  {showSites ? "Ranked sites" : overlayMode === "nominated-only" ? "Nominated tracts" : "Eligible tracts"}
                 </p>
                 <p className="text-sm text-white">
                   {showSites
@@ -918,7 +918,7 @@ export function AppShell({
                   className={`rounded-full border px-3 py-1 text-xs ${inventoryTab === "tracts" ? "border-clay-400/50 bg-ink-800 text-white" : "border-white/10 text-ink-300"}`}
                   onClick={() => setInventoryTab("tracts")}
                 >
-                  Eligible tracts
+                  {overlayMode === "nominated-only" ? "Nominated tracts" : "Eligible tracts"}
                 </button>
               </div>
             ) : null}

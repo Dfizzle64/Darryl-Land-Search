@@ -373,8 +373,10 @@ SOURCES = {
     "TN": {
         "agency": "TDOT",
         "field": "AADT",
+        "year": 2025,
         "yearField": "AADTYEAR",
         "url": "https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0",
+        "countyField": "COUNTY_NUMBER",
     },
     "MS": {
         "agency": "Mississippi RCI",
@@ -394,8 +396,10 @@ SOURCES = {
     "AR": {
         "agency": "ARDOT",
         "field": "MostRecentADT",
+        "year": 2025,
         "yearField": "Year_ADT",
-        "url": "https://gis.ardot.gov/referenced/rest/services/SIR_TIS/Average_Daily_Traffic_Points/MapServer/0",
+        "url": "https://gis.ardot.gov/referenced/rest/services/SIR_TIS/ADTLinear/FeatureServer/0",
+        "geometry": "polyline",
         "kept": "Comment = Actual Station",
     },
 }
@@ -597,38 +601,46 @@ def fetch_sc() -> list[dict]:
 
 
 def fetch_tn() -> list[dict]:
+    """TDOT Traffic Lines for 2025 only. COUNTY_NUMBER is zero-padded, not FIPS."""
     url = "https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0/query"
-    reverse = {code: fips for fips, code in TN.items()}
-    quoted = "','".join(sorted(reverse))
     out: list[dict] = []
     seen: set = set()
+    for fips, code in sorted(TN.items(), key=lambda item: item[1]):
+        before = len(out)
 
-    def consume(batch: list[dict]) -> None:
-        for item in batch:
-            attrs = item.get("attributes") or {}
-            oid = attrs.get("OBJECTID")
-            if oid in seen:
-                continue
-            seen.add(oid)
-            count = as_count(attrs.get("AADT"))
-            code = str(attrs.get("COUNTY_NUMBER") or "").zfill(2)
-            fips = reverse.get(code)
-            if count is None or not fips:
-                continue
-            out.extend(line_features(item, props(count, as_year(attrs.get("AADTYEAR")), None, "TDOT", "Tennessee", fips)))
+        def consume(batch: list[dict], fips: str = fips) -> None:
+            for item in batch:
+                attrs = item.get("attributes") or {}
+                oid = attrs.get("OBJECTID")
+                if oid in seen:
+                    continue
+                seen.add(oid)
+                count = as_count(attrs.get("AADT"))
+                year = as_year(attrs.get("AADTYEAR"))
+                if count is None or year != 2025:
+                    continue
+                out.extend(line_features(item, props(count, year, None, "TDOT", "Tennessee", fips)))
 
-    page_query(
-        url,
-        {
-            "where": f"COUNTY_NUMBER IN ('{quoted}') AND AADT>0",
-            "outFields": "COUNTY_NUMBER,AADT,AADTYEAR,OBJECTID",
-            "returnGeometry": "true",
-            "outSR": 4326,
-            "resultRecordCount": 2000,
-        },
-        "TN",
-        consume,
-    )
+        where = f"COUNTY_NUMBER='{code}' AND AADTYEAR='2025' AND AADT>0"
+        page_query(
+            url,
+            {
+                "where": where,
+                "outFields": "COUNTY_NUMBER,AADT,AADTYEAR,OBJECTID",
+                "returnGeometry": "true",
+                "outSR": 4326,
+                "orderByFields": "OBJECTID",
+                "resultRecordCount": 2000,
+            },
+            f"TN {fips}",
+            consume,
+        )
+        counted = fetch_json(url, {"where": where, "returnCountOnly": "true", "f": "json"})
+        expected = int(counted.get("count") or 0)
+        got = len(out) - before
+        print(f"  TN {fips} COUNTY_NUMBER={code} {got}/{expected}")
+        if got != expected:
+            raise RuntimeError(f"TN {fips} COUNTY_NUMBER={code} kept {got}, layer reports {expected}")
     print(f"  TN segments {len(out)}")
     return out
 
@@ -730,43 +742,51 @@ def fetch_al() -> list[dict]:
 
 
 def fetch_ar() -> list[dict]:
-    url = "https://gis.ardot.gov/referenced/rest/services/SIR_TIS/Average_Daily_Traffic_Points/MapServer/0/query"
+    """ARDOT ADT Linear. Actual stations only. County is the ARDOT number, not FIPS."""
+    url = "https://gis.ardot.gov/referenced/rest/services/SIR_TIS/ADTLinear/FeatureServer/0/query"
     reverse = {code: fips for fips, code in AR.items()}
-    nums = ",".join(str(code) for code in sorted(reverse))
-    rows = page_query(
-        url,
-        {
-            "where": f"County IN ({nums}) AND MostRecentADT>0 AND Comment='Actual Station'",
-            "outFields": "OBJECTID,County,MostRecentADT,Year_ADT,Route,Comment,Latitude_Use,Longtitude_Use",
-            "returnGeometry": "true",
-            "outSR": 4326,
-            "resultRecordCount": 1000,
-        },
-        "AR",
-    )
-    out = []
-    seen = set()
-    for item in rows:
-        attrs = item.get("attributes") or {}
-        if attrs.get("Comment") != "Actual Station":
-            continue
-        oid = attrs.get("OBJECTID")
-        if oid in seen:
-            continue
-        seen.add(oid)
-        count = as_count(attrs.get("MostRecentADT"))
-        year = as_year(attrs.get("Year_ADT"))
-        try:
-            code = int(attrs.get("County") or 0)
-        except (TypeError, ValueError):
-            code = 0
-        fips = reverse.get(code)
-        if count is None or year is None or not fips:
-            continue
-        feature = point_feature(item, attrs, props(count, year, attrs.get("Route") or None, "ARDOT", "Arkansas", fips))
-        if feature:
-            out.append(feature)
-    print(f"  AR actual stations {len(out)}")
+    out: list[dict] = []
+    seen: set = set()
+    for fips, code in sorted(AR.items(), key=lambda item: item[1]):
+        before = len(out)
+
+        def consume(batch: list[dict], fips: str = fips) -> None:
+            for item in batch:
+                attrs = item.get("attributes") or {}
+                if attrs.get("Comment") != "Actual Station":
+                    continue
+                oid = attrs.get("OBJECTID")
+                if oid in seen:
+                    continue
+                seen.add(oid)
+                count = as_count(attrs.get("MostRecentADT"))
+                year = as_year(attrs.get("Year_ADT"))
+                if count is None or year is None:
+                    continue
+                roadway = attrs.get("Route") or attrs.get("AH_RoadID") or None
+                out.extend(line_features(item, props(count, year, roadway, "ARDOT", "Arkansas", fips)))
+
+        where = f"County={code} AND MostRecentADT>0 AND Comment='Actual Station'"
+        page_query(
+            url,
+            {
+                "where": where,
+                "outFields": "OBJECTID,County,MostRecentADT,Year_ADT,Route,Comment",
+                "returnGeometry": "true",
+                "outSR": 4326,
+                "orderByFields": "OBJECTID",
+                "resultRecordCount": 2000,
+            },
+            f"AR {fips}",
+            consume,
+        )
+        counted = fetch_json(url, {"where": where, "returnCountOnly": "true", "f": "json"})
+        expected = int(counted.get("count") or 0)
+        got = len(out) - before
+        print(f"  AR {fips} County={code} {got}/{expected}")
+        if got != expected:
+            raise RuntimeError(f"AR {fips} County={code} kept {got}, layer reports {expected}")
+    print(f"  AR actual segments {len(out)}")
     return out
 
 
@@ -854,8 +874,8 @@ def coverage_notes() -> list[str]:
         "Mississippi uses the HDR AGOL republish of Mississippi RCI layer RC_AADT_2019, field ADT_21 (counts through 2021). COUNTYNMBR is the alphabetical county number, not FIPS. This is not an MDOT-hosted FeatureServer. The MDOT 2025 traffic-count application has no public FeatureServer. Segments with ADT_21 of zero, or with no shape, are left out.",
         "Georgia uses the DeKalb County GIS republish of GDOT stations (GDOT_AADT FeatureServer/1), field aadt, including Bibb, Cobb, DeKalb, Fulton, and Lowndes. The layer has no year field, so the year is unknown. ITOS MapServer/21 is not used. "
         "Alabama uses ALDOT TDM TrafficCounterPoint, field AADT, YearAADT=2024. 2025 rows are present and AADT is null. LUCountyID is the alphabetical county index with St. Clair sorted as Saint Clair, not FIPS. "
-        "Tennessee COUNTY_NUMBER and Mississippi COUNTYNMBR and Alabama LUCountyID are alphabetical county codes, not FIPS. "
-        "Arkansas keeps Comment = Actual Station only. Estimated Station, Estimated CCS, and Cross County rows are omitted. "
+        "Tennessee uses TDOT Traffic Lines, field AADT, AADTYEAR 2025, including Davidson. COUNTY_NUMBER is the zero-padded alphabetical code, not FIPS. Bradley is Census FIPS 47011 and COUNTY_NUMBER 06. "
+        "Arkansas uses ARDOT ADT Linear, field MostRecentADT, Year_ADT 2025. County is the ARDOT number, not FIPS (Crittenden 18, Mississippi 47). Comment = Actual Station only. Estimated Station, Estimated CCS, and Cross County rows are omitted. The older AGIO FeatureServer/7 is not used. "
         "Line geometry is generalized to about 90 m. Counts are the published values.",
         "A parcel more than 15 km from the nearest count stays unknown. Outside Florida the drawer label is Nearest AADT, not FDOT.",
     ]
@@ -906,21 +926,25 @@ def require_counts(features: list[dict], expected: dict | set, label: str) -> No
         raise RuntimeError(f"{label} returned no counts for {missing}")
 
 
+def replace_state(state_name: str, features: list[dict]) -> None:
+    data = json.loads(OUT.read_text())
+    kept = [
+        feature
+        for feature in data.get("features") or []
+        if (feature.get("properties") or {}).get("state") != state_name
+    ]
+    data["features"] = kept + features
+    OUT.write_text(json.dumps(data, separators=(",", ":")))
+    apply_state_meta(data["features"])
+    print(f"replaced {state_name} with {len(features)} counts; fixture {len(data['features'])}")
+
+
 def refresh_mississippi() -> None:
     """Replace Mississippi features only. Other states stay in the fixture."""
     print("MS")
     ms = fetch_ms()
     require_counts(ms, MS, "MS")
-    data = json.loads(OUT.read_text())
-    kept = [
-        feature
-        for feature in data.get("features") or []
-        if (feature.get("properties") or {}).get("state") != "Mississippi"
-    ]
-    data["features"] = kept + ms
-    OUT.write_text(json.dumps(data, separators=(",", ":")))
-    apply_state_meta(data["features"])
-    print(f"replaced Mississippi with {len(ms)} segments; fixture {len(data['features'])}")
+    replace_state("Mississippi", ms)
 
 
 def main() -> None:
@@ -935,18 +959,21 @@ def main() -> None:
             print("GA")
             ga = fetch_ga()
             require_counts(ga, GA.values(), "GA")
-            data = json.loads(OUT.read_text())
-            kept = [
-                feature
-                for feature in data.get("features") or []
-                if (feature.get("properties") or {}).get("state") != "Georgia"
-            ]
-            data["features"] = kept + ga
-            OUT.write_text(json.dumps(data, separators=(",", ":")))
-            apply_state_meta(data["features"])
-            print(f"replaced Georgia with {len(ga)} stations; fixture {len(data['features'])}")
+            replace_state("Georgia", ga)
             return
-        raise SystemExit("Only --only MS or --only GA is supported. A full run rebuilds every state.")
+        if which == "TN":
+            print("TN")
+            tn = fetch_tn()
+            require_counts(tn, TN, "TN")
+            replace_state("Tennessee", tn)
+            return
+        if which == "AR":
+            print("AR")
+            ar = fetch_ar()
+            require_counts(ar, AR, "AR")
+            replace_state("Arkansas", ar)
+            return
+        raise SystemExit("Only --only MS, GA, TN, or AR is supported. A full run rebuilds every state.")
     print("NC")
     nc = fetch_nc()
     require_counts(nc, NC.values(), "NC")

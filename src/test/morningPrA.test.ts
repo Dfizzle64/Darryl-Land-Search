@@ -107,6 +107,7 @@ describe("footprint county traffic fixture", () => {
     expect(sources.GA.vintage).toMatch(/unknown/i);
     expect(deferred.size).toBe(0);
     expect(sources.TN.field).toBe("AADT");
+    expect(sources.TN.year).toBe(2025);
     expect(sources.MS.field).toBe("ADT_21");
     expect(sources.MS.year).toBe(2021);
     expect(sources.MS.layer).toBe("RC_AADT_2019");
@@ -115,9 +116,13 @@ describe("footprint county traffic fixture", () => {
     expect(notes).toMatch(/HPMS 2022/);
     expect(notes).toMatch(/11,570/);
     expect(notes).toMatch(/HDR AGOL/);
+    expect(notes).toMatch(/AADTYEAR 2025/);
+    expect(notes).toMatch(/ADT Linear/);
     expect(sources.AL.field).toBe("AADT");
     expect(sources.AL.year).toBe(2024);
     expect(sources.AR.field).toBe("MostRecentADT");
+    expect(sources.AR.year).toBe(2025);
+    expect(sources.AR.url).toContain("ADTLinear/FeatureServer/0");
     expect(sources.FL.field).toBe("AADT");
     expect(sources.FL.year).toBe(2025);
     expect(meta.aadtSource).toContain("gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0");

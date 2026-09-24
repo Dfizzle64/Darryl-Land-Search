@@ -13,11 +13,64 @@
   "source": "fl-doh-ehwaters-12085",
   "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/41/query",
   "gaps": [
-    "No zoning or FLU on the Florida DOH extract."
+    "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12085, 203 zoning codes and 201 future land use codes). County parcels were not re-downloaded.",
+    "Stuart zoning and future land use join on PCN when it matches, otherwise a point inside the parcel. Indiantown uses the village zoning and future land use layers.",
+    "Ocean Breeze has no city service. Martin County zoning was checked only for those parcels. Town-name stubs and NO DATA were not stored.",
+    "Sewall's Point and Jupiter Island stay blank. County labels JUPITER ISLAND and SEWALLS POINT are not districts.",
+    "Rejected: Ocoee ParcelsFLUZoning, Palm Beach County zoning, and ClearviewGeographic stacks."
   ],
   "path": "data/fixtures/market-parcels/counties/12085/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12085/lookup.json",
   "sourceCount": 3802,
   "dropped": 0,
-  "tileCount": 8
+  "tileCount": 8,
+  "zoningJoinedCount": 203,
+  "fluJoinedCount": 201,
+  "municipalOverlayJoins": {
+    "Stuart": {
+      "parcels": 488,
+      "zoningJoined": 109,
+      "fluJoined": 107,
+      "fluStatus": "city"
+    },
+    "Indiantown": {
+      "parcels": 780,
+      "zoningJoined": 94,
+      "fluJoined": 94,
+      "fluStatus": "city"
+    },
+    "Ocean Breeze": {
+      "parcels": 2,
+      "zoningJoined": 0,
+      "fluJoined": 0,
+      "fluStatus": "partial",
+      "cityRest": null
+    }
+  },
+  "overlays": [
+    {
+      "role": "stuart-zoning",
+      "url": "https://services.arcgis.com/RyoFD3Lw9KSERnvQ/arcgis/rest/services/COS_Zoning/FeatureServer/0"
+    },
+    {
+      "role": "stuart-flu",
+      "url": "https://services.arcgis.com/RyoFD3Lw9KSERnvQ/arcgis/rest/services/Future_Land_Use/FeatureServer/0"
+    },
+    {
+      "role": "indiantown-zoning",
+      "url": "https://services6.arcgis.com/fwjLUNzkr85qH0zV/arcgis/rest/services/voi_zoning_public/FeatureServer/0"
+    },
+    {
+      "role": "indiantown-flu",
+      "url": "https://services6.arcgis.com/fwjLUNzkr85qH0zV/arcgis/rest/services/voi_flu_public/FeatureServer/0"
+    }
+  ],
+  "rejected": [
+    "Rejected namesake: maps.ocoee.org ParcelsFLUZoning (Ocoee, Orange County), not Okeechobee or Martin.",
+    "Indian River portal COVB folder is token-gated and is not called. Vero Beach uses the city AGOL layers.",
+    "Palm Beach County zoning and ClearviewGeographic stacks are not Jupiter Island zoning.",
+    "Martin County zoning values JUPITER ISLAND, INDIANTOWN, OCEAN BREEZE, and SEWALLS POINT are town-name stubs, not districts. FUTURE_LANDUSE NO DATA is not stored.",
+    "Sebastian future land use is not published in the COS folder. Fellsmere, Indian River Shores, and Orchid have no public city FeatureServer.",
+    "Stuart zoning twins ZoningMerged and Zoning_Parcels are not stacked on COS_Zoning."
+  ]
 }

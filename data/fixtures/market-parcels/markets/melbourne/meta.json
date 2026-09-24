@@ -48,12 +48,17 @@
       "source": "fl-doh-ehwaters-12061",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/29/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12061, 191 zoning codes and 104 future land use codes). County parcels were not re-downloaded.",
+        "Vero Beach zoning is ZoningDistricts and future land use is ZoningFutureLandUse. Those code lists are not interchangeable. The token-gated COVB folder is not called.",
+        "Sebastian zoning is COS_Zoning. Sebastian future land use is still a gap.",
+        "Fellsmere, Indian River Shores, and Orchid stay blank. No city FeatureServer was invented."
       ],
       "path": "data/fixtures/market-parcels/counties/12061/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12061/lookup.json",
       "tileCount": 6,
-      "sourceCount": 3505
+      "sourceCount": 3505,
+      "zoningJoinedCount": 191,
+      "fluJoinedCount": 104
     },
     {
       "name": "Orange",

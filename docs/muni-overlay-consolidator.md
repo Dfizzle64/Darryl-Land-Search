@@ -9,6 +9,7 @@ npm run seed:volusia-flagler-municipal
 npm run seed:polk-municipal
 npm run seed:pinellas-pasco-muni
 npm run seed:seminole-municipal
+npm run seed:martin-irc-municipal
 npm run seed:sc-muni
 ```
 
@@ -159,6 +160,28 @@ Shelf totals: zoning 1,001, future land use 991. A situs city on this acreage ba
 Longwood stays blank. County `Land_Use` FeatureServer 0 and 1 are not stamped. `CITY` and Casselberry `SEMINOLE COUNTY` are not stored. Geneva, Chuluota, and the other unincorporated labels stay blank, as do Winter Park, Apopka, and Maitland. Oviedo uses `maps.cityofoviedo.net` DevelopmentServices MapServer 11 and 10. The retired AGOL `DSZoning` service is not called. Winter Springs EnerGov, the Lake Mary twin layers, and Sanford `Land_Use` MapServer 0 are not stacked.
 
 Rejected and not queried: Hernando `Zoning_Flu`, Lake County InteractiveMap zoning, Winter Park EnerGov, the FDOR `Zoning` product, and the Longwood giswebtechguru host.
+
+## Martin County and Indian River County, Florida (FIPS 12085 and 12061)
+
+Catalog: `data/martin-irc-municipal.json`. Join script: `scripts/join_martin_irc_municipal.py`. Stamped onto the existing Florida DOH shelves (`fl-doh-ehwaters-12085`, 3,802 parcels; `fl-doh-ehwaters-12061`, 3,416 parcels; both 5–150 acres). County parcels were not re-downloaded. Stuart joins on `PCN` when that key matches a DOH parcel id, otherwise a point inside the parcel. Indiantown, Vero Beach, and Sebastian are spatial. Opportunity Zone fields were not written.
+
+| Place | Situs parcels | Zoning | Future land use |
+| --- | ---: | ---: | ---: |
+| Stuart | 488 | 109 | 107 |
+| Indiantown | 780 | 94 | 94 |
+| Ocean Breeze | 2 | 0 | 0 |
+| Vero Beach | 2,303 | 104 | 104 |
+| Sebastian | 228 | 87 | 0 |
+
+Shelf totals: Martin zoning 203 and future land use 201; Indian River zoning 191 and future land use 104. A situs city on this acreage band is often wider than the municipal polygon, so a miss stays blank.
+
+Stuart zoning is `COS_Zoning` and future land use is `Future_Land_Use` (`LAND_USE`). The dissolved `ZoningMerged` and `Zoning_Parcels` twins are not stacked. `COUNTY` on the Stuart future land use layer is not stored. Indiantown uses the village layers `voi_zoning_public` and `voi_flu_public`. County zoning inside the village is not copied in.
+
+Vero Beach zoning is `ZoningDistricts` and future land use is `ZoningFutureLandUse`. A shared abbreviation such as `GU` still comes from those two layers. The token-gated Indian River `COVB` folder is not called. Sebastian zoning is `COS/COS_Zoning`. Sebastian future land use is still a gap.
+
+Ocean Breeze has no city service. The Martin County zoning and future land use maps were checked only at those two parcels. Both hits were the town-name stub or `NO DATA`, so nothing was stored. Sewall's Point, Jupiter Island, Fellsmere, Indian River Shores, and Orchid stay blank. County labels `JUPITER ISLAND`, `SEWALLS POINT`, `OCEAN BREEZE`, and `INDIANTOWN` are not districts.
+
+Rejected and not queried: Ocoee `ParcelsFLUZoning`, Palm Beach County zoning, and ClearviewGeographic stacks.
 
 ## Not in this pass
 

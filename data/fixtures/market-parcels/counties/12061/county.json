@@ -14,11 +14,52 @@
   "source": "fl-doh-ehwaters-12061",
   "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/29/query",
   "gaps": [
-    "No zoning or FLU on the Florida DOH extract."
+    "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12061, 191 zoning codes and 104 future land use codes). County parcels were not re-downloaded.",
+    "Vero Beach zoning is ZoningDistricts and future land use is ZoningFutureLandUse. Those code lists are not interchangeable. The token-gated COVB folder is not called.",
+    "Sebastian zoning is COS_Zoning. Sebastian future land use is still a gap.",
+    "Fellsmere, Indian River Shores, and Orchid stay blank. No city FeatureServer was invented."
   ],
   "path": "data/fixtures/market-parcels/counties/12061/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12061/lookup.json",
   "sourceCount": 3505,
   "dropped": 0,
-  "tileCount": 6
+  "tileCount": 6,
+  "zoningJoinedCount": 191,
+  "fluJoinedCount": 104,
+  "municipalOverlayJoins": {
+    "Vero Beach": {
+      "parcels": 2303,
+      "zoningJoined": 104,
+      "fluJoined": 104,
+      "fluStatus": "city"
+    },
+    "Sebastian": {
+      "parcels": 228,
+      "zoningJoined": 87,
+      "fluJoined": 0,
+      "fluStatus": "gap"
+    }
+  },
+  "overlays": [
+    {
+      "role": "vero-beach-zoning",
+      "url": "https://services1.arcgis.com/mK9abRqiJFkUgbPZ/arcgis/rest/services/ZoningDistricts/FeatureServer/0"
+    },
+    {
+      "role": "vero-beach-flu",
+      "url": "https://services1.arcgis.com/mK9abRqiJFkUgbPZ/arcgis/rest/services/ZoningFutureLandUse/FeatureServer/0"
+    },
+    {
+      "role": "sebastian-zoning",
+      "url": "https://gisportal.ircgov.com/server3/rest/services/COS/COS_Zoning/MapServer/0"
+    }
+  ],
+  "rejected": [
+    "Rejected namesake: maps.ocoee.org ParcelsFLUZoning (Ocoee, Orange County), not Okeechobee or Martin.",
+    "Indian River portal COVB folder is token-gated and is not called. Vero Beach uses the city AGOL layers.",
+    "Palm Beach County zoning and ClearviewGeographic stacks are not Jupiter Island zoning.",
+    "Martin County zoning values JUPITER ISLAND, INDIANTOWN, OCEAN BREEZE, and SEWALLS POINT are town-name stubs, not districts. FUTURE_LANDUSE NO DATA is not stored.",
+    "Sebastian future land use is not published in the COS folder. Fellsmere, Indian River Shores, and Orchid have no public city FeatureServer.",
+    "Stuart zoning twins ZoningMerged and Zoning_Parcels are not stacked on COS_Zoning."
+  ]
 }

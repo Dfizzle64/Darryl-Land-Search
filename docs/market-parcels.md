@@ -223,6 +223,8 @@ Pinellas and Pasco keep those DOH shelves. City zoning and future land use are s
 | Okeechobee | Florida | 12093 | complete-gte-5ac | 3,176 | fl-doh-ehwaters-12093 |
 | St. Lucie | Florida | 12111 | complete-gte-5ac | 4,824 | fl-doh-ehwaters-12111 |
 
+Martin and Indian River keep those DOH shelves. City zoning and future land use are stamped on top: Martin 203 zoning and 201 future land use; Indian River 191 zoning and 104 future land use. Stuart, Indiantown, and Vero Beach have both. Sebastian is zoning only. Ocean Breeze, Sewall's Point, Jupiter Island, Fellsmere, Indian River Shores, and Orchid stay blank. Sources are in `docs/muni-overlay-consolidator.md`. County parcels were not re-downloaded.
+
 ### Melbourne
 
 | County | State | FIPS | Coverage | Parcels | Source |

@@ -12,6 +12,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Nashville | primary | 109,348 | 13 | 0 | 4 |
 | Charlotte | primary | 106,650 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 151,530 | 17 | 0 | 0 |
+| South Florida | shelf | — | 3 | 1 | 0 |
 | SWFL | other | 32,749 | 4 | 0 | 0 |
 | Vero Beach | other | 23,009 | 5 | 0 | 0 |
 | Melbourne | other | 41,026 | 5 | 0 | 0 |

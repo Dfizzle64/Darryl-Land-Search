@@ -63,6 +63,7 @@ describe("other market display order", () => {
       "North-Central Florida",
       "Pensacola",
       "Savannah",
+      "South Florida",
       "SWFL",
       "Tuscaloosa",
       "Valdosta",
@@ -70,8 +71,9 @@ describe("other market display order", () => {
       "Wilmington",
       "Winston-Salem",
     ]);
-    expect(OTHER_MARKETS[0]).toBe("SWFL");
-    expect(OTHER_MARKETS[1]).toBe("Heartland");
+    expect(OTHER_MARKETS[0]).toBe("South Florida");
+    expect(OTHER_MARKETS[1]).toBe("SWFL");
+    expect(OTHER_MARKETS[2]).toBe("Heartland");
     expect(PARCEL_MARKETS).toEqual(["Asheville"]);
     expect(MARKETS).toEqual([
       "Atlanta",

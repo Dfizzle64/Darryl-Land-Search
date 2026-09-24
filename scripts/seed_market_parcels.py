@@ -895,6 +895,10 @@ def county_override(fips: str) -> dict | None:
                 "Greenville County Tax Parcel GCGIA/10. TACRES 5–150 inclusive. Replaces the City of Greenville GIS sample.",
             ],
         }
+    if fips in {"12086", "12087", "12011", "12099"}:
+        from south_florida_parcels import south_florida_spec
+
+        return south_florida_spec(fips)
     return None
 
 
@@ -1191,6 +1195,10 @@ def apply_sc_muni_zoning(fips: str, features: list[dict]) -> tuple[list[dict], l
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "south-florida":
+        from south_florida_parcels import download_south_florida
+
+        return download_south_florida(county, markets, spec)
     if spec.get("kind") == "new-metro":
         from new_metro_parcels import download_new_metro
 

@@ -2,17 +2,18 @@
 
 import {
   comptrollerRecordsUrl,
+  entitySearchLink,
   formatAcres,
   formatMailing,
-  formatParcelPlace,
   formatNumber,
   formatRoadLabel,
   formatSale,
   formatUsd,
   isEntityOwner,
   parcelAppraiserUrl,
-  sunbizSearchUrl,
 } from "@/lib/format";
+import { mailingGap, type ScreeningPoint } from "@/lib/screening";
+import { ScreeningDetails } from "./ScreeningDetails";
 import { describeFluMatch } from "@/lib/flu";
 import { describeRezoningCandidate } from "@/lib/filters";
 import { describeOpportunityZone, describeOz2Eligibility } from "@/lib/opportunityZone";
@@ -24,6 +25,8 @@ type ParcelDrawerProps = {
   zoningConfig: ZoningConfig;
   fluConfig: FluConfig;
   filters: FilterState;
+  screeningPoint?: ScreeningPoint | null;
+  screeningStatus?: "idle" | "loading" | "error";
   onClose: () => void;
   /** `pane` fills the desktop details rail. `page` is the standalone column / mobile sheet. */
   layout?: "page" | "pane";
@@ -54,6 +57,8 @@ export function ParcelDrawer({
   zoningConfig,
   fluConfig,
   filters,
+  screeningPoint = null,
+  screeningStatus = "idle",
   onClose,
   layout = "page",
 }: ParcelDrawerProps) {
@@ -105,12 +110,21 @@ export function ParcelDrawer({
         ? "No municipal or county zoning joined for this parcel"
         : "Not in this county's public parcel extract";
   const zoningLine = formatZoningWithCity(properties.zoningCode, properties.zoningDistrict);
-  const mailing = formatMailing(properties.mailingAddress);
-  const entity = isEntityOwner(properties.ownerName) || isEntityOwner(properties.ownerName2);
+  const mailing = formatMailing(properties.mailingAddress) ?? mailingGap(properties.mailingAddress);
+  const entityName = isEntityOwner(properties.ownerName)
+    ? properties.ownerName
+    : isEntityOwner(properties.ownerName2)
+      ? properties.ownerName2
+      : null;
+  const entityLink = entityName ? entitySearchLink(properties.state, entityName, properties.countyFips) : null;
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
-  const placeLine = formatParcelPlace(properties);
+  const stateLabel = properties.state?.trim() || (properties.countyFips?.startsWith("12") || !properties.countyFips ? "FL" : null);
+  const placeLine =
+    [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
+    [properties.countyName ? `${properties.countyName} County` : null, stateLabel].filter(Boolean).join(", ") ||
+    "Location not in this extract";
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -222,17 +236,22 @@ export function ParcelDrawer({
 
       <div className="mt-5 space-y-2 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Public contact paths</p>
-        <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
-          {appraiser.label}
-        </a>
-        {florida && entity && properties.ownerName ? (
-          <a className="block text-moss-400 underline-offset-2 hover:underline" href={sunbizSearchUrl(properties.ownerName)} target="_blank" rel="noreferrer">
-            Search Florida Sunbiz for LLC / corporate principals
+        {appraiser.href ? (
+          <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
+            {appraiser.label}
           </a>
-        ) : florida ? (
-          <p className="text-ink-300">Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped.</p>
         ) : (
-          <p className="text-ink-300">Florida Sunbiz is not used outside Florida. Owner contact is the mailing address and the county appraiser search.</p>
+          <p className="text-ink-300">{appraiser.label}</p>
+        )}
+        {entityLink ? (
+          <a className="block text-moss-400 underline-offset-2 hover:underline" href={entityLink.href} target="_blank" rel="noreferrer">
+            {entityLink.label}
+            {entityLink.prefilled ? "" : " (name is not prefilled)"}
+          </a>
+        ) : entityName ? (
+          <p className="text-ink-300">This owner looks like an entity, but no secretary-of-state search is cataloged for this state.</p>
+        ) : (
+          <p className="text-ink-300">Owner does not look like an LLC or corporation in the assessor name field. Business-entity search is skipped.</p>
         )}
         {properties.countyFips === "12095" || !properties.countyFips ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={comptrollerRecordsUrl()} target="_blank" rel="noreferrer">
@@ -243,10 +262,11 @@ export function ParcelDrawer({
           <p className="text-xs text-ink-500">Data gaps for this county extract: {gaps.join("; ")}</p>
         ) : null}
         <p className="text-xs text-ink-500">
-          Contact paths are mailing address plus official search links only. This app does not scrape or invent emails or
-          phone numbers.
+          Contact paths are the public mailing address plus official search links. This app does not scrape or invent emails
+          or phone numbers.
         </p>
       </div>
+      <ScreeningDetails point={screeningPoint} status={screeningStatus} />
     </aside>
   );
 }

@@ -1,6 +1,8 @@
 "use client";
 
+import { ScreeningDetails } from "./ScreeningDetails";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
+import type { ScreeningPoint } from "@/lib/screening";
 import { displayStatusChip, formatCountyLabel, showsGovernorFiledSoftCopy } from "@/lib/markets";
 import { formatTractCounty } from "@/lib/tractCounty";
 import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME } from "@/lib/orlandoParcels";
@@ -10,12 +12,21 @@ import { SC_GOVERNOR_FILED_STATUS, SHED_CAVEAT, type EligibleTractRow } from "@/
 type TractDrawerProps = {
   tract: EligibleTractRow | null;
   statusHelp?: string | null;
+  screeningPoint?: ScreeningPoint | null;
+  screeningStatus?: "idle" | "loading" | "error";
   onClose: () => void;
   /** `pane` fills the desktop details rail. `page` is the standalone column / mobile sheet. */
   layout?: "page" | "pane";
 };
 
-export function TractDrawer({ tract, statusHelp = null, onClose, layout = "page" }: TractDrawerProps) {
+export function TractDrawer({
+  tract,
+  statusHelp = null,
+  screeningPoint = null,
+  screeningStatus = "idle",
+  onClose,
+  layout = "page",
+}: TractDrawerProps) {
   const pane = layout === "pane";
   if (!tract) {
     return (
@@ -166,6 +177,7 @@ export function TractDrawer({ tract, statusHelp = null, onClose, layout = "page"
         </p>
       ) : null}
 
+      <ScreeningDetails point={screeningPoint} status={screeningStatus} />
       <p className="mt-4 text-xs leading-relaxed text-ink-500">
         {SHED_CAVEAT} An eligible GEOID is not a pad site. Sewer, zoning, wetlands, title, and assembly still control.
         {tract.state === "Florida" && isFull5AcCounty(tract.county)

@@ -29,6 +29,7 @@ npm run seed:parcels:orlando  # full 5–150 acre parcels for Lake, Orange, Osce
 npm run seed:signals          # Florida ACS income + FDOT AADT sidecars (not copied onto tiles)
 npm run seed:parcels:markets  # 5–150 acre parcels for every other MSA (skips finished counties)
 npm run seed:zoning  # refresh coverage report vs knowledge JSON (no LLM)
+npm run seed:schools # Florida + North Carolina public school-grade fixture
 ```
 
 Orlando parcel architecture, county source URLs, and field mapping: [`docs/orlando-parcels.md`](docs/orlando-parcels.md) and [`data/orlando-parcel-sources.json`](data/orlando-parcel-sources.json).
@@ -36,6 +37,8 @@ Orlando parcel architecture, county source URLs, and field mapping: [`docs/orlan
 Other MSAs use the same tile grid and the same zoom / area-lock / Show parcels gate. They load only while that market is selected. Refresh and the complete-vs-sample-vs-gap table: [`docs/market-parcels.md`](docs/market-parcels.md). DeKalb County, Georgia uses Tax_Parcels_Assessment_View layer 2 for the full 5–150 acre band. City zoning and future land use are joined for Decatur, Brookhaven, Dunwoody, Doraville, Tucker, Stonecrest, and the DeKalb portion of Atlanta. Chamblee is future land use only. There is no public sale table.
 
 No API keys are required for the default fixture mode. Copy `.env.example` to `.env.local` only if you want to point at live feeds.
+
+**Site screening** (off until you turn a layer on): FEMA flood zones (with a base flood elevation only when NFHL publishes one, plus the community id and no invented CRS class), National Wetlands Inventory, public school ratings, Orange County and Charlotte-Mecklenburg attendance zones, and Orange County water, sewer, and electric service areas. Charlotte Water has no public polygon, so the drawer uses the city boundary only as a jurisdiction proxy and leaves unincorporated Mecklenburg unverified. Gas stays unknown. Outside Orange County, electric falls back to HIFLD retail territories (Duke Energy Carolinas and EnergyUnited EMC in Mecklenburg). The parcel drawer adds the mailing address already on the extract plus the county appraiser and, for entity owners, the state business search. It does not add phone numbers or emails. Coverage and refresh steps: [`docs/screening-layers.md`](docs/screening-layers.md).
 
 ## What you can do
 

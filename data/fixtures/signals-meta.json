@@ -196,7 +196,7 @@
     "North Carolina uses NCDOT AADT Stations, field AADT_2022. That field is a string; blanks are trimmed and dropped. The FeatureServer is still HPMS 2022. NCDOT Connect publishes 2023, 2024, and 2025 station files that are not on this REST layer, so they are not ingested.",
     "South Carolina uses SCDOT 2025 Statewide Traffic Points, field FactoredAA, year FactoredA1 2025, filtered by CountyName. The layer has 11,570 stations statewide. Charleston, Dorchester, Berkeley, and Beaufort stay on this same layer. The 2025 lines layer is not used.",
     "Mississippi uses the HDR AGOL republish of Mississippi RCI layer RC_AADT_2019, field ADT_21 (counts through 2021). COUNTYNMBR is the alphabetical county number, not FIPS. This is not an MDOT-hosted FeatureServer. The MDOT 2025 traffic-count application has no public FeatureServer. Segments with ADT_21 of zero, or with no shape, are left out.",
-    "North Carolina, South Carolina, Tennessee, Mississippi, Alabama, and Arkansas footprint counties use the state DOT layer filtered to those counties. Georgia uses GDOT MapServer/21. That layer has no county field and only a few hundred statewide segments, so a segment is kept only when its midpoint falls in that county's TIGER tract. Counties with no such segment stay unknown. Tennessee COUNTY_NUMBER and Mississippi COUNTYNMBR and Alabama LUCountyID are alphabetical county codes, not FIPS. Arkansas keeps Comment = Actual Station only. Estimated Station, Estimated CCS, and Cross County rows are omitted. Line geometry is generalized to about 90 m. Counts are the published values.",
+    "Georgia uses the DeKalb County GIS republish of GDOT stations (GDOT_AADT FeatureServer/1), field aadt, including Bibb, Cobb, DeKalb, Fulton, and Lowndes. The layer has no year field, so the year is unknown. ITOS MapServer/21 is not used. Alabama uses ALDOT TDM TrafficCounterPoint, field AADT, YearAADT=2024. 2025 rows are present and AADT is null. LUCountyID is the alphabetical county index with St. Clair sorted as Saint Clair, not FIPS. Tennessee COUNTY_NUMBER and Mississippi COUNTYNMBR and Alabama LUCountyID are alphabetical county codes, not FIPS. Arkansas keeps Comment = Actual Station only. Estimated Station, Estimated CCS, and Cross County rows are omitted. Line geometry is generalized to about 90 m. Counts are the published values.",
     "A parcel more than 15 km from the nearest count stays unknown. Outside Florida the drawer label is Nearest AADT, not FDOT.",
     "Valdosta, Macon, Athens, Hilton Head, and Jackson MS tract polygons were added for centroid fallback. Estimates stay ACS 5-year 2020\u20132024 B19013. Those counties use the same statewide AADT join as the rest of the footprint."
   ],
@@ -217,7 +217,7 @@
   ],
   "incomePolygonCount": 9785,
   "stateAadtSource": "SE footprint state DOT layers, 2026-09-24",
-  "stateAadtCount": 337280,
+  "stateAadtCount": 349684,
   "stateAadtByCounty": {
     "01001": 264,
     "01003": 642,
@@ -247,41 +247,54 @@
     "01129": 70,
     "05035": 325,
     "05093": 303,
-    "13011": 1,
-    "13015": 3,
-    "13021": 13,
-    "13029": 3,
-    "13031": 1,
-    "13035": 1,
-    "13047": 1,
-    "13051": 18,
-    "13059": 3,
-    "13063": 10,
-    "13067": 10,
-    "13083": 3,
-    "13089": 16,
-    "13097": 2,
-    "13103": 1,
-    "13117": 1,
-    "13121": 28,
-    "13135": 10,
-    "13139": 2,
-    "13143": 1,
-    "13151": 3,
-    "13157": 1,
-    "13171": 1,
-    "13179": 2,
-    "13185": 2,
-    "13187": 2,
-    "13199": 1,
-    "13207": 1,
-    "13211": 1,
-    "13217": 1,
-    "13227": 4,
-    "13255": 1,
-    "13295": 1,
-    "13297": 1,
-    "13313": 1,
+    "13011": 102,
+    "13013": 176,
+    "13015": 315,
+    "13021": 483,
+    "13029": 74,
+    "13031": 220,
+    "13035": 83,
+    "13045": 310,
+    "13047": 145,
+    "13051": 617,
+    "13057": 273,
+    "13059": 320,
+    "13063": 359,
+    "13067": 737,
+    "13077": 291,
+    "13083": 101,
+    "13085": 77,
+    "13089": 878,
+    "13097": 191,
+    "13103": 92,
+    "13113": 158,
+    "13117": 154,
+    "13121": 1525,
+    "13129": 212,
+    "13135": 722,
+    "13139": 420,
+    "13143": 122,
+    "13149": 55,
+    "13151": 292,
+    "13157": 183,
+    "13159": 65,
+    "13171": 115,
+    "13179": 115,
+    "13185": 350,
+    "13187": 72,
+    "13199": 143,
+    "13207": 154,
+    "13211": 139,
+    "13217": 216,
+    "13223": 110,
+    "13227": 73,
+    "13231": 80,
+    "13247": 148,
+    "13251": 98,
+    "13255": 216,
+    "13295": 263,
+    "13297": 227,
+    "13313": 284,
     "28009": 6148,
     "28029": 10891,
     "28033": 18546,
@@ -431,9 +444,14 @@
     },
     "GA": {
       "agency": "GDOT",
-      "field": "AADT",
+      "field": "aadt",
       "year": null,
-      "url": "https://maps.itos.uga.edu/arcgis/rest/services/GDOT/GDOT_FunctionalClass/MapServer/21"
+      "url": "https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1",
+      "countyField": "county",
+      "host": "DeKalb County GIS AGOL republish",
+      "layer": "GDOT_sites_join",
+      "vintage": "No year field. AGOL item last modified 2026-05-07. Year is unknown.",
+      "geometry": "points"
     },
     "SC": {
       "agency": "SCDOT",
@@ -523,71 +541,5 @@
     "12129": 63,
     "12131": 128
   },
-  "aadtDeferred": [
-    {
-      "fips": "13013",
-      "state": "GA",
-      "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated."
-    },
-    {
-      "fips": "13045",
-      "state": "GA",
-      "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated."
-    },
-    {
-      "fips": "13057",
-      "state": "GA",
-      "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated."
-    },
-    {
-      "fips": "13077",
-      "state": "GA",
-      "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated."
-    },
-    {
-      "fips": "13085",
-      "state": "GA",
-      "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated."
-    },
-    {
-      "fips": "13113",
-      "state": "GA",
-      "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated."
-    },
-    {
-      "fips": "13129",
-      "state": "GA",
-      "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated."
-    },
-    {
-      "fips": "13149",
-      "state": "GA",
-      "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated."
-    },
-    {
-      "fips": "13159",
-      "state": "GA",
-      "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated."
-    },
-    {
-      "fips": "13223",
-      "state": "GA",
-      "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated."
-    },
-    {
-      "fips": "13231",
-      "state": "GA",
-      "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated."
-    },
-    {
-      "fips": "13247",
-      "state": "GA",
-      "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated."
-    },
-    {
-      "fips": "13251",
-      "state": "GA",
-      "reason": "GDOT FunctionalClass MapServer/21 publishes AADT, and this county's TIGER 2024 tracts contain no segment with a positive AADT. No count was estimated."
-    }
-  ]
+  "aadtDeferred": []
 }

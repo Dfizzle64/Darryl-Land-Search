@@ -21,7 +21,7 @@ const PRIORITY = [
   "28121",
 ];
 
-/** Southeast footprint counties whose state layer has a county field. Georgia may defer. */
+/** Southeast footprint counties whose state layer has a county field. */
 const STATE_FIELD_COUNTIES = [
   "37001", "37007", "37019", "37021", "37025", "37035", "37037", "37045", "37047", "37057",
   "37059", "37061", "37063", "37067", "37069", "37071", "37077", "37081", "37085", "37089",
@@ -91,8 +91,8 @@ describe("footprint county traffic fixture", () => {
       expect(flByCounty[fips], fips).toBeGreaterThan(0);
     }
     for (const fips of GA_FOOTPRINT) {
-      if (deferred.has(fips)) continue;
       expect(byCounty[fips], fips).toBeGreaterThan(0);
+      expect(deferred.has(fips), fips).toBe(false);
     }
     const sources = meta.stateAadtSources as Record<
       string,
@@ -102,7 +102,10 @@ describe("footprint county traffic fixture", () => {
     expect(sources.NC.year).toBe(2022);
     expect(sources.SC.field).toBe("FactoredAA");
     expect(sources.SC.year).toBe(2025);
-    expect(sources.GA.field).toBe("AADT");
+    expect(sources.GA.field).toBe("aadt");
+    expect(sources.GA.url).toContain("GDOT_AADT/FeatureServer/1");
+    expect(sources.GA.vintage).toMatch(/unknown/i);
+    expect(deferred.size).toBe(0);
     expect(sources.TN.field).toBe("AADT");
     expect(sources.MS.field).toBe("ADT_21");
     expect(sources.MS.year).toBe(2021);

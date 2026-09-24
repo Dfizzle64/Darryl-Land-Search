@@ -411,7 +411,33 @@ export type ParcelProperties = {
   appraiserUrl?: string | null;
   /** Honest per-county gaps (no zoning, etc.). */
   dataGaps?: string[];
+  /**
+   * Cobb batch-40 school, flood, and utility join. Absent on every other parcel.
+   * Gas is always null. This is not an Opportunity Zone, income, or AADT field.
+   */
+  siteScreening?: SiteScreeningJoin;
   source: string;
+};
+
+/** Fields joined from the Cobb County batch-40 screening fixture. */
+export type SiteScreeningJoin = {
+  floodZone: string | null;
+  floodSubtype: string | null;
+  /** Feet, only when NFHL published a static BFE. Never invented. */
+  staticBfe: number | null;
+  schools: Array<{
+    level: string;
+    name: string;
+    /** GOSA CCRPI single score. Not an A–F letter. */
+    ccrpi: number;
+    distanceMiles: number | null;
+  }>;
+  waterProvider: string | null;
+  waterFromBoundary: boolean;
+  sewerProvider: string | null;
+  sewerGap: boolean;
+  electricProvider: string | null;
+  gasProvider: null;
 };
 
 export type BBox = [west: number, south: number, east: number, north: number];

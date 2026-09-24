@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { entitySearchLink, parcelAppraiserUrl } from "../lib/format";
 import fs from "node:fs";
+import { attachCobbSiteScreening, cobbBatchParcel, cobbScreeningOverlay, loadCobbBatch40 } from "../lib/cobbBatch40";
 import {
   bboxSpan,
   cmsAgencyCode,
@@ -17,6 +18,7 @@ import {
   toSchoolRating,
   type SchoolRating,
 } from "../lib/screening";
+import type { ParcelProperties } from "../lib/types";
 
 function school(partial: Partial<SchoolRating> & Pick<SchoolRating, "id" | "name" | "lon" | "lat">): SchoolRating {
   return {
@@ -222,6 +224,120 @@ describe("screening layers", () => {
     );
     expect(nearby.map((item) => item.id)).toEqual(["near", "mid"]);
     expect(bboxSpan([-81.5, 28.4, -81.2, 28.6])).toBeLessThan(1.2);
+  });
+});
+
+describe("Cobb batch-40 screening join", () => {
+  it("joins school, flood, and utility onto the 40 Atlanta Cobb parcels", () => {
+    const file = loadCobbBatch40();
+    expect(file?.countyFips).toBe("13067");
+    expect(file?.market).toBe("Atlanta");
+    expect(file?.parcelCount).toBe(40);
+    expect(file?.omitted).toEqual(["opportunityZone", "income", "aadt"]);
+    expect(file?.letterGrades).toBe("not_published_by_ga_post_2022_23");
+    const lookup = JSON.parse(fs.readFileSync("data/fixtures/market-parcels/counties/13067/lookup.json", "utf8")) as Record<string, string>;
+    const zones: Record<string, number> = {};
+    const sewerGaps: string[] = [];
+    let publishedBfe = 0;
+    let floodways = 0;
+    for (const [id, record] of Object.entries(file?.parcels ?? {})) {
+      expect(lookup[id]).toBeTruthy();
+      expect(record).not.toHaveProperty("opportunityZone");
+      expect(record).not.toHaveProperty("aadt");
+      const overlay = cobbScreeningOverlay(record, -84.5, 33.9);
+      const zone = overlay.flood.zone ?? "missing";
+      zones[zone] = (zones[zone] ?? 0) + 1;
+      expect(overlay.flood.summary).not.toMatch(/-9999/);
+      expect(overlay.flood.summary).not.toMatch(/Community Rating System class \d/);
+      if (overlay.flood.staticBfe != null) {
+        publishedBfe += 1;
+        expect(overlay.flood.staticBfe).toBe(861);
+        expect(overlay.flood.datum).toBe("NAVD88");
+        expect(overlay.flood.summary).toMatch(/861 ft NAVD88/);
+      } else {
+        expect(overlay.flood.summary).toMatch(/No published static base flood elevation/);
+      }
+      if (overlay.flood.floodway) floodways += 1;
+      const gas = overlay.utilities.find((utility) => utility.kind === "gas");
+      expect(gas?.status).toBe("unknown");
+      expect(gas?.providers).toEqual([]);
+      expect(gas?.summary).toMatch(/No public gas/);
+      const sewer = overlay.utilities.find((utility) => utility.kind === "sewer");
+      if (record.sewer.gap) {
+        sewerGaps.push(id);
+        expect(sewer?.status).toBe("unknown");
+        expect(sewer?.providers).toEqual([]);
+        expect(sewer?.summary).toMatch(/Sewer Not Anticipated/);
+        expect(record.sewer.notAnticipated).toBe(true);
+      } else {
+        expect(sewer?.status).toBe("ok");
+        expect(sewer?.providers).toEqual([record.sewer.provider]);
+      }
+      expect(overlay.utilities.find((utility) => utility.kind === "water")?.providers).toEqual([record.water.provider]);
+      expect(overlay.utilities.find((utility) => utility.kind === "power")?.providers).toEqual([record.electric.provider]);
+      expect(overlay.schools).toHaveLength(3);
+      expect(overlay.schoolsNote).toMatch(/does not publish A–F/);
+      for (const school of overlay.schools) {
+        expect(school.ratingKind).toBe("ccrpi");
+        expect(school.zoned).toBe(true);
+        expect(school.rating).toMatch(/^\d+\.\d$/);
+        expect(["A", "B", "C", "D", "F"]).not.toContain(school.rating);
+        expect(school.summary).toMatch(/GOSA CCRPI single score/);
+        expect(school.summary).toMatch(/does not publish A–F letter grades/);
+        expect(school.summary).not.toMatch(/Public rating [ABCDF]/);
+      }
+      const joined = attachCobbSiteScreening({
+        properties: {
+          parcelId: id,
+          countyFips: "13067",
+          opportunityZone: null,
+          incomeTract: null,
+          nearestRoad: null,
+        } as ParcelProperties,
+      });
+      expect(joined.properties.siteScreening?.floodZone).toBe(zone);
+      expect(joined.properties.siteScreening?.staticBfe).toBe(overlay.flood.staticBfe);
+      expect(joined.properties.siteScreening?.gasProvider).toBeNull();
+      expect(joined.properties.siteScreening?.sewerGap).toBe(record.sewer.gap);
+      expect(joined.properties.opportunityZone).toBeNull();
+      expect(joined.properties.incomeTract).toBeNull();
+      expect(joined.properties.nearestRoad).toBeNull();
+    }
+    expect(zones).toEqual({ X: 28, AE: 11, A: 1 });
+    expect(sewerGaps).toHaveLength(5);
+    expect(publishedBfe).toBe(3);
+    expect(floodways).toBeGreaterThan(0);
+    expect(cobbBatchParcel("not-a-cobb-parcel")).toBeNull();
+    const otherCounty = attachCobbSiteScreening({
+      properties: { parcelId: "20028400020", countyFips: "13089" } as ParcelProperties,
+    });
+    expect(otherCounty.properties.siteScreening).toBeUndefined();
+  });
+
+  it("keeps Marietta assignment, a real BFE, and a sewer gap distinct", () => {
+    const hayes = cobbBatchParcel("20028400020");
+    const hayesPoint = cobbScreeningOverlay(hayes!, -84.589, 33.971);
+    expect(hayes?.assignment).toBe("ccsd_zones");
+    expect(hayesPoint.schools[0]).toMatchObject({ name: "Hayes Elementary School", rating: "72.5", ratingKind: "ccrpi" });
+    expect(hayesPoint.flood.zone).toBe("X");
+    expect(hayesPoint.flood.staticBfe).toBeNull();
+    const bfe = cobbScreeningOverlay(cobbBatchParcel("20004100010")!, -84.6, 34.0);
+    expect(bfe.flood.zone).toBe("AE");
+    expect(bfe.flood.staticBfe).toBe(861);
+    const gap = cobbScreeningOverlay(cobbBatchParcel("20008000010")!, -84.7, 34.0);
+    expect(gap.flood.zone).toBe("AE");
+    expect(gap.flood.staticBfe).toBeNull();
+    expect(gap.utilities.find((utility) => utility.kind === "sewer")?.status).toBe("unknown");
+    const marietta = cobbBatchParcel("17014500010");
+    expect(marietta?.assignment).toBe("marietta_city");
+    expect(marietta?.district).toMatch(/Marietta City/);
+    expect(marietta?.water.provider).toMatch(/Marietta/);
+    const zoneA = cobbScreeningOverlay(cobbBatchParcel("20008300020")!, -84.6, 34.0);
+    expect(zoneA.flood.zone).toBe("A");
+    expect(zoneA.flood.staticBfe).toBeNull();
+    expect(describeSchoolRating({ state: "GA", rating: "72.5", ratingKind: "ccrpi", year: "2025", source: "GOSA" })).toMatch(
+      /does not publish A–F/,
+    );
   });
 });
 

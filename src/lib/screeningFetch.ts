@@ -48,6 +48,7 @@ import {
   type TractAtPoint,
   type UtilityKind,
 } from "./screening";
+import { cobbBatchParcel, cobbScreeningOverlay } from "./cobbBatch40";
 
 const FIXTURE_PATH = path.join(process.cwd(), "data/fixtures/screening/school-ratings.json");
 const CMS_FIXTURE_PATH = path.join(process.cwd(), "data/fixtures/screening/cms-spg-2025-26.json");
@@ -595,16 +596,18 @@ export async function schoolsNear(lon: number, lat: number): Promise<{ schools: 
   }
 }
 
-export async function screeningAtPoint(lon: number, lat: number): Promise<ScreeningPoint> {
+export async function screeningAtPoint(lon: number, lat: number, parcelId?: string | null): Promise<ScreeningPoint> {
+  const cobb = cobbBatchParcel(parcelId);
+  const cobbOverlay = cobb ? cobbScreeningOverlay(cobb, lon, lat) : null;
   const [flood, wetland, water, sewer, power, gas, schools, tract] = await Promise.allSettled([
-    floodAtPoint(lon, lat),
+    cobbOverlay ? Promise.resolve(cobbOverlay.flood) : floodAtPoint(lon, lat),
     wetlandAtPoint(lon, lat),
-    utilityAtPoint("water", lon, lat),
-    utilityAtPoint("sewer", lon, lat),
-    utilityAtPoint("power", lon, lat),
-    utilityAtPoint("gas", lon, lat),
-    schoolsNear(lon, lat),
-    meckTractAtPoint(lon, lat),
+    cobbOverlay ? Promise.resolve(cobbOverlay.utilities[0]) : utilityAtPoint("water", lon, lat),
+    cobbOverlay ? Promise.resolve(cobbOverlay.utilities[1]) : utilityAtPoint("sewer", lon, lat),
+    cobbOverlay ? Promise.resolve(cobbOverlay.utilities[2]) : utilityAtPoint("power", lon, lat),
+    cobbOverlay ? Promise.resolve(cobbOverlay.utilities[3]) : utilityAtPoint("gas", lon, lat),
+    cobbOverlay ? Promise.resolve({ schools: cobbOverlay.schools, note: cobbOverlay.schoolsNote }) : schoolsNear(lon, lat),
+    cobbOverlay ? Promise.resolve(null) : meckTractAtPoint(lon, lat),
   ]);
   const schoolResult =
     schools.status === "fulfilled"

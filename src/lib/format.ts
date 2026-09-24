@@ -168,12 +168,32 @@ export function formatDate(value: string | null | undefined): string {
   return `${month}/${day}/${year}`;
 }
 
-export function formatSale(sale: { date: string | null; price: number | null }): string {
-  if (!sale.date && (sale.price == null || sale.price <= 0)) return "Not available";
+export function formatSale(sale: { date: string | null; price: number | null }): string | null {
+  if (!sale.date && (sale.price == null || sale.price <= 0)) return null;
   const date = sale.date ? formatDate(sale.date) : null;
   const price = sale.price != null && sale.price > 0 ? formatUsd(sale.price) : null;
   if (date && price) return `${date}\n${price}`;
-  return date ?? price ?? "Not available";
+  return date ?? price;
+}
+
+/**
+ * Honest empty states for public parcel rows. These sentences describe a gap
+ * in the extract. They are not a zoning code and not an IRS designation.
+ */
+export function missingPublicParcelValue(
+  field: "propertyName" | "situs" | "sale" | "saleQualified" | "zoning" | "designatedOz",
+  countyFips?: string | null,
+): string {
+  if (field === "propertyName") return "No property name on this public parcel row.";
+  if (field === "situs") return "No street address on this public parcel row.";
+  if (field === "sale") return "No sale date or price on this public parcel row.";
+  if (field === "saleQualified") return "No sale-qualification code on this public parcel row.";
+  if (field === "designatedOz") {
+    return "Designated QOZ status is not joined for this parcel. That is not a yes or no, and it is not a 2027 designation.";
+  }
+  if (countyFips === "12095") return "Not on the OCPA parcel.";
+  if (countyFips === "13089") return "No municipal or county zoning joined for this parcel.";
+  return "Zoning is not on this county's public parcel row. Missing zoning is not a zoning code.";
 }
 
 export function formatParcelPlace(properties: {

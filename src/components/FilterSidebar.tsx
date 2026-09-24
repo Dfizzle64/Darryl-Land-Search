@@ -244,8 +244,8 @@ export function FilterSidebar({
             {market}: {tractCount.toLocaleString()} eligible {tractCount === 1 ? "tract" : "tracts"}
           </p>
           <p className="text-xs text-ink-300">
-            {ruralTractCount.toLocaleString()} rural · {urbanTractCount.toLocaleString()} urban. Orange is rural. Blue
-            is urban. Status is eligible — not designated.
+            {ruralTractCount.toLocaleString()} rural · {urbanTractCount.toLocaleString()} urban. Violet is rural. Blue
+            is urban, including Orlando. Status is eligible — not designated.
           </p>
           <p className="text-xs leading-relaxed text-ink-500">{SHED_CAVEAT}</p>
           {statusHelp ? (
@@ -313,7 +313,7 @@ export function FilterSidebar({
             label="Show OZ 2.0 eligible tracts"
             checked={showOz2}
             onChange={onShowOz2}
-            hint="Orange tracts are rural-eligible. Blue tracts are urban eligible. In Orange County, Florida, the amber overlay is the county urban set. None of these are designated."
+            hint="Violet tracts are rural-eligible. Blue tracts are urban eligible in every market, including Orlando. None of these are designated."
           />
           <Toggle
             label="Show designated Opportunity Zone overlay"
@@ -511,9 +511,9 @@ export function FilterSidebar({
           Fixture snapshot {generatedAt ?? "unknown"}. Orlando shed parcels are partitioned public GIS extracts (DOH
           EHWATER / Orange County Property Appraiser). Zoning and FLU joins are richest for Orange County; other counties
           degrade when a field is missing. Opportunity Zones shown in copper with a dashed outline are current designated
-          QOZs in the Orange pilot. Rural tracts are orange and urban eligible tracts are blue. Both are Rev. Proc.
-          2026-14 nomination eligibility — Eligible — not designated. The seven-market rural chip still reads Eligible
-          (rural) — not designated. Amber, in Orange County only, is that county’s urban overlay. {SHED_CAVEAT} Income
+          QOZs in the Orange pilot. Rural tracts are violet and urban eligible tracts are blue in every market,
+          including Orlando. Both are Rev. Proc. 2026-14 nomination eligibility — Eligible — not designated. The
+          seven-market rural chip still reads Eligible (rural) — not designated. {SHED_CAVEAT} Income
           and AADT joins are Orange-pilot first.
         </p>
       </aside>

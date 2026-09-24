@@ -706,7 +706,7 @@ export function AppShell({
               <span className="block text-[11px]">
                 {marketCoverage
                   ? `Tract overlay · no 5–150 acre polygons in this pull (${marketCoverage.gapCountyCount} counties documented)`
-                  : "Tract overlay and pins · parcels stay on the Orlando shed"}
+                  : "Tract overlay · parcels stay on the Orlando shed"}
               </span>
             )}
           </p>

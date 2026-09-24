@@ -10,6 +10,7 @@ import {
   formatSale,
   formatUsd,
   isEntityOwner,
+  missingPublicParcelValue,
   parcelAppraiserUrl,
 } from "@/lib/format";
 import { mailingGap, type ScreeningPoint } from "@/lib/screening";
@@ -103,12 +104,7 @@ export function ParcelDrawer({
     ? "No FDOT count segment within 15 km"
     : "FDOT AADT is Florida only";
   const dekalb = properties.countyFips === "13089";
-  const zoningEmpty =
-    properties.countyFips === "12095"
-      ? "Not on the OCPA parcel"
-      : dekalb
-        ? "No municipal or county zoning joined for this parcel"
-        : "Not in this county's public parcel extract";
+  const zoningEmpty = missingPublicParcelValue("zoning", properties.countyFips);
   const zoningLine = formatZoningWithCity(properties.zoningCode, properties.zoningDistrict);
   const mailing = formatMailing(properties.mailingAddress) ?? mailingGap(properties.mailingAddress);
   const entityName = isEntityOwner(properties.ownerName)
@@ -138,7 +134,7 @@ export function ParcelDrawer({
         <div>
           <p className="text-[11px] uppercase tracking-[0.18em] text-clay-400">{properties.parcelId}</p>
           <h2 className="mt-1 font-display text-2xl leading-tight text-white">
-            {properties.situsAddress || "Address not available"}
+            {properties.situsAddress || missingPublicParcelValue("situs")}
           </h2>
           <p className="text-sm text-ink-300">{placeLine}</p>
         </div>
@@ -149,7 +145,7 @@ export function ParcelDrawer({
 
       <dl className="mt-5 grid grid-cols-2 gap-4">
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
-        <Field label="Property name" value={properties.propertyName} />
+        <Field label="Property name" value={properties.propertyName} empty={missingPublicParcelValue("propertyName")} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
         {dekalb ? (
           <Field label="Tax district" value={properties.dorCode} empty="Tax district not on this parcel" />
@@ -160,19 +156,34 @@ export function ParcelDrawer({
           value={fluLine}
           empty={dekalb ? "No future land use joined for this parcel" : "Not joined for this county"}
         />
-        <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
+        <Field
+          label="Designated Opportunity Zone"
+          value={
+            oz.inZone == null
+              ? null
+              : oz.inZone
+                ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}`
+                : "No — centroid is outside the joined designated QOZ tracts"
+          }
+          empty={missingPublicParcelValue("designatedOz")}
+        />
         <Field
           label="OZ 2.0"
           value={
             oz2.eligible == null
               ? null
               : oz2.eligible
-                ? `${oz2.statusChip ?? (oz2.rural === false ? "Eligible, not rural" : "Eligible")} · GEOID ${properties.oz2Eligibility?.tractGeoid ?? "unknown"}`
+                ? `${oz2.statusChip ?? (oz2.rural === false ? "Eligible, not rural" : "Eligible")} · census tract GEOID ${properties.oz2Eligibility?.tractGeoid ?? "unknown"}`
                 : "Not eligible"
           }
+          empty="OZ 2.0 eligibility is not joined for this parcel. That is not a designation."
         />
-        <Field label="Last sale" value={formatSale(properties.lastSale)} />
-        <Field label="Qualified sale" value={properties.lastSale.qualified} />
+        <Field label="Last sale" value={formatSale(properties.lastSale)} empty={missingPublicParcelValue("sale")} />
+        <Field
+          label="Qualified sale"
+          value={properties.lastSale.qualified}
+          empty={missingPublicParcelValue("saleQualified")}
+        />
         <Field label="Market value" value={formatUsd(properties.tax.marketValue)} />
         <Field label="Assessed value" value={formatUsd(properties.tax.assessedValue)} />
         <Field label="Taxable value" value={formatUsd(properties.tax.taxableValue)} />

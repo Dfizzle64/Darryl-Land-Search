@@ -58,7 +58,6 @@ describe("basemap helpers", () => {
       "mf-priority-a-line",
       "mf-priority-b-fill",
       "mf-priority-b-line",
-      "rural-pins",
       "oz2-fill",
       "oz2-line",
       "oz-fill",
@@ -120,15 +119,20 @@ describe("basemap helpers", () => {
   it("lowers parcel fill opacity and brightens outlines on satellite", () => {
     const streetFill = parcelFillPaint("streets")["fill-opacity"];
     const satelliteFill = parcelFillPaint("satellite")["fill-opacity"];
-    expect(JSON.stringify(streetFill)).toContain("0.52");
-    expect(JSON.stringify(streetFill)).toContain("0.16");
-    expect(JSON.stringify(satelliteFill)).toContain("0.26");
-    expect(JSON.stringify(parcelLinePaint("satellite")["line-width"])).toContain("1.7");
-    expect(JSON.stringify(parcelLinePaint("satellite")["line-width"])).toContain("0.55");
-    expect(JSON.stringify(parcelLinePaint("streets")["line-width"])).toContain("0.35");
+    const streetFillJson = JSON.stringify(streetFill);
+    const satelliteFillJson = JSON.stringify(satelliteFill);
+    expect(streetFillJson).toContain("0.2");
+    expect(streetFillJson).toContain("0.08");
+    expect(streetFillJson.indexOf("0.2")).toBeLessThan(streetFillJson.lastIndexOf("0.08"));
+    expect(satelliteFillJson).toContain("0.05");
+    expect(JSON.stringify(parcelLinePaint("satellite")["line-width"])).toContain("2.6");
+    expect(JSON.stringify(parcelLinePaint("satellite")["line-width"])).toContain("1.3");
+    expect(JSON.stringify(parcelLinePaint("streets")["line-width"])).toContain("2.4");
+    expect(JSON.stringify(parcelLinePaint("streets")["line-width"])).toContain("1.15");
     expect(JSON.stringify(parcelLinePaint("streets")["line-color"])).toContain("#0f5132");
     expect(JSON.stringify(parcelLinePaint("dark")["line-color"])).toContain("#b7e3cf");
-    expect(JSON.stringify(oz2LinePaint("streets")["line-color"])).toContain("#9a3412");
+    expect(JSON.stringify(oz2LinePaint("streets")["line-color"])).toContain("#4c1d95");
+    expect(JSON.stringify(oz2LinePaint("streets")["line-color"])).toContain("#1d4ed8");
     expect(ozLinePaint("streets")["line-color"]).toBe("#9a3412");
     expect(ozLinePaint("dark")["line-color"]).toBe("#f6d0b0");
     expect(parcelMatchFilter).toEqual(["==", ["get", "filterMatch"], 1]);
@@ -159,14 +163,18 @@ describe("basemap helpers", () => {
     );
   });
 
-  it("paints census tracts in distinct oranges and leaves parcel fills green", () => {
+  it("paints rural tracts violet, urban tracts one blue, and parcel fills green", () => {
     const parcelFill = JSON.stringify(parcelFillPaint("streets")["fill-color"]);
     expect(parcelFill).toContain("#3f9d74");
 
     const rural = OZ_TRACT_SWATCH.rural;
+    const urban = OZ_TRACT_SWATCH.urban;
     const eligible = OZ_TRACT_SWATCH.eligible;
     const designated = OZ_TRACT_SWATCH.designated;
-    expect(new Set([rural, eligible, designated]).size).toBe(3);
+    expect(eligible).toBe(urban);
+    expect(new Set([rural, urban, designated]).size).toBe(3);
+    expect(rural).not.toMatch(/f15a08|f0b429|ff7a29/i);
+    expect(urban).toBe("#3d7dff");
 
     const tractPaint = [
       JSON.stringify(oz2FillPaint("streets")),
@@ -174,7 +182,11 @@ describe("basemap helpers", () => {
       JSON.stringify(ozFillPaint("streets")),
       JSON.stringify(ozFillPaint("satellite")),
     ].join(" ");
-    expect(tractPaint).not.toMatch(/#3dbe86|#5ee0a0|#5b8def|#9ec1ff|#3f9d74/i);
+    expect(tractPaint).toContain(rural);
+    expect(tractPaint).toContain(urban);
+    expect(tractPaint).toContain("#c084fc");
+    expect(tractPaint).toContain("#8eb6ff");
+    expect(tractPaint).not.toMatch(/#f15a08|#f0b429|#ffd56a|#ff7a29|#3f9d74/i);
     expect(JSON.stringify(oz2FillPaint("streets")["fill-opacity"])).toContain("0.32");
     expect(JSON.stringify(oz2FillPaint("streets")["fill-opacity"])).toContain("0.22");
     expect(JSON.stringify(oz2LinePaint("streets")["line-width"])).toContain("2.5");

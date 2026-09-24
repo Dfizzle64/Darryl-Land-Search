@@ -675,6 +675,10 @@ def gap_reason(county: dict) -> str:
 
 def spec_for(county: dict) -> dict:
     fips = county["fips"]
+    if fips == "37089":
+        from henderson_parcels import henderson_spec
+
+        return henderson_spec()
     if fips in ORLANDO_REUSE:
         return {"kind": "reuse-orlando"}
     override = county_override(fips)
@@ -740,6 +744,7 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    extra: dict | None = None,
 ) -> dict:
     row = {
         "name": county["name"],
@@ -760,6 +765,8 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    if extra:
+        row.update(extra)
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
     (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
     return row
@@ -921,7 +928,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons. Henderson County uses the county Parcels FeatureServer (`CALCULATED_ACRES`) plus city zoning and FLU | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Henderson joins city zoning first and does not use the parcel Zoning_aggregated Cities stub |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -929,13 +936,17 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or when a county override spatial-joins municipal polygons (Henderson County, NC). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "henderson":
+        from henderson_parcels import download_henderson
+
+        return download_henderson(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

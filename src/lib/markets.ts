@@ -249,6 +249,25 @@ export function unionBounds(
   ];
 }
 
+/**
+ * Asheville has a public parcel extract and no eligible-tract rows.
+ * Bounds cover Henderson County. This is not an Opportunity Zone designation.
+ */
+const PARCEL_ONLY_MARKETS: Partial<Record<SearchMarketId, MarketSummary>> = {
+  Asheville: {
+    market: "Asheville",
+    rowCount: 0,
+    ruralCount: 0,
+    urbanCount: 0,
+    bounds: [
+      [-82.95, 35.05],
+      [-82.15, 35.55],
+    ],
+    center: [-82.46, 35.32],
+    counties: [{ county: "Henderson", state: "North Carolina", count: 0, outerEdge: false }],
+  },
+};
+
 export function catalogForMarket(
   ruralCatalog: RuralMarketsCatalog,
   urbanCatalog: EligibleMarketsCatalog,
@@ -256,7 +275,13 @@ export function catalogForMarket(
   market: SearchMarketId,
 ): MarketSummary {
   const catalog = isPrimaryMarket(market) ? ruralCatalog : otherCatalog;
-  if (!isPrimaryMarket(market)) return marketSummary(catalog, market);
+  if (!isPrimaryMarket(market)) {
+    const summary = catalog.markets.find((item) => item.market === market);
+    if (summary) return summary;
+    const parcelOnly = PARCEL_ONLY_MARKETS[market];
+    if (parcelOnly) return parcelOnly;
+    throw new Error(`Catalog is missing market ${market}`);
+  }
   const rural = marketSummary(ruralCatalog, market);
   const urban = urbanCatalog.markets.find((item) => item.market === market);
   if (!urban) return rural;

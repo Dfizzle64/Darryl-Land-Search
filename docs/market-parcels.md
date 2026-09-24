@@ -22,7 +22,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons. Henderson County uses the county Parcels FeatureServer (`CALCULATED_ACRES`) plus city zoning and FLU | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Henderson joins city zoning first and does not use the parcel Zoning_aggregated Cities stub |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -30,7 +30,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or when a county override spatial-joins municipal polygons (Henderson County, NC). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 
@@ -62,6 +62,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
+| Asheville | other | 6,270 | 1 | 0 | 0 |
 
 ## Counties
 
@@ -377,4 +378,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,256 | nc-onemap-37129 |
 | Onslow | North Carolina | 37133 | complete-gte-5ac | 6,747 | nc-onemap-37133 |
 | Pender | North Carolina | 37141 | complete-gte-5ac | 7,275 | nc-onemap-37141 |
+
+### Asheville
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Henderson | North Carolina | 37089 | complete-gte-5ac | 6,270 | nc-henderson-parcels-37089 |
 

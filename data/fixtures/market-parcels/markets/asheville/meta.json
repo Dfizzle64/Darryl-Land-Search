@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-09-24T00:29:01Z",
+  "market": "Asheville",
+  "tier": "other",
+  "parcelCount": 6270,
+  "coreMinAcres": 5.0,
+  "coreMaxAcres": 150.0,
+  "tile": {
+    "originLon": -83.0,
+    "originLat": 27.0,
+    "tileDeg": 0.25
+  },
+  "notes": [
+    "Loaded only when this market is selected.",
+    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Orange, Osceola, and Polk point at the existing Orlando complete extract."
+  ],
+  "counties": [
+    {
+      "name": "Henderson",
+      "fips": "37089",
+      "state": "North Carolina",
+      "featureCount": 6270,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-henderson-parcels-37089",
+      "queryUrl": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/Parcels/FeatureServer/0/query",
+      "gaps": [
+        "6272 source rows kept 6270 parcel ids. 2 duplicate PINs collapsed to the larger part.",
+        "Parcel Zoning_aggregated is often the stub Cities inside municipalities and is not used as zoning.",
+        "County zoning MapServer/85 ZONE_CODE values Cities and NO mark municipal land and are not joined.",
+        "Hendersonville zoning is COH_Zoning_Test (county MapServer/83 if AGOL is down). Fletcher, Mills River, Laurel Park, and Flat Rock zoning are county-hosted.",
+        "Hendersonville 2045 FLU is an attribute join on PIN for parcels routed to the city. Fletcher, Mills River, Laurel Park, and Flat Rock have no public FLU service. County Planning MapServer/88 is joined only where its polygon contains the parcel, and that map leaves most of those towns uncovered.",
+        "Flat Rock tax CITY codes VH/BR/GR are not a zoning route. Those parcels use the municipal boundary or ETJ=FLAT ROCK.",
+        "Saluda is a Polk County tip. No Saluda zoning layer is joined.",
+        "Sales are the latest package sale on the parcel, otherwise the latest land sale. There is no multi-transfer sales layer.",
+        "TOTAL_PROP_VALUE is tax.marketValue. Assessed value is land plus building assessed values when those fields are present.",
+        "NC OneMap cntyfips 089 is the parcel fallback if the county FeatureServer is down. Acreage on this extract is CALCULATED_ACRES.",
+        "Opportunity Zone and OZ 2.0 fields are not filled. Eligible tracts are not marked designated.",
+        "Owner phones and emails are not on these public layers."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37089/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37089/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 6272
+    }
+  ]
+}

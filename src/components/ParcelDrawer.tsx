@@ -13,6 +13,7 @@ import {
   sunbizSearchUrl,
 } from "@/lib/format";
 import { describeFluMatch } from "@/lib/flu";
+import { STATE_ABBR } from "@/lib/markets";
 import { describeRezoningCandidate } from "@/lib/filters";
 import { describeOpportunityZone, describeOz2Eligibility } from "@/lib/opportunityZone";
 import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "@/lib/types";
@@ -94,9 +95,13 @@ export function ParcelDrawer({
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
+  const zoningLine = properties.zoningCode
+    ? [properties.zoningCode, properties.jurisdictionPrefix].filter(Boolean).join(" · ")
+    : null;
+  const stateAbbr = properties.state ? (STATE_ABBR[properties.state] ?? properties.state) : "FL";
   const placeLine =
     [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+    (properties.countyName ? `${properties.countyName} County, ${stateAbbr}` : properties.state || "Florida");
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -123,7 +128,7 @@ export function ParcelDrawer({
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
-        <Field label="Zoning" value={properties.zoningCode} empty={zoningEmpty} />
+        <Field label="Zoning" value={zoningLine} empty={zoningEmpty} />
         <Field label="Future Land Use" value={fluLine} empty="Not joined for this county" />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
         <Field
@@ -204,13 +209,13 @@ export function ParcelDrawer({
         <a className="block text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
           {appraiser.label}
         </a>
-        {entity && properties.ownerName ? (
+        {florida && entity && properties.ownerName ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={sunbizSearchUrl(properties.ownerName)} target="_blank" rel="noreferrer">
             Search Florida Sunbiz for LLC / corporate principals
           </a>
-        ) : (
+        ) : florida ? (
           <p className="text-ink-300">Owner does not look like an LLC/corp in the assessor name field. Sunbiz search is skipped.</p>
-        )}
+        ) : null}
         {properties.countyFips === "12095" || !properties.countyFips ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={comptrollerRecordsUrl()} target="_blank" rel="noreferrer">
             Orange County Comptroller official records

@@ -33,7 +33,7 @@ const URBAN_ROWS: Record<MarketId, number> = {
   "Raleigh-Durham": 79,
 };
 
-const OTHER_ROWS: Record<OtherMarketId, { total: number; rural: number; urban: number }> = {
+const OTHER_ROWS: Record<Exclude<OtherMarketId, "Asheville">, { total: number; rural: number; urban: number }> = {
   "Vero Beach": { total: 62, rural: 25, urban: 37 },
   Melbourne: { total: 175, rural: 24, urban: 151 },
   Jacksonville: { total: 98, rural: 8, urban: 90 },
@@ -107,10 +107,15 @@ describe("other MSA eligible pack", () => {
   });
 
   it("matches each smaller market and does not treat them as primary", () => {
-    expect(OTHER_MARKETS).toHaveLength(15);
+    expect(OTHER_MARKETS).toHaveLength(16);
     expect(OTHER_MARKETS[2]).toBe("Jacksonville");
+    expect(OTHER_MARKETS[OTHER_MARKETS.length - 1]).toBe("Asheville");
     for (const market of OTHER_MARKETS) {
       const rows = filterEligibleRows(catalog.rows, market, null, null);
+      if (market === "Asheville") {
+        expect(rows).toHaveLength(0);
+        continue;
+      }
       const expected = OTHER_ROWS[market];
       expect(rows).toHaveLength(expected.total);
       expect(rows.filter((row) => row.rural === "Y")).toHaveLength(expected.rural);

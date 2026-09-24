@@ -39,6 +39,7 @@ import {
 import { showMarketParcels, type MarketParcelIndex } from "@/lib/marketParcels";
 import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcels";
 import { rankSites } from "@/lib/score";
+import { DEFAULT_SCREENING_TOGGLES, type ScreeningPoint, type ScreeningToggles } from "@/lib/screening";
 import { filterTractRowsByIncome, incomeByGeoidFromFeatures } from "@/lib/tractIncome";
 import {
   annotateRuralRows,
@@ -131,6 +132,9 @@ export function AppShell({
   const [showTraffic, setShowTraffic] = useState(true);
   const [showOz, setShowOz] = useState(false);
   const [showOz2, setShowOz2] = useState(true);
+  const [screening, setScreening] = useState<ScreeningToggles>(DEFAULT_SCREENING_TOGGLES);
+  const [screeningPoint, setScreeningPoint] = useState<ScreeningPoint | null>(null);
+  const [screeningStatus, setScreeningStatus] = useState<"idle" | "loading" | "error">("idle");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sitesOpen, setSitesOpen] = useState(false);
   const [rankingExpanded, setRankingExpanded] = useState(false);
@@ -306,6 +310,39 @@ export function AppShell({
   const matchedIds = useMemo(() => new Set(matched.map((feature) => feature.properties.id)), [matched]);
   const selected = activeParcels.features.find((feature) => feature.properties.id === selectedId) ?? null;
   const selectedTract = visibleTracts.find((row) => row.geoid === selectedTractGeoid) ?? null;
+  const screeningFocus = selected
+    ? { key: `parcel:${selected.properties.id}`, lon: selected.properties.centroid[0], lat: selected.properties.centroid[1] }
+    : selectedTract
+      ? { key: `tract:${selectedTract.geoid}`, lon: selectedTract.lon, lat: selectedTract.lat }
+      : null;
+
+  const screeningKey = screeningFocus?.key ?? null;
+  const screeningLon = screeningFocus?.lon ?? null;
+  const screeningLat = screeningFocus?.lat ?? null;
+  useEffect(() => {
+    if (screeningKey == null || screeningLon == null || screeningLat == null) {
+      setScreeningPoint(null);
+      setScreeningStatus("idle");
+      return;
+    }
+    const controller = new AbortController();
+    setScreeningStatus("loading");
+    setScreeningPoint(null);
+    fetch(`/api/screening/point?lng=${screeningLon}&lat=${screeningLat}`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("screening failed");
+        return (await response.json()) as ScreeningPoint;
+      })
+      .then((point) => {
+        setScreeningPoint(point);
+        setScreeningStatus("idle");
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setScreeningStatus("error");
+      });
+    return () => controller.abort();
+  }, [screeningKey, screeningLon, screeningLat]);
   const fluUnknownCount = useMemo(
     () => activeParcels.features.filter((feature) => !feature.properties.flu?.code).length,
     [activeParcels.features],
@@ -733,6 +770,8 @@ export function AppShell({
           onShowOz={setShowOz}
           showOz2={showOz2}
           onShowOz2={setShowOz2}
+          screening={screening}
+          onScreening={(key, value) => setScreening((current) => ({ ...current, [key]: value }))}
           open={filtersOpen}
           onClose={() => setFiltersOpen(false)}
           meta={meta}
@@ -769,6 +808,7 @@ export function AppShell({
             showTraffic={showTraffic}
             showOz={showOz}
             showOz2={showOz2}
+            screening={screening}
             showParcels={shedParcelsOn}
             parcelLayerVisible={parcelLayerVisible}
             parcelVisibilityHint={visibilityHint}
@@ -907,6 +947,8 @@ export function AppShell({
                 zoningConfig={zoningConfig}
                 fluConfig={fluConfig}
                 filters={appliedFilters}
+                screeningPoint={screeningPoint}
+                screeningStatus={screeningStatus}
                 onClose={() => setSelectedId(null)}
               />
             ) : (
@@ -914,6 +956,8 @@ export function AppShell({
                 layout="pane"
                 tract={selectedTract}
                 statusHelp={statusHelp}
+                screeningPoint={screeningPoint}
+                screeningStatus={screeningStatus}
                 onClose={() => setSelectedTractGeoid(null)}
               />
             )}
@@ -926,10 +970,18 @@ export function AppShell({
               zoningConfig={zoningConfig}
               fluConfig={fluConfig}
               filters={appliedFilters}
+              screeningPoint={screeningPoint}
+              screeningStatus={screeningStatus}
               onClose={() => setSelectedId(null)}
             />
           ) : (
-            <TractDrawer tract={selectedTract} statusHelp={statusHelp} onClose={() => setSelectedTractGeoid(null)} />
+            <TractDrawer
+              tract={selectedTract}
+              statusHelp={statusHelp}
+              screeningPoint={screeningPoint}
+              screeningStatus={screeningStatus}
+              onClose={() => setSelectedTractGeoid(null)}
+            />
           )}
         </div>
       </div>

@@ -26,11 +26,11 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Spalding county services | Cobb complete. DeKalb is a polygon-acre sample. Spalding is a complete 5–150 acre extract from public parcel geometry (State Plane Georgia West feet / 43560) with county zoning outside Griffin. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when a public field or a verified zoning polygon is available (DeKalb's parcel field; Spalding County zoning outside Griffin). Griffin city zoning is left empty. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 
@@ -42,7 +42,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 8,149 | 1 | 1 | 33 |
+| Atlanta | primary | 11,981 | 2 | 1 | 32 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
@@ -102,7 +102,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Pickens | Georgia | 13227 | gap | 0 | unavailable |
 | Pike | Georgia | 13231 | gap | 0 | unavailable |
 | Rockdale | Georgia | 13247 | gap | 0 | unavailable |
-| Spalding | Georgia | 13255 | gap | 0 | unavailable |
+| Spalding | Georgia | 13255 | complete-gte-5ac | 3,832 | ga-spalding-parcels-public |
 | Walton | Georgia | 13297 | gap | 0 | unavailable |
 
 ### Tampa

@@ -6,7 +6,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample counties | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 8,149 | 1 | 1 | 33 |
+| Atlanta | primary | 11,981 | 2 | 1 | 32 |
 | Tampa | primary | 98,259 | 10 | 0 | 0 |
 | Charleston | primary | 6,774 | 1 | 0 | 6 |
 | Nashville | primary | 31,132 | 6 | 0 | 11 |
@@ -66,7 +66,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Pickens | Georgia | 13227 | gap | 0 | unavailable |
 | Pike | Georgia | 13231 | gap | 0 | unavailable |
 | Rockdale | Georgia | 13247 | gap | 0 | unavailable |
-| Spalding | Georgia | 13255 | gap | 0 | unavailable |
+| Spalding | Georgia | 13255 | complete-gte-5ac | 3,832 | ga-spalding-parcels-public |
 | Walton | Georgia | 13297 | gap | 0 | unavailable |
 
 ### Tampa

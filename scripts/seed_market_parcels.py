@@ -26,7 +26,17 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
-from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
+from parcel_geometry import (
+    esri_rings_to_geojson,
+    ga_west_ft_to_wgs84,
+    geometry_contains,
+    net_acres,
+    planar_acres,
+    polygon_parts,
+    project_ga_west_rings,
+    representative_point,
+    signed_area,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "data" / "market-parcel-counties.json"
@@ -334,6 +344,37 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
+def fetch_paged(url: str, where: str, out_fields: list[str], out_sr: int, page_size: int = 2000) -> list[dict]:
+    """Stable OBJECTID pages. Some county services 404 a long objectIds GET."""
+    features: list[dict] = []
+    offset = 0
+    while True:
+        data = fetch_json(
+            url,
+            {
+                "where": where,
+                "outFields": ",".join(out_fields),
+                "returnGeometry": "true",
+                "outSR": str(out_sr),
+                "orderByFields": "OBJECTID",
+                "resultOffset": str(offset),
+                "resultRecordCount": str(page_size),
+                "f": "json",
+            },
+            timeout=180,
+        )
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        batch = data.get("features") or []
+        features.extend(batch)
+        print(f"    {len(features)}", flush=True)
+        if len(batch) < page_size:
+            break
+        offset += len(batch)
+        time.sleep(0.05)
+    return features
+
+
 def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
@@ -386,7 +427,22 @@ def normalize_rows(
     dropped = 0
     for item in raw:
         attrs = item.get("attributes") or {}
-        geometry, computed = rings_to_feature_geometry(item.get("geometry"))
+        geom = item.get("geometry") or {}
+        if spec.get("planarFeet") == "ga-west":
+            rings = geom.get("rings")
+            if not rings:
+                dropped += 1
+                continue
+            acres = planar_acres(rings)
+            geometry = esri_rings_to_geojson(project_ga_west_rings(rings))
+        else:
+            geometry, computed = rings_to_feature_geometry(geom or None)
+            acres = num(attrs.get(spec["acresField"])) if spec.get("acresField") else None
+            scale = spec.get("acresScale") or 1
+            if acres is not None and scale != 1:
+                acres = acres / scale
+            if spec.get("computeAcres") or acres is None:
+                acres = computed
         if not geometry:
             dropped += 1
             continue
@@ -394,12 +450,6 @@ def normalize_rows(
         if not plausible_centroid(center):
             dropped += 1
             continue
-        acres = num(attrs.get(spec["acresField"])) if spec.get("acresField") else None
-        scale = spec.get("acresScale") or 1
-        if acres is not None and scale != 1:
-            acres = acres / scale
-        if spec.get("computeAcres") or acres is None:
-            acres = computed
         if not in_band(acres):
             dropped += 1
             continue
@@ -446,6 +496,8 @@ def normalize_rows(
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        if spec.get("jurisdictionField"):
+            feature["_jurisdiction"] = clean(attrs.get(spec["jurisdictionField"]))
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -657,7 +709,168 @@ def county_override(fips: str) -> dict | None:
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
             ],
         }
+    if fips == "13255":  # Spalding GA
+        return {
+            "kind": "arcgis",
+            "url": "https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/Parcels_Public_View/FeatureServer/1/query",
+            "where": "1=1",
+            "outFields": ["PARCEL_ID", "JURISDICTION"],
+            "idField": "PARCEL_ID",
+            "computeAcres": True,
+            "planarFeet": "ga-west",
+            "outSR": 102667,
+            "paged": True,
+            "pageSize": 2000,
+            "jurisdictionField": "JURISDICTION",
+            "zoningOverlay": {
+                "url": "https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/Spalding_County_Zoning_(public_view)/FeatureServer/0/query",
+                "labelField": "LABEL",
+            },
+            "source": "ga-spalding-parcels-public",
+            "coverage": "complete-gte-5ac",
+            "gaps": [
+                "Spalding County Parcels public view is PARCEL_ID and JURISDICTION only. Owner, mailing, situs, tax, and last sale are null on this extract.",
+                "GIS acres are computed from State Plane Georgia West feet (102667/2240) polygon area / 43560. Band is 5.0–150.0 inclusive.",
+                "County zoning LABEL is joined only where JURISDICTION is COUNTY (unincorporated Spalding, including Orchard Hill and former Sunny Side). JURISDICTION CITY is Griffin and is left unzoned: the county zoning layer does not cover Griffin, and no verified Griffin zoning FeatureServer was used.",
+                "Future land use is the Comp Plan 2042 PDF only. FLU is null.",
+                "Sales and tax are qPublic AppID=766 HTML only and were not scraped. Last sale and tax values are null.",
+                "Sunny Side's charter was repealed effective 2024-01-01. It is not treated as an incorporated municipality.",
+                "Rejected substitutes were not used: University of Maryland Regrid ga_spalding extract and ARC LandPro.",
+            ],
+        }
     return None
+
+
+def assert_ga_west_projection() -> None:
+    lon, lat = ga_west_ft_to_wgs84(2268729.57984738, 1208629.65336716)
+    if abs(lon + 84.2578550320386) > 1e-6 or abs(lat - 33.3226976969319) > 1e-6:
+        raise RuntimeError(f"Georgia West projection drifted to {lon}, {lat}")
+
+
+def _polygon_area(geometry: dict) -> float:
+    area = 0.0
+    for poly in polygon_parts(geometry):
+        if poly and poly[0]:
+            area += abs(signed_area(poly[0]))
+    return area
+
+
+def join_zoning_overlay(features: list[dict], overlay: dict) -> tuple[list[str], dict]:
+    """Spatial-join a county zoning layer. Griffin (JURISDICTION=CITY) stays unzoned."""
+    print(f"  zoning overlay {overlay['url']}", flush=True)
+    raw = fetch_paged(overlay["url"], "1=1", [overlay["labelField"]], 4326, 2000)
+    prepared: list[tuple] = []
+    for item in raw:
+        attrs = item.get("attributes") or {}
+        label = clean(attrs.get(overlay["labelField"]))
+        geometry = esri_rings_to_geojson((item.get("geometry") or {}).get("rings") or [])
+        if not label or not geometry:
+            continue
+        xs: list[float] = []
+        ys: list[float] = []
+        for poly in polygon_parts(geometry):
+            for ring in poly:
+                for x, y in ring:
+                    xs.append(x)
+                    ys.append(y)
+        if not xs:
+            continue
+        prepared.append((min(xs), min(ys), max(xs), max(ys), _polygon_area(geometry), label, geometry))
+    cell = 0.02
+    grid: dict[tuple[int, int], list] = defaultdict(list)
+    for item in prepared:
+        west, south, east, north = item[:4]
+        for ix in range(math.floor(west / cell), math.floor(east / cell) + 1):
+            for iy in range(math.floor(south / cell), math.floor(north / cell) + 1):
+                grid[(ix, iy)].append(item)
+    zoned = 0
+    city_null = 0
+    county_miss = 0
+    other_null = 0
+    for feature in features:
+        jurisdiction = (feature.pop("_jurisdiction", None) or "").strip().upper()
+        props = feature["properties"]
+        props["zoningCode"] = None
+        props["zoningDistrict"] = None
+        props["flu"] = None
+        props["opportunityZone"] = None
+        props["oz2Eligibility"] = None
+        if jurisdiction == "CITY":
+            city_null += 1
+            continue
+        if jurisdiction != "COUNTY":
+            other_null += 1
+            continue
+        lon, lat = props["centroid"]
+        hits: list[tuple[float, str]] = []
+        for item in grid.get((math.floor(lon / cell), math.floor(lat / cell)), []):
+            west, south, east, north, area, label, geometry = item
+            if lon < west or lon > east or lat < south or lat > north:
+                continue
+            if geometry_contains(geometry, lon, lat):
+                hits.append((area, label))
+        if not hits:
+            county_miss += 1
+            continue
+        hits.sort()
+        props["zoningCode"] = hits[0][1]
+        zoned += 1
+    print(
+        f"  zoning county {zoned} griffin-null {city_null} county-miss {county_miss} other-null {other_null}",
+        flush=True,
+    )
+    stats = {"zoned": zoned, "cityNull": city_null, "countyMiss": county_miss, "otherNull": other_null}
+    note = (
+        f"County zoning labels joined on {zoned} JURISDICTION=COUNTY parcels. "
+        f"{city_null} Griffin CITY parcels in the acreage band were left unzoned. "
+        f"{county_miss} COUNTY parcels had no county zoning intersect."
+    )
+    return [note], stats
+
+
+def assert_spalding_extract(features: list[dict], stats: dict) -> None:
+    count = len(features)
+    if not 3500 <= count <= 4200:
+        raise RuntimeError(f"Spalding 5–150 acre count {count} is outside the expected GIS band")
+    if stats["cityNull"] < 50:
+        raise RuntimeError(f"Expected Griffin CITY parcels in band, saw {stats['cityNull']}")
+    if stats["zoned"] < 1000:
+        raise RuntimeError(f"County zoning join kept only {stats['zoned']} parcels")
+    if stats["otherNull"]:
+        raise RuntimeError(f"Unexpected jurisdiction values on {stats['otherNull']} parcels")
+    pins = {feature["properties"]["parcelId"]: feature for feature in features}
+    county_pin = pins.get("244 02001B")
+    if county_pin is None:
+        raise RuntimeError("Geo pin 244 02001B missing from the 5–150 acre extract")
+    lon, lat = county_pin["properties"]["centroid"]
+    if not (-84.28 < lon < -84.23 and 33.30 < lat < 33.35):
+        raise RuntimeError(f"Geo pin 244 02001B drifted to {lon}, {lat}")
+    if not county_pin["properties"].get("zoningCode"):
+        raise RuntimeError("County pin 244 02001B was left unzoned")
+    for parcel_id in ("001 01001", "039 01003", "039 01004"):
+        city = pins.get(parcel_id)
+        if city is None:
+            raise RuntimeError(f"Griffin pin {parcel_id} missing from the 5–150 acre extract")
+        if city["properties"].get("zoningCode"):
+            raise RuntimeError(f"Griffin pin {parcel_id} received county zoning {city['properties']['zoningCode']}")
+    for feature in features:
+        props = feature["properties"]
+        if not str(props["id"]).startswith("13255:"):
+            raise RuntimeError(f"Parcel id {props['id']} is missing the 13255 GEOID prefix")
+        if props.get("countyFips") != "13255":
+            raise RuntimeError(f"Parcel {props['id']} countyFips is {props.get('countyFips')}")
+        if props.get("flu") is not None or props.get("opportunityZone") is not None or props.get("oz2Eligibility") is not None:
+            raise RuntimeError(f"Parcel {props['id']} invented FLU or an Opportunity Zone")
+        tax = props.get("tax") or {}
+        sale = props.get("lastSale") or {}
+        if tax.get("marketValue") is not None or tax.get("assessedValue") is not None or tax.get("taxableValue") is not None:
+            raise RuntimeError(f"Parcel {props['id']} has tax values on a thin CAMA layer")
+        if sale.get("price") is not None or sale.get("date") is not None:
+            raise RuntimeError(f"Parcel {props['id']} has a sale on a layer with no sale history")
+        if props.get("ownerName") or props.get("situsAddress") or props.get("situsCity"):
+            raise RuntimeError(f"Parcel {props['id']} invented owner or situs")
+        if "_jurisdiction" in feature:
+            raise RuntimeError(f"Parcel {props['id']} leaked JURISDICTION onto the feature")
 
 
 def gap_reason(county: dict) -> str:
@@ -848,7 +1061,16 @@ def rebuild_indexes(catalog: dict) -> None:
         rel = f"data/fixtures/market-parcels/markets/{slug(market['id'])}/meta.json"
         market_path = ROOT / rel
         market_path.parent.mkdir(parents=True, exist_ok=True)
-        market_path.write_text(json.dumps(meta, indent=2) + "\n")
+        payload = json.dumps(meta, indent=2) + "\n"
+        if market_path.exists():
+            previous = json.loads(market_path.read_text())
+            previous.pop("generatedAt", None)
+            current = json.loads(payload)
+            current.pop("generatedAt", None)
+            if previous == current:
+                payload = None
+        if payload is not None:
+            market_path.write_text(payload)
         index_markets[market["id"]] = {
             "tier": market["tier"],
             "parcelCount": parcel_count,
@@ -925,11 +1147,11 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Spalding county services | Cobb complete. DeKalb is a polygon-acre sample. Spalding is a complete 5–150 acre extract from public parcel geometry (State Plane Georgia West feet / 43560) with county zoning outside Griffin. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when a public field or a verified zoning polygon is available (DeKalb's parcel field; Spalding County zoning outside Griffin). Griffin city zoning is left empty. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -957,7 +1179,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=[*(spec.get("gaps") or []), *(cached.get("notes") or [])],
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
@@ -1010,17 +1232,41 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
             source_count=0,
         )
     print(f"  source rows {expected}", flush=True)
-    ids = fetch_object_ids(spec["url"], spec["where"])
-    raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
+    if spec.get("planarFeet") == "ga-west":
+        assert_ga_west_projection()
+    if spec.get("paged"):
+        raw = fetch_paged(
+            spec["url"],
+            spec["where"],
+            spec["outFields"],
+            int(spec.get("outSR") or 4326),
+            int(spec.get("pageSize") or 2000),
+        )
+        if len(raw) != expected:
+            raise RuntimeError(f"{fips} paged fetch returned {len(raw)} features, expected {expected}")
+    else:
+        ids = fetch_object_ids(spec["url"], spec["where"])
+        raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
     features, dropped = normalize_rows(raw, county, markets, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    extra_notes: list[str] = []
+    if spec.get("zoningOverlay"):
+        extra_notes, stats = join_zoning_overlay(features, spec["zoningOverlay"])
+        if fips == "13255":
+            assert_spalding_extract(features, stats)
+    else:
+        for feature in features:
+            feature.pop("_jurisdiction", None)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "notes": extra_notes, "features": features},
+            separators=(",", ":"),
+        )
     )
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
+    gaps = [*(spec.get("gaps") or []), *extra_notes]
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,

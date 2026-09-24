@@ -94,9 +94,15 @@ export function ParcelDrawer({
   const fluLine = properties.flu?.code
     ? `${properties.flu.label || properties.flu.code}${properties.flu.jurisdiction ? ` · ${properties.flu.jurisdiction}` : ""}`
     : null;
+  const cityLine = [properties.situsCity, properties.situsZip].filter(Boolean).join(" ");
+  const countyFallback =
+    properties.countyName && properties.state && properties.state !== "Florida"
+      ? `${properties.countyName} County, ${properties.state}`
+      : properties.countyName
+        ? `${properties.countyName} County, FL`
+        : "Florida";
   const placeLine =
-    [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    (properties.countyName ? `${properties.countyName} County, FL` : "Florida");
+    cityLine && properties.state && properties.state !== "Florida" ? `${cityLine} · ${countyFallback}` : cityLine || countyFallback;
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,

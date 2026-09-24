@@ -35,6 +35,12 @@ export function parcelAppraiserUrl(options: {
   appraiserUrl?: string | null;
 }): { href: string; label: string } {
   const fips = options.countyFips ?? null;
+  if (fips === "47011") {
+    return {
+      href: options.appraiserUrl || "https://assessment.cot.tn.gov/tpad/",
+      label: "Open Bradley County parcel in TPAD",
+    };
+  }
   if (fips === "12095" || (!fips && !options.appraiserUrl)) {
     return {
       href: ocpaParcelUrl(options.parcelId),

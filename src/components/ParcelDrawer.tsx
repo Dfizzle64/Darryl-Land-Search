@@ -82,7 +82,7 @@ export function ParcelDrawer({
   const pane = layout === "pane";
   if (!parcel) {
     return (
-      <aside className={pane ? "h-full overflow-y-auto bg-ink-900/80 p-5" : "hidden w-[24rem] shrink-0 border-l border-white/10 bg-ink-900/80 p-5 lg:block"}>
+      <aside className={pane ? "h-full overflow-y-auto bg-ink-900/80 p-5" : "hidden"}>
         <p className="font-display text-2xl text-white">Parcel details</p>
         <p className="mt-2 text-sm leading-relaxed text-ink-300">
           Click a ranked site or a parcel on the map to see acreage, zoning, Future Land Use, Opportunity Zone,
@@ -163,7 +163,7 @@ export function ParcelDrawer({
   const gaps = properties.dataGaps?.length ? properties.dataGaps : null;
 
   return (
-    <aside className={pane ? "drawer-scroll h-full overflow-y-auto bg-ink-900 p-5" : "drawer-scroll absolute inset-x-0 bottom-0 z-20 max-h-[70vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-5 shadow-2xl lg:static lg:z-0 lg:max-h-none lg:w-[24rem] lg:shrink-0 lg:rounded-none lg:border-l lg:border-t-0 lg:shadow-none"}>
+    <aside className={pane ? "drawer-scroll h-full overflow-y-auto bg-ink-900 p-5" : "drawer-scroll absolute inset-x-0 bottom-0 z-20 max-h-[70vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-5 shadow-2xl"}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">{parcelIdLabel(properties.countyFips)}</p>

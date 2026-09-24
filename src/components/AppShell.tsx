@@ -752,7 +752,7 @@ export function AppShell({
         <div className="border-b border-red-500/30 bg-red-950/60 px-4 py-2 text-sm text-red-100">{error}</div>
       ) : null}
 
-      <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 flex-1 flex-nowrap">
         <FilterSidebar
           filters={filters}
           onChange={setFilters}

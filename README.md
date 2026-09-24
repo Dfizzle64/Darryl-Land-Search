@@ -49,7 +49,7 @@ No API keys are required for the default fixture mode. Copy `.env.example` to `.
 - Include **planned development / PUD** (always labeled maybe — site-specific).
 - Include **conditional zoning** (Live Local commercial/industrial, limited multiplex, some mixed-use overlays). Off by default so C-2 warehouses do not flood the map.
 - Set a **minimum median household income** (tract or block group) and **minimum AADT**. Tract geography also hides eligible tracts whose joined ACS median income is below the minimum. That join is ACS 5-year 2020–2024 B19013 for every state with a live parcel extract. Tracts outside that table have no AMI and stay visible while Include unknown income is on. A set minimum excludes unknown income unless that toggle is on. Block group income applies to parcels only. Florida AADT is FDOT. Priority counties in North Carolina, Georgia, South Carolina, Tennessee, and Mississippi use that state's DOT counts.
-- Browse a **ranked sites** list (score 0–100) in the tract-details rail. It is collapsed until you expand it, and that choice is kept for the browser session. Click a row to open the drawer and fly the map.
+- Browse a **ranked sites** list (score 0–100) in its own collapsible rail. The selected parcel or tract stays in a separate panel beside that list. The list starts collapsed, and that choice is kept for the browser session. Click a row to fill the selection panel and fly the map.
 - Open **Zoning knowledge** in the sidebar: jurisdictions covered, district explanations, citations, last-updated date. This is an offline JSON knowledge base, not a live model call.
 - Switch the map between **Streets** (Esri World Street Map: roads, labels, and places — no API key), **Satellite hybrid** (Esri imagery plus road and city/place labels), and **Dark** (OpenFreeMap dark / Carto Dark Matter fallback). The toggle is a map control; parcel filters, selection, OZ overlay, and camera stay put. No API key is required. Set `NEXT_PUBLIC_MAPTILER_KEY` to use MapTiler Streets v2 and MapTiler Hybrid instead of the keyless tiles.
 - **Measure** a polyline on any basemap. Each click adds a vertex; the readout lists every segment and the total in miles. Clear drops the line, Cancel (or Esc) leaves measure mode.
@@ -88,7 +88,7 @@ FLU-only and rezoning modes do **not** treat missing FLU as a match. Other munic
 
 ### Ranked site list
 
-Matching parcels are scored 0–100 and listed (desktop overlay from the `xl` breakpoint; **Sites** sheet/button below that). Clicking a row selects the parcel, opens the drawer, and flies the map to the centroid.
+Matching parcels are scored 0–100 and listed in the ranked-sites rail (from the `lg` breakpoint; a **Sites** sheet below that). The selected parcel opens in the selection rail beside the list, not underneath it. Clicking a row selects the parcel, fills that panel, and flies the map to the centroid.
 
 **Formula.** `score = 100 × Σ (weightᵢ × componentᵢ)` with default weights:
 

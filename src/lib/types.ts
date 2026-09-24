@@ -138,6 +138,8 @@ export type MarketId = (typeof MARKETS)[number];
  * Florida markets stay together: SWFL and the Heartland shelf, east coast south to north,
  * then North-Central Florida, Big Bend, and the panhandle. Jackson is Jackson, Tennessee.
  * Heartland, Tuscaloosa, and Montgomery are parcel shelves with no eligible-tract rows.
+ * Valdosta, Macon, Athens, Hilton Head, and Jackson MS are parcel shelves too.
+ * Jackson MS is Jackson, Mississippi. Jackson remains Jackson, Tennessee.
  */
 export const OTHER_MARKETS = [
   "SWFL",
@@ -162,6 +164,11 @@ export const OTHER_MARKETS = [
   "Jackson",
   "Winston-Salem",
   "Wilmington",
+  "Valdosta",
+  "Macon",
+  "Athens",
+  "Hilton Head",
+  "Jackson MS",
 ] as const;
 
 export type OtherMarketId = (typeof OTHER_MARKETS)[number];

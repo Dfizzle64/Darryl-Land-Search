@@ -79,4 +79,51 @@ describe("parcel income and AADT join", () => {
     annotateParcelSignals(inside, index);
     expect(inside.properties.incomeTract?.medianHouseholdIncome).toBe(72000);
   });
+
+  it("does not attach a Florida AADT count to a Georgia parcel", () => {
+    const index = buildOrangeSignalIndex(
+      {
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [-83.4, 30.7],
+                  [-83.2, 30.7],
+                  [-83.2, 30.9],
+                  [-83.4, 30.9],
+                  [-83.4, 30.7],
+                ],
+              ],
+            },
+            properties: {
+              geoid: "13185000100",
+              name: "Census Tract 1",
+              medianHouseholdIncome: 48000,
+              medianHouseholdIncomeMoe: 500,
+            },
+          },
+        ],
+      },
+      { type: "FeatureCollection", features: [] },
+      { type: "FeatureCollection", features: [road(-83.3, 30.8, 22000)] },
+    );
+    const parcel = {
+      type: "Feature",
+      geometry: { type: "Polygon", coordinates: [] },
+      properties: {
+        countyFips: "13185",
+        centroid: [-83.3, 30.8],
+        incomeTract: null,
+        incomeBlockGroup: null,
+        nearestRoad: null,
+      },
+    } as unknown as ParcelFeature;
+    annotateParcelSignals(parcel, index);
+    expect(parcel.properties.incomeTract?.medianHouseholdIncome).toBe(48000);
+    expect(parcel.properties.nearestRoad).toBeNull();
+  });
 });

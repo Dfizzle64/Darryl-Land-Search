@@ -58,6 +58,17 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "13255": "https://qpublic.schneidercorp.com/Application.aspx?AppID=766&PageTypeID=2",
   "13029": "https://qpublic.net/ga/bryan/",
   "13103": "https://qpublic.schneidercorp.com/Application.aspx?App=EffinghamCountyGA&Layer=Parcels&PageType=Search",
+  "13185": "https://qpublic.schneidercorp.com/Application.aspx?App=LowndesCountyGA&Layer=Parcels&PageType=Search",
+  "13021": "https://qpublic.schneidercorp.com/Application.aspx?App=BibbCountyGA&Layer=Parcels&PageType=Search",
+  "13059": "https://qpublic.schneidercorp.com/Application.aspx?App=ClarkeCountyGA&Layer=Parcels&PageType=Search",
+  "45013": "https://sc-beaufort.publicaccessnow.com/Searches/Real.aspx",
+  "28121": "https://www.deltacomputersystems.com/ms/ms61/plinkquerym.html",
+  "28089": "https://www.madison-co.com/elected-offices/tax-assessor/real-property-search",
+  "28049": "https://www.co.hinds.ms.us/pgs/apps/landroll_query.asp",
+  "28029": "https://cmpdd.org/maps/",
+  "28127": "https://cmpdd.org/maps/",
+  "28149": "https://cmpdd.org/maps/",
+  "28163": "https://cmpdd.org/maps/",
   "47011": "https://assessment.cot.tn.gov/tpad/",
   "37089": "https://lrcpwa.ncptscloud.com/henderson/parcel-search",
 };
@@ -106,6 +117,17 @@ const APPRAISER_LINKS: Record<string, { href: string; label: string }> = {
   "13255": { href: DEFAULT_APPRAISER_URLS["13255"], label: "Open Spalding County qPublic search" },
   "13029": { href: DEFAULT_APPRAISER_URLS["13029"], label: "Open Bryan County qPublic search" },
   "13103": { href: DEFAULT_APPRAISER_URLS["13103"], label: "Open Effingham County qPublic search" },
+  "13185": { href: DEFAULT_APPRAISER_URLS["13185"], label: "Open Lowndes County qPublic search" },
+  "13021": { href: DEFAULT_APPRAISER_URLS["13021"], label: "Open Bibb County qPublic search" },
+  "13059": { href: DEFAULT_APPRAISER_URLS["13059"], label: "Open Clarke County qPublic search" },
+  "45013": { href: DEFAULT_APPRAISER_URLS["45013"], label: "Open Beaufort County property search" },
+  "28121": { href: DEFAULT_APPRAISER_URLS["28121"], label: "Open Rankin County property search" },
+  "28089": { href: DEFAULT_APPRAISER_URLS["28089"], label: "Open Madison County, Mississippi property search" },
+  "28049": { href: DEFAULT_APPRAISER_URLS["28049"], label: "Open Hinds County land roll search" },
+  "28029": { href: DEFAULT_APPRAISER_URLS["28029"], label: "Open CMPDD maps" },
+  "28127": { href: DEFAULT_APPRAISER_URLS["28127"], label: "Open CMPDD maps" },
+  "28149": { href: DEFAULT_APPRAISER_URLS["28149"], label: "Open CMPDD maps" },
+  "28163": { href: DEFAULT_APPRAISER_URLS["28163"], label: "Open CMPDD maps" },
   "47011": { href: DEFAULT_APPRAISER_URLS["47011"], label: "Open Bradley County parcel in TPAD" },
   "37089": { href: DEFAULT_APPRAISER_URLS["37089"], label: "Open Henderson County property appraiser" },
 };
@@ -166,7 +188,23 @@ export function parcelAppraiserUrl(options: {
       label: "Open Bradley County parcel in TPAD",
     };
   }
-  if (fips === "13217" || fips === "13255" || fips === "13029" || fips === "13103") {
+  if (
+    fips === "13217" ||
+    fips === "13255" ||
+    fips === "13029" ||
+    fips === "13103" ||
+    fips === "13185" ||
+    fips === "13021" ||
+    fips === "13059" ||
+    fips === "45013" ||
+    fips === "28121" ||
+    fips === "28089" ||
+    fips === "28049" ||
+    fips === "28029" ||
+    fips === "28127" ||
+    fips === "28149" ||
+    fips === "28163"
+  ) {
     return {
       href: options.appraiserUrl || named?.href || null,
       label: named?.label || "Open county property appraiser",

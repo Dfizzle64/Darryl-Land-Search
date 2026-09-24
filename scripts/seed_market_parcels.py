@@ -394,6 +394,22 @@ def fetch_by_ids(
     return features
 
 
+def text_date(value: Any) -> str | None:
+    """Calendar dates stored as text. Epoch numbers stay on epoch_to_iso."""
+    text = clean(value)
+    if not text:
+        return None
+    for fmt, width in (("%Y-%m-%d", 10), ("%m/%d/%Y", None), ("%m/%d/%y", None), ("%Y/%m/%d", 10)):
+        sample = text[:width] if width else text
+        try:
+            parsed = datetime.strptime(sample, fmt).date()
+        except ValueError:
+            continue
+        if 1900 <= parsed.year <= 2100:
+            return parsed.isoformat()
+    return None
+
+
 def epoch_to_iso(value: Any) -> str | None:
     """ArcGIS epoch millis or seconds to YYYY-MM-DD. Rejects values outside 1900–2100."""
     parsed = num(value)
@@ -471,7 +487,10 @@ def normalize_rows(
         if spec.get("saleYearField"):
             sold = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1"))
         elif spec.get("saleDateField"):
-            sold = epoch_to_iso(attrs.get(spec["saleDateField"]))
+            raw_date = attrs.get(spec["saleDateField"])
+            sold = epoch_to_iso(raw_date)
+            if sold is None:
+                sold = text_date(raw_date)
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -822,6 +841,22 @@ def county_override(fips: str) -> dict | None:
         from effingham_parcels import effingham_spec
 
         return effingham_spec()
+    if fips in {
+        "13185",  # Lowndes GA — Valdosta
+        "13021",  # Bibb GA — Macon
+        "13059",  # Clarke GA — Athens
+        "45013",  # Beaufort SC — Hilton Head shelf; also the Savannah gap
+        "28121",  # Rankin MS
+        "28089",  # Madison MS
+        "28049",  # Hinds MS
+        "28029",  # Copiah MS
+        "28127",  # Simpson MS
+        "28149",  # Warren MS
+        "28163",  # Yazoo MS
+    }:
+        from new_metro_parcels import metro_spec
+
+        return metro_spec(fips)
     if fips == "45045":  # Greenville SC — county tax parcels, not the city GIS sample
         return {
             "kind": "arcgis",
@@ -967,7 +1002,7 @@ def county_row(
     if extra:
         row.update(extra)
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
-    (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
+    (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2, ensure_ascii=False) + "\n")
     return row
 
 
@@ -1058,7 +1093,7 @@ def rebuild_indexes(catalog: dict) -> None:
         rel = f"data/fixtures/market-parcels/markets/{slug(market['id'])}/meta.json"
         market_path = ROOT / rel
         market_path.parent.mkdir(parents=True, exist_ok=True)
-        market_path.write_text(json.dumps(meta, indent=2) + "\n")
+        market_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n")
         index_markets[market["id"]] = {
             "tier": market["tier"],
             "parcelCount": parcel_count,
@@ -1100,7 +1135,7 @@ def rebuild_indexes(catalog: dict) -> None:
         "orlando": "unchanged — see data/fixtures/orlando-parcels",
         "markets": index_markets,
     }
-    (OUT_DIR / "index.json").write_text(json.dumps(index, indent=2) + "\n")
+    (OUT_DIR / "index.json").write_text(json.dumps(index, indent=2, ensure_ascii=False) + "\n")
     coverage = "\n".join(coverage_lines + detail_lines) + "\n"
     (OUT_DIR / "coverage.md").write_text(coverage)
     docs = ROOT / "docs" / "market-parcels.md"
@@ -1128,7 +1163,9 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 Finished extracts in this batch were merged from public county and state GIS branches. Each `county.json` records the service URL, the feature count, and what was not joined. The coverage table is the inventory. A gap means no finished extract was included. Zoning and future land use are stored only where that county's source or a joined municipal layer published them.
 
-DeKalb County, Georgia is the complete assessment extract already merged on main (`ga-dekalb-assessment-view-2`). City zoning and future land use are joined where that extract published them. That service has no sale table. South Carolina city zoning joins through `scripts/sc_muni_zoning.py` and does not write an Opportunity Zone. Cobb and DeKalb batch-40 screening is the parcel-id fixture in `docs/muni-overlay-consolidator.md`.
+DeKalb County, Georgia is the complete assessment extract already merged on main (`ga-dekalb-assessment-view-2`). City zoning and future land use are joined where that extract published them. That service has no sale table.
+
+Municipal zoning, future land use, and Cobb/DeKalb batch-40 screening stay in [`muni-overlay-consolidator.md`](muni-overlay-consolidator.md). Those city codes are copied onto this shelf only when the parcel id still matches. The overlay does not add an Opportunity Zone, a school letter grade, or a base flood elevation. Polk's Orlando tiles still carry Lakeland, Bartow, Auburndale, Lake Alfred, and Lake Hamilton (`docs/polk-municipal.md`). Volusia city layers are in `docs/volusia-flagler-municipal.md`. Flagler has no parcel baseline here.
 
 Marshall County, Alabama is the web5 Marshall/Public/37 5–150 acre extract. Zoning is null. Baldwin County keeps the existing parcel shelf and adds Daphne Class zoning, Daphne Future_Dev, and Fairhope base zoning. Fairhope AO/MO names are overlay notes, not zoning codes. Shelby County keeps the existing parcel shelf and adds Alabaster ZoneCode. Walker, Washington, and Escambia County, Alabama stay gaps. Morgan County stays the existing VAM extract already on this branch. No Opportunity Zone designation was added.
 
@@ -1137,6 +1174,8 @@ Carroll County, Georgia uses the OpenAddresses job 910028 parcel snapshot becaus
 Walton County, Georgia is the choosewalton 5–150 GIS-acre landbase. FLU and Description are character areas, not Euclidean zoning. Monroe CAMA matches a handful of shared parcel numbers. City zoning covers Monroe, Loganville, and Social Circle only. Countywide owner, tax, sales, and Euclidean zoning stay gaps. Nothing in that extract is an Opportunity Zone designation.
 
 Newton County, Georgia is the University of Maryland AGOL redistribute (not an official county FeatureServer). Sales stop in 2021. County Euclidean zoning stays null except a Social Circle centroid join. Future land use is the NEGRC centroid join. Spalding County, Georgia is the public parcel view: owner, situs, sales, tax, and future land use stay null, and Griffin is left unzoned. Bradley County, Tennessee uses Census FIPS 47011 and the Cleveland GIS Parcels_Impact layer. The older Comptroller IMPACT tiles for that FIPS were the wrong geography and are replaced. Yadkin County, North Carolina uses the county GIS parcel layer instead of NC OneMap. Bryan County, Georgia uses PropertyDetails. Sales are a Beacon gap, and assessed values on that layer are empty. Effingham County, Georgia uses Parcels2024. Sale price and market value are joined from ParcelUpdate or the 2024 FLUM. No Opportunity Zone designation was added for these counties.
+
+Valdosta, Macon, Athens, Hilton Head, and Jackson MS are parcel shelves with no eligible-tract rows. Sources, zoning and future-land-use gaps, and the counties left off this pull are in `docs/new-metro-parcels.md`. Beaufort County also fills the previous Savannah gap. Tract income is ACS B19013. AADT stays the Florida FDOT layer. Nothing in these extracts is an Opportunity Zone designation, a school letter grade, or a base flood elevation.
 
 ## Coverage
 """
@@ -1152,6 +1191,10 @@ def apply_sc_muni_zoning(fips: str, features: list[dict]) -> tuple[list[dict], l
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "new-metro":
+        from new_metro_parcels import download_new_metro
+
+        return download_new_metro(county, markets, spec)
     if spec.get("kind") == "bryan":
         from bryan_parcels import download_bryan
 
@@ -1406,7 +1449,7 @@ def main() -> None:
                 raise RuntimeError(f"{fips} is a shipped parcel shelf and county.json is missing")
             row = json.loads(existing.read_text())
             row["markets"] = markets
-            (COUNTY_DIR / fips / "county.json").write_text(json.dumps(row, indent=2) + "\n")
+            (COUNTY_DIR / fips / "county.json").write_text(json.dumps(row, indent=2, ensure_ascii=False) + "\n")
             continue
         if spec["kind"] == "gap":
             if not existing.exists() or args.refresh:
@@ -1420,7 +1463,7 @@ def main() -> None:
             row = json.loads(existing.read_text())
             if row.get("featureCount") and row.get("coverage") in {"complete-gte-5ac", "sample"}:
                 row["markets"] = markets
-                (COUNTY_DIR / fips / "county.json").write_text(json.dumps(row, indent=2) + "\n")
+                (COUNTY_DIR / fips / "county.json").write_text(json.dumps(row, indent=2, ensure_ascii=False) + "\n")
                 continue
         jobs.append((priority_of(markets, catalog), slot["county"]["name"], slot["county"], markets, spec))
 

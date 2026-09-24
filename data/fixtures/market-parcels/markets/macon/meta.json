@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-09-24T04:29:15Z",
+  "market": "Macon",
+  "tier": "other",
+  "parcelCount": 3257,
+  "coreMinAcres": 5.0,
+  "coreMaxAcres": 150.0,
+  "tile": {
+    "originLon": -83.0,
+    "originLat": 27.0,
+    "tileDeg": 0.25
+  },
+  "notes": [
+    "Loaded only when this market is selected.",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
+    "Orange, Osceola, and Polk point at the existing Orlando complete extract."
+  ],
+  "counties": [
+    {
+      "name": "Bibb",
+      "fips": "13021",
+      "state": "Georgia",
+      "featureCount": 3257,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "ga-bibb-parcelcama-2025",
+      "queryUrl": "https://services2.arcgis.com/zPFLSOZ5HzUzzTQb/arcgis/rest/services/ParcelCAMA_Current_2025/FeatureServer/0/query",
+      "gaps": [
+        "Bibb County, Georgia (FIPS 13021) is consolidated Macon-Bibb. ParcelCAMA_Current_2025. TOTALACRES_1 5–150 inclusive. Not Bibb County, Alabama, and not Macon County, Georgia.",
+        "City of Macon and Payne City dissolved in 2014. There is no separate city parcel layer.",
+        "Zoning is ZoningDistrictsNew ZONECLASS. Parcel ZONINGCODE remains only where the polygon misses.",
+        "Future land use is MATS_Future_LandUse_2050. Certify against the adopted comprehensive plan.",
+        "No assessed value on this WinGAP extract. Sale prices of 0, 1, and 100 are dropped as nominal. Only the latest sale is on the polygon.",
+        "gis.maconbibb.us was down on the research pass and was not used.",
+        "No public AADT layer is on these cards, and the FDOT count layer is Florida-only. nearestRoad stays empty for these counties.",
+        "No Opportunity Zone designation, school letter grade, or base flood elevation was assigned."
+      ],
+      "path": "data/fixtures/market-parcels/counties/13021/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13021/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 3337,
+      "zoningJoinedCount": 3256,
+      "fluJoinedCount": 3249
+    }
+  ]
+}

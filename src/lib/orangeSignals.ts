@@ -6,9 +6,11 @@ import type { BBox, IncomeInfo, NearestRoad, ParcelFeature } from "./types";
  * ACS median household income and FDOT AADT joined at query time.
  * Tiles do not store these fields (they would duplicate the same tract and
  * road onto every parcel). The income fixture is ACS B19013 for Florida
- * parcel counties plus Atlanta and Charleston parcel counties, joined by
- * centroid-in-tract on `medianHouseholdIncome`. AADT segments are statewide
- * FDOT counts. Points outside that coverage stay unknown.
+ * parcel counties plus Atlanta, Charleston, and the Valdosta, Macon, Athens,
+ * Hilton Head, and Jackson MS shelves, joined by centroid-in-tract on
+ * `medianHouseholdIncome`. AADT segments are Florida FDOT counts and are
+ * attached only when the parcel has no county FIPS or a Florida FIPS.
+ * Georgia, South Carolina, and Mississippi parcels stay unknown for traffic.
  */
 
 const DATA_DIR = path.join(process.cwd(), "data", "fixtures");
@@ -289,7 +291,8 @@ export function annotateParcelSignals(feature: ParcelFeature, index: OrangeSigna
   if (feature.properties.incomeBlockGroup == null) {
     feature.properties.incomeBlockGroup = lookupIncome(lon, lat, index.blockGroups) ?? EMPTY_INCOME;
   }
-  if (feature.properties.nearestRoad == null) {
+  const floridaAadt = !feature.properties.countyFips || feature.properties.countyFips.startsWith("12");
+  if (feature.properties.nearestRoad == null && floridaAadt) {
     feature.properties.nearestRoad = nearestRoad(lon, lat, index.roads, index.roadGrid);
   }
 }

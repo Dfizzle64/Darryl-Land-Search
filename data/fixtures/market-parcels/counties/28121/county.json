@@ -1,0 +1,43 @@
+{
+  "name": "Rankin",
+  "fips": "28121",
+  "state": "Mississippi",
+  "markets": [
+    "Jackson MS"
+  ],
+  "featureCount": 12150,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ms-rankin-cmpdd-parcels",
+  "queryUrl": "https://gis.cmpdd.org/server/rest/services/Hosted/Rankin_County_Feature_Layer/FeatureServer/8/query",
+  "gaps": [
+    "Rankin County, Mississippi (FIPS 28121). CMPDD Hosted Rankin_County_Feature_Layer/8 on gis.cmpdd.org. arcacres 5–150 inclusive.",
+    "County zoning is FeatureServer/16 zoning2025. County future land use is FeatureServer/32 fulu2025.",
+    "Brandon zoning and future land use replace the county values on a parcel-id match. Flowood zoning (December 2025) replaces the county code. Flowood draft land use was not joined.",
+    "Pearl has future land use for 2026 and no city zoning layer. County zoning stays. Pearl future land use replaces the county future land use on a match.",
+    "Ridgeland has no verified public zoning REST on this pass. No Ridgeland code was invented.",
+    "No sale price on this layer. deed_date is the deed date, not a qualified sale price.",
+    "No public AADT layer is on these cards, and the FDOT count layer is Florida-only. nearestRoad stays empty for these counties.",
+    "No Opportunity Zone designation, school letter grade, or base flood elevation was assigned."
+  ],
+  "path": "data/fixtures/market-parcels/counties/28121/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/28121/lookup.json",
+  "sourceCount": 12173,
+  "dropped": 0,
+  "tileCount": 8,
+  "zoningJoinedCount": 9971,
+  "fluJoinedCount": 10734,
+  "join": {
+    "zoningJoined": 9971,
+    "fluJoined": 10734,
+    "salePriceNonNull": 0,
+    "byJurisdiction": {
+      "Flowood": 417,
+      "Pearl": 1293,
+      "Brandon": 439
+    },
+    "outsideBox": 0
+  }
+}

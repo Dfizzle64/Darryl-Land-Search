@@ -1,0 +1,41 @@
+{
+  "name": "Clarke",
+  "fips": "13059",
+  "state": "Georgia",
+  "markets": [
+    "Athens"
+  ],
+  "featureCount": 2039,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-clarke-acc-parcels",
+  "queryUrl": "https://enigma.accgov.com/server/rest/services/ACC_Parcels/FeatureServer/0/query",
+  "gaps": [
+    "Clarke County, Georgia (FIPS 13059, Athens-Clarke). ACC_Parcels on enigma.accgov.com. ACRES 5–150 inclusive. Not Clarke County, Virginia or Alabama, and not Athens, Ohio or Texas.",
+    "Zoning is PlanningViewer2025/14 CurrentZn. Future land use is PlanningViewer2025/41 Updated_FL.",
+    "Winterville and Bogart keep their own zoning. ACC CurrentZn and FLU are cleared inside those city limits and are not treated as the city codes.",
+    "No market or assessed value on the public parcel REST. qPublic App=ClarkeCountyGA (AppID 630) is the tax record.",
+    "Parcel_Sales_2018 is calendar year 2018 only. Later sales are not on a public year layer.",
+    "No public AADT layer is on these cards, and the FDOT count layer is Florida-only. nearestRoad stays empty for these counties.",
+    "No Opportunity Zone designation, school letter grade, or base flood elevation was assigned."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13059/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13059/lookup.json",
+  "sourceCount": 2122,
+  "dropped": 0,
+  "tileCount": 4,
+  "zoningJoinedCount": 1965,
+  "fluJoinedCount": 1942,
+  "join": {
+    "zoningJoined": 1965,
+    "fluJoined": 1942,
+    "salePriceNonNull": 69,
+    "byJurisdiction": {
+      "Winterville": 57,
+      "Bogart": 7
+    },
+    "outsideBox": 0
+  }
+}

@@ -72,6 +72,74 @@ const PARCEL_MARKET_SUMMARIES: Record<ParcelMarketId, MarketSummary> = {
 };
 
 const PARCEL_ONLY_MARKETS: Partial<Record<SearchMarketId, MarketSummary>> = {
+  Valdosta: {
+    market: "Valdosta",
+    rowCount: 0,
+    ruralCount: 0,
+    urbanCount: 0,
+    bounds: [
+      [-83.6, 30.5],
+      [-83.0, 31.25],
+    ],
+    center: [-83.28, 30.85],
+    counties: [{ county: "Lowndes", state: "Georgia", count: 0, outerEdge: false }],
+  },
+  Macon: {
+    market: "Macon",
+    rowCount: 0,
+    ruralCount: 0,
+    urbanCount: 0,
+    bounds: [
+      [-84.15, 32.45],
+      [-83.35, 33.15],
+    ],
+    center: [-83.7, 32.8],
+    counties: [{ county: "Bibb", state: "Georgia", count: 0, outerEdge: false }],
+  },
+  Athens: {
+    market: "Athens",
+    rowCount: 0,
+    ruralCount: 0,
+    urbanCount: 0,
+    bounds: [
+      [-83.65, 33.8],
+      [-83.1, 34.15],
+    ],
+    center: [-83.38, 33.95],
+    counties: [{ county: "Clarke", state: "Georgia", count: 0, outerEdge: false }],
+  },
+  "Hilton Head": {
+    market: "Hilton Head",
+    rowCount: 0,
+    ruralCount: 0,
+    urbanCount: 0,
+    bounds: [
+      [-81.25, 32.0],
+      [-80.3, 32.75],
+    ],
+    center: [-80.75, 32.35],
+    counties: [{ county: "Beaufort", state: "South Carolina", count: 0, outerEdge: false }],
+  },
+  "Jackson MS": {
+    market: "Jackson MS",
+    rowCount: 0,
+    ruralCount: 0,
+    urbanCount: 0,
+    bounds: [
+      [-91.4, 31.45],
+      [-89.35, 33.25],
+    ],
+    center: [-90.35, 32.35],
+    counties: [
+      { county: "Copiah", state: "Mississippi", count: 0, outerEdge: true },
+      { county: "Hinds", state: "Mississippi", count: 0, outerEdge: false },
+      { county: "Madison", state: "Mississippi", count: 0, outerEdge: false },
+      { county: "Rankin", state: "Mississippi", count: 0, outerEdge: false },
+      { county: "Simpson", state: "Mississippi", count: 0, outerEdge: true },
+      { county: "Warren", state: "Mississippi", count: 0, outerEdge: true },
+      { county: "Yazoo", state: "Mississippi", count: 0, outerEdge: true },
+    ],
+  },
   Heartland: {
     market: "Heartland",
     rowCount: 0,

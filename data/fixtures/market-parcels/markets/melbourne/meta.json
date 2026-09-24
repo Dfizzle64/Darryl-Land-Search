@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T01:06:16Z",
   "market": "Melbourne",
   "tier": "other",
-  "parcelCount": 39435,
+  "parcelCount": 41026,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -20,47 +20,308 @@
       "name": "Brevard",
       "fips": "12009",
       "state": "Florida",
-      "featureCount": 5746,
+      "featureCount": 6802,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12009",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/4/query",
+      "source": "fl-brevard-accela-12009",
+      "queryUrl": "https://gis.brevardfl.gov/gissrv/rest/services/Accela/AccelaGIS_Layers_WKID2881/MapServer/5/query",
       "gaps": [
-        "6989 source rows collapsed to 5746 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "City zoning and future land use are centroid-joined from municipal REST, with TaxAcct, PID, or RENUM when the parcel id matches. Melbourne market extract joined zoning on 979 parcels and FLU on 973 parcels. Melbourne, West Melbourne, Rockledge, Satellite Beach, and Cocoa (prior zoning plus FLU_Public_View layer 6) are usable. Indian Harbour Beach is zoning only. Cocoa Beach is the unofficial 2021 parcel layer. Palm Bay and Titusville are prior cards and are not applied in this pass. Cape Canaveral, Indialantic, Melbourne Beach, Grant-Valkaria, Palm Shores, Melbourne Village, and Malabar have no public city REST. County Zoning_WKID2881, county FLU, and Accela zoning are not copied into these cities. Melbourne, Australia is rejected."
+        "Rejected Melbourne, Australia. Brevard Accela covers Brevard County, Florida (about longitude -81 to -80.4 and latitude 27.8 to 28.8), not Victoria.",
+        "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
+        "Incorporated Brevard cities (the General map City layer) have no public city zoning or FLU FeatureServer in this pull. Melbourne, Palm Bay, Titusville, Cocoa, and the other cities stay blank. Accela is not used as their ordinance.",
+        "Parcel_by_Municipality_Ownership is municipal-owned parcels, not city limits, and is not the municipality layer.",
+        "The Accela parcel layer has land and building values but no just value, taxable value, sale price, or sale date. Those tax fields stay empty. The appraiser link is the BCPAO search page, not a parcel deep link.",
+        "Situs CITY on the parcel is a post-office place (Mims, Merritt Island, and similar) and is not the legal city. Legal cities come from the City polygon.",
+        "No owner phone or email is copied."
       ],
       "path": "data/fixtures/market-parcels/counties/12009/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12009/lookup.json",
-      "tileCount": 10,
-      "sourceCount": 6989,
-      "zoningJoinedCount": 979,
-      "fluJoinedCount": 973
+      "tileCount": 11,
+      "sourceCount": 6802,
+      "municipalities": [
+        {
+          "name": "Cape Canaveral",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Cocoa",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Cocoa Beach",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Grant-Valkaria",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Indialantic",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Indian Harbour Beach",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Malabar",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Melbourne",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Melbourne Beach",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Melbourne Village",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Palm Bay",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Palm Shores",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Rockledge",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Satellite Beach",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Titusville",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "West Melbourne",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        }
+      ],
+      "unincorporated": {
+        "zoningUrl": "https://gis.brevardfl.gov/gissrv/rest/services/Accela/AccelaGIS_Layers_WKID2881/MapServer/7",
+        "fluUrl": "https://gis.brevardfl.gov/gissrv/rest/services/Accela/AccelaGIS_Layers_WKID2881/MapServer/8",
+        "zoningFeatures": 10111,
+        "fluFeatures": 8246,
+        "zoningJoined": 3809,
+        "fluJoined": 3813,
+        "note": "Accela zoning and future land use cover unincorporated Brevard. A downtown Melbourne point does not hit the zoning layer. Incorporated cities are named from General/City and are not given county districts."
+      },
+      "zoningJoinedCount": 3809,
+      "fluJoinedCount": 3813
     },
     {
       "name": "Indian River",
       "fips": "12061",
       "state": "Florida",
-      "featureCount": 3416,
+      "featureCount": 3779,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12061",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/29/query",
+      "source": "fl-ircpa-parcels-12061",
+      "queryUrl": "https://gisportal.ircgov.com/server3/rest/services/IRCPA/Parcels_MS/MapServer/0/query",
       "gaps": [
-        "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12061, 191 zoning codes and 104 future land use codes). County parcels were not re-downloaded.",
-        "Vero Beach zoning is ZoningDistricts and future land use is ZoningFutureLandUse. Those code lists are not interchangeable. The token-gated COVB folder is not called.",
-        "Sebastian zoning is COS_Zoning. Sebastian future land use is still a gap.",
-        "Fellsmere, Indian River Shores, and Orchid stay blank. No city FeatureServer was invented."
+        "Rejected Tuscaloosa IRC AGOL. A layer titled IRC whose extent is Tuscaloosa County, Alabama is not Indian River County. Parcels are the Indian River property appraiser service on gisportal.ircgov.com.",
+        "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
+        "Fellsmere, Indian River Shores, and Orchid are municipalities on the county boundary layer and have no public zoning or FLU FeatureServer. Their parcels stay blank rather than inheriting unincorporated districts.",
+        "County COS/COS_Zoning is the Sebastian mirror on the county server. The city zoning and FLU services are the ones joined.",
+        "COVB on gisportal.ircgov.com requires a token. Vero Beach zoning and FLU come from the city's public FeatureServers.",
+        "Assessed and taxable value are not on the property-appraiser parcel service. CAMA_VALUE is stored as tax.marketValue and TAXES as tax.taxes. SALE_VI_CD is not treated as a qualified-sale flag.",
+        "No owner phone or email fields are copied."
       ],
       "path": "data/fixtures/market-parcels/counties/12061/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12061/lookup.json",
       "tileCount": 6,
-      "sourceCount": 3505,
-      "zoningJoinedCount": 191,
-      "fluJoinedCount": 104
+      "sourceCount": 3779,
+      "municipalities": [
+        {
+          "name": "Fellsmere",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Indian River Shores",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Orchid",
+          "independentGis": false,
+          "zoningUrl": null,
+          "fluUrl": null,
+          "fluGap": null,
+          "join": null,
+          "zoningJoined": 0,
+          "fluJoined": 0,
+          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
+        },
+        {
+          "name": "Sebastian",
+          "independentGis": true,
+          "zoningUrl": "https://services3.arcgis.com/NkT47EHQsmn9GxB3/arcgis/rest/services/City_of_Sebastian_Zoning_Web_Map_WFL1/FeatureServer/3",
+          "fluUrl": "https://services3.arcgis.com/NkT47EHQsmn9GxB3/arcgis/rest/services/Future_Land_Use/FeatureServer/0",
+          "fluGap": null,
+          "join": "spatial",
+          "zoningJoined": 152,
+          "fluJoined": 151,
+          "note": null
+        },
+        {
+          "name": "Vero Beach",
+          "independentGis": true,
+          "zoningUrl": "https://services1.arcgis.com/mK9abRqiJFkUgbPZ/arcgis/rest/services/ZoningDistricts/FeatureServer/0",
+          "fluUrl": "https://services1.arcgis.com/mK9abRqiJFkUgbPZ/arcgis/rest/services/ZoningFutureLandUse/FeatureServer/0",
+          "fluGap": null,
+          "join": "spatial",
+          "zoningJoined": 105,
+          "fluJoined": 105,
+          "note": null
+        }
+      ],
+      "unincorporated": {
+        "zoningUrl": "https://gisportal.ircgov.com/server3/rest/services/Planning/IRC_Zoning_MS/MapServer/0",
+        "fluUrl": "https://gisportal.ircgov.com/server3/rest/services/Planning/IRC_Future_Land_Use_MS/MapServer/0",
+        "zoningFeatures": 638,
+        "fluFeatures": 294,
+        "zoningJoined": 3362,
+        "fluJoined": 3366,
+        "note": "IRC_Zoning_MS is the unincorporated area. It does not cover Vero Beach or Sebastian."
+      },
+      "zoningJoinedCount": 3619,
+      "fluJoinedCount": 3622
     },
     {
       "name": "Orange",
@@ -74,7 +335,7 @@
       "source": "reused-orlando-ocpa-5-150",
       "queryUrl": "https://vgispublic.ocpafl.org/server/rest/services/Webmap/PARCEL/MapServer/4/query",
       "gaps": [
-        "Reused the Orlando OCPA 5.0\u2013150.0 acre tiles. Not a second download.",
+        "Reused the Orlando OCPA 5.0–150.0 acre tiles. Not a second download.",
         "Geometry, owner, mailing, sale, tax, and zoning come from OCPA."
       ],
       "path": "data/fixtures/orlando-parcels/tiles/12095",
@@ -86,20 +347,20 @@
       "name": "Osceola",
       "fips": "12097",
       "state": "Florida",
-      "featureCount": 5997,
+      "featureCount": 6169,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
       "source": "reused-orlando-complete-5-150",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/48/query",
+      "queryUrl": "https://gis.osceola.org/hosting/rest/services/Parcels/FeatureServer/3/query",
       "gaps": [
-        "Reused the Orlando complete 5.0\u2013150.0 acre tiles. Not re-scraped."
+        "Market rows point at the Orlando tile folder. Those tiles were reseeded from Osceola public parcels."
       ],
       "path": "data/fixtures/orlando-parcels/tiles/12097",
       "lookup": "data/fixtures/orlando-parcels/lookup/12097.json",
       "tileCount": 13,
-      "sourceCount": 7413
+      "sourceCount": 6170
     },
     {
       "name": "Volusia",
@@ -113,6 +374,7 @@
       "source": "fl-doh-ehwaters-12127",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/63/query",
       "gaps": [
+        "No zoning or FLU on the Florida DOH extract.",
         "City zoning and future land use are joined from municipal REST where a city polygon covers the centroid. Melbourne extract joined zoning on 2942 parcels and FLU on 1914 parcels. Volusia Open Data zoning layer 36 (ZONCODE 999) is not used. DeBary, New Smyrna Beach, Orange City, Lake Helen, and Pierson use CountywideZoning OriginalZoningCode only, not a city FLUM. Daytona Beach Shores and Beverly Beach are zoning-only. Flagler city layers are hosted on gis.palmcoast.gov; this repo has no Flagler parcel baseline."
       ],
       "path": "data/fixtures/market-parcels/counties/12127/tiles",

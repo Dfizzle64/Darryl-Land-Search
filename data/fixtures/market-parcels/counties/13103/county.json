@@ -5,19 +5,46 @@
   "markets": [
     "Savannah"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 6128,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "ga-effingham-parcels-2024",
+  "queryUrl": "https://services.arcgis.com/9scQWTgPOi3GxJRr/arcgis/rest/services/Parcels2024/FeatureServer/0/query",
   "gaps": [
-    "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+    "Kept 6128 Effingham County, Georgia parcels in the inclusive 5\u2013150 acre band from Parcels2024 (6130 source rows). TOTALACRES is the acreage field.",
+    "Parcels2024 has SalesDate and no SALEPRICE or CURR_VAL. lastSale.price and tax.marketValue are joined from ParcelUpdate on PARCEL_NO, then from FLUM_20240903_BOC_APPR_2 when ParcelUpdate has no positive value. Newer parcels can miss that join.",
+    "REASON is on Parcels2024 and is not a documented sale-quality flag, so lastSale.qualified stays null. There is no multi-sale history on the REST layer.",
+    "No assessed or taxable value is on the public REST layers. esttax is stored as tax.taxes when it is positive. tax.assessedValue and tax.taxableValue stay null.",
+    "Zoning is parcel-attributed ZCODE. No separate Euclidean zoning polygon service was found. Rincon, Guyton, and Springfield zoning maps are PDF or county ZCODE; no city zoning FeatureServer was used.",
+    "Future land use is EFF_REV2 on FLUM_20240903_BOC_APPR_2 joined by PARCEL_NO. That layer has fewer polygons than Parcels2024, so some parcels have no FLU.",
+    "Situs city is a spatial hit on County_Municipal_Boundaries (Rincon, Guyton, Springfield). The parcel city field is owner mailing and is not a municipality filter. Meldrim has no city polygon.",
+    "Rejected Effingham County, Illinois, SAGIS/Chatham ParcelDigest, and paid parcel vendors. Opportunity Zone and OZ 2.0 fields were not assigned."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/13103/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13103/lookup.json",
+  "sourceCount": 6130,
+  "dropped": 2,
+  "tileCount": 8,
+  "stats": {
+    "sourceRows": 6130,
+    "kept": 6128,
+    "duplicateGroups": 2,
+    "droppedGeometry": 0,
+    "droppedOutsideEffinghamGa": 0,
+    "droppedBand": 0,
+    "zoningJoined": 6120,
+    "fluJoined": 5444,
+    "salePriceJoined": 2748,
+    "saleDateFilled": 5925,
+    "marketValueFilled": 5620,
+    "rincon": 149,
+    "guyton": 38,
+    "springfield": 83,
+    "parcelUpdateRows": 28867,
+    "flumRows": 24619,
+    "situsFilled": 6128
+  },
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=EffinghamCountyGA&Layer=Parcels&PageType=Search"
 }

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T01:06:16Z",
   "market": "Knoxville",
   "tier": "other",
-  "parcelCount": 38433,
+  "parcelCount": 39939,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -39,20 +39,26 @@
       "name": "Blount",
       "fips": "47009",
       "state": "Tennessee",
-      "featureCount": 6102,
+      "featureCount": 8183,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47009",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-blount-agol-47009",
+      "queryUrl": "https://services3.arcgis.com/NIOS5f3vobGvnGtD/arcgis/rest/services/BlountParcels/FeatureServer/0/query",
       "gaps": [
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "8193 source rows collapsed to 8183 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "Blount County TN (FIPS 47009) is an IMPACT/TPAD county. Comptroller JUR is 005 and COUNTY_ID is 5, not the FIPS suffix. Parcels are the public AGOL BlountParcels layer (PARCEL_TYP=1, CALC_ACRE 5\u2013150) with owner, mailing, situs, sale, and appraisal. The geometry-only statewide IMPACT Parcels layer is not the attribute source. Token-gated ParcelPublishing (499) and the county GIS premium extract are not used. Blount County, Alabama (kcsgis Blount/Public) is the wrong state and is not used.",
+        "tax.marketValue is total appraisal (APPRAISAL). LANDVAL, IMPVAL, and OBYVAL are appraisal components stored beside it. Assessed and taxable totals are not on this public REST layer \u2014 confirm those, and blank or zero sales, on TPAD (https://assessment.cot.tn.gov/tpad/). No stable anonymous deep link was verified; search by parcel ID (ID / PARID) or GISLINK. lastSale.qualified is the roll AR code when present; deed book/page and VI are retained on the sale object.",
+        "Zoning is city-only on countywide parcels. The parcel ZONING attribute is a weak CAMA label. The joined code prefers LandUsePlanning/Zoning MapServer layer 2 ZONECLASS after CityLimits, then CITYNUM (464 Maryville, 012 Alcoa). Friendsville, Louisville, Townsend, and Rockford have no CITYNUM and resolve only from CityLimits. Blount County zoning polygons are not applied inside a city.",
+        "Adopted FLU is joined only inside Maryville (Maryville Future Land Use LANDUSEDESC) and Alcoa (Current Land Use landusedesc). Friendsville, Louisville, Townsend, Rockford, and unincorporated Blount have no verified public adopted FLU service, so FLU stays null there. Proposed countywide FLU Option layers are draft and are not joined. Maryville and Alcoa FLU are not applied outside those cities.",
+        "Acreage filter is CALC_ACRE. CAMADEEDAC and CAMACALCAC are secondary and often zero. National Park (NP) and federal rows can fall in the 5\u2013150 acre band; acreage is not a developability judgment.",
+        "Join counts \u2014 flu:alcoa 175, flu:alcoa-miss 4, flu:gap 7764, flu:maryville 234, flu:maryville-miss 6, jurisdiction:ALCOA 179, jurisdiction:FRIENDSVILLE 77, jurisdiction:LOUISVILLE 369, jurisdiction:MARYVILLE 240, jurisdiction:ROCKFORD 43, jurisdiction:TOWNSEND 31, jurisdiction:UNINCORPORATED 7244, zoning:cama 19, zoning:polygon 8164. FLU stays null for Friendsville, Louisville, Townsend, Rockford, and unincorporated (no adopted public FLU). Proposed county FLU options were not joined."
       ],
       "path": "data/fixtures/market-parcels/counties/47009/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47009/lookup.json",
-      "tileCount": 6,
-      "sourceCount": 6296
+      "tileCount": 7,
+      "sourceCount": 8193
     },
     {
       "name": "Campbell",
@@ -154,20 +160,22 @@
       "name": "Knox",
       "fips": "47093",
       "state": "Tennessee",
-      "featureCount": 5144,
+      "featureCount": 4569,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47093",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "kgis-parcel-search",
+      "queryUrl": "https://www.kgis.org/gisportal/sharing/servers/871856067a1243bd899774b2072381c5/rest/services/Parcel_Search_Layer/MapServer/0/query",
       "gaps": [
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "City of Knoxville future land use (PRLU) and the One Year Plan are not available to anonymous query. FLU stays null inside the city.",
+        "Town of Farragut has no public future-land-use FeatureServer. FLU stays null in Farragut.",
+        "Direct www.kgis.org/arcgis GlobalSearch and Property MapServers still return HTTP 401. This extract uses the public Parcel_Search_Layer portal proxy. Comptroller IMPACT is not used."
       ],
       "path": "data/fixtures/market-parcels/counties/47093/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47093/lookup.json",
-      "tileCount": 5,
-      "sourceCount": 5294
+      "tileCount": 7,
+      "sourceCount": 4569
     },
     {
       "name": "Loudon",

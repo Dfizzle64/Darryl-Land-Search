@@ -6,10 +6,12 @@ import {
   formatAcres,
   formatMailing,
   formatNumber,
+  formatParcelPlace,
   formatRoadLabel,
   formatSale,
   formatUsd,
   isEntityOwner,
+  missingPublicParcelValue,
   parcelAppraiserUrl,
 } from "@/lib/format";
 import { mailingGap, type ScreeningPoint } from "@/lib/screening";
@@ -114,38 +116,32 @@ export function ParcelDrawer({
   const zoningEmpty = zoningEmptyForPanhandle(
     properties.countyFips,
     zoningEmptyForCharlotte(
-    properties.countyFips,
-    zoningEmptyForManateeSarasota(
-    properties.countyFips,
-    properties.countyFips === "12009"
-    ? "No city zoning layer covers this parcel."
-    : zoningEmptyForMartinIrc(
-    properties.countyFips,
-    zoningEmptyForSeminole(
-    properties.countyFips,
-    zoningEmptyForPolk(
-    properties.countyFips,
-    zoningEmptyForCounty(
       properties.countyFips,
-      properties.countyFips === "12095"
-        ? "Not on the OCPA parcel"
-        : dekalb
-          ? "No municipal or county zoning joined for this parcel"
-          : "Not in this county's public parcel extract",
-    ),
-    ),
-    ),
-    ),
-    ),
+      zoningEmptyForManateeSarasota(
+        properties.countyFips,
+        properties.countyFips === "12009"
+          ? "No city zoning layer covers this parcel."
+          : zoningEmptyForMartinIrc(
+              properties.countyFips,
+              zoningEmptyForSeminole(
+                properties.countyFips,
+                zoningEmptyForPolk(
+                  properties.countyFips,
+                  zoningEmptyForCounty(properties.countyFips, missingPublicParcelValue("zoning", properties.countyFips)),
+                ),
+              ),
+            ),
+      ),
     ),
   );
-  const zoningLine = properties.countyFips === "12009"
-    ? formatJoinedZoning(properties.zoningCode, properties.municipal)
-    : properties.zoningCode
-      ? properties.municipal?.zoningLabel && properties.municipal.zoningLabel !== properties.zoningCode
-        ? `${properties.zoningCode} — ${properties.municipal.zoningLabel}`
-        : formatZoningWithCity(properties.zoningCode, properties.zoningDistrict)
-      : null;
+  const zoningLine =
+    properties.countyFips === "12009"
+      ? formatJoinedZoning(properties.zoningCode, properties.municipal)
+      : properties.zoningCode
+        ? properties.municipal?.zoningLabel && properties.municipal.zoningLabel !== properties.zoningCode
+          ? `${properties.zoningCode} — ${properties.municipal.zoningLabel}`
+          : formatZoningWithCity(properties.zoningCode, properties.zoningDistrict)
+        : null;
   const mailing = formatMailing(properties.mailingAddress) ?? mailingGap(properties.mailingAddress);
   const entityName = isEntityOwner(properties.ownerName)
     ? properties.ownerName
@@ -160,11 +156,7 @@ export function ParcelDrawer({
           : ""
       }`
     : null;
-  const stateLabel = properties.state?.trim() || (properties.countyFips?.startsWith("12") || !properties.countyFips ? "FL" : null);
-  const placeLine =
-    [properties.situsCity, properties.situsZip].filter(Boolean).join(" ") ||
-    [properties.countyName ? `${properties.countyName} County` : null, stateLabel].filter(Boolean).join(", ") ||
-    "Location not in this extract";
+  const placeLine = formatParcelPlace(properties);
   const appraiser = parcelAppraiserUrl({
     parcelId: properties.parcelId,
     countyFips: properties.countyFips,
@@ -178,7 +170,7 @@ export function ParcelDrawer({
         <div>
           <p className="text-[11px] uppercase tracking-[0.18em] text-clay-400">{properties.parcelId}</p>
           <h2 className="mt-1 font-display text-2xl leading-tight text-white">
-            {properties.situsAddress || "Address not available"}
+            {properties.situsAddress || missingPublicParcelValue("situs")}
           </h2>
           <p className="text-sm text-ink-300">{placeLine}</p>
         </div>
@@ -189,7 +181,7 @@ export function ParcelDrawer({
 
       <dl className="mt-5 grid grid-cols-2 gap-4">
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
-        <Field label="Property name" value={properties.propertyName} />
+        <Field label="Property name" value={properties.propertyName} empty={missingPublicParcelValue("propertyName")} />
         <Field label="Acreage" value={formatAcres(properties.acreage)} />
         {dekalb ? (
           <Field label="Tax district" value={properties.dorCode} empty="Tax district not on this parcel" />
@@ -221,19 +213,34 @@ export function ParcelDrawer({
             ),
           )}
         />
-        <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />
+        <Field
+          label="Designated Opportunity Zone"
+          value={
+            oz.inZone == null
+              ? null
+              : oz.inZone
+                ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}`
+                : "No — centroid is outside the joined designated QOZ tracts"
+          }
+          empty={missingPublicParcelValue("designatedOz")}
+        />
         <Field
           label="OZ 2.0"
           value={
             oz2.eligible == null
               ? null
               : oz2.eligible
-                ? `${oz2.statusChip ?? (oz2.rural === false ? "Eligible, not rural" : "Eligible")} · GEOID ${properties.oz2Eligibility?.tractGeoid ?? "unknown"}`
+                ? `${oz2.statusChip ?? (oz2.rural === false ? "Eligible, not rural" : "Eligible")} · census tract GEOID ${properties.oz2Eligibility?.tractGeoid ?? "unknown"}`
                 : "Not eligible"
           }
+          empty="OZ 2.0 eligibility is not joined for this parcel. That is not a designation."
         />
-        <Field label="Last sale" value={formatSale(properties.lastSale)} />
-        <Field label="Qualified sale" value={properties.lastSale.qualified} />
+        <Field label="Last sale" value={formatSale(properties.lastSale)} empty={missingPublicParcelValue("sale")} />
+        <Field
+          label="Qualified sale"
+          value={properties.lastSale.qualified}
+          empty={missingPublicParcelValue("saleQualified")}
+        />
         <Field label="Market value" value={formatUsd(properties.tax.marketValue)} />
         <Field label="Assessed value" value={formatUsd(properties.tax.assessedValue)} />
         <Field label="Taxable value" value={formatUsd(properties.tax.taxableValue)} />
@@ -256,6 +263,11 @@ export function ParcelDrawer({
       <div className="mt-5 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Zoning</p>
         <p className="mt-1 text-ink-100">{zoning.reason}</p>
+        {properties.zoningOverlay ? (
+          <p className="mt-2 text-ink-300">
+            Overlay: {properties.zoningOverlay}. This note is not the base zoning district.
+          </p>
+        ) : null}
       </div>
       <div className="mt-3 rounded-2xl border border-white/10 bg-ink-800/80 p-3 text-sm">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Future Land Use</p>

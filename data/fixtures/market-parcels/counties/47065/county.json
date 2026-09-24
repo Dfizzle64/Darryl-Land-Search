@@ -5,19 +5,27 @@
   "markets": [
     "Chattanooga"
   ],
-  "featureCount": 5108,
+  "featureCount": 9162,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "tn-impact-47065",
-  "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+  "source": "tn-hamilton-live-parcels",
+  "queryUrl": "https://mapsdev.hamiltontn.gov/hcwa03/rest/services/Live_Parcels/MapServer/0/query",
   "gaps": [
-    "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+    "Zoning joined on 9043 of 9162 parcels. Plan Hamilton place type joined on 6262 unincorporated parcels. City counts: Chattanooga 1752, Collegedale 215, East Ridge 76, Lakesite 26, Lookout Mountain 5, Red Bank 64, Ridgeside 1, Signal Mountain 75, Soddy Daisy 472, Unincorporated Hamilton 6391, Walden 85.",
+    "Hamilton County is not an IMPACT county. Parcels are Hamilton County Live_Parcels MapServer layer 0 filtered on CALCACRES 5\u2013150, not Comptroller IMPACT.",
+    "Owner, mailing, situs, land/building/yard/appraised/assessed values, and four sale slots come from that parcel layer. RecordsOnl is the assessor card. A sale consideration of 0 is kept as no price.",
+    "Municipality comes from Live_Administrative MapServer layer 2. Inside a city, that city's zoning layer wins over county RPA zoning.",
+    "Chattanooga zoning is Live_PropertyZoning layer 14 (new_zone), then the city Public Works Misc/Zoning mirror. East Ridge zoning is OpenGov/Live_East_Ridge layer 12, not Live_PropertyZoning layers 1\u20135. Red Bank, Soddy Daisy, Signal Mountain, and Collegedale use Live_PropertyZoning layers 3, 4, 5, and 1. Red Bank revised conditions (layer 2) are supplemental.",
+    "Lookout Mountain, Lakesite, Walden, and Ridgeside have no dedicated zoning REST layer. County RPA zoning is not used as their city code.",
+    "Unincorporated zoning falls through TempZoningRPA layer 3, Live_PropertyZoning layer 16, then PlanHamilton unincorporated zoning. RPA labels such as Collegedale, Red Bank, and Signal Mtn are coverage placeholders, not city district codes.",
+    "PlanHamilton PlaceTypesPlanHamilton layer 3 is policy guidance for unincorporated geography, not a zoning entitlement, and it is not applied inside city limits. City of Chattanooga Place Type (https://planchattanooga.org/draft/) was reconfirmed on 2026-09-23: pwgis.chattanooga.gov has no Place Type FeatureServer. East Ridge, Red Bank, Soddy Daisy, Signal Mountain, Collegedale, Lookout Mountain, Lakesite, Walden, and Ridgeside also have no public Place Type layer.",
+    "County GIS polygons are representational, not survey-grade. The next countywide reappraisal is January 1, 2029."
   ],
   "path": "data/fixtures/market-parcels/counties/47065/tiles",
   "lookup": "data/fixtures/market-parcels/counties/47065/lookup.json",
-  "sourceCount": 5317,
-  "dropped": 177,
-  "tileCount": 7
+  "sourceCount": 9163,
+  "dropped": 1,
+  "tileCount": 9
 }

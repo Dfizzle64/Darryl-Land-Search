@@ -5,20 +5,25 @@
   "markets": [
     "Nashville"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 7038,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "tn-impact-47125",
-  "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+  "source": "tn-mcgtn-cama-47125",
+  "queryUrl": "https://gis.montgomerytn.gov/gisserver/rest/services/mcgtn_parcels/MapServer/0/query",
   "gaps": [
-    "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-    "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+    "11003 PARCEL_TYPE=1 rows in the 5.0\u2013150.0 acre band collapsed to 7038 GISLINK ids. Extra rows are CAMA building cards on the same polygon. One feature is kept per GISLINK (largest CalcAcreage, then building card 1).",
+    "Montgomery County, Tennessee (FIPS 47125, Clarksville) is not on Comptroller IMPACT (COUNTY_ID 125 returns no 5\u2013150 acre rows). Parcels are the county CAMA service mcgtn_parcels on gis.montgomerytn.gov. Filter is PARCEL_TYPE=1 and CalcAcreage 5.0\u2013150.0. COUNTY_ID on this layer is 63, the Comptroller county number, not FIPS 125.",
+    "City of Clarksville is TaxingDistrictCode 135. TaxingDistrictCode 000 is unincorporated Montgomery County. PropertyCity CLARKSVILLE is a post office and includes unincorporated parcels, so it is not the city limit. Clarksville, Indiana is a different city and is not in this extract; centroids outside the Montgomery TN extent are dropped.",
+    "Zoning is the CMCRPC district stored on the CAMA parcel (Zoning), which matches the public Zoning map service. Districts are not classified in the multifamily knowledge base. Prefer All parcels. The CMCRPC zoning map also has a Fort Campbell polygon; this extract is taxable PARCEL_TYPE=1 parcels only.",
+    "Clarksville-Montgomery County Growth Plan 2040 is adopted policy for the urban growth boundary, planned growth areas, and rural area. It is not current zoning and is not joined as future land use.",
+    "Opportunity Zone fields are left unset. OZ 2.0 eligibility on the tract overlay means eligible for nomination, not a designated QOZ. Designated zones are HUD/Treasury geography and are not inferred from eligibility.",
+    "No tax bill on this layer. Market value is MktAppraisedValue and assessed value is AssessedValue. Greenbelt use value is not copied into taxable. A sale price of $0 is treated as not available. There is no situs ZIP field; mailing ZIP is kept. Sale qualification codes are not interpreted."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": 0,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/47125/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47125/lookup.json",
+  "sourceCount": 11003,
+  "dropped": 0,
+  "tileCount": 6
 }

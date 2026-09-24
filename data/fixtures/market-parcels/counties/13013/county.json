@@ -5,19 +5,34 @@
   "markets": [
     "Atlanta"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 4251,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "ga-barrow-parcels",
+  "queryUrl": "https://services5.arcgis.com/OVFGXfRTCVcPwl55/arcgis/rest/services/BarrowParcelswOwner_Project/FeatureServer/1/query",
   "gaps": [
-    "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+    "4277 source rows collapsed to 4251 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "Acreage is GIS area only (BarrowParcelswOwner_Project/FeatureServer/1 Shape__Area / 4046.8564224, Web Mercator). No deeded-acre field is published.",
+    "No public sales or tax values on the parcel polygons. qPublic SchneiderCorp AppID=635 LayerID=11218 is HTML only.",
+    "County CurrentZoningDistricts Zone is PIN-joined. City-name zones (Winder, Auburn, Statham, Braselton, Bethlehem, Carl) are stubs. City Euclidean zoning is joined for Winder (spatial ZONECLASS), Bethlehem, and Carl (PIN). Auburn, Statham, and Braselton have no city zoning service.",
+    "Future land use is parcel-tied FLU2023. Winder 2023 character replaces the City of Winder stub on a centroid hit. Statham and Braselton NEGRC FLU replace those city stubs on a centroid hit. Auburn NEGRC FLU is partial and is not applied. Bethlehem and Carl have no separate city FLU layer.",
+    "Situs is joined from Address_Points on Parcel_ID when that field is filled. Post_Comm is the postal community, not the municipality.",
+    "Mailing ADDRESS1 is often a co-owner name. The street is ADDRESS2, then ADDRESS3, when ADDRESS1 looks like a person name.",
+    "Opportunity Zone and OZ 2.0 designations are not assigned from this county layer.",
+    "Rejected lookalikes were not used: City of Norwalk CT ParcelViewer (org HfsHDBmkGwb1UtID) and ARC LandPro as a cadastral substitute."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/13013/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13013/lookup.json",
+  "sourceCount": 4277,
+  "dropped": 6,
+  "tileCount": 4,
+  "annotations": {
+    "zoning": 3654,
+    "cityZoning": 285,
+    "flu": 4112,
+    "cityFlu": 331,
+    "situs": 2815
+  }
 }

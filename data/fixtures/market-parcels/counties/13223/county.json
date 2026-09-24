@@ -5,19 +5,27 @@
   "markets": [
     "Atlanta"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 5094,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "ga-paulding-parcels",
+  "queryUrl": "https://services8.arcgis.com/7YXQzPPGs9Uc4qKl/arcgis/rest/services/Paulding_Map_Auto_Updated_WFL3/FeatureServer/25/query",
   "gaps": [
-    "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+    "5099 source rows collapsed to 5094 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "Paulding Map Auto Updated FeatureServer/25. Acreage is DeedAc (5.0\u2013150.0 inclusive). CalcAc is 0 on this layer and is not the filter. Parcel id is GPIN. Thin attributes are GPIN, DeedAc, TaxDist, OWNKEY, SubdivID, and SubdivLotNum. OWNKEY is an owner key, not a name.",
+    "Owner name, mailing address, tax values, and last sale are not on the public REST layer. qPublic HTML was not scraped. The county search page is linked; it is not a per-parcel record pull.",
+    "Zoning is a centroid join to Paulding_County_GA_Zoning_Map_WFL1 FeatureServer/3 ZoningCode (~42k polygons). The layer keeps preceding zoning underneath newer cases. The smallest polygon with a code wins. Denied, withdrawn, and pending statuses are skipped. There is no separate Dallas, Hiram, or Braswell zoning FeatureServer on this join.",
+    "County future land use is not a public FeatureServer. Dallas FLU is DallasFLU2017 Character_ (the character area), extent-checked to Paulding County, Georgia, and joined only where TaxDist is 1100 (Dallas). CA_Descrip is often blank and sometimes a different class, so it is not stored. Hiram and Braswell future land use are not on a public REST layer.",
+    "Municipality is the TaxDist proxy: 1000 Paulding County, 1100 Dallas, 1200 Hiram, 1300 Braswell. City Limits FeatureServer/12 (Dallas, Hiram, Braswell) is a boundary check and does not override TaxDist. Null TaxDist may take the city boundary name.",
+    "The parcel extent is checked against Paulding County, Georgia (about -84.87, 33.83). Paulding, Ohio is rejected and not queried.",
+    "Paulding 5\u2013150 acre join: zoning 4862/5094 (zoning polygons read 41973, skipped blank or closed status 145). Dallas FLU 110; Dallas centroids with no FLU polygon 7. TaxDist municipalities: Braswell 32, Dallas 117, Hiram 81, Paulding County 4861, Unknown 3. City-limit boundary filled a null TaxDist on 0. TaxDist 1000 centroids inside a city polygon 2 (TaxDist kept). TaxDist city disagreed with the city-limit polygon on 0 (TaxDist kept). City-limit extent -84.973,33.831,-84.724,33.995.",
+    "DallasFLU2017 extent -84.940,33.870,-84.724,33.984 is inside Paulding County, Georgia (605 character-area polygons)."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/13223/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13223/lookup.json",
+  "sourceCount": 5099,
+  "dropped": 0,
+  "tileCount": 5
 }

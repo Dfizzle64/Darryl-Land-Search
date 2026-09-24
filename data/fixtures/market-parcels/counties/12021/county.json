@@ -1,0 +1,25 @@
+{
+  "name": "Collier",
+  "fips": "12021",
+  "state": "Florida",
+  "markets": [
+    "SWFL"
+  ],
+  "featureCount": 13889,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "fl-collier-parceljoin",
+  "queryUrl": "https://services2.arcgis.com/SlIq32SqARUHIhSx/arcgis/rest/services/Parcels/FeatureServer/42/query",
+  "gaps": [
+    "Collier sales are not on the ParcelJoin REST layer (Parcels Join, FeatureServer layer 42). Sale price and date are omitted. They were not filled from a paid vendor.",
+    "ParcelJoin has owner and total acres only. No situs, city, zip, zoning, or assessed value. Naples, Marco Island, and Everglades City are listed in data/swfl-municipalities.json and are not spatially joined.",
+    "Florida DOH EHWATER Collier layer 10 does carry NAL sales. This extract stays on county ParcelJoin so that missing-sales gap stays visible. FGDL zoning was not used."
+  ],
+  "path": "data/fixtures/market-parcels/counties/12021/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12021/lookup.json",
+  "sourceCount": 13889,
+  "dropped": 0,
+  "tileCount": 17
+}

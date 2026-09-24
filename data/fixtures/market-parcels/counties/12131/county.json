@@ -5,24 +5,35 @@
   "markets": [
     "Pensacola"
   ],
-  "featureCount": 8179,
+  "featureCount": 8930,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-doh-ehwaters-12131",
-  "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/65/query",
+  "source": "fl-panhandle-12131",
+  "queryUrl": "https://services1.arcgis.com/TaXHPwWfIMuzJ7Ov/arcgis/rest/services/EnerGov/FeatureServer/4/query",
   "gaps": [
-    "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12131, 135 zoning codes and 158 future land use codes). County parcels were not re-downloaded.",
-    "DeFuniak Springs zoning and future land use are the city WeeklyUpdates layers. Paxton future land use is FLU_CLASS. Paxton zoning stays a gap.",
-    "Panama City Beach city layers were checked. They sit in Bay County and do not cover the Walton PCB situs parcels.",
-    "Freeport zoning is a numeric code with a blank description and was not stored."
+    "Joined zoning on 8801 of 8930 parcels and FLU on 8867. Owner 8852, situs 0, sale price 0, sale date 8492.",
+    "9632 source rows became 8930 parcel ids. 756 split pieces with a new shape were merged. 18 repeated rows with the same polygon (stacked units or duplicate ids) were collapsed to one feature. Acreage and tax values are not summed across those rows. Rows that failed the WGS84 or county-extent check were dropped.",
+    "Situs is a gap on EnerGov Parcels/4. Sale price is a gap (SALE_DATE_1 only; book/page is not a price and is not stored).",
+    "County EnerGov zoning/19 (ZONE_CLASS) and FLU/15 (FLU_TYPE code, FLU_CLASS label) apply outside city limits. DeFuniak Springs, Freeport, and Paxton use city layers. County districts are not applied inside those cities. Hits: county 8956, DeFuniak Springs 208, Freeport 335, Paxton 83.",
+    "DeFuniak Springs zoning and FLU join on PARCELNO (WeeklyUpdatesDFS/7 and /6), with a spatial fallback on the same city layers.",
+    "Freeport zoning (WeeklyUpdatesFreeport/7) is numeric and Description was blank on the samples. Observed zoning codes in this extract: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12. Do not treat the number as a named district until the city LDC legend is confirmed.",
+    "Freeport FLU (WeeklyUpdatesFreeport/6) Land_Use was numeric and Description was blank on first ingest. Observed Land_Use codes: 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12. The code is stored. No legend was invented.",
+    "Paxton FLU is WeeklyUpdatesPaxton/6 (FLU_CLASS). SubType is numeric and is not expanded into a name. Paxton zoning is a gap.",
+    "A Monroe County layer titled Walton County Tax Parcels was rejected as wrong geography.",
+    "Appraiser link is the Walton PA portal. No verified per-parcel deep link is on the layer. Search uses PARCELNO.",
+    "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077)."
   ],
   "path": "data/fixtures/market-parcels/counties/12131/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12131/lookup.json",
-  "sourceCount": 9815,
-  "dropped": 0,
+  "sourceCount": 9632,
+  "dropped": 1,
   "tileCount": 8,
-  "zoningJoinedCount": 135,
-  "fluJoinedCount": 158
+  "zoningJoinedCount": 8801,
+  "fluJoinedCount": 8867,
+  "salePriceCount": 0,
+  "saleDateCount": 8492,
+  "situsCount": 0,
+  "ownerCount": 8852
 }

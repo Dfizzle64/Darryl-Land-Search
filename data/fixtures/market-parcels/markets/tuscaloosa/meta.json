@@ -1,0 +1,103 @@
+{
+  "generatedAt": "2026-09-24T01:06:16Z",
+  "market": "Tuscaloosa",
+  "tier": "other",
+  "parcelCount": 11596,
+  "coreMinAcres": 5.0,
+  "coreMaxAcres": 150.0,
+  "tile": {
+    "originLon": -83.0,
+    "originLat": 27.0,
+    "tileDeg": 0.25
+  },
+  "notes": [
+    "Loaded only when this market is selected.",
+    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Orange, Osceola, and Polk point at the existing Orlando complete extract."
+  ],
+  "counties": [
+    {
+      "name": "Greene",
+      "fips": "01063",
+      "state": "Alabama",
+      "featureCount": 0,
+      "coverage": "gap",
+      "partition": "none",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "unavailable",
+      "queryUrl": null,
+      "gaps": [
+        "Greene County has Flagship/CaptureCAMA HTML only. No usable public parcel REST in this pull. Polygons were not invented."
+      ],
+      "path": null,
+      "lookup": null,
+      "tileCount": null,
+      "sourceCount": null
+    },
+    {
+      "name": "Hale",
+      "fips": "01065",
+      "state": "Alabama",
+      "featureCount": 0,
+      "coverage": "gap",
+      "partition": "none",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "unavailable",
+      "queryUrl": null,
+      "gaps": [
+        "Hale County has Flagship/CaptureCAMA HTML only. No usable public parcel REST in this pull. Polygons were not invented."
+      ],
+      "path": null,
+      "lookup": null,
+      "tileCount": null,
+      "sourceCount": null
+    },
+    {
+      "name": "Pickens",
+      "fips": "01107",
+      "state": "Alabama",
+      "featureCount": 0,
+      "coverage": "gap",
+      "partition": "none",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "unavailable",
+      "queryUrl": null,
+      "gaps": [
+        "Pickens County has Flagship/CaptureCAMA HTML only. No usable public parcel REST in this pull. Polygons were not invented."
+      ],
+      "path": null,
+      "lookup": null,
+      "tileCount": null,
+      "sourceCount": null
+    },
+    {
+      "name": "Tuscaloosa",
+      "fips": "01125",
+      "state": "Alabama",
+      "featureCount": 11596,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "al-tuscaloosa-parcels",
+      "queryUrl": "https://services.arcgis.com/AWzSDaKZ41uuVges/ArcGIS/rest/services/Parcels/FeatureServer/0/query",
+      "gaps": [
+        "11646 source rows collapsed to 11596 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+        "No sale price on the public parcel layer. lastSale.price stays null.",
+        "Acreage filter uses rtMAP_ACRE. rtDEED_ACR is often 0 and is not the filter.",
+        "deedDATE is stored as lastSale.date when present. There is no sale price field.",
+        "City of Tuscaloosa zoning is Zoning_Districts/3. Framework_Zoning_Map is a draft and was not joined.",
+        "Northport zoning is NorthportZoning_Dec2024, joined on pclNUM digits to Name/pclnum, then by centroid.",
+        "Northport future land use is FLU_240408, joined by centroid.",
+        "Hale, Pickens, and Greene counties are Flagship/CaptureCAMA HTML only in this pull. No usable public parcel REST. Polygons were not invented. Bibb County stays a Birmingham parcel gap for the same reason."
+      ],
+      "path": "data/fixtures/market-parcels/counties/01125/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01125/lookup.json",
+      "tileCount": 11,
+      "sourceCount": 11646
+    }
+  ]
+}

@@ -46,7 +46,6 @@ import {
   pointInBbox,
   STATE_REPORT_CARDS,
   toSchoolRating,
-  UTILITY_LAYER_NOTE,
   type SchoolRating,
   type ScreeningPoint,
   type TractAtPoint,
@@ -582,13 +581,13 @@ export async function schoolsNear(lon: number, lat: number): Promise<{ schools: 
     ].slice(0, 8);
     const fixture = loadSchoolRatings();
     const orangeNote = zoned.some((school) => school.id.startsWith("ocps-"))
-      ? " Zoned elementary, middle, and high schools are OCPS attendance zones, not the nearest campus. "
+      ? "Zoned elementary, middle, and high schools are OCPS attendance zones, not the nearest campus. "
       : zoned.some((school) => school.id.startsWith("cms-"))
-        ? " Zoned elementary, middle, and high schools are CMS attendance zones, not the nearest campus. Charlotte-Mecklenburg letters are the 2025-26 NCDPI file for LEA 600. "
-        : " ";
+        ? "Zoned elementary, middle, and high schools are CMS attendance zones, not the nearest campus. Charlotte-Mecklenburg letters are the 2025-26 NCDPI file for LEA 600. "
+        : "";
     const note = fixture
-      ? `${UTILITY_LAYER_NOTE.schools}${orangeNote}`
-      : `Florida letter grades are not loaded in this build. Dots still use NCES locations and state report-card links. No grade is invented.${orangeNote}`;
+      ? `${orangeNote}No grade is invented.`
+      : `${orangeNote}School letter grades are not loaded in this build. No grade is invented.`;
     return { schools, note };
   } catch {
     const schools = [...zoned, ...nearestSchools(floridaSchoolsInBbox(bbox), lon, lat)].slice(0, 8);
@@ -718,10 +717,7 @@ export async function utilityPolygons(kind: UtilityKind, bbox: BBox): Promise<Sc
   }
   const orangeView = bboxesIntersect(bbox, ORANGE_UTILITY_BBOX);
   if (!orangeView && kind !== "power") {
-    return EMPTY_COLLECTION(
-      "unknown",
-      kind === "water" ? UTILITY_LAYER_NOTE.water : UTILITY_LAYER_NOTE.sewer,
-    );
+    return EMPTY_COLLECTION("unknown", "Not available for this view yet.");
   }
   const ocflPower = kind === "power" && orangeView;
   const service = kind === "water" ? ORANGE_WATER_SERVICE : kind === "sewer" ? ORANGE_SEWER_SERVICE : ocflPower ? ORANGE_POWER_SERVICE : HIFLD_POWER_SERVICE;
@@ -746,7 +742,14 @@ export async function utilityPolygons(kind: UtilityKind, bbox: BBox): Promise<Sc
       features,
       meta: {
         status: "ok",
-        summary: kind === "power" ? UTILITY_LAYER_NOTE.power : kind === "water" ? UTILITY_LAYER_NOTE.water : UTILITY_LAYER_NOTE.sewer,
+        summary:
+          kind === "power"
+            ? ocflPower
+              ? "Orange County electric service areas. Not a connection or a will-serve."
+              : "HIFLD electric retail territories. Not a connection or a will-serve."
+            : kind === "water"
+              ? "Orange County public water service areas. Not a connection or a will-serve."
+              : "Orange County public wastewater service areas. Not a connection or a will-serve.",
       },
     };
   } catch {
@@ -785,8 +788,8 @@ export async function schoolsInView(bbox: BBox): Promise<ScreeningCollection> {
       meta: {
         status: "ok",
         summary: gradedFlorida
-          ? UTILITY_LAYER_NOTE.schools
-          : "Florida letter grades are not in this build. Dots are NCES locations with a link to the state report card. No grade is invented.",
+          ? "School locations for this view. No grade is invented."
+          : "School letter grades are not in this build. Dots are NCES locations with a link to the state report card. No grade is invented.",
       },
     };
   } catch {

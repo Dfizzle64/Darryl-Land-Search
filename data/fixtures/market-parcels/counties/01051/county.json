@@ -1,0 +1,42 @@
+{
+  "name": "Elmore",
+  "fips": "01051",
+  "state": "Alabama",
+  "markets": [
+    "Montgomery"
+  ],
+  "featureCount": 9758,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "al-elmore-parcels",
+  "queryUrl": "https://web5.kcsgis.com/kcsgis/rest/services/Elmore/Public/MapServer/133/query",
+  "gaps": [
+    "14848 source rows collapsed to 9758 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "No sale price on the public parcel layer. lastSale.price stays null.",
+    "Public/133 is the county parcel source. Public_2022 was not used.",
+    "Millbrook zoning is Millbrook_GIS_View/2 (Zone_). Null Zone_ polygons are skipped.",
+    "Prattville zoning is ZONING_JULY_2017 (internal layer name Zoning_2022). Vintage is unclear: sampled DATE_ZONED values are often May 1, 1987, with some later ordinances. Joined only where the polygon overlaps Autauga or Elmore parcels. Partial until a current official zoning service is confirmed.",
+    "City of Wetumpka Zoning_Districts_Public returns token required (HTTP 499). The zoning web map is not a public FeatureServer query. It was not downloaded and no Wetumpka zoning was invented."
+  ],
+  "path": "data/fixtures/market-parcels/counties/01051/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01051/lookup.json",
+  "sourceCount": 14848,
+  "dropped": 15,
+  "tileCount": 9,
+  "join": {
+    "featureCount": 9758,
+    "zoningJoined": 288,
+    "zoningRate": 0.0295,
+    "byJurisdiction": {
+      "Millbrook": 203,
+      "Prattville": 85
+    },
+    "fluJoined": 0,
+    "fluRate": 0.0,
+    "prattvilleJoined": 85,
+    "salePriceNonNull": 0,
+    "saleDateNonNull": 0
+  }
+}

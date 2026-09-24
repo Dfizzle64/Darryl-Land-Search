@@ -310,7 +310,7 @@ export function emptyStateHint(filters: FilterState, matched: number, fluUnknown
     return "No matching parcels sit in a current designated Qualified Opportunity Zone under the other filters. Clear the OZ filter or lower acreage / income / AADT thresholds.";
   }
   if (filters.ozFilter === "rural-eligible") {
-    return "No matching parcels have a centroid in an OZ 2.0 rural-eligible tract. In Orange County, Rev. Proc. 2026-14 rural-eligible is census tract 12095016605 (eligible for nomination, not a designated 2027 QOZ). Try All parcels if the land-use mode is hiding it, or clear the OZ filter.";
+    return "No parcel centroid in this view falls in a Rev. Proc. 2026-14 rural-eligible tract. That status is eligible for nomination, not a designated 2027 QOZ. Try a wider view, or clear the Opportunity Zone filter.";
   }
   if (filters.ozFilter === "non-rural-eligible") {
     return "No matching parcels have a centroid in an OZ 2.0 eligible tract that Rev. Proc. 2026-14 marks Non-rural. Try All parcels, or clear the OZ filter.";

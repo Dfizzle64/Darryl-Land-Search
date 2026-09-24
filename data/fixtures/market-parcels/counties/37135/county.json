@@ -5,20 +5,42 @@
   "markets": [
     "Raleigh-Durham"
   ],
-  "featureCount": 11139,
+  "featureCount": 9375,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "nc-onemap-37135",
-  "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+  "source": "nc-orange-webparcel-37135",
+  "queryUrl": "https://gis.orangecountync.gov/arcgis/rest/services/WebParcelService/MapServer/0/query",
   "gaps": [
-    "NC OneMap gisacres is 0 for this county. Acres were computed from the polygon and then limited to 5.0\u2013150.0.",
-    "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
+    "Acreage is county GIS CALC_ACRES in the inclusive 5\u2013150 band. Deed SIZE can differ and is not the filter.",
+    "Situs is not on parcel polygons. Address points are joined by PIN from WebIdentifyServiceAnalysis/1. LRCAMA/WebCamaAddresses fills PINs that layer missed. PrimaryFlag YES is preferred.",
+    "County WebZoningService district codes are used only for unincorporated County. CH, CA, HI, ME, and DU are jurisdiction shells and are never stored as zoning.",
+    "Chapel Hill zoning is OpenData Zoning_Districts, Carrboro is ZoningSP/30 (conditional ZoningSP/20 when the PIN is listed), and Hillsborough is ZoningLayersII/3. Joined by a point inside the parcel.",
+    "FLU is city-first: Chapel Hill Future Land Use Map 2050 (requested in WGS84; source is Web Mercator) and Hillsborough Land Use. County Future_Land_Use_Map/12 covers unincorporated land and Mebane/Durham edge. Carrboro has no public FLU FeatureServer.",
+    "Last sale price is STAMPVALUE, a tax-stamp proxy, not deed consideration. There is no multi-sale history layer.",
+    "tax.marketValue is total VALUATION, tax.assessedValue is LANDVALUE, and tax.taxableValue is USEVALUE when the parcel is in present-use. Building value is not a separate field.",
+    "Mebane and Durham edge parcels have no Orange-hosted district zoning.",
+    "Overlay districts (Chapel Hill, Carrboro, Hillsborough) are not joined.",
+    "NC OneMap is fallback only (cntyfips 135, recareano). OneMap gisacres is 0 and siteadd is empty for Orange.",
+    "No phones or emails. Public GIS only."
   ],
   "path": "data/fixtures/market-parcels/counties/37135/tiles",
   "lookup": "data/fixtures/market-parcels/counties/37135/lookup.json",
-  "sourceCount": 59366,
-  "dropped": 48227,
-  "tileCount": 6
+  "sourceCount": 9375,
+  "dropped": 0,
+  "tileCount": 6,
+  "enrich": {
+    "situsMatched": 6542,
+    "zoningMatched": 9261,
+    "fluMatched": 8989,
+    "jurisdictions": {
+      "chapelHill": 372,
+      "carrboro": 262,
+      "hillsborough": 216,
+      "county": 8423,
+      "mebane": 100,
+      "durham": 2
+    }
+  }
 }

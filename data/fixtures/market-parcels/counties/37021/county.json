@@ -1,0 +1,37 @@
+{
+  "name": "Buncombe",
+  "fips": "37021",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 10523,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-buncombe-opendata-37021",
+  "queryUrl": "https://gis.buncombecounty.org/arcgis/rest/services/opendata/FeatureServer/1/query",
+  "gaps": [
+    "Biltmore Forest zoning is PDF-only (biltmoreforest.org planning maps). City CBF parcels stay blank. County zoning is not applied inside the town.",
+    "SalePrice was non-zero on 3796 parcels and kept on 310. A price is kept only when it is within 25% of excise stamps divided by 0.002, or when stamps are 0, the price is at least $25,000, and it sits between 20% of land value and 4\u00d7 total market value. Other SalePrice values are null. DeedDate is still stored. Prices are not reconstructed from stamps.",
+    "Asheville zoning is the city Property Zoning Categories pin join, with ZoningDistricts as a spatial fallback. Asheville FLU is FutureLandUseOverlay commtype.",
+    "Weaverville zoning is town AGOL Zoning_ForApp. Black Mountain, Woodfin, and Montreat use the county-hosted town layers. Those four towns have no public FLU REST.",
+    "Unincorporated zoning is county opendata FeatureServer/5 only. Unincorporated FLU is the Growth, Equity and Conservation place category, not a municipal future land use map.",
+    "NC OneMap gisacres is 0 for Buncombe. Acreage is the county Property field, inclusive 5 through 150.",
+    "10526 source rows in the acreage band collapsed to 10523 parcel IDs. PIN 967680537500000 is published four times with the same acreage; one record is kept.",
+    "Asheville zoning matched 572 of 577. The rest have a blank district on Property Zoning Categories and the parcel point misses ZoningDistricts, so no code was guessed.",
+    "Asheville: 577 parcels, zoning 572 (99.1%), FLU 572 (99.1%).",
+    "Weaverville: 71 parcels, zoning 71 (100.0%), FLU 0 (0.0%).",
+    "Black Mountain: 79 parcels, zoning 79 (100.0%), FLU 0 (0.0%).",
+    "Woodfin: 113 parcels, zoning 111 (98.2%), FLU 0 (0.0%).",
+    "Montreat: 4 parcels, zoning 4 (100.0%), FLU 0 (0.0%).",
+    "Biltmore Forest: 16 parcels, zoning 0 (0.0%), FLU 0 (0.0%).",
+    "Unincorporated: 9663 parcels, zoning 9636 (99.7%), FLU 9661 (100.0%)."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37021/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37021/lookup.json",
+  "sourceCount": 10526,
+  "dropped": 0,
+  "tileCount": 10
+}

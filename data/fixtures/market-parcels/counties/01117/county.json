@@ -5,19 +5,27 @@
   "markets": [
     "Birmingham"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 11994,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "al-shelby-cadastral-2025",
+  "queryUrl": "https://maps.shelbyal.com/gisserver/rest/services/LegacyServices/Cadastral_2025/MapServer/91/query",
   "gaps": [
-    "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+    "12123 source rows collapsed to 11994 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
+    "Municipal join: Alabaster zoning 404 (key 403, spatial 1).",
+    "Shelby County parcels are LegacyServices Cadastral_2025 MapServer/91, tax year 2025. Acreage is used when it is set; otherwise ACRES. Inclusive 5\u2013150.",
+    "CaptureServices C_PARCEL is geometry without owner, tax, or sale and is not used. Birmingham city GIS mirrors of Shelby parcels are not the county source.",
+    "Alabaster zoning is Zoning_Current_VIEWONLY FeatureServer/6. ZoneCode joins to Shelby Assess_Num, with a centroid fallback. Coverage is city-only. ZoneDescription is the district label.",
+    "Zone_Layer_VIEW layer 78 returns HTTP 400 on query and is not used. Zoning_Conditional (one polygon) is not base zoning.",
+    "On this band the county layer's own Zoning field is empty. Sale price is stored only when SALES_PRICE is positive. Instrument date is stored when INST_DATE1 converts. There is no qualified-sale flag.",
+    "Walker County, Decatur AL (MapGeo; not Decatur, Illinois), Washington County AL, and Escambia County AL are outside this pull.",
+    "This extract does not assign Opportunity Zone designations."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/01117/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01117/lookup.json",
+  "sourceCount": 12123,
+  "dropped": 15,
+  "tileCount": 9
 }

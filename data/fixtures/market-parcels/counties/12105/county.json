@@ -5,22 +5,85 @@
   "markets": [
     "Tampa"
   ],
-  "featureCount": 19734,
+  "featureCount": 20263,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "reused-orlando-complete-5-150",
-  "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/52/query",
+  "source": "fl-polk-property-appraiser-134",
+  "queryUrl": "https://gis.polk-county.net/hosting/rest/services/All-In-One_Viewer/Property_Appraiser/MapServer/134/query",
   "gaps": [
-    "Reused the Orlando complete 5.0\u2013150.0 acre tiles. Not re-scraped.",
-    "City zoning and future land use are joined for Lakeland, Bartow, Auburndale, Lake Alfred, and Lake Hamilton onto the existing 5\u2013150 acre parcels (1696 zoning, 1735 future land use). Lakeland is a centroid join. The other four cities use a Polk parcel id when the city layer has one, then the centroid. Polk County has no LDC zoning-district polygon, and county FLUNAME is not copied into zoning. County future land use is not stamped. Winter Haven, Haines City, Davenport, Fort Meade, Dundee, Eagle Lake, Frostproof, Mulberry, Polk City, Hillcrest Heights, and Highland Park stay blank. Lake Wales is token-blocked. Iowa Polk City, New Jersey Highland Park, Georgia Mulberry, the Georgia Bartow GIS host, and UK Dundee are rejected."
+    "Polk market parcels are Property_Appraiser MapServer/134. Orlando shed tiles are unchanged.",
+    "No countywide zoning-district polygons are published. County FLU 2030 (FLUNAME / FLU_LDC) is land use only and is not stored as zoning.",
+    "Property Appraiser parcels have no sale fields. A sale is copied from the FDOR/DOH extract when the parcel id matches.",
+    "Lakeland zoning and future land use are city AGOL polygons (LABEL / DESIGNATIO) joined onto county parcels inside the city. Winter Haven has no verified public zoning FeatureServer."
   ],
-  "path": "data/fixtures/orlando-parcels/tiles/12105",
-  "lookup": "data/fixtures/orlando-parcels/lookup/12105.json",
-  "sourceCount": 21292,
-  "dropped": null,
+  "path": "data/fixtures/market-parcels/counties/12105/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12105/lookup.json",
+  "sourceCount": 20263,
+  "dropped": 0,
   "tileCount": 17,
-  "zoningJoinedCount": 1696,
-  "fluJoinedCount": 1735
+  "zoningJoinedCount": 890,
+  "fluJoinedCount": 20262,
+  "municipalityCounts": {
+    "Lakeland": 3463,
+    "Lake Wales": 3080,
+    "Frostproof": 2127,
+    "Polk City": 1860,
+    "Fort Meade": 1729,
+    "Bartow": 1551,
+    "Haines City": 1550,
+    "Winter Haven": 1302,
+    "Davenport": 1163,
+    "Mulberry": 555,
+    "Auburndale": 551,
+    "Babson Park": 340,
+    "Poinciana": 269,
+    "Lake Alfred": 165,
+    "Dundee": 147,
+    "Kathleen": 127,
+    "Eagle Lake": 59,
+    "Unincorporated Polk": 50,
+    "Bowling Green": 36,
+    "Lithia": 27,
+    "Avon Park": 24,
+    "Lake Hamilton": 18,
+    "Alturas": 12,
+    "Indian Lake Estates": 12,
+    "Kissimmee": 11,
+    "Bradley": 5,
+    "Waverly": 5,
+    "Loughman": 4,
+    "Clermont": 3,
+    "Dade City": 3,
+    "Eloise": 3,
+    "Homeland": 3,
+    "Ft Meade": 2,
+    "Highland City": 2,
+    "River Ranch": 2,
+    "Webster": 2,
+    "Fedhaven": 1
+  },
+  "overlays": [
+    {
+      "role": "flu-2030",
+      "url": "https://gis.polk-county.net/hosting/rest/services/All-In-One_Viewer/Land_Use_and_Zoning/FeatureServer/10"
+    },
+    {
+      "role": "lakeland-zoning",
+      "url": "https://services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/Zoning/FeatureServer/0"
+    },
+    {
+      "role": "lakeland-flu",
+      "url": "https://services1.arcgis.com/mcbQY5xNGGGM1vBX/arcgis/rest/services/Future_Land_Use/FeatureServer/0"
+    }
+  ],
+  "rejected": [
+    "Polk zoning-district polygons — none published on Land_Use_and_Zoning",
+    "https://gismims.lakelandgov.net/portal/rest/services/Public/Lakeland10_Zoning/FeatureServer/0",
+    "https://gismims.lakelandgov.net/portal/rest/services/Public/Lakeland10_FutureLandUse/FeatureServer/0"
+  ],
+  "fdorSaleCopiedCount": 1321,
+  "lakelandZoningJoinedCount": 871,
+  "lakelandFluJoinedCount": 905
 }

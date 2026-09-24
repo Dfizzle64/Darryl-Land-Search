@@ -3,15 +3,15 @@
   "state": "Florida",
   "generatedFor": "Orlando ~90-minute drive shed (approximate county ring)",
   "architecture": {
-    "fixtures": "Lake, Orange, Osceola, Polk, and Seminole are complete 5.0–150.0 acre extracts in 0.25° tiles under data/fixtures/orlando-parcels/tiles/{fips}/. Parcels under 5 or over 150 are excluded. Brevard, Marion, Sumter, and Volusia remain single-file samples.",
+    "fixtures": "Lake (county tax parcels), Osceola (county parcels), Orange (OCPA), Polk, Seminole (DOH geometry plus county land use), and Sumter (SWFWMD parcels) are complete 5.0–150.0 acre extracts in 0.25° tiles under data/fixtures/orlando-parcels/tiles/{fips}/. Parcels under 5 or over 150 are excluded. Brevard, Marion, and Volusia remain single-file samples.",
     "runtime": "GET /api/parcels?market=Orlando&bbox=w,s,e,n reads only tiles that intersect the viewport. Optional source=live queries DOH for a zoomed-in sample county at ≥5 acres. A live query for a complete county uses 217800 <= LND_SQFOOT <= 6534000.",
     "refresh": "npm run seed:parcels:orlando",
-    "acreageRule": "Include when 217800 <= FDOR LND_SQFOOT <= 6534000 (5.0 through 150.0 acres). Exclude under 5 and over 150. Orange OCPA ACREAGE replaces the stored value only when it is also inside that band."
+    "acreageRule": "Lake uses Open Data Acres. Osceola uses county TotalAcres. Sumter uses SWFWMD AREANO (ACRES is empty). Orange uses OCPA ACREAGE and sums multipart pieces that disagree. Polk and Seminole use 217800 <= FDOR LND_SQFOOT <= 6534000. Parcels outside 5.0–150.0 are excluded."
   },
   "primaryStack": {
     "name": "Florida DOH EHWATER parcels (FDOR NAL attributes)",
     "url": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer",
-    "notes": "Official public GIS joined to Florida DOR Name-Address-Legal tax-roll attributes. No zoning polygons. Acreage derived from LND_SQFOOT when present."
+    "notes": "Still the live viewport and the Polk complete extract. Seminole fixtures keep DOH geometry and join county land use. Sumter fixtures use the SWFWMD parcel mirror. Lake and Osceola fixtures use the county layers below. Orange fixtures use OCPA."
   },
   "fieldMapping": {
     "id": "PARCEL_ID (prefixed with county FIPS)",
@@ -29,8 +29,8 @@
     "tax.assessedValue": "AV_SD",
     "tax.taxableValue": "TV_SD",
     "mailingAddress": "OWN_ADDR1/2, OWN_CITY, OWN_STATE, OWN_ZIPCD",
-    "zoning": "null on DOH layer — degrade gracefully",
-    "flu": "null except Orange County OCPA pilot join"
+    "zoning": "null on Polk DOH. Osceola Zoning/13, Lake InteractiveMap/50, Seminole Land_Use/1, and Sumter FLU_Zoning/11 are centroid-joined. St. Cloud, Altamonte Springs, and Oviedo override those county codes inside the city. Orange uses OCPA ZONING_CODE.",
+    "flu": "null on Polk DOH. Osceola Future_Land_Use/12, Lake InteractiveMap/48, Seminole Land_Use/0, Sumter FLU_Zoning/5, and Orange County + Orlando FLU are centroid-joined. St. Cloud, Altamonte Springs, and Oviedo override inside the city."
   },
   "counties": [
     {
@@ -50,11 +50,9 @@
         }
       ],
       "gaps": [
-        "BCPAO live endpoint may require allowlisted clients",
-        "DOH sample. City zoning and FLU are centroid-joined from municipal REST. This sample joined zoning 0 and FLU 0. Titusville and Palm Bay are not applied here. County zoning is not a city substitute."
-      ],
-      "zoningJoinedCount": 0,
-      "fluJoinedCount": 0
+        "No zoning on DOH extract",
+        "BCPAO live endpoint may require allowlisted clients"
+      ]
     },
     {
       "name": "Lake",
@@ -62,20 +60,30 @@
       "coverage": "complete-gte-5ac",
       "dohLayerId": 33,
       "status": "active",
-      "preferredSource": "doh-ehwaters",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/33/query",
-      "appraiserSearchUrl": "https://www.lakecopropappr.com/",
+      "preferredSource": "lakecounty-tax-parcels",
+      "queryUrl": "https://gis.lakecountyfl.gov/lakegis/rest/services/OpenData/OpenData1/FeatureServer/12/query",
+      "appraiserSearchUrl": "https://www.lakecopropappr.com/property-details.aspx?AltKey={AltKey}",
       "alternateSources": [
         {
-          "name": "Lake County Open Data Tax Parcels",
-          "url": "https://gis.lakecountyfl.gov/lakegis/rest/services/OpenData/OpenData1/FeatureServer/12",
-          "status": "usable",
-          "notes": "Richer owner/sale fields; seed prefers DOH for shed-wide consistency."
+          "name": "DOH EHWATER Lake",
+          "url": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/33",
+          "status": "fallback-live-only",
+          "notes": "Live viewport still queries DOH. The seeded extract uses the county tax-parcel layer."
+        },
+        {
+          "name": "Lake County city FLU",
+          "url": "https://gis.lakecountyfl.gov/lakegis/rest/services/LocalGov/CityFLU/MapServer",
+          "status": "partial-city-only",
+          "notes": "Layers 0–10 are city FLU. Not a county-wide substitute for Future Land Use 2030."
         }
       ],
+      "overlays": {
+        "zoning": "https://gis.lakecountyfl.gov/lakegis/rest/services/InteractiveMap/MapServer/50",
+        "flu": "https://gis.lakecountyfl.gov/lakegis/rest/services/InteractiveMap/MapServer/48"
+      },
       "gaps": [
-        "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded. No zoning or FLU on the DOH extract.",
-        "OZ 2.0 join is the seven-market rural-eligible pack only."
+        "Complete 5.0–150.0 acre extract from Open Data Tax Parcels. Assessed and taxable values are not on that layer. No qualified-sale flag. Situs city is not a separate field.",
+        "Zoning and FLU are centroid joins. Codes are not in the Orange knowledge base, so multifamily filters treat them as unknown. City FLU is not joined."
       ]
     },
     {
@@ -91,10 +99,24 @@
           "name": "Marion County ParcelsAndSubdivisions",
           "url": "https://gis.marionfl.org/public/rest/services/General/ParcelsAndSubdivisions/MapServer/0",
           "status": "usable",
-          "notes": "Includes ZONE1/ZONE2/ZONE3; not wired into seed yet."
+          "notes": "Verified 2026-09-23: ACRES, NAME, sale PR_1/MO1/YR1/Q1, TOT_VAL/ASSD_VAL/TOT_TAX_VA, ZONE1. About 17,840 parcels in the 5–150 acre band. Not seeded in this build."
+        },
+        {
+          "name": "Marion Future Land Use",
+          "url": "https://gis.marionfl.org/public/rest/services/General/PlanningZoning/MapServer/6",
+          "status": "usable-not-seeded",
+          "notes": "GS_FLUM plus PARCELID attribute join. About 259,000 rows. Follow-up, not this extract."
+        },
+        {
+          "name": "Marion Zoning Classification",
+          "url": "https://gis.marionfl.org/public/rest/services/General/PlanningZoning/MapServer/20",
+          "status": "usable-not-seeded",
+          "notes": "ZONECLASS / ZONEDESC. Spatial join. About 20,000 polygons. Follow-up."
         }
       ],
-      "gaps": ["Zoning is available on the county MapServer but is not joined in this thinner sample"]
+      "gaps": [
+        "Thinner DOH sample. County parcels, PARCELID FLU, and zoning classification were verified and left for a follow-up so this pull stays Osceola and Lake."
+      ]
     },
     {
       "name": "Orange",
@@ -111,6 +133,12 @@
           "url": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/47",
           "status": "usable",
           "notes": "Used for live viewport fills; OCPA remaining the zoning/FLU-rich pilot fixture."
+        },
+        {
+          "name": "Edgewood TX (maps.etcog.org EDGEWOOD)",
+          "url": "https://maps.etcog.org/",
+          "status": "rejected-wrong-state",
+          "notes": "The EDGEWOOD service on maps.etcog.org is Edgewood, Texas. Edgewood, Florida stays a gap. Maitland, Winter Garden, Apopka, Winter Park, and Orlando city overlays are a separate change and are not seeded here."
         }
       ],
       "gaps": [
@@ -125,26 +153,45 @@
       "coverage": "complete-gte-5ac",
       "dohLayerId": 48,
       "status": "active",
-      "preferredSource": "doh-ehwaters",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/48/query",
-      "appraiserSearchUrl": "https://www.property-appraiser.org/",
+      "preferredSource": "osceola-parcels",
+      "queryUrl": "https://gis.osceola.org/hosting/rest/services/Parcels/FeatureServer/3/query",
+      "appraiserSearchUrl": "https://maps.property-appraiser.org/?Pin={PIN}",
       "alternateSources": [
+        {
+          "name": "DOH EHWATER Osceola",
+          "url": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/48",
+          "status": "fallback-live-only",
+          "notes": "Live viewport still queries DOH. The seeded extract uses the county parcel layer."
+        },
+        {
+          "name": "Osceola AGOL Tax Parcels",
+          "url": "https://services6.arcgis.com/JLFFzWH5zlcBPpfO/ArcGIS/rest/services/Osceola_Tax_Parcels/FeatureServer/9",
+          "status": "twin-not-used",
+          "notes": "Public twin of the county parcels. The seed uses gis.osceola.org FeatureServer/3."
+        },
         {
           "name": "City of St Cloud Referenced Parcels",
           "url": "https://arcgisweb.stcloud.org/arcgis/rest/services/Referenced_Layers/Parcels/MapServer/42",
-          "status": "partial-city-only",
-          "notes": "Has Zone1/sale/owner but is St Cloud–centric, not full county."
+          "status": "rejected-city-only",
+          "notes": "St Cloud only. Not a county extract. City zoning and FLU are joined onto county parcels by PIN."
         },
         {
-          "name": "ECFRPC Basemap Osceola Parcels",
-          "url": "https://gis.ecfrpc.org/arcgis/rest/services/Basemap/MapServer/6",
-          "status": "geometry-only",
-          "notes": "PARCELNO only — insufficient attributes."
+          "name": "Winter Springs EnerGov FLU/Zoning",
+          "url": "https://services5.arcgis.com/EnerGov_WFL1",
+          "status": "rejected-wrong-county",
+          "notes": "City of Winter Springs, Seminole County. Not Osceola."
         }
       ],
+      "overlays": {
+        "zoning": "https://gis.osceola.org/hosting/rest/services/Zoning/MapServer/13",
+        "flu": "https://gis.osceola.org/hosting/rest/services/Future_Land_Use/FeatureServer/12",
+        "stCloudZoning": "https://arcgisweb.stcloud.org/arcgis/rest/services/Referenced_Layers/Zoning/FeatureServer/2",
+        "stCloudFlu": "https://arcgisweb.stcloud.org/arcgis/rest/services/Referenced_Layers/Future_Land_Use_Update/FeatureServer/98"
+      },
       "gaps": [
-        "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded. No county-wide zoning layer is joined.",
-        "St Cloud city parcels are not a substitute for the county extract."
+        "Complete 5.0–150.0 acre extract from county Parcels FeatureServer/3. Taxable value is prior-roll PrevTaxabl. EstimatedT is an estimate. Q_U is stored and not used as a sale filter.",
+        "Zoning and FLU are centroid joins. Codes are not in the Orange knowledge base, so multifamily filters treat them as unknown. Directory HTML is often 403; JSON queries work. The host certificate chain is incomplete from some clients.",
+        "St. Cloud zoning and FLU override the county code on a matching PIN. They are not a county-wide extract. Winter Springs EnerGov is Seminole and is not used. Kissimmee city zoning remains a gap."
       ]
     },
     {
@@ -165,9 +212,8 @@
         }
       ],
       "gaps": [
-        "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded. City zoning is joined only for five Polk cities. County LDC zoning is still a gap.",
-        "The AGOL layer labeled Polk County parcels is in Minnesota and is not used.",
-        "City zoning and future land use are joined for Lakeland, Bartow, Auburndale, Lake Alfred, and Lake Hamilton onto the existing 5–150 acre parcels (1696 zoning, 1735 future land use). Lakeland is a centroid join. The other four cities use a Polk parcel id when the city layer has one, then the centroid. Polk County has no LDC zoning-district polygon, and county FLUNAME is not copied into zoning. County future land use is not stamped. Winter Haven, Haines City, Davenport, Fort Meade, Dundee, Eagle Lake, Frostproof, Mulberry, Polk City, Hillcrest Heights, and Highland Park stay blank. Lake Wales is token-blocked. Iowa Polk City, New Jersey Highland Park, Georgia Mulberry, the Georgia Bartow GIS host, and UK Dundee are rejected."
+        "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded. No zoning on the DOH extract.",
+        "The AGOL layer labeled Polk County parcels is in Minnesota and is not used."
       ]
     },
     {
@@ -176,44 +222,74 @@
       "coverage": "complete-gte-5ac",
       "dohLayerId": 58,
       "status": "active",
-      "preferredSource": "doh-ehwaters",
+      "preferredSource": "doh-ehwaters+seminole-land-use",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/58/query",
       "appraiserSearchUrl": "https://www.scpafl.org/",
       "alternateSources": [
         {
-          "name": "Seminole County Parcels (PW Zoning AGO)",
+          "name": "City of Lake Mary PW Zoning AGO",
           "url": "https://services1.arcgis.com/v0YMSb0ovdJoIQKg/arcgis/rest/services/PW_Zoning_Landuse_Query_AGO/FeatureServer/2",
-          "status": "usable-limited-fields",
-          "notes": "Has OWNER/GIS_ACRES/situs fragments; no sale/tax depth."
+          "status": "rejected-city-only",
+          "notes": "Lake Mary city limits and Heathrow PUD. Not a Seminole County substitute."
+        },
+        {
+          "name": "Hernando Zoning_Flu",
+          "url": "https://services2.arcgis.com/",
+          "status": "rejected-wrong-county",
+          "notes": "A Zoning_Flu service under that host pattern is Hernando County, not Seminole."
         }
       ],
+      "overlays": {
+        "zoning": "https://services3.arcgis.com/n4VF6lyYfB5kizho/arcgis/rest/services/Land_Use/FeatureServer/1",
+        "flu": "https://services3.arcgis.com/n4VF6lyYfB5kizho/arcgis/rest/services/Land_Use/FeatureServer/0",
+        "altamonteZoning": "https://webgis.altamonte.org/gis/rest/services/EnerGov/EnerGovService/MapServer/39",
+        "altamonteFlu": "https://webgis.altamonte.org/gis/rest/services/EnerGov/EnerGovService/MapServer/44",
+        "oviedoZoning": "https://services.arcgis.com/0EfLIvtSLPR9PKI2/arcgis/rest/services/DSZoning/FeatureServer/11",
+        "oviedoFlu": "https://services.arcgis.com/0EfLIvtSLPR9PKI2/arcgis/rest/services/DSZoning/FeatureServer/10"
+      },
       "gaps": [
-        "Complete 5–150 acre geometry and FDOR owner/sale/tax. Parcels under 5 or over 150 are excluded. City zoning and future land use are joined for Casselberry, Winter Springs, Lake Mary, Sanford, Oviedo, and Altamonte Springs (1001 zoning, 991 future land use). Longwood stays blank. County Land_Use is not stamped. Oviedo retired DSZoning is not called.",
-        "Seminole has no rural-eligible OZ 2.0 tracts in the seven-market pack."
+        "Complete 5–150 acre geometry and FDOR owner/sale/tax from DOH. Zoning and FLU are centroid joins to the county Land Use service. CITY remains where no city overlay hits.",
+        "Altamonte Springs and Oviedo override the county stub. Sanford, Lake Mary, Winter Springs, Longwood, and Casselberry stay CITY. Seminole has no rural-eligible OZ 2.0 tracts in the seven-market pack."
       ]
     },
     {
       "name": "Sumter",
       "fips": "12119",
+      "coverage": "complete-gte-5ac",
       "dohLayerId": 59,
       "status": "active",
-      "preferredSource": "doh-ehwaters",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/59/query",
-      "appraiserSearchUrl": "https://www.sumterpa.com/",
+      "preferredSource": "swfwmd-sumter-parcels",
+      "queryUrl": "https://services1.arcgis.com/gdr0FcZCwx1BmrQk/arcgis/rest/services/Sumter_County_Parcels/FeatureServer/0/query",
+      "appraiserSearchUrl": "https://app.sumterpa.com/gis/D_ShowDetail.html?KEY={PARCELID}&PIN={PARCELID}",
       "alternateSources": [
+        {
+          "name": "DOH EHWATER Sumter",
+          "url": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/59",
+          "status": "fallback-live-only",
+          "notes": "Live viewport still queries DOH. The Orlando extract uses SWFWMD. Tampa market tiles stay on their own DOH extract."
+        },
         {
           "name": "Sumter County Development Services Parcels",
           "url": "https://gis.sumtercountyfl.gov/sumtergis/rest/services/DevelopmentServices/Development_Services_Base/MapServer/3",
-          "status": "usable",
-          "notes": "Owner/physical address/acres; used as secondary check."
+          "status": "tls-flaky",
+          "notes": "County host handshake often fails. Not the parcel source."
         },
         {
-          "name": "SWFWMD Sumter County Parcels",
-          "url": "https://www25.swfwmd.state.fl.us/arcgis12/rest/services/BaseVector/parcel_search/MapServer/16",
-          "status": "usable"
+          "name": "Sumter County Georgia parcels",
+          "url": "https://ga31portal.kcsgis.com/",
+          "status": "rejected-wrong-state",
+          "notes": "Sumter County, Georgia. Not used."
         }
       ],
-      "gaps": ["No zoning on DOH extract"]
+      "overlays": {
+        "sales": "https://services3.arcgis.com/ITa4LPv6Pe88ISGp/arcgis/rest/services/2026_Qualified_Sales/FeatureServer/0",
+        "zoning": "https://gis.sumtercountyfl.gov/sumtergis/rest/services/Interactive/FLU_Zoning/FeatureServer/11",
+        "flu": "https://gis.sumtercountyfl.gov/sumtergis/rest/services/Interactive/FLU_Zoning/FeatureServer/5"
+      },
+      "gaps": [
+        "Complete 5.0–150.0 acre extract from SWFWMD AREANO. Owner, market value, assessed value, and DOR come from that mirror. Taxable value is not published there.",
+        "Qualified sales join on PIN. The flag is stored and does not drop a sale. County zoning and FLU join when gis.sumtercountyfl.gov answers; TLS failure leaves those fields empty."
+      ]
     },
     {
       "name": "Volusia",
@@ -232,10 +308,8 @@
         }
       ],
       "gaps": [
-        "DOH extract has no zoning. City zoning and FLU are centroid-joined from municipal REST. This sample joined zoning 79 and FLU 58. ZONCODE 999 stubs and the Seattle future land use service are not used."
-      ],
-      "zoningJoinedCount": 79,
-      "fluJoinedCount": 58
+        "No zoning on DOH extract"
+      ]
     }
   ]
 }

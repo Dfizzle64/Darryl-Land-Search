@@ -1,6 +1,7 @@
 import path from "node:path";
 import { access, readFile } from "node:fs/promises";
 import { parcelMatchesFilters } from "../filters";
+import { annotateMissingOz2Eligibility } from "../oz2CentroidJoin";
 import { annotateParcelSignals, loadOrangeSignalIndex } from "../orangeSignals";
 import {
   ORLANDO_CORE_ACREAGE,
@@ -170,6 +171,7 @@ export async function finalizeOrlandoParcelPage(
   features: ParcelFeature[],
   query: OrlandoParcelQuery = {},
 ): Promise<OrlandoParcelPage> {
+  await annotateMissingOz2Eligibility(features);
   const index = await loadOrangeSignalIndex();
   for (const feature of features) annotateParcelSignals(feature, index);
 
@@ -247,6 +249,7 @@ export async function getOrlandoFixtureParcel(id: string): Promise<ParcelFeature
 
 async function annotateLoadedParcel(feature: ParcelFeature | null): Promise<ParcelFeature | null> {
   if (!feature) return null;
+  await annotateMissingOz2Eligibility([feature]);
   annotateParcelSignals(feature, await loadOrangeSignalIndex());
   return feature;
 }

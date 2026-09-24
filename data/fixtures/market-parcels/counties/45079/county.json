@@ -5,19 +5,22 @@
   "markets": [
     "Columbia"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 638,
+  "coverage": "sample",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-columbia-city-landrecords",
+  "queryUrl": "https://gis.columbiasc.gov/cola/rest/services/InnercityMap/LandRecords/MapServer/2/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "City of Columbia only (CityLimit=Y on the Richland side of LandRecords). This is not a Richland County-wide parcel roll. Richland County has no public ArcGIS FeatureServer or MapServer for countywide parcels; GeoServer WFS is disabled and county GIS is sold under license. This pull does not use richlandmaps.com PHP parcel endpoints.",
+    "City LandRecords has no sale or tax fields. Acreage is Shape_Area in South Carolina State Plane feet divided by 43560, limited to 5.0\u2013150.0. Forest Acres, Blythewood, Arcadia Lakes, Eastover, and Irmo have no verified public municipal parcel service. Lexington-side city parcels stay on the Lexington County extract, which carries CAMA.",
+    "City of Columbia FLU centroids 636. Zoning stays the parcel ZoningDistrict.",
+    "641 source rows collapsed to 638 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45079/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45079/lookup.json",
+  "sourceCount": 641,
+  "dropped": 0,
+  "tileCount": 4
 }

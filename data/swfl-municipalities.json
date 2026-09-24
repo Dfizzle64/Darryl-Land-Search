@@ -1,0 +1,139 @@
+{
+  "market": "SWFL",
+  "acreage": { "min": 5, "max": 150 },
+  "eligibleStatus": "Eligible — not designated",
+  "rule": "Rev. Proc. 2026-14 tracts in this market are eligible for nomination. They are not designated or certified 2027 QOZs.",
+  "rejected": [
+    {
+      "id": "fgdl-zoning",
+      "reason": "FGDL zoning is a north-Florida geography. It is not applied to SWFL parcels or cities."
+    },
+    {
+      "id": "eagleview-lee-republish",
+      "url": "https://arcgisserver.eagleview.com/arcgis/rest/services/Lee_County_FL_Parcels/MapServer/0",
+      "reason": "EagleView republishes Lee County parcels. The public source is Lee County GIS ParcelAddress."
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Cape Coral",
+      "county": "Lee",
+      "kind": "city",
+      "role": "first-class",
+      "parcelSource": "fl-lee-parceladdress",
+      "municode": "C",
+      "notes": "Parcels and most zoning codes in the 5–150 acre band come from the Lee County ParcelAddress layer. Cape Coral also publishes GISData/Zoning; that city layer is not spatially joined."
+    },
+    {
+      "name": "Fort Myers",
+      "county": "Lee",
+      "kind": "city",
+      "role": "county-fallback",
+      "parcelSource": "fl-lee-parceladdress",
+      "municode": "P",
+      "blockedUrl": "https://gis.fortmyers.gov/arcgis/rest/services",
+      "notes": "The city GIS host failed TLS certificate verification and was not ingested. City of Fort Myers rows are Lee County ParcelAddress features with MUNICODE P (tax district City of Fort Myers)."
+    },
+    {
+      "name": "Bonita Springs",
+      "county": "Lee",
+      "kind": "city",
+      "role": "county-stub",
+      "parcelSource": "fl-lee-parceladdress",
+      "municode": "B",
+      "notes": "No independent public parcel REST. County stub on Lee ParcelAddress."
+    },
+    {
+      "name": "Estero",
+      "county": "Lee",
+      "kind": "village",
+      "role": "county-stub",
+      "parcelSource": "fl-lee-parceladdress",
+      "municode": "E",
+      "notes": "No independent public parcel REST. County stub on Lee ParcelAddress."
+    },
+    {
+      "name": "Fort Myers Beach",
+      "county": "Lee",
+      "kind": "town",
+      "role": "county-stub",
+      "parcelSource": "fl-lee-parceladdress",
+      "municode": "W",
+      "notes": "No independent public parcel REST. County stub on Lee ParcelAddress."
+    },
+    {
+      "name": "Sanibel",
+      "county": "Lee",
+      "kind": "city",
+      "role": "zoning-gap",
+      "parcelSource": "fl-lee-parceladdress",
+      "municode": "T",
+      "notes": "Parcels are on the Lee County layer. Zoning is blank there for almost every 5–150 acre Sanibel parcel. Sanibel's public REST is a future-land-use map series, not a parcel zoning code, and was not joined."
+    },
+    {
+      "name": "Unincorporated Lee",
+      "county": "Lee",
+      "kind": "unincorporated",
+      "role": "first-class",
+      "parcelSource": "fl-lee-parceladdress",
+      "municode": "L",
+      "notes": "Lee County unincorporated tax district on the same ParcelAddress layer."
+    },
+    {
+      "name": "Naples",
+      "county": "Collier",
+      "kind": "city",
+      "role": "first-class",
+      "parcelSource": "fl-collier-parceljoin",
+      "notes": "County ParcelJoin does not carry a city field, situs, or sales. Naples publishes a city parcel layer that republishes Collier County Property Appraiser parcels; it is not ingested a second time. City zoning is not joined."
+    },
+    {
+      "name": "Marco Island",
+      "county": "Collier",
+      "kind": "city",
+      "role": "city-limits-only",
+      "parcelSource": "fl-collier-parceljoin",
+      "notes": "Named on the Collier city-limits layer. ParcelJoin has no municipality field, so these parcels are not tagged."
+    },
+    {
+      "name": "Everglades City",
+      "county": "Collier",
+      "kind": "city",
+      "role": "city-limits-only",
+      "parcelSource": "fl-collier-parceljoin",
+      "notes": "Named on the Collier city-limits layer. ParcelJoin has no municipality field, so these parcels are not tagged."
+    },
+    {
+      "name": "Sarasota",
+      "county": "Sarasota",
+      "kind": "city",
+      "role": "optional-county",
+      "parcelSource": "fl-doh-ehwaters-12115",
+      "notes": "Optional SWFL county. Parcels are the existing Tampa DOH extract, shared in place. No separate city pull."
+    },
+    {
+      "name": "Venice",
+      "county": "Sarasota",
+      "kind": "city",
+      "role": "optional-county",
+      "parcelSource": "fl-doh-ehwaters-12115",
+      "notes": "Optional. Covered only by the shared Sarasota county extract."
+    },
+    {
+      "name": "North Port",
+      "county": "Sarasota",
+      "kind": "city",
+      "role": "optional-county",
+      "parcelSource": "fl-doh-ehwaters-12115",
+      "notes": "Optional. Covered only by the shared Sarasota county extract."
+    },
+    {
+      "name": "Punta Gorda",
+      "county": "Charlotte",
+      "kind": "city",
+      "role": "partial",
+      "parcelSource": "fl-doh-ehwaters-12015",
+      "notes": "Partial Charlotte coverage. County parcels are the DOH land-area extract. Punta Gorda zoning on Charlotte CCGISLayers is not joined."
+    }
+  ]
+}

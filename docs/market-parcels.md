@@ -27,6 +27,8 @@ Carroll County, Georgia uses the OpenAddresses job 910028 parcel snapshot becaus
 
 Walton County, Georgia is the choosewalton 5–150 GIS-acre landbase. FLU and Description are character areas, not Euclidean zoning. Monroe CAMA matches a handful of shared parcel numbers. City zoning covers Monroe, Loganville, and Social Circle only. Countywide owner, tax, sales, and Euclidean zoning stay gaps. Nothing in that extract is an Opportunity Zone designation.
 
+Spalding County, Georgia is the public Parcels_Public_View. Acreage is GIS area in Georgia West State Plane feet, inclusive 5–150. The layer publishes parcel id and jurisdiction only, so owner, situs, tax, and last sale stay null. County zoning is joined outside Griffin. Griffin city parcels stay unzoned. Future land use is a PDF. Sunny Side is not treated as a city. University of Maryland / Regrid and ARC LandPro were not used. No Opportunity Zone designation was added.
+
 ## Coverage
 
 # Market parcel coverage
@@ -37,7 +39,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 85,505 | 15 | 0 | 20 |
+| Atlanta | primary | 89,337 | 16 | 0 | 19 |
 | Tampa | primary | 124,315 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 109,348 | 13 | 0 | 4 |
@@ -106,7 +108,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Pickens | Georgia | 13227 | gap | 0 | unavailable |
 | Pike | Georgia | 13231 | gap | 0 | unavailable |
 | Rockdale | Georgia | 13247 | complete-gte-5ac | 2,555 | ga-rockdale-parcels |
-| Spalding | Georgia | 13255 | gap | 0 | unavailable |
+| Spalding | Georgia | 13255 | complete-gte-5ac | 3,832 | ga-spalding-parcels-public |
 | Walton | Georgia | 13297 | complete-gte-5ac | 5,824 | ga-walton-choosewalton-parcels |
 
 ### Tampa

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T01:06:16Z",
+  "generatedAt": "2026-09-24T01:20:16Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 85505,
+  "parcelCount": 89337,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -988,20 +988,27 @@
       "name": "Spalding",
       "fips": "13255",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 3832,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-spalding-parcels-public",
+      "queryUrl": "https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/Parcels_Public_View/FeatureServer/1/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Spalding County Parcels public view is PARCEL_ID and JURISDICTION only. Owner, mailing, situs, tax, and last sale are null on this extract.",
+        "GIS acres are computed from State Plane Georgia West feet (102667/2240) polygon area / 43560. Band is 5.0\u2013150.0 inclusive.",
+        "County zoning LABEL is joined only where JURISDICTION is COUNTY (unincorporated Spalding, including Orchard Hill and former Sunny Side). JURISDICTION CITY is Griffin and is left unzoned: the county zoning layer does not cover Griffin, and no verified Griffin zoning FeatureServer was used.",
+        "Future land use is the Comp Plan 2042 PDF only. FLU is null.",
+        "Sales and tax are qPublic AppID=766 HTML only and were not scraped. Last sale and tax values are null.",
+        "Sunny Side's charter was repealed effective 2024-01-01. It is not treated as an incorporated municipality.",
+        "Rejected substitutes were not used: University of Maryland Regrid ga_spalding extract and ARC LandPro.",
+        "County zoning labels joined on 3624 JURISDICTION=COUNTY parcels. 199 Griffin CITY parcels in the acreage band were left unzoned. 9 COUNTY parcels had no county zoning intersect."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13255/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13255/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 33700
     },
     {
       "name": "Walton",

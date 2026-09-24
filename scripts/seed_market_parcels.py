@@ -334,6 +334,37 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
+def fetch_paged(url: str, where: str, out_fields: list[str], out_sr: int, page_size: int = 2000) -> list[dict]:
+    """Stable OBJECTID pages. Some county services 404 a long objectIds GET."""
+    features: list[dict] = []
+    offset = 0
+    while True:
+        data = fetch_json(
+            url,
+            {
+                "where": where,
+                "outFields": ",".join(out_fields),
+                "returnGeometry": "true",
+                "outSR": str(out_sr),
+                "orderByFields": "OBJECTID",
+                "resultOffset": str(offset),
+                "resultRecordCount": str(page_size),
+                "f": "json",
+            },
+            timeout=180,
+        )
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        batch = data.get("features") or []
+        features.extend(batch)
+        print(f"    {len(features)}", flush=True)
+        if len(batch) < page_size:
+            break
+        offset += len(batch)
+        time.sleep(0.05)
+    return features
+
+
 def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
@@ -386,7 +417,21 @@ def normalize_rows(
     dropped = 0
     for item in raw:
         attrs = item.get("attributes") or {}
-        geometry, computed = rings_to_feature_geometry(item.get("geometry"))
+        geom = item.get("geometry") or {}
+        planar = spec.get("planarFeet") == "ga-west"
+        if planar:
+            from parcel_geometry import planar_acres, project_ga_west_rings
+
+            rings = geom.get("rings")
+            if not rings:
+                dropped += 1
+                continue
+            acres = planar_acres(rings)
+            geometry = esri_rings_to_geojson(project_ga_west_rings(rings))
+            computed = acres
+        else:
+            geometry, computed = rings_to_feature_geometry(geom or None)
+            acres = None
         if not geometry:
             dropped += 1
             continue
@@ -394,12 +439,13 @@ def normalize_rows(
         if not plausible_centroid(center):
             dropped += 1
             continue
-        acres = num(attrs.get(spec["acresField"])) if spec.get("acresField") else None
-        scale = spec.get("acresScale") or 1
-        if acres is not None and scale != 1:
-            acres = acres / scale
-        if spec.get("computeAcres") or acres is None:
-            acres = computed
+        if not planar:
+            acres = num(attrs.get(spec["acresField"])) if spec.get("acresField") else None
+            scale = spec.get("acresScale") or 1
+            if acres is not None and scale != 1:
+                acres = acres / scale
+            if spec.get("computeAcres") or acres is None:
+                acres = computed
         if not in_band(acres):
             dropped += 1
             continue
@@ -446,6 +492,8 @@ def normalize_rows(
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        if spec.get("jurisdictionField"):
+            feature["_jurisdiction"] = clean(attrs.get(spec["jurisdictionField"]))
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -649,13 +697,17 @@ def county_override(fips: str) -> dict | None:
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
             ],
         }
+    if fips == "13255":  # Spalding GA — public view, GIS acres, county zoning outside Griffin
+        from spalding_parcels import spalding_spec
+
+        return spalding_spec()
     return None
 
 
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, Walton, or Carroll pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, Walton, Carroll, or Spalding pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -925,6 +977,8 @@ Carroll County, Georgia uses the OpenAddresses job 910028 parcel snapshot becaus
 
 Walton County, Georgia is the choosewalton 5–150 GIS-acre landbase. FLU and Description are character areas, not Euclidean zoning. Monroe CAMA matches a handful of shared parcel numbers. City zoning covers Monroe, Loganville, and Social Circle only. Countywide owner, tax, sales, and Euclidean zoning stay gaps. Nothing in that extract is an Opportunity Zone designation.
 
+Spalding County, Georgia is the public Parcels_Public_View. Acreage is GIS area in Georgia West State Plane feet, inclusive 5–150. The layer publishes parcel id and jurisdiction only, so owner, situs, tax, and last sale stay null. County zoning is joined outside Griffin. Griffin city parcels stay unzoned. Future land use is a PDF. Sunny Side is not treated as a city. University of Maryland / Regrid and ARC LandPro were not used. No Opportunity Zone designation was added.
+
 ## Coverage
 """
 
@@ -963,7 +1017,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
                 lookup=lookup if features else None,
                 source=spec["source"],
                 query_url=spec["url"],
-                gaps=list(spec.get("gaps") or []),
+                gaps=[*(spec.get("gaps") or []), *(cached.get("notes") or [])],
                 source_count=cached.get("sourceCount"),
                 dropped=cached.get("dropped"),
                 tile_count=tiles,
@@ -1016,17 +1070,45 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
             source_count=0,
         )
     print(f"  source rows {expected}", flush=True)
-    ids = fetch_object_ids(spec["url"], spec["where"])
-    raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
+    if spec.get("planarFeet") == "ga-west":
+        from spalding_parcels import assert_ga_west_projection
+
+        assert_ga_west_projection()
+    if spec.get("paged"):
+        raw = fetch_paged(
+            spec["url"],
+            spec["where"],
+            spec["outFields"],
+            int(spec.get("outSR") or 4326),
+            int(spec.get("pageSize") or 2000),
+        )
+        if len(raw) != expected:
+            raise RuntimeError(f"{fips} paged fetch returned {len(raw)} features, expected {expected}")
+    else:
+        ids = fetch_object_ids(spec["url"], spec["where"])
+        raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
     features, dropped = normalize_rows(raw, county, markets, spec)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
+    extra_notes: list[str] = []
+    if spec.get("zoningOverlay"):
+        from spalding_parcels import assert_spalding_extract, join_zoning_overlay
+
+        extra_notes, stats = join_zoning_overlay(features, spec["zoningOverlay"])
+        if fips == "13255":
+            assert_spalding_extract(features, stats)
+    else:
+        for feature in features:
+            feature.pop("_jurisdiction", None)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
+        json.dumps(
+            {"sourceCount": expected, "dropped": dropped, "notes": extra_notes, "features": features},
+            separators=(",", ":"),
+        )
     )
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
+    gaps = [*(spec.get("gaps") or []), *extra_notes]
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,

@@ -61,6 +61,12 @@ export function parcelAppraiserUrl(options: {
   appraiserUrl?: string | null;
 }): { href: string | null; label: string } {
   const fips = options.countyFips ?? null;
+  if (fips === "37021" || options.appraiserUrl?.includes("prc-buncombe.spatialest.com")) {
+    return {
+      href: options.appraiserUrl || `https://prc-buncombe.spatialest.com/#/property/${encodeURIComponent(options.parcelId)}`,
+      label: "Open Buncombe property card",
+    };
+  }
   if (options.appraiserUrl) {
     return { href: options.appraiserUrl, label: "Open county property appraiser" };
   }

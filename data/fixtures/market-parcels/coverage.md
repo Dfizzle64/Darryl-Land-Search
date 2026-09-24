@@ -26,6 +26,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
+| Asheville | other | 10,523 | 1 | 0 | 0 |
 
 ## Counties
 
@@ -341,4 +342,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,256 | nc-onemap-37129 |
 | Onslow | North Carolina | 37133 | complete-gte-5ac | 6,747 | nc-onemap-37133 |
 | Pender | North Carolina | 37141 | complete-gte-5ac | 7,275 | nc-onemap-37141 |
+
+### Asheville
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Buncombe | North Carolina | 37021 | complete-gte-5ac | 10,523 | nc-buncombe-opendata-37021 |
 

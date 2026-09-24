@@ -571,6 +571,14 @@ def county_override(fips: str) -> dict | None:
         from dekalb_parcels import dekalb_spec
 
         return dekalb_spec()
+    if fips == "37021":  # Buncombe NC — OneMap gisacres is 0; use county Property
+        return {
+            "kind": "buncombe",
+            "url": "https://gis.buncombecounty.org/arcgis/rest/services/opendata/FeatureServer/1/query",
+            "source": "nc-buncombe-opendata-37021",
+            "coverage": "complete-gte-5ac",
+            "gaps": [],
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -909,7 +917,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Buncombe uses county Property `Acreage` because OneMap `gisacres` is 0, and joins cities-first zoning |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -918,6 +926,8 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
 Zoning is joined when a public layer supports it. DeKalb municipalities are first-class: Decatur (Georgia, not Illinois), Brookhaven, Dunwoody, Doraville, Tucker, and Stonecrest supply zoning and future land use. Chamblee is future land use only. Atlanta's citywide layers are joined only inside DeKalb's Atlanta boundary. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake stay blank. County Zoning_District and LandUse fill unincorporated DeKalb only. Those codes are not scored as Orange County multifamily districts. There is no public DeKalb sale table. Prefer **All parcels** in these markets.
+
+Buncombe (Asheville) joins city and town zoning from public REST and leaves Biltmore Forest blank. It is not scored as an Orange County multifamily district. Sale prices that fail the excise-stamp or assessed-value check stay null. No opportunity zone designation is copied onto these parcels.
 
 ### DeKalb County, Georgia
 
@@ -938,6 +948,13 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         from dekalb_parcels import download_dekalb
 
         return download_dekalb(county, markets, spec)
+    if spec.get("kind") == "buncombe":
+        from seed_buncombe_parcels import ingest_buncombe, patch_index, write_market_meta
+
+        row = ingest_buncombe(county, markets)
+        write_market_meta(row)
+        patch_index(row)
+        return row
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

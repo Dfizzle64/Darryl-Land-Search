@@ -3,6 +3,7 @@ import {
   MARKETS,
   ORANGE_COUNTY_BOUNDS,
   OTHER_MARKETS,
+  PARCEL_MARKETS,
   RURAL_ELIGIBLE_STATUS_CHIP,
   type EligibleMarketsCatalog,
   type EligibleTractRow,
@@ -10,6 +11,7 @@ import {
   type MarketId,
   type MarketSummary,
   type OtherMarketId,
+  type ParcelMarketId,
   type RuralMarketTractRow,
   type RuralMarketsCatalog,
   type SearchMarketId,
@@ -38,8 +40,35 @@ export function isOtherMarketId(value: string): value is OtherMarketId {
   return (OTHER_MARKETS as readonly string[]).includes(value);
 }
 
+export function isParcelMarketId(value: string): value is ParcelMarketId {
+  return (PARCEL_MARKETS as readonly string[]).includes(value);
+}
+
 export function isSearchMarketId(value: string): value is SearchMarketId {
-  return isMarketId(value) || isOtherMarketId(value);
+  return isMarketId(value) || isOtherMarketId(value) || isParcelMarketId(value);
+}
+
+/**
+ * Asheville is a parcel market only. The OZ screening packs are unchanged,
+ * so this summary has zero eligible tracts and does not call any tract designated.
+ */
+const PARCEL_MARKET_SUMMARIES: Record<ParcelMarketId, MarketSummary> = {
+  Asheville: {
+    market: "Asheville",
+    rowCount: 0,
+    ruralCount: 0,
+    urbanCount: 0,
+    bounds: [
+      [-82.9, 35.42],
+      [-82.2, 35.82],
+    ],
+    center: [-82.55, 35.6],
+    counties: [{ county: "Buncombe", state: "North Carolina", count: 0, outerEdge: false }],
+  },
+};
+
+export function parcelMarketSummary(market: ParcelMarketId): MarketSummary {
+  return PARCEL_MARKET_SUMMARIES[market];
 }
 
 export function isPrimaryMarket(value: string): value is MarketId {
@@ -255,6 +284,7 @@ export function catalogForMarket(
   otherCatalog: EligibleMarketsCatalog,
   market: SearchMarketId,
 ): MarketSummary {
+  if (isParcelMarketId(market)) return parcelMarketSummary(market);
   const catalog = isPrimaryMarket(market) ? ruralCatalog : otherCatalog;
   if (!isPrimaryMarket(market)) return marketSummary(catalog, market);
   const rural = marketSummary(ruralCatalog, market);

@@ -22,7 +22,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | State | Endpoint | What shipped |
 | --- | --- | --- |
 | Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
-| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
+| North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0. Buncombe (Asheville) uses county Property `Acreage` because OneMap `gisacres` is 0, and joins cities-first zoning and FLU |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
@@ -31,6 +31,8 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
 Zoning is joined when a public layer supports it. DeKalb municipalities are first-class: Decatur (Georgia, not Illinois), Brookhaven, Dunwoody, Doraville, Tucker, and Stonecrest supply zoning and future land use. Chamblee is future land use only. Atlanta's citywide layers are joined only inside DeKalb's Atlanta boundary. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake stay blank. County Zoning_District and LandUse fill unincorporated DeKalb only. Those codes are not scored as Orange County multifamily districts. There is no public DeKalb sale table. Prefer **All parcels** in these markets.
+
+Buncombe (Asheville) joins city and town zoning from public REST and leaves Biltmore Forest blank. It is not scored as an Orange County multifamily district. Sale prices that fail the excise-stamp or assessed-value check stay null. No opportunity zone designation is copied onto these parcels.
 
 ### DeKalb County, Georgia
 
@@ -72,6 +74,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Memphis | other | 35,611 | 7 | 0 | 4 |
 | Winston-Salem | other | 91,784 | 9 | 0 | 0 |
 | Wilmington | other | 46,720 | 6 | 0 | 0 |
+| Asheville | other | 10,523 | 1 | 0 | 0 |
 
 ## Counties
 
@@ -387,4 +390,12 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,256 | nc-onemap-37129 |
 | Onslow | North Carolina | 37133 | complete-gte-5ac | 6,747 | nc-onemap-37133 |
 | Pender | North Carolina | 37141 | complete-gte-5ac | 7,275 | nc-onemap-37141 |
+
+### Asheville
+
+Buncombe only. Henderson, Haywood, and Madison are not in this pull. Zoning is cities-first. Biltmore Forest has no public zoning REST. SalePrice is kept on 310 of 3,796 non-zero values; the rest are null. Unincorporated FLU is the county Growth, Equity and Conservation category, not a municipal future land use map. No opportunity zone designation is joined.
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Buncombe | North Carolina | 37021 | complete-gte-5ac | 10,523 | nc-buncombe-opendata-37021 |
 

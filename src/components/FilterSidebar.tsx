@@ -469,10 +469,11 @@ export function FilterSidebar({
           />
           <Note label="Income notes">
             <p>
-              Census tract median household income (ACS B19013) is joined the same way for Orlando, Atlanta, and
-              Charleston parcel counties. Other markets stay unknown. Setting a minimum hides parcels below it and
-              parcels with no joined median, unless Include unknown income is on. Block-group income is Orange County
-              only. No income is invented.
+              Census tract median household income is ACS 5-year 2020–2024 table B19013 (2024 dollars) for every live
+              parcel market. A parcel with an 11-digit 2020 tract GEOID uses that id; otherwise the tract containing
+              the centroid is used. Setting a minimum hides parcels below it and parcels with no joined median, unless
+              Include unknown income is on. Block-group income is Orange County only. County, ZIP, and neighborhood
+              substitutes are not the filter. Charlotte neighborhood income is not used. No income is invented.
             </p>
           </Note>
         </section>
@@ -480,7 +481,7 @@ export function FilterSidebar({
         <section className="mt-5 space-y-3">
           <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Nearby traffic</h2>
           <label className="block text-sm">
-            Minimum AADT on nearest FDOT segment
+            Minimum AADT on the nearest count segment
             <input
               type="range"
               min={0}
@@ -502,8 +503,10 @@ export function FilterSidebar({
           <Toggle label="Road counts" checked={showTraffic} onChange={onShowTraffic} />
           <Note label="Traffic notes">
             <p>
-              Florida parcels use the nearest FDOT count within 15 km. Outside that, AADT stays unknown. The road overlay
-              is FDOT segments at 15,000 or more. Tracts have no AADT.
+              Florida parcels use the nearest FDOT count within 15 km. Priority counties in North Carolina, Georgia,
+              South Carolina, Tennessee, and Mississippi use that state’s published traffic counts, labeled Nearest AADT.
+              Alabama, Arkansas, and counties outside those priority sets stay unknown. The road overlay is still FDOT
+              segments at 15,000 or more. Tracts have no AADT.
             </p>
           </Note>
         </section>

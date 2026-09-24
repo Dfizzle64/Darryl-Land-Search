@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { entitySearchLink, parcelAppraiserUrl } from "../lib/format";
+import { entitySearchLink, lakeAltKey, parcelAppraiserUrl, parcelIdLabel } from "../lib/format";
 import fs from "node:fs";
 import { attachCobbSiteScreening, cobbBatchParcel, cobbScreeningOverlay, loadCobbBatch40 } from "../lib/cobbBatch40";
 import { attachDekalbSiteScreening, dekalbBatchParcel, dekalbScreeningOverlay, loadDekalbBatch40 } from "../lib/dekalbBatch40";
@@ -519,12 +519,25 @@ describe("public contact links", () => {
     expect(barrowParcel.label).toMatch(/Barrow County qPublic/);
     const uncataloged = parcelAppraiserUrl({ parcelId: "123", countyFips: "01001" });
     expect(uncataloged.href).toBeNull();
-    expect(uncataloged.label).toMatch(/No county property-appraiser search is cataloged/);
+    expect(uncataloged.label).toBe("Property appraiser not available");
     const orange = parcelAppraiserUrl({ parcelId: "282312000000000", countyFips: "12095" });
     expect(orange.href).toContain("ocpafl.org");
     expect(orange.href).toContain("282312000000000");
     const pilot = parcelAppraiserUrl({ parcelId: "282312000000000" });
     expect(pilot.href).toContain("ocpafl.org");
+    const lake = parcelAppraiserUrl({
+      parcelId: "352426000100007100",
+      countyFips: "12069",
+      appraiserUrl: "http://www.lakecopropappr.com/property-details.aspx?AltKey=3824846",
+    });
+    expect(lake.href).toBe("https://www.lakecopropappr.com/property-details.aspx?AltKey=3824846");
+    expect(lake.label).toMatch(/Lake County Property Appraiser/);
+    expect(parcelIdLabel("12069")).toBe("Parcel Number");
+    expect(parcelIdLabel("01001")).toBe("Parcel ID");
+    expect(lakeAltKey(lake.href)).toBe("3824846");
+    const lakeWithoutAltKey = parcelAppraiserUrl({ parcelId: "352426000100007100", countyFips: "12069" });
+    expect(lakeWithoutAltKey.href).toBe("https://www.lakecopropappr.com/");
+    expect(lakeWithoutAltKey.href).not.toContain("352426000100007100");
   });
 
   it("uses the state business search and says when the mailing address is missing", () => {

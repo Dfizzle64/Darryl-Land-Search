@@ -4,9 +4,9 @@ import type { FilterState, IncomeGeography } from "./types";
  * Numeric tract filtering.
  *
  * Eligible-tract GeoJSON does not carry acreage or AADT. Those sliders stay
- * parcel-only. Median household income exists only where a tract GEOID is in
- * the Orange County ACS fixture (`income-tracts.geojson`). Other tracts are
- * unknown income, not a fabricated zero.
+ * parcel-only. Median household income exists where a 2020 tract GEOID is in
+ * the Southeast ACS 5-year 2020–2024 B19013 table. Other tracts are unknown
+ * income, not a fabricated zero.
  */
 export function tractIncomePasses(
   income: number | null | undefined,
@@ -43,7 +43,7 @@ export function filterTractRowsByIncome<T extends { geoid: string }>(
 
 /**
  * MapLibre filter for layers whose features were stamped with
- * `medianHouseholdIncome` only when the Orange County ACS fixture has that GEOID.
+ * `medianHouseholdIncome` only when the Southeast ACS B19013 table has that GEOID.
  * Returns null when the income slider should not touch tracts.
  */
 export function tractIncomeLayerFilter(

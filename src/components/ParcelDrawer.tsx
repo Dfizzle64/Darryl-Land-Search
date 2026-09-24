@@ -5,12 +5,19 @@ import {
   entitySearchLink,
   formatAcres,
   formatMailing,
+  aadtEmptyMessage,
+  aadtFieldLabel,
   formatNumber,
   formatParcelPlace,
   formatRoadLabel,
   formatSale,
   formatUsd,
+  incomeEmptyMessage,
   isEntityOwner,
+  isFloridaParcel,
+  lakeAltKey,
+  parcelIdLabel,
+  showAadtField,
   missingPublicParcelValue,
   parcelAppraiserUrl,
 } from "@/lib/format";
@@ -98,20 +105,11 @@ export function ParcelDrawer({
   const oz2 = describeOz2Eligibility(properties.oz2Eligibility);
   const rezoning = describeRezoningCandidate(parcel, filters, zoningConfig, fluConfig);
   const income = filters.incomeGeography === "tract" ? properties.incomeTract : properties.incomeBlockGroup;
-  const florida = !properties.state || properties.state === "Florida";
+  const florida = isFloridaParcel(properties.state);
   const orangeCounty = properties.countyFips === "12095" || properties.countyName === "Orange";
-  const incomeEmpty = !florida
-    ? "No ACS join outside Florida"
-    : filters.incomeGeography === "blockGroup"
-      ? orangeCounty
-        ? "No block-group income for this location"
-        : "Block-group income is joined for Orange County only"
-      : income?.geoid
-        ? "ACS did not publish a median for this tract"
-        : "No ACS tract join for this location";
-  const aadtEmpty = florida
-    ? "No FDOT count segment within 15 km"
-    : "FDOT AADT is Florida only";
+  const incomeEmpty = incomeEmptyMessage(filters.incomeGeography, income, orangeCounty);
+  const aadtKnown = properties.nearestRoad?.aadt != null;
+  const aadtEmpty = aadtEmptyMessage(properties.state);
   const dekalb = properties.countyFips === "13089";
   const zoningEmpty = zoningEmptyForPanhandle(
     properties.countyFips,
@@ -168,11 +166,24 @@ export function ParcelDrawer({
     <aside className={pane ? "drawer-scroll h-full overflow-y-auto bg-ink-900 p-5" : "drawer-scroll absolute inset-x-0 bottom-0 z-20 max-h-[70vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-5 shadow-2xl lg:static lg:z-0 lg:max-h-none lg:w-[24rem] lg:shrink-0 lg:rounded-none lg:border-l lg:border-t-0 lg:shadow-none"}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-clay-400">{properties.parcelId}</p>
+          <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">{parcelIdLabel(properties.countyFips)}</p>
+          <p className="mt-0.5 break-all font-mono text-sm text-clay-300">{properties.parcelId}</p>
+          {properties.countyFips === "12069" && lakeAltKey(properties.appraiserUrl) ? (
+            <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-ink-500">
+              Alt Key <span className="font-mono normal-case tracking-normal text-clay-300">{lakeAltKey(properties.appraiserUrl)}</span>
+            </p>
+          ) : null}
           <h2 className="mt-1 font-display text-2xl leading-tight text-white">
             {properties.situsAddress || missingPublicParcelValue("situs")}
           </h2>
           <p className="text-sm text-ink-300">{placeLine}</p>
+          {appraiser.href ? (
+            <a className="mt-2 inline-block text-sm text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
+              {appraiser.label}
+            </a>
+          ) : (
+            <p className="mt-2 text-sm text-ink-500">Property appraiser not available</p>
+          )}
         </div>
         <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-3 py-1 text-sm">
           Close
@@ -296,22 +307,22 @@ export function ParcelDrawer({
           label={filters.incomeGeography === "tract" ? "Tract median household income" : "Block group median household income"}
           value={
             income?.medianHouseholdIncome != null
-              ? `${formatUsd(income.medianHouseholdIncome)}\n${income.name ?? ""}`
-              : income?.name && income.medianHouseholdIncome == null
-                ? null
-                : income?.name
+              ? `${formatUsd(income.medianHouseholdIncome)}${income.vintage ? ` · ${income.vintage}` : ""}\n${income.name ?? ""}`
+              : null
           }
           empty={incomeEmpty}
         />
-        <Field
-          label="Nearest FDOT AADT"
-          value={
-            properties.nearestRoad?.aadt != null
-              ? `${formatNumber(properties.nearestRoad.aadt)} vehicles/day (${properties.nearestRoad.year ?? "year n/a"})\n${formatRoadLabel(properties.nearestRoad)}\n${properties.nearestRoad.distanceMeters != null ? `${formatNumber(properties.nearestRoad.distanceMeters)} m from centroid` : ""}`
-              : null
-          }
-          empty={aadtEmpty}
-        />
+        {showAadtField(properties.state, aadtKnown) ? (
+          <Field
+            label={aadtFieldLabel(properties.state)}
+            value={
+              aadtKnown
+                ? `${formatNumber(properties.nearestRoad?.aadt)} vehicles/day (${properties.nearestRoad?.year ?? "year n/a"})\n${formatRoadLabel(properties.nearestRoad, florida ? "FDOT" : null)}\n${properties.nearestRoad?.distanceMeters != null ? `${formatNumber(properties.nearestRoad.distanceMeters)} m from centroid` : ""}`
+                : null
+            }
+            empty={aadtEmpty}
+          />
+        ) : null}
       </div>
 
       <div className="mt-5 space-y-2 text-sm">
@@ -321,7 +332,7 @@ export function ParcelDrawer({
             {appraiser.label}
           </a>
         ) : (
-          <p className="text-ink-300">{appraiser.label}</p>
+          <p className="text-ink-500">Property appraiser not available</p>
         )}
         {entityLink ? (
           <a className="block text-moss-400 underline-offset-2 hover:underline" href={entityLink.href} target="_blank" rel="noreferrer">

@@ -35,6 +35,8 @@ export type IncomeInfo = {
   name: string | null;
   medianHouseholdIncome: number | null;
   medianHouseholdIncomeMoe: number | null;
+  /** ACS release id. Tract medians use `acs5_2020_2024` (2024 inflation-adjusted dollars). */
+  vintage?: string | null;
 };
 
 export type NearestRoad = {
@@ -101,7 +103,7 @@ export type Oz2TractProperties = {
   /** Short county name, without a "County" suffix (for example "Orange"). */
   county?: string | null;
   state?: string | null;
-  /** Orange County ACS median household income when the GEOID is in that fixture. */
+  /** ACS 5-year B19013 median when this 2020 tract GEOID is in the Southeast income table. */
   medianHouseholdIncome?: number;
 };
 
@@ -377,7 +379,7 @@ export type RuralMarketTractProperties = {
   lat: number;
   lon: number;
   source: string;
-  /** Orange County ACS median household income when the GEOID is in that fixture. */
+  /** ACS 5-year B19013 median when this 2020 tract GEOID is in the Southeast income table. */
   medianHouseholdIncome?: number;
 };
 

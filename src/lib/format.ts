@@ -21,6 +21,41 @@ export function lakeAppraiserUrl(url: string): string {
   return url.replace(/^http:\/\/www\.lakecopropappr\.com/i, "https://www.lakecopropappr.com");
 }
 
+/** Alt Key embedded in a Lake Property Appraiser record URL. Not the Parcel Number. */
+export function lakeAltKey(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const match = url.match(/[?&]AltKey=([^&]+)/i);
+  if (!match) return null;
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    return match[1];
+  }
+}
+
+/**
+ * What the county calls the id stored on `parcelId`.
+ * Lake's shelf field is ParcelNumber; the PA record is opened with Alt Key.
+ */
+const PARCEL_ID_LABELS: Record<string, string> = {
+  "12069": "Parcel Number",
+  "12095": "Parcel ID",
+  "12097": "PIN",
+  "12105": "Parcel ID",
+  "12117": "Parcel ID",
+  "13013": "Parcel Number",
+  "13089": "Parcel ID",
+  "37021": "PIN",
+  "47011": "Parcel ID",
+};
+
+export function parcelIdLabel(countyFips?: string | null): string {
+  if (!countyFips) return "Parcel ID";
+  return PARCEL_ID_LABELS[countyFips] ?? "Parcel ID";
+}
+
+export const APPRAISER_UNAVAILABLE = "Property appraiser not available";
+
 export function comptrollerRecordsUrl(): string {
   return "https://or.occompt.com/recorder/web/";
 }
@@ -126,7 +161,13 @@ export function parcelAppraiserUrl(options: {
   if (fips === "12069" && options.appraiserUrl) {
     return {
       href: lakeAppraiserUrl(options.appraiserUrl),
-      label: "Open Lake County Property Appraiser record",
+      label: "Lake County Property Appraiser",
+    };
+  }
+  if (fips === "12069") {
+    return {
+      href: DEFAULT_APPRAISER_URLS["12069"],
+      label: "Lake County Property Appraiser search",
     };
   }
   if (fips === "12119" && options.appraiserUrl?.includes("sumterpa.com")) {
@@ -192,7 +233,7 @@ export function parcelAppraiserUrl(options: {
   if (known) return known;
   return {
     href: null,
-    label: "No county property-appraiser search is cataloged for this parcel. The mailing address above is the public contact path.",
+    label: APPRAISER_UNAVAILABLE,
   };
 }
 
@@ -342,14 +383,49 @@ export function formatMailing(address: {
   return lines.length ? lines.join("\n") : null;
 }
 
-export function formatRoadLabel(road: {
-  from: string | null;
-  to: string | null;
-  roadwayId: string | null;
-} | null): string {
+export function formatRoadLabel(
+  road: {
+    from: string | null;
+    to: string | null;
+    roadwayId: string | null;
+  } | null,
+  agency?: string | null,
+): string {
   if (!road) return "Not available";
   if (road.from && road.to) return `${road.from} → ${road.to}`;
   if (road.from) return road.from;
-  if (road.roadwayId) return `FDOT ${road.roadwayId}`;
-  return "Nearest FDOT count segment";
+  if (road.roadwayId) return agency ? `${agency} ${road.roadwayId}` : road.roadwayId;
+  return agency ? `Nearest ${agency} count segment` : "Nearest count segment";
+}
+
+export function isFloridaParcel(state: string | null | undefined): boolean {
+  return !state || state === "Florida";
+}
+
+/** Tract income is joined for every Southeast market. Block group stays Orange County. */
+export function incomeEmptyMessage(
+  geography: "tract" | "blockGroup",
+  income: { geoid?: string | null } | null | undefined,
+  orangeCounty: boolean,
+): string {
+  if (geography === "blockGroup") {
+    return orangeCounty
+      ? "No block-group income for this location"
+      : "Block-group income is joined for Orange County only";
+  }
+  if (income?.geoid) return "ACS did not publish a median for this tract";
+  return "No ACS tract join for this location";
+}
+
+/** Hide the AADT row outside Florida when no count was joined. */
+export function showAadtField(state: string | null | undefined, hasCount: boolean): boolean {
+  return isFloridaParcel(state) || hasCount;
+}
+
+export function aadtFieldLabel(state: string | null | undefined): string {
+  return isFloridaParcel(state) ? "Nearest FDOT AADT" : "Nearest AADT";
+}
+
+export function aadtEmptyMessage(state: string | null | undefined): string {
+  return isFloridaParcel(state) ? "No FDOT count segment within 15 km" : "No AADT count joined for this location";
 }

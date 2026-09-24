@@ -567,6 +567,10 @@ def ar_spec(fips: str) -> dict:
 
 
 def county_override(fips: str) -> dict | None:
+    if fips in {"12055", "12049", "12043", "12051", "12027"}:
+        from heartland_parcels import heartland_spec
+
+        return heartland_spec(fips)
     if fips == "13089":  # DeKalb GA — assessment roll plus municipal zoning/FLU
         from dekalb_parcels import dekalb_spec
 
@@ -908,7 +912,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 
 | State | Endpoint | What shipped |
 | --- | --- | --- |
-| Florida | Florida DOH EHWATER Parcels | Complete 5–150 acre extract where the county is not already an Orlando complete county |
+| Florida | Florida DOH EHWATER Parcels, plus the Heartland shelf | Complete 5–150 acre extract where the county is not already an Orlando complete county. Highlands, Hardee, Glades, Hendry, and DeSoto (Florida) use the county card instead of DOH |
 | North Carolina | NC OneMap `NC1Map_Parcels` polygons | Complete 5–150 acre extract. Most counties use `gisacres`. Cleveland, Columbus, Orange, and Warren store polygon acres because `gisacres` is 0 |
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
@@ -929,6 +933,14 @@ City layers are extent-checked in WGS84. A layer centered on Decatur, Illinois, 
 
 OZ 2.0 tracts that are eligible for nomination are not designated QOZs. This extract does not copy eligibility onto `opportunityZone`.
 
+## Florida Heartland shelf
+
+Heartland is a parcel shelf, not an Opportunity Zone market. The MSA menu does not list it. Hardee stays on Tampa and is also on this shelf. DeSoto here is Florida 12027, not Mississippi 28033. Unpublished city and unincorporated zoning stays blank.
+
+```bash
+python3 scripts/seed_market_parcels.py --market Heartland --refresh
+```
+
 ## Coverage
 """
 
@@ -938,6 +950,12 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         from dekalb_parcels import download_dekalb
 
         return download_dekalb(county, markets, spec)
+    if spec.get("kind") == "heartland":
+        from heartland_parcels import download_heartland
+
+        spec = dict(spec)
+        spec["ignoreCache"] = spec.get("ignoreCache")
+        return download_heartland(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
@@ -1143,6 +1161,9 @@ def main() -> None:
     for fips, slot in grouped.items():
         markets = full_markets[fips]
         spec = spec_for(slot["county"])
+        if args.refresh and spec.get("kind") == "heartland":
+            spec = dict(spec)
+            spec["ignoreCache"] = True
         existing = COUNTY_DIR / fips / "county.json"
         if spec["kind"] == "gap":
             if not existing.exists() or args.refresh:

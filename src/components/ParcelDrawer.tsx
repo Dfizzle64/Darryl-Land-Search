@@ -123,7 +123,6 @@ export function ParcelDrawer({
     ),
     ),
     ),
-    ),
   );
   const zoningLine = properties.zoningCode
     ? properties.municipal?.zoningLabel && properties.municipal.zoningLabel !== properties.zoningCode

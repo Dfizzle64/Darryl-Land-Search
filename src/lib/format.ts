@@ -27,6 +27,7 @@ const DEFAULT_APPRAISER_URLS: Record<string, string> = {
   "12117": "https://www.scpafl.org/",
   "12119": "https://www.sumterpa.com/",
   "12127": "https://vcpa.vcgov.org/",
+  "13077": "https://qpublic.schneidercorp.com/Application.aspx?AppID=704&LayerID=11412&PageTypeID=1",
 };
 
 export function parcelAppraiserUrl(options: {
@@ -59,7 +60,9 @@ export function parcelAppraiserUrl(options: {
                   ? "Sumter"
                   : fips === "12127"
                     ? "Volusia"
-                    : "county";
+                    : fips === "13077"
+                      ? "Coweta"
+                      : "county";
   return {
     href,
     label: fips === "12095" ? "Open in Orange County Property Appraiser" : `Open ${countyLabel} Property Appraiser search`,
@@ -123,4 +126,30 @@ export function formatRoadLabel(road: {
   if (road.from) return road.from;
   if (road.roadwayId) return `FDOT ${road.roadwayId}`;
   return "Nearest FDOT count segment";
+}
+
+export function formatZoningLabel(code: string | null | undefined, district: string | null | undefined): string | null {
+  if (district?.includes(":")) {
+    const [place, ...rest] = district.split(":");
+    const suffix = rest.join(":").trim();
+    if (place?.trim() && suffix) return `${place.trim()}: ${suffix}`;
+  }
+  const text = code?.trim();
+  return text || null;
+}
+
+export function formatParcelPlace(properties: {
+  situsCity?: string | null;
+  situsZip?: string | null;
+  countyName?: string | null;
+  state?: string | null;
+}): string {
+  const cityZip = [properties.situsCity, properties.situsZip].filter(Boolean).join(" ");
+  if (cityZip) return cityZip;
+  if (properties.countyName) {
+    const stateLabel =
+      properties.state === "Georgia" ? "Georgia" : properties.state && properties.state !== "Florida" ? properties.state : "FL";
+    return `${properties.countyName} County, ${stateLabel}`;
+  }
+  return properties.state || "Florida";
 }

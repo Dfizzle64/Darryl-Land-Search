@@ -107,7 +107,7 @@ def fetch_json(url: str, params: dict | None = None, timeout: int = 180, retries
     last: Exception | None = None
     for attempt in range(retries):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "darryl-land-search/market-parcels"})
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 darryl-land-search/market-parcels"})
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 return json.loads(resp.read().decode("utf-8"))
         except Exception as exc:  # noqa: BLE001
@@ -266,12 +266,11 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    appraiser_url: str | None = None,
+    jurisdiction_code: str | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
-    return {
-        "type": "Feature",
-        "id": feature_id,
-        "properties": {
+    properties = {
             "id": feature_id,
             "parcelId": parcel_id,
             "countyFips": fips,
@@ -281,7 +280,7 @@ def empty_feature(
             "situsAddress": situs,
             "situsCity": city,
             "situsZip": zip_code,
-            "jurisdictionCode": None,
+            "jurisdictionCode": jurisdiction_code,
             "ownerName": owner,
             "ownerName2": None,
             "propertyName": None,
@@ -312,7 +311,13 @@ def empty_feature(
             "opportunityZone": None,
             "oz2Eligibility": None,
             "source": source,
-        },
+        }
+    if appraiser_url:
+        properties["appraiserUrl"] = appraiser_url
+    return {
+        "type": "Feature",
+        "id": feature_id,
+        "properties": properties,
         "geometry": geometry,
     }
 
@@ -334,12 +339,18 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    geometry: bool = True,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
         "outFields": ",".join(out_fields),
-        "returnGeometry": "true",
+        "returnGeometry": "true" if geometry else "false",
         "outSR": "4326",
     }
     for start in range(0, total, batch):
@@ -351,12 +362,12 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), geometry=geometry))
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), geometry=geometry))
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -566,7 +577,496 @@ def ar_spec(fips: str) -> dict:
     }
 
 
+COWETA_WINGAP = "https://coweta-gis-web.coweta.ga.us/arcgis/rest/services/WinGapParcels/MapServer/0/query"
+COWETA_VALUES = "https://coweta-gis-web.coweta.ga.us/arcgis/rest/services/Hosted/ParcelPropertyValues/FeatureServer/0/query"
+COWETA_ZONING = "https://coweta-gis-web.coweta.ga.us/arcgis/rest/services/Zoning/MapServer/0/query"
+NEWNAN_FLU = "https://services6.arcgis.com/tjTJgu5ZqqixGP2v/arcgis/rest/services/Future_Land_Use/FeatureServer/0/query"
+COWETA_APPRAISER = "https://qpublic.schneidercorp.com/Application.aspx?AppID=704&LayerID=11412&PageTypeID=1"
+# WinGapParcels extent, WGS84. Southwest of Atlanta. Rejects Coweta, Oklahoma and other namesakes.
+COWETA_BOX = (-85.05, 33.15, -84.45, 33.55)
+COWETA_CITY_GAPS = (
+    "Senoia",
+    "Grantville",
+    "Moreland",
+    "Turin",
+    "Sharpsburg",
+    "Haralson",
+    "Palmetto",
+    "Chattahoochee Hills",
+)
+
+
+def _coweta_gaps() -> list[str]:
+    cities = ", ".join(COWETA_CITY_GAPS)
+    return [
+        "Primary polygons are Coweta WinGapParcels. Acres and municipality are joined from Hosted ParcelPropertyValues. The 5.0–150.0 acre band uses that acres field.",
+        "CurrentValue is the assessor current value. Assessed value is not a separate published field.",
+        "Sales are not on WinGapParcels or ParcelPropertyValues. lastSale is left null.",
+        "County zoning is Zoning/MapServer/0. A Newnan point falls outside those polygons, so Newnan parcels are not given a county district.",
+        "County future land use is not published. Land Development Guidance System 2020 is a score grid, not a FLU map, and is not joined.",
+        "Newnan zoning and future land use come from the City of Newnan Future Land Use layer only when the centroid is inside an in-city polygon.",
+        f"{cities} have no public city zoning or FLU service in this pull. City zoning and FLU stay empty there.",
+        "Assessor search is qPublic AppID 704 (LayerID 11412), the link Coweta County publishes for the tax parcel viewer.",
+    ]
+
+
+def _in_coweta_box(lon: float, lat: float) -> bool:
+    west, south, east, north = COWETA_BOX
+    return west <= lon <= east and south <= lat <= north
+
+
+def _extent_in_coweta(url: str) -> None:
+    data = fetch_json(url, {"where": "1=1", "returnExtentOnly": "true", "outSR": "4326", "f": "json"})
+    extent = data.get("extent") or {}
+    xmin, ymin = num(extent.get("xmin")), num(extent.get("ymin"))
+    xmax, ymax = num(extent.get("xmax")), num(extent.get("ymax"))
+    if None in (xmin, ymin, xmax, ymax):
+        raise RuntimeError(f"No WGS84 extent from {url}")
+    cx = (xmin + xmax) / 2
+    cy = (ymin + ymax) / 2
+    if not _in_coweta_box(cx, cy) or not _in_coweta_box(xmin, ymin) or not _in_coweta_box(xmax, ymax):
+        raise RuntimeError(
+            f"Rejected layer extent ({xmin:.3f},{ymin:.3f})-({xmax:.3f},{ymax:.3f}). Expected Coweta County, Georgia, southwest of Atlanta."
+        )
+
+
+def _parcel_key(value: Any) -> str | None:
+    text = clean(value)
+    if not text:
+        return None
+    return "".join(text.split()).upper()
+
+
+def _integral(value: Any) -> int | None:
+    parsed = num(value)
+    if parsed is None or abs(parsed - round(parsed)) > 1e-4:
+        return None
+    return int(round(parsed))
+
+
+def _situs_line(attrs: dict) -> str | None:
+    house = _integral(attrs.get("housenumber"))
+    parts: list[str] = []
+    if house and house > 0:
+        parts.append(str(house))
+    for key in ("streetdirection", "streetname", "streettype"):
+        piece = clean(attrs.get(key))
+        if piece:
+            parts.append(piece)
+    line = " ".join(parts).strip()
+    unit = clean(attrs.get("unit"))
+    if line and unit:
+        line = f"{line} {unit}"
+    return line or None
+
+
+def _title_city(municipality: str | None) -> str | None:
+    if not municipality or municipality.upper() == "COUNTY":
+        return None
+    return municipality.title()
+
+
+def _point_in_ring(x: float, y: float, ring: list[list[float]]) -> bool:
+    inside = False
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = ring[i]
+        xj, yj = ring[j]
+        if (yi > y) != (yj > y):
+            denom = (yj - yi) or 1e-12
+            if x < (xj - xi) * (y - yi) / denom + xi:
+                inside = not inside
+        j = i
+    return inside
+
+
+def _point_in_geo(x: float, y: float, geometry: dict) -> bool:
+    polygons = [geometry["coordinates"]] if geometry.get("type") == "Polygon" else geometry.get("coordinates") or []
+    if geometry.get("type") not in {"Polygon", "MultiPolygon"}:
+        return False
+    for poly in polygons:
+        if not poly or not _point_in_ring(x, y, poly[0]):
+            continue
+        if any(_point_in_ring(x, y, hole) for hole in poly[1:]):
+            continue
+        return True
+    return False
+
+
+def _geom_bbox(geometry: dict) -> tuple[float, float, float, float] | None:
+    xs: list[float] = []
+    ys: list[float] = []
+
+    def walk(node: Any) -> None:
+        if isinstance(node, (list, tuple)) and node and isinstance(node[0], (int, float)):
+            xs.append(float(node[0]))
+            ys.append(float(node[1]))
+            return
+        if isinstance(node, list):
+            for child in node:
+                walk(child)
+
+    walk(geometry.get("coordinates"))
+    if not xs:
+        return None
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+class _SpatialIndex:
+    def __init__(self, cell: float = 0.02) -> None:
+        self.cell = cell
+        self.bins: dict[tuple[int, int], list[tuple[dict, dict]]] = defaultdict(list)
+
+    def add(self, geometry: dict, payload: dict) -> None:
+        bbox = _geom_bbox(geometry)
+        if not bbox:
+            return
+        if not _in_coweta_box(bbox[0], bbox[1]) or not _in_coweta_box(bbox[2], bbox[3]):
+            return
+        x0, y0 = math.floor(bbox[0] / self.cell), math.floor(bbox[1] / self.cell)
+        x1, y1 = math.floor(bbox[2] / self.cell), math.floor(bbox[3] / self.cell)
+        for ix in range(x0, x1 + 1):
+            for iy in range(y0, y1 + 1):
+                self.bins[(ix, iy)].append((geometry, payload))
+
+    def hit(self, x: float, y: float) -> dict | None:
+        ix, iy = math.floor(x / self.cell), math.floor(y / self.cell)
+        for geometry, payload in self.bins.get((ix, iy), []):
+            if _point_in_geo(x, y, geometry):
+                return payload
+        return None
+
+
+def _fetch_where(url: str, where: str, out_fields: list[str], geometry: bool) -> list[dict]:
+    ids = fetch_object_ids(url, where)
+    if not ids:
+        return []
+    print(f"    {where[:72]} -> {len(ids)}", flush=True)
+    return fetch_by_ids(url, ids, out_fields, batch=80 if geometry else 200, geometry=geometry)
+
+
+def _fetch_keyed(url: str, field: str, values: list[Any], out_fields: list[str], numeric: bool) -> list[dict]:
+    features: list[dict] = []
+    batch = 80
+    total = len(values)
+    for start in range(0, total, batch):
+        chunk = values[start : start + batch]
+        if numeric:
+            where = f"{field} IN ({','.join(str(int(v)) for v in chunk)})"
+        else:
+            quoted = ",".join("'" + str(v).replace("'", "''") + "'" for v in chunk)
+            where = f"{field} IN ({quoted})"
+        data = fetch_json(
+            url,
+            {
+                "where": where,
+                "outFields": ",".join(out_fields),
+                "returnGeometry": "true",
+                "outSR": "4326",
+                "f": "json",
+            },
+            timeout=180,
+        )
+        if data.get("error"):
+            raise RuntimeError(json.dumps(data["error"])[:300])
+        features.extend(data.get("features") or [])
+        done = min(start + len(chunk), total)
+        if done == len(chunk) or done == total or done % 800 == 0:
+            print(f"    geometry {done}/{total}", flush=True)
+        time.sleep(0.04)
+    return features
+
+
+def _overlay_code(value: Any) -> str | None:
+    return clean(value)
+
+
+def download_coweta(county: dict, markets: list[str], spec: dict) -> dict:
+    fips = county["fips"]
+    cache_path = CACHE_DIR / f"{fips}.json"
+    print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)
+    if cache_path.exists() and not spec.get("ignoreCache"):
+        cached = json.loads(cache_path.read_text())
+        if cached.get("features"):
+            print(f"  cache hit {len(cached['features'])}", flush=True)
+            features = cached["features"]
+            for feature in features:
+                feature["properties"]["marketIds"] = markets
+            path, lookup, tiles = write_tiles(county, features)
+            return county_row(
+                county,
+                markets,
+                feature_count=len(features),
+                coverage=spec["coverage"] if features else "gap",
+                partition="tiles" if features else "none",
+                path=path if features else None,
+                lookup=lookup if features else None,
+                source=spec["source"],
+                query_url=spec["url"],
+                gaps=list(spec.get("gaps") or []),
+                source_count=cached.get("sourceCount"),
+                dropped=cached.get("dropped"),
+                tile_count=tiles,
+            )
+
+    _extent_in_coweta(COWETA_WINGAP)
+    _extent_in_coweta(COWETA_ZONING)
+    _extent_in_coweta(NEWNAN_FLU)
+    zoning_count = count_where(COWETA_ZONING, "1=1")
+    if zoning_count < 600 or zoning_count > 800:
+        raise RuntimeError(f"Coweta zoning count {zoning_count} is not the expected ~669 polygon layer")
+
+    print("  parcel values", flush=True)
+    value_rows = _fetch_where(
+        COWETA_VALUES,
+        "acres>=5 AND acres<=150",
+        [
+            "parcel_id",
+            "acres",
+            "municipality",
+            "current_val",
+            "realkey",
+            "parcelnumber",
+            "pid",
+            "ownername",
+            "additionalownerinfo",
+            "streetaddress",
+            "city",
+            "state",
+            "zip",
+            "housenumber",
+            "streetdirection",
+            "streetname",
+            "streettype",
+            "unit",
+        ],
+        geometry=False,
+    )
+    by_key: dict[str, dict] = {}
+    realkeys: list[int] = []
+    for item in value_rows:
+        attrs = item.get("attributes") or {}
+        acres = num(attrs.get("acres"))
+        if not in_band(acres):
+            continue
+        key = _parcel_key(attrs.get("parcel_id") or attrs.get("pid") or attrs.get("parcelnumber"))
+        if not key:
+            continue
+        previous = by_key.get(key)
+        if previous is not None and (num(previous.get("acres")) or 0) >= (acres or 0):
+            continue
+        by_key[key] = attrs
+    for attrs in by_key.values():
+        realkey = _integral(attrs.get("realkey"))
+        if realkey is not None:
+            realkeys.append(realkey)
+    realkeys = list(dict.fromkeys(realkeys))
+    print(f"  values in band {len(by_key)}", flush=True)
+
+    print("  wingap geometry", flush=True)
+    raw_geom = _fetch_keyed(
+        COWETA_WINGAP,
+        "RealKey",
+        realkeys,
+        ["ParcelNumber", "PID", "RealKey"],
+        numeric=True,
+    )
+    geom_by_key: dict[str, dict] = {}
+    for item in raw_geom:
+        attrs = item.get("attributes") or {}
+        geometry, _computed = rings_to_feature_geometry(item.get("geometry"))
+        if not geometry:
+            continue
+        center = centroid_of(geometry)
+        if not center or not _in_coweta_box(center[0], center[1]):
+            continue
+        key = _parcel_key(attrs.get("PID") or attrs.get("ParcelNumber"))
+        if not key:
+            continue
+        previous = geom_by_key.get(key)
+        if previous is None or (previous.get("_acres") or 0) < (_computed or 0):
+            geom_by_key[key] = {"geometry": geometry, "center": center, "_acres": _computed}
+    missing = [key for key in by_key if key not in geom_by_key]
+    if missing:
+        numbers = []
+        for key in missing:
+            attrs = by_key[key]
+            pid = clean(attrs.get("pid") or attrs.get("parcelnumber") or attrs.get("parcel_id"))
+            if pid:
+                numbers.append(pid)
+        print(f"  wingap PID fallback {len(numbers)}", flush=True)
+        for item in _fetch_keyed(COWETA_WINGAP, "PID", numbers, ["ParcelNumber", "PID", "RealKey"], numeric=False):
+            attrs = item.get("attributes") or {}
+            geometry, computed = rings_to_feature_geometry(item.get("geometry"))
+            if not geometry:
+                continue
+            center = centroid_of(geometry)
+            if not center or not _in_coweta_box(center[0], center[1]):
+                continue
+            key = _parcel_key(attrs.get("PID") or attrs.get("ParcelNumber"))
+            if not key or key in geom_by_key:
+                continue
+            geom_by_key[key] = {"geometry": geometry, "center": center, "_acres": computed}
+    missing = [key for key in by_key if key not in geom_by_key]
+    print(f"  geometry matched {len(geom_by_key)} missing {len(missing)}", flush=True)
+
+    print("  zoning and Newnan FLU", flush=True)
+    zoning_index = _SpatialIndex(0.015)
+    for item in _fetch_where(COWETA_ZONING, "1=1", ["BaseZoning", "ZoningLabel"], geometry=True):
+        geometry, _acres = rings_to_feature_geometry(item.get("geometry"))
+        if not geometry:
+            continue
+        attrs = item.get("attributes") or {}
+        code = _overlay_code(attrs.get("ZoningLabel")) or _overlay_code(attrs.get("BaseZoning"))
+        if not code:
+            continue
+        zoning_index.add(geometry, {"code": code})
+
+    flu_index = _SpatialIndex(0.008)
+    flu_rows = _fetch_where(NEWNAN_FLU, "InCityLMTS='YES'", ["FLU", "zoning", "InCityLMTS", "PID"], geometry=True)
+    flu_kept = 0
+    for item in flu_rows:
+        attrs = item.get("attributes") or {}
+        if (clean(attrs.get("InCityLMTS")) or "").upper() != "YES":
+            continue
+        geometry, _acres = rings_to_feature_geometry(item.get("geometry"))
+        if not geometry:
+            continue
+        bbox = _geom_bbox(geometry)
+        if not bbox or not _in_coweta_box((bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2):
+            continue
+        flu_index.add(geometry, {"flu": _overlay_code(attrs.get("FLU")), "zoning": _overlay_code(attrs.get("zoning"))})
+        flu_kept += 1
+    print(f"  newnan in-city polygons {flu_kept}", flush=True)
+
+    features: list[dict] = []
+    dropped = 0
+    zoning_n = 0
+    newnan_zoning_n = 0
+    flu_n = 0
+    muni_counts: dict[str, int] = defaultdict(int)
+    for key, attrs in by_key.items():
+        geom = geom_by_key.get(key)
+        if not geom:
+            dropped += 1
+            continue
+        acres = num(attrs.get("acres"))
+        if not in_band(acres) or acres is None:
+            dropped += 1
+            continue
+        parcel_id = clean(attrs.get("parcel_id") or attrs.get("pid") or attrs.get("parcelnumber"))
+        if not parcel_id:
+            dropped += 1
+            continue
+        municipality = clean(attrs.get("municipality"))
+        municipality_name = municipality.upper() if municipality else None
+        value = num(attrs.get("current_val"))
+        if value is not None and value <= 0:
+            value = None
+        feature = empty_feature(
+            fips=fips,
+            county=county["name"],
+            state=county["state"],
+            markets=markets,
+            parcel_id=parcel_id,
+            acreage=acres,
+            geometry=geom["geometry"],
+            center=geom["center"],
+            source=spec["source"],
+            owner=clean(attrs.get("ownername")),
+            situs=_situs_line(attrs),
+            city=_title_city(municipality_name),
+            zoning=None,
+            market_value=value,
+            mail1=clean(attrs.get("streetaddress")),
+            mail_city=clean(attrs.get("city")),
+            mail_state=clean(attrs.get("state")),
+            mail_zip=zip_str(attrs.get("zip")),
+            appraiser_url=COWETA_APPRAISER,
+            jurisdiction_code=municipality_name,
+        )
+        feature["properties"]["ownerName2"] = clean(attrs.get("additionalownerinfo"))
+        lon, lat = geom["center"]
+        zone = zoning_index.hit(lon, lat)
+        if zone and zone.get("code"):
+            code = zone["code"]
+            feature["properties"]["zoningCode"] = code
+            feature["properties"]["zoningDistrict"] = f"Coweta:{code}"
+        city_hit = flu_index.hit(lon, lat)
+        if city_hit:
+            if city_hit.get("zoning"):
+                code = city_hit["zoning"]
+                feature["properties"]["zoningCode"] = code
+                feature["properties"]["zoningDistrict"] = f"Newnan:{code}"
+                newnan_zoning_n += 1
+            if city_hit.get("flu"):
+                label = city_hit["flu"]
+                feature["properties"]["flu"] = {
+                    "code": label,
+                    "label": label,
+                    "jurisdiction": "Newnan",
+                    "source": NEWNAN_FLU.replace("/query", ""),
+                }
+                flu_n += 1
+        if feature["properties"].get("zoningCode"):
+            zoning_n += 1
+        muni_counts[municipality_name or "UNKNOWN"] += 1
+        features.append(feature)
+
+    if not all(in_band(feature["properties"].get("acreage")) for feature in features):
+        raise RuntimeError("Coweta emitted a parcel outside 5–150 acres")
+    if any(not _in_coweta_box(*feature["properties"]["centroid"]) for feature in features):
+        raise RuntimeError("Coweta emitted a centroid outside Coweta County, Georgia")
+    features.sort(key=lambda row: row["properties"].get("acreage") or 0, reverse=True)
+    newnan_parcels = muni_counts.get("NEWNAN", 0)
+    print(
+        f"  kept {len(features)} zoning {zoning_n} newnan zoning {newnan_zoning_n} newnan flu {flu_n} newnan parcels {newnan_parcels}",
+        flush=True,
+    )
+    gaps = list(spec.get("gaps") or [])
+    gaps.append(
+        f"ParcelPropertyValues 5–150 acre rows: {len(by_key)}. WinGap geometry matched {len(geom_by_key)}. Kept {len(features)}. Newnan municipality parcels {newnan_parcels}; Newnan FLU joined {flu_n}; Newnan zoning joined {newnan_zoning_n}."
+    )
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(
+        json.dumps(
+            {"sourceCount": len(by_key), "dropped": dropped, "features": features},
+            separators=(",", ":"),
+        )
+    )
+    path, lookup, tiles = (None, None, 0)
+    coverage = spec["coverage"] if features else "gap"
+    if features:
+        path, lookup, tiles = write_tiles(county, features)
+    else:
+        gaps.insert(0, "ParcelPropertyValues returned 5–150 acre rows but none joined to a Coweta WinGap polygon.")
+    return county_row(
+        county,
+        markets,
+        feature_count=len(features),
+        coverage=coverage,
+        partition="tiles" if features else "none",
+        path=path,
+        lookup=lookup,
+        source=spec["source"],
+        query_url=spec["url"],
+        gaps=gaps,
+        source_count=len(by_key),
+        dropped=dropped,
+        tile_count=tiles,
+    )
+
+
 def county_override(fips: str) -> dict | None:
+    if fips == "13077":  # Coweta GA — WinGap polygons, ParcelPropertyValues acres
+        return {
+            "kind": "coweta",
+            "url": COWETA_WINGAP,
+            "source": "ga-coweta-wingap-parcels",
+            "coverage": "complete-gte-5ac",
+            "appraiserUrl": COWETA_APPRAISER,
+            "gaps": _coweta_gaps(),
+        }
     if fips == "13067":  # Cobb GA
         return {
             "kind": "arcgis",
@@ -663,7 +1163,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, or Coweta pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -925,17 +1425,19 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Coweta county services | Cobb and Coweta are complete 5–150 acre extracts. DeKalb is a polygon-acre sample. Coweta joins county zoning and Newnan city future land use inside the city. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer already carries a zoning field (DeKalb) or a public zoning map is available (Coweta county zoning, plus Newnan inside the city). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "coweta":
+        return download_coweta(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

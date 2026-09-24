@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-23T04:31:27Z",
+  "generatedAt": "2026-09-24T00:06:57Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 8149,
+  "parcelCount": 16239,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -172,20 +172,28 @@
       "name": "Coweta",
       "fips": "13077",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 8090,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-coweta-wingap-parcels",
+      "queryUrl": "https://coweta-gis-web.coweta.ga.us/arcgis/rest/services/WinGapParcels/MapServer/0/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Primary polygons are Coweta WinGapParcels. Acres and municipality are joined from Hosted ParcelPropertyValues. The 5.0\u2013150.0 acre band uses that acres field.",
+        "CurrentValue is the assessor current value. Assessed value is not a separate published field.",
+        "Sales are not on WinGapParcels or ParcelPropertyValues. lastSale is left null.",
+        "County zoning is Zoning/MapServer/0. A Newnan point falls outside those polygons, so Newnan parcels are not given a county district.",
+        "County future land use is not published. Land Development Guidance System 2020 is a score grid, not a FLU map, and is not joined.",
+        "Newnan zoning and future land use come from the City of Newnan Future Land Use layer only when the centroid is inside an in-city polygon.",
+        "Senoia, Grantville, Moreland, Turin, Sharpsburg, Haralson, Palmetto, Chattahoochee Hills have no public city zoning or FLU service in this pull. City zoning and FLU stay empty there.",
+        "Assessor search is qPublic AppID 704 (LayerID 11412), the link Coweta County publishes for the tax parcel viewer.",
+        "ParcelPropertyValues 5\u2013150 acre rows: 8114. WinGap geometry matched 8090. Kept 8090. Newnan municipality parcels 303; Newnan FLU joined 302; Newnan zoning joined 302."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13077/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13077/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 8114
     },
     {
       "name": "Dawson",

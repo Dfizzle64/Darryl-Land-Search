@@ -1,0 +1,291 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-24",
+  "title": "Brevard County municipal zoning and future land use",
+  "countyFips": "12009",
+  "doNotInventOpportunityZones": true,
+  "doNotInventSchoolGrades": true,
+  "doNotInventBaseFloodElevations": true,
+  "brevardBbox": [-81.05, 27.75, -80.38, 28.86],
+  "parcelNote": "Joined onto parcels already in the repo (Florida DOH EHWATER for FIPS 12009). Melbourne is spatial. West Melbourne, Rockledge, Satellite Beach, Cocoa, Indian Harbour Beach, and Cocoa Beach try TaxAcct, PID, RENUM, or Name first, then the parcel centroid. On this shelf those ids match for most West Melbourne, Rockledge, Satellite Beach, Cocoa, and Cocoa Beach rows. Centroids fill the rest. Accela remains the preferred cadastre when that roll is the parcel source.",
+  "namesakes": [
+    {
+      "id": "melbourne-au",
+      "reason": "Melbourne, Australia / Victoria planning is the wrong country. Any layer whose sample centroid falls outside the Brevard bbox is refused. Do not use a Melbourne name alone."
+    }
+  ],
+  "rejected": [
+    {
+      "id": "melbourne-florida-org-dead-host",
+      "url": "https://gis.melbourneflorida.org/",
+      "reason": "Prior City of Melbourne hostname. TLS/connect failed. Use maps.mlbfl.org."
+    },
+    {
+      "id": "brevard-county-zoning",
+      "url": "https://gis.brevardfl.gov/gissrv/rest/services/Planning_Development/Zoning_WKID2881/MapServer/0",
+      "reason": "County zoning. Usable for unincorporated Brevard only. Not a substitute inside the cities cataloged here."
+    },
+    {
+      "id": "brevard-county-flu",
+      "url": "https://gis.brevardfl.gov/gissrv/rest/services/Planning_Development/FLU_WKID2881/MapServer",
+      "reason": "County future land use. Not a city FLUM."
+    },
+    {
+      "id": "brevard-accela-zoning",
+      "url": "https://gis.brevardfl.gov/gissrv/rest/services/Accela/AccelaGIS_Layers_WKID2881/MapServer/7",
+      "reason": "Accela county zoning. Not a city ordinance inside incorporated places."
+    },
+    {
+      "id": "brevard-accela-flu",
+      "url": "https://gis.brevardfl.gov/gissrv/rest/services/Accela/AccelaGIS_Layers_WKID2881/MapServer/8",
+      "reason": "Accela county future land use. Not a city FLUM."
+    },
+    {
+      "id": "west-melbourne-county-flu",
+      "url": "https://cwm-gis.westmelbourne.org/server/rest/services/Hosted/County_FLU_Areas/FeatureServer/0",
+      "reason": "Brevard County FLU hosted on the West Melbourne portal. Prefer Future_Land_Use_View_2."
+    },
+    {
+      "id": "west-melbourne-elementary-zones",
+      "url": "https://cwm-gis.westmelbourne.org/server/rest/services/Hosted/Elementary_School_Zones_View",
+      "reason": "School attendance zones. Not zoning or future land use. School grades are not invented."
+    },
+    {
+      "id": "west-melbourne-middle-zones",
+      "url": "https://cwm-gis.westmelbourne.org/server/rest/services/Hosted/Middle_School_Zones_View",
+      "reason": "School attendance zones. Not zoning or future land use. School grades are not invented."
+    },
+    {
+      "id": "west-melbourne-high-zones",
+      "url": "https://cwm-gis.westmelbourne.org/server/rest/services/Hosted/High_School_Zones_View",
+      "reason": "School attendance zones. Not zoning or future land use. School grades are not invented."
+    }
+  ],
+  "skippedAlreadyCarded": [
+    {
+      "id": "palm-bay",
+      "name": "Palm Bay",
+      "reason": "Prior BR-C1 zoning and future land use. Not re-wired as new in this pass.",
+      "hint": "gis.palmbayflorida.org GrowthManagement Zoning and FLU1 FeatureServer/0"
+    },
+    {
+      "id": "titusville",
+      "name": "Titusville",
+      "reason": "Prior BR-C2 zoning and future land use. Not re-wired as new in this pass.",
+      "hint": "gis.titusville.com CommunityDevelopment MapServer 15 and 16"
+    }
+  ],
+  "gaps": [
+    {
+      "id": "cape-canaveral",
+      "name": "Cape Canaveral",
+      "reason": "Official zoning is a PDF. No public city FeatureServer."
+    },
+    {
+      "id": "indialantic",
+      "name": "Indialantic",
+      "reason": "No public city zoning or FLU FeatureServer."
+    },
+    {
+      "id": "melbourne-beach",
+      "name": "Melbourne Beach",
+      "reason": "Zoning pages only. No public REST."
+    },
+    {
+      "id": "grant-valkaria",
+      "name": "Grant-Valkaria",
+      "reason": "No public city FeatureServer."
+    },
+    {
+      "id": "palm-shores",
+      "name": "Palm Shores",
+      "reason": "No public city FeatureServer."
+    },
+    {
+      "id": "melbourne-village",
+      "name": "Melbourne Village",
+      "reason": "No public city FeatureServer."
+    },
+    {
+      "id": "malabar",
+      "name": "Malabar",
+      "reason": "No public city zoning FeatureServer."
+    }
+  ],
+  "places": [
+    {
+      "id": "melbourne",
+      "name": "Melbourne",
+      "county": "Brevard",
+      "countyFips": "12009",
+      "kind": "city",
+      "status": "usable",
+      "rank": 1,
+      "prefix": "MLB",
+      "join": "spatial",
+      "newThisPass": true,
+      "notes": "City of Melbourne, Florida on maps.mlbfl.org. Not Melbourne, Australia. Spatial join only.",
+      "zoning": {
+        "url": "https://maps.mlbfl.org/services/rest/services/AGOL/CommunityDevelopmentViewer_AGOL/MapServer/109",
+        "fields": ["ZONING", "ZONE_ALL"],
+        "labelFields": []
+      },
+      "flu": {
+        "url": "https://maps.mlbfl.org/services/rest/services/AGOL/CommunityDevelopmentViewer_AGOL/MapServer/108",
+        "fields": ["FLUM"],
+        "labelFields": [],
+        "where": "Status='Active / Current'"
+      }
+    },
+    {
+      "id": "west-melbourne",
+      "name": "West Melbourne",
+      "county": "Brevard",
+      "countyFips": "12009",
+      "kind": "city",
+      "status": "usable",
+      "rank": 2,
+      "prefix": "WM",
+      "join": "attribute-then-spatial",
+      "newThisPass": true,
+      "notes": "City portal. taxacct attribute, then centroid. County_FLU_Areas is not used.",
+      "zoning": {
+        "url": "https://cwm-gis.westmelbourne.org/server/rest/services/Hosted/Zoning_View/FeatureServer/0",
+        "fields": ["zoningnew"],
+        "labelFields": ["zoningdesc"],
+        "idFields": ["taxacct", "name"]
+      },
+      "flu": {
+        "url": "https://cwm-gis.westmelbourne.org/server/rest/services/Hosted/Future_Land_Use_View_2/FeatureServer/0",
+        "fields": ["flunew"],
+        "labelFields": [],
+        "idFields": ["taxacct", "name"]
+      }
+    },
+    {
+      "id": "rockledge",
+      "name": "Rockledge",
+      "county": "Brevard",
+      "countyFips": "12009",
+      "kind": "city",
+      "status": "usable",
+      "rank": 3,
+      "prefix": "RCK",
+      "join": "attribute-then-spatial",
+      "newThisPass": true,
+      "notes": "TaxAcct attribute, then centroid.",
+      "zoning": {
+        "url": "https://gis-rockledge.cityofrockledge.org/server/rest/services/Planning_Building_Public/FeatureServer/0",
+        "fields": ["Zoning"],
+        "labelFields": [],
+        "idFields": ["TaxAcct", "Name"]
+      },
+      "flu": {
+        "url": "https://gis-rockledge.cityofrockledge.org/server/rest/services/Planning_Building_Public/FeatureServer/1",
+        "fields": ["FLU"],
+        "labelFields": [],
+        "idFields": ["TaxAcct", "Name"]
+      }
+    },
+    {
+      "id": "satellite-beach",
+      "name": "Satellite Beach",
+      "county": "Brevard",
+      "countyFips": "12009",
+      "kind": "city",
+      "status": "usable",
+      "rank": 4,
+      "prefix": "STB",
+      "join": "attribute-then-spatial",
+      "newThisPass": true,
+      "notes": "PID attribute when it matches the parcel id, then centroid. Layer 16 is zoning-primary and layer 15 is FLU-primary.",
+      "zoning": {
+        "url": "https://services5.arcgis.com/6oVY31bK6DOd0VbR/arcgis/rest/services/City_of_Satellite_Beach_Map_v1_0/FeatureServer/16",
+        "fields": ["Zoning"],
+        "labelFields": ["Zoning_Descr"],
+        "idFields": ["PID"]
+      },
+      "flu": {
+        "url": "https://services5.arcgis.com/6oVY31bK6DOd0VbR/arcgis/rest/services/City_of_Satellite_Beach_Map_v1_0/FeatureServer/15",
+        "fields": ["FLU"],
+        "labelFields": ["FLU_descrip"],
+        "idFields": ["PID"]
+      }
+    },
+    {
+      "id": "cocoa",
+      "name": "Cocoa",
+      "county": "Brevard",
+      "countyFips": "12009",
+      "kind": "city",
+      "status": "usable",
+      "rank": 5,
+      "prefix": "COC",
+      "join": "attribute-then-spatial",
+      "newThisPass": true,
+      "fluClose": true,
+      "notes": "Zoning is the prior BR-C3 layer (not a new find). Future land use is FLU_Public_View layer 6, which closes the prior FLU gap. TaxAcct, then centroid.",
+      "zoning": {
+        "url": "https://services1.arcgis.com/Tex1uhbqnOZPx6qT/arcgis/rest/services/Public_View_Cocoa_Zoning_with_Split_Lots_June_2023_view/FeatureServer/1",
+        "fields": ["Zoning"],
+        "labelFields": ["ZoneDesc"],
+        "idFields": ["TaxAcct", "Name"],
+        "alreadyCarded": true
+      },
+      "flu": {
+        "url": "https://services1.arcgis.com/Tex1uhbqnOZPx6qT/arcgis/rest/services/FLU_Public_View/FeatureServer/6",
+        "fields": ["FLUCity"],
+        "labelFields": ["FLUDescr"],
+        "idFields": ["TaxAcct"]
+      }
+    },
+    {
+      "id": "indian-harbour-beach",
+      "name": "Indian Harbour Beach",
+      "county": "Brevard",
+      "countyFips": "12009",
+      "kind": "city",
+      "status": "partial",
+      "rank": 6,
+      "prefix": "IHB",
+      "join": "attribute-then-spatial",
+      "newThisPass": false,
+      "notes": "Zoning only. The layer also carries a FLU string; it is not used. LULC vintages are land cover, not a future land use map.",
+      "fluGap": "Indian Harbour Beach has city zoning only. Land-cover layers are not a future land use map, and the FLU string on the zoning layer is left blank.",
+      "zoning": {
+        "url": "https://services7.arcgis.com/p4PcsTDMX7kob6sh/arcgis/rest/services/IHB_Zoning_LandUse_AGOL/FeatureServer/1",
+        "fields": ["Zoning"],
+        "labelFields": ["Zoning_Des"],
+        "idFields": ["RENUM", "TaxAcct"]
+      },
+      "flu": null
+    },
+    {
+      "id": "cocoa-beach",
+      "name": "Cocoa Beach",
+      "county": "Brevard",
+      "countyFips": "12009",
+      "kind": "city",
+      "status": "partial",
+      "rank": 7,
+      "prefix": "CBC",
+      "join": "attribute-then-spatial",
+      "newThisPass": false,
+      "unofficial": true,
+      "vintage": "2021",
+      "notes": "CBParcelsMaster2021. The city web map is titled Cocoa Beach Zoning (Unofficial). Vintage 2021. Kept only with that flag.",
+      "zoning": {
+        "url": "https://services5.arcgis.com/U4PMgBw5XA2nmleg/arcgis/rest/services/CBParcelsMaster2021/FeatureServer/0",
+        "fields": ["Zoning"],
+        "labelFields": ["ZonDesc"],
+        "idFields": ["TaxAcct", "Name"]
+      },
+      "flu": {
+        "url": "https://services5.arcgis.com/U4PMgBw5XA2nmleg/arcgis/rest/services/CBParcelsMaster2021/FeatureServer/0",
+        "fields": ["FLU"],
+        "labelFields": [],
+        "idFields": ["TaxAcct", "Name"]
+      }
+    }
+  ]
+}

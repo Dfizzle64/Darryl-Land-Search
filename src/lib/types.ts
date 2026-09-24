@@ -62,6 +62,10 @@ export type MunicipalOverlayNote = {
   zoningLabel: string | null;
   /** Set when this city has no future land use service. County FLU is not filled in. */
   fluGap: string | null;
+  /** Cocoa Beach uses an unofficial 2021 layer. Other cities omit this. */
+  unofficial?: boolean;
+  vintage?: string | null;
+  join?: "attribute" | "spatial";
 };
 
 export type OpportunityZoneInfo = {

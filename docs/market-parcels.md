@@ -30,7 +30,7 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | South Carolina | Berkeley Addr_muni, Charleston energov_ent, Dorchester Parcels_Public, Greenville County Tax Parcel | Seed wiring joins city zoning where a public layer is usable. Shipped tiles are still Dorchester complete, Greenville city-GIS sample, and Berkeley/Charleston gaps. Other counties stay gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined when a public layer supports it. DeKalb municipalities are first-class: Decatur (Georgia, not Illinois), Brookhaven, Dunwoody, Doraville, Tucker, and Stonecrest supply zoning and future land use. Chamblee is future land use only. Atlanta's citywide layers are joined only inside DeKalb's Atlanta boundary. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake stay blank. County Zoning_District and LandUse fill unincorporated DeKalb only. Those codes are not scored as Orange County multifamily districts. There is no public DeKalb sale table. Prefer **All parcels** in these markets.
+Zoning is joined when a public layer supports it. Brevard city overlays (Melbourne, West Melbourne, Rockledge, Satellite Beach, Cocoa, plus Indian Harbour Beach zoning and unofficial 2021 Cocoa Beach) are in [`brevard-municipal.md`](brevard-municipal.md). Palm Bay, Titusville, and the gap cities there are not filled from county zoning. DeKalb municipalities are first-class: Decatur (Georgia, not Illinois), Brookhaven, Dunwoody, Doraville, Tucker, and Stonecrest supply zoning and future land use. Chamblee is future land use only. Atlanta's citywide layers are joined only inside DeKalb's Atlanta boundary. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake stay blank. County Zoning_District and LandUse fill unincorporated DeKalb only. Those codes are not scored as Orange County multifamily districts. There is no public DeKalb sale table. Prefer **All parcels** in these markets.
 
 Volusia parcels in the Melbourne extract also get city zoning and future land use where a municipal polygon covers the centroid (`docs/volusia-flagler-municipal.md`). Flagler city layers are cataloged on the Palm Coast host. This repo has no Flagler parcel baseline, so those overlays are not stamped onto new parcels. The Volusia join is not a multifamily knowledge-base match outside Orange County.
 
@@ -234,6 +234,8 @@ Martin and Indian River keep those DOH shelves. City zoning and future land use 
 | Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 5,997 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
+
+Brevard keeps the Florida DOH shelf (`fl-doh-ehwaters-12009`, 5,746 parcels). City zoning is on 979 parcels and future land use on 973. Melbourne, West Melbourne, Rockledge, Satellite Beach, and Cocoa have both. Indian Harbour Beach is zoning only. Cocoa Beach is the unofficial 2021 layer. Palm Bay, Titusville, Cape Canaveral, Indialantic, Melbourne Beach, Grant-Valkaria, Palm Shores, Melbourne Village, and Malabar stay blank. Sources are in `docs/brevard-municipal.md`. County parcels were not re-downloaded.
 
 ### Pensacola
 

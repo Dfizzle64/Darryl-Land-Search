@@ -10,6 +10,7 @@ npm run seed:polk-municipal
 npm run seed:pinellas-pasco-muni
 npm run seed:seminole-municipal
 npm run seed:martin-irc-municipal
+npm run seed:brevard-municipal
 npm run seed:sc-muni
 ```
 
@@ -183,7 +184,24 @@ Ocean Breeze has no city service. The Martin County zoning and future land use m
 
 Rejected and not queried: Ocoee `ParcelsFLUZoning`, Palm Beach County zoning, and ClearviewGeographic stacks.
 
+## Brevard County, Florida (FIPS 12009)
+
+Catalog: `data/brevard-municipal.json`. Join script: `scripts/join_brevard_municipal.py`. Stamped onto the existing Florida DOH shelf (`fl-doh-ehwaters-12009`, 5,746 parcels, 5–150 acres), not the Accela cadastre. County parcels were not re-downloaded. West Melbourne, Rockledge, Satellite Beach, Cocoa, and Cocoa Beach join on a parcel id when it matches, then a point inside the parcel. Melbourne is spatial. Opportunity Zone fields, school grades, and base flood elevations were not written.
+
+Shelf totals: zoning 979, future land use 973. The Orlando shed sample (mostly Titusville) joined none.
+
+| City | Zoning | Future land use | Join |
+| --- | ---: | ---: | --- |
+| Melbourne | 409 | 409 | CommunityDevelopmentViewer_AGOL MapServer 109 `ZONING` and 108 `FLUM` |
+| West Melbourne | 149 | 149 | `Zoning_View` `zoningnew` and `Future_Land_Use_View_2` `flunew` |
+| Rockledge | 163 | 160 | Planning_Building_Public FeatureServer 0 `Zoning` and 1 `FLU` |
+| Satellite Beach | 16 | 16 | FeatureServer 16 `Zoning` and 15 `FLU`, on `PID` |
+| Cocoa | 206 | 215 | Public_View_Cocoa_Zoning FeatureServer 1 `Zoning` and `FLU_Public_View` FeatureServer 6 `FLUCity` |
+| Indian Harbour Beach | 12 | 0 | Zoning only. Land cover is not stored as future land use |
+| Cocoa Beach | 24 | 24 | Unofficial 2021 `CBParcelsMaster2021`. The drawer flags that vintage |
+
+Palm Bay and Titusville stay on their prior cards and are not applied here. Cape Canaveral, Indialantic, Melbourne Beach, Grant-Valkaria, Palm Shores, Melbourne Village, and Malabar have no public city service. County `Zoning_WKID2881`, county future land use, Accela zoning, West Melbourne `County_FLU_Areas`, and West Melbourne school-zone layers are not copied in. `gis.melbourneflorida.org` and Melbourne, Australia are rejected.
+
 ## Not in this pass
 
-- Brevard city future land use for Melbourne, West Melbourne, Rockledge, Satellite Beach, and Cocoa is not on a finished overlay branch. The Treasure Coast parcel pull records those cities as having no separate public zoning service in that extract, and that pull is a new county shelf.
 - New county parcel extracts for any other market.

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T04:05:54Z",
+  "generatedAt": "2026-09-24T15:06:09Z",
   "incomeSource": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b19013.dat",
   "incomeTable": "B19013",
   "incomeCounties": [
@@ -181,7 +181,7 @@
   ],
   "incomeTractCount": 16790,
   "incomeKnownCount": 16524,
-  "aadtSource": "https://services1.arcgis.com/O1JpcwDW8sjYuddV/arcgis/rest/services/Annual_Average_Daily_Traffic_Historical_TDA/FeatureServer/0",
+  "aadtSource": "https://gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0",
   "aadtYear": 2025,
   "aadtSegmentCount": 21605,
   "majorRoadOverlayCount": 7310,
@@ -192,9 +192,9 @@
     "Join prefers the parcel's 11-digit 2020 tract GEOID. Centroid-in-tract is only the fallback when that GEOID is missing.",
     "BEA county income, IRS SOI ZIP income, and HUD CHAS are not the tract household-income field.",
     "Block-group income remains the Orange County pilot fixture.",
-    "Florida AADT is the existing FDOT 2025 historical count layer for every footprint county, not only Orange and Hillsborough. gis.fdot.gov RCI FeatureServer/0 returned HTTP 500 here, so that URL was not used.",
     "North Carolina, South Carolina, Tennessee, Mississippi, Alabama, and Arkansas footprint counties use the state DOT layer filtered to those counties. Georgia uses GDOT MapServer/21. That layer has no county field and only a few hundred statewide segments, so a segment is kept only when its midpoint falls in that county's TIGER tract. Counties with no such segment stay unknown. Tennessee COUNTY_NUMBER and Mississippi COUNTYNMBR and Alabama LUCountyID are alphabetical county codes, not FIPS. Arkansas keeps Comment = Actual Station only. Estimated Station, Estimated CCS, and Cross County rows are omitted. Line geometry is generalized to about 90 m. Counts are the published values.",
     "A parcel more than 15 km from the nearest count stays unknown. Outside Florida the drawer label is Nearest AADT, not FDOT.",
+    "Florida AADT is FDOT RCI FeatureServer/0 (gis.fdot.gov), field AADT, YEAR_=2025, for every footprint county including Orange and Hillsborough. The service is EPSG:26917; this extract requested outSR 4326. Nearest segment to the parcel centroid within 15 km.",
     "Valdosta, Macon, Athens, Hilton Head, and Jackson MS tract polygons were added for centroid fallback. Estimates stay ACS 5-year 2020\u20132024 B19013. Those counties use the same statewide AADT join as the rest of the footprint."
   ],
   "incomeApi": "https://api.census.gov/data/2024/acs/acs5?get=NAME,B19013_001E,B19013_001M&for=tract:*&in=state:XX&in=county:*",
@@ -414,7 +414,9 @@
       "agency": "FDOT",
       "field": "AADT",
       "year": 2025,
-      "url": "https://services1.arcgis.com/O1JpcwDW8sjYuddV/arcgis/rest/services/Annual_Average_Daily_Traffic_Historical_TDA/FeatureServer/0"
+      "url": "https://gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0",
+      "yearField": "YEAR_",
+      "crs": "EPSG:26917"
     },
     "NC": {
       "agency": "NCDOT",

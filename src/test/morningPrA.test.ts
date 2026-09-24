@@ -107,6 +107,8 @@ describe("footprint county traffic fixture", () => {
     expect(sources.AR.field).toBe("MostRecentADT");
     expect(sources.FL.field).toBe("AADT");
     expect(sources.FL.year).toBe(2025);
+    expect(meta.aadtSource).toContain("gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0");
+    expect(sources.FL.url).toContain("RCI_Layers/FeatureServer/0");
     const raw = readFileSync("data/fixtures/aadt-state-dots.geojson", "utf8");
     expect(raw).not.toMatch(/FDOT/);
     expect(raw).toContain('"countyFips":"45019"');

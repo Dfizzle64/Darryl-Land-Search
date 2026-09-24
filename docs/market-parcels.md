@@ -39,7 +39,7 @@ Valdosta, Macon, Athens, Hilton Head, and Jackson MS are parcel shelves with no 
 
 Acreage band is **5.0–150.0 inclusive**. Lake, Osceola, Seminole, and Sumter Orlando tiles were reseeded from county GIS. Polk market parcels use the property-appraiser extract. Orange still points at the Orlando tiles.
 
-AADT is not copied onto these tiles. `/api/parcels` joins the nearest published count within 15 km. Florida uses the FDOT 2025 historical layer for every footprint county. North Carolina, South Carolina, Tennessee, Mississippi, Alabama, and Arkansas use that state's public DOT layer for the footprint counties. Georgia uses GDOT FunctionalClass MapServer/21, tagged by TIGER tract midpoint. That layer has only a few hundred segments statewide, so thirteen footprint counties with no positive segment stay unknown. Counts are the published field. Zero and missing values are dropped. Nothing is estimated.
+AADT is not copied onto these tiles. `/api/parcels` joins the nearest published count within 15 km. Florida uses FDOT RCI FeatureServer/0, field AADT, YEAR_=2025, for every footprint county. The nearest segment is the one closest to the parcel centroid, within 15 km. North Carolina, South Carolina, Tennessee, Mississippi, Alabama, and Arkansas use that state's public DOT layer for the footprint counties. Georgia uses GDOT FunctionalClass MapServer/21, tagged by TIGER tract midpoint. That layer has only a few hundred segments statewide, so thirteen footprint counties with no positive segment stay unknown. Counts are the published field. Zero and missing values are dropped. Nothing is estimated.
 
 Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map requests the selected market's viewport tiles only.
 

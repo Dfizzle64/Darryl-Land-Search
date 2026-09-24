@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """State DOT traffic counts for the Southeast footprint outside Florida.
 
-Florida stays on the FDOT 2025 historical sidecar (`aadt-segments.geojson`).
-That extract already covers every Florida county. gis.fdot.gov RCI
-FeatureServer/0 returned HTTP 500 here, so this script does not replace it.
-It only records which footprint counties that sidecar already contains.
+Florida stays on FDOT RCI FeatureServer/0 (`aadt-segments.geojson`),
+field AADT, YEAR_=2025. `scripts/seed_fl_signals.py --aadt-only` refreshes
+that sidecar. This script only records which footprint counties it contains.
 
 Every other footprint state uses one verified public statewide layer. Counts
 are copied from the published field. Zero and missing values are left out.
@@ -278,7 +277,7 @@ AL = {
 # the footprint.
 AR = {"05035": 18, "05093": 47}
 
-# FDOT historical COUNTY names already on aadt-segments.geojson.
+# FDOT RCI COUNTY names (Title Case; DeSoto is Desoto).
 FL = {
     "12001": "Alachua",
     "12003": "Baker",
@@ -334,7 +333,9 @@ SOURCES = {
         "agency": "FDOT",
         "field": "AADT",
         "year": 2025,
-        "url": "https://services1.arcgis.com/O1JpcwDW8sjYuddV/arcgis/rest/services/Annual_Average_Daily_Traffic_Historical_TDA/FeatureServer/0",
+        "url": "https://gis.fdot.gov/arcgis/rest/services/RCI_Layers/FeatureServer/0",
+        "crs": "EPSG:26917",
+        "yearField": "YEAR_",
     },
     "NC": {
         "agency": "NCDOT",
@@ -880,7 +881,7 @@ def stamp_florida() -> dict[str, int]:
         counts[fips] = counts.get(fips, 0) + 1
     missing = [fips for fips in FL if fips not in counts]
     if missing:
-        raise RuntimeError(f"FDOT historical sidecar has no segments for {missing}")
+        raise RuntimeError(f"FDOT RCI sidecar has no segments for {missing}")
     print(f"  FL footprint counties {len(counts)} segments {sum(counts.values())}")
     return counts
 
@@ -940,7 +941,7 @@ def main() -> None:
     meta = json.loads(META.read_text()) if META.exists() else {}
     notes = [note for note in (meta.get("notes") or []) if "AADT" not in note and "FDOT" not in note]
     notes.append(
-        "Florida AADT is the existing FDOT 2025 historical count layer for every footprint county, not only Orange and Hillsborough. gis.fdot.gov RCI FeatureServer/0 returned HTTP 500 here, so that URL was not used."
+        "Florida AADT is FDOT RCI FeatureServer/0 (gis.fdot.gov), field AADT, YEAR_=2025, for every footprint county including Orange and Hillsborough. The service is EPSG:26917; the fixture requested outSR 4326."
     )
     notes.append(
         "North Carolina, South Carolina, Tennessee, Mississippi, Alabama, and Arkansas footprint counties use the state DOT layer filtered to those counties. "

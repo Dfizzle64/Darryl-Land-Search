@@ -322,6 +322,7 @@ NEXT_PUBLIC_MAPTILER_KEY=
 - AADT is nearest FDOT **state-count** segment, not local-road counts. Some parcels sit far from a counted road.
 - Block-group income is missing for a small number of centroids that do not fall in the simplified ACS polygons.
 - Contact data is **mailing address + Sunbiz / OCPA / Comptroller links only**. No skip-traced phones or emails.
+- Marshall County, Alabama 5–150 acre parcels come from web5 KCS `Marshall/Public/37` using CalcAcres. That layer has no zoning code, so zoning stays empty. Daphne Class zoning and the April 2026 Future_Dev FLU, plus Fairhope base districts, join onto Baldwin County parcels. Alabaster ZoneCode joins onto Shelby County parcels. Walker, Decatur AL (MapGeo, not Decatur IL), Washington AL, and Escambia AL stay gaps. None of these joins are Opportunity Zone designations.
 
 ## Stack
 

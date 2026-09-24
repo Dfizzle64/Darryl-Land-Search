@@ -51,6 +51,9 @@ const APPRAISER_LINKS: Record<string, { href: string; label: string }> = {
   "12117": { href: DEFAULT_APPRAISER_URLS["12117"], label: "Open Seminole Property Appraiser search" },
   "12119": { href: DEFAULT_APPRAISER_URLS["12119"], label: "Open Sumter Property Appraiser search" },
   "12127": { href: DEFAULT_APPRAISER_URLS["12127"], label: "Open Volusia Property Appraiser search" },
+  "01003": { href: "https://isv.kcsgis.com/al.baldwin_revenue/", label: "Open Baldwin County revenue search" },
+  "01095": { href: "https://isv.kcsgis.com/al.marshall_revenue/", label: "Open Marshall County revenue search" },
+  "01117": { href: "https://ptc.shelbyal.com/propsearch", label: "Open Shelby County property search" },
 };
 
 export function parcelAppraiserUrl(options: {

@@ -15,6 +15,7 @@ Tile origin matches ORLANDO_PARCEL_TILE in src/lib/orlandoParcels.ts.
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import math
 import threading
@@ -26,6 +27,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
+from al_municipal import apply_municipal_joins
 from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -266,6 +268,9 @@ def empty_feature(
     mail_city: str | None = None,
     mail_state: str | None = None,
     mail_zip: str | None = None,
+    owner2: str | None = None,
+    zoning_district: str | None = None,
+    taxes: float | None = None,
 ) -> dict:
     feature_id = f"{fips}:{parcel_id}"
     return {
@@ -283,10 +288,10 @@ def empty_feature(
             "situsZip": zip_code,
             "jurisdictionCode": None,
             "ownerName": owner,
-            "ownerName2": None,
+            "ownerName2": owner2,
             "propertyName": None,
             "zoningCode": zoning,
-            "zoningDistrict": None,
+            "zoningDistrict": zoning_district,
             "jurisdictionPrefix": None,
             "dorCode": dor,
             "acreage": round(acreage, 4),
@@ -296,7 +301,7 @@ def empty_feature(
                 "marketValue": market_value,
                 "assessedValue": assessed,
                 "taxableValue": taxable,
-                "taxes": None,
+                "taxes": taxes,
             },
             "mailingAddress": {
                 "line1": mail1,
@@ -334,14 +339,21 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    return_geometry: bool = True,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
         "outFields": ",".join(out_fields),
-        "returnGeometry": "true",
-        "outSR": "4326",
+        "returnGeometry": "true" if return_geometry else "false",
     }
+    if return_geometry:
+        params["outSR"] = "4326"
     for start in range(0, total, batch):
         chunk = ids[start : start + batch]
         query = dict(params)
@@ -351,12 +363,12 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), return_geometry=return_geometry))
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2), return_geometry=return_geometry))
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -365,6 +377,69 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             print(f"    {done}/{total}", flush=True)
         time.sleep(0.05)
     return features
+
+
+def epoch_day(value: Any) -> str | None:
+    parsed = num(value)
+    if parsed is None or parsed <= 0:
+        return None
+    seconds = parsed / 1000.0 if abs(parsed) > 10_000_000_000 else parsed
+    try:
+        stamp = datetime.datetime.fromtimestamp(seconds, datetime.timezone.utc)
+    except (OverflowError, OSError, ValueError):
+        return None
+    if stamp.year < 1900 or stamp.year > 2100:
+        return None
+    return stamp.date().isoformat()
+
+
+def parse_sale_date(value: Any) -> str | None:
+    """YYYYMMDD integers, ArcGIS epoch millis, or ISO dates. Zero means empty."""
+    if value is None or value == "":
+        return None
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return None
+        if len(text) >= 10 and text[4] == "-" and text[7] == "-":
+            return text[:10]
+        if text.isdigit():
+            value = int(text)
+        else:
+            return None
+    parsed = num(value)
+    if parsed is None or parsed <= 0:
+        return None
+    whole = int(parsed)
+    if 10_000_101 <= whole <= 21_001_231:
+        text = f"{whole:08d}"
+        year, month, day = int(text[:4]), int(text[4:6]), int(text[6:8])
+        if 1900 <= year <= 2100 and 1 <= month <= 12 and 1 <= day <= 31:
+            return f"{year:04d}-{month:02d}-{day:02d}"
+        return None
+    return epoch_day(parsed)
+
+
+def situs_line(number: Any, street: Any) -> str | None:
+    parts: list[str] = []
+    parsed = num(number)
+    if parsed is not None and parsed > 0:
+        parts.append(str(int(parsed)) if parsed == int(parsed) else str(parsed))
+    else:
+        text = clean(number)
+        if text and text != "0":
+            parts.append(text)
+    street_text = clean(street)
+    if street_text:
+        parts.append(street_text)
+    return " ".join(parts) or None
+
+
+def city_name(value: Any) -> str | None:
+    text = clean(value)
+    if not text or text.isdigit():
+        return None
+    return text
 
 
 def sale_date(year: Any, month: Any) -> str | None:
@@ -398,6 +473,8 @@ def normalize_rows(
         scale = spec.get("acresScale") or 1
         if acres is not None and scale != 1:
             acres = acres / scale
+        if spec.get("acresFallbackField") and (acres is None or acres <= 0):
+            acres = num(attrs.get(spec["acresFallbackField"]))
         if spec.get("computeAcres") or acres is None:
             acres = computed
         if not in_band(acres):
@@ -418,6 +495,33 @@ def normalize_rows(
         price = num(attrs.get(spec["salePriceField"])) if spec.get("salePriceField") else None
         if price is not None and price <= 0:
             price = None
+        if spec.get("blankZeroMoney"):
+            def money(field: str) -> float | None:
+                parsed = num(attrs.get(field))
+                if parsed is None or parsed <= 0:
+                    return None
+                return parsed
+        else:
+            def money(field: str) -> float | None:
+                return num(attrs.get(field))
+        if spec.get("situsNumberField") or spec.get("situsStreetField"):
+            situs = situs_line(attrs.get(spec.get("situsNumberField")), attrs.get(spec.get("situsStreetField")))
+        else:
+            situs = clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None
+        dated = sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None
+        if dated is None and spec.get("saleDateField"):
+            dated = parse_sale_date(attrs.get(spec["saleDateField"]))
+        if dated is None and spec.get("saleDateEpochField"):
+            dated = epoch_day(attrs.get(spec["saleDateEpochField"]))
+            if not dated:
+                for key in spec.get("saleDateEpochFallbacks") or []:
+                    dated = epoch_day(attrs.get(key))
+                    if dated:
+                        break
+        mail2 = clean(attrs.get(spec["mail2Field"])) if spec.get("mail2Field") else None
+        mail3 = clean(attrs.get(spec["mail3Field"])) if spec.get("mail3Field") else None
+        if mail3:
+            mail2 = " ".join(part for part in (mail2, mail3) if part) or None
         feature = empty_feature(
             fips=county["fips"],
             county=county["name"],
@@ -429,23 +533,33 @@ def normalize_rows(
             center=center,  # type: ignore[arg-type]
             source=spec["source"],
             owner=clean(attrs.get(spec["ownerField"])) if spec.get("ownerField") else None,
-            situs=clean(attrs.get(spec["situsField"])) if spec.get("situsField") else None,
-            city=clean(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
+            owner2=clean(attrs.get(spec["owner2Field"])) if spec.get("owner2Field") else None,
+            situs=situs,
+            city=city_name(attrs.get(spec["cityField"])) if spec.get("cityField") else None,
             zip_code=zip_str(attrs.get(spec["zipField"])) if spec.get("zipField") else None,
             zoning=clean(attrs.get(spec["zoningField"])) if spec.get("zoningField") else None,
+            zoning_district=clean(attrs.get(spec["zoningDistrictField"])) if spec.get("zoningDistrictField") else None,
             dor=clean(attrs.get(spec["dorField"])) if spec.get("dorField") else None,
             sale_price=price,
-            sale_date=sale_date(attrs.get("SALE_YR1"), attrs.get("SALE_MO1")) if spec.get("saleYearField") else None,
+            sale_date=dated,
             sale_qualified=clean(attrs.get("QUAL_CD1")) if spec.get("saleYearField") else None,
-            market_value=num(attrs.get(spec["marketValueField"])) if spec.get("marketValueField") else None,
-            assessed=num(attrs.get(spec["assessedField"])) if spec.get("assessedField") else None,
-            taxable=num(attrs.get(spec["taxableField"])) if spec.get("taxableField") else None,
+            market_value=money(spec["marketValueField"]) if spec.get("marketValueField") else None,
+            assessed=money(spec["assessedField"]) if spec.get("assessedField") else None,
+            taxable=money(spec["taxableField"]) if spec.get("taxableField") else None,
+            taxes=money(spec["taxesField"]) if spec.get("taxesField") else None,
             mail1=clean(attrs.get(spec["mail1Field"])) if spec.get("mail1Field") else None,
-            mail2=clean(attrs.get(spec["mail2Field"])) if spec.get("mail2Field") else None,
+            mail2=mail2,
             mail_city=clean(attrs.get(spec["mailCityField"])) if spec.get("mailCityField") else None,
             mail_state=clean(attrs.get(spec["mailStateField"])) if spec.get("mailStateField") else None,
             mail_zip=zip_str(attrs.get(spec["mailZipField"])) if spec.get("mailZipField") else None,
         )
+        alt_ids = []
+        for key in spec.get("altIdFields") or []:
+            alt = clean(attrs.get(key))
+            if alt:
+                alt_ids.append(alt)
+        if alt_ids:
+            feature["properties"]["_altIds"] = alt_ids
         previous = by_id.get(parcel_id)
         if previous is None or (feature["properties"]["acreage"] or 0) > (previous["properties"]["acreage"] or 0):
             by_id[parcel_id] = feature
@@ -655,6 +769,239 @@ def county_override(fips: str) -> dict | None:
             "coverage": "sample",
             "gaps": [
                 "Published by City of Greenville GIS. The 5–150 acre count on this layer is too small to treat as all of Greenville County. Sample, not a countywide roll.",
+            ],
+        }
+    if fips == "01095":  # Marshall County AL — web5 Public/37. Not the Huntsville fringe sample.
+        return {
+            "kind": "arcgis",
+            "url": "https://web5.kcsgis.com/kcsgis/rest/services/Marshall/Public/MapServer/37/query",
+            "where": "CalcAcres>=5 AND CalcAcres<=150",
+            "outFields": [
+                "PARCELID",
+                "GIS_PARCELID",
+                "PIN",
+                "Owner",
+                "MailAdd1",
+                "MailAdd2",
+                "MailAdd3",
+                "MailCity",
+                "MailState",
+                "MailZip1",
+                "SitusAddNumber",
+                "SitusAddName",
+                "CalcAcres",
+                "TTV",
+                "TAV",
+                "TotalTaxDue",
+                "PropertyClass",
+                "DeedRecorded",
+                "DeedSigned",
+            ],
+            "idField": "PARCELID",
+            "idFallbacks": ["GIS_PARCELID", "PIN"],
+            "acresField": "CalcAcres",
+            "ownerField": "Owner",
+            "situsNumberField": "SitusAddNumber",
+            "situsStreetField": "SitusAddName",
+            "mail1Field": "MailAdd1",
+            "mail2Field": "MailAdd2",
+            "mail3Field": "MailAdd3",
+            "mailCityField": "MailCity",
+            "mailStateField": "MailState",
+            "mailZipField": "MailZip1",
+            "marketValueField": "TTV",
+            "assessedField": "TAV",
+            "taxesField": "TotalTaxDue",
+            "dorField": "PropertyClass",
+            "saleDateEpochField": "DeedSigned",
+            "saleDateEpochFallbacks": ["DeedRecorded"],
+            "source": "al-marshall-public-37",
+            "coverage": "complete-gte-5ac",
+            "gaps": [
+                "Marshall County parcels are web5.kcsgis.com Marshall/Public/MapServer/37 (66,601 countywide). Acreage is CalcAcres, inclusive 5–150. DeededAcres is often 0 or null and is not the filter.",
+                "Host is web5 only. web3 Marshall/Public returns 404, web4 has no Marshall/Public service, and web6 does not publish this layer.",
+                "Huntsville CombinedParcels/MapServer/9 (~137 features) is a fringe sample and is not the inventory.",
+                "Public/37 has no ZoningCode. Albertville and Guntersville municipal zoning were not on this card, so zoning is left null.",
+                "No last-sale price. DeedSigned (fallback DeedRecorded) is stored as lastSale.date when the epoch converts.",
+                "SitusAddCity is a coded small integer without a published domain, so city is left null rather than storing the code.",
+                "This extract does not assign Opportunity Zone designations. Eligible tracts are not designated zones.",
+            ],
+        }
+    if fips == "01003":  # Baldwin AL — county parcels, Daphne zoning+FLU, Fairhope base districts.
+        return {
+            "kind": "arcgis",
+            "url": "https://web6.kcsgis.com/kcsgis/rest/services/Baldwin/Baldwin_Public_ISV/MapServer/31/query",
+            "where": "CalcAcre>=5 AND CalcAcre<=150",
+            "outFields": [
+                "PARCELID",
+                "PIN",
+                "PID",
+                "Owner",
+                "MailAdd1",
+                "MailAdd2",
+                "MailCity",
+                "MailState",
+                "MailZip1",
+                "SitusAddNumber",
+                "SitusAddName",
+                "CalcAcre",
+                "TTV",
+                "TAV",
+                "TotalTaxDue",
+                "ZoningCode",
+                "ZoningDesc",
+                "DeedSigned",
+                "DeedRecorded",
+                "PropertyClass",
+            ],
+            "idField": "PARCELID",
+            "idFallbacks": ["PIN", "PID"],
+            "altIdFields": ["PID", "PIN"],
+            "acresField": "CalcAcre",
+            "ownerField": "Owner",
+            "situsNumberField": "SitusAddNumber",
+            "situsStreetField": "SitusAddName",
+            "mail1Field": "MailAdd1",
+            "mail2Field": "MailAdd2",
+            "mailCityField": "MailCity",
+            "mailStateField": "MailState",
+            "mailZipField": "MailZip1",
+            "marketValueField": "TTV",
+            "assessedField": "TAV",
+            "taxesField": "TotalTaxDue",
+            "zoningField": "ZoningCode",
+            "zoningDistrictField": "ZoningDesc",
+            "dorField": "PropertyClass",
+            "saleDateEpochField": "DeedSigned",
+            "saleDateEpochFallbacks": ["DeedRecorded"],
+            "batch": 60,
+            "source": "al-baldwin-public-isv",
+            "coverage": "complete-gte-5ac",
+            "municipal": {
+                "countyZoning": {
+                    "name": "Baldwin County",
+                    "url": "https://web6.kcsgis.com/kcsgis/rest/services/Baldwin/Baldwin_Public_ISV/MapServer/42/query",
+                    "where": "1=1",
+                    "codeField": "ZONE_1",
+                    "districtField": "PLAN_DEV_1",
+                },
+                "cities": [
+                    {
+                        "name": "Daphne",
+                        "url": "https://services7.arcgis.com/7c7D9V3dsU3qPDB8/arcgis/rest/services/Zoning_Current_view/FeatureServer/0/query",
+                        "where": "1=1",
+                        "keyFields": ["PID", "PIN", "PARCELID"],
+                        "codeField": "Class",
+                        "districtField": "Zoning",
+                    },
+                    {
+                        "name": "Fairhope",
+                        "url": "https://services9.arcgis.com/Px78HKZXDdJTUWYm/arcgis/rest/services/Master_COF_ZoningDistrict/FeatureServer/0/query",
+                        "where": "1=1",
+                        "keyFields": ["PID", "PIN"],
+                        "codeField": "Zoning",
+                        "districtField": "ZONEClassification",
+                    },
+                ],
+                "flu": {
+                    "name": "Daphne",
+                    "url": "https://services7.arcgis.com/7c7D9V3dsU3qPDB8/arcgis/rest/services/Placetypes_for_Future_Development_APRIL_2026/FeatureServer/2/query",
+                    "where": "1=1",
+                    "keyFields": ["PID", "PIN"],
+                    "codeField": "Future_Dev",
+                    "labelField": "Land_Use",
+                    "source": "City of Daphne Placetypes_for_Future_Development_APRIL_2026",
+                },
+                "overlays": [
+                    {
+                        "label": "Fairhope AO",
+                        "url": "https://services9.arcgis.com/Px78HKZXDdJTUWYm/arcgis/rest/services/COF_AO_Overlay/FeatureServer/0/query",
+                        "where": "1=1",
+                        "nameField": "Name",
+                    },
+                    {
+                        "label": "Fairhope MO",
+                        "url": "https://services9.arcgis.com/Px78HKZXDdJTUWYm/arcgis/rest/services/COF_MO_Overlay/FeatureServer/0/query",
+                        "where": "1=1",
+                        "nameField": "Name",
+                    },
+                ],
+            },
+            "gaps": [
+                "Baldwin County parcels are web6 Baldwin_Public_ISV/MapServer/31. Acreage is CalcAcre, inclusive 5–150. The al05baldrevenue Baldwin/Public URL is not used.",
+                "Parcel ZoningCode is usually empty. County Zoning/42 (ZONE_1) is the unincorporated baseline and is replaced inside Daphne and Fairhope.",
+                "Daphne zoning is Zoning_Current_view FeatureServer/0. Class is the zoning code (R1, B2, PUD). The Zoning field is the long label. Join is PID, PIN, or PARCELID, then centroid. Coverage is city-only.",
+                "Daphne FLU is Placetypes_for_Future_Development_APRIL_2026 FeatureServer/2 field Future_Dev. Land_Use is the label. The older Envision_Placetype_Map layer is not used. Overlays_view is not base zoning.",
+                "Fairhope base zoning is Master_COF_ZoningDistrict FeatureServer/0 field Zoning (R-1, R-2, B-1, B-2, M-1, PUD, and the rest of that layer). AO and MO overlays are enrichment only and are not stored as zoning codes.",
+                "ZoningDistricts_Public on services7 org BJisQXdgVScP0JMy is a California State Plane extent and is not used.",
+                "No last-sale price. DeedSigned (fallback DeedRecorded) is stored as lastSale.date when the epoch converts.",
+                "SitusAddCity is a coded small integer, so city is left null. Gulf Shores, Orange Beach, and Foley are not part of this re-chase.",
+                "This extract does not assign Opportunity Zone designations.",
+            ],
+        }
+    if fips == "01117":  # Shelby AL — Cadastral_2025/91 plus Alabaster ZoneCode.
+        return {
+            "kind": "arcgis",
+            "url": "https://maps.shelbyal.com/gisserver/rest/services/LegacyServices/Cadastral_2025/MapServer/91/query",
+            "where": "(Acreage>=5 AND Acreage<=150) OR ((Acreage IS NULL OR Acreage<=0) AND ACRES>=5 AND ACRES<=150)",
+            "outFields": [
+                "Assess_Num",
+                "PROPERTY_NUM",
+                "NAM1",
+                "NAM2",
+                "ADR1",
+                "ADR2",
+                "CITY",
+                "STATE",
+                "ZIP",
+                "PROP_ADR",
+                "Acreage",
+                "ACRES",
+                "SALES_PRICE",
+                "INST_DATE1",
+                "LN_VL1",
+                "MunCode",
+            ],
+            "idField": "Assess_Num",
+            "idFallbacks": ["PROPERTY_NUM"],
+            "acresField": "Acreage",
+            "acresFallbackField": "ACRES",
+            "ownerField": "NAM1",
+            "owner2Field": "NAM2",
+            "situsField": "PROP_ADR",
+            "cityField": "MunCode",
+            "salePriceField": "SALES_PRICE",
+            "saleDateField": "INST_DATE1",
+            "marketValueField": "LN_VL1",
+            "blankZeroMoney": True,
+            "mail1Field": "ADR1",
+            "mail2Field": "ADR2",
+            "mailCityField": "CITY",
+            "mailStateField": "STATE",
+            "mailZipField": "ZIP",
+            "batch": 80,
+            "source": "al-shelby-cadastral-2025",
+            "coverage": "complete-gte-5ac",
+            "municipal": {
+                "cities": [
+                    {
+                        "name": "Alabaster",
+                        "url": "https://services5.arcgis.com/Z1v85DZS9DpIp2Y6/arcgis/rest/services/Zoning_Current_VIEWONLY/FeatureServer/6/query",
+                        "where": "1=1",
+                        "keyFields": ["Assess_Num"],
+                        "codeField": "ZoneCode",
+                        "districtField": "ZoneDescription",
+                    }
+                ]
+            },
+            "gaps": [
+                "Shelby County parcels are LegacyServices Cadastral_2025 MapServer/91, tax year 2025. Acreage is used when it is set; otherwise ACRES. Inclusive 5–150.",
+                "CaptureServices C_PARCEL is geometry without owner, tax, or sale and is not used. Birmingham city GIS mirrors of Shelby parcels are not the county source.",
+                "Alabaster zoning is Zoning_Current_VIEWONLY FeatureServer/6. ZoneCode joins to Shelby Assess_Num, with a centroid fallback. Coverage is city-only. ZoneDescription is the district label.",
+                "Zone_Layer_VIEW layer 78 returns HTTP 400 on query and is not used. Zoning_Conditional (one polygon) is not base zoning.",
+                "On this band the county layer's own Zoning field is empty. Sale price is stored only when SALES_PRICE is positive. Instrument date is stored when INST_DATE1 converts. There is no qualified-sale flag.",
+                "Walker County, Decatur AL (MapGeo; not Decatur, Illinois), Washington County AL, and Escambia County AL are outside this pull.",
+                "This extract does not assign Opportunity Zone designations.",
             ],
         }
     return None
@@ -927,9 +1274,9 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
 | Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
-| Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
+| Alabama | Jefferson parcels; Marshall Public/37; Baldwin Public ISV/31; Shelby Cadastral_2025/91 | Jefferson stays the existing extract. Marshall (Huntsville) is a complete 5–150 acre CalcAcres extract from web5 Marshall/Public/37. Baldwin joins Daphne Class zoning plus April 2026 Future_Dev, and Fairhope base districts from Master_COF_ZoningDistrict. Fairhope AO/MO overlays are notes only. Shelby joins Alabaster ZoneCode from Zoning_Current_VIEWONLY/6 on Assess_Num. Walker, Morgan (Decatur AL MapGeo, not Decatur IL), Washington AL, and Escambia AL stay gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined when the county layer carries a zoning field (DeKalb), when Baldwin County Zoning/42 fills unincorporated parcels, or when a city layer is joined (Daphne, Fairhope, Alabaster). City zoning replaces the county code only inside that city. Daphne FLU is city-only. Fairhope AO/MO names are overlays, not zoning codes. Joined codes are not a multifamily knowledge-base match outside Orange County. Eligible tracts are not designated Opportunity Zones. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
@@ -1011,8 +1358,20 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         )
     print(f"  source rows {expected}", flush=True)
     ids = fetch_object_ids(spec["url"], spec["where"])
-    raw = fetch_by_ids(spec["url"], ids, spec["outFields"])
+    raw = fetch_by_ids(spec["url"], ids, spec["outFields"], batch=int(spec.get("batch") or 120))
     features, dropped = normalize_rows(raw, county, markets, spec)
+    gaps_from_join: list[str] = []
+    if features and spec.get("municipal"):
+        try:
+            gaps_from_join = apply_municipal_joins(features, spec["municipal"], fetch_object_ids, fetch_by_ids)
+        except Exception as exc:  # noqa: BLE001
+            gaps_from_join = [f"Municipal join failed: {exc}. Parcel attributes were still saved."]
+            print(f"  municipal join failed {exc}", flush=True)
+            for feature in features:
+                feature["properties"].pop("_altIds", None)
+    else:
+        for feature in features:
+            feature["properties"].pop("_altIds", None)
     if not all(in_band(feature["properties"].get("acreage")) for feature in features):
         raise RuntimeError(f"{fips} emitted a parcel outside 5–150 acres")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -1020,7 +1379,7 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         json.dumps({"sourceCount": expected, "dropped": dropped, "features": features}, separators=(",", ":"))
     )
     coverage = spec["coverage"]
-    gaps = list(spec.get("gaps") or [])
+    gaps = [*gaps_from_join, *list(spec.get("gaps") or [])]
     if expected and len(features) < expected and not spec.get("computeAcres"):
         gaps.insert(
             0,
@@ -1108,6 +1467,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--market", action="append", default=[])
     parser.add_argument("--county", action="append", default=[])
+    parser.add_argument("--fips", action="append", default=[])
     parser.add_argument("--tier", choices=["primary", "other", "all"], default="all")
     parser.add_argument("--refresh", action="store_true")
     parser.add_argument("--workers", type=int, default=3)
@@ -1116,6 +1476,7 @@ def main() -> None:
     catalog = json.loads(CATALOG_PATH.read_text())
     selected = set(args.market)
     county_filter = {name.lower() for name in args.county}
+    fips_filter = set(args.fips)
     grouped: dict[str, dict] = {}
     for market in catalog["markets"]:
         if args.tier != "all" and market["tier"] != args.tier:
@@ -1124,6 +1485,8 @@ def main() -> None:
             continue
         for county in market["counties"]:
             if county_filter and county["name"].lower() not in county_filter:
+                continue
+            if fips_filter and county["fips"] not in fips_filter:
                 continue
             slot = grouped.setdefault(county["fips"], {"county": county, "markets": []})
             if market["id"] not in slot["markets"]:

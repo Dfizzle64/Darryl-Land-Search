@@ -14,10 +14,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Raleigh-Durham | primary | 153,279 | 17 | 0 | 0 |
 | Vero Beach | other | 20,964 | 5 | 0 | 0 |
 | Melbourne | other | 41,757 | 5 | 0 | 0 |
-| Pensacola | other | 30,141 | 4 | 0 | 1 |
-| Birmingham | other | 15,641 | 1 | 0 | 9 |
-| Mobile | other | 7,189 | 1 | 0 | 4 |
-| Huntsville | other | 0 | 0 | 0 | 7 |
+| Pensacola | other | 48,128 | 5 | 0 | 0 |
+| Birmingham | other | 27,635 | 2 | 0 | 8 |
+| Mobile | other | 25,176 | 2 | 0 | 3 |
+| Huntsville | other | 11,014 | 1 | 0 | 6 |
 | Savannah | other | 0 | 0 | 0 | 8 |
 | Columbia | other | 0 | 0 | 0 | 10 |
 | Greenville | other | 1,570 | 0 | 1 | 7 |
@@ -184,7 +184,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Baldwin | Alabama | 01003 | gap | 0 | unavailable |
+| Baldwin | Alabama | 01003 | complete-gte-5ac | 17,987 | al-baldwin-public-isv |
 | Escambia | Florida | 12033 | complete-gte-5ac | 9,097 | fl-doh-ehwaters-12033 |
 | Okaloosa | Florida | 12091 | complete-gte-5ac | 5,854 | fl-doh-ehwaters-12091 |
 | Santa Rosa | Florida | 12113 | complete-gte-5ac | 7,011 | fl-doh-ehwaters-12113 |
@@ -199,7 +199,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Chilton | Alabama | 01021 | gap | 0 | unavailable |
 | Cullman | Alabama | 01043 | gap | 0 | unavailable |
 | Jefferson | Alabama | 01073 | complete-gte-5ac | 15,641 | al-jefferson-parcels |
-| Shelby | Alabama | 01117 | gap | 0 | unavailable |
+| Shelby | Alabama | 01117 | complete-gte-5ac | 11,994 | al-shelby-cadastral-2025 |
 | St. Clair | Alabama | 01115 | gap | 0 | unavailable |
 | Talladega | Alabama | 01121 | gap | 0 | unavailable |
 | Tuscaloosa | Alabama | 01125 | gap | 0 | unavailable |
@@ -209,7 +209,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Baldwin | Alabama | 01003 | gap | 0 | unavailable |
+| Baldwin | Alabama | 01003 | complete-gte-5ac | 17,987 | al-baldwin-public-isv |
 | Escambia | Alabama | 01053 | gap | 0 | unavailable |
 | George | Mississippi | 28039 | complete-gte-5ac | 7,189 | ms-mdeq-2023-28039 |
 | Mobile | Alabama | 01097 | gap | 0 | unavailable |
@@ -224,7 +224,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Limestone | Alabama | 01083 | gap | 0 | unavailable |
 | Lincoln | Tennessee | 47103 | gap | 0 | tn-impact-47103 |
 | Madison | Alabama | 01089 | gap | 0 | unavailable |
-| Marshall | Alabama | 01095 | gap | 0 | unavailable |
+| Marshall | Alabama | 01095 | complete-gte-5ac | 11,014 | al-marshall-public-37 |
 | Morgan | Alabama | 01103 | gap | 0 | unavailable |
 
 ### Savannah

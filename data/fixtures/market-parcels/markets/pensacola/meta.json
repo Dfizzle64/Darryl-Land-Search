@@ -47,12 +47,17 @@
       "source": "fl-doh-ehwaters-12033",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/15/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12033, 810 zoning codes and 0 future land use codes). County parcels were not re-downloaded.",
+        "Pensacola zoning is maps.cityofpensacola.com Zoning_WebMap_MIL1 layer 16. City future land use is still a gap.",
+        "gis.cityofpensacola.com still returns HTTP 523. Escambia Accela zoning and future land use are not copied in.",
+        "Century stays blank."
       ],
       "path": "data/fixtures/market-parcels/counties/12033/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12033/lookup.json",
       "tileCount": 9,
-      "sourceCount": 9149
+      "sourceCount": 9149,
+      "zoningJoinedCount": 810,
+      "fluJoinedCount": 0
     },
     {
       "name": "Okaloosa",
@@ -66,12 +71,16 @@
       "source": "fl-doh-ehwaters-12091",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/45/query",
       "gaps": [
-        "No zoning or FLU on the Florida DOH extract."
+        "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12091, 270 zoning codes and 270 future land use codes). County parcels were not re-downloaded.",
+        "Destin and Fort Walton Beach use the city layers.",
+        "Crestview, Niceville, Valparaiso, Mary Esther, Laurel Hill, Shalimar, and Cinco Bayou stay blank. County zoning is not copied into those cities."
       ],
       "path": "data/fixtures/market-parcels/counties/12091/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12091/lookup.json",
       "tileCount": 9,
-      "sourceCount": 5854
+      "sourceCount": 5854,
+      "zoningJoinedCount": 270,
+      "fluJoinedCount": 270
     },
     {
       "name": "Santa Rosa",
@@ -85,13 +94,16 @@
       "source": "fl-doh-ehwaters-12113",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/56/query",
       "gaps": [
-        "7967 source rows collapsed to 7011 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "No zoning or FLU on the Florida DOH extract."
+        "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12113, 85 zoning codes and 9 future land use codes). County parcels were not re-downloaded.",
+        "Milton and Jay are zoning only. Gulf Breeze zoning and future land use come from the city parcel layer.",
+        "Milton and Jay future land use stay gaps. County FLUM is not copied in."
       ],
       "path": "data/fixtures/market-parcels/counties/12113/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12113/lookup.json",
       "tileCount": 8,
-      "sourceCount": 7967
+      "sourceCount": 7967,
+      "zoningJoinedCount": 85,
+      "fluJoinedCount": 9
     },
     {
       "name": "Walton",
@@ -105,13 +117,17 @@
       "source": "fl-doh-ehwaters-12131",
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/65/query",
       "gaps": [
-        "9815 source rows collapsed to 8179 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "No zoning or FLU on the Florida DOH extract."
+        "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12131, 135 zoning codes and 158 future land use codes). County parcels were not re-downloaded.",
+        "DeFuniak Springs zoning and future land use are the city WeeklyUpdates layers. Paxton future land use is FLU_CLASS. Paxton zoning stays a gap.",
+        "Panama City Beach city layers were checked. They sit in Bay County and do not cover the Walton PCB situs parcels.",
+        "Freeport zoning is a numeric code with a blank description and was not stored."
       ],
       "path": "data/fixtures/market-parcels/counties/12131/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12131/lookup.json",
       "tileCount": 8,
-      "sourceCount": 9815
+      "sourceCount": 9815,
+      "zoningJoinedCount": 135,
+      "fluJoinedCount": 158
     }
   ]
 }

@@ -13,12 +13,16 @@
   "source": "fl-doh-ehwaters-12131",
   "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/65/query",
   "gaps": [
-    "9815 source rows collapsed to 8179 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-    "No zoning or FLU on the Florida DOH extract."
+    "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12131, 135 zoning codes and 158 future land use codes). County parcels were not re-downloaded.",
+    "DeFuniak Springs zoning and future land use are the city WeeklyUpdates layers. Paxton future land use is FLU_CLASS. Paxton zoning stays a gap.",
+    "Panama City Beach city layers were checked. They sit in Bay County and do not cover the Walton PCB situs parcels.",
+    "Freeport zoning is a numeric code with a blank description and was not stored."
   ],
   "path": "data/fixtures/market-parcels/counties/12131/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12131/lookup.json",
   "sourceCount": 9815,
   "dropped": 0,
-  "tileCount": 8
+  "tileCount": 8,
+  "zoningJoinedCount": 135,
+  "fluJoinedCount": 158
 }

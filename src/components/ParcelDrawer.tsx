@@ -21,6 +21,7 @@ import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "@/lib/
 import { fluEmptyForPolk, zoningEmptyForPolk } from "@/lib/polkMunicipal";
 import { fluEmptyForSeminole, zoningEmptyForSeminole } from "@/lib/seminoleMunicipal";
 import { fluEmptyForMartinIrc, zoningEmptyForMartinIrc } from "@/lib/martinIrcMunicipal";
+import { fluEmptyForPanhandle, zoningEmptyForPanhandle } from "@/lib/panhandleMunicipal";
 import { fluEmptyForCharlotte, zoningEmptyForCharlotte } from "@/lib/charlotteMunicipal";
 import { fluEmptyForManateeSarasota, zoningEmptyForManateeSarasota } from "@/lib/manateeSarasotaMunicipal";
 import { brevardFluReason, formatJoinedZoning } from "@/lib/brevardMunicipal";
@@ -110,7 +111,9 @@ export function ParcelDrawer({
     ? "No FDOT count segment within 15 km"
     : "FDOT AADT is Florida only";
   const dekalb = properties.countyFips === "13089";
-  const zoningEmpty = zoningEmptyForCharlotte(
+  const zoningEmpty = zoningEmptyForPanhandle(
+    properties.countyFips,
+    zoningEmptyForCharlotte(
     properties.countyFips,
     zoningEmptyForManateeSarasota(
     properties.countyFips,
@@ -129,6 +132,7 @@ export function ParcelDrawer({
         : dekalb
           ? "No municipal or county zoning joined for this parcel"
           : "Not in this county's public parcel extract",
+    ),
     ),
     ),
     ),
@@ -194,7 +198,9 @@ export function ParcelDrawer({
         <Field
           label="Future Land Use"
           value={fluLine}
-          empty={fluEmptyForCharlotte(
+          empty={fluEmptyForPanhandle(
+            properties.countyFips,
+            fluEmptyForCharlotte(
             properties.countyFips,
             fluEmptyForManateeSarasota(
             properties.countyFips,
@@ -208,6 +214,7 @@ export function ParcelDrawer({
             properties.countyFips,
             properties.municipal?.fluGap ? fluEmptyForMunicipal(properties.municipal.fluGap) : null,
             dekalb ? "No future land use joined for this parcel" : "Not joined for this county",
+            ),
             ),
             ),
             ),

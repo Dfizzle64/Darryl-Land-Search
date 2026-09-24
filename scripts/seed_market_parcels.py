@@ -544,6 +544,8 @@ def fl_spec(fips: str) -> dict:
             if fips == "12009"
             else "City zoning and future land use are joined by npm run seed:manatee-sarasota-municipal. Re-run that join after this county is re-seeded. North Port and Venice future land use stay gaps. Anna Maria, Bradenton Beach, and Holmes Beach stay blank. County zoning is not copied into cities."
             if fips in {"12081", "12115"}
+            else "City zoning and future land use are joined by npm run seed:panhandle-municipal. Re-run that join after this county is re-seeded. Pensacola, Milton, and Jay future land use stay gaps. Freeport numeric codes are not stored. County zoning is not copied into the gap cities."
+            if fips in {"12033", "12091", "12113", "12131"}
             else "No zoning or FLU on the Florida DOH extract."
         ],
     }

@@ -13,6 +13,7 @@ npm run seed:martin-irc-municipal
 npm run seed:brevard-municipal
 npm run seed:manatee-sarasota-municipal
 npm run seed:charlotte-municipal
+npm run seed:panhandle-municipal
 npm run seed:sc-muni
 ```
 
@@ -231,6 +232,34 @@ This checkout has no Charlotte County parcel shelf, and none was downloaded. The
 
 County zoning `ZONE_` value `CITY` (21 polygons) and county future land use `NEWLU` value `City` (571 polygons) are city stubs, not districts. The county `PG_Zoning` copy is not used. Charlotte, North Carolina, Punta Gorda, Belize, and the `BO_Charlotte_*` prefer-official layers are rejected.
 
+## Panhandle Florida (Escambia 12033, Okaloosa 12091, Santa Rosa 12113, Walton 12131, Bay 12005)
+
+Catalog: `data/panhandle-municipal.json`. Join script: `scripts/join_panhandle_municipal.py`. The four Pensacola-market shelves stay on the existing Florida DOH 5–150 acre extracts. Bay County has no parcel shelf in this checkout, so its city layers were indexed and stamped onto zero parcels. County parcels were not downloaded. Opportunity Zone fields, school grades, and base flood elevations were not written. The join is spatial: the centroid plus up to four points inside the parcel, and the smallest containing polygon wins.
+
+Shelf totals: Escambia zoning 810 and future land use 0 (9,097 parcels); Okaloosa zoning 270 and future land use 270 (5,854); Santa Rosa zoning 85 and future land use 9 (7,011); Walton zoning 135 and future land use 158 (8,179); Bay zoning 0 and future land use 0.
+
+| City | County | Situs parcels | Zoning | Future land use | Layer |
+| --- | --- | ---: | ---: | ---: | --- |
+| Panama City | Bay | 0 | 0 | 0 | City `Zoning_CPC` `LABEL` (18,777 indexed) and `FutureLandUse_CPC` `LANDUSE` (17,300 indexed) |
+| Callaway | Bay | 0 | 0 | 0 | Bay `LandUsePlanning` `SUB_ZONING=2` (702 indexed) and `SUB_FLU=2` (751 indexed) |
+| Mexico Beach | Bay | 0 | 0 | 0 | Same service, `SUB_ZONING=4` (234) and `SUB_FLU=4` (226) |
+| Lynn Haven | Bay | 0 | 0 | 0 | Future land use only, `SUB_FLU=3` (778 indexed) |
+| Parker | Bay | 0 | 0 | 0 | Future land use only, `SUB_FLU=7` (242 indexed) |
+| Springfield | Bay | 0 | 0 | 0 | Future land use only, `SUB_FLU=8` (434 indexed) |
+| Pensacola | Escambia | 4,368 | 810 | 0 | `maps.cityofpensacola.com` `Zoning_WebMap_MIL1` layer 16 `ZONING`. City future land use stays a gap |
+| Destin | Okaloosa | 226 | 202 | 202 | `Zoning_JulyB_WFL1` `Zone_ABBR` and `LandUse_DND25_WFL1` layer 2 `LU_CODE` |
+| Fort Walton Beach | Okaloosa | 119 | 68 | 68 | `gis.fwb.org` Maps/Zoning `Zoning` and Maps/FLU `FLU` |
+| Milton | Santa Rosa | 1,946 | 53 | 0 | `City_of_Milton_Zoning` `zone_code`. Future land use stays a gap |
+| Gulf Breeze | Santa Rosa | 108 | 9 | 9 | `Gulf_Breeze_Zoning` `zoning` and `flum` on the same layer |
+| Jay | Santa Rosa | 983 | 23 | 0 | `TownOfJayZoning` `zone`. Future land use stays a gap |
+| Panama City Beach | Walton | 24 | 0 | 0 | City twin FeatureServer 47 `ZONING` and 49 `FLU_CODE` (633 and 696 indexed). The polygons sit in Bay County and miss these Walton centroids |
+| DeFuniak Springs | Walton | 2,816 | 135 | 134 | `WeeklyUpdatesDFS` FeatureServer 7 `ZONING` and 6 `FLU` |
+| Paxton | Walton | 0 named | 0 | 24 | `WeeklyUpdatesPaxton` FeatureServer 6 `FLU_CLASS` (103 indexed). Zoning stays a gap. The 24 hits are blank-situs parcels inside the town |
+
+A situs city on this acreage band is often wider than the municipal polygon, so a miss stays blank. Freeport zoning is a numeric code with a blank description and was left blank. Crestview, Niceville, Valparaiso, Mary Esther, Laurel Hill, Shalimar, Cinco Bayou, Century, and Pensacola Beach stay blank.
+
+`gis.cityofpensacola.com` still returns HTTP 523. Escambia Accela zoning, the FGDL statewide zoning service, Okaloosa county zoning and future land use, Walton EnerGov county layers, Santa Rosa county `Hosted/ZONE` and `OpenDataFlum`, and Bay unincorporated `SUB_ZONING=1` / `SUB_FLU=1` stay unused. Panama City uses the city `Zoning_CPC` layers rather than county subtype 5. Lynn Haven, Parker, and Springfield zoning filters stay unused.
+
 ## Not in this pass
 
-- New county parcel extracts for any other market.
+- New county parcel extracts for any other market. Bay County parcels were not downloaded for the Panhandle city layers.

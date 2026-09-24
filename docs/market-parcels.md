@@ -251,6 +251,8 @@ Brevard keeps the Florida DOH shelf (`fl-doh-ehwaters-12009`, 5,746 parcels). Ci
 | Santa Rosa | Florida | 12113 | complete-gte-5ac | 7,011 | fl-doh-ehwaters-12113 |
 | Walton | Florida | 12131 | complete-gte-5ac | 8,179 | fl-doh-ehwaters-12131 |
 
+City zoning on these four shelves is in `docs/muni-overlay-consolidator.md`. Escambia has Pensacola zoning on 810 parcels. Okaloosa has Destin and Fort Walton Beach zoning and future land use on 270 parcels. Santa Rosa has 85 zoning codes and 9 future land use codes (Milton and Jay zoning, Gulf Breeze both). Walton has 135 zoning codes and 158 future land use codes (DeFuniak Springs both, Paxton future land use). Panama City Beach city layers sit in Bay County and miss the Walton PCB parcels. Bay County has no parcel shelf here, so Panama City, Callaway, Mexico Beach, Lynn Haven, Parker, and Springfield are indexed only. Freeport numeric codes stay blank. Crestview, Niceville, Valparaiso, Mary Esther, Laurel Hill, Shalimar, Cinco Bayou, Century, and Pensacola Beach stay blank. County parcels were not re-downloaded.
+
 ### Birmingham
 
 | County | State | FIPS | Coverage | Parcels | Source |

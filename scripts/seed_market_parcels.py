@@ -334,12 +334,18 @@ def fetch_object_ids(url: str, where: str) -> list[int]:
     return [int(i) for i in (data.get("objectIds") or [])]
 
 
-def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 120) -> list[dict]:
+def fetch_by_ids(
+    url: str,
+    ids: list[int],
+    out_fields: list[str],
+    batch: int = 120,
+    return_geometry: bool = True,
+) -> list[dict]:
     features: list[dict] = []
     total = len(ids)
     params = {
         "outFields": ",".join(out_fields),
-        "returnGeometry": "true",
+        "returnGeometry": "true" if return_geometry else "false",
         "outSR": "4326",
     }
     for start in range(0, total, batch):
@@ -351,12 +357,28 @@ def fetch_by_ids(url: str, ids: list[int], out_fields: list[str], batch: int = 1
             data = fetch_json(url, query, timeout=180)
         except RuntimeError:
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(
+                        url,
+                        chunk,
+                        out_fields,
+                        batch=max(20, len(chunk) // 2),
+                        return_geometry=return_geometry,
+                    )
+                )
                 continue
             raise
         if data.get("error"):
             if len(chunk) > 30:
-                features.extend(fetch_by_ids(url, chunk, out_fields, batch=max(20, len(chunk) // 2)))
+                features.extend(
+                    fetch_by_ids(
+                        url,
+                        chunk,
+                        out_fields,
+                        batch=max(20, len(chunk) // 2),
+                        return_geometry=return_geometry,
+                    )
+                )
                 continue
             raise RuntimeError(json.dumps(data["error"])[:300])
         features.extend(data.get("features") or [])
@@ -585,6 +607,13 @@ def county_override(fips: str) -> dict | None:
             "coverage": "complete-gte-5ac",
             "gaps": ["Cobb County open parcels. No zoning join on this layer."],
         }
+    if fips == "13297":  # Walton GA — choosewalton landbase is character FLU, not Euclidean zoning
+        return {
+            "kind": "walton",
+            "source": "ga-walton-choosewalton-parcels",
+            "url": "https://services.arcgis.com/ftUt0Vfnzfo0Cs96/arcgis/rest/services/Walton_County_Zoning/FeatureServer/29/query",
+            "coverage": "complete-gte-5ac",
+        }
     if fips == "13089":  # DeKalb GA
         return {
             "kind": "arcgis",
@@ -663,7 +692,7 @@ def county_override(fips: str) -> dict | None:
 def gap_reason(county: dict) -> str:
     state = county["state"]
     if state == "Georgia":
-        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        return "No public statewide Georgia parcel polygon service. This county is not in the Cobb, DeKalb, or Walton pull."
     if state == "South Carolina":
         return "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
     if state == "Alabama":
@@ -740,6 +769,7 @@ def county_row(
     source_count: int | None = None,
     dropped: int | None = None,
     tile_count: int | None = None,
+    stats: dict | None = None,
 ) -> dict:
     row = {
         "name": county["name"],
@@ -760,6 +790,8 @@ def county_row(
         "dropped": dropped,
         "tileCount": tile_count,
     }
+    if stats:
+        row["stats"] = stats
     (COUNTY_DIR / county["fips"]).mkdir(parents=True, exist_ok=True)
     (COUNTY_DIR / county["fips"] / "county.json").write_text(json.dumps(row, indent=2) + "\n")
     return row
@@ -925,17 +957,21 @@ A finished county is skipped unless `--refresh` is passed. Cached normalized fea
 | Tennessee | Comptroller IMPACT Parcels | Complete where `CALC_ACRE` returns rows. Several large counties are absent from that layer and stay gaps |
 | Mississippi | MDEQ statewide parcels (2023) | Complete 5–150 acre extract on `GISACRES` |
 | Arkansas | Arkansas GIS cadastre polygons | Complete band using polygon-derived acres |
-| Georgia | Cobb and DeKalb county services only | Cobb complete. DeKalb is a polygon-acre sample. Other Georgia counties are gaps |
+| Georgia | Cobb, DeKalb, and Walton county services | Cobb complete. DeKalb is a polygon-acre sample. Walton is a complete 5–150 GIS-acre extract from choosewalton parcel polygons (character-area FLU, not Euclidean zoning). Countywide owner, tax, sales, and Euclidean zoning stay gaps. Monroe CAMA joins on Parcel_No. Monroe, Loganville, and Social Circle zoning join spatially. Other Georgia counties are gaps |
 | South Carolina | Dorchester public parcels; Greenville city GIS | Dorchester complete. Greenville is a city-hosted sample. Charleston County's GIS requires a token. Other counties are gaps |
 | Alabama | Jefferson County parcels | Jefferson is a complete 5–150 acre extract. Other Alabama counties are gaps |
 
-Zoning is joined only when the county layer already carries a zoning field (DeKalb). It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
+Zoning is joined only when the county layer already carries a zoning field (DeKalb) or a city Euclidean layer can be spatial-joined (Walton: Monroe, Loganville, and Social Circle). Walton's choosewalton layer is named Zoning, but FLU and Description are character areas, not Euclidean districts. It is not a multifamily knowledge-base match outside Orange County. Prefer **All parcels** in these markets.
 
 ## Coverage
 """
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "walton":
+        from walton_parcels import download_walton_county
+
+        return download_walton_county(county, markets, spec)
     fips = county["fips"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} {county['state']} ({fips}) via {spec['source']}", flush=True)

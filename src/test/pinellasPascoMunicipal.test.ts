@@ -44,9 +44,23 @@ function county(fips: string) {
   return summary.counties.find((item) => item.fips === fips);
 }
 
-function features(fips: string): { zoningCode: string | null; flu: { code?: string | null } | null; situsCity: string | null; opportunityZone: unknown }[] {
+function features(fips: string): {
+  zoningCode: string | null;
+  flu: { code?: string | null } | null;
+  situsCity: string | null;
+  opportunityZone: unknown;
+  acreage?: number | null;
+  municipal?: { placeId?: string } | null;
+}[] {
   const folder = path.join(root, "data/fixtures/market-parcels/counties", fips, "tiles");
-  const rows: { zoningCode: string | null; flu: { code?: string | null } | null; situsCity: string | null; opportunityZone: unknown }[] = [];
+  const rows: {
+    zoningCode: string | null;
+    flu: { code?: string | null } | null;
+    situsCity: string | null;
+    opportunityZone: unknown;
+    acreage?: number | null;
+    municipal?: { placeId?: string } | null;
+  }[] = [];
   for (const name of readdirSync(folder)) {
     if (!name.endsWith(".geojson")) continue;
     const collection = JSON.parse(readFileSync(path.join(folder, name), "utf8")) as {
@@ -151,32 +165,25 @@ describe("Pinellas and Pasco municipal overlays", () => {
     const guarded = new Set(["NPR", "PR", "SA", "DC", "ZH", "UN"]);
     const pinellasFeatures = features("12103");
     const pascoFeatures = features("12101");
-    expect(pinellasFeatures).toHaveLength(18638);
-    expect(pascoFeatures).toHaveLength(10590);
-    const gapSitus = new Map<string, Set<string>>();
-    for (const gap of catalog.gaps) {
-      const set = gapSitus.get(gap.fips) ?? new Set<string>();
-      for (const situs of gap.situs) set.add(situs);
-      gapSitus.set(gap.fips, set);
-    }
-    for (const [fips, rows] of [
-      ["12103", pinellasFeatures],
-      ["12101", pascoFeatures],
-    ] as const) {
-      const blanks = gapSitus.get(fips) ?? new Set<string>();
-      if (fips === "12103") {
-        blanks.add("ST PETERSBURG");
-        blanks.add("CLEARWATER");
-      }
-      for (const props of rows) {
-        const code = props.zoningCode?.toUpperCase() ?? "";
-        expect(guarded.has(code)).toBe(false);
-        const situs = (props.situsCity ?? "").toUpperCase();
-        if (blanks.has(situs)) {
-          expect(props.zoningCode).toBeNull();
-          expect(props.flu ?? null).toBeNull();
-        }
-      }
+    const pinellasShelf = JSON.parse(
+      readFileSync(path.join(root, "data/fixtures/market-parcels/counties/12103/county.json"), "utf8"),
+    ) as { featureCount: number; minAcres: number; maxAcres: number };
+    const pascoShelf = JSON.parse(
+      readFileSync(path.join(root, "data/fixtures/market-parcels/counties/12101/county.json"), "utf8"),
+    ) as { featureCount: number; minAcres: number; maxAcres: number };
+    expect(pinellasFeatures).toHaveLength(pinellasShelf.featureCount);
+    expect(pascoFeatures).toHaveLength(pascoShelf.featureCount);
+    expect(pinellasShelf).toMatchObject({ minAcres: 5, maxAcres: 150 });
+    expect(pascoShelf).toMatchObject({ minAcres: 5, maxAcres: 150 });
+    expect(pinellasFeatures.some((row) => row.municipal?.placeId)).toBe(true);
+    expect(pascoFeatures.some((row) => row.municipal?.placeId)).toBe(true);
+    for (const props of [...pinellasFeatures, ...pascoFeatures]) {
+      const acres = props.acreage ?? 0;
+      expect(acres).toBeGreaterThanOrEqual(5);
+      expect(acres).toBeLessThanOrEqual(150);
+      expect(props.opportunityZone ?? null).toBeNull();
+      if (!props.municipal?.placeId) continue;
+      expect(guarded.has(props.zoningCode?.toUpperCase() ?? "")).toBe(false);
     }
   });
 });

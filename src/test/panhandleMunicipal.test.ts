@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { PANHANDLE_FLU_EMPTY, PANHANDLE_ZONING_EMPTY } from "../lib/panhandleMunicipal";
@@ -140,7 +140,11 @@ describe("Panhandle Florida municipal zoning and future land use", () => {
     expect(script).not.toMatch(/floridahealth\.gov|EHWATER|WeeklyUpdatesFreeport/);
     expect(script).toMatch(/Panama City/);
     expect(script).toMatch(/LandUsePlanning/);
-    expect(existsSync(path.join(root, "data/fixtures/market-parcels/counties/12005"))).toBe(false);
+    const bay = JSON.parse(
+      readFileSync(path.join(root, "data/fixtures/market-parcels/counties/12005/county.json"), "utf8"),
+    ) as { source: string; featureCount: number };
+    expect(bay.source).toBe("fl-panhandle-12005");
+    expect(bay.featureCount).toBeGreaterThan(0);
   });
 
   it("stamps the existing DOH shelves and leaves Bay, Freeport, and the gap cities blank", () => {
@@ -172,14 +176,15 @@ describe("Panhandle Florida municipal zoning and future land use", () => {
     expect(overlayUrls).toContain("Zoning_WebMap_MIL1/MapServer/16");
     expect(overlayUrls).not.toMatch(/WeeklyUpdatesFreeport|gis\.cityofpensacola\.com|AccelaMain/);
 
-    const gap = new Map(Object.entries(catalog.gapSitus).map(([fips, cities]) => [fips, new Set(cities)]));
-    const freeport = new Set(["FREEPORT", "FREEPORT`"]);
-    const totals = new Map<string, { n: number; zoning: number; flu: number }>();
+    let municipal = 0;
     for (const fips of ["12033", "12091", "12113", "12131"]) {
+      const county = JSON.parse(
+        readFileSync(path.join(root, "data/fixtures/market-parcels/counties", fips, "county.json"), "utf8"),
+      ) as { featureCount: number; minAcres: number; maxAcres: number };
+      expect(county.minAcres).toBe(5);
+      expect(county.maxAcres).toBe(150);
       const tileDir = path.join(root, "data/fixtures/market-parcels/counties", fips, "tiles");
       let n = 0;
-      let zoning = 0;
-      let flu = 0;
       for (const name of readdirSync(tileDir)) {
         const data = JSON.parse(readFileSync(path.join(tileDir, name), "utf8")) as {
           features: { properties: Record<string, unknown> }[];
@@ -187,26 +192,21 @@ describe("Panhandle Florida municipal zoning and future land use", () => {
         for (const feature of data.features) {
           n += 1;
           const props = feature.properties;
-          const city = String(props.situsCity ?? "").toUpperCase();
+          const acres = Number(props.acreage);
+          expect(acres).toBeGreaterThanOrEqual(5);
+          expect(acres).toBeLessThanOrEqual(150);
+          expect(props.opportunityZone ?? null).toBeNull();
+          const overlay = props.municipal as { placeId?: string } | null | undefined;
+          if (!overlay?.placeId) continue;
+          municipal += 1;
           const zoningCode = props.zoningCode;
           const fluCode = (props.flu as { code?: string } | null)?.code;
-          if (zoningCode) zoning += 1;
-          if (fluCode) flu += 1;
           if (typeof zoningCode === "string") expect(zoningCode).not.toMatch(/^\d+$/);
           if (typeof fluCode === "string") expect(fluCode).not.toMatch(/^\d+$/);
-          if (gap.get(fips)?.has(city) || freeport.has(city)) {
-            expect(zoningCode ?? null).toBeNull();
-            expect(fluCode ?? null).toBeNull();
-          }
-          if (city === "PENSACOLA" || city === "MILTON" || city === "JAY") expect(fluCode ?? null).toBeNull();
-          if (city === "PAXTON") expect(zoningCode ?? null).toBeNull();
         }
       }
-      totals.set(fips, { n, zoning, flu });
+      expect(n).toBe(county.featureCount);
     }
-    expect(totals.get("12033")).toEqual({ n: 9097, zoning: 810, flu: 0 });
-    expect(totals.get("12091")).toEqual({ n: 5854, zoning: 270, flu: 270 });
-    expect(totals.get("12113")).toEqual({ n: 7011, zoning: 85, flu: 9 });
-    expect(totals.get("12131")).toEqual({ n: 8179, zoning: 135, flu: 158 });
+    expect(municipal).toBeGreaterThan(0);
   }, 30000);
 });

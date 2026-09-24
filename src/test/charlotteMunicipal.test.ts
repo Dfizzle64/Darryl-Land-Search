@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { CHARLOTTE_FLU_EMPTY, CHARLOTTE_ZONING_EMPTY } from "../lib/charlotteMunicipal";
@@ -92,6 +92,32 @@ describe("Charlotte County, Florida municipal zoning and future land use", () =>
     expect(overlayUrls).toContain("ZoningOfficial_View/FeatureServer/0");
     expect(overlayUrls).toContain("FLU_All_2045/FeatureServer/5");
     expect(overlayUrls).not.toMatch(/BO_Charlotte|CCGISLayers|belize/i);
-    expect(existsSync(path.join(root, "data/fixtures/market-parcels/counties/12015"))).toBe(false);
+    const shelfPath = path.join(root, "data/fixtures/market-parcels/counties/12015");
+    expect(existsSync(path.join(shelfPath, "county.json"))).toBe(true);
+    const shelf = JSON.parse(readFileSync(path.join(shelfPath, "county.json"), "utf8")) as {
+      featureCount: number;
+      minAcres: number;
+      maxAcres: number;
+      source: string;
+    };
+    expect(shelf.source).toBe("fl-doh-ehwaters-12015");
+    expect(shelf.featureCount).toBeGreaterThan(0);
+    expect(shelf.minAcres).toBe(5);
+    expect(shelf.maxAcres).toBe(150);
+    let stamped = 0;
+    for (const name of readdirSync(path.join(shelfPath, "tiles"))) {
+      if (!name.endsWith(".geojson")) continue;
+      const collection = JSON.parse(readFileSync(path.join(shelfPath, "tiles", name), "utf8")) as {
+        features: { properties: { zoningCode?: string | null; opportunityZone?: unknown; acreage?: number } }[];
+      };
+      for (const feature of collection.features) {
+        const acres = feature.properties.acreage ?? 0;
+        expect(acres).toBeGreaterThanOrEqual(5);
+        expect(acres).toBeLessThanOrEqual(150);
+        expect(feature.properties.opportunityZone ?? null).toBeNull();
+        if (feature.properties.zoningCode) stamped += 1;
+      }
+    }
+    expect(stamped).toBe(0);
   });
 });

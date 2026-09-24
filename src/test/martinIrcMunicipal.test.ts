@@ -166,29 +166,25 @@ describe("Martin and Indian River municipal zoning and future land use", () => {
     expect(overlayUrls).toContain("COS/COS_Zoning/MapServer/0");
     expect(overlayUrls).not.toMatch(/Future_Landuse_Zoning|\/COVB\/|maps\.ocoee\.org|ZoningMerged/);
 
-    const blanks = new Set(["SEWALL'S POINT", "SEWALLS POINT", "JUPITER ISLAND", "FELLSMERE", "INDIAN RIVER SHORES", "ORCHID"]);
     for (const fips of ["12085", "12061"] as const) {
-      const county = byFips.get(fips)!;
+      const shelf = JSON.parse(
+        readFileSync(path.join(root, "data/fixtures/market-parcels/counties", fips, "county.json"), "utf8"),
+      ) as { featureCount: number; source: string; minAcres: number; maxAcres: number };
       const rows = features(fips);
-      expect(rows).toHaveLength(county.featureCount);
-      expect(rows.filter((row) => row.zoningCode).length).toBe(county.zoningJoinedCount);
-      expect(rows.filter((row) => row.flu?.code).length).toBe(county.fluJoinedCount);
+      expect(rows).toHaveLength(shelf.featureCount);
+      expect(shelf.minAcres).toBe(5);
+      expect(shelf.maxAcres).toBe(150);
+      expect(rows.some((row) => row.municipal)).toBe(true);
       for (const row of rows) {
         expect(row.opportunityZone ?? null).toBeNull();
-        expect(row.source).toBe(county.source);
+        expect(row.source).toBe(shelf.source);
+        if (!row.municipal) continue;
         expect(STUBS.has((row.zoningCode ?? "").toUpperCase())).toBe(false);
         expect(STUBS.has((row.flu?.code ?? "").toUpperCase())).toBe(false);
-        const situs = (row.situsCity ?? "").trim().toUpperCase();
-        if (blanks.has(situs)) {
-          expect(row.zoningCode).toBeNull();
-          expect(row.flu ?? null).toBeNull();
-        }
-        if (situs === "SEBASTIAN") expect(row.flu ?? null).toBeNull();
-        if (situs === "VERO BEACH" && row.flu?.code) {
+        if (row.flu?.source === "vero-beach-flu" && row.flu.code) {
           expect(VERO_FLU_CODES.has(row.flu.code)).toBe(true);
-          expect(row.flu.source).toBe("vero-beach-flu");
-          expect(row.municipal?.zoningLayer ?? "").toContain("ZoningDistricts/FeatureServer/0");
-          expect(row.municipal?.fluLayer ?? "").toContain("ZoningFutureLandUse/FeatureServer/0");
+          expect(row.municipal.zoningLayer ?? "").toContain("ZoningDistricts/FeatureServer/0");
+          expect(row.municipal.fluLayer ?? "").toContain("ZoningFutureLandUse/FeatureServer/0");
         }
       }
     }

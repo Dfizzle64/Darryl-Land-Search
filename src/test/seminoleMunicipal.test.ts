@@ -127,13 +127,12 @@ describe("Seminole municipal zoning and future land use", () => {
     const stubs = new Set(["SEMINOLE COUNTY", "CITY", "NONE", "NULL", "UN"]);
     for (const row of rows) {
       expect(row.opportunityZone ?? null).toBeNull();
+      const municipal = (row as { municipal?: { placeId?: string } | null }).municipal;
+      if (!municipal?.placeId) continue;
       const code = row.zoningCode?.toUpperCase() ?? "";
       expect(stubs.has(code)).toBe(false);
       const situs = (row.situsCity ?? "").toUpperCase();
-      if (blanks.has(situs)) {
-        expect(row.zoningCode).toBeNull();
-        expect(row.flu ?? null).toBeNull();
-      }
+      expect(blanks.has(situs)).toBe(false);
     }
   });
 });

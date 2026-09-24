@@ -97,9 +97,13 @@ describe("South Carolina municipal zoning joins", () => {
     const berkeley = JSON.parse(readFileSync(path.join(countyRoot, "45015/county.json"), "utf8")) as { source: string; coverage: string; featureCount: number };
     const charleston = JSON.parse(readFileSync(path.join(countyRoot, "45019/county.json"), "utf8")) as { source: string; coverage: string; featureCount: number };
     const greenville = JSON.parse(readFileSync(path.join(countyRoot, "45045/county.json"), "utf8")) as { source: string; coverage: string; featureCount: number };
-    expect(berkeley).toMatchObject({ source: "unavailable", coverage: "gap", featureCount: 0 });
-    expect(charleston).toMatchObject({ source: "unavailable", coverage: "gap", featureCount: 0 });
-    expect(greenville).toMatchObject({ source: "sc-greenville-city-gis", coverage: "sample", featureCount: 1570 });
+    expect(berkeley).toMatchObject({ source: "sc-berkeley-addr-muni", coverage: "complete-gte-5ac", featureCount: 7886 });
+    expect(charleston).toMatchObject({ source: "sc-charleston-energov-ent", coverage: "complete-gte-5ac", featureCount: 7989 });
+    expect(greenville).toMatchObject({
+      source: "sc-greenville-gcgia-tax-parcel",
+      coverage: "complete-gte-5ac",
+      featureCount: 14959,
+    });
   });
 
   it("keeps the inclusive acreage band and does not invent opportunity zones", () => {

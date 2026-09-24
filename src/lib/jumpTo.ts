@@ -1,6 +1,21 @@
-import { pointInRing } from "@/lib/orangeSignals";
-
 export type JumpPoint = { lng: number; lat: number };
+
+function pointInRing(x: number, y: number, ring: number[][]): boolean {
+  let inside = false;
+  const n = ring.length;
+  let j = n - 1;
+  for (let i = 0; i < n; i += 1) {
+    const xi = ring[i][0];
+    const yi = ring[i][1];
+    const xj = ring[j][0];
+    const yj = ring[j][1];
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / ((yj - yi) || 1e-12) + xi) {
+      inside = !inside;
+    }
+    j = i;
+  }
+  return inside;
+}
 
 export type MapFlyTarget = JumpPoint & { key: number };
 

@@ -178,7 +178,7 @@ export function parcelAppraiserUrl(options: {
   appraiserUrl?: string | null;
 }): { href: string | null; label: string } {
   const fips = options.countyFips ?? null;
-  const southFlorida = southFloridaAppraiserLink(fips, options.parcelId, options.appraiserUrl);
+  const southFlorida = southFloridaAppraiserLink(fips, options.parcelId);
   if (southFlorida) return southFlorida;
   if (fips === "12097") {
     const stored = options.appraiserUrl;

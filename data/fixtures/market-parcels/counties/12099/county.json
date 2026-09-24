@@ -1,0 +1,28 @@
+{
+  "name": "Palm Beach",
+  "fips": "12099",
+  "state": "Florida",
+  "markets": [
+    "South Florida"
+  ],
+  "featureCount": 11430,
+  "coverage": "partial",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "fl-palm-beach-parcel-info-4",
+  "queryUrl": "https://gis.pbcgov.org/arcgis/rest/services/Parcels/PARCEL_INFO/FeatureServer/4/query",
+  "gaps": [
+    "Partial. PARCEL_INFO reports about 146,014 object ids with ACRES from 5.0 through 150.0. This extract kept the parcels that survived geometry normalize and parcel-id dedupe, not that full object-id count.",
+    "Palm Beach parcels are PARCEL_INFO FeatureServer/4. Acreage is ACRES, 5.0\u2013150.0 inclusive. PROPERTY_USE is a text use description, not a numeric DOR_UC.",
+    "Zoning is the unincorporated OpenData layer only. Municipal zoning is not on this card. West Palm Beach and Boca Raton city layers were not joined.",
+    "Future land use is open_data_v2. maps.co.palm-beach.fl.us TLS is fragile from some clients. The gis.pbcgov.org OpenData mirror requires a token and was not used. opendata.pbcgov.org does not resolve.",
+    "The legacy pbcgov.org/papa PropertyDetail URL redirects home and is not the record link.",
+    "Palm Beach unincorporated zoning joined 10851/11430. Future land use joined 11123/11430."
+  ],
+  "path": "data/fixtures/market-parcels/counties/12099/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12099/lookup.json",
+  "sourceCount": 11430,
+  "dropped": 0,
+  "tileCount": 11
+}

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Wave 0 South Florida parcel extract. Four counties only.
+"""Wave 0 South Florida parcel extract. Three counties on this shelf.
 
-Miami-Dade 12086, Monroe 12087, Broward 12011 (partial), Palm Beach 12099.
-Public GIS only. Acreage is 5.0–150.0 inclusive. Utilities, school grades,
-base flood elevations, and Opportunity Zone status are not joined.
+Miami-Dade 12086, Broward 12011 (partial), and Palm Beach 12099.
+Monroe 12087 is deferred. Acreage is 5.0–150.0 inclusive. Utilities, school
+grades, base flood elevations, and Opportunity Zone status are not joined.
 
-Broward BCPA MapServer/16 is folio and geometry. Countywide CAMA is an FDOR
-join (CO_NO=16, PARCEL_ID=FOLIO). BMSD layers are unincorporated only.
+Broward BCPA MapServer/16 is folio and geometry. The FDOR CO_NO=16 join was
+not applied. BMSD zoning is unincorporated only.
 """
 
 from __future__ import annotations
@@ -27,7 +27,8 @@ MIN_SQFT = 217800.0
 MAX_SQFT = 6534000.0
 SQFT_PER_ACRE = 43560.0
 
-FIPS = ("12086", "12087", "12011", "12099")
+# Monroe (12087) is deferred. The finished extract is not on this shelf.
+FIPS = ("12086", "12011", "12099")
 
 # Generous envelopes. They reject namesake counties, not shoreline slivers.
 COUNTY_BBOX = {
@@ -192,7 +193,7 @@ SPECS: dict[str, dict] = {
         },
         "gaps": [
             "Partial. BCPA MapServer/16 (BCPA_EXTERNAL_JAN26) is folio and geometry only. Acreage is the polygon area, 5.0–150.0 inclusive. gis.bcpa.net does not resolve. The service name rotates yearly.",
-            "Countywide CAMA is not on that layer. Attributes are joined from FDOR Florida Statewide Cadastral where CO_NO=16 and PARCEL_ID equals FOLIO. A countywide CO_NO=16 query times out, so the join is by folio. BMSDParcelAddress is an unincorporated subset and is not the county roll.",
+            "Countywide CAMA is not on that layer. The FDOR CO_NO=16 join (PARCEL_ID=FOLIO) did not return from batched queries, so owner, sale, and value are not on these rows. BMSDParcelAddress is an unincorporated subset and is not the county roll.",
             "BMSD zoning covers unincorporated Broward only. The city zoning mosaic (MapServer/9) is partial: many ZONE_NAME values are blank, N/A, or WATER, and it is not a city ordinance. Authoritative city zoning was not invented.",
             "County land use (MapServer/10) stores numeric SLUC1 codes, not plain-language future-land-use labels. BCPA sales layers were not queried.",
         ],
@@ -200,7 +201,7 @@ SPECS: dict[str, dict] = {
     "12099": {
         "kind": "south-florida",
         "source": "fl-palm-beach-parcel-info-4",
-        "coverage": "complete-gte-5ac",
+        "coverage": "partial",
         "url": PALM_PARCELS,
         "layerId": 4,
         "status": "live",
@@ -221,7 +222,7 @@ SPECS: dict[str, dict] = {
             "PROPERTY_USE": "dorCode",
         },
         "gaps": [
-            "Palm Beach parcels are PARCEL_INFO FeatureServer/4. Acreage is ACRES, 5.0–150.0 inclusive. PROPERTY_USE is a text use description, not a numeric DOR_UC.",
+            "Partial. PARCEL_INFO reports about 146,014 object ids with ACRES from 5.0 through 150.0. This extract kept the parcels that survived geometry normalize and parcel-id dedupe, not that full object-id count. PROPERTY_USE is text, not a numeric DOR code.",
             "Zoning is the unincorporated OpenData layer only. Municipal zoning is not on this card. West Palm Beach and Boca Raton city layers were not joined.",
             "Future land use is open_data_v2. maps.co.palm-beach.fl.us TLS is fragile from some clients. The gis.pbcgov.org OpenData mirror requires a token and was not used. opendata.pbcgov.org does not resolve.",
             "The legacy pbcgov.org/papa PropertyDetail URL redirects home and is not the record link.",
@@ -404,7 +405,7 @@ def fetch_by_ids(
     out_fields: list[str],
     *,
     geometry: bool,
-    batch: int = 80,
+    batch: int = 120,
 ) -> list[dict]:
     features: list[dict] = []
     params_base = {"outFields": ",".join(out_fields), "returnGeometry": "true" if geometry else "false", "f": "json"}
@@ -418,17 +419,29 @@ def fetch_by_ids(
         params["objectIds"] = ",".join(str(i) for i in chunk)
         try:
             data = _query(url, params, timeout=180)
-        except Exception:
-            if len(chunk) > 20:
-                features.extend(fetch_by_ids(url, chunk, out_fields, geometry=geometry, batch=max(10, len(chunk) // 2)))
+        except Exception as exc:
+            if len(chunk) > 1:
+                mid = max(1, len(chunk) // 2)
+                features.extend(fetch_by_ids(url, chunk[:mid], out_fields, geometry=geometry, batch=mid))
+                features.extend(fetch_by_ids(url, chunk[mid:], out_fields, geometry=geometry, batch=max(1, len(chunk) - mid)))
                 start += len(chunk)
                 continue
-            raise
-        features.extend(data.get("features") or [])
+            print(f"    skip object {chunk[0]} ({exc})", flush=True)
+            start += len(chunk)
+            continue
+        page = data.get("features") or []
+        if len(page) < len(chunk) and len(chunk) > 1:
+            print(f"    short page {len(page)}/{len(chunk)} {url.rsplit('/', 2)[-2]}", flush=True)
+            mid = max(1, len(chunk) // 2)
+            features.extend(fetch_by_ids(url, chunk[:mid], out_fields, geometry=geometry, batch=mid))
+            features.extend(fetch_by_ids(url, chunk[mid:], out_fields, geometry=geometry, batch=max(1, len(chunk) - mid)))
+            start += len(chunk)
+            continue
+        features.extend(page)
         start += len(chunk)
         if start == len(chunk) or start == total or start % 800 == 0:
             print(f"    {start}/{total} {url.rsplit('/', 2)[-2]}", flush=True)
-        time.sleep(0.02)
+        time.sleep(0.01)
     return features
 
 
@@ -750,7 +763,7 @@ def normalize_broward_geometry(seed: Any, county: dict, markets: list[str], item
         acres=gis_acres,
         geometry=geometry,
         center=center,
-        gaps=["BCPA MapServer/16 has folio and geometry only. FDOR CO_NO=16 did not match this folio."],
+        gaps=["BCPA MapServer/16 is folio and geometry only. The FDOR CO_NO=16 join was not applied."],
     )
 
 
@@ -1045,21 +1058,9 @@ def _pull_broward(seed: Any, county: dict, markets: list[str], notes: list[str])
         if feature:
             features.append(feature)
     features = _dedupe(features)
-    fdor = _fdor_for([feature["properties"]["parcelId"] for feature in features])
-    matched = 0
-    for feature in features:
-        attrs = None
-        for key in _folio_keys(feature["properties"]["parcelId"]):
-            attrs = fdor.get(key)
-            if attrs:
-                break
-        if not attrs:
-            continue
-        apply_fdor(seed, feature, attrs)
-        matched += 1
     notes.append(
-        f"Broward FDOR CO_NO=16 join matched {matched}/{len(features)} folios. "
-        "Unmatched rows stay folio and geometry."
+        "FDOR CO_NO=16 was not joined. Batched PARCEL_ID queries did not return, "
+        "so this partial extract is folio and geometry from BCPA MapServer/16."
     )
     bmsd = index_polygons(
         fetch_layer(BROWARD_BMSD_ZONING, "1=1", ["ZONING", "DESCRIPTION", "FOLIO"], geometry=True),
@@ -1213,10 +1214,10 @@ def refresh_south_florida_index() -> None:
         "coreMaxAcres": MAX_ACRES,
         "tile": {"originLon": seed.ORIGIN_LON, "originLat": seed.ORIGIN_LAT, "tileDeg": seed.TILE_DEG},
         "notes": [
-            "Wave 0 is South Florida only: Miami-Dade, Monroe, Broward, and Palm Beach.",
+            "Wave 0 on this shelf is Miami-Dade, Broward, and Palm Beach. Monroe is deferred.",
             "Loaded only when this market is selected.",
             "Acreage is 5.0–150.0 inclusive. Utilities are not joined.",
-            "Broward is partial. BCPA MapServer/16 is folio and geometry. CAMA is the FDOR CO_NO=16 join.",
+            "Broward is partial. BCPA MapServer/16 is folio and geometry. The FDOR CAMA join was not applied.",
         ],
         "counties": rows,
     }
@@ -1250,7 +1251,6 @@ def refresh_south_florida_index() -> None:
 
 COUNTIES = {
     "12086": {"name": "Miami-Dade", "state": "Florida", "fips": "12086"},
-    "12087": {"name": "Monroe", "state": "Florida", "fips": "12087"},
     "12011": {"name": "Broward", "state": "Florida", "fips": "12011"},
     "12099": {"name": "Palm Beach", "state": "Florida", "fips": "12099"},
 }
@@ -1261,13 +1261,15 @@ def main() -> None:
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--county", action="append", default=[])
+    parser.add_argument("--no-index", action="store_true")
     args = parser.parse_args()
     wanted = {name.lower() for name in args.county}
     for fips, county in COUNTIES.items():
         if wanted and county["name"].lower() not in wanted:
             continue
         download_south_florida(county, ["South Florida"], south_florida_spec(fips))
-    refresh_south_florida_index()
+    if not args.no_index:
+        refresh_south_florida_index()
 
 
 if __name__ == "__main__":

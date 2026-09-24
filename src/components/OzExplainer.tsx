@@ -61,6 +61,18 @@ export function OzExplainer({ open, onClose }: OzExplainerProps) {
                   ))}
                 </ul>
               ) : null}
+              {section.links?.map((link) => (
+                <p key={link.href} className="mt-2">
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-clay-400 underline-offset-2 hover:underline"
+                  >
+                    {link.label}
+                  </a>
+                </p>
+              ))}
               {section.heading.startsWith("What it means for investors") ? (
                 <p className="mt-2 text-ink-300">{OZ_EXPLAINER_TAX_NOTE}</p>
               ) : null}

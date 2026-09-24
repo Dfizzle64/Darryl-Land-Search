@@ -2,9 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { MfPriorityFilter } from "./MfPriorityFilter";
-import { displayStatusChip, formatCountyLabel, showsGovernorFiledSoftCopy } from "@/lib/markets";
+import { displayStatusChip, formatCountyLabel, isSouthCarolinaState } from "@/lib/markets";
 import { tractPlaceLabel } from "@/lib/scMfPriority";
-import { SC_GOVERNOR_FILED_STATUS, type EligibleTractRow, type MfPriorityView } from "@/lib/types";
+import type { EligibleTractRow, MfPriorityView } from "@/lib/types";
 
 type TractPanelProps = {
   tracts: EligibleTractRow[];
@@ -53,10 +53,10 @@ export function TractPanel({
             {tracts.length.toLocaleString()} {tracts.length === 1 ? "tract" : "tracts"}
           </p>
           <p className="mt-0.5 text-[11px] leading-relaxed text-ink-500">
-            Rev. Proc. 2026-14 nomination eligibility only. Brown is rural. Blue is urban. Status stays eligible —
+            Rev. Proc. 2026-14 nomination eligibility. Brown is rural. Blue is urban. Eligible tracts stay Eligible —
             not designated.
-            {tracts.some((tract) => showsGovernorFiledSoftCopy(tract)) || priorityView
-              ? ` South Carolina tracts: ${SC_GOVERNOR_FILED_STATUS}.`
+            {tracts.some((tract) => isSouthCarolinaState(tract.state))
+              ? " South Carolina GEOIDs on the official list read Governor-nominated / awaiting Treasury. That is not a QOZ and not a tax benefit."
               : ""}
           </p>
           {onPriorityView && priorityView && priorityCounts ? (
@@ -104,9 +104,6 @@ export function TractPanel({
                   >
                     {rural ? "Rural" : "Urban"} · {displayStatusChip(tract)}
                   </span>
-                  {showsGovernorFiledSoftCopy(tract) ? (
-                    <p className="mt-1 text-[11px] leading-snug text-ink-300">{SC_GOVERNOR_FILED_STATUS}</p>
-                  ) : null}
                   {tract.mfPriority ? (
                     <span
                       className={`mt-1 inline-block rounded-full border px-1.5 py-px text-[10px] ${

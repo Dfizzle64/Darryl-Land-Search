@@ -12,11 +12,13 @@ import {
   southCarolinaStatusHelp,
   viewIncludesSouthCarolina,
 } from "../lib/markets";
+import { isScGovernorNominatedGeoid } from "../lib/scNominatedTracts";
 import {
   ELIGIBLE_NOT_DESIGNATED_STATUS,
   MARKETS,
   OTHER_MARKETS,
   RURAL_ELIGIBLE_STATUS_CHIP,
+  SC_GOVERNOR_NOMINATED_STATUS,
   type EligibleMarketsCatalog,
   type EligiblePackTractCollection,
   type MarketId,
@@ -135,8 +137,11 @@ describe("other MSA eligible pack", () => {
       expect(rows.filter((row) => row.rural === "N")).toHaveLength(expected.urban);
       expect(isOtherMarketId(market)).toBe(true);
       expect(isPrimaryMarket(market)).toBe(false);
-      if (rows.length > 0) {
-        expect(displayStatusChip(rows[0])).toBe(ELIGIBLE_NOT_DESIGNATED_STATUS);
+      for (const row of rows) {
+        const chip = displayStatusChip(row);
+        expect(chip).not.toMatch(/^designated/i);
+        if (isScGovernorNominatedGeoid(row.geoid)) expect(chip).toBe(SC_GOVERNOR_NOMINATED_STATUS);
+        else expect(chip).toBe(ELIGIBLE_NOT_DESIGNATED_STATUS);
       }
     }
     const jackson = catalog.markets.find((item) => item.market === "Jackson");
@@ -318,7 +323,8 @@ describe("tract class and South Carolina help for the new markets", () => {
     expect(viewIncludesSouthCarolina("Savannah", "Georgia")).toBe(false);
     expect(viewIncludesSouthCarolina("Memphis", null)).toBe(false);
     expect(southCarolinaStatusHelp("Columbia", null)).toMatch(/not designated/i);
-    expect(southCarolinaStatusHelp("Greenville", null)).toMatch(/not public/i);
+    expect(southCarolinaStatusHelp("Greenville", null)).toMatch(/Governor-nominated \/ awaiting Treasury/);
+    expect(southCarolinaStatusHelp("Greenville", null)).not.toMatch(/not public/i);
     expect(southCarolinaStatusHelp("Savannah", null)).toMatch(/Beaufort and Jasper/);
     expect(southCarolinaStatusHelp("Savannah", "Georgia")).toBeNull();
     expect(southCarolinaStatusHelp("Birmingham", null)).toBeNull();

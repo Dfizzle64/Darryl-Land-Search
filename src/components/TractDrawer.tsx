@@ -3,11 +3,12 @@
 import { ScreeningDetails } from "./ScreeningDetails";
 import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import type { ScreeningPoint } from "@/lib/screening";
-import { displayStatusChip, formatCountyLabel, showsGovernorFiledSoftCopy } from "@/lib/markets";
+import { displayStatusChip, formatCountyLabel } from "@/lib/markets";
 import { formatTractCounty } from "@/lib/tractCounty";
 import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME } from "@/lib/orlandoParcels";
 import { MF_PRIORITY_DISCLAIMER, NOM_WATCH_CAVEAT, tractPlaceLabel } from "@/lib/scMfPriority";
-import { SC_GOVERNOR_FILED_STATUS, SHED_CAVEAT, type EligibleTractRow } from "@/lib/types";
+import { displayTractNotes, isScGovernorNominatedGeoid } from "@/lib/scNominatedTracts";
+import { SC_NOMINATED_NOT_A_QOZ, SHED_CAVEAT, type EligibleTractRow } from "@/lib/types";
 
 type TractDrawerProps = {
   tract: EligibleTractRow | null;
@@ -43,7 +44,7 @@ export function TractDrawer({
     );
   }
 
-  const southCarolina = showsGovernorFiledSoftCopy(tract);
+  const nominated = isScGovernorNominatedGeoid(tract.geoid);
   const priority = tract.mfPriority ?? null;
   const place = tractPlaceLabel(tract);
   const rural = tract.rural === "Y";
@@ -76,7 +77,7 @@ export function TractDrawer({
       >
         {statusChip}
       </p>
-      {southCarolina ? <p className="mt-2 text-xs leading-relaxed text-ink-100">{SC_GOVERNOR_FILED_STATUS}</p> : null}
+      {nominated ? <p className="mt-2 text-xs leading-relaxed text-ink-100">{SC_NOMINATED_NOT_A_QOZ}</p> : null}
       {priority ? (
         <p
           className={`mt-2 inline-block rounded-full border px-2 py-1 text-xs ${
@@ -132,10 +133,9 @@ export function TractDrawer({
             {rural
               ? "Rev. Proc. 2026-14 lists this 2020 census tract as a low-income community comprised entirely of a rural area."
               : "Rev. Proc. 2026-14 lists this 2020 census tract as a low-income community that is eligible and not entirely rural."}{" "}
-            It is eligible for nomination.{" "}
-            {southCarolina
-              ? "South Carolina’s governor filed OZ 2.0 nominations on Sep 10, 2026, but the tract list is not public. This GEOID is not marked nominated or designated."
-              : "It has not been nominated or certified as a 2027 QOZ."}
+            {nominated
+              ? "South Carolina’s governor nominated this tract (announced Sep 23, 2026; Final Recommendations dated Sep 22). It is awaiting Treasury. It is not a designated QOZ, and nomination alone is not a tax benefit."
+              : "It is eligible for nomination. It has not been nominated or certified as a 2027 QOZ."}
           </dd>
         </div>
         <div>
@@ -154,7 +154,7 @@ export function TractDrawer({
           <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">
             {priority ? "Rural-pack notes" : "Notes"}
           </dt>
-          <dd className="mt-1 text-ink-100">{tract.notes}</dd>
+          <dd className="mt-1 text-ink-100">{displayTractNotes(tract.notes, tract.geoid)}</dd>
         </div>
         <div>
           <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">Internal point</dt>

@@ -11,7 +11,6 @@ import { BasemapToggle } from "./BasemapToggle";
 import { AoiControls } from "./AoiControls";
 import { MeasureControl } from "./MeasureControl";
 import { ParcelLayerToggle } from "./ParcelLayerToggle";
-import { SouthCarolinaStatusNote } from "./SouthCarolinaStatusNote";
 import {
   STREET_STYLE_CANDIDATES,
   addSatelliteSourceAndLayer,
@@ -61,7 +60,7 @@ import {
 } from "@/lib/screening";
 import { tractClickFromFeature, tractPopupRuralLine, type TractClickDetails } from "@/lib/tractCounty";
 import { tractIncomeLayerFilter } from "@/lib/tractIncome";
-import { ORANGE_COUNTY_CENTER, MF_PRIORITY_LEGEND_BLURB, MF_PRIORITY_TIER_A_MEANING, MF_PRIORITY_TIER_B_MEANING, RURAL_ELIGIBLE_LEGEND_BLURB, SC_GOVERNOR_FILED_STATUS, URBAN_ELIGIBLE_LEGEND_BLURB, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
+import { ORANGE_COUNTY_CENTER, MF_PRIORITY_LEGEND_BLURB, MF_PRIORITY_TIER_A_MEANING, MF_PRIORITY_TIER_B_MEANING, RURAL_ELIGIBLE_LEGEND_BLURB, URBAN_ELIGIBLE_LEGEND_BLURB, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
 
 type LngLatBounds = [[number, number], [number, number]];
 
@@ -541,6 +540,13 @@ function showTractPopup(map: MapLibreMap, lngLat: maplibregl.LngLatLike, details
   status.style.color = POPUP_TEXT;
   status.textContent = details.status;
   const lines = [kicker, place, geoid, status];
+  if (details.statusDetail) {
+    const detail = document.createElement("p");
+    detail.style.margin = "2px 0 0";
+    detail.style.color = POPUP_TEXT;
+    detail.textContent = details.statusDetail;
+    lines.push(detail);
+  }
   const ruralLine = tractPopupRuralLine(details.ruralLabel);
   if (ruralLine) {
     const rural = document.createElement("p");
@@ -1444,6 +1450,12 @@ export function SiteMap({
                 Urban eligible — not designated
                 <span className="mt-0.5 block text-xs text-ink-100">{URBAN_ELIGIBLE_LEGEND_BLURB}</span>
               </p>
+              {scStatusHelp ? (
+                <p className="text-xs text-ink-100">
+                  Governor-nominated / awaiting Treasury — official South Carolina list only. Not designated. No tax
+                  benefit from nomination alone.
+                </p>
+              ) : null}
               {showMfLegend ? (
                 <div className="space-y-1.5 border-t border-white/20 pt-1.5">
                   <p className="text-[10px] uppercase tracking-[0.14em] text-ink-300">MF priority</p>
@@ -1469,9 +1481,6 @@ export function SiteMap({
             </>
           ) : null}
           <p className="text-xs text-ink-100">90-minute sheds are approximate county rings, not drive-time isochrones. Tract polygons have no center dot.</p>
-          {scStatusHelp ? (
-            <SouthCarolinaStatusNote note={SC_GOVERNOR_FILED_STATUS} className="text-ink-300" />
-          ) : null}
           {screening.flood ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-3.5 rounded-sm align-middle" style={{ backgroundColor: "#3b6ea5" }} />

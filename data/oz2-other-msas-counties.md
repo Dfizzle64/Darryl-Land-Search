@@ -16,7 +16,7 @@ Drive-time sheds are **approximate county sets**, not surveyed isochrones. Each 
 
 County matching is **state-aware**. Alabama markets are **NEW** to Darryl's map. Memphis includes AR/MS MSA counties clearly in the drive shed (documented below).
 
-Status labeling: **Eligible — not designated**. SC markets include Governor-filed Sep 10, 2026 caveat in notes (nominated GEOID list not public) — do **not** mark designated. GA/FL/NC/TN/AL(/AR/MS for Memphis spill): eligible only.
+Status labeling: **Eligible — not designated**, except GEOIDs on South Carolina’s official 112 (`data/oz/sc-oz2-nominated-official-sccommerce-2026-09-23.csv`), which read **Governor-nominated / awaiting Treasury**. Do **not** mark designated. GA/FL/NC/TN/AL(/AR/MS for Memphis spill): eligible only.
 
 ---
 

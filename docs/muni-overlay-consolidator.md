@@ -8,6 +8,7 @@ Refresh commands:
 npm run seed:volusia-flagler-municipal
 npm run seed:polk-municipal
 npm run seed:pinellas-pasco-muni
+npm run seed:seminole-municipal
 npm run seed:sc-muni
 ```
 
@@ -139,6 +140,25 @@ North Redington Beach is on the county zoning view and has no situs parcels in t
 Largo zoning is a gap. Largo future land use is not on this shelf and was not invented. Gulfport, Belleair Beach, Belleair Bluffs, Redington Beach, and St. Pete Beach stay blank. St. Petersburg and Clearwater stay blank here; their city layers were not copied from the Tampa parcel re-extract. Port Richey, Dade City, San Antonio, and St. Leo stay blank. Zephyrhills uses the Euclidean layers only. The traditional city center layer is not stacked. County `ZN_TYPE` placeholders `NPR`, `PR`, `SA`, `DC`, and `ZH` are not stored.
 
 Rejected and not queried: Hernando `Zoning_Flu` (Weeki Wachee), Anderson County, California `Zoning_view`, and Gulfport, Mississippi `GPT_Zoning`.
+
+## Seminole County, Florida (FIPS 12117)
+
+Catalog: `data/seminole-municipal.json`. Join script: `scripts/join_seminole_municipal.py`. Stamped onto the existing Orlando DOH shelf (`doh-ehwaters`, 4,788 parcels, 5–150 acres). County parcels were not re-downloaded. Casselberry joins on `PARCEL` and Winter Springs on `PIN`, then a point inside the parcel. Lake Mary, Sanford, Oviedo, and Altamonte Springs are spatial. Opportunity Zone fields were not written.
+
+| City | Zoning parcels | FLU parcels |
+| --- | ---: | ---: |
+| Casselberry | 68 | 63 |
+| Winter Springs | 147 | 144 |
+| Lake Mary | 132 | 131 |
+| Sanford | 369 | 369 |
+| Oviedo | 145 | 144 |
+| Altamonte Springs | 140 | 140 |
+
+Shelf totals: zoning 1,001, future land use 991. A situs city on this acreage band is often wider than the municipal polygon, so a miss stays blank.
+
+Longwood stays blank. County `Land_Use` FeatureServer 0 and 1 are not stamped. `CITY` and Casselberry `SEMINOLE COUNTY` are not stored. Geneva, Chuluota, and the other unincorporated labels stay blank, as do Winter Park, Apopka, and Maitland. Oviedo uses `maps.cityofoviedo.net` DevelopmentServices MapServer 11 and 10. The retired AGOL `DSZoning` service is not called. Winter Springs EnerGov, the Lake Mary twin layers, and Sanford `Land_Use` MapServer 0 are not stacked.
+
+Rejected and not queried: Hernando `Zoning_Flu`, Lake County InteractiveMap zoning, Winter Park EnerGov, the FDOR `Zoning` product, and the Longwood giswebtechguru host.
 
 ## Not in this pass
 

@@ -14,7 +14,7 @@ Orange is the public OCPA cadastre. The other complete counties are Florida DOH 
 | Orange | 12095 | 11,709 | 11,887 | OCPA shapes. 320 extra parts merged. 36 multipart accounts summed past 150 and dropped. Zoning on 9,789. FLU on 8,238 |
 | Osceola | 12097 | 5,997 | 6,028 | 31 extra parts merged. No zoning/FLU. 1,481 rural-eligible centroids |
 | Polk | 12105 | 19,734 | 19,738 | 4 extra parts merged. City zoning on 1,696 and FLU on 1,735 for five cities. County LDC zoning is still a gap. 4,253 rural-eligible centroids |
-| Seminole | 12117 | 4,788 | 4,788 | No zoning/FLU. No rural-eligible OZ 2.0 tracts in the pack |
+| Seminole | 12117 | 4,788 | 4,788 | City zoning on 1,001 and FLU on 991 for six cities. Longwood stays blank. No rural-eligible OZ 2.0 tracts in the pack |
 | Brevard | 12009 | 120 | — | Thinner sample (not capped at 150) |
 | Marion | 12083 | 120 | — | Thinner sample (not capped at 150) |
 | Sumter | 12119 | 120 | — | Thinner sample (not capped at 150) |
@@ -80,7 +80,7 @@ Orange cadastre:
 
 ## Gaps
 
-- Lake, Osceola, Polk, and Seminole have no zoning or FLU on the DOH extract. Land-use filters should stay on **All parcels** there. Missing zoning is not treated as multifamily.
+- Lake and Osceola have no zoning or FLU on the DOH extract. Polk and Seminole keep that extract and add city overlays; county district layers are still gaps there. Land-use filters should stay on **All parcels** where a parcel has no zoning code. Missing zoning is not treated as multifamily.
 - Outside Orange, the OZ 2.0 flag is only the seven-market **rural-eligible** tract pack. Non-rural eligible tracts in those counties are not joined.
 - Orange municipal FLU other than Orlando is often the county placeholder `City` and stays unknown. In this 5–150 acre snapshot, 8,238 Orange parcels have a FLU code and 3,471 do not.
 - Income and AADT are not stored on the parcel tiles. `/api/parcels` joins ACS B19013 and FDOT AADT at query time for Florida. Block-group income is still Orange County only. Other states stay unknown. Uncheck Include unknown to hide those parcels.

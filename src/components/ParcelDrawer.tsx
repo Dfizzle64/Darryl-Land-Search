@@ -19,6 +19,7 @@ import { describeRezoningCandidate } from "@/lib/filters";
 import { describeOpportunityZone, describeOz2Eligibility } from "@/lib/opportunityZone";
 import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "@/lib/types";
 import { fluEmptyForPolk, zoningEmptyForPolk } from "@/lib/polkMunicipal";
+import { fluEmptyForSeminole, zoningEmptyForSeminole } from "@/lib/seminoleMunicipal";
 import { fluEmptyForMunicipal, zoningEmptyForCounty } from "@/lib/volusiaFlaglerMunicipal";
 import { describeZoningMatch } from "@/lib/zoning";
 
@@ -105,7 +106,9 @@ export function ParcelDrawer({
     ? "No FDOT count segment within 15 km"
     : "FDOT AADT is Florida only";
   const dekalb = properties.countyFips === "13089";
-  const zoningEmpty = zoningEmptyForPolk(
+  const zoningEmpty = zoningEmptyForSeminole(
+    properties.countyFips,
+    zoningEmptyForPolk(
     properties.countyFips,
     zoningEmptyForCounty(
       properties.countyFips,
@@ -114,6 +117,7 @@ export function ParcelDrawer({
         : dekalb
           ? "No municipal or county zoning joined for this parcel"
           : "Not in this county's public parcel extract",
+    ),
     ),
   );
   const zoningLine = properties.zoningCode
@@ -169,10 +173,13 @@ export function ParcelDrawer({
         <Field
           label="Future Land Use"
           value={fluLine}
-          empty={fluEmptyForPolk(
+          empty={fluEmptyForSeminole(
+            properties.countyFips,
+            fluEmptyForPolk(
             properties.countyFips,
             properties.municipal?.fluGap ? fluEmptyForMunicipal(properties.municipal.fluGap) : null,
             dekalb ? "No future land use joined for this parcel" : "Not joined for this county",
+            ),
           )}
         />
         <Field label="Designated Opportunity Zone" value={oz.inZone == null ? null : oz.inZone ? `Yes · ${properties.opportunityZone?.tractName || properties.opportunityZone?.tractGeoid}` : "No"} />

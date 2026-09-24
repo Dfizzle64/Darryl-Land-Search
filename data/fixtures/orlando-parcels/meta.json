@@ -184,8 +184,8 @@
       "featureCount": 4788,
       "ruralEligibleParcelCount": 0,
       "oz2EligibleParcelCount": 0,
-      "zoningJoinedCount": 0,
-      "fluJoinedCount": 0,
+      "zoningJoinedCount": 1001,
+      "fluJoinedCount": 991,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
@@ -193,7 +193,9 @@
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/58/query",
       "gaps": [
         "Acreage band is 5.0\u2013150.0 acres (FDOR LND_SQFOOT / 43560). Parcels under 5 or over 150 are excluded.",
-        "No zoning or future land use on the Florida DOH EHWATER extract. Owner, sale, and tax are the public FDOR fields when that roll has them.",
+        "City zoning and future land use are joined for Casselberry, Winter Springs, Lake Mary, Sanford, Oviedo, and Altamonte Springs onto the existing DOH parcels (1001 zoning, 991 future land use). Casselberry joins on PARCEL and Winter Springs on PIN, then a point inside the parcel. The other four cities are spatial. Oviedo uses maps.cityofoviedo.net DevelopmentServices MapServer 11 and 10. The retired AGOL DSZoning service is not called.",
+        "Longwood stays blank. County Land_Use FeatureServer 0 and 1 are not stamped, and CITY or SEMINOLE COUNTY placeholders are not stored.",
+        "Unincorporated situs labels and Winter Park, Apopka, and Maitland stay blank.",
         "OZ 2.0 here is the seven-market rural-eligible tract pack only, not every eligible tract in the county.",
         "Median household income and FDOT AADT are joined at query time for Florida counties, not stored on each tile."
       ],

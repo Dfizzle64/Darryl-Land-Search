@@ -105,6 +105,7 @@ type AppShellProps = {
   ruralTracts: RuralMarketTractCollection;
   urbanCatalog: EligibleMarketsCatalog;
   otherCatalog: EligibleMarketsCatalog;
+  eligibleOverview: GeoJSON.FeatureCollection;
   eligibleTracts: EligiblePackTractCollection;
   mfPriority: ScMfPriorityCatalog;
   zoningConfig: ZoningConfig;
@@ -129,6 +130,7 @@ export function AppShell({
   ruralTracts,
   urbanCatalog,
   otherCatalog,
+  eligibleOverview,
   eligibleTracts,
   mfPriority,
   zoningConfig,
@@ -430,6 +432,7 @@ export function AppShell({
   const showExcludedRef = useRef(showExcluded);
   showExcludedRef.current = showExcluded;
   const lastViewport = useRef<{ bbox: [number, number, number, number]; zoom: number } | null>(null);
+  const parcelsClearedForZoom = useRef(false);
   const loadViewportRef = useRef<(bbox: [number, number, number, number], zoom: number) => Promise<void>>(
     async () => {},
   );
@@ -441,11 +444,14 @@ export function AppShell({
     // keep querying even if outlines are hidden so the ranked list still filters.
     if (!shouldQueryParcelsForZoom(preferenceRef.current, zoom)) {
       viewportRequest.current += 1;
+      if (parcelsClearedForZoom.current) return;
+      parcelsClearedForZoom.current = true;
       setViewportParcels(EMPTY_PARCELS);
       setViewportStats(null);
       setParcelsLoading(false);
       return;
     }
+    parcelsClearedForZoom.current = false;
     // Live DOH fill is only for the thinner sample counties, and only once the
     // view is tighter than the neighborhood gate. The complete counties already
     // ship every parcel from 5 through 150 acres.
@@ -896,6 +902,7 @@ export function AppShell({
             opportunityZones={opportunityZones}
             oz2Tracts={oz2Tracts}
             ruralTracts={ruralTracts}
+            eligibleOverview={eligibleOverview}
             eligibleTracts={eligibleTracts}
             ruralPins={ruralPins}
             selectedId={selectedId}

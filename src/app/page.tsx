@@ -3,6 +3,7 @@ import { loadMarketParcelIndex } from "@/lib/data/marketParcelStore";
 import { loadOrlandoParcelsMeta } from "@/lib/data/orlandoParcelStore";
 import type { ParcelCollection } from "@/lib/types";
 import {
+  loadEligibleOverview,
   loadEligiblePackTracts,
   loadFixtureMeta,
   loadFluConfig,
@@ -31,6 +32,7 @@ export default async function HomePage() {
     ruralTracts,
     urbanCatalog,
     otherCatalog,
+    eligibleOverview,
     eligibleTracts,
     mfPriority,
     zoningConfig,
@@ -46,6 +48,7 @@ export default async function HomePage() {
     loadRuralMarketTracts(),
     loadUrbanMarketsCatalog(),
     loadOtherMarketsCatalog(),
+    loadEligibleOverview(),
     loadEligiblePackTracts(),
     loadScMfPriority(),
     loadZoningConfig(),
@@ -71,6 +74,7 @@ export default async function HomePage() {
       ruralTracts={ruralTracts}
       urbanCatalog={urbanCatalog}
       otherCatalog={otherCatalog}
+      eligibleOverview={eligibleOverview}
       eligibleTracts={eligibleTracts}
       mfPriority={mfPriority}
       zoningConfig={zoningConfig}

@@ -1,378 +1,235 @@
-import { showOzTractInScMarkets } from "./scNominatedTracts";
-import { formatTractCounty } from "./tractCounty";
+import { scNominatedOverlayFilter, showOzTractInScMarkets } from "./scNominatedTracts";
 
 /**
- * County-scale gate for 2020 census tract outlines.
- * Below this, a typical screen covers more than a few counties and the
- * boundary layer would turn into a national mesh.
+ * Eligible tracts draw from a Southeast-wide view. Below this zoom the overlay
+ * stays off so a continental pan does not paint the whole country.
  */
-export const TRACT_MIN_ZOOM = 8;
+export const TRACT_MIN_ZOOM = 4;
 
-/** Each TIGERweb request stays inside this span so a pan does not pull a state. */
+/**
+ * Zooms 4–7 use the precomputed dissolved overlay. At this zoom the map
+ * switches to per-tract geometry.
+ */
+export const TRACT_DETAIL_MIN_ZOOM = 8;
+
+/** Wait until the camera rests before merging another viewport of tract tiles. */
+export const TRACT_VIEWPORT_DEBOUNCE_MS = 350;
+
+/**
+ * Stable degree grid for the detail cache. Keys are independent of zoom so a
+ * tile loaded at tract scale is not fetched again after a small zoom change.
+ */
 export const TRACT_TILE_DEGREES = 2;
-
-/** Cap parallel tiles. The center of the view is kept when the screen is wider. */
-export const TRACT_MAX_TILES = 12;
-
-export const CENSUS_TRACT_LINE_LAYER = "census-tract-line";
-
-export const CENSUS_TRACTS_SOURCE =
-  "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2020/MapServer/6/query";
-
-const STATE_NAME_BY_FIPS: Record<string, string> = {
-  "01": "Alabama",
-  "02": "Alaska",
-  "04": "Arizona",
-  "05": "Arkansas",
-  "06": "California",
-  "08": "Colorado",
-  "09": "Connecticut",
-  "10": "Delaware",
-  "11": "District of Columbia",
-  "12": "Florida",
-  "13": "Georgia",
-  "15": "Hawaii",
-  "16": "Idaho",
-  "17": "Illinois",
-  "18": "Indiana",
-  "19": "Iowa",
-  "20": "Kansas",
-  "21": "Kentucky",
-  "22": "Louisiana",
-  "23": "Maine",
-  "24": "Maryland",
-  "25": "Massachusetts",
-  "26": "Michigan",
-  "27": "Minnesota",
-  "28": "Mississippi",
-  "29": "Missouri",
-  "30": "Montana",
-  "31": "Nebraska",
-  "32": "Nevada",
-  "33": "New Hampshire",
-  "34": "New Jersey",
-  "35": "New Mexico",
-  "36": "New York",
-  "37": "North Carolina",
-  "38": "North Dakota",
-  "39": "Ohio",
-  "40": "Oklahoma",
-  "41": "Oregon",
-  "42": "Pennsylvania",
-  "44": "Rhode Island",
-  "45": "South Carolina",
-  "46": "South Dakota",
-  "47": "Tennessee",
-  "48": "Texas",
-  "49": "Utah",
-  "50": "Vermont",
-  "51": "Virginia",
-  "53": "Washington",
-  "54": "West Virginia",
-  "55": "Wisconsin",
-  "56": "Wyoming",
-  "72": "Puerto Rico",
-};
 
 export type TractBbox = [number, number, number, number];
 
-export type ViewportTractProperties = {
-  tractGeoid: string;
-  name: string | null;
-  stateName: string | null;
-  county: string | null;
-  state: string | null;
-  /** Present only when this GEOID is in an OZ 2.0 fixture. Never defaulted. */
-  rural?: boolean;
-  eligible?: boolean;
-  /** Present only when this GEOID is in the designated QOZ extract. */
-  designatedQoz?: boolean;
-  /** Present only when ACS B19013 has a positive median for this GEOID. */
-  medianHouseholdIncome?: number;
+export type TractProps = {
+  tractGeoid?: string;
+  state?: string | null;
+  county?: string | null;
+  rural?: boolean | null;
 };
 
-export type ViewportTractFeature = GeoJSON.Feature<
-  GeoJSON.Polygon | GeoJSON.MultiPolygon,
-  ViewportTractProperties
->;
+export type IndexedTractFeature = GeoJSON.Feature<GeoJSON.Geometry, TractProps>;
 
-/** Joined from fixtures already on the map. Absence means we do not know. */
-export type KnownTractAttributes = {
-  county: string | null;
-  state: string | null;
-  rural: boolean | null;
-  eligible: boolean;
-  designated: boolean;
-  medianHouseholdIncome?: number;
+export type TractDetailBucket = {
+  rural: IndexedTractFeature[];
+  eligible: IndexedTractFeature[];
+  oz2: IndexedTractFeature[];
 };
+
+export type EligibleTractTileCache = {
+  signature: string;
+  tiles: Map<string, TractDetailBucket>;
+  loaded: Set<string>;
+  rural: Map<string, IndexedTractFeature>;
+  eligible: Map<string, IndexedTractFeature>;
+  oz2: Map<string, IndexedTractFeature>;
+};
+
+export type TractClassCut = "all" | "rural" | "urban" | "none";
 
 export function tractsVisibleAtZoom(zoom: number): boolean {
   return Number.isFinite(zoom) && zoom >= TRACT_MIN_ZOOM;
 }
 
-export function stateNameFromFips(fips: string | null | undefined): string | null {
-  if (!fips) return null;
-  const key = String(fips).padStart(2, "0").slice(-2);
-  return STATE_NAME_BY_FIPS[key] ?? null;
+export function detailTractsVisibleAtZoom(zoom: number): boolean {
+  return Number.isFinite(zoom) && zoom >= TRACT_DETAIL_MIN_ZOOM;
 }
 
-export function normalizeTractGeoid(value: unknown): string | null {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return String(Math.trunc(value)).padStart(11, "0");
-  }
-  if (typeof value !== "string") return null;
-  const digits = value.replace(/\D/g, "");
-  if (!digits) return null;
-  if (digits.length > 11) return digits.slice(0, 11);
-  return digits.padStart(11, "0");
+/** Inclusive of zoom 4, exclusive of the detail zoom. */
+export function overviewTractsVisibleAtZoom(zoom: number): boolean {
+  return tractsVisibleAtZoom(zoom) && zoom < TRACT_DETAIL_MIN_ZOOM;
 }
 
-export function generalizationBand(zoom: number): "far" | "mid" | "near" {
-  if (zoom < 10) return "far";
-  if (zoom < 12) return "mid";
-  return "near";
+/**
+ * A tract is drawn only when a fixture already marked it eligible (rural true
+ * or false). Missing eligibility is left off the map. South Carolina keeps the
+ * governor-nominated list only.
+ */
+export function isDrawnEligibleTract(properties: TractProps | null | undefined): boolean {
+  if (!properties?.tractGeoid) return false;
+  if (properties.rural !== true && properties.rural !== false) return false;
+  return showOzTractInScMarkets({ state: properties.state, geoid: properties.tractGeoid });
 }
 
-/** Degrees of generalization for TIGERweb `maxAllowableOffset`. Coarser when zoomed out. */
-export function maxAllowableOffset(zoom: number): number {
-  const band = generalizationBand(zoom);
-  if (band === "far") return 0.012;
-  if (band === "mid") return 0.004;
-  return 0.0015;
+export function geometryBbox(geometry: GeoJSON.Geometry | null | undefined): TractBbox | null {
+  let west = Infinity;
+  let south = Infinity;
+  let east = -Infinity;
+  let north = -Infinity;
+  let found = false;
+  const walk = (coords: unknown) => {
+    if (!Array.isArray(coords)) return;
+    if (coords.length >= 2 && typeof coords[0] === "number" && typeof coords[1] === "number") {
+      found = true;
+      const lng = coords[0];
+      const lat = coords[1];
+      if (lng < west) west = lng;
+      if (lng > east) east = lng;
+      if (lat < south) south = lat;
+      if (lat > north) north = lat;
+      return;
+    }
+    for (const child of coords) walk(child);
+  };
+  if (geometry && "coordinates" in geometry) walk(geometry.coordinates);
+  if (!found) return null;
+  return [west, south, east, north];
 }
 
-export function tractTilesForBbox(bbox: TractBbox): TractBbox[] {
+/** Absolute grid keys for a bbox. The same area always returns the same keys. */
+export function tractGridKeysForBbox(bbox: TractBbox, tileDegrees = TRACT_TILE_DEGREES): string[] {
   const [west, south, east, north] = bbox;
   if (![west, south, east, north].every((value) => Number.isFinite(value))) return [];
-  if (east <= west || north <= south) return [];
-  const width = east - west;
-  const height = north - south;
-  const cols = Math.max(1, Math.ceil(width / TRACT_TILE_DEGREES));
-  const rows = Math.max(1, Math.ceil(height / TRACT_TILE_DEGREES));
-  const colSize = width / cols;
-  const rowSize = height / rows;
-  const tiles: TractBbox[] = [];
-  for (let col = 0; col < cols; col += 1) {
-    for (let row = 0; row < rows; row += 1) {
-      tiles.push([
-        west + col * colSize,
-        south + row * rowSize,
-        col === cols - 1 ? east : west + (col + 1) * colSize,
-        row === rows - 1 ? north : south + (row + 1) * rowSize,
-      ]);
+  if (east < west || north < south) return [];
+  const x0 = Math.floor(west / tileDegrees);
+  const x1 = Math.floor(Math.max(west, east - 1e-9) / tileDegrees);
+  const y0 = Math.floor(south / tileDegrees);
+  const y1 = Math.floor(Math.max(south, north - 1e-9) / tileDegrees);
+  const keys: string[] = [];
+  for (let x = x0; x <= x1; x += 1) {
+    for (let y = y0; y <= y1; y += 1) {
+      keys.push(`${x}:${y}`);
     }
   }
-  if (tiles.length <= TRACT_MAX_TILES) return tiles;
-  const centerX = (west + east) / 2;
-  const centerY = (south + north) / 2;
-  const distance = (tile: TractBbox) => {
-    const x = (tile[0] + tile[2]) / 2 - centerX;
-    const y = (tile[1] + tile[3]) / 2 - centerY;
-    return x * x + y * y;
+  return keys;
+}
+
+function emptyBucket(): TractDetailBucket {
+  return { rural: [], eligible: [], oz2: [] };
+}
+
+function indexBuckets(groups: TractDetailBucket): Map<string, TractDetailBucket> {
+  const tiles = new Map<string, TractDetailBucket>();
+  const add = (kind: keyof TractDetailBucket, feature: IndexedTractFeature) => {
+    if (!isDrawnEligibleTract(feature.properties)) return;
+    const bbox = geometryBbox(feature.geometry);
+    if (!bbox) return;
+    for (const key of tractGridKeysForBbox(bbox)) {
+      let bucket = tiles.get(key);
+      if (!bucket) {
+        bucket = emptyBucket();
+        tiles.set(key, bucket);
+      }
+      bucket[kind].push(feature);
+    }
   };
-  return tiles.sort((a, b) => distance(a) - distance(b)).slice(0, TRACT_MAX_TILES);
+  for (const feature of groups.rural) add("rural", feature);
+  for (const feature of groups.eligible) add("eligible", feature);
+  for (const feature of groups.oz2) add("oz2", feature);
+  return tiles;
 }
 
-export function buildTigerQuery(bbox: TractBbox, zoom: number): string {
-  const [west, south, east, north] = bbox;
-  const url = new URL(CENSUS_TRACTS_SOURCE);
-  url.searchParams.set("where", "1=1");
-  url.searchParams.set("geometry", `${west},${south},${east},${north}`);
-  url.searchParams.set("geometryType", "esriGeometryEnvelope");
-  url.searchParams.set("inSR", "4326");
-  url.searchParams.set("spatialRel", "esriSpatialRelIntersects");
-  url.searchParams.set("outFields", "GEOID,NAME,STATE,COUNTY,BASENAME");
-  url.searchParams.set("returnGeometry", "true");
-  url.searchParams.set("outSR", "4326");
-  url.searchParams.set("f", "geojson");
-  url.searchParams.set("maxAllowableOffset", String(maxAllowableOffset(zoom)));
-  return url.toString();
-}
-
-function isPolygonGeometry(
-  geometry: GeoJSON.Geometry | null | undefined,
-): geometry is GeoJSON.Polygon | GeoJSON.MultiPolygon {
-  return geometry?.type === "Polygon" || geometry?.type === "MultiPolygon";
-}
-
-export function normalizeTigerFeature(feature: GeoJSON.Feature): ViewportTractFeature | null {
-  if (!isPolygonGeometry(feature.geometry)) return null;
-  const props = (feature.properties ?? {}) as Record<string, unknown>;
-  const tractGeoid = normalizeTractGeoid(props.GEOID ?? props.geoid ?? props.tractGeoid);
-  if (!tractGeoid) return null;
-  const stateFips = typeof props.STATE === "string" || typeof props.STATE === "number" ? String(props.STATE) : null;
-  const name =
-    typeof props.NAME === "string" && props.NAME.trim()
-      ? props.NAME.trim()
-      : typeof props.BASENAME === "string" && props.BASENAME.trim()
-        ? `Census Tract ${props.BASENAME.trim()}`
-        : null;
+export function createEligibleTractTileCache(): EligibleTractTileCache {
   return {
-    type: "Feature",
-    geometry: feature.geometry,
-    properties: {
-      tractGeoid,
-      name,
-      stateName: stateNameFromFips(stateFips),
-      county: null,
-      state: stateNameFromFips(stateFips),
-    },
+    signature: "",
+    tiles: new Map(),
+    loaded: new Set(),
+    rural: new Map(),
+    eligible: new Map(),
+    oz2: new Map(),
   };
-}
-
-export function parseTigerCollection(body: unknown): ViewportTractFeature[] {
-  if (!body || typeof body !== "object") return [];
-  const features = (body as { features?: unknown }).features;
-  if (!Array.isArray(features)) return [];
-  const parsed: ViewportTractFeature[] = [];
-  for (const feature of features) {
-    if (!feature || typeof feature !== "object") continue;
-    const next = normalizeTigerFeature(feature as GeoJSON.Feature);
-    if (next) parsed.push(next);
-  }
-  return parsed;
 }
 
 /**
- * Copy a positive ACS B19013 median onto a tract. GEOIDs missing from the
- * table are left untouched — no zero, no null placeholder.
+ * Build the grid once per fixture signature. Repeat calls with the same
+ * signature keep tiles that were already merged into the map sources.
  */
-export function stampKnownIncome<T extends { properties: { tractGeoid?: string; medianHouseholdIncome?: number } }>(
-  features: T[],
-  income: ReadonlyMap<string, number>,
-): T[] {
-  for (const feature of features) {
-    const geoid = feature.properties.tractGeoid;
-    if (!geoid) continue;
-    const value = income.get(geoid);
-    if (value == null || !Number.isFinite(value) || value <= 0) continue;
-    feature.properties.medianHouseholdIncome = value;
-  }
-  return features;
-}
-
-type IndexableFeature = {
-  properties: {
-    tractGeoid?: string;
-    county?: string | null;
-    state?: string | null;
-    rural?: boolean | null;
-    medianHouseholdIncome?: number | null;
-  };
-};
-
-export function buildTractAttributeIndex(collections: {
-  eligible?: { features: IndexableFeature[] };
-  rural?: { features: IndexableFeature[] };
-  oz2?: { features: IndexableFeature[] };
-  designated?: { features: IndexableFeature[] };
-}): Map<string, KnownTractAttributes> {
-  const index = new Map<string, KnownTractAttributes>();
-  const addEligible = (feature: IndexableFeature) => {
-    const geoid = feature.properties.tractGeoid;
-    if (!geoid) return;
-    const current = index.get(geoid) ?? {
-      county: null,
-      state: null,
-      rural: null,
-      eligible: false,
-      designated: false,
-    };
-    current.eligible = true;
-    if (feature.properties.county) current.county = feature.properties.county;
-    if (feature.properties.state) current.state = feature.properties.state;
-    if (feature.properties.rural === true || feature.properties.rural === false) {
-      current.rural = feature.properties.rural;
-    }
-    const income = feature.properties.medianHouseholdIncome;
-    if (typeof income === "number" && Number.isFinite(income) && income > 0) {
-      current.medianHouseholdIncome = income;
-    }
-    index.set(geoid, current);
-  };
-  for (const feature of collections.eligible?.features ?? []) addEligible(feature);
-  for (const feature of collections.rural?.features ?? []) addEligible(feature);
-  for (const feature of collections.oz2?.features ?? []) addEligible(feature);
-  for (const feature of collections.designated?.features ?? []) {
-    const geoid = feature.properties.tractGeoid;
-    if (!geoid) continue;
-    const current = index.get(geoid) ?? {
-      county: null,
-      state: null,
-      rural: null,
-      eligible: false,
-      designated: false,
-    };
-    current.designated = true;
-    if (feature.properties.county) current.county = feature.properties.county;
-    if (feature.properties.state) current.state = feature.properties.state;
-    index.set(geoid, current);
-  }
-  return index;
+export function syncEligibleTractTileCache(
+  cache: EligibleTractTileCache,
+  groups: TractDetailBucket,
+  signature: string,
+): void {
+  if (cache.signature === signature) return;
+  cache.signature = signature;
+  cache.tiles = indexBuckets(groups);
+  cache.loaded.clear();
+  cache.rural.clear();
+  cache.eligible.clear();
+  cache.oz2.clear();
 }
 
 /**
- * Attach fixture attributes onto a viewport tract. South Carolina tracts that
- * are not on the governor list stay outline-only. Income is copied only when
- * a positive median is already known.
+ * Merge grid cells that are not already loaded. Loaded keys are skipped, so a
+ * pan back across the same ground does not rebuild those tiles.
  */
-export function annotateViewportTract(
-  feature: ViewportTractFeature,
-  index: ReadonlyMap<string, KnownTractAttributes>,
-): ViewportTractFeature {
-  const hit = index.get(feature.properties.tractGeoid);
-  const next: ViewportTractProperties = {
-    tractGeoid: feature.properties.tractGeoid,
-    name: feature.properties.name,
-    stateName: feature.properties.stateName,
-    county: feature.properties.county,
-    state: feature.properties.state,
-  };
-  if (typeof feature.properties.medianHouseholdIncome === "number" && feature.properties.medianHouseholdIncome > 0) {
-    next.medianHouseholdIncome = feature.properties.medianHouseholdIncome;
-  }
-  if (!hit) return { ...feature, properties: next };
-
-  if (hit.county) next.county = hit.county;
-  if (hit.state) next.state = hit.state;
-  if (hit.medianHouseholdIncome != null && next.medianHouseholdIncome == null) {
-    next.medianHouseholdIncome = hit.medianHouseholdIncome;
-  }
-  const eligible =
-    hit.eligible &&
-    showOzTractInScMarkets({
-      state: hit.state ?? next.state,
-      geoid: feature.properties.tractGeoid,
-    });
-  if (eligible) {
-    next.eligible = true;
-    if (hit.rural === true || hit.rural === false) next.rural = hit.rural;
-  }
-  if (hit.designated) next.designatedQoz = true;
-  return { ...feature, properties: next };
-}
-
-export function annotateViewportTracts(
-  features: ViewportTractFeature[],
-  index: ReadonlyMap<string, KnownTractAttributes>,
-): ViewportTractFeature[] {
-  return features.map((feature) => annotateViewportTract(feature, index));
-}
-
-export function mergeTractFeatures(groups: ViewportTractFeature[][]): ViewportTractFeature[] {
-  const byGeoid = new Map<string, ViewportTractFeature>();
-  for (const group of groups) {
-    for (const feature of group) {
-      byGeoid.set(feature.properties.tractGeoid, feature);
+export function absorbEligibleTractTiles(
+  cache: EligibleTractTileCache,
+  keys: string[],
+): { rural: boolean; eligible: boolean; oz2: boolean } {
+  const changed = { rural: false, eligible: false, oz2: false };
+  for (const key of keys) {
+    if (cache.loaded.has(key)) continue;
+    cache.loaded.add(key);
+    const bucket = cache.tiles.get(key);
+    if (!bucket) continue;
+    for (const kind of ["rural", "eligible", "oz2"] as const) {
+      const stored = cache[kind];
+      for (const feature of bucket[kind]) {
+        const id = feature.properties?.tractGeoid;
+        if (!id || stored.has(id)) continue;
+        stored.set(id, feature);
+        changed[kind] = true;
+      }
     }
   }
-  return [...byGeoid.values()];
+  return changed;
 }
 
-export function viewportTractPlace(properties: ViewportTractProperties): string {
-  if (properties.county || properties.state) return formatTractCounty(properties.county, properties.state);
-  if (properties.stateName && properties.name) return `${properties.name}, ${properties.stateName}`;
-  if (properties.stateName) return properties.stateName;
-  if (properties.name) return properties.name;
-  return "2020 census tract";
+/**
+ * Detail-layer filter. No market clause: every eligible tract in the viewport
+ * stays on the map. The header market only moves the camera.
+ */
+export function eligibleTractOverlayFilter(options: {
+  hideOrangeCounty?: boolean;
+  geoids?: string[] | null;
+  classCut?: TractClassCut;
+} = {}): unknown[] {
+  const classCut = options.classCut ?? "all";
+  const parts: unknown[] = [];
+  if (options.hideOrangeCounty) {
+    parts.push(["!", ["all", ["==", ["get", "state"], "Florida"], ["==", ["get", "county"], "Orange"]]]);
+  }
+  if (classCut === "none") parts.push(["==", ["get", "tractGeoid"], "__none__"]);
+  if (classCut === "urban") parts.push(["==", ["get", "rural"], false]);
+  if (classCut === "rural") parts.push(["==", ["get", "rural"], true]);
+  if (options.geoids) {
+    parts.push(
+      options.geoids.length === 0
+        ? ["==", ["get", "tractGeoid"], "__none__"]
+        : ["in", ["get", "tractGeoid"], ["literal", options.geoids]],
+    );
+  }
+  parts.push(scNominatedOverlayFilter());
+  if (parts.length === 1) return parts[0] as unknown[];
+  return ["all", ...parts];
+}
+
+/** Far-zoom filter. Dissolved features have rural/urban, not a tract GEOID list. */
+export function eligibleOverviewFilter(classCut: TractClassCut): unknown[] | null {
+  if (classCut === "none") return ["==", ["get", "eligible"], "__hide__"];
+  if (classCut === "rural") return ["==", ["get", "rural"], true];
+  if (classCut === "urban") return ["==", ["get", "rural"], false];
+  return null;
 }

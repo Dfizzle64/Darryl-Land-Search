@@ -1,170 +1,159 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
-  annotateViewportTract,
-  buildTigerQuery,
-  buildTractAttributeIndex,
-  CENSUS_TRACTS_SOURCE,
-  maxAllowableOffset,
-  mergeTractFeatures,
-  normalizeTigerFeature,
-  parseTigerCollection,
-  stampKnownIncome,
-  stateNameFromFips,
+  absorbEligibleTractTiles,
+  createEligibleTractTileCache,
+  detailTractsVisibleAtZoom,
+  eligibleOverviewFilter,
+  eligibleTractOverlayFilter,
+  isDrawnEligibleTract,
+  overviewTractsVisibleAtZoom,
+  syncEligibleTractTileCache,
+  TRACT_DETAIL_MIN_ZOOM,
   TRACT_MIN_ZOOM,
   TRACT_TILE_DEGREES,
-  tractTilesForBbox,
+  TRACT_VIEWPORT_DEBOUNCE_MS,
+  tractGridKeysForBbox,
   tractsVisibleAtZoom,
-  viewportTractPlace,
-  type ViewportTractFeature,
+  type IndexedTractFeature,
 } from "../lib/censusTracts";
 
-function polygon(geoid: string, income?: number): ViewportTractFeature {
+function tract(geoid: string, rural: boolean | null, state: string, lng = -81.4, lat = 28.5): IndexedTractFeature {
   return {
     type: "Feature",
     geometry: {
       type: "Polygon",
       coordinates: [
         [
-          [0, 0],
-          [1, 0],
-          [1, 1],
-          [0, 0],
+          [lng, lat],
+          [lng + 0.2, lat],
+          [lng + 0.2, lat + 0.2],
+          [lng, lat],
         ],
       ],
     },
     properties: {
       tractGeoid: geoid,
-      name: "Census Tract 1",
-      stateName: "Florida",
-      county: null,
-      state: "Florida",
-      ...(income ? { medianHouseholdIncome: income } : {}),
+      state,
+      rural,
     },
   };
 }
 
-describe("census tract viewport", () => {
-  it("starts tract outlines at county scale and not at a national zoom", () => {
-    expect(TRACT_MIN_ZOOM).toBe(8);
-    expect(tractsVisibleAtZoom(7.9)).toBe(false);
-    expect(tractsVisibleAtZoom(8)).toBe(true);
-    expect(tractTilesForBbox([-125, 24, -67, 49])).toHaveLength(12);
-    const orlando = tractTilesForBbox([-81.6, 28.2, -81.1, 28.7]);
-    expect(orlando).toHaveLength(1);
-    expect(orlando[0][2] - orlando[0][0]).toBeLessThanOrEqual(TRACT_TILE_DEGREES + 0.001);
+describe("eligible tract overlay", () => {
+  it("shows eligible tracts from a Southeast view and detail geometry from zoom 8", () => {
+    expect(TRACT_MIN_ZOOM).toBe(4);
+    expect(TRACT_DETAIL_MIN_ZOOM).toBe(8);
+    expect(TRACT_VIEWPORT_DEBOUNCE_MS).toBeGreaterThanOrEqual(250);
+    expect(TRACT_VIEWPORT_DEBOUNCE_MS).toBeLessThanOrEqual(400);
+    expect(tractsVisibleAtZoom(3.9)).toBe(false);
+    expect(tractsVisibleAtZoom(4)).toBe(true);
+    expect(overviewTractsVisibleAtZoom(4)).toBe(true);
+    expect(overviewTractsVisibleAtZoom(7.9)).toBe(true);
+    expect(overviewTractsVisibleAtZoom(8)).toBe(false);
+    expect(detailTractsVisibleAtZoom(7.9)).toBe(false);
+    expect(detailTractsVisibleAtZoom(8)).toBe(true);
   });
 
-  it("queries the Census 2020 tract layer by bounding box", () => {
-    const url = buildTigerQuery([-81.5, 28.4, -81.2, 28.6], 9);
-    expect(url.startsWith(CENSUS_TRACTS_SOURCE)).toBe(true);
-    expect(url).toContain("MapServer/6/query");
-    expect(url).toContain("geometry=-81.5%2C28.4%2C-81.2%2C28.6");
-    expect(url).toContain(`maxAllowableOffset=${maxAllowableOffset(9)}`);
-    expect(url).not.toContain("B19013");
-    expect(maxAllowableOffset(8)).toBeGreaterThan(maxAllowableOffset(13));
+  it("keys detail tiles on a stable grid and does not refetch a loaded tile", () => {
+    const bbox: [number, number, number, number] = [-82.2, 28.1, -81.1, 28.9];
+    const keys = tractGridKeysForBbox(bbox);
+    expect(keys).toEqual(tractGridKeysForBbox(bbox));
+    expect(keys.every((key) => /^\-?\d+:\-?\d+$/.test(key))).toBe(true);
+    expect(keys.join("|")).not.toMatch(/zoom|far|mid|near/);
+    expect(tractGridKeysForBbox([-81.2, 28.2, -81.05, 28.4])).toEqual(["-41:14"]);
+    expect(TRACT_TILE_DEGREES).toBe(2);
+
+    const cache = createEligibleTractTileCache();
+    const groups = {
+      rural: [tract("12095016605", true, "Florida")],
+      eligible: [tract("13051000100", false, "Georgia", -84.4, 33.7)],
+      oz2: [tract("12095015204", false, "Florida", -81.3, 28.6)],
+    };
+    syncEligibleTractTileCache(cache, groups, "sig");
+    syncEligibleTractTileCache(cache, groups, "sig");
+    const first = absorbEligibleTractTiles(cache, keys);
+    expect(first.rural || first.oz2).toBe(true);
+    const loaded = cache.loaded.size;
+    const again = absorbEligibleTractTiles(cache, keys);
+    expect(again).toEqual({ rural: false, eligible: false, oz2: false });
+    expect(cache.loaded.size).toBe(loaded);
+    expect(cache.rural.size).toBe(1);
+    expect([...cache.eligible.keys()]).toEqual([]);
   });
 
-  it("normalizes a TIGER feature and leaves unknown tracts as outlines", () => {
-    const feature = normalizeTigerFeature({
-      type: "Feature",
-      geometry: {
-        type: "Polygon",
-        coordinates: [
-          [
-            [0, 0],
-            [1, 0],
-            [1, 1],
-            [0, 0],
-          ],
-        ],
-      },
-      properties: { GEOID: "12095015204", NAME: "Census Tract 152.04", STATE: "12", COUNTY: "095" },
-    });
-    expect(feature?.properties.tractGeoid).toBe("12095015204");
-    expect(feature?.properties.state).toBe("Florida");
-    expect(feature?.properties.rural).toBeUndefined();
-    expect(feature?.properties.eligible).toBeUndefined();
-    expect(feature?.properties.medianHouseholdIncome).toBeUndefined();
-    expect(feature?.properties.designatedQoz).toBeUndefined();
-    expect(stateNameFromFips("47")).toBe("Tennessee");
-    expect(parseTigerCollection({ features: [] })).toEqual([]);
-  });
+  it("does not draw a tract that has no eligibility flag or a non-nominated South Carolina tract", () => {
+    expect(isDrawnEligibleTract({ tractGeoid: "12095016605", state: "Florida", rural: true })).toBe(true);
+    expect(isDrawnEligibleTract({ tractGeoid: "12095016605", state: "Florida", rural: null })).toBe(false);
+    expect(isDrawnEligibleTract({ tractGeoid: "12095016605", state: "Florida" })).toBe(false);
+    expect(isDrawnEligibleTract({ state: "Florida", rural: true })).toBe(false);
+    expect(isDrawnEligibleTract({ tractGeoid: "45019000100", state: "South Carolina", rural: false })).toBe(false);
 
-  it("joins ACS income and OZ attributes only when the GEOID is already known", () => {
-    const income = new Map<string, number>([["12095016605", 61234]]);
-    const [stamped] = stampKnownIncome([polygon("12095016605"), polygon("12095019999")], income);
-    expect(stamped.properties.medianHouseholdIncome).toBe(61234);
-    const unknown = stampKnownIncome([polygon("12095019999")], income)[0];
-    expect(unknown.properties.medianHouseholdIncome).toBeUndefined();
-    expect(stampKnownIncome([polygon("12095016605")], new Map([["12095016605", 0]]))[0].properties.medianHouseholdIncome).toBe(
-      undefined,
-    );
-
-    const index = buildTractAttributeIndex({
-      rural: {
-        features: [
-          {
-            properties: {
-              tractGeoid: "12095016605",
-              county: "Orange",
-              state: "Florida",
-              rural: true,
-              medianHouseholdIncome: 61234,
-            },
-          },
-        ],
-      },
-      designated: {
-        features: [{ properties: { tractGeoid: "12095017600", county: "Orange", state: "Florida", rural: false } }],
-      },
-    });
-    const joined = annotateViewportTract(polygon("12095016605"), index);
-    expect(joined.properties.eligible).toBe(true);
-    expect(joined.properties.rural).toBe(true);
-    expect(joined.properties.county).toBe("Orange");
-    expect(joined.properties.medianHouseholdIncome).toBe(61234);
-    expect(viewportTractPlace(joined.properties)).toBe("Orange County, Florida");
-
-    const outline = annotateViewportTract(polygon("06037000100"), index);
-    expect(outline.properties.eligible).toBeUndefined();
-    expect(outline.properties.rural).toBeUndefined();
-    expect(outline.properties.medianHouseholdIncome).toBeUndefined();
-    expect(outline.properties.designatedQoz).toBeUndefined();
-
-    const designated = annotateViewportTract(polygon("12095017600"), index);
-    expect(designated.properties.designatedQoz).toBe(true);
-    expect(designated.properties.eligible).toBeUndefined();
-  });
-
-  it("does not paint a non-nominated South Carolina tract as eligible", () => {
-    const index = buildTractAttributeIndex({
-      eligible: {
-        features: [
-          {
-            properties: {
-              tractGeoid: "45019000100",
-              county: "Charleston",
-              state: "South Carolina",
-              rural: false,
-            },
-          },
-        ],
-      },
-    });
-    const feature = annotateViewportTract(
+    const cache = createEligibleTractTileCache();
+    syncEligibleTractTileCache(
+      cache,
       {
-        ...polygon("45019000100"),
-        properties: { ...polygon("45019000100").properties, state: "South Carolina", stateName: "South Carolina" },
+        rural: [],
+        eligible: [
+          tract("45019000100", false, "South Carolina", -79.9, 32.8),
+          tract("37119000100", false, "North Carolina", -80.8, 35.2),
+        ],
+        oz2: [tract("12095010000", null, "Florida")],
       },
-      index,
+      "eligibility",
     );
-    expect(feature.properties.eligible).toBeUndefined();
-    expect(feature.properties.rural).toBeUndefined();
-    expect(feature.properties.county).toBe("Charleston");
+    absorbEligibleTractTiles(cache, tractGridKeysForBbox([-85, 24, -75, 37]));
+    expect([...cache.eligible.keys()]).toEqual(["37119000100"]);
+    expect(cache.oz2.size).toBe(0);
   });
 
-  it("keeps one geometry per GEOID when tiles overlap", () => {
-    const merged = mergeTractFeatures([[polygon("12095016605")], [polygon("12095016605"), polygon("12095010400")]]);
-    expect(merged.map((feature) => feature.properties.tractGeoid).sort()).toEqual(["12095010400", "12095016605"]);
+  it("filters rural and urban without a market clause", () => {
+    const both = JSON.stringify(eligibleTractOverlayFilter());
+    expect(both).not.toContain("markets");
+    expect(both).not.toContain("Orlando");
+    expect(both).toContain("South Carolina");
+    expect(JSON.stringify(eligibleTractOverlayFilter({ classCut: "rural" }))).toContain("true");
+    expect(JSON.stringify(eligibleTractOverlayFilter({ classCut: "urban" }))).toContain("false");
+    expect(JSON.stringify(eligibleTractOverlayFilter({ classCut: "none" }))).toContain("__none__");
+    expect(JSON.stringify(eligibleTractOverlayFilter({ hideOrangeCounty: true }))).toContain("Orange");
+    expect(eligibleOverviewFilter("all")).toBeNull();
+    expect(eligibleOverviewFilter("rural")).toEqual(["==", ["get", "rural"], true]);
+    expect(eligibleOverviewFilter("urban")).toEqual(["==", ["get", "rural"], false]);
+    expect(JSON.stringify(eligibleOverviewFilter("none"))).not.toContain("tractGeoid");
+  });
+
+  it("ships a small dissolved eligible-only layer for the far zoom", () => {
+    const file = path.join(process.cwd(), "data/fixtures/oz2-eligible-overview.geojson");
+    const raw = readFileSync(file, "utf8");
+    expect(raw.length).toBeLessThan(250_000);
+    const collection = JSON.parse(raw) as {
+      features: Array<{ properties: { state: string; rural: boolean; eligible: boolean; overview: boolean; tractCount: number }; geometry: GeoJSON.Geometry }>;
+    };
+    expect(collection.features.length).toBeGreaterThan(0);
+    expect(collection.features.length).toBeLessThanOrEqual(20);
+    let points = 0;
+    const states = new Set<string>();
+    for (const feature of collection.features) {
+      expect(feature.properties.eligible).toBe(true);
+      expect(feature.properties.overview).toBe(true);
+      expect(typeof feature.properties.rural).toBe("boolean");
+      expect(feature.properties.tractCount).toBeGreaterThan(0);
+      expect(feature.properties).not.toHaveProperty("tractGeoid");
+      states.add(feature.properties.state);
+      const walk = (coords: unknown) => {
+        if (!Array.isArray(coords)) return;
+        if (typeof coords[0] === "number") {
+          points += 1;
+          return;
+        }
+        for (const child of coords) walk(child);
+      };
+      walk((feature.geometry as { coordinates: unknown }).coordinates);
+    }
+    expect(points).toBeLessThan(12_000);
+    expect(states.has("Florida")).toBe(true);
+    expect(states.has("South Carolina")).toBe(true);
+    expect(states.has("Georgia")).toBe(true);
   });
 });

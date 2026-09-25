@@ -36,6 +36,7 @@ import { fluEmptyForManateeSarasota, zoningEmptyForManateeSarasota } from "@/lib
 import { brevardFluReason, formatJoinedZoning } from "@/lib/brevardMunicipal";
 import { fluEmptyForMunicipal, zoningEmptyForCounty } from "@/lib/volusiaFlaglerMunicipal";
 import { jurisdictionGisViewers } from "@/lib/jurisdictionLinks";
+import { fluEmptyForFlRest, saleEmptyForFlRest, zoningEmptyForFlRest } from "@/lib/flRestBatch1";
 import { fluEmptyForSouthFlorida, saleEmptyForSouthFlorida, zoningEmptyForSouthFlorida } from "@/lib/southFlorida";
 import { describeZoningMatch } from "@/lib/zoning";
 
@@ -113,7 +114,9 @@ export function ParcelDrawer({
   const aadtKnown = properties.nearestRoad?.aadt != null;
   const aadtEmpty = aadtEmptyMessage(properties.state);
   const dekalb = properties.countyFips === "13089";
-  const zoningEmpty = zoningEmptyForSouthFlorida(
+  const zoningEmpty = zoningEmptyForFlRest(
+    properties.countyFips,
+    zoningEmptyForSouthFlorida(
     properties.countyFips,
     zoningEmptyForPanhandle(
     properties.countyFips,
@@ -134,6 +137,7 @@ export function ParcelDrawer({
               ),
             ),
       ),
+    ),
     ),
     ),
   );
@@ -223,7 +227,9 @@ export function ParcelDrawer({
         <Field
           label="Future Land Use"
           value={fluLine}
-          empty={fluEmptyForSouthFlorida(
+          empty={fluEmptyForFlRest(
+            properties.countyFips,
+            fluEmptyForSouthFlorida(
             properties.countyFips,
             fluEmptyForPanhandle(
             properties.countyFips,
@@ -241,6 +247,7 @@ export function ParcelDrawer({
             properties.countyFips,
             properties.municipal?.fluGap ? fluEmptyForMunicipal(properties.municipal.fluGap) : null,
             dekalb ? "No future land use joined for this parcel" : "Not joined for this county",
+            ),
             ),
             ),
             ),
@@ -268,7 +275,7 @@ export function ParcelDrawer({
         <Field
           label="Last sale"
           value={formatSale(properties.lastSale)}
-          empty={saleEmptyForSouthFlorida(properties.countyFips) ?? missingPublicParcelValue("sale")}
+          empty={saleEmptyForFlRest(properties.countyFips) ?? saleEmptyForSouthFlorida(properties.countyFips) ?? missingPublicParcelValue("sale")}
         />
         <Field
           label="Qualified sale"

@@ -9,7 +9,7 @@ npm run seed:oz2-eligible
 npm run seed:parcels:north-central
 ```
 
-`seed:parcels:north-central` passes `--refresh` so Hernando and Citrus replace the earlier Florida DOH-only tiles. Those two counties stay on the Tampa list as well. The shared tile files are the upgraded extract. The Orlando sample is not rewritten. Marion parcels were added later by FL-rest batch 1. That pull did not add eligible tracts.
+`seed:parcels:north-central` passes `--refresh` so Hernando and Citrus replace the earlier Florida DOH-only tiles. Those two counties stay on the Tampa list as well. The shared tile files are the upgraded extract. Marion is not in this market and the Orlando sample is not rewritten.
 
 ## Eligible tracts
 
@@ -79,6 +79,6 @@ Gilchrist still appears in the county menu because the parcel extract exists, ev
 
 ## Not in this pull
 
-- The Orlando central sample was not rewritten by this North-Central pull. Marion's 5–150 acre parcels are the later FL-rest batch 1 extract on this same shelf, not a second market listing.
+- Marion. Same Orlando central sample as before. No Marion tiles were rewritten and Marion is not a second market listing.
 - Placeholder zoning (`CITY`, `MUNICIPAL`, `MUNI`, `CITY LIMITS`, `CITY LIMITS OF INV. OR C.R.`) is never stored.
 - City zoning codes are labels. They are not Orange County multifamily districts.

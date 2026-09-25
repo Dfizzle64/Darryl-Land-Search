@@ -5,26 +5,22 @@
   "markets": [
     "Big Bend"
   ],
-  "featureCount": 5933,
-  "coverage": "complete-gte-5ac",
+  "featureCount": 5917,
+  "coverage": "sample",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-gadsden-mil1-12039",
-  "queryUrl": "https://gis.arpc.org/server/rest/services/Florida_Statewide_Cadastral_MIL1/MapServer/0/query",
+  "source": "fl-gadsden-arpc-par-071218-12039",
+  "queryUrl": "https://services8.arcgis.com/N3lCn6dEKCL6LidU/arcgis/rest/services/Gadsden_FLUM2/FeatureServer/0/query",
   "gaps": [
-    "Gadsden parcels are ARPC MIL1 filtered to CNTYNAME='GADSDEN'. Acreage is ACRES, 5.0–150.0 inclusive. FDOR 2025 is preferred for the owner name. County-roll names that differ are flagged. Just value, DOR use, and roll-year sale fill from FDOR when the county layer is blank.",
-    "Unincorporated zoning is the December 2020 future-land-use category. County code treats that category as the land-use district. Quincy and Havana zoning polygons override it inside those cities. Chattahoochee, Greensboro, Gretna, and Midway zoning were not found.",
-    "The property appraiser link is a search page. The parcel id is not in the URL. City of Gadsden, Alabama was not used.",
-    "FDOR 2025 joined 5863/5933 parcel ids. County-number-only filters were not used.",
-    "FDOR owner replaced a conflicting county-roll name on 537 parcels.",
-    "gadsden-flum-as-zoning joined 5777/5933.",
-    "quincy-zoning joined 124/5933.",
-    "havana-zoning joined 36/5933."
+    "Partial. Parcels are Apalachee RPC Gadsden_FLUM2 layer Par_071218 (a 2018 roll), not a live county host. Deed acres are a zero-padded string. Rows stored as 0 are omitted instead of guessed from the polygon.",
+    "Quincy zoning is a PDF at https://www.myquincy.net/building-planning/page/maps, not a FeatureServer. Quincy FLUM categories are joined as future land use inside those polygons and are not zoning codes. Havana zoning districts are joined from the city zoning layer. Midway, Gretna, Chattahoochee, and Greensboro publish FLUM only and are not joined. The roll's situs city is a post office and is not the zoning jurisdiction. Eligible tracts in this county stay eligible and are not designated QOZs.",
+    "County FLUM categories are joined outside Quincy. Property appraiser search is https://gadsdenpa.com/.",
+    "Join counts: quincyFlu=108, havanaZoning=29, countyFlu=5683, county=5780"
   ],
   "path": "data/fixtures/market-parcels/counties/12039/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12039/lookup.json",
-  "sourceCount": 5933,
-  "dropped": 0,
+  "sourceCount": 5984,
+  "dropped": 10,
   "tileCount": 6
 }

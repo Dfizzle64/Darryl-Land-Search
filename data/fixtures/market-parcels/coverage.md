@@ -17,7 +17,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Vero Beach | other | 23,009 | 5 | 0 | 0 |
 | Melbourne | other | 41,026 | 5 | 0 | 0 |
 | Jacksonville | other | 26,301 | 5 | 0 | 0 |
-| Big Bend | other | 35,957 | 4 | 3 | 0 |
+| Big Bend | other | 21,551 | 1 | 3 | 3 |
 | Pensacola | other | 59,902 | 6 | 0 | 0 |
 | Birmingham | other | 38,101 | 3 | 0 | 6 |
 | Mobile | other | 42,446 | 3 | 0 | 2 |
@@ -32,7 +32,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Winston-Salem | other | 92,199 | 9 | 0 | 0 |
 | Wilmington | other | 47,320 | 6 | 0 | 0 |
 | Heartland | shelf | 21,163 | 4 | 1 | 0 |
-| North-Central Florida | other | 70,271 | 8 | 0 | 0 |
+| North-Central Florida | other | 52,695 | 7 | 0 | 0 |
 | Asheville | other | 16,793 | 2 | 0 | 0 |
 | Tuscaloosa | other | 11,596 | 1 | 0 | 3 |
 | Montgomery | other | 26,759 | 3 | 0 | 1 |
@@ -41,8 +41,6 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Athens | other | 2,039 | 1 | 0 | 0 |
 | Hilton Head | other | 4,756 | 1 | 0 | 0 |
 | Jackson MS | other | 57,020 | 7 | 0 | 0 |
-| North Florida | shelf | 35,347 | 2 | 4 | 0 |
-| Panhandle Florida | shelf | 31,906 | 4 | 3 | 0 |
 
 ## Counties
 
@@ -220,13 +218,13 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Dixie | Florida | 12029 | partial | 3,213 | fl-dixie-mil1-12029 |
-| Gadsden | Florida | 12039 | complete-gte-5ac | 5,933 | fl-gadsden-mil1-12039 |
-| Jefferson | Florida | 12065 | complete-gte-5ac | 5,158 | fl-jefferson-parcels-12065 |
+| Dixie | Florida | 12029 | gap | 0 | unavailable |
+| Gadsden | Florida | 12039 | sample | 5,917 | fl-gadsden-arpc-par-071218-12039 |
+| Jefferson | Florida | 12065 | sample | 5,165 | fl-jefferson-pa-parcels-12065 |
 | Leon | Florida | 12073 | complete-gte-5ac | 5,685 | fl-leon-overlay-parcel-12073 |
-| Madison | Florida | 12079 | partial | 7,266 | fl-madison-sdl-12079 |
-| Taylor | Florida | 12123 | partial | 3,836 | fl-taylor-mil1-12123 |
-| Wakulla | Florida | 12129 | complete-gte-5ac | 4,866 | fl-wakulla-parcelm-12129 |
+| Madison | Florida | 12079 | gap | 0 | unavailable |
+| Taylor | Florida | 12123 | gap | 0 | unavailable |
+| Wakulla | Florida | 12129 | sample | 4,784 | fl-wakulla-county-parcels-12129 |
 
 ### Pensacola
 
@@ -416,7 +414,6 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Gilchrist | Florida | 12041 | complete-gte-5ac | 6,395 | fl-doh-ehwaters-12041 |
 | Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
 | Levy | Florida | 12075 | complete-gte-5ac | 10,200 | fl-doh-ehwaters-12075 |
-| Marion | Florida | 12083 | complete-gte-5ac | 17,576 | fl-marion-parcels-12083 |
 | Putnam | Florida | 12107 | complete-gte-5ac | 7,560 | fl-putnam-doh-municipal-12107 |
 
 ### Asheville
@@ -480,26 +477,3 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Warren | Mississippi | 28149 | complete-gte-5ac | 3,473 | ms-warren-cmpdd-parcels |
 | Yazoo | Mississippi | 28163 | complete-gte-5ac | 5,917 | ms-yazoo-cmpdd-2026-parcels |
 
-
-### Panhandle Florida
-
-| County | State | FIPS | Coverage | Parcels | Source |
-| --- | --- | --- | --- | ---: | --- |
-| Calhoun | Florida | 12013 | complete-gte-5ac | 3,863 | fl-calhoun-mil1-12013 |
-| Franklin | Florida | 12037 | partial | 742 | fl-franklin-mil1-12037 |
-| Gulf | Florida | 12045 | partial | 1,219 | fl-gulf-mil1-12045 |
-| Holmes | Florida | 12059 | partial | 6,339 | fl-holmes-mil1-12059 |
-| Jackson | Florida | 12063 | complete-gte-5ac | 11,026 | fl-jackson-mil1-12063 |
-| Liberty | Florida | 12077 | complete-gte-5ac | 1,627 | fl-liberty-mil1-12077 |
-| Washington | Florida | 12133 | complete-gte-5ac | 7,090 | fl-washington-agol-12133 |
-
-### North Florida
-
-| County | State | FIPS | Coverage | Parcels | Source |
-| --- | --- | --- | --- | ---: | --- |
-| Columbia | Florida | 12023 | complete-gte-5ac | 10,747 | fl-columbia-parcels-12023 |
-| Flagler | Florida | 12035 | complete-gte-5ac | 3,446 | fl-flagler-parcels-12035 |
-| Hamilton | Florida | 12047 | partial | 4,158 | fl-hamilton-mil1-12047 |
-| Lafayette | Florida | 12067 | partial | 2,834 | fl-lafayette-srwmd-12067 |
-| Suwannee | Florida | 12121 | partial | 11,818 | fl-suwannee-srwmd-12121 |
-| Union | Florida | 12125 | partial | 2,344 | fl-union-srwmd-12125 |

@@ -13,7 +13,6 @@ import { SitesPanel } from "./SitesPanel";
 import { TractDrawer } from "./TractDrawer";
 import { TractPanel } from "./TractPanel";
 import { AOI_PARCEL_LIMIT, featuresIntersectingBbox, type AoiLock } from "@/lib/aoi";
-import { flRestMarketAt } from "@/lib/flRestBatch1";
 import {
   bboxContains,
   parcelAtPoint,
@@ -609,12 +608,9 @@ export function AppShell({
         zoom: 14,
       };
       const inSouthFlorida = pointInBounds(point.lng, point.lat, SOUTH_FLORIDA_BOUNDS);
-      const flRestMarket = flRestMarketAt(point.lng, point.lat);
       const inCurrent = pointInBounds(point.lng, point.lat, summary.bounds);
       if (!inCurrent && inSouthFlorida && market !== "South Florida") {
         changeMarket("South Florida");
-      } else if (!inCurrent && flRestMarket && market !== flRestMarket) {
-        changeMarket(flRestMarket);
       } else if (county || countyState) {
         setCounty(null);
         setCountyState(null);

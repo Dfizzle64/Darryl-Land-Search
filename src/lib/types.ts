@@ -142,7 +142,6 @@ export type MarketId = (typeof MARKETS)[number];
  * South Florida (Wave 0: Miami-Dade, Monroe, Broward, and Palm Beach), Heartland, Tuscaloosa, and Montgomery are parcel shelves with no eligible-tract rows.
  * Valdosta, Macon, Athens, Hilton Head, and Jackson MS are parcel shelves too.
  * Jackson MS is Jackson, Mississippi. Jackson remains Jackson, Tennessee.
- * North Florida and Panhandle Florida are FL-rest batch 1 parcel shelves. They are appended so the earlier markets stay in place.
  */
 export const OTHER_MARKETS = [
   "South Florida",
@@ -173,8 +172,6 @@ export const OTHER_MARKETS = [
   "Athens",
   "Hilton Head",
   "Jackson MS",
-  "North Florida",
-  "Panhandle Florida",
 ] as const;
 
 export type OtherMarketId = (typeof OTHER_MARKETS)[number];

@@ -899,31 +899,6 @@ def county_override(fips: str) -> dict | None:
         from south_florida_parcels import south_florida_spec
 
         return south_florida_spec(fips)
-    if fips in {
-        "12013",
-        "12023",
-        "12029",
-        "12035",
-        "12037",
-        "12039",
-        "12045",
-        "12047",
-        "12059",
-        "12063",
-        "12065",
-        "12067",
-        "12077",
-        "12079",
-        "12083",
-        "12121",
-        "12123",
-        "12125",
-        "12129",
-        "12133",
-    }:
-        from fl_rest_batch1 import fl_rest_spec
-
-        return fl_rest_spec(fips)
     return None
 
 
@@ -1194,7 +1169,7 @@ Finished extracts in this batch were merged from public county and state GIS bra
 
 DeKalb County, Georgia is the complete assessment extract already merged on main (`ga-dekalb-assessment-view-2`). City zoning and future land use are joined where that extract published them. That service has no sale table.
 
-Municipal zoning, future land use, and Cobb/DeKalb batch-40 screening stay in [`muni-overlay-consolidator.md`](muni-overlay-consolidator.md). Those city codes are copied onto this shelf only when the parcel id still matches. The overlay does not add an Opportunity Zone, a school letter grade, or a base flood elevation. Polk's Orlando tiles still carry Lakeland, Bartow, Auburndale, Lake Alfred, and Lake Hamilton (`docs/polk-municipal.md`). Volusia city layers are in `docs/volusia-flagler-municipal.md`. Flagler parcels are the FL-rest batch 1 extract on the North Florida shelf.
+Municipal zoning, future land use, and Cobb/DeKalb batch-40 screening stay in [`muni-overlay-consolidator.md`](muni-overlay-consolidator.md). Those city codes are copied onto this shelf only when the parcel id still matches. The overlay does not add an Opportunity Zone, a school letter grade, or a base flood elevation. Polk's Orlando tiles still carry Lakeland, Bartow, Auburndale, Lake Alfred, and Lake Hamilton (`docs/polk-municipal.md`). Volusia city layers are in `docs/volusia-flagler-municipal.md`. Flagler has no parcel baseline here.
 
 Marshall County, Alabama is the web5 Marshall/Public/37 5–150 acre extract. Zoning is null. Baldwin County keeps the existing parcel shelf and adds Daphne Class zoning, Daphne Future_Dev, and Fairhope base zoning. Fairhope AO/MO names are overlay notes, not zoning codes. Shelby County keeps the existing parcel shelf and adds Alabaster ZoneCode. Walker, Washington, and Escambia County, Alabama stay gaps. Morgan County stays the existing VAM extract already on this branch. No Opportunity Zone designation was added.
 
@@ -1224,10 +1199,6 @@ def download_county(county: dict, markets: list[str], spec: dict) -> dict:
         from south_florida_parcels import download_south_florida
 
         return download_south_florida(county, markets, spec)
-    if spec.get("kind") == "fl-rest-batch1":
-        from fl_rest_batch1 import download_fl_rest
-
-        return download_fl_rest(county, markets, spec)
     if spec.get("kind") == "new-metro":
         from new_metro_parcels import download_new_metro
 

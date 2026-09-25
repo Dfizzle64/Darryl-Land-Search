@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-25T00:09:31Z",
+  "generatedAt": "2026-09-24T01:06:16Z",
   "market": "North-Central Florida",
   "tier": "other",
-  "parcelCount": 70271,
+  "parcelCount": 52695,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -12,9 +12,8 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
-    "Orange, Osceola, and Polk point at the existing Orlando complete extract.",
-    "FL-rest batch 1 updated parcel rows on this shelf. Eligible tracts were not added."
+    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
     {
@@ -56,7 +55,7 @@
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/3/query",
       "gaps": [
         "598 source rows collapsed to 593 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "Partial. Bradford parcels are the Florida DOH 5–150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
+        "Partial. Bradford parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
       ],
       "path": "data/fixtures/market-parcels/counties/12007/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12007/lookup.json",
@@ -101,7 +100,7 @@
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/19/query",
       "gaps": [
         "6854 source rows collapsed to 6395 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "Partial. Gilchrist parcels are the Florida DOH 5–150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
+        "Partial. Gilchrist parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
       ],
       "path": "data/fixtures/market-parcels/counties/12041/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12041/lookup.json",
@@ -146,40 +145,12 @@
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/36/query",
       "gaps": [
         "10984 source rows collapsed to 10200 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "Partial. Levy parcels are the Florida DOH 5–150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
+        "Partial. Levy parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
       ],
       "path": "data/fixtures/market-parcels/counties/12075/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12075/lookup.json",
       "tileCount": 11,
       "sourceCount": 10984
-    },
-    {
-      "name": "Marion",
-      "fips": "12083",
-      "state": "Florida",
-      "markets": [
-        "North-Central Florida"
-      ],
-      "featureCount": 17576,
-      "coverage": "complete-gte-5ac",
-      "partition": "tiles",
-      "minAcres": 5.0,
-      "maxAcres": 150.0,
-      "source": "fl-marion-parcels-12083",
-      "queryUrl": "https://gis.marionfl.org/public/rest/services/General/ParcelsAndSubdivisions/MapServer/0/query",
-      "gaps": [
-        "Marion parcels are ParcelsAndSubdivisions MapServer/0. Acreage is ACRES, 5.0–150.0 inclusive. FDOR 2025 fills blank just value and DOR use by PARCEL_ID.",
-        "Zoning is PlanningZoning MapServer/20. Future land use is joined on PARCELID from MapServer/6. The parcel ZONE1 attribute is not stored as zoning.",
-        "The property appraiser link is a search page. A stable parcel URL was not verified, so the parcel id is not put in the URL. Q1 is stored as the county qualified flag and was not remapped.",
-        "FDOR 2025 joined 17234/17576 parcel ids. County-number-only filters were not used.",
-        "marion-zoning joined 16340/17576.",
-        "marion-flu joined 15325/17576."
-      ],
-      "path": "data/fixtures/market-parcels/counties/12083/tiles",
-      "lookup": "data/fixtures/market-parcels/counties/12083/lookup.json",
-      "sourceCount": 17576,
-      "dropped": 0,
-      "tileCount": 15
     },
     {
       "name": "Putnam",

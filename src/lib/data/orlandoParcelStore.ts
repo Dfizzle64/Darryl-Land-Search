@@ -145,6 +145,8 @@ export type OrlandoParcelQuery = {
   zoningConfig?: ZoningConfig | null;
   fluConfig?: FluConfig | null;
   includeExcluded?: boolean;
+  /** Return every parcel in the bbox. No spatial cap and no simplified rings. */
+  complete?: boolean;
 };
 
 const EXCLUDED_DRAW_LIMIT = 800;
@@ -164,7 +166,8 @@ function unionById(first: ParcelFeature[], second: ParcelFeature[]): ParcelFeatu
 
 /**
  * Attach Orange income/AADT, then keep parcels that pass the sliders, then
- * thin. The ranked shortlist is unioned back in so the list is the real top
+ * thin. A complete query skips the thin and returns every parcel in the box.
+ * The ranked shortlist is unioned back in so the list is the real top
  * of the filtered set, not the top of a spatial sample.
  */
 export async function finalizeOrlandoParcelPage(
@@ -180,6 +183,18 @@ export async function finalizeOrlandoParcelPage(
   const zoningConfig = query.zoningConfig;
   const fluConfig = query.fluConfig;
   const canFilter = Boolean(filters && zoningConfig && fluConfig);
+  if (query.complete) {
+    const totalMatching = canFilter
+      ? features.filter((feature) => parcelMatchesFilters(feature, filters!, zoningConfig!, fluConfig!)).length
+      : features.length;
+    return {
+      collection: { type: "FeatureCollection", features },
+      excluded: [],
+      totalInBbox: features.length,
+      totalMatching,
+      truncated: false,
+    };
+  }
   const page = selectParcelPage(features, limit, (feature) =>
     canFilter ? parcelMatchesFilters(feature, filters!, zoningConfig!, fluConfig!) : true,
   );

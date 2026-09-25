@@ -56,14 +56,12 @@ body {
   color: #ffffff !important;
 }
 
-/* Imperial scale, pinned to the map's bottom-right. Sits left of the zoom buttons
-   and above the attribution chip so it misses the legend and the ranking rail. */
-.maplibregl-map > .dls-map-scale {
-  position: absolute;
-  right: 3.25rem;
-  bottom: 6.75rem;
+/* Imperial scale, in the bottom-right cluster with the zoom readout and Measure. */
+.dls-map-scale {
+  position: static;
   z-index: 2;
   pointer-events: none;
+  flex: 0 0 auto;
   background-color: #0c1218 !important;
   border: 2px solid #ffffff !important;
   border-top: 2px solid #ffffff !important;

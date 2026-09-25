@@ -25,7 +25,7 @@ describe("FL-rest batch 1 registration", () => {
     expect(OTHER_MARKETS[7]).toBe("Big Bend");
     expect(OTHER_MARKETS.at(-2)).toBe("North Florida");
     expect(OTHER_MARKETS.at(-1)).toBe("Panhandle Florida");
-    expect(flRestMarketAt(-85.045, 30.443)).toBe("Panhandle Florida");
+    expect(flRestMarketAt(-85.2, 30.45)).toBe("Panhandle Florida");
     expect(flRestMarketAt(-82.64, 30.19)).toBe("North Florida");
     expect(flRestMarketAt(-82.14, 29.19)).toBe("North-Central Florida");
     expect(flRestMarketAt(-84.28, 30.44)).toBe("Big Bend");

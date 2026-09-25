@@ -14,6 +14,7 @@ export function MarketMenu({ value, groups, onChange }: MarketMenuProps) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [flyoutTop, setFlyoutTop] = useState(0);
+  const [flyoutRight, setFlyoutRight] = useState(true);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -51,6 +52,8 @@ export function MarketMenu({ value, groups, onChange }: MarketMenuProps) {
     const menuBox = menu.getBoundingClientRect();
     const rowBox = row.getBoundingClientRect();
     setFlyoutTop(rowBox.top - menuBox.top);
+    const spaceOnRight = window.innerWidth - menuBox.right;
+    setFlyoutRight(spaceOnRight < 240 && menuBox.left > spaceOnRight);
   };
 
   const reveal = (state: string, row: HTMLElement) => {
@@ -61,7 +64,7 @@ export function MarketMenu({ value, groups, onChange }: MarketMenuProps) {
   const expandedGroup = groups.find((group) => group.state === expanded) ?? null;
 
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef} className="relative z-50">
       <button
         type="button"
         aria-label="Market"
@@ -141,7 +144,11 @@ export function MarketMenu({ value, groups, onChange }: MarketMenuProps) {
               role="menu"
               aria-label={`${expandedGroup.state} markets`}
               className="absolute hidden w-56 rounded-2xl border border-white/15 bg-ink-900 p-1.5 shadow-2xl sm:block"
-              style={{ top: flyoutTop, right: "calc(100% - 8px)" }}
+              style={
+                flyoutRight
+                  ? { top: flyoutTop, right: "calc(100% - 8px)" }
+                  : { top: flyoutTop, left: "calc(100% - 8px)" }
+              }
               onMouseEnter={() => setExpanded(expandedGroup.state)}
             >
               {expandedGroup.markets.map((market) => (

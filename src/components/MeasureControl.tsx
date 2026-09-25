@@ -13,7 +13,7 @@ type MeasureControlProps = {
 export function MeasureControl({ active, points, onStart, onClear, onCancel }: MeasureControlProps) {
   const summary = summarizeMeasure(points);
   return (
-    <div className="pointer-events-auto flex max-w-[18rem] flex-col items-start gap-1.5">
+    <div className="pointer-events-auto flex max-w-[18rem] flex-col-reverse items-end gap-1.5">
       <button
         type="button"
         aria-pressed={active}

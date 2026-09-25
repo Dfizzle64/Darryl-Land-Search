@@ -56,7 +56,7 @@ import {
   tractGridKeysForBbox,
   type EligibleTractTileCache,
 } from "@/lib/censusTracts";
-import { MAP_SCALE } from "@/lib/mapScale";
+import { formatMapZoom, MAP_SCALE } from "@/lib/mapScale";
 import { eligibleClassCut, southCarolinaOverlayMode } from "@/lib/markets";
 import { PARCEL_MIN_ZOOM } from "@/lib/parcelVisibility";
 import { scNominatedOverlayFilter, showOzTractInScMarkets } from "@/lib/scNominatedTracts";
@@ -696,6 +696,8 @@ export function SiteMap({
 }: SiteMapProps) {
   const shellRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const cornerClusterRef = useRef<HTMLDivElement | null>(null);
+  const zoomReadoutRef = useRef<HTMLSpanElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState("Loading map…");
@@ -912,7 +914,12 @@ export function SiteMap({
             callbacksRef.current.onHover(null);
           });
           const paintZoomAttr = () => {
-            containerRef.current?.setAttribute("data-map-zoom", map.getZoom().toFixed(2));
+            const zoomNow = map.getZoom();
+            containerRef.current?.setAttribute("data-map-zoom", zoomNow.toFixed(2));
+            const label = zoomReadoutRef.current;
+            if (!label) return;
+            const text = formatMapZoom(zoomNow);
+            if (label.textContent !== text) label.textContent = text;
           };
           const emitViewport = () => {
             paintZoomAttr();
@@ -1500,6 +1507,17 @@ export function SiteMap({
     mapRef.current?.resize();
   }, [selectedId, selectedTractGeoid]);
 
+  useEffect(() => {
+    if (status !== "ready") return;
+    const map = mapRef.current;
+    const slot = cornerClusterRef.current;
+    if (!map || !slot) return;
+    const scaleEl = map.getContainer().querySelector<HTMLElement>(".maplibregl-ctrl-scale");
+    if (scaleEl && scaleEl.parentElement !== slot) slot.appendChild(scaleEl);
+    const label = zoomReadoutRef.current;
+    if (label) label.textContent = formatMapZoom(map.getZoom());
+  }, [status]);
+
   const overlayMode = southCarolinaOverlayMode(market, countyState);
   const tractToggleName =
     overlayMode === "nominated-only" ? "nominated census tracts" : overlayMode === "mixed" ? "census tracts" : "eligible census tracts";
@@ -1512,19 +1530,6 @@ export function SiteMap({
       {status === "ready" ? (
         <div className="map-chrome absolute left-3 top-3 z-30 flex flex-col items-start gap-2 sm:left-4 sm:top-4">
           <BasemapToggle value={basemap} onChange={setBasemap} />
-          <MeasureControl
-            active={measuring}
-            points={measurePoints}
-            onStart={() => {
-              setDrawing(false);
-              setMeasuring(true);
-            }}
-            onClear={() => setMeasurePoints([])}
-            onCancel={() => {
-              setMeasuring(false);
-              setMeasurePoints([]);
-            }}
-          />
           {showParcels && onToggleParcelLayer ? (
             <ParcelLayerToggle visible={layerOn} hint={parcelVisibilityHint ?? ""} onToggle={onToggleParcelLayer} />
           ) : null}
@@ -1548,6 +1553,33 @@ export function SiteMap({
               {showOz2 ? "Hide tracts" : "Show tracts"}
             </button>
           ) : null}
+        </div>
+      ) : null}
+      {status === "ready" ? (
+        <div
+          ref={cornerClusterRef}
+          className="map-chrome absolute bottom-[6.75rem] right-[3.25rem] z-20 flex items-end gap-2"
+        >
+          <MeasureControl
+            active={measuring}
+            points={measurePoints}
+            onStart={() => {
+              setDrawing(false);
+              setMeasuring(true);
+            }}
+            onClear={() => setMeasurePoints([])}
+            onCancel={() => {
+              setMeasuring(false);
+              setMeasurePoints([]);
+            }}
+          />
+          <span
+            ref={zoomReadoutRef}
+            data-map-zoom-readout
+            className="mb-px rounded border-2 border-white bg-[#0c1218] px-1.5 py-px text-[11px] font-medium leading-[1.35] text-white shadow-[0_0_0_2px_#0c1218]"
+          >
+            Zoom
+          </span>
         </div>
       ) : null}
       {status === "ready" && showParcels ? (

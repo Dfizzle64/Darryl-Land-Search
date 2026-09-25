@@ -1,65 +1,67 @@
 /**
- * Parcel outlines turn on at zoom 8, the same zoom as detailed tract boundaries.
- * A zoom-8 screen can cover several counties, so that band draws a capped,
- * simplified sample. Full boundaries start at the detail zoom. Hide parcels
- * sticks until the user turns them back on.
+ * Parcel outlines turn on at zoom 10. From there the map draws every 5–150 acre
+ * parcel in view with its real boundary. Tiles already loaded stay cached.
+ * Hide parcels sticks until the user turns them back on.
  */
 
 /** Zoom where parcel polygons may draw. */
-export const PARCEL_MIN_ZOOM = 8;
-
-/** Full parcel boundaries. Zooms 8–12 use simplified rings. */
-export const PARCEL_DETAIL_ZOOM = 13;
+export const PARCEL_MIN_ZOOM = 10;
 
 /**
- * A zoom-8 view of one market can hold tens of thousands of 5–150 acre parcels.
- * The map draws at most this many in that view, spread across it.
+ * Same 0.25° grid as the parcel extracts (origin -83, 27). One cell is one
+ * cached chunk. The key does not include zoom.
  */
-export const PARCEL_LOW_ZOOM_LIMIT = 1600;
-
-/** Quantize a low-zoom view to this grid so a small pan reuses the cached sample. */
-export const PARCEL_RANGE_DEGREES = 1;
+export const PARCEL_TILE_DEGREES = 0.25;
+export const PARCEL_TILE_ORIGIN_LON = -83;
+export const PARCEL_TILE_ORIGIN_LAT = 27;
 
 /** @deprecated Use PARCEL_MIN_ZOOM. Kept so existing imports keep compiling. */
 export const PARCEL_AUTO_ZOOM = PARCEL_MIN_ZOOM;
 
 export const PARCEL_VISIBILITY_STORAGE_KEY = "dls.parcelVisibility";
 
-export const PARCEL_ZOOM_HINT = "Zoom in to see parcels. Outlines start at zoom 8.";
+export const PARCEL_ZOOM_HINT = "Zoom in to see parcels. Outlines start at zoom 10.";
 
-export type ParcelGeometryBand = "low" | "detail";
-
-export function parcelGeometryBand(zoom: number): ParcelGeometryBand {
-  return zoom >= PARCEL_DETAIL_ZOOM ? "detail" : "low";
-}
-
-export type ParcelRangeCache<T> = {
+export type ParcelTileCache<T> = {
   signature: string;
-  ranges: Map<string, T>;
+  tiles: Map<string, T>;
 };
 
-export function createParcelRangeCache<T>(): ParcelRangeCache<T> {
-  return { signature: "", ranges: new Map() };
+export function createParcelTileCache<T>(): ParcelTileCache<T> {
+  return { signature: "", tiles: new Map() };
 }
 
-/** Drop cached views when the market or filters change. The same signature keeps them. */
-export function syncParcelRangeCache<T>(cache: ParcelRangeCache<T>, signature: string): void {
+/** Drop cached tiles when the market or county changes. The same signature keeps them. */
+export function syncParcelTileCache<T>(cache: ParcelTileCache<T>, signature: string): void {
   if (cache.signature === signature) return;
   cache.signature = signature;
-  cache.ranges.clear();
+  cache.tiles.clear();
 }
 
-/**
- * Stable cache key for a view. Low zoom snaps to 1°; detail snaps to 0.25°.
- * The key does not include the exact zoom, so zooming within a band does not refetch.
- */
-export function parcelRangeKey(bbox: [number, number, number, number], zoom: number): string {
-  const tile = parcelGeometryBand(zoom) === "low" ? PARCEL_RANGE_DEGREES : 0.25;
+export function parcelTileKey(ix: number, iy: number): string {
+  return `${ix}:${iy}`;
+}
+
+export function parcelTileKeysForBbox(bbox: [number, number, number, number]): string[] {
   const [west, south, east, north] = bbox;
-  const snapDown = (value: number) => Math.floor(value / tile) * tile;
-  const snapUp = (value: number) => Math.ceil(value / tile) * tile;
-  const quant = [snapDown(west), snapDown(south), snapUp(east), snapUp(north)];
-  return `${parcelGeometryBand(zoom)}|${quant.map((value) => value.toFixed(2)).join(",")}`;
+  const ix0 = Math.floor((west - PARCEL_TILE_ORIGIN_LON) / PARCEL_TILE_DEGREES);
+  const ix1 = Math.floor((Math.max(west, east - 1e-9) - PARCEL_TILE_ORIGIN_LON) / PARCEL_TILE_DEGREES);
+  const iy0 = Math.floor((south - PARCEL_TILE_ORIGIN_LAT) / PARCEL_TILE_DEGREES);
+  const iy1 = Math.floor((Math.max(south, north - 1e-9) - PARCEL_TILE_ORIGIN_LAT) / PARCEL_TILE_DEGREES);
+  const keys: string[] = [];
+  for (let ix = ix0; ix <= ix1; ix += 1) {
+    for (let iy = iy0; iy <= iy1; iy += 1) {
+      keys.push(parcelTileKey(ix, iy));
+    }
+  }
+  return keys;
+}
+
+export function parcelTileBbox(key: string): [number, number, number, number] {
+  const [ix, iy] = key.split(":").map((part) => Number(part));
+  const west = PARCEL_TILE_ORIGIN_LON + ix * PARCEL_TILE_DEGREES;
+  const south = PARCEL_TILE_ORIGIN_LAT + iy * PARCEL_TILE_DEGREES;
+  return [west, south, west + PARCEL_TILE_DEGREES, south + PARCEL_TILE_DEGREES];
 }
 
 export type ParcelVisibilityPreference = "auto" | "manual-on" | "manual-off";
@@ -113,8 +115,8 @@ export function parcelVisibilityHint(preference: ParcelVisibilityPreference, par
   if (preference === "manual-on") {
     return parcelsVisible
       ? "On at this zoom. Turn Show parcels off to hide the outlines."
-      : "Zoom in to see parcels. Outlines start at zoom 8. Show parcels stays on once you get there.";
+      : "Zoom in to see parcels. Outlines start at zoom 10. Show parcels stays on once you get there.";
   }
   if (!parcelsVisible) return PARCEL_ZOOM_HINT;
-  return "On from zoom 8. Zoom out past zoom 8 and the outlines hide, unless you turn Show parcels on.";
+  return "On from zoom 10. Zoom out past zoom 10 and the outlines hide, unless you turn Show parcels on.";
 }

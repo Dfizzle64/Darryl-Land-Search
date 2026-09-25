@@ -25,16 +25,15 @@ import {
 } from "@/lib/jumpTo";
 import { appliedParcelFilters, emptyStateHint, filterParcels, parcelFilterKey, stampFilterMatch, writeParcelFilters } from "@/lib/filters";
 import {
-  createParcelRangeCache,
+  createParcelTileCache,
   isParcelVisibilityPreference,
-  parcelGeometryBand,
-  parcelRangeKey,
+  parcelTileBbox,
+  parcelTileKeysForBbox,
   parcelVisibilityHint,
   parcelsAreVisible,
-  PARCEL_LOW_ZOOM_LIMIT,
   PARCEL_VISIBILITY_STORAGE_KEY,
   shouldQueryParcelsForZoom,
-  syncParcelRangeCache,
+  syncParcelTileCache,
   toggleParcelVisibility,
   type ParcelVisibilityPreference,
 } from "@/lib/parcelVisibility";
@@ -57,7 +56,7 @@ import {
 } from "@/lib/markets";
 import { displayedOzTracts } from "@/lib/scNominatedTracts";
 import { showMarketParcels, type MarketParcelIndex } from "@/lib/marketParcels";
-import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcels";
+import { ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcels";
 import { rankSites } from "@/lib/score";
 import { DEFAULT_SCREENING_TOGGLES, type ScreeningPoint, type ScreeningToggles } from "@/lib/screening";
 import { filterTractRowsByIncome, incomeByGeoidFromFeatures } from "@/lib/tractIncome";
@@ -92,11 +91,6 @@ import {
 } from "@/lib/types";
 
 type ParcelViewStats = { totalInBbox: number; totalMatching: number; truncated: boolean };
-
-type CachedParcelRange = {
-  collection: ParcelCollection;
-  stats: ParcelViewStats;
-};
 
 type ParcelResponse = ParcelCollection & {
   error?: string;
@@ -334,7 +328,7 @@ export function AppShell({
     [activeParcels.features, appliedFilters, zoningConfig, fluConfig],
   );
   const parcelStats = aoi ? aoiStats : viewportStats;
-  const filterMatchTotal = parcelStats?.totalMatching ?? matched.length;
+  const filterMatchTotal = parcelStats?.truncated ? parcelStats.totalMatching : matched.length;
   const parcelsInView = parcelStats?.totalInBbox ?? activeParcels.features.length;
   const fullAcreageCounties = useMemo(() => {
     if (market === "Orlando") {
@@ -435,15 +429,12 @@ export function AppShell({
     }
   }, [orlandoParcelsOn, county]);
 
-  const filtersRef = useRef(filters);
-  filtersRef.current = filters;
   const preferenceRef = useRef(parcelPreference);
   preferenceRef.current = parcelPreference;
-  const showExcludedRef = useRef(showExcluded);
-  showExcludedRef.current = showExcluded;
   const lastViewport = useRef<{ bbox: [number, number, number, number]; zoom: number } | null>(null);
   const parcelsClearedForZoom = useRef(false);
-  const parcelRangeCacheRef = useRef(createParcelRangeCache<CachedParcelRange>());
+  const parcelTileCacheRef = useRef(createParcelTileCache<ParcelFeature[]>());
+  const parcelTileInflight = useRef(new Map<string, Promise<ParcelFeature[]>>());
   const displayedParcelKey = useRef<string | null>(null);
   const loadViewportRef = useRef<(bbox: [number, number, number, number], zoom: number) => Promise<void>>(
     async () => {},
@@ -452,85 +443,98 @@ export function AppShell({
   const loadViewportParcels = async (bbox: [number, number, number, number], zoom: number) => {
     lastViewport.current = { bbox, zoom };
     if (!shedParcelsOn || aoiRef.current) return;
-    // Below zoom 8 the outlines stay off. Once they can draw, keep querying even
+    // Below zoom 10 the outlines stay off. Once they can draw, keep querying even
     // if the user hid them so the ranked list still filters.
     if (!shouldQueryParcelsForZoom(preferenceRef.current, zoom)) {
       viewportRequest.current += 1;
       if (parcelsClearedForZoom.current) return;
       parcelsClearedForZoom.current = true;
+      displayedParcelKey.current = null;
       setViewportParcels(EMPTY_PARCELS);
       setViewportStats(null);
       setParcelsLoading(false);
       return;
     }
     parcelsClearedForZoom.current = false;
-    const signature = `${market}|${county ?? ""}|${countyState ?? ""}|${parcelFilterKey(filtersRef.current)}|${showExcludedRef.current ? 1 : 0}`;
-    const cache = parcelRangeCacheRef.current;
+    const signature = `${market}|${county ?? ""}|${countyState ?? ""}`;
+    const cache = parcelTileCacheRef.current;
     const signatureChanged = cache.signature !== signature;
-    syncParcelRangeCache(cache, signature);
-    if (signatureChanged) displayedParcelKey.current = null;
-    const rangeKey = parcelRangeKey(bbox, zoom);
-    const cached = cache.ranges.get(rangeKey);
-    if (cached) {
+    syncParcelTileCache(cache, signature);
+    if (signatureChanged) {
+      displayedParcelKey.current = null;
+      parcelTileInflight.current.clear();
+    }
+    const keys = parcelTileKeysForBbox(bbox);
+    const publish = () => {
+      const readyKey = keys.filter((key) => cache.tiles.has(key)).join("|");
+      if (!readyKey || displayedParcelKey.current === readyKey) return;
+      displayedParcelKey.current = readyKey;
+      const byId = new Map<string, ParcelFeature>();
+      for (const key of keys) {
+        for (const feature of cache.tiles.get(key) ?? []) byId.set(feature.properties.id, feature);
+      }
+      const features = [...byId.values()];
+      setViewportParcels({ type: "FeatureCollection", features });
+      setParcelLoadStamp((stamp) => stamp + 1);
+      setViewportStats({ totalInBbox: features.length, totalMatching: features.length, truncated: false });
+      setParcelSource("fixture");
+    };
+    const missing = keys.filter((key) => !cache.tiles.has(key));
+    if (missing.length === 0) {
       viewportRequest.current += 1;
       setParcelsLoading(false);
-      if (displayedParcelKey.current !== rangeKey) {
-        displayedParcelKey.current = rangeKey;
-        setViewportParcels(cached.collection);
-        setViewportStats(cached.stats);
-      }
+      publish();
       return;
     }
-    // Live DOH fill is only for the thinner sample counties, and only once the
-    // view is tighter than the neighborhood gate. The complete counties already
-    // ship every parcel from 5 through 150 acres. Zooms 8–12 cap the draw and
-    // ask for simplified rings; the same view is not fetched again.
-    const useLive = orlandoParcelsOn && zoom >= 11.5 && Boolean(county) && !isFull5AcCounty(county);
-    const lowZoom = parcelGeometryBand(zoom) === "low";
-    const limit = useLive ? 900 : lowZoom ? PARCEL_LOW_ZOOM_LIMIT : 3500;
     const requestId = ++viewportRequest.current;
     setParcelsLoading(true);
     setError(null);
+    const loadTile = (key: string) => {
+      const flightKey = `${signature}|${key}`;
+      const pending = parcelTileInflight.current.get(flightKey);
+      if (pending) return pending;
+      const promise = (async () => {
+        const tileBbox = parcelTileBbox(key);
+        const params = new URLSearchParams({
+          market,
+          source: "fixture",
+          bbox: tileBbox.join(","),
+          complete: "1",
+        });
+        if (county && countyState) {
+          params.set("county", county);
+          params.set("state", countyState);
+        }
+        const response = await fetch(`/api/parcels?${params.toString()}`);
+        if (!response.ok) throw new Error(`Parcel load failed (${response.status})`);
+        const body = (await response.json()) as ParcelResponse;
+        if (body.error) throw new Error(body.error);
+        return featuresIntersectingBbox(body.features ?? [], tileBbox);
+      })();
+      parcelTileInflight.current.set(flightKey, promise);
+      return promise.then(
+        (features) => {
+          parcelTileInflight.current.delete(flightKey);
+          if (cache.signature === signature) cache.tiles.set(key, features);
+          return features;
+        },
+        (error: unknown) => {
+          parcelTileInflight.current.delete(flightKey);
+          throw error;
+        },
+      );
+    };
     try {
-      const params = new URLSearchParams({
-        market,
-        source: useLive ? "live" : "fixture",
-        bbox: bbox.join(","),
-        limit: String(limit),
-        zoom: zoom.toFixed(2),
-      });
-      if (county && countyState) {
-        params.set("county", county);
-        params.set("state", countyState);
+      const batchSize = 4;
+      for (let index = 0; index < missing.length; index += batchSize) {
+        if (requestId !== viewportRequest.current || aoiRef.current) return;
+        await Promise.all(missing.slice(index, index + batchSize).map((key) => loadTile(key)));
+        if (requestId !== viewportRequest.current || aoiRef.current) return;
+        publish();
       }
-      writeParcelFilters(params, filtersRef.current, showExcludedRef.current);
-      const response = await fetch(`/api/parcels?${params.toString()}`);
-      if (requestId !== viewportRequest.current || aoiRef.current) return;
-      if (!response.ok) {
-        throw new Error(`Parcel load failed (${response.status})`);
-      }
-      const body = (await response.json()) as ParcelResponse;
-      if (body.error) throw new Error(body.error);
-      if (requestId !== viewportRequest.current || aoiRef.current) return;
-      const features = featuresIntersectingBbox([...(body.features ?? []), ...(body.excluded ?? [])], bbox);
-      const collection: ParcelCollection = { type: "FeatureCollection", features };
-      const stats: ParcelViewStats = {
-        totalInBbox: body.meta?.totalInBbox ?? features.length,
-        totalMatching: body.meta?.totalMatching ?? body.features?.length ?? features.length,
-        truncated: Boolean(body.meta?.truncated),
-      };
-      cache.ranges.set(rangeKey, { collection, stats });
-      displayedParcelKey.current = rangeKey;
-      setViewportParcels(collection);
-      setParcelLoadStamp((stamp) => stamp + 1);
-      setViewportStats(stats);
-      setParcelSource(useLive ? "live" : "fixture");
     } catch (err) {
       if (requestId !== viewportRequest.current || aoiRef.current) return;
       setError(err instanceof Error ? err.message : "Unable to refresh parcels");
-      setViewportParcels(null);
-      setViewportStats(null);
-      setParcelSource("fixture");
     } finally {
       if (requestId === viewportRequest.current && !aoiRef.current) setParcelsLoading(false);
     }

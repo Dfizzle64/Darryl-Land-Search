@@ -4,3 +4,9 @@ export const MAP_SCALE = {
   position: "bottom-right" as const,
   maxWidth: 100,
 };
+
+/** Live zoom readout. One decimal, updated on the map element, not through React state. */
+export function formatMapZoom(zoom: number): string {
+  if (!Number.isFinite(zoom)) return "Zoom";
+  return `Zoom ${zoom.toFixed(1)}`;
+}

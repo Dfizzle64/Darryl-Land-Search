@@ -1,0 +1,29 @@
+{
+  "name": "Columbia",
+  "fips": "12023",
+  "state": "Florida",
+  "markets": [
+    "North Florida"
+  ],
+  "featureCount": 10747,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "fl-columbia-parcels-12023",
+  "queryUrl": "https://gis.columbiacountyfla.com/hosting/rest/services/Parcels_and_Addresses/MapServer/2/query",
+  "gaps": [
+    "Columbia parcels are Parcels_and_Addresses MapServer/2. Acreage is Acres, 5.0–150.0 inclusive. The layer has owner and acres. Just value and DOR use are not on the layer.",
+    "County ParcelNo and the FDOR PARCEL_ID are different formats. The FDOR join is by parcel id only. Rows that do not match stay without a FDOR value.",
+    "Zoning geometry queries are flaky on this host. The atlas is still the zoning source when the query returns.",
+    "FDOR 2025 joined 0/10747 parcel ids. County-number-only filters were not used.",
+    "FDOR parcel-id match covered less than half of this county. Unmatched rows keep the county attributes only.",
+    "columbia-zoning-atlas joined 10468/10747.",
+    "columbia-future-land-use joined 0/10747."
+  ],
+  "path": "data/fixtures/market-parcels/counties/12023/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12023/lookup.json",
+  "sourceCount": 10747,
+  "dropped": 0,
+  "tileCount": 10
+}

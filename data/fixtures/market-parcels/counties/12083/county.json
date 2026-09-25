@@ -1,0 +1,28 @@
+{
+  "name": "Marion",
+  "fips": "12083",
+  "state": "Florida",
+  "markets": [
+    "North-Central Florida"
+  ],
+  "featureCount": 17576,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "fl-marion-parcels-12083",
+  "queryUrl": "https://gis.marionfl.org/public/rest/services/General/ParcelsAndSubdivisions/MapServer/0/query",
+  "gaps": [
+    "Marion parcels are ParcelsAndSubdivisions MapServer/0. Acreage is ACRES, 5.0–150.0 inclusive. FDOR 2025 fills blank just value and DOR use by PARCEL_ID.",
+    "Zoning is PlanningZoning MapServer/20. Future land use is joined on PARCELID from MapServer/6. The parcel ZONE1 attribute is not stored as zoning.",
+    "The property appraiser link is a search page. A stable parcel URL was not verified, so the parcel id is not put in the URL. Q1 is stored as the county qualified flag and was not remapped.",
+    "FDOR 2025 joined 17234/17576 parcel ids. County-number-only filters were not used.",
+    "marion-zoning joined 16340/17576.",
+    "marion-flu joined 15325/17576."
+  ],
+  "path": "data/fixtures/market-parcels/counties/12083/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12083/lookup.json",
+  "sourceCount": 17576,
+  "dropped": 0,
+  "tileCount": 15
+}

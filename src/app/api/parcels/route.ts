@@ -3,7 +3,14 @@ import { getParcelProvider } from "@/lib/data/adapters";
 import { loadFluConfig, loadZoningConfig } from "@/lib/data/loadFixtures";
 import { filterParcels, parcelFiltersFromSearchParams } from "@/lib/filters";
 import { isSearchMarketId } from "@/lib/markets";
+import { simplifyParcelFeature } from "@/lib/parcelGeometry";
+import { parcelGeometryBand } from "@/lib/parcelVisibility";
 import type { BBox, ParcelFeature } from "@/lib/types";
+
+function presentParcels(features: ParcelFeature[], zoom: number): ParcelFeature[] {
+  if (!Number.isFinite(zoom) || parcelGeometryBand(zoom) !== "low") return features;
+  return features.map((feature) => simplifyParcelFeature(feature));
+}
 
 function parseBbox(value: string | null): BBox | null {
   if (!value) return null;
@@ -23,6 +30,7 @@ export async function GET(request: Request) {
   const bbox = parseBbox(url.searchParams.get("bbox"));
   const source = url.searchParams.get("source") === "live" ? "live" : "fixture";
   const limit = Number(url.searchParams.get("limit") ?? (source === "live" ? 800 : 4000));
+  const zoom = Number(url.searchParams.get("zoom"));
   const applyFilters = url.searchParams.get("filter") === "1";
   const includeExcluded = url.searchParams.get("includeExcluded") === "1";
   const filters = parcelFiltersFromSearchParams(url.searchParams);
@@ -45,17 +53,19 @@ export async function GET(request: Request) {
         fluConfig,
         includeExcluded: applyFilters && includeExcluded,
       });
+      const features = presentParcels(page.collection.features, zoom);
+      const excluded = presentParcels(page.excluded, zoom);
       return NextResponse.json({
         type: "FeatureCollection",
-        features: page.collection.features,
-        excluded: page.excluded,
+        features,
+        excluded,
         meta: {
           market,
           county,
           state,
           bbox,
           source,
-          total: page.collection.features.length,
+          total: features.length,
           totalInBbox: page.totalInBbox,
           totalMatching: page.totalMatching,
           truncated: page.truncated,
@@ -75,17 +85,19 @@ export async function GET(request: Request) {
         fluConfig,
         includeExcluded: applyFilters && includeExcluded,
       });
+      const features = presentParcels(page.collection.features, zoom);
+      const excluded = presentParcels(page.excluded, zoom);
       return NextResponse.json({
         type: "FeatureCollection",
-        features: page.collection.features,
-        excluded: page.excluded,
+        features,
+        excluded,
         meta: {
           market,
           county,
           state,
           bbox,
           source: "fixture",
-          total: page.collection.features.length,
+          total: features.length,
           totalInBbox: page.totalInBbox,
           totalMatching: page.totalMatching,
           truncated: page.truncated,
@@ -99,9 +111,10 @@ export async function GET(request: Request) {
     if (applyFilters && zoningConfig && fluConfig) {
       features = filterParcels(features, filters, zoningConfig, fluConfig);
     }
+    const drawn = presentParcels(features, zoom);
     return NextResponse.json({
       type: "FeatureCollection",
-      features,
+      features: drawn,
       excluded: [],
       meta: {
         market,

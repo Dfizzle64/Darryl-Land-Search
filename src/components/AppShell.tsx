@@ -25,11 +25,16 @@ import {
 } from "@/lib/jumpTo";
 import { appliedParcelFilters, emptyStateHint, filterParcels, parcelFilterKey, stampFilterMatch, writeParcelFilters } from "@/lib/filters";
 import {
+  createParcelRangeCache,
   isParcelVisibilityPreference,
+  parcelGeometryBand,
+  parcelRangeKey,
   parcelVisibilityHint,
   parcelsAreVisible,
+  PARCEL_LOW_ZOOM_LIMIT,
   PARCEL_VISIBILITY_STORAGE_KEY,
   shouldQueryParcelsForZoom,
+  syncParcelRangeCache,
   toggleParcelVisibility,
   type ParcelVisibilityPreference,
 } from "@/lib/parcelVisibility";
@@ -87,6 +92,11 @@ import {
 } from "@/lib/types";
 
 type ParcelViewStats = { totalInBbox: number; totalMatching: number; truncated: boolean };
+
+type CachedParcelRange = {
+  collection: ParcelCollection;
+  stats: ParcelViewStats;
+};
 
 type ParcelResponse = ParcelCollection & {
   error?: string;
@@ -433,6 +443,8 @@ export function AppShell({
   showExcludedRef.current = showExcluded;
   const lastViewport = useRef<{ bbox: [number, number, number, number]; zoom: number } | null>(null);
   const parcelsClearedForZoom = useRef(false);
+  const parcelRangeCacheRef = useRef(createParcelRangeCache<CachedParcelRange>());
+  const displayedParcelKey = useRef<string | null>(null);
   const loadViewportRef = useRef<(bbox: [number, number, number, number], zoom: number) => Promise<void>>(
     async () => {},
   );
@@ -440,8 +452,8 @@ export function AppShell({
   const loadViewportParcels = async (bbox: [number, number, number, number], zoom: number) => {
     lastViewport.current = { bbox, zoom };
     if (!shedParcelsOn || aoiRef.current) return;
-    // Tract zoom stays unloaded. Once the camera is close enough for parcels,
-    // keep querying even if outlines are hidden so the ranked list still filters.
+    // Below zoom 8 the outlines stay off. Once they can draw, keep querying even
+    // if the user hid them so the ranked list still filters.
     if (!shouldQueryParcelsForZoom(preferenceRef.current, zoom)) {
       viewportRequest.current += 1;
       if (parcelsClearedForZoom.current) return;
@@ -452,11 +464,30 @@ export function AppShell({
       return;
     }
     parcelsClearedForZoom.current = false;
+    const signature = `${market}|${county ?? ""}|${countyState ?? ""}|${parcelFilterKey(filtersRef.current)}|${showExcludedRef.current ? 1 : 0}`;
+    const cache = parcelRangeCacheRef.current;
+    const signatureChanged = cache.signature !== signature;
+    syncParcelRangeCache(cache, signature);
+    if (signatureChanged) displayedParcelKey.current = null;
+    const rangeKey = parcelRangeKey(bbox, zoom);
+    const cached = cache.ranges.get(rangeKey);
+    if (cached) {
+      viewportRequest.current += 1;
+      setParcelsLoading(false);
+      if (displayedParcelKey.current !== rangeKey) {
+        displayedParcelKey.current = rangeKey;
+        setViewportParcels(cached.collection);
+        setViewportStats(cached.stats);
+      }
+      return;
+    }
     // Live DOH fill is only for the thinner sample counties, and only once the
     // view is tighter than the neighborhood gate. The complete counties already
-    // ship every parcel from 5 through 150 acres.
+    // ship every parcel from 5 through 150 acres. Zooms 8–12 cap the draw and
+    // ask for simplified rings; the same view is not fetched again.
     const useLive = orlandoParcelsOn && zoom >= 11.5 && Boolean(county) && !isFull5AcCounty(county);
-    const limit = useLive ? 900 : zoom >= 13 ? 3500 : zoom >= 11.5 ? 2200 : 1600;
+    const lowZoom = parcelGeometryBand(zoom) === "low";
+    const limit = useLive ? 900 : lowZoom ? PARCEL_LOW_ZOOM_LIMIT : 3500;
     const requestId = ++viewportRequest.current;
     setParcelsLoading(true);
     setError(null);
@@ -466,6 +497,7 @@ export function AppShell({
         source: useLive ? "live" : "fixture",
         bbox: bbox.join(","),
         limit: String(limit),
+        zoom: zoom.toFixed(2),
       });
       if (county && countyState) {
         params.set("county", county);
@@ -481,13 +513,17 @@ export function AppShell({
       if (body.error) throw new Error(body.error);
       if (requestId !== viewportRequest.current || aoiRef.current) return;
       const features = featuresIntersectingBbox([...(body.features ?? []), ...(body.excluded ?? [])], bbox);
-      setViewportParcels({ type: "FeatureCollection", features });
-      setParcelLoadStamp((stamp) => stamp + 1);
-      setViewportStats({
+      const collection: ParcelCollection = { type: "FeatureCollection", features };
+      const stats: ParcelViewStats = {
         totalInBbox: body.meta?.totalInBbox ?? features.length,
         totalMatching: body.meta?.totalMatching ?? body.features?.length ?? features.length,
         truncated: Boolean(body.meta?.truncated),
-      });
+      };
+      cache.ranges.set(rangeKey, { collection, stats });
+      displayedParcelKey.current = rangeKey;
+      setViewportParcels(collection);
+      setParcelLoadStamp((stamp) => stamp + 1);
+      setViewportStats(stats);
       setParcelSource(useLive ? "live" : "fixture");
     } catch (err) {
       if (requestId !== viewportRequest.current || aoiRef.current) return;

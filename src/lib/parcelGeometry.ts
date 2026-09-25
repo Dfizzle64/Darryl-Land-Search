@@ -184,3 +184,83 @@ export function representativePoint(geometry: GeoJSON.Polygon | GeoJSON.MultiPol
   }
   return round(body[0][0], body[0][1]);
 }
+
+/** ~200 m. Coarse enough that a zoom-8 parcel is a few corners, not the full boundary. */
+export const PARCEL_LOW_ZOOM_TOLERANCE = 0.002;
+
+function walkCoords(coords: unknown, visit: (x: number, y: number) => void) {
+  if (!Array.isArray(coords)) return;
+  if (coords.length >= 2 && typeof coords[0] === "number" && typeof coords[1] === "number") {
+    visit(coords[0], coords[1]);
+    return;
+  }
+  for (const child of coords) walkCoords(child, visit);
+}
+
+export function parcelVertexCount(geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon): number {
+  let count = 0;
+  walkCoords(geometry.coordinates, () => {
+    count += 1;
+  });
+  return count;
+}
+
+function envelopeGeometry(geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon): GeoJSON.Polygon {
+  let west = Infinity;
+  let south = Infinity;
+  let east = -Infinity;
+  let north = -Infinity;
+  walkCoords(geometry.coordinates, (x, y) => {
+    if (x < west) west = x;
+    if (x > east) east = x;
+    if (y < south) south = y;
+    if (y > north) north = y;
+  });
+  if (![west, south, east, north].every((value) => Number.isFinite(value))) {
+    return { type: "Polygon", coordinates: [] };
+  }
+  const ring = [
+    [west, south],
+    [east, south],
+    [east, north],
+    [west, north],
+    [west, south],
+  ];
+  return { type: "Polygon", coordinates: [ring] };
+}
+
+function simplifyGeometry(
+  geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon,
+  tolerance: number,
+): GeoJSON.Polygon | GeoJSON.MultiPolygon | null {
+  if (geometry.type === "Polygon") {
+    const rings = geometry.coordinates.map((ring) => simplifyRing(ring, tolerance)).filter((ring) => ring.length >= 4);
+    if (!rings.length) return null;
+    return { type: "Polygon", coordinates: rings };
+  }
+  const polygons = geometry.coordinates
+    .map((poly) => poly.map((ring) => simplifyRing(ring, tolerance)).filter((ring) => ring.length >= 4))
+    .filter((poly) => poly.length > 0);
+  if (!polygons.length) return null;
+  return { type: "MultiPolygon", coordinates: polygons };
+}
+
+/**
+ * Low-zoom drawing geometry. The acreage and the rest of the properties stay
+ * on the feature. A ring that collapses becomes the parcel envelope.
+ */
+export function simplifyParcelGeometry(
+  geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon,
+  tolerance = PARCEL_LOW_ZOOM_TOLERANCE,
+): GeoJSON.Polygon | GeoJSON.MultiPolygon {
+  const simplified = simplifyGeometry(geometry, tolerance);
+  if (simplified && parcelVertexCount(simplified) >= 4) return simplified;
+  return envelopeGeometry(geometry);
+}
+
+export function simplifyParcelFeature<T extends { geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon }>(
+  feature: T,
+  tolerance = PARCEL_LOW_ZOOM_TOLERANCE,
+): T {
+  return { ...feature, geometry: simplifyParcelGeometry(feature.geometry, tolerance) };
+}

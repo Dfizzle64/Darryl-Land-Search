@@ -169,8 +169,8 @@ function parcelZoomStops(
     hover,
     base,
   ];
-  // First stop is the parcel-visible zoom. Tract outlines own the view below that.
-  return ["interpolate", ["linear"], ["zoom"], 13, at(quiet), 14.25, at(mid), 15.5, at(full)];
+  // First stop is the parcel-visible zoom. Below zoom 8 the layer is hidden.
+  return ["interpolate", ["linear"], ["zoom"], 8, at(quiet), 14.25, at(mid), 15.5, at(full)];
 }
 
 export function parcelFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {

@@ -15,6 +15,7 @@ import {
   STREET_STYLE_CANDIDATES,
   addSatelliteSourceAndLayer,
   applyBasemap,
+  censusTractLinePaint,
   excludedFillPaint,
   excludedLinePaint,
   MF_PRIORITY_SWATCH,
@@ -42,7 +43,23 @@ import {
   measureFeatureCollection,
   type LngLat,
 } from "@/lib/measure";
+import { formatUsd } from "@/lib/format";
+import {
+  annotateViewportTracts,
+  buildTractAttributeIndex,
+  CENSUS_TRACT_LINE_LAYER,
+  generalizationBand,
+  mergeTractFeatures,
+  tractTilesForBbox,
+  TRACT_MIN_ZOOM,
+  tractsVisibleAtZoom,
+  viewportTractPlace,
+  type ViewportTractFeature,
+  type ViewportTractProperties,
+} from "@/lib/censusTracts";
+import { MAP_SCALE } from "@/lib/mapScale";
 import { eligibleClassCut, southCarolinaOverlayMode } from "@/lib/markets";
+import { PARCEL_MIN_ZOOM } from "@/lib/parcelVisibility";
 import { scNominatedOverlayFilter, showOzTractInScMarkets } from "@/lib/scNominatedTracts";
 import {
   arcgisExportTileUrl,
@@ -147,19 +164,16 @@ function andFilter(
   return ["all", base, extra] as maplibregl.FilterSpecification;
 }
 
-function ruralLayerFilter(
-  market: SearchMarketId,
-  county: string | null,
-  countyState: string | null,
+/**
+ * OZ color follows any tract that already has fixture data, not the market
+ * selected in the header. County zoom and panning reveal the rest as outlines.
+ */
+function tractHighlightFilter(
   hideOrangeCounty: boolean,
   geoids: string[] | null = null,
   classCut: "all" | "rural" | "urban" | "none" = "all",
 ): maplibregl.FilterSpecification {
-  const parts: maplibregl.FilterSpecification[] = [["in", ["literal", market], ["get", "markets"]]];
-  if (county && countyState) {
-    parts.push(["==", ["get", "county"], county]);
-    parts.push(["==", ["get", "state"], countyState]);
-  }
+  const parts: maplibregl.FilterSpecification[] = [];
   if (hideOrangeCounty) {
     parts.push(["!", ["all", ["==", ["get", "state"], "Florida"], ["==", ["get", "county"], "Orange"]]]);
   }
@@ -332,6 +346,25 @@ function addOverlayLayers(
   mode: BasemapMode,
 ) {
   addScreeningLayers(map, mode);
+  map.addSource("census-tracts", {
+    type: "geojson",
+    data: EMPTY_COLLECTION,
+    attribution: "U.S. Census Bureau 2020 tracts",
+  });
+  map.addLayer({
+    id: "census-tract-fill",
+    type: "fill",
+    source: "census-tracts",
+    minzoom: TRACT_MIN_ZOOM,
+    paint: { "fill-color": "#64748b", "fill-opacity": 0.01 },
+  });
+  map.addLayer({
+    id: CENSUS_TRACT_LINE_LAYER,
+    type: "line",
+    source: "census-tracts",
+    minzoom: TRACT_MIN_ZOOM,
+    paint: censusTractLinePaint(mode),
+  });
   map.addSource("rural-tracts", { type: "geojson", data: ruralTracts, promoteId: "tractGeoid" });
   map.addSource("eligible-tracts", { type: "geojson", data: eligibleTracts, promoteId: "tractGeoid" });
   map.addSource("rural-pins", { type: "geojson", data: ruralPins, promoteId: "tractGeoid" });
@@ -515,11 +548,41 @@ function addOverlayLayers(
       "circle-stroke-width": 2,
     },
   });
+  for (const layerId of [
+    "rural-fill",
+    "rural-line",
+    "eligible-fill",
+    "eligible-line",
+    "mf-priority-a-fill",
+    "mf-priority-a-line",
+    "mf-priority-b-fill",
+    "mf-priority-b-line",
+    "oz2-fill",
+    "oz2-line",
+    "oz-fill",
+    "oz-line",
+  ]) {
+    map.setLayerZoomRange(layerId, TRACT_MIN_ZOOM, 24);
+  }
+  for (const layerId of ["parcels-fill", "parcels-line", "parcels-fill-excluded", "parcels-line-excluded"]) {
+    map.setLayerZoomRange(layerId, PARCEL_MIN_ZOOM, 24);
+  }
 }
 
 const POPUP_TEXT = "#12202b";
 
-function showTractPopup(map: MapLibreMap, lngLat: maplibregl.LngLatLike, details: TractClickDetails) {
+function incomeLineFrom(value: unknown): string | null {
+  const income = typeof value === "number" ? value : typeof value === "string" && value.trim() ? Number(value) : Number.NaN;
+  if (!Number.isFinite(income) || income <= 0) return null;
+  return `Median household income ${formatUsd(income)} (ACS 5-year B19013)`;
+}
+
+function showTractPopup(
+  map: MapLibreMap,
+  lngLat: maplibregl.LngLatLike,
+  details: TractClickDetails,
+  incomeLine: string | null = null,
+) {
   const root = document.createElement("div");
   root.style.color = POPUP_TEXT;
   const kicker = document.createElement("p");
@@ -558,6 +621,13 @@ function showTractPopup(map: MapLibreMap, lngLat: maplibregl.LngLatLike, details
     rural.style.color = POPUP_TEXT;
     rural.textContent = ruralLine;
     lines.push(rural);
+  }
+  if (incomeLine) {
+    const income = document.createElement("p");
+    income.style.margin = "2px 0 0";
+    income.style.color = POPUP_TEXT;
+    income.textContent = incomeLine;
+    lines.push(income);
   }
   root.append(...lines);
   return new maplibregl.Popup({
@@ -670,7 +740,16 @@ export function SiteMap({
             cooperativeGestures: false,
           });
           applyMapGestures(map, false);
-          map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), "bottom-right");
+          map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), MAP_SCALE.position);
+          map.addControl(
+            new maplibregl.ScaleControl({ maxWidth: MAP_SCALE.maxWidth, unit: MAP_SCALE.unit }),
+            MAP_SCALE.position,
+          );
+          const scaleEl = map.getContainer().querySelector<HTMLElement>(".maplibregl-ctrl-scale");
+          if (scaleEl) {
+            scaleEl.classList.add("dls-map-scale");
+            map.getContainer().appendChild(scaleEl);
+          }
           map.fitBounds(boundsRef.current, { padding: 48, duration: 0, maxZoom: 11 });
           await new Promise<void>((resolve, reject) => {
             const timer = window.setTimeout(() => reject(new Error("Basemap timed out")), 15000);
@@ -737,6 +816,21 @@ export function SiteMap({
             if (typeof id === "string") callbacksRef.current.onSelect(id);
           });
           const tractLayers = ["mf-priority-a-fill", "mf-priority-b-fill", "eligible-fill", "rural-fill", "oz2-fill", "oz-fill"];
+          const outlineDetails = (properties: ViewportTractProperties): TractClickDetails | null => {
+            if (properties.eligible) {
+              return tractClickFromFeature({
+                layerId: properties.rural ? "rural-fill" : "eligible-fill",
+                properties: properties as unknown as Record<string, unknown>,
+              });
+            }
+            if (properties.designatedQoz) {
+              return tractClickFromFeature({
+                layerId: "oz-fill",
+                properties: properties as unknown as Record<string, unknown>,
+              });
+            }
+            return null;
+          };
           map.on("click", tractLayers, (event) => {
             if (drawingRef.current || measuringRef.current) return;
             const feature = event.features?.[0];
@@ -746,21 +840,72 @@ export function SiteMap({
             });
             if (!details) return;
             if (details.kind === "eligible" && !showOzTractInScMarkets({ state: details.state, geoid: details.geoid })) return;
+            const income = incomeLineFrom(feature?.properties?.medianHouseholdIncome);
             const parcelHit = queryRendered(map, event.point, interactive);
             if (parcelHit.length > 0) {
               popupRef.current?.remove();
-              popupRef.current = showTractPopup(map, event.lngLat, details);
+              popupRef.current = showTractPopup(map, event.lngLat, details, income);
               return;
             }
             if (details.kind === "eligible") {
               callbacksRef.current.onSelectTract(details.geoid);
               popupRef.current?.remove();
-              popupRef.current = details.opensRuralDrawer ? null : showTractPopup(map, event.lngLat, details);
+              popupRef.current = details.opensRuralDrawer ? null : showTractPopup(map, event.lngLat, details, income);
               return;
             }
             callbacksRef.current.onSelectTract(null);
             popupRef.current?.remove();
-            popupRef.current = showTractPopup(map, event.lngLat, details);
+            popupRef.current = showTractPopup(map, event.lngLat, details, income);
+          });
+          map.on("click", "census-tract-fill", (event) => {
+            if (drawingRef.current || measuringRef.current) return;
+            if (queryRendered(map, event.point, interactive).length > 0) return;
+            if (queryRendered(map, event.point, tractLayers).length > 0) return;
+            const properties = (event.features?.[0]?.properties ?? null) as ViewportTractProperties | null;
+            if (!properties?.tractGeoid) return;
+            const income = incomeLineFrom(properties.medianHouseholdIncome);
+            const joined = outlineDetails(properties);
+            popupRef.current?.remove();
+            if (joined) {
+              popupRef.current = showTractPopup(map, event.lngLat, joined, income);
+              return;
+            }
+            const place = document.createElement("p");
+            place.style.margin = "0";
+            place.style.fontWeight = "600";
+            place.style.color = POPUP_TEXT;
+            place.textContent = viewportTractPlace(properties);
+            const geoid = document.createElement("p");
+            geoid.style.margin = "2px 0 0";
+            geoid.style.fontWeight = "600";
+            geoid.style.color = POPUP_TEXT;
+            geoid.textContent = `GEOID ${properties.tractGeoid}`;
+            const root = document.createElement("div");
+            root.style.color = POPUP_TEXT;
+            const kicker = document.createElement("p");
+            kicker.textContent = "Census tract";
+            kicker.style.margin = "0 0 2px";
+            kicker.style.fontSize = "11px";
+            kicker.style.letterSpacing = "0.08em";
+            kicker.style.textTransform = "uppercase";
+            kicker.style.color = "#3d4a57";
+            root.append(kicker, place, geoid);
+            if (income) {
+              const line = document.createElement("p");
+              line.style.margin = "2px 0 0";
+              line.style.color = POPUP_TEXT;
+              line.textContent = income;
+              root.append(line);
+            }
+            popupRef.current = new maplibregl.Popup({
+              closeButton: true,
+              maxWidth: "280px",
+              closeOnClick: false,
+              className: "dls-map-popup",
+            })
+              .setLngLat(event.lngLat)
+              .setDOMContent(root)
+              .addTo(map);
           });
           map.on("click", (event) => {
             if (!measuringRef.current || drawingRef.current) return;
@@ -1052,6 +1197,8 @@ export function SiteMap({
     setVisibilitySafe(map, "traffic-line", showOrangePilot && showTraffic ? "visible" : "none");
     setVisibilitySafe(map, "oz-fill", showOrangePilot && showOz ? "visible" : "none");
     setVisibilitySafe(map, "oz-line", showOrangePilot && showOz ? "visible" : "none");
+    setVisibilitySafe(map, "census-tract-fill", showOz2 ? "visible" : "none");
+    setVisibilitySafe(map, CENSUS_TRACT_LINE_LAYER, showOz2 ? "visible" : "none");
     setVisibilitySafe(map, "oz2-fill", showOrangePilot && showOz2 ? "visible" : "none");
     setVisibilitySafe(map, "oz2-line", showOrangePilot && showOz2 ? "visible" : "none");
     const classCut = eligibleClassCut(tractClass, ozFilter);
@@ -1078,14 +1225,14 @@ export function SiteMap({
     const oz2Shown = andFilter(oz2Filter, scNominatedOverlayFilter() as maplibregl.FilterSpecification);
     setFilterSafe(map, "oz2-fill", andFilter(oz2Shown, incomeFilter));
     setFilterSafe(map, "oz2-line", andFilter(oz2Shown, incomeFilter));
-    const ruralFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, restrictGeoids);
+    const ruralFilter = tractHighlightFilter(showOrangePilot, restrictGeoids);
     setFilterSafe(map, "rural-fill", andFilter(ruralFilter, incomeFilter));
     setFilterSafe(map, "rural-line", andFilter(ruralFilter, incomeFilter));
-    const eligibleFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, null, classCut);
+    const eligibleFilter = tractHighlightFilter(showOrangePilot, null, classCut);
     setFilterSafe(map, "eligible-fill", andFilter(eligibleFilter, incomeFilter));
     setFilterSafe(map, "eligible-line", andFilter(eligibleFilter, incomeFilter));
-    const tierAFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, highlightTierA);
-    const tierBFilter = ruralLayerFilter(market, county, countyState, showOrangePilot, highlightTierB);
+    const tierAFilter = tractHighlightFilter(showOrangePilot, highlightTierA);
+    const tierBFilter = tractHighlightFilter(showOrangePilot, highlightTierB);
     setFilterSafe(map, "mf-priority-a-fill", andFilter(tierAFilter, incomeFilter));
     setFilterSafe(map, "mf-priority-a-line", andFilter(tierAFilter, incomeFilter));
     setFilterSafe(map, "mf-priority-b-fill", andFilter(tierBFilter, incomeFilter));
@@ -1103,9 +1250,6 @@ export function SiteMap({
     includeUnknownIncome,
     incomeGeography,
     tractClass,
-    market,
-    county,
-    countyState,
     status,
     highlightTierA,
     highlightTierB,
@@ -1120,6 +1264,8 @@ export function SiteMap({
     setVisibilitySafe(map, "traffic-line", showOrangePilot && showTraffic ? "visible" : "none");
     setVisibilitySafe(map, "oz-fill", showOrangePilot && showOz ? "visible" : "none");
     setVisibilitySafe(map, "oz-line", showOrangePilot && showOz ? "visible" : "none");
+    setVisibilitySafe(map, "census-tract-fill", showOz2 ? "visible" : "none");
+    setVisibilitySafe(map, CENSUS_TRACT_LINE_LAYER, showOz2 ? "visible" : "none");
     setVisibilitySafe(map, "oz2-fill", showOrangePilot && showOz2 ? "visible" : "none");
     setVisibilitySafe(map, "oz2-line", showOrangePilot && showOz2 ? "visible" : "none");
     const classCut = eligibleClassCut(tractClass, ozFilter);
@@ -1207,6 +1353,81 @@ export function SiteMap({
       if (timer) window.clearTimeout(timer);
     };
   }, [screening, status]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready") return;
+    const index = buildTractAttributeIndex({
+      eligible: eligibleTracts,
+      rural: ruralTracts,
+      oz2: oz2Tracts,
+      designated: opportunityZones,
+    });
+    const tileCache = new Map<string, ViewportTractFeature[]>();
+    let timer: number | null = null;
+    let requestId = 0;
+    const setData = (features: ViewportTractFeature[]) => {
+      const source = map.getSource("census-tracts");
+      if (source?.type === "geojson") {
+        (source as GeoJSONSource).setData({ type: "FeatureCollection", features });
+      }
+    };
+    const loadTile = async (tile: [number, number, number, number], zoom: number, id: number) => {
+      const key = `${generalizationBand(zoom)}|${tile.map((value) => value.toFixed(3)).join(",")}`;
+      const cached = tileCache.get(key);
+      if (cached) return cached;
+      const response = await fetch(`/api/census-tracts?bbox=${tile.join(",")}&zoom=${zoom.toFixed(2)}`);
+      if (!response.ok || id !== requestId) return [] as ViewportTractFeature[];
+      const payload = (await response.json()) as { features?: ViewportTractFeature[]; error?: string };
+      if (id !== requestId || payload.error) return [];
+      const features = payload.features ?? [];
+      tileCache.set(key, features);
+      return features;
+    };
+    const load = async () => {
+      const zoom = map.getZoom();
+      if (!tractsVisibleAtZoom(zoom)) {
+        setData([]);
+        return;
+      }
+      const camera = map.getBounds();
+      const tiles = tractTilesForBbox([
+        camera.getWest(),
+        camera.getSouth(),
+        camera.getEast(),
+        camera.getNorth(),
+      ]);
+      const id = ++requestId;
+      if (tiles.length === 0) {
+        setData([]);
+        return;
+      }
+      const groups = await Promise.all(
+        tiles.map(async (tile) => {
+          try {
+            return await loadTile(tile, zoom, id);
+          } catch {
+            return [] as ViewportTractFeature[];
+          }
+        }),
+      );
+      if (id !== requestId) return;
+      setData(annotateViewportTracts(mergeTractFeatures(groups), index));
+    };
+    const schedule = () => {
+      if (timer) window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        void load();
+      }, 350);
+    };
+    schedule();
+    map.on("moveend", schedule);
+    return () => {
+      requestId += 1;
+      map.off("moveend", schedule);
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [eligibleTracts, opportunityZones, oz2Tracts, ruralTracts, status]);
 
   const previousHover = useRef<string | null>(null);
   const previousSelected = useRef<string | null>(null);
@@ -1411,13 +1632,13 @@ export function SiteMap({
           >
             <p className="text-sm font-medium text-clay-400">Parcels are hidden</p>
             <p className="mt-1 text-xs leading-snug text-ink-100">
-              {parcelVisibilityHint || "Zoom in to neighborhood level, lock an area, or turn Show parcels on."}
+              {parcelVisibilityHint || "Zoom in to see parcels."}
             </p>
           </div>
         </div>
       ) : null}
       {status === "ready" && (showOz || showOz2 || showParcels || screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power) ? (
-        <div className="map-chrome map-scrim absolute bottom-3 left-3 z-10 max-w-[17rem] rounded-xl border sm:bottom-4 sm:left-4 sm:max-w-[22rem]">
+        <div className="map-chrome map-scrim absolute bottom-3 left-3 z-10 max-w-[min(17rem,calc(100%-12rem))] rounded-xl border sm:bottom-4 sm:left-4 sm:max-w-[min(22rem,calc(100%-12rem))]">
           <div className="legend-scroll max-h-[42vh] space-y-1.5 overflow-y-auto px-3 py-2.5 text-sm leading-snug">
           {aoi ? (
             <p>
@@ -1455,6 +1676,14 @@ export function SiteMap({
                   </button>
                 ))}
               </div>
+              <p>
+                <span className="mr-2 inline-block h-3.5 w-5 border border-white align-middle" />
+                2020 census tract
+                <span className="mt-0.5 block text-xs text-ink-100">
+                  Boundaries load for the area in view from about county zoom. Color is only where an OZ 2.0 join
+                  exists. A boundary with no color is not a zone and has no invented income.
+                </span>
+              </p>
               <p className="text-[10px] uppercase tracking-[0.14em] text-ink-300">
                 {overlayMode === "nominated-only" ? "South Carolina nominations" : "OZ eligibility"}
               </p>
@@ -1477,8 +1706,8 @@ export function SiteMap({
                     <span className="mt-0.5 block text-xs text-ink-100">{SC_NOMINATED_URBAN_LEGEND_BLURB}</span>
                   </p>
                   <p className="text-xs text-ink-100">
-                    Eligible tracts that were not nominated are not shown. Not a designated QOZ. Nomination alone is not
-                    a tax benefit.
+                    Eligible tracts that were not nominated are not colored. The boundary can still show. Not a designated
+                    QOZ. Nomination alone is not a tax benefit.
                   </p>
                 </>
               ) : (

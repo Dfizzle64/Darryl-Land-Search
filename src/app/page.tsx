@@ -56,7 +56,7 @@ export default async function HomePage() {
   const catalog = {
     ...ruralCatalog,
     parcelNote:
-      "Lake, Orange, Osceola, Polk, and Seminole load every public parcel from 5.0 through 150.0 acres. Other markets load their own 5–150 acre tiles only while that market is selected. Parcels stay off until neighborhood zoom, an area lock, or Show parcels. Counties without an open polygon source stay documented gaps.",
+      "Lake, Orange, Osceola, Polk, and Seminole load every public parcel from 5.0 through 150.0 acres. Other markets load their own 5–150 acre tiles only while that market is selected. Parcel polygons stay off until you zoom in past the tract outlines. Counties without an open polygon source stay documented gaps.",
   };
 
   return (

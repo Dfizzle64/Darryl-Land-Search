@@ -2,7 +2,7 @@
 
 Orlando keeps `scripts/seed_orlando_parcels.py` and `data/fixtures/orlando-parcels`. Lake, Osceola, Seminole, and Sumter in that store were reseeded from public county GIS. Polk's market extract is the property-appraiser layer under `data/fixtures/market-parcels`. The Orlando Polk tiles were not replaced.
 
-Other markets use the same 0.25° tile grid (origin longitude -83, latitude 27) under `data/fixtures/market-parcels/counties/{fips}/tiles`, or they point at an Orlando tile folder when the county is shared. The home page does not embed the polygons. `GET /api/parcels?market={Market}&bbox=w,s,e,n` reads only the tiles for **that market** that intersect the viewport. Outlines stay off until neighborhood zoom (about 10.5), an area is locked, or Show parcels is on — the same gate as Orlando.
+Other markets use the same 0.25° tile grid (origin longitude -83, latitude 27) under `data/fixtures/market-parcels/counties/{fips}/tiles`, or they point at an Orlando tile folder when the county is shared. The home page does not embed the polygons. `GET /api/parcels?market={Market}&bbox=w,s,e,n` reads only the tiles for **that market** that intersect the viewport. Outlines stay off until zoom 13.
 
 ## Refresh
 

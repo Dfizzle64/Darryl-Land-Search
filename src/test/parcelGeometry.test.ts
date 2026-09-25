@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  PARCEL_LOW_ZOOM_TOLERANCE,
   PARCEL_SIMPLIFY_MAX,
   esriRingsToGeoJSON,
+  parcelVertexCount,
   representativePoint,
   signedArea,
+  simplifyParcelFeature,
   simplifyRing,
 } from "../lib/parcelGeometry";
 
@@ -93,5 +96,24 @@ describe("parcel geometry", () => {
     expect(point![0]).toBeLessThanOrEqual(1.05);
     expect(point![1]).toBeGreaterThan(0);
     expect(point![1]).toBeLessThan(3);
+  });
+
+  it("simplifies a dense parcel for zoom 8 without changing acreage", () => {
+    const ring: number[][] = [[-81.5, 28.5]];
+    for (let i = 1; i <= 40; i += 1) {
+      const angle = (i / 40) * Math.PI * 2;
+      ring.push([-81.5 + Math.cos(angle) * 0.01, 28.5 + Math.sin(angle) * 0.01]);
+    }
+    ring.push(ring[0]);
+    const feature = {
+      type: "Feature" as const,
+      geometry: { type: "Polygon" as const, coordinates: [ring] },
+      properties: { acreage: 12.5 },
+    };
+    const simplified = simplifyParcelFeature(feature, PARCEL_LOW_ZOOM_TOLERANCE);
+    expect(simplified.properties.acreage).toBe(12.5);
+    expect(parcelVertexCount(simplified.geometry)).toBeLessThan(parcelVertexCount(feature.geometry));
+    expect(parcelVertexCount(simplified.geometry)).toBeGreaterThanOrEqual(4);
+    expect(feature.geometry.coordinates[0].length).toBeGreaterThan(40);
   });
 });

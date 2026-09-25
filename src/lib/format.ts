@@ -1,4 +1,3 @@
-import { flRestAppraiserLink } from "./flRestBatch1";
 import { southFloridaAppraiserLink } from "./southFlorida";
 
 const ENTITY_RE = /\b(LLC|L\.L\.C|INC|INCORPORATED|LP|L\.P|LLP|CORP|CORPORATION|LTD|TRUST|HOLDINGS|PARTNERS|COMPANY|CO)\b/i;
@@ -42,8 +41,6 @@ export function lakeAltKey(url: string | null | undefined): string | null {
  */
 const PARCEL_ID_LABELS: Record<string, string> = {
   "12011": "Folio",
-  "12023": "Parcel Number",
-  "12035": "Parcel Number",
   "12069": "Parcel Number",
   "12086": "Folio",
   "12087": "RE Number",
@@ -51,7 +48,6 @@ const PARCEL_ID_LABELS: Record<string, string> = {
   "12097": "PIN",
   "12105": "Parcel ID",
   "12117": "Parcel ID",
-  "12125": "PIN",
   "13013": "Parcel Number",
   "13089": "Parcel ID",
   "37021": "PIN",
@@ -184,8 +180,6 @@ export function parcelAppraiserUrl(options: {
   const fips = options.countyFips ?? null;
   const southFlorida = southFloridaAppraiserLink(fips, options.parcelId, options.appraiserUrl);
   if (southFlorida) return southFlorida;
-  const flRest = flRestAppraiserLink(fips, options.parcelId);
-  if (flRest) return flRest;
   if (fips === "12097") {
     const stored = options.appraiserUrl;
     return {

@@ -5,24 +5,22 @@
   "markets": [
     "Big Bend"
   ],
-  "featureCount": 4866,
-  "coverage": "complete-gte-5ac",
+  "featureCount": 4784,
+  "coverage": "sample",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-wakulla-parcelm-12129",
-  "queryUrl": "https://services9.arcgis.com/vAltLjtfYIJc7pDt/arcgis/rest/services/ParcelM/FeatureServer/0/query",
+  "source": "fl-wakulla-county-parcels-12129",
+  "queryUrl": "https://services9.arcgis.com/vAltLjtfYIJc7pDt/arcgis/rest/services/Wakulla_County_Parcels/FeatureServer/0/query",
   "gaps": [
-    "Wakulla parcels are ParcelM. Acreage is MAP_ACRES, 5.0–150.0 inclusive. The layer has no owner or value. FDOR 2025 joins on PARCEL_ID with dashes removed.",
-    "Zoning is Zoning_Map layer 30. Future land use is Future_Land_Use layer 8. Sopchoppy and St. Marks city zoning are not separate layers on this card.",
-    "Sale history beyond the FDOR roll year is not on this extract.",
-    "FDOR 2025 joined 4762/4866 parcel ids. County-number-only filters were not used.",
-    "wakulla-zoning joined 4763/4866.",
-    "wakulla-flu joined 4859/4866."
+    "Partial. The county parcel layer has MAP_ACRES and PARCEL_ID only. No owner, situs, or county zoning.",
+    "County future land use is joined from the planning Future Land Use layer. Sopchoppy zoning (ZoningCat on Sopchoppy_FLUM_WFL1) is joined when the centroid falls inside it. St. Marks has no public zoning FeatureServer. Eligible tracts in this county stay eligible and are not designated QOZs.",
+    "Property appraiser search is https://mywakullapa.com/.",
+    "Join counts: flu=4776, sopchoppy=35, county=4749"
   ],
   "path": "data/fixtures/market-parcels/counties/12129/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12129/lookup.json",
-  "sourceCount": 4866,
-  "dropped": 0,
+  "sourceCount": 4801,
+  "dropped": 1,
   "tileCount": 8
 }

@@ -5,23 +5,20 @@
   "markets": [
     "Big Bend"
   ],
-  "featureCount": 3213,
-  "coverage": "partial",
-  "partition": "tiles",
+  "featureCount": 0,
+  "coverage": "gap",
+  "partition": "none",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-dixie-mil1-12029",
-  "queryUrl": "https://gis.arpc.org/server/rest/services/Florida_Statewide_Cadastral_MIL1/MapServer/0/query",
+  "source": "unavailable",
+  "queryUrl": null,
   "gaps": [
-    "Partial. Dixie parcels are ARPC MIL1 filtered to CNTYNAME='DIXIE'. FDOR 2025 fills blank owner, value, DOR use, acreage, and roll-year sale by PARCEL_ID.",
-    "No queryable zoning or future land use. The land-development atlas is a PDF. Future land use on these rows is the UF GeoPlan 2008 statewide broad land-use categories, not current zoning.",
-    "The property-appraiser detail page uses the same PageID as the search page. Sale history beyond the FDOR roll year is not on this extract.",
-    "FDOR 2025 joined 3183/3213 parcel ids. County-number-only filters were not used.",
-    "2008 statewide broad land-use categories, not current zoning joined 3198/3213."
+    "Gap. No county-hosted parcel polygon service for Dixie County. The property appraiser portal (https://www.qpublic.net/fl/dixie/) is qPublic/Schneider or a search page, not an open parcel GIS, and was not used as a geometry source.",
+    "Statewide FDOR cadastral, Florida DOH EHWATER, and SRWMD republished rolls exist and were not wired. No municipal zoning FeatureServer was confirmed. Eligible tracts in this county stay eligible and are not designated QOZs."
   ],
-  "path": "data/fixtures/market-parcels/counties/12029/tiles",
-  "lookup": "data/fixtures/market-parcels/counties/12029/lookup.json",
-  "sourceCount": 3213,
-  "dropped": 0,
-  "tileCount": 9
+  "path": null,
+  "lookup": null,
+  "sourceCount": null,
+  "dropped": null,
+  "tileCount": null
 }

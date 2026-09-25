@@ -64,8 +64,6 @@ const OTHER_ROWS: Record<OtherMarketId, { total: number; rural: number; urban: n
   Athens: { total: 0, rural: 0, urban: 0 },
   "Hilton Head": { total: 0, rural: 0, urban: 0 },
   "Jackson MS": { total: 0, rural: 0, urban: 0 },
-  "North Florida": { total: 0, rural: 0, urban: 0 },
-  "Panhandle Florida": { total: 0, rural: 0, urban: 0 },
 };
 
 function loadUrban(): EligibleMarketsCatalog {
@@ -124,7 +122,7 @@ describe("other MSA eligible pack", () => {
   });
 
   it("matches each smaller market and does not treat them as primary", () => {
-    expect(OTHER_MARKETS).toHaveLength(30);
+    expect(OTHER_MARKETS).toHaveLength(28);
     expect(OTHER_MARKETS[0]).toBe("South Florida");
     expect(OTHER_MARKETS[1]).toBe("SWFL");
     expect(OTHER_MARKETS[2]).toBe("Heartland");

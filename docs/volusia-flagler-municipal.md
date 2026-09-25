@@ -2,7 +2,7 @@
 
 City zoning and future land use are joined by parcel centroid onto parcels that are already in the app. This pass does not download a new county parcel layer.
 
-Volusia parcels are the Melbourne market extract (`data/fixtures/market-parcels/counties/12127`, 5–150 acres) and the smaller Orlando-shed sample (`data/fixtures/orlando-parcels/12127.geojson`). Flagler 5–150 acre parcels are the FL-rest batch 1 extract on the North Florida shelf. Flagler city and unincorporated layers stay cataloged here. The FL-rest join uses the county zoning and future-land-use layers from that card.
+Volusia parcels are the Melbourne market extract (`data/fixtures/market-parcels/counties/12127`, 5–150 acres) and the smaller Orlando-shed sample (`data/fixtures/orlando-parcels/12127.geojson`). Flagler has no parcel baseline in this repo. Flagler city and unincorporated layers are cataloged and the join script will stamp them when a `12035` parcel fixture exists. County parcels are not pulled to fill that gap.
 
 The catalog is `data/volusia-flagler-municipal.json`. Refresh the stamp with:
 

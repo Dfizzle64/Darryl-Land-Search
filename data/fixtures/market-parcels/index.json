@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-25T00:09:31Z",
+  "generatedAt": "2026-09-24T04:29:15Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -1636,49 +1636,49 @@
     },
     "Big Bend": {
       "tier": "other",
-      "parcelCount": 35957,
-      "completeCountyCount": 4,
+      "parcelCount": 21551,
+      "completeCountyCount": 1,
       "sampleCountyCount": 3,
-      "gapCountyCount": 0,
+      "gapCountyCount": 3,
       "path": "data/fixtures/market-parcels/markets/big-bend/meta.json",
       "counties": [
         {
           "name": "Dixie",
           "state": "Florida",
           "fips": "12029",
-          "featureCount": 3213,
-          "coverage": "partial",
+          "featureCount": 0,
+          "coverage": "gap",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Partial. Dixie parcels are ARPC MIL1 filtered to CNTYNAME='DIXIE'. FDOR 2025 fills blank owner, value, DOR use, acreage, and roll-year sale by PARCEL_ID.",
-            "No queryable zoning or future land use. The land-development atlas is a PDF. Future land use on these rows is the UF GeoPlan 2008 statewide broad land-use categories, not current zoning."
+            "Gap. No county-hosted parcel polygon service for Dixie County. The property appraiser portal (https://www.qpublic.net/fl/dixie/) is qPublic/Schneider or a search page, not an open parcel GIS, and was not used as a geometry source.",
+            "Statewide FDOR cadastral, Florida DOH EHWATER, and SRWMD republished rolls exist and were not wired. No municipal zoning FeatureServer was confirmed. Eligible tracts in this county stay eligible and are not designated QOZs."
           ]
         },
         {
           "name": "Gadsden",
           "state": "Florida",
           "fips": "12039",
-          "featureCount": 5933,
-          "coverage": "complete-gte-5ac",
+          "featureCount": 5917,
+          "coverage": "sample",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Gadsden parcels are ARPC MIL1 filtered to CNTYNAME='GADSDEN'. Acreage is ACRES, 5.0–150.0 inclusive. FDOR 2025 is preferred for the owner name. County-roll names that differ are flagged. Just value, DOR use, and roll-year sale fill from FDOR when the county layer is blank.",
-            "Unincorporated zoning is the December 2020 future-land-use category. County code treats that category as the land-use district. Quincy and Havana zoning polygons override it inside those cities. Chattahoochee, Greensboro, Gretna, and Midway zoning were not found."
+            "Partial. Parcels are Apalachee RPC Gadsden_FLUM2 layer Par_071218 (a 2018 roll), not a live county host. Deed acres are a zero-padded string. Rows stored as 0 are omitted instead of guessed from the polygon.",
+            "Quincy zoning is a PDF at https://www.myquincy.net/building-planning/page/maps, not a FeatureServer. Quincy FLUM categories are joined as future land use inside those polygons and are not zoning codes. Havana zoning districts are joined from the city zoning layer. Midway, Gretna, Chattahoochee, and Greensboro publish FLUM only and are not joined. The roll's situs city is a post office and is not the zoning jurisdiction. Eligible tracts in this county stay eligible and are not designated QOZs."
           ]
         },
         {
           "name": "Jefferson",
           "state": "Florida",
           "fips": "12065",
-          "featureCount": 5158,
-          "coverage": "complete-gte-5ac",
+          "featureCount": 5165,
+          "coverage": "sample",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Jefferson parcels are JC__PARCELS_view. Acreage is COGO_ACRES, 5.0–150.0 inclusive. The parcel layer has no owner. FDOR 2025 fills owner, value, DOR use, and roll-year sale by PARCEL_ID.",
-            "Unincorporated zoning is the land-use district attribute. That layer repeats each parcel about 14 times, so it is deduped on parcel id. OwnerPhone and OwnerEmail are not requested."
+            "Partial. Jefferson County Property Appraiser parcels have COGO_ACRES and a parcel id. No owner or situs.",
+            "Monticello city zoning and city future land use are joined inside the city outline. Unincorporated Jefferson County has no public zoning FeatureServer. Eligible tracts in this county stay eligible and are not designated QOZs."
           ]
         },
         {
@@ -1698,39 +1698,39 @@
           "name": "Madison",
           "state": "Florida",
           "fips": "12079",
-          "featureCount": 7266,
-          "coverage": "partial",
+          "featureCount": 0,
+          "coverage": "gap",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Partial. Madison polygons are the SpatialDataLogic 2024 county extract. Acreage is land square feet divided by 43560, 5.0–150.0 inclusive. FDOR 2025 fills blank owner, value, DOR use, and roll-year sale by PARCEL_ID. CO_NO=50 is the FDOR county number.",
-            "County future land use is the zoning-equivalent district under the land-development code, but the county map is render-only. These rows use the UF GeoPlan 2008 statewide broad land-use categories, not current zoning."
+            "Gap. No county-hosted parcel polygon service for Madison County. The property appraiser portal (https://madisonpa.com/) is qPublic/Schneider or a search page, not an open parcel GIS, and was not used as a geometry source.",
+            "Statewide FDOR cadastral, Florida DOH EHWATER, and SRWMD republished rolls exist and were not wired. No municipal zoning FeatureServer was confirmed. Eligible tracts in this county stay eligible and are not designated QOZs."
           ]
         },
         {
           "name": "Taylor",
           "state": "Florida",
           "fips": "12123",
-          "featureCount": 3836,
-          "coverage": "partial",
+          "featureCount": 0,
+          "coverage": "gap",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Partial. Taylor parcels are ARPC MIL1 filtered to CNTYNAME='TAYLOR'. FDOR 2025 fills blank acreage, owner, value, DOR use, and roll-year sale by PARCEL_ID.",
-            "County future land use is the zoning-equivalent district, and the adopted map is a PDF. These rows use the UF GeoPlan 2008 statewide broad land-use categories, not current zoning. Perry zoning is a PDF. Perry, Utah was not used."
+            "Gap. No county-hosted parcel polygon service for Taylor County. The property appraiser portal (https://qpublic.net/fl/taylor/) is qPublic/Schneider or a search page, not an open parcel GIS, and was not used as a geometry source.",
+            "Statewide FDOR cadastral, Florida DOH EHWATER, and SRWMD republished rolls exist and were not wired. No municipal zoning FeatureServer was confirmed. Eligible tracts in this county stay eligible and are not designated QOZs."
           ]
         },
         {
           "name": "Wakulla",
           "state": "Florida",
           "fips": "12129",
-          "featureCount": 4866,
-          "coverage": "complete-gte-5ac",
+          "featureCount": 4784,
+          "coverage": "sample",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Wakulla parcels are ParcelM. Acreage is MAP_ACRES, 5.0–150.0 inclusive. The layer has no owner or value. FDOR 2025 joins on PARCEL_ID with dashes removed.",
-            "Zoning is Zoning_Map layer 30. Future land use is Future_Land_Use layer 8. Sopchoppy and St. Marks city zoning are not separate layers on this card."
+            "Partial. The county parcel layer has MAP_ACRES and PARCEL_ID only. No owner, situs, or county zoning.",
+            "County future land use is joined from the planning Future Land Use layer. Sopchoppy zoning (ZoningCat on Sopchoppy_FLUM_WFL1) is joined when the centroid falls inside it. St. Marks has no public zoning FeatureServer. Eligible tracts in this county stay eligible and are not designated QOZs."
           ]
         }
       ]
@@ -3230,8 +3230,8 @@
     },
     "North-Central Florida": {
       "tier": "other",
-      "parcelCount": 70271,
-      "completeCountyCount": 8,
+      "parcelCount": 52695,
+      "completeCountyCount": 7,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
       "path": "data/fixtures/market-parcels/markets/north-central-florida/meta.json",
@@ -3312,19 +3312,6 @@
           "gaps": [
             "10984 source rows collapsed to 10200 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
             "Partial. Levy parcels are the Florida DOH 5–150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
-          ]
-        },
-        {
-          "name": "Marion",
-          "state": "Florida",
-          "fips": "12083",
-          "featureCount": 17576,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Marion parcels are ParcelsAndSubdivisions MapServer/0. Acreage is ACRES, 5.0–150.0 inclusive. FDOR 2025 fills blank just value and DOR use by PARCEL_ID.",
-            "Zoning is PlanningZoning MapServer/20. Future land use is joined on PARCELID from MapServer/6. The parcel ZONE1 attribute is not stored as zoning."
           ]
         },
         {
@@ -3749,195 +3736,6 @@
           "gaps": [
             "Partial. PARCEL_INFO reports about 146,014 object ids with ACRES from 5.0 through 150.0. This extract kept the parcels that survived geometry normalize and parcel-id dedupe, not that full object-id count.",
             "Palm Beach parcels are PARCEL_INFO FeatureServer/4. Acreage is ACRES, 5.0–150.0 inclusive. PROPERTY_USE is a text use description, not a numeric DOR_UC."
-          ]
-        }
-      ]
-    },
-    "Panhandle Florida": {
-      "tier": "shelf",
-      "parcelCount": 31906,
-      "completeCountyCount": 4,
-      "sampleCountyCount": 3,
-      "gapCountyCount": 0,
-      "path": "data/fixtures/market-parcels/markets/panhandle-florida/meta.json",
-      "counties": [
-        {
-          "name": "Calhoun",
-          "state": "Florida",
-          "fips": "12013",
-          "featureCount": 3863,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Calhoun parcels are ARPC Florida_Statewide_Cadastral_MIL1 filtered to CNTYNAME='CALHOUN'. Acreage is ACRES, 5.0–150.0 inclusive. FDOR 2025 fills blank owner, value, DOR use, and roll-year sale by PARCEL_ID.",
-            "County zoning is not a FeatureServer. Future land use is Calhoun_FLUM2 category layers plus Blountstown and Altha city layers. Alabama Calhoun GIS was not used."
-          ]
-        },
-        {
-          "name": "Franklin",
-          "state": "Florida",
-          "fips": "12037",
-          "featureCount": 742,
-          "coverage": "partial",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Partial. Franklin parcels are ARPC MIL1 filtered to CNTYNAME='FRANKLIN'. FDOR 2025 fills blank owner, value, DOR use, and roll-year sale by PARCEL_ID.",
-            "County zoning is Franklin_Zones_2292024 joined on parcel id. Unincorporated future land use is not a queryable layer. Carrabelle city zoning and future land use are joined inside that city layer."
-          ]
-        },
-        {
-          "name": "Gulf",
-          "state": "Florida",
-          "fips": "12045",
-          "featureCount": 1219,
-          "coverage": "partial",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Partial. Gulf parcels are ARPC MIL1 filtered to CNTYNAME='GULF'. FDOR 2025 fills blank owner, value, DOR use, and roll-year sale by PARCEL_ID.",
-            "No queryable county zoning or future land use. Port St. Joe and Wewahitchka ARPC layers are vulnerability layers, not zoning, and were not used."
-          ]
-        },
-        {
-          "name": "Holmes",
-          "state": "Florida",
-          "fips": "12059",
-          "featureCount": 6339,
-          "coverage": "partial",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Partial. Holmes parcels are ARPC MIL1 filtered to CNTYNAME='HOLMES'. FDOR 2025 fills blank owner, value, DOR use, and roll-year sale by PARCEL_ID.",
-            "The county regulates by future land use, and that map is a PDF. There is no zoning district layer and no future-land-use FeatureServer."
-          ]
-        },
-        {
-          "name": "Jackson",
-          "state": "Florida",
-          "fips": "12063",
-          "featureCount": 11026,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Jackson parcels are ARPC MIL1 filtered to CNTYNAME='JACKSON'. FDOR 2025 fills blank owner, value, DOR use, and roll-year sale by PARCEL_ID.",
-            "Future land use is Counties/Jackson_FLUM. There is no countywide zoning FeatureServer. Jackson County in other states was not used."
-          ]
-        },
-        {
-          "name": "Liberty",
-          "state": "Florida",
-          "fips": "12077",
-          "featureCount": 1627,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Liberty parcels are ARPC MIL1 filtered to CNTYNAME='LIBERTY'. FDOR 2025 fills blank owner, value, DOR use, and roll-year sale by PARCEL_ID.",
-            "Future land use is Liberty_FLUM category layers plus Bristol. There is no countywide zoning FeatureServer. Liberty County, Georgia was not used."
-          ]
-        },
-        {
-          "name": "Washington",
-          "state": "Florida",
-          "fips": "12133",
-          "featureCount": 7090,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Washington parcels are WashingtonParcelsAGOL. Acreage is CALC_ACRES, 5.0–150.0 inclusive. Owner, value, DOR use, and roll-year sale come from the FDOR 2025 join on PARCEL_ID.",
-            "Future land use is WashingtonFLUM_D, with Ebro inside the town layer. There is no countywide zoning FeatureServer."
-          ]
-        }
-      ]
-    },
-    "North Florida": {
-      "tier": "shelf",
-      "parcelCount": 35347,
-      "completeCountyCount": 2,
-      "sampleCountyCount": 4,
-      "gapCountyCount": 0,
-      "path": "data/fixtures/market-parcels/markets/north-florida/meta.json",
-      "counties": [
-        {
-          "name": "Columbia",
-          "state": "Florida",
-          "fips": "12023",
-          "featureCount": 10747,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Columbia parcels are Parcels_and_Addresses MapServer/2. Acreage is Acres, 5.0–150.0 inclusive. The layer has owner and acres. Just value and DOR use are not on the layer.",
-            "County ParcelNo and the FDOR PARCEL_ID are different formats. The FDOR join is by parcel id only. Rows that do not match stay without a FDOR value."
-          ]
-        },
-        {
-          "name": "Flagler",
-          "state": "Florida",
-          "fips": "12035",
-          "featureCount": 3446,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Flagler parcels are Flagler_County_Parcels. Acreage is legal_acreage, 5.0–150.0 inclusive. FDOR 2025 fills blank DOR use and roll-year sale by PARCEL_ID.",
-            "Zoning and future land use are the unincorporated Palm Coast GIS layers. Beverly Beach future land use is a gap on the municipal card and is not invented here."
-          ]
-        },
-        {
-          "name": "Hamilton",
-          "state": "Florida",
-          "fips": "12047",
-          "featureCount": 4158,
-          "coverage": "partial",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Partial. Hamilton parcels are ARPC MIL1 filtered to CNTYNAME='HAMILTON'. FDOR 2025 fills blank owner, value, DOR use, and roll-year sale by PARCEL_ID.",
-            "No county enterprise zoning or future-land-use service. Hamilton County, Ohio and other namesakes were not used."
-          ]
-        },
-        {
-          "name": "Lafayette",
-          "state": "Florida",
-          "fips": "12067",
-          "featureCount": 2834,
-          "coverage": "partial",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Partial. Lafayette parcels are SRWMD_Parcels layer 8. Acreage is AREANO, 5.0–150.0 inclusive. FDOR 2025 fills blank owner, value, DOR use, and roll-year sale by PIN.",
-            "No queryable zoning or future land use. Lafayette County in other states was not used."
-          ]
-        },
-        {
-          "name": "Suwannee",
-          "state": "Florida",
-          "fips": "12121",
-          "featureCount": 11818,
-          "coverage": "partial",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Partial. Suwannee parcels are SRWMD_Parcels layer 11. Acreage is AREANO, 5.0–150.0 inclusive. FDOR 2025 fills blank owner, value, DOR use, and roll-year sale by PIN.",
-            "No queryable zoning or future land use."
-          ]
-        },
-        {
-          "name": "Union",
-          "state": "Florida",
-          "fips": "12125",
-          "featureCount": 2344,
-          "coverage": "partial",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Partial. Union parcels are SRWMD_Parcels layer 13, Lake Butler, Florida. Acreage is AREANO, 5.0–150.0 inclusive. FDOR 2025 fills blank owner, value, DOR use, and roll-year sale by PIN.",
-            "No queryable zoning or future land use. Union County in South Carolina, North Carolina, and other states was not used."
           ]
         }
       ]

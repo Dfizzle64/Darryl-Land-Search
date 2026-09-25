@@ -5,26 +5,22 @@
   "markets": [
     "Big Bend"
   ],
-  "featureCount": 5158,
-  "coverage": "complete-gte-5ac",
+  "featureCount": 5165,
+  "coverage": "sample",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-jefferson-parcels-12065",
+  "source": "fl-jefferson-pa-parcels-12065",
   "queryUrl": "https://services5.arcgis.com/vFMp1Ly1q6rKKp0o/arcgis/rest/services/JC__PARCELS_view/FeatureServer/0/query",
   "gaps": [
-    "Jefferson parcels are JC__PARCELS_view. Acreage is COGO_ACRES, 5.0–150.0 inclusive. The parcel layer has no owner. FDOR 2025 fills owner, value, DOR use, and roll-year sale by PARCEL_ID.",
-    "Unincorporated zoning is the land-use district attribute. That layer repeats each parcel about 14 times, so it is deduped on parcel id. OwnerPhone and OwnerEmail are not requested.",
-    "Monticello zoning and future land use override inside the city polygons. The county FLUM is a legacy shapefile and may be missing. Jefferson County, Alabama was not used.",
-    "FDOR 2025 joined 5024/5158 parcel ids. County-number-only filters were not used.",
-    "jefferson-land-use-district joined 5154/5158.",
-    "monticello-zoning joined 48/5158.",
-    "monticello-flum joined 48/5158.",
-    "jefferson-flum-legacy joined 5149/5158."
+    "Partial. Jefferson County Property Appraiser parcels have COGO_ACRES and a parcel id. No owner or situs.",
+    "Monticello city zoning and city future land use are joined inside the city outline. Unincorporated Jefferson County has no public zoning FeatureServer. Eligible tracts in this county stay eligible and are not designated QOZs.",
+    "Property appraiser search is https://jeffersonpa.net/. Null COGO_ACRES rows are omitted.",
+    "Join counts: monticello=48, county=5117, zoning=48, flu=48"
   ],
   "path": "data/fixtures/market-parcels/counties/12065/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12065/lookup.json",
-  "sourceCount": 5158,
+  "sourceCount": 5383,
   "dropped": 0,
   "tileCount": 8
 }

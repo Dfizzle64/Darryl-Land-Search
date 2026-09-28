@@ -104,4 +104,16 @@ describe("rural OZ batch 1 parcel shelves", () => {
     );
     expect(page.collection.features.some((item) => item.properties.countyFips === "12007")).toBe(true);
   });
+
+  it("draws the Marion market extract instead of the Orlando sample", async () => {
+    const row = countyFile("12083");
+    const tiles = readdirSync(row.path).filter((name) => name.endsWith(".geojson"));
+    const collection = JSON.parse(readFileSync(path.join(row.path, tiles[0]), "utf8")) as ParcelCollection;
+    const [lon, lat] = collection.features[0].properties.centroid;
+    const page = await queryParcelsInView([lon - 0.05, lat - 0.05, lon + 0.05, lat + 0.05]);
+    const marion = page.collection.features.filter((item) => item.properties.countyFips === "12083");
+    expect(marion.length).toBeGreaterThan(0);
+    expect(marion.every((item) => item.properties.source === "fl-marion-parcels-12083")).toBe(true);
+    expect(marion.every((item) => (item.properties.acreage ?? 0) >= 5 && (item.properties.acreage ?? 0) <= 150)).toBe(true);
+  });
 });

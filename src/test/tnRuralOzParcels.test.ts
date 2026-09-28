@@ -24,7 +24,7 @@ const COUNTIES = [
   { fips: "47145", name: "Roane", source: "tn-oir-public-use-47145" },
   { fips: "47147", name: "Robertson", source: "tn-oir-public-use-47147" },
   { fips: "47153", name: "Sequatchie", source: "tn-oir-public-use-47153" },
-  { fips: "47155", name: "Sevier", source: "tn-oir-public-use-47155" },
+  { fips: "47155", name: "Sevier", source: "tn-sevier-county-gis-mapserver-57" },
   { fips: "47183", name: "Weakley", source: "tn-oir-public-use-47183" },
   { fips: "47189", name: "Wilson", source: "tn-oir-public-use-47189" },
 ] as const;
@@ -151,10 +151,60 @@ describe("Tennessee rural parcel counties", () => {
       } else if (county.fips === "47133") {
         if (sale && (sale.price != null || sale.date != null)) expect(sale.vintage).toBe("2019");
         if (tax?.marketValue != null) expect(tax.vintage).toBe("2019");
+      } else if (county.fips === "47155") {
+        expect(manifest.queryUrl).toContain("GIS_Department_Layers/MapServer/57");
+        expect(manifest.queryUrl).not.toContain("Tennessee_Property_Boundaries_Public_Use");
+        expect(feature.properties.appraiserUrl).toContain("assessment.cot.tn.gov/TPAD");
+        if (sale && (sale.price != null || sale.date != null)) expect(sale.vintage ?? null).toBeNull();
+        if (tax?.marketValue != null) expect(tax.vintage ?? null).toBeNull();
+        let sales = 0;
+        let values = 0;
+        let assessed = 0;
+        let stamped2023 = 0;
+        for (const tile of tiles) {
+          const all = JSON.parse(await readFile(path.join(tileDir, tile), "utf8")) as {
+            features: Array<{
+              properties: {
+                acreage: number;
+                parcelId?: string;
+                lastSale?: { vintage?: string | null; price?: number | null; date?: string | null };
+                tax?: { vintage?: string | null; marketValue?: number | null; assessedValue?: number | null };
+                opportunityZone: unknown;
+              };
+            }>;
+          };
+          for (const row of all.features) {
+            expect(row.properties.acreage).toBeGreaterThanOrEqual(5);
+            expect(row.properties.acreage).toBeLessThanOrEqual(150);
+            expect(row.properties.opportunityZone).toBeNull();
+            expect(row.properties.parcelId ?? "").toMatch(/^078/);
+            const rowSale = row.properties.lastSale;
+            const rowTax = row.properties.tax;
+            if (rowSale && (rowSale.price != null || rowSale.date != null)) {
+              sales += 1;
+              if (rowSale.vintage != null) stamped2023 += 1;
+            }
+            if (rowTax?.marketValue != null) {
+              values += 1;
+              if (rowTax.vintage != null) stamped2023 += 1;
+            }
+            if (rowTax?.assessedValue != null) assessed += 1;
+          }
+        }
+        expect(sales).toBeGreaterThan(0);
+        expect(values).toBeGreaterThan(0);
+        expect(assessed).toBeGreaterThan(0);
+        expect(stamped2023).toBe(0);
       } else if (sale && (sale.price != null || sale.date != null)) {
         expect(sale.vintage).toBe("2023");
       }
-      if (tax?.marketValue != null && county.fips !== "47023" && county.fips !== "47133" && county.fips !== "47081") {
+      if (
+        tax?.marketValue != null &&
+        county.fips !== "47023" &&
+        county.fips !== "47133" &&
+        county.fips !== "47081" &&
+        county.fips !== "47155"
+      ) {
         expect(tax.vintage).toBe("2023");
       }
     }

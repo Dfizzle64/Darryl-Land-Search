@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
 """Public 5.0–150.0 acre parcels for 20 Tennessee counties.
 
-Geometry and owner come from the Tennessee OIR layer
-Tennessee Property Boundaries Public Use (edited 2026-09-10). Sale date,
-sale price, and appraisal are joined from AGOL TN_County_Parcel_Map
-(edited 2023-11-22) on GISLINK and labeled 2023. Acreage is polygon area
-because DEEDAC is often 0.
+County endpoints live in data/tn-rural-parcel-sources.json. After a
+refreshed research card changes a URL or field, edit that county's block
+and re-pull only that county:
 
-Hickman is not on that statewide layer. It uses the May 2023 CaptureCAMA
-snapshot. Chester uses the county CaptureCAMA Parcels_12 layer: a blank
-tax-record id falls back to the map id, and rows with neither id are dropped.
+    python3 scripts/tn_oir_parcels.py --county Sevier --refresh
 
-Bedford County, Pennsylvania and paid parcel vendors are rejected.
-Opportunity Zone status is not set.
+The source rule wins over older card text. Geometry and owner come from
+the Tennessee OIR layer Tennessee Property Boundaries Public Use (edited
+2026-09-10). Sale date, sale price, and appraisal are joined from AGOL
+TN_County_Parcel_Map (edited 2023-11-22) on GISLINK and labeled 2023.
+Acreage is polygon area because DEEDAC is often 0.
+
+Hickman uses the May 2023 CaptureCAMA snapshot. Chester uses the county
+CaptureCAMA Parcels_12 layer: a blank tax-record id falls back to the map
+id, and rows with neither id are dropped. Sevier uses the county-hosted
+Sevierville GIS layer as the primary source, not the statewide OIR layer.
+That county CAMA is not labeled 2023.
+
+Bedford County, Pennsylvania, Utah Sevier County, and paid parcel vendors
+are rejected. Opportunity Zone status is not set.
 """
 
 from __future__ import annotations
@@ -29,6 +37,7 @@ from typing import Any
 from parcel_geometry import esri_rings_to_geojson, net_acres, representative_point
 
 ROOT = Path(__file__).resolve().parents[1]
+SOURCES_PATH = ROOT / "data" / "tn-rural-parcel-sources.json"
 CACHE_DIR = Path("/tmp/dls-tn-oir")
 MIN_ACRES = 5.0
 MAX_ACRES = 150.0
@@ -102,7 +111,7 @@ CHESTER_FIELDS = [
     "GPDATA__27",
 ]
 
-# Paid vendors and the wrong Bedford / Chester County, Pennsylvania layers.
+# Paid vendors, the Pennsylvania namesakes of Bedford and Chester, and Utah Sevier.
 REJECTED_URL_TOKENS = (
     "regrid",
     "chesco.org",
@@ -110,42 +119,62 @@ REJECTED_URL_TOKENS = (
     "april2023parcels",
     "bedfordcountypa",
     "imagery.pasda",
+    "gis.utah.gov",
+    "agrc.utah",
 )
-
-COUNTIES: list[dict[str, Any]] = [
-    {"fips": "47111", "name": "Macon", "mode": "oir", "oir": "MACON", "tncpm": 37},
-    {"fips": "47043", "name": "Dickson", "mode": "oir", "oir": "DICKSON", "tncpm": 64},
-    {"fips": "47129", "name": "Morgan", "mode": "oir", "oir": "MORGAN", "tncpm": 26},
-    {"fips": "47143", "name": "Rhea", "mode": "oir", "oir": "RHEA", "tncpm": 20},
-    {"fips": "47145", "name": "Roane", "mode": "oir", "oir": "ROANE", "tncpm": 19},
-    {"fips": "47147", "name": "Robertson", "mode": "oir", "oir": "ROBERTSON", "tncpm": 18},
-    {"fips": "47153", "name": "Sequatchie", "mode": "oir", "oir": "SEQUATCHIE", "tncpm": 16},
-    {"fips": "47189", "name": "Wilson", "mode": "oir", "oir": "WILSON", "tncpm": 0},
-    {"fips": "47081", "name": "Hickman", "mode": "hickman"},
-    {"fips": "47023", "name": "Chester", "mode": "chester"},
-    {"fips": "47003", "name": "Bedford", "mode": "oir", "oir": "BEDFORD", "tncpm": 82},
-    {"fips": "47015", "name": "Cannon", "mode": "oir", "oir": "CANNON", "tncpm": 76},
-    {"fips": "47071", "name": "Hardin", "mode": "oir", "oir": "HARDIN", "tncpm": 52},
-    {"fips": "47133", "name": "Overton", "mode": "oir", "oir": "OVERTON", "tncpm": None},
-    {"fips": "47155", "name": "Sevier", "mode": "oir", "oir": "SEVIER", "tncpm": 15},
-    {"fips": "47141", "name": "Putnam", "mode": "oir", "oir": "PUTNAM", "tncpm": 21},
-    {"fips": "47183", "name": "Weakley", "mode": "oir", "oir": "WEAKLEY", "tncpm": 2},
-    {"fips": "47001", "name": "Anderson", "mode": "oir", "oir": "ANDERSON", "tncpm": 83},
-    {"fips": "47029", "name": "Cocke", "mode": "oir", "oir": "COCKE", "tncpm": 70},
-    {"fips": "47013", "name": "Campbell", "mode": "oir", "oir": "CAMPBELL", "tncpm": 77},
-]
-BY_FIPS = {row["fips"]: row for row in COUNTIES}
 
 
 def reject_source_url(url: str) -> None:
-    """Refuse paid vendors and the Pennsylvania namesakes of Bedford and Chester."""
+    """Refuse paid vendors and the out-of-state namesakes of these counties."""
     lowered = (url or "").lower()
     for token in REJECTED_URL_TOKENS:
         if token in lowered:
             raise RuntimeError(
-                f"Refusing {url}. That endpoint is a paid vendor or a Pennsylvania "
-                "Bedford/Chester layer, not a Tennessee public parcel source."
+                f"Refusing {url}. That endpoint is a paid vendor, a Pennsylvania "
+                "Bedford/Chester layer, or Utah Sevier County parcels."
             )
+
+
+def assert_sevier_primary(row: dict) -> None:
+    """Sevier stays on the county-hosted layer even if a card still names OIR."""
+    if row.get("fips") != "47155":
+        return
+    url = row.get("queryUrl") or ""
+    if row.get("mode") != "county-hosted":
+        raise RuntimeError("Sevier mode must be county-hosted, not the statewide OIR layer")
+    if "Tennessee_Property_Boundaries_Public_Use" in url or "/TN_County_Parcel_Map/" in url:
+        raise RuntimeError(
+            "Sevier primary source must be the county-hosted GIS layer, not statewide OIR "
+            "or TN_County_Parcel_Map"
+        )
+    reject_source_url(url)
+
+
+def load_source_rows(path: Path | None = None) -> list[dict[str, Any]]:
+    """Read the county endpoint manifest. Editing a block and re-running is the re-pull."""
+    source_path = path or SOURCES_PATH
+    payload = json.loads(source_path.read_text())
+    rows = payload.get("counties")
+    if not isinstance(rows, list) or not rows:
+        raise RuntimeError(f"{source_path} has no counties")
+    seen: set[str] = set()
+    for row in rows:
+        fips = row.get("fips")
+        if not fips or fips in seen:
+            raise RuntimeError(f"Duplicate or blank FIPS in {source_path}")
+        seen.add(fips)
+        if not row.get("queryUrl") or not row.get("mode") or not row.get("source"):
+            raise RuntimeError(f"{fips} is missing mode, source, or queryUrl")
+        reject_source_url(row["queryUrl"])
+        assert_sevier_primary(row)
+        for join_url in (row.get("joins") or {}).values():
+            if isinstance(join_url, str):
+                reject_source_url(join_url)
+    return rows
+
+
+COUNTIES: list[dict[str, Any]] = load_source_rows()
+BY_FIPS = {row["fips"]: row for row in COUNTIES}
 
 
 def clean(value: Any) -> str | None:
@@ -169,6 +198,13 @@ def num(value: Any) -> float | None:
 
 def in_band(acres: float | None) -> bool:
     return acres is not None and MIN_ACRES <= acres <= MAX_ACRES
+
+
+def positive(value: Any) -> float | None:
+    parsed = num(value)
+    if parsed is None or parsed <= 0:
+        return None
+    return parsed
 
 
 def yymmdd_to_iso(value: Any) -> str | None:
@@ -370,26 +406,17 @@ def tn_oir_spec(fips: str) -> dict:
     row = BY_FIPS[fips]
     mode = row["mode"]
     if mode == "hickman":
-        return {
-            "kind": "tn-oir",
-            "url": HICKMAN_QUERY,
-            "source": "tn-hickman-capturecama-202305",
-            "coverage": "complete-gte-5ac",
-            "gaps": hickman_gaps(),
-        }
-    if mode == "chester":
-        return {
-            "kind": "tn-oir",
-            "url": CHESTER_QUERY,
-            "source": "tn-chester-capturecama-parcels12",
-            "coverage": "complete-gte-5ac",
-            "gaps": chester_gaps(),
-        }
-    gaps = oir_gaps(row)
+        gaps = hickman_gaps()
+    elif mode == "chester":
+        gaps = chester_gaps()
+    elif mode == "county-hosted":
+        gaps = sevier_gaps()
+    else:
+        gaps = oir_gaps(row)
     return {
         "kind": "tn-oir",
-        "url": OIR_QUERY,
-        "source": f"tn-oir-public-use-{fips}",
+        "url": row["queryUrl"],
+        "source": row["source"],
         "coverage": "complete-gte-5ac",
         "gaps": gaps,
     }
@@ -412,12 +439,21 @@ def oir_gaps(row: dict) -> list[str]:
             0,
             "Bedford is Bedford County, Tennessee (FIPS 47003). April2023Parcels and the Bedford County, Pennsylvania viewer were not used. Centroids outside Tennessee abort the load.",
         )
-    if row["tncpm"] is None:
+    if row.get("tncpmLayer") is None:
         notes.insert(
             1,
             "Overton is not a layer on TN_County_Parcel_Map. Sale date, sale price, appraisal, and mailing are joined from UCDD Overton_Parcels on GISLINK. That roll's PARCELID year is 2019, so those fields are labeled 2019, not 2023. Owner and geometry stay on the 2026 OIR layer.",
         )
     return notes
+
+
+def sevier_gaps() -> list[str]:
+    return [
+        "Sevier parcels are the county-hosted Sevierville GIS layer GIS_Department_Layers MapServer/57. The statewide OIR layer and TN_County_Parcel_Map are not the primary source. Utah AGRC Sevier County parcels were not used.",
+        "Acreage is computed from the polygon. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified. CALC_ACRE is recorded as a source statistic and is not the filter.",
+        "Owner, situs, mailing, sale date, sale price, appraisal, and assessed value come from that county layer. A sale price of 0 is treated as no price. Those sale and value fields are the county CAMA and are not labeled 2023.",
+        "The property-record link is the Comptroller TPAD GIS card for the GISLINK. Opportunity Zone status was not inferred. Regrid and other paid parcel vendors were not used.",
+    ]
 
 
 def hickman_gaps() -> list[str]:
@@ -506,9 +542,11 @@ def geometry_acres(feature: dict, source_url: str) -> tuple[dict | None, float, 
 
 
 def load_oir(row: dict, county: dict, markets: list[str], source: str) -> tuple[list[dict], dict]:
-    where = f"COUNTY_NAME='{row['oir']}' AND PARCEL_TYPE=1"
+    url = row["queryUrl"]
+    oir_name = row["oirName"]
+    where = row.get("where") or f"COUNTY_NAME='{oir_name}' AND PARCEL_TYPE=1"
     print(f"  OIR ids {where}", flush=True)
-    ids = fetch_object_ids(OIR_QUERY, where)
+    ids = fetch_object_ids(url, where)
     print(f"  OIR object ids {len(ids)}", flush=True)
     by_id: dict[str, dict] = {}
     dropped_geom = 0
@@ -517,15 +555,15 @@ def load_oir(row: dict, county: dict, markets: list[str], source: str) -> tuple[
     deed_in_band = 0
     fetched = 0
     considered = 0
-    for page in iter_by_ids(OIR_QUERY, ids, OIR_FIELDS, geometry=True, batch=40):
+    for page in iter_by_ids(url, ids, OIR_FIELDS, geometry=True, batch=40):
         fetched += len(page)
         for item in page:
             considered += 1
             attrs = item.get("attributes") or {}
             county_name = clean(attrs.get("COUNTY_NAME"))
-            if county_name and county_name.upper() != row["oir"]:
+            if county_name and county_name.upper() != oir_name:
                 raise RuntimeError(f"{row['fips']} received COUNTY_NAME {attrs.get('COUNTY_NAME')}")
-            geometry, acres, center = geometry_acres(item, OIR_QUERY)
+            geometry, acres, center = geometry_acres(item, url)
             if num(attrs.get("DEEDAC")) is not None and in_band(num(attrs.get("DEEDAC"))):
                 deed_in_band += 1
             if not geometry or not center:
@@ -645,19 +683,133 @@ def apply_2023_join(features: list[dict], layer_id: int | None) -> dict:
     return {"tncpmLayer": layer_id, "tncpmMatched": matched, "saleCount": sales, "appraisalCount": values}
 
 
-def load_hickman(county: dict, markets: list[str], source: str) -> tuple[list[dict], dict]:
-    where = "CALC_ACRE>=5 AND CALC_ACRE<=150"
-    ids = fetch_object_ids(HICKMAN_QUERY, where)
+def load_county_hosted(row: dict, county: dict, markets: list[str], source: str) -> tuple[list[dict], dict]:
+    """Primary polygons and CAMA from a county layer. Acreage is the polygon, not a 2023 join."""
+    from seed_market_parcels import epoch_to_iso
+
+    assert_sevier_primary(row)
+    url = row["queryUrl"]
+    fields_map = row.get("fields") or {}
+    required = ("id", "owner", "situs", "saleDate", "salePrice", "marketValue", "calcAcres")
+    missing = [name for name in required if not fields_map.get(name)]
+    if missing:
+        raise RuntimeError(f"{row['fips']} county-hosted field map is missing {', '.join(missing)}")
+    out_fields = list(dict.fromkeys(value for value in fields_map.values() if value))
+    where = row.get("where") or "1=1"
+    print(f"  county-hosted ids {url} {where}", flush=True)
+    ids = fetch_object_ids(url, where)
+    print(f"  county-hosted object ids {len(ids)}", flush=True)
+    by_id: dict[str, dict] = {}
+    dropped_geom = 0
+    dropped_band = 0
+    dropped_id = 0
+    dropped_prefix = 0
+    calc_in_band = 0
+    fetched = 0
+    considered = 0
+    prefix = clean(row.get("gislinkPrefix"))
+    expected_county = row.get("countyId")
+    county_field = fields_map.get("countyId")
+    for page in iter_by_ids(url, ids, out_fields, geometry=True, batch=40):
+        fetched += len(page)
+        for item in page:
+            considered += 1
+            attrs = item.get("attributes") or {}
+            if expected_county is not None and county_field:
+                found_county = num(attrs.get(county_field))
+                # This layer stores 0 when the comptroller id was not filled in.
+                if found_county is not None and int(found_county) not in (0, int(expected_county)):
+                    raise RuntimeError(
+                        f"{row['fips']} received COUNTY_ID {attrs.get(county_field)} from {url}"
+                    )
+            if in_band(num(attrs.get(fields_map["calcAcres"]))):
+                calc_in_band += 1
+            geometry, acres, center = geometry_acres(item, url)
+            if not geometry or not center:
+                dropped_geom += 1
+                continue
+            if not in_band(acres):
+                dropped_band += 1
+                continue
+            parcel_id = clean(attrs.get(fields_map["id"])) or clean(attrs.get(fields_map.get("altId") or ""))
+            if not parcel_id:
+                dropped_id += 1
+                continue
+            if prefix and not "".join(parcel_id.split()).startswith(prefix):
+                dropped_prefix += 1
+                continue
+            feature = base_feature(
+                county=county,
+                markets=markets,
+                parcel_id=parcel_id,
+                acreage=acres,
+                geometry=geometry,
+                center=center,
+                source=source,
+                owner=clean(attrs.get(fields_map["owner"])),
+                situs=clean(attrs.get(fields_map["situs"])),
+                mail1=clean(attrs.get(fields_map.get("mail1") or "")),
+                mail_city=clean(attrs.get(fields_map.get("mailCity") or "")),
+                mail_state=clean(attrs.get(fields_map.get("mailState") or "")),
+                mail_zip=clean(attrs.get(fields_map.get("mailZip") or "")),
+            )
+            props = feature["properties"]
+            props["ownerName2"] = clean(attrs.get(fields_map.get("owner2") or ""))
+            props["appraiserUrl"] = tpad_url(None, parcel_id)
+            sold = epoch_to_iso(attrs.get(fields_map["saleDate"]))
+            price = positive(attrs.get(fields_map["salePrice"]))
+            if sold is not None or price is not None:
+                props["lastSale"] = {"date": sold, "price": price, "qualified": None}
+            appraisal = positive(attrs.get(fields_map["marketValue"]))
+            assessed = positive(attrs.get(fields_map.get("assessedValue") or ""))
+            if appraisal is not None:
+                props["tax"]["marketValue"] = appraisal
+            if assessed is not None:
+                props["tax"]["assessedValue"] = assessed
+            remember(by_id, feature)
+    if fetched != len(ids):
+        raise RuntimeError(f"{row['fips']} fetched {fetched} county features of {len(ids)} ids")
+    if dropped_prefix and not by_id:
+        raise RuntimeError(f"{row['fips']} dropped every row for GISLINK prefix {prefix}")
+    kept = list(by_id.values())
+    sales = sum(
+        1
+        for feature in kept
+        if feature["properties"]["lastSale"].get("date") or feature["properties"]["lastSale"].get("price") is not None
+    )
+    appraisals = sum(1 for feature in kept if feature["properties"]["tax"].get("marketValue") is not None)
+    assessed_count = sum(1 for feature in kept if feature["properties"]["tax"].get("assessedValue") is not None)
+    stats = {
+        "sourceRows": len(ids),
+        "calcAcresInBand": calc_in_band,
+        "droppedGeometry": dropped_geom,
+        "droppedOutsideBand": dropped_band,
+        "droppedNoId": dropped_id,
+        "droppedWrongPrefix": dropped_prefix,
+        "duplicateIdsCollapsed": considered - dropped_geom - dropped_band - dropped_id - dropped_prefix - len(by_id),
+        "saleCount": sales,
+        "appraisalCount": appraisals,
+        "assessedCount": assessed_count,
+        "saleVintage": None,
+    }
+    return kept, stats
+
+
+def load_hickman(row: dict, county: dict, markets: list[str], source: str) -> tuple[list[dict], dict]:
+    url = row["queryUrl"]
+    where = row.get("where") or "CALC_ACRE>=5 AND CALC_ACRE<=150"
+    portal = row.get("portal") or HICKMAN_PORTAL
+    ids = fetch_object_ids(url, where)
     print(f"  Hickman ids {len(ids)}", flush=True)
     by_id: dict[str, dict] = {}
     dropped = 0
     fetched = 0
-    for page in iter_by_ids(HICKMAN_QUERY, ids, HICKMAN_FIELDS, geometry=True, batch=40):
+    for page in iter_by_ids(url, ids, HICKMAN_FIELDS, geometry=True, batch=40):
         fetched += len(page)
         for item in page:
             attrs = item.get("attributes") or {}
             acres = num(attrs.get("CALC_ACRE"))
-            geometry, _computed, center = geometry_acres(item, HICKMAN_QUERY)
+            geometry, _computed, center = geometry_acres(item, url)
             if not geometry or not center or not in_band(acres):
                 dropped += 1
                 continue
@@ -681,7 +833,7 @@ def load_hickman(county: dict, markets: list[str], source: str) -> tuple[list[di
                 mail_zip=clean(attrs.get("ZIP")),
             )
             feature["properties"]["ownerName2"] = clean(attrs.get("OWNER2"))
-            feature["properties"]["appraiserUrl"] = HICKMAN_PORTAL
+            feature["properties"]["appraiserUrl"] = portal
             appraisal = num(attrs.get("APRVAL"))
             assessed = num(attrs.get("ASMT"))
             if appraisal is not None and appraisal > 0:
@@ -696,9 +848,11 @@ def load_hickman(county: dict, markets: list[str], source: str) -> tuple[list[di
     return list(by_id.values()), {"sourceRows": len(ids), "dropped": dropped, "kept": len(by_id)}
 
 
-def load_chester(county: dict, markets: list[str], source: str) -> tuple[list[dict], dict]:
-    where = "L15Parce_4>=5 AND L15Parce_4<=150"
-    ids = fetch_object_ids(CHESTER_QUERY, where)
+def load_chester(row: dict, county: dict, markets: list[str], source: str) -> tuple[list[dict], dict]:
+    url = row["queryUrl"]
+    where = row.get("where") or "L15Parce_4>=5 AND L15Parce_4<=150"
+    portal = row.get("portal") or CHESTER_PORTAL
+    ids = fetch_object_ids(url, where)
     print(f"  Chester ids {len(ids)}", flush=True)
     by_id: dict[str, dict] = {}
     dropped_neither = 0
@@ -706,7 +860,7 @@ def load_chester(county: dict, markets: list[str], source: str) -> tuple[list[di
     used_tax = 0
     outside = 0
     fetched = 0
-    for page in iter_by_ids(CHESTER_QUERY, ids, CHESTER_FIELDS, geometry=True, batch=40):
+    for page in iter_by_ids(url, ids, CHESTER_FIELDS, geometry=True, batch=40):
         fetched += len(page)
         for item in page:
             attrs = item.get("attributes") or {}
@@ -715,7 +869,7 @@ def load_chester(county: dict, markets: list[str], source: str) -> tuple[list[di
             if kind == "neither" or not parcel_id:
                 dropped_neither += 1
                 continue
-            geometry, _computed, center = geometry_acres(item, CHESTER_QUERY)
+            geometry, _computed, center = geometry_acres(item, url)
             if not geometry or not center or not in_band(acres):
                 outside += 1
                 continue
@@ -735,7 +889,7 @@ def load_chester(county: dict, markets: list[str], source: str) -> tuple[list[di
                 mail_zip=clean(attrs.get("GPDATA__ZI")),
             )
             feature["properties"]["ownerName2"] = clean(attrs.get("GPDATA___2"))
-            feature["properties"]["appraiserUrl"] = CHESTER_PORTAL
+            feature["properties"]["appraiserUrl"] = portal
             appraisal = num(attrs.get("GPDATA__30"))
             assessed = num(attrs.get("GPDATA__26"))
             year = clean(attrs.get("GPDATA__AP"))
@@ -800,11 +954,15 @@ def download_tn_oir(county: dict, markets: list[str], spec: dict) -> dict:
     else:
         if row["mode"] == "oir":
             features, stats = load_oir(row, county, markets, source)
-            stats.update(apply_2023_join(features, row.get("tncpm")))
+            stats.update(apply_2023_join(features, row.get("tncpmLayer")))
         elif row["mode"] == "hickman":
-            features, stats = load_hickman(county, markets, source)
+            features, stats = load_hickman(row, county, markets, source)
+        elif row["mode"] == "chester":
+            features, stats = load_chester(row, county, markets, source)
+        elif row["mode"] == "county-hosted":
+            features, stats = load_county_hosted(row, county, markets, source)
         else:
-            features, stats = load_chester(county, markets, source)
+            raise RuntimeError(f"{fips} has unknown mode {row['mode']}")
         features = finalize_features(features)
         if len(features) < 500:
             raise RuntimeError(f"{fips} kept only {len(features)} parcels; refusing to replace the shelf")
@@ -867,7 +1025,15 @@ def main() -> None:
     parser.add_argument("--county", action="append", default=[])
     parser.add_argument("--refresh", action="store_true")
     parser.add_argument("--workers", type=int, default=2)
+    parser.add_argument(
+        "--sources",
+        default=str(SOURCES_PATH),
+        help="County endpoint manifest. Edit a block, then re-run that county with --refresh.",
+    )
     args = parser.parse_args()
+    global COUNTIES, BY_FIPS
+    COUNTIES = load_source_rows(Path(args.sources))
+    BY_FIPS = {row["fips"]: row for row in COUNTIES}
     selected = {name.lower() for name in args.county}
     catalog = json.loads((ROOT / "data" / "market-parcel-counties.json").read_text())
     jobs = []

@@ -6,7 +6,7 @@ from __future__ import annotations
 import unittest
 
 from parcel_geometry import esri_rings_to_geojson
-from tn_oir_parcels import chester_parcel_id, in_band, reject_source_url, slash_date_to_iso, yymmdd_to_iso
+from tn_oir_parcels import BY_FIPS, chester_parcel_id, in_band, positive, reject_source_url, slash_date_to_iso, yymmdd_to_iso
 
 
 class TnOirParcelTests(unittest.TestCase):
@@ -30,6 +30,27 @@ class TnOirParcelTests(unittest.TestCase):
             reject_source_url("https://services.arcgis.com/example/April2023Parcels/FeatureServer/0")
         with self.assertRaises(RuntimeError):
             reject_source_url("https://app.regrid.com/parcels")
+        with self.assertRaises(RuntimeError):
+            reject_source_url("https://opendata.gis.utah.gov/datasets/utah::sevier-county-parcels")
+
+    def test_manifest_keeps_oir_and_sevier_county_layer(self) -> None:
+        sevier = BY_FIPS["47155"]
+        self.assertEqual(sevier["mode"], "county-hosted")
+        self.assertEqual(sevier["source"], "tn-sevier-county-gis-mapserver-57")
+        self.assertIn("GIS_Department_Layers/MapServer/57", sevier["queryUrl"])
+        self.assertNotIn("Tennessee_Property_Boundaries_Public_Use", sevier["queryUrl"])
+        self.assertIsNone(sevier["saleVintage"])
+        macon = BY_FIPS["47111"]
+        self.assertEqual(macon["mode"], "oir")
+        self.assertIn("Tennessee_Property_Boundaries_Public_Use", macon["queryUrl"])
+        self.assertEqual(BY_FIPS["47081"]["mode"], "hickman")
+        self.assertEqual(BY_FIPS["47023"]["mode"], "chester")
+        self.assertEqual(len(BY_FIPS), 20)
+
+    def test_positive_drops_zero_prices(self) -> None:
+        self.assertIsNone(positive(0))
+        self.assertIsNone(positive(-5))
+        self.assertEqual(positive("95100"), 95100.0)
 
     def test_card_date_formats(self) -> None:
         self.assertEqual(yymmdd_to_iso("220315"), "2022-03-15")

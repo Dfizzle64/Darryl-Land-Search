@@ -1,0 +1,258 @@
+{
+  "version": 1,
+  "rerun": "python3 scripts/tn_oir_parcels.py --county <Name-or-FIPS> --refresh",
+  "rule": "OIR 2026 geometry and owner, geometry acres, TN_County_Parcel_Map 2023 sale and value on GISLINK. Hickman and Chester stay on their county snapshots. Sevier stays on the county-hosted layer, not statewide OIR.",
+  "counties": [
+    {
+      "fips": "47111",
+      "name": "Macon",
+      "mode": "oir",
+      "oirName": "MACON",
+      "source": "tn-oir-public-use-47111",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='MACON' AND PARCEL_TYPE=1",
+      "tncpmLayer": 37
+    },
+    {
+      "fips": "47043",
+      "name": "Dickson",
+      "mode": "oir",
+      "oirName": "DICKSON",
+      "source": "tn-oir-public-use-47043",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='DICKSON' AND PARCEL_TYPE=1",
+      "tncpmLayer": 64,
+      "joins": {
+        "countyZoning": "https://services5.arcgis.com/o0K7afBI69raYtru/arcgis/rest/services/Dickson_County_Zoning/FeatureServer/0/query",
+        "cityZoning": "https://services7.arcgis.com/Gld89lf779txw3q4/arcgis/rest/services/City_of_Dickson_Zoning_View/FeatureServer/0/query",
+        "whiteBluffZoning": "https://services5.arcgis.com/o0K7afBI69raYtru/arcgis/rest/services/WhiteBluff_Zoning/FeatureServer/0/query"
+      }
+    },
+    {
+      "fips": "47129",
+      "name": "Morgan",
+      "mode": "oir",
+      "oirName": "MORGAN",
+      "source": "tn-oir-public-use-47129",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='MORGAN' AND PARCEL_TYPE=1",
+      "tncpmLayer": 26
+    },
+    {
+      "fips": "47143",
+      "name": "Rhea",
+      "mode": "oir",
+      "oirName": "RHEA",
+      "source": "tn-oir-public-use-47143",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='RHEA' AND PARCEL_TYPE=1",
+      "tncpmLayer": 20
+    },
+    {
+      "fips": "47145",
+      "name": "Roane",
+      "mode": "oir",
+      "oirName": "ROANE",
+      "source": "tn-oir-public-use-47145",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='ROANE' AND PARCEL_TYPE=1",
+      "tncpmLayer": 19
+    },
+    {
+      "fips": "47147",
+      "name": "Robertson",
+      "mode": "oir",
+      "oirName": "ROBERTSON",
+      "source": "tn-oir-public-use-47147",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='ROBERTSON' AND PARCEL_TYPE=1",
+      "tncpmLayer": 18,
+      "joins": {
+        "unincorporatedZoning": "https://apnsgis4.apsu.edu/arcgis/rest/services/Robertson/RobertsonGIS/MapServer/9/query",
+        "springfieldRoot": "https://services6.arcgis.com/OvhYC4wRuXsRGdB3/arcgis/rest/services/Springfield_Current_Zoning/FeatureServer",
+        "greenbrierZoning": "https://services3.arcgis.com/2J1sItLsWSeMbkZB/arcgis/rest/services/Zoning_Public_View/FeatureServer/0/query",
+        "whiteHouseZoning": "https://gis.cityofwhitehouse.com/arcgis/rest/services/WhiteHouseTN_Zoning/FeatureServer/3/query",
+        "millersvilleZoning": "https://services.arcgis.com/jcrrmnzMsBOEAFJp/arcgis/rest/services/Millersville_Zoning_view/FeatureServer/5/query",
+        "adamsZoning": "https://apnsgis4.apsu.edu/arcgis/rest/services/Robertson/RobertsonGIS/MapServer/6/query",
+        "orlindaZoning": "https://apnsgis4.apsu.edu/arcgis/rest/services/Robertson/RobertsonGIS/MapServer/8/query",
+        "cedarHillZoning": "https://apnsgis4.apsu.edu/arcgis/rest/services/Robertson/RobertsonGIS/MapServer/7/query",
+        "whiteHouseFlu": "https://gis.cityofwhitehouse.com/arcgis/rest/services/WhiteHouseTN_CompPlan/FeatureServer/2/query"
+      }
+    },
+    {
+      "fips": "47153",
+      "name": "Sequatchie",
+      "mode": "oir",
+      "oirName": "SEQUATCHIE",
+      "source": "tn-oir-public-use-47153",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='SEQUATCHIE' AND PARCEL_TYPE=1",
+      "tncpmLayer": 16
+    },
+    {
+      "fips": "47189",
+      "name": "Wilson",
+      "mode": "oir",
+      "oirName": "WILSON",
+      "source": "tn-oir-public-use-47189",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='WILSON' AND PARCEL_TYPE=1",
+      "tncpmLayer": 0,
+      "joins": {
+        "lebanonZoning": "https://maps.lebanontn.org/arcgis/rest/services/Hosted/Zoning_Districts/FeatureServer/0/query",
+        "mtJulietZoning": "https://utility.arcgis.com/usrsvcs/servers/5e2f5bfd27984da89b2e45a726d0e37b/rest/services/Planning___Zoning/FeatureServer/5/query",
+        "mtJulietFlu": "https://utility.arcgis.com/usrsvcs/servers/5e2f5bfd27984da89b2e45a726d0e37b/rest/services/Planning___Zoning/FeatureServer/1/query"
+      }
+    },
+    {
+      "fips": "47081",
+      "name": "Hickman",
+      "mode": "hickman",
+      "source": "tn-hickman-capturecama-202305",
+      "queryUrl": "https://maps.capturecama.com/arcgis/rest/services/Hickman/HickmanTN05182023/MapServer/9/query",
+      "where": "CALC_ACRE>=5 AND CALC_ACRE<=150",
+      "portal": "https://hickman.capturecama.com/CAMA/CAPortal/CZ_MainPage.aspx"
+    },
+    {
+      "fips": "47023",
+      "name": "Chester",
+      "mode": "chester",
+      "source": "tn-chester-capturecama-parcels12",
+      "queryUrl": "https://gis.capturecama.com/arcgis/rest/services/ChesterTN/ChesterCapture/MapServer/7/query",
+      "where": "L15Parce_4>=5 AND L15Parce_4<=150",
+      "portal": "https://chester.capturecama.com/CAMA/CAPortal/CZ_MainPage.aspx"
+    },
+    {
+      "fips": "47003",
+      "name": "Bedford",
+      "mode": "oir",
+      "oirName": "BEDFORD",
+      "source": "tn-oir-public-use-47003",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='BEDFORD' AND PARCEL_TYPE=1",
+      "tncpmLayer": 82
+    },
+    {
+      "fips": "47015",
+      "name": "Cannon",
+      "mode": "oir",
+      "oirName": "CANNON",
+      "source": "tn-oir-public-use-47015",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='CANNON' AND PARCEL_TYPE=1",
+      "tncpmLayer": 76,
+      "joins": {
+        "zoning": "https://services1.arcgis.com/EMZFDxQzNQloLbAf/arcgis/rest/services/Cannon_County_Zoning_220331/FeatureServer/0/query"
+      }
+    },
+    {
+      "fips": "47071",
+      "name": "Hardin",
+      "mode": "oir",
+      "oirName": "HARDIN",
+      "source": "tn-oir-public-use-47071",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='HARDIN' AND PARCEL_TYPE=1",
+      "tncpmLayer": 52
+    },
+    {
+      "fips": "47133",
+      "name": "Overton",
+      "mode": "oir",
+      "oirName": "OVERTON",
+      "source": "tn-oir-public-use-47133",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='OVERTON' AND PARCEL_TYPE=1",
+      "tncpmLayer": null,
+      "joins": {
+        "cama": "https://services1.arcgis.com/EMZFDxQzNQloLbAf/arcgis/rest/services/Overton_Parcels/FeatureServer/0/query"
+      }
+    },
+    {
+      "fips": "47155",
+      "name": "Sevier",
+      "mode": "county-hosted",
+      "source": "tn-sevier-county-gis-mapserver-57",
+      "queryUrl": "https://gis.seviervilletn.org/arcgis/rest/services/DeptMaps/GIS_Department_Layers/MapServer/57/query",
+      "where": "1=1",
+      "acreage": "geometry",
+      "saleVintage": null,
+      "countyId": 78,
+      "gislinkPrefix": "078",
+      "fields": {
+        "id": "GISLINK",
+        "altId": "PARCELID",
+        "owner": "OWNER",
+        "owner2": "OWNER2",
+        "situs": "ADDRESS",
+        "mail1": "MAILADDR",
+        "mailCity": "MAILCITY",
+        "mailState": "STATE",
+        "mailZip": "ZIP",
+        "saleDate": "SALEDATE",
+        "salePrice": "PRICE",
+        "marketValue": "APPRAISAL",
+        "assessedValue": "ASSESSMENT",
+        "calcAcres": "CALC_ACRE",
+        "countyId": "COUNTY_ID"
+      },
+      "joins": {
+        "countyZoning": "https://gis.seviervilletn.org/arcgis/rest/services/DeptMaps/SevierCountyZoning/MapServer/0/query",
+        "cityZoning": "https://gis.seviervilletn.org/arcgis/rest/services/DeptMaps/GIS_Department_Layers/MapServer/205/query"
+      }
+    },
+    {
+      "fips": "47141",
+      "name": "Putnam",
+      "mode": "oir",
+      "oirName": "PUTNAM",
+      "source": "tn-oir-public-use-47141",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='PUTNAM' AND PARCEL_TYPE=1",
+      "tncpmLayer": 21
+    },
+    {
+      "fips": "47183",
+      "name": "Weakley",
+      "mode": "oir",
+      "oirName": "WEAKLEY",
+      "source": "tn-oir-public-use-47183",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='WEAKLEY' AND PARCEL_TYPE=1",
+      "tncpmLayer": 2
+    },
+    {
+      "fips": "47001",
+      "name": "Anderson",
+      "mode": "oir",
+      "oirName": "ANDERSON",
+      "source": "tn-oir-public-use-47001",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='ANDERSON' AND PARCEL_TYPE=1",
+      "tncpmLayer": 83,
+      "joins": {
+        "zoning": "https://services8.arcgis.com/vL7QLF4BNi1wukPE/arcgis/rest/services/AndersonTN_PSALayers/FeatureServer/3/query"
+      }
+    },
+    {
+      "fips": "47029",
+      "name": "Cocke",
+      "mode": "oir",
+      "oirName": "COCKE",
+      "source": "tn-oir-public-use-47029",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='COCKE' AND PARCEL_TYPE=1",
+      "tncpmLayer": 70
+    },
+    {
+      "fips": "47013",
+      "name": "Campbell",
+      "mode": "oir",
+      "oirName": "CAMPBELL",
+      "source": "tn-oir-public-use-47013",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "where": "COUNTY_NAME='CAMPBELL' AND PARCEL_TYPE=1",
+      "tncpmLayer": 77
+    }
+  ]
+}

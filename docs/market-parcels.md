@@ -33,7 +33,7 @@ Newton County, Georgia is the University of Maryland AGOL redistribute (not an o
 
 Valdosta, Macon, Athens, Hilton Head, and Jackson MS are parcel shelves with no eligible-tract rows. Sources, zoning and future-land-use gaps, and the counties left off this pull are in `docs/new-metro-parcels.md`. Beaufort County also fills the previous Savannah gap. Tract income is ACS 5-year 2020–2024 B19013. Those counties use the same statewide AADT join as the rest of the footprint. Nothing in these extracts is an Opportunity Zone designation, a school letter grade, or a base flood elevation.
 
-Twenty Tennessee counties were loaded from public GIS only. Geometry and owner come from the Office of Information Resources layer Tennessee Property Boundaries Public Use (edited 2026-09-10), except Hickman and Chester, which that layer does not include. Acreage on the OIR counties is the polygon area, because deeded acres are often 0. Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK and labeled 2023 in the popup, except Overton, which is not on that service and uses the UCDD Overton_Parcels roll labeled 2019. Hickman is the May 2023 CaptureCAMA snapshot and links to the county portal instead of TPAD. Chester is the county CaptureCAMA Parcels_12 layer: the tax-record id is the parcel id, a blank tax-record id falls back to the map id, rows with neither id are dropped, and the link is the county portal. Zoning is stamped only where that county's research card published a usable layer. Bedford County, Pennsylvania is not a source. Macon had been a shelf gap because the generic loader queried IMPACT COUNTY_ID 111; the Comptroller county number is 56 and the public layer was live. No Opportunity Zone designation was added. AADT wiring was not changed.
+Twenty Tennessee counties were loaded from public GIS only. Geometry and owner come from the Office of Information Resources layer Tennessee Property Boundaries Public Use (edited 2026-09-10), except Hickman, Chester, and Sevier. Acreage is the polygon area, because deeded acres are often 0. Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK and labeled 2023 in the popup, except Overton, which is not on that service and uses the UCDD Overton_Parcels roll labeled 2019, and except Sevier. Sevier uses the county-hosted Sevierville GIS parcel layer (GIS_Department_Layers MapServer/57) for geometry, owner, situs, mailing, sale, and value. Those Sevier sale and value fields are that county CAMA and are not labeled 2023. The statewide OIR layer is not the Sevier source. Hickman is the May 2023 CaptureCAMA snapshot and links to the county portal instead of TPAD. Chester is the county CaptureCAMA Parcels_12 layer: the tax-record id is the parcel id, a blank tax-record id falls back to the map id, rows with neither id are dropped, and the link is the county portal. County endpoints live in `data/tn-rural-parcel-sources.json`. Re-pull one county after that file changes with `python3 scripts/tn_oir_parcels.py --county <Name> --refresh`. Zoning is stamped only where that county's research card published a usable layer. Bedford County, Pennsylvania is not a source. Utah Sevier County parcels are not a source. Macon had been a shelf gap because the generic loader queried IMPACT COUNTY_ID 111; the Comptroller county number is 56 and the public layer was live. No Opportunity Zone designation was added. AADT wiring was not changed.
 
 ## Coverage
 
@@ -65,7 +65,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Columbia | other | 14,613 | 1 | 1 | 8 |
 | Greenville | other | 31,164 | 2 | 0 | 6 |
 | Chattanooga | other | 22,725 | 4 | 0 | 6 |
-| Knoxville | other | 58,134 | 10 | 0 | 3 |
+| Knoxville | other | 58,159 | 10 | 0 | 3 |
 | Memphis | other | 45,278 | 8 | 0 | 3 |
 | Jackson | other | 21,501 | 4 | 0 | 0 |
 | Winston-Salem | other | 92,199 | 9 | 0 | 0 |
@@ -394,7 +394,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Loudon | Tennessee | 47105 | gap | 0 | tn-impact-47105 |
 | Morgan | Tennessee | 47129 | complete-gte-5ac | 5,086 | tn-oir-public-use-47129 |
 | Roane | Tennessee | 47145 | complete-gte-5ac | 5,649 | tn-oir-public-use-47145 |
-| Sevier | Tennessee | 47155 | complete-gte-5ac | 7,502 | tn-oir-public-use-47155 |
+| Sevier | Tennessee | 47155 | complete-gte-5ac | 7,527 | tn-sevier-county-gis-mapserver-57 |
 | Union | Tennessee | 47173 | gap | 0 | tn-impact-47173 |
 
 ### Memphis

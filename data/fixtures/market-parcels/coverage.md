@@ -26,7 +26,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Columbia | other | 14,613 | 1 | 1 | 8 |
 | Greenville | other | 31,164 | 2 | 0 | 6 |
 | Chattanooga | other | 22,725 | 4 | 0 | 6 |
-| Knoxville | other | 58,134 | 10 | 0 | 3 |
+| Knoxville | other | 58,159 | 10 | 0 | 3 |
 | Memphis | other | 45,278 | 8 | 0 | 3 |
 | Jackson | other | 21,501 | 4 | 0 | 0 |
 | Winston-Salem | other | 92,199 | 9 | 0 | 0 |
@@ -355,7 +355,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Loudon | Tennessee | 47105 | gap | 0 | tn-impact-47105 |
 | Morgan | Tennessee | 47129 | complete-gte-5ac | 5,086 | tn-oir-public-use-47129 |
 | Roane | Tennessee | 47145 | complete-gte-5ac | 5,649 | tn-oir-public-use-47145 |
-| Sevier | Tennessee | 47155 | complete-gte-5ac | 7,502 | tn-oir-public-use-47155 |
+| Sevier | Tennessee | 47155 | complete-gte-5ac | 7,527 | tn-sevier-county-gis-mapserver-57 |
 | Union | Tennessee | 47173 | gap | 0 | tn-impact-47173 |
 
 ### Memphis

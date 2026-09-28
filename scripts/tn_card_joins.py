@@ -1,8 +1,11 @@
 """Per-county joins from the Tennessee research cards.
 
-Geometry and owner stay on the OIR layer (or the Hickman/Chester snapshots).
-This module adds the card's sale, mailing, zoning, and future-land-use
-layers that are not on that geometry source. AADT is not joined here.
+Geometry and owner stay on the OIR layer, except Hickman, Chester, and
+Sevier. Sevier geometry and CAMA come from the county-hosted layer. This
+module adds sale, mailing, zoning, and future-land-use layers that are
+not already on that geometry source. Join URLs are read from
+data/tn-rural-parcel-sources.json when the county block sets them.
+AADT is not joined here.
 """
 
 from __future__ import annotations
@@ -26,6 +29,14 @@ OVERTON_QUERY = (
     "https://services1.arcgis.com/EMZFDxQzNQloLbAf/arcgis/rest/services/"
     "Overton_Parcels/FeatureServer/0/query"
 )
+
+
+def configured_url(row: dict, key: str, fallback: str) -> str:
+    """Prefer the endpoint manifest so a card refresh is a JSON edit plus a re-run."""
+    url = (row.get("joins") or {}).get(key)
+    if isinstance(url, str) and url.strip():
+        return url.strip()
+    return fallback
 
 
 def bbox_of(geometry: dict) -> tuple[float, float, float, float]:
@@ -194,9 +205,13 @@ def stamp_attribute_zoning(features: list[dict], index: dict[str, dict], code_fi
     return stamped
 
 
-def sevierville_polygons(notes: list[str]) -> list[dict] | None:
+def sevierville_polygons(notes: list[str], row: dict) -> list[dict] | None:
     """Prefer the proposed abbreviation, then ZONE_, inside the city polygons only."""
-    url = "https://gis.seviervilletn.org/arcgis/rest/services/DeptMaps/GIS_Department_Layers/MapServer/205/query"
+    url = configured_url(
+        row,
+        "cityZoning",
+        "https://gis.seviervilletn.org/arcgis/rest/services/DeptMaps/GIS_Department_Layers/MapServer/205/query",
+    )
     try:
         ids = fetch_object_ids(url, "1=1")
         items: list[dict] = []
@@ -225,10 +240,10 @@ def sevierville_polygons(notes: list[str]) -> list[dict] | None:
         return None
 
 
-def join_overton(features: list[dict]) -> dict:
+def join_overton(features: list[dict], row: dict) -> dict:
     print("  Overton UCDD CAMA join", flush=True)
     index = attribute_index(
-        OVERTON_QUERY,
+        configured_url(row, "cama", OVERTON_QUERY),
         "GISLINK",
         ["SALEDATE", "PRICE", "APPRAISAL", "MAILADDR", "MAILCITY", "STATE", "ZIP", "ZONING", "PARCELID"],
     )
@@ -293,14 +308,19 @@ def add_grid(grid: ZoneGrid | None, items: list[dict] | None) -> ZoneGrid | None
     return grid
 
 
-def join_zoning(features: list[dict], fips: str, notes: list[str]) -> dict:
+def join_zoning(features: list[dict], row: dict, notes: list[str]) -> dict:
     zoning_before = sum(1 for feature in features if feature["properties"].get("zoningCode"))
     flu_stamped = 0
+    fips = row["fips"]
     if fips == "47001":
         print("  Anderson zoning attribute join", flush=True)
         try:
             index = attribute_index(
-                "https://services8.arcgis.com/vL7QLF4BNi1wukPE/arcgis/rest/services/AndersonTN_PSALayers/FeatureServer/3/query",
+                configured_url(
+                    row,
+                    "zoning",
+                    "https://services8.arcgis.com/vL7QLF4BNi1wukPE/arcgis/rest/services/AndersonTN_PSALayers/FeatureServer/3/query",
+                ),
                 "GISLINK",
                 ["ZONING_1"],
             )
@@ -313,7 +333,11 @@ def join_zoning(features: list[dict], fips: str, notes: list[str]) -> dict:
     elif fips == "47015":
         items = try_polygons(
             "Cannon zoning",
-            "https://services1.arcgis.com/EMZFDxQzNQloLbAf/arcgis/rest/services/Cannon_County_Zoning_220331/FeatureServer/0/query",
+            configured_url(
+                row,
+                "zoning",
+                "https://services1.arcgis.com/EMZFDxQzNQloLbAf/arcgis/rest/services/Cannon_County_Zoning_220331/FeatureServer/0/query",
+            ),
             notes,
             code_field="ZONING",
         )
@@ -325,21 +349,33 @@ def join_zoning(features: list[dict], fips: str, notes: list[str]) -> dict:
         # City polygons win over the unincorporated map.
         county = try_polygons(
             "Dickson County zoning",
-            "https://services5.arcgis.com/o0K7afBI69raYtru/arcgis/rest/services/Dickson_County_Zoning/FeatureServer/0/query",
+            configured_url(
+                row,
+                "countyZoning",
+                "https://services5.arcgis.com/o0K7afBI69raYtru/arcgis/rest/services/Dickson_County_Zoning/FeatureServer/0/query",
+            ),
             notes,
             code_field="Zone_Curre",
             label_field="Zoning_Des",
         )
         city = try_polygons(
             "City of Dickson zoning",
-            "https://services7.arcgis.com/Gld89lf779txw3q4/arcgis/rest/services/City_of_Dickson_Zoning_View/FeatureServer/0/query",
+            configured_url(
+                row,
+                "cityZoning",
+                "https://services7.arcgis.com/Gld89lf779txw3q4/arcgis/rest/services/City_of_Dickson_Zoning_View/FeatureServer/0/query",
+            ),
             notes,
             code_field="Current_Zo",
             label_field="Zoning_Des",
         )
         white_bluff = try_polygons(
             "White Bluff zoning",
-            "https://services5.arcgis.com/o0K7afBI69raYtru/arcgis/rest/services/WhiteBluff_Zoning/FeatureServer/0/query",
+            configured_url(
+                row,
+                "whiteBluffZoning",
+                "https://services5.arcgis.com/o0K7afBI69raYtru/arcgis/rest/services/WhiteBluff_Zoning/FeatureServer/0/query",
+            ),
             notes,
             code_field="Zone_Curre",
             label_field="ZoneDesc",
@@ -358,19 +394,23 @@ def join_zoning(features: list[dict], fips: str, notes: list[str]) -> dict:
             "Dickson zoning is the unincorporated county layer, overwritten inside the City of Dickson and White Bluff polygons. Burns, Charlotte, Vanleer, and Slayden have no public zoning layer. Future land use is not on a public layer."
         )
     elif fips == "47147":
-        flu_stamped += robertson_zoning(features, notes)
+        flu_stamped += robertson_zoning(features, notes, row)
     elif fips == "47155":
         print("  Sevier zoning attribute join", flush=True)
         try:
             index = attribute_index(
-                "https://gis.seviervilletn.org/arcgis/rest/services/DeptMaps/SevierCountyZoning/MapServer/0/query",
+                configured_url(
+                    row,
+                    "countyZoning",
+                    "https://gis.seviervilletn.org/arcgis/rest/services/DeptMaps/SevierCountyZoning/MapServer/0/query",
+                ),
                 "GISLINK",
                 ["Zoning"],
             )
             stamp_attribute_zoning(features, index, "Zoning", overwrite=False)
         except Exception as exc:  # noqa: BLE001
             notes.append(f"SevierCountyZoning query failed ({exc}). Zoning was not invented.")
-        city = sevierville_polygons(notes)
+        city = sevierville_polygons(notes, row)
         if city:
             grid = ZoneGrid()
             grid.add_many(city)
@@ -379,7 +419,7 @@ def join_zoning(features: list[dict], fips: str, notes: list[str]) -> dict:
             "Sevier county zoning is SevierCountyZoning joined on GISLINK. Sevierville city zoning overwrites parcels whose centroids fall in that city layer. It is not applied outside the city."
         )
     elif fips == "47189":
-        flu_stamped += wilson_zoning(features, notes)
+        flu_stamped += wilson_zoning(features, notes, row)
     zoning_after = sum(1 for feature in features if feature["properties"].get("zoningCode"))
     flu_after = sum(1 for feature in features if feature["properties"].get("flu"))
     return {
@@ -389,11 +429,15 @@ def join_zoning(features: list[dict], fips: str, notes: list[str]) -> dict:
     }
 
 
-def robertson_zoning(features: list[dict], notes: list[str]) -> int:
+def robertson_zoning(features: list[dict], notes: list[str], row: dict) -> int:
     print("  Robertson zoning", flush=True)
     try:
         index = attribute_index(
-            "https://apnsgis4.apsu.edu/arcgis/rest/services/Robertson/RobertsonGIS/MapServer/9/query",
+            configured_url(
+                row,
+                "unincorporatedZoning",
+                "https://apnsgis4.apsu.edu/arcgis/rest/services/Robertson/RobertsonGIS/MapServer/9/query",
+            ),
             "gislink",
             ["zoning"],
         )
@@ -403,9 +447,10 @@ def robertson_zoning(features: list[dict], notes: list[str]) -> int:
             f"APSU Robertson unincorporated zoning (2014 digitizing, card status partial) query failed ({exc})."
         )
     cities = ZoneGrid()
-    springfield_root = (
-        "https://services6.arcgis.com/OvhYC4wRuXsRGdB3/arcgis/rest/services/"
-        "Springfield_Current_Zoning/FeatureServer"
+    springfield_root = configured_url(
+        row,
+        "springfieldRoot",
+        "https://services6.arcgis.com/OvhYC4wRuXsRGdB3/arcgis/rest/services/Springfield_Current_Zoning/FeatureServer",
     )
     names = {
         1: "RS15",
@@ -444,37 +489,61 @@ def robertson_zoning(features: list[dict], notes: list[str]) -> int:
     for label, url, code_field, label_field in (
         (
             "Greenbrier zoning",
-            "https://services3.arcgis.com/2J1sItLsWSeMbkZB/arcgis/rest/services/Zoning_Public_View/FeatureServer/0/query",
+            configured_url(
+                row,
+                "greenbrierZoning",
+                "https://services3.arcgis.com/2J1sItLsWSeMbkZB/arcgis/rest/services/Zoning_Public_View/FeatureServer/0/query",
+            ),
             "ZoneCode",
             "ZoneName",
         ),
         (
             "White House zoning",
-            "https://gis.cityofwhitehouse.com/arcgis/rest/services/WhiteHouseTN_Zoning/FeatureServer/3/query",
+            configured_url(
+                row,
+                "whiteHouseZoning",
+                "https://gis.cityofwhitehouse.com/arcgis/rest/services/WhiteHouseTN_Zoning/FeatureServer/3/query",
+            ),
             "ZONECLASS",
             "ZONEDESC",
         ),
         (
             "Millersville zoning",
-            "https://services.arcgis.com/jcrrmnzMsBOEAFJp/arcgis/rest/services/Millersville_Zoning_view/FeatureServer/5/query",
+            configured_url(
+                row,
+                "millersvilleZoning",
+                "https://services.arcgis.com/jcrrmnzMsBOEAFJp/arcgis/rest/services/Millersville_Zoning_view/FeatureServer/5/query",
+            ),
             "ZONE_2021",
             None,
         ),
         (
             "Adams zoning",
-            "https://apnsgis4.apsu.edu/arcgis/rest/services/Robertson/RobertsonGIS/MapServer/6/query",
+            configured_url(
+                row,
+                "adamsZoning",
+                "https://apnsgis4.apsu.edu/arcgis/rest/services/Robertson/RobertsonGIS/MapServer/6/query",
+            ),
             "zoning_1",
             "zone_id",
         ),
         (
             "Orlinda zoning",
-            "https://apnsgis4.apsu.edu/arcgis/rest/services/Robertson/RobertsonGIS/MapServer/8/query",
+            configured_url(
+                row,
+                "orlindaZoning",
+                "https://apnsgis4.apsu.edu/arcgis/rest/services/Robertson/RobertsonGIS/MapServer/8/query",
+            ),
             "zoning",
             "zone_id",
         ),
         (
             "Cedar Hill zoning",
-            "https://apnsgis4.apsu.edu/arcgis/rest/services/Robertson/RobertsonGIS/MapServer/7/query",
+            configured_url(
+                row,
+                "cedarHillZoning",
+                "https://apnsgis4.apsu.edu/arcgis/rest/services/Robertson/RobertsonGIS/MapServer/7/query",
+            ),
             "zone",
             "zoning",
         ),
@@ -485,7 +554,11 @@ def robertson_zoning(features: list[dict], notes: list[str]) -> int:
     cities.stamp(features, overwrite=True)
     flu_items = try_polygons(
         "White House future land use",
-        "https://gis.cityofwhitehouse.com/arcgis/rest/services/WhiteHouseTN_CompPlan/FeatureServer/2/query",
+        configured_url(
+            row,
+            "whiteHouseFlu",
+            "https://gis.cityofwhitehouse.com/arcgis/rest/services/WhiteHouseTN_CompPlan/FeatureServer/2/query",
+        ),
         notes,
         code_field="Future_LU",
     )
@@ -500,18 +573,26 @@ def robertson_zoning(features: list[dict], notes: list[str]) -> int:
     return flu_count
 
 
-def wilson_zoning(features: list[dict], notes: list[str]) -> int:
+def wilson_zoning(features: list[dict], notes: list[str], row: dict) -> int:
     print("  Wilson zoning", flush=True)
     cities = ZoneGrid()
     lebanon = try_polygons(
         "Lebanon zoning",
-        "https://maps.lebanontn.org/arcgis/rest/services/Hosted/Zoning_Districts/FeatureServer/0/query",
+        configured_url(
+            row,
+            "lebanonZoning",
+            "https://maps.lebanontn.org/arcgis/rest/services/Hosted/Zoning_Districts/FeatureServer/0/query",
+        ),
         notes,
         code_field="zone",
     )
     mtj = try_polygons(
         "Mt. Juliet zoning",
-        "https://utility.arcgis.com/usrsvcs/servers/5e2f5bfd27984da89b2e45a726d0e37b/rest/services/Planning___Zoning/FeatureServer/5/query",
+        configured_url(
+            row,
+            "mtJulietZoning",
+            "https://utility.arcgis.com/usrsvcs/servers/5e2f5bfd27984da89b2e45a726d0e37b/rest/services/Planning___Zoning/FeatureServer/5/query",
+        ),
         notes,
         code_field="Zone_Curre",
     )
@@ -522,7 +603,11 @@ def wilson_zoning(features: list[dict], notes: list[str]) -> int:
     cities.stamp(features, overwrite=False)
     flu_items = try_polygons(
         "Mt. Juliet future land use",
-        "https://utility.arcgis.com/usrsvcs/servers/5e2f5bfd27984da89b2e45a726d0e37b/rest/services/Planning___Zoning/FeatureServer/1/query",
+        configured_url(
+            row,
+            "mtJulietFlu",
+            "https://utility.arcgis.com/usrsvcs/servers/5e2f5bfd27984da89b2e45a726d0e37b/rest/services/Planning___Zoning/FeatureServer/1/query",
+        ),
         notes,
         code_field="FLU_Lisa",
     )
@@ -544,7 +629,7 @@ def apply_card_details(features: list[dict], row: dict) -> dict:
     fips = row["fips"]
     if fips == "47133":
         try:
-            stats.update(join_overton(features))
+            stats.update(join_overton(features, row))
         except Exception as exc:  # noqa: BLE001
             notes.append(f"Overton UCDD CAMA join failed ({exc}). Sale and appraisal were not invented.")
         else:
@@ -553,7 +638,7 @@ def apply_card_details(features: list[dict], row: dict) -> dict:
             )
     if fips in {"47001", "47015", "47043", "47147", "47155", "47189"}:
         try:
-            stats.update(join_zoning(features, fips, notes))
+            stats.update(join_zoning(features, row, notes))
         except Exception as exc:  # noqa: BLE001
             notes.append(f"Zoning join failed ({exc}). Zoning was not invented.")
     elif fips not in {"47023", "47133"}:

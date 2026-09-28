@@ -24,7 +24,12 @@ describe("new metro parcel shelves", () => {
       expect(index.markets[market]?.parcelCount).toBeGreaterThan(0);
       expect(catalogForMarket({ markets: [] } as never, { markets: [] } as never, { markets: [] } as never, market as "Valdosta").market).toBe(market);
     }
-    expect(index.markets.Jackson.counties.map((county) => county.fips)).toEqual(["47113"]);
+    expect(index.markets.Jackson.counties.map((county) => county.fips)).toEqual([
+      "47023",
+      "47071",
+      "47113",
+      "47183",
+    ]);
     expect(index.markets["Jackson MS"].counties.map((county) => county.fips)).toEqual(
       expect.arrayContaining(["28121", "28089", "28049"]),
     );

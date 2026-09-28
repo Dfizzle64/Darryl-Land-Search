@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-28T18:31:27Z",
+  "generatedAt": "2026-09-28T22:27:33Z",
   "market": "Pensacola",
   "tier": "other",
   "parcelCount": 66434,
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -30,7 +30,7 @@
       "gaps": [
         "17989 source rows collapsed to 17987 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
         "Municipal join: Daphne zoning 294 (key 293, spatial 1); Fairhope zoning 184 (key 177, spatial 7); Baldwin County Zoning/42 baseline 6991; Fairhope AO/MO overlay enrichment 156 parcels (overlay names are not zoning codes); Daphne FLU 668 (key 621, spatial 47); Daphne cleared county Zoning/42 on 288 parcels that only matched the city FLU layer.",
-        "Baldwin County parcels are web6 Baldwin_Public_ISV/MapServer/31. Acreage is CalcAcre, inclusive 5\u2013150. The al05baldrevenue Baldwin/Public URL is not used.",
+        "Baldwin County parcels are web6 Baldwin_Public_ISV/MapServer/31. Acreage is CalcAcre, inclusive 5–150. The al05baldrevenue Baldwin/Public URL is not used.",
         "Parcel ZoningCode is usually empty. County Zoning/42 (ZONE_1) is the unincorporated baseline and is replaced inside Daphne and Fairhope.",
         "Daphne zoning is Zoning_Current_view FeatureServer/0. Class is the zoning code (R1, B2, PUD). The Zoning field is the long label. Join is PID, PIN, or PARCELID, then centroid. Coverage is city-only.",
         "Daphne FLU is Placetypes_for_Future_Development_APRIL_2026 FeatureServer/2 field Future_Dev. Land_Use is the label. The older Envision_Placetype_Map layer is not used. Overlays_view is not base zoning.",
@@ -68,7 +68,9 @@
       "path": "data/fixtures/market-parcels/counties/12005/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12005/lookup.json",
       "tileCount": 8,
-      "sourceCount": 5667
+      "sourceCount": 5667,
+      "zoningJoinedCount": 4768,
+      "fluJoinedCount": 4777
     },
     {
       "name": "Escambia",
@@ -93,7 +95,9 @@
       "path": "data/fixtures/market-parcels/counties/12033/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12033/lookup.json",
       "tileCount": 9,
-      "sourceCount": 9240
+      "sourceCount": 9240,
+      "zoningJoinedCount": 8487,
+      "fluJoinedCount": 8487
     },
     {
       "name": "Holmes",
@@ -107,7 +111,7 @@
       "source": "fl-holmes-taxparcels-12059",
       "queryUrl": "https://services.arcgis.com/yghUoIoA2Cd2cWki/arcgis/rest/services/Holmes_Parcels/FeatureServer/0/query",
       "gaps": [
-        "Holmes TaxParcels (Holmes_Parcels/0). Acreage is Gis_Acres, 5.0\u2013150.0 inclusive. The id is PARCELNO.",
+        "Holmes TaxParcels (Holmes_Parcels/0). Acreage is Gis_Acres, 5.0–150.0 inclusive. The id is PARCELNO.",
         "Owner is not on this layer. The Panda maintenance-request layer is not this source and is not ingested.",
         "No Opportunity Zone status is stored. FDOR joins need CO_NO=40 and a PARCELNO with '.' and '-' removed."
       ],
@@ -140,7 +144,9 @@
       "path": "data/fixtures/market-parcels/counties/12091/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12091/lookup.json",
       "tileCount": 9,
-      "sourceCount": 9956
+      "sourceCount": 9956,
+      "zoningJoinedCount": 9449,
+      "fluJoinedCount": 9470
     },
     {
       "name": "Santa Rosa",
@@ -170,7 +176,9 @@
       "path": "data/fixtures/market-parcels/counties/12113/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12113/lookup.json",
       "tileCount": 8,
-      "sourceCount": 16194
+      "sourceCount": 16194,
+      "zoningJoinedCount": 8901,
+      "fluJoinedCount": 8900
     },
     {
       "name": "Walton",
@@ -199,7 +207,9 @@
       "path": "data/fixtures/market-parcels/counties/12131/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12131/lookup.json",
       "tileCount": 8,
-      "sourceCount": 9632
+      "sourceCount": 9632,
+      "zoningJoinedCount": 8801,
+      "fluJoinedCount": 8867
     }
   ]
 }

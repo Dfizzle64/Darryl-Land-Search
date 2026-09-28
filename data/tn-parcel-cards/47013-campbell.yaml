@@ -1,0 +1,169 @@
+state: TN
+jurisdiction: Campbell County
+fips: '47013'
+level: county
+markets:
+- Knoxville
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=7)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 27,573; DEEDAC 5–150 → 1985; id GISLINK populated=True; geo PASS
+    (5/5 centroids in county, 5/5 polys touch county) (36.57968,-84.23838)→Campbell; (36.48124,-84.25793)→Campbell;
+    (36.3896,-83.99597)→Campbell (where COUNTY_ID=7). Service lastEditDate 2026-09-10 (PARCELID suffix
+    2026) — freshest public owner/geometry; no sale/value/CALC_ACRE (DEEDAC often 0 — derive geodesic
+    acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 3616
+- role: parcels
+  name: TN County Parcel Map — Campbell_Parcels (Assessment_Data_07 join)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/77
+  layerId: 77
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Assessment_Data_07_GISLINK: parcelIdAlt
+    Assessment_Data_07_ID: parcelIdDisplay
+    Assessment_Data_07_PARCELID: parcelIdFull
+    Parcels_CALC_ACRE: acreage
+    Assessment_Data_07_DEEDAC: acreageDeed
+    Assessment_Data_07_OWNER: ownerName
+    Assessment_Data_07_OWNER2: ownerName2
+    Assessment_Data_07_ADDRESS: situsAddress
+    Assessment_Data_07_SALEDATE: lastSale.date
+    Assessment_Data_07_PRICE: lastSale.price
+    Assessment_Data_07_VI: lastSale.qualified
+    Assessment_Data_07_DEED_BOOK: lastSale.deedBook
+    Assessment_Data_07_DEED_PAGE: lastSale.deedPage
+    Assessment_Data_07_LANDMKTVAL: tax.landValue
+    Assessment_Data_07_APPRAISAL: tax.marketValue
+    Assessment_Data_07_LANDUSE: dorCode
+    Assessment_Data_07_CLASS: propType
+    County_Name: countyName
+  notes: 'Preferred over bare IMPACT (box often 403). Live count 27,623; CALC_ACRE 5–150 → 3,546 (2026-09-24
+    ET). Geo-verify PASS: (36.58349,-84.14503) / (36.59147,-84.15376) WGS84 in Campbell; GISLINK prefix
+    007. publicGisUrl: https://tnmap.tn.gov/Assessment/ (no free county ArcGIS parcel viewer found). Assessment
+    vintage may lag live TPAD. Do not use Fort Campbell KY LUCS layers as Campbell TN zoning. 2026-09-28
+    ET TN PIR re-verify: count 27,623; Parcels_CALC_ACRE 5–150 → 3546; id Parcels_GISLINK populated=True;
+    geo PASS (5/5 centroids in county, 5/5 polys touch county) (36.58196,-84.14495)→Campbell; (36.35656,-84.10096)→Campbell;
+    (36.39788,-84.05347)→Campbell.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: Parcels_GISLINK
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: IMPACT Parcels sibling (COUNTY_ID=7)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+  notes: 'Filter COUNTY_ID=7 AND PARCEL_TYPE=1. Egress-sensitive (403 common). Sibling OK. 2026-09-28
+    ET TN PIR: maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes sibling (JUR=007)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    CALC_ACRE: acreage
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    LANDUSE: dorCode
+    ZONING: zoning
+    TAXYR: taxYear
+  notes: 'Filter JUR=''007''; prefer latest TAXYR. Query-only. Use AGOL twin when blocked. 2026-09-28
+    ET TN PIR: maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+gaps:
+- No free public county zoning polygon FeatureServer (CAMA ZONING via Themes only)
+- Adopted FLU FeatureServer not found
+- No dedicated county ArcGIS parcel webapp — use TN Property Viewer
+- IMPACT Themes often 403 from datacenter egress
+- AGOL Assessment_Data_07 vintage may lag current TPAD
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: Comptroller IMPACT-TPAD public records; AGOL TN County Parcel Map republish — attribution required.
+  No paid GIS purchase channel.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+jurisdictionGisUrl: https://tnmap.tn.gov/Assessment/
+zoningOverall: partial
+packagingNote: >-
+  Digged 2026-09-24 ET full-suite TRANCHE-3; prefer AGOL joined parcels over bare IMPACT; geo-verify PASS;
+  skip utilities/AADT. RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added OIR. LSB-approved
+  parcel setup applied 2026-09-28 (see parcelSetup).
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=7
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/77
+  joinKey: OIR.GISLINK = Parcels_GISLINK
+  salesValueVintage: 2023
+  salesValueSourceEditDate: '2023-11-22'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 3616
+  gislinkJoinSample: 10/10 (100%)

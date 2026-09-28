@@ -2,7 +2,7 @@
 
 Orlando keeps `scripts/seed_orlando_parcels.py` and `data/fixtures/orlando-parcels`. Lake, Osceola, Seminole, and Sumter in that store were reseeded from public county GIS. Polk's market extract is the property-appraiser layer under `data/fixtures/market-parcels`. The Orlando Polk tiles were not replaced.
 
-Other markets use the same 0.25° tile grid (origin longitude -83, latitude 27) under `data/fixtures/market-parcels/counties/{fips}/tiles`, or they point at an Orlando tile folder when the county is shared. The home page does not embed the polygons. `GET /api/parcels?market={Market}&bbox=w,s,e,n` reads only the tiles for **that market** that intersect the viewport. Outlines stay off until zoom 13.
+Other markets use the same 0.25° tile grid (origin longitude -83, latitude 27) under `data/fixtures/market-parcels/counties/{fips}/tiles`, or they point at an Orlando tile folder when the county is shared. The home page does not embed the polygons. `GET /api/parcels?market={Market}&bbox=w,s,e,n` reads only the tiles for **that market** that intersect the viewport. Outlines stay off until neighborhood zoom (about 10.5), an area is locked, or Show parcels is on — the same gate as Orlando.
 
 ## Refresh
 
@@ -29,19 +29,17 @@ Carroll County, Georgia uses the OpenAddresses job 910028 parcel snapshot becaus
 
 Walton County, Georgia is the choosewalton 5–150 GIS-acre landbase. FLU and Description are character areas, not Euclidean zoning. Monroe CAMA matches a handful of shared parcel numbers. City zoning covers Monroe, Loganville, and Social Circle only. Countywide owner, tax, sales, and Euclidean zoning stay gaps. Nothing in that extract is an Opportunity Zone designation.
 
-Newton County, Georgia is the University of Maryland AGOL redistribute (not an official county FeatureServer). Sales stop in 2021. County Euclidean zoning stays null except a Social Circle centroid join. Future land use is the NEGRC centroid join. Spalding County, Georgia is the public parcel view: owner, situs, sales, tax, and future land use stay null, and Griffin is left unzoned. Bradley County, Tennessee uses Census FIPS 47011 and the Cleveland GIS Parcels_Impact layer. The older Comptroller IMPACT tiles for that FIPS were the wrong geography and are replaced. The Tennessee card package is 9 usable / 7 partial / 0 gap, but the YAML files were not in this checkout, so those card URLs were not applied. The packaging note that says 47107 Bradley does not match this shelf: 47107 is McMinn County, and McMinn was not added. Yadkin County, North Carolina uses the county GIS parcel layer instead of NC OneMap. Bryan County, Georgia uses PropertyDetails. Sales are a Beacon gap, and assessed values on that layer are empty. Effingham County, Georgia uses Parcels2024. Sale price and market value are joined from ParcelUpdate or the 2024 FLUM. No Opportunity Zone designation was added for these counties.
+Newton County, Georgia is the University of Maryland AGOL redistribute (not an official county FeatureServer). Sales stop in 2021. County Euclidean zoning stays null except a Social Circle centroid join. Future land use is the NEGRC centroid join. Spalding County, Georgia is the public parcel view: owner, situs, sales, tax, and future land use stay null, and Griffin is left unzoned. Bradley County, Tennessee uses Census FIPS 47011 and the Cleveland GIS Parcels_Impact layer. The older Comptroller IMPACT tiles for that FIPS were the wrong geography and are replaced. Yadkin County, North Carolina uses the county GIS parcel layer instead of NC OneMap. Bryan County, Georgia uses PropertyDetails. Sales are a Beacon gap, and assessed values on that layer are empty. Effingham County, Georgia uses Parcels2024. Sale price and market value are joined from ParcelUpdate or the 2024 FLUM. No Opportunity Zone designation was added for these counties.
 
 Valdosta, Macon, Athens, Hilton Head, and Jackson MS are parcel shelves with no eligible-tract rows. Sources, zoning and future-land-use gaps, and the counties left off this pull are in `docs/new-metro-parcels.md`. Beaufort County also fills the previous Savannah gap. Tract income is ACS 5-year 2020–2024 B19013. Those counties use the same statewide AADT join as the rest of the footprint. Nothing in these extracts is an Opportunity Zone designation, a school letter grade, or a base flood elevation.
 
-South Florida is a Wave 0 parcel shelf: Miami-Dade, Monroe, Broward, and Palm Beach. Sources, zoning, future land use, property-appraiser links, public GIS viewers, the jump-to address bar, and the Broward CAMA / Monroe TLS / Palm Beach gaps are in `docs/south-florida-parcels.md`. Broward stays partial. Palm Beach is the MapServer extract with condo units excluded. No eligible-tract rows were added.
+Twenty Tennessee counties were loaded from public GIS only. Geometry and owner come from the Office of Information Resources layer Tennessee Property Boundaries Public Use (edited 2026-09-10), except Hickman and Chester, which that layer does not include. Acreage is the geodesic area of the polygon, because deeded acres are often 0. Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK and labeled 2023 in the popup. A GISLINK that does not match is left without sale or value. Overton is not on that service; its sale and value come from UCDD Overton_Parcels and are labeled 2019, that roll's latest tax year. Sevier geometry and owner stay on OIR; sale, value, assessed value, and mailing come from the Sevierville countywide CAMA and are labeled 2025. Hickman is the May 2023 CaptureCAMA snapshot, labeled 2020, and links to the county portal instead of TPAD. Chester is the county CaptureCAMA Parcels_12 layer: the parcel id is the CAMA GISLINK, a blank GISLINK falls back to the map id, rows with neither id are dropped, sale data stays empty because GPDATA__LA is the record's last-updated date, and market and assessed values are labeled 2026. A sale date later than the pull date is left blank. The TPAD GIS link is stored for browsers and is not requested during ingest, tests, or the build. Parcel layers are chosen from `data/tn-parcel-cards` by each layer's `use` label and the card's `parcelSetup` block, never by taking the first parcels layer. Acreage is geodesic polygon area because the OIR layer has no acreage field. Zoning join URLs stay in `data/tn-rural-parcel-sources.json`. Re-pull one county after a card changes with `python3 scripts/tn_oir_parcels.py --county <Name> --refresh`. Zoning is stamped only where that county's research card published a usable layer. Bedford County, Pennsylvania is not a source. Utah Sevier County parcels are not a source. Macon had been a shelf gap because the generic loader queried IMPACT COUNTY_ID 111; the Comptroller county number is 56 and the public layer was live. No Opportunity Zone designation was added. AADT wiring was not changed.
 
 ## Coverage
 
 # Market parcel coverage
 
 Acreage band is **5.0–150.0 inclusive**. Lake, Osceola, Seminole, and Sumter Orlando tiles were reseeded from county GIS. Polk market parcels use the property-appraiser extract. Orange still points at the Orlando tiles.
-
-AADT is not copied onto these tiles. `/api/parcels` joins the nearest published count within 15 km. Florida uses FDOT RCI FeatureServer/0, field AADT, YEAR_=2025, for every footprint county. The nearest segment is the one closest to the parcel centroid, within 15 km. North Carolina gap counties use NCDOT 2024 stations, field AADT_2024 (a string; blanks dropped). Durham, Mecklenburg, and Wake stay on AADT_2022. South Carolina uses SCDOT 2025 Statewide Traffic Points, field FactoredAA, CountyName. Mississippi uses the HDR AGOL republish of RCI layer RC_AADT_2019, field ADT_21 (through 2021). COUNTYNMBR is the alphabetical county number, not FIPS, and this is not an MDOT-hosted FeatureServer. Tennessee uses TDOT Traffic Lines, field AADT, AADTYEAR 2025. COUNTY_NUMBER is the zero-padded alphabetical code, not FIPS. Arkansas uses ARDOT ADT Linear, field MostRecentADT, Year_ADT 2025, for Crittenden and Mississippi County. County is the ARDOT number, not FIPS. Actual stations only. Georgia uses the DeKalb County GIS republish of GDOT stations, field aadt, for every footprint county including Bibb, Cobb, DeKalb, Fulton, and Lowndes. That layer has no year field. Alabama uses ALDOT TDM TrafficCounterPoint, field AADT, YearAADT=2024. LUCountyID is the alphabetical county index, not FIPS, and 2025 AADT values are null. Counts are the published field. Zero and missing values are dropped. Nothing is estimated.
 
 Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map requests the selected market's viewport tiles only.
 
@@ -50,7 +48,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Atlanta | primary | 93,811 | 17 | 0 | 18 |
 | Tampa | primary | 127,713 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
-| Nashville | primary | 109,348 | 13 | 0 | 4 |
+| Nashville | primary | 127,947 | 16 | 0 | 3 |
 | Charlotte | primary | 106,650 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 151,530 | 17 | 0 | 0 |
 | South Florida | shelf | 41,693 | 3 | 1 | 0 |
@@ -66,10 +64,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Savannah | other | 16,305 | 4 | 0 | 4 |
 | Columbia | other | 14,613 | 1 | 1 | 8 |
 | Greenville | other | 31,164 | 2 | 0 | 6 |
-| Chattanooga | other | 15,498 | 2 | 0 | 8 |
-| Knoxville | other | 39,939 | 7 | 0 | 6 |
+| Chattanooga | other | 22,817 | 4 | 0 | 6 |
+| Knoxville | other | 58,475 | 10 | 0 | 3 |
 | Memphis | other | 45,278 | 8 | 0 | 3 |
-| Jackson | other | 6,384 | 1 | 0 | 0 |
+| Jackson | other | 21,540 | 4 | 0 | 0 |
 | Winston-Salem | other | 92,199 | 9 | 0 | 0 |
 | Wilmington | other | 47,320 | 6 | 0 | 0 |
 | Heartland | shelf | 21,163 | 4 | 1 | 0 |
@@ -140,10 +138,6 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Sarasota | Florida | 12115 | complete-gte-5ac | 4,303 | fl-doh-ehwaters-12115 |
 | Sumter | Florida | 12119 | complete-gte-5ac | 9,572 | fl-sumter-bocc-parcels-12119 |
 
-Manatee and Sarasota keep those DOH shelves. City zoning is on 221 Manatee parcels and 566 Sarasota parcels. Future land use is on 247 Manatee parcels and 124 Sarasota parcels. Bradenton, Palmetto, Longboat Key, and the City of Sarasota have both. North Port and Venice are zoning only. Anna Maria, Bradenton Beach, and Holmes Beach stay blank. Sources are in `docs/muni-overlay-consolidator.md`. County parcels were not re-downloaded.
-
-Charlotte County, Florida (FIPS 12015) is not on these shelves. Punta Gorda city zoning and future land use are cataloged and were not stamped, because no county parcels were downloaded. County `CITY` stubs are not stored.
-
 ### Charleston
 
 | County | State | FIPS | Coverage | Parcels | Source |
@@ -160,23 +154,25 @@ Charlotte County, Florida (FIPS 12015) is not on these shelves. Punta Gorda city
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Bedford | Tennessee | 47003 | complete-gte-5ac | 4,211 | tn-impact-47003 |
-| Cannon | Tennessee | 47015 | complete-gte-5ac | 6,376 | tn-impact-47015 |
+| Bedford | Tennessee | 47003 | complete-gte-5ac | 6,686 | tn-oir-public-use-47003 |
+| Cannon | Tennessee | 47015 | complete-gte-5ac | 3,863 | tn-oir-public-use-47015 |
 | Cheatham | Tennessee | 47021 | complete-gte-5ac | 5,426 | apsu-cheatgis-47021 |
 | Davidson | Tennessee | 47037 | complete-gte-5ac | 9,478 | tn-metro-davidson-parcels |
-| Dickson | Tennessee | 47043 | complete-gte-5ac | 8,443 | tn-impact-47043 |
-| Hickman | Tennessee | 47081 | complete-gte-5ac | 3,672 | tn-impact-47081 |
-| Macon | Tennessee | 47111 | gap | 0 | tn-impact-47111 |
+| Dickson | Tennessee | 47043 | complete-gte-5ac | 8,477 | tn-oir-public-use-47043 |
+| Hickman | Tennessee | 47081 | complete-gte-5ac | 5,445 | tn-hickman-capturecama-202305 |
+| Macon | Tennessee | 47111 | complete-gte-5ac | 5,064 | tn-oir-public-use-47111 |
 | Marshall | Tennessee | 47117 | gap | 0 | tn-impact-47117 |
 | Maury | Tennessee | 47119 | complete-gte-5ac | 9,033 | tn-columbia-agol-47119 |
 | Montgomery | Tennessee | 47125 | complete-gte-5ac | 7,038 | tn-mcgtn-cama-47125 |
-| Robertson | Tennessee | 47147 | complete-gte-5ac | 8,581 | tn-impact-47147 |
+| Overton | Tennessee | 47133 | complete-gte-5ac | 5,557 | tn-oir-public-use-47133 |
+| Putnam | Tennessee | 47141 | complete-gte-5ac | 6,089 | tn-oir-public-use-47141 |
+| Robertson | Tennessee | 47147 | complete-gte-5ac | 8,606 | tn-oir-public-use-47147 |
 | Rutherford | Tennessee | 47149 | complete-gte-5ac | 9,677 | tn-rutherford-agol-parcels |
 | Smith | Tennessee | 47159 | gap | 0 | tn-impact-47159 |
 | Sumner | Tennessee | 47165 | complete-gte-5ac | 15,982 | tn-sumner-911-parcels-cama |
 | Trousdale | Tennessee | 47169 | gap | 0 | tn-impact-47169 |
 | Williamson | Tennessee | 47187 | complete-gte-5ac | 10,760 | tn-williamson-datapull-47187 |
-| Wilson | Tennessee | 47189 | complete-gte-5ac | 10,671 | tn-impact-47189 |
+| Wilson | Tennessee | 47189 | complete-gte-5ac | 10,766 | tn-oir-public-use-47189 |
 
 ### Charlotte
 
@@ -220,6 +216,15 @@ Charlotte County, Florida (FIPS 12015) is not on these shelves. Punta Gorda city
 | Wayne | North Carolina | 37191 | complete-gte-5ac | 15,079 | nc-onemap-37191 |
 | Wilson | North Carolina | 37195 | complete-gte-5ac | 5,152 | nc-onemap-37195 |
 
+### South Florida
+
+| County | State | FIPS | Coverage | Parcels | Source |
+| --- | --- | --- | --- | ---: | --- |
+| Broward | Florida | 12011 | partial | 7,549 | fl-broward-bcpa-jan26-16 |
+| Miami-Dade | Florida | 12086 | complete-gte-5ac | 15,563 | fl-miami-dade-landinformation-26 |
+| Monroe | Florida | 12087 | complete-gte-5ac | 6,492 | fl-monroe-apo-parcels-0 |
+| Palm Beach | Florida | 12099 | complete-gte-5ac | 12,089 | fl-palm-beach-parcel-info-4 |
+
 ### SWFL
 
 | County | State | FIPS | Coverage | Parcels | Source |
@@ -239,8 +244,6 @@ Charlotte County, Florida (FIPS 12015) is not on these shelves. Punta Gorda city
 | Okeechobee | Florida | 12093 | complete-gte-5ac | 3,053 | fl-okeechobee-planning-12093 |
 | St. Lucie | Florida | 12111 | complete-gte-5ac | 5,585 | fl-slc-parcels-12111 |
 
-Martin and Indian River keep those DOH shelves. City zoning and future land use are stamped on top: Martin 203 zoning and 201 future land use; Indian River 191 zoning and 104 future land use. Stuart, Indiantown, and Vero Beach have both. Sebastian is zoning only. Ocean Breeze, Sewall's Point, Jupiter Island, Fellsmere, Indian River Shores, and Orchid stay blank. Sources are in `docs/muni-overlay-consolidator.md`. County parcels were not re-downloaded.
-
 ### Melbourne
 
 | County | State | FIPS | Coverage | Parcels | Source |
@@ -250,8 +253,6 @@ Martin and Indian River keep those DOH shelves. City zoning and future land use 
 | Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
 | Osceola | Florida | 12097 | complete-gte-5ac | 6,169 | reused-orlando-complete-5-150 |
 | Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
-
-Brevard city zoning and future land use are cataloged in [`brevard-municipal.md`](brevard-municipal.md). Codes from that join are copied onto this Accela shelf only when the parcel id still matches. Cocoa Beach stays the unofficial 2021 layer when that stamp matches. Palm Bay and Titusville are not filled from a county code.
 
 ### Jacksonville
 
@@ -282,12 +283,10 @@ Brevard city zoning and future land use are cataloged in [`brevard-municipal.md`
 | Baldwin | Alabama | 01003 | complete-gte-5ac | 17,987 | al-baldwin-public-isv |
 | Bay | Florida | 12005 | complete-gte-5ac | 4,861 | fl-panhandle-12005 |
 | Escambia | Florida | 12033 | complete-gte-5ac | 9,240 | fl-panhandle-12033 |
+| Holmes | Florida | 12059 | complete-gte-5ac | 6,532 | fl-holmes-taxparcels-12059 |
 | Okaloosa | Florida | 12091 | complete-gte-5ac | 9,956 | fl-panhandle-12091 |
 | Santa Rosa | Florida | 12113 | complete-gte-5ac | 8,928 | fl-panhandle-12113 |
 | Walton | Florida | 12131 | complete-gte-5ac | 8,930 | fl-panhandle-12131 |
-| Holmes | Florida | 12059 | complete-gte-5ac | 6,532 | fl-holmes-taxparcels-12059 |
-
-City zoning on these four shelves is in `docs/muni-overlay-consolidator.md`. Escambia has Pensacola zoning on 810 parcels. Okaloosa has Destin and Fort Walton Beach zoning and future land use on 270 parcels. Santa Rosa has 85 zoning codes and 9 future land use codes (Milton and Jay zoning, Gulf Breeze both). Walton has 135 zoning codes and 158 future land use codes (DeFuniak Springs both, Paxton future land use). Panama City Beach city layers sit in Bay County and miss the Walton PCB parcels. Bay County has no parcel shelf here, so Panama City, Callaway, Mexico Beach, Lynn Haven, Parker, and Springfield are indexed only. Freeport numeric codes stay blank. Crestview, Niceville, Valparaiso, Mary Esther, Laurel Hill, Shalimar, Cinco Bayou, Century, and Pensacola Beach stay blank. County parcels were not re-downloaded.
 
 ### Birmingham
 
@@ -376,8 +375,8 @@ City zoning on these four shelves is in `docs/muni-overlay-consolidator.md`. Esc
 | Hamilton | Tennessee | 47065 | complete-gte-5ac | 9,162 | tn-hamilton-live-parcels |
 | Marion | Tennessee | 47115 | gap | 0 | tn-impact-47115 |
 | Meigs | Tennessee | 47121 | gap | 0 | tn-impact-47121 |
-| Rhea | Tennessee | 47143 | gap | 0 | tn-impact-47143 |
-| Sequatchie | Tennessee | 47153 | gap | 0 | tn-impact-47153 |
+| Rhea | Tennessee | 47143 | complete-gte-5ac | 3,977 | tn-oir-public-use-47143 |
+| Sequatchie | Tennessee | 47153 | complete-gte-5ac | 3,342 | tn-oir-public-use-47153 |
 | Walker | Georgia | 13295 | gap | 0 | unavailable |
 | Whitfield | Georgia | 13313 | gap | 0 | unavailable |
 
@@ -385,18 +384,18 @@ City zoning on these four shelves is in `docs/muni-overlay-consolidator.md`. Esc
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Anderson | Tennessee | 47001 | complete-gte-5ac | 4,302 | tn-impact-47001 |
+| Anderson | Tennessee | 47001 | complete-gte-5ac | 4,310 | tn-oir-public-use-47001 |
 | Blount | Tennessee | 47009 | complete-gte-5ac | 8,183 | tn-blount-agol-47009 |
-| Campbell | Tennessee | 47013 | complete-gte-5ac | 5,445 | tn-impact-47013 |
-| Cocke | Tennessee | 47029 | complete-gte-5ac | 4,448 | tn-impact-47029 |
+| Campbell | Tennessee | 47013 | complete-gte-5ac | 3,613 | tn-oir-public-use-47013 |
+| Cocke | Tennessee | 47029 | complete-gte-5ac | 6,377 | tn-oir-public-use-47029 |
 | Grainger | Tennessee | 47057 | complete-gte-5ac | 6,406 | tn-impact-47057 |
 | Hamblen | Tennessee | 47063 | gap | 0 | tn-impact-47063 |
 | Jefferson | Tennessee | 47089 | complete-gte-5ac | 6,586 | tn-impact-47089 |
 | Knox | Tennessee | 47093 | complete-gte-5ac | 4,569 | kgis-parcel-search |
 | Loudon | Tennessee | 47105 | gap | 0 | tn-impact-47105 |
-| Morgan | Tennessee | 47129 | gap | 0 | tn-impact-47129 |
-| Roane | Tennessee | 47145 | gap | 0 | tn-impact-47145 |
-| Sevier | Tennessee | 47155 | gap | 0 | tn-impact-47155 |
+| Morgan | Tennessee | 47129 | complete-gte-5ac | 5,113 | tn-oir-public-use-47129 |
+| Roane | Tennessee | 47145 | complete-gte-5ac | 5,731 | tn-oir-public-use-47145 |
+| Sevier | Tennessee | 47155 | complete-gte-5ac | 7,587 | tn-oir-public-use-47155 |
 | Union | Tennessee | 47173 | gap | 0 | tn-impact-47173 |
 
 ### Memphis
@@ -419,7 +418,10 @@ City zoning on these four shelves is in `docs/muni-overlay-consolidator.md`. Esc
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Chester | Tennessee | 47023 | complete-gte-5ac | 3,333 | tn-chester-capturecama-parcels12 |
+| Hardin | Tennessee | 47071 | complete-gte-5ac | 5,438 | tn-oir-public-use-47071 |
 | Madison | Tennessee | 47113 | complete-gte-5ac | 6,384 | tn-impact-47113 |
+| Weakley | Tennessee | 47183 | complete-gte-5ac | 6,385 | tn-oir-public-use-47183 |
 
 ### Winston-Salem
 
@@ -464,12 +466,12 @@ City zoning on these four shelves is in `docs/muni-overlay-consolidator.md`. Esc
 | Bradford | Florida | 12007 | complete-gte-5ac | 3,292 | fl-srwmd-parcels-12007 |
 | Citrus | Florida | 12017 | complete-gte-5ac | 5,992 | fl-citrus-swfwmd-12017 |
 | Gilchrist | Florida | 12041 | complete-gte-5ac | 6,395 | fl-doh-ehwaters-12041 |
-| Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
-| Levy | Florida | 12075 | complete-gte-5ac | 9,645 | fl-srwmd-parcels-12075 |
-| Putnam | Florida | 12107 | complete-gte-5ac | 7,560 | fl-putnam-doh-municipal-12107 |
 | Hamilton | Florida | 12047 | complete-gte-5ac | 4,149 | fl-srwmd-parcels-12047 |
+| Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
 | Lafayette | Florida | 12067 | complete-gte-5ac | 3,165 | fl-srwmd-parcels-12067 |
+| Levy | Florida | 12075 | complete-gte-5ac | 9,645 | fl-srwmd-parcels-12075 |
 | Marion | Florida | 12083 | complete-gte-5ac | 17,730 | fl-marion-parcels-12083 |
+| Putnam | Florida | 12107 | complete-gte-5ac | 7,560 | fl-putnam-doh-municipal-12107 |
 | Suwannee | Florida | 12121 | complete-gte-5ac | 11,856 | fl-srwmd-parcels-12121 |
 | Union | Florida | 12125 | complete-gte-5ac | 2,347 | fl-srwmd-parcels-12125 |
 

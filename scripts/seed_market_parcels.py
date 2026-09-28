@@ -895,6 +895,10 @@ def county_override(fips: str) -> dict | None:
                 "Greenville County Tax Parcel GCGIA/10. TACRES 5–150 inclusive. Replaces the City of Greenville GIS sample.",
             ],
         }
+    from tn_oir_parcels import BY_FIPS, tn_oir_spec
+
+    if fips in BY_FIPS:
+        return tn_oir_spec(fips)
     if fips in {"12086", "12087", "12011", "12099"}:
         from south_florida_parcels import south_florida_spec
 
@@ -1181,6 +1185,8 @@ Newton County, Georgia is the University of Maryland AGOL redistribute (not an o
 
 Valdosta, Macon, Athens, Hilton Head, and Jackson MS are parcel shelves with no eligible-tract rows. Sources, zoning and future-land-use gaps, and the counties left off this pull are in `docs/new-metro-parcels.md`. Beaufort County also fills the previous Savannah gap. Tract income is ACS 5-year 2020–2024 B19013. Those counties use the same statewide AADT join as the rest of the footprint. Nothing in these extracts is an Opportunity Zone designation, a school letter grade, or a base flood elevation.
 
+Twenty Tennessee counties were loaded from public GIS only. Geometry and owner come from the Office of Information Resources layer Tennessee Property Boundaries Public Use (edited 2026-09-10), except Hickman and Chester, which that layer does not include. Acreage is the geodesic area of the polygon, because deeded acres are often 0. Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK and labeled 2023 in the popup. A GISLINK that does not match is left without sale or value. Overton is not on that service; its sale and value come from UCDD Overton_Parcels and are labeled 2019, that roll's latest tax year. Sevier geometry and owner stay on OIR; sale, value, assessed value, and mailing come from the Sevierville countywide CAMA and are labeled 2025. Hickman is the May 2023 CaptureCAMA snapshot, labeled 2020, and links to the county portal instead of TPAD. Chester is the county CaptureCAMA Parcels_12 layer: the parcel id is the CAMA GISLINK, a blank GISLINK falls back to the map id, rows with neither id are dropped, sale data stays empty because GPDATA__LA is the record's last-updated date, and market and assessed values are labeled 2026. A sale date later than the pull date is left blank. The TPAD GIS link is stored for browsers and is not requested during ingest, tests, or the build. Parcel layers are chosen from `data/tn-parcel-cards` by each layer's `use` label and the card's `parcelSetup` block, never by taking the first parcels layer. Acreage is geodesic polygon area because the OIR layer has no acreage field. Zoning join URLs stay in `data/tn-rural-parcel-sources.json`. Re-pull one county after a card changes with `python3 scripts/tn_oir_parcels.py --county <Name> --refresh`. Zoning is stamped only where that county's research card published a usable layer. Bedford County, Pennsylvania is not a source. Utah Sevier County parcels are not a source. Macon had been a shelf gap because the generic loader queried IMPACT COUNTY_ID 111; the Comptroller county number is 56 and the public layer was live. No Opportunity Zone designation was added. AADT wiring was not changed.
+
 ## Coverage
 """
 
@@ -1195,6 +1201,10 @@ def apply_sc_muni_zoning(fips: str, features: list[dict]) -> tuple[list[dict], l
 
 
 def download_county(county: dict, markets: list[str], spec: dict) -> dict:
+    if spec.get("kind") == "tn-oir":
+        from tn_oir_parcels import download_tn_oir
+
+        return download_tn_oir(county, markets, spec)
     if spec.get("kind") == "south-florida":
         from south_florida_parcels import download_south_florida
 

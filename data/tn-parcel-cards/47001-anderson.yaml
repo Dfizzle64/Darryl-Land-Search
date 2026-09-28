@@ -1,0 +1,189 @@
+state: TN
+jurisdiction: Anderson County
+fips: '47001'
+level: county
+markets:
+- Knoxville
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=1)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 36,465; DEEDAC 5–150 → 2881; id GISLINK populated=True; geo PASS
+    (5/5 centroids in county, 5/5 polys touch county) (36.27214,-84.02573)→Anderson; (36.18223,-83.95632)→Anderson;
+    (36.12098,-84.08731)→Anderson (where COUNTY_ID=1). Service lastEditDate 2026-09-10 (PARCELID suffix
+    2026) — freshest public owner/geometry; no sale/value/CALC_ACRE (DEEDAC often 0 — derive geodesic
+    acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 4316
+- role: parcels
+  name: TN County Parcel Map — Anderson_Parcels (Assessment_Data_01 join)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/83
+  layerId: 83
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Assessment_Data_01_GISLINK: parcelIdAlt
+    Assessment_Data_01_ID: parcelIdDisplay
+    Assessment_Data_01_PARCELID: parcelIdFull
+    Parcels_CALC_ACRE: acreage
+    Assessment_Data_01_DEEDAC: acreageDeed
+    Assessment_Data_01_OWNER: ownerName
+    Assessment_Data_01_OWNER2: ownerName2
+    Assessment_Data_01_ADDRESS: situsAddress
+    Assessment_Data_01_SALEDATE: lastSale.date
+    Assessment_Data_01_PRICE: lastSale.price
+    Assessment_Data_01_VI: lastSale.qualified
+    Assessment_Data_01_DEED_BOOK: lastSale.deedBook
+    Assessment_Data_01_DEED_PAGE: lastSale.deedPage
+    Assessment_Data_01_LANDMKTVAL: tax.landValue
+    Assessment_Data_01_APPRAISAL: tax.marketValue
+    Assessment_Data_01_LANDUSE: dorCode
+    Assessment_Data_01_CLASS: propType
+    County_Name: countyName
+  notes: 'Preferred over bare IMPACT (box often 403 on maps.cot.tn.gov). Live count 35,891; CALC_ACRE
+    5–150 → 4,425 (2026-09-24 ET). Geo-verify PASS: sample centroids (36.03825,-84.30548) / (36.16586,-84.11111)
+    WGS84 in Anderson; GISLINK prefix 001. publicGisUrl: https://acassessor.maps.arcgis.com/apps/webappviewer/index.html?id=ceca75ab630048669e3b90abb301b09a
+    and https://andersoncotn.interactivegis.com/ and https://tnmap.tn.gov/Assessment/. Assessment table
+    vintage may lag live TPAD. 2026-09-28 ET TN PIR re-verify: count 35,891; Parcels_CALC_ACRE 5–150 →
+    4425; id Parcels_GISLINK populated=True; geo PASS (5/5 centroids in county, 5/5 polys touch county)
+    (36.03751,-84.30328)→Anderson; (36.06816,-84.11557)→Anderson; (36.07068,-84.34634)→Anderson.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: Parcels_GISLINK
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: IMPACT Parcels sibling (COUNTY_ID=1)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+  notes: 'Filter COUNTY_ID=1 AND PARCEL_TYPE=1. Egress-sensitive (403 common). Geo-identity confirmed
+    via AGOL twin — sibling OK when reachable. 2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP 403 from box
+    — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes sibling (JUR=001)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    CALC_ACRE: acreage
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    LANDUSE: dorCode
+    ZONING: zoning
+    TAXYR: taxYear
+  notes: 'Filter JUR=''001''; prefer latest TAXYR. Query-only. Egress-sensitive; use AGOL Anderson_Parcels
+    when Themes blocked. 2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP 403 from box — not verifiable; keep
+    as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: zoning
+  name: AndersonTN_PSALayers Zoning (parcel-attributed ZONING_1)
+  restUrl: https://services8.arcgis.com/vL7QLF4BNi1wukPE/arcgis/rest/services/AndersonTN_PSALayers/FeatureServer/3
+  layerId: 3
+  coverage: county-wide
+  fieldMap:
+    ZONING_1: zoning
+    GISLINK: parcelId
+    ADDRESS: situsAddress
+    OWNER: ownerName
+    CALC_ACRE: acreage
+    LANDUSE: dorCode
+  notes: ~35,426 polys — parcel fabric with ZONING_1 (e.g. R-1 / R-1-S / CITY), not district polygons.
+    Join on GISLINK. Sample centroid in-county (36.08,-84.17). Prefer over blank CAMA ZONING when Themes
+    blocked. City-code CITY may need municipal resolve.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+gaps:
+- Adopted FLU FeatureServer not found (honest gap)
+- IMPACT Themes live query often 403 from datacenter egress
+- AGOL Assessment_Data_01 vintage may lag current TPAD tax year
+- PSA Zoning is parcel-attributed codes — not ordinance district polygons
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: Anderson County Assessor / Comptroller IMPACT-TPAD public records; AGOL TN County Parcel Map
+  republish — attribution required. No paid GIS purchase channel.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+jurisdictionGisUrl: https://acassessor.maps.arcgis.com/apps/webappviewer/index.html?id=ceca75ab630048669e3b90abb301b09a
+zoningOverall: usable
+packagingNote: >-
+  Digged 2026-09-24 ET full-suite TRANCHE-3; prefer AGOL joined parcels over bare IMPACT; geo-verify PASS;
+  skip utilities/AADT. RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added OIR. LSB-approved
+  parcel setup applied 2026-09-28 (see parcelSetup).
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=1
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/83
+  joinKey: OIR.GISLINK = Parcels_GISLINK
+  salesValueVintage: 2023
+  salesValueSourceEditDate: '2023-11-22'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 4316
+  gislinkJoinSample: 10/10 (100%)

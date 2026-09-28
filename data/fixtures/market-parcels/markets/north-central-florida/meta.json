@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-28T18:31:27Z",
+  "generatedAt": "2026-09-28T22:27:33Z",
   "market": "North-Central Florida",
   "tier": "other",
   "parcelCount": 94271,
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -55,8 +55,8 @@
       "queryUrl": "http://gis.srwmd.state.fl.us/arcgis/rest/services/SRWMDGIS/SRWMD_Parcels/FeatureServer/2/query",
       "gaps": [
         "3293 rows matched the acreage filter; 3292 kept after the parcel-id and geometry checks.",
-        "Upgrade off the Florida DOH roll (593 parcels). SRWMD layer 2 is the countywide 5\u2013150 acre extract. FDOR joins for this county need CO_NO=14.",
-        "Acreage is AREANO, 5.0\u2013150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
+        "Upgrade off the Florida DOH roll (593 parcels). SRWMD layer 2 is the countywide 5–150 acre extract. FDOR joins for this county need CO_NO=14.",
+        "Acreage is AREANO, 5.0–150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
         "No Opportunity Zone status is stored. Zoning and future land use are not on this SRWMD roll."
       ],
       "path": "data/fixtures/market-parcels/counties/12007/tiles",
@@ -77,7 +77,7 @@
       "queryUrl": "https://www25.swfwmd.state.fl.us/arcgis12/rest/services/BaseVector/parcel_search/MapServer/2/query",
       "gaps": [
         "6028 rows matched the acreage filter; 5992 kept after the parcel-id and geometry checks.",
-        "Parcels are SWFWMD parcel_search layer 2. Acreage is AREANO (ACRES is empty), 5.0\u2013150.0 inclusive. PARCELID keeps embedded spaces.",
+        "Parcels are SWFWMD parcel_search layer 2. Acreage is AREANO (ACRES is empty), 5.0–150.0 inclusive. PARCELID keeps embedded spaces.",
         "Replaces the Florida DOH tiles. Zoning copied only when the parcel id still matches the previous extract.",
         "No Opportunity Zone status is stored.",
         "Zoning, future land use, or appraiser links carried forward for 5275 parcel ids that still match."
@@ -100,7 +100,7 @@
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/19/query",
       "gaps": [
         "6854 source rows collapsed to 6395 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "Partial. Gilchrist parcels are the Florida DOH 5\u2013150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
+        "Partial. Gilchrist parcels are the Florida DOH 5–150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified. PHY_CITY is a postal city, not a municipality."
       ],
       "path": "data/fixtures/market-parcels/counties/12041/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12041/lookup.json",
@@ -121,7 +121,7 @@
       "gaps": [
         "4150 rows matched the acreage filter; 4149 kept after the parcel-id and geometry checks.",
         "SRWMD layer 6. FDOR joins need CO_NO=34.",
-        "Acreage is AREANO, 5.0\u2013150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
+        "Acreage is AREANO, 5.0–150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
         "No Opportunity Zone status is stored. Zoning and future land use are not on this SRWMD roll."
       ],
       "path": "data/fixtures/market-parcels/counties/12047/tiles",
@@ -168,7 +168,7 @@
       "gaps": [
         "3166 rows matched the acreage filter; 3165 kept after the parcel-id and geometry checks.",
         "SRWMD layer 8. FDOR joins need CO_NO=44.",
-        "Acreage is AREANO, 5.0\u2013150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
+        "Acreage is AREANO, 5.0–150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
         "No Opportunity Zone status is stored. Zoning and future land use are not on this SRWMD roll."
       ],
       "path": "data/fixtures/market-parcels/counties/12067/tiles",
@@ -189,7 +189,7 @@
       "queryUrl": "http://gis.srwmd.state.fl.us/arcgis/rest/services/SRWMDGIS/SRWMD_Parcels/FeatureServer/9/query",
       "gaps": [
         "Upgrade off the Florida DOH roll. SRWMD layer 9. PARNO matches PARCELID here. FDOR joins need CO_NO=48.",
-        "Acreage is AREANO, 5.0\u2013150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
+        "Acreage is AREANO, 5.0–150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
         "No Opportunity Zone status is stored. Zoning and future land use are not on this SRWMD roll."
       ],
       "path": "data/fixtures/market-parcels/counties/12075/tiles",
@@ -210,7 +210,7 @@
       "queryUrl": "https://gis.marionfl.org/public/rest/services/General/ParcelsAndSubdivisions/MapServer/0/query",
       "gaps": [
         "17840 rows matched the acreage filter; 17730 kept after the parcel-id and geometry checks.",
-        "County ParcelsAndSubdivisions MapServer/0. Acreage is ACRES, 5.0\u2013150.0 inclusive. Replaces the Orlando 120-parcel sample on the map.",
+        "County ParcelsAndSubdivisions MapServer/0. Acreage is ACRES, 5.0–150.0 inclusive. Replaces the Orlando 120-parcel sample on the map.",
         "The Orlando sample file is unchanged and is not drawn once this extract is larger. No Opportunity Zone status is stored.",
         "FDOR joins need CO_NO=52 and PARCEL kept dashed."
       ],
@@ -260,7 +260,7 @@
       "gaps": [
         "11857 rows matched the acreage filter; 11856 kept after the parcel-id and geometry checks.",
         "SRWMD layer 11. FDOR joins need CO_NO=71. Some PARNO values have a leading space; it is trimmed.",
-        "Acreage is AREANO, 5.0\u2013150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
+        "Acreage is AREANO, 5.0–150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
         "No Opportunity Zone status is stored. Zoning and future land use are not on this SRWMD roll."
       ],
       "path": "data/fixtures/market-parcels/counties/12121/tiles",
@@ -282,7 +282,7 @@
       "gaps": [
         "2348 rows matched the acreage filter; 2347 kept after the parcel-id and geometry checks.",
         "SRWMD layer 13. The Panda UnionMaintenanceRequests layer is publicly editable and is not ingested.",
-        "Acreage is AREANO, 5.0\u2013150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
+        "Acreage is AREANO, 5.0–150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
         "No Opportunity Zone status is stored. Zoning and future land use are not on this SRWMD roll."
       ],
       "path": "data/fixtures/market-parcels/counties/12125/tiles",

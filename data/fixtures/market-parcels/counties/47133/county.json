@@ -1,0 +1,56 @@
+{
+  "name": "Overton",
+  "fips": "47133",
+  "state": "Tennessee",
+  "markets": [
+    "Nashville"
+  ],
+  "featureCount": 5557,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "tn-oir-public-use-47133",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+  "gaps": [
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Overton is not a layer on TN_County_Parcel_Map. Sale date, sale price, appraisal, and mailing are joined from UCDD Overton_Parcels on GISLINK. The latest tax year on that roll is 2019, so those fields are labeled 2019. Owner and geometry stay on the 2026 OIR layer. An unmatched GISLINK is left without sale or value.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used.",
+    "Overton has no countywide zoning FeatureServer. A non-blank ZONING value on the UCDD roll is kept. Future land use stays empty.",
+    "GISLINK matched 89.5% of kept parcels on the sale/value layer. Unmatched parcels are published without sale or value."
+  ],
+  "path": "data/fixtures/market-parcels/counties/47133/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47133/lookup.json",
+  "sourceCount": 15539,
+  "dropped": 0,
+  "tileCount": 6,
+  "ingest": {
+    "sourceRows": 15539,
+    "deedAcresInBand": 3745,
+    "droppedGeometry": 0,
+    "droppedOutsideBand": 9980,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 2,
+    "tncpmLayer": null,
+    "tncpmMatched": 0,
+    "saleCount": 0,
+    "appraisalCount": 0,
+    "gislinkMatchRate": 0.8951,
+    "overtonCamaMatched": 4974,
+    "overtonSaleCount": 1962,
+    "overtonAppraisalCount": 4970,
+    "overtonMailCount": 4974,
+    "overtonZoningCount": 42,
+    "salesVintage": "2019",
+    "kept": 5557,
+    "ownerCount": 5551,
+    "tpadCount": 5557,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
+}

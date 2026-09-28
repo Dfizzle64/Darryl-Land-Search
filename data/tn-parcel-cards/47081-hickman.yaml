@@ -1,0 +1,107 @@
+state: TN
+jurisdiction: Hickman County
+fips: '47081'
+level: county
+markets:
+- Nashville
+layers:
+- role: parcels
+  name: Hickman CaptureCAMA Parcels (MapServer/9 joined CAMA)
+  restUrl: https://maps.capturecama.com/arcgis/rest/services/Hickman/HickmanTN05182023/MapServer/9
+  layerId: 9
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    PARCELID: parcelIdFull
+    CALC_ACRE: acreage
+    DACRES: acreageDeed
+    CACRES: acreageCama
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    CITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    PROPADDR: situsAddress
+    LNDVALMKT: tax.landValue
+    IMPVAL: tax.improvementValue
+    APRVAL: tax.marketValue
+    ASMT: tax.assessedValue
+    ASMTPCT: tax.assessmentPct
+    TAXYR: taxYear
+    COUNTY_ID: countyId
+    PARCEL_TYP: parcelType
+  notes: 'Preferred source — Hickman is NOT maintained by Comptroller IMPACT (TPAD external). Absent from
+    AGOL TN_County_Parcel_Map (86 IMPACT counties only). CaptureCAMA MapServer/9 queryable Feature Layer:
+    live count 18,549; CALC_ACRE 5–150 → 5,507 (2026-09-24 ET). Geo-verify PASS: (35.99233,-87.53431)
+    / (35.99109,-87.52835) / (35.98821,-87.49575) WGS84 in Hickman; GISLINK prefix 041; COUNTY_ID=41.
+    No SALEDATE/PRICE on this layer (sale history gap). publicGisUrl: https://hickman.capturecama.com/CAMA/CAPortal/CZ_MainPage.aspx
+    and zoning Experience https://experience.arcgis.com/experience/c0cb87fa75864f64a503f4cec9417c6d. maxRecordCount
+    1000 — paginate. Service name dated HickmanTN05182023. 2026-09-28 ET TN PIR re-verify: count 18,549;
+    CALC_ACRE 5–150 → 5507; id GISLINK populated=True; geo PASS (3/3 in county) (35.99208,-87.53299)→Hickman;
+    (35.65361,-87.38888)→Hickman.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner-sales-value
+  salesValueVintage: 2020
+  sourceEditDate: 2023-05-18 (service snapshot name)
+  count5to150CalcArea: 5501
+- role: parcels
+  name: IMPACT Parcels sibling (NOT MAINTAINED — do not prefer)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: unknown
+  fieldMap:
+    GISLINK: parcelId
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+  notes: 'Hickman listed among counties NOT maintained by Comptroller (with Davidson, Knox, Shelby, etc.).
+    Do not use IMPACT as primary. CaptureCAMA is authoritative public REST. 2026-09-28 ET TN PIR: maps.cot.tn.gov
+    HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: gap
+  auth: blocked-403
+  geometry: polygon
+gaps:
+- No SALEDATE/PRICE/VI on CaptureCAMA parcel layer (sale history honest gap)
+- No free public zoning polygon FeatureServer (Experience viewer only; REST not exposed)
+- Adopted FLU FeatureServer not found
+- Absent from AGOL TN_County_Parcel_Map twin (non-IMPACT county)
+- CaptureCAMA deep-link with {GISLINK} not stably verified — use Citizen Access Portal search
+- MapServer dated HickmanTN05182023 — confirm refresh cadence with assessor
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: Hickman County Property Assessor / CaptureCAMA (E-Ring) public records — attribution required.
+  Not Comptroller IMPACT-maintained. No paid GIS purchase channel.
+appraiserSearchUrl: https://hickman.capturecama.com/CAMA/CAPortal/CZ_MainPage.aspx
+jurisdictionGisUrl: https://hickman.capturecama.com/CAMA/CAPortal/CZ_MainPage.aspx
+zoningOverall: partial
+packagingNote: >-
+  Digged 2026-09-24 ET full-suite TRANCHE-3; non-IMPACT external county — CaptureCAMA primary; geo-verify
+  PASS; skip utilities/AADT. RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added none.
+  Hickman is non-IMPACT (absent from TNCPM and OIR fabric). Only public polygon host = CaptureCAMA HickmanTN05182023
+  (service snapshot 2023-05-18; sample LASTUPD 180920) — vintage stale; no fresher public host found in
+  maps.capturecama.com/Hickman folder. LSB-approved parcel setup applied 2026-09-28 (see parcelSetup).
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://maps.capturecama.com/arcgis/rest/services/Hickman/HickmanTN05182023/MapServer/9
+  salesValueSource: https://maps.capturecama.com/arcgis/rest/services/Hickman/HickmanTN05182023/MapServer/9
+  joinKey: n/a (single joined layer)
+  salesValueVintage: 2020
+  salesValueSourceEditDate: 2023-05-18 (service snapshot name)
+  exception: Hickman is not IMPACT-maintained; absent from OIR 2026 fabric and TN_County_Parcel_Map. CaptureCAMA
+    joined layer kept as primary geometry+owner+sale/value.
+  acreageFilter: 5–150 ac on geodesic polygon area computed from geometry (not deed acres)
+  count5to150CalcArea: 5501
+  gislinkJoinSample: n/a (no OIR coverage)

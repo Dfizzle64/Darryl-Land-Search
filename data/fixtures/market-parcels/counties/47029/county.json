@@ -5,19 +5,46 @@
   "markets": [
     "Knoxville"
   ],
-  "featureCount": 4448,
+  "featureCount": 6377,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "tn-impact-47029",
-  "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+  "source": "tn-oir-public-use-47029",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
   "gaps": [
-    "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used.",
+    "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
   ],
   "path": "data/fixtures/market-parcels/counties/47029/tiles",
   "lookup": "data/fixtures/market-parcels/counties/47029/lookup.json",
-  "sourceCount": 4563,
-  "dropped": 107,
-  "tileCount": 4
+  "sourceCount": 25266,
+  "dropped": 0,
+  "tileCount": 6,
+  "ingest": {
+    "sourceRows": 25266,
+    "deedAcresInBand": 5386,
+    "droppedGeometry": 2,
+    "droppedOutsideBand": 18882,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 5,
+    "tncpmLayer": 70,
+    "tncpmMatched": 6171,
+    "saleCount": 6015,
+    "appraisalCount": 6100,
+    "gislinkMatchRate": 0.9677,
+    "salesVintage": "2023",
+    "kept": 6377,
+    "ownerCount": 6372,
+    "tpadCount": 6377,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
 }

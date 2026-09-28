@@ -24,7 +24,11 @@ describe("parcel coverage overlay", () => {
     const loaded = loadedParcelCounties(index.markets, orlando.counties);
     const davidson = loaded.find((county) => county.fips === "47037");
     expect(davidson).toEqual({ fips: "47037", name: "Davidson", state: "Tennessee" });
-    expect(loaded.find((county) => county.fips === "47111")).toBeUndefined();
+    expect(loaded.find((county) => county.fips === "47111")).toEqual({
+      fips: "47111",
+      name: "Macon",
+      state: "Tennessee",
+    });
     expect(loaded.find((county) => county.fips === "12069")).toEqual({ fips: "12069", name: "Lake", state: "Florida" });
     expect(loaded.find((county) => county.fips === "12095")).toMatchObject({ name: "Orange", state: "Florida" });
     const fips = new Set(loaded.map((county) => county.fips));
@@ -36,7 +40,9 @@ describe("parcel coverage overlay", () => {
     const davidson = collection.features.find((feature) => feature.properties?.fips === "47037");
     expect(davidson?.properties).toMatchObject({ name: "Davidson", state: "Tennessee" });
     expect(davidson?.geometry.type === "Polygon" || davidson?.geometry.type === "MultiPolygon").toBe(true);
-    expect(collection.features.find((feature) => feature.properties?.fips === "47111")).toBeUndefined();
+    const macon = collection.features.find((feature) => feature.properties?.fips === "47111");
+    expect(macon?.properties).toMatchObject({ name: "Macon", state: "Tennessee" });
+    expect(macon?.geometry.type === "Polygon" || macon?.geometry.type === "MultiPolygon").toBe(true);
     const raw = await readFile(path.join(process.cwd(), "data/fixtures/census/cb_2024_us_county_5m.geojson"), "utf8");
     expect(raw).toContain("cb_2024_us_county_5m");
     const boundaries = JSON.parse(raw) as GeoJSON.FeatureCollection;

@@ -1,0 +1,240 @@
+state: TN
+jurisdiction: Hardin County
+fips: '47071'
+level: county
+markets:
+- Memphis
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=36)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 28,565; DEEDAC 5–150 → 3881; id GISLINK populated=True; geo PASS
+    (5/5 centroids in county, 5/5 polys touch county) (35.4184,-88.35581)→Hardin; (35.30849,-88.24663)→Hardin;
+    (35.20885,-88.18257)→Hardin (where COUNTY_ID=36). Service lastEditDate 2026-09-10 (PARCELID suffix
+    2026) — freshest public owner/geometry; no sale/value/CALC_ACRE (DEEDAC often 0 — derive geodesic
+    acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 5438
+- role: parcels
+  name: TN County Parcel Map — Hardin_Parcels (Assessment_Data_36 join)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/52
+  layerId: 52
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Parcels_GISLINK2: parcelIdAlt
+    Assessment_Data_36_GISLINK: parcelIdJoin
+    Assessment_Data_36_ID: parcelIdDisplay
+    Assessment_Data_36_PARCELID: parcelIdFull
+    Assessment_Data_36_OWNER: ownerName
+    Assessment_Data_36_OWNER2: ownerName2
+    Assessment_Data_36_ADDRESS: situsAddress
+    Parcels_CALC_ACRE: acreage
+    Assessment_Data_36_DEEDAC: acreageDeed
+    Assessment_Data_36_LANDMKTVAL: tax.landValue
+    Assessment_Data_36_APPRAISAL: tax.marketValue
+    Assessment_Data_36_SALEDATE: lastSale.date
+    Assessment_Data_36_PRICE: lastSale.price
+    Assessment_Data_36_VI: lastSale.qualified
+    Assessment_Data_36_DEED_BOOK: lastSale.deedBook
+    Assessment_Data_36_DEED_PAGE: lastSale.deedPage
+    Assessment_Data_36_LANDUSE: dorCode
+    Assessment_Data_36_CLASS: propType
+    Assessment_Data_36_DISTRICT: taxDistrict
+    County_Name: countyName
+  notes: 'Preferred CAMA/AGOL over bare IMPACT (maps.cot.tn.gov often 403 from datacenter egress). Live
+    2026-09-24 ET: 27,853 polys; CALC_ACRE 5–150 → 5,378. Geo-verify PASS — sample centroids ~35.41N,
+    88.35W WGS84 (Savannah / Hardin TN). GISLINK/JUR prefix 036. Owner / sale / land market / appraisal
+    on join. No IMPVAL/mailing on this extract. OZ 2.0: join national Opportunity Zone 2.0 / rural-eligible
+    tracts by centroid. 2026-09-28 ET TN PIR re-verify: count 27,853; Parcels_CALC_ACRE 5–150 → 5378;
+    id Parcels_GISLINK populated=True; geo PASS (5/5 centroids in county, 5/5 polys touch county) (35.41628,-88.35495)→Hardin;
+    (35.22203,-88.17354)→Hardin; (35.01853,-88.24505)→Hardin.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: Parcels_GISLINK
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: Hardin Parcels (Public) — JCBurgess AGOL geometry twin
+  restUrl: https://services8.arcgis.com/QuuhNNKD3xQ6RqEv/arcgis/rest/services/Hardin_Parcels_(Public)/FeatureServer/12
+  layerId: 12
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    ID: parcelIdDisplay
+    ADDRESS: situsAddress
+    SUBDIV: subdivision
+    LOT: lot
+  notes: 'Local AGOL ~27,846 polys (2026-09-24). Geo-verify PASS (~35.40N, 88.09W Savannah / Hardin TN).
+    Attribute-thin (ID/ADDRESS/SUBDIV/LOT) — prefer TN_County_Parcel_Map for owner/sale/tax. Companion
+    Mar_2020 layer adds OWNER. 2026-09-28 ET TN PIR re-verify: count 27,846; None 5–150 → n/a; id ID populated=True;
+    geo PASS (5/5 centroids in county, 5/5 polys touch county) (35.39989,-88.08532)→Hardin; (35.22381,-88.35859)→Hardin;
+    (35.0808,-88.21844)→Hardin.'
+  status: partial
+  auth: none
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: Hardin_Parcels_Mar_2020_Online (JCBurgess) — owner attrs, vintage
+  restUrl: https://services8.arcgis.com/QuuhNNKD3xQ6RqEv/arcgis/rest/services/Hardin_Parcels_Mar_2020_Online/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    ID: parcelIdDisplay
+    ADDRESS: situsAddress
+    OWNER: ownerName
+    OWNER2: ownerName2
+    SUBDIV: subdivision
+    LOT: lot
+    BLDGS: buildingCount
+  notes: '~26,992 polys; March 2020 vintage. Geo PASS (~35.41N, 88.35W). Prefer live AGOL join for tax/sale;
+    use for owner when needed. 2026-09-28 ET TN PIR re-verify: count 26,992; None 5–150 → n/a; id ID populated=True;
+    geo PASS (5/5 centroids in county, 5/5 polys touch county) (35.41261,-88.35658)→Hardin; (35.21477,-88.36754)→Hardin;
+    (35.1141,-88.29341)→Hardin.'
+  status: partial
+  auth: none
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcels (COUNTY_ID=36) — egress-sensitive sibling
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+  notes: 'Filter COUNTY_ID=36 AND PARCEL_TYPE=1. Prefer TN_County_Parcel_Map when IMPACT blocked. 2026-09-28
+    ET TN PIR: maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes (JUR='036') — CAMA when IMPACT reachable
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    CALC_ACRE: acreage
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    LANDUSE: dorCode
+    ZONING: zoning
+    TAXYR: taxYear
+  notes: 'Filter JUR=''036''; prefer latest TAXYR. Adds IMPVAL/mailing when reachable. 2026-09-28 ET TN
+    PIR: maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: zoning
+  name: null — no public countywide zoning REST found
+  restUrl: null
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: unknown
+  fieldMap: {}
+  notes: 'No countywide zoning FeatureServer located (2026-09-24). City/town zoning may exist as PDF/hardcopy
+    only — do not invent districts. '
+  status: gap
+- role: flu
+  name: null — no public FLU FeatureServer
+  restUrl: null
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: unknown
+  fieldMap: {}
+  notes: No adopted FLU FeatureServer found (2026-09-24).
+  status: gap
+gaps:
+- No countywide zoning FeatureServer found (2026-09-24)
+- No adopted FLU FeatureServer found
+- TN_County_Parcel_Map join lacks IMPVAL / mailing columns
+- IMPACT maps.cot.tn.gov egress-sensitive (403 common)
+- Local Hardin AGOL twins lack tax/sale; Mar_2020 is vintage
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: TN Comptroller Geographic Services / IMPACT-TPAD / Hardin County public records; AGOL TN County
+  Parcel Map republish — attribution required. No paid GIS purchase channel.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+publicGisUrl: https://tnmap.tn.gov/Assessment/
+jurisdictionGisUrl: https://tnmap.tn.gov/Assessment/
+zoningOverall: gap
+packagingNote: >-
+  Wave 3B TRANCHE-3 dig 2026-09-24. Primary parcels = TN_County_Parcel_Map/52 (Assessment_Data_36). TPAD
+  deep-link {GISLINK}. Public GIS = tnmap Assessment viewer. Skip utilities + AADT. OZ 2.0 = national
+  tract join. Local JCBurgess Hardin Parcels (Public)/12 + Mar_2020 noted as geometry/owner twins. RURAL-OZ
+  PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added OIR. Hardin local AGOL layers: (Public)/12
+  lastEdit 2023-09-04 (ID/ADDRESS/SUBDIV/LOT only); Mar_2020_Online lastEdit 2020-10-12 (owner, stale).
+  Neither has acreage — secondary only. LSB-approved parcel setup applied 2026-09-28 (see parcelSetup).
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=36
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/52
+  joinKey: OIR.GISLINK = Parcels_GISLINK
+  salesValueVintage: 2023
+  salesValueSourceEditDate: '2023-11-22'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 5438
+  gislinkJoinSample: 10/10 (100%)

@@ -1,0 +1,131 @@
+state: TN
+jurisdiction: Chester County
+fips: '47023'
+level: county
+markets:
+- Jackson
+layers:
+- role: parcels
+  name: Chester CaptureCAMA Parcels_12 (county CAMA — NON-IMPACT)
+  restUrl: https://gis.capturecama.com/arcgis/rest/services/ChesterTN/ChesterCapture/MapServer/7
+  layerId: 7
+  acreageField: L15Parce_4
+  coverage: county-wide
+  fieldMap:
+    GPDATA__GI: parcelId
+    L15Parce_2: parcelIdAlt
+    GPDATA__PA: parcelIdFull
+    L15Parce_4: acreage
+    GPDATA__DA: acreageDeed
+    GPDATA__OW: ownerName
+    GPDATA___2: ownerName2
+    GPDATA__PR: situsAddress
+    GPDATA__MA: mailingAddress.street
+    GPDATA__CI: mailingAddress.city
+    GPDATA__ST: mailingAddress.state
+    GPDATA__ZI: mailingAddress.zip
+    GPDATA__LA: recordUpdated
+    GPDATA__23: tax.landValue
+    GPDATA__25: tax.improvementValue
+    GPDATA__30: tax.marketValue
+    GPDATA__26: tax.assessedValue
+    GPDATA__AS: tax.assessmentRatio
+    GPDATA__AP: tax.appraisalYear
+    GPDATA___5: dorCode
+    GPDATA__CO: countyCode
+  notes: 'NON-IMPACT county (own CAMA; absent from TN County Parcel Map / IMPACT Themes). Preferred public
+    source = CaptureCAMA MapServer Parcels_12. Live count 10,333; L15Parce_4 (calc acres) 5–150 → 3,422
+    (2026-09-24 ET). Geo-verify PASS: sample centroids (−88.65031, 35.45459) / (−88.48665, 35.39030) WGS84
+    in Chester (Henderson / Finger); GISLINK prefix 012 (alpha 12). MapServer exposes truncated GPDATA__*
+    aliases — mapped by sample semantics (OW=owner, PR=situs, MA/CI/ST/ZI=mail, 23=land, 25=impr, 30=market,
+    26=assessed, AS=ratio, AP=year, LA=YYMMDD date). Sale PRICE not clearly published on this layer (honest
+    gap). publicGisUrl = ArcGIS webmap f214fb11968a4539bf128561ea61ecd6 + Capture portal. Skip utility
+    attrs. Reject Chester County PA / Chester County SC twins. 2026-09-28 ET TN PIR re-verify: count 10,333;
+    L15Parce_4 5–150 → 3422; id GPDATA__GI populated=False; geo PASS (3/3 in county) (35.32969,-88.7766)→Chester;
+    (35.53026,-88.60087)→Chester. Id check 2026-09-28: probe sample hit a blank GPDATA__GI; in 5–150 band
+    133/3,422 (3.9%) have blank CAMA GISLINK, 79 also blank geometry GISLINK (L15Parce_2) — use COALESCE(GPDATA__GI,
+    L15Parce_2) and drop the 79 unkeyed polys. Status stays usable.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner-sales-value
+  salesValueVintage: 2026
+  sourceEditDate: unknown (CaptureCAMA MapServer, no editingInfo)
+  count5to150CalcArea: 3423
+- role: parcels
+  name: Chester CaptureCAMA Citizen Access Portal (attribute search)
+  restUrl: null
+  layerId: null
+  acreageField: null
+  coverage: county-wide
+  fieldMap: {}
+  notes: 'Assessor Citizen Access Portal: https://chester.capturecama.com/CAMA/CAPortal/CZ_MainPage.aspx
+    (linked from chestercountytn.org/assessor_of_property.html). Search by owner / parcel / address. No
+    confirmed {GISLINK} deep-link template (common CZ_ParcelDetail patterns 404); use portal search. appraiserSearchUrl
+    points here.'
+  status: usable
+  auth: none
+  geometry: none
+- role: zoning
+  name: null — no public countywide zoning FeatureServer found
+  restUrl: null
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: unknown
+  fieldMap: {}
+  notes: Chester County Building & Zoning page exists but no public FeatureServer located 2026-09-24.
+    Henderson city zoning REST not verified — honest gap.
+  status: gap
+- role: flu
+  name: null — no public FLU FeatureServer found
+  restUrl: null
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: unknown
+  fieldMap: {}
+  notes: Adopted countywide FLU FeatureServer not found 2026-09-24.
+  status: gap
+gaps:
+- NON-IMPACT — not on TN County Parcel Map / IMPACT Themes; CaptureCAMA is sole public CAMA
+- Sale PRICE not clearly exposed on Capture MapServer layer (date YYMMDD in GPDATA__LA only)
+- Capture MapServer field aliases truncated (GPDATA__*) — verify mapping against portal cards
+- No confirmed appraiser deep-link template with {parcelId}; portal search only
+- No public countywide zoning FeatureServer found
+- Adopted FLU FeatureServer not found (honest gap)
+- Do NOT use Chester County PA / Chester County SC GIS twins
+license: Chester County Assessor / CaptureCAMA public records — attribution required. Not an IMPACT/TPAD
+  county. No paid GIS purchase channel.
+appraiserSearchUrl: https://chester.capturecama.com/CAMA/CAPortal/CZ_MainPage.aspx
+publicGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?webmap=f214fb11968a4539bf128561ea61ecd6
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?webmap=f214fb11968a4539bf128561ea61ecd6
+zoningOverall: gap
+packagingNote: >-
+  Digged 2026-09-24 ET full-suite TRANCHE-3; NON-IMPACT own CAMA (CaptureCAMA); geo-verify PASS; skip
+  utilities/AADT. RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added none. Chester
+  is non-IMPACT (absent from TNCPM/OIR). Twin service ChesterCapture1/MapServer/8 (Parcels_12) also live:
+  count 10,333; L15Parce_4 5–150 → 3,422; geo PASS — same data, fallback only. LSB-approved parcel setup
+  applied 2026-09-28 (see parcelSetup).
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://gis.capturecama.com/arcgis/rest/services/ChesterTN/ChesterCapture/MapServer/7
+  salesValueSource: https://gis.capturecama.com/arcgis/rest/services/ChesterTN/ChesterCapture/MapServer/7
+  joinKey: n/a (single joined layer)
+  salesValueVintage: 2026
+  salesValueSourceEditDate: unknown (CaptureCAMA MapServer, no editingInfo)
+  exception: Chester is not IMPACT-maintained; absent from OIR 2026 fabric and TN_County_Parcel_Map. CaptureCAMA
+    joined layer kept as primary geometry+owner+sale/value; coalesce GPDATA__GI with L15Parce_2.
+  acreageFilter: 5–150 ac on geodesic polygon area computed from geometry (not deed acres)
+  count5to150CalcArea: 3423
+  gislinkJoinSample: n/a (no OIR coverage)

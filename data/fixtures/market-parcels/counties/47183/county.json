@@ -1,0 +1,50 @@
+{
+  "name": "Weakley",
+  "fips": "47183",
+  "state": "Tennessee",
+  "markets": [
+    "Jackson"
+  ],
+  "featureCount": 6385,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "tn-oir-public-use-47183",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+  "gaps": [
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used.",
+    "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
+  ],
+  "path": "data/fixtures/market-parcels/counties/47183/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47183/lookup.json",
+  "sourceCount": 20191,
+  "dropped": 0,
+  "tileCount": 6,
+  "ingest": {
+    "sourceRows": 20191,
+    "deedAcresInBand": 1809,
+    "droppedGeometry": 0,
+    "droppedOutsideBand": 13805,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 1,
+    "tncpmLayer": 2,
+    "tncpmMatched": 6266,
+    "saleCount": 6202,
+    "appraisalCount": 6199,
+    "gislinkMatchRate": 0.9814,
+    "salesVintage": "2023",
+    "kept": 6385,
+    "ownerCount": 6383,
+    "tpadCount": 6385,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
+}

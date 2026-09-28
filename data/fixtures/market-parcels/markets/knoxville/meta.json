@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T01:06:16Z",
+  "generatedAt": "2026-09-28T22:27:33Z",
   "market": "Knoxville",
   "tier": "other",
-  "parcelCount": 39939,
+  "parcelCount": 58475,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -20,20 +20,24 @@
       "name": "Anderson",
       "fips": "47001",
       "state": "Tennessee",
-      "featureCount": 4302,
+      "featureCount": 4310,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47001",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-oir-public-use-47001",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "Anderson zoning is AndersonTN_PSALayers ZONING_1 joined on GISLINK (3858 parcels). A code of CITY is the published city flag and was not resolved to a municipal district."
       ],
       "path": "data/fixtures/market-parcels/counties/47001/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47001/lookup.json",
       "tileCount": 7,
-      "sourceCount": 4398
+      "sourceCount": 36465
     },
     {
       "name": "Blount",
@@ -48,12 +52,12 @@
       "queryUrl": "https://services3.arcgis.com/NIOS5f3vobGvnGtD/arcgis/rest/services/BlountParcels/FeatureServer/0/query",
       "gaps": [
         "8193 source rows collapsed to 8183 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "Blount County TN (FIPS 47009) is an IMPACT/TPAD county. Comptroller JUR is 005 and COUNTY_ID is 5, not the FIPS suffix. Parcels are the public AGOL BlountParcels layer (PARCEL_TYP=1, CALC_ACRE 5\u2013150) with owner, mailing, situs, sale, and appraisal. The geometry-only statewide IMPACT Parcels layer is not the attribute source. Token-gated ParcelPublishing (499) and the county GIS premium extract are not used. Blount County, Alabama (kcsgis Blount/Public) is the wrong state and is not used.",
-        "tax.marketValue is total appraisal (APPRAISAL). LANDVAL, IMPVAL, and OBYVAL are appraisal components stored beside it. Assessed and taxable totals are not on this public REST layer \u2014 confirm those, and blank or zero sales, on TPAD (https://assessment.cot.tn.gov/tpad/). No stable anonymous deep link was verified; search by parcel ID (ID / PARID) or GISLINK. lastSale.qualified is the roll AR code when present; deed book/page and VI are retained on the sale object.",
+        "Blount County TN (FIPS 47009) is an IMPACT/TPAD county. Comptroller JUR is 005 and COUNTY_ID is 5, not the FIPS suffix. Parcels are the public AGOL BlountParcels layer (PARCEL_TYP=1, CALC_ACRE 5–150) with owner, mailing, situs, sale, and appraisal. The geometry-only statewide IMPACT Parcels layer is not the attribute source. Token-gated ParcelPublishing (499) and the county GIS premium extract are not used. Blount County, Alabama (kcsgis Blount/Public) is the wrong state and is not used.",
+        "tax.marketValue is total appraisal (APPRAISAL). LANDVAL, IMPVAL, and OBYVAL are appraisal components stored beside it. Assessed and taxable totals are not on this public REST layer — confirm those, and blank or zero sales, on TPAD (https://assessment.cot.tn.gov/tpad/). No stable anonymous deep link was verified; search by parcel ID (ID / PARID) or GISLINK. lastSale.qualified is the roll AR code when present; deed book/page and VI are retained on the sale object.",
         "Zoning is city-only on countywide parcels. The parcel ZONING attribute is a weak CAMA label. The joined code prefers LandUsePlanning/Zoning MapServer layer 2 ZONECLASS after CityLimits, then CITYNUM (464 Maryville, 012 Alcoa). Friendsville, Louisville, Townsend, and Rockford have no CITYNUM and resolve only from CityLimits. Blount County zoning polygons are not applied inside a city.",
         "Adopted FLU is joined only inside Maryville (Maryville Future Land Use LANDUSEDESC) and Alcoa (Current Land Use landusedesc). Friendsville, Louisville, Townsend, Rockford, and unincorporated Blount have no verified public adopted FLU service, so FLU stays null there. Proposed countywide FLU Option layers are draft and are not joined. Maryville and Alcoa FLU are not applied outside those cities.",
-        "Acreage filter is CALC_ACRE. CAMADEEDAC and CAMACALCAC are secondary and often zero. National Park (NP) and federal rows can fall in the 5\u2013150 acre band; acreage is not a developability judgment.",
-        "Join counts \u2014 flu:alcoa 175, flu:alcoa-miss 4, flu:gap 7764, flu:maryville 234, flu:maryville-miss 6, jurisdiction:ALCOA 179, jurisdiction:FRIENDSVILLE 77, jurisdiction:LOUISVILLE 369, jurisdiction:MARYVILLE 240, jurisdiction:ROCKFORD 43, jurisdiction:TOWNSEND 31, jurisdiction:UNINCORPORATED 7244, zoning:cama 19, zoning:polygon 8164. FLU stays null for Friendsville, Louisville, Townsend, Rockford, and unincorporated (no adopted public FLU). Proposed county FLU options were not joined."
+        "Acreage filter is CALC_ACRE. CAMADEEDAC and CAMACALCAC are secondary and often zero. National Park (NP) and federal rows can fall in the 5–150 acre band; acreage is not a developability judgment.",
+        "Join counts — flu:alcoa 175, flu:alcoa-miss 4, flu:gap 7764, flu:maryville 234, flu:maryville-miss 6, jurisdiction:ALCOA 179, jurisdiction:FRIENDSVILLE 77, jurisdiction:LOUISVILLE 369, jurisdiction:MARYVILLE 240, jurisdiction:ROCKFORD 43, jurisdiction:TOWNSEND 31, jurisdiction:UNINCORPORATED 7244, zoning:cama 19, zoning:polygon 8164. FLU stays null for Friendsville, Louisville, Townsend, Rockford, and unincorporated (no adopted public FLU). Proposed county FLU options were not joined."
       ],
       "path": "data/fixtures/market-parcels/counties/47009/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47009/lookup.json",
@@ -64,39 +68,47 @@
       "name": "Campbell",
       "fips": "47013",
       "state": "Tennessee",
-      "featureCount": 5445,
+      "featureCount": 3613,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47013",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-oir-public-use-47013",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
       ],
       "path": "data/fixtures/market-parcels/counties/47013/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47013/lookup.json",
-      "tileCount": 6,
-      "sourceCount": 5585
+      "tileCount": 8,
+      "sourceCount": 27573
     },
     {
       "name": "Cocke",
       "fips": "47029",
       "state": "Tennessee",
-      "featureCount": 4448,
+      "featureCount": 6377,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47029",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-oir-public-use-47029",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
       ],
       "path": "data/fixtures/market-parcels/counties/47029/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47029/lookup.json",
-      "tileCount": 4,
-      "sourceCount": 4563
+      "tileCount": 6,
+      "sourceCount": 25266
     },
     {
       "name": "Grainger",
@@ -129,7 +141,7 @@
       "source": "tn-impact-47063",
       "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
+        "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
         "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
       ],
       "path": null,
@@ -189,7 +201,7 @@
       "source": "tn-impact-47105",
       "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
+        "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
         "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
       ],
       "path": null,
@@ -201,61 +213,70 @@
       "name": "Morgan",
       "fips": "47129",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 5113,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47129",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-oir-public-use-47129",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47129/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47129/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 14388
     },
     {
       "name": "Roane",
       "fips": "47145",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 5731,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47145",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-oir-public-use-47145",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47145/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47145/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 35837
     },
     {
       "name": "Sevier",
       "fips": "47155",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 7587,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47155",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-oir-public-use-47155",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sevier sale date, sale price, appraisal, assessed value, and mailing are joined from the Sevierville countywide CAMA (GIS_Department_Layers MapServer/57) on GISLINK. That CAMA is labeled 2025. The 2023 TN_County_Parcel_Map layer is not the sale source. Owner and geometry stay on the 2026 OIR layer. An unmatched GISLINK is left without sale or value.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "Sevier county zoning is SevierCountyZoning joined on GISLINK. Sevierville city zoning overwrites parcels whose centroids fall in that city layer. It is not applied outside the city."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47155/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47155/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 70701
     },
     {
       "name": "Union",
@@ -269,7 +290,7 @@
       "source": "tn-impact-47173",
       "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
+        "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
         "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
       ],
       "path": null,

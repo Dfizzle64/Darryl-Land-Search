@@ -5,19 +5,37 @@
   "markets": [
     "Nashville"
   ],
-  "featureCount": 3672,
+  "featureCount": 5445,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "tn-impact-47081",
-  "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+  "source": "tn-hickman-capturecama-202305",
+  "queryUrl": "https://maps.capturecama.com/arcgis/rest/services/Hickman/HickmanTN05182023/MapServer/9/query",
   "gaps": [
-    "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+    "Hickman is not in the OIR statewide layer or TN_County_Parcel_Map. The only public polygon source used here is the CaptureCAMA snapshot HickmanTN05182023 (May 18, 2023).",
+    "Acreage is the geodesic area of the polygon, from 5.0 through 150.0 inclusive. Owner and situs street come from that snapshot. CITY, STATE, and ZIP are the mailing city, not the situs city. APRVAL is market value and ASMT is assessed value, labeled 2020. TAXYR on this layer is not a year. There is no sale date or sale price.",
+    "Hickman is outside Comptroller TPAD. The property-record link is the CaptureCAMA citizen portal, not a TPAD GIS card. The research card has no zoning or future-land-use FeatureServer. Opportunity Zone status was not inferred. Regrid was not used.",
+    "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
   ],
   "path": "data/fixtures/market-parcels/counties/47081/tiles",
   "lookup": "data/fixtures/market-parcels/counties/47081/lookup.json",
-  "sourceCount": 3831,
-  "dropped": 158,
-  "tileCount": 5
+  "sourceCount": 18549,
+  "dropped": 13048,
+  "tileCount": 6,
+  "ingest": {
+    "sourceRows": 18549,
+    "calcAcresInBand": 5507,
+    "dropped": 13048,
+    "kept": 5445,
+    "salesVintage": "2020",
+    "ownerCount": 5236,
+    "tpadCount": 5445,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
 }

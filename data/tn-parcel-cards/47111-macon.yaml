@@ -1,0 +1,186 @@
+state: TN
+jurisdiction: Macon County
+fips: '47111'
+level: county
+markets:
+- Nashville
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=56)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 14,433; DEEDAC 5–150 → 3148; id GISLINK populated=True; geo PASS
+    (36.63525,-86.20119)→Macon; (36.636,-86.17183)→Macon (where COUNTY_ID=56). Service lastEditDate 2026-09-10
+    (PARCELID suffix 2026) — freshest public owner/geometry; no sale/value/CALC_ACRE (DEEDAC often 0 —
+    derive geodesic acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 5068
+- role: parcels
+  name: TN County Parcel Map — Macon_Parcels (Assessment_Data_56 join)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/37
+  layerId: 37
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Assessment_Data_56_GISLINK: parcelIdAlt
+    Assessment_Data_56_ID: parcelIdDisplay
+    Assessment_Data_56_PARCELID: parcelIdFull
+    Parcels_CALC_ACRE: acreage
+    Parcels_CAMA_CALCA: acreageCama
+    Parcels_CAMA_DEEDA: acreageDeed
+    Assessment_Data_56_DEEDAC: acreageDeedAlt
+    Assessment_Data_56_OWNER: ownerName
+    Assessment_Data_56_OWNER2: ownerName2
+    Assessment_Data_56_ADDRESS: situsAddress
+    Assessment_Data_56_DISTRICT: taxDistrict
+    Assessment_Data_56_SALEDATE: lastSale.date
+    Assessment_Data_56_PRICE: lastSale.price
+    Assessment_Data_56_VI: lastSale.qualified
+    Assessment_Data_56_DEED_BOOK: lastSale.deedBook
+    Assessment_Data_56_DEED_PAGE: lastSale.deedPage
+    Assessment_Data_56_LANDMKTVAL: tax.landValue
+    Assessment_Data_56_APPRAISAL: tax.marketValue
+    Assessment_Data_56_LANDUSE: dorCode
+    Assessment_Data_56_CLASS: propType
+    County_Name: countyName
+  notes: 'Preferred over bare IMPACT (box often 403 on maps.cot.tn.gov). Live count 13,556; CALC_ACRE
+    5–150 → 4,921 (2026-09-24 ET). Geo-verify PASS: sample centroids (−86.17849, 36.51384) / (−85.83093,
+    36.49252) / (−85.90484, 36.49568) WGS84 in Macon; GISLINK prefix 056. publicGisUrl: https://tnmap.tn.gov/Assessment/
+    . Assessor hub: https://www.maconcountytn.gov/government/property_assessor.php . No mailing fields
+    on this AGOL join — use IMPACT Themes when egress allows. Assessment table vintage may lag live TPAD.
+    Skip WATER/SEWER/ELEC/GAS (utilities OOS). 2026-09-28 ET TN PIR re-verify: count 13,556; Parcels_CALC_ACRE
+    5–150 → 4921; id Parcels_GISLINK populated=True; geo PASS (36.51313,-86.17551)→Macon; (36.49246,-85.83027)→Macon.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: Parcels_GISLINK
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: IMPACT Parcels sibling (COUNTY_ID=56)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    PARCELWP: parcelIdDisplay
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+  notes: 'Filter COUNTY_ID=56 AND PARCEL_TYPE=1. Egress-sensitive (403 common). Geo-identity confirmed
+    via AGOL twin — sibling OK when reachable. 2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP 403 from box
+    — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes sibling (JUR=056)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    ID: parcelIdDisplay
+    PARID: parcelIdParid
+    PARCELID: parcelIdFull
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    CITYNUM: taxDistrict
+    CALC_ACRE: acreage
+    CAMADEEDAC: acreageDeed
+    CAMACALCAC: acreageCama
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    DEEDBKPG: lastSale.deedRef
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    OBYVAL: tax.obxfValue
+    APPRAISAL: tax.marketValue
+    LANDUSE: dorCode
+    ZONING: zoning
+    PROPTYPE: propType
+    TAXYR: taxYear
+  notes: 'Filter JUR=''056''; prefer latest TAXYR. Query-only. Egress-sensitive; use AGOL Macon_Parcels
+    when Themes blocked. Richer mail/IMPVAL than AGOL Assessment join. 2026-09-28 ET TN PIR: maps.cot.tn.gov
+    HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+gaps:
+- No public countywide or municipal (Lafayette / Red Boiling Springs) zoning FeatureServer found (2026-09-24)
+- Adopted FLU FeatureServer not found (honest gap)
+- IMPACT Themes live query often 403 from datacenter egress
+- AGOL Assessment_Data_56 vintage may lag current TPAD; no MAIL* on AGOL join
+- No GeoPowered {county}tn.geopowered.com host for Macon
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: Macon County / Comptroller IMPACT-TPAD public records; AGOL TN County Parcel Map republish —
+  attribution required. No paid GIS purchase channel.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+jurisdictionGisUrl: https://tnmap.tn.gov/Assessment/
+zoningOverall: gap
+packagingNote: >-
+  Digged 2026-09-24 ET full-suite TRANCHE-3; prefer AGOL joined parcels over bare IMPACT; geo-verify PASS;
+  skip utilities/AADT. RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added OIR. Hard
+  re-verify (LSB known-gap flag): TNCPM layer 37 live; in 5–150 band only 7 null OWNER / 8 null-or-0 APPRAISAL
+  / 7 null SALEDATE; 0 null GISLINK. No fresher county/UCDD AGOL parcel host found (UCDD org EMZFDxQzNQloLbAf
+  has no Macon layer; AGOL search only returns TNCPM). Conclusion: public parcels ARE loadable — 'gap'
+  is an app-load gap, not a source gap. LSB-approved parcel setup applied 2026-09-28 (see parcelSetup).
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=56
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/37
+  joinKey: OIR.GISLINK = Parcels_GISLINK
+  salesValueVintage: 2023
+  salesValueSourceEditDate: '2023-11-22'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 5068
+  gislinkJoinSample: 10/10 (100%)

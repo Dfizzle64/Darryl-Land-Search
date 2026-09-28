@@ -1,0 +1,238 @@
+state: TN
+jurisdiction: Wilson County
+fips: '47189'
+level: county
+markets:
+- Nashville
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=95)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 66,872; DEEDAC 5–150 → 8796; id GISLINK populated=True; geo PASS
+    (36.34849,-86.36306)→Wilson; (36.34833,-86.36804)→Wilson (where COUNTY_ID=95). Service lastEditDate
+    2026-09-10 (PARCELID suffix 2026) — freshest public owner/geometry; no sale/value/CALC_ACRE (DEEDAC
+    often 0 — derive geodesic acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 10766
+- role: parcels
+  name: TN County Parcel Map — Wilson_Parcels (Assessment join)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/0
+  layerId: 0
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Parcels_CALC_ACRE: acreage
+    County_Name: countyName
+    ASSESSMENT_DATA_95_SALEDATE: lastSale.date
+    ASSESSMENT_DATA_95_PRICE: lastSale.price
+    ASSESSMENT_DATA_95_APPRAISAL: tax.marketValue
+  notes: Added 2026-09-28 ET TN PIR (anonymous CAMA-joined AGOL twin; replaces IMPACT-only primary that
+    returns 403 from box). count 62,820; Parcels_CALC_ACRE 5–150 → 12235; id Parcels_GISLINK populated=True;
+    geo PASS (36.35161,-86.36556)→Wilson; (36.34919,-86.36291)→Wilson. Service data vintage lastEditDate
+    2023-11-22 — owner/sale/value may lag TPAD; pair with OIR 2026 fabric for current owner.
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: Parcels_GISLINK
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: IMPACT Parcels (COUNTY_ID=95)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    PARCELWP: parcelIdDisplay
+    CALC_ACRE: acreage
+    PARCEL_TYPE: parcelType
+    COUNTY_ID: countyId
+  notes: 'Filter COUNTY_ID=95 AND PARCEL_TYPE=1; acreage band CALC_ACRE 5–150. Geometry sibling; join
+    Themes on GISLINK. Egress-sensitive maps.cot.tn.gov. 2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP 403
+    from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes (JUR=095)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    ID: parcelIdDisplay
+    PARID: parcelIdParid
+    PARCELID: parcelIdFull
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    ST_NUM: situsAddress.number
+    STREET: situsAddress.street
+    CITYNUM: taxDistrict
+    CALC_ACRE: acreage
+    CAMADEEDAC: acreageDeed
+    CAMACALCAC: acreageCama
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    DEEDBKPG: lastSale.deedRef
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    OBYVAL: tax.obxfValue
+    APPRAISAL: tax.marketValue
+    ZONING: zoning
+    LANDUSE: dorCode
+    PROPTYPE: propType
+    TAXYR: taxYear
+  notes: 'CAMA ZONING weak first-pass — prefer Lebanon zone / Mt Juliet Zone_Curre after CITYNUM resolve.
+    2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: zoning
+  name: Lebanon Zoning_Districts
+  restUrl: https://maps.lebanontn.org/arcgis/rest/services/Hosted/Zoning_Districts/FeatureServer/0
+  layerId: 0
+  coverage: city-only
+  fieldMap:
+    zone: zoning
+  notes: CITYNUM=404. City-only on countywide parcels. FLU honest gap.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: zoning
+  name: Mt. Juliet Zoning (Planning___Zoning/5)
+  restUrl: https://utility.arcgis.com/usrsvcs/servers/5e2f5bfd27984da89b2e45a726d0e37b/rest/services/Planning___Zoning/FeatureServer/5
+  layerId: 5
+  coverage: city-only
+  fieldMap:
+    Zone_Curre: zoning
+    Ord_Num: zoningOrdinance
+  notes: CITYNUM=508. ~669. City-only. Multifamily RM-8/RM-16. Utility proxy — item IDs can rotate.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: flu
+  name: Mt. Juliet Landuse (FLU_Lisa)
+  restUrl: https://utility.arcgis.com/usrsvcs/servers/5e2f5bfd27984da89b2e45a726d0e37b/rest/services/Planning___Zoning/FeatureServer/1
+  layerId: 1
+  coverage: city-only
+  fieldMap:
+    FLU_Lisa: flu
+  notes: Mt. Juliet only (~307). Guidance. Do not apply outside city limits.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: other
+  name: TDOT Traffic Lines (AADT statewide)
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  geometry: polyline
+  coverage: state-wide
+  fieldMap:
+    AADT: aadt
+    AADTYEAR: aadtYear
+    COUNTY_NUMBER: countyNumberTdot
+  notes: TDOT Traffic_Lines AADT + AADTYEAR (prefer 2025); filter COUNTY_NUMBER='95' for Wilson. Statewide
+    polyline fabric; nearest-segment/buffer join to parcels. COUNTY_NUMBER is TDOT alpha id (not Census
+    FIPS). Stamped 2026-09-24 statewide AADT dig.
+  status: usable
+  auth: none
+  acreageField: null
+gaps:
+- Unincorporated Wilson County zoning FeatureServer — PDF atlas + paid $75 shapefile only (no public REST)
+- Watertown zoning REST — ordinance PDF only
+- County 2021 Future Land Use / Lebanon / Watertown FLU REST
+- Do not use gis.wilson-co.com (Wilson County North Carolina)
+- GEOJobe PSA utility twins token-gated
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: Wilson County / City of Lebanon / City of Mt. Juliet / IMPACT-TPAD public records; attribution
+  required.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+jurisdictionGisUrl: https://wilsontn.geopowered.com/propertysearch/
+zoningOverall: partial
+packagingNote: >-
+  Packaged from 47189-wilson.md 2026-09-24; research checked 2026-09-23 ET. County unincorporated zoning
+  gap; Lebanon+Mt Juliet usable. AADT statewide TDOT Traffic_Lines stamped 2026-09-24. TRANCHE-3 retrofit
+  2026-09-24 ET (tax/sale/owner confirm + appraiserSearchUrl + jurisdictionGisUrl); no parcel re-dig.
+  RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added TNCPM,OIR. Card primary was
+  IMPACT-only (maps.cot.tn.gov 403 from box today) — replaced with CAMA-joined TN_County_Parcel_Map twin
+  + OIR 2026 fabric; IMPACT demoted to partial/blocked-403 sibling. LSB-approved parcel setup applied
+  2026-09-28 (see parcelSetup).
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+enrichment:
+  aadt:
+    source: TDOT Traffic Lines
+    restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+    layerId: 0
+    field: AADT
+    extraFields:
+    - AADTYEAR
+    - COUNTY_NUMBER
+    geography: statewide TDOT traffic lines
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-24'
+    verifiedBy: Tennessee Public Info Researcher
+    notes: TDOT Traffic_Lines AADT + AADTYEAR (prefer 2025); filter COUNTY_NUMBER='95' for Wilson. Live
+      probe 2026-09-24 ET; same statewide URL as Davidson.
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=95
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/0
+  joinKey: OIR.GISLINK = Parcels_GISLINK
+  salesValueVintage: 2023
+  salesValueSourceEditDate: '2023-11-22'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 10766
+  gislinkJoinSample: 10/10 (100%)

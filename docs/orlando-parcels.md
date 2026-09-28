@@ -117,7 +117,7 @@ St. Cloud (city overlay on Osceola parcels, not a county extract):
 - [Zoning FeatureServer/2](https://arcgisweb.stcloud.org/arcgis/rest/services/Referenced_Layers/Zoning/FeatureServer/2)
 - [Future land use FeatureServer/98](https://arcgisweb.stcloud.org/arcgis/rest/services/Referenced_Layers/Future_Land_Use_Update/FeatureServer/98)
 
-Marion was checked and not seeded: [ParcelsAndSubdivisions/0](https://gis.marionfl.org/public/rest/services/General/ParcelsAndSubdivisions/MapServer/0), [FLU /6](https://gis.marionfl.org/public/rest/services/General/PlanningZoning/MapServer/6) (`PARCELID` join), [Zoning /20](https://gis.marionfl.org/public/rest/services/General/PlanningZoning/MapServer/20). About 17,840 parcels sit in the 5–150 acre band.
+Marion's full 5–150 acre extract is the North-Central Florida market shelf ([ParcelsAndSubdivisions/0](https://gis.marionfl.org/public/rest/services/General/ParcelsAndSubdivisions/MapServer/0)). This Orlando file stays the 120-parcel sample and is not drawn when the market extract is larger. FLU and zoning were not joined on the market shelf.
 
 ## Gaps
 
@@ -134,5 +134,5 @@ Marion was checked and not seeded: [ParcelsAndSubdivisions/0](https://gis.marion
 - Orange inclusion uses OCPA `ACREAGE`, including sibling shapes under 5 acres that belong to the same parcel id. Those pieces are summed and the parcel is dropped when the sum is outside 5.0–150.0. Lake, Osceola, and Sumter use the county acreage field the same way. Polk and Seminole still use DOH `LND_SQFOOT`.
 - A public ArcGIS Online layer named Polk County parcels is the wrong state (Minnesota). It is not used.
 - Brevard’s property-appraiser MapServer has returned HTTP 403 from this environment. The sample uses DOH.
-- Brevard, Marion, and Volusia are still windowed samples around rural tracts, not every 5–150 acre parcel. Those samples are not capped at 150 acres. The Brevard sample keeps a city zoning or FLU stamp when the parcel id matches `docs/brevard-municipal.md`. Titusville and Palm Bay are not applied in that join.
+- Brevard and Volusia are still windowed samples around rural tracts, not every 5–150 acre parcel. Marion's sample file remains here; the countywide roll is the North-Central Florida shelf. Those samples are not capped at 150 acres. The Brevard sample keeps a city zoning or FLU stamp when the parcel id matches `docs/brevard-municipal.md`. Titusville and Palm Bay are not applied in that join.
 - Volusia city zoning and future land use on the sample (and on the Melbourne extract) come from municipal REST, not from the DOH parcel attributes. See `docs/volusia-flagler-municipal.md`. Open Data zoning layer 36 city rows (`ZONCODE` 999) are not used.

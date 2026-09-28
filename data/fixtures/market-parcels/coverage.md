@@ -7,18 +7,18 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
 | Atlanta | primary | 93,811 | 17 | 0 | 18 |
-| Tampa | primary | 124,315 | 10 | 0 | 0 |
+| Tampa | primary | 127,713 | 10 | 0 | 0 |
 | Charleston | primary | 22,649 | 3 | 0 | 4 |
 | Nashville | primary | 127,947 | 16 | 0 | 3 |
 | Charlotte | primary | 106,650 | 12 | 0 | 3 |
 | Raleigh-Durham | primary | 151,530 | 17 | 0 | 0 |
-| South Florida | shelf | 41,034 | 2 | 2 | 0 |
+| South Florida | shelf | 41,693 | 3 | 1 | 0 |
 | SWFL | other | 32,749 | 4 | 0 | 0 |
 | Vero Beach | other | 23,009 | 5 | 0 | 0 |
 | Melbourne | other | 41,026 | 5 | 0 | 0 |
-| Jacksonville | other | 26,301 | 5 | 0 | 0 |
-| Big Bend | other | 21,551 | 1 | 3 | 3 |
-| Pensacola | other | 59,902 | 6 | 0 | 0 |
+| Jacksonville | other | 26,878 | 5 | 0 | 0 |
+| Big Bend | other | 35,793 | 4 | 3 | 0 |
+| Pensacola | other | 66,434 | 7 | 0 | 0 |
 | Birmingham | other | 38,101 | 3 | 0 | 6 |
 | Mobile | other | 42,446 | 3 | 0 | 2 |
 | Huntsville | other | 29,598 | 4 | 0 | 3 |
@@ -32,7 +32,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Winston-Salem | other | 92,199 | 9 | 0 | 0 |
 | Wilmington | other | 47,320 | 6 | 0 | 0 |
 | Heartland | shelf | 21,163 | 4 | 1 | 0 |
-| North-Central Florida | other | 52,695 | 7 | 0 | 0 |
+| North-Central Florida | other | 94,271 | 12 | 0 | 0 |
 | Asheville | other | 16,793 | 2 | 0 | 0 |
 | Tuscaloosa | other | 11,596 | 1 | 0 | 3 |
 | Montgomery | other | 26,759 | 3 | 0 | 1 |
@@ -88,7 +88,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Citrus | Florida | 12017 | complete-gte-5ac | 5,807 | fl-citrus-doh-municipal-12017 |
+| Citrus | Florida | 12017 | complete-gte-5ac | 5,992 | fl-citrus-swfwmd-12017 |
 | Hardee | Florida | 12049 | complete-gte-5ac | 5,303 | fl-hardee-infomap-12049 |
 | Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
 | Hillsborough | Florida | 12057 | complete-gte-5ac | 13,838 | fl-hillsborough-parcelpublishing-12 |
@@ -97,7 +97,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Pinellas | Florida | 12103 | complete-gte-5ac | 42,230 | fl-pinellas-publicwebgis-1 |
 | Polk | Florida | 12105 | complete-gte-5ac | 20,263 | fl-polk-property-appraiser-134 |
 | Sarasota | Florida | 12115 | complete-gte-5ac | 4,303 | fl-doh-ehwaters-12115 |
-| Sumter | Florida | 12119 | complete-gte-5ac | 6,359 | fl-doh-ehwaters-12119 |
+| Sumter | Florida | 12119 | complete-gte-5ac | 9,572 | fl-sumter-bocc-parcels-12119 |
 
 ### Charleston
 
@@ -184,7 +184,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Broward | Florida | 12011 | partial | 7,549 | fl-broward-bcpa-jan26-16 |
 | Miami-Dade | Florida | 12086 | complete-gte-5ac | 15,563 | fl-miami-dade-landinformation-26 |
 | Monroe | Florida | 12087 | complete-gte-5ac | 6,492 | fl-monroe-apo-parcels-0 |
-| Palm Beach | Florida | 12099 | partial | 11,430 | fl-palm-beach-parcel-info-4 |
+| Palm Beach | Florida | 12099 | complete-gte-5ac | 12,089 | fl-palm-beach-parcel-info-4 |
 
 ### SWFL
 
@@ -223,18 +223,18 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Clay | Florida | 12019 | complete-gte-5ac | 4,688 | fl-clay-parcels-lgim-12019 |
 | Duval | Florida | 12031 | complete-gte-5ac | 7,768 | fl-coj-citybiz-parcels-12031 |
 | Nassau | Florida | 12089 | complete-gte-5ac | 5,587 | fl-nassau-taxmap-12089 |
-| St. Johns | Florida | 12109 | complete-gte-5ac | 4,944 | fl-sjc-hosted-parcel-12109 |
+| St. Johns | Florida | 12109 | complete-gte-5ac | 5,521 | fl-sjc-hosted-parcel-12109 |
 
 ### Big Bend
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Dixie | Florida | 12029 | gap | 0 | unavailable |
+| Dixie | Florida | 12029 | complete-gte-5ac | 3,251 | fl-srwmd-parcels-12029 |
 | Gadsden | Florida | 12039 | sample | 5,917 | fl-gadsden-arpc-par-071218-12039 |
 | Jefferson | Florida | 12065 | sample | 5,165 | fl-jefferson-pa-parcels-12065 |
 | Leon | Florida | 12073 | complete-gte-5ac | 5,685 | fl-leon-overlay-parcel-12073 |
-| Madison | Florida | 12079 | gap | 0 | unavailable |
-| Taylor | Florida | 12123 | gap | 0 | unavailable |
+| Madison | Florida | 12079 | complete-gte-5ac | 7,178 | fl-srwmd-parcels-12079 |
+| Taylor | Florida | 12123 | complete-gte-5ac | 3,813 | fl-srwmd-parcels-12123 |
 | Wakulla | Florida | 12129 | sample | 4,784 | fl-wakulla-county-parcels-12129 |
 
 ### Pensacola
@@ -244,6 +244,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Baldwin | Alabama | 01003 | complete-gte-5ac | 17,987 | al-baldwin-public-isv |
 | Bay | Florida | 12005 | complete-gte-5ac | 4,861 | fl-panhandle-12005 |
 | Escambia | Florida | 12033 | complete-gte-5ac | 9,240 | fl-panhandle-12033 |
+| Holmes | Florida | 12059 | complete-gte-5ac | 6,532 | fl-holmes-taxparcels-12059 |
 | Okaloosa | Florida | 12091 | complete-gte-5ac | 9,956 | fl-panhandle-12091 |
 | Santa Rosa | Florida | 12113 | complete-gte-5ac | 8,928 | fl-panhandle-12113 |
 | Walton | Florida | 12131 | complete-gte-5ac | 8,930 | fl-panhandle-12131 |
@@ -423,12 +424,17 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Alachua | Florida | 12001 | complete-gte-5ac | 15,539 | fl-alachua-parcels35-12001 |
-| Bradford | Florida | 12007 | complete-gte-5ac | 593 | fl-doh-ehwaters-12007 |
-| Citrus | Florida | 12017 | complete-gte-5ac | 5,807 | fl-citrus-doh-municipal-12017 |
+| Bradford | Florida | 12007 | complete-gte-5ac | 3,292 | fl-srwmd-parcels-12007 |
+| Citrus | Florida | 12017 | complete-gte-5ac | 5,992 | fl-citrus-swfwmd-12017 |
 | Gilchrist | Florida | 12041 | complete-gte-5ac | 6,395 | fl-doh-ehwaters-12041 |
+| Hamilton | Florida | 12047 | complete-gte-5ac | 4,149 | fl-srwmd-parcels-12047 |
 | Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
-| Levy | Florida | 12075 | complete-gte-5ac | 10,200 | fl-doh-ehwaters-12075 |
+| Lafayette | Florida | 12067 | complete-gte-5ac | 3,165 | fl-srwmd-parcels-12067 |
+| Levy | Florida | 12075 | complete-gte-5ac | 9,645 | fl-srwmd-parcels-12075 |
+| Marion | Florida | 12083 | complete-gte-5ac | 17,730 | fl-marion-parcels-12083 |
 | Putnam | Florida | 12107 | complete-gte-5ac | 7,560 | fl-putnam-doh-municipal-12107 |
+| Suwannee | Florida | 12121 | complete-gte-5ac | 11,856 | fl-srwmd-parcels-12121 |
+| Union | Florida | 12125 | complete-gte-5ac | 2,347 | fl-srwmd-parcels-12125 |
 
 ### Asheville
 

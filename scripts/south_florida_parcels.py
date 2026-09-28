@@ -103,7 +103,8 @@ BROWARD_MOSAIC = "https://gisweb-adapters.bcpa.net/arcgis/rest/services/BCPA_EXT
 BROWARD_FLU = "https://gisweb-adapters.bcpa.net/arcgis/rest/services/BCPA_EXTERNAL_JAN26/MapServer/10/query"
 BROWARD_PA = "https://bcpa.net/RecInfo.asp?URL_Folio={FOLIO}"
 
-PALM_PARCELS = "https://gis.pbcgov.org/arcgis/rest/services/Parcels/PARCEL_INFO/FeatureServer/4/query"
+# MapServer twin. The FeatureServer advertises public edits and is not the extract.
+PALM_PARCELS = "https://gis.pbcgov.org/arcgis/rest/services/Parcels/PARCEL_INFO/MapServer/4/query"
 PALM_ZONING = "https://maps.co.palm-beach.fl.us/arcgis/rest/services/OpenData/Planning_Open_Data/MapServer/9/query"
 PALM_FLU = "https://maps.co.palm-beach.fl.us/arcgis/rest/services/OpenData/open_data_v2/FeatureServer/6/query"
 PALM_PA = "https://pbcpao.gov/Property/Details?parcelId={PARID}"
@@ -200,7 +201,7 @@ SPECS: dict[str, dict] = {
     "12099": {
         "kind": "south-florida",
         "source": "fl-palm-beach-parcel-info-4",
-        "coverage": "partial",
+        "coverage": "complete-gte-5ac",
         "url": PALM_PARCELS,
         "layerId": 4,
         "status": "live",
@@ -221,7 +222,7 @@ SPECS: dict[str, dict] = {
             "PROPERTY_USE": "dorCode",
         },
         "gaps": [
-            "Partial. PARCEL_INFO reports about 146,014 object ids with ACRES from 5.0 through 150.0. This extract kept the parcels that survived geometry normalize and parcel-id dedupe, not that full object-id count. PROPERTY_USE is text, not a numeric DOR code.",
+            "Palm Beach parcels are PARCEL_INFO MapServer/4. Acreage is ACRES from 5.0 through 150.0 and CONDO='NO'. Condo units inherit the parent ACRES, so the unfiltered FeatureServer count is not this extract. PROPERTY_USE is text, not a numeric DOR code.",
             "Zoning is the unincorporated OpenData layer only. Municipal zoning is not on this card. West Palm Beach and Boca Raton city layers were not joined.",
             "Future land use is open_data_v2. maps.co.palm-beach.fl.us TLS is fragile from some clients. The gis.pbcgov.org OpenData mirror requires a token and was not used. opendata.pbcgov.org does not resolve.",
             "The legacy pbcgov.org/papa PropertyDetail URL redirects home and is not the record link.",
@@ -1108,13 +1109,18 @@ def _pull_palm_beach(seed: Any, county: dict, markets: list[str], notes: list[st
         "TOTAL_TAXABLE",
         "PROPERTY_USE",
     ]
-    raw = fetch_layer(PALM_PARCELS, "ACRES>=5 AND ACRES<=150", fields, geometry=True)
+    raw = fetch_layer(PALM_PARCELS, "ACRES>=5 AND ACRES<=150 AND CONDO='NO'", fields, geometry=True)
     features = []
     for item in raw:
         feature = normalize_palm_beach(seed, county, markets, item)
         if feature:
             features.append(feature)
-    features = _dedupe(features)
+    # MapServer/4 repeats PARID on distinct polygons (different acres and extents).
+    # Collapsing to one id drops those pieces. The server 5–150 CONDO='NO' count is the row count.
+    features = _retain_repeated_parids(features)
+    notes.append(
+        "Repeated PARID values that are separate polygons are kept. The largest piece keeps the bare PARID; the others use a suffixed feature id so the viewport does not collapse them."
+    )
     zoning = index_polygons(
         fetch_layer(PALM_ZONING, "1=1", ["FCODE", "FNAME", "ZONING_DESC"], geometry=True),
         "FCODE",
@@ -1130,6 +1136,38 @@ def _pull_palm_beach(seed: Any, county: dict, markets: list[str], notes: list[st
         notes.append("Palm Beach zoning host TLS verification failed. Ingest used the documented certificate fallback.")
     notes.append(f"Palm Beach unincorporated zoning joined {zoned}/{len(features)}. Future land use joined {flued}/{len(features)}.")
     return features
+
+
+def _retain_repeated_parids(features: list[dict]) -> list[dict]:
+    grouped: dict[str, list[dict]] = defaultdict(list)
+    order: list[str] = []
+    for feature in features:
+        parcel_id = feature["properties"]["parcelId"]
+        if parcel_id not in grouped:
+            order.append(parcel_id)
+        grouped[parcel_id].append(feature)
+    kept: list[dict] = []
+    for parcel_id in order:
+        group = grouped[parcel_id]
+        if len(group) == 1:
+            kept.append(group[0])
+            continue
+        group.sort(
+            key=lambda row: (
+                -(row["properties"].get("acreage") or 0),
+                row["properties"]["centroid"][0],
+                row["properties"]["centroid"][1],
+            )
+        )
+        for index, feature in enumerate(group):
+            if index:
+                fips = feature["properties"]["countyFips"]
+                feature_id = f"{fips}:{parcel_id}~{index}"
+                feature["id"] = feature_id
+                feature["properties"]["id"] = feature_id
+            kept.append(feature)
+    kept.sort(key=lambda row: row["properties"].get("acreage") or 0, reverse=True)
+    return kept
 
 
 def _dedupe(features: list[dict]) -> list[dict]:

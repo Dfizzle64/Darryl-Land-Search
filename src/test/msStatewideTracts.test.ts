@@ -1,11 +1,8 @@
-import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { loadMsStatewideTracts, loadOrangeTractIncomeMap } from "../lib/data/loadFixtures";
+import { loadEligibleOverview, loadMsStatewideTracts, loadOrangeTractIncomeMap } from "../lib/data/loadFixtures";
 import { mergeMsStatewideTracts, msStatewideTractRows } from "../lib/msStatewideTracts";
 import { ELIGIBLE_NOT_DESIGNATED_STATUS, type EligiblePackTractCollection } from "../lib/types";
-
-const OTHER_STATE_OVERVIEW_HASH = "8172234bb8f4fbd4c90b4ee6fbdf3e02b4ed33a9c96d401c1c47ddb3efea7a50";
 
 const OTHER_STATE_TRACT_COUNTS: Record<string, { rural: number; urban: number }> = {
   Alabama: { rural: 83, urban: 188 },
@@ -105,33 +102,38 @@ describe("Mississippi statewide eligible tracts", () => {
     expect(unknown).toBe(5);
   });
 
-  it("adds Mississippi to the far-zoom overlay without changing other states", () => {
-    const overview = loadJson<{
-      features: Array<{
-        properties: { state: string; rural: boolean; tractCount: number };
-        geometry: { coordinates: unknown };
-      }>;
-    }>("data/fixtures/oz2-eligible-overview.geojson");
-    const ms = overview.features.filter((feature) => feature.properties.state === "Mississippi");
-    expect(ms.find((feature) => feature.properties.rural)?.properties.tractCount).toBe(320);
-    expect(ms.find((feature) => !feature.properties.rural)?.properties.tractCount).toBe(84);
-    const others = overview.features.filter((feature) => feature.properties.state !== "Mississippi");
-    expect(others).toHaveLength(14);
-    for (const feature of others) {
-      const expected = OTHER_STATE_TRACT_COUNTS[feature.properties.state];
-      expect(expected).toBeTruthy();
-      expect(feature.properties.tractCount).toBe(feature.properties.rural ? expected.rural : expected.urban);
+  it("puts every eligible tract on the far-zoom overlay with ACS income", async () => {
+    const [overview, income] = await Promise.all([loadEligibleOverview(), loadOrangeTractIncomeMap()]);
+    const counts = new Map<string, { rural: number; urban: number }>();
+    const geoids = new Set<string>();
+    for (const feature of overview.features) {
+      const props = feature.properties as {
+        state?: string;
+        rural?: boolean;
+        tractGeoid?: string;
+        medianHouseholdIncome?: number;
+      };
+      expect(props.tractGeoid).toMatch(/^\d{11}$/);
+      expect(props.state).toBeTruthy();
+      expect(props.rural === true || props.rural === false).toBe(true);
+      geoids.add(props.tractGeoid!);
+      const bucket = counts.get(props.state!) ?? { rural: 0, urban: 0 };
+      if (props.rural) bucket.rural += 1;
+      else bucket.urban += 1;
+      counts.set(props.state!, bucket);
+      const table = income.get(props.tractGeoid!);
+      if (table == null) expect(props.medianHouseholdIncome).toBeUndefined();
+      else expect(props.medianHouseholdIncome).toBe(table);
     }
-    const parts: string[] = [];
-    const walk = (coords: unknown) => {
-      if (!Array.isArray(coords)) return;
-      if (typeof coords[0] === "number") parts.push(coords.map((value) => Number(value).toFixed(4)).join(","));
-      else coords.forEach(walk);
-    };
-    for (const feature of others) {
-      parts.push(`${feature.properties.state}:${feature.properties.rural}:${feature.properties.tractCount}`);
-      walk(feature.geometry.coordinates);
+    expect(geoids.size).toBe(overview.features.length);
+    expect(counts.get("Mississippi")).toEqual({ rural: 320, urban: 84 });
+    for (const [state, expected] of Object.entries(OTHER_STATE_TRACT_COUNTS)) {
+      expect(counts.get(state)).toEqual(expected);
     }
-    expect(createHash("sha256").update(parts.join("|")).digest("hex")).toBe(OTHER_STATE_OVERVIEW_HASH);
+    for (const geoid of ["28049003200", "28075000401", "28121020500", "28121020805", "28151002000"]) {
+      const feature = overview.features.find((item) => (item.properties as { tractGeoid?: string }).tractGeoid === geoid);
+      expect(feature).toBeTruthy();
+      expect((feature?.properties as { medianHouseholdIncome?: number }).medianHouseholdIncome).toBeUndefined();
+    }
   });
 });

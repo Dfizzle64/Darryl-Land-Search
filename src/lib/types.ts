@@ -374,8 +374,8 @@ export type EligiblePackTractProperties = {
   lon: number;
   source: string;
   /**
-   * ACS tract median household income when this GEOID is in the Orange County
-   * income fixture. Absent for every other tract — do not treat absence as zero.
+   * ACS 5-year 2020–2024 B19013 median when this 2020 tract GEOID is in the
+   * Southeast income table. Absent means unknown, not zero.
    */
   medianHouseholdIncome?: number;
 };

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-28T21:29:37Z",
+  "generatedAt": "2026-09-28T22:27:33Z",
   "market": "Tampa",
   "tier": "primary",
-  "parcelCount": 124315,
+  "parcelCount": 127713,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,26 +20,24 @@
       "name": "Citrus",
       "fips": "12017",
       "state": "Florida",
-      "featureCount": 5807,
+      "featureCount": 5992,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-citrus-doh-municipal-12017",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/8/query",
+      "source": "fl-citrus-swfwmd-12017",
+      "queryUrl": "https://www25.swfwmd.state.fl.us/arcgis12/rest/services/BaseVector/parcel_search/MapServer/2/query",
       "gaps": [
-        "Parcel polygons, owner, situs, and tax values are Florida DOH EHWATER layer 8. Citrus County lots have no acre or owner field, and lot PRCLKEY is empty, so zoning is a centroid join.",
-        "Municipality is the corporate-limit layer (Inverness or Crystal River). PHY_CITY is the postal city and is not the city limit.",
-        "County zoning and land use values CITY are placeholders and are not stored.",
-        "Inverness parcels: 86. Zoning is INV_FLU and future land use is FLU on the city layer.",
-        "Crystal River parcels left without city zoning: 88.",
-        "No public Crystal River zoning or FLU FeatureServer was verified.",
-        "County zoning codes are not Orange County multifamily districts."
+        "6028 rows matched the acreage filter; 5992 kept after the parcel-id and geometry checks.",
+        "Parcels are SWFWMD parcel_search layer 2. Acreage is AREANO (ACRES is empty), 5.0–150.0 inclusive. PARCELID keeps embedded spaces.",
+        "Replaces the Florida DOH tiles. Zoning copied only when the parcel id still matches the previous extract.",
+        "No Opportunity Zone status is stored.",
+        "Zoning, future land use, or appraiser links carried forward for 5275 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12017/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12017/lookup.json",
       "tileCount": 9,
-      "sourceCount": 5813
+      "sourceCount": 6028
     },
     {
       "name": "Hardee",
@@ -246,21 +244,22 @@
       "name": "Sumter",
       "fips": "12119",
       "state": "Florida",
-      "featureCount": 6359,
+      "featureCount": 9572,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12119",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/59/query",
+      "source": "fl-sumter-bocc-parcels-12119",
+      "queryUrl": "https://services8.arcgis.com/FTrtUCmxaVKdPC5e/arcgis/rest/services/Parcels_gdb/FeatureServer/0/query",
       "gaps": [
-        "13576 source rows collapsed to 6359 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "No zoning or FLU on the Florida DOH extract."
+        "Sumter BOCC Parcels_gdb. Acreage is Shape_STAr / 43560, 5.0–150.0 inclusive. Acres_Lot_ is a string and is not the acreage.",
+        "Replaces the Tampa DOH tiles. Orlando SWFWMD tiles are a separate shelf and were not rewritten.",
+        "No Opportunity Zone status is stored. FDOR joins need CO_NO=70 and PIN exactly."
       ],
       "path": "data/fixtures/market-parcels/counties/12119/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12119/lookup.json",
       "tileCount": 7,
-      "sourceCount": 13576
+      "sourceCount": 9572
     }
   ]
 }

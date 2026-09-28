@@ -49,7 +49,7 @@ import {
   absorbEligibleTractTiles,
   createEligibleTractTileCache,
   detailTractsVisibleAtZoom,
-  eligibleOverviewFilter,
+  eligibleOverviewShownFilter,
   eligibleTractOverlayFilter,
   syncEligibleTractTileCache,
   TRACT_DETAIL_MIN_ZOOM,
@@ -88,7 +88,7 @@ import {
   reduceJumpPin,
 } from "@/lib/jumpPin";
 import { tractClickFromFeature, tractPopupRuralLine, type TractClickDetails } from "@/lib/tractCounty";
-import { tractIncomeFilterActive, tractIncomeLayerFilter } from "@/lib/tractIncome";
+import { tractIncomeLayerFilter } from "@/lib/tractIncome";
 import { ORANGE_COUNTY_CENTER, MF_PRIORITY_LEGEND_BLURB, MF_PRIORITY_TIER_A_MEANING, MF_PRIORITY_TIER_B_MEANING, RURAL_ELIGIBLE_LEGEND_BLURB, SC_NOMINATED_RURAL_LEGEND_BLURB, SC_NOMINATED_URBAN_LEGEND_BLURB, URBAN_ELIGIBLE_LEGEND_BLURB, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
 
 type LngLatBounds = [[number, number], [number, number]];
@@ -1261,8 +1261,7 @@ export function SiteMap({
     setVisibilitySafe(map, "oz2-fill", showOrangePilot && showOz2 ? "visible" : "none");
     setVisibilitySafe(map, "oz2-line", showOrangePilot && showOz2 ? "visible" : "none");
     const classCut = eligibleClassCut(tractClass, ozFilter);
-    const incomeActive = tractIncomeFilterActive(incomeGeography, minIncome, includeUnknownIncome);
-    const showOverview = showOz2 && classCut !== "none" && restrictGeoids == null && !incomeActive;
+    const showOverview = showOz2 && classCut !== "none" && restrictGeoids == null;
     const showRuralLayer = showOz2 && tractClass !== "urban" && ozFilter !== "non-rural-eligible";
     const showEligibleLayer = showOz2 && restrictGeoids == null && classCut !== "none";
     setVisibilitySafe(map, "eligible-overview-fill", showOverview ? "visible" : "none");
@@ -1288,7 +1287,7 @@ export function SiteMap({
     const oz2Shown = andFilter(oz2Filter, scNominatedOverlayFilter() as maplibregl.FilterSpecification);
     setFilterSafe(map, "oz2-fill", andFilter(oz2Shown, incomeFilter));
     setFilterSafe(map, "oz2-line", andFilter(oz2Shown, incomeFilter));
-    const overviewFilter = eligibleOverviewFilter(classCut) as maplibregl.FilterSpecification | null;
+    const overviewFilter = eligibleOverviewShownFilter(classCut, incomeFilter) as maplibregl.FilterSpecification | null;
     setFilterSafe(map, "eligible-overview-fill", overviewFilter);
     setFilterSafe(map, "eligible-overview-line", overviewFilter);
     const ruralFilter = tractOverlayFilter(showOrangePilot, restrictGeoids);
@@ -1333,8 +1332,7 @@ export function SiteMap({
     setVisibilitySafe(map, "oz2-fill", showOrangePilot && showOz2 ? "visible" : "none");
     setVisibilitySafe(map, "oz2-line", showOrangePilot && showOz2 ? "visible" : "none");
     const classCut = eligibleClassCut(tractClass, ozFilter);
-    const incomeActive = tractIncomeFilterActive(incomeGeography, minIncome, includeUnknownIncome);
-    const showOverview = showOz2 && classCut !== "none" && restrictGeoids == null && !incomeActive;
+    const showOverview = showOz2 && classCut !== "none" && restrictGeoids == null;
     const showRuralLayer = showOz2 && tractClass !== "urban" && ozFilter !== "non-rural-eligible";
     const showEligibleLayer = showOz2 && restrictGeoids == null && classCut !== "none";
     setVisibilitySafe(map, "eligible-overview-fill", showOverview ? "visible" : "none");
@@ -1356,9 +1354,6 @@ export function SiteMap({
     tractClass,
     restrictGeoids,
     status,
-    minIncome,
-    includeUnknownIncome,
-    incomeGeography,
   ]);
 
   useEffect(() => {

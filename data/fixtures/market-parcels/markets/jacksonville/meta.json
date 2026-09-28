@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-28T21:29:37Z",
+  "generatedAt": "2026-09-28T22:27:33Z",
   "market": "Jacksonville",
   "tier": "other",
-  "parcelCount": 26301,
+  "parcelCount": 26878,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -120,7 +120,7 @@
       "name": "St. Johns",
       "fips": "12109",
       "state": "Florida",
-      "featureCount": 4944,
+      "featureCount": 5521,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
@@ -128,18 +128,16 @@
       "source": "fl-sjc-hosted-parcel-12109",
       "queryUrl": "https://www.gis.sjcfl.us/portal_sjcgis/rest/services/Hosted/Parcel/FeatureServer/0/query",
       "gaps": [
-        "No acreage field on Hosted/Parcel. Acres are computed from WGS84 rings after a Web Mercator SHAPE__Area prefilter.",
-        "Sale price and tax values are not on the public parcel layer.",
-        "Unincorporated zoning does not cover St. Augustine, St. Augustine Beach, or Marineland.",
-        "St. Augustine parcels in the 5–150 acre band: 219.",
-        "St. Augustine Beach parcels in the 5–150 acre band: 27. St. Augustine Beach FLU is a gap.",
-        "Marineland parcels left without city zoning: 6.",
-        "Ponte Vedra overlay labeled on 46 unincorporated parcels."
+        "5555 rows matched the acreage filter; 5521 kept after the parcel-id and geometry checks.",
+        "No acreage field on Hosted/Parcel. Acreage is FDOR 2025 LND_SQFOOT / 43560 for CO_NO=65, deduped on PARCEL_ID. Geometry is the county layer dissolved by strap.",
+        "Pins repeat across polygon pieces, so SHAPE__Area is not the parcel acreage. The Panda maintenance layer is not used.",
+        "No Opportunity Zone status is stored. Zoning carried forward only when the pin still matches.",
+        "Zoning, future land use, or appraiser links carried forward for 4531 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12109/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12109/lookup.json",
       "tileCount": 9,
-      "sourceCount": 9961
+      "sourceCount": 5555
     }
   ]
 }

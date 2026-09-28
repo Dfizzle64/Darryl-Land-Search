@@ -13,6 +13,8 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+The site is behind a password gate. Set `SITE_PASSWORD` in `.env.local` (see `.env.example`) before signing in. If that variable is unset, the login page loads and every other page and API route stays closed. On Vercel, set `SITE_PASSWORD` for Production and Preview.
+
 Other scripts:
 
 ```bash

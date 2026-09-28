@@ -32,6 +32,7 @@ type FilterSidebarProps = {
   meta: Record<string, unknown>;
   orangePilot: boolean;
   orlandoParcels: boolean;
+  resultsCaption?: string | null;
   parcelCoverageNote?: string | null;
   market: SearchMarketId;
   county: string | null;
@@ -210,6 +211,7 @@ export function FilterSidebar({
   meta,
   orangePilot,
   orlandoParcels,
+  resultsCaption = null,
   parcelCoverageNote = null,
   market,
   county,
@@ -276,7 +278,7 @@ export function FilterSidebar({
           <p className="text-xs uppercase tracking-[0.16em] text-ink-500">Results</p>
           <p className="mt-1 font-display text-3xl text-white">{matchedCount.toLocaleString()}</p>
           <p className="text-xs text-ink-500">
-            matching {totalCount.toLocaleString()} {orlandoParcels ? "parcels in this view" : "sample parcels"}
+            {resultsCaption ?? `matching ${totalCount.toLocaleString()} ${orlandoParcels ? "parcels in this view" : "sample parcels"}`}
           </p>
           <button
             type="button"

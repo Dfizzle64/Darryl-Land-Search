@@ -6,6 +6,8 @@ import {
   createParcelTileCache,
   parcelTileBbox,
   parcelTileKeysForBbox,
+  parcelViewEmptyCopy,
+  parcelViewSearchParams,
   parcelVisibilityHint,
   parcelsAreVisible,
   shouldQueryParcelsForZoom,
@@ -66,5 +68,20 @@ describe("parcel visibility", () => {
     expect(cache.tiles.get(keys[0])).toBe("exact");
     syncParcelTileCache(cache, "atlanta");
     expect(cache.tiles.size).toBe(0);
+  });
+
+  it("asks for the parcels in view without the selected market, and does not blame filters when nothing is loaded", () => {
+    const params = parcelViewSearchParams([-86.9, 36.1, -86.7, 36.2]);
+    expect(params.get("scope")).toBe("view");
+    expect(params.get("complete")).toBe("1");
+    expect(params.get("market")).toBeNull();
+    expect(params.get("county")).toBeNull();
+    expect(
+      parcelViewEmptyCopy({ covered: false, parcelCount: 0, matched: 0, filterHint: "Lower the acreage" })?.title,
+    ).toMatch(/isn't loaded/i);
+    expect(
+      parcelViewEmptyCopy({ covered: true, parcelCount: 12, matched: 0, filterHint: "Lower the acreage" })?.title,
+    ).toMatch(/filters/i);
+    expect(parcelViewEmptyCopy({ covered: true, parcelCount: 12, matched: 4, filterHint: "Lower the acreage" })).toBeNull();
   });
 });

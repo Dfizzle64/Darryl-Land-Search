@@ -57,6 +57,45 @@ export function parcelTileKeysForBbox(bbox: [number, number, number, number]): s
   return keys;
 }
 
+/** Viewport parcel request. The selected market is not part of it. */
+export function parcelViewSearchParams(bbox: [number, number, number, number]): URLSearchParams {
+  return new URLSearchParams({
+    scope: "view",
+    source: "fixture",
+    bbox: bbox.join(","),
+    complete: "1",
+  });
+}
+
+export type ParcelViewEmptyCopy = { title: string; detail: string };
+
+/**
+ * A view with no extract is not a filter miss. Filters are only blamed when
+ * parcels were loaded and none of them matched.
+ */
+export function parcelViewEmptyCopy(input: {
+  covered: boolean;
+  parcelCount: number;
+  matched: number;
+  filterHint: string | null;
+}): ParcelViewEmptyCopy | null {
+  if (input.matched > 0) return null;
+  if (!input.covered) {
+    return {
+      title: "Parcel data isn't loaded for this area yet.",
+      detail: "This area is not in the 5.0–150.0 acre extracts. The filters are not hiding parcels.",
+    };
+  }
+  if (input.parcelCount === 0) {
+    return {
+      title: "No 5.0–150.0 acre parcels in this view.",
+      detail: "The extracts cover this area, and none of those parcels fall in the current view.",
+    };
+  }
+  if (!input.filterHint) return null;
+  return { title: "No parcels match these filters", detail: input.filterHint };
+}
+
 export function parcelTileBbox(key: string): [number, number, number, number] {
   const [ix, iy] = key.split(":").map((part) => Number(part));
   const west = PARCEL_TILE_ORIGIN_LON + ix * PARCEL_TILE_DEGREES;

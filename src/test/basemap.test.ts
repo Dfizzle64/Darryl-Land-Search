@@ -64,6 +64,8 @@ describe("basemap helpers", () => {
       "oz2-line",
       "oz-fill",
       "oz-line",
+      "parcel-coverage-fill",
+      "parcel-coverage-line",
       "traffic-line",
       "parcels-fill-excluded",
       "parcels-line-excluded",

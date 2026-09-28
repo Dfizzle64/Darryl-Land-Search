@@ -6,13 +6,21 @@ describe("company logo", () => {
     const logo = readFileSync(new URL("../components/CompanyLogo.tsx", import.meta.url), "utf8");
     expect(logo).toContain('alt="Catalyst Development Partners"');
     expect(logo).toContain('src="/catalyst-logo.webp"');
-    expect(logo).toContain("h-10");
-    expect(logo).toContain("sm:h-12");
+    expect(logo).toContain("h-11");
+    expect(logo).toContain("md:h-12");
+
+    const shell = readFileSync(new URL("../components/AppShell.tsx", import.meta.url), "utf8");
+    const header = shell.slice(shell.indexOf("<header"), shell.indexOf("</header>"));
+    expect(header.indexOf("<CompanyLogo")).toBeGreaterThan(-1);
+    expect(header.indexOf("<CompanyLogo")).toBeLessThan(header.indexOf("<h1"));
 
     const map = readFileSync(new URL("../components/SiteMap.tsx", import.meta.url), "utf8");
-    const corner = map.slice(map.indexOf("data-map-corner"));
-    expect(corner.indexOf("<CompanyLogo")).toBeGreaterThan(-1);
-    expect(corner.indexOf("<CompanyLogo")).toBeLessThan(corner.indexOf("<BasemapToggle"));
+    expect(map).not.toContain("CompanyLogo");
+    expect(map).not.toContain("bottom-[6.75rem]");
+    const cluster = map.indexOf("data-map-zoom-readout");
+    const clusterClass = map.slice(map.lastIndexOf("className=", cluster), cluster);
+    expect(clusterClass).toContain("bottom-4");
+    expect(map).toContain("absolute bottom-4 left-3");
 
     const file = readFileSync(new URL("../../public/catalyst-logo.webp", import.meta.url));
     expect(file.subarray(0, 4).toString()).toBe("RIFF");

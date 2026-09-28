@@ -8,7 +8,6 @@ import { aoiFeatureCollection, normalizeBbox, type AoiLock } from "@/lib/aoi";
 import { screeningLegendLine } from "@/lib/screeningLayerHelp";
 import { applyMapGestures } from "@/lib/mapGestures";
 import { BasemapToggle } from "./BasemapToggle";
-import { CompanyLogo } from "./CompanyLogo";
 import { AoiControls } from "./AoiControls";
 import { MeasureControl } from "./MeasureControl";
 import { ParcelLayerToggle } from "./ParcelLayerToggle";
@@ -1602,14 +1601,13 @@ export function SiteMap({
   const legendScope = { market, county, state: countyState, states: marketStates };
 
   return (
-    <div ref={shellRef} className="relative h-full w-full">
+    <div ref={shellRef} className="dls-map relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
       {status === "ready" ? (
         <div
           data-map-corner
           className="map-chrome absolute left-3 top-3 z-30 flex flex-col items-start gap-2 sm:left-4 sm:top-4"
         >
-          <CompanyLogo />
           <BasemapToggle value={basemap} onChange={setBasemap} />
           {showParcels && onToggleParcelLayer ? (
             <ParcelLayerToggle visible={layerOn} hint={parcelVisibilityHint ?? ""} onToggle={onToggleParcelLayer} />
@@ -1639,7 +1637,7 @@ export function SiteMap({
       {status === "ready" ? (
         <div
           ref={cornerClusterRef}
-          className="map-chrome absolute bottom-[6.75rem] right-[3.25rem] z-20 flex items-end gap-2"
+          className="map-chrome absolute bottom-4 right-[3.25rem] z-20 flex flex-col items-end gap-1 sm:flex-row sm:gap-2"
         >
           <MeasureControl
             active={measuring}
@@ -1692,8 +1690,8 @@ export function SiteMap({
         />
       ) : null}
       {status === "ready" && (showOz || showOz2 || showParcels || screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power) ? (
-        <div className="map-chrome map-scrim absolute bottom-3 left-3 z-10 max-w-[min(17rem,calc(100%-12rem))] rounded-xl border sm:bottom-4 sm:left-4 sm:max-w-[min(22rem,calc(100%-12rem))]">
-          <div className="legend-scroll max-h-[42vh] space-y-1.5 overflow-y-auto px-3 py-2.5 text-sm leading-snug">
+        <div className="map-chrome map-scrim absolute bottom-4 left-3 z-10 max-h-[calc(100%-17.5rem)] max-w-[min(17rem,calc(100%-9.5rem))] rounded-xl border sm:left-4 sm:max-h-[42vh] sm:max-w-[min(22rem,calc(100%-18.5rem))]">
+          <div className="legend-scroll max-h-[inherit] space-y-1.5 overflow-y-auto break-words px-3 py-2.5 text-sm leading-snug">
           {aoi ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-5 border border-dashed border-clay-400 align-middle" />
@@ -1709,7 +1707,7 @@ export function SiteMap({
           ) : null}
           {showOz2 ? (
             <>
-              <div className="flex gap-1 pb-1" role="group" aria-label="Rural or urban eligible tracts">
+              <div className="flex flex-wrap gap-1 pb-1" role="group" aria-label="Rural or urban eligible tracts">
                 {(
                   [
                     ["both", "Both"],

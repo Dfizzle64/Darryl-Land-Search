@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { CompanyLogo } from "./CompanyLogo";
 import { FilterSidebar } from "./FilterSidebar";
 import { JumpToBar } from "./JumpToBar";
 import { OzExplainer } from "./OzExplainer";
@@ -777,12 +778,15 @@ export function AppShell({
 
   return (
     <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-ink-950 text-ink-100">
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-3 md:px-5">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.22em] text-clay-400">{headerPlace}</p>
-          <h1 className="font-display text-xl tracking-tight text-white md:text-2xl">
-            {shedParcelsOn ? "Multifamily site search" : overlayMode === "nominated-only" ? "Nominated tracts" : "Eligible tracts"}
-          </h1>
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-3 py-2.5 sm:px-4 sm:py-3 md:px-5">
+        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+          <CompanyLogo />
+          <div className="min-w-0">
+            <p className="text-[11px] uppercase tracking-[0.22em] text-clay-400">{headerPlace}</p>
+            <h1 className="font-display text-xl tracking-tight text-white md:text-2xl">
+              {shedParcelsOn ? "Multifamily site search" : overlayMode === "nominated-only" ? "Nominated tracts" : "Eligible tracts"}
+            </h1>
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button

@@ -8,10 +8,11 @@ import { formatTractCounty } from "@/lib/tractCounty";
 import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME } from "@/lib/orlandoParcels";
 import { MF_PRIORITY_DISCLAIMER, NOM_WATCH_CAVEAT, tractPlaceLabel } from "@/lib/scMfPriority";
 import { displayTractNotes, isScGovernorNominatedGeoid } from "@/lib/scNominatedTracts";
-import { SC_NOMINATED_NOT_A_QOZ, SHED_CAVEAT, type EligibleTractRow } from "@/lib/types";
+import type { TractInfoRow } from "@/lib/msStatewideTracts";
+import { SC_NOMINATED_NOT_A_QOZ, SHED_CAVEAT } from "@/lib/types";
 
 type TractDrawerProps = {
-  tract: EligibleTractRow | null;
+  tract: TractInfoRow | null;
   statusHelp?: string | null;
   overlayMode?: ScOzOverlayMode;
   screeningPoint?: ScreeningPoint | null;

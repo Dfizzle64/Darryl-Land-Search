@@ -5,6 +5,7 @@ import type { ParcelCollection } from "@/lib/types";
 import {
   loadEligibleOverview,
   loadEligiblePackTracts,
+  loadMsStatewideTracts,
   loadFixtureMeta,
   loadFluConfig,
   loadOpportunityZones,
@@ -34,6 +35,7 @@ export default async function HomePage() {
     otherCatalog,
     eligibleOverview,
     eligibleTracts,
+    msTracts,
     mfPriority,
     zoningConfig,
     fluConfig,
@@ -50,6 +52,7 @@ export default async function HomePage() {
     loadOtherMarketsCatalog(),
     loadEligibleOverview(),
     loadEligiblePackTracts(),
+    loadMsStatewideTracts(),
     loadScMfPriority(),
     loadZoningConfig(),
     loadFluConfig(),
@@ -76,6 +79,7 @@ export default async function HomePage() {
       otherCatalog={otherCatalog}
       eligibleOverview={eligibleOverview}
       eligibleTracts={eligibleTracts}
+      msTracts={msTracts}
       mfPriority={mfPriority}
       zoningConfig={zoningConfig}
       fluConfig={fluConfig}

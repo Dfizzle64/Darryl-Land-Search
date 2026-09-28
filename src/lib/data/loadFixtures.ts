@@ -153,6 +153,13 @@ export async function loadEligiblePackTracts(): Promise<EligiblePackTractCollect
   return collection;
 }
 
+export async function loadMsStatewideTracts(): Promise<EligiblePackTractCollection> {
+  const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-ms-statewide.geojson"), "utf8");
+  const collection = JSON.parse(raw) as EligiblePackTractCollection;
+  stampOrangeTractIncome(collection.features, await loadOrangeTractIncomeMap());
+  return collection;
+}
+
 export async function loadScMfPriority(): Promise<ScMfPriorityCatalog> {
   const raw = await readFile(path.join(DATA_DIR, "fixtures/sc-oz2-mf-priority.json"), "utf8");
   return JSON.parse(raw) as ScMfPriorityCatalog;

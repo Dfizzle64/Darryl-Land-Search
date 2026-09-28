@@ -58,6 +58,7 @@ import {
   viewBounds,
   viewIncludesSouthCarolina,
 } from "@/lib/markets";
+import { mergeMsStatewideTracts, msStatewideTractRows } from "@/lib/msStatewideTracts";
 import { displayedOzTracts } from "@/lib/scNominatedTracts";
 import { showMarketParcels, type MarketParcelIndex } from "@/lib/marketParcels";
 import { ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcels";
@@ -117,6 +118,7 @@ type AppShellProps = {
   otherCatalog: EligibleMarketsCatalog;
   eligibleOverview: GeoJSON.FeatureCollection;
   eligibleTracts: EligiblePackTractCollection;
+  msTracts: EligiblePackTractCollection;
   mfPriority: ScMfPriorityCatalog;
   zoningConfig: ZoningConfig;
   fluConfig: FluConfig;
@@ -142,6 +144,7 @@ export function AppShell({
   otherCatalog,
   eligibleOverview,
   eligibleTracts,
+  msTracts,
   mfPriority,
   zoningConfig,
   fluConfig,
@@ -220,9 +223,14 @@ export function AppShell({
     return rows;
   }, [ruralSide, tractClass, urbanSide]);
   const tractIncomeByGeoid = useMemo(
-    () => incomeByGeoidFromFeatures([ruralTracts, eligibleTracts, oz2Tracts]),
-    [eligibleTracts, oz2Tracts, ruralTracts],
+    () => incomeByGeoidFromFeatures([ruralTracts, eligibleTracts, oz2Tracts, msTracts]),
+    [eligibleTracts, msTracts, oz2Tracts, ruralTracts],
   );
+  const drawnEligibleTracts = useMemo(
+    () => mergeMsStatewideTracts(eligibleTracts, ruralTracts, oz2Tracts, msTracts),
+    [eligibleTracts, msTracts, oz2Tracts, ruralTracts],
+  );
+  const msTractRows = useMemo(() => msStatewideTractRows(msTracts), [msTracts]);
   const ruralShown = useMemo(
     () => filterTractRowsByIncome(ruralSide, tractIncomeByGeoid, filters),
     [filters, ruralSide, tractIncomeByGeoid],
@@ -349,7 +357,10 @@ export function AppShell({
   );
   const matchedIds = useMemo(() => new Set(matched.map((feature) => feature.properties.id)), [matched]);
   const selected = activeParcels.features.find((feature) => feature.properties.id === selectedId) ?? null;
-  const selectedTract = visibleTracts.find((row) => row.geoid === selectedTractGeoid) ?? null;
+  const selectedTract =
+    visibleTracts.find((row) => row.geoid === selectedTractGeoid) ??
+    msTractRows.find((row) => row.geoid === selectedTractGeoid) ??
+    null;
   const screeningFocus = selected
     ? { key: `parcel:${selected.properties.id}`, lon: selected.properties.centroid[0], lat: selected.properties.centroid[1] }
     : selectedTract
@@ -419,10 +430,14 @@ export function AppShell({
   }, [matchedIds, selectedId, showExcluded]);
 
   useEffect(() => {
-    if (selectedTractGeoid && !visibleTracts.some((row) => row.geoid === selectedTractGeoid)) {
+    if (
+      selectedTractGeoid &&
+      !visibleTracts.some((row) => row.geoid === selectedTractGeoid) &&
+      !msTractRows.some((row) => row.geoid === selectedTractGeoid)
+    ) {
       setSelectedTractGeoid(null);
     }
-  }, [selectedTractGeoid, visibleTracts]);
+  }, [msTractRows, selectedTractGeoid, visibleTracts]);
 
   useEffect(() => {
     if (!shedParcelsOn) {
@@ -962,7 +977,7 @@ export function AppShell({
             oz2Tracts={oz2Tracts}
             ruralTracts={ruralTracts}
             eligibleOverview={eligibleOverview}
-            eligibleTracts={eligibleTracts}
+            eligibleTracts={drawnEligibleTracts}
             ruralPins={ruralPins}
             selectedId={selectedId}
             hoveredId={hoveredId}

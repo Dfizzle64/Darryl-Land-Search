@@ -23,6 +23,7 @@ type DicksonCounty = {
     tncpmLayer: number;
     opportunityZoneDesignated: number;
     simplified: boolean;
+    zoningJoined: number;
   };
 };
 
@@ -81,7 +82,7 @@ describe("Dickson County TN parcel extract", () => {
       expect(lat).toBeGreaterThan(35.8);
       expect(lat).toBeLessThan(36.5);
       if (props.zoningCode) {
-        expect(props.zoningCode).toMatch(/^[A-Za-z0-9][A-Za-z0-9 \-/]{0,24}$/);
+        expect(props.zoningCode).toMatch(/^[A-Za-z0-9][A-Za-z0-9 _\-/]{0,40}$/);
       }
       if (GAP_TOWNS.has(props.jurisdictionPrefix || "")) {
         expect(props.zoningCode).toBeNull();
@@ -116,7 +117,8 @@ describe("Dickson County TN parcel extract", () => {
     expect(sales).toBe(county.ingest.saleCount);
     expect(vintageSales).toBe(sales);
     expect(appraisals).toBe(county.ingest.appraisalCount);
-    expect(zoned).toBe(0);
+    expect(zoned).toBeGreaterThan(0);
+    expect(county.ingest.zoningJoined).toBe(zoned);
     expect(owners).toBeGreaterThan(features.length * 0.9);
   });
 });

@@ -14,9 +14,10 @@
   "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
   "gaps": [
     "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
-    "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers.",
+    "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join.",
     "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
-    "Regrid and other paid parcel vendors were not used."
+    "Regrid and other paid parcel vendors were not used.",
+    "Anderson zoning is AndersonTN_PSALayers ZONING_1 joined on GISLINK (3819 parcels). A code of CITY is the published city flag and was not resolved to a municipal district."
   ],
   "path": "data/fixtures/market-parcels/counties/47001/tiles",
   "lookup": "data/fixtures/market-parcels/counties/47001/lookup.json",
@@ -34,6 +35,9 @@
     "tncpmMatched": 4159,
     "saleCount": 4038,
     "appraisalCount": 4043,
+    "zoningJoined": 3819,
+    "zoningAdded": 3819,
+    "fluJoined": 0,
     "kept": 4263,
     "ownerCount": 4258,
     "tpadCount": 4263,

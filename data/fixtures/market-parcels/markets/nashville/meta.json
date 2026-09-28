@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-28T18:34:14Z",
+  "generatedAt": "2026-09-28T19:11:16Z",
   "market": "Nashville",
   "tier": "primary",
   "parcelCount": 127197,
@@ -30,9 +30,10 @@
       "gaps": [
         "Bedford is Bedford County, Tennessee (FIPS 47003). April2023Parcels and the Bedford County, Pennsylvania viewer were not used. Centroids outside Tennessee abort the load.",
         "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
-        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers.",
+        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join.",
         "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
-        "Regrid and other paid parcel vendors were not used."
+        "Regrid and other paid parcel vendors were not used.",
+        "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
       ],
       "path": "data/fixtures/market-parcels/counties/47003/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47003/lookup.json",
@@ -52,9 +53,10 @@
       "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
         "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
-        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers.",
+        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join.",
         "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
-        "Regrid and other paid parcel vendors were not used."
+        "Regrid and other paid parcel vendors were not used.",
+        "Cannon zoning is the four UCDD districts (A-1, C-1, I-1, R-1), stamped by centroid."
       ],
       "path": "data/fixtures/market-parcels/counties/47015/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47015/lookup.json",
@@ -129,9 +131,10 @@
       "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
         "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
-        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers.",
+        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join.",
         "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
-        "Regrid and other paid parcel vendors were not used."
+        "Regrid and other paid parcel vendors were not used.",
+        "Dickson zoning is the unincorporated county layer, overwritten inside the City of Dickson and White Bluff polygons. Burns, Charlotte, Vanleer, and Slayden have no public zoning layer. Future land use is not on a public layer."
       ],
       "path": "data/fixtures/market-parcels/counties/47043/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47043/lookup.json",
@@ -151,8 +154,9 @@
       "queryUrl": "https://maps.capturecama.com/arcgis/rest/services/Hickman/HickmanTN05182023/MapServer/9/query",
       "gaps": [
         "Hickman is not in the OIR statewide layer or TN_County_Parcel_Map. The only public polygon source used here is the CaptureCAMA snapshot HickmanTN05182023 (May 18, 2023).",
-        "Acreage is CALC_ACRE from 5.0 through 150.0 inclusive. Owner, situs, mailing, and APRVAL come from that snapshot. APRVAL is labeled 2023 vintage. The snapshot has no sale date or sale price.",
-        "The property-record link is the TPAD GIS card for GISLINK when that id is present. Opportunity Zone status was not inferred. Regrid was not used."
+        "Acreage is CALC_ACRE from 5.0 through 150.0 inclusive. Owner and situs street come from that snapshot. CITY, STATE, and ZIP are the mailing city, not the situs city. APRVAL is market value and ASMT is assessed value, labeled 2023 because the snapshot is HickmanTN05182023. TAXYR on this layer is not a year. There is no sale date or sale price.",
+        "Hickman is outside Comptroller TPAD. The property-record link is the CaptureCAMA citizen portal, not a TPAD GIS card. The research card has no zoning or future-land-use FeatureServer. Opportunity Zone status was not inferred. Regrid was not used.",
+        "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
       ],
       "path": "data/fixtures/market-parcels/counties/47081/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47081/lookup.json",
@@ -173,9 +177,10 @@
       "gaps": [
         "Macon was a shelf gap because the generic Tennessee loader queried IMPACT COUNTY_ID=111, the FIPS suffix. The Comptroller county number is 56. TN_County_Parcel_Map Macon_Parcels is live and has 4,921 parcels with Parcels_CALC_ACRE from 5 through 150. This extract replaces that app-load gap.",
         "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
-        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers.",
+        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join.",
         "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
-        "Regrid and other paid parcel vendors were not used."
+        "Regrid and other paid parcel vendors were not used.",
+        "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
       ],
       "path": "data/fixtures/market-parcels/counties/47111/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47111/lookup.json",
@@ -264,10 +269,11 @@
       "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
         "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
-        "Overton is not a layer on TN_County_Parcel_Map, so sale date, sale price, and appraisal stay empty. That is not a 2023 value.",
-        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers.",
+        "Overton is not a layer on TN_County_Parcel_Map. Sale date, sale price, appraisal, and mailing are joined from UCDD Overton_Parcels on GISLINK. That roll's PARCELID year is 2019, so those fields are labeled 2019, not 2023. Owner and geometry stay on the 2026 OIR layer.",
+        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join.",
         "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
-        "Regrid and other paid parcel vendors were not used."
+        "Regrid and other paid parcel vendors were not used.",
+        "Overton has no countywide zoning FeatureServer. A non-blank ZONING value on the UCDD roll is kept. Future land use stays empty."
       ],
       "path": "data/fixtures/market-parcels/counties/47133/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47133/lookup.json",
@@ -287,9 +293,10 @@
       "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
         "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
-        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers.",
+        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join.",
         "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
-        "Regrid and other paid parcel vendors were not used."
+        "Regrid and other paid parcel vendors were not used.",
+        "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
       ],
       "path": "data/fixtures/market-parcels/counties/47141/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47141/lookup.json",
@@ -309,9 +316,10 @@
       "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
         "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
-        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers.",
+        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join.",
         "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
-        "Regrid and other paid parcel vendors were not used."
+        "Regrid and other paid parcel vendors were not used.",
+        "Robertson zoning is APSU unincorporated zoning where a GISLINK matches, overwritten by Springfield, Greenbrier, White House, Millersville, Adams, Orlinda, and Cedar Hill polygons. City layers are not applied outside their polygons. White House future land use is stamped only inside that layer. Greenbrier, West Virginia was not used."
       ],
       "path": "data/fixtures/market-parcels/counties/47147/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47147/lookup.json",
@@ -542,9 +550,10 @@
       "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
         "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
-        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers.",
+        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join.",
         "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
-        "Regrid and other paid parcel vendors were not used."
+        "Regrid and other paid parcel vendors were not used.",
+        "Wilson has no countywide zoning layer. Lebanon and Mt. Juliet zoning are stamped only where the centroid falls in those city polygons. Mt. Juliet future land use is the same kind of city-only stamp. Cookeville is not in Wilson."
       ],
       "path": "data/fixtures/market-parcels/counties/47189/tiles",
       "lookup": "data/fixtures/market-parcels/counties/47189/lookup.json",

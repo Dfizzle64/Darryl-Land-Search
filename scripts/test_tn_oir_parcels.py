@@ -6,7 +6,7 @@ from __future__ import annotations
 import unittest
 
 from parcel_geometry import esri_rings_to_geojson
-from tn_oir_parcels import chester_parcel_id, in_band, reject_source_url
+from tn_oir_parcels import chester_parcel_id, in_band, reject_source_url, slash_date_to_iso, yymmdd_to_iso
 
 
 class TnOirParcelTests(unittest.TestCase):
@@ -30,6 +30,14 @@ class TnOirParcelTests(unittest.TestCase):
             reject_source_url("https://services.arcgis.com/example/April2023Parcels/FeatureServer/0")
         with self.assertRaises(RuntimeError):
             reject_source_url("https://app.regrid.com/parcels")
+
+    def test_card_date_formats(self) -> None:
+        self.assertEqual(yymmdd_to_iso("220315"), "2022-03-15")
+        self.assertEqual(yymmdd_to_iso("241024"), "2024-10-24")
+        self.assertEqual(yymmdd_to_iso("990101"), "1999-01-01")
+        self.assertIsNone(yymmdd_to_iso("229999"))
+        self.assertEqual(slash_date_to_iso("10/17/2002"), "2002-10-17")
+        self.assertIsNone(slash_date_to_iso(" "))
 
     def test_exact_rings_keep_a_vertex_the_cadastral_tolerance_drops(self) -> None:
         ring = [[0.0, 0.0], [0.5, 0.000005], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0], [0.0, 0.0]]

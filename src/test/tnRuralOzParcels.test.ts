@@ -134,11 +134,27 @@ describe("Tennessee rural parcel counties", () => {
       expect(lat).toBeGreaterThan(34.8);
       expect(lat).toBeLessThan(36.8);
       const sale = feature.properties.lastSale;
-      if (sale && (sale.price != null || sale.date != null)) {
+      const tax = feature.properties.tax;
+      if (county.fips === "47023") {
+        expect(feature.properties.appraiserUrl).toContain("chester.capturecama.com");
+        expect(feature.properties.appraiserUrl).not.toContain("TPAD");
+        expect(feature.properties.situsCity ?? null).toBeNull();
+        if (sale && (sale.price != null || sale.date != null)) expect(sale.vintage ?? null).toBeNull();
+        if (tax?.marketValue != null) expect(tax.vintage).toMatch(/^\d{4}$/);
+      } else if (county.fips === "47081") {
+        expect(feature.properties.appraiserUrl).toContain("hickman.capturecama.com");
+        expect(feature.properties.appraiserUrl).not.toContain("TPAD");
+        expect(feature.properties.situsCity ?? null).toBeNull();
+        expect(sale?.date ?? null).toBeNull();
+        expect(sale?.price ?? null).toBeNull();
+        if (tax?.marketValue != null) expect(tax.vintage).toBe("2023");
+      } else if (county.fips === "47133") {
+        if (sale && (sale.price != null || sale.date != null)) expect(sale.vintage).toBe("2019");
+        if (tax?.marketValue != null) expect(tax.vintage).toBe("2019");
+      } else if (sale && (sale.price != null || sale.date != null)) {
         expect(sale.vintage).toBe("2023");
       }
-      const tax = feature.properties.tax;
-      if (tax?.marketValue != null && county.fips !== "47023") {
+      if (tax?.marketValue != null && county.fips !== "47023" && county.fips !== "47133" && county.fips !== "47081") {
         expect(tax.vintage).toBe("2023");
       }
     }

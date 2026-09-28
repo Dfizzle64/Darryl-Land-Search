@@ -6,6 +6,7 @@ import {
   createEligibleTractTileCache,
   detailTractsVisibleAtZoom,
   eligibleOverviewFilter,
+  eligibleOverviewShownFilter,
   eligibleTractOverlayFilter,
   isDrawnEligibleTract,
   overviewTractsVisibleAtZoom,
@@ -121,25 +122,61 @@ describe("eligible tract overlay", () => {
     expect(eligibleOverviewFilter("rural")).toEqual(["==", ["get", "rural"], true]);
     expect(eligibleOverviewFilter("urban")).toEqual(["==", ["get", "rural"], false]);
     expect(JSON.stringify(eligibleOverviewFilter("none"))).not.toContain("tractGeoid");
+    const shown = JSON.stringify(eligibleOverviewShownFilter("all", null));
+    expect(shown).toContain("South Carolina");
+    expect(shown).not.toContain("medianHouseholdIncome");
+    const filtered = JSON.stringify(eligibleOverviewShownFilter("rural", ["has", "medianHouseholdIncome"]));
+    expect(filtered).toContain("medianHouseholdIncome");
+    expect(filtered).toContain("true");
   });
 
-  it("ships a small dissolved eligible-only layer for the far zoom", () => {
+  it("keeps ACS income on features merged into the detail cache", () => {
+    const cache = createEligibleTractTileCache();
+    const georgia = tract("13051000100", false, "Georgia", -84.4, 33.7);
+    georgia.properties.medianHouseholdIncome = 42000;
+    const missing = tract("28049003200", true, "Mississippi", -90.4, 32.3);
+    syncEligibleTractTileCache(
+      cache,
+      { rural: [missing], eligible: [georgia], oz2: [] },
+      "income",
+    );
+    absorbEligibleTractTiles(cache, tractGridKeysForBbox([-91, 31, -83, 35]));
+    expect(cache.eligible.get("13051000100")?.properties.medianHouseholdIncome).toBe(42000);
+    expect(cache.rural.get("28049003200")?.properties.medianHouseholdIncome).toBeUndefined();
+  });
+
+  it("ships one simplified eligible tract per feature for the far zoom", () => {
     const file = path.join(process.cwd(), "data/fixtures/oz2-eligible-overview.geojson");
     const raw = readFileSync(file, "utf8");
-    expect(raw.length).toBeLessThan(250_000);
+    expect(raw.length).toBeLessThan(1_600_000);
     const collection = JSON.parse(raw) as {
-      features: Array<{ properties: { state: string; rural: boolean; eligible: boolean; overview: boolean; tractCount: number }; geometry: GeoJSON.Geometry }>;
+      features: Array<{
+        properties: {
+          state: string;
+          rural: boolean;
+          eligible: boolean;
+          overview: boolean;
+          tractGeoid: string;
+          medianHouseholdIncome?: number;
+        };
+        geometry: GeoJSON.Geometry;
+      }>;
     };
-    expect(collection.features.length).toBeGreaterThan(0);
-    expect(collection.features.length).toBeLessThanOrEqual(20);
+    expect(collection.features.length).toBeGreaterThan(2000);
+    expect(collection.features.length).toBeLessThan(4000);
     let points = 0;
     const states = new Set<string>();
+    const geoids = new Set<string>();
     for (const feature of collection.features) {
       expect(feature.properties.eligible).toBe(true);
       expect(feature.properties.overview).toBe(true);
       expect(typeof feature.properties.rural).toBe("boolean");
-      expect(feature.properties.tractCount).toBeGreaterThan(0);
-      expect(feature.properties).not.toHaveProperty("tractGeoid");
+      expect(feature.properties.tractGeoid).toMatch(/^\d{11}$/);
+      expect(feature.properties).not.toHaveProperty("tractCount");
+      if (feature.properties.medianHouseholdIncome != null) {
+        expect(feature.properties.medianHouseholdIncome).toBeGreaterThan(0);
+      }
+      geoids.add(feature.properties.tractGeoid);
       states.add(feature.properties.state);
       const walk = (coords: unknown) => {
         if (!Array.isArray(coords)) return;
@@ -151,9 +188,12 @@ describe("eligible tract overlay", () => {
       };
       walk((feature.geometry as { coordinates: unknown }).coordinates);
     }
-    expect(points).toBeLessThan(12_000);
+    expect(geoids.size).toBe(collection.features.length);
+    expect(points).toBeGreaterThan(1000);
+    expect(points).toBeLessThan(80_000);
     expect(states.has("Florida")).toBe(true);
     expect(states.has("South Carolina")).toBe(true);
     expect(states.has("Georgia")).toBe(true);
+    expect(states.has("Mississippi")).toBe(true);
   });
 });

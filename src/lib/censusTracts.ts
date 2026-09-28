@@ -28,6 +28,8 @@ export type TractProps = {
   state?: string | null;
   county?: string | null;
   rural?: boolean | null;
+  /** ACS B19013 median when the 2020 GEOID is in the Southeast table. Absent means unknown. */
+  medianHouseholdIncome?: number;
 };
 
 export type IndexedTractFeature = GeoJSON.Feature<GeoJSON.Geometry, TractProps>;
@@ -226,10 +228,24 @@ export function eligibleTractOverlayFilter(options: {
   return ["all", ...parts];
 }
 
-/** Far-zoom filter. Dissolved features have rural/urban, not a tract GEOID list. */
+/** Far-zoom class filter. Each overview feature is one eligible tract. */
 export function eligibleOverviewFilter(classCut: TractClassCut): unknown[] | null {
   if (classCut === "none") return ["==", ["get", "eligible"], "__hide__"];
   if (classCut === "rural") return ["==", ["get", "rural"], true];
   if (classCut === "urban") return ["==", ["get", "rural"], false];
   return null;
+}
+
+/**
+ * Far-zoom layer filter. Class, the South Carolina nomination list, and the
+ * income slider all apply. Income is null when the slider should not touch tracts.
+ */
+export function eligibleOverviewShownFilter(classCut: TractClassCut, incomeFilter: unknown): unknown[] | null {
+  const parts: unknown[] = [];
+  const classFilter = eligibleOverviewFilter(classCut);
+  if (classFilter) parts.push(classFilter);
+  parts.push(scNominatedOverlayFilter());
+  if (Array.isArray(incomeFilter)) parts.push(incomeFilter);
+  if (parts.length === 1) return parts[0] as unknown[];
+  return ["all", ...parts];
 }

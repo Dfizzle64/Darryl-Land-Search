@@ -16,7 +16,7 @@ const COUNTIES = [
   { fips: "12086", name: "Miami-Dade", source: "fl-miami-dade-landinformation-26", coverage: "complete-gte-5ac" },
   { fips: "12087", name: "Monroe", source: "fl-monroe-apo-parcels-0", coverage: "complete-gte-5ac" },
   { fips: "12011", name: "Broward", source: "fl-broward-bcpa-jan26-16", coverage: "partial" },
-  { fips: "12099", name: "Palm Beach", source: "fl-palm-beach-parcel-info-4", coverage: "partial" },
+  { fips: "12099", name: "Palm Beach", source: "fl-palm-beach-parcel-info-4", coverage: "complete-gte-5ac" },
 ] as const;
 
 describe("Wave 0 South Florida registration", () => {

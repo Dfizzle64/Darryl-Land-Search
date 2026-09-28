@@ -13,6 +13,7 @@ import { SitesPanel } from "./SitesPanel";
 import { TractDrawer } from "./TractDrawer";
 import { TractPanel } from "./TractPanel";
 import { AOI_PARCEL_LIMIT, featuresIntersectingBbox, type AoiLock } from "@/lib/aoi";
+import { formatJumpPinLabel } from "@/lib/jumpPin";
 import {
   bboxContains,
   parcelAtPoint,
@@ -181,6 +182,7 @@ export function AppShell({
   const [parcelSource, setParcelSource] = useState<"fixture" | "live">("fixture");
   const [error, setError] = useState<string | null>(null);
   const [flyTarget, setFlyTarget] = useState<MapFlyTarget | null>(null);
+  const jumpSeq = useRef(0);
   const [jumpNote, setJumpNote] = useState<string | null>(null);
   const [jumpError, setJumpError] = useState<string | null>(null);
   const [jumpBusy, setJumpBusy] = useState(false);
@@ -663,8 +665,9 @@ export function AppShell({
         setSelectedId(null);
         setViewportParcels(null);
       }
-      const key = Date.now();
-      setFlyTarget({ lng: point.lng, lat: point.lat, key });
+      const key = jumpSeq.current + 1;
+      jumpSeq.current = key;
+      setFlyTarget({ lng: point.lng, lat: point.lat, key, label: formatJumpPinLabel(query) });
       setPick({ lng: point.lng, lat: point.lat, key, loadStamp: parcelLoadStamp });
     } catch {
       setJumpError(ADDRESS_NOT_FOUND);

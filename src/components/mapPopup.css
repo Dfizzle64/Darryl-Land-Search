@@ -72,3 +72,77 @@
   position: relative;
   left: -1px;
 }
+
+/* Jump-to pin. The marker root stays click-through; only the teardrop and the x hit. */
+.jump-pin,
+.jump-pin-body,
+.jump-pin-label,
+.jump-pin-label span {
+  pointer-events: none;
+}
+
+.jump-pin-body {
+  position: relative;
+  width: 28px;
+  height: 38px;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.45));
+}
+
+.jump-pin-body.is-fading {
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+
+.jump-pin-mark,
+.jump-pin-close {
+  pointer-events: auto;
+}
+
+.jump-pin-mark {
+  display: block;
+}
+
+.jump-pin-label {
+  position: absolute;
+  left: calc(100% + 6px);
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  max-width: min(14rem, 58vw);
+  padding: 2px 2px 2px 8px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #12202b;
+  font: 600 11px/1.3 ui-sans-serif, system-ui, sans-serif;
+  box-shadow:
+    0 1px 2px rgba(12, 18, 24, 0.2),
+    0 4px 12px rgba(12, 18, 24, 0.28);
+}
+
+.jump-pin-label span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jump-pin-close {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #12202b;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.jump-pin-close:hover,
+.jump-pin-close:focus-visible {
+  background: rgba(18, 32, 43, 0.08);
+  outline: none;
+}

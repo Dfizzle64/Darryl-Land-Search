@@ -17,7 +17,7 @@ function pointInRing(x: number, y: number, ring: number[][]): boolean {
   return inside;
 }
 
-export type MapFlyTarget = JumpPoint & { key: number };
+export type MapFlyTarget = JumpPoint & { key: number; label: string };
 
 /** South Florida shelf camera box. Same corners as the parcel-only market. */
 export const SOUTH_FLORIDA_BOUNDS: [[number, number], [number, number]] = [

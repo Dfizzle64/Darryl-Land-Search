@@ -1,0 +1,269 @@
+state: TN
+jurisdiction: Dickson County
+fips: '47043'
+level: county
+markets:
+- Nashville
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=22)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 28,412; DEEDAC 5–150 → 6335; id GISLINK populated=True; geo PASS
+    (36.31788,-87.49948)→Dickson; (36.3177,-87.49732)→Dickson (where COUNTY_ID=22). Service lastEditDate
+    2026-09-10 (PARCELID suffix 2026) — freshest public owner/geometry; no sale/value/CALC_ACRE (DEEDAC
+    often 0 — derive geodesic acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 8477
+- role: parcels
+  name: TN County Parcel Map — Dickson_Parcels (Assessment join)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/64
+  layerId: 64
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Parcels_CALC_ACRE: acreage
+    Assessment_Data_22_GISLINK: parcelIdAlt
+    Assessment_Data_22_PARCELID: parcelIdFull
+    Assessment_Data_22_ADDRESS: situsAddress
+    Assessment_Data_22_CLASS: propType
+    Assessment_Data_22_DEEDAC: acreageDeed
+    Assessment_Data_22_OWNER: ownerName
+    Assessment_Data_22_OWNER2: ownerName2
+    Assessment_Data_22_LANDMKTVAL: tax.landValue
+    Assessment_Data_22_APPRAISAL: tax.marketValue
+    Assessment_Data_22_SALEDATE: lastSale.date
+    Assessment_Data_22_PRICE: lastSale.price
+    Assessment_Data_22_DEED_BOOK: lastSale.deedBook
+    Assessment_Data_22_DEED_PAGE: lastSale.deedPage
+    Assessment_Data_22_VI: lastSale.qualified
+    Assessment_Data_22_LANDUSE: dorCode
+    Assessment_Data_22_ID: parcelIdDisplay
+    County_Name: countyName
+  notes: Added 2026-09-28 ET TN PIR (anonymous CAMA-joined AGOL twin; replaces IMPACT-only primary that
+    returns 403 from box). count 27,422; Parcels_CALC_ACRE 5–150 → 8243; id Parcels_GISLINK populated=True;
+    geo PASS (36.33266,-87.50857)→Dickson; (36.33162,-87.4883)→Dickson. Service data vintage lastEditDate
+    2023-11-22 — owner/sale/value may lag TPAD; pair with OIR 2026 fabric for current owner.
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: Parcels_GISLINK
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: IMPACT Parcels (COUNTY_ID=22)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    PARCELWP: parcelIdDisplay
+    CALC_ACRE: acreage
+    PARCEL_TYPE: parcelType
+    COUNTY_ID: countyId
+  notes: 'Filter COUNTY_ID=22 AND PARCEL_TYPE=1; acreage band CALC_ACRE 5–150. Geometry sibling; join
+    Themes on GISLINK. Egress-sensitive maps.cot.tn.gov. 2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP 403
+    from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes (JUR=022)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    ID: parcelIdDisplay
+    PARID: parcelIdParid
+    PARCELID: parcelIdFull
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    ST_NUM: situsAddress.number
+    STREET: situsAddress.street
+    CITYNUM: taxDistrict
+    CALC_ACRE: acreage
+    CAMADEEDAC: acreageDeed
+    CAMACALCAC: acreageCama
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    DEEDBKPG: lastSale.deedRef
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    OBYVAL: tax.obxfValue
+    APPRAISAL: tax.marketValue
+    ZONING: zoning
+    LANDUSE: dorCode
+    PROPTYPE: propType
+    TAXYR: taxYear
+  notes: 'Filter JUR=''022''; prefer latest TAXYR. CAMA ZONING often blank — prefer polygon zoning after
+    CITYNUM resolve. Query-only. 2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP 403 from box — not verifiable;
+    keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: zoning
+  name: Dickson County Zoning (unincorporated)
+  restUrl: https://services5.arcgis.com/o0K7afBI69raYtru/arcgis/rest/services/Dickson_County_Zoning/FeatureServer/0
+  layerId: 0
+  coverage: county-wide
+  fieldMap:
+    Zone_Curre: zoning
+    Zoning_Des: zoningLabel
+    Date_Effec: zoningEffective
+    Ord_Number: zoningOrdinance
+  notes: Unincorporated ~164 district polys (2026-08-04 dated). A1 sparse — QA against Official Zoning
+    Map PDF when no intersect. Do not invent from blank CAMA ZONING.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: zoning
+  name: City of Dickson Zoning
+  restUrl: https://services7.arcgis.com/Gld89lf779txw3q4/arcgis/rest/services/City_of_Dickson_Zoning_View/FeatureServer/0
+  layerId: 0
+  coverage: city-only
+  fieldMap:
+    Current_Zo: zoning
+    Zoning_Des: zoningLabel
+    ACREAGE: acreage
+  notes: CITYNUM=203. ~7,838 polys. City-only zoning on countywide parcels. Multifamily-relevant R3/R3A/R3PUD
+    — confirm ordinance.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: zoning
+  name: White Bluff Zoning
+  restUrl: https://services5.arcgis.com/o0K7afBI69raYtru/arcgis/rest/services/WhiteBluff_Zoning/FeatureServer/0
+  layerId: 0
+  coverage: city-only
+  fieldMap:
+    Zone_Curre: zoning
+    ZoneDesc: zoningLabel
+  notes: CITYNUM=770. ~99 polys. City-only on countywide parcels.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: other
+  name: City Limits Dickson County (all six munis)
+  restUrl: https://services5.arcgis.com/o0K7afBI69raYtru/arcgis/rest/services/City_Limits_Dickson_County/FeatureServer/0
+  layerId: 0
+  coverage: county-wide
+  fieldMap:
+    NAME: municipality
+  notes: Dickson / White Bluff / Burns / Charlotte / Vanleer / Slayden. Jurisdiction QA.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: other
+  name: TDOT Traffic Lines (AADT statewide)
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  geometry: polyline
+  coverage: state-wide
+  fieldMap:
+    AADT: aadt
+    AADTYEAR: aadtYear
+    COUNTY_NUMBER: countyNumberTdot
+  notes: TDOT Traffic_Lines AADT + AADTYEAR (prefer 2025); filter COUNTY_NUMBER='22' for Dickson. Statewide
+    polyline fabric; nearest-segment/buffer join to parcels. COUNTY_NUMBER is TDOT alpha id (not Census
+    FIPS). Stamped 2026-09-24 statewide AADT dig.
+  status: usable
+  auth: none
+  acreageField: null
+gaps:
+- Burns / Charlotte / Vanleer / Slayden zoning REST (PDF/portal only)
+- Adopted FLU FeatureServer for county and all six municipalities — UGB/PGA and 2043 Comp Plan draft PDF
+  are guidance only
+- No local AGOL countywide joined parcel twin — IMPACT primary (egress-sensitive)
+- CAMA ZONING often blank
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: Dickson County / City of Dickson AGOL / IMPACT-TPAD public records; attribution required.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+jurisdictionGisUrl: https://experience.arcgis.com/experience/0ce727202f644ae1ae68d05c7d3ee6ff
+zoningOverall: partial
+packagingNote: >-
+  Packaged from 47043-dickson.md 2026-09-24; research checked 2026-09-23 ET. AADT statewide TDOT Traffic_Lines
+  stamped 2026-09-24. — TRANCHE-3 retrofit 2026-09-24 ET (tax/sale/owner confirm + appraiserSearchUrl
+  + jurisdictionGisUrl); no parcel re-dig. RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable;
+  added TNCPM,OIR. Card primary was IMPACT-only (maps.cot.tn.gov 403 from box today) — replaced with CAMA-joined
+  TN_County_Parcel_Map twin + OIR 2026 fabric; IMPACT demoted to partial/blocked-403 sibling. LSB-approved
+  parcel setup applied 2026-09-28 (see parcelSetup).
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+enrichment:
+  aadt:
+    source: TDOT Traffic Lines
+    restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+    layerId: 0
+    field: AADT
+    extraFields:
+    - AADTYEAR
+    - COUNTY_NUMBER
+    geography: statewide TDOT traffic lines
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-24'
+    verifiedBy: Tennessee Public Info Researcher
+    notes: TDOT Traffic_Lines AADT + AADTYEAR (prefer 2025); filter COUNTY_NUMBER='22' for Dickson. Live
+      probe 2026-09-24 ET; same statewide URL as Davidson.
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=22
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/64
+  joinKey: OIR.GISLINK = Parcels_GISLINK
+  salesValueVintage: 2023
+  salesValueSourceEditDate: '2023-11-22'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 8477
+  gislinkJoinSample: 9/10 (90%); misses ['022096    04303']

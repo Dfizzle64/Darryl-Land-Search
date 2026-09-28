@@ -1,0 +1,207 @@
+state: TN
+jurisdiction: Roane County
+fips: '47145'
+level: county
+markets:
+- Knoxville
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=73)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 35,837; DEEDAC 5–150 → 3424; id GISLINK populated=True; geo PASS
+    (3/3 in county) (36.04496,-84.35362)→Roane; (35.84439,-84.39682)→Roane (where COUNTY_ID=73). Service
+    lastEditDate 2026-09-10 (PARCELID suffix 2026) — freshest public owner/geometry; no sale/value/CALC_ACRE
+    (DEEDAC often 0 — derive geodesic acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 5731
+- role: parcels
+  name: TN County Parcel Map — Roane_Parcels (Assessment join)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/19
+  layerId: 19
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Parcels_CALC_ACRE: acreage
+    Assessment_Data_73_GISLINK: parcelIdAlt
+    Assessment_Data_73_PARCELID: parcelIdFull
+    Assessment_Data_73_ADDRESS: situsAddress
+    Assessment_Data_73_CLASS: propType
+    Assessment_Data_73_DEEDAC: acreageDeed
+    Assessment_Data_73_OWNER: ownerName
+    Assessment_Data_73_OWNER2: ownerName2
+    Assessment_Data_73_LANDMKTVAL: tax.landValue
+    Assessment_Data_73_APPRAISAL: tax.marketValue
+    Assessment_Data_73_SALEDATE: lastSale.date
+    Assessment_Data_73_PRICE: lastSale.price
+    Assessment_Data_73_DEED_BOOK: lastSale.deedBook
+    Assessment_Data_73_DEED_PAGE: lastSale.deedPage
+    Assessment_Data_73_VI: lastSale.qualified
+    Assessment_Data_73_LANDUSE: dorCode
+    Assessment_Data_73_ID: parcelIdDisplay
+    County_Name: countyName
+  notes: Added 2026-09-28 ET TN PIR (anonymous CAMA-joined AGOL twin; replaces IMPACT-only primary that
+    returns 403 from box). count 35,303; Parcels_CALC_ACRE 5–150 → 5637; id Parcels_GISLINK populated=True;
+    geo PASS (2/3 in county) (36.04797,-84.34058)→Anderson; (35.7498,-84.52327)→Roane. Service data vintage
+    lastEditDate 2023-11-22 — owner/sale/value may lag TPAD; pair with OIR 2026 fabric for current owner.
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: Parcels_GISLINK
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: IMPACT Parcels (COUNTY_ID=73)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    PARCELWP: parcelIdDisplay
+    CALC_ACRE: acreage
+    PARCEL_TYPE: parcelType
+    COUNTY_ID: countyId
+  notes: 'Filter COUNTY_ID=73 AND PARCEL_TYPE=1; acreage band CALC_ACRE 5–150. Live count PARCEL_TYPE=1
+    = 35846; 5–150 type1 = 5716 (2026-09-24 ET). Geo-verified sample GISLINK 073125 01701 centroid ~-84.536,35.688
+    (Roane TN / Kingston–Harriman). No public county AGOL CAMA FeatureServer found — IMPACT primary. Egress-sensitive
+    maps.cot.tn.gov. SmartGov HTML portal is viewer only (not REST). 2026-09-28 ET TN PIR: maps.cot.tn.gov
+    HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes (JUR=073)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    ID: parcelIdDisplay
+    PARID: parcelIdParid
+    PARCELID: parcelIdFull
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    ST_NUM: situsAddress.number
+    STREET: situsAddress.street
+    CITYNUM: taxDistrict
+    CALC_ACRE: acreage
+    CAMADEEDAC: acreageDeed
+    CAMACALCAC: acreageCama
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    DEEDBKPG: lastSale.deedRef
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    OBYVAL: tax.obxfValue
+    APPRAISAL: tax.marketValue
+    ZONING: zoning
+    LANDUSE: dorCode
+    PROPTYPE: propType
+    TAXYR: taxYear
+  notes: 'Filter JUR=''073''; COUNTY=ROANE verified. Sample GISLINK 073049 09301 TAXYR=2027 APPRAISAL=251000.
+    Prefer latest TAXYR. Query-only. CAMA ZONING often blank. 2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP
+    403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: zoning
+  name: null — no public countywide zoning REST found
+  restUrl: null
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: unknown
+  fieldMap: {}
+  notes: Roane Planning & Zoning publishes static maps / ordinance (roanecountytn.gov/planning-and-zoning);
+    no anonymous FeatureServer zoning contract found 2026-09-24. Honest gap.
+  status: gap
+- role: flu
+  name: null — no public FLU FeatureServer
+  restUrl: null
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: unknown
+  fieldMap: {}
+  notes: No adopted FLU FeatureServer found for Roane County (2026-09-24).
+  status: gap
+gaps:
+- No local AGOL countywide joined parcel twin — IMPACT primary (egress-sensitive)
+- SmartGov ParcelHome is HTML search — not a FeatureServer contract
+- Zoning / FLU REST gaps; CAMA ZONING often blank
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: Roane County GIS / Assessor / IMPACT-TPAD public records; attribution required.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+publicGisUrl: https://roane-county-gis-tn-rcgis.hub.arcgis.com/
+jurisdictionGisUrl: https://roane-county-gis-tn-rcgis.hub.arcgis.com/
+zoningOverall: gap
+packagingNote: >-
+  Full-suite dig 2026-09-24 Wave1B retry. TRANCHE-3 tax/sale/owner on Themes; appraiserSearchUrl TPAD
+  {GISLINK}; publicGisUrl = Roane County GIS Hub. Also SmartGov https://co-roane-tn.smartgovcommunity.com/Parcels/ParcelHome
+  (HTML). Skip utilities + AADT. Geo-verified IMPACT COUNTY_ID=73. RURAL-OZ PASS 1 re-verify 2026-09-28
+  ET (TN PIR): parcels usable; added TNCPM,OIR. Card primary was IMPACT-only (maps.cot.tn.gov 403 from
+  box today) — replaced with CAMA-joined TN_County_Parcel_Map twin + OIR 2026 fabric; IMPACT demoted to
+  partial/blocked-403 sibling. First probe hit a border parcel (Oliver Springs, GISLINK 073…) whose interior
+  point fell in Anderson — re-probed with spread samples. LSB-approved parcel setup applied 2026-09-28
+  (see parcelSetup).
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=73
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/19
+  joinKey: OIR.GISLINK = Parcels_GISLINK
+  salesValueVintage: 2023
+  salesValueSourceEditDate: '2023-11-22'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 5731
+  gislinkJoinSample: 10/10 (100%)

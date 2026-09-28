@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Public 5.0–150.0 acre parcels for 20 Tennessee counties.
 
-County endpoints live in data/tn-rural-parcel-sources.json. After a
-refreshed research card changes a URL or field, edit that county's block
-and re-pull only that county:
+Parcel layers are chosen from data/tn-parcel-cards by each layer's use
+label and the card's parcelSetup block. The first role:parcels layer is
+never the source. After a refreshed card changes a URL, re-pull only
+that county:
 
     python3 scripts/tn_oir_parcels.py --county Sevier --refresh
+
+data/tn-rural-parcel-sources.json still holds zoning join URLs and the
+published source id. A new county is a YAML card plus a catalog row.
 
 The source rule wins over older card text. Geometry and owner come from
 the Tennessee OIR layer Tennessee Property Boundaries Public Use (edited
@@ -156,25 +160,41 @@ def assert_sevier_primary(row: dict) -> None:
 
 
 def load_source_rows(path: Path | None = None) -> list[dict[str, Any]]:
-    """Read the county endpoint manifest. Editing a block and re-running is the re-pull."""
+    """Resolve parcel endpoints from the YAML cards. The JSON file is the zoning overlay."""
+    from tn_parcel_cards import load_cards, resolve_card
+
     source_path = path or SOURCES_PATH
     payload = json.loads(source_path.read_text())
-    rows = payload.get("counties")
-    if not isinstance(rows, list) or not rows:
+    overlays = payload.get("counties")
+    if not isinstance(overlays, list) or not overlays:
         raise RuntimeError(f"{source_path} has no counties")
-    seen: set[str] = set()
-    for row in rows:
-        fips = row.get("fips")
-        if not fips or fips in seen:
+    by_overlay: dict[str, dict] = {}
+    for overlay in overlays:
+        fips = overlay.get("fips")
+        if not fips or fips in by_overlay:
             raise RuntimeError(f"Duplicate or blank FIPS in {source_path}")
-        seen.add(fips)
+        by_overlay[fips] = overlay
+    cards = load_cards()
+    card_fips = {str(card["fips"]) for card in cards}
+    missing = sorted(set(by_overlay) - card_fips)
+    if missing:
+        raise RuntimeError(f"Missing parcel cards for {', '.join(missing)}")
+    rows: list[dict[str, Any]] = []
+    for card in cards:
+        row = resolve_card(card, by_overlay.get(str(card["fips"])))
         if not row.get("queryUrl") or not row.get("mode") or not row.get("source"):
-            raise RuntimeError(f"{fips} is missing mode, source, or queryUrl")
+            raise RuntimeError(f"{row.get('fips')} is missing mode, source, or queryUrl")
+        if row.get("acreageMethod") != "geodesic":
+            raise RuntimeError(f"{row['fips']} must filter on geodesic polygon area")
         reject_source_url(row["queryUrl"])
+        sales_url = ((row.get("salesJoin") or {}).get("url")) or ""
+        if sales_url:
+            reject_source_url(sales_url)
         assert_sevier_primary(row)
         for join_url in (row.get("joins") or {}).values():
             if isinstance(join_url, str):
                 reject_source_url(join_url)
+        rows.append(row)
     return rows
 
 
@@ -963,11 +983,107 @@ def finalize_features(features: list[dict]) -> list[dict]:
     return features
 
 
+def load_card_geometry(row: dict, county: dict, markets: list[str], source: str) -> tuple[list[dict], dict]:
+    """Geometry for a card that is not OIR, Hickman, or Chester. Acreage is geodesic."""
+    from tn_parcel_cards import stamp_mapped_sale
+
+    if row.get("acreageMethod") != "geodesic":
+        raise RuntimeError(f"{row['fips']} card geometry must use geodesic area")
+    url = row["queryUrl"]
+    where = row.get("where") or "1=1"
+    fields = row.get("geometryFields") or {}
+    wanted = [
+        fields[key]
+        for key in (
+            "parcelId",
+            "parcelIdAlt",
+            "ownerName",
+            "ownerName2",
+            "situsAddress",
+            "appraiserSearchUrlPerParcel",
+        )
+        if fields.get(key)
+    ]
+    sales = row.get("salesJoin") or {}
+    if row.get("salesOnGeometry"):
+        for key in (
+            "dateField",
+            "priceField",
+            "marketField",
+            "assessedField",
+            "mail1",
+            "mailCity",
+            "mailState",
+            "mailZip",
+            "zoningField",
+        ):
+            if sales.get(key):
+                wanted.append(sales[key])
+    wanted = list(dict.fromkeys(wanted))
+    if not fields.get("parcelId"):
+        raise RuntimeError(f"{row['fips']} primary layer has no parcelId field")
+    ids = fetch_object_ids(url, where)
+    print(f"  card geometry ids {len(ids)} {where}", flush=True)
+    by_id: dict[str, dict] = {}
+    dropped = 0
+    fetched = 0
+    for page in iter_by_ids(url, ids, wanted, geometry=True, batch=40):
+        fetched += len(page)
+        for item in page:
+            attrs = item.get("attributes") or {}
+            geometry, acres, center = geometry_acres(item, url)
+            if not geometry or not center or not in_band(acres):
+                dropped += 1
+                continue
+            parcel_id = clean(attrs.get(fields.get("parcelId"))) or clean(attrs.get(fields.get("parcelIdAlt")))
+            if not parcel_id:
+                dropped += 1
+                continue
+            feature = base_feature(
+                county=county,
+                markets=markets,
+                parcel_id=parcel_id,
+                acreage=acres,
+                geometry=geometry,
+                center=center,
+                source=source,
+                owner=clean(attrs.get(fields.get("ownerName"))),
+                situs=clean(attrs.get(fields.get("situsAddress"))),
+            )
+            feature["properties"]["ownerName2"] = clean(attrs.get(fields.get("ownerName2")))
+            link = clean(attrs.get(fields.get("appraiserSearchUrlPerParcel")))
+            feature["properties"]["appraiserUrl"] = link or tpad_url(None, parcel_id)
+            feature["properties"]["_gislink"] = parcel_id
+            if row.get("salesOnGeometry"):
+                stamp_mapped_sale(
+                    feature["properties"],
+                    attrs,
+                    sales,
+                    row.get("salesVintage"),
+                    stamp_zoning=bool(row.get("stampSalesZoning")),
+                )
+            remember(by_id, feature)
+    if fetched != len(ids):
+        raise RuntimeError(f"{row['fips']} fetched {fetched} card features of {len(ids)} ids")
+    return list(by_id.values()), {
+        "sourceRows": len(ids),
+        "dropped": dropped,
+        "kept": len(by_id),
+        "salesVintage": row.get("salesVintage"),
+        "acreageMethod": "geodesic",
+    }
+
+
 def download_tn_oir(county: dict, markets: list[str], spec: dict) -> dict:
     from seed_market_parcels import county_row, write_tiles
 
     fips = county["fips"]
     row = BY_FIPS[fips]
+    if row.get("acreageMethod") != "geodesic":
+        raise RuntimeError(
+            f"{fips} has no acreage filter on geodesic polygon area "
+            f"(acreageField={row.get('acreageField')!r})"
+        )
     source = spec["source"]
     cache_path = CACHE_DIR / f"{fips}.json"
     print(f"Pulling {county['name']} County, Tennessee ({fips}) via {source}", flush=True)
@@ -988,6 +1104,8 @@ def download_tn_oir(county: dict, markets: list[str], spec: dict) -> dict:
             features, stats = load_chester(row, county, markets, source)
         elif row["mode"] == "county-hosted":
             features, stats = load_county_hosted(row, county, markets, source)
+        elif row["mode"] == "card":
+            features, stats = load_card_geometry(row, county, markets, source)
         else:
             raise RuntimeError(f"{fips} has unknown mode {row['mode']}")
         features = finalize_features(features)
@@ -1061,7 +1179,7 @@ def main() -> None:
     parser.add_argument(
         "--sources",
         default=str(SOURCES_PATH),
-        help="County endpoint manifest. Edit a block, then re-run that county with --refresh.",
+        help="Zoning-join overlay. Parcel endpoints come from data/tn-parcel-cards.",
     )
     args = parser.parse_args()
     global COUNTIES, BY_FIPS

@@ -1,0 +1,265 @@
+state: TN
+jurisdiction: Sevier County
+fips: '47155'
+level: county
+markets:
+- Knoxville
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=78)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 70,701; DEEDAC 5–150 → 6865; id GISLINK populated=True; geo PASS
+    (4/4 centroids in county, 4/4 polys touch county) (35.9049,-83.54016)→Sevier; (35.83589,-83.38275)→Sevier;
+    (35.80311,-83.32043)→Sevier (where COUNTY_ID=78). Service lastEditDate 2026-09-10 (PARCELID suffix
+    2026) — freshest public owner/geometry; no sale/value/CALC_ACRE (DEEDAC often 0 — derive geodesic
+    acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 7589
+- role: parcels
+  name: Sevierville GIS Parcel (countywide CAMA twin)
+  restUrl: https://gis.seviervilletn.org/arcgis/rest/services/DeptMaps/GIS_Department_Layers/MapServer/57
+  layerId: 57
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    ID: parcelIdDisplay
+    PARCELID: parcelIdFull
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    CALC_ACRE: acreage
+    CAMA_DEEDA: acreageDeed
+    CAMA_CALCA: acreageCama
+    DEEDAC: acreageDeedAlt
+    CALCAC: acreageCalcAlt
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    DEED_BOOK: lastSale.deedBook
+    DEED_PAGE: lastSale.deedPage
+    LANDMKTVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    ASSESSMENT: tax.assessedValue
+    USEVALUE: tax.useValue
+    ZONING: zoning
+    LANDUSE: dorCode
+    COUNTY_ID: countyId
+  notes: 'PREFERRED over bare IMPACT — City of Sevierville hosts countywide Sevier parcels with joined
+    CAMA (owner/sale/appraisal/mailing). Live count 70436; CALC_ACRE 5–150 = 7618 (2026-09-24 ET). COUNTY_ID=78
+    / GISLINK 078… prefix. Geo-verified sample ~-83.655,36.042 (Sevierville / north Sevier TN). maxRecordCount
+    10000. Prefer this over IMPACT for egress reliability. 2026-09-28 ET TN PIR re-verify: count 70,436;
+    CALC_ACRE 5–150 → 7618; id GISLINK populated=True; geo PASS (5/5 centroids in county, 5/5 polys touch
+    county) (36.03775,-83.65491)→Sevier; (35.8808,-83.49107)→Sevier; (35.79974,-83.60448)→Sevier.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: GISLINK
+  salesValueVintage: 2025
+  sourceEditDate: '2025-04-30'
+- role: parcels
+  name: TN County Parcel Map — Sevier_Parcels (Assessment join)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/15
+  layerId: 15
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Parcels_CALC_ACRE: acreage
+    Assessment_Data_78_GISLINK: parcelIdAlt
+    Assessment_Data_78_PARCELID: parcelIdFull
+    Assessment_Data_78_ADDRESS: situsAddress
+    Assessment_Data_78_CLASS: propType
+    Assessment_Data_78_DEEDAC: acreageDeed
+    Assessment_Data_78_OWNER: ownerName
+    Assessment_Data_78_OWNER2: ownerName2
+    Assessment_Data_78_LANDMKTVAL: tax.landValue
+    Assessment_Data_78_APPRAISAL: tax.marketValue
+    Assessment_Data_78_SALEDATE: lastSale.date
+    Assessment_Data_78_PRICE: lastSale.price
+    Assessment_Data_78_DEED_BOOK: lastSale.deedBook
+    Assessment_Data_78_DEED_PAGE: lastSale.deedPage
+    Assessment_Data_78_VI: lastSale.qualified
+    Assessment_Data_78_LANDUSE: dorCode
+    Assessment_Data_78_ID: parcelIdDisplay
+    County_Name: countyName
+  notes: Added 2026-09-28 ET TN PIR (anonymous CAMA-joined AGOL twin; sibling to existing county-hosted
+    primary). count 69,573; Parcels_CALC_ACRE 5–150 → 7601; id Parcels_GISLINK populated=True; geo PASS
+    (5/5 centroids in county, 5/5 polys touch county) (36.03775,-83.65491)→Sevier; (35.87521,-83.54592)→Sevier;
+    (35.80183,-83.32116)→Sevier. Service data vintage lastEditDate 2023-11-22 — owner/sale/value may lag
+    TPAD; pair with OIR 2026 fabric for current owner.
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sibling-fallback (2023 sale/value, not primary for this county)
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: IMPACT Parcels (COUNTY_ID=78) — geometry sibling / fallback
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    PARCELWP: parcelIdDisplay
+    CALC_ACRE: acreage
+    PARCEL_TYPE: parcelType
+    COUNTY_ID: countyId
+  notes: 'Filter COUNTY_ID=78 AND PARCEL_TYPE=1. Live type1=69328; 5–150 type1=7514 (2026-09-24). Egress-sensitive.
+    Prefer Sevierville layer 57 when available. 2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP 403 from box
+    — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes (JUR=078)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    ID: parcelIdDisplay
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    CALC_ACRE: acreage
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    ZONING: zoning
+    LANDUSE: dorCode
+    TAXYR: taxYear
+  notes: 'Filter JUR=''078''; COUNTY=SEVIER verified (sample GISLINK 078094C E 00601 TAXYR=2026). Secondary
+    to Sevierville layer 57. Query-only. 2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP 403 from box — not
+    verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: zoning
+  name: SevierCountyZoning (countywide)
+  restUrl: https://gis.seviervilletn.org/arcgis/rest/services/DeptMaps/SevierCountyZoning/MapServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    Zoning: zoning
+    GISLINK: parcelId
+  notes: 'Parcel-keyed zoning polygons (GISLINK + Zoning); live count 53407 (2026-09-24 ET). Codes: A-1,
+    C-1, C-2, I-1, PARK, R-1, R-2, R2-M. Samples GISLINK 078004… Prefer join on GISLINK to parcels. Hosted
+    by Sevierville GIS. maxRecordCount 1000 — paginate.'
+  status: usable
+  auth: none
+  geometry: polygon
+- role: zoning
+  name: Sevierville City Zoning
+  restUrl: https://gis.seviervilletn.org/arcgis/rest/services/DeptMaps/GIS_Department_Layers/MapServer/205
+  layerId: 205
+  acreageField: null
+  coverage: city-only
+  fieldMap:
+    ZONE_: zoning
+    ProposedZoneAbrev: zoningProposed
+    ProposedZoneName: zoningLabel
+    ZoningOrdinance: zoningOrdinance
+    PARCEL_ID: parcelId
+  notes: City of Sevierville only (~233 polys). Prefer ProposedZoneAbrev / ZONE_ after city-limits resolve.
+    Do not apply citywide outside Sevierville.
+  status: usable
+  auth: none
+  geometry: polygon
+- role: flu
+  name: null — no public FLU FeatureServer found
+  restUrl: null
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: unknown
+  fieldMap: {}
+  notes: No adopted countywide FLU FeatureServer found 2026-09-24. Urban_Growth_Boundary MapServer exists
+    on Sevierville GIS — growth context only, not FLU entitlement.
+  status: gap
+gaps:
+- FLU REST gap (UGB is growth context only)
+- Pigeon Forge / Gatlinburg / Pittman Center city zoning REST not separately verified — QA city limits
+- IMPACT egress-sensitive (prefer Sevierville layer 57)
+- Reject Utah Sevier County Parcels (AGRC) — wrong state
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: Sevier County / City of Sevierville GIS / IMPACT-TPAD public records; attribution required.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+publicGisUrl: https://sevier-county-gis-public-sc-gis.hub.arcgis.com/
+jurisdictionGisUrl: https://sevier-county-gis-public-sc-gis.hub.arcgis.com/
+zoningOverall: partial
+packagingNote: >-
+  Full-suite dig 2026-09-24 Wave1B retry. PREFERRED Sevierville MapServer/57 CAMA twin over bare IMPACT.
+  TRANCHE-3 tax/sale/owner on layer 57 + Themes; county zoning SevierCountyZoning; city zoning layer 205.
+  appraiserSearchUrl TPAD {GISLINK}; publicGisUrl = Sevier County GIS Hub. Skip utilities + AADT. RURAL-OZ
+  PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added TNCPM,OIR. LSB-approved parcel setup
+  applied 2026-09-28 (see parcelSetup).
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=78
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://gis.seviervilletn.org/arcgis/rest/services/DeptMaps/GIS_Department_Layers/MapServer/57
+  joinKey: OIR.GISLINK = GISLINK
+  salesValueVintage: 2025
+  salesValueSourceEditDate: '2025-04-30'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 7589
+  gislinkJoinSample: 10/10 (100%)
+  exception: 'Sevierville GIS countywide CAMA: max SALEDATE 2025-04-28, max LASTUPDATE 2025-04-30.'

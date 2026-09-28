@@ -1,11 +1,10 @@
 """Per-county joins from the Tennessee research cards.
 
-Geometry and owner stay on the OIR layer, except Hickman, Chester, and
-Sevier. Sevier geometry and CAMA come from the county-hosted layer. This
-module adds sale, mailing, zoning, and future-land-use layers that are
-not already on that geometry source. Join URLs are read from
-data/tn-rural-parcel-sources.json when the county block sets them.
-AADT is not joined here.
+Geometry and owner come from the layer whose use is primary-geometry-owner
+(or the combined CaptureCAMA use). Sale and value come from sales-value-join
+unless parcelSetup names the same layer. This module adds sale, mailing,
+zoning, and future-land-use layers that are not already on that geometry
+source. AADT is not joined here.
 """
 
 from __future__ import annotations
@@ -696,17 +695,74 @@ def join_sevier_cama(features: list[dict], row: dict) -> dict:
     }
 
 
+def join_mapped_sales(features: list[dict], row: dict) -> dict:
+    """Sale and value for a later card whose sales layer is not TN_County_Parcel_Map."""
+    from tn_parcel_cards import sales_join_kind, stamp_mapped_sale
+
+    if sales_join_kind(row) != "mapped":
+        return {}
+    spec = row.get("salesJoin") or {}
+    url = spec.get("url") or ""
+    if not url:
+        raise RuntimeError(f"{row.get('fips')} sales join URL is missing")
+    print(f"  card sale/value join {url}", flush=True)
+    fields = [
+        spec.get("dateField"),
+        spec.get("priceField"),
+        spec.get("marketField"),
+        spec.get("assessedField"),
+        spec.get("mail1"),
+        spec.get("mailCity"),
+        spec.get("mailState"),
+        spec.get("mailZip"),
+        spec.get("zoningField"),
+    ]
+    index = attribute_index(url, spec.get("idField") or "GISLINK", [name for name in fields if name])
+    vintage = row.get("salesVintage")
+    matched = sales = values = assessed_count = mailed = zoned = 0
+    for feature in features:
+        attrs = match_attrs(feature, index)
+        if not attrs:
+            continue
+        matched += 1
+        stamped = stamp_mapped_sale(
+            feature["properties"],
+            attrs,
+            spec,
+            vintage,
+            stamp_zoning=bool(row.get("stampSalesZoning")),
+        )
+        sales += int(stamped["sale"])
+        values += int(stamped["value"])
+        assessed_count += int(stamped["assessed"])
+        mailed += int(stamped["mail"])
+        zoned += int(stamped["zoning"])
+    return {
+        "cardSalesMatched": matched,
+        "saleCount": sales,
+        "appraisalCount": values,
+        "assessedCount": assessed_count,
+        "cardMailCount": mailed,
+        "cardZoningCount": zoned,
+        "gislinkMatchRate": round(matched / len(features), 4) if features else None,
+        "salesVintage": vintage,
+    }
+
+
 def apply_card_details(features: list[dict], row: dict) -> dict:
     """Mutate features with card-specific sale, mailing, zoning, and FLU."""
+    from tn_parcel_cards import sales_join_kind
+
     notes: list[str] = []
     stats: dict = {}
     fips = row["fips"]
-    if fips == "47155":
+    kind = sales_join_kind(row)
+    if kind == "sevier-cama":
         try:
             stats.update(join_sevier_cama(features, row))
         except Exception as exc:  # noqa: BLE001
             notes.append(f"Sevier county CAMA join failed ({exc}). Sale and value were not invented.")
-    if fips == "47133":
+    if kind == "overton-ucdd":
         try:
             stats.update(join_overton(features, row))
         except Exception as exc:  # noqa: BLE001
@@ -715,14 +771,24 @@ def apply_card_details(features: list[dict], row: dict) -> dict:
             notes.append(
                 "Overton has no countywide zoning FeatureServer. A non-blank ZONING value on the UCDD roll is kept. Future land use stays empty."
             )
+    if kind == "mapped":
+        try:
+            stats.update(join_mapped_sales(features, row))
+        except Exception as exc:  # noqa: BLE001
+            notes.append(f"Card sale/value join failed ({exc}). Sale and value were not invented.")
     if fips in {"47001", "47015", "47043", "47147", "47155", "47189"}:
         try:
             stats.update(join_zoning(features, row, notes))
         except Exception as exc:  # noqa: BLE001
             notes.append(f"Zoning join failed ({exc}). Zoning was not invented.")
     elif fips not in {"47023", "47133"}:
-        notes.append(
-            "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
-        )
+        if row.get("hasUsableZoning"):
+            notes.append(
+                "The research card lists a usable zoning layer. This ingest does not stamp that layer yet, so zoning stays empty."
+            )
+        else:
+            notes.append(
+                "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
+            )
     stats["gapNotes"] = notes
     return stats

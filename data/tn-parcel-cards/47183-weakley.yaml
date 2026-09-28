@@ -1,0 +1,195 @@
+state: TN
+jurisdiction: Weakley County
+fips: '47183'
+level: county
+markets: []
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=92)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 20,191; DEEDAC 5–150 → 1809; id GISLINK populated=True; geo PASS
+    (5/5 centroids in county, 5/5 polys touch county) (36.50138,-88.81952)→Weakley; (36.36382,-88.6436)→Weakley;
+    (36.27947,-88.94435)→Weakley (where COUNTY_ID=92). Service lastEditDate 2026-09-10 (PARCELID suffix
+    2026) — freshest public owner/geometry; no sale/value/CALC_ACRE (DEEDAC often 0 — derive geodesic
+    acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 6386
+- role: parcels
+  name: TN County Parcel Map — Weakley_Parcels (Assessment_Data_92 join)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/2
+  layerId: 2
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Parcels_GISLINK2: parcelIdAlt
+    Assessment_Data_92_GISLINK: parcelIdJoin
+    Assessment_Data_92_ID: parcelIdDisplay
+    Assessment_Data_92_PARCELID: parcelIdFull
+    Assessment_Data_92_OWNER: ownerName
+    Assessment_Data_92_OWNER2: ownerName2
+    Assessment_Data_92_ADDRESS: situsAddress
+    Parcels_CALC_ACRE: acreage
+    Assessment_Data_92_DEEDAC: acreageDeed
+    Assessment_Data_92_LANDMKTVAL: tax.landValue
+    Assessment_Data_92_APPRAISAL: tax.marketValue
+    Assessment_Data_92_SALEDATE: lastSale.date
+    Assessment_Data_92_PRICE: lastSale.price
+    Assessment_Data_92_VI: lastSale.qualified
+    Assessment_Data_92_DEED_BOOK: lastSale.deedBook
+    Assessment_Data_92_DEED_PAGE: lastSale.deedPage
+    Assessment_Data_92_CLASS: propType
+    Assessment_Data_92_DISTRICT: taxDistrict
+    County_Name: countyName
+    Assessment_Data_92_LANDUSE: dorCode
+  notes: 'Preferred CAMA/AGOL over bare IMPACT (maps.cot.tn.gov often 403 from datacenter egress). Live
+    2026-09-24 ET: 20,025 polys; CALC_ACRE 5–150 → 6,351. Geo-verify PASS — sample centroids (36.50211,
+    -88.82678) / (36.5022, -88.82191) WGS84 (Weakley / Dresden TN). GISLINK/JUR prefix 092. Owner / sale
+    / land market / appraisal on join. Skip WATER/SEWER/ELEC/GAS. No IMPVAL/mailing on this extract. OZ
+    2.0: join national Opportunity Zone 2.0 / rural-eligible tracts by centroid. publicGisUrl: https://tnmap.tn.gov/Assessment/.
+    2026-09-28 ET TN PIR re-verify: count 20,025; Parcels_CALC_ACRE 5–150 → 6351; id Parcels_GISLINK populated=True;
+    geo PASS (5/5 centroids in county, 5/5 polys touch county) (36.50033,-88.82494)→Weakley; (36.358,-88.53709)→Weakley;
+    (36.24494,-88.57799)→Weakley.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: Parcels_GISLINK
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: IMPACT Parcels (COUNTY_ID=92) — egress-sensitive sibling
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+  notes: 'Filter COUNTY_ID=92 AND PARCEL_TYPE=1. Egress-sensitive (403 common). Geo-identity confirmed
+    via AGOL twin — sibling OK when reachable. 2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP 403 from box
+    — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes sibling (JUR=092)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    CALC_ACRE: acreage
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    LANDUSE: dorCode
+    ZONING: zoning
+    TAXYR: taxYear
+  notes: 'Filter JUR=''092''; prefer latest TAXYR. Query-only. Prefer AGOL Weakley_Parcels when Themes
+    403. 2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: zoning
+  name: null — no public countywide zoning FeatureServer found
+  restUrl: null
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: unknown
+  fieldMap: {}
+  notes: No Weakley County countywide zoning FeatureServer found 2026-09-24.
+  status: gap
+- role: flu
+  name: null — no public FLU FeatureServer found
+  restUrl: null
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: unknown
+  fieldMap: {}
+  notes: Adopted countywide FLU FeatureServer not found 2026-09-24.
+  status: gap
+gaps:
+- No public countywide zoning FeatureServer found
+- Adopted FLU FeatureServer not found (honest gap)
+- IMPACT Themes live query often 403 from datacenter egress
+- AGOL Assessment_Data_92 vintage may lag current TPAD tax year
+- No IMPVAL / mailing / ASSESSMENT on this AGOL extract (use Themes when reachable)
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: Comptroller IMPACT-TPAD / AGOL TN County Parcel Map republish — attribution required. No paid
+  GIS purchase channel.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+publicGisUrl: https://tnmap.tn.gov/Assessment/
+jurisdictionGisUrl: https://tnmap.tn.gov/Assessment/
+zoningOverall: gap
+packagingNote: >-
+  Digged 2026-09-24 ET full-suite TRANCHE-3; prefer AGOL joined parcels over bare IMPACT; geo-verify PASS;
+  skip utilities/AADT. RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added OIR. LSB-approved
+  parcel setup applied 2026-09-28 (see parcelSetup).
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=92
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/2
+  joinKey: OIR.GISLINK = Parcels_GISLINK
+  salesValueVintage: 2023
+  salesValueSourceEditDate: '2023-11-22'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 6386
+  gislinkJoinSample: 9/10 (90%); misses ['092127    00503']

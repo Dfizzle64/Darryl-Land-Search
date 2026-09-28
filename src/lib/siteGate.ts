@@ -1,7 +1,7 @@
-/** httpOnly session cookie. The value is an HMAC, never SITE_PASSWORD. */
+/** httpOnly session cookie. The value is an HMAC of the password hash. */
 export const SITE_AUTH_COOKIE = "site_auth";
 
-/** 30 days. Changing SITE_PASSWORD changes the HMAC, so old cookies stop matching. */
+/** 30 days. A new password hash invalidates old cookies. */
 export const SITE_AUTH_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
 export function siteAuthCookieOptions() {

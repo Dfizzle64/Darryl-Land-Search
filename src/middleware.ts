@@ -1,10 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { gateRequest, sitePassword } from "./lib/siteAuth";
+import { gateRequest } from "./lib/siteAuth";
 import { SITE_AUTH_COOKIE } from "./lib/siteGate";
 
 /**
- * Site-wide password gate. Node.js runtime so SITE_PASSWORD is read on each
- * request (Edge middleware would not reliably see a non-public env var).
+ * Site-wide password gate. Node.js runtime so an optional SITE_PASSWORD
+ * override is read on each request. The built-in hash works when it is unset.
  */
 export function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
@@ -12,7 +12,6 @@ export function middleware(request: NextRequest) {
     pathname,
     search,
     cookie: request.cookies.get(SITE_AUTH_COOKIE)?.value,
-    password: sitePassword(),
   });
 
   if (decision.action === "allow") return NextResponse.next();

@@ -15,6 +15,7 @@ from collections import defaultdict
 from parcel_geometry import esri_rings_to_geojson, point_in_geometry
 
 from tn_oir_parcels import (
+    acceptable_sale_date,
     clean,
     fetch_object_ids,
     gis_keys,
@@ -253,7 +254,7 @@ def join_overton(features: list[dict], row: dict) -> dict:
         matched += 1
         props = feature["properties"]
         vintage = str(row.get("salesVintage") or "2023")
-        sold = slash_date_to_iso(attrs.get("SALEDATE"))
+        sold = acceptable_sale_date(slash_date_to_iso(attrs.get("SALEDATE")))
         price = num(attrs.get("PRICE"))
         if price is not None and price <= 0:
             price = None
@@ -650,7 +651,7 @@ def join_sevier_cama(features: list[dict], row: dict) -> dict:
             continue
         matched += 1
         props = feature["properties"]
-        sold = epoch_to_iso(attr_get(attrs, date_field))
+        sold = acceptable_sale_date(epoch_to_iso(attr_get(attrs, date_field)))
         price = num(attr_get(attrs, price_field))
         if price is not None and price <= 0:
             price = None

@@ -17,13 +17,16 @@ the Tennessee OIR layer Tennessee Property Boundaries Public Use (edited
 TN_County_Parcel_Map (edited 2023-11-22) on GISLINK and labeled 2023.
 Acreage is polygon area because DEEDAC is often 0.
 
-Hickman uses the May 2023 CaptureCAMA snapshot. Chester uses the county
-CaptureCAMA Parcels_12 layer: the parcel id is the CAMA GISLINK, then the
-map id, and rows with neither id are dropped. Chester has no vintage
-label. Sevier geometry and owner stay on OIR. Sevier sale and value come
-from the Sevierville countywide CAMA and are labeled 2025. Overton sale
-and value come from UCDD Overton_Parcels and are labeled 2023. Acreage
-for every county is geodesic polygon area.
+Hickman uses the May 2023 CaptureCAMA snapshot and labels value 2020.
+Chester uses the county CaptureCAMA Parcels_12 layer: the parcel id is
+the CAMA GISLINK, then the map id, and rows with neither id are dropped.
+Chester has no public sale field, so sale data stays empty, and value is
+labeled 2026. Sevier geometry and owner stay on OIR. Sevier sale and
+value come from the Sevierville countywide CAMA and are labeled 2025.
+Overton sale and value come from UCDD Overton_Parcels and are labeled
+2019. Wilson sale and value fields are the uppercase ASSESSMENT_DATA_95
+names. Acreage for every county is geodesic polygon area. A sale date
+later than the pull date is dropped. The TPAD link is not fetched.
 
 Bedford County, Pennsylvania, Utah Sevier County, and paid parcel vendors
 are rejected. Opportunity Zone status is not set.
@@ -67,6 +70,8 @@ CHESTER_QUERY = (
 )
 CHESTER_PORTAL = "https://chester.capturecama.com/CAMA/CAPortal/CZ_MainPage.aspx"
 HICKMAN_PORTAL = "https://hickman.capturecama.com/CAMA/CAPortal/CZ_MainPage.aspx"
+# Browsers open this card. Server and datacenter fetches get 403, so ingest,
+# tests, and the build must not request it.
 TPAD_PREFIX = "https://assessment.cot.tn.gov/TPAD/Parcel/GIS?gislink="
 
 OIR_FIELDS = [
@@ -113,7 +118,6 @@ CHESTER_FIELDS = [
     "GPDATA__30",
     "GPDATA__26",
     "GPDATA__AP",
-    "GPDATA__LA",
     "GPDATA__27",
 ]
 
@@ -233,7 +237,7 @@ def positive(value: Any) -> float | None:
 
 
 def yymmdd_to_iso(value: Any) -> str | None:
-    """CaptureCAMA GPDATA__LA is YYMMDD. Two-digit years 70–99 are 19xx."""
+    """Some CaptureCAMA dates are YYMMDD. Two-digit years 70–99 are 19xx."""
     text = clean(value)
     if not text or not text.isdigit():
         return None
@@ -298,7 +302,25 @@ def chester_parcel_id(attrs: dict[str, Any]) -> tuple[str | None, str]:
     return None, "neither"
 
 
+def acceptable_sale_date(value: str | None, *, today: Any = None) -> str | None:
+    """Drop blank dates and junk years after the pull date, such as 2325."""
+    from datetime import date
+
+    text = clean(value)
+    if not text:
+        return None
+    try:
+        parsed = date.fromisoformat(text[:10])
+    except ValueError:
+        return None
+    current = today or date.today()
+    if parsed > current:
+        return None
+    return parsed.isoformat()
+
+
 def tpad_url(explicit: Any, gislink: Any) -> str | None:
+    """Store the TPAD card link. Do not fetch it; datacenters receive 403."""
     link = clean(explicit)
     if link and link.lower().startswith("http"):
         reject_source_url(link)
@@ -467,7 +489,7 @@ def oir_gaps(row: dict) -> list[str]:
         )
     if row["fips"] == "47133":
         notes[1] = (
-            "Overton is not a layer on TN_County_Parcel_Map. Sale date, sale price, appraisal, and mailing are joined from UCDD Overton_Parcels on GISLINK. That service was edited 2023-03-24, so those fields are labeled 2023. Owner and geometry stay on the 2026 OIR layer. An unmatched GISLINK is left without sale or value."
+            "Overton is not a layer on TN_County_Parcel_Map. Sale date, sale price, appraisal, and mailing are joined from UCDD Overton_Parcels on GISLINK. The latest tax year on that roll is 2019, so those fields are labeled 2019. Owner and geometry stay on the 2026 OIR layer. An unmatched GISLINK is left without sale or value."
         )
     if row["fips"] == "47155":
         notes[1] = (
@@ -488,7 +510,7 @@ def sevier_gaps() -> list[str]:
 def hickman_gaps() -> list[str]:
     return [
         "Hickman is not in the OIR statewide layer or TN_County_Parcel_Map. The only public polygon source used here is the CaptureCAMA snapshot HickmanTN05182023 (May 18, 2023).",
-        "Acreage is the geodesic area of the polygon, from 5.0 through 150.0 inclusive. Owner and situs street come from that snapshot. CITY, STATE, and ZIP are the mailing city, not the situs city. APRVAL is market value and ASMT is assessed value, labeled 2023 because the snapshot is HickmanTN05182023. TAXYR on this layer is not a year. There is no sale date or sale price.",
+        "Acreage is the geodesic area of the polygon, from 5.0 through 150.0 inclusive. Owner and situs street come from that snapshot. CITY, STATE, and ZIP are the mailing city, not the situs city. APRVAL is market value and ASMT is assessed value, labeled 2020. TAXYR on this layer is not a year. There is no sale date or sale price.",
         "Hickman is outside Comptroller TPAD. The property-record link is the CaptureCAMA citizen portal, not a TPAD GIS card. The research card has no zoning or future-land-use FeatureServer. Opportunity Zone status was not inferred. Regrid was not used.",
     ]
 
@@ -497,7 +519,7 @@ def chester_gaps() -> list[str]:
     return [
         "Chester is not in the OIR statewide layer. Geometry and CAMA attributes are the public Chester County, Tennessee CaptureCAMA Parcels_12 layer (ChesterTN/ChesterCapture). Chester County, Pennsylvania (chesco.org and PASDA) was not used.",
         "Acreage is the geodesic area of the polygon, from 5.0 through 150.0 inclusive. The parcel id is GPDATA__GI, falling back to the map id L15Parce_2. Rows with neither id are dropped.",
-        "GPDATA__30 is market value and GPDATA__26 is assessed value. This layer has no salesValueVintage, so the popup does not stamp a year on sale or value. GPDATA__LA is a YYMMDD sale date. Sale price is not on this layer. GPDATA__CI is the mailing city, not the situs city. There is no confirmed parcel deep link, so the link is the CaptureCAMA citizen portal. Opportunity Zone status was not inferred. Regrid was not used.",
+        "GPDATA__30 is market value and GPDATA__26 is assessed value, labeled 2026. This layer has no public sale date or sale price, so sale data stays empty. GPDATA__LA is the record's last-updated date and is not a sale. GPDATA__CI is the mailing city, not the situs city. There is no confirmed parcel deep link, so the link is the CaptureCAMA citizen portal. Opportunity Zone status was not inferred. Regrid was not used.",
     ]
 
 
@@ -635,30 +657,41 @@ def load_oir(row: dict, county: dict, markets: list[str], source: str) -> tuple[
     return list(by_id.values()), stats
 
 
-def tncpm_field_map(layer_id: int) -> dict[str, str]:
+def tncpm_field_map(layer_id: int, explicit: dict | None = None) -> dict[str, str]:
     meta = get_json(f"{TNCPM_ROOT}/{layer_id}?f=json")
     # Layer metadata is a GET-style document; post_json still works for f=json.
     names = [field["name"] for field in meta.get("fields") or []]
     if not names:
         raise RuntimeError(f"TN_County_Parcel_Map layer {layer_id} returned no fields")
+    requested = explicit or {}
 
-    def pick(suffix: str) -> str | None:
+    def resolve(wanted: str, suffix: str) -> str:
+        if wanted:
+            exact = next((name for name in names if name == wanted), None)
+            if exact:
+                return exact
+            folded = next((name for name in names if name.upper() == wanted.upper()), None)
+            if folded:
+                return folded
+            raise RuntimeError(f"TN_County_Parcel_Map layer {layer_id} has no field {wanted}")
         hits = [name for name in names if name.upper().endswith(suffix) and "ASSESSMENT_DATA" in name.upper()]
-        return hits[0] if hits else None
+        return hits[0] if hits else ""
 
-    gis = next((name for name in names if name.upper() == "PARCELS_GISLINK"), None)
+    gis = resolve(requested.get("gis") or "", "") if requested.get("gis") else next(
+        (name for name in names if name.upper() == "PARCELS_GISLINK"), None
+    )
     if not gis:
         raise RuntimeError(f"TN_County_Parcel_Map layer {layer_id} has no Parcels_GISLINK")
     return {
         "gis": gis,
-        "price": pick("_PRICE") or "",
-        "date": pick("_SALEDATE") or "",
-        "value": pick("_APPRAISAL") or "",
+        "price": resolve(requested.get("price") or "", "_PRICE"),
+        "date": resolve(requested.get("date") or "", "_SALEDATE"),
+        "value": resolve(requested.get("value") or "", "_APPRAISAL"),
     }
 
 
-def load_tncpm(layer_id: int) -> tuple[dict[str, dict], dict[str, str]]:
-    fields_map = tncpm_field_map(layer_id)
+def load_tncpm(layer_id: int, explicit: dict | None = None) -> tuple[dict[str, dict], dict[str, str]]:
+    fields_map = tncpm_field_map(layer_id, explicit)
     fields = [name for name in (fields_map["gis"], fields_map["price"], fields_map["date"], fields_map["value"]) if name]
     url = f"{TNCPM_ROOT}/{layer_id}/query"
     ids = fetch_object_ids(url, "1=1")
@@ -679,7 +712,12 @@ def load_tncpm(layer_id: int) -> tuple[dict[str, dict], dict[str, str]]:
     return index, fields_map
 
 
-def apply_2023_join(features: list[dict], layer_id: int | None, vintage: str = VINTAGE_2023) -> dict:
+def apply_2023_join(
+    features: list[dict],
+    layer_id: int | None,
+    vintage: str = VINTAGE_2023,
+    explicit_fields: dict | None = None,
+) -> dict:
     from seed_market_parcels import epoch_to_iso
 
     matched = 0
@@ -689,7 +727,7 @@ def apply_2023_join(features: list[dict], layer_id: int | None, vintage: str = V
         for feature in features:
             feature["properties"].pop("_gislink", None)
         return {"tncpmLayer": None, "tncpmMatched": 0, "saleCount": 0, "appraisalCount": 0, "gislinkMatchRate": None}
-    index, _fields = load_tncpm(layer_id)
+    index, _fields = load_tncpm(layer_id, explicit_fields)
     for feature in features:
         props = feature["properties"]
         gislink = props.pop("_gislink", None)
@@ -702,7 +740,7 @@ def apply_2023_join(features: list[dict], layer_id: int | None, vintage: str = V
             continue
         matched += 1
         price = row["price"] if row["price"] is not None and row["price"] > 0 else None
-        sold = epoch_to_iso(row["date"])
+        sold = acceptable_sale_date(epoch_to_iso(row["date"]))
         appraisal = row["value"] if row["value"] is not None and row["value"] > 0 else None
         if price is not None or sold is not None:
             props["lastSale"] = {"date": sold, "price": price, "qualified": None, "vintage": vintage}
@@ -795,7 +833,7 @@ def load_county_hosted(row: dict, county: dict, markets: list[str], source: str)
             props = feature["properties"]
             props["ownerName2"] = clean(attrs.get(fields_map.get("owner2") or ""))
             props["appraiserUrl"] = tpad_url(None, parcel_id)
-            sold = epoch_to_iso(attrs.get(fields_map["saleDate"]))
+            sold = acceptable_sale_date(epoch_to_iso(attrs.get(fields_map["saleDate"])))
             price = positive(attrs.get(fields_map["salePrice"]))
             if sold is not None or price is not None:
                 props["lastSale"] = {"date": sold, "price": price, "qualified": None}
@@ -900,6 +938,7 @@ def load_chester(row: dict, county: dict, markets: list[str], source: str) -> tu
     url = row["queryUrl"]
     where = row.get("where") or "1=1"
     portal = row.get("portal") or CHESTER_PORTAL
+    vintage = row.get("salesVintage")
     ids = fetch_object_ids(url, where)
     print(f"  Chester ids {len(ids)}", flush=True)
     by_id: dict[str, dict] = {}
@@ -946,9 +985,11 @@ def load_chester(row: dict, county: dict, markets: list[str], source: str) -> tu
                 feature["properties"]["tax"]["marketValue"] = appraisal
             if assessed is not None and assessed > 0:
                 feature["properties"]["tax"]["assessedValue"] = assessed
-            sold = yymmdd_to_iso(attrs.get("GPDATA__LA"))
-            if sold:
-                feature["properties"]["lastSale"] = {"date": sold, "price": None, "qualified": None}
+            if vintage and (
+                feature["properties"]["tax"].get("marketValue") is not None
+                or feature["properties"]["tax"].get("assessedValue") is not None
+            ):
+                feature["properties"]["tax"]["vintage"] = str(vintage)
             if kind == "map":
                 used_map += 1
             else:
@@ -963,7 +1004,7 @@ def load_chester(row: dict, county: dict, markets: list[str], source: str) -> tu
         "droppedGeometryOrBand": outside,
         "usedCamaGislink": used_gis,
         "usedMapId": used_map,
-        "salesVintage": None,
+        "salesVintage": str(vintage) if vintage else None,
         "kept": len(by_id),
     }
 
@@ -1097,7 +1138,14 @@ def download_tn_oir(county: dict, markets: list[str], spec: dict) -> dict:
     else:
         if row["mode"] == "oir":
             features, stats = load_oir(row, county, markets, source)
-            stats.update(apply_2023_join(features, row.get("tncpmLayer"), str(row.get("salesVintage") or VINTAGE_2023)))
+            stats.update(
+                apply_2023_join(
+                    features,
+                    row.get("tncpmLayer"),
+                    str(row.get("salesVintage") or VINTAGE_2023),
+                    row.get("tncpmFields"),
+                )
+            )
         elif row["mode"] == "hickman":
             features, stats = load_hickman(row, county, markets, source)
         elif row["mode"] == "chester":

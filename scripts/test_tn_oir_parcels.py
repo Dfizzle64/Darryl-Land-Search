@@ -9,7 +9,19 @@ import json
 from copy import deepcopy
 
 from parcel_geometry import esri_rings_to_geojson
-from tn_oir_parcels import BY_FIPS, ROOT, chester_parcel_id, in_band, positive, reject_source_url, slash_date_to_iso, yymmdd_to_iso
+from datetime import date
+
+from tn_oir_parcels import (
+    BY_FIPS,
+    ROOT,
+    acceptable_sale_date,
+    chester_parcel_id,
+    in_band,
+    positive,
+    reject_source_url,
+    slash_date_to_iso,
+    yymmdd_to_iso,
+)
 from tn_parcel_cards import (
     card_sale_date,
     load_cards,
@@ -57,8 +69,15 @@ class TnOirParcelTests(unittest.TestCase):
         self.assertEqual(sevier["salesVintage"], "2025")
         self.assertIn("GIS_Department_Layers/MapServer/57", sevier["salesJoin"]["url"])
         self.assertIsNone(sevier["tncpmLayer"])
-        self.assertEqual(BY_FIPS["47133"]["salesVintage"], "2023")
-        self.assertIsNone(BY_FIPS["47023"]["salesVintage"])
+        self.assertEqual(BY_FIPS["47133"]["salesVintage"], "2019")
+        self.assertEqual(BY_FIPS["47023"]["salesVintage"], "2026")
+        self.assertEqual(BY_FIPS["47081"]["salesVintage"], "2020")
+        self.assertEqual(BY_FIPS["47189"]["tncpmFields"]["date"], "ASSESSMENT_DATA_95_SALEDATE")
+        self.assertEqual(BY_FIPS["47189"]["tncpmFields"]["price"], "ASSESSMENT_DATA_95_PRICE")
+        self.assertEqual(BY_FIPS["47189"]["tncpmFields"]["value"], "ASSESSMENT_DATA_95_APPRAISAL")
+        self.assertNotEqual(BY_FIPS["47189"]["tncpmFields"]["date"], BY_FIPS["47189"]["tncpmFields"]["date"].lower())
+        self.assertIsNone(BY_FIPS["47023"]["geometryFields"].get("lastSale.date"))
+        self.assertEqual(BY_FIPS["47023"]["geometryFields"].get("recordUpdated"), "GPDATA__LA")
         self.assertEqual(BY_FIPS["47111"]["where"], "COUNTY_ID=56")
         macon = BY_FIPS["47111"]
         self.assertEqual(macon["mode"], "oir")
@@ -175,6 +194,17 @@ class TnOirParcelTests(unittest.TestCase):
         self.assertEqual(card_sale_date("3/4/2020"), "2020-03-04")
         self.assertEqual(card_sale_date("220315"), "2022-03-15")
         self.assertEqual(card_sale_date(1_640_995_200_000), "2022-01-01")
+        today = date(2026, 9, 28)
+        self.assertIsNone(acceptable_sale_date("2325-06-01", today=today))
+        self.assertIsNone(acceptable_sale_date("2026-09-29", today=today))
+        self.assertEqual(acceptable_sale_date("2026-09-28", today=today), "2026-09-28")
+        self.assertEqual(acceptable_sale_date("2019-10-08", today=today), "2019-10-08")
+        loader = (ROOT / "scripts" / "tn_oir_parcels.py").read_text()
+        self.assertIn("must not request it", loader)
+        self.assertNotIn("urlopen(TPAD_PREFIX", loader)
+        tests = "\n".join(path.read_text() for path in (ROOT / "src" / "test").glob("*.ts"))
+        self.assertNotIn('fetch("https://assessment.cot.tn.gov', tests)
+        self.assertNotIn("fetch('https://assessment.cot.tn.gov", tests)
         props = {"tax": {}}
         stamped = stamp_mapped_sale(
             props,

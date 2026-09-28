@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rerun": "python3 scripts/tn_oir_parcels.py --county <Name-or-FIPS> --refresh",
-  "rule": "Parcel endpoints are resolved from data/tn-parcel-cards by use and parcelSetup, not by the first parcels layer. OIR 2026 geometry and owner, geodesic polygon acres, sale and value joined on GISLINK. TN_County_Parcel_Map is stamped 2023. Sevier sale/value is the Sevierville county CAMA stamped 2025. Overton sale/value is UCDD Overton_Parcels stamped 2023. Hickman and Chester stay on CaptureCAMA. Chester salesValueVintage is null. Unmatched GISLINKs stay without sale or value. This file keeps zoning join URLs and source ids.",
+  "rule": "Parcel endpoints are resolved from data/tn-parcel-cards by use and parcelSetup, not by the first parcels layer. OIR 2026 geometry and owner, geodesic polygon acres, sale and value joined on GISLINK. TN_County_Parcel_Map is stamped 2023, except Wilson which uses the uppercase ASSESSMENT_DATA_95 sale and value fields. Sevier sale/value is the Sevierville county CAMA stamped 2025. Overton sale/value is UCDD Overton_Parcels stamped 2019. Hickman CaptureCAMA is stamped 2020. Chester CaptureCAMA values are stamped 2026 and sale data stays empty. Sale dates after the pull date are dropped. Unmatched GISLINKs stay without sale or value. This file keeps zoning join URLs and source ids.",
   "counties": [
     {
       "fips": "47111",
@@ -128,7 +128,7 @@
       "queryUrl": "https://maps.capturecama.com/arcgis/rest/services/Hickman/HickmanTN05182023/MapServer/9/query",
       "where": "1=1",
       "portal": "https://hickman.capturecama.com/CAMA/CAPortal/CZ_MainPage.aspx",
-      "salesVintage": "2023"
+      "salesVintage": "2020"
     },
     {
       "fips": "47023",
@@ -138,7 +138,7 @@
       "queryUrl": "https://gis.capturecama.com/arcgis/rest/services/ChesterTN/ChesterCapture/MapServer/7/query",
       "where": "1=1",
       "portal": "https://chester.capturecama.com/CAMA/CAPortal/CZ_MainPage.aspx",
-      "salesVintage": null
+      "salesVintage": "2026"
     },
     {
       "fips": "47003",
@@ -192,7 +192,7 @@
         "cama": "https://services1.arcgis.com/EMZFDxQzNQloLbAf/arcgis/rest/services/Overton_Parcels/FeatureServer/0/query"
       },
       "countyId": 67,
-      "salesVintage": "2023"
+      "salesVintage": "2019"
     },
     {
       "fips": "47155",

@@ -266,6 +266,13 @@ def resolve_card(card: dict, overlay: dict | None = None) -> dict[str, Any]:
     if overlay and isinstance(overlay.get("joins"), dict):
         row["joins"] = dict(overlay["joins"])
     if tncpm_layer is not None:
+        fields = canonical_fields(sales)
+        row["tncpmFields"] = {
+            "gis": fields.get("parcelId") or "",
+            "price": fields.get("lastSale.price") or "",
+            "date": fields.get("lastSale.date") or "",
+            "value": fields.get("tax.marketValue") or "",
+        }
         return row
     if mode in {"hickman", "chester"}:
         return row
@@ -355,9 +362,9 @@ def stamp_mapped_sale(
     stamp_zoning: bool = False,
 ) -> dict[str, bool]:
     """Copy sale, value, mailing, and optional zoning from a card field map."""
-    from tn_oir_parcels import clean, num
+    from tn_oir_parcels import acceptable_sale_date, clean, num
 
-    sold = card_sale_date(lookup_attr(attrs, sales.get("dateField")))
+    sold = acceptable_sale_date(card_sale_date(lookup_attr(attrs, sales.get("dateField"))))
     price = num(lookup_attr(attrs, sales.get("priceField")))
     if price is not None and price <= 0:
         price = None

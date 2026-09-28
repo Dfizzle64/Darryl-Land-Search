@@ -139,18 +139,19 @@ describe("Tennessee rural parcel counties", () => {
         expect(feature.properties.appraiserUrl).toContain("chester.capturecama.com");
         expect(feature.properties.appraiserUrl).not.toContain("TPAD");
         expect(feature.properties.situsCity ?? null).toBeNull();
-        if (sale && (sale.price != null || sale.date != null)) expect(sale.vintage ?? null).toBeNull();
-        if (tax?.marketValue != null) expect(tax.vintage ?? null).toBeNull();
+        expect(sale?.date ?? null).toBeNull();
+        expect(sale?.price ?? null).toBeNull();
+        if (tax?.marketValue != null) expect(tax.vintage).toBe("2026");
       } else if (county.fips === "47081") {
         expect(feature.properties.appraiserUrl).toContain("hickman.capturecama.com");
         expect(feature.properties.appraiserUrl).not.toContain("TPAD");
         expect(feature.properties.situsCity ?? null).toBeNull();
         expect(sale?.date ?? null).toBeNull();
         expect(sale?.price ?? null).toBeNull();
-        if (tax?.marketValue != null) expect(tax.vintage).toBe("2023");
+        if (tax?.marketValue != null) expect(tax.vintage).toBe("2020");
       } else if (county.fips === "47133") {
-        if (sale && (sale.price != null || sale.date != null)) expect(sale.vintage).toBe("2023");
-        if (tax?.marketValue != null) expect(tax.vintage).toBe("2023");
+        if (sale && (sale.price != null || sale.date != null)) expect(sale.vintage).toBe("2019");
+        if (tax?.marketValue != null) expect(tax.vintage).toBe("2019");
       } else if (county.fips === "47155") {
         expect(manifest.queryUrl).toContain("Tennessee_Property_Boundaries_Public_Use");
         expect(feature.properties.appraiserUrl).toContain("assessment.cot.tn.gov/TPAD");
@@ -204,10 +205,13 @@ describe("Tennessee rural parcel counties", () => {
         tax?.marketValue != null &&
         county.fips !== "47023" &&
         county.fips !== "47081" &&
+        county.fips !== "47133" &&
         county.fips !== "47155"
       ) {
         expect(tax.vintage).toBe("2023");
       }
+      const saleDate = sale?.date;
+      if (saleDate) expect(saleDate <= new Date().toISOString().slice(0, 10)).toBe(true);
     }
   });
 });

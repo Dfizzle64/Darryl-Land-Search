@@ -56,6 +56,54 @@ body {
   color: #ffffff !important;
 }
 
+/* The map width is the attribution strip's measure. The control corner itself is only as wide as the +/- buttons. */
+.dls-map {
+  container-type: inline-size;
+}
+
+/* +/- and compass share the legend baseline, just above the attribution line. */
+.dls-map .maplibregl-ctrl-bottom-right .maplibregl-ctrl-group {
+  position: absolute;
+  right: 8px;
+  bottom: 1rem;
+  z-index: 2;
+  margin: 0;
+}
+
+/* One-line strip along the map's bottom edge. Legend and the measure cluster sit above it. */
+.dls-map .maplibregl-ctrl-bottom-right > .maplibregl-ctrl-attrib {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: auto;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 100cqi;
+  max-width: 100cqi;
+  height: 14px;
+  min-height: 0 !important;
+  max-height: 14px;
+  margin: 0 !important;
+  padding: 0 8px !important;
+  overflow: hidden;
+  border-radius: 0 !important;
+  font-size: 10px;
+  line-height: 14px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dls-map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-inner {
+  display: block !important;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dls-map .maplibregl-ctrl-attrib-button {
+  display: none !important;
+}
+
 /* Imperial scale, in the bottom-right cluster with the zoom readout and Measure. */
 .dls-map-scale {
   position: static;

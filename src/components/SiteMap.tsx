@@ -76,6 +76,14 @@ import {
   type ScreeningToggles,
 } from "@/lib/screening";
 import { type MapFlyTarget } from "@/lib/jumpTo";
+import {
+  IDLE_JUMP_PIN,
+  JUMP_PIN_FADE_MS,
+  JUMP_PIN_TTL_MS,
+  jumpPinFromQuery,
+  paintJumpPinElement,
+  reduceJumpPin,
+} from "@/lib/jumpPin";
 import { tractClickFromFeature, tractPopupRuralLine, type TractClickDetails } from "@/lib/tractCounty";
 import { tractIncomeFilterActive, tractIncomeLayerFilter } from "@/lib/tractIncome";
 import { ORANGE_COUNTY_CENTER, MF_PRIORITY_LEGEND_BLURB, MF_PRIORITY_TIER_A_MEANING, MF_PRIORITY_TIER_B_MEANING, RURAL_ELIGIBLE_LEGEND_BLURB, SC_NOMINATED_RURAL_LEGEND_BLURB, SC_NOMINATED_URBAN_LEGEND_BLURB, URBAN_ELIGIBLE_LEGEND_BLURB, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
@@ -1462,11 +1470,79 @@ export function SiteMap({
     if (!map || status !== "ready" || !flyTo) return;
     if (flewToPoint.current === flyTo.key) return;
     flewToPoint.current = flyTo.key;
+
+    const pin = jumpPinFromQuery(flyTo.label, { lng: flyTo.lng, lat: flyTo.lat }, flyTo.key);
+    let state = reduceJumpPin(IDLE_JUMP_PIN, { type: "search", pin });
+    let marker: maplibregl.Marker | null = null;
+    let fadeTimer = 0;
+    let removeTimer = 0;
+
+    const removeMarker = () => {
+      window.clearTimeout(fadeTimer);
+      window.clearTimeout(removeTimer);
+      window.removeEventListener("keydown", onKeyDown);
+      marker?.remove();
+      marker = null;
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      state = reduceJumpPin(state, { type: "dismiss" });
+      removeMarker();
+    };
+
+    const dismiss = () => {
+      state = reduceJumpPin(state, { type: "dismiss" });
+      removeMarker();
+    };
+
+    const showPin = () => {
+      if (state.status !== "pending" || marker) return;
+      state = reduceJumpPin(state, { type: "fly-end", now: Date.now() });
+      if (state.status !== "visible") return;
+      const element = paintJumpPinElement(document, state.pin.label, dismiss);
+      marker = new maplibregl.Marker({ element, anchor: "bottom", draggable: false })
+        .setLngLat([state.pin.lng, state.pin.lat])
+        .addTo(map);
+      const shownAt = state.shownAt;
+      fadeTimer = window.setTimeout(() => {
+        state = reduceJumpPin(state, { type: "tick", now: shownAt + JUMP_PIN_TTL_MS });
+        if (state.status !== "fading") return;
+        element.querySelector(".jump-pin-body")?.classList.add("is-fading");
+        removeTimer = window.setTimeout(() => {
+          state = reduceJumpPin(state, { type: "tick", now: shownAt + JUMP_PIN_TTL_MS + JUMP_PIN_FADE_MS });
+          removeMarker();
+        }, JUMP_PIN_FADE_MS);
+      }, JUMP_PIN_TTL_MS);
+    };
+
+    // easeTo stops any in-flight camera move and can emit that moveend immediately.
+    // Ignore events until this jump's own ease has been requested.
+    let armed = false;
+    const onMoveEnd = () => {
+      if (!armed || map.isMoving()) return;
+      map.off("moveend", onMoveEnd);
+      showPin();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    map.on("moveend", onMoveEnd);
     map.easeTo({
       center: [flyTo.lng, flyTo.lat],
       zoom: Math.max(map.getZoom(), 14),
       duration: 700,
     });
+    armed = true;
+    if (!map.isMoving()) {
+      map.off("moveend", onMoveEnd);
+      showPin();
+    }
+
+    return () => {
+      map.off("moveend", onMoveEnd);
+      if (flewToPoint.current === flyTo.key) flewToPoint.current = null;
+      removeMarker();
+    };
   }, [flyTo, status]);
 
   useEffect(() => {
@@ -1525,10 +1601,13 @@ export function SiteMap({
   const legendScope = { market, county, state: countyState, states: marketStates };
 
   return (
-    <div ref={shellRef} className="relative h-full w-full">
+    <div ref={shellRef} className="dls-map relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
       {status === "ready" ? (
-        <div className="map-chrome absolute left-3 top-3 z-30 flex flex-col items-start gap-2 sm:left-4 sm:top-4">
+        <div
+          data-map-corner
+          className="map-chrome absolute left-3 top-3 z-30 flex flex-col items-start gap-2 sm:left-4 sm:top-4"
+        >
           <BasemapToggle value={basemap} onChange={setBasemap} />
           {showParcels && onToggleParcelLayer ? (
             <ParcelLayerToggle visible={layerOn} hint={parcelVisibilityHint ?? ""} onToggle={onToggleParcelLayer} />
@@ -1558,7 +1637,7 @@ export function SiteMap({
       {status === "ready" ? (
         <div
           ref={cornerClusterRef}
-          className="map-chrome absolute bottom-[6.75rem] right-[3.25rem] z-20 flex items-end gap-2"
+          className="map-chrome absolute bottom-4 right-[3.25rem] z-20 flex flex-col items-end gap-1 sm:flex-row sm:gap-2"
         >
           <MeasureControl
             active={measuring}
@@ -1611,8 +1690,8 @@ export function SiteMap({
         />
       ) : null}
       {status === "ready" && (showOz || showOz2 || showParcels || screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power) ? (
-        <div className="map-chrome map-scrim absolute bottom-3 left-3 z-10 max-w-[min(17rem,calc(100%-12rem))] rounded-xl border sm:bottom-4 sm:left-4 sm:max-w-[min(22rem,calc(100%-12rem))]">
-          <div className="legend-scroll max-h-[42vh] space-y-1.5 overflow-y-auto px-3 py-2.5 text-sm leading-snug">
+        <div className="map-chrome map-scrim absolute bottom-4 left-3 z-10 max-h-[calc(100%-17.5rem)] max-w-[min(17rem,calc(100%-9.5rem))] rounded-xl border sm:left-4 sm:max-h-[42vh] sm:max-w-[min(22rem,calc(100%-18.5rem))]">
+          <div className="legend-scroll max-h-[inherit] space-y-1.5 overflow-y-auto break-words px-3 py-2.5 text-sm leading-snug">
           {aoi ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-5 border border-dashed border-clay-400 align-middle" />
@@ -1628,7 +1707,7 @@ export function SiteMap({
           ) : null}
           {showOz2 ? (
             <>
-              <div className="flex gap-1 pb-1" role="group" aria-label="Rural or urban eligible tracts">
+              <div className="flex flex-wrap gap-1 pb-1" role="group" aria-label="Rural or urban eligible tracts">
                 {(
                   [
                     ["both", "Both"],

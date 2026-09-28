@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { loadEligiblePackTracts, loadOrangeTractIncomeMap } from "../lib/data/loadFixtures";
+import { loadEligibleOverview, loadEligiblePackTracts, loadOrangeTractIncomeMap } from "../lib/data/loadFixtures";
 import {
   filterTractRowsByIncome,
   tractIncomeFilterActive,
@@ -49,5 +49,22 @@ describe("tract income", () => {
     ).toBe(true);
     const outside = packs.features.find((feature) => !live.has(feature.properties.tractGeoid.slice(0, 2)));
     if (outside) expect(outside.properties.medianHouseholdIncome).toBeUndefined();
+  });
+
+  it("stamps the same ACS median onto the far-zoom overlay", async () => {
+    const [income, overview] = await Promise.all([loadOrangeTractIncomeMap(), loadEligibleOverview()]);
+    const georgia = overview.features.find((feature) =>
+      String(feature.properties?.tractGeoid ?? "").startsWith("13"),
+    );
+    const florida = overview.features.find((feature) =>
+      String(feature.properties?.tractGeoid ?? "").startsWith("12"),
+    );
+    expect(georgia?.properties?.tractGeoid).toBeTruthy();
+    expect(florida?.properties?.tractGeoid).toBeTruthy();
+    expect(georgia?.properties?.medianHouseholdIncome).toBe(income.get(String(georgia?.properties?.tractGeoid)));
+    expect(florida?.properties?.medianHouseholdIncome).toBe(income.get(String(florida?.properties?.tractGeoid)));
+    const unknown = overview.features.filter((feature) => feature.properties?.medianHouseholdIncome == null);
+    expect(unknown.length).toBeGreaterThan(0);
+    expect(unknown.every((feature) => !income.has(String(feature.properties?.tractGeoid)))).toBe(true);
   });
 });

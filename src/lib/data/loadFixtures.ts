@@ -143,7 +143,9 @@ export async function loadOtherMarketsCatalog(): Promise<EligibleMarketsCatalog>
 
 export async function loadEligibleOverview(): Promise<GeoJSON.FeatureCollection> {
   const raw = await readFile(path.join(DATA_DIR, "fixtures/oz2-eligible-overview.geojson"), "utf8");
-  return JSON.parse(raw) as GeoJSON.FeatureCollection;
+  const collection = JSON.parse(raw) as GeoJSON.FeatureCollection;
+  stampOrangeTractIncome(collection.features as Array<{ properties: IncomeStamped }>, await loadOrangeTractIncomeMap());
+  return collection;
 }
 
 export async function loadEligiblePackTracts(): Promise<EligiblePackTractCollection> {

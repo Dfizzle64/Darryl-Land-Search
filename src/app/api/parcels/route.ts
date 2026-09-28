@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getParcelProvider } from "@/lib/data/adapters";
 import { loadFluConfig, loadZoningConfig } from "@/lib/data/loadFixtures";
+import { queryParcelsInView } from "@/lib/data/parcelViewQuery";
 import { filterParcels, parcelFiltersFromSearchParams } from "@/lib/filters";
 import { isSearchMarketId } from "@/lib/markets";
 import type { BBox, ParcelFeature } from "@/lib/types";
@@ -24,11 +25,34 @@ export async function GET(request: Request) {
   const source = url.searchParams.get("source") === "live" ? "live" : "fixture";
   const limit = Number(url.searchParams.get("limit") ?? (source === "live" ? 800 : 4000));
   const complete = url.searchParams.get("complete") === "1";
+  const viewScope = url.searchParams.get("scope") === "view";
   const applyFilters = url.searchParams.get("filter") === "1";
   const includeExcluded = url.searchParams.get("includeExcluded") === "1";
   const filters = parcelFiltersFromSearchParams(url.searchParams);
 
   try {
+    if (viewScope && bbox) {
+      const page = await queryParcelsInView(bbox);
+      return NextResponse.json({
+        type: "FeatureCollection",
+        features: page.collection.features,
+        excluded: page.excluded,
+        meta: {
+          market: null,
+          county,
+          state,
+          bbox,
+          source: "fixture",
+          total: page.collection.features.length,
+          totalInBbox: page.totalInBbox,
+          totalMatching: page.totalMatching,
+          truncated: page.truncated,
+          covered: page.covered,
+          markets: page.markets,
+        },
+      });
+    }
+
     const provider = getParcelProvider();
     const [zoningConfig, fluConfig] = applyFilters
       ? await Promise.all([loadZoningConfig(), loadFluConfig()])

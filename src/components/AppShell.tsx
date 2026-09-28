@@ -31,6 +31,8 @@ import {
   isParcelVisibilityPreference,
   parcelTileBbox,
   parcelTileKeysForBbox,
+  parcelViewEmptyCopy,
+  parcelViewSearchParams,
   parcelVisibilityHint,
   parcelsAreVisible,
   PARCEL_VISIBILITY_STORAGE_KEY,
@@ -92,12 +94,14 @@ import {
   type ZoningConfig,
 } from "@/lib/types";
 
-type ParcelViewStats = { totalInBbox: number; totalMatching: number; truncated: boolean };
+type ParcelViewStats = { totalInBbox: number; totalMatching: number; truncated: boolean; covered: boolean };
+
+type CachedParcelTile = { features: ParcelFeature[]; covered: boolean };
 
 type ParcelResponse = ParcelCollection & {
   error?: string;
   excluded?: ParcelFeature[];
-  meta?: { totalInBbox?: number; totalMatching?: number; truncated?: boolean };
+  meta?: { totalInBbox?: number; totalMatching?: number; truncated?: boolean; covered?: boolean };
 };
 
 type AppShellProps = {
@@ -254,7 +258,7 @@ export function AppShell({
   const marketParcelsOn = showMarketParcels(market, county, countyState, marketParcelIndex);
   const shedParcelsOn = orlandoParcelsOn || marketParcelsOn;
   const orangePilot = showOrangeCountyPilot(market, county, countyState);
-  const parcelLayerVisible = shedParcelsOn && parcelsAreVisible(parcelPreference, mapZoom, Boolean(aoi));
+  const parcelLayerVisible = parcelsAreVisible(parcelPreference, mapZoom, Boolean(aoi));
   const visibilityHint = parcelVisibilityHint(parcelPreference, parcelLayerVisible);
   const filterKey = parcelFilterKey(filters);
   const statusHelp = southCarolinaStatusHelp(market, countyState);
@@ -302,14 +306,14 @@ export function AppShell({
   }, [county, countyState, orlandoParcelsOn, parcels.features, shedParcelsOn]);
 
   const activeParcels = useMemo<ParcelCollection>(() => {
-    if (!shedParcelsOn) return EMPTY_PARCELS;
-    if (aoi) {
+    if (aoi && shedParcelsOn) {
       return {
         type: "FeatureCollection",
         features: featuresIntersectingBbox(lockedParcels?.features ?? [], aoi.bbox),
       };
     }
     if (viewportParcels) return viewportParcels;
+    if (!shedParcelsOn) return EMPTY_PARCELS;
     return { type: "FeatureCollection", features: countyParcelFeatures };
   }, [shedParcelsOn, aoi, lockedParcels, viewportParcels, countyParcelFeatures]);
 
@@ -394,9 +398,18 @@ export function AppShell({
       ? meta.fluJoinedCount
       : activeParcels.features.length - fluUnknownCount;
   const queryingParcels = shouldQueryParcelsForZoom(parcelPreference, mapZoom);
-  const hint =
-    shedParcelsOn && queryingParcels && !parcelsLoading && parcelStats
+  const filterHint =
+    queryingParcels && !parcelsLoading && parcelStats
       ? emptyStateHint(appliedFilters, filterMatchTotal, fluUnknownCount)
+      : null;
+  const emptyCopy =
+    queryingParcels && !parcelsLoading && parcelStats
+      ? parcelViewEmptyCopy({
+          covered: parcelStats.covered,
+          parcelCount: parcelStats.totalInBbox,
+          matched: filterMatchTotal,
+          filterHint,
+        })
       : null;
 
   useEffect(() => {
@@ -414,12 +427,9 @@ export function AppShell({
   useEffect(() => {
     if (!shedParcelsOn) {
       setInventoryTab("tracts");
-      setViewportParcels(null);
-      setViewportStats(null);
       setAoi(null);
       setLockedParcels(null);
       setAoiStats(null);
-      setParcelsLoading(false);
       return;
     }
     setInventoryTab("sites");
@@ -436,8 +446,8 @@ export function AppShell({
   preferenceRef.current = parcelPreference;
   const lastViewport = useRef<{ bbox: [number, number, number, number]; zoom: number } | null>(null);
   const parcelsClearedForZoom = useRef(false);
-  const parcelTileCacheRef = useRef(createParcelTileCache<ParcelFeature[]>());
-  const parcelTileInflight = useRef(new Map<string, Promise<ParcelFeature[]>>());
+  const parcelTileCacheRef = useRef(createParcelTileCache<CachedParcelTile>());
+  const parcelTileInflight = useRef(new Map<string, Promise<CachedParcelTile>>());
   const displayedParcelKey = useRef<string | null>(null);
   const loadViewportRef = useRef<(bbox: [number, number, number, number], zoom: number) => Promise<void>>(
     async () => {},
@@ -445,7 +455,7 @@ export function AppShell({
 
   const loadViewportParcels = async (bbox: [number, number, number, number], zoom: number) => {
     lastViewport.current = { bbox, zoom };
-    if (!shedParcelsOn || aoiRef.current) return;
+    if (aoiRef.current) return;
     // Below zoom 10 the outlines stay off. Once they can draw, keep querying even
     // if the user hid them so the ranked list still filters.
     if (!shouldQueryParcelsForZoom(preferenceRef.current, zoom)) {
@@ -459,7 +469,7 @@ export function AppShell({
       return;
     }
     parcelsClearedForZoom.current = false;
-    const signature = `${market}|${county ?? ""}|${countyState ?? ""}`;
+    const signature = "view";
     const cache = parcelTileCacheRef.current;
     const signatureChanged = cache.signature !== signature;
     syncParcelTileCache(cache, signature);
@@ -474,12 +484,13 @@ export function AppShell({
       displayedParcelKey.current = readyKey;
       const byId = new Map<string, ParcelFeature>();
       for (const key of keys) {
-        for (const feature of cache.tiles.get(key) ?? []) byId.set(feature.properties.id, feature);
+        for (const feature of cache.tiles.get(key)?.features ?? []) byId.set(feature.properties.id, feature);
       }
       const features = [...byId.values()];
+      const covered = keys.some((key) => cache.tiles.get(key)?.covered);
       setViewportParcels({ type: "FeatureCollection", features });
       setParcelLoadStamp((stamp) => stamp + 1);
-      setViewportStats({ totalInBbox: features.length, totalMatching: features.length, truncated: false });
+      setViewportStats({ totalInBbox: features.length, totalMatching: features.length, truncated: false, covered });
       setParcelSource("fixture");
     };
     const missing = keys.filter((key) => !cache.tiles.has(key));
@@ -498,28 +509,21 @@ export function AppShell({
       if (pending) return pending;
       const promise = (async () => {
         const tileBbox = parcelTileBbox(key);
-        const params = new URLSearchParams({
-          market,
-          source: "fixture",
-          bbox: tileBbox.join(","),
-          complete: "1",
-        });
-        if (county && countyState) {
-          params.set("county", county);
-          params.set("state", countyState);
-        }
-        const response = await fetch(`/api/parcels?${params.toString()}`);
+        const response = await fetch(`/api/parcels?${parcelViewSearchParams(tileBbox).toString()}`);
         if (!response.ok) throw new Error(`Parcel load failed (${response.status})`);
         const body = (await response.json()) as ParcelResponse;
         if (body.error) throw new Error(body.error);
-        return featuresIntersectingBbox(body.features ?? [], tileBbox);
+        return {
+          features: featuresIntersectingBbox(body.features ?? [], tileBbox),
+          covered: body.meta?.covered === true,
+        };
       })();
       parcelTileInflight.current.set(flightKey, promise);
       return promise.then(
-        (features) => {
+        (tile) => {
           parcelTileInflight.current.delete(flightKey);
-          if (cache.signature === signature) cache.tiles.set(key, features);
-          return features;
+          if (cache.signature === signature) cache.tiles.set(key, tile);
+          return tile;
         },
         (error: unknown) => {
           parcelTileInflight.current.delete(flightKey);
@@ -551,14 +555,14 @@ export function AppShell({
   }, []);
 
   useEffect(() => {
-    if (!shedParcelsOn || aoi) return;
+    if (aoi) return;
     const last = lastViewport.current;
     if (!last) return;
     const timer = window.setTimeout(() => {
       void loadViewportRef.current(last.bbox, last.zoom);
     }, 280);
     return () => window.clearTimeout(timer);
-  }, [filterKey, parcelPreference, showExcluded, shedParcelsOn, orlandoParcelsOn, county, countyState, aoi]);
+  }, [filterKey, parcelPreference, showExcluded, county, countyState, aoi]);
 
   useEffect(() => {
     if (!shedParcelsOn || !aoi) {
@@ -598,6 +602,7 @@ export function AppShell({
             totalInBbox: body.meta?.totalInBbox ?? features.length,
             totalMatching: body.meta?.totalMatching ?? body.features?.length ?? features.length,
             truncated: Boolean(body.meta?.truncated),
+            covered: true,
           });
           setParcelSource("fixture");
         } catch (err) {
@@ -825,11 +830,17 @@ export function AppShell({
             <span className="block text-[11px]">
               {ruralShown.length.toLocaleString()} rural · {urbanShown.length.toLocaleString()} urban
             </span>
-            {shedParcelsOn ? (
+            {queryingParcels || shedParcelsOn ? (
               <span className="block text-[11px]">
-                {filterMatchTotal.toLocaleString()} match
-                {parcelsInView > 0 ? ` of ${parcelsInView.toLocaleString()}` : ""} {aoi ? "in AOI" : "in view"}
-                {parcelsLoading ? " · loading…" : aoi ? " · locked" : parcelLayerVisible ? ` · ${parcelSource}` : " · parcels off"}
+                {emptyCopy && !parcelStats?.covered ? (
+                  emptyCopy.title
+                ) : (
+                  <>
+                    {filterMatchTotal.toLocaleString()} match
+                    {parcelsInView > 0 ? ` of ${parcelsInView.toLocaleString()}` : ""} {aoi ? "in AOI" : "in view"}
+                    {parcelsLoading ? " · loading…" : aoi ? " · locked" : parcelLayerVisible ? ` · ${parcelSource}` : " · parcels off"}
+                  </>
+                )}
                 {aoi && aoiStats?.truncated ? (
                   <span className="block">
                     {aoiStats.totalMatching.toLocaleString()} parcels match these filters inside the AOI (
@@ -924,6 +935,7 @@ export function AppShell({
           meta={meta}
           orangePilot={orangePilot}
           orlandoParcels={shedParcelsOn}
+          resultsCaption={emptyCopy && !parcelStats?.covered ? emptyCopy.title : null}
           parcelCoverageNote={
             marketCoverage
               ? `${marketCoverage.parcelCount.toLocaleString()} parcels in the 5–150 acre band · ${marketCoverage.completeCountyCount} complete counties · ${marketCoverage.sampleCountyCount} sample · ${marketCoverage.gapCountyCount} not pulled`
@@ -961,7 +973,7 @@ export function AppShell({
             showOz2={showOz2}
             onToggleTractOverlay={() => setShowOz2((current) => !current)}
             screening={screening}
-            showParcels={shedParcelsOn}
+            showParcels
             parcelLayerVisible={parcelLayerVisible}
             parcelVisibilityHint={visibilityHint}
             onToggleParcelLayer={
@@ -995,18 +1007,18 @@ export function AppShell({
             onHover={setHoveredId}
             onSelectTract={selectTract}
             flyTo={flyTarget}
-            onViewportIdle={shedParcelsOn ? loadViewportParcels : undefined}
+            onViewportIdle={loadViewportParcels}
             onZoom={setMapZoom}
             aoi={shedParcelsOn ? aoi : null}
             aoiMatchedCount={filterMatchTotal}
             aoiTruncated={Boolean(aoiStats?.truncated)}
             onAoiChange={setAoi}
           />
-          {hint && showSites ? (
+          {emptyCopy && (showSites || queryingParcels) ? (
             <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center px-4">
               <div className="pointer-events-none max-w-md rounded-2xl border border-white/10 bg-ink-900/95 px-4 py-3 text-sm shadow-2xl">
-                <p className="font-medium text-white">No parcels match these filters</p>
-                <p className="mt-1 text-ink-300">{hint}</p>
+                <p className="font-medium text-white">{emptyCopy.title}</p>
+                <p className="mt-1 text-ink-300">{emptyCopy.detail}</p>
               </div>
             </div>
           ) : null}

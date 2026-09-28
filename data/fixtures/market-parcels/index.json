@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T04:29:15Z",
+  "generatedAt": "2026-09-28T18:34:14Z",
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -114,8 +114,7 @@
           "maxAcres": 150.0,
           "gaps": [
             "4859 source rows collapsed to 4770 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "Parcels are Cobb Tax Assessors Daily MapServer/0 (CobbParcels on gis.cobbcounty.gov), filtered on ACRES 5.0–150.0. A live count was 279,635 parcels and 4,859 in that band. ACRE_DEEDED is a different field (about 4,681 in the band) and was not the filter. The older cobbpublic Parcels MapServer/3 on gis.cobbcounty.org was not used.",
-            "Batch-40 join on 40 parcels: CCSD or Marietta schools with GOSA 2025 CCRPI scores (no A–F letters), NFHL flood zones, and water, sewer, and electric. Gas stays unknown. Five sewer Not Anticipated parcels stay gaps. Opportunity Zone, income, and AADT are not in this join."
+            "Parcels are Cobb Tax Assessors Daily MapServer/0 (CobbParcels on gis.cobbcounty.gov), filtered on ACRES 5.0–150.0. A live count was 279,635 parcels and 4,859 in that band. ACRE_DEEDED is a different field (about 4,681 in the band) and was not the filter. The older cobbpublic Parcels MapServer/3 on gis.cobbcounty.org was not used."
           ]
         },
         {
@@ -153,8 +152,7 @@
           "maxAcres": 150.0,
           "gaps": [
             "No sale price, sale date, or qualified flag. Tax_Parcels_Assessment_View has no sale history. Delinquent-tax layers are not sales and are not joined.",
-            "Municipal zoning and future land use are joined where a public layer exists (Decatur, Brookhaven, Dunwoody, Doraville, Tucker, Stonecrest, and Atlanta inside DeKalb). Chamblee is future land use only. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake have no public zoning or FLU service and stay blank.",
-            "Batch-40 join on 40 parcels: DCSD schools with GOSA 2025 CCRPI scores (no A–F letters), including two City of Atlanta parcels zoned to Druid Hills. NFHL flood zones are 31 X and 9 AE, with no published static BFE. Water and sewer name DeKalb DWM, or Atlanta DWM inside the City of Atlanta, as a jurisdiction proxy. Electric is HIFLD. Gas stays unknown. Opportunity Zone, income, and AADT are not in this join."
+            "Municipal zoning and future land use are joined where a public layer exists (Decatur, Brookhaven, Dunwoody, Doraville, Tucker, Stonecrest, and Atlanta inside DeKalb). Chamblee is future land use only. Stone Mountain, Avondale Estates, Clarkston, Lithonia, and Pine Lake have no public zoning or FLU service and stay blank."
           ]
         },
         {
@@ -528,10 +526,8 @@
           "maxAcres": 150.0,
           "gaps": [
             "8098 source rows collapsed to 7239 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-            "No zoning or FLU on the Florida DOH extract."
-          ],
-          "zoningJoinedCount": 221,
-          "fluJoinedCount": 247
+            "Florida DOH 5–150 acre parcels (fl-doh-ehwaters-12081, 221 zoning codes and 247 future land use codes). County parcels were not re-downloaded."
+          ]
         },
         {
           "name": "Pasco",
@@ -583,9 +579,7 @@
           "gaps": [
             "No zoning or FLU on the Florida DOH extract.",
             "Optional SWFL county. Tiles are shared with Tampa and are not downloaded a second time."
-          ],
-          "zoningJoinedCount": 566,
-          "fluJoinedCount": 124
+          ]
         },
         {
           "name": "Sumter",
@@ -701,34 +695,36 @@
     },
     "Nashville": {
       "tier": "primary",
-      "parcelCount": 109348,
-      "completeCountyCount": 13,
+      "parcelCount": 127197,
+      "completeCountyCount": 16,
       "sampleCountyCount": 0,
-      "gapCountyCount": 4,
+      "gapCountyCount": 3,
       "path": "data/fixtures/market-parcels/markets/nashville/meta.json",
       "counties": [
         {
           "name": "Bedford",
           "state": "Tennessee",
           "fips": "47003",
-          "featureCount": 4211,
+          "featureCount": 6625,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Bedford is Bedford County, Tennessee (FIPS 47003). April2023Parcels and the Bedford County, Pennsylvania viewer were not used. Centroids outside Tennessee abort the load.",
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified."
           ]
         },
         {
           "name": "Cannon",
           "state": "Tennessee",
           "fips": "47015",
-          "featureCount": 6376,
+          "featureCount": 3829,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
           ]
         },
         {
@@ -761,38 +757,39 @@
           "name": "Dickson",
           "state": "Tennessee",
           "fips": "47043",
-          "featureCount": 8443,
+          "featureCount": 8379,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Zoning polygons are joined only inside the resolved jurisdiction. City of Dickson Current_Zo 408/408, White Bluff Zone_Curre 92/92, county Zone_Curre 7696/7700. Burns (72), Charlotte (90), Vanleer (47), and Slayden (34) have no public zoning FeatureServer (Burns is a 2016 PDF), so those parcels stay unzoned. IMPACT Themes ZONING was non-blank on 3 parcels and was not copied. County Zone_Curre is 164 district polygons; A1 is only 6 of them, and those large polygons cover most rural acreage.",
-            "No adopted future-land-use FeatureServer. The 2043 Comp Plan draft and UGB/PGA layers are growth context only and were not written as parcel FLU. Sale date and price are often blank or zero. REST exposes appraisal (APPRAISAL), not assessed or taxable value."
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
           ]
         },
         {
           "name": "Hickman",
           "state": "Tennessee",
           "fips": "47081",
-          "featureCount": 3672,
+          "featureCount": 5411,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Hickman is not in the OIR statewide layer or TN_County_Parcel_Map. The only public polygon source used here is the CaptureCAMA snapshot HickmanTN05182023 (May 18, 2023).",
+            "Acreage is CALC_ACRE from 5.0 through 150.0 inclusive. Owner, situs, mailing, and APRVAL come from that snapshot. APRVAL is labeled 2023 vintage. The snapshot has no sale date or sale price."
           ]
         },
         {
           "name": "Macon",
           "state": "Tennessee",
           "fips": "47111",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 5020,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Macon was a shelf gap because the generic Tennessee loader queried IMPACT COUNTY_ID=111, the FIPS suffix. The Comptroller county number is 56. TN_County_Parcel_Map Macon_Parcels is live and has 4,921 parcels with Parcels_CALC_ACRE from 5 through 150. This extract replaces that app-load gap.",
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified."
           ]
         },
         {
@@ -835,16 +832,42 @@
           ]
         },
         {
-          "name": "Robertson",
+          "name": "Overton",
           "state": "Tennessee",
-          "fips": "47147",
-          "featureCount": 8581,
+          "fips": "47133",
+          "featureCount": 5522,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "IMPACT COUNTY_ID 74 / JUR 074. The FIPS suffix 147 returns no parcels on this service. Geometry is Parcels/0 parcel type 1, CALC_ACRE 5–150 (8581 source rows, 8581 kept). Attributes joined from Parcel_Layer_Themes/12 on GISLINK (8581 matches).",
-            "Weekly Assessment_Data_074.dbf is the attribute fallback when Parcel_Layer_Themes/12 is blocked. The Comptroller ships that table inside the county shapefile from the parcel-data request form; there is no stable anonymous file URL, and paid parcel vendors are not used. This pull used Themes/12, so the DBF was not required."
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Overton is not a layer on TN_County_Parcel_Map, so sale date, sale price, and appraisal stay empty. That is not a 2023 value."
+          ]
+        },
+        {
+          "name": "Putnam",
+          "state": "Tennessee",
+          "fips": "47141",
+          "featureCount": 6030,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
+          ]
+        },
+        {
+          "name": "Robertson",
+          "state": "Tennessee",
+          "fips": "47147",
+          "featureCount": 8477,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
           ]
         },
         {
@@ -916,13 +939,13 @@
           "name": "Wilson",
           "state": "Tennessee",
           "fips": "47189",
-          "featureCount": 10671,
+          "featureCount": 10510,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Unincorporated Wilson zoning and future land use have no public FeatureServer (county PDF maps only; the $75 shapefile was not purchased). Zoning and FLU stay null outside Lebanon and Mt. Juliet.",
-            "Watertown zoning is the 2017 ordinance PDF only. No anonymous city-limit or zoning FeatureServer was verified. CITYNUM 758 parcels keep IMPACT geometry with null zoning and FLU."
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
           ]
         }
       ]
@@ -1346,6 +1369,68 @@
         }
       ]
     },
+    "South Florida": {
+      "tier": "shelf",
+      "parcelCount": 41034,
+      "completeCountyCount": 2,
+      "sampleCountyCount": 2,
+      "gapCountyCount": 0,
+      "path": "data/fixtures/market-parcels/markets/south-florida/meta.json",
+      "counties": [
+        {
+          "name": "Broward",
+          "state": "Florida",
+          "fips": "12011",
+          "featureCount": 7549,
+          "coverage": "partial",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Partial. BCPA MapServer/16 (BCPA_EXTERNAL_JAN26) is folio and geometry only. Acreage is the polygon area, 5.0–150.0 inclusive. gis.bcpa.net does not resolve. The service name rotates yearly.",
+            "Countywide CAMA is not on that layer. The FDOR CO_NO=16 join (PARCEL_ID=FOLIO) did not return from batched queries, so owner, sale, and value are not on these rows. BMSDParcelAddress is an unincorporated subset and is not the county roll."
+          ]
+        },
+        {
+          "name": "Miami-Dade",
+          "state": "Florida",
+          "fips": "12086",
+          "featureCount": 15563,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Wave 0 is South Florida only. Miami-Dade parcels are MD_LandInformation MapServer/26. Acreage is LOT_SIZE square feet divided by 43560, 5.0–150.0 inclusive.",
+            "PRIMARY_ZONE is a property-appraiser neighborhood code, not a zoning district. Zoning is Zone_Poly_U (unincorporated) or MunicipalZone. It is not copied from PRIMARY_ZONE."
+          ]
+        },
+        {
+          "name": "Monroe",
+          "state": "Florida",
+          "fips": "12087",
+          "featureCount": 6492,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Monroe parcels are mcgis4 Parcels MapServer/0. The server certificate does not verify with the default OpenSSL trust store, so ingest retries that host without certificate verification. qPublic HTML often returns Cloudflare 403 to bots. The record link is still the human URL.",
+            "Acreage is the WGS84 polygon area. Shape.STArea() is rejected in SQL on this service. AREA1 is inconsistent for condos and is not the stored acreage."
+          ]
+        },
+        {
+          "name": "Palm Beach",
+          "state": "Florida",
+          "fips": "12099",
+          "featureCount": 11430,
+          "coverage": "partial",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Partial. PARCEL_INFO reports about 146,014 object ids with ACRES from 5.0 through 150.0. This extract kept the parcels that survived geometry normalize and parcel-id dedupe, not that full object-id count.",
+            "Palm Beach parcels are PARCEL_INFO FeatureServer/4. Acreage is ACRES, 5.0–150.0 inclusive. PROPERTY_USE is a text use description, not a numeric DOR_UC."
+          ]
+        }
+      ]
+    },
     "SWFL": {
       "tier": "other",
       "parcelCount": 32749,
@@ -1551,11 +1636,8 @@
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "No zoning or FLU on the Florida DOH extract.",
             "City zoning and future land use are joined from municipal REST where a city polygon covers the centroid. Melbourne extract joined zoning on 2942 parcels and FLU on 1914 parcels. Volusia Open Data zoning layer 36 (ZONCODE 999) is not used. DeBary, New Smyrna Beach, Orange City, Lake Helen, and Pierson use CountywideZoning OriginalZoningCode only, not a city FLUM. Daytona Beach Shores and Beverly Beach are zoning-only. Flagler city layers are hosted on gis.palmcoast.gov; this repo has no Flagler parcel baseline."
-          ],
-          "zoningJoinedCount": 2942,
-          "fluJoinedCount": 1914
+          ]
         }
       ]
     },
@@ -2467,10 +2549,10 @@
     },
     "Chattanooga": {
       "tier": "other",
-      "parcelCount": 15498,
-      "completeCountyCount": 2,
+      "parcelCount": 22725,
+      "completeCountyCount": 4,
       "sampleCountyCount": 0,
-      "gapCountyCount": 8,
+      "gapCountyCount": 6,
       "path": "data/fixtures/market-parcels/markets/chattanooga/meta.json",
       "counties": [
         {
@@ -2553,26 +2635,26 @@
           "name": "Rhea",
           "state": "Tennessee",
           "fips": "47143",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 3931,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
           ]
         },
         {
           "name": "Sequatchie",
           "state": "Tennessee",
           "fips": "47153",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 3296,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
           ]
         },
         {
@@ -2603,22 +2685,23 @@
     },
     "Knoxville": {
       "tier": "other",
-      "parcelCount": 39939,
-      "completeCountyCount": 7,
+      "parcelCount": 58134,
+      "completeCountyCount": 10,
       "sampleCountyCount": 0,
-      "gapCountyCount": 6,
+      "gapCountyCount": 3,
       "path": "data/fixtures/market-parcels/markets/knoxville/meta.json",
       "counties": [
         {
           "name": "Anderson",
           "state": "Tennessee",
           "fips": "47001",
-          "featureCount": 4302,
+          "featureCount": 4263,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
           ]
         },
         {
@@ -2638,24 +2721,26 @@
           "name": "Campbell",
           "state": "Tennessee",
           "fips": "47013",
-          "featureCount": 5445,
+          "featureCount": 3560,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
           ]
         },
         {
           "name": "Cocke",
           "state": "Tennessee",
           "fips": "47029",
-          "featureCount": 4448,
+          "featureCount": 6330,
           "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
           ]
         },
         {
@@ -2725,39 +2810,39 @@
           "name": "Morgan",
           "state": "Tennessee",
           "fips": "47129",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 5086,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
           ]
         },
         {
           "name": "Roane",
           "state": "Tennessee",
           "fips": "47145",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 5649,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
           ]
         },
         {
           "name": "Sevier",
           "state": "Tennessee",
           "fips": "47155",
-          "featureCount": 0,
-          "coverage": "gap",
+          "featureCount": 7502,
+          "coverage": "complete-gte-5ac",
           "minAcres": 5.0,
           "maxAcres": 150.0,
           "gaps": [
-            "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-            "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
           ]
         },
         {
@@ -2923,12 +3008,38 @@
     },
     "Jackson": {
       "tier": "other",
-      "parcelCount": 6384,
-      "completeCountyCount": 1,
+      "parcelCount": 21501,
+      "completeCountyCount": 4,
       "sampleCountyCount": 0,
       "gapCountyCount": 0,
       "path": "data/fixtures/market-parcels/markets/jackson/meta.json",
       "counties": [
+        {
+          "name": "Chester",
+          "state": "Tennessee",
+          "fips": "47023",
+          "featureCount": 3333,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Chester is not in the OIR statewide layer. Geometry and CAMA attributes are the public Chester County, Tennessee CaptureCAMA Parcels_12 layer (ChesterTN/ChesterCapture). Chester County, Pennsylvania (chesco.org and PASDA) was not used.",
+            "Acreage is L15Parce_4, the layer's calculated acres, from 5.0 through 150.0 inclusive. 3.9% of that band have a blank tax-record id (GPDATA__PA). Those rows use the map id (L15Parce_2). Rows with neither id are dropped (79 in the band)."
+          ]
+        },
+        {
+          "name": "Hardin",
+          "state": "Tennessee",
+          "fips": "47071",
+          "featureCount": 5415,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
+          ]
+        },
         {
           "name": "Madison",
           "state": "Tennessee",
@@ -2940,6 +3051,19 @@
           "gaps": [
             "Joined 6384 parcels. Owner 6351, situs 6351, sale 2878, appraisal 6333. Jackson zoning 848 / FLU 848 (MF 44). Three Way zoning 73 / FLU 73. Medon parcels 7 (county zoning hits 6, FLU 0). Unincorporated zoning 5454. CAMA miss 33.",
             "Anonymous production pull is GeoJobe AGOL Cadastral/45 Parcels_57 joined to table/46 Cama MadisonTN on GISLINK. Comptroller IMPACT Parcels (COUNTY_ID=57 / JUR=057) is the official sibling and can 403, so it is not the fetch path."
+          ]
+        },
+        {
+          "name": "Weakley",
+          "state": "Tennessee",
+          "fips": "47183",
+          "featureCount": 6369,
+          "coverage": "complete-gte-5ac",
+          "minAcres": 5.0,
+          "maxAcres": 150.0,
+          "gaps": [
+            "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+            "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers."
           ]
         }
       ]
@@ -3674,68 +3798,6 @@
           "gaps": [
             "Yazoo County, Mississippi (FIPS 28163). CMPDD Yazoo_County_2026_layers/2. gisacres 5–150 inclusive.",
             "County zoning is FeatureServer/18 zoning_2026. County future land use is FeatureServer/5 fulu_2026."
-          ]
-        }
-      ]
-    },
-    "South Florida": {
-      "tier": "shelf",
-      "parcelCount": 41034,
-      "completeCountyCount": 2,
-      "sampleCountyCount": 2,
-      "gapCountyCount": 0,
-      "path": "data/fixtures/market-parcels/markets/south-florida/meta.json",
-      "counties": [
-        {
-          "name": "Broward",
-          "state": "Florida",
-          "fips": "12011",
-          "featureCount": 7549,
-          "coverage": "partial",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Partial. BCPA MapServer/16 (BCPA_EXTERNAL_JAN26) is folio and geometry only. Acreage is the polygon area, 5.0–150.0 inclusive. gis.bcpa.net does not resolve. The service name rotates yearly.",
-            "Countywide CAMA is not on that layer. The FDOR CO_NO=16 join (PARCEL_ID=FOLIO) did not return from batched queries, so owner, sale, and value are not on these rows. BMSDParcelAddress is an unincorporated subset and is not the county roll."
-          ]
-        },
-        {
-          "name": "Miami-Dade",
-          "state": "Florida",
-          "fips": "12086",
-          "featureCount": 15563,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Wave 0 is South Florida only. Miami-Dade parcels are MD_LandInformation MapServer/26. Acreage is LOT_SIZE square feet divided by 43560, 5.0–150.0 inclusive.",
-            "PRIMARY_ZONE is a property-appraiser neighborhood code, not a zoning district. Zoning is Zone_Poly_U (unincorporated) or MunicipalZone. It is not copied from PRIMARY_ZONE."
-          ]
-        },
-        {
-          "name": "Monroe",
-          "state": "Florida",
-          "fips": "12087",
-          "featureCount": 6492,
-          "coverage": "complete-gte-5ac",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Monroe parcels are mcgis4 Parcels MapServer/0. The server certificate does not verify with the default OpenSSL trust store, so ingest retries that host without certificate verification. qPublic HTML often returns Cloudflare 403 to bots. The record link is still the human URL.",
-            "Acreage is the WGS84 polygon area. Shape.STArea() is rejected in SQL on this service. AREA1 is inconsistent for condos and is not the stored acreage."
-          ]
-        },
-        {
-          "name": "Palm Beach",
-          "state": "Florida",
-          "fips": "12099",
-          "featureCount": 11430,
-          "coverage": "partial",
-          "minAcres": 5.0,
-          "maxAcres": 150.0,
-          "gaps": [
-            "Partial. PARCEL_INFO reports about 146,014 object ids with ACRES from 5.0 through 150.0. This extract kept the parcels that survived geometry normalize and parcel-id dedupe, not that full object-id count.",
-            "Palm Beach parcels are PARCEL_INFO FeatureServer/4. Acreage is ACRES, 5.0–150.0 inclusive. PROPERTY_USE is a text use description, not a numeric DOR_UC."
           ]
         }
       ]

@@ -118,8 +118,12 @@ def _ensure_closed(raw: list[list[float]]) -> list[list[float]]:
     return raw
 
 
-def esri_rings_to_geojson(rings: list, tol: float = BASE_TOL) -> dict | None:
-    """Group Esri rings into polygons and emit RFC 7946 winding."""
+def esri_rings_to_geojson(rings: list, tol: float = BASE_TOL, simplify: bool = True) -> dict | None:
+    """Group Esri rings into polygons and emit RFC 7946 winding.
+
+    simplify=False keeps every vertex (rounded to 6 decimals). The default
+    still applies the cadastral Douglas-Peucker tolerance.
+    """
     polygons: list[list[list[list[float]]]] = []
     current: list[list[list[float]]] = []
     for ring in rings or []:
@@ -130,7 +134,10 @@ def esri_rings_to_geojson(rings: list, tol: float = BASE_TOL) -> dict | None:
         area = signed_area(raw)
         if abs(area) < 1e-14:
             continue
-        coords = simplify_ring(raw, tol)
+        if simplify:
+            coords = simplify_ring(raw, tol)
+        else:
+            coords = _round_ring([(float(x), float(y)) for x, y in raw])
         if len(coords) < 4:
             continue
         # Positive shoelace is counter-clockwise: an Esri hole.

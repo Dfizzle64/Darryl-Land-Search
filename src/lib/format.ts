@@ -371,6 +371,17 @@ export function formatDate(value: string | null | undefined): string {
   return `${month}/${day}/${year}`;
 }
 
+/** Append a published vintage only when that field actually has a value. */
+export function vintageFieldLabel(
+  label: string,
+  vintage: string | null | undefined,
+  present: boolean,
+): string {
+  const year = vintage?.trim();
+  if (!present || !year) return label;
+  return `${label} · ${year}`;
+}
+
 export function formatSale(sale: { date: string | null; price: number | null }): string | null {
   if (!sale.date && (sale.price == null || sale.price <= 0)) return null;
   const date = sale.date ? formatDate(sale.date) : null;

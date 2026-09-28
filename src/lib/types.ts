@@ -21,6 +21,8 @@ export type LastSale = {
   date: string | null;
   price: number | null;
   qualified: string | null;
+  /** Set when the sale row is an older published vintage, such as TN 2023. */
+  vintage?: string | null;
 };
 
 export type TaxInfo = {
@@ -28,6 +30,8 @@ export type TaxInfo = {
   assessedValue: number | null;
   taxableValue: number | null;
   taxes: number | null;
+  /** Set when value fields are an older published vintage, such as TN 2023. */
+  vintage?: string | null;
 };
 
 export type IncomeInfo = {

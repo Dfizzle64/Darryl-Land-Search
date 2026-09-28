@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T01:22:21Z",
+  "generatedAt": "2026-09-28T18:34:14Z",
   "market": "Chattanooga",
   "tier": "other",
-  "parcelCount": 15498,
+  "parcelCount": 22725,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -28,7 +28,7 @@
       "source": "tn-cleveland-parcels-impact-47011",
       "queryUrl": "https://utility.arcgis.com/usrsvcs/servers/93852593c94f4e178f338703adc6bca3/rest/services/Operational/OperationalLayersPRO/MapServer/2/query",
       "gaps": [
-        "City of Cleveland stays in Bradley County (Census FIPS 47011, Chattanooga). 7801 City of Cleveland GIS Parcels_Impact rows (JUR 006, parcel type 1, CALC_ACRE 5\u2013150) collapsed to 6336 GISLINK parcels at the latest TAXYR. GEOID prefix is 47011, not Comptroller 006 and not 47107 (McMinn County).",
+        "City of Cleveland stays in Bradley County (Census FIPS 47011, Chattanooga). 7801 City of Cleveland GIS Parcels_Impact rows (JUR 006, parcel type 1, CALC_ACRE 5–150) collapsed to 6336 GISLINK parcels at the latest TAXYR. GEOID prefix is 47011, not Comptroller 006 and not 47107 (McMinn County).",
         "Cleveland Zoning Districts ZONECLASS is joined only inside the Cleveland municipal boundary (508 of 508 Cleveland parcels). Charleston (17) and unincorporated Bradley (5811) have no zoning polygon service; CAMA ZONING is a first-pass label only. 10 CITYNUM 138 parcels sit outside the city limits and did not receive ZONECLASS.",
         "County zoning and Charleston zoning are PDF or municipal-code gaps. Future land use REST is a gap; the Cleveland urban growth boundary is not parcel FLU. Opportunity Zone flags are not invented by this ingest.",
         "Assessed and taxable values are left null. Market value is the IMPACT appraisal. Stacked CAMA cards that share a GISLINK keep the latest tax year, preferring the base 000 card."
@@ -89,10 +89,10 @@
       "queryUrl": "https://mapsdev.hamiltontn.gov/hcwa03/rest/services/Live_Parcels/MapServer/0/query",
       "gaps": [
         "Zoning joined on 9043 of 9162 parcels. Plan Hamilton place type joined on 6262 unincorporated parcels. City counts: Chattanooga 1752, Collegedale 215, East Ridge 76, Lakesite 26, Lookout Mountain 5, Red Bank 64, Ridgeside 1, Signal Mountain 75, Soddy Daisy 472, Unincorporated Hamilton 6391, Walden 85.",
-        "Hamilton County is not an IMPACT county. Parcels are Hamilton County Live_Parcels MapServer layer 0 filtered on CALCACRES 5\u2013150, not Comptroller IMPACT.",
+        "Hamilton County is not an IMPACT county. Parcels are Hamilton County Live_Parcels MapServer layer 0 filtered on CALCACRES 5–150, not Comptroller IMPACT.",
         "Owner, mailing, situs, land/building/yard/appraised/assessed values, and four sale slots come from that parcel layer. RecordsOnl is the assessor card. A sale consideration of 0 is kept as no price.",
         "Municipality comes from Live_Administrative MapServer layer 2. Inside a city, that city's zoning layer wins over county RPA zoning.",
-        "Chattanooga zoning is Live_PropertyZoning layer 14 (new_zone), then the city Public Works Misc/Zoning mirror. East Ridge zoning is OpenGov/Live_East_Ridge layer 12, not Live_PropertyZoning layers 1\u20135. Red Bank, Soddy Daisy, Signal Mountain, and Collegedale use Live_PropertyZoning layers 3, 4, 5, and 1. Red Bank revised conditions (layer 2) are supplemental.",
+        "Chattanooga zoning is Live_PropertyZoning layer 14 (new_zone), then the city Public Works Misc/Zoning mirror. East Ridge zoning is OpenGov/Live_East_Ridge layer 12, not Live_PropertyZoning layers 1–5. Red Bank, Soddy Daisy, Signal Mountain, and Collegedale use Live_PropertyZoning layers 3, 4, 5, and 1. Red Bank revised conditions (layer 2) are supplemental.",
         "Lookout Mountain, Lakesite, Walden, and Ridgeside have no dedicated zoning REST layer. County RPA zoning is not used as their city code.",
         "Unincorporated zoning falls through TempZoningRPA layer 3, Live_PropertyZoning layer 16, then PlanHamilton unincorporated zoning. RPA labels such as Collegedale, Red Bank, and Signal Mtn are coverage placeholders, not city district codes.",
         "PlanHamilton PlaceTypesPlanHamilton layer 3 is policy guidance for unincorporated geography, not a zoning entitlement, and it is not applied inside city limits. City of Chattanooga Place Type (https://planchattanooga.org/draft/) was reconfirmed on 2026-09-23: pwgis.chattanooga.gov has no Place Type FeatureServer. East Ridge, Red Bank, Soddy Daisy, Signal Mountain, Collegedale, Lookout Mountain, Lakesite, Walden, and Ridgeside also have no public Place Type layer.",
@@ -115,7 +115,7 @@
       "source": "tn-impact-47115",
       "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
+        "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
         "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
       ],
       "path": null,
@@ -135,7 +135,7 @@
       "source": "tn-impact-47121",
       "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
+        "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
         "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
       ],
       "path": null,
@@ -147,41 +147,45 @@
       "name": "Rhea",
       "fips": "47143",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 3931,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47143",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-oir-public-use-47143",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47143/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47143/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 21463
     },
     {
       "name": "Sequatchie",
       "fips": "47153",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 3296,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47153",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-oir-public-use-47153",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47153/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47153/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 12642
     },
     {
       "name": "Walker",

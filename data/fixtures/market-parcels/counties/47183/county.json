@@ -1,0 +1,47 @@
+{
+  "name": "Weakley",
+  "fips": "47183",
+  "state": "Tennessee",
+  "markets": [
+    "Jackson"
+  ],
+  "featureCount": 6369,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "tn-oir-public-use-47183",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+  "gaps": [
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used."
+  ],
+  "path": "data/fixtures/market-parcels/counties/47183/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47183/lookup.json",
+  "sourceCount": 20180,
+  "dropped": 0,
+  "tileCount": 6,
+  "ingest": {
+    "sourceRows": 20180,
+    "deedAcresInBand": 1809,
+    "droppedGeometry": 0,
+    "droppedOutsideBand": 13811,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 0,
+    "tncpmLayer": 2,
+    "tncpmMatched": 6251,
+    "saleCount": 6192,
+    "appraisalCount": 6190,
+    "kept": 6369,
+    "ownerCount": 6367,
+    "tpadCount": 6369,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
+}

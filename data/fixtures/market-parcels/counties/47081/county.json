@@ -5,19 +5,34 @@
   "markets": [
     "Nashville"
   ],
-  "featureCount": 3672,
+  "featureCount": 5411,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "tn-impact-47081",
-  "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+  "source": "tn-hickman-capturecama-202305",
+  "queryUrl": "https://maps.capturecama.com/arcgis/rest/services/Hickman/HickmanTN05182023/MapServer/9/query",
   "gaps": [
-    "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+    "Hickman is not in the OIR statewide layer or TN_County_Parcel_Map. The only public polygon source used here is the CaptureCAMA snapshot HickmanTN05182023 (May 18, 2023).",
+    "Acreage is CALC_ACRE from 5.0 through 150.0 inclusive. Owner, situs, mailing, and APRVAL come from that snapshot. APRVAL is labeled 2023 vintage. The snapshot has no sale date or sale price.",
+    "The property-record link is the TPAD GIS card for GISLINK when that id is present. Opportunity Zone status was not inferred. Regrid was not used."
   ],
   "path": "data/fixtures/market-parcels/counties/47081/tiles",
   "lookup": "data/fixtures/market-parcels/counties/47081/lookup.json",
-  "sourceCount": 3831,
-  "dropped": 158,
-  "tileCount": 5
+  "sourceCount": 5507,
+  "dropped": 0,
+  "tileCount": 6,
+  "ingest": {
+    "sourceRows": 5507,
+    "dropped": 0,
+    "kept": 5411,
+    "ownerCount": 5198,
+    "tpadCount": 5411,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
 }

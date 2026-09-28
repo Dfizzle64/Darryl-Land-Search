@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T01:06:16Z",
+  "generatedAt": "2026-09-28T18:34:14Z",
   "market": "SWFL",
   "tier": "other",
   "parcelCount": 32749,
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -29,7 +29,7 @@
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/7/query",
       "gaps": [
         "5780 source rows collapsed to 4565 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "Partial SWFL county. Parcel polygons are the public Florida DOH EHWATER 5.0\u2013150.0 acre land-area extract.",
+        "Partial SWFL county. Parcel polygons are the public Florida DOH EHWATER 5.0–150.0 acre land-area extract.",
         "Charlotte County CCGISLayers publishes county zoning and Punta Gorda zoning, not this parcel roll. Those zoning polygons are not joined.",
         "No zoning or FLU on the Florida DOH extract."
       ],
@@ -75,7 +75,7 @@
         "Lee County public ParcelAddress on gismapserver.leegov.com. EagleView's Lee County FL Parcels service is a republish and was not used.",
         "Fort Myers native GIS at https://gis.fortmyers.gov/arcgis/rest/services is TLS-blocked (certificate issuer could not be verified) and was not ingested. City of Fort Myers rows are the county layer where MUNICODE is P.",
         "Bonita Springs, Estero, and Fort Myers Beach have no independent parcel REST. They are county stubs on this layer (MUNICODE B, E, and W).",
-        "Sanibel zoning is blank on this county layer for almost every 5\u2013150 acre Sanibel parcel. Sanibel's public REST is a future-land-use map series, not a parcel zoning code, and was not joined. FGDL zoning was not used.",
+        "Sanibel zoning is blank on this county layer for almost every 5–150 acre Sanibel parcel. Sanibel's public REST is a future-land-use map series, not a parcel zoning code, and was not joined. FGDL zoning was not used.",
         "Lee S_1VI is a vacant/improved flag, not a qualified-sale code, so lastSale.qualified is left empty."
       ],
       "path": "data/fixtures/market-parcels/counties/12071/tiles",
@@ -101,7 +101,9 @@
       "path": "data/fixtures/market-parcels/counties/12115/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12115/lookup.json",
       "tileCount": 6,
-      "sourceCount": 4303
+      "sourceCount": 4303,
+      "zoningJoinedCount": 566,
+      "fluJoinedCount": 124
     }
   ]
 }

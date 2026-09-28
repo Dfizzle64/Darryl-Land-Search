@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T01:06:16Z",
+  "generatedAt": "2026-09-28T18:34:14Z",
   "market": "Charlotte",
   "tier": "primary",
   "parcelCount": 106650,
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -108,7 +108,7 @@
       "source": "nc-onemap-37045",
       "queryUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
       "gaps": [
-        "NC OneMap gisacres is 0 for this county. Acres were computed from the polygon and then limited to 5.0\u2013150.0.",
+        "NC OneMap gisacres is 0 for this county. Acres were computed from the polygon and then limited to 5.0–150.0.",
         "NC OneMap gisacres is GIS acreage, not a deed acreage field. No zoning join."
       ],
       "path": "data/fixtures/market-parcels/counties/37045/tiles",
@@ -137,7 +137,7 @@
         "Zoning strings are public district codes, not an Orange County multifamily knowledge-base match.",
         "OZ 2.0 eligibility is Rev. Proc. 2026-14 nomination eligibility on 2020 tracts. It is not a designated Qualified Opportunity Zone. Designation is a separate HUD 2010-tract join.",
         "Sale day is not on the roll; the stored date is the first of the sale month. Owner phones and emails are not collected.",
-        "Municipality counts on the 5\u2013150 acre roll: Denton 34, High Point 47, Lexington 242, Midway 153, Thomasville 222, Unincorporated 11226, Wallburg 139.",
+        "Municipality counts on the 5–150 acre roll: Denton 34, High Point 47, Lexington 242, Midway 153, Thomasville 222, Unincorporated 11226, Wallburg 139.",
         "Lexington city zoning matched 148 of 242 CityCode 07 parcels on PIN.",
         "Thomasville PTRC zoning covered 221 of 222 CityCode 28 parcels.",
         "Wallburg clip matched zoning on 136 parcels and future land use on 136.",
@@ -162,7 +162,7 @@
       "gaps": [
         "No public future land use service. Envision Gaston 2050 is policy-only. High Shoals, Spencer Mountain, and Dellview have municipal boundaries and no zoning layer.",
         "Zoning is a spatial join to PublicGIS/Zoning in the county CRS. Gastonia cogserver is a different State Plane vintage and is not the join source. Many sale amounts are zero.",
-        "Zoning joined on 6745 of 6815 parcels in the 5\u2013150 acre band."
+        "Zoning joined on 6745 of 6815 parcels in the 5–150 acre band."
       ],
       "path": "data/fixtures/market-parcels/counties/37071/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37071/lookup.json",
@@ -328,7 +328,7 @@
       "source": "meck-taxparcel-camadata-37119",
       "queryUrl": "https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/MapServer/0/query",
       "gaps": [
-        "33567 TaxParcel_camadata rows with gisacres 5\u2013150 collapse onto 8402 parcel outlines (8277 joined to owner, tax, and sale; 8316 unique nc_pin values in that account pull). Condo and townhouse accounts that share an nc_pin are one polygon.",
+        "33567 TaxParcel_camadata rows with gisacres 5–150 collapse onto 8402 parcel outlines (8277 joined to owner, tax, and sale; 8316 unique nc_pin values in that account pull). Condo and townhouse accounts that share an nc_pin are one polygon.",
         "Outlines are Mecklenburg Tax/ParcelsViewer polygons. TaxParcel_camadata does not return geometry.",
         "zone_class joined from ParcelsZoningZipcode for 8392 of 8402 parcels. There is no single countywide zoning service. Charlotte zoning polygons do not cover Cornelius, Davidson, Huntersville, Matthews, Mint Hill, Pineville, or Stallings. Town codes are stored only when this parcel join published them. Split zones are combined on zoningCode.",
         "Charlotte 2040 Place Types joined for 5873 of 8402 parcels. The rest are outside that city layer, which does not cover Mecklenburg towns. The legacy area-plan future land use overlay is not used as current policy.",
@@ -395,7 +395,7 @@
         "No countywide future land use service. Secrest Short Cut and employment-center scraps are not joined as county FLU.",
         "FMV_LAND and FMV_IMPRV are zero on OperationalLayers parcels; tax totals only. Hemby Bridge has no zoning layer. Mint Hill in Union is negligible and is not joined.",
         "About 78k parcels stub CountyZoning=CITY. Zoning is routed by ParcelCentroids ZoningAdmin to town layers. Legacy gis.unioncountync.gov returns 404; the atlas host is used. Stallings is joined by account number (its service is State Plane).",
-        "Zoning joined on 12874 of 13025 parcels in the 5\u2013150 acre band."
+        "Zoning joined on 12874 of 13025 parcels in the 5–150 acre band."
       ],
       "path": "data/fixtures/market-parcels/counties/37179/tiles",
       "lookup": "data/fixtures/market-parcels/counties/37179/lookup.json",

@@ -1,0 +1,48 @@
+{
+  "name": "Overton",
+  "fips": "47133",
+  "state": "Tennessee",
+  "markets": [
+    "Nashville"
+  ],
+  "featureCount": 5522,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "tn-oir-public-use-47133",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+  "gaps": [
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, PARCEL_TYPE=1. Acreage is computed from the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Overton is not a layer on TN_County_Parcel_Map, so sale date, sale price, and appraisal stay empty. That is not a 2023 value.",
+    "Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK where that county layer exists. The popup labels those fields as 2023 vintage. Assessed value, taxable value, and tax amount are not on that join. Zoning and future land use are not on these layers.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used."
+  ],
+  "path": "data/fixtures/market-parcels/counties/47133/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47133/lookup.json",
+  "sourceCount": 15524,
+  "dropped": 0,
+  "tileCount": 6,
+  "ingest": {
+    "sourceRows": 15524,
+    "deedAcresInBand": 3733,
+    "droppedGeometry": 0,
+    "droppedOutsideBand": 10002,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 0,
+    "tncpmLayer": null,
+    "tncpmMatched": 0,
+    "saleCount": 0,
+    "appraisalCount": 0,
+    "kept": 5522,
+    "ownerCount": 5516,
+    "tpadCount": 5522,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
+}

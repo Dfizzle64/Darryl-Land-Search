@@ -1,0 +1,41 @@
+{
+  "name": "Chester",
+  "fips": "47023",
+  "state": "Tennessee",
+  "markets": [
+    "Jackson"
+  ],
+  "featureCount": 3333,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "tn-chester-capturecama-parcels12",
+  "queryUrl": "https://gis.capturecama.com/arcgis/rest/services/ChesterTN/ChesterCapture/MapServer/7/query",
+  "gaps": [
+    "Chester is not in the OIR statewide layer. Geometry and CAMA attributes are the public Chester County, Tennessee CaptureCAMA Parcels_12 layer (ChesterTN/ChesterCapture). Chester County, Pennsylvania (chesco.org and PASDA) was not used.",
+    "Acreage is L15Parce_4, the layer's calculated acres, from 5.0 through 150.0 inclusive. 3.9% of that band have a blank tax-record id (GPDATA__PA). Those rows use the map id (L15Parce_2). Rows with neither id are dropped (79 in the band).",
+    "Appraisal is GPDATA__30 and is labeled with the row's appraisal year when that year is published. The layer has no sale date or sale price. The TPAD link uses the map id. Opportunity Zone status was not inferred. Regrid was not used."
+  ],
+  "path": "data/fixtures/market-parcels/counties/47023/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47023/lookup.json",
+  "sourceCount": 3422,
+  "dropped": 79,
+  "tileCount": 7,
+  "ingest": {
+    "sourceRows": 3422,
+    "droppedNeitherId": 79,
+    "droppedGeometryOrBand": 0,
+    "usedTaxRecordId": 3289,
+    "usedMapId": 54,
+    "kept": 3333,
+    "ownerCount": 3278,
+    "tpadCount": 3333,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
+}

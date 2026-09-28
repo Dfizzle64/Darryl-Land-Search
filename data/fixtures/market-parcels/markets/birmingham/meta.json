@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T01:06:16Z",
+  "generatedAt": "2026-09-28T18:34:14Z",
   "market": "Birmingham",
   "tier": "other",
   "parcelCount": 38101,
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -107,7 +107,7 @@
         "Municipal overlay: county parcel source unchanged (JCC Basemap/Parcels). Birmingham zoning 1658, Birmingham FLU 1639, Hoover 267, Homewood 38, Vestavia Hills 161 (676 blank VH_ZONING left unknown).",
         "Gap-fill only. This Jefferson extract is the existing county service. Birmingham city GIS parcel mirrors of Shelby were not used as parcels.",
         "68985 source rows collapsed to 15641 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "Jefferson County public parcels. Owner and situs are sparse on this layer. No zoning join."
+        "Unincorporated zoning is Jefferson County DDS/FutureLandUse FeatureServer/4 (https://jccgis.jccal.org/server/rest/services/DDS/FutureLandUse/FeatureServer/4) field ZNCODE, joined by centroid where the parcel had no city code. Filled 8506 parcels. 5011 parcels still have no zoning polygon. City codes already on 2124 parcels were not replaced."
       ],
       "path": "data/fixtures/market-parcels/counties/01073/tiles",
       "lookup": "data/fixtures/market-parcels/counties/01073/lookup.json",
@@ -128,7 +128,7 @@
       "gaps": [
         "12123 source rows collapsed to 11994 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
         "Municipal join: Alabaster zoning 404 (key 403, spatial 1).",
-        "Shelby County parcels are LegacyServices Cadastral_2025 MapServer/91, tax year 2025. Acreage is used when it is set; otherwise ACRES. Inclusive 5\u2013150.",
+        "Shelby County parcels are LegacyServices Cadastral_2025 MapServer/91, tax year 2025. Acreage is used when it is set; otherwise ACRES. Inclusive 5–150.",
         "CaptureServices C_PARCEL is geometry without owner, tax, or sale and is not used. Birmingham city GIS mirrors of Shelby parcels are not the county source.",
         "Alabaster zoning is Zoning_Current_VIEWONLY FeatureServer/6. ZoneCode joins to Shelby Assess_Num, with a centroid fallback. Coverage is city-only. ZoneDescription is the district label.",
         "Zone_Layer_VIEW layer 78 returns HTTP 400 on query and is not used. Zoning_Conditional (one polygon) is not base zoning.",

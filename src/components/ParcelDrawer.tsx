@@ -12,6 +12,7 @@ import {
   formatRoadLabel,
   formatSale,
   formatUsd,
+  vintageFieldLabel,
   incomeEmptyMessage,
   isEntityOwner,
   isFloridaParcel,
@@ -266,7 +267,7 @@ export function ParcelDrawer({
           empty="OZ 2.0 eligibility is not joined for this parcel. That is not a designation."
         />
         <Field
-          label="Last sale"
+          label={vintageFieldLabel("Last sale", properties.lastSale.vintage, formatSale(properties.lastSale) != null)}
           value={formatSale(properties.lastSale)}
           empty={saleEmptyForSouthFlorida(properties.countyFips) ?? missingPublicParcelValue("sale")}
         />
@@ -275,8 +276,22 @@ export function ParcelDrawer({
           value={properties.lastSale.qualified}
           empty={missingPublicParcelValue("saleQualified")}
         />
-        <Field label="Market value" value={formatUsd(properties.tax.marketValue)} />
-        <Field label="Assessed value" value={formatUsd(properties.tax.assessedValue)} />
+        <Field
+          label={vintageFieldLabel(
+            "Market value",
+            properties.tax.vintage,
+            properties.tax.marketValue != null && properties.tax.marketValue > 0,
+          )}
+          value={formatUsd(properties.tax.marketValue)}
+        />
+        <Field
+          label={vintageFieldLabel(
+            "Assessed value",
+            properties.tax.vintage,
+            properties.tax.assessedValue != null && properties.tax.assessedValue > 0,
+          )}
+          value={formatUsd(properties.tax.assessedValue)}
+        />
         <Field label="Taxable value" value={formatUsd(properties.tax.taxableValue)} />
         <Field label="Taxes" value={formatUsd(properties.tax.taxes)} />
       </dl>

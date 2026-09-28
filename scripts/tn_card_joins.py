@@ -22,7 +22,6 @@ from tn_oir_parcels import (
     iter_by_ids,
     num,
     slash_date_to_iso,
-    trailing_year,
 )
 
 OVERTON_QUERY = (
@@ -254,7 +253,7 @@ def join_overton(features: list[dict], row: dict) -> dict:
             continue
         matched += 1
         props = feature["properties"]
-        year = trailing_year(attrs.get("PARCELID"))
+        vintage = str(row.get("salesVintage") or "2023")
         sold = slash_date_to_iso(attrs.get("SALEDATE"))
         price = num(attrs.get("PRICE"))
         if price is not None and price <= 0:
@@ -263,15 +262,11 @@ def join_overton(features: list[dict], row: dict) -> dict:
         if appraisal is not None and appraisal <= 0:
             appraisal = None
         if sold or price is not None:
-            sale = {"date": sold, "price": price, "qualified": None}
-            if year:
-                sale["vintage"] = year
-            props["lastSale"] = sale
+            props["lastSale"] = {"date": sold, "price": price, "qualified": None, "vintage": vintage}
             sales += 1
         if appraisal is not None:
             props["tax"]["marketValue"] = appraisal
-            if year:
-                props["tax"]["vintage"] = year
+            props["tax"]["vintage"] = vintage
             values += 1
         mail1 = clean(attrs.get("MAILADDR"))
         mail_city = clean(attrs.get("MAILCITY"))
@@ -296,6 +291,8 @@ def join_overton(features: list[dict], row: dict) -> dict:
         "overtonAppraisalCount": values,
         "overtonMailCount": mailed,
         "overtonZoningCount": zoned,
+        "gislinkMatchRate": round(matched / len(features), 4) if features else None,
+        "salesVintage": str(row.get("salesVintage") or "2023"),
     }
 
 
@@ -622,11 +619,93 @@ def wilson_zoning(features: list[dict], notes: list[str], row: dict) -> int:
     return flu_count
 
 
+def join_sevier_cama(features: list[dict], row: dict) -> dict:
+    """Sale, value, assessed, and mailing from the county CAMA. Owner stays on OIR."""
+    from seed_market_parcels import epoch_to_iso
+
+    spec = row.get("salesJoin") or {}
+    url = spec.get("url") or configured_url(row, "cama", "")
+    if not url:
+        raise RuntimeError("Sevier sales join URL is missing")
+    print("  Sevier county CAMA sale/value join", flush=True)
+    date_field = spec.get("dateField") or "SALEDATE"
+    price_field = spec.get("priceField") or "PRICE"
+    market_field = spec.get("marketField") or "APPRAISAL"
+    assessed_field = spec.get("assessedField") or "ASSESSMENT"
+    mail_fields = [
+        spec.get("mail1") or "MAILADDR",
+        spec.get("mailCity") or "MAILCITY",
+        spec.get("mailState") or "STATE",
+        spec.get("mailZip") or "ZIP",
+    ]
+    index = attribute_index(
+        url,
+        spec.get("idField") or "GISLINK",
+        [date_field, price_field, market_field, assessed_field, *mail_fields],
+    )
+    vintage = str(row.get("salesVintage") or "2025")
+    matched = sales = values = assessed_count = mailed = 0
+    for feature in features:
+        attrs = match_attrs(feature, index)
+        if not attrs:
+            continue
+        matched += 1
+        props = feature["properties"]
+        sold = epoch_to_iso(attr_get(attrs, date_field))
+        price = num(attr_get(attrs, price_field))
+        if price is not None and price <= 0:
+            price = None
+        appraisal = num(attr_get(attrs, market_field))
+        if appraisal is not None and appraisal <= 0:
+            appraisal = None
+        assessed = num(attr_get(attrs, assessed_field))
+        if assessed is not None and assessed <= 0:
+            assessed = None
+        if sold or price is not None:
+            props["lastSale"] = {"date": sold, "price": price, "qualified": None, "vintage": vintage}
+            sales += 1
+        if appraisal is not None:
+            props["tax"]["marketValue"] = appraisal
+            values += 1
+        if assessed is not None:
+            props["tax"]["assessedValue"] = assessed
+            assessed_count += 1
+        if appraisal is not None or assessed is not None:
+            props["tax"]["vintage"] = vintage
+        mail1 = clean(attr_get(attrs, mail_fields[0]))
+        mail_city = clean(attr_get(attrs, mail_fields[1]))
+        mail_state = clean(attr_get(attrs, mail_fields[2]))
+        mail_zip = clean(attr_get(attrs, mail_fields[3]))
+        if mail1 or mail_city:
+            props["mailingAddress"] = {
+                "line1": mail1,
+                "line2": None,
+                "city": mail_city,
+                "state": mail_state,
+                "zip": mail_zip,
+            }
+            mailed += 1
+    return {
+        "sevierCamaMatched": matched,
+        "saleCount": sales,
+        "appraisalCount": values,
+        "assessedCount": assessed_count,
+        "sevierMailCount": mailed,
+        "gislinkMatchRate": round(matched / len(features), 4) if features else None,
+        "salesVintage": vintage,
+    }
+
+
 def apply_card_details(features: list[dict], row: dict) -> dict:
     """Mutate features with card-specific sale, mailing, zoning, and FLU."""
     notes: list[str] = []
     stats: dict = {}
     fips = row["fips"]
+    if fips == "47155":
+        try:
+            stats.update(join_sevier_cama(features, row))
+        except Exception as exc:  # noqa: BLE001
+            notes.append(f"Sevier county CAMA join failed ({exc}). Sale and value were not invented.")
     if fips == "47133":
         try:
             stats.update(join_overton(features, row))

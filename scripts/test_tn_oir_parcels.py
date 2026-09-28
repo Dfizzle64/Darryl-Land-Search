@@ -16,10 +16,13 @@ class TnOirParcelTests(unittest.TestCase):
         self.assertFalse(in_band(4.999))
         self.assertFalse(in_band(150.001))
 
-    def test_chester_id_uses_tax_record_then_map_id(self) -> None:
-        self.assertEqual(chester_parcel_id({"GPDATA__PA": "033C A 00500", "L15Parce_2": "012033"})[1], "tax-record")
-        self.assertEqual(chester_parcel_id({"GPDATA__PA": " ", "L15Parce_2": "012086    03300"})[0], "012086    03300")
-        self.assertEqual(chester_parcel_id({"GPDATA__PA": " ", "L15Parce_2": " "})[1], "neither")
+    def test_chester_id_uses_cama_gislink_then_map_id(self) -> None:
+        self.assertEqual(
+            chester_parcel_id({"GPDATA__GI": "012033    00500", "L15Parce_2": "012033", "GPDATA__PA": "033C A 00500"})[0],
+            "012033    00500",
+        )
+        self.assertEqual(chester_parcel_id({"GPDATA__GI": " ", "L15Parce_2": "012086    03300"})[1], "map")
+        self.assertEqual(chester_parcel_id({"GPDATA__GI": " ", "L15Parce_2": " "})[1], "neither")
 
     def test_bedford_pennsylvania_and_regrid_are_rejected(self) -> None:
         with self.assertRaises(RuntimeError):
@@ -35,11 +38,15 @@ class TnOirParcelTests(unittest.TestCase):
 
     def test_manifest_keeps_oir_and_sevier_county_layer(self) -> None:
         sevier = BY_FIPS["47155"]
-        self.assertEqual(sevier["mode"], "county-hosted")
-        self.assertEqual(sevier["source"], "tn-sevier-county-gis-mapserver-57")
-        self.assertIn("GIS_Department_Layers/MapServer/57", sevier["queryUrl"])
-        self.assertNotIn("Tennessee_Property_Boundaries_Public_Use", sevier["queryUrl"])
-        self.assertIsNone(sevier["saleVintage"])
+        self.assertEqual(sevier["mode"], "oir")
+        self.assertEqual(sevier["source"], "tn-oir-public-use-47155")
+        self.assertIn("Tennessee_Property_Boundaries_Public_Use", sevier["queryUrl"])
+        self.assertEqual(sevier["salesVintage"], "2025")
+        self.assertIn("GIS_Department_Layers/MapServer/57", sevier["salesJoin"]["url"])
+        self.assertIsNone(sevier["tncpmLayer"])
+        self.assertEqual(BY_FIPS["47133"]["salesVintage"], "2023")
+        self.assertIsNone(BY_FIPS["47023"]["salesVintage"])
+        self.assertEqual(BY_FIPS["47111"]["where"], "COUNTY_ID=56")
         macon = BY_FIPS["47111"]
         self.assertEqual(macon["mode"], "oir")
         self.assertIn("Tennessee_Property_Boundaries_Public_Use", macon["queryUrl"])

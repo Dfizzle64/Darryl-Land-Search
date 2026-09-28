@@ -255,3 +255,26 @@ def net_acres(rings: list) -> float:
             raw = raw + [raw[0]]
         net += ring_signed_m2(raw)
     return abs(net) / 4046.8564224
+
+
+_GEOD = None
+M2_PER_ACRE = 4046.8564224
+
+
+def geodesic_acres(rings: list) -> float:
+    """WGS84 geodesic area in acres. Esri exteriors are clockwise, so the signed sum is negated."""
+    global _GEOD
+    if _GEOD is None:
+        from pyproj import Geod
+
+        _GEOD = Geod(ellps="WGS84")
+    net = 0.0
+    for ring in rings or []:
+        if len(ring) < 4:
+            continue
+        closed = ring if ring[0] == ring[-1] else list(ring) + [ring[0]]
+        lons = [float(point[0]) for point in closed]
+        lats = [float(point[1]) for point in closed]
+        area, _perimeter = _GEOD.polygon_area_perimeter(lons, lats)
+        net += area
+    return abs(net) / M2_PER_ACRE

@@ -7,7 +7,7 @@ Wave 0 is South Florida only: Miami-Dade, Monroe, Broward, and Palm Beach. Acrea
 | Miami-Dade | 12086 | live | MD_LandInformation MapServer/26 | `https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/26` |
 | Monroe | 12087 | live | APO Parcels MapServer/0 | `https://mcgis4.monroecounty-fl.gov/public/rest/services/Parcels/MapServer/0` |
 | Broward | 12011 | partial | BCPA_EXTERNAL_JAN26 MapServer/16 | `https://gisweb-adapters.bcpa.net/arcgis/rest/services/BCPA_EXTERNAL_JAN26/MapServer/16` |
-| Palm Beach | 12099 | partial | PARCEL_INFO FeatureServer/4 | `https://gis.pbcgov.org/arcgis/rest/services/Parcels/PARCEL_INFO/FeatureServer/4` |
+| Palm Beach | 12099 | live | PARCEL_INFO MapServer/4, CONDO='NO' | `https://gis.pbcgov.org/arcgis/rest/services/Parcels/PARCEL_INFO/MapServer/4` |
 
 ## Property appraiser links
 
@@ -40,7 +40,7 @@ The header jump box accepts a street address or coordinates (`26.1224, -80.1373`
 
 - **Broward CAMA.** MapServer/16 is folio and geometry. The FDOR `CO_NO=16` join did not return from batched `PARCEL_ID` queries, so owner, sale, and value are not on these rows. BMSD parcel attributes are not the county roll. City zoning is the partial mosaic, not a Fort Lauderdale ordinance.
 - **Monroe TLS.** `mcgis4.monroecounty-fl.gov` fails default certificate verification. Ingest retries that host without verification. qPublic often blocks bots. The record link is still for people. `maps.monroecounty.gov` is Monroe County, New York, and is rejected.
-- **Palm Beach count.** The ACRES 5.0–150.0 query reports about 146,014 object ids. This shelf kept the parcels that survived geometry normalize and parcel-id dedupe, so Palm Beach is partial, not a full object-id extract. `maps.co.palm-beach.fl.us` TLS is fragile. The token-gated OpenData mirror and `opendata.pbcgov.org` are not used. `PROPERTY_USE` is text, not a numeric DOR code.
+- **Palm Beach count.** MapServer/4 with ACRES 5.0–150.0 and CONDO='NO' is 12,089 parcels. Condo units inherit the parent ACRES, so the unfiltered count is not this shelf. The FeatureServer advertises public edits and is not queried. `maps.co.palm-beach.fl.us` TLS is fragile. `PROPERTY_USE` is text, not a numeric DOR code.
 
 Refresh with:
 

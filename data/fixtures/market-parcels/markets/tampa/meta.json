@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-24T01:06:16Z",
+  "generatedAt": "2026-09-28T18:31:27Z",
   "market": "Tampa",
   "tier": "primary",
-  "parcelCount": 124315,
+  "parcelCount": 127713,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -20,26 +20,24 @@
       "name": "Citrus",
       "fips": "12017",
       "state": "Florida",
-      "featureCount": 5807,
+      "featureCount": 5992,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-citrus-doh-municipal-12017",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/8/query",
+      "source": "fl-citrus-swfwmd-12017",
+      "queryUrl": "https://www25.swfwmd.state.fl.us/arcgis12/rest/services/BaseVector/parcel_search/MapServer/2/query",
       "gaps": [
-        "Parcel polygons, owner, situs, and tax values are Florida DOH EHWATER layer 8. Citrus County lots have no acre or owner field, and lot PRCLKEY is empty, so zoning is a centroid join.",
-        "Municipality is the corporate-limit layer (Inverness or Crystal River). PHY_CITY is the postal city and is not the city limit.",
-        "County zoning and land use values CITY are placeholders and are not stored.",
-        "Inverness parcels: 86. Zoning is INV_FLU and future land use is FLU on the city layer.",
-        "Crystal River parcels left without city zoning: 88.",
-        "No public Crystal River zoning or FLU FeatureServer was verified.",
-        "County zoning codes are not Orange County multifamily districts."
+        "6028 rows matched the acreage filter; 5992 kept after the parcel-id and geometry checks.",
+        "Parcels are SWFWMD parcel_search layer 2. Acreage is AREANO (ACRES is empty), 5.0\u2013150.0 inclusive. PARCELID keeps embedded spaces.",
+        "Replaces the Florida DOH tiles. Zoning copied only when the parcel id still matches the previous extract.",
+        "No Opportunity Zone status is stored.",
+        "Zoning, future land use, or appraiser links carried forward for 5275 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12017/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12017/lookup.json",
       "tileCount": 9,
-      "sourceCount": 5813
+      "sourceCount": 6028
     },
     {
       "name": "Hardee",
@@ -109,10 +107,7 @@
       "path": "data/fixtures/market-parcels/counties/12057/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12057/lookup.json",
       "tileCount": 10,
-      "sourceCount": 13838,
-      "zoningJoinedCount": 13786,
-      "fluJoinedCount": 13785,
-      "rejected": []
+      "sourceCount": 13838
     },
     {
       "name": "Manatee",
@@ -127,14 +122,15 @@
       "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/39/query",
       "gaps": [
         "8098 source rows collapsed to 7239 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "No zoning or FLU on the Florida DOH extract."
+        "Florida DOH 5\u2013150 acre parcels (fl-doh-ehwaters-12081, 221 zoning codes and 247 future land use codes). County parcels were not re-downloaded.",
+        "Bradenton and Palmetto zoning and future land use are city layers. Longboat Key uses the town zoning polygons and future land use layer.",
+        "Anna Maria, Bradenton Beach, and Holmes Beach stay blank. PDF maps and parcel AM_, BB_, and HB_ fields are not a city service.",
+        "Rejected: Northport, Alabama ArcGIS org 3u10F1chkeawsUZY. Manatee County Planning zoning is not copied into these cities."
       ],
       "path": "data/fixtures/market-parcels/counties/12081/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12081/lookup.json",
       "tileCount": 8,
-      "sourceCount": 8098,
-      "zoningJoinedCount": 221,
-      "fluJoinedCount": 247
+      "sourceCount": 8098
     },
     {
       "name": "Pasco",
@@ -155,12 +151,7 @@
       "path": "data/fixtures/market-parcels/counties/12101/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12101/lookup.json",
       "tileCount": 8,
-      "sourceCount": 12557,
-      "zoningJoinedCount": 11834,
-      "fluJoinedCount": 12033,
-      "rejected": [
-        "https://pascogis.pascocountyfl.net/giswebeserver/rest/services/Hosted/County_Master_Property_List/FeatureServer/0"
-      ]
+      "sourceCount": 12557
     },
     {
       "name": "Pinellas",
@@ -181,12 +172,7 @@
       "path": "data/fixtures/market-parcels/counties/12103/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12103/lookup.json",
       "tileCount": 6,
-      "sourceCount": 42236,
-      "zoningJoinedCount": 18812,
-      "fluJoinedCount": 25989,
-      "rejected": [
-        "https://egis.pinellas.gov/gis/rest/services/AGO/Planning_LandUse/MapServer"
-      ]
+      "sourceCount": 42236
     },
     {
       "name": "Polk",
@@ -208,14 +194,7 @@
       "path": "data/fixtures/market-parcels/counties/12105/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12105/lookup.json",
       "tileCount": 17,
-      "sourceCount": 20263,
-      "zoningJoinedCount": 890,
-      "fluJoinedCount": 20262,
-      "rejected": [
-        "Polk zoning-district polygons — none published on Land_Use_and_Zoning",
-        "https://gismims.lakelandgov.net/portal/rest/services/Public/Lakeland10_Zoning/FeatureServer/0",
-        "https://gismims.lakelandgov.net/portal/rest/services/Public/Lakeland10_FutureLandUse/FeatureServer/0"
-      ]
+      "sourceCount": 20263
     },
     {
       "name": "Sarasota",
@@ -235,29 +214,28 @@
       "path": "data/fixtures/market-parcels/counties/12115/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12115/lookup.json",
       "tileCount": 6,
-      "sourceCount": 4303,
-      "zoningJoinedCount": 566,
-      "fluJoinedCount": 124
+      "sourceCount": 4303
     },
     {
       "name": "Sumter",
       "fips": "12119",
       "state": "Florida",
-      "featureCount": 6359,
+      "featureCount": 9572,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12119",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/59/query",
+      "source": "fl-sumter-bocc-parcels-12119",
+      "queryUrl": "https://services8.arcgis.com/FTrtUCmxaVKdPC5e/arcgis/rest/services/Parcels_gdb/FeatureServer/0/query",
       "gaps": [
-        "13576 source rows collapsed to 6359 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
-        "No zoning or FLU on the Florida DOH extract."
+        "Sumter BOCC Parcels_gdb. Acreage is Shape_STAr / 43560, 5.0\u2013150.0 inclusive. Acres_Lot_ is a string and is not the acreage.",
+        "Replaces the Tampa DOH tiles. Orlando SWFWMD tiles are a separate shelf and were not rewritten.",
+        "No Opportunity Zone status is stored. FDOR joins need CO_NO=70 and PIN exactly."
       ],
       "path": "data/fixtures/market-parcels/counties/12119/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12119/lookup.json",
       "tileCount": 7,
-      "sourceCount": 13576
+      "sourceCount": 9572
     }
   ]
 }

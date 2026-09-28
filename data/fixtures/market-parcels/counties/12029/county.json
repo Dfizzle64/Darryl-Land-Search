@@ -5,20 +5,22 @@
   "markets": [
     "Big Bend"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 3251,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "fl-srwmd-parcels-12029",
+  "queryUrl": "http://gis.srwmd.state.fl.us/arcgis/rest/services/SRWMDGIS/SRWMD_Parcels/FeatureServer/4/query",
   "gaps": [
-    "Gap. No county-hosted parcel polygon service for Dixie County. The property appraiser portal (https://www.qpublic.net/fl/dixie/) is qPublic/Schneider or a search page, not an open parcel GIS, and was not used as a geometry source.",
-    "Statewide FDOR cadastral, Florida DOH EHWATER, and SRWMD republished rolls exist and were not wired. No municipal zoning FeatureServer was confirmed. Eligible tracts in this county stay eligible and are not designated QOZs."
+    "3252 rows matched the acreage filter; 3251 kept after the parcel-id and geometry checks.",
+    "SRWMD layer 4 replaces the Big Bend gap. FDOR joins need CO_NO=25.",
+    "Acreage is AREANO, 5.0–150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
+    "No Opportunity Zone status is stored. Zoning and future land use are not on this SRWMD roll."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/12029/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/12029/lookup.json",
+  "sourceCount": 3252,
+  "dropped": 1,
+  "tileCount": 9
 }

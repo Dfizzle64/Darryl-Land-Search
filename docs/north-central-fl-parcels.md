@@ -9,7 +9,7 @@ npm run seed:oz2-eligible
 npm run seed:parcels:north-central
 ```
 
-`seed:parcels:north-central` passes `--refresh` so Hernando and Citrus replace the earlier Florida DOH-only tiles. Those two counties stay on the Tampa list as well. The shared tile files are the upgraded extract. Marion is not in this market and the Orlando sample is not rewritten.
+`seed:parcels:north-central` passes `--refresh` so Hernando and Citrus replace the earlier Florida DOH-only tiles. Those two counties stay on the Tampa list as well. The shared tile files are the upgraded extract. Bradford, Levy, Hamilton, Lafayette, Marion, Suwannee, and Union are on this shelf. The Orlando Marion sample file is not rewritten.
 
 ## Eligible tracts
 
@@ -27,17 +27,22 @@ npm run seed:parcels:north-central
 
 ## Parcels
 
-52,695 stored parcels. Coverage `complete-gte-5ac` means the 5–150 acre roll was queried countywide. It does **not** mean every county has municipal zoning or future land use.
+94,271 stored parcels. Coverage `complete-gte-5ac` means the 5–150 acre roll was queried countywide. It does **not** mean every county has municipal zoning or future land use.
 
 | County | Stored | Source rows | What is joined |
 | --- | ---: | ---: | --- |
 | Alachua | 15,539 | 15,563 | County Parcels35. Jurisdiction is `JurisNo`, not the mailing city |
 | Hernando | 6,601 | 6,601 | County parcels. Upgrade off DOH. Zoning by `PARCEL_KEY` |
-| Levy | 10,200 | 10,984 | DOH acreage only. Partial |
+| Levy | 9,645 | 9,645 | SRWMD layer 9. PARNO |
 | Putnam | 7,560 | 8,810 | DOH polygons plus municipal zoning centroids |
 | Gilchrist | 6,395 | 6,854 | DOH acreage only. Partial |
-| Citrus | 5,807 | 5,813 | DOH polygons plus corporate limits and county zoning centroids |
-| Bradford | 593 | 598 | DOH acreage only. Partial |
+| Citrus | 5,992 | 6,028 | SWFWMD layer 2. AREANO. Prior zoning kept when the parcel id matches |
+| Bradford | 3,292 | 3,293 | SRWMD layer 2. PARNO |
+| Hamilton | 4,149 | 4,150 | SRWMD layer 6. PARNO |
+| Lafayette | 3,165 | 3,166 | SRWMD layer 8. PARNO |
+| Marion | 17,730 | 17,840 | County ParcelsAndSubdivisions MapServer/0 |
+| Suwannee | 11,856 | 11,857 | SRWMD layer 11. PARNO |
+| Union | 2,347 | 2,348 | SRWMD layer 13. PARNO. The editable maintenance layer is not ingested |
 
 ### Alachua
 
@@ -55,9 +60,7 @@ County zoning joins on `KEY_NUMBER`. The value `CITY` is a placeholder and is no
 
 ### Citrus
 
-DOH EHWATER layer 8 supplies polygons, owner, situs, and tax values (5,813 source rows, 5,807 stored: 3 failed the extent check and 3 duplicate ids were collapsed). County lots have no acre or owner field and `PRCLKEY` is empty, so zoning is a centroid join. Corporate limits are Crystal River and Inverness only. `PHY_CITY` is postal.
-
-Unincorporated 5,633, Crystal River 88, Inverness 86. County zoning and land use values `CITY` are not stored. Inverness zoning is `INV_FLU` and land use is `FLU` on the city layer. Crystal River has no verified zoning or FLU service, so those 88 parcels have neither. 5,588 parcels have a zoning code and 5,585 have FLU. No placeholder `CITY` code was stored. Appraiser: https://www.citruspa.org/
+SWFWMD parcel_search layer 2 (`AREANO`, `PARCELID` with embedded spaces). 6,028 source rows, 5,992 stored. Zoning, future land use, and appraiser links from the earlier DOH extract are copied only when the parcel id still matches. Appraiser: https://www.citruspa.org/
 
 ### Putnam
 
@@ -65,20 +68,23 @@ Optional pull. DOH layer 53. 8,810 source rows stored as 7,560 parcels; the drop
 
 Municipal zoning is a centroid join to `ReferenceMap/Zoning_R` (Crescent City, Interlachen, Palatka, Pomona Park, Welaka). Stored counts: unincorporated 7,220, Palatka 108, Interlachen 95, Pomona Park 75, Crescent City 40, Welaka 22. Those 340 city parcels have zoning. Unincorporated zoning and future land use returned an error and were not joined. The hosted Palatka FLU service returned HTTP 500, so Palatka FLU is blank. The other cities do not have a verified FLU layer separate from zoning. `PHY_CITY` stays the postal city. Appraiser: https://pa.putnam-fl.com/
 
-### Levy, Gilchrist, and Bradford (partial)
+### Levy, Gilchrist, and Bradford
 
-These stay on the Florida DOH 5–150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified, so zoning and FLU are blank and `PHY_CITY` is not treated as a municipality.
+Levy and Bradford are the SRWMD April 2025 roll (`AREANO`, id `PARNO`). Gilchrist stays on the Florida DOH 5–150 acre roll. No public municipal boundary, zoning, or future-land-use service was verified for these three, so zoning and FLU are blank.
 
 | County | Stored | Source rows | Appraiser |
 | --- | ---: | ---: | --- |
-| Levy | 10,200 | 10,984 | https://www.qpublic.net/fl/levy/ |
+| Levy | 9,645 | 9,645 | https://www.qpublic.net/fl/levy/ |
 | Gilchrist | 6,395 | 6,854 | https://www.qpublic.net/fl/gilchrist/ |
-| Bradford | 593 | 598 | https://www.bradfordappraiser.com/ |
+| Bradford | 3,292 | 3,293 | https://www.bradfordappraiser.com/ |
 
 Gilchrist still appears in the county menu because the parcel extract exists, even though it has no eligible tract.
 
+## Also on this shelf
+
+Marion, Hamilton, Lafayette, Suwannee, and Union are the countywide 5–150 acre rolls in the table above. Marion's Orlando sample file is unchanged and is not drawn once this extract is larger. No Opportunity Zone status is stored.
+
 ## Not in this pull
 
-- Marion. Same Orlando central sample as before. No Marion tiles were rewritten and Marion is not a second market listing.
 - Placeholder zoning (`CITY`, `MUNICIPAL`, `MUNI`, `CITY LIMITS`, `CITY LIMITS OF INV. OR C.R.`) is never stored.
 - City zoning codes are labels. They are not Orange County multifamily districts.

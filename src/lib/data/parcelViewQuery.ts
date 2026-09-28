@@ -79,10 +79,28 @@ export async function loadParcelViewIndex(): Promise<ParcelViewIndex> {
   const tiles = new Map<string, Set<string>>();
   const files: FileCoverage[] = [];
 
+  const marketIndex = await loadMarketParcelIndex();
+  const marketCountByFips = new Map<string, number>();
+  for (const summary of Object.values(marketIndex.markets)) {
+    for (const county of summary?.counties ?? []) {
+      const fips = county.fips?.padStart(5, "0");
+      if (!fips) continue;
+      const count = county.featureCount ?? 0;
+      marketCountByFips.set(fips, Math.max(marketCountByFips.get(fips) ?? 0, count));
+    }
+  }
+
   const orlando = await loadOrlandoParcelsMeta();
   await Promise.all(
     orlando.counties.map(async (county) => {
       if (!county.path) return;
+      // A shed sample is not drawn on top of a larger market extract for the same county.
+      if (
+        county.partition !== "tiles" &&
+        (marketCountByFips.get(county.fips) ?? 0) > (county.featureCount ?? 0)
+      ) {
+        return;
+      }
       if (county.partition === "tiles") {
         for (const name of await tileNames(county.path)) addTile(tiles, name, "Orlando");
         return;
@@ -91,8 +109,6 @@ export async function loadParcelViewIndex(): Promise<ParcelViewIndex> {
       if (bbox) files.push({ market: "Orlando", bbox });
     }),
   );
-
-  const marketIndex = await loadMarketParcelIndex();
   await Promise.all(
     Object.keys(marketIndex.markets).map(async (market) => {
       const summary = marketIndex.markets[market];

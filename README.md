@@ -13,6 +13,8 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+The site is behind a password gate. No environment variable is required. An optional `SITE_PASSWORD` in `.env.local` overrides the built-in password and signs everyone out when it changes.
+
 Other scripts:
 
 ```bash

@@ -15,6 +15,8 @@ import {
   STREET_STYLE_CANDIDATES,
   addSatelliteSourceAndLayer,
   applyBasemap,
+  coverageFillPaint,
+  coverageLinePaint,
   excludedFillPaint,
   excludedLinePaint,
   MF_PRIORITY_SWATCH,
@@ -58,6 +60,7 @@ import {
 } from "@/lib/censusTracts";
 import { formatMapZoom, MAP_SCALE } from "@/lib/mapScale";
 import { eligibleClassCut, southCarolinaOverlayMode } from "@/lib/markets";
+import { PARCEL_COVERAGE_DEFAULT_ON, PARCEL_COVERAGE_MIN_ZOOM, coverageCountyLabel } from "@/lib/parcelCoverage";
 import { PARCEL_MIN_ZOOM } from "@/lib/parcelVisibility";
 import { scNominatedOverlayFilter, showOzTractInScMarkets } from "@/lib/scNominatedTracts";
 import {
@@ -454,6 +457,27 @@ function addOverlayLayers(
     layout: { visibility: "none" },
     paint: ozLinePaint(mode),
   });
+  map.addSource("parcel-coverage", {
+    type: "geojson",
+    data: EMPTY_COLLECTION,
+    attribution: "U.S. Census Bureau cartographic county boundaries",
+  });
+  map.addLayer({
+    id: "parcel-coverage-fill",
+    type: "fill",
+    source: "parcel-coverage",
+    minzoom: PARCEL_COVERAGE_MIN_ZOOM,
+    layout: { visibility: "none" },
+    paint: coverageFillPaint(mode),
+  });
+  map.addLayer({
+    id: "parcel-coverage-line",
+    type: "line",
+    source: "parcel-coverage",
+    minzoom: PARCEL_COVERAGE_MIN_ZOOM,
+    layout: { visibility: "none" },
+    paint: coverageLinePaint(mode),
+  });
   map.addLayer({
     id: "traffic-line",
     type: "line",
@@ -587,6 +611,20 @@ function incomeLineFrom(value: unknown): string | null {
   return `Median household income ${formatUsd(income)} (ACS 5-year B19013)`;
 }
 
+function showCoveragePopup(map: MapLibreMap, lngLat: maplibregl.LngLatLike, label: string) {
+  const root = document.createElement("div");
+  const place = document.createElement("p");
+  place.style.margin = "0";
+  place.style.fontWeight = "600";
+  place.style.color = POPUP_TEXT;
+  place.textContent = label;
+  root.append(place);
+  return new maplibregl.Popup({ closeButton: true, maxWidth: "280px", className: "dls-map-popup" })
+    .setLngLat(lngLat)
+    .setDOMContent(root)
+    .addTo(map);
+}
+
 function showTractPopup(
   map: MapLibreMap,
   lngLat: maplibregl.LngLatLike,
@@ -710,6 +748,8 @@ export function SiteMap({
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState("Loading map…");
   const [basemap, setBasemap] = useState<BasemapMode>("streets");
+  const [showCoverage, setShowCoverage] = useState(PARCEL_COVERAGE_DEFAULT_ON);
+  const coverageLoaded = useRef(false);
   const [drawing, setDrawing] = useState(false);
   const [measuring, setMeasuring] = useState(false);
   const [measurePoints, setMeasurePoints] = useState<LngLat[]>([]);
@@ -904,6 +944,23 @@ export function SiteMap({
             callbacksRef.current.onSelectTract(null);
             popupRef.current?.remove();
             popupRef.current = showTractPopup(map, event.lngLat, details, income);
+          });
+          map.on("click", "parcel-coverage-fill", (event) => {
+            if (drawingRef.current || measuringRef.current) return;
+            const props = event.features?.[0]?.properties;
+            const name = typeof props?.name === "string" ? props.name : "";
+            const stateName = typeof props?.state === "string" ? props.state : "";
+            if (!name || !stateName) return;
+            popupRef.current?.remove();
+            popupRef.current = showCoveragePopup(map, event.lngLat, coverageCountyLabel(name, stateName));
+          });
+          map.on("mousemove", "parcel-coverage-fill", () => {
+            if (drawingRef.current || measuringRef.current) return;
+            map.getCanvas().style.cursor = "pointer";
+          });
+          map.on("mouseleave", "parcel-coverage-fill", () => {
+            if (drawingRef.current) return;
+            map.getCanvas().style.cursor = "";
           });
           map.on("click", (event) => {
             if (!measuringRef.current || drawingRef.current) return;
@@ -1584,6 +1641,33 @@ export function SiteMap({
   }, [selectedId, selectedTractGeoid]);
 
   useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready") return;
+    const visibility = showCoverage ? "visible" : "none";
+    setVisibilitySafe(map, "parcel-coverage-fill", visibility);
+    setVisibilitySafe(map, "parcel-coverage-line", visibility);
+    if (!showCoverage || coverageLoaded.current) return;
+    let cancelled = false;
+    void fetch("/api/parcel-coverage")
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`Coverage load failed (${response.status})`);
+        return (await response.json()) as GeoJSON.FeatureCollection;
+      })
+      .then((collection) => {
+        if (cancelled) return;
+        const source = map.getSource("parcel-coverage");
+        if (source?.type === "geojson") (source as GeoJSONSource).setData(collection);
+        coverageLoaded.current = true;
+      })
+      .catch(() => {
+        coverageLoaded.current = false;
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [showCoverage, status]);
+
+  useEffect(() => {
     if (status !== "ready") return;
     const map = mapRef.current;
     const slot = cornerClusterRef.current;
@@ -1632,6 +1716,24 @@ export function SiteMap({
               {showOz2 ? "Hide tracts" : "Show tracts"}
             </button>
           ) : null}
+          <button
+            type="button"
+            data-coverage-toggle
+            aria-pressed={showCoverage}
+            aria-label={showCoverage ? "Hide parcel data coverage" : "Show parcel data coverage"}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              setShowCoverage((current) => !current);
+            }}
+            className={`rounded-full border px-3.5 py-2 text-sm font-semibold ${
+              showCoverage
+                ? "map-scrim text-white"
+                : "border-ink-950 bg-clay-500 text-ink-950 shadow-[0_10px_28px_rgba(0,0,0,0.55)] hover:bg-clay-400"
+            }`}
+          >
+            Coverage
+          </button>
         </div>
       ) : null}
       {status === "ready" ? (
@@ -1689,13 +1791,22 @@ export function SiteMap({
           }}
         />
       ) : null}
-      {status === "ready" && (showOz || showOz2 || showParcels || screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power) ? (
+      {status === "ready" && (showOz || showOz2 || showParcels || showCoverage || screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power) ? (
         <div className="map-chrome map-scrim absolute bottom-4 left-3 z-10 max-h-[calc(100%-17.5rem)] max-w-[min(17rem,calc(100%-9.5rem))] rounded-xl border sm:left-4 sm:max-h-[42vh] sm:max-w-[min(22rem,calc(100%-18.5rem))]">
           <div className="legend-scroll max-h-[inherit] space-y-1.5 overflow-y-auto break-words px-3 py-2.5 text-sm leading-snug">
           {aoi ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-5 border border-dashed border-clay-400 align-middle" />
               Area of interest
+            </p>
+          ) : null}
+          {showCoverage ? (
+            <p>
+              <span
+                className="mr-2 inline-block h-3.5 w-5 align-middle border"
+                style={{ backgroundColor: "rgba(158, 196, 228, 0.7)", borderColor: "#1e4e78" }}
+              />
+              Parcel data loaded
             </p>
           ) : null}
           {layerOn ? (

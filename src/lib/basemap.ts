@@ -129,6 +129,8 @@ export const OVERLAY_LAYER_IDS = [
   "oz2-line",
   "oz-fill",
   "oz-line",
+  "parcel-coverage-fill",
+  "parcel-coverage-line",
   "traffic-line",
   "parcels-fill-excluded",
   "parcels-line-excluded",
@@ -346,6 +348,17 @@ export function eligiblePackLinePaint(mode: BasemapMode): NonNullable<LineLayerS
   };
 }
 
+/** Light county wash. Streets get a darker edge so the outline still reads on the pale basemap. */
+export function coverageFillPaint(mode: BasemapMode): NonNullable<FillLayerSpecification["paint"]> {
+  if (mode === "streets") return { "fill-color": "#9ec4e4", "fill-opacity": 0.34 };
+  return { "fill-color": "#d7eafa", "fill-opacity": 0.32 };
+}
+
+export function coverageLinePaint(mode: BasemapMode): NonNullable<LineLayerSpecification["paint"]> {
+  if (mode === "streets") return { "line-color": "#1e4e78", "line-width": 1.4, "line-opacity": 0.9 };
+  return { "line-color": "#f7fbff", "line-width": 1.5, "line-opacity": 0.95 };
+}
+
 export function oz2LinePaint(mode: BasemapMode): NonNullable<LineLayerSpecification["paint"]> {
   const rural = ruralTractLine(mode);
   const other = mode === "satellite" ? "#d6e6ff" : mode === "streets" ? "#1d4ed8" : "#c5d8ff";
@@ -449,6 +462,8 @@ export function applyBasemap(map: MapLibreMap, mode: BasemapMode) {
   setPaint(map, "oz-line", ozLinePaint(mode));
   setPaint(map, "oz2-fill", oz2FillPaint(mode));
   setPaint(map, "oz2-line", oz2LinePaint(mode));
+  setPaint(map, "parcel-coverage-fill", coverageFillPaint(mode));
+  setPaint(map, "parcel-coverage-line", coverageLinePaint(mode));
   setPaint(map, "eligible-overview-fill", oz2FillPaint(mode));
   setPaint(map, "eligible-overview-line", oz2LinePaint(mode));
   setPaint(map, "rural-fill", oz2FillPaint(mode));

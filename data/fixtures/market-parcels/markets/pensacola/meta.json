@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-29T00:00:42Z",
+  "generatedAt": "2026-09-29T01:35:40Z",
   "market": "Pensacola",
   "tier": "other",
   "parcelCount": 66437,
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -30,7 +30,7 @@
       "gaps": [
         "17989 source rows collapsed to 17987 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
         "Municipal join: Daphne zoning 294 (key 293, spatial 1); Fairhope zoning 184 (key 177, spatial 7); Baldwin County Zoning/42 baseline 6991; Fairhope AO/MO overlay enrichment 156 parcels (overlay names are not zoning codes); Daphne FLU 668 (key 621, spatial 47); Daphne cleared county Zoning/42 on 288 parcels that only matched the city FLU layer.",
-        "Baldwin County parcels are web6 Baldwin_Public_ISV/MapServer/31. Acreage is CalcAcre, inclusive 5\u2013150. The al05baldrevenue Baldwin/Public URL is not used.",
+        "Baldwin County parcels are web6 Baldwin_Public_ISV/MapServer/31. Acreage is CalcAcre, inclusive 5–150. The al05baldrevenue Baldwin/Public URL is not used.",
         "Parcel ZoningCode is usually empty. County Zoning/42 (ZONE_1) is the unincorporated baseline and is replaced inside Daphne and Fairhope.",
         "Daphne zoning is Zoning_Current_view FeatureServer/0. Class is the zoning code (R1, B2, PUD). The Zoning field is the long label. Join is PID, PIN, or PARCELID, then centroid. Coverage is city-only.",
         "Daphne FLU is Placetypes_for_Future_Development_APRIL_2026 FeatureServer/2 field Future_Dev. Land_Use is the label. The older Envision_Placetype_Map layer is not used. Overlays_view is not base zoning.",
@@ -58,7 +58,7 @@
       "queryUrl": "https://gis.baycountyfl.gov/arcgis/rest/services/TEST_Parcels/FeatureServer/1/query",
       "gaps": [
         "5800 rows matched the acreage filter; 4863 kept after the parcel-id and geometry checks.",
-        "Bay parcels are TEST_Parcels/FeatureServer/1 (DTAXACRES 5.0\u2013150.0). The layer is queried only; it advertises public edits and is not written. Hosted/Parcels is the 2022 snapshot and is not this extract.",
+        "Bay parcels are TEST_Parcels/FeatureServer/1 (DTAXACRES 5.0–150.0). The layer is queried only; it advertises public edits and is not written. Hosted/Parcels is the 2022 snapshot and is not this extract.",
         "FDOR joins need CO_NO=13 and A1RENUM with '-' removed. No Opportunity Zone status is stored.",
         "Zoning or future land use carried forward for 4499 parcel ids that still match."
       ],
@@ -90,7 +90,9 @@
       "path": "data/fixtures/market-parcels/counties/12033/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12033/lookup.json",
       "tileCount": 9,
-      "sourceCount": 9240
+      "sourceCount": 9240,
+      "zoningJoinedCount": 8487,
+      "fluJoinedCount": 8487
     },
     {
       "name": "Holmes",
@@ -104,7 +106,7 @@
       "source": "fl-holmes-taxparcels-12059",
       "queryUrl": "https://services.arcgis.com/yghUoIoA2Cd2cWki/arcgis/rest/services/Holmes_Parcels/FeatureServer/0/query",
       "gaps": [
-        "Holmes TaxParcels (Holmes_Parcels/0). Acreage is Gis_Acres, 5.0\u2013150.0 inclusive. The id is PARCELNO.",
+        "Holmes TaxParcels (Holmes_Parcels/0). Acreage is Gis_Acres, 5.0–150.0 inclusive. The id is PARCELNO.",
         "Owner is not on this layer. The Panda maintenance-request layer is not this source and is not ingested.",
         "No Opportunity Zone status is stored. FDOR joins need CO_NO=40 and a PARCELNO with '.' and '-' removed."
       ],
@@ -139,7 +141,9 @@
       "path": "data/fixtures/market-parcels/counties/12091/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12091/lookup.json",
       "tileCount": 9,
-      "sourceCount": 9956
+      "sourceCount": 9956,
+      "zoningJoinedCount": 9449,
+      "fluJoinedCount": 9470
     },
     {
       "name": "Santa Rosa",
@@ -165,13 +169,15 @@
         "Appraiser link is https://srcpa.gov/search. No verified per-parcel deep link is on the layer. Search uses ParNum.",
         "Mailing city/state/zip are parsed from MailingCityStZip. The combined MailingAddr blob repeats the owner name and is not stored.",
         "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077).",
-        "Santa Rosa Basemap/1 is one row per address. The extract is deduped on Parcel. Acreage 5.0\u2013150.0 is the distinct Parcel count.",
+        "Santa Rosa Basemap/1 is one row per address. The extract is deduped on Parcel. Acreage 5.0–150.0 is the distinct Parcel count.",
         "FDOR joins need CO_NO=67 and the dashed Parcel. ParNum with the dashes removed does not match. The field named ParcelID is the object id and is not the parcel id."
       ],
       "path": "data/fixtures/market-parcels/counties/12113/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12113/lookup.json",
       "tileCount": 8,
-      "sourceCount": 16194
+      "sourceCount": 16194,
+      "zoningJoinedCount": 8901,
+      "fluJoinedCount": 8900
     },
     {
       "name": "Walton",
@@ -186,7 +192,7 @@
       "queryUrl": "https://services1.arcgis.com/TaXHPwWfIMuzJ7Ov/arcgis/rest/services/EnerGov/FeatureServer/4/query",
       "gaps": [
         "9623 rows matched the acreage filter; 8931 kept after the parcel-id and geometry checks.",
-        "Walton parcels are EnerGov/FeatureServer/4. Acreage is GIS_ACRES, 5.0\u2013150.0 inclusive. The object id field is OBJECTID_1.",
+        "Walton parcels are EnerGov/FeatureServer/4. Acreage is GIS_ACRES, 5.0–150.0 inclusive. The object id field is OBJECTID_1.",
         "FDOR joins need CO_NO=76 and PARCELNO with '-' removed. Sale price is the FDOR roll price. Sale dates after the load date are cleared. No Opportunity Zone status is stored.",
         "Zoning or future land use carried forward for 8888 parcel ids that still match."
       ],

@@ -19,9 +19,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Jacksonville | other | 26,878 | 5 | 0 | 0 |
 | Big Bend | other | 55,317 | 12 | 0 | 0 |
 | Pensacola | other | 73,565 | 8 | 0 | 0 |
-| Birmingham | other | 94,992 | 8 | 0 | 3 |
+| Birmingham | other | 101,123 | 9 | 0 | 3 |
 | Mobile | other | 51,658 | 4 | 0 | 2 |
-| Huntsville | other | 123,857 | 15 | 0 | 0 |
+| Huntsville | other | 132,496 | 16 | 0 | 0 |
 | Savannah | other | 19,987 | 5 | 0 | 3 |
 | Columbia | other | 49,244 | 5 | 1 | 7 |
 | Greenville | other | 48,073 | 5 | 0 | 4 |
@@ -35,7 +35,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | North-Central Florida | other | 103,358 | 13 | 0 | 0 |
 | Asheville | other | 89,533 | 15 | 0 | 0 |
 | Tuscaloosa | other | 27,452 | 4 | 0 | 1 |
-| Montgomery | other | 56,134 | 8 | 0 | 1 |
+| Montgomery | other | 85,425 | 13 | 0 | 1 |
 | Valdosta | other | 5,815 | 1 | 0 | 0 |
 | Macon | other | 3,257 | 1 | 0 | 0 |
 | Athens | other | 2,039 | 1 | 0 | 0 |
@@ -302,6 +302,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Blount | Alabama | 01009 | complete-gte-5ac | 11,515 | al-blount-parcels-01009 |
 | Calhoun | Alabama | 01015 | complete-gte-5ac | 9,768 | al-calhoun-parcels-01015 |
 | Chilton | Alabama | 01021 | gap | 0 | unavailable |
+| Cleburne | Alabama | 01029 | complete-gte-5ac | 6,131 | al-cleburne-parcels-01029 |
 | Cullman | Alabama | 01043 | complete-gte-5ac | 14,885 | al-cullman-parcels-01043 |
 | Etowah | Alabama | 01055 | complete-gte-5ac | 11,021 | al-etowah-parcels-01055 |
 | Jefferson | Alabama | 01073 | complete-gte-5ac | 15,641 | al-jefferson-parcels |
@@ -333,6 +334,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Giles | Tennessee | 47055 | complete-gte-5ac | 7,028 | tn-oir-public-use-47055 |
 | Jackson | Alabama | 01071 | complete-gte-5ac | 13,862 | al-jackson-parcels-01071 |
 | Lauderdale | Alabama | 01077 | complete-gte-5ac | 3,840 | al-lauderdale-parcels-01077 |
+| Lawrence | Alabama | 01079 | complete-gte-5ac | 8,639 | al-lawrence-parcels-01079 |
 | Limestone | Alabama | 01083 | complete-gte-5ac | 5,445 | al-limestone-remap-1 |
 | Lincoln | Tennessee | 47103 | complete-gte-5ac | 6,630 | tn-oir-public-use-47103 |
 | Madison | Alabama | 01089 | complete-gte-5ac | 12,312 | al-madison-public-isv-185 |
@@ -575,11 +577,16 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Autauga | Alabama | 01001 | complete-gte-5ac | 7,047 | al-autauga-parcels |
 | Barbour | Alabama | 01005 | complete-gte-5ac | 7,226 | al-barbour-parcels-01005 |
 | Bullock | Alabama | 01011 | complete-gte-5ac | 3,579 | al-bullock-parcels-01011 |
+| Coosa | Alabama | 01037 | complete-gte-5ac | 5,947 | al-coosa-parcels-01037 |
 | Dallas | Alabama | 01047 | complete-gte-5ac | 6,351 | al-dallas-parcels-01047 |
 | Elmore | Alabama | 01051 | complete-gte-5ac | 9,758 | al-elmore-parcels |
+| Henry | Alabama | 01067 | complete-gte-5ac | 6,275 | al-henry-parcels-01067 |
+| Houston | Alabama | 01069 | complete-gte-5ac | 2,734 | al-houston-parcels-01069 |
+| Lee | Alabama | 01081 | complete-gte-5ac | 8,747 | al-lee-parcels-01081 |
 | Lowndes | Alabama | 01085 | gap | 0 | unavailable |
 | Macon | Alabama | 01087 | complete-gte-5ac | 5,757 | al-macon-parcels-01087 |
 | Montgomery | Alabama | 01101 | complete-gte-5ac | 9,954 | al-montgomery-parcels |
+| Russell | Alabama | 01113 | complete-gte-5ac | 5,588 | al-russell-parcels-01113 |
 | Wilcox | Alabama | 01131 | complete-gte-5ac | 6,462 | al-wilcox-parcels-01131 |
 
 ### Valdosta

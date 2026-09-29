@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-29T04:25:22Z",
+  "generatedAt": "2026-09-29T04:41:50Z",
   "market": "Jacksonville",
   "tier": "other",
   "parcelCount": 26878,
@@ -28,12 +28,10 @@
       "source": "fl-baker-parcels-web2-12003",
       "queryUrl": "https://services6.arcgis.com/HSWu3dhzHf7nZfIa/arcgis/rest/services/parcels_web2/FeatureServer/0/query",
       "gaps": [
-        "Baker 2024_sales requires a token and was not joined.",
-        "Tax values on parcels_web2 use unlabeled cama0827 columns and were not mapped.",
-        "Macclenny and Glen St. Mary have no separate public zoning service. County zoning and FLU are applied countywide.",
-        "Zoning joined on 3312 of 3314 parcels.",
-        "FLU joined on 3301 of 3314 parcels.",
-        "Sales joined on 238 of 3314 parcels from the public year sales layers."
+        "3331 rows matched the acreage filter; 3314 kept after the parcel-id and geometry checks.",
+        "Baker parcels are parcels_web2/FeatureServer/0. Acreage is GIS_Acreag, 5.0–150.0 inclusive. MIL1 2023 is not the polygon source.",
+        "FDOR joins need CO_NO=12 and PIN with '-' removed. The property-appraiser link uses that undashed id. No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 3314 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12003/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12003/lookup.json",
@@ -104,13 +102,10 @@
       "source": "fl-nassau-taxmap-12089",
       "queryUrl": "https://maps.ncpafl.com/ncflpa_arcgis/rest/services/nassau/NassauCountyPublicTaxMap/MapServer/144/query",
       "gaps": [
-        "8117 source rows collapsed to 5587 parcel ids. Repeated PINs on the tax map were kept once.",
-        "Last sale is not on MapServer/144. Yearly sales sublayers were not joined.",
-        "Assessed and taxable values are the non-school county figures (cap_val_nonSCH and tax_val_nonSCH). School and city columns are not summed.",
-        "Unincorporated zoning and FLU are replaced inside Fernandina Beach, Hilliard, and Callahan.",
-        "Fernandina Beach parcels in the 5–150 acre band: 833.",
-        "Hilliard parcels in the 5–150 acre band: 109.",
-        "Callahan parcels in the 5–150 acre band: 37. Callahan has no separate zoning layer."
+        "8117 rows matched the acreage filter; 5587 kept after the parcel-id and geometry checks.",
+        "Nassau parcels are NassauCountyPublicTaxMap/MapServer/144. Acreage is GISCalculatedAcre, 5.0–150.0 inclusive. Repeated PINs are kept once.",
+        "FDOR joins need CO_NO=55 and PIN with '-' removed. The dashed PIN does not match. MIL1 2023 is not the polygon source. No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 5587 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12089/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12089/lookup.json",

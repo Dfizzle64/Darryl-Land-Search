@@ -12,13 +12,13 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Nashville | primary | 202,510 | 34 | 0 | 0 |
 | Charlotte | primary | 132,539 | 17 | 0 | 2 |
 | Raleigh-Durham | primary | 236,519 | 37 | 0 | 0 |
-| South Florida | shelf | 41,693 | 3 | 1 | 0 |
-| SWFL | other | 32,749 | 4 | 0 | 0 |
-| Vero Beach | other | 23,480 | 5 | 0 | 0 |
-| Melbourne | other | 41,026 | 5 | 0 | 0 |
+| South Florida | shelf | 40,322 | 3 | 1 | 0 |
+| SWFL | other | 32,170 | 4 | 0 | 0 |
+| Vero Beach | other | 23,470 | 5 | 0 | 0 |
+| Melbourne | other | 41,492 | 5 | 0 | 0 |
 | Jacksonville | other | 26,878 | 5 | 0 | 0 |
-| Big Bend | other | 53,214 | 8 | 2 | 0 |
-| Pensacola | other | 66,437 | 7 | 0 | 0 |
+| Big Bend | other | 55,317 | 12 | 0 | 0 |
+| Pensacola | other | 73,565 | 8 | 0 | 0 |
 | Birmingham | other | 101,123 | 9 | 0 | 3 |
 | Mobile | other | 51,658 | 4 | 0 | 2 |
 | Huntsville | other | 132,496 | 16 | 0 | 0 |
@@ -229,7 +229,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Broward | Florida | 12011 | partial | 7,549 | fl-broward-bcpa-jan26-16 |
-| Miami-Dade | Florida | 12086 | complete-gte-5ac | 15,563 | fl-miami-dade-landinformation-26 |
+| Miami-Dade | Florida | 12086 | complete-gte-5ac | 14,192 | fl-miami-dade-landinformation-26 |
 | Monroe | Florida | 12087 | complete-gte-5ac | 6,492 | fl-monroe-apo-parcels-0 |
 | Palm Beach | Florida | 12099 | complete-gte-5ac | 12,089 | fl-palm-beach-parcel-info-4 |
 
@@ -237,9 +237,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Charlotte | Florida | 12015 | complete-gte-5ac | 4,565 | fl-doh-ehwaters-12015 |
+| Charlotte | Florida | 12015 | complete-gte-5ac | 4,438 | fl-charlotte-ccgis-12015 |
 | Collier | Florida | 12021 | complete-gte-5ac | 13,889 | fl-collier-parceljoin |
-| Lee | Florida | 12071 | complete-gte-5ac | 9,992 | fl-lee-parceladdress |
+| Lee | Florida | 12071 | complete-gte-5ac | 9,540 | fl-lee-parceladdress |
 | Sarasota | Florida | 12115 | complete-gte-5ac | 4,303 | fl-doh-ehwaters-12115 |
 
 ### Vero Beach
@@ -250,7 +250,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,779 | fl-ircpa-parcels-12061 |
 | Martin | Florida | 12085 | complete-gte-5ac | 3,790 | fl-martin-geoweb-12085 |
 | Okeechobee | Florida | 12093 | complete-gte-5ac | 3,524 | fl-okeechobee-tyler-12093 |
-| St. Lucie | Florida | 12111 | complete-gte-5ac | 5,585 | fl-slc-parcels-12111 |
+| St. Lucie | Florida | 12111 | complete-gte-5ac | 5,575 | fl-slc-parcels-12111 |
 
 ### Melbourne
 
@@ -258,9 +258,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Brevard | Florida | 12009 | complete-gte-5ac | 6,802 | fl-brevard-accela-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,779 | fl-ircpa-parcels-12061 |
-| Orange | Florida | 12095 | complete-gte-5ac | 11,709 | reused-orlando-ocpa-5-150 |
-| Osceola | Florida | 12097 | complete-gte-5ac | 6,169 | reused-orlando-complete-5-150 |
-| Volusia | Florida | 12127 | complete-gte-5ac | 12,567 | fl-doh-ehwaters-12127 |
+| Orange | Florida | 12095 | complete-gte-5ac | 11,769 | fl-orange-agol-open-data-12095 |
+| Osceola | Florida | 12097 | complete-gte-5ac | 6,169 | osceola-parcels-12097 |
+| Volusia | Florida | 12127 | complete-gte-5ac | 12,973 | fl-volusia-open-data-12127 |
 
 ### Jacksonville
 
@@ -278,14 +278,16 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | --- | --- | ---: | --- |
 | Calhoun | Florida | 12013 | complete-gte-5ac | 4,121 | fl-fdor-cadastral-2025-12013 |
 | Dixie | Florida | 12029 | complete-gte-5ac | 3,251 | fl-srwmd-parcels-12029 |
+| Franklin | Florida | 12037 | complete-gte-5ac | 779 | fl-franklin-parcels-2023-12037 |
 | Gadsden | Florida | 12039 | complete-gte-5ac | 6,170 | fl-fdor-cadastral-2025-12039 |
+| Gulf | Florida | 12045 | complete-gte-5ac | 1,245 | fl-gulf-gomaps4-12045 |
 | Jackson | Florida | 12063 | complete-gte-5ac | 11,461 | fl-fdor-cadastral-2025-12063 |
-| Jefferson | Florida | 12065 | sample | 5,165 | fl-jefferson-pa-parcels-12065 |
-| Leon | Florida | 12073 | complete-gte-5ac | 5,685 | fl-leon-overlay-parcel-12073 |
+| Jefferson | Florida | 12065 | complete-gte-5ac | 5,163 | fl-jefferson-pa-parcels-12065 |
+| Leon | Florida | 12073 | complete-gte-5ac | 5,684 | fl-leon-overlay-parcel-12073 |
 | Liberty | Florida | 12077 | complete-gte-5ac | 1,586 | fl-fdor-cadastral-2025-12077 |
 | Madison | Florida | 12079 | complete-gte-5ac | 7,178 | fl-srwmd-parcels-12079 |
 | Taylor | Florida | 12123 | complete-gte-5ac | 3,813 | fl-srwmd-parcels-12123 |
-| Wakulla | Florida | 12129 | sample | 4,784 | fl-wakulla-county-parcels-12129 |
+| Wakulla | Florida | 12129 | complete-gte-5ac | 4,866 | fl-wakulla-parcelm-12129 |
 
 ### Pensacola
 
@@ -298,6 +300,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Okaloosa | Florida | 12091 | complete-gte-5ac | 9,956 | fl-panhandle-12091 |
 | Santa Rosa | Florida | 12113 | complete-gte-5ac | 8,928 | fl-panhandle-12113 |
 | Walton | Florida | 12131 | complete-gte-5ac | 8,931 | fl-walton-energov-12131 |
+| Washington | Florida | 12133 | complete-gte-5ac | 7,128 | fl-washington-agol-12133 |
 
 ### Birmingham
 

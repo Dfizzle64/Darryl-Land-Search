@@ -10,14 +10,20 @@
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "reused-orlando-complete-5-150",
-  "queryUrl": "https://gis.osceola.org/hosting/rest/services/Parcels/FeatureServer/3/query",
+  "source": "osceola-parcels-12097",
+  "queryUrl": "https://gis.osceola.org/hosting/rest/services/Parcels/MapServer/3/query",
   "gaps": [
-    "Market rows point at the Orlando tile folder. Those tiles were reseeded from Osceola public parcels."
+    "6170 rows matched the acreage filter; 6169 kept after the parcel-id and geometry checks.",
+    "Osceola parcels are read from Parcels/MapServer/3. FeatureServer/3 advertises public edits and is not written. Acreage is TotalAcres, 5.0–150.0 inclusive. Tiles stay on the Orlando shelf.",
+    "FDOR joins need CO_NO=59 and PIN exactly. The property-appraiser pattern is stored and was not health-checked. No Opportunity Zone status is stored.",
+    "Zoning or future land use carried forward for 6129 parcel ids that still match."
   ],
   "path": "data/fixtures/orlando-parcels/tiles/12097",
   "lookup": "data/fixtures/orlando-parcels/lookup/12097.json",
   "sourceCount": 6170,
-  "dropped": null,
-  "tileCount": 13
+  "dropped": 0,
+  "tileCount": 13,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://maps.property-appraiser.org/?PIN={id}",
+  "gisViewerUrl": "https://maps.property-appraiser.org/"
 }

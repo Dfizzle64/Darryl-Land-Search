@@ -5,20 +5,26 @@
   "markets": [
     "Melbourne"
   ],
-  "featureCount": 11709,
+  "featureCount": 11769,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "reused-orlando-ocpa-5-150",
-  "queryUrl": "https://vgispublic.ocpafl.org/server/rest/services/Webmap/PARCEL/MapServer/4/query",
+  "source": "fl-orange-agol-open-data-12095",
+  "queryUrl": "https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/56/query",
   "gaps": [
-    "Reused the Orlando OCPA 5.0\u2013150.0 acre tiles. Not a second download.",
-    "Geometry, owner, mailing, sale, tax, and zoning come from OCPA."
+    "11911 rows matched the acreage filter; 11769 kept after the parcel-id and geometry checks.",
+    "Orange parcels are AGOL_Open_Data/MapServer/56. The acreage filter is ACREAGE BETWEEN 5 AND 150 because the host rejects >= and <=. The OCPA Webmap/PARCEL extract is not this shelf.",
+    "Where NAME1='CONFIDENTIAL', NAME1, NAME2, and the mailing address are suppressed.",
+    "FDOR joins need CO_NO=58 and PARCEL with the 1st and 3rd 2-digit groups swapped (or ALT_KEY = PARCEL). No Opportunity Zone status is stored.",
+    "Zoning or future land use carried forward for 10074 parcel ids that still match."
   ],
   "path": "data/fixtures/orlando-parcels/tiles/12095",
   "lookup": "data/fixtures/orlando-parcels/lookup/12095.json",
-  "sourceCount": 11887,
-  "dropped": null,
-  "tileCount": 10
+  "sourceCount": 11911,
+  "dropped": 0,
+  "tileCount": 10,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://ocpaweb.ocpafl.org/parcelsearch/Parcel%20ID/{id}",
+  "gisViewerUrl": "https://www.ocfl.net/PlanningDevelopment/InteractiveMapping.aspx"
 }

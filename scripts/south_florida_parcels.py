@@ -76,7 +76,7 @@ MIAMI_PARCELS = "https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInform
 MIAMI_ZONE_COUNTY = "https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/18/query"
 MIAMI_ZONE_CITY = "https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/19/query"
 MIAMI_FLU = "https://gisweb.miamidade.gov/arcgis/rest/services/LandManagement/MD_CDMP/MapServer/7/query"
-MIAMI_PA = "https://apps.miamidadepa.gov/ComparableSales/#/?folio={FOLIO}"
+MIAMI_PA = "https://apps.miamidadepa.gov/PropertySearch/#/?folio={FOLIO}"
 MIAMI_PA_API = (
     "https://apps.miamidadepa.gov/PApublicServiceProxy/PaServicesProxy.ashx"
     "?Operation=GetPropertySearchByFolio&clientAppName=PropertySearch&folioNumber={FOLIO}"

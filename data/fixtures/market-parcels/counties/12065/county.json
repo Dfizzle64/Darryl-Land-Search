@@ -5,22 +5,26 @@
   "markets": [
     "Big Bend"
   ],
-  "featureCount": 5165,
-  "coverage": "sample",
+  "featureCount": 5163,
+  "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
   "source": "fl-jefferson-pa-parcels-12065",
   "queryUrl": "https://services5.arcgis.com/vFMp1Ly1q6rKKp0o/arcgis/rest/services/JC__PARCELS_view/FeatureServer/0/query",
   "gaps": [
-    "Partial. Jefferson County Property Appraiser parcels have COGO_ACRES and a parcel id. No owner or situs.",
-    "Monticello city zoning and city future land use are joined inside the city outline. Unincorporated Jefferson County has no public zoning FeatureServer. Eligible tracts in this county stay eligible and are not designated QOZs.",
-    "Property appraiser search is https://jeffersonpa.net/. Null COGO_ACRES rows are omitted.",
-    "Join counts: monticello=48, county=5117, zoning=48, flu=48"
+    "5382 rows matched the acreage filter; 5163 kept after the parcel-id and geometry checks.",
+    "Jefferson parcels are JC__PARCELS_view/FeatureServer/0. Acreage is COGO_ACRES, 5.0–150.0 inclusive. Road placeholder 00-00-00-0000-0RDS-0000 is dropped.",
+    "OwnerPhone and OwnerEmail are present on the Jefferson roll and are not ingested.",
+    "FDOR joins need CO_NO=43 and the dashed PARCELID. Owner, tax, and the roll sale come from that FDOR row. The property-appraiser pattern is stored and was not health-checked. MIL1 2023 is not the polygon source. No Opportunity Zone status is stored.",
+    "Zoning or future land use carried forward for 5163 parcel ids that still match."
   ],
   "path": "data/fixtures/market-parcels/counties/12065/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12065/lookup.json",
-  "sourceCount": 5383,
-  "dropped": 0,
-  "tileCount": 8
+  "sourceCount": 5382,
+  "dropped": 1,
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=866&LayerID=16381&PageTypeID=4&PageID=7228&KeyValue={id}",
+  "gisViewerUrl": "https://gisdata-jcpa.hub.arcgis.com"
 }

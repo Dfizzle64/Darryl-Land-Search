@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T05:24:55Z",
+  "generatedAt": "2026-09-29T05:27:18Z",
   "market": "Greenville",
   "tier": "other",
-  "parcelCount": 48073,
+  "parcelCount": 91872,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -46,20 +46,27 @@
       "name": "Anderson",
       "fips": "45007",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 12288,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-anderson-parcels-45007",
+      "queryUrl": "https://propertyviewer.andersoncountysc.org/arcgis/rest/services/NewPropertyViewer/MapServer/5/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Source query returned 12592 rows; 12288 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Parcels (NewPropertyViewer MapServer) (https://propertyviewer.andersoncountysc.org/arcgis/rest/services/NewPropertyViewer/MapServer/5). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "Owner name / mailing not on public parcel REST — use ACPASS Real Property (QryMapNo=TMS / ACPASS_LOOKUP).",
+        "TAXOWNSTR is ownership-structure code, NOT ownerName.",
+        "No dedicated acreage field — parse DESCRIPTIO or Shape.STArea()/43560.",
+        "Zoning Opengov/MAT/6 covers ~33k/120k parcels (zoned areas); unincorporated often unzoned."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45007/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45007/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 12592
     },
     {
       "name": "Cherokee",
@@ -143,58 +150,78 @@
       "name": "Laurens",
       "fips": "45059",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 8633,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-laurens-parcels-45059",
+      "queryUrl": "https://www.laurenscountygis.org/arcgis/rest/services/Pebble/TaxParcel/MapServer/5/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Source query returned 8649 rows; 8633 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Parcel (Pebble TaxParcel) (https://www.laurenscountygis.org/arcgis/rest/services/Pebble/TaxParcel/MapServer/5). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "No public zoning FeatureServer verified on dig day; LaurensGIS viewer is parcels/base data.",
+        "Assessed/market tax values not on MapServer/5 fields reviewed.",
+        "Reject SCDOT SC_Parcels (token required) as primary."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45059/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45059/lookup.json",
+      "tileCount": 11,
+      "sourceCount": 8649
     },
     {
       "name": "Oconee",
       "fips": "45073",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 9314,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-oconee-parcels-45073",
+      "queryUrl": "https://arcserver2.oconeesc.com/arcgis/rest/services/PARCELDATA_owner/MapServer/1/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Source query returned 9335 rows; 9314 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Parcels with owner (PARCELDATA_owner MapServer) (https://arcserver2.oconeesc.com/arcgis/rest/services/PARCELDATA_owner/MapServer/1). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "No sale price / market / assessed values on public GIS — use qPublic AppID=1030.",
+        "No situs address field on PARCELDATA_owner — owner mailing only; situs via qPublic.",
+        "Zoning is citizen-initiated / sparse (12 base polygons); default CFD for most land — honest partial, not countywide district coverage.",
+        "No FLU REST found."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45073/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45073/lookup.json",
+      "tileCount": 10,
+      "sourceCount": 9335
     },
     {
       "name": "Pickens",
       "fips": "45077",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 9257,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-pickens-parcels-45077",
+      "queryUrl": "https://services1.arcgis.com/59960rq18IxUcAVI/arcgis/rest/services/Pickens_Open_data/FeatureServer/6/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Parcels are Parcels (Pickens_Open_data — county AGOL GISpickens) (https://services1.arcgis.com/59960rq18IxUcAVI/arcgis/rest/services/Pickens_Open_data/FeatureServer/6). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "MUNICIPALITY INVENTORY: Easley (city zoning+FLU REST — companion 45077-easley.yaml), Clemson, Liberty, Pickens, Central, Norris, Six Mile. Clemson/Liberty/Pickens/Central — no separate city zoning FeatureServer verified 2026-09-24; use parcel ZONINGCODE where populated or UDSO rules.",
+        "County UDSO applies to unincorporated land; no dissolved countywide zoning polygon layer found — parcel ZONINGCODE partial.",
+        "Market/assessed values not reliable on public open-data/ArcReader layers — use qPublic AppID=927.",
+        "pcgis-pickenscosc.opendata.arcgis.com Hub search returns unrelated datasets — use GISpickens FeatureServer URLs directly.",
+        "EasleyZoningMap/7 is a ~16k subset — wrong-geography for county ingest."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45077/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45077/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 9257
     },
     {
       "name": "Spartanburg",
@@ -223,6 +250,32 @@
       "lookup": "data/fixtures/market-parcels/counties/45083/lookup.json",
       "tileCount": 7,
       "sourceCount": 16214
+    },
+    {
+      "name": "Union",
+      "fips": "45087",
+      "state": "South Carolina",
+      "featureCount": 4307,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "sc-union-parcels-45087",
+      "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18/query",
+      "gaps": [
+        "Source query returned 4315 rows; 4307 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are SC RFA Statewide_Parcels filtered to Union County (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "Primary parcels now SC RFA Statewide_Parcels (layer 18, where County='Union County'), state-hosted inside a boundary-program map — fragile; alt source retained.",
+        "Parcel polygons loadable from AGOL UNION_SC_PARCELS_WFL1/FeatureServer/2 (18,885; 2026-03-30 snapshot) — publisher account mitchelllh not confirmed as county; prefer a county-published source if one appears.",
+        "No county-published Union County SC parcel REST verified (GIS office page points to data orders); the AGOL layer above is third-party/unconfirmed publisher.",
+        "PublicGisUrl/PA link: qPublic search at https://www.qpublic.net/sc/union/search.html; use parcelId as the 13-digit SC tax map number in the search form. No stable parcel-specific deep link verified."
+      ],
+      "path": "data/fixtures/market-parcels/counties/45087/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45087/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 4315
     }
   ]
 }

@@ -1,0 +1,33 @@
+{
+  "name": "McCormick",
+  "fips": "45065",
+  "state": "South Carolina",
+  "markets": [
+    "Columbia"
+  ],
+  "featureCount": 1863,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "sc-mccormick-parcels-45065",
+  "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Edgefield_McCormick_Greenwood_Web_Map_WFL1/FeatureServer/7/query",
+  "gaps": [
+    "Source query returned 2203 rows; 1863 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are SC RFA McCormick Parcels (county-specific layer w/ CAMA, boundary program map) (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Edgefield_McCormick_Greenwood_Web_Map_WFL1/FeatureServer/7). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "tax usable: RFA McCormick Parcels layer 7 (county CAMA join, 2025-11-04 load). Numeric values stored as strings; RFA/18 M_Value (12128>0) mirrors taxTotMark.",
+    "sale usable: Parse %m/%d/%Y %I:%M:%S %p. Note taxTransfe/taxTrans1 are a boolean flag + a date — do not confuse with sale price. Stale ~2025-11.",
+    "owner usable: Owner + mailing public on RFA layer 7.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "Parcel polygons now loadable from SC RFA Statewide_Parcels (layer 18, where County='McCormick County') plus RFA county-specific layer; state-hosted inside boundary-program maps — fragile, snapshot extracts. No county-published parcel REST found 2026-09-28."
+  ],
+  "path": "data/fixtures/market-parcels/counties/45065/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45065/lookup.json",
+  "sourceCount": 2203,
+  "dropped": 6,
+  "tileCount": 7,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://map.viewprogis.com/ecp/mccormick-sc",
+  "gisViewerUrl": "https://map.viewprogis.com/ecp/mccormick-sc"
+}

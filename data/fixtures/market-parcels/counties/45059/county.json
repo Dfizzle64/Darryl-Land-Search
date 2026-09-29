@@ -5,19 +5,28 @@
   "markets": [
     "Greenville"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 8633,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-laurens-parcels-45059",
+  "queryUrl": "https://www.laurenscountygis.org/arcgis/rest/services/Pebble/TaxParcel/MapServer/5/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Source query returned 8649 rows; 8633 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcel (Pebble TaxParcel) (https://www.laurenscountygis.org/arcgis/rest/services/Pebble/TaxParcel/MapServer/5). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "No public zoning FeatureServer verified on dig day; LaurensGIS viewer is parcels/base data.",
+    "Assessed/market tax values not on MapServer/5 fields reviewed.",
+    "Reject SCDOT SC_Parcels (token required) as primary."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45059/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45059/lookup.json",
+  "sourceCount": 8649,
+  "dropped": 15,
+  "tileCount": 11,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://beacon.schneidercorp.com/Application.aspx?AppID=1228&LayerID=39077&PageTypeID=4&KeyValue={parcelId}",
+  "gisViewerUrl": "https://www.laurenscountygis.org/LaurensGIS/"
 }

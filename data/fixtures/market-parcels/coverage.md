@@ -8,9 +8,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | ---: | ---: | ---: | ---: |
 | Atlanta | primary | 97,868 | 18 | 0 | 17 |
 | Tampa | primary | 127,713 | 10 | 0 | 0 |
-| Charleston | primary | 86,151 | 14 | 0 | 1 |
+| Charleston | primary | 113,262 | 18 | 0 | 0 |
 | Nashville | primary | 202,510 | 34 | 0 | 0 |
-| Charlotte | primary | 132,539 | 17 | 0 | 2 |
+| Charlotte | primary | 157,704 | 19 | 0 | 0 |
 | Raleigh-Durham | primary | 236,519 | 37 | 0 | 0 |
 | South Florida | shelf | 40,322 | 3 | 1 | 0 |
 | SWFL | other | 32,170 | 4 | 0 | 0 |
@@ -23,8 +23,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Mobile | other | 51,658 | 4 | 0 | 2 |
 | Huntsville | other | 132,496 | 16 | 0 | 0 |
 | Savannah | other | 38,540 | 9 | 0 | 2 |
-| Columbia | other | 49,244 | 5 | 1 | 7 |
-| Greenville | other | 48,073 | 5 | 0 | 4 |
+| Columbia | other | 96,799 | 12 | 0 | 2 |
+| Greenville | other | 91,872 | 10 | 0 | 0 |
 | Chattanooga | other | 51,467 | 10 | 0 | 4 |
 | Knoxville | other | 146,507 | 26 | 0 | 0 |
 | Memphis | other | 102,576 | 20 | 0 | 0 |
@@ -117,7 +117,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Georgetown | South Carolina | 45043 | complete-gte-5ac | 3,963 | sc-georgetown-parcels-45043 |
 | Hampton | South Carolina | 45049 | complete-gte-5ac | 3,402 | sc-hampton-parcels-45049 |
 | Horry | South Carolina | 45051 | complete-gte-5ac | 12,037 | sc-horry-parcels-45051 |
-| Orangeburg | South Carolina | 45075 | gap | 0 | unavailable |
+| Marion | South Carolina | 45067 | complete-gte-5ac | 3,697 | sc-marion-parcels-45067 |
+| Marlboro | South Carolina | 45069 | complete-gte-5ac | 3,632 | sc-marlboro-parcels-45069 |
+| Orangeburg | South Carolina | 45075 | complete-gte-5ac | 12,608 | sc-orangeburg-parcels-45075 |
+| Williamsburg | South Carolina | 45089 | complete-gte-5ac | 7,174 | sc-williamsburg-parcels-45089 |
 
 ### Nashville
 
@@ -171,7 +174,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Davidson | North Carolina | 37057 | complete-gte-5ac | 12,063 | nc-davidson-opengov-37057 |
 | Gaston | North Carolina | 37071 | complete-gte-5ac | 6,815 | nc-gaston-publicgis-37071 |
 | Iredell | North Carolina | 37097 | complete-gte-5ac | 10,768 | nc-iredell-taxsql-37097 |
-| Lancaster | South Carolina | 45057 | gap | 0 | unavailable |
+| Lancaster | South Carolina | 45057 | complete-gte-5ac | 13,416 | sc-lancaster-parcels-45057 |
 | Lincoln | North Carolina | 37109 | complete-gte-5ac | 6,563 | nc-lincoln-operational-37109 |
 | Mecklenburg | North Carolina | 37119 | complete-gte-5ac | 8,402 | meck-taxparcel-camadata-37119 |
 | Montgomery | North Carolina | 37123 | complete-gte-5ac | 5,957 | nc-montgomery-parcels-37123 |
@@ -180,7 +183,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Scotland | North Carolina | 37165 | complete-gte-5ac | 3,348 | nc-scotland-parcels-37165 |
 | Stanly | North Carolina | 37167 | complete-gte-5ac | 8,024 | nc-onemap-37167 |
 | Union | North Carolina | 37179 | complete-gte-5ac | 13,025 | nc-union-atlas-37179 |
-| York | South Carolina | 45091 | gap | 0 | unavailable |
+| York | South Carolina | 45091 | complete-gte-5ac | 11,749 | sc-york-parcels-45091 |
 
 ### Raleigh-Durham
 
@@ -376,13 +379,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Chesterfield | South Carolina | 45025 | complete-gte-5ac | 8,287 | sc-chesterfield-parcels-45025 |
 | Edgefield | South Carolina | 45037 | complete-gte-5ac | 5,811 | sc-edgefield-parcels-45037 |
 | Fairfield | South Carolina | 45039 | complete-gte-5ac | 5,031 | sc-fairfield-parcels-45039 |
-| Kershaw | South Carolina | 45055 | gap | 0 | unavailable |
-| Lee | South Carolina | 45061 | gap | 0 | unavailable |
+| Kershaw | South Carolina | 45055 | complete-gte-5ac | 8,685 | sc-kershaw-parcels-45055 |
+| Lee | South Carolina | 45061 | complete-gte-5ac | 3,908 | sc-lee-parcels-45061 |
 | Lexington | South Carolina | 45063 | complete-gte-5ac | 13,975 | sc-lexington-property-4 |
-| Newberry | South Carolina | 45071 | gap | 0 | unavailable |
-| Orangeburg | South Carolina | 45075 | gap | 0 | unavailable |
-| Richland | South Carolina | 45079 | sample | 638 | sc-columbia-city-landrecords |
-| Saluda | South Carolina | 45081 | gap | 0 | unavailable |
+| McCormick | South Carolina | 45065 | complete-gte-5ac | 1,863 | sc-mccormick-parcels-45065 |
+| Newberry | South Carolina | 45071 | complete-gte-5ac | 6,717 | sc-newberry-parcels-45071 |
+| Orangeburg | South Carolina | 45075 | complete-gte-5ac | 12,608 | sc-orangeburg-parcels-45075 |
+| Richland | South Carolina | 45079 | complete-gte-5ac | 8,677 | sc-richland-parcels-45079 |
+| Saluda | South Carolina | 45081 | complete-gte-5ac | 5,735 | sc-saluda-parcels-45081 |
 | Sumter | South Carolina | 45085 | gap | 0 | unavailable |
 
 ### Greenville
@@ -390,14 +394,15 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Abbeville | South Carolina | 45001 | complete-gte-5ac | 5,266 | sc-abbeville-parcels-45001 |
-| Anderson | South Carolina | 45007 | gap | 0 | unavailable |
+| Anderson | South Carolina | 45007 | complete-gte-5ac | 12,288 | sc-anderson-parcels-45007 |
 | Cherokee | South Carolina | 45021 | complete-gte-5ac | 6,302 | sc-cherokee-parcels-45021 |
 | Greenville | South Carolina | 45045 | complete-gte-5ac | 14,959 | sc-greenville-gcgia-tax-parcel |
 | Greenwood | South Carolina | 45047 | complete-gte-5ac | 5,341 | sc-greenwood-parcels-45047 |
-| Laurens | South Carolina | 45059 | gap | 0 | unavailable |
-| Oconee | South Carolina | 45073 | gap | 0 | unavailable |
-| Pickens | South Carolina | 45077 | gap | 0 | unavailable |
+| Laurens | South Carolina | 45059 | complete-gte-5ac | 8,633 | sc-laurens-parcels-45059 |
+| Oconee | South Carolina | 45073 | complete-gte-5ac | 9,314 | sc-oconee-parcels-45073 |
+| Pickens | South Carolina | 45077 | complete-gte-5ac | 9,257 | sc-pickens-parcels-45077 |
 | Spartanburg | South Carolina | 45083 | complete-gte-5ac | 16,205 | sc-spartanburg-cama-parcels |
+| Union | South Carolina | 45087 | complete-gte-5ac | 4,307 | sc-union-parcels-45087 |
 
 ### Chattanooga
 

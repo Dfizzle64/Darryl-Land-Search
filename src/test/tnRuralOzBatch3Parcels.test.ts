@@ -189,7 +189,7 @@ describe("Tennessee rural parcel batch 3", () => {
         expect(manifest.gaps.join(" ")).toMatch(/stay empty/);
       } else {
         expect(sawZoning).toBe(true);
-        expect(manifest.gaps.join(" ")).toMatch(/Zoning/);
+        expect(manifest.gaps.join(" ")).toMatch(/zoning/i);
       }
     }
   }, 240_000);

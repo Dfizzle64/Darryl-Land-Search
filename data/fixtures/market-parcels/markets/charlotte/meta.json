@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T04:03:44Z",
+  "generatedAt": "2026-09-29T04:25:22Z",
   "market": "Charlotte",
   "tier": "primary",
-  "parcelCount": 129191,
+  "parcelCount": 132539,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -435,6 +435,29 @@
       "lookup": "data/fixtures/market-parcels/counties/37159/lookup.json",
       "tileCount": 6,
       "sourceCount": 10385
+    },
+    {
+      "name": "Scotland",
+      "fips": "37165",
+      "state": "North Carolina",
+      "featureCount": 3348,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-scotland-parcels-37165",
+      "queryUrl": "https://services3.arcgis.com/bgKigTDifCMNj8OU/arcgis/rest/services/Tax_Parcels_Scotland_County_view/FeatureServer/6/query",
+      "gaps": [
+        "Parcels are Tax Parcels Scotland County - Public View (PRIMARY AGOL CAMA) (https://services3.arcgis.com/bgKigTDifCMNj8OU/arcgis/rest/services/Tax_Parcels_Scotland_County_view/FeatureServer/6). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 3361 rows; 3348 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 406 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Scotland's public price field is DeedStamps. Excise stamps are not stored as a sale price.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37165/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37165/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 3361
     },
     {
       "name": "Stanly",

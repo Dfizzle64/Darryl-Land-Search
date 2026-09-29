@@ -1,0 +1,29 @@
+{
+  "name": "Rutherford",
+  "fips": "37161",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 11190,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-rutherford-parcels-37161",
+  "queryUrl": "https://gis.rutherfordcountync.gov/server/rest/services/Addressing/MapServer/2/query",
+  "gaps": [
+    "Parcels are Addressing Parcels (CAMA + polygons) (https://gis.rutherfordcountync.gov/server/rest/services/Addressing/MapServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 11199 rows; 11190 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 558 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37161/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37161/lookup.json",
+  "sourceCount": 11199,
+  "dropped": 0,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/rutherford/parcel-detail?YearFor=2010&REID={Parcel_Number}",
+  "gisViewerUrl": "https://gis.rutherfordcountync.gov/maps/"
+}

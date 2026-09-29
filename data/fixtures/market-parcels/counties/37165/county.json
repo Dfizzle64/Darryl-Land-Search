@@ -1,0 +1,30 @@
+{
+  "name": "Scotland",
+  "fips": "37165",
+  "state": "North Carolina",
+  "markets": [
+    "Charlotte"
+  ],
+  "featureCount": 3348,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-scotland-parcels-37165",
+  "queryUrl": "https://services3.arcgis.com/bgKigTDifCMNj8OU/arcgis/rest/services/Tax_Parcels_Scotland_County_view/FeatureServer/6/query",
+  "gaps": [
+    "Parcels are Tax Parcels Scotland County - Public View (PRIMARY AGOL CAMA) (https://services3.arcgis.com/bgKigTDifCMNj8OU/arcgis/rest/services/Tax_Parcels_Scotland_County_view/FeatureServer/6). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 3361 rows; 3348 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 406 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Scotland's public price field is DeedStamps. Excise stamps are not stored as a sale price.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37165/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37165/lookup.json",
+  "sourceCount": 3361,
+  "dropped": 8,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicSC/AppraisalCard.aspx?id={PIN}",
+  "gisViewerUrl": "https://laurinburg.maps.arcgis.com/apps/webappviewer/index.html?id=889f012d9e2645278a18addbedd03d74"
+}

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T04:03:44Z",
+  "generatedAt": "2026-09-29T04:25:22Z",
   "market": "Winston-Salem",
   "tier": "other",
-  "parcelCount": 95812,
+  "parcelCount": 110007,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -384,6 +384,28 @@
       "lookup": "data/fixtures/market-parcels/counties/37171/lookup.json",
       "tileCount": 8,
       "sourceCount": 10594
+    },
+    {
+      "name": "Wilkes",
+      "fips": "37193",
+      "state": "North Carolina",
+      "featureCount": 14195,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-wilkes-parcels-37193",
+      "queryUrl": "https://gis.wilkescounty.net/arcgis/rest/services/Parcels/MapServer/0/query",
+      "gaps": [
+        "Parcels are Parcels (PRIMARY CAMA + sale) (https://gis.wilkescounty.net/arcgis/rest/services/Parcels/MapServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 14800 rows; 14195 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 518 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37193/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37193/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 14800
     },
     {
       "name": "Yadkin",

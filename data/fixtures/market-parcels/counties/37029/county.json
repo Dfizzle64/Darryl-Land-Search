@@ -1,0 +1,33 @@
+{
+  "name": "Camden",
+  "fips": "37029",
+  "state": "North Carolina",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "featureCount": 1978,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-camden-parcels-37029",
+  "queryUrl": "https://services7.arcgis.com/f8vjF7CsMeTPBIVC/arcgis/rest/services/Parcels/FeatureServer/1/query",
+  "gaps": [
+    "Parcels are Parcels FeatureServer/1 (PRIMARY county AGOL CAMA + owner/sale-date/zoning attr) (https://services7.arcgis.com/f8vjF7CsMeTPBIVC/arcgis/rest/services/Parcels/FeatureServer/1). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 1997 rows; 1978 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax gap, sale partial). Pass 2 counted 102 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Pass 2 tax status is gap. Scrubbed or missing tax values were not copied off the parcel layer.",
+    "Pass 2 sale: SaleDate (string) on layer; no price on REST. Price only on NCPTS https://lrcpwa.ncptscloud.com/camden/parcel-detail/{PIN} (script-rendered SPA).",
+    "This county is not on the rural Opportunity Zone pass-1 table. It fills the batch after Rutherford through Wilkes.",
+    "Non-OZ fill. Usable county parcel card; not on the rural Opportunity Zone pass-1 table.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37029/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37029/lookup.json",
+  "sourceCount": 1997,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/camden/parcel-detail/{PIN}",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/60ecb9b737384e7dbd1ad3f1f20b27b2/"
+}

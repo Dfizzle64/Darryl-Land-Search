@@ -1,0 +1,29 @@
+{
+  "name": "Transylvania",
+  "fips": "37175",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 3926,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-transylvania-parcels-37175",
+  "queryUrl": "https://gis.transylvaniacounty.org/server/rest/services/Parcels/FeatureServer/2/query",
+  "gaps": [
+    "Parcels are Parcels (CAMA + polygons) (https://gis.transylvaniacounty.org/server/rest/services/Parcels/FeatureServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 5188 rows; 3926 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 225 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37175/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37175/lookup.json",
+  "sourceCount": 5188,
+  "dropped": 0,
+  "tileCount": 5,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/transylvania/parcel-detail/{PIN}",
+  "gisViewerUrl": "https://gis.transylvaniacounty.org/portal/apps/webappviewer/index.html?id=072e71230d03460898f502e66961d5cf"
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Clay",
+  "fips": "37043",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 2425,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-clay-parcels-37043",
+  "queryUrl": "https://services1.arcgis.com/H71paQpWhqUBnyO1/arcgis/rest/services/Parcels04162026/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are Parcels04162026 (CAMA + polygons) (https://services1.arcgis.com/H71paQpWhqUBnyO1/arcgis/rest/services/Parcels04162026/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 2907 rows; 2425 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 123 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Clay keeps LegalLandT='AC' so a square-foot legal unit is not treated as acres.",
+    "This county is not on the rural Opportunity Zone pass-1 table. It fills the batch after Rutherford through Wilkes.",
+    "Non-OZ fill. Usable county parcel card; not on the rural Opportunity Zone pass-1 table.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37043/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37043/lookup.json",
+  "sourceCount": 2907,
+  "dropped": 0,
+  "tileCount": 5,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://bttaxpayerportal.com/ITSPublicCL/AppraisalCard.aspx?id={ParcelNumb}",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/d706343410ba46c586bfb15b0ca30bdb/"
+}

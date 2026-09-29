@@ -47,6 +47,7 @@ _ORIG_GAPS = b1.gap_notes
 _ORIG_RESOLVE = nc.resolve_acres
 _ORIG_FILL = nc.fill_template
 _ORIG_DOWNLOAD = b1.download_county
+_ORIG_APPRAISER = b1.appraiser_url
 GENERIC_LINK_FIELDS = {"pin", "parcelid", "id", "parcel"}
 A_VALUE = {"avalue", "aval"}
 _CURRENT: dict[str, str] = {}
@@ -98,6 +99,17 @@ def attribute_field_map(layer: dict, pass2: dict, available: set[str], id_field:
             label = "tax.landValue"
         fixed[key] = label
     return fixed
+
+
+def appraiser_url(template: str | None, attrs: dict, parcel_id: str, token_value: str, sample: str | None) -> str | None:
+    """Keep a link whose parcel id merely contains the pass-2 sample string.
+
+    Dooly parcel ``21      1`` contains sample ``1      1``. Evans parcel
+    ``028    018 001`` starts with sample ``028    018``. Those are different
+    parcels. A single URL copied onto every parcel is still cleared later.
+    """
+    del sample
+    return _ORIG_APPRAISER(template, attrs, parcel_id, token_value, None)
 
 
 def fill_template(template: str | None, attrs: dict, parcel_id: str) -> str | None:
@@ -183,6 +195,7 @@ def install_patches() -> None:
     b1.gap_notes = gap_notes
     nc.resolve_acres = resolve_acres
     nc.fill_template = fill_template
+    b1.appraiser_url = appraiser_url
     b1.download_county = download_county
     b1.CACHE_DIR = CACHE_DIR
     b1.RESULT_PATH = RESULT_PATH

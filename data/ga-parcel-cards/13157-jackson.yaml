@@ -1,0 +1,898 @@
+state: GA
+jurisdiction: Jackson County
+fips: "13157"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons + WinGAP/REALPROP CAMA (owner/mailing/situs/acres/FMV)
+  - role: parcels
+    name: Tax_Parcels Tax Parcels (official Jackson County GA AGOL)
+    restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/Tax_Parcels/FeatureServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      tax_id: parcelId
+      PARCEL_NO: parcelIdAlt
+      MAPID: mapSheet
+      PIN: parcelPin
+      REALKEY: ownerKey
+      OWNKEY: ownerKeyAlt
+      LASTNAME: ownerName
+      ADDRESS1: mailingAddressLine1OrCoOwner
+      ADDRESS2: mailingAddress
+      ADDRESS3: mailingAddress2
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP: mailingZip
+      HOUSE_NO: situsNumber
+      STREET_NAM: situsStreet
+      TOTALACRES: acreage
+      acre_calc: acreageGis
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      TAXDISTRIC: taxDistrict
+      TAXDISTR: taxDistrictAlt
+      DIGCLASS: dorCode
+      DIGSTRAT: dorStrata
+      LEGAL_DESC: legalDescription
+      NEIGHBHOOD: neighborhood
+      LANDGMD: georgiaMilitiaDistrict
+      HOMEEXEMPT: homesteadExempt
+      Shape__Area: shapeAreaSqM
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA landbase (Jackson County, Georgia GIS
+      AGOL org bcbi4lYRFOsss0F5 / jacksoncountyga.maps.arcgis.com / joellogan; Hub
+      jackson-county-ga-open-data-portal-jacksoncountyga.hub.arcgis.com Tax Parcels item
+      cb6bbe781e324c3abf6e135ed1bc0a32). Live count 45046 (2026-09-23). Twin identical
+      count on jackson_baselayers/FeatureServer/9. SR Web Mercator 102100/3857. TOTALACRES
+      filled ≈43442; TOTALACRES 5–150 ≈6676 (preferred acreage); acre_calc>0 ≈21650 and
+      acre_calc 5–150 ≈3830 (GIS calc thinner — prefer TOTALACRES). LASTNAME filled
+      ≈42944; PARCEL_NO/tax_id filled ≈43463; HOUSE_NO>0 ≈38684; CITY filled ≈38447;
+      FMVRES|FMVCOM>0 ≈33798; FMVACC>0 ≈9756. Compose situsAddress from HOUSE_NO +
+      STREET_NAM when HOUSE_NO>0. Compose tax.marketValue ≈ FMVRES+FMVCOM+FMVACC (no
+      single FMV / assessedValue / taxableValue REST field). ZIP tracks with CITY
+      mailing (sample out-of-state CITY=CHARLOTTESVILLE ZIP=22902) — treat as
+      mailingZip; situs zip via Addresses.ZipCode spatial. ADDRESS1 often blank/co-owner;
+      street typically ADDRESS2. DIGCLASS: R/A/C/I/E/U/V. TAXDISTRIC codes 00–19+25
+      (22 distinct) — no public REST legend recovered; do NOT filter municipality by
+      mailing CITY (owners statewide/national). Municipality filter = spatial
+      City_Boundaries AREANAME OR zoning ZONING city-stub / zoning_* fields OR School
+      Districts jurisdiction Jefferson/Commerce. Geo-verified WGS84 samples ~-83.407,34.190
+      (tax_id 001 001A Commerce fringe), ~-83.394,34.186 (001 024C), ~-83.366,34.164
+      (002 014), ~-83.61,34.14 Jefferson city center — Jackson County GA NE of Atlanta
+      (~-83.6,34.1) (NOT Jackson MO jcgis.jacksongov.org SR 102698; NOT Jackson MI
+      mijackson.org; NOT Jackson WI; NOT Jefferson Parish LA trueautomation SR 102660;
+      NOT Jefferson County GA / USLandGrid paid). Official viewers: experience
+      8eb925b17f3841b597316505aafdb45f Voyager; Zoning Map webappviewer
+      7011f97436d249179b25fbada11a55bb (webmap 9781bb1724d94b48a8c5ed404179dbdb). Open
+      data updated most Friday mornings. Rejected ARC LandPro_2012; rejected
+      Regrid/ATTOM/USLandGrid.
+    status: usable
+
+  - role: tax
+    name: Tax_Parcels FMV fields (same layer as preferred parcels)
+    restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/Tax_Parcels/FeatureServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      tax_id: parcelId
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      HOMEEXEMPT: homesteadExempt
+    notes: >
+      FMV components on preferred parcels (no separate assessedValue/taxableValue REST).
+      Assessor HTML: qPublic/Beacon SchneiderCorp App=JacksonCountyGA / AppID=797
+      LayerID=11838 (qpublic.net/ga/jackson; qpublic.schneidercorp.com). CDN/bot
+      Cloudflare 403 from research box on Application.aspx; public for humans.
+      Deep-link: Application.aspx?App=JacksonCountyGA&Layer=Parcels&PageType=Report&KeyValue={tax_id}
+      or AppID=797&LayerID=11838&PageTypeID=4&KeyValue={tax_id}. TAXDISTRIC codes lack
+      published REST name legend — soft only.
+    status: usable
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Jackson GA multi-sale FeatureServer/MapServer found (2026-09-23). Preferred
+      parcels expose no SALE_PRICE/SALE_DATE/qualified. qPublic App=JacksonCountyGA /
+      AppID=797 Sales Search HTML only (Cloudflare/bot 403 automated). Rejected ARC
+      LandPro_2012 and paid Regrid/USLandGrid/ATTOM as sales substitutes. Rejected
+      Jackson MO / MI / WI sales services (wrong state).
+    status: gap
+
+  - role: zoning
+    name: jackson_baselayers County_Zoning_Polygons (Euclidean + city codes)
+    restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/jackson_baselayers/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TAX_ID: parcelId
+      ZONING: zoning
+      zoning_jeff: zoningJefferson
+      zoning_commerce: zoningCommerce
+      zoning_hoschton: zoningHoschton
+      zoning_braselton: zoningBraselton
+      zoning_pendergrass: zoningPendergrass
+      zoning_arcade: zoningArcade
+      zoning_nicholson: zoningNicholson
+      zoning_talmo: zoningTalmo
+      Shape__Area: shapeAreaSqM
+    notes: >
+      Preferred county zoning district polygons (parcel-tied). Live count 44199.
+      Join TAX_ID→parcels.tax_id/PARCEL_NO (majority exact; some TAX_ID zero-pad map
+      sheet e.g. '0001    036' vs parcel '001    …' — normalize map sheet OR spatial
+      intersect). ZONING Euclidean (unincorporated): A2≈10649, R1≈6963, PUD≈1415,
+      AR≈1272, R2≈1186, A1≈429, A3≈353, MH≈278, PCFD≈237, CRC≈73, NRC≈83, GI≈88,
+      HRC≈143, R3≈137, LI≈34, HI≈5, ROW≈8. ZONING city-name STUBS (use city field
+      instead): Jefferson≈6183, Hoschton≈4257, Commerce≈3821, Braselton≈2778,
+      Pendergrass≈1515, Arcade≈824, Nicholson≈775, Maysville≈512, Talmo≈179.
+      City Euclidean fill (non-null city field counts): zoning_jeff≈6186 (R-1, AG-R,
+      C-1/C-2, CBD, MFR, O-I, PCD, PCFD, R-2/3/4, RR-2/3, LI, HI, SPLIT…);
+      zoning_hoschton≈4235 (A, R1–R4, MFR, PUD, MU, C1–C3, M1, INST, OR, SPLIT);
+      zoning_commerce≈3805 (R1–R6, R1E, C1/C2, CBD, M1/M2, AR, AF, OCR, PUD, SPLIT);
+      zoning_braselton≈2769 (prefer ZONINGLANDUSE.ZONING_BRASELTON R-1/R-2/R-3/PUD/
+      TND/G-C/N-C/O-I/M-D ≈2833); zoning_pendergrass≈1511 (AG, AG-R, R-1..R-4, MFR,
+      C-1/C-2, O-I, LI, SPLIT); zoning_arcade≈818; zoning_nicholson≈757; zoning_talmo≈177.
+      NO zoning_maysville column — Maysville = stub only (gap; multi-county Banks+Jackson).
+      String literal '<Null>' appears in some city fields — treat as null. Official
+      electronic zoning on county Zoning Map app; county Zoning Map PDF amended
+      Feb 16 2026 (jacksoncountygov.com/DocumentCenter/View/1830) — certify with
+      Planning & Zoning. Geo-verified ~-83.40,34.19 Jackson GA.
+    status: usable
+
+  - role: zoning
+    name: jackson_baselayers ZONINGLANDUSE table (attrs only — richer FLU years + Braselton)
+    restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/jackson_baselayers/FeatureServer/19
+    layerId: 19
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ZONING: zoning
+      ZONING_CONDITIONS: zoningConditions
+      NOTES: zoningNotes
+      zoning_jeff: zoningJefferson
+      zoning_commerce: zoningCommerce
+      zoning_hoschton: zoningHoschton
+      zoning_pendergrass: zoningPendergrass
+      zoning_arcade: zoningArcade
+      zoning_nicholson: zoningNicholson
+      zoning_talmo: zoningTalmo
+      ZONING_BRASELTON: zoningBraselton
+      FLU: flu
+      FLU2020: flu2020
+      FLU2025: flu2025
+      FLU_2030: flu2030
+      FLU2040: flu2040
+      FLU2050: flu2050
+      FLU2055: flu2055
+      CHAR2025: character2025
+      CHAR2040: character2040
+      CHAR2050: character2050
+      CHAR2055: character2055
+      ELU: existingLandUse
+      CITY_SPLITZ: citySplitZoning
+    notes: >
+      Live count 46658 attribute table (no geometry) — PIN-join PARCEL_NO to preferred
+      parcels. Carries multi-horizon FLU/CHAR and ZONING_BRASELTON (≈2833) not on
+      polygon layer 14. Prefer polygon layer 14 for spatial; this table for Braselton
+      codes + FLU year fields + conditions/notes.
+    status: usable
+
+  - role: flu
+    name: jackson_baselayers County_FutureLandUse_Polygons
+    restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/jackson_baselayers/FeatureServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TAX_ID: parcelId
+      FUTURELANDUSE: flu
+      Shape__Area: shapeAreaSqM
+    notes: >
+      Preferred county parcel-tied Future Land Use. Live count 47418. Domain
+      FUTURELANDUSE: R≈18994, Jefferson≈6178, Hoschton≈4248, Commerce≈3826, PRC≈2831,
+      Braselton≈2773, Pendergrass≈1515, AG≈3121, Arcade≈821, Nicholson≈777, C≈807,
+      Maysville≈514, I≈293, IA≈214, PI≈206, Talmo≈178, TCU≈112, MU≈3, ROW≈3. City-named
+      values are stubs — inside cities prefer NEGRC city FLU layers (Jefferson 420,
+      Hoschton 419, Commerce CA 418, Nicholson 421, Braselton 417, etc.) or
+      ZONINGLANDUSE FLU2055/FLU2025. Join TAX_ID same caveats as zoning. Twin Character
+      layer /16 (46285; CHARACTER SB≈10280, R≈6314, Jefferson≈6180, Hoschton≈4246,
+      Commerce≈3819, AG≈3363, U≈3248, Braselton≈2775, CON≈2248, Pendergrass≈1515…).
+      Official Zoning Map app also shows FLU+Character. Geo-verified ~-83.40,34.19.
+    status: usable
+
+  - role: flu
+    name: NEGRC FLU - Jackson County - 2025
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/427
+    layerId: 427
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FDM_Short: fluCode
+      FDM_Long: flu
+      ID: fluFeatureId
+    notes: >
+      Live count 3712 dissolved Comp Plan inventory (NEGRC org Ug5xGQbHsD8zuZzM).
+      Spatial-join only. Prefer county parcel-tied FUTURELANDUSE for PIN search; this
+      for regional inventory. Twin CA - Jackson County - 2025 layer 428 count 3870.
+      Same org hosts LandPro_2012 — reject as cadastral. Geo-verified ~-83.58,34.07
+      Jackson GA.
+    status: partial
+
+  - role: other
+    name: City_Boundaries (municipalities)
+    restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/City_Boundaries/FeatureServer/17
+    layerId: 17
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      AREANAME: municipality
+      CLASS: municipalityType
+      PLACEFIP: placeFips
+      ST: state
+      STFIPS: stateFips
+    notes: >
+      Live count 9 municipality polygons (STFIPS=13 Georgia): Jefferson (~-83.61,34.14),
+      Commerce (~-83.48,34.21), Hoschton (~-83.75,34.09), Braselton (~-83.77,34.12),
+      Pendergrass (~-83.68,34.16), Arcade (~-83.55,34.06), Nicholson (~-83.42,34.13),
+      Talmo (~-83.72,34.19), Maysville (~-83.56,34.25). Twin jackson_baselayers/17.
+      Preferred spatial join for municipality filter (standing order). Multi-county:
+      Braselton (Jackson+Barrow+Hall+Gwinnett), Maysville (Banks+Jackson) — this card
+      Jackson-side footprint only. OOC Braselton_Allcounties (jackson_ooc_layers/0,
+      count 2) is multi-county footprint sketch (AREANAME blank) — prefer City_Boundaries
+      Braselton for Jackson-side + note OOC for context.
+    status: usable
+
+  - role: other
+    name: Addresses Addressing (situs points)
+    restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/Addresses/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ADD_ID: addressId
+      FULL_ADDRESS: situsAddress
+      ADDRESS: situsAddressAlt
+      NUMBER_: situsNumber
+      StreetName: situsStreet
+      PostType: situsStreetType
+      PREFIX_DIRECTIONAL: situsStreetDir
+      Unit: situsUnit
+      ZipCode: situsZip
+      PostalCity: postalCity
+      COMMUNITY: postalCommunity
+    notes: >
+      Live count 59688 address points. JOIN_ID sparsely useful (often 0) — prefer
+      spatial to parcels for situs zip/building-level. PostalCity is POSTAL (JEFFERSON
+      ≈20209, HOSCHTON≈11130, COMMERCE≈9549, BRASELTON≈5291…) — not city-limits;
+      Arcade PostalCity≈0 (uses Jefferson postal). COMMUNITY includes ATHENS/BOGART/
+      WINDER/STATHAM/GILLSVILLE/HULL spill from adjacent counties — soft only. Twin
+      jackson_baselayers/0. Geo-verified ~-83.649,34.123 Jefferson GA.
+    status: usable
+
+municipalities:
+  - name: Jefferson
+    level: city
+    parentFips: "13157"
+    joinToCountyParcels: >
+      Spatial City_Boundaries AREANAME='Jefferson' (~-83.61,34.14) OR zoning
+      ZONING='Jefferson' / zoning_jeff IS NOT NULL (≈6183–6186) OR School Districts
+      jurisdiction='Jefferson'. PostalCity/COMMUNITY='JEFFERSON' soft only (~20209).
+    layers:
+      - role: zoning
+        name: County_Zoning_Polygons zoning_jeff (city Euclidean on county host)
+        restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/jackson_baselayers/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          TAX_ID: parcelId
+          zoning_jeff: zoning
+          ZONING: zoningJurisdictionStub
+        notes: >
+          Preferred Jefferson-local Euclidean zoning (standing order: city over county
+          stub). Filter zoning_jeff not null / not '<Null>' (≈6186). Domain includes
+          R-1, R-2, R-3, R-4, RR-2, RR-3, AG, AG-R, MFR, C-1, C-2, CBD, O-I, PCD,
+          PCFD, LI, HI, ROW, SPLIT, A1. Official Zoning Map PDF Oct 2024
+          (jeffersonga.gov/230) mapped by Jackson County GIS — REST codes align.
+          Rejected webmap.trueautomation.com JeffersonPAMapSearchNoLabels/5 CITY_ZONING
+          (SR 102660 Jefferson Parish LA — wrong geography).
+        status: usable
+      - role: flu
+        name: NEGRC FLU - Jefferson - 2026
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/420
+        layerId: 420
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+        notes: >
+          Preferred Jefferson-local FLU. Live count 691 (e.g. Adaptive Reuse Residential).
+          Spatial-join. Prefer over county FUTURELANDUSE='Jefferson' stub. Geo-verified
+          ~-83.578,34.117 Jefferson GA (NOT Jefferson Parish LA; NOT Jefferson County GA).
+        status: usable
+      - role: parcels
+        name: null — use county Tax_Parcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Jefferson-only CAMA FeatureServer — county Tax_Parcels + spatial /
+          zoning_jeff filter. City GIS partnership via county GIS (Joel Logan).
+        status: gap
+    gaps:
+      - "No Jefferson-only parcel CAMA REST — county landbase + spatial/zoning_jeff."
+      - "Rejected Jefferson Parish LA trueautomation CITY_ZONING (wrong geography)."
+      - "County FUTURELANDUSE='Jefferson' stub — prefer NEGRC FLU layer 420."
+    status: usable
+
+  - name: Commerce
+    level: city
+    parentFips: "13157"
+    joinToCountyParcels: >
+      Spatial City_Boundaries AREANAME='Commerce' (~-83.48,34.21) OR ZONING='Commerce' /
+      zoning_commerce IS NOT NULL (≈3805–3821) OR School Districts jurisdiction='Commerce'.
+      PostalCity='COMMERCE' soft (~9549).
+    layers:
+      - role: zoning
+        name: County_Zoning_Polygons zoning_commerce
+        restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/jackson_baselayers/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          TAX_ID: parcelId
+          zoning_commerce: zoning
+        notes: >
+          Preferred Commerce Euclidean on county host (≈3805). Domain R1–R6, R1E, C1/C2,
+          CBD, M1/M2, AR, AF, OCR, PUD, COUNTY, SPLIT. City AGOL
+          cityofcommerce.maps.arcgis.com / kwheeler_cityofcommerce has DDA/wards/utilities/
+          historic — NO city zoning FeatureServer found (2026-09-23).
+        status: usable
+      - role: flu
+        name: NEGRC CA - Commerce - 2025
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/418
+        layerId: 418
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 408 character areas (e.g. Conservation & Parks). Spatial-join.
+          Geo-verified ~-83.461,34.180 Commerce GA. NEGRC also hosts Commerce Comp Plan
+          2025 PDFs. Prefer over county FUTURELANDUSE='Commerce' stub.
+        status: usable
+      - role: other
+        name: Commerce DDA Boundary Map
+        restUrl: https://services7.arcgis.com/JnaiTp8d3rhKkJ9G/arcgis/rest/services/Commerce_DDA_Boundary_Map_WFL1/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City DDA / Entertainment Zone / Enterprise Zone context — not parcels/zoning.
+        status: partial
+    gaps:
+      - "No Commerce-only parcel CAMA or city-hosted zoning FeatureServer — county zoning_commerce + NEGRC CA."
+    status: usable
+
+  - name: Hoschton
+    level: city
+    parentFips: "13157"
+    joinToCountyParcels: >
+      Spatial City_Boundaries AREANAME='Hoschton' (~-83.75,34.09) OR ZONING='Hoschton' /
+      zoning_hoschton IS NOT NULL (≈4235–4257). PostalCity='HOSCHTON' soft (~11130).
+    layers:
+      - role: zoning
+        name: County_Zoning_Polygons zoning_hoschton
+        restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/jackson_baselayers/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          TAX_ID: parcelId
+          zoning_hoschton: zoning
+        notes: >
+          Preferred Hoschton Euclidean (≈4235). Domain A, R1–R4, MFR, PUD, MU, C1–C3,
+          M1, INST, OR, SPLIT — aligns with city Official Zoning Map PDF amended
+          12.18.25 (cityofhoschton.net/planning) mapped by Jackson County GIS. No
+          separate city FeatureServer.
+        status: usable
+      - role: flu
+        name: NEGRC FLU - Hoschton - 2025
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/419
+        layerId: 419
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 400. Spatial-join. Overlay: FLU Downtown Overlay - Hoschton - 2025
+          layer 32 (1 polygon). Geo-verified ~-83.755,34.090. Prefer over county
+          FUTURELANDUSE='Hoschton' stub.
+        status: usable
+    gaps:
+      - "No Hoschton-only parcel CAMA REST — county + zoning_hoschton / spatial."
+      - "City zoning official source is PDF (Dec 2025); REST is county-hosted mirror."
+    status: usable
+
+  - name: Braselton
+    level: city
+    parentFips: "13157"
+    joinToCountyParcels: >
+      Spatial City_Boundaries AREANAME='Braselton' (~-83.77,34.12 Jackson footprint) OR
+      ZONING='Braselton' / zoning_braselton / ZONINGLANDUSE.ZONING_BRASELTON (≈2769–2833).
+      Multi-county Jackson (primary)+Barrow+Hall+Gwinnett — this card Jackson-side only.
+      PostalCity='BRASELTON' soft (~5291).
+    layers:
+      - role: zoning
+        name: ZONINGLANDUSE ZONING_BRASELTON (+ layer 14 zoning_braselton)
+        restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/jackson_baselayers/FeatureServer/19
+        layerId: 19
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          ZONING_BRASELTON: zoning
+        notes: >
+          Preferred Braselton Euclidean codes on county table (≈2833; R-1/R-2/R-3/PUD/
+          TND/G-C/N-C/O-I/M-D/ROW/SPLIT). Polygon layer 14 zoning_braselton≈2769 also
+          filled. Town interactive zoning map retired; Zoning Map PDF Oct 2025 on
+          braselton.gov — no public Braselton FeatureServer found. Defer Barrow/Hall/
+          Gwinnett cards for non-Jackson portions. Some dirty values observed in domain
+          sample (Hoschton spill / field-name artifact) — validate before use.
+        status: partial
+      - role: flu
+        name: NEGRC FLU - Braselton - 2025
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/417
+        layerId: 417
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 95 (e.g. Commercial). Spatial-join. Geo-verified ~-83.829,34.119
+          Braselton GA. Prefer over county FUTURELANDUSE='Braselton' stub; do not
+          substitute county Comp Plan as town official FLU.
+        status: usable
+    gaps:
+      - "Braselton multi-county — Jackson City_Boundaries / ZONING_BRASELTON only here."
+      - "No town-hosted Euclidean zoning FeatureServer — county ZONING_BRASELTON + PDF Oct 2025."
+      - "ZONING_BRASELTON domain has occasional dirty values — validate."
+    status: partial
+
+  - name: Pendergrass
+    level: city
+    parentFips: "13157"
+    joinToCountyParcels: >
+      Spatial City_Boundaries AREANAME='Pendergrass' (~-83.68,34.16) OR ZONING='Pendergrass'
+      / zoning_pendergrass (≈1511–1515). PostalCity soft (~4709).
+    layers:
+      - role: zoning
+        name: County_Zoning_Polygons zoning_pendergrass
+        restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/jackson_baselayers/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          TAX_ID: parcelId
+          zoning_pendergrass: zoning
+        notes: >
+          Preferred Pendergrass Euclidean (≈1511). Domain AG, AG-R, R-1..R-4, MFR, C-1,
+          C-2, O-I, LI, ROW, SPLIT. No city-hosted FeatureServer found.
+        status: usable
+      - role: flu
+        name: NEGRC CA - Pendergrass - 2022
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/422
+        layerId: 422
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 64; many FDM_Long null on sample — coarse inventory. Spatial-join.
+          Geo-verified ~-83.675,34.144. Prefer county FLU/CHAR inside limits when NEGRC
+          attrs empty.
+        status: partial
+    gaps:
+      - "No Pendergrass-only parcel CAMA; NEGRC CA attrs often null."
+    status: usable
+
+  - name: Arcade
+    level: city
+    parentFips: "13157"
+    joinToCountyParcels: >
+      Spatial City_Boundaries AREANAME='Arcade' (~-83.55,34.06) OR ZONING='Arcade' /
+      zoning_arcade (≈818–824). PostalCity Arcade≈0 (Jefferson postal noise).
+    layers:
+      - role: zoning
+        name: County_Zoning_Polygons zoning_arcade
+        restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/jackson_baselayers/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          TAX_ID: parcelId
+          zoning_arcade: zoning
+        notes: >
+          Preferred Arcade Euclidean (≈818). Domain AG, RR-1/RR-2, R-1/R1/R-2, C-1/C-2,
+          O-I, LI, PCD, PCFD, SPLIT. Quad Cities LUMC historically related to Jefferson.
+        status: usable
+      - role: flu
+        name: NEGRC CA - Arcade - 2024
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/414
+        layerId: 414
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 90; FDM_Long often blank. Overlay CA Overlay - Arcade - 2024
+          layer 413 (4 polys, e.g. Gateways). Geo-verified ~-83.542,34.034 Arcade GA.
+        status: partial
+    gaps:
+      - "Arcade PostalCity empty — must use spatial City_Boundaries / zoning_arcade."
+      - "NEGRC Arcade CA attrs thin."
+    status: usable
+
+  - name: Nicholson
+    level: city
+    parentFips: "13157"
+    joinToCountyParcels: >
+      Spatial City_Boundaries AREANAME='Nicholson' (~-83.42,34.13) OR ZONING='Nicholson' /
+      zoning_nicholson (≈757–775). PostalCity soft (~2711).
+    layers:
+      - role: zoning
+        name: County_Zoning_Polygons zoning_nicholson
+        restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/jackson_baselayers/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          TAX_ID: parcelId
+          zoning_nicholson: zoning
+        notes: >
+          Preferred Nicholson Euclidean (≈757). Domain AG, RR, SR, HB, INST, TC, SPLIT.
+        status: usable
+      - role: flu
+        name: NEGRC FLU - Nicholson - 2021
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/421
+        layerId: 421
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 144 (e.g. Agriculture/Forestry). Spatial-join. Geo-verified
+          ~-83.438,34.097. Older 2021 vintage — confirm vs city/county staff if critical.
+        status: usable
+    gaps:
+      - "No Nicholson-only parcel CAMA REST."
+    status: usable
+
+  - name: Talmo
+    level: city
+    parentFips: "13157"
+    joinToCountyParcels: >
+      Spatial City_Boundaries AREANAME='Talmo' (~-83.72,34.19) OR ZONING='Talmo' /
+      zoning_talmo (≈177–179). PostalCity soft (~688). Covered under Jefferson LUMC
+      jurisdiction per city code references.
+    layers:
+      - role: zoning
+        name: County_Zoning_Polygons zoning_talmo
+        restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/jackson_baselayers/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          TAX_ID: parcelId
+          zoning_talmo: zoning
+        notes: >
+          Preferred Talmo Euclidean (≈177). Domain AG, RR-1/RR-2/RR-3, C-2, O-I, PCFD,
+          TC, COUNTY, SPLIT — aligns with Jefferson LUMC district set.
+        status: usable
+      - role: flu
+        name: NEGRC CA - Talmo - 2024
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/425
+        layerId: 425
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 38 (e.g. Agricultural_Area). Access points overlay layer 424
+          (3 points). Geo-verified ~-83.723,34.169 Talmo GA.
+        status: usable
+    gaps:
+      - "Small town — thin parcel/zoning counts; no city-hosted GIS org found."
+    status: usable
+
+  - name: Maysville
+    level: city
+    parentFips: "13157"
+    joinToCountyParcels: >
+      Spatial City_Boundaries AREANAME='Maysville' (~-83.56,34.25 Jackson footprint) OR
+      ZONING='Maysville' stub (≈512). Multi-county Banks+Jackson — Jackson-side only.
+      PostalCity soft (~2184).
+    layers:
+      - role: zoning
+        name: null — ZONING='Maysville' stub only (no zoning_maysville field)
+        restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/jackson_baselayers/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          TAX_ID: parcelId
+          ZONING: zoning
+        notes: >
+          County ZONING='Maysville' ≈512 stubs with all zoning_* null — NOT usable
+          Euclidean. No Maysville city FeatureServer / PDF REST found on Jackson research
+          (2026-09-23). Certify via city/Banks County staff; Banks card for Banks-side.
+        status: gap
+      - role: flu
+        name: null — county FUTURELANDUSE/CHARACTER='Maysville' stub only
+        restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/jackson_baselayers/FeatureServer/15
+        layerId: 15
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          TAX_ID: parcelId
+          FUTURELANDUSE: flu
+        notes: >
+          No NEGRC Maysville FLU layer in inventory. County FLU/CHAR Maysville stubs
+          ≈512–514 — planning context only; not city official FLU certification.
+        status: gap
+    gaps:
+      - "Maysville Euclidean zoning REST missing (stub only); multi-county Banks+Jackson."
+      - "No Maysville FLU FeatureServer on NEGRC inventory / county city fields."
+    status: gap
+
+gaps:
+  - "No public REST lastSale.price/date/qualified — qPublic App=JacksonCountyGA / AppID=797 LayerID=11838 Sales Search HTML only (Cloudflare/bot 403 automated)."
+  - "No single tax.marketValue / assessedValue / taxableValue REST field — compose FMVRES+FMVCOM+FMVACC; digest details on qPublic HTML."
+  - "ZIP on parcels behaves as mailingZip (tracks CITY; out-of-state samples) — situs zip via Addresses.ZipCode spatial; no dedicated MAILZIP field name."
+  - "TAXDISTRIC 00–19+25 lack published REST name legend — do not use as municipality filter; prefer City_Boundaries / zoning city fields / school jurisdiction."
+  - "Mailing CITY is owner mailing (nationwide) — never municipality filter."
+  - "Zoning TAX_ID join: some rows zero-pad map sheet ('0001    036') vs parcel tax_id ('001    …') — normalize or spatial intersect."
+  - "City Euclidean REST usable via county zoning_* for Jefferson/Commerce/Hoschton/Pendergrass/Arcade/Nicholson/Talmo + ZONING_BRASELTON; Maysville stub-only gap."
+  - "Maysville / Braselton multi-county — Jackson City_Boundaries footprint only on this card."
+  - "Addresses JOIN_ID often 0; PostalCity/COMMUNITY postal (Arcade PostalCity=0; spill ATHENS/WINDER/STATHAM) — spatial City_Boundaries preferred."
+  - "acre_calc thinner than TOTALACRES — prefer TOTALACRES for 5–150 filter (≈6676)."
+  - "City zoning official PDFs (Jefferson Oct 2024; Hoschton Dec 2025; Braselton Oct 2025; county Feb 2026) remain certification source; REST is county GIS mirror."
+  - "Commerce city AGOL has no zoning/FLU FeatureServer — DDA/utilities only."
+  - "Rejected lookalikes / non-preferred: Jackson County MO (jcgis.jacksongov.org Cadastral/PastYearParcels SR 102698; Internal_Parcel_Viewer); Jackson MI (gis.mijackson.org ParcelViewer SR 2898); Jackson WI Hub zoning; Jefferson Parish LA trueautomation JeffersonPAMapSearchNoLabels CITY_ZONING SR 102660; Jefferson County GA / USLandGrid paid Jefferson extracts; ARC LandPro_2012 (Ug5xGQbHsD8zuZzM) stale regional land-cover as cadastral; Regrid/ATTOM/CoreLogic/USLandGrid paid Jackson parcel extracts; stale ARC LandPro as preferred parcels."
+  - "Enrichment vs thin in-app: county 45046 geometry+tax_id+owner/mailing+situs house/street+TOTALACRES+FMV components+taxdist+dor; zoning 44199 w/ city Euclidean fields; FLU 47418; Character 46285; ZONINGLANDUSE 46658; City_Boundaries 9; Addresses 59688; NEGRC city/county FLU/CA; sales + Maysville Euclidean + assessed/taxable + TAXDIST legend remain gap/HTML/PDF."
+
+license: >
+  Jackson County, Georgia GIS (AGOL org bcbi4lYRFOsss0F5 / jacksoncountyga.maps.arcgis.com
+  / joellogan / jlogan@jacksoncountygov.com) — Tax_Parcels, jackson_baselayers (Zoning/
+  FLU/Character/City Boundaries/Addresses/Schools/Fire), City_Boundaries, Addresses,
+  jackson_ooc_layers, County_Boundary, Hub Open Data Portal
+  jackson-county-ga-open-data-portal-jacksoncountyga.hub.arcgis.com. Viewers: experience
+  8eb925b17f3841b597316505aafdb45f (Voyager); webappviewer 7011f97436d249179b25fbada11a55bb
+  (Zoning Map / webmap 9781bb1724d94b48a8c5ed404179dbdb); basemap webappviewer
+  723d2e2317d14c1ba666205d151bf6e3. County site jacksoncountygov.com/270 Available Maps;
+  Zoning PDF DocumentCenter/View/1830 (amended Feb 16 2026). Assessor HTML: qPublic
+  SchneiderCorp App=JacksonCountyGA / AppID=797 LayerID=11838 (qpublic.net/ga/jackson).
+  Northeast Georgia Regional Commission (NEGRC / Ug5xGQbHsD8zuZzM) —
+  NEGRC_Future_Development_Map_Inventory_WFL1 layers 32, 413–414, 417–422, 424–425,
+  427–428. City PDFs: Jefferson Official Zoning Map Oct 2024 (jeffersonga.gov/230);
+  Hoschton Official Zoning Map Dec 18 2025 (cityofhoschton.net); Braselton Zoning Map
+  Oct 2025 (braselton.gov). City of Commerce AGOL JnaiTp8d3rhKkJ9G (DDA/wards — not
+  zoning). Attribution to Jackson County GIS / partner cities / NEGRC. Public fields
+  only; no emails/phones; no paid vendors (Regrid/ATTOM/CoreLogic/USLandGrid).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=JacksonCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/Tax_Parcels/FeatureServer/9 count
+    45044; extent center [['13157', 'Jackson County']]; sample [['13157', 'Jackson County']]. No change
+    to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Arcade city"
+      level: city
+      parentFips: "13157"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Commerce city"
+      level: city
+      parentFips: "13157"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Hoschton city"
+      level: city
+      parentFips: "13157"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Jefferson city"
+      level: city
+      parentFips: "13157"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Nicholson city"
+      level: city
+      parentFips: "13157"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Pendergrass town"
+      level: city
+      parentFips: "13157"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Talmo town"
+      level: city
+      parentFips: "13157"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Jackson' AND aadt>0
+    altFilter: name LIKE '157-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 157-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 184
+    maxAadt: 64400
+    geoCheck: 182/184 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - FMVRES
+    - FMVACC
+    - FMVCOM
+    filledCount: 32760
+    restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/Tax_Parcels/FeatureServer/9
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 42854
+    restUrl: https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/Tax_Parcels/FeatureServer/9
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=JacksonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=797&LayerID=11838&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    001A
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=JacksonCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20001A
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=JacksonCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Arcade city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Commerce city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Hoschton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Jefferson city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Nicholson city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Pendergrass town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Talmo town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

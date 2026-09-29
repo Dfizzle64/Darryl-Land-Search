@@ -1,0 +1,356 @@
+state: GA
+jurisdiction: Laurens County
+fips: "13175"
+level: county
+markets: [Dublin]
+
+layers:
+  - role: parcels
+    name: Laurens_County_Wide_View TaxParcels_25 (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Laurens_County_Wide_View/FeatureServer/25
+    layerId: 25
+    geometry: polygon
+    auth: none
+    acreageField: Calc_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      Calc_Acres: acreage
+      Realkey: ownerKey
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Heart of Georgia Altamaha RC / hogagis org
+      HHvUPZ2XuLOAJxjR; Laurens_County_Wide_View FeatureServer/25 "TaxParcels_25").
+      Live count 30009 (2026-09-24). Schema THIN — Parcel_No + Calc_Acres + geometry
+      (Realkey null-filled). No owner/mailing/situs/CURR_VAL/sale on this layer.
+      Calc_Acres 5–150 ≈7023. maxRecordCount 2000 — page via resultOffset / envelopes.
+      Twin TaxParcels_22/29 older snapshot — prefer /25. CountyBoundary/17 confirms
+      CNTYIDFP=13175 NAME=Laurens RDC=Heart of Georgia-Altamaha seat circuit Dublin.
+      GEO-VERIFY GEORGIA: WGS84 samples ~-83.223,32.585 / ~-83.222,32.585 /
+      ~-83.216,32.580 — FIPS 13175 seat Dublin (~-82.90,32.54). REJECT Laurens County
+      SC (laurenscountygis.org Baselayers/84 TMS… centroids ~-82.14,34.75 wkid 6570
+      SC State Plane — wrong state). Join CAMA via qPublic App=LaurensCountyGA
+      KeyValue={Parcel_No} (preserve spaces e.g. '002    001'). Rejected paid
+      Regrid/ATTOM; skip ElectricUtilityAreas/ServiceUtilityLines + AADT; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on TaxParcels_25; qPublic App=LaurensCountyGA HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on TaxParcels_25. Assessor HTML
+      qpublic.net/ga/laurens → App=LaurensCountyGA Layer=Parcels (Cloudflare/bot 403
+      automated; public for humans). Deep-link KeyValue={Parcel_No}:
+      Application.aspx?App=LaurensCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_No}.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/lastSale on TaxParcels_25. Prefer qPublic Sales Search / Sales List HTML
+      App=LaurensCountyGA. Rejected paid Regrid/ATTOM sales. (Laurens SC Sale_Price on
+      laurenscountygis.org is WRONG geography — do not use.)
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean; City of Dublin / East Dublin only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Laurens County-wide Euclidean zoning FeatureServer on Laurens_County_Wide_View.
+      City of Dublin DublinZoning (City_of_Dublin_new_View_gdb_view/12) and East Dublin
+      EastDublinZoning (City_of_East_Dublin_View/7) published separately — see municipalities.
+      LandUse/23 and CharacterAreas_Poly/27 are FLU/character — not Euclidean zoning.
+    status: gap
+
+  - role: flu
+    name: Laurens_County_Wide_View LandUse + CharacterAreas_Poly (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Laurens_County_Wide_View/FeatureServer/23
+    layerId: 23
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      EXTLU: existingLandUse
+      FLULU: flu
+      EXTLUDCA: existingLandUseDca
+      FLULUDCA: fluDca
+      Acres: acreage
+    notes: >
+      Preferred FLU polygons LandUse/23 (count ≈30569; FLULU e.g. Agriculture/Commercial/
+      Residential/Industrial/Forestry/Mixed Use/Park…). Companion CharacterAreas_Poly/27
+      (count ≈30567; CharacterArea e.g. Rural Laurens/Dublin Residential/Downtown Dublin/
+      Suburban Residential/GA Mega Site/Oconee River Greenway…). Spatial intersect
+      TaxParcels_25. Not a substitute for Euclidean zoning.
+    status: usable
+
+  - role: other
+    name: Laurens_County_Wide_View CountyBoundary
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Laurens_County_Wide_View/FeatureServer/17
+    layerId: 17
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      CNTYIDFP: fips
+      GA_CIR_BOU: circuitSeat
+    notes: >
+      Live FIPS check CNTYIDFP=13175 NAME=Laurens GA_CIR_BOU=Dublin. Preferred
+      geo-verify polygon. Municipal limits via City_of_Dublin_new_View_gdb_view/4
+      DublinCityLimits + City_of_East_Dublin_View/0 EastDublinCityLimits (+ Cadwell/
+      Montrose/Rentz/Dudley town views on same HOGARC org).
+    status: usable
+
+municipalities:
+  - name: Dublin
+    level: city
+    parentFips: "13175"
+    joinToCountyParcels: >
+      Spatial City_of_Dublin_new_View_gdb_view/4 DublinCityLimits (centroid
+      ~-82.90–83.0,32.54) ∩ county TaxParcels_25; soft mail city never sole filter.
+    layers:
+      - role: zoning
+        name: City_of_Dublin_new_View_gdb_view DublinZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Dublin_new_View_gdb_view/FeatureServer/12
+        layerId: 12
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+          ExtLandUse: existingLandUse
+          FutLandUse: flu
+        notes: >
+          Preferred Dublin Euclidean/parcel zoning (count 15203). Zoning labels e.g.
+          R-1/R-2/R-3/R-4/R-5 Single/Multi-Family; B-1/B-2/B-3 Business; M-1/M-2
+          Industrial; P/P-1 Professional/Public; AG; H-1 Bellevue; CO County.
+          Public experience: experience.arcgis.com/experience/89a88545d49c4412b338f49c5073aac7
+          (Dublin Ga Zoning and Land Use Map). Skip DublinWaterLines/SewerLines (utilities).
+        status: usable
+      - role: flu
+        name: DublinZoning FutLandUse + county LandUse spatial Dublin
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Dublin_new_View_gdb_view/FeatureServer/12
+        layerId: 12
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FutLandUse: flu
+          ExtLandUse: existingLandUse
+        notes: City FutLandUse/ExtLandUse on zoning polys + county CharacterAreas spatial Dublin.
+        status: usable
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial DublinCityLimits
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Dublin-only CAMA FeatureServer — county /25 + DublinCityLimits/4.
+        status: gap
+    gaps:
+      - "No Dublin city-owned parcel/CAMA REST — county TaxParcels_25 + spatial DublinCityLimits."
+      - "Owner/tax/sale via qPublic App=LaurensCountyGA HTML only."
+    status: usable
+
+  - name: East Dublin
+    level: city
+    parentFips: "13175"
+    joinToCountyParcels: >
+      Spatial City_of_East_Dublin_View/0 EastDublinCityLimits ∩ TaxParcels_25.
+    layers:
+      - role: zoning
+        name: City_of_East_Dublin_View EastDublinZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_East_Dublin_View/FeatureServer/7
+        layerId: 7
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          East Dublin Euclidean zoning polygons (prefer /7 over EastDublinZoningOld/2).
+          Viewer HOGARC.maps.arcgis.com webappviewer id=b5e1d10c73a64cf78c0e16b737d78434.
+          Skip EastDublinWaterLines (utilities).
+        status: partial
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial EastDublinCityLimits
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No East Dublin-only CAMA — county parcels + city limits.
+        status: gap
+    gaps:
+      - "East Dublin zoning usable; parcel CAMA still county TaxParcels_25 + qPublic."
+    status: partial
+
+gaps:
+  - "TaxParcels_25 schema thin (Parcel_No/Calc_Acres only) — no owner/mailing/situs/CURR_VAL/sale REST; qPublic App=LaurensCountyGA HTML."
+  - "No county-wide Euclidean zoning FeatureServer — Dublin/12 + East Dublin/7 city-only."
+  - "Realkey null-filled on TaxParcels_25."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; public for humans (qpublic.net/ga/laurens)."
+  - "REJECT Laurens County SC laurenscountygis.org (TMS/~-82.14,34.75); REJECT paid Regrid/ATTOM; skip utilities+AADT; no emails/phones."
+
+license: >
+  Heart of Georgia Altamaha Regional Commission GIS (hogagis org HHvUPZ2XuLOAJxjR) —
+  Laurens_County_Wide_View (TaxParcels_25/LandUse/CharacterAreas_Poly/CountyBoundary);
+  City_of_Dublin_new_View_gdb_view; City_of_East_Dublin_View. Open data
+  hogarc-hogarc.opendata.arcgis.com. Assessor qPublic App=LaurensCountyGA
+  (qpublic.net/ga/laurens). Attribution HOGARC / Laurens County Tax Assessor /
+  City of Dublin / City of East Dublin. Public fields only; no emails/phones;
+  no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LaurensCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://hogarc-hogarc.opendata.arcgis.com/datasets/HHvUPZ2XuLOAJxjR::laurens-county-wide-view/explore
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/HHvUPZ2XuLOAJ
+    xjR/arcgis/rest/services/Laurens_County_Wide_View/FeatureServer/25 count 30009; extent center
+    [['13175', 'Laurens County']]; sample [['13175', 'Laurens County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Cadwell town"
+      level: city
+      parentFips: "13175"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Dexter town"
+      level: city
+      parentFips: "13175"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Dublin city"
+      level: city
+      parentFips: "13175"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Dudley city"
+      level: city
+      parentFips: "13175"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "East Dublin city"
+      level: city
+      parentFips: "13175"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Montrose town"
+      level: city
+      parentFips: "13175"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Rentz city"
+      level: city
+      parentFips: "13175"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Laurens' AND aadt>0
+    altFilter: name LIKE '175-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 175-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 272
+    maxAadt: 27500
+    geoCheck: 271/272 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=LaurensCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 002    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LaurensCountyGA&Layer=Parcels&PageType=Report&KeyValue=002%20%20%20%20001
+    verification: 'pattern-tested: real sample ID from Parcel_No; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://hogarc-hogarc.opendata.arcgis.com/datasets/HHvUPZ2XuLOAJxjR::laurens-county-wide-view/explore
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Cadwell town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Dexter town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Dublin city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Dudley city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: East Dublin city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Montrose town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Rentz city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

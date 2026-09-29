@@ -1,0 +1,433 @@
+state: GA
+jurisdiction: Evans County
+fips: "13109"
+level: county
+markets: [Savannah]
+
+layers:
+  - role: parcels
+    name: Evan_CountyWide_GeoData_View TaxParcels25 (HOGARC) — thin geometry
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Evan_CountyWide_GeoData_View/FeatureServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      C_PRINT: parcelIdAlt
+      PARCELNUM: parcelNumber
+      MAP_NUM: mapSheet
+      REALKEY: ownerKey
+      OWNKEY: ownerKeyAlt
+      LEGAL_DESC: legalDescription
+      TOTALACRES: acreage
+      ACRES: acreageGis
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Heart of Georgia Altamaha RC / hogagis
+      org HHvUPZ2XuLOAJxjR — Evan_CountyWide_GeoData_View item
+      e1cdd7fc171f4dd4a7f672c17af32a31; NOTE service title spelling "Evan_" singular).
+      Live count 6662 (2026-09-24). Schema THIN — PARCEL_NO / C_PRINT / acres /
+      LEGAL_DESC / REALKEY/OWNKEY keys + geometry; NO owner name / mailing / situs /
+      CURR_VAL / sale on this layer. TOTALACRES>0 ≈6488; TOTALACRES 5–150 ≈1761
+      (preferred acreage band); ACRES>0 ≈6657; ACRES 5–150 ≈1759; PARCEL_NO filled
+      6662; LEGAL_DESC filled ≈5643. Parcel id format e.g. '028    018' /
+      '036    002 004' (padded; preserve spaces for qPublic KeyValue). Twin county
+      AGOL EvansBasemap/0 Parcels (org vgwS5Le2XfU2EPjI owner evanscounty; count
+      6672; same thin schema + date_updated) — nearly identical; prefer HOGARC
+      TaxParcels25 for regional consistency with Candler/Emanuel HOGARC cards.
+      CountyBoundary/0 CNTYIDFP=13109 / NAME=Evans / STATEFP=13 geo-verified
+      GEORGIA (RDC=Heart of Georgia-Altamaha). WGS84 samples ~-81.897,32.058 /
+      ~-81.908,32.060 / ~-81.869,32.059 — Evans County GA around Claxton
+      (~-81.90,32.16). REJECT Evans County IN (~-87.7,38.0) / Evans CO / Evans NY
+      lookalikes; reject paid Regrid/ATTOM/Equator/DynamoSpatial. Join CAMA via
+      qPublic App=EvansCountyGA / AppID=740 LayerID=11777 HTML KeyValue={PARCEL_NO}.
+      No EvansCountyGA_WFS recovered. Skip utilities+AADT; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on TaxParcels25; qPublic AppID=740 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on TaxParcels25 or EvansBasemap Parcels.
+      Assessor HTML qpublic.net/ga/evans → App=EvansCountyGA / AppID=740
+      LayerID=11777 (Cloudflare/bot 403 automated; public for humans). Deep-link
+      KeyValue={PARCEL_NO}: Application.aspx?App=EvansCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCEL_NO}
+      (also AppID=740&LayerID=11777&PageTypeID=4&PageID=5483&KeyValue=…).
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No SALEPRICE/SALEDATE on TaxParcels25 / EvansBasemap. qPublic Sales Search
+      AppID=740 HTML only. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no county Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No county-wide Euclidean zoning on Evan_CountyWide or EvansBasemap (2026-09-24).
+      City of Claxton / City of Hagan publish municipal zoning polygons (see
+      municipalities). County planning PDF / municode gap for unincorporated zoning.
+    status: gap
+
+  - role: flu
+    name: Evan_CountyWide_GeoData_View Landuse (EXTLU / FLULU)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Evan_CountyWide_GeoData_View/FeatureServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      FLULU: flu
+      FLUDCA: fluDca
+      EXTLU: existingLandUse
+      EXTLUDCA: existingLandUseDca
+      Acres: acreage
+    notes: >
+      Preferred Future / existing land-use polygons (NOT parcel-tied — spatial
+      intersect). Live count 7120. FLULU: Residential≈3936, Forestry≈2042,
+      Agriculture≈647, Commercial≈347, Public/Institutional≈89, Industrial≈46,
+      Park/Recreation/Conservation≈9, Transportation/Communication/Utilities≈4.
+      Prefer FLULU as flu; EXTLU as existing. Companion SpecialAreas/5 (count 22;
+      Natural/Cultural Resources — Public Fishing Area / Canoochee School etc.) —
+      planning/special only, not Euclidean zoning. Geo Evans GA.
+    status: usable
+
+municipalities:
+  - name: Claxton
+    level: city
+    parentFips: "13109"
+    joinToCountyParcels: >
+      Spatial EvansBasemap City_Limits CITY='CLAXTON' (STATE='GA' COUNTY_FIP='109')
+      OR City_of_Claxton_GeoData_View ClaxtonCityLimits/0 onto TaxParcels25;
+      mailing city='CLAXTON' is NOT authoritative.
+    layers:
+      - role: zoning
+        name: City_of_Claxton_GeoData_View ClaxtonZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Claxton_GeoData_View/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          ZONE_: zoningId
+          ZONE_ID: zoningIdAlt
+        notes: >
+          Preferred City of Claxton Euclidean zoning polygons (count 216). Domain
+          ZONING: R-1≈123, R-2≈26, CR≈23, CBD≈12, HOC≈11, O≈11, R-3≈6, L-1≈2,
+          H-1≈1, HOC-R-3≈1. Spatial join onto county TaxParcels25. Geo Claxton GA
+          (~-81.90,32.16). Skip utilities.
+        status: usable
+      - role: flu
+        name: County Landuse spatial Claxton
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Evan_CountyWide_GeoData_View/FeatureServer/13
+        layerId: 13
+        geometry: polygon
+        auth: none
+        acreageField: Acres
+        coverage: city-only
+        fieldMap:
+          FLULU: flu
+        notes: County FLU spatial intersect Claxton city limits.
+        status: usable
+      - role: parcels
+        name: County TaxParcels25 spatial Claxton
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Evan_CountyWide_GeoData_View/FeatureServer/16
+        layerId: 16
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          TOTALACRES: acreage
+        notes: No Claxton-owned parcel CAMA — county TaxParcels25 + city limits spatial.
+        status: partial
+    gaps:
+      - "No Claxton-owned parcel CAMA FeatureServer — county TaxParcels25 + spatial city limits; CAMA via qPublic AppID=740."
+    status: usable
+
+  - name: Hagan
+    level: city
+    parentFips: "13109"
+    joinToCountyParcels: >
+      Spatial EvansBasemap City_Limits CITY='HAGAN' OR City_of_Hagan_View
+      HaganCityLimits/9 onto TaxParcels25.
+    layers:
+      - role: zoning
+        name: City_of_Hagan_View HaganZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Hagan_View/FeatureServer/12
+        layerId: 12
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+        notes: >
+          Preferred City of Hagan Euclidean zoning polygons (count 96). Domain
+          Zoning: R-20≈30, R2-15≈19, B-1≈16, AG≈10, R-40≈10, RM-15≈7, I≈3, L-1≈1.
+          Skip Hagan water/sewer/manhole utility layers per tranche-3.
+        status: usable
+      - role: flu
+        name: County Landuse spatial Hagan
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Evan_CountyWide_GeoData_View/FeatureServer/13
+        layerId: 13
+        geometry: polygon
+        auth: none
+        acreageField: Acres
+        coverage: city-only
+        fieldMap:
+          FLULU: flu
+        notes: County FLU spatial Hagan city limits.
+        status: usable
+      - role: parcels
+        name: County TaxParcels25 spatial Hagan
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels25 + HaganCityLimits spatial; no Hagan-only CAMA.
+        status: gap
+    gaps:
+      - "Skip City_of_Hagan_View water/sewer/wells utility layers (tranche-3)."
+      - "No Hagan-owned parcel CAMA REST."
+    status: usable
+
+  - name: Bellville
+    level: city
+    parentFips: "13109"
+    joinToCountyParcels: >
+      Spatial EvansBasemap City_Limits CITY='BELLVILLE' OR
+      City_of_Bellville_GeoData_View BellvilleCityLimits/0.
+    layers:
+      - role: zoning
+        name: null — no Bellville zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: City_of_Bellville_GeoData_View has city limits / special areas only — no zoning.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Landuse spatial Bellville limits.
+        status: partial
+      - role: parcels
+        name: null — county TaxParcels25 spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels25 + BellvilleCityLimits.
+        status: gap
+    gaps:
+      - "No Bellville city zoning/parcel CAMA REST."
+    status: partial
+
+  - name: Daisy
+    level: city
+    parentFips: "13109"
+    joinToCountyParcels: >
+      Spatial EvansBasemap City_Limits CITY='DAISY' OR
+      City_of_Daisy_GeoData_View DaisyCityLimits/0.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Daisy city zoning REST (limits / special areas only).
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Landuse spatial Daisy.
+        status: partial
+      - role: parcels
+        name: null — county TaxParcels25 spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels25 + DaisyCityLimits.
+        status: gap
+    gaps:
+      - "No Daisy city zoning/parcel CAMA REST."
+    status: partial
+
+gaps:
+  - "TaxParcels25 / EvansBasemap Parcels are geometry+PIN+acres+legal only — no owner/mailing/situs/CURR_VAL/sale REST; qPublic AppID=740 HTML for CAMA (bot/CDN may 403)."
+  - "No county-wide Euclidean zoning FeatureServer — ClaxtonZoning + HaganZoning city-only."
+  - "No public REST lastSale.price/date — qPublic Sales Search HTML AppID=740."
+  - "TaxParcels25 maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "GEO-VERIFY GEORGIA: CNTYIDFP=13109 STATEFP=13; samples ~-81.90,32.06 Claxton GA — REJECT Evans IN/CO/NY lookalikes."
+  - "Rejected paid Regrid/ATTOM/Equator/DynamoSpatial Evans extracts."
+  - "Skip Hagan/Claxton utility layers + AADT; no emails/phones."
+
+license: >
+  Heart of Georgia Altamaha Regional Commission GIS (AGOL org HHvUPZ2XuLOAJxjR owner
+  hogagis) — Evan_CountyWide_GeoData_View FeatureServer/16 TaxParcels25; Landuse/13;
+  SpecialAreas/5; CountyBoundary/0. Twin county basemap EvansBasemap (org
+  vgwS5Le2XfU2EPjI owner evanscounty) Parcels/0 + City_Limits/4. City zoning:
+  City_of_Claxton_GeoData_View/1; City_of_Hagan_View/12. Assessor qPublic
+  App=EvansCountyGA / AppID=740 LayerID=11777 (qpublic.net/ga/evans; Claxton GA
+  Board of Assessors). Attribution HOGARC / Evans County / City of Claxton / City
+  of Hagan. Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=740&LayerID=11777&PageTypeID=2
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Evan_CountyWide_GeoData_View/FeatureServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/HHvUPZ2XuLOAJ
+    xjR/arcgis/rest/services/Evan_CountyWide_GeoData_View/FeatureServer/16 count 6662; extent center
+    [['13109', 'Evans County']]; sample [['13109', 'Evans County']]. No change to field map (see layer
+    above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Bellville city"
+      level: city
+      parentFips: "13109"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Claxton city"
+      level: city
+      parentFips: "13109"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Daisy city"
+      level: city
+      parentFips: "13109"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Hagan city"
+      level: city
+      parentFips: "13109"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Evans' AND aadt>0
+    altFilter: name LIKE '109-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 109-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 61
+    maxAadt: 10200
+    geoCheck: 61/61 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=EvansCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=740&LayerID=11777&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 028    018
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=EvansCountyGA&Layer=Parcels&PageType=Report&KeyValue=028%20%20%20%20018
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Evan_CountyWide_GeoData_View/FeatureServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Bellville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Claxton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Daisy city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Hagan city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

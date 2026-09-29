@@ -1,0 +1,622 @@
+state: GA
+jurisdiction: Fayette County
+fips: "13113"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons (PIN, GIS acres sparse, county zoning attr)
+  - role: parcels
+    name: Pictometry parcelsRO Tax Parcels
+    restUrl: https://gis.fayettecountyga.gov/arcgis/rest/services/Pictometry/parcelsRO/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: acres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PARCEL_KEY: parcelIdAlt
+      acres: acreage
+      Zoning: zoning
+      DISTRICT: landDistrict
+      PWID: publicWorksId
+    notes: >
+      Preferred county-wide parcel GEOMETRY source (on-prem MapServer). Live count 49104
+      (2026-09-23); FeatureServer mirror same count / same schema
+      (Pictometry/parcelsRO/FeatureServer/0). SR NAD 1983 StatePlane Georgia West FIPS 1002
+      Feet (102667/2240); maxRecordCount 2000. Geo-verified WGS84 samples ~-84.474,33.258
+      (Brooks / Lynch Rd unincorporated south), ~-84.468,33.258 (Mask Rd) — Fayette County
+      GA, Atlanta MSA south (NOT Fayette KY ~-84.5,38.0 Lexington; Fayette PA ~-79.7,39.9;
+      Fayette IN; Fayetteville NC ~-78.9,35.1; Fayetteville AR ~-94.2,36.1; Gillette WY).
+      Thin CAMA: NO owner / mailing / tax / sale on this layer. acres>0 = 6610 only;
+      acres 5–150 = 1070 (sparse deeded acres — most urban lots acres=0). Prefer acres when
+      >0 else derive GIS acres = Shape__Area/43560 (StatePlane feet; sample 0402  029
+      acres=0 → ~1.48 ac). Zoning filled 46073 but 'NA' ≈25078 are city stubs — prefer
+      ZoningRO for unincorporated and city REST inside Fayetteville / Peachtree City /
+      Tyrone. Join CAMA on PARCEL_NO = TaxParcels_public PARCELID (formats '061130015' and
+      '0402  029' both occur). Situs via Parcels_Data_SAGES single_line_address (same 49104
+      PINs). Enrichment vs thin in-app: full-county outlines + PIN + county zoning attr +
+      join keys for owner/tax/sales/city zoning.
+    status: usable
+
+  - role: parcels
+    name: Parcels_Data_SAGES (situs-enriched AGOL mirror)
+    restUrl: https://services5.arcgis.com/Hg5aLg4LtSINzVWa/arcgis/rest/services/Parcels_Data_SAGES/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: acres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PARCEL_KEY: parcelIdAlt
+      acres: acreage
+      Zoning: zoning
+      single_line_address: situsAddress
+      street_number: situsNumber
+      street_name: situsStreet
+      street_type: situsStreetType
+      City: postalCommunity
+      state: situsState
+      ZipCode: situsZip
+    notes: >
+      Live count 49104 — same landbase as parcelsRO plus geocoded situs. City is postal
+      (FAYETTEVILLE≈26794, PEACHTREE CITY≈15162, TYRONE≈3920, BROOKS≈1386, SENOIA≈443,
+      JONESBORO≈350) — NOT incorporated municipality (Senoia/Jonesboro are out-of-county
+      postal; City field is dirty with semicolon-duplicated concatenations). Prefer
+      parcelsRO MapServer for geometry; this AGOL layer for situs join on PARCEL_NO.
+      Zoning='NA' ≈25078 city stubs (same caveat). acres stats identical to parcelsRO.
+      Stale sibling Parcels_Data_SAGES_UD2 count 48053 — do not prefer.
+    status: partial
+
+  - role: tax
+    name: TaxParcels_public (CAMA owner / mailing / assessed)
+    restUrl: https://services5.arcgis.com/Hg5aLg4LtSINzVWa/arcgis/rest/services/TaxParcels_public/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      OWNERNME1: ownerName
+      OWNERNME2: ownerName2
+      PSTLADDRESS: mailingAddress
+      PSTLCITY: mailingCity
+      PSTLSTATE: mailingState
+      PSTLZIP5: mailingZip
+      SITEADDRESS: situsAddress
+      CNTASSDVAL: tax.assessedValue
+      PRVASSDVAL: tax.priorAssessedValue
+      LNDVALUE: tax.landValue
+      CNTTXBLVAL: tax.taxableValue
+      CLASSCD: dorCode
+      CLASSDSCRP: dorCodeDescription
+      CVTTXCD: taxDistrict
+      USECD: landUseCode
+      USEDSCRP: landUseDescription
+      CNVYNAME: subdivision
+      NGHBRHDCD: neighborhood
+    notes: >
+      Preferred county-wide owner + mailing + assessed-value source. Live count 46021
+      (some PIN duplicates — condo/building rows; first 6k rows ≈93 multi-PIN groups).
+      OWNERNME1 IS NOT NULL ≈45634; CNTASSDVAL>0 ≈45612; SITEADDRESS IS NOT NULL ≈45480;
+      LNDVALUE>0 ≈45540. CNTTXBLVAL>0 = 5 only — do not use as FMV. Alias is "Current
+      Assessed Value"; no reliable tax.marketValue on this layer (TaxParcel_5e
+      cnttxblval looks like FMV on a thinner owner-sparse extract — see gaps).
+      STATEDAREA almost unused. CVTTXCD decode (live groupBy): 1≈20759 unincorporated,
+      2≈7362 Fayetteville, 3≈3263 Tyrone, 4≈351 Brooks, 5≈13760 Peachtree City,
+      90≈138 Fayetteville Glynn St / special corridor, null≈388. Woolsey has no
+      distinct tax-district code (tiny; use City Limits spatial). Join to parcelsRO
+      on PARCELID = PARCEL_NO. AGOL org Hg5aLg4LtSINzVWa (fayettecounty.maps.arcgis.com).
+      TaxDistribution table/1 live count 0 — stub. Assessor HTML: qPublic AppID=942.
+    status: usable
+
+  - role: sales
+    name: Sales Analysis (AGOL last-sale snapshot)
+    restUrl: https://services5.arcgis.com/Hg5aLg4LtSINzVWa/arcgis/rest/services/Sales_Analysis_5e04729658e04c9488fb3401f5ee29e9/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: parcelsize
+    coverage: county-wide
+    fieldMap:
+      parcelid: parcelId
+      saleamnt: lastSale.price
+      recorddt: lastSale.date
+      transdt: lastSale.transactionDate
+      saletype: lastSale.saleType
+      grantor: lastSale.grantor
+      grantee: lastSale.grantee
+      liber: lastSale.deedBook
+      page: lastSale.deedPage
+      fulladdr: situsAddress
+      cntassdval: tax.assessedValue
+      statedarea: acreage
+    notes: >
+      Live count 54989 polygons; saleamnt>0 only ≈2392 (2026-09-23). saletype /
+      grantor / grantee / transdt all null on priced samples — not a qualified
+      multi-sale history table (unlike Cobb ParcelSales). recorddt present on
+      priced rows (2025–2026 epoch samples). Join on parcelid = PARCEL_NO; take
+      max(recorddt) if duplicates. Peachtree City last-sale attrs (SALEPRICE>0
+      ≈10188) are richer inside PTC — prefer city layer there. County-wide
+      qualified sales history remains a gap; qPublic HTML for humans.
+    status: partial
+
+  - role: zoning
+    name: Pictometry ZoningRO (unincorporated parcel-tied)
+    restUrl: https://gis.fayettecountyga.gov/arcgis/rest/services/Pictometry/ZoningRO/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PARCEL_KEY: parcelIdAlt
+      ZONING_1: zoning
+    notes: >
+      Preferred unincorporated zoning. Live count 20328 parcel-tied polygons (not
+      dissolved districts). Domain: R-40≈7045, A-R≈4132, R-45≈2146, R-70≈2067,
+      R-20≈1913, P-U-D≈1466, C-S≈377, R-50≈260, C-H≈195, R-72≈181, S-Z≈166, M-1≈119,
+      O-I≈88, M-H-P≈54, C-C≈39, E-S-T≈38, …. FeatureServer mirror
+      Pictometry/ZoningRO/FeatureServer/0. Join on PARCEL_NO. Does NOT cover city
+      interiors — parcelsRO Zoning='NA' ≈25078 inside Fayetteville / Peachtree City /
+      Tyrone / Brooks / Woolsey; prefer city REST (see municipalities). Geo-verified
+      ~-84.471,33.257 Fayette GA.
+    status: usable
+
+  - role: other
+    name: Site Address Points
+    restUrl: https://gis.fayettecountyga.gov/arcgis/rest/services/Pictometry/SiteAddressPointsRO/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FullAddr: situsAddress
+      AddNum: situsNumber
+      FullStreet: situsStreet
+      City: postalCommunityCode
+      ZipCode: situsZip
+      State: situsState
+    notes: >
+      Live count 54169 E911/site address points. City codedomain: FAY≈30276,
+      PTC≈17762, TYR≈4262, BRK≈1110, SEN≈378, JBO≈315 — postal/CDP, not
+      incorporated (SEN=Senoia Coweta postal; JBO=Jonesboro Clayton postal).
+      Municipality filter = TaxParcels_public CVTTXCD or City Limits spatial.
+    status: usable
+
+  - role: other
+    name: City Limits
+    restUrl: https://gis.fayettecountyga.gov/arcgis/rest/services/Pictometry/CityLimitsRO/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY: municipality
+    notes: >
+      Live count 5 incorporated polygons: WOOLSEY (~-84.414,33.361), BROOKS
+      (~-84.459,33.293), TYRONE (~-84.607,33.472), PEACHTREE CITY (~-84.580,33.387),
+      FAYETTEVILLE (~-84.467,33.453) — all Fayette GA. Parcel↔city join = spatial
+      intersect OR TaxParcels_public CVTTXCD (2 Fayetteville, 3 Tyrone, 4 Brooks,
+      5 Peachtree City; Woolsey spatial-only). AGOL City_Limits mirror
+      services5.arcgis.com/Hg5aLg4LtSINzVWa/.../City_Limits/FeatureServer/0.
+    status: usable
+
+municipalities:
+  - name: Peachtree City
+    level: city
+    parentFips: "13113"
+    joinToCountyParcels: >
+      Attribute: Peachtree_City_Parcels / Parcels PARCEL_NO ≈ county PARCEL_NO
+      (verified 061130015). Also CVTTXCD='5' ≈13760; spatial City Limits
+      CITY='PEACHTREE CITY'; SiteAddress City='PTC'.
+    layers:
+      - role: zoning
+        name: Peachtree City Zoning2021
+        restUrl: https://gis.peachtree-city.org/arcgis/rest/services/Zoning2021/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+          Zoning_Sym: zoningLabel
+          ZoningCond: zoningConditioned
+          Overlay: zoningOverlay
+          CodeLink: zoningOrdinanceUrl
+          Subdivisio: subdivision
+        notes: >
+          Preferred Peachtree City-local zoning district polygons (standing order:
+          city over county Zoning='NA' stub). Live count 939. Domain OS-C, OS-P,
+          R-12, GC, R-43, GR-4, LUR-15, R-15, OI, R-22, R-1, GR-6, GI, GR-12, …
+          Spatial-join (no PIN). Geo-verified ~-84.596,33.441 Peachtree City GA.
+          MapServer: Zoning2021/MapServer/0. Overlays on layers 1 (Airport) and 3
+          (Zoning Condition). County/SAGES Zoning is 'NA' on ≈13789 of 15315 city
+          extract rows — do not use county stub inside PTC.
+        status: usable
+      - role: flu
+        name: Peachtree City LandUse Proposed_L
+        restUrl: https://gis.peachtree-city.org/arcgis/rest/services/LandUse/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: Acres
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          Proposed_L: flu
+          LANDUSE: landUseCode
+          LANDUSEDESC: landUseDescription
+          Zoning: zoning
+          OWNER1: ownerName
+          PROP_LOCAT: situsAddress
+          CITY: mailingCity
+          MKT_VALUE1: tax.marketValue
+          ASSD_VAL: tax.assessedValue
+          Acres: acreage
+        notes: >
+          Live count 12820 parcel-tied. Proposed_L domain SFM≈7189, SFC≈2301,
+          SFL≈1082, MF≈834, OS≈713, IND≈252, COM≈221, OFF≈133, CS, MIX — treat as
+          FLU / plan-category proxy (not a separately named FLUM). PIN-joinable.
+          MKT_VALUE1/ASSD_VAL are strings. Geo-verified ~-84.581,33.361 PTC GA.
+        status: usable
+      - role: parcels
+        name: Peachtree_City_Parcels (city CAMA + last sale)
+        restUrl: https://gis.peachtree-city.org/arcgis/rest/services/Peachtree_City_Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: acreage
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          PARCEL_KEY: parcelIdAlt
+          acreage: acreage
+          OWNNAME1: ownerName
+          OWNNAME2: ownerName2
+          OWNADDR1: mailingAddress
+          OWNADDR2: mailingAddress2
+          OWNCITY: mailingCity
+          OWNSTATE: mailingState
+          OWNZIP: mailingZip
+          LOCADDR: situsAddress
+          Zoning: zoningCountyStub
+          APPRTOT: tax.marketValue
+          APPRLAND: tax.landMarketValue
+          APPRBLDG: tax.improvementMarketValue
+          ASDTOT: tax.assessedValue
+          SALEPRICE: lastSale.price
+          SALEDT: lastSale.date
+          QUAL: lastSale.qualified
+          GRANTOR: lastSale.grantor
+          GRANTEE: lastSale.grantee
+          BOOK: lastSale.deedBook
+          PAGE: lastSale.deedPage
+        notes: >
+          Live count 15315 city extract with rich CAMA. acreage>0 = 15315;
+          acreage 5–150 ≈340; APPRTOT>0 ≈15056; SALEPRICE>0 ≈10188 (QUAL blank on
+          all priced rows — not a Q/U flag). Zoning field is county stub
+          (NA≈13789) — prefer Zoning2021 spatial. Prefer county parcelsRO for
+          county-wide search; this for PTC-scoped owner/tax/lastSale. Thinner
+          Parcels/FeatureServer/0 (15390; OWNER1, PHYSICAL_A, QPublicLink) is
+          situs+qPublic only.
+        status: usable
+    gaps:
+      - "PTC QUAL sale-qualification field is blank; county Sales_Analysis also lacks saletype."
+      - "Zoning on Peachtree_City_Parcels is county NA stub — must spatial-join Zoning2021."
+    status: usable
+
+  - name: Fayetteville
+    level: city
+    parentFips: "13113"
+    joinToCountyParcels: >
+      Attribute: City_Zoning / Parcels PARCEL_NO ≈ county PARCEL_NO (verified
+      051613005). Also CVTTXCD='2' ≈7362; TAX_DIST=2 / TAX_DIST_N='FAYETTEVILE'
+      (typo in source); spatial City Limits CITY='FAYETTEVILLE'.
+    layers:
+      - role: zoning
+        name: City of Fayetteville City Zoning
+        restUrl: https://services5.arcgis.com/cYdGvS3rAv77unWU/arcgis/rest/services/City_Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          PARCEL_KEY: parcelIdAlt
+          ZONING: zoning
+          OWNER_1: ownerName
+          OWNER_2: ownerName2
+          TAX_DIST: taxDistrict
+          CITY: situsCity
+        notes: >
+          Preferred Fayetteville-local zoning (standing order: city over county
+          NA stub). Live count 7268 parcel-tied. Domain R-30≈1777, R-22≈1510,
+          R-THC≈819, PDP≈620, PCD≈611, DR-15≈456, R-40≈391, NC≈346, RMF-15,
+          PO, R-15, LI, RP, C-4, BP, …. Geo-verified ~-84.475,33.423 Fayetteville
+          GA (NOT Fayetteville NC / AR). Org cYdGvS3rAv77unWU (anthony67GIS /
+          fayetteville-gis.maps.arcgis.com). Viewer:
+          fayetteville-gis.maps.arcgis.com/apps/instant/interactivelegend/index.html?appid=5f39143a3fb54189bdddfd7c35c72cb7.
+          Main_Street_Zones/FeatureServer/0 (902; UDO e.g. DMU-MUC) is downtown
+          overlay — spatial/PIN join for Main Street form-based districts.
+        status: usable
+      - role: flu
+        name: City of Fayetteville FUTURE LAND USE
+        restUrl: https://services5.arcgis.com/cYdGvS3rAv77unWU/arcgis/rest/services/FUTURE_LAND_USE/FeatureServer/18
+        layerId: 18
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          PARCEL_KEY: parcelIdAlt
+          Land_use: flu
+          ADDRESS: situsAddress
+          CITY: situsCity
+          TAX_DIST: taxDistrict
+        notes: >
+          Live count 8207 parcel-tied. Land_use alias Proposed_F: Neighborhood
+          Residential 1, Activity Center, Neighborhood Center, Mixed Residential,
+          Neighborhood Residential 2, Parks/Conservation/Open Space, Industrial,
+          Business Park, Public Institutional. PIN-join. /FeatureServer/0 is
+          Invalid URL — layer id is 18.
+        status: usable
+      - role: parcels
+        name: City of Fayetteville Parcels (zoning+FLU attrs)
+        restUrl: https://services5.arcgis.com/cYdGvS3rAv77unWU/arcgis/rest/services/Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          PARCEL_KEY: parcelIdAlt
+          ZONING: zoning
+          land_use: flu
+          TAX_DIST: taxDistrict
+          CITY: situsCity
+        notes: >
+          Live count 8241 city extract with ZONING + land_use on polygons.
+          Prefer county TaxParcels_public for owner/assessed; this for
+          city-scoped zoning/FLU attrs. land_use domain matches FLU layer
+          (Neighborhood Residential 1≈5552).
+        status: usable
+    gaps:
+      - "No Fayetteville multi-sale REST; use county Sales_Analysis on PARCEL_NO or qPublic."
+      - "REJECTED lookalikes: gismaps.fayettevillenc.gov / fay_gis_publisher (Fayetteville NC); maps.fayetteville-ar.gov (AR); Fay_Parcels org j3zNT485kmwrBtMJ SR 102719 (Cumberland NC); gillettegis / gisportal.gillettewy.gov Official Zoning experience 8acdf7fb39ac4eabb5fcb5641fc3f6b5 (Gillette WY)."
+    status: usable
+
+  - name: Tyrone
+    level: city
+    parentFips: "13113"
+    joinToCountyParcels: >
+      Attribute: Zoning Districts PARCEL_NO ≈ county PARCEL_NO (verified 0736  110).
+      Filter TAXDIST=3 (≈3256) — layer also contains PTC/uninc rows. Also
+      CVTTXCD='3' ≈3263; spatial City Limits CITY='TYRONE'.
+    layers:
+      - role: zoning
+        name: Town of Tyrone Zoning Districts (parcel-tied)
+        restUrl: https://services8.arcgis.com/CAwtAHohiClrjBri/arcgis/rest/services/Tyrone_Online_Zoning_Map_WFL1/FeatureServer/7
+        layerId: 7
+        geometry: polygon
+        auth: none
+        acreageField: TOTAL_ACRE
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          PARID: parcelIdAlt
+          Zoning: zoning
+          ZONING_1: zoningAlt
+          TAXDIST: taxDistrict
+          OWNER1: ownerName
+          PHYSICAL_A: situsAddress
+          STREET_ADD: mailingAddress
+          CITY: mailingCity
+          STATE: mailingState
+          ZIP5: mailingZip
+          TOTAL_ACRE: acreage
+          MKT_VALUE: tax.marketValue
+          ASSD_VALUE: tax.assessedValue
+          LAST_SALE1: lastSale.price
+          LAST_SALE_: lastSale.date
+          DEED_BOOK: lastSale.deedBook
+          DEED_PAGE: lastSale.deedPage
+        notes: >
+          Preferred Tyrone-local zoning. Live count 6847 (mixed-geography extract —
+          MUST filter TAXDIST=3 ≈3256 for town). Inside TAXDIST=3, Zoning filled
+          ≠NA ≈3242: R-18≈1056, R-12≈866, LUR≈373, DR≈262, CR-2≈144, A-R≈128,
+          C-1≈114, O-I≈99, M-2≈70, C-2≈38, R-20, M-1, CR-3, O-S, E-I, TCMU, RMF,
+          CMU. ZONING_1 is sparse (339 in TAXDIST=3) — prefer Zoning. Official
+          town webmap c17970c5d4ca45f3a48a8b457637d329 also hosts non-REST
+          shapefile district layers (R-12, CR-2, …) — not queryable; this
+          FeatureServer is the live path. Overlays: layer 3 Hwy 74 (count 1),
+          layer 4 Town Center (count 3), layer 5 PIP (count 1). Geo-verified
+          ~-84.606,33.439 Tyrone GA. Owner bkonwick / org CAwtAHohiClrjBri.
+          Viewer: tyronega.gov/find/zoning. CAMA on this extract (MKT_VALUE /
+          LAST_SALE1) is useful but not the county-wide tax source.
+        status: usable
+    gaps:
+      - "Webmap shapefile district polygons are not published as REST — Zoning field on layer 7 is the queryable city zoning."
+      - "No separate Tyrone FLU FeatureServer found (2026-09-23)."
+    status: usable
+
+  - name: Brooks
+    level: city
+    parentFips: "13113"
+    joinToCountyParcels: >
+      CVTTXCD='4' ≈351; spatial City Limits CITY='BROOKS' (~-84.459,33.293).
+    layers: []
+    notes: >
+      No official Town of Brooks ArcGIS FeatureServer/MapServer for zoning/FLU
+      found (2026-09-23). brooksga.com has no public zoning REST. County
+      parcelsRO Zoning / ZoningRO may carry unincorporated-style codes on some
+      Brooks-adjacent parcels but city certification is a gap vs Fayetteville /
+      Peachtree City / Tyrone. Use county parcels + City Limits / CVTTXCD=4 for
+      geography only.
+    status: gap
+
+  - name: Woolsey
+    level: city
+    parentFips: "13113"
+    joinToCountyParcels: >
+      Spatial City Limits CITY='WOOLSEY' (~-84.414,33.361). No distinct CVTTXCD
+      (tiny town; parcels sit in unincorporated-coded district 1).
+    layers: []
+    notes: >
+      No official Town of Woolsey GIS REST found (2026-09-23). County ZoningRO
+      is the only public zoning near Woolsey. Geography via City Limits only.
+    status: gap
+
+gaps:
+  - "Preferred parcelsRO is geometry+PIN+sparse acres+county zoning only — owner/mailing/assessed require TaxParcels_public join on PARCEL_NO=PARCELID; situs prefer SAGES single_line_address."
+  - "acres on parcelsRO/SAGES filled on only 6610 / 49104 (5–150 = 1070). Derive GIS acres from Shape__Area/43560 (wkid 102667 feet) when acres=0."
+  - "No public REST tax.marketValue on TaxParcels_public (CNTASSDVAL is assessed; CNTTXBLVAL≈empty). TaxParcel_5e cnttxblval looks like FMV but owner-sparse and misaliased — do not treat as authoritative FMV."
+  - "County-wide qualified multi-sale history REST gap. Sales_Analysis has only ≈2392 priced rows and null saletype/grantor; PTC SALEPRICE is city-only last sale with blank QUAL."
+  - "Unincorporated FLU REST gap — LandManagement folder is token-required (499). City FLU exists for Fayetteville (layer 18) and Peachtree City Proposed_L only."
+  - "County ZoningRO (20328) is unincorporated; parcelsRO Zoning='NA' ≈25078 inside cities — must join Fayetteville City_Zoning, PTC Zoning2021, Tyrone TAXDIST=3 Zoning. Brooks and Woolsey official city zoning REST gap."
+  - "SAGES/Address Points City and CAD-style codes (FAY/PTC/TYR/BRK/SEN/JBO) are postal — SEN=Senoia (Coweta) and JBO=Jonesboro (Clayton) are not Fayette municipalities. Municipality = CVTTXCD or City Limits only."
+  - "TaxParcels_public has PIN-duplicate rows (condo/building); take one row per PARCELID or keep BUILDING/UNIT. TaxDistribution table count 0."
+  - "LandManagement, SagesServices, Collector, ParcelNotifications, Utilities, Water, Voting folders on gis.fayettecountyga.gov return Token Required (499) — not public."
+  - "2017_CAMA / Dec_29_2017_Tax_Parcels / Parcels-Deprecated are stale snapshots — do not wire."
+  - "qPublic AppID=942 may CDN/bot-403 automated clients; public for humans. Deep-link pattern from PTC QPublicLink: Application.aspx?AppID=942&LayerID=18406&PageTypeID=4&PageID=8206&KeyValue={PARCEL_NO}. Do not collect emails/phones."
+  - "Rejected lookalikes: Fayette County KY Tax_Parcels (services.arcgis.com/f4rR7WnIfGBdVYFd); Fayette County PA PASDA (mapservices.pasda.psu.edu .../pasda/FayetteCounty); Fayette County IN Beacon; Fayetteville NC (gismaps.fayettevillenc.gov, fay_gis_publisher, gis.co.cumberland.nc.us); Fayetteville AR (maps.fayetteville-ar.gov, data-fayetteville-ar.opendata.arcgis.com); Fay_Parcels org j3zNT485kmwrBtMJ SR 102719 NC StatePlane; gillettegis / gisportal.gillettewy.gov Official Zoning (experience 8acdf7fb39ac4eabb5fcb5641fc3f6b5); Zoning_Districts f4rR7WnIfGBdVYFd sample ~-147.76,64.84 (not GA)."
+  - "Enrichment vs thin in-app: full county 49104 geometry+PIN; owner/mailing/situs/assessed via TaxParcels_public+SAGES; unincorporated ZoningRO; city zoning/FLU for Fayetteville+PTC and Tyrone zoning; PTC last-sale; Brooks/Woolsey geography-only."
+
+license: >
+  Fayette County GIS public ArcGIS Server (gis.fayettecountyga.gov) — Pictometry
+  parcelsRO, ZoningRO, CityLimitsRO, SiteAddressPointsRO. County AGOL org
+  Hg5aLg4LtSINzVWa (fayettecounty.maps.arcgis.com / bkeller@fayettecountyga.gov) —
+  TaxParcels_public, Parcels_Data_SAGES, Sales_Analysis. City of Peachtree City
+  GIS (gis.peachtree-city.org) — Zoning2021, LandUse, Peachtree_City_Parcels.
+  City of Fayetteville AGOL (cYdGvS3rAv77unWU / anthony67GIS /
+  fayetteville-gis.maps.arcgis.com) — City_Zoning, FUTURE_LAND_USE, Parcels,
+  Main_Street_Zones. Town of Tyrone AGOL (CAwtAHohiClrjBri / bkonwick) —
+  Tyrone_Online_Zoning_Map_WFL1. Assessor HTML: qPublic SchneiderCorp AppID=942
+  LayerID=18406. Attribution to Fayette County GIS / City of Peachtree City /
+  City of Fayetteville / Town of Tyrone. Public fields only; no emails/phones;
+  no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=942&LayerID=18406&PageTypeID=2&PageID=8204
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://gis.fayettecountyga.gov/arcgis/rest/services/Pictometry/parcelsRO/MapServer/0 count 49104;
+    extent center [['13113', 'Fayette County']]; sample [['13113', 'Fayette County']]. No change to
+    field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Brooks town"
+      level: city
+      parentFips: "13113"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Fayetteville city"
+      level: city
+      parentFips: "13113"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Peachtree City city"
+      level: city
+      parentFips: "13113"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Tyrone town"
+      level: city
+      parentFips: "13113"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Woolsey town"
+      level: city
+      parentFips: "13113"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Fayette' AND aadt>0
+    altFilter: name LIKE '113-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 113-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 156
+    maxAadt: 47100
+    geoCheck: 156/156 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CNTASSDVAL
+    - CNTTXBLVAL
+    - LNDVALUE
+    - PRVASSDVAL
+    - cntassdval
+    filledCount: null
+    restUrl: https://services5.arcgis.com/Hg5aLg4LtSINzVWa/arcgis/rest/services/TaxParcels_public/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: REST-partial
+    detail: 'Sales_Analysis FeatureServer/2: saleamnt (~2392 >0), recorddt (2025-2026 only); not full history'
+    restUrl: https://services5.arcgis.com/Hg5aLg4LtSINzVWa/arcgis/rest/services/Sales_Analysis_5e04729658e04c9488fb3401f5ee29e9/FeatureServer/2
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: OWNERNME1
+    filledCount: null
+    restUrl: https://services5.arcgis.com/Hg5aLg4LtSINzVWa/arcgis/rest/services/TaxParcels_public/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner field on another REST layer already on this card
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=FayetteCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=942&LayerID=18406&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0402  029
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=FayetteCountyGA&Layer=Parcels&PageType=Report&KeyValue=0402%20%20029
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: inferred {County}CountyGA convention
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=FayetteCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Brooks town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Fayetteville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Peachtree City city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Tyrone town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Woolsey town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

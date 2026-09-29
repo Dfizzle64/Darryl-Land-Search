@@ -1,0 +1,598 @@
+state: GA
+jurisdiction: Liberty County
+fips: "13179"
+level: county
+markets: [Savannah]
+
+layers:
+  # PRIMARY — official county TaxParcel fabric (ParcelsService)
+  - role: parcels
+    name: ParcelsService TaxParcel (official Liberty County GA ArcGIS Server)
+    restUrl: https://gis.libertycountyga.gov/arcgis/rest/services/ParcelsService/FeatureServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      Parcel_Number: parcelId
+      Name: parcelIdSpaced
+      PIN: parcelPin
+      PBA_NUM: parcelIdAlt
+      PARCEL_NO2: parcelIdLegacy
+      Realkey: ownerKey
+      Owner_Name: ownerName
+      Property_Address: situsAddress
+      Tax_District: taxDistrict
+      Legal_Description: legalDescription
+      Acreage: acreage
+      StatedArea: acreageStated
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + owner/situs/acres/tax-district landbase
+      (Liberty County GIS gis.libertycountyga.gov ArcGIS Server ParcelsService FeatureServer
+      layer TaxParcel id 15). Live count 29504 (2026-09-24). SR NAD 1983 StatePlane Georgia
+      East FIPS 1001 Feet (wkid 102666 / latestWkid 2239). maxRecordCount 2000. Acreage
+      5–150 ≈2274 (preferred acreage band). Owner_Name / Parcel_Number filled. Tax_District
+      domain (live): HINESVILLE≈13506, COUNTY≈10295, WALTHOURVILLE≈1670, MIDWAY≈1126,
+      FLEMINGTON≈1015, RICEBORO≈612, ALLENHURST≈336, GUMBRANCH≈118, null≈826 — soft
+      municipality attr; prefer spatial Municipality layer 24 for city membership (mailing
+      not present on this layer). No CURR_VAL / FMV / SALEPRICE / mailing fields on REST —
+      win CAMA values via qPublic HTML. Geo-verified WGS84 samples ~-81.501,31.707
+      (Barrington Ferry Rd COUNTY), ~-81.481,31.717 (Briar Bay Rd), ~-81.60,31.81
+      (Hinesville) — Liberty County GA coastal (~-81.5,31.8) SW of Savannah / Fort Stewart
+      adjacency. LEAD URL https://gis.libertycountyga.gov/arcgis/rest/services/Parcels/MapServer/0
+      returns 404 Service not found (2026-09-24) — do NOT wire; use ParcelsService/15.
+      Token-required twins Parcels/FeatureServer and TaxParcels/MapServer (auth token) —
+      blocked; prefer open ParcelsService. CRC Liberty/Parcels MapServer/0 (count 28170)
+      is thinner public mirror (owner/address/Acres) — usable fallback, prefer county
+      TaxParcel for currency (last_edited 2026). Rejected paid Regrid/ATTOM/DynamoSpatial;
+      rejected SAGIS Chatham-only. Companion layers same FeatureServer: Subdivision/18,
+      Lot/21, Municipality/24.
+    status: usable
+
+  - role: tax
+    name: null — no public REST market/assessed values on TaxParcel
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      TaxParcel exposes Tax_District + Acreage only — no CURR_VAL / FMV / assessed /
+      esttax on public REST. Assessor HTML: qpublic.net/ga/liberty → qpublic.schneidercorp.com
+      Application.aspx?App=LibertyCountyGA&Layer=Parcels (Cloudflare/bot 403 automated;
+      public for humans). Deep-link KeyValue={PIN or Parcel_Number spaced}.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No SALEPRICE/SALEDATE FeatureServer found (2026-09-24). qPublic Sales Search HTML only.
+    status: gap
+
+  - role: zoning
+    name: null — no county Euclidean zoning REST; city Hinesville CRC dissolve (see municipalities)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No county-wide zoning FeatureServer on gis.libertycountyga.gov (2026-09-24). Parcel
+      layer has no ZONINGCODE. City of Hinesville: CRC HinesvilleView/HinesvilleZoningDissolve
+      (probe intermittently slow — document under municipalities when live). Other cities
+      PDF/Municode gap.
+    status: gap
+
+  - role: flu
+    name: null — no public county FLU FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Liberty County Future Land Use FeatureServer recovered (2026-09-24). Comp Plan /
+      DCA PDF path only — gap.
+    status: gap
+
+  - role: other
+    name: ParcelsService Municipality (cities + Unincorporated)
+    restUrl: https://gis.libertycountyga.gov/arcgis/rest/services/ParcelsService/FeatureServer/24
+    layerId: 24
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Name: municipality
+    notes: >
+      Live count 8: Hinesville, Midway, Flemington, Walthourville, Riceboro, Allenhurst,
+      Gumbranch, Unincorporated (plus Riceboro listed). Preferred spatial join for
+      municipality filter (standing order). Tax_District on parcels soft-aligns to same names.
+      CRC Liberty/PoliticalBoundaries MapServer also exposes City_of_Hinesville/8, City_Limits/9,
+      Fort_Stewart/6, Unincorporated_Liberty/3 — secondary.
+    status: usable
+
+  - role: other
+    name: CRC Liberty Parcels (public mirror — non-preferred vs county TaxParcel)
+    restUrl: https://maps.crc.ga.gov/crcarcgis/rest/services/Liberty/Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      Parcels_PIN: parcelPin
+      Parcel_Number: parcelId
+      Parcel_No: parcelIdAlt
+      Owner_Name: ownerName
+      Property_Address: situsAddress
+      Tax_District: taxDistrict
+      House_No: situsNumber
+      Street_Nam: situsStreet
+      StType: situsStreetType
+      RealKey: ownerKey
+      Acres: acreage
+      Legal_Description: legalDescription
+    notes: >
+      Coastal Regional Commission Liberty County Parcels mirror count 28170. Thinner than
+      county TaxParcel 29504; use only if county ParcelsService unavailable. Geo-verified
+      Hinesville ~-81.60,31.81.
+    status: partial
+
+municipalities:
+  - name: Hinesville
+    level: city
+    parentFips: "13179"
+    joinToCountyParcels: >
+      Spatial Municipality Name='Hinesville' OR Tax_District='HINESVILLE' (~13506). Soft only
+      for tax district; spatial preferred.
+    layers:
+      - role: zoning
+        name: HinesvilleZoningDissolve (CRC HinesvilleView)
+        restUrl: https://maps.crc.ga.gov/crcarcgis/rest/services/HinesvilleView/HinesvilleZoningDissolve/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City of Hinesville dissolved zoning on Coastal Regional Commission host. Endpoint
+          intermittently times out from research box (2026-09-24) — retry; when live use as
+          preferred city Euclidean. County TaxParcel has no zoning attr inside city.
+        status: partial
+      - role: parcels
+        name: null — use county TaxParcel filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcel + spatial Hinesville / Tax_District='HINESVILLE'.
+        status: gap
+      - role: flu
+        name: null — no city FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Hinesville FLU FeatureServer found — gap.
+        status: gap
+    gaps:
+      - "HinesvilleZoningDissolve CRC endpoint intermittently slow/timeout — certify against city Planning PDF when needed."
+      - "No Hinesville-owned parcel/FLU FeatureServer."
+    status: partial
+
+  - name: Midway
+    level: city
+    parentFips: "13179"
+    joinToCountyParcels: "Spatial Municipality Name='Midway' OR Tax_District='MIDWAY' (~1126)."
+    layers:
+      - role: zoning
+        name: null — no city zoning REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Midway public zoning FeatureServer — Municode / PDF gap.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcel spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County parcels + spatial Midway.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Midway FLU REST.
+        status: gap
+    gaps:
+      - "No Midway-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Flemington
+    level: city
+    parentFips: "13179"
+    joinToCountyParcels: "Spatial Name='Flemington' OR Tax_District='FLEMINGTON' (~1015)."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Flemington zoning REST — gap.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcel spatial.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Flemington FLU REST.
+        status: gap
+    gaps:
+      - "No Flemington-owned zoning/FLU REST."
+    status: partial
+
+  - name: Walthourville
+    level: city
+    parentFips: "13179"
+    joinToCountyParcels: "Spatial Name='Walthourville' OR Tax_District='WALTHOURVILLE' (~1670)."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Walthourville zoning REST — gap.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcel spatial.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Walthourville FLU REST.
+        status: gap
+    gaps:
+      - "No Walthourville-owned zoning/FLU REST."
+    status: partial
+
+  - name: Riceboro
+    level: city
+    parentFips: "13179"
+    joinToCountyParcels: "Spatial Name='Riceboro' OR Tax_District='RICEBORO' (~612)."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Riceboro zoning REST — gap.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcel spatial.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Riceboro FLU REST.
+        status: gap
+    gaps:
+      - "No Riceboro-owned zoning/FLU REST."
+    status: partial
+
+  - name: Allenhurst
+    level: city
+    parentFips: "13179"
+    joinToCountyParcels: "Spatial Name='Allenhurst' OR Tax_District='ALLENHURST' (~336)."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Allenhurst zoning REST — gap.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcel spatial.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Allenhurst FLU REST.
+        status: gap
+    gaps:
+      - "No Allenhurst-owned zoning/FLU REST."
+    status: partial
+
+  - name: Gumbranch
+    level: city
+    parentFips: "13179"
+    joinToCountyParcels: "Spatial Name='Gumbranch' OR Tax_District='GUMBRANCH' (~118)."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Gumbranch zoning REST — gap.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcel spatial.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Gumbranch FLU REST.
+        status: gap
+    gaps:
+      - "No Gumbranch-owned zoning/FLU REST."
+    status: partial
+
+gaps:
+  - "Lead URL gis.libertycountyga.gov/.../Parcels/MapServer/0 returns 404 Service not found — wire ParcelsService/FeatureServer/15 TaxParcel instead."
+  - "Token Required (499) on Parcels/FeatureServer and TaxParcels/MapServer — blocked; open ParcelsService preferred."
+  - "No public REST tax.marketValue / assessedValue / lastSale — qPublic LibertyCountyGA HTML only."
+  - "No county-wide zoning or FLU FeatureServer; HinesvilleZoningDissolve CRC only (intermittent timeout)."
+  - "TaxParcel lacks mailing address / WinGAP FMV fields — owner+situs+acres+tax district only."
+  - "CRC Liberty/Parcels (28170) is thinner older mirror — prefer county TaxParcel 29504."
+  - "Fort Stewart occupies large federal footprint — not a municipality; CRC PoliticalBoundaries Fort_Stewart context only."
+  - "Rejected lookalikes / non-preferred: paid Regrid/ATTOM/DynamoSpatial; SAGIS Chatham; stale Parcels/MapServer lead URL; token-gated county twins."
+  - "No emails/phones collected; no paid vendors."
+
+license: >
+  Liberty County GIS (gis.libertycountyga.gov — ParcelsService TaxParcel/Municipality/Lot/
+  Subdivision). Coastal Regional Commission maps.crc.ga.gov Liberty/Parcels + PoliticalBoundaries
+  + HinesvilleView/HinesvilleZoningDissolve. Assessor HTML qpublic.net/ga/liberty →
+  qpublic.schneidercorp.com App=LibertyCountyGA. Attribution to Liberty County GIS / CRC /
+  Tax Assessor / partner cities. Public fields only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LibertyCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://gis.libertycountyga.gov/arcgis/rest/services/ParcelsService/FeatureServer/15 count 29504;
+    extent center [['13179', 'Liberty County']]; sample [['13179', 'Liberty County']]. No change to
+    field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Allenhurst city"
+      level: city
+      parentFips: "13179"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Flemington city"
+      level: city
+      parentFips: "13179"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Gumbranch city"
+      level: city
+      parentFips: "13179"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Hinesville city"
+      level: city
+      parentFips: "13179"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Midway city"
+      level: city
+      parentFips: "13179"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Riceboro city"
+      level: city
+      parentFips: "13179"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Walthourville city"
+      level: city
+      parentFips: "13179"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Liberty' AND aadt>0
+    altFilter: name LIKE '179-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 179-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 115
+    maxAadt: 66700
+    geoCheck: 115/115 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: Owner_Name
+    filledCount: 28678
+    restUrl: https://gis.libertycountyga.gov/arcgis/rest/services/ParcelsService/FeatureServer/15
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=LibertyCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PIN
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: '131____001'
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LibertyCountyGA&Layer=Parcels&PageType=Report&KeyValue=131____001
+    verification: 'pattern-tested: real sample ID from PIN; box test HTTP 403 Cloudflare challenge (expected; pattern
+      follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=LibertyCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Allenhurst city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Flemington city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Gumbranch city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Hinesville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Midway city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Riceboro city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Walthourville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

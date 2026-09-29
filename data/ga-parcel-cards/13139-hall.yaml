@@ -1,0 +1,847 @@
+state: GA
+jurisdiction: Hall County
+fips: "13139"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons + full CAMA (official hallgis MapServer)
+  - role: parcels
+    name: HallCo_Addr_Pcl_Rds Parcel Boundary (official GHCGIS)
+    restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/HallCo_Addr_Pcl_Rds/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: DEED_ACRE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      REALKEY: parcelIdAlt
+      OWNER: ownerName
+      OWNER_LASTNAME: ownerNameLast
+      OWNER_FIRSTNAME: ownerNameFirst
+      OWNER_MIDDLE: ownerNameMiddle
+      MAILADR1: mailingAddress
+      MAILADR2: mailingAddress2
+      MAILADR3: mailingAddress3
+      MAILCITY: mailingCity
+      MAILSTATE: mailingState
+      MAILZIP: mailingZip
+      SITE_LOCATION: situsAddress
+      SITE_DIRECT: situsStreetDir
+      SITE_UNIT: situsUnit
+      SITE_CITY: situsCity
+      ZIP: situsZip
+      DEED_ACRE: acreage
+      CALC_ACRE: acreageGis
+      LAND_VALUE: tax.landValue
+      IMPROVEMENT_VALUE: tax.improvementValue
+      CUR_VALUE: tax.marketValue
+      PREV_VALUE: tax.priorMarketValue
+      TAXDIST: taxDistrict
+      TAXDIST_DESC: taxDistrictDesc
+      DIGCLASS: dorCode
+      DIGCLASS_DESC: dorCodeDesc
+      DIGSTRAT: dorStrata
+      LEGAL_DESC: legalDescription
+      SUBD_NAME: subdivision
+      NEIGHBHOOD: neighborhood
+      NO_RELEASE: ownerPrivacyFlag
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA landbase (Gainesville-Hall County
+      GIS / GHCGIS; hallgis.hallcounty.org ArcGIS Server 11.5; service item
+      aed18d99447044f580005504cf095b90; org HALLGIS AGOL 3t0UAc8xSMWWaD2c /
+      hallgis.maps.arcgis.com). Live count 91921 (2026-09-23). SR StatePlane GA West
+      FIPS 1002 Feet (102667/2240). DEED_ACRE 5–150 ≈6904; CALC_ACRE 5–150 ≈7695.
+      OWNER filled ≈88024; CUR_VALUE string FMV filled ≈88088; MAILCITY ≈88024;
+      SITE_LOCATION non-zero ≈86112. NO_RELEASE=1 ≈63 suppresses OWNER/MAIL* (privacy —
+      do not invent). Geo-verified WGS84 samples ~-83.794,34.481 (PIN 12039 000008
+      Clermont), ~-83.857,34.424 (11033 000004 Gainesville), ~-83.901,34.236
+      (08066 003008 Oakwood) — Hall County GA NE of Atlanta (~-83.8,34.3) (NOT Hall NE
+      Grand Island; NOT Hall TX; NOT Gainesville FL Alachua). TAXDIST domain (top):
+      01 COUNTY≈61129, 04 GAINESVILLE 1≈12962, 03 FLOWERY BRANCH≈4315, 07 OAKWOOD≈2932,
+      21 BRASELTON≈1536, 08 BUFORD 1≈1471, 06 LULA≈1110, 16 FLOWERY BRANCH-TAD≈1077,
+      02 CLERMONT≈507, plus GAINESVILLE Midtown/Westside TAD, OAKWOOD-TAD, GILLSVILLE,
+      BUFORD 2, BRASELTON CID. DIGCLASS: R Residential≈73578, A Agricultural≈6246,
+      C Commercial≈3579, V Consv Use≈1885, I Industrial≈1397, E Exempt≈1173.
+      SITE_CITY is POSTAL (GAINESVILLE≈47974 dominates incl. unincorporated) — prefer
+      spatial Hosted/City_Limits or TAXDIST for municipality filter. Twins (same schema
+      count 91921): Assessors_Web_Service/MapServer/0 Parcel_Owner;
+      GeneralTab/MapServer/1; Accela_APO/MapServer/2. AGOL hosted twin
+      services1.arcgis.com/3t0UAc8xSMWWaD2c/.../parcel_owner_public/FeatureServer/0
+      count 89484 (slightly thinner; DEED 5–150≈6906) — prefer live hallgis MapServer.
+      QPublic/Parcel/MapServer/8 is thin geometry+PIN+acres only (92109). OpenAddresses
+      us/ga/hall harvests Accela_APO/0 addresses + Accela/3 Parcel Dimensions (NOT full
+      CAMA parcels — OA parcels conform pid=PIN on dimensions layer; prefer this
+      MapServer/1 for app landbase). Viewer: experience
+      07c9cfa0f6a94be0b7a24ad4e0b084fa "Hall County GIS Viewer". Rejected paid
+      USLandGrid/Regrid/ATTOM Hall extracts; rejected ARC LandPro_2012.
+    status: usable
+
+  - role: tax
+    name: Assessors_Web_Service Parcel_Owner (CAMA twin of preferred parcels)
+    restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/Assessors_Web_Service/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: DEED_ACRE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      OWNER: ownerName
+      LAND_VALUE: tax.landValue
+      IMPROVEMENT_VALUE: tax.improvementValue
+      CUR_VALUE: tax.marketValue
+      PREV_VALUE: tax.priorMarketValue
+      TAXDIST: taxDistrict
+      DIGCLASS: dorCode
+    notes: >
+      Same 91921 CAMA polygons as HallCo_Addr_Pcl_Rds/1 (CUR_VALUE string FMV;
+      LAND_VALUE/IMPROVEMENT_VALUE integers). Parcel_Land twin MapServer/2 (84675) is
+      land-line / subtype rows (LAND_ACRES, SUB_TYPE) — not preferred landbase.
+      Assessor HTML deep-link: qPublic/Beacon SchneiderCorp AppID=724 /
+      App=HallCountyGA&Layer=Parcels (qpublic.net/ga/hall redirects here). CDN/bot
+      Cloudflare 403 from research box on Application.aspx; public for humans.
+      Deep-link pattern: Application.aspx?App=HallCountyGA&Layer=Parcels&PageType=Report&KeyValue={PIN}
+      or AppID=724&PageTypeID=4&KeyValue={PIN} (LayerID not recovered under Cloudflare —
+      use App=HallCountyGA form). No separate assessedValue/taxableValue REST field —
+      CUR_VALUE is published FMV string.
+    status: usable
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Hall multi-sale FeatureServer/MapServer found (2026-09-23). Preferred parcels
+      expose no SALE_PRICE/SALE_DATE. HC_Res_Development_Tracking/FeatureServer/0
+      (197 polys; Parent_Parcel, Approved_MF/TH/SFD, CaseAcres, Dev_Status) is
+      residential entitlement pipeline — NOT deed sales. Prefer qPublic AppID=724 /
+      App=HallCountyGA Sales Search HTML (weekly). Rejected ARC LandPro_2012 and paid
+      Regrid/USLandGrid/ATTOM as sales substitutes. Rejected Hall County NE
+      Points_For_the_Sales_Search (Grand Island org H1fomogcAqX4720J — wrong state).
+    status: gap
+
+  - role: zoning
+    name: ZoningTab Hall County Zoning (unincorporated Euclidean)
+    restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/ZoningTab/MapServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZN_CLASS: zoning
+      ZN_JURISDI: zoningJurisdiction
+      ZN_CONDITI: zoningConditions
+      ZN_DATE: zoningDate
+    notes: >
+      Preferred unincorporated Hall Euclidean zoning (ZN_JURISDI='HALL COUNTY'). Live
+      count 2032 district polygons (NOT parcel-tied — spatial intersect default). Domain
+      ZN_CLASS (top): R-1≈551, AR-1≈416, H-B≈257, PRD≈197, I-1≈150, PCD≈115, S-S≈98,
+      PID≈54, PCFD≈43, I-2≈38, O-I≈37, R-1-L≈25, V-C≈22, POD≈12, AG-1≈7, R-MF≈4,
+      plus MHP/R-X/R-TF rare. Geo-verified ~-83.930,34.441 Hall GA. Inside cities prefer
+      city ZoningTab layers (Gainesville/14, Flowery Branch/13, Oakwood/16) or
+      Accela_APO/12 / QPublic/ZONING/7 filtered ZN_JURISDI (combined 3472). Combined
+      layer includes BUFORD/LULA/CLERMONT/GILLSVILLE/BRASELTON/RESTHAVEN as ZN_CLASS=MUNI
+      stubs only (not real Euclidean codes — gap; use city PDF/staff). Overlay districts
+      on ZoningTab group 17 (Gateway, Midtown, Historic, WPD, Oakwood Corridor, TAD,
+      Opportunity Zones) — spatial overlays. Official electronic zoning map maintained
+      by GHCGIS / Planning.
+    status: usable
+
+  - role: flu
+    name: HC_FutureLandUse_2024 HC_FLU_2024 (parcel-tied Comp Plan FLU)
+    restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/HC_FutureLandUse_2024/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      pin: parcelId
+      FLU: flu
+      Exist_LU: existingLandUse
+      site_locat: situsAddress
+      site_city: situsCity
+      zip: situsZip
+      P_Area: planningArea
+    notes: >
+      Preferred county Comp Plan Future Land Use (adopted Dec 2024; joint plan w/
+      Clermont, Lula, Oakwood per DCA). Live count 58806 parcel-tied polygons — join on
+      pin to preferred parcels (PIN). Domain FLU (top): Lakeside Residential≈15345,
+      Suburban Neighborhood Medium-Density≈14609, Rural Neighborhood≈10737, Suburban
+      Neighborhood Low-Density≈9979, Business Corridors≈1952, Rural Agriculture≈1699,
+      Rural Scenic Corridors≈1693, Employment≈1285, Suburban Multi-family≈357,
+      Greenspace-Conservation≈338, Regional Activity Center≈301, Industrial≈184,
+      Inland Port≈32, Greenspace-Parks≈57. Twin Character Areas layer /1 (6 polys:
+      Gainesville, South Hall, Chestnut Mountain Candler, East Hall, North Hall,
+      Murrayville Sardis). Geo-verified Suburban Multi-family samples ~-83.807,34.291
+      Hall GA. site_city is POSTAL — not city-limits. Inside City of Gainesville prefer
+      Gnvl_FutureLandUse/3 FLU_2022 district polys over this county FLU. Older
+      Hall_FutureLandUse/17 Future Development (5 Function_ polygons) and /15 Existing
+      Land Use 2016 (342 sample with Zoning/Exist_LU — NOT county-wide) are legacy —
+      prefer HC_FLU_2024. Rejected ARC LandPro_2012.
+    status: usable
+
+  - role: other
+    name: Hosted City_Limits (municipality polygons)
+    restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/Hosted/City_Limits/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      city_name: municipality
+    notes: >
+      Live count 9 city/town polygons (WebMercator 102100): GAINESVILLE, FLOWERY BRANCH,
+      OAKWOOD, LULA, CLERMONT, GILLSVILLE, BRASELTON, BUFORD, RESTHAVEN. Preferred
+      spatial join target for municipality filter (standing order). Twins:
+      GeneralTab/MapServer/23 City Limits; GHCGIS_WebData/24; QPublic/Citylimits/6;
+      Accela_APO/7 — same 9 names. Multi-county: BRASELTON (Jackson+Barrow+Hall+Gwinnett),
+      BUFORD (Gwinnett+Hall), LULA (Banks+Hall), GILLSVILLE (Banks+Hall), RESTHAVEN/
+      Rest Haven (Gwinnett+Hall) — this card is Hall-side footprint only.
+    status: usable
+
+  - role: other
+    name: Accela_APO Address (OA / situs points)
+    restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/Accela_APO/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: DEED_ACRE
+    coverage: county-wide
+    fieldMap:
+      ADDR_ID: addressId
+      PARCEL_NO: parcelId
+      ADDR_ST_NMBR: situsNumber
+      ST_FULL_NAME: situsStreet
+      ADDR_CITYNAME: situsCity
+      ADDR_ZIP: situsZip
+      SITE_LOCATION: situsAddress
+      OWNER: ownerName
+      MAILADR1: mailingAddress
+      DEED_ACRE: acreage
+      TAXDIST: taxDistrict
+      DIGCLASS: dorCode
+    notes: >
+      Live count 117723 address points (OpenAddresses us/ga/hall addresses source).
+      Soft PIN join via PARCEL_NO; also carries thin CAMA. Prefer parcel polygons for
+      geometry; use addresses when building-level situs needed. QPublic/
+      Hall_Address_Points twin.
+    status: usable
+
+  - role: other
+    name: HC_Res_Development_Tracking (entitlements — not sales)
+    restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/HC_Res_Development_Tracking/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CaseAcres
+    coverage: sample
+    fieldMap:
+      Parent_Parcel: parcelId
+      Development_Name: subdivision
+      Approved_MF: approvedMultifamilyUnits
+      Approved_TH: approvedTownhomeUnits
+      Approved_SFD: approvedSingleFamilyUnits
+      CaseAcres: acreage
+      Dev_Status: developmentStatus
+      CaseNumber: caseNumber
+    notes: >
+      Live count 197 residential development tracking polygons (BOC approvals /
+      permits / undeveloped units). Context for multifamily pipeline — NOT lastSale.
+    status: partial
+
+municipalities:
+  - name: Gainesville
+    level: city
+    parentFips: "13139"
+    joinToCountyParcels: >
+      Spatial Hosted/City_Limits city_name='GAINESVILLE' (~-83.83,34.29) OR
+      TAXDIST in (04,10,18) GAINESVILLE 1 / Midtown TAD / Westside TAD (≈13546 soft).
+      SITE_CITY='GAINESVILLE' is postal (~47974) — prefer spatial / TAXDIST.
+    layers:
+      - role: zoning
+        name: ZoningTab Gainesville Zoning
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/ZoningTab/MapServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZN_CLASS: zoning
+          ZN_JURISDI: zoningJurisdiction
+          ZN_CONDITI: zoningConditions
+        notes: >
+          Preferred city Euclidean zoning (standing order: city over county). Live count
+          719; ZN_JURISDI='GAINESVILLE'. Domain: PUD≈142, G-B≈138, R-II≈103, L-I≈76,
+          R-I≈66, O-I≈65, N-B≈36, R-I-A≈27, H-I≈26, R-O≈18, R-B≈16, N-C≈4, C-B≈2.
+          Geo-verified ~-83.867,34.301 Gainesville GA (NOT Gainesville FL ~-82.3,29.7;
+          NOT Gainesville TX). Spatial intersect; also on Accela_APO/12 /
+          QPublic/ZONING/7 filter ZN_JURISDI='GAINESVILLE'. Overlays: ZoningTab
+          Gainesville Gateway/Midtown districts.
+        status: usable
+      - role: flu
+        name: Gnvl_FutureLandUse Gainesville Future Land Use
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/Gnvl_FutureLandUse/MapServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FLU_2022: flu
+        notes: >
+          Preferred City of Gainesville FLU district polygons (2022). Live count 9
+          (Commercial, Downtown Mixed Use, General Mixed Use, Industrial, Multi-family
+          Residential, Park Conservation Recreation, Public/Institutional, Single Family
+          Residential — Commercial duplicated in legend query). Spatial intersect.
+          Geo-verified ~-83.857,34.300. Twin /2 Adjacent County Future Land Use
+          (CA_2022; 7 polys) for fringe context. Prefer over county HC_FLU_2024 inside
+          city limits.
+        status: usable
+      - role: parcels
+        name: null — use county HallCo parcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Gainesville-only CAMA FeatureServer — county HallCo_Addr_Pcl_Rds/1 +
+          spatial City_Limits / TAXDIST 04|10|18. GIS partnership (county + Gainesville
+          + Flowery Branch + Oakwood) hosts shared schema.
+        status: gap
+      - role: other
+        name: Hosted City_Limits (Gainesville)
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/Hosted/City_Limits/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          city_name: municipality
+        notes: >
+          Filter city_name='GAINESVILLE'. Live 1 of 9. Preferred spatial join.
+        status: usable
+    gaps:
+      - "No Gainesville-only parcel CAMA REST — county landbase + TAXDIST/spatial filter."
+      - "SITE_CITY='GAINESVILLE' postal ≠ city limits."
+      - "County HC_FLU_2024 may tag Gainesville postal parcels — prefer Gnvl FLU_2022 inside city."
+    status: usable
+
+  - name: Flowery Branch
+    level: city
+    parentFips: "13139"
+    joinToCountyParcels: >
+      Spatial Hosted/City_Limits city_name='FLOWERY BRANCH' (~-83.91,34.16) OR
+      TAXDIST in (03,16) FLOWERY BRANCH / FLOWERY BRANCH-TAD (≈5392 soft).
+      SITE_CITY postal (~17843) unreliable alone.
+    layers:
+      - role: zoning
+        name: ZoningTab Flowery Branch Zoning
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/ZoningTab/MapServer/13
+        layerId: 13
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZN_CLASS: zoning
+          ZN_JURISDI: zoningJurisdiction
+        notes: >
+          Preferred city Euclidean zoning. Live count 181; ZN_JURISDI='FLOWERY BRANCH'.
+          Domain: HB≈33, M-1≈25, R-1≈17, PUD≈16, TND≈15, INST≈13, R-3≈12, R-2≈12,
+          CBD≈12, A≈11, M-2≈10, NS≈4, MHP≈1. Geo-verified ~-83.956,34.171 Flowery
+          Branch GA. Municode zoning ordinance confirms Official Zoning Map.
+        status: usable
+      - role: flu
+        name: null — no Flowery Branch-only FLU REST (use county Comp Plan / city staff)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No dedicated Flowery Branch FLU FeatureServer found (2026-09-23). County
+          HC_FLU_2024 is joint Comp Plan primarily with Clermont/Lula/Oakwood — do not
+          assume it is Flowery Branch official FLU inside city; certify via city
+          Planning / Comp Plan PDF. Spatial city limits for filter.
+        status: gap
+      - role: other
+        name: Hosted City_Limits (Flowery Branch)
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/Hosted/City_Limits/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          city_name: municipality
+        notes: >
+          Filter city_name='FLOWERY BRANCH'. GIS partnership city with county.
+        status: usable
+    gaps:
+      - "No Flowery Branch-local FLU REST — county HC_FLU_2024 / city Comp Plan PDF / staff."
+      - "No city-only parcel CAMA — county parcels + TAXDIST 03|16 / spatial."
+    status: usable
+
+  - name: Oakwood
+    level: city
+    parentFips: "13139"
+    joinToCountyParcels: >
+      Spatial Hosted/City_Limits city_name='OAKWOOD' (~-83.88,34.23) OR TAXDIST in
+      (07,15) OAKWOOD / OAKWOOD-TAD (≈3277 soft). SITE_CITY postal (~4367) soft only.
+    layers:
+      - role: zoning
+        name: ZoningTab Oakwood Zoning
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/ZoningTab/MapServer/16
+        layerId: 16
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZN_CLASS: zoning
+          ZN_JURISDI: zoningJurisdiction
+        notes: >
+          Preferred city Euclidean zoning. Live count 383; ZN_JURISDI='OAKWOOD'. Domain:
+          C-2≈107, R-1≈70, M-1≈58, R-4≈30, PRD≈24, M-2≈21, C-1≈20, A-1≈18, O-P≈12,
+          R-3≈9, R-2≈7, PCD≈4, PID≈2, POD≈1. Geo-verified ~-83.872,34.228 Oakwood GA.
+          Overlay: ZoningTab Oakwood Corridor Overlay District. Joint Comp Plan with
+          county (Clermont/Lula/Oakwood) — FLU via HC_FLU_2024 inside Oakwood is
+          reasonable; confirm vs city if critical.
+        status: usable
+      - role: flu
+        name: HC_FutureLandUse_2024 (joint Comp Plan covers Oakwood)
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/HC_FutureLandUse_2024/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          pin: parcelId
+          FLU: flu
+        notes: >
+          DCA joint Comp Plan Hall County w/ Clermont, Lula, and Oakwood — pin-join
+          HC_FLU_2024 inside Oakwood city limits. No separate Oakwood FLU REST.
+        status: partial
+      - role: other
+        name: Hosted City_Limits (Oakwood)
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/Hosted/City_Limits/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          city_name: municipality
+        notes: >
+          Filter city_name='OAKWOOD'.
+        status: usable
+    gaps:
+      - "No Oakwood-only parcel CAMA REST — county + TAXDIST 07|15 / spatial."
+      - "No Oakwood-local FLU FeatureServer beyond joint county HC_FLU_2024."
+    status: usable
+
+  - name: Lula
+    level: city
+    parentFips: "13139"
+    joinToCountyParcels: >
+      Spatial Hosted/City_Limits city_name='LULA' (~-83.67,34.39) OR TAXDIST=06 LULA
+      (≈1110 Hall-side). Multi-county Banks+Hall — this card Hall-side only. SITE_CITY
+      postal (~3127) soft.
+    layers:
+      - role: zoning
+        name: null — QPublic/Accela ZN_CLASS=MUNI stub only (no Euclidean codes)
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/QPublic/ZONING/MapServer/7
+        layerId: 7
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZN_CLASS: zoning
+          ZN_JURISDI: zoningJurisdiction
+        notes: >
+          Filter ZN_JURISDI='LULA' → 10 polys all ZN_CLASS='MUNI' (placeholder — not
+          usable Euclidean). No ZoningTab Lula layer. City zoning PDF/staff /
+          certification; joint Comp Plan FLU via HC_FLU_2024. Geo-verified MUNI stub
+          ~-83.684,34.368 Lula GA.
+        status: gap
+      - role: flu
+        name: HC_FutureLandUse_2024 (joint Comp Plan covers Lula)
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/HC_FutureLandUse_2024/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          pin: parcelId
+          FLU: flu
+        notes: >
+          Joint Comp Plan with county — pin-join inside Lula limits. Prefer over MUNI
+          zoning stub for planning context.
+        status: partial
+    gaps:
+      - "Lula Euclidean zoning REST missing (MUNI stub only) — PDF/staff."
+      - "Lula multi-county (Banks+Hall) — Hall-side City_Limits / TAXDIST=06 only on this card."
+    status: partial
+
+  - name: Clermont
+    level: city
+    parentFips: "13139"
+    joinToCountyParcels: >
+      Spatial Hosted/City_Limits city_name='CLERMONT' (~-83.78,34.48) OR TAXDIST=02
+      CLERMONT (≈507). SITE_CITY postal (~2256) soft.
+    layers:
+      - role: zoning
+        name: null — QPublic/Accela ZN_CLASS=MUNI stub only
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/QPublic/ZONING/MapServer/7
+        layerId: 7
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZN_CLASS: zoning
+          ZN_JURISDI: zoningJurisdiction
+        notes: >
+          Filter ZN_JURISDI='CLERMONT' → 14 polys all MUNI stub. No ZoningTab Clermont
+          layer. Joint Comp Plan FLU via HC_FLU_2024; zoning PDF/staff. Sample
+          ~-83.774,34.476 Clermont GA.
+        status: gap
+      - role: flu
+        name: HC_FutureLandUse_2024 (joint Comp Plan covers Clermont)
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/HC_FutureLandUse_2024/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          pin: parcelId
+          FLU: flu
+        notes: >
+          Joint Comp Plan — pin-join inside Clermont limits.
+        status: partial
+    gaps:
+      - "Clermont Euclidean zoning REST missing (MUNI stub only)."
+    status: partial
+
+  - name: Gillsville
+    level: city
+    parentFips: "13139"
+    joinToCountyParcels: >
+      Spatial Hosted/City_Limits city_name='GILLSVILLE' (~-83.64,34.30) OR TAXDIST=05
+      GILLSVILLE (≈108 Hall-side). Multi-county Banks+Hall. SITE_CITY postal (~1534) soft.
+    layers:
+      - role: zoning
+        name: null — QPublic/Accela ZN_CLASS=MUNI stub only
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/QPublic/ZONING/MapServer/7
+        layerId: 7
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZN_CLASS: zoning
+          ZN_JURISDI: zoningJurisdiction
+        notes: >
+          Filter ZN_JURISDI='GILLSVILLE' → 17 polys all MUNI. No city FLU REST; county
+          HC_FLU_2024 spatial inside limits for planning context only. Sample
+          ~-83.629,34.303 Gillsville GA.
+        status: gap
+      - role: flu
+        name: null — no Gillsville-local FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Not listed on DCA joint Comp Plan trio (Clermont/Lula/Oakwood). Optional
+          spatial HC_FLU_2024 inside limits — verify with city/county staff.
+        status: gap
+    gaps:
+      - "Gillsville Euclidean zoning REST missing (MUNI stub); multi-county Banks+Hall."
+      - "No Gillsville FLU REST."
+    status: gap
+
+  - name: Braselton
+    level: city
+    parentFips: "13139"
+    joinToCountyParcels: >
+      Spatial Hosted/City_Limits city_name='BRASELTON' (~-83.87,34.11 Hall footprint) OR
+      TAXDIST in (21,22) BRASELTON / BRASELTON CID (≈1542 Hall-side). Multi-county
+      Jackson (primary)+Barrow+Hall+Gwinnett — this card Hall-side only. SITE_CITY
+      postal (~1848) soft; Hoschton postal noise nearby.
+    layers:
+      - role: zoning
+        name: null — Hall MUNI stub; town Zoning Map PDF Oct 2025 (interactive map retired)
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/QPublic/ZONING/MapServer/7
+        layerId: 7
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZN_CLASS: zoning
+          ZN_JURISDI: zoningJurisdiction
+        notes: >
+          Hall-side ZN_JURISDI='BRASELTON' → 14 polys all MUNI stub (not Euclidean).
+          Official town zoning: braselton.gov Planning — Zoning Map updated Oct 2025
+          PDF; interactive zoning map retired. Comp Plan 2025 / Future Land Use Plan
+          PDF. No public Braselton FeatureServer found (2026-09-23). Defer Jackson/
+          Barrow/Gwinnett cards for non-Hall portions. Sample ~-83.878,34.109.
+        status: gap
+      - role: flu
+        name: null — Braselton Comp Plan / Future Land Use Plan PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Town Comp Plan 2025 + Future Land Use Plan PDF on braselton.gov — no open
+          REST. Do not substitute county HC_FLU_2024 as Braselton official FLU.
+        status: gap
+    gaps:
+      - "Braselton multi-county (Jackson+Barrow+Hall+Gwinnett) — Hall City_Limits / TAXDIST only here."
+      - "No Braselton Euclidean zoning/FLU FeatureServer — PDF Oct 2025; interactive map retired."
+      - "Hall QPublic ZONING Braselton = MUNI stub only."
+    status: gap
+
+  - name: Buford
+    level: city
+    parentFips: "13139"
+    joinToCountyParcels: >
+      Spatial Hosted/City_Limits city_name='BUFORD' (~-83.96,34.15 Hall footprint) OR
+      TAXDIST in (08,09) BUFORD 1/2 (≈1477 Hall-side). Multi-county Gwinnett (primary)+
+      Hall — Gwinnett card 13135 for Gwinnett-side parcels/zoning. SITE_CITY postal
+      (~3661) soft.
+    layers:
+      - role: zoning
+        name: null — Hall MUNI stub; city Zoning Map PDF Feb 2023; Gwinnett GC_Parcel has ZONING for Gwinnett-side
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/QPublic/ZONING/MapServer/7
+        layerId: 7
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZN_CLASS: zoning
+          ZN_JURISDI: zoningJurisdiction
+        notes: >
+          Hall-side ZN_JURISDI='BUFORD' → 100 polys all MUNI stub. City of Buford
+          Planning & Zoning: Zoning Map adopted Feb 2023 PDF (cityofbuford.com) — no
+          public city FeatureServer found. Gwinnett-side: gis3.gwinnettcounty.com
+          GISDataBrowser/GC_Parcel/MapServer/6 exposes ZONING/ZONEDESC on Gwinnett
+          parcels (see Gwinnett card) — do NOT treat as Hall CAMA. Sample Hall MUNI
+          ~-83.948,34.165.
+        status: gap
+      - role: flu
+        name: null — no Buford FLU REST on Hall research
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Buford FLU FeatureServer via Hall GIS. City Comp Plan / staff; Gwinnett
+          planning for Gwinnett-side.
+        status: gap
+    gaps:
+      - "Buford multi-county (Gwinnett+Hall) — Hall-side only on this card; prefer Gwinnett GC_Parcel for Gwinnett-side zoning."
+      - "Hall QPublic Buford zoning = MUNI stub; city Zoning Map PDF Feb 2023 only."
+    status: gap
+
+  - name: Rest Haven
+    level: city
+    parentFips: "13139"
+    joinToCountyParcels: >
+      Spatial Hosted/City_Limits city_name='RESTHAVEN' (~-83.97,34.14) — tiny footprint.
+      Multi-county Gwinnett+Hall. No dedicated TAXDIST code observed (falls in COUNTY
+      / Buford fringe). SITE_CITY rarely distinct.
+    layers:
+      - role: zoning
+        name: null — QPublic ZN_CLASS=MUNI stub (2 polys)
+        restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/QPublic/ZONING/MapServer/7
+        layerId: 7
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZN_CLASS: zoning
+          ZN_JURISDI: zoningJurisdiction
+        notes: >
+          ZN_JURISDI='RESTHAVEN' → 2 MUNI stubs. Official spelling Rest Haven; layer
+          uses RESTHAVEN. No city GIS REST — PDF/staff / Gwinnett-side as applicable.
+        status: gap
+    gaps:
+      - "Rest Haven tiny multi-county town — MUNI zoning stub only; no FLU/parcel city REST."
+    status: gap
+
+gaps:
+  - "No public REST lastSale.price/date/qualified — qPublic AppID=724 / App=HallCountyGA Sales Search HTML only (Cloudflare/bot 403 automated)."
+  - "qPublic LayerID for AppID=724 not recovered under Cloudflare challenge — use App=HallCountyGA&Layer=Parcels deep-link with KeyValue={PIN}."
+  - "CUR_VALUE is string FMV (not typed double); no separate assessedValue/taxableValue REST field."
+  - "NO_RELEASE=1 (~63) blanks OWNER/MAIL* — honor privacy; do not scrape HTML to backfill."
+  - "SITE_CITY / HC_FLU site_city are POSTAL — not incorporated municipality; prefer Hosted/City_Limits spatial or TAXDIST."
+  - "Smaller cities Lula/Clermont/Gillsville/Braselton/Buford/Rest Haven Euclidean zoning on county servers are ZN_CLASS=MUNI stubs only — real codes = city PDF/staff (Braselton Oct 2025 PDF; Buford Feb 2023 PDF)."
+  - "No Flowery Branch / Gillsville / Braselton / Buford / Rest Haven dedicated FLU FeatureServer; Gainesville has Gnvl FLU_2022; county HC_FLU_2024 joint with Clermont/Lula/Oakwood."
+  - "Braselton/Buford/Lula/Gillsville/Rest Haven multi-county — Hall City_Limits footprint only on this card."
+  - "OpenAddresses us/ga/hall parcels conform points at Accela_APO/3 Parcel Dimensions (not full CAMA) — do not prefer OA snapshot over live HallCo MapServer/1."
+  - "AGOL parcel_owner_public (89484) thinner than live MapServer (91921) — prefer hallgis."
+  - "Hall_FutureLandUse/15 Existing Land Use 2016 is 342-feature sample only — not county-wide CAMA/zoning."
+  - "maps.hallcounty.org DNS dead; internal Property_Zoning_Map :6080 / app-gis-01:6443 not public — use hallgis.hallcounty.org."
+  - "Rejected lookalikes / non-preferred: Hall County NE Grand Island (H1fomogcAqX4720J PV1_ParcelManagement / Points_For_the_Sales_Search / Hall County Addresses — extent Nebraska); Hall County TX lookalikes; Gainesville FL (Alachua) parcel/zoning services; Gainesville TX; ARC LandPro_2012 (Ug5xGQbHsD8zuZzM / ryanbarrett) stale regional; USLandGrid/Regrid/ATTOM/CoreLogic paid Hall parcel extracts; token/internal arcgis.hallcounty.org:6080 Property_Zoning_Map; OA Accela dimensions as cadastral substitute."
+  - "Enrichment vs thin in-app: county 91921 full CAMA geometry+owner+mailing+situs+acres+FMV+taxdist+dor; county Euclidean zoning 2032; city zoning Gainesville/FB/Oakwood; HC_FLU_2024 58806 pin-tied; Gainesville FLU_2022; 9 city limits; address points 117723; sales + small-city Euclidean zoning/FLU remain gap/HTML/PDF."
+
+license: >
+  Gainesville-Hall County GIS (GHCGIS) hallgis.hallcounty.org — HallCo_Addr_Pcl_Rds,
+  Assessors_Web_Service, ZoningTab, HC_FutureLandUse_2024, Hall_FutureLandUse,
+  Gnvl_FutureLandUse, Accela_APO, GeneralTab, GHCGIS_WebData, QPublic/*, Hosted/
+  City_Limits, Hosted/Hall_County_Boundary, HC_Res_Development_Tracking; AGOL org
+  HALLGIS 3t0UAc8xSMWWaD2c (hallgis.maps.arcgis.com) parcel_owner_public + Experience
+  07c9cfa0f6a94be0b7a24ad4e0b084fa. Partnership: Hall County + cities of Gainesville,
+  Flowery Branch, & Oakwood (hallcounty.org/235 GIS). Comp Plan 2024:
+  hallcounty.org/DocumentCenter/View/13713; DCA Hall County w/ Clermont, Lula, Oakwood.
+  Assessor HTML: qPublic/Beacon SchneiderCorp AppID=724 / App=HallCountyGA
+  (qpublic.net/ga/hall). City PDFs: Braselton Zoning Map Oct 2025 (braselton.gov);
+  Buford Zoning Map Feb 2023 (cityofbuford.com). OpenAddresses us/ga/hall (Accela
+  addresses). Attribution to Hall County / GHCGIS / partner cities. Public fields only;
+  honor NO_RELEASE; no emails/phones; no paid vendors (Regrid/ATTOM/CoreLogic/USLandGrid).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HallCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://hallgis.hallcounty.org/arcgis/rest/services/HallCo_Addr_Pcl_Rds/MapServer/1 count 92150;
+    extent center [['13139', 'Hall County']]; sample [['13139', 'Hall County']]. No change to field map
+    (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Clermont town"
+      level: city
+      parentFips: "13139"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Flowery Branch city"
+      level: city
+      parentFips: "13139"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Gainesville city"
+      level: city
+      parentFips: "13139"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Lula city"
+      level: city
+      parentFips: "13139"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Oakwood city"
+      level: city
+      parentFips: "13139"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Hall' AND aadt>0
+    altFilter: name LIKE '139-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 139-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 417
+    maxAadt: 71000
+    geoCheck: 417/417 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - LAND_VALUE
+    filledCount: 87712
+    restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/HallCo_Addr_Pcl_Rds/MapServer/1
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: OWNER
+    filledCount: 88298
+    restUrl: https://hallgis.hallcounty.org/arcgis/rest/services/HallCo_Addr_Pcl_Rds/MapServer/1
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=HallCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PIN
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 15016 000011X
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HallCountyGA&Layer=Parcels&PageType=Report&KeyValue=15016%20000011X
+    verification: 'pattern-tested: real sample ID from PIN; box test HTTP 403 Cloudflare challenge (expected; pattern
+      follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=HallCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Clermont town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Flowery Branch city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Gainesville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Lula city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Oakwood city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

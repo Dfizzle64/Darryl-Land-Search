@@ -1,0 +1,294 @@
+state: GA
+jurisdiction: Long County
+fips: "13183"
+level: county
+markets: [Savannah]
+
+layers:
+  - role: parcels
+    name: Long/Property_Data Parcels (CRC / SEGRASS portal)
+    restUrl: https://portal.segrass.org/crcarcgis/rest/services/Long/Property_Data/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Acres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      GIS_Parcel_No: parcelIdCompact
+      GIS_Acres: acreage
+      Shape.STArea(): shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Coastal Regional Commission / SEGRASS portal
+      portal.segrass.org Long/Property_Data MapServer layer Parcels id 0; WinGap-sourced
+      per iteminfo). Live count 9636 (2026-09-24). SR NAD 1983 StatePlane Georgia East
+      FIPS 1001 Feet variant (wkid 103027 / latestWkid 6445). maxRecordCount 2000 — page
+      via resultOffset / spatial envelopes. GIS_Acres 5–150 ≈1669. Schema is THIN —
+      PARCEL_NO + GIS_Parcel_No + GIS_Acres + geometry only (no owner/mailing/situs/
+      CURR_VAL/sale on this layer). PIN format e.g. '086    001' (preserve spaces for
+      qPublic KeyValue); compact GIS_Parcel_No e.g. '086001'. Older maps.crc.ga.gov
+      Long/LongParcels MapServer now exposes ONLY Long Subdivisions/1 (parcels layer
+      removed/500) — do NOT prefer; use segrass Property_Data/0. maps.crc LongZoning
+      FeatureServer 500 error. Geo-verified WGS84 samples ~-81.605,31.570 / ~-81.606,31.581
+      / ~-81.655,31.581 — Long County GA coastal (~-81.75,31.75) W of Liberty / Fort
+      Stewart adjacency / Ludowici seat. Census TIGERweb GEOID 13183 CENTLAT +31.7525106
+      CENTLON -081.7456158. Join CAMA via qPublic AppID=748 LayerID=11784 HTML
+      (KeyValue={PARCEL_NO}). Rejected paid Regrid/ATTOM; skip utilities+AADT
+      (LongWaterFacilities/LongSanitation on maps.crc — DO NOT collect); no emails/phones.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on Property_Data; qPublic AppID=748 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on Property_Data/0. Assessor HTML
+      qpublic.net/ga/long → AppID=748 LayerID=11784 (Cloudflare/bot 403 automated;
+      public for humans; linked from longcountyga.gov/tax-assessor). Deep-link
+      KeyValue={PARCEL_NO}:
+      Application.aspx?AppID=748&LayerID=11784&PageTypeID=4&KeyValue={PARCEL_NO}
+      (also App=LongCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCEL_NO}).
+      Honest REST tax/owner gap. Tax Commissioner bills are separate AssuranceGov HTML
+      (longproperty.assurancegov.com) — not preferred for CAMA.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No SALEPRICE/SALEDATE on Property_Data. Prefer qPublic Sales Search / Sales List /
+      Yearly Sales HTML AppID=748. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Long/Landuse_Planning Zoning (parcel-attributed)
+    restUrl: https://portal.segrass.org/crcarcgis/rest/services/Long/Landuse_Planning/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Acres
+    coverage: county-wide
+    fieldMap:
+      ParcelID: parcelId
+      Zoning: zoning
+      ZoningName: zoningName
+      GIS_Acres: acreage
+    notes: >
+      Preferred county Euclidean/parcel-attributed zoning (count 8200). Join to
+      Property_Data on ParcelID=PARCEL_NO. Live codes: RR≈2885, R-1≈1685, AF≈1484,
+      R-2≈1091, Unknown≈662, MHP≈237, C-1≈69, C-2≈45, MFR≈17, CON≈14,
+      Transportation≈9, I-2≈2. ZoningName e.g. Rural Residential / Agriculture Forestry.
+      maps.crc Long/LongZoning FeatureServer+MapServer return 500 — prefer segrass
+      Landuse_Planning/3. Companion Zoning App:
+      segrass.maps.arcgis.com/apps/instant/sidebar/index.html?appid=583b381565c3487e9a95e3aff26eccd1.
+    status: usable
+
+  - role: flu
+    name: Long/Landuse_Planning Landuse Existing + Character Areas 2024
+    restUrl: https://portal.segrass.org/crcarcgis/rest/services/Long/Landuse_Planning/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel: parcelId
+      ELU: existingLandUse
+      ELU_DCA: existingLandUseDca
+      FLU: flu
+      FLU_DCA: fluDca
+      EXT_Zoning: zoningExisting
+    notes: >
+      Preferred existing land-use on parcel polygons (count 5970; fields ELU/FLU/ELU_DCA/
+      FLU_DCA). Spatial/attribute join Parcel onto Property_Data PARCEL_NO.
+      Companion Character Areas 2024 MapServer/4 (count 13; CharacterArea e.g. Commercial
+      Redevelopment Corridor / Developing Traditional Neighborhood / Agricultural Area /
+      Military Area / Industrial / Mixed Use / Open Space) — planning character, not
+      Euclidean. Landuse Future/2 is sparse (count 8) — do NOT prefer over Existing/1.
+      Comp Plan App: webappviewer id=a7902ae56df04502a72b1edb0b3c3bf4.
+    status: usable
+
+  - role: other
+    name: Long/Jurisdiction_Boundaries City Limits (Ludowici)
+    restUrl: https://portal.segrass.org/crcarcgis/rest/services/Long/Jurisdiction_Boundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: cityName
+      GEOID: placeGeoid
+      NAMELSAD: placeNameFull
+    notes: >
+      Live count 1 — Ludowici city (GEOID 1347784; INTPT ~-81.749,+31.708; sample vertex
+      ~-81.766,31.713). Preferred spatial municipality filter. Companion County/1 boundary.
+      Soft mailing city alone insufficient.
+    status: usable
+
+municipalities:
+  - name: Ludowici
+    level: city
+    parentFips: "13183"
+    joinToCountyParcels: >
+      Spatial Jurisdiction_Boundaries/0 NAME='Ludowici' (GEOID 1347784; ~-81.75,31.71)
+      onto Property_Data PARCEL_NO. Sole incorporated municipality in Long County.
+      Addresses FeatureServer layer 1 'Addresses - Ludowici' is situs aid only (not parcels).
+    layers:
+      - role: zoning
+        name: County Zoning spatial Ludowici
+        restUrl: https://portal.segrass.org/crcarcgis/rest/services/Long/Landuse_Planning/MapServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: GIS_Acres
+        coverage: city-only
+        fieldMap:
+          ParcelID: parcelId
+          Zoning: zoning
+          ZoningName: zoningName
+        notes: County zoning polygons clipped/joined via Ludowici city limits — no city-owned zoning FS.
+        status: usable
+      - role: flu
+        name: County Landuse Existing spatial Ludowici
+        restUrl: https://portal.segrass.org/crcarcgis/rest/services/Long/Landuse_Planning/MapServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FLU: flu
+          ELU: existingLandUse
+        notes: County ELU/FLU spatial Ludowici city limits.
+        status: usable
+      - role: parcels
+        name: null — use county Property_Data spatial Ludowici
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Ludowici-only CAMA FeatureServer — county Property_Data + spatial city limits;
+          owner/tax via qPublic AppID=748.
+        status: gap
+    gaps:
+      - "No Ludowici city-owned parcel CAMA FeatureServer — thin county PIN geometry + qPublic HTML."
+    status: partial
+
+gaps:
+  - "Property_Data thin PARCEL_NO+GIS_Acres only — no REST owner/mailing/situs/tax/sale; qPublic AppID=748 LayerID=11784 HTML for CAMA."
+  - "maps.crc.ga.gov Long/LongParcels now subdivisions-only; LongZoning 500 — prefer portal.segrass.org Property_Data + Landuse_Planning."
+  - "Landuse Future/2 sparse (count 8) — prefer Existing/1 + Character Areas/4."
+  - "Property_Data maxRecordCount 2000 — page via resultOffset / spatial envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/long + AppID=748 Search/Maps public for humans."
+  - "Skip LongWaterFacilities/LongSanitation/utilities+AADT; no emails/phones; rejected paid Regrid/ATTOM."
+
+license: >
+  Coastal Regional Commission / SEGRASS GIS (portal.segrass.org crcarcgis) —
+  Long/Property_Data MapServer/0 Parcels; Long/Landuse_Planning Zoning/3 + Landuse
+  Existing/1 + Character Areas 2024/4; Long/Jurisdiction_Boundaries City Limits/0.
+  Public viewers: Long County GIS Gallery
+  (segrass.maps.arcgis.com filtergallery appid=1a381d74ec9145539209085cd865dbc5);
+  Zoning App appid=583b381565c3487e9a95e3aff26eccd1; Comp Plan App
+  webappviewer id=a7902ae56df04502a72b1edb0b3c3bf4; longcountyga.gov/maps.
+  Assessor qPublic AppID=748 LayerID=11784 (qpublic.net/ga/long; Ludowici GA 31316).
+  Attribution CRC GIS / Long County Tax Assessors. Public fields only; no emails/phones;
+  no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=748&LayerID=11784&PageTypeID=2
+jurisdictionGisUrl: https://segrass.maps.arcgis.com/apps/instant/filtergallery/index.html?appid=1a381d74ec9145539209085cd865dbc5
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://portal.segrass.org/crcarcgis/rest/services/Long/Property_Data/MapServer/0 count 9636; extent
+    center [['13183', 'Long County']]; sample [['13183', 'Long County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Ludowici city"
+      level: city
+      parentFips: "13183"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Long' AND aadt>0
+    altFilter: name LIKE '183-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 183-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 29
+    maxAadt: 15300
+    geoCheck: 29/29 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: thin coverage (29 stations); mostly state routes
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=LongCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=748&LayerID=11784&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 086    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LongCountyGA&Layer=Parcels&PageType=Report&KeyValue=086%20%20%20%20001
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://segrass.maps.arcgis.com/apps/instant/filtergallery/index.html?appid=1a381d74ec9145539209085cd865dbc5
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Ludowici city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

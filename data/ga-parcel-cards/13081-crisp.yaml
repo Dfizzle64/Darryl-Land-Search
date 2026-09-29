@@ -1,0 +1,401 @@
+state: GA
+jurisdiction: Crisp County
+fips: "13081"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: CrispParcels (SGRC_GIS / RVRC_ELA)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrispParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      Realkey: ownerKey
+      Ownkey: ownerKeyAlt
+      lastname: ownerName
+      firstname: ownerNameFirst
+      address2: mailingAddress
+      address3: mailingAddress2
+      city: mailingCity
+      state: mailingState
+      zip_code: mailingZip
+      house_no: situsNumber
+      stdirect: situsStreetDir
+      street_nam: situsStreet
+      sttype: situsStreetType
+      unit: situsUnit
+      totalacres: acreage
+      Draw_Acres: acreageGis
+      Deed_Acres: acreageDeed
+      woodacres: acreageWoodland
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      a_value: tax.landValue
+      p_value: tax.improvementValue
+      sale_val: lastSale.price
+      saleland1: lastSale.landPrice1
+      saleimp1: lastSale.impPrice1
+      zoning: zoningCode
+      zoningcode: zoningAlt
+      taxdistric: taxDistrict
+      digclass: dorCode
+      digstrat: dorStrata
+      land_type: landType
+      legal_desc: legalDescription
+      subd_name: subdivision
+      homeexempt: homesteadExempt
+      landgmd: georgiaMilitiaDistrict
+      landlot: landLot
+      landdist: landDistrict
+      neighbhood: neighborhood
+      histyr1: tax.histYear1
+      histval1: tax.histValue1
+      histyr2: tax.histYear2
+      histval2: tax.histValue2
+      histyr3: tax.histYear3
+      histval3: tax.histValue3
+      lat: latitude
+      lon: longitude
+      qPub_Link: appraiserSearchUrl
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (Southern Georgia / River Valley
+      Regional Commission AGOL org Ug5xGQbHsD8zuZzM owner SGRC_GIS — CrispParcels
+      FeatureServer/0). Twin also at CRDO_All_WFL1/13 "Crisp County Parcels" (same
+      count/schema). Live count 12351 (2026-09-24). maxRecordCount 2000 — page via
+      resultOffset / spatial envelopes. totalacres 5–150 = 1873; Draw_Acres 5–150 =
+      1874; curr_val>0 = 12308; mavcurr>0 = 0 (assessed REST gap); sale_val>0 = 0;
+      saleland1>0 = 183 / saleimp1>0 = 99 (sparse sale components); lastname ≈12308;
+      address2 (mailing street) ≈11825; city ≈12307; house_no>0 ≈9572; fmvres>0 ≈6968;
+      qPub_Link filled 12351. Compose situs from house_no+stdirect+street_nam+sttype
+      when house_no>0. Prefer totalacres for acreage band; Draw_Acres GIS aid.
+      zoning field is coded neighborhood/zone ids (001≈5940, 004≈3985, 002≈810,
+      003≈270, 005≈174) — NOT Euclidean ordinance labels; zoningcode text sparse ≈69
+      (HC/RR/R12/GC/…). digclass: R≈8834, V≈1022, C≈910, A≈705, E≈642, I≈135, J≈58,
+      P≈2. taxdistric soft geo-checked: 01≈6906 unincorp/north (~-83.94,32.01),
+      02≈5031 Cordele (~-83.80,31.97), 03≈371 Arabi (~-83.74,31.84). Schema
+      water/sewer/gas/electricty/roadstreet present — SKIP utilities+AADT. Parcel_No
+      format e.g. '001    027' / '007K   028' (preserve spaces for KeyValue). Official
+      assessor HTML: qPublic App=crispCountyGA / AppID=778 LayerID=11814
+      (qpublic.net/ga/crisp; crispcounty.com Tax Assessor). CrispCountyGA_WFS 404.
+      Geo-verified WGS84 samples ~-83.935,32.013 / ~-83.939,32.023 / ~-83.804,31.973 /
+      ~-83.734,31.838 — Crisp County GA / Cordele–Arabi / Lake Blackshear fringe
+      (FIPS 13081; county seat Cordele ~-83.78,31.96). REJECT lookalikes: GDITAdmin
+      Crisp_Parcels FeatureServer Invalid URL; paid Regrid/ATTOM/DynamoSpatial/
+      GetParcelData/USLandGrid. No emails/phones collected.
+    status: usable
+
+  - role: tax
+    name: CrispParcels curr_val / fmv* / mav* (on polygons)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrispParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      a_value: tax.landValue
+      p_value: tax.improvementValue
+      taxdistric: taxDistrict
+      digclass: dorCode
+      homeexempt: homesteadExempt
+      histyr1: tax.histYear1
+      histval1: tax.histValue1
+      histyr2: tax.histYear2
+      histval2: tax.histValue2
+      histyr3: tax.histYear3
+      histval3: tax.histValue3
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. curr_val>0 = 12308; mavcurr>0
+      = 0 (assessed REST gap — use qPublic HTML). a_value>0 ≈11490; p_value>0 ≈1082;
+      histval1>0 ≈12255 (assessment history — NOT sales). Assessor HTML: AppID=778
+      LayerID=11814 PageTypeID=2 PageID=5669 (search). Deep-link KeyValue={Parcel_No}:
+      Application.aspx?App=crispCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_No}
+      (also AppID=778&LayerID=11814 PageTypeID=4 + KeyValue; qPub_Link embeds same).
+      Tax Commissioner crispcountypay.com is payments — not CAMA REST.
+    status: usable
+
+  - role: sales
+    name: CrispParcels saleland1/saleimp* partial — sale_val zero-filled
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrispParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      sale_val: lastSale.price
+      saleland1: lastSale.landPrice1
+      saleland2: lastSale.landPrice2
+      saleimp1: lastSale.impPrice1
+      saleimp2: lastSale.impPrice2
+    notes: >
+      sale_val>0 = 0 live; saleland1>0 = 183; saleimp1>0 = 99 (partial component
+      fields only — no reliable lastSale.date on REST). Prefer qPublic Sales Search /
+      Sales List HTML App=crispCountyGA / AppID=778. Rejected paid Regrid/ATTOM sales.
+    status: partial
+
+  - role: zoning
+    name: CrispParcels zoning (coded) — no Euclidean FeatureServer
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrispParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      zoning: zoningCode
+      zoningcode: zoningAlt
+    notes: >
+      Parcel-attributed zoning codes only (001/004/002/003/005…). No public Euclidean
+      zoning FeatureServer for Crisp County GA (2026-09-24). County planning PDF /
+      municode crisp_county Land Development Code — not REST. City of Cordele local
+      zoning not recovered as separate public FeatureServer.
+    status: partial
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Crisp County GA future land use / character-area FeatureServer on SGRC_GIS /
+      CRDO folder (2026-09-24). Comp Plan PDF gap.
+    status: gap
+
+  - role: other
+    name: CRDO_All_WFL1 Crisp County Addresses
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CRDO_All_WFL1/FeatureServer/1
+    layerId: 1
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Crisp address points on CRDO multi-layer (companion Dooly addresses/2). Prefer
+      parcel house_no+street for situs when filled; addresses for gap-fill. Skip roads/
+      EMS/Fire/Police PSAP layers for parcel CAMA. Geo Crisp GA.
+    status: usable
+
+municipalities:
+  - name: Cordele
+    level: city
+    parentFips: "13081"
+    joinToCountyParcels: >
+      Soft taxdistric='02' (~5031; ~-83.80,31.97) OR spatial city limits when published;
+      mailing city='CORDELE' is NOT authoritative (owner mailing).
+    layers:
+      - role: zoning
+        name: null — no Cordele city zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City-of-Cordele Euclidean zoning REST found — county zoning codes only.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cordele FLU REST.
+        status: gap
+      - role: parcels
+        name: null — use county CrispParcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cordele-only CAMA — county CrispParcels + taxdistric=02 / spatial.
+        status: gap
+    gaps:
+      - "No Cordele-owned separate zoning/FLU/parcel FeatureServer — SGRC county layers + soft taxdistric."
+    status: partial
+
+  - name: Arabi
+    level: city
+    parentFips: "13081"
+    joinToCountyParcels: >
+      Soft taxdistric='03' (~371; ~-83.74,31.84) OR spatial Arabi limits when published.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Arabi city zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Arabi FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county CrispParcels + taxdistric=03
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County CrispParcels + soft taxdistric=03.
+        status: gap
+    gaps:
+      - "No Arabi city-owned zoning/FLU/parcel REST."
+    status: partial
+
+gaps:
+  - "mavcurr>0 = 0 — no usable assessedValue on REST; prefer curr_val market + qPublic AppID=778 HTML for assessed/taxable."
+  - "sale_val>0 = 0; only sparse saleland1/saleimp1 — no reliable REST lastSale.date; qPublic Sales Search HTML AppID=778."
+  - "zoning field is coded 001–008 (not Euclidean ordinance labels); zoningcode text ≈69 only; no Euclidean zoning FeatureServer."
+  - "No public FLU / character-area FeatureServer on SGRC Crisp/CRDO."
+  - "CrispParcels maxRecordCount 2000 — page via resultOffset / spatial envelopes."
+  - "taxdistric soft only — 01≈unincorp / 02≈Cordele / 03≈Arabi; prefer spatial city limits when available."
+  - "CrispCountyGA_WFS 404; qPublic Application.aspx Cloudflare/bot 403 automated."
+  - "Rejected lookalikes: GDITAdmin Crisp_Parcels Invalid URL; paid Regrid/ATTOM/DynamoSpatial/GetParcelData/USLandGrid."
+  - "Schema water/sewer/gas/electricty/road* — DO NOT collect (skip utilities+AADT); no emails/phones."
+
+license: >
+  Southern Georgia / River Valley Regional Commission GIS (AGOL org Ug5xGQbHsD8zuZzM
+  owner SGRC_GIS) — CrispParcels FeatureServer/0; companion CRDO_All_WFL1 (Parcels/13,
+  Crisp Addresses/1). Assessor qPublic App=crispCountyGA / AppID=778 LayerID=11814
+  (qpublic.net/ga/crisp; crispcounty.com). Tax Commissioner crispcountypay.com.
+  Attribution SGRC / Crisp County Tax Assessor. Public fields only; no emails/phones;
+  no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=778&LayerID=11814&PageTypeID=2&PageID=5669
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrispParcels/FeatureServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrispParcels/FeatureServer/0
+    count 12351; extent center [['13081', 'Crisp County']]; sample [['13081', 'Crisp County']]. No
+    change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Arabi town"
+      level: city
+      parentFips: "13081"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Cordele city"
+      level: city
+      parentFips: "13081"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Crisp' AND aadt>0
+    altFilter: name LIKE '081-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 081-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 190
+    maxAadt: 57400
+    geoCheck: 190/190 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 12308
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrispParcels/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: REST-partial
+    detail: saleland1/saleimp1 component prices only (183/99 >0); sale_val=0; no date
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrispParcels/FeatureServer/0
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 12308
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrispParcels/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=crispCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=778&LayerID=11814&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 007K   028
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=crispCountyGA&Layer=Parcels&PageType=Report&KeyValue=007K%20%20%20028
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrispParcels/FeatureServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Arabi town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Cordele city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

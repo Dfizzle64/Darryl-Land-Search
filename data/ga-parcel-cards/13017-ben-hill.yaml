@@ -1,0 +1,354 @@
+state: GA
+jurisdiction: Ben Hill County
+fips: "13017"
+level: county
+markets: [Albany]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + WinGAP/REALPROP CAMA (owner/mailing/situs/acres/FMV)
+  - role: parcels
+    name: BenHill/Property Parcel Labels (Parcel No.) — SGRC alma MapServer
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/BenHill/Property/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      REALKEY: ownerKey
+      OWNKEY: ownerKeyAlt
+      LASTNAME: ownerName
+      FIRSTNAME: ownerFirstName
+      MIDDLE: ownerMiddleName
+      ADDRESS1: mailingAddressLine1OrCoOwner
+      ADDRESS2: mailingAddress
+      ADDRESS3: mailingAddress2
+      CITY_1: mailingCity
+      STATE_1: mailingState
+      ZIP_1: mailingZip
+      HOUSE_NO: situsNumber
+      STDIRECT: situsStreetDir
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      UNIT: situsUnit
+      TOTALACRES: acreage
+      WOODACRES: acreageWoodland
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      SALE_VAL: lastSale.price
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      DIGSTRAT: dorStrata
+      LAND_TYPE: landType
+      LEGAL_DESC: legalDescription
+      NEIGHBHOOD: neighborhood
+      LANDGMD: georgiaMilitiaDistrict
+      LANDLOT: landLot
+      LANDDIST: landDistrict
+      HISTYR1: tax.histYear1
+      HISTVAL1: tax.histValue1
+      HISTYR2: tax.histYear2
+      HISTVAL2: tax.histValue2
+      HISTYR3: tax.histYear3
+      HISTVAL3: tax.histValue3
+      LAT: latitude
+      LON: longitude
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA landbase (Southern Georgia Regional
+      Commission SGRC alma ArcGIS Server — BenHill/Property MapServer layer 4 "Parcel
+      Labels (Parcel No.)"). Live count 11549 (2026-09-24). Identical-count twin layer 2
+      "Parcels" (thinner owner/acres/situs only — no CURR_VAL) and layer 6 "Parcel Labels
+      (Owner)" (same rich schema) — prefer layer 4 for Parcel_No labeling + full CAMA.
+      SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet (wkid 102667 / latestWkid 2240).
+      TOTALACRES 5–150 ≈2337; HOUSE_NO>0 ≈7799; LASTNAME filled ≈11499; CURR_VAL>0 ≈11499;
+      PREV_VAL>0 ≈11494; FMVRES>0 ≈5927; MAVCURR>0 =0 (MAV* present but unused — do NOT
+      rely on MAVCURR as assessed; prefer CURR_VAL as market; assessed/taxable via qPublic
+      HTML). SALE_VAL>0 =0 live (on-parcel sale price unused — sales gap / qPublic HTML).
+      ZONINGCODE filled only ≈310 (e.g. GF) — sparse; parcel ZONING numeric codes
+      001≈9306 / 004≈361 / 002≈118 / 003≈25 / 008≈6 — opaque; prefer Euclidean
+      BenHill/Zoning/MapServer/0 ZONE_ for district codes. TAXDISTRIC soft: 01≈4856
+      (Fitzgerald-leaning), 02≈6643 (unincorporated-leaning) — no published REST legend;
+      prefer spatial Boundaries/0 Fitzgerald City Limits. DIGCLASS: R≈8677, V≈886, C≈710,
+      E≈665, A≈391, J≈109, I≈47, U≈14. Compose situs HOUSE_NO+STDIRECT+STREET_NAM+STTYPE
+      when HOUSE_NO>0. CITY_1/STATE_1/ADDRESS2 are OWNER mailing (nationwide — Madison GA,
+      Sorrento FL, etc.) — never municipality filter. ADDRESS1 often co-owner/DBA.
+      WATER/SEWER/GAS/ELECTRICTY/ROADSTREET present — SKIP per tranche-3 (no utilities).
+      Schema may expose phone-like fields on companion Addresses layers — DO NOT collect.
+      Official human viewer: https://www.sgrcmaps.com/BenHill/ . Assessor qPublic AppID=725
+      (qpublic.net/ga/benhill → Application.aspx?AppID=725&LayerID=11766; also
+      App=BenHillCountyGA; bot 403 automated). BenHillCountyGA_WFS 404. Geo-verified WGS84
+      samples ~-83.208,31.846 (1 10 9 Bowens Mill / Fitzgerald fringe), ~-83.473,31.842 /
+      ~-83.470,31.847 (1 2 4 / 1 2 4A Twinflower) — Ben Hill County GA / Fitzgerald
+      (~-83.25,31.71) SGA (NOT Hill County TX/other; NOT Regrid paid extract). Rejected
+      paid Regrid/ATTOM/DynamoSpatial.
+    status: usable
+
+  - role: tax
+    name: BenHill/Property Parcel Labels CURR_VAL (on preferred parcels)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/BenHill/Property/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      HISTYR1: tax.histYear1
+      HISTVAL1: tax.histValue1
+      HISTYR2: tax.histYear2
+      HISTVAL2: tax.histValue2
+      HISTYR3: tax.histYear3
+      HISTVAL3: tax.histValue3
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. CURR_VAL>0 ≈11499; MAVCURR>0=0 —
+      no usable assessedValue on REST; use CURR_VAL market + qPublic AppID=725 HTML for
+      assessed/taxable. HISTYR*/HISTVAL* are assessment value-year history — NOT sales.
+    status: usable
+
+  - role: sales
+    name: null — no public REST sale history (SALE_VAL unused)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      SALE_VAL / SALELAND* / SALEIMP* all >0 count =0 on Property/4 (2026-09-24). No
+      BenHill property_sales year MapServer recovered (unlike Lowndes VALOR). Prefer
+      qPublic Sales Search HTML AppID=725. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: BenHill/Zoning Zoning (Euclidean ZONE_)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/BenHill/Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: DRWN_ACRES
+    coverage: county-wide
+    fieldMap:
+      ZONE_: zoning
+      WHERE_: zoningJurisdiction
+      ORDINANCE: zoningOrdinance
+      CHNG_DAT: zoningDate
+      DRWN_ACRES: acreage
+    notes: >
+      Preferred Euclidean zoning polygons (count 2405). ZONE_ × WHERE_ (CITY/COUNTY) top:
+      R-6 CITY≈414, R-6-M CITY≈346, G-F COUNTY≈264, R-9 CITY≈192, G-B CITY≈180,
+      R-15 COUNTY≈159, R-6-M COUNTY≈139, R-15 CITY≈117, P CITY≈110, R-9 COUNTY≈89,
+      C-C CITY≈69, G-B COUNTY≈61, H-I CITY≈43, W-L-I CITY≈33, D-C CITY≈27, plus
+      H-I/W-L-I/M-R/N-C/M-H-P/R-1 sparse. WHERE_=CITY ≈ city-limit districts; COUNTY ≈
+      unincorporated. Parcel ZONINGCODE sparse (≈310); parcel ZONING numeric opaque —
+      spatial-join this layer. Geo-verified Ben Hill GA extent.
+    status: usable
+
+  - role: zoning
+    name: Property/4 ZONINGCODE + ZONING (parcel-attributed; secondary)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/BenHill/Property/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+    notes: >
+      Secondary only. ZONINGCODE sparse ≈310; ZONING numeric 001/004/… opaque. Prefer
+      Euclidean BenHill/Zoning/0 ZONE_.
+    status: partial
+
+  - role: flu
+    name: null — no public county FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Ben Hill County Future Land Use / Character Areas FeatureServer in SGRC BenHill
+      folder (2026-09-24). Comp Plan PDF / staff gap.
+    status: gap
+
+  - role: other
+    name: BenHill/Boundaries Fitzgerald City Limits
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/BenHill/Boundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      WHERE_: municipality
+    notes: >
+      Count 1 Fitzgerald city-limits polygon. Preferred spatial municipality filter over
+      TAXDISTRIC 01/02 soft codes. Companion Boundaries layers: County Boundary/1,
+      Voting Precinct/2, Fitzgerald Wards/3, School Districts/4, Commission Districts/5.
+    status: usable
+
+municipalities:
+  - name: Fitzgerald
+    level: city
+    parentFips: "13017"
+    joinToCountyParcels: "Spatial Boundaries/0 Fitzgerald City Limits onto Property/4; soft TAXDISTRIC='01'."
+    layers:
+      - role: zoning
+        name: BenHill/Zoning spatial Fitzgerald (WHERE_='CITY')
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/BenHill/Zoning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: DRWN_ACRES
+        coverage: city-only
+        fieldMap:
+          ZONE_: zoning
+          WHERE_: zoningJurisdiction
+        notes: Filter WHERE_='CITY' or spatial-clip to Fitzgerald limits; certify vs city ordinance/PDF.
+        status: usable
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Fitzgerald FLU REST found.
+        status: gap
+      - role: parcels
+        name: null — county Property/4 spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Property/4 + Fitzgerald poly.
+        status: gap
+    gaps:
+      - "No Fitzgerald-owned parcel FeatureServer separate from SGRC BenHill/Property."
+    status: partial
+
+gaps:
+  - "SALE_VAL/SALELAND*/SALEIMP*>0 =0 on Property/4 — no public REST multi-sale history; qPublic AppID=725 HTML only."
+  - "MAVCURR assessed unused (MAVCURR>0=0) — assessed/taxable via qPublic HTML."
+  - "Parcel ZONINGCODE sparse; parcel ZONING numeric opaque — prefer Euclidean Zoning/0 ZONE_."
+  - "TAXDISTRIC 01/02 soft only — use Fitzgerald City Limits spatial."
+  - "No county FLU REST."
+  - "BenHillCountyGA_WFS 404."
+  - "Thinner Property/2 Parcels twin — prefer layer 4 for CURR_VAL CAMA."
+  - "WATER/SEWER/GAS/ELECTRICTY/ROAD* skipped (no utilities/AADT per tranche-3)."
+  - "Rejected paid Regrid/ATTOM; no emails/phones collected."
+
+license: >
+  Southern Georgia Regional Commission (SGRC) alma ArcGIS Server BenHill services
+  (sgrcmaps.com/alma — Property / Zoning / Boundaries / TaxInfo). Public viewer
+  sgrcmaps.com/BenHill. Assessor HTML qPublic SchneiderCorp AppID=725 /
+  App=BenHillCountyGA (qpublic.net/ga/benhill). Attribution Ben Hill County / SGRC /
+  Tax Assessors. Public fields only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=725&LayerID=11766&PageTypeID=2&PageID=5429
+jurisdictionGisUrl: https://www.sgrcmaps.com/BenHill/
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://www.sgrcmaps.com/alma/rest/services/BenHill/Property/MapServer/4 count 11549; extent center
+    [['13017', 'Ben Hill County']]; sample [['13315', 'Wilcox County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Fitzgerald city"
+      level: city
+      parentFips: "13017"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Ben Hill' AND aadt>0
+    altFilter: name LIKE '017-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 017-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 146
+    maxAadt: 12100
+    geoCheck: 146/146 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - A_VALUE
+    - FMVRES
+    filledCount: 11499
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/BenHill/Property/MapServer/4
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: SALE_VAL=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 11499
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/BenHill/Property/MapServer/4
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=BenHillCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=725&LayerID=11766&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 1 10      9
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BenHillCountyGA&Layer=Parcels&PageType=Report&KeyValue=1%2010%20%20%20%20%20%209
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.sgrcmaps.com/BenHill/
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Fitzgerald city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

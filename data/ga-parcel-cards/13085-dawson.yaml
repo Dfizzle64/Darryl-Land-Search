@@ -1,0 +1,216 @@
+state: GA
+jurisdiction: Dawson County
+fips: "13085"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — parcel-keyed polygons with acres + zoning + character + qPublic deep-link
+  - role: parcels
+    name: Zoning_2026 (Dawson County GIS — parcel polygons + acres/zoning)
+    restUrl: https://services7.arcgis.com/Ptz860OPLeIY55cX/arcgis/rest/services/Zoning_2026/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      Acres: acreage
+      ZONING_CLA: zoning
+      CharArea: fluCharacterArea
+      CaseNumber: zoningCaseNumber
+      W_Cond: zoningWithConditions
+      qPublic_Link: appraiserSearchUrl
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + acreage + zoning landbase (Dawson County
+      GIS / dawsoncountyga.maps.arcgis.com org Ptz860OPLeIY55cX Public_Works1; Hub
+      gis-dawsoncountyga.hub.arcgis.com). Live count 19630 (2026-09-24). Acres 5–150
+      ≈3051. ZONING_CLA domain: RPC≈3640, RA≈3623, VCR≈2782, City≈2545, RSRMM≈1612,
+      RSR≈1609, RMF≈1301, C-PCD≈886, RS≈483, RS2≈318, C-HB≈276, VC≈154, C-IR≈135,
+      RS3≈85, C-CB≈67, C-OI≈62 (+ sparse RRE/MUV/R-AC/C-HI/C-RB/CT/RT/RL). Twin geometry
+      (thin CAMA): Energov_Layers_Update2021/FeatureServer/3 Parcels count 19548 fields
+      PARCELID/Parcel_Dis/Shape__Area only — prefer Zoning_2026 for acres+zoning;
+      OpenAddresses us/ga/dawson harvests Energov/3. qPublic_Link embeds AppID=676
+      LayerID=11636 PageTypeID=4 KeyValue={Parcel_No}. NO ownerName / mailing / tax
+      values / lastSale on REST — CAMA via qPublic HTML. CharArea soft FLU context
+      (prefer Character_Area_2025 / Comp Plan for FLU). Geo-verified samples
+      ~-84.049,34.336 / ~-84.120,34.424 and Energov twin ~-84.330,34.581 — Dawson
+      County GA north of Atlanta / Dawsonville (~-84.12,34.42) (NOT Dawson County NE
+      Lexington; NOT Dawson TX). Viewer: dawsoncountyga.gov GIS + Hub. Rejected
+      Regrid/ATTOM; rejected misnamed Parcels_2026 item (is Zoning 2026 twin).
+    status: usable
+
+  - role: parcels
+    name: Energov_Layers_Update2021 Parcels (geometry twin — thin attrs)
+    restUrl: https://services7.arcgis.com/Ptz860OPLeIY55cX/arcgis/rest/services/Energov_Layers_Update2021/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      Parcel_Dis: parcelIdDisplay
+      Shape__Area: shapeAreaSqM
+    notes: >
+      Geometry twin count 19548; Shape__Area WebMercator m² 5–150 ≈3797 (approx). Prefer
+      Zoning_2026 for Acres+zoning; use Energov/3 when needing OA-aligned PARCELID only.
+    status: partial
+
+  - role: tax
+    name: null — no public REST CAMA values
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No CURR_VAL / FMV / assessed on Zoning_2026 or Energov. Assessor HTML: qPublic /
+      Beacon AppID=676 LayerID=11636 (dawsoncountyga.gov GIS → QPublic; bot 403).
+      Deep-link: Application.aspx?AppID=676&LayerID=11636&PageTypeID=4&PageID=5339&KeyValue={Parcel_No}
+      (spaces in key as in qPublic_Link). Also App=DawsonCountyGA name form.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Dawson GA multi-sale FeatureServer recovered. Prefer qPublic Sales Search HTML.
+      Rejected paid vendors.
+    status: gap
+
+  - role: zoning
+    name: Zoning_2026 ZONING_CLA (same preferred parcel layer)
+    restUrl: https://services7.arcgis.com/Ptz860OPLeIY55cX/arcgis/rest/services/Zoning_2026/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      ZONING_CLA: zoning
+      CharArea: fluCharacterArea
+    notes: >
+      Preferred authoritative county zoning on public REST (parcel-keyed). ZONING_CLA='City'
+      ≈2545 marks Dawsonville city footprint — prefer city Zoning_Districts for local
+      codes inside city limits (standing order city-over-county). Overlay_Districts/21
+      companion overlays. Zoning Instant App 0fec65e58b0d412283a3ca3f4f179c9d.
+    status: usable
+
+  - role: flu
+    name: Character_Area_2025 (parcel-keyed character / FLU soft)
+    restUrl: https://services7.arcgis.com/Ptz860OPLeIY55cX/arcgis/rest/services/Character_Area_2025/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      ZONING_CLA: zoning
+      CharArea: flu
+    notes: >
+      Preferred public REST character / FLU soft layer. Join PARCELID→Zoning_2026.Parcel_No
+      or spatial. Energov/7 FLU twin carries FLU/CALC_ACRE/WGAcre/ZONING1 + legacy
+      qpublic7 link — older; prefer Character_Area_2025 + Zoning_2026 CharArea. Certify
+      critical sites against adopted Comp Plan PDF.
+    status: partial
+
+  - role: other
+    name: Energov Dawsonville City Limits
+    restUrl: https://services7.arcgis.com/Ptz860OPLeIY55cX/arcgis/rest/services/Energov_Layers_Update2021/FeatureServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      Dawsonville city-limit polygon(s). Twin Dawsonville_City_Limits FeatureServer.
+      Spatial municipality filter; do not use mailing CITY.
+    status: usable
+
+municipalities:
+  - name: Dawsonville
+    level: city
+    parentFips: "13085"
+    joinToCountyParcels: >
+      Spatial Energov/5 Dawsonville City Limits OR soft ZONING_CLA='City' (~2545) OR
+      CharArea city context. Centroid ~-84.12,34.42.
+    layers:
+      - role: zoning
+        name: Zoning_Districts (City of Dawsonville)
+        restUrl: https://services6.arcgis.com/hAql8eOvKyu8F8bU/arcgis/rest/services/Zoning_Districts/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          District: zoning
+          Id: zoningPolyId
+        notes: >
+          Preferred Dawsonville-local zoning (org hAql8eOvKyu8F8bU dawsonvilleplanning).
+          District field = city zoning code. Prefer over county ZONING_CLA='City' stub
+          inside city limits. Live schema fields OBJECTID/Id/District/Shape__/GlobalID.
+        status: usable
+      - role: flu
+        name: null — county Character_Area_2025 spatial
+        restUrl: https://services7.arcgis.com/Ptz860OPLeIY55cX/arcgis/rest/services/Character_Area_2025/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CharArea: flu
+        notes: No Dawsonville-only FLU FeatureServer — county character spatial.
+        status: partial
+      - role: parcels
+        name: DawsonvilleCityParcels (city extract) / county Zoning_2026 spatial
+        restUrl: https://services7.arcgis.com/Ptz860OPLeIY55cX/arcgis/rest/services/DawsonvilleCityParcels/FeatureServer/12
+        layerId: 12
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          City: municipality
+        notes: >
+          Thin city parcel extract (PARCELID/City). Prefer county Zoning_2026 filtered
+          to city poly for acres+zoning; no separate city CAMA.
+        status: partial
+    gaps:
+      - "County ZONING_CLA='City' is stub — use city Zoning_Districts District inside limits."
+    status: usable
+
+gaps:
+  - "No ownerName / mailing / tax.marketValue / assessed / lastSale on public REST — qPublic AppID=676 HTML only (bot 403)."
+  - "Energov/3 parcels geometry-only (PARCELID); prefer Zoning_2026 for Acres+ZONING_CLA."
+  - "Parcels_2026 / Parcels_2025 AGOL item titles are misnamed Zoning layers — do not treat as CAMA parcels."
+  - "Character_Area_2025 / Zoning_2026 CharArea are soft FLU — certify vs Comp Plan PDF."
+  - "Rejected Regrid/ATTOM; rejected Dawson NE/TX lookalikes; rejected ARC LandPro_2012."
+  - "No emails/phones collected; no paid vendors."
+
+license: >
+  Dawson County GIS / Public Works (services7.arcgis.com/Ptz860OPLeIY55cX —
+  Zoning_2026, Character_Area_2025, Energov_Layers_Update2021, DawsonvilleCityParcels,
+  Overlay_Districts). Hub gis-dawsoncountyga.hub.arcgis.com. City of Dawsonville
+  Zoning_Districts (hAql8eOvKyu8F8bU). Assessor HTML qPublic/Beacon AppID=676
+  LayerID=11636 (dawsoncountyga.gov GIS). Attribution to Dawson County / City of
+  Dawsonville. Public fields only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=676&LayerID=11636&PageTypeID=2&PageID=5340
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

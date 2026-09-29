@@ -1,0 +1,58 @@
+state: GA
+jurisdiction: "Fairburn, Fulton County"
+fips: "13121"
+level: city
+markets: [Atlanta]
+
+layers:
+  - role: zoning
+    name: Current_Zoning_FLU
+    restUrl: https://services8.arcgis.com/ZvMgtqecACHwgXJb/arcgis/rest/services/Current_Zoning_FLU/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: LandAcres
+    coverage: city-only
+    fieldMap:
+      ParcelID: parcelId
+      ZoningCurr: zoning
+      ZoningPrev: zoningPrevious
+      FLU: flu
+      Address: situsAddress
+      Owner: ownerName
+      LandAcres: acreage
+      LUCode: dorCode
+      TaxYear: taxYear
+    notes: >
+      Official Fairburn staff FeatureServer (owner cwhatley_Fairburn). Live count 6279; TaxYear
+      sample 2025. Parcel-attributed zoning + FLU on one layer. ParcelID matches Fulton PMV/11.
+      Third-party copy Zoning_20230321_Copy (mlinfoot_TWCLIS) also exists but prefer this staff layer.
+    status: usable
+
+  - role: flu
+    name: Current_Zoning_FLU (FLU field)
+    restUrl: https://services8.arcgis.com/ZvMgtqecACHwgXJb/arcgis/rest/services/Current_Zoning_FLU/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: LandAcres
+    coverage: city-only
+    fieldMap:
+      ParcelID: parcelId
+      FLU: flu
+      ZoningCurr: zoning
+    notes: >
+      Same layer as zoning — FLU attribute is current. Separate Future_Land_Use / Future_Land_Use_2023
+      services exist but carry older TaxYear samples (2013/2022); prefer Current_Zoning_FLU.FLU.
+    status: usable
+
+gaps:
+  - "Older Fairburn Future_Land_Use layers are stale vs Current_Zoning_FLU; use current combined layer."
+
+license: "City of Fairburn GIS (cwhatley_Fairburn AGOL); public FeatureServer."
+appraiserSearchUrl: https://fultonassessor.org/
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+notes: >
+  JOIN TO COUNTY PARCELS: Attribute join ParcelID = Fulton PMV MapServer/11 ParcelID
+  (same spaced format), with spatial intersect as fallback.

@@ -1,0 +1,62 @@
+state: GA
+jurisdiction: "East Point, Fulton County"
+fips: "13121"
+level: city
+markets: [Atlanta]
+
+layers:
+  - role: zoning
+    name: Current Zoning
+    restUrl: https://services7.arcgis.com/CPLm4MuWYjfnA2R9/arcgis/rest/services/Current_Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Acres
+    coverage: city-only
+    fieldMap:
+      PIN: parcelId
+      ZONING: zoning
+      ADDRESS: situsAddress
+      GIS_Acres: acreage
+      ASSESS_ACR: acreageAssessed
+      Exist_Use: currentLandUse
+      Future_Use: flu
+      Case_Num: zoningCaseId
+    notes: >
+      Official EastPointGIS AGOL FeatureServer (GEO-POINT / data-eastpointgis.opendata.arcgis.com).
+      Live count 11445 (2026-09-23). Parcel-attributed. PIN is compacted without spaces
+      (e.g. "09F37000179103") vs Fulton PMV ParcelID with spaces — normalize by stripping spaces
+      for optional attribute join; spatial intersect remains the reliable default.
+    status: usable
+
+  - role: flu
+    name: Current Zoning (Future_Use field)
+    restUrl: https://services7.arcgis.com/CPLm4MuWYjfnA2R9/arcgis/rest/services/Current_Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Acres
+    coverage: city-only
+    fieldMap:
+      PIN: parcelId
+      Future_Use: flu
+      Exist_Use: currentLandUse
+      ZONING: zoning
+    notes: >
+      No separate FLU FeatureServer in EastPointGIS org. Future_Use on the Current Zoning layer
+      is the public FLU attribute (same 11445 polygons).
+    status: partial
+
+gaps:
+  - "No dedicated FLU FeatureServer; Future_Use on zoning is the only public FLU attribute."
+  - "On-prem gis.eastpointga.gov-style REST not found; AGOL Current_Zoning is the live source."
+  - "City site also links PDF Official Zoning Map — not a REST geometry source."
+
+license: "City of East Point GIS (EastPointGIS AGOL / GEO-POINT hub)."
+appraiserSearchUrl: https://fultonassessor.org/
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+notes: >
+  JOIN TO COUNTY PARCELS: Preferred — spatial intersect with Fulton PMV MapServer/11.
+  Optional attribute join: strip spaces from PMV ParcelID and match East Point PIN
+  (REPLACE/normalize). MapServer SQL REPLACE may not be supported on PMV; normalize client-side.

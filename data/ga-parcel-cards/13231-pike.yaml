@@ -1,0 +1,217 @@
+state: GA
+jurisdiction: Pike County
+fips: "13231"
+level: county
+markets: [Atlanta]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Pike County GA public parcel FeatureServer/MapServer recovered
+      (2026-09-24). Official human viewer = qPublic/Beacon App=PikeCountyGA
+      (qpublic.net/ga/pike → qpublic.schneidercorp.com; seat Zebulon GA 30295). County GIS
+      dept pikecoga.com/gis-department.html (Brad Vaughan) — no public REST directory
+      published. PikeCountyGA_WFS on wfs.schneidercorp.com 404. Cloudflare/bot 403 on
+      automated Application.aspx; public for humans. REJECT lookalikes: Pike County PA
+      (gis.pikepa.org / AGOL item c387530403f54149b6219c7b3fcd4957 extents ~-75.3,41.3);
+      Pike Township PA; DeKalb/other Pike road overlays; paid Regrid/ATTOM/USLandGrid/
+      DynamoSpatial Pike GA extracts (~10k parcels advertised — not wired).
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: Tax values via qPublic App=PikeCountyGA HTML only — no public REST.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: qPublic Yearly Sales / Sales Search HTML; no public REST sales layer.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Pike County GA zoning REST found — Planning PDF / pikecoga.com gap.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Pike County GA FLU REST — Comp Plan PDF gap.
+    status: gap
+
+municipalities:
+  - name: Zebulon
+    level: city
+    parentFips: "13231"
+    joinToCountyParcels: "No county parcel REST to join — blocked until geometry source exists."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Zebulon zoning REST found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Zebulon FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city or county parcel REST.
+        status: gap
+    gaps:
+      - "No Zebulon-owned public GIS REST."
+    status: gap
+
+  - name: Concord
+    level: city
+    parentFips: "13231"
+    joinToCountyParcels: "No county parcel REST."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Concord zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Concord FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No parcel REST.
+        status: gap
+    gaps:
+      - "No Concord public GIS REST."
+    status: gap
+
+  - name: Molena
+    level: city
+    parentFips: "13231"
+    joinToCountyParcels: "No county parcel REST."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Molena zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Molena FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No parcel REST.
+        status: gap
+    gaps:
+      - "No Molena public GIS REST."
+    status: gap
+
+gaps:
+  - "No public REST parcels/zoning/FLU/tax/sales for Pike County GA — qPublic App=PikeCountyGA HTML only."
+  - "PikeCountyGA_WFS 404; pikecoga.com GIS page has contact only, no REST."
+  - "REJECT Pike County PA (gis.pikepa.org / item c387530403f54149b6219c7b3fcd4957); other Pike lookalikes; paid vendors."
+  - "No emails/phones; no paid vendors."
+
+license: >
+  Pike County Tax Assessor qPublic/Beacon App=PikeCountyGA (qpublic.net/ga/pike). County
+  GIS contact pikecoga.com/gis-department.html. No public ArcGIS parcel service discovered
+  2026-09-24. Attribution Pike County Tax Assessor / GIS. Public HTML only; no emails/
+  phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=PikeCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

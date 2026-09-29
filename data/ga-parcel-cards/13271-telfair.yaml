@@ -1,0 +1,447 @@
+state: GA
+jurisdiction: Telfair County
+fips: "13271"
+level: county
+markets: [Savannah]
+
+layers:
+  # PRIMARY — county-wide parcel polygons (GEOMETRY ONLY — no Parcel_No / owner / tax / sale)
+  - role: parcels
+    name: Telfair_County_Wide_View TaxParcels25 (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Telfair_County_Wide_View/FeatureServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      OBJECTID_12: objectId
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Heart of Georgia Altamaha RC / hogagis org
+      HHvUPZ2XuLOAJxjR — Telfair_County_Wide_View item 2683b1e923584747ba69d4593b96ef4b
+      FeatureServer/15 TaxParcels25). Live count 8876 (2026-09-24). Schema GEOMETRY-ONLY —
+      OBJECTID_12 + Shape__Area + Shape__Length + polygon only (NO Parcel_No / PIN / owner /
+      mailing / situs / CURR_VAL / sale / Draw_Acres). Shape__Area is AGOL metric area
+      (Web Mercator), NOT deed/GIS acres — do not treat as acreageField. maxRecordCount 2000 —
+      page via resultOffset / spatial envelopes. Envelope WGS84 ≈ -83.208..-82.646 ×
+      31.774..32.153 — Telfair County GA / McRae-Helena seat. CountyBoundary/0 CNTYIDFP=13271
+      NAME=Telfair STATEFP=13 COUNTYFP=271 RDC=Heart of Georgia-Altamaha SqMiles≈444
+      geo-verified. Census TIGERweb GEOID 13271 CENTLAT +31.9297929 CENTLON -082.9390197.
+      Join CAMA via qPublic App=TelfairCountyGA / AppID=809 LayerID=14326 HTML
+      (KeyValue={parcelId}). Address layer /16 is bloated shared schema with null STREET —
+      not usable situs REST. Rejected paid Regrid/ATTOM/DynamoSpatial/USLandGrid/NETR;
+      no emails/phones; skip utilities+AADT.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on TaxParcels25; qPublic AppID=809 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on TaxParcels25. Assessor HTML
+      qpublic.net/ga/telfair → App=TelfairCountyGA / AppID=809 LayerID=14326
+      (Cloudflare/bot 403 automated on Application.aspx; qpublicaux + qpublic.net public
+      for humans). Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=809&LayerID=14326&PageTypeID=4&PageID=6224&KeyValue={parcelId}
+      (Search PageTypeID=2 PageID=6227; also App=TelfairCountyGA&Layer=Parcels&PageType=Report
+      &KeyValue=). Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/lastSale on TaxParcels25. Prefer qPublic Sales Search / Sales List HTML
+      AppID=809 / App=TelfairCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean; city zoning only (McRae-Helena + Lumber City)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Telfair County-wide Euclidean zoning FeatureServer on Telfair_County_Wide_View
+      (2026-09-24). Prefer city Euclidean: McRae-Helena ProposedZoning / Lumber City Zoning
+      (see municipalities). Milan / Jacksonville / Scotland lack zoning layers.
+    status: gap
+
+  - role: flu
+    name: null — no Landuse FLULU layer; SpecialAreas planning character only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No county Landuse / FLULU FeatureServer layer (unlike Montgomery Landuse/16).
+      SpecialAreas/14 has SPECIALARE + NAME (count 21; Ocmulgee River / Little Ocmulgee
+      River Corridor / Horse Creek WMA / US 341 Corridor / Downtown Milan …) — planning
+      character only; FLULU/EXTLU fields present in bloated schema but live fill = 0.
+      Not a substitute for Euclidean zoning or FLU.
+    status: gap
+
+  - role: other
+    name: Telfair_County_Wide_View CountyBoundary (GA FIPS 13271)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Telfair_County_Wide_View/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      CNTYIDFP: countyFips
+      STATEFP: stateFips
+      COUNTYFP: countyFp
+      SqMiles: squareMiles
+      RDC: regionalCommission
+    notes: >
+      Preferred spatial county mask — NAME=Telfair CNTYIDFP=13271 STATEFP=13. Companion
+      CountyCommissionerDistricts/1 / SchoolBoardDistricts/12 / FireDistricts/4 —
+      not parcels. Skip FloodZones/Soils/Roads as non-CAMA.
+    status: usable
+
+municipalities:
+  - name: McRae-Helena
+    level: city
+    parentFips: "13271"
+    joinToCountyParcels: >
+      County seat (merged McRae + Helena). Spatial City_of_McRae_View/0 CityLimitsMcRaeHelena
+      (~-82.90,32.06; FIPS='271') ∩ TaxParcels25. Mailing city never sole filter.
+    layers:
+      - role: zoning
+        name: City_of_McRae_View McRaeHelenaZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_McRae_View/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ProposedZoning: zoning
+          ProposedZoningDescr: zoningDescription
+          Ward: ward
+        notes: >
+          City Euclidean ProposedZoning (live count 3246; 2026-09-24). Codes: R1≈601 /
+          R2≈711 / R3≈673 / B1≈429 / M1≈103 / RM≈39 / OP≈37 / blank≈652. Domain also
+          lists PUD / DC. Companion webapp McRae_Helena Zoning_Viewer
+          hogarc.maps.arcgis.com/apps/webappviewer/index.html?id=98ce0f71fbed4ceb9c9aa6d29461b26a.
+          Skip SDSWaterLinesOutsideOfTheCity / SolidWasteRoutes / Hydrants per tranche-3.
+        status: usable
+      - role: flu
+        name: null — no city FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No McRae-Helena FLU FeatureServer — county SpecialAreas only.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels25 + spatial McRae-Helena
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No McRae-Helena-only CAMA — county /15 + CityLimits/0. Tax/sale qPublic HTML.
+        status: gap
+    gaps:
+      - "No McRae-Helena city-owned parcel/FLU REST — county TaxParcels25 + spatial limits."
+      - "Owner/tax/sale via qPublic AppID=809 HTML even inside city."
+    status: usable
+
+  - name: Lumber City
+    level: city
+    parentFips: "13271"
+    joinToCountyParcels: >
+      Spatial City_of_Lumber_City_View/6 LumberCityCityLimits (~-82.68,31.93; FIPS='271')
+      ∩ TaxParcels25. Prefer spatial envelope — Lumber Zoning layer has countywide stray
+      PIDs outside city; always ∩ city limits.
+    layers:
+      - role: zoning
+        name: City_of_Lumber_City_View Lumber Zoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Lumber_City_View/FeatureServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+          PID: parcelIdSoft
+        notes: >
+          City Zoning text (≈1537 with Zoning filled inside city envelope 2026-09-24).
+          Distinct: Single Family Residential / Multiple Family Residential / Agricultural
+          District / Roadside Business District / Industrial District / Central Business
+          District / Road (+ typo variants). Layer raw count huge (≈17k) with out-of-city
+          PIDs — ALWAYS spatial-filter to LumberCityCityLimits/6. Skip WaterValves /
+          Hydrants / WaterLines per tranche-3.
+        status: usable
+      - role: parcels
+        name: null — county TaxParcels25 + spatial Lumber City
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Lumber City-only CAMA REST; PID on zoning is soft only.
+        status: gap
+    gaps:
+      - "Lumber Zoning must be clipped to city limits; raw layer includes out-of-city geometries."
+    status: usable
+
+  - name: Milan
+    level: city
+    parentFips: "13271"
+    joinToCountyParcels: >
+      Spatial City_of_Milan_Telfair_View/0 MilanCityLimits (~-83.06,32.01; FIPS='271') ∩
+      TaxParcels25. City also spans Dodge County — prefer Telfair-side MilanCL /
+      MilanCLComplete; do not use mailing city alone.
+    layers:
+      - role: zoning
+        name: null — no MilanZoning layer published
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: City_of_Milan_Telfair_View has limits/whiteout/prison/water only — no zoning FS.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels25 + spatial Milan
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Milan-only CAMA. Skip SDSWaterLinesOutsideTheCity per tranche-3.
+        status: gap
+    gaps:
+      - "No Milan zoning/parcel/FLU REST — city limits only + county parcels."
+    status: partial
+
+  - name: Jacksonville
+    level: city
+    parentFips: "13271"
+    joinToCountyParcels: >
+      Spatial City_of_Jacksonville_View/0 JacksonvilleCityLimits (~-82.98,31.81; NAME='Jacksonville'
+      FIPS='271') ∩ TaxParcels25.
+    layers:
+      - role: zoning
+        name: null — no JacksonvilleZoning layer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: City_of_Jacksonville_View has limits/special areas/water only — no zoning FS.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels25 + spatial Jacksonville
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Jacksonville-only CAMA. Skip WaterLinesOutsideCity per tranche-3.
+        status: gap
+    gaps:
+      - "No Jacksonville zoning/parcel/FLU REST — city limits only + county parcels."
+    status: partial
+
+  - name: Scotland
+    level: city
+    parentFips: "13271"
+    joinToCountyParcels: >
+      Spatial Cit_of_Scotland_View/4 ScotlandCityLimits (~-82.82,32.05; NAME='Scotland'
+      FIPS='271') ∩ TaxParcels25. Confirm Wheeler-county fringe before sole filter.
+    layers:
+      - role: zoning
+        name: null — no ScotlandZoning layer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Cit_of_Scotland_View has limits/special areas/fire/water/sewer only — no zoning FS.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels25 + spatial Scotland
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Scotland-only CAMA. Skip FireHydrants / WaterLines / ScotlandSewerLines.
+        status: gap
+    gaps:
+      - "No Scotland zoning/parcel/FLU REST — city limits only + county parcels."
+    status: partial
+
+gaps:
+  - "TaxParcels25 REST is geometry-only — no Parcel_No/owner/mailing/situs/CURR_VAL/sale/Draw_Acres; tax/owner/sale via qPublic AppID=809 LayerID=14326 HTML only."
+  - "No county-wide Euclidean zoning or FLU FeatureServer — city ProposedZoning (McRae-Helena) + Lumber Zoning only; SpecialAreas planning character."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/telfair + AppID=809 Search/Maps public for humans."
+  - "Skip city Water/Sewer/Hydrant/SolidWaste + AADT per tranche-3; no emails/phones."
+  - "Rejected paid Regrid/ATTOM/USLandGrid/NETR; no Telfair TX lookalike recovered."
+
+license: >
+  Heart of Georgia Altamaha RC GIS (hogagis / services5.arcgis.com/HHvUPZ2XuLOAJxjR) —
+  Telfair_County_Wide_View TaxParcels25/15, CountyBoundary/0, SpecialAreas/14;
+  City_of_McRae_View, City_of_Lumber_City_View, City_of_Milan_Telfair_View,
+  City_of_Jacksonville_View, Cit_of_Scotland_View. Assessor qPublic App=TelfairCountyGA /
+  AppID=809 LayerID=14326 (qpublic.net/ga/telfair; McRae-Helena GA 31055). Attribution
+  HOGARC / Telfair County Tax Assessor. Public fields only; no emails/phones; no paid
+  vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=809&LayerID=14326&PageTypeID=2&PageID=6227
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Telfair_County_Wide_View/FeatureServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/HHvUPZ2XuLOAJ
+    xjR/arcgis/rest/services/Telfair_County_Wide_View/FeatureServer/15 count 8876; extent center
+    [['13271', 'Telfair County']]; sample [['13271', 'Telfair County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Jacksonville city"
+      level: city
+      parentFips: "13271"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Lumber City city"
+      level: city
+      parentFips: "13271"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "McRae-Helena city"
+      level: city
+      parentFips: "13271"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Milan city"
+      level: city
+      parentFips: "13271"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Scotland city"
+      level: city
+      parentFips: "13271"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Telfair' AND aadt>0
+    altFilter: name LIKE '271-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 271-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 77
+    maxAadt: 10300
+    geoCheck: 77/77 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=TelfairCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=809&LayerID=14326&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Telfair_County_Wide_View/FeatureServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Jacksonville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Lumber City city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: McRae-Helena city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Milan city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Scotland city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'
+  pass1Correction: TaxParcels25 (FeatureServer/15) has geometry only (OBJECTID/Shape fields), no parcel ID; for
+    5-150 ac screening with IDs treat as PARTIAL until an ID-bearing layer is found

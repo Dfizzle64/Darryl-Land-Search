@@ -1,0 +1,488 @@
+state: GA
+jurisdiction: Effingham County
+fips: "13103"
+level: county
+markets: [Savannah]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons + WinGAP-style CAMA (official Effingham County AGOL)
+  - role: parcels
+    name: Parcels2024 (Effingham County GIS AGOL — official Interactive GIS Map parcels)
+    restUrl: https://services.arcgis.com/9scQWTgPOi3GxJRr/arcgis/rest/services/Parcels2024/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PIN: parcelPin
+      REALKEY: ownerKey
+      ownkey: ownerKeyAlt
+      TOTALACRES: acreage
+      ACRES: acreageGis
+      LASTNAME: ownerName
+      address1: mailingAddress
+      address2: mailingAddress2
+      address3: mailingAddress3
+      CityStateZ: mailingCityStateZip
+      city: mailingCity
+      state: mailingState
+      zip: mailingZip
+      StreetAdd: situsAddress
+      HOUSE_NO: situsNumber
+      stdirect: situsStreetDir
+      STREET_NAM: situsStreet
+      sttype: situsStreetType
+      unit: situsUnit
+      SalesDate: lastSale.date
+      DEEDPAGE: lastSale.docRef
+      PLOTPAGE: lastSale.platRef
+      REASON: lastSale.reason
+      esttax: tax.estimatedTax
+      HOMEEXEMPT: homesteadExempt
+      TAXDISTRIC: taxDistrict
+      ZCODE: zoning
+      zoningcode: zoningAlt
+      Z_TYPE: zoningType
+      Zoning_Con: zoningConditional
+      OverlayDis: zoningOverlay
+      OverlayCod: zoningOverlayCode
+      DIGCLASS: dorCode
+      DIGSTRAT: digestStratum
+      LEGAL_DESC: legalDescription
+      NEIGHBHOOD: neighborhood
+      SUBd_name: subdivision
+      PropRecCar: appraiserDeepLink
+      WPIN: webPin
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA landbase (official Effingham County GIS
+      AGOL org 9scQWTgPOi3GxJRr / EffinghamCounty.maps.arcgis.com; owner Effingham_GIS;
+      Interactive Web Map 2026 item 297c47df37ed4453bff2e43d10f83b36 parcels layer).
+      Live count 34248 (2026-09-23). SR Web Mercator 102100/3857. TOTALACRES filled 34248;
+      TOTALACRES 5–150 ≈6130 (preferred acreage filter); ACRES (shape) 5–150 ≈5777 — prefer
+      TOTALACRES for app band. LASTNAME / PARCEL_NO / PropRecCar filled ≈34248; StreetAdd
+      filled; SalesDate filled ≈33154; ZCODE nonempty ≈34230; esttax>0 ≈32748. NO SALEPRICE /
+      CURR_VAL / FMV on this layer — join ParcelUpdate or FLUM_20240903_BOC_APPR_2 on
+      PARCEL_NO for lastSale.price + tax.marketValue (see sales/tax layers). Zoning is
+      PARCEL-ATTRIBUTED (ZCODE/zoningcode); Interactive Map "Zoning" group points at this
+      same FeatureServer/0 — no separate Euclidean zoning polygon service found. ZCODE
+      domain: AR-1≈11004, R-1≈9228, PD≈3356, AR-2≈3054, R-2≈1904, R-6≈1148, R-3≈880,
+      R-5≈823, PUD≈648, R-4≈525, B-2≈415, I-1≈264, B-1≈179, B-3≈167, PD-R≈117, M-6≈109,
+      DT≈97, plus OC/R-1-A/RR/C-1/LI/SPLIT/AR-3/C-2/CP/HI/C-3/R-8/I-G/M-H/PD-MR/M-U/FH/GC
+      rare. TAXDISTRIC: 01≈25951 unincorporated (preferred county filter), 02≈1657 Guyton,
+      03≈4505 Rincon, 04≈1530 Springfield, 05≈61 / 06≈108 / 07≈205 special pockets —
+      prefer spatial County_Municipal_Boundaries for city membership (mailing city is NOT
+      municipality; Bloomingdale/Savannah/Meldrim/Atlanta appear as postal). OverlayDis
+      filled sparsely ≈221. PropRecCar deep-link:
+      https://qpublic.schneidercorp.com/Application.aspx?AppID=666&LayerID=11348&PageTypeID=4&PageID=4716&KeyValue={PARCEL_NO}
+      (App=EffinghamCountyGA name form also works). last_edi_1 max ≈2026-09-22 UTC;
+      EDIT_DATE max ≈2024-10-30 UTC. Geo-verified WGS84 samples ~-81.383,32.103
+      (PARCEL_NO 03320008 Old River Rd / Bloomingdale postal), ~-81.330,32.161 (Guyton
+      area), ~-81.22,32.26 (Rincon), ~-81.26,32.33 (Springfield) — Effingham County GA NW
+      of Savannah (~-81.3,32.4). REJECT Effingham County IL Magnasoft experience
+      fb79291577184609b770e5d885eb50a5 / services.arcgis.com/4YineAQdtmx0tv46 and
+      vj0V9Lal6oiz0YXp Features (~-88.8,39.2 Beecher City IL — wrong state); REJECT paid
+      USLandGrid/Regrid/ATTOM; REJECT stale ARC LandPro as cadastral; REJECT SAGIS/Chatham
+      ParcelDigest as Effingham parcels (adjacent Chatham only). Alternate thinner/older:
+      ParcelUpdate (count 28867, has SALEPRICE+CURR_VAL+fmv*); Parcels2020; Parcel11819.
+      Instant media app b7fb6067b5be476183e7c2a988f3e484; county GIS pages
+      effinghamcounty.org/180|/189|/190. No SchneiderCorp EffinghamCountyGA_WFS (404 —
+      unlike ButtsCountyGA_WFS).
+    status: usable
+
+  - role: tax
+    name: Parcels2024 esttax + ParcelUpdate/FLUM CURR_VAL join
+    restUrl: https://services.arcgis.com/9scQWTgPOi3GxJRr/arcgis/rest/services/Parcels2024/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PIN: parcelPin
+      esttax: tax.estimatedTax
+      HOMEEXEMPT: homesteadExempt
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+    notes: >
+      Preferred parcels carry esttax only — no FairMarketValue / assessedValue /
+      taxableValue on Parcels2024. Join ParcelUpdate (CURR_VAL, fmvres, fmvcom, fmvacc,
+      esttax; count 28867; CURR_VAL>0 ≈28685) OR FLUM_20240903_BOC_APPR_2 (CURR_VAL>0
+      ≈24396; also fmv*) on PARCEL_NO for tax.marketValue. GA 40% assessed not exposed as
+      a separate REST field. Assessor HTML: qpublic.net/ga/effingham →
+      qpublic.schneidercorp.com Application.aspx?App=EffinghamCountyGA&Layer=Parcels
+      (AppID=666). CDN/bot Cloudflare 403 possible from automated clients; public for
+      humans. Deep-link KeyValue={PARCEL_NO} via PropRecCar. Tax Commissioner separate
+      from Assessor.
+    status: partial
+
+  - role: sales
+    name: SalesDate on Parcels2024 + SALEPRICE via ParcelUpdate/FLUM join
+    restUrl: https://services.arcgis.com/9scQWTgPOi3GxJRr/arcgis/rest/services/Parcels2024/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      SalesDate: lastSale.date
+      DEEDPAGE: lastSale.docRef
+      PLOTPAGE: lastSale.platRef
+      REASON: lastSale.reason
+    notes: >
+      Preferred parcels expose SalesDate (~33154 non-null) + deed/plat/reason — NO
+      SALEPRICE. Join ParcelUpdate.SALEPRICE (SALEPRICE>0 ≈16137; also SalesDate) OR
+      FLUM_20240903_BOC_APPR_2.SALEPRICE (SALEPRICE>0 ≈14176) on PARCEL_NO for
+      lastSale.price. No Sale_Quality / qualified flag on REST; no multi-sale history
+      array — prior sales via qPublic App=EffinghamCountyGA Sales Search HTML. ParcelUpdate
+      is older/smaller (28867) than Parcels2024 (34248) — price join will miss newer
+      parcels. Status partial until a single-layer price+date source matches preferred
+      geometry count.
+    status: partial
+
+  - role: zoning
+    name: Parcels2024 ZCODE / zoningcode (parcel-attributed — official Interactive Map Zoning)
+    restUrl: https://services.arcgis.com/9scQWTgPOi3GxJRr/arcgis/rest/services/Parcels2024/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ZCODE: zoning
+      zoningcode: zoningAlt
+      Z_TYPE: zoningType
+      Zoning_Con: zoningConditional
+      OverlayDis: zoningOverlay
+      OverlayCod: zoningOverlayCode
+      TAXDISTRIC: taxDistrict
+    notes: >
+      Official Interactive Web Map 2026 wires "Zoning" and "Conditional Use" to Parcels2024
+      itself — parcel-attributed Euclidean codes for county + cities (no separate dissolved
+      zoning FeatureServer found 2026-09-23). ZCODE≈zoningcode; nonempty ≈34230. Domain
+      AR-1/AR-2/AR-3, R-1..R-6/R-8/R-1-A, PD/PD-R/PD-MR/PUD, B-1/B-2/B-3, C-1/C-2/C-3,
+      I-1/I-G/LI/HI, DT/OC/RO/RR/M-6/M-H/M-U/CP/FH/GC/SPLIT. Inside Rincon/Guyton/Springfield
+      prefer city ordinance/PDF maps when they diverge (standing order) — no city-owned
+      public zoning FeatureServer recovered; county ZCODE is the public REST source.
+      Corridor overlay polygons: CorridorOverlayDistricts FeatureServer/0 (2 polys;
+      CORRIDOR/OverlayDis attrs blank on query — geometry usable, attribution thin/partial).
+      Planning & Zoning: effinghamcounty.org/241 (unincorporated); OpenGov portal
+      effinghamcountyga.portal.opengov.com.
+    status: usable
+
+  - role: flu
+    name: FLUM_20240903_BOC_APPR_2 (Future Land Use Map — BOC approved 2024-09-03)
+    restUrl: https://services.arcgis.com/9scQWTgPOi3GxJRr/arcgis/rest/services/FLUM_20240903_BOC_APPR_2/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PIN: parcelPin
+      EFF_REV2: flu
+      OLD_FLU: fluPrior
+      Plan_Date: fluPlanDate
+      TOTALACRES: acreage
+      ACRES: acreageGis
+      LASTNAME: ownerName
+      ZCODE: zoning
+      zoningcode: zoningAlt
+      SalesDate: lastSale.date
+      SALEPRICE: lastSale.price
+      CURR_VAL: tax.marketValue
+      fmvres: tax.residentialMarketValue
+      fmvcom: tax.commercialMarketValue
+      fmvacc: tax.accessoryMarketValue
+      esttax: tax.estimatedTax
+    notes: >
+      Preferred FLU (FLUM Areas Plan Date 9/3/2024 on Interactive Web Map 2026). Live count
+      24619 parcel-shaped polygons — fewer than Parcels2024 (34248); join/spatialize on
+      PARCEL_NO/PIN or geometry. EFF_REV2 domain: Ag_Residential≈19028, Agriculture≈4455,
+      Industrial≈266, Commercial≈231, Utilities≈211, Church/Cemetery≈126, Transitional≈112,
+      P/I≈108, Conservation/Recreation≈45, Transportation≈37. Also carries SALEPRICE
+      (>0 ≈14176) and CURR_VAL (>0 ≈24396) useful as sales/tax enrichment join. Older
+      mirrors: FLUM (Plan Date 11/21/2023, count ≈24632, same EFF_REV2); CRC_FLU
+      plan_date_10_1_2019 (9 dissolved class polys AGF/COM/IND/MU/PIN/PRC/RES/TCU/UND —
+      superseded; historical only). Character Areas companion:
+      Character_Areas_20240903_BOC_APPROVED (30 polys; EFF_REV2 CON/COMM/DEV-SUBURBAN/
+      DEV-RURAL/HIS-O-DIS/PARKS-REC) — character context, not Euclidean FLU. City FLU REST
+      not published separately — county FLUM covers municipal areas in this parcel fabric.
+    status: usable
+
+  - role: other
+    name: County_Municipal_Boundaries (Rincon / Guyton / Springfield)
+    restUrl: https://services.arcgis.com/9scQWTgPOi3GxJRr/arcgis/rest/services/County_Municipal_Boundaries/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+      TYPE: municipalityType
+      LOCALFIPS: localFips
+    notes: >
+      Live count 3 cities: Rincon, Guyton, Springfield (LOCALFIPS 13103 parent). Preferred
+      spatial join for incorporated filter (standing order). Mirror CityLimits/FeatureServer/0
+      Municipal Boundaries (same 3 names; older LASTUPDATE). TAXDISTRIC soft map:
+      03≈Rincon, 02≈Guyton, 04≈Springfield, 01≈unincorporated — spatial preferred over
+      tax-district attr (annexation lag / special districts 05–07). Meldrim is unincorporated
+      CDP — no city poly. No Bloomingdale (Chatham) / Savannah city polys here.
+    status: usable
+
+  - role: other
+    name: MAT_NG911_Addresses (situs address points)
+    restUrl: https://services.arcgis.com/9scQWTgPOi3GxJRr/arcgis/rest/services/MAT_NG911_Addresses/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FullAddr: situsAddress
+      FullAddNum: situsNumber
+      Add_Number: situsNumberAlt
+      St_PreDir: situsStreetDir
+      St_Name: situsStreet
+      St_PosTyp: situsStreetType
+      St_PosDir: situsStreetDirSuffix
+      Unit: situsUnit
+      Post_Code: situsZip
+      Post_Comm: postalCommunity
+      Inc_Muni: municipality
+      County: county
+      State: state
+      Parcel_ID: parcelIdAlt
+      Lat: latitude
+      Long: longitude
+    notes: >
+      Live count 32255 NENA-style address points. Inc_Muni + Parcel_ID support municipality /
+      parcel joins alongside County_Municipal_Boundaries spatial. Prefer FullAddr composition;
+      Lat/Long present. Geo-verified Effingham GA.
+    status: usable
+
+  - role: other
+    name: Character_Areas_20240903_BOC_APPROVED (Comp Plan character areas)
+    restUrl: https://services.arcgis.com/9scQWTgPOi3GxJRr/arcgis/rest/services/Character_Areas_20240903_BOC_APPROVED/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      EFF_REV2: characterArea
+      CA_Type: characterType
+      NAME: characterName
+      Plan_Date: characterPlanDate
+    notes: >
+      Live count 30. Companion to FLUM 2024-09-03 BOC approval. EFF_REV2 values CON, COMM,
+      DEV-SUBURBAN, DEV-RURAL, HIS-O-DIS, PARKS-REC. Context for land-search scoring — not a
+      substitute for EFF_REV2 FLU on FLUM layer.
+    status: partial
+
+  - role: other
+    name: CorridorOverlayDistricts (commercial corridor overlay)
+    restUrl: https://services.arcgis.com/9scQWTgPOi3GxJRr/arcgis/rest/services/CorridorOverlayDistricts/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: partial
+    fieldMap:
+      CORRIDOR: corridorName
+      OverlayDis: zoningOverlay
+      OverlayCod: zoningOverlayCode
+    notes: >
+      Live count 2 corridor polygons on Interactive Map "Commercial Corridor Overlay".
+      CORRIDOR/OverlayDis/OverlayCod attributes blank on public query (2026-09-23) — geometry
+      usable for spatial flag; attribution thin. Parcel OverlayDis (~221) is alternate attr path.
+    status: partial
+
+municipalities:
+  - name: Rincon
+    level: city
+    parentFips: "13103"
+    joinToCountyParcels: >
+      Spatial intersect County_Municipal_Boundaries NAME='Rincon' (preferred) OR CityLimits
+      NAME='Rincon'. Soft TAXDISTRIC='03' (~4505) — some 01 spill at edges. Addresses
+      Inc_Muni / Post_Comm soft only. Largest municipality; NW of Savannah along SR 21.
+    layers:
+      - role: zoning
+        name: null — county Parcels2024 ZCODE inside Rincon poly (no city FeatureServer)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Rincon-owned public zoning FeatureServer (2026-09-23 AGOL search empty). County
+          Interactive Map uses Parcels2024 ZCODE countywide including Rincon. Official city
+          zoning map PDF + UDO O-2025-3 (adopted 2025-03-24; replaces prior official zoning
+          map) at cityofrincon.com — PDF-only gap for REST. Prefer PDF/staff for authoritative
+          city district when it conflicts with county ZCODE; otherwise filter Parcels2024 by
+          spatial Rincon poly / TAXDISTRIC='03'.
+        status: gap
+      - role: flu
+        name: null — use county FLUM_20240903 spatial Rincon
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Rincon-only FLU FeatureServer. County FLUM_20240903_BOC_APPR_2 covers city fabric —
+          spatial-intersect Rincon poly. City Comp Plan joint with county (DCA).
+        status: gap
+      - role: parcels
+        name: null — use county Parcels2024 filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Rincon-only CAMA FeatureServer — county Parcels2024 + spatial municipal poly /
+          TAXDISTRIC='03'.
+        status: gap
+    gaps:
+      - "No Rincon-owned public zoning/FLU/parcel FeatureServer — county ZCODE + FLUM + Parcels2024 spatial."
+      - "City zoning authoritative on PDF/UDO (2025) — REST gap; certify against PDF when city vs county code conflicts."
+    status: usable
+
+  - name: Guyton
+    level: city
+    parentFips: "13103"
+    joinToCountyParcels: >
+      Spatial intersect NAME='Guyton' on County_Municipal_Boundaries / CityLimits. Soft
+      TAXDISTRIC='02' (~1657). Centroid ~-81.39,32.33.
+    layers:
+      - role: zoning
+        name: null — county Parcels2024 ZCODE inside Guyton poly
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Guyton-owned public zoning FeatureServer (AGOL search empty). Use county ZCODE +
+          spatial city poly / TAXDISTRIC='02'. City site cityofguyton.com — no open GIS REST
+          discovered.
+        status: gap
+      - role: flu
+        name: null — county FLUM spatial Guyton
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: "No Guyton FLU FeatureServer — county FLUM_20240903 spatial."
+        status: gap
+      - role: parcels
+        name: null — use county Parcels2024 filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: "County parcels + spatial NAME='Guyton' / TAXDISTRIC='02'."
+        status: gap
+    gaps:
+      - "No Guyton-owned public zoning/FLU/parcel REST — county layers + spatial city poly."
+    status: usable
+
+  - name: Springfield
+    level: city
+    parentFips: "13103"
+    joinToCountyParcels: >
+      Spatial intersect NAME='Springfield' on County_Municipal_Boundaries / CityLimits.
+      Soft TAXDISTRIC='04' (~1530). County seat; centroid ~-81.26,32.33. CAUTION: City of
+      Springfield GA (Effingham) ≠ Springfield IL/MO/MA or other namesakes.
+    layers:
+      - role: zoning
+        name: null — city Zoning Map PDF Feb 2025; county ZCODE fallback
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Official Zoning Map PDF (springfieldga.org/maps/ — last updated February 2025) —
+          PDF-only, no city FeatureServer. Prefer PDF over county stub inside city limits when
+          certifying; public REST fallback = Parcels2024 ZCODE spatial Springfield /
+          TAXDISTRIC='04'. City Limits map PDF updated September 2025.
+        status: gap
+      - role: flu
+        name: null — county FLUM spatial Springfield
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: "No Springfield FLU FeatureServer — county FLUM_20240903 spatial."
+        status: gap
+      - role: parcels
+        name: null — use county Parcels2024 filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: "County parcels + spatial NAME='Springfield' / TAXDISTRIC='04'."
+        status: gap
+    gaps:
+      - "Springfield zoning map is PDF-only (Feb 2025) — no city zoning REST."
+      - "No Springfield-owned parcel/FLU FeatureServer."
+      - "Do not confuse with Springfield IL/MO or other US Springfields."
+    status: usable
+
+gaps:
+  - "Parcels2024 (preferred, 34248) has SalesDate but NO SALEPRICE / CURR_VAL / FMV — join ParcelUpdate (28867; SALEPRICE>0≈16137, CURR_VAL>0≈28685) or FLUM_20240903_BOC_APPR_2 (SALEPRICE>0≈14176, CURR_VAL>0≈24396) on PARCEL_NO; newer parcels may lack price/value join."
+  - "No tax.assessedValue / taxableValue REST field — esttax on parcels; CURR_VAL market-style on ParcelUpdate/FLUM only; digest detail on qPublic HTML AppID=666."
+  - "No separate Euclidean zoning polygon FeatureServer — zoning is parcel-attributed ZCODE on Parcels2024 (official map wiring); city PDFs authoritative inside Rincon/Guyton/Springfield when they diverge."
+  - "Rincon / Guyton / Springfield have no public city zoning or FLU FeatureServers — PDF (Rincon UDO 2025 / Springfield Zoning Map Feb 2025) or county ZCODE+FLUM spatial."
+  - "FLUM_20240903_BOC_APPR_2 count 24619 < Parcels2024 34248 — not every parcel has FLU polygon; spatial/PARCEL_NO join required."
+  - "CorridorOverlayDistricts (2 polys) has blank CORRIDOR/OverlayDis attributes on public query — geometry-only partial."
+  - "TAXDISTRIC / mailing-city confusion — city filter must use municipal polygons or TAXDISTRIC 02/03/04; never mailing city (Bloomingdale/Savannah/Meldrim/Atlanta postal spill)."
+  - "No SchneiderCorp EffinghamCountyGA_WFS MapServer (404) — unlike Butts; parcels live on county AGOL only."
+  - "qPublic / schneidercorp AppID=666 may return CDN/bot 403 to automated clients; public for humans."
+  - "Rejected lookalikes / non-preferred: Effingham County IL Magnasoft Web Experience fb79291577184609b770e5d885eb50a5 (org 4YineAQdtmx0tv46) and vj0V9Lal6oiz0YXp Features/TaxParcels (~-88.8,39.2 Beecher City IL — wrong state); SAGIS/Chatham ParcelDigest (pub.sagis.org) adjacent-county only — do not wire as Effingham parcels; paid USLandGrid / Regrid / ATTOM / CoreLogic Effingham extracts; stale ARC LandPro as cadastral; third-party agol_tr2 Effingham_County_Parcels ownership subsets (BOE/BOC/Industrial Authority — not full CAMA landbase)."
+  - "Enrichment vs thin in-app: official 34248 geometry+PARCEL_NO/PIN+owner/mailing/situs+TOTALACRES+SalesDate+esttax+ZCODE (all jurisdictions)+TAXDISTRIC+PropRecCar; FLUM 24619 EFF_REV2; Character 30; Municipal 3; Addresses 32255; SALEPRICE+CURR_VAL via join; city zoning/FLU REST remain gap/PDF."
+
+license: >
+  Effingham County GIS (EffinghamCounty.maps.arcgis.com org 9scQWTgPOi3GxJRr —
+  Parcels2024, ParcelUpdate, FLUM_20240903_BOC_APPR_2, Character_Areas_20240903_BOC_APPROVED,
+  County_Municipal_Boundaries, CityLimits, CorridorOverlayDistricts, MAT_NG911_Addresses;
+  Interactive Web Map 2026; Instant GIS Map appid b7fb6067b5be476183e7c2a988f3e484).
+  County site effinghamcounty.org (GIS / Planning & Zoning / Interactive GIS Map). Assessor
+  HTML: qpublic.net/ga/effingham → qpublic.schneidercorp.com Application.aspx?App=EffinghamCountyGA
+  (AppID=666). City PDF maps: springfieldga.org/maps/ (Zoning Feb 2025); cityofrincon.com UDO
+  O-2025-3 / zoning map; cityofguyton.com. Joint Comp Plan DCA (Effingham County w/ Guyton,
+  Rincon, Springfield). Attribution to Effingham County GIS / Tax Assessor / partner cities.
+  Public fields only; no emails/phones; no paid vendors (Regrid/ATTOM/CoreLogic/USLandGrid).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=EffinghamCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"

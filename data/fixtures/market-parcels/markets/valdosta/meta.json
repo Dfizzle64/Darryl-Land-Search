@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T05:02:25Z",
+  "generatedAt": "2026-09-29T05:19:20Z",
   "market": "Valdosta",
   "tier": "other",
-  "parcelCount": 5815,
+  "parcelCount": 11810,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -16,6 +16,32 @@
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
+    {
+      "name": "Early",
+      "fips": "13099",
+      "state": "Georgia",
+      "featureCount": 2776,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "ga-early-parcels-13099",
+      "queryUrl": "https://services3.arcgis.com/aYlIod9kh71mtnDG/arcgis/rest/services/Parcels/FeatureServer/0/query",
+      "gaps": [
+        "Parcels are Early County Parcels (aYlIod9kh71mtnDG) (https://services3.arcgis.com/aYlIod9kh71mtnDG/arcgis/rest/services/Parcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Source query returned 2792 rows; 2776 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Counted 2776 distinct parcel ids.",
+        "Pass 2 tax is HTML-only, sale is HTML-only, and owner is HTML-only. HTML-only values were not scraped.",
+        "Pass 2 tax is HTML-only. Assessed value and tax bills were not copied off qPublic.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Pass 2 owner name is HTML-only and was not copied."
+      ],
+      "path": "data/fixtures/market-parcels/counties/13099/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13099/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 2792
+    },
     {
       "name": "Lowndes",
       "fips": "13185",
@@ -42,6 +68,32 @@
       "sourceCount": 6774,
       "zoningJoinedCount": 5814,
       "fluJoinedCount": 5814
+    },
+    {
+      "name": "Worth",
+      "fips": "13321",
+      "state": "Georgia",
+      "featureCount": 3219,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "ga-worth-parcels-13321",
+      "queryUrl": "https://services2.arcgis.com/PYn6bWCjT6bhw1z3/arcgis/rest/services/Worth_Heirs_Concentration_Census_Block_WFL1/FeatureServer/4/query",
+      "gaps": [
+        "Parcels are Worth County parcels (UGA heirs-property project copy of county WinGAP landbase) (https://services2.arcgis.com/PYn6bWCjT6bhw1z3/arcgis/rest/services/Worth_Heirs_Concentration_Census_Block_WFL1/FeatureServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Source query returned 3244 rows; 3219 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Counted 3219 distinct parcel ids.",
+        "Pass 2 tax is HTML-only, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+        "Pass 2 tax is HTML-only. Assessed value and tax bills were not copied off qPublic.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/13321/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13321/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 3244
     }
   ]
 }

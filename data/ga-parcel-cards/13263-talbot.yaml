@@ -1,0 +1,460 @@
+state: GA
+jurisdiction: Talbot County
+fips: "13263"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner/situs/mailing/acres/tax/zoning (RVRC_ELA WinGAP)
+  - role: parcels
+    name: Parcels2025 / Parcel_Regions_w_WinGAP (RVRC_ELA — Talbot WinGAP)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      lastname: ownerLastName
+      firstname: ownerFirstName
+      middle: ownerMiddle
+      address1: mailingAddress
+      address2: mailingAddress2
+      address3: mailingAddress3
+      city: mailingCity
+      state: mailingState
+      zip_code: mailingZip
+      house_no: situsNumber
+      stdirect: situsStreetDir
+      street_nam: situsStreet
+      sttype: situsStreetType
+      unit: situsUnit
+      zip: situsZip
+      totalacres: acreage
+      Draw_Acres: acreageGis
+      Deed_Acres: acreageDeed
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      ovrideval: tax.overrideValue
+      flbaseval: tax.landBaseValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      zoningcode: zoning
+      digclass: dorCode
+      taxdistric: taxDistrict
+      neighbhood: neighborhood
+      subd_name: subdivision
+      legal_desc: legalDescription
+      qPub_Link: appraiserDeepLink
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (River Valley RC RVRC_ELA AGOL org
+      Ug5xGQbHsD8zuZzM — FeatureServer Parcels2025 layer 2 titled Parcel_Regions_w_WinGAP;
+      serviceItemId 29ccc8c6e14041f38f1a71b2f276bee0). Live count 6692 (2026-09-24); Talbot
+      WGS84 envelope ≈6677. SR NAD 1983 UTM Zone 16N (26916). maxRecordCount 2000 — page
+      via resultOffset / envelopes. Schema: Parcel_No (preserve spaces, e.g. '005 00301' /
+      '005 00309  A' / 'TALB03 01') + lastname/firstname/middle (lastname often holds full
+      owner string when firstname blank; filled ≈6625) + mailing address1–3/city/state/
+      zip_code + situs house_no/street_nam/sttype/zip + totalacres/Draw_Acres/Deed_Acres +
+      curr_val/prev_val/flbaseval/fmv* + zoningcode + digclass + taxdistric + qPub_Link.
+      totalacres 5–150 ≈2168; curr_val>0 ≈6625. zoningcode domain: A-1≈2775 / R-1≈2555 /
+      CITY≈1186 / I-1≈66 / C-1≈43. taxdistric soft (1≈5362 county / 2≈594 Talbotton /
+      5≈316 Woodland / 6≈161 Junction City / 3≈120 Geneva / 4≈72) — owner mailing city alone
+      insufficient; prefer spatial CityLimits_Talbot / Talbot_CityLimits. qPub_Link deep-links
+      App=talbotCountyGA Layer=Parcels PageType=Report KeyValue={Parcel_No URL-encoded}.
+      Official assessor qPublic App=TalbotCountyGA / AppID=680 LayerID=11370
+      (qpublic.net/ga/talbot; Cloudflare/bot 403 automated; public for humans). GEO-VERIFY
+      GEORGIA Talbot FIPS 13263 Talbotton seat: WGS84 samples ~-84.673,32.532 (Box Springs
+      Rd) / ~-84.598,32.825 / ~-84.539,32.677 (Talbotton); Census TIGERweb GEOID 13263
+      CENTLAT +32.6994430 CENTLON -084.5330293; CityLimits_Talbot STATEFP=13 places Geneva /
+      Woodland / Junction City / Talbotton. REJECT Talbot County MD (gis.talbotdes.org;
+      experience.arcgis.com/experience/f146f60406d747d793b418bc2317db45 Critical Area /
+      Chesapeake) — wrong state; REJECT paid Regrid/ATTOM/USLandGrid/DynamoSpatial/
+      GetParcelData; skip water/sewer/gas/electricty utilities + AADT; skip apprname /
+      alternate / land_appr / appraiser / fuserid staff names as PII; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: Parcels2025/2 curr_val / prev_val / flbaseval / fmv* (same layer)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      lastname: ownerLastName
+      firstname: ownerFirstName
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      ovrideval: tax.overrideValue
+      flbaseval: tax.landBaseValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      totalacres: acreage
+    notes: >
+      Preferred tax/CAMA values live on Parcels2025/2 (curr_val>0 ≈6625). Treat curr_val as
+      digest FMV (100% market), not 40% assessed — no separate assessed/taxable millage field
+      on this layer; tax bill via Tax Commissioner (talbotcountytax.com). Companion HTML
+      qPublic AppID=680 for appeal / history detail. Rejected paid vendor tax extracts.
+    status: usable
+
+  - role: sales
+    name: null — sale_* fields present but empty on WinGAP; qPublic Sales HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Parcels2025/2 exposes sale_val / saleland1 / saleland2 / saleimp1 / saleimp2 but live
+      counts sale_val>0 and saleland/saleimp>0 are 0 (2026-09-24) — not usable as REST sale
+      history. Prefer qPublic Sales Search / Sales List HTML App=TalbotCountyGA / AppID=680.
+      Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Parcels2025/2 zoningcode (on parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      zoningcode: zoning
+    notes: >
+      Euclidean zoningcode on preferred parcels (same FS). Domain: A-1≈2775 / R-1≈2555 /
+      CITY≈1186 / blank≈67 / I-1≈66 / C-1≈43. No separate county zoning FeatureServer
+      recovered on RVRC_ELA beyond parcel attribute. Planning & Zoning via
+      talbotcountyga.org/planning-zoning (Cloudflare) / staff — not a substitute REST.
+      Reject Talbot MD zoning layers on gis.talbotdes.org.
+    status: usable
+
+  - role: flu
+    name: null — no public Future Land Use FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Talbot County GA FLU / character-areas public FeatureServer recovered (2026-09-24).
+      Zoningcode is Euclidean, not long-range FLU. Honest gap.
+    status: gap
+
+  - role: other
+    name: CityLimits_Talbot + Talbot_CityLimits (municipal boundaries)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CityLimits_Talbot/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: cityName
+      NAMELSAD: cityNameFull
+      GEOID: placeGeoid
+      INTPTLAT: centroidLat
+      INTPTLON: centroidLon
+    notes: >
+      Live count 4 — Geneva / Woodland / Junction City / Talbotton (STATEFP='13'). Twin
+      Talbot_CityLimits/0 Name field (Talbotton row Name blank — use spatial / CityLimits_Talbot
+      NAMELSAD). Preferred spatial municipality filter. Companion RVRCRegion1/2 TILE_NAME=
+      Talbot COFIPS=263 TaxDataOnL=Free (boundary context).
+    status: usable
+
+municipalities:
+  - name: Talbotton
+    level: city
+    parentFips: "13263"
+    joinToCountyParcels: >
+      Spatial CityLimits_Talbot/0 NAME='Talbotton' (GEOID 1375244 INTPT ~-84.5407,+32.6772)
+      ∩ Parcels2025/2. Soft taxdistric='2' (~594) secondary; mailing city alone insufficient.
+    layers:
+      - role: parcels
+        name: Parcels2025/2 spatial Talbotton
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: totalacres
+        coverage: city-only
+        fieldMap:
+          Parcel_No: parcelId
+          lastname: ownerLastName
+          curr_val: tax.marketValue
+          totalacres: acreage
+          zoningcode: zoning
+        notes: No separate Talbotton CAMA — county WinGAP + city limits clip; qPublic AppID=680.
+        status: usable
+      - role: zoning
+        name: Parcels2025/2 zoningcode spatial Talbotton
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          zoningcode: zoning
+        notes: Prefer spatial city limits ∩ zoningcode (CITY / R-1 common in town).
+        status: usable
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city FLU REST.
+        status: gap
+    gaps:
+      - "No City-of-Talbotton separate parcel/CAMA REST — county Parcels2025/2 + spatial limits."
+      - "Sales via qPublic AppID=680 HTML even inside city."
+    status: usable
+
+  - name: Woodland
+    level: city
+    parentFips: "13263"
+    joinToCountyParcels: >
+      Spatial CityLimits_Talbot/0 NAME='Woodland' (GEOID 1383952 INTPT ~-84.5612,+32.7882)
+      ∩ Parcels2025/2. Soft taxdistric='5' (~316) secondary.
+    layers:
+      - role: parcels
+        name: Parcels2025/2 spatial Woodland
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: totalacres
+        coverage: city-only
+        fieldMap:
+          Parcel_No: parcelId
+          curr_val: tax.marketValue
+          zoningcode: zoning
+        notes: County WinGAP + Woodland limits; no city-owned CAMA FS.
+        status: usable
+      - role: zoning
+        name: Parcels2025/2 zoningcode spatial Woodland
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          zoningcode: zoning
+        notes: Spatial clip to Woodland city limits.
+        status: usable
+    gaps:
+      - "No City-of-Woodland separate parcel/CAMA REST."
+    status: usable
+
+  - name: Junction City
+    level: city
+    parentFips: "13263"
+    joinToCountyParcels: >
+      Spatial CityLimits_Talbot/0 NAME='Junction City' (GEOID 1342800 INTPT ~-84.4582,+32.6036)
+      ∩ Parcels2025/2. Soft taxdistric='6' (~161) secondary.
+    layers:
+      - role: parcels
+        name: Parcels2025/2 spatial Junction City
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: totalacres
+        coverage: city-only
+        fieldMap:
+          Parcel_No: parcelId
+          curr_val: tax.marketValue
+          zoningcode: zoning
+        notes: County WinGAP + Junction City limits.
+        status: usable
+      - role: zoning
+        name: Parcels2025/2 zoningcode spatial Junction City
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          zoningcode: zoning
+        notes: Spatial clip.
+        status: usable
+    gaps:
+      - "No Junction City separate parcel/CAMA REST."
+    status: usable
+
+  - name: Geneva
+    level: city
+    parentFips: "13263"
+    joinToCountyParcels: >
+      Spatial CityLimits_Talbot/0 NAME='Geneva' (GEOID 1332412 INTPT ~-84.5531,+32.5782)
+      ∩ Parcels2025/2. Soft taxdistric='3' (~120) secondary.
+    layers:
+      - role: parcels
+        name: Parcels2025/2 spatial Geneva
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: totalacres
+        coverage: city-only
+        fieldMap:
+          Parcel_No: parcelId
+          curr_val: tax.marketValue
+          zoningcode: zoning
+        notes: County WinGAP + Geneva town limits.
+        status: usable
+      - role: zoning
+        name: Parcels2025/2 zoningcode spatial Geneva
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          zoningcode: zoning
+        notes: Spatial clip.
+        status: usable
+    gaps:
+      - "No Town-of-Geneva separate parcel/CAMA REST."
+    status: usable
+
+gaps:
+  - "No usable REST sale history — sale_* fields on Parcels2025/2 are empty (counts 0); use qPublic AppID=680 Sales Search HTML."
+  - "No separate FLU FeatureServer — zoningcode is Euclidean only."
+  - "No separate county zoning polygon FS beyond parcel zoningcode attribute."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/talbot public for humans; TalbotCountyGA_WFS 404."
+  - "REJECT Talbot County MD (gis.talbotdes.org / Critical Area experience); REJECT paid Regrid/ATTOM/USLandGrid/DynamoSpatial; skip utilities+AADT; no emails/phones; skip apprname/alternate/land_appr PII."
+
+license: >
+  River Valley Regional Commission RVRC_ELA AGOL org Ug5xGQbHsD8zuZzM — Parcels2025
+  Parcel_Regions_w_WinGAP/2 (serviceItemId 29ccc8c6e14041f38f1a71b2f276bee0),
+  CityLimits_Talbot/0, Talbot_CityLimits/0, RVRCRegion1. Assessor qPublic
+  App=TalbotCountyGA / AppID=680 LayerID=11370 (qpublic.net/ga/talbot;
+  talbotcountyga.org). Attribution Talbot County Board of Assessors / RVRC GIS.
+  Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=680&LayerID=11370&PageTypeID=2
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=680&LayerID=11370&PageTypeID=1
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2 count
+    6692; extent center [['13263', 'Talbot County']]; sample [['13263', 'Talbot County']]. No change to
+    field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Geneva town"
+      level: city
+      parentFips: "13263"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Junction City town"
+      level: city
+      parentFips: "13263"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Talbotton city"
+      level: city
+      parentFips: "13263"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Woodland city"
+      level: city
+      parentFips: "13263"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Talbot' AND aadt>0
+    altFilter: name LIKE '263-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 263-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 72
+    maxAadt: 8290
+    geoCheck: 71/72 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 6625
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: sale_val=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 6625
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=talbotCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=680&LayerID=11370&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 005 00301
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=talbotCountyGA&Layer=Parcels&PageType=Report&KeyValue=005%2000301
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?AppID=680&LayerID=11370&PageTypeID=1
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Geneva town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Junction City town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Talbotton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Woodland city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

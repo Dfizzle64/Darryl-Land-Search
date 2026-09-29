@@ -1,0 +1,422 @@
+state: GA
+jurisdiction: Mitchell County
+fips: "13205"
+level: county
+markets: [Albany]
+
+layers:
+  - role: parcels
+    name: "Mitchell County parcels 20-50 ac subset (utility/site-selection)"
+    restUrl: https://services3.arcgis.com/aWsj5IRJJyfqnzyv/arcgis/rest/services/MitchellCounty_UtilityandParcels/FeatureServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: "TOTAL_ACRE"
+    coverage: sample
+    parcelIdField: "PIN"
+    liveCount: 624
+    liveCount5to150ac: null
+    geoCheck: "extent center [['13205', 'Mitchell County']]; sample [['13205', 'Mitchell County']]; extent WGS84 [-84.4808, 31.0745, -83.9961, 31.4363]"
+    fieldMap:
+      PIN: "parcelId"
+      OWNER: "ownerName"
+      TOTAL_ACRE: "acreage"
+      CALC_ACRE: "acreageGis"
+      LEGAL_DESC: "legalDescription"
+    notes: >
+      pass1 2026-09-28: Only acreage-band subsets are public: MitchellCounty_UtilityandParcels layers 11
+      (20-50 ac, 624), 12 (51-100, 536), 13 (100-150, 328) plus no-wetland variants 8-10. No full county
+      landbase; parcels 5-20 ac missing. Usable for 20-150 ac screening only - union layers 11+12+13 (1488
+      parcels). PIN + OWNER + TOTAL_ACRE.
+    status: partial
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Mitchell County GA public cadastral parcel FeatureServer/MapServer
+      recovered (2026-09-24). Official human viewer = qPublic/Beacon App=MitchellCountyGA /
+      AppID=937 LayerID=18309 MapKey=PARCEL_NO (qpublic.net/ga/mitchell; linked from
+      mitchellcountyga.net tax assessor; seat Camilla GA 31730). Cloudflare/bot 403 blocks
+      automated Application.aspx; qpublicaux confirms Search PageID=8169 / Report PageID=8171
+      KeyValue={PARCEL_NO} and interactive Map PageTypeID=1. Beacon LayerView includes
+      County Zoning / Yearly Sales tiles on Schneider ServerId=31601 — NOT a public REST
+      endpoint (no MitchellCountyGA_WFS on wfs.schneidercorp.com; only MitchellCountyIA_WFS
+      Iowa lookalike — REJECT). SWGRC AGOL (jhamilton@swgrc) has Decatur Parcels012924 etc.
+      but NO Mitchell folder; SGRC alma folders exclude Mitchell (SWGA / SWGRC territory).
+      REJECTED: mapping.mitchellcounty.org / mapping.mitchellcountync.gov WebMap Parcels
+      (Mitchell NC — Spruce Pine / McDowell County Line / NC StatePlane 102719 — WRONG
+      state). REJECTED: Mitchell SD / paid Regrid/ATTOM/DynamoSpatial/Equator. GEO-VERIFY
+      GEORGIA: Census FIPS 13205 Camilla ~-84.21,31.23 / Pelham ~-84.15,31.13 — SW Georgia
+      Albany MSA (NOT Mitchell NC ~Bakersville; NOT Mitchell SD). Parcel/owner/tax/sale via
+      qPublic HTML only until a live county/RC REST appears.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via qPublic App=MitchellCountyGA
+      HTML. Deep-link KeyValue={PARCEL_NO}:
+      Application.aspx?AppID=937&LayerID=18309&PageTypeID=4&PageID=8171&KeyValue={PARCEL_NO}
+      (also App=MitchellCountyGA&Layer=Parcels&PageType=Report&KeyValue=). Tax Estimator
+      companion PageID=8210 (not parcel CAMA geometry).
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search / Sales List HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer qPublic Sales Search PageID=8208 / Sales List
+      PageID=8207 HTML AppID=937. Yearly Sales is Beacon map overlay only — not queryable
+      FeatureServer. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — PDF zoning map + Beacon overlay only (no FeatureServer)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Mitchell County Euclidean zoning FeatureServer found. Human PDF:
+      qpublic.net/ga/mitchell/docs/Mitchell-Zoning-Map.pdf (linked from qPublic search).
+      Beacon "County Zoning" LayerID=18433 MapServerLayerId=9 on private Schneider server
+      — not public REST. Comp-plan / city zoning PDFs may exist — not machine-readable REST.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU/CharacterAreas FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Mitchell FutureLandUse / CharacterAreas FeatureServer recovered (2026-09-24).
+      Comp Plan PDF gap. Zoning PDF is not FLU.
+    status: gap
+
+municipalities:
+  - name: Camilla
+    level: city
+    parentFips: "13205"
+    joinToCountyParcels: >
+      No county parcel REST to join — city filter blocked until geometry source exists.
+      Soft: Camilla city limits ~-84.21,31.23 when parcels available; postal CITY never sole
+      municipality filter.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Camilla-owned public zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Camilla FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic when REST appears
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city-only CAMA FeatureServer — qPublic AppID=937 HTML countywide.
+        status: gap
+    gaps:
+      - "No Camilla city-owned parcel/zoning/FLU FeatureServer."
+    status: gap
+
+  - name: Pelham
+    level: city
+    parentFips: "13205"
+    joinToCountyParcels: >
+      No county parcel REST. Soft spatial Pelham ~-84.15,31.13 when parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Pelham-owned zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Pelham FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic only.
+        status: gap
+    gaps:
+      - "No Pelham city-owned GIS REST."
+    status: gap
+
+  - name: Baconton
+    level: city
+    parentFips: "13205"
+    joinToCountyParcels: >
+      No county parcel REST. Soft spatial Baconton when parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Baconton zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Baconton FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic only.
+        status: gap
+    gaps:
+      - "No Baconton city-owned GIS REST."
+    status: gap
+
+  - name: Sale City
+    level: city
+    parentFips: "13205"
+    joinToCountyParcels: >
+      No county parcel REST. Soft spatial Sale City when parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sale City zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sale City FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic only.
+        status: gap
+    gaps:
+      - "No Sale City city-owned GIS REST."
+    status: gap
+
+gaps:
+  - "No public county parcel geometry REST — qPublic AppID=937 HTML/map only; MitchellCountyGA_WFS 404; SWGRC/SGRC no Mitchell parcel folder."
+  - "No REST tax.marketValue / assessedValue / owner / situs — qPublic digest HTML AppID=937 LayerID=18309."
+  - "No REST lastSale.price/date — qPublic Sales Search / Sales List HTML only."
+  - "No zoning/FLU FeatureServer — Mitchell-Zoning-Map.pdf + Beacon County Zoning overlay only."
+  - "REJECTED Mitchell NC mapping.mitchellcountync.gov / mapping.mitchellcounty.org (NC StatePlane / Spruce Pine); REJECTED MitchellCountyIA_WFS; REJECTED Mitchell SD."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/mitchell + qpublicaux public for humans."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial/Equator; skip utilities+AADT; no emails/phones."
+
+license: >
+  Mitchell County Tax Assessors qPublic (qpublic.net/ga/mitchell) App=MitchellCountyGA /
+  AppID=937 LayerID=18309. County site mitchellcountyga.net. Zoning PDF
+  qpublic.net/ga/mitchell/docs/Mitchell-Zoning-Map.pdf. Attribution Mitchell County Tax
+  Assessor. Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=937&LayerID=18309&PageTypeID=2&PageID=8169
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=MitchellCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: partial
+  summary: >
+    No county-wide public parcel layer found; best partial: Mitchell County parcels 20-50 ac subset
+    (utility/site-selection) https://services3.arcgis.com/aWsj5IRJJyfqnzyv/arcgis/rest/services/Mitchell
+    County_UtilityandParcels/FeatureServer/11 (624). Only acreage-band subsets are public:
+    MitchellCounty_UtilityandParcels layers 11 (20-50 ac, 624), 12 (51-100, 536), 13 (100-150, 328) plus
+    no-wetland variants 8-10. No full county landbase; parcels 5-20 ac missing. Usable for 20-150 ac
+    screening only - union layers 11+12+13 (1488 parcels). PIN + OWNER + TOTAL_ACRE.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+    - "qPublic viewer (Schneider) is HTML/Cloudflare only - no public REST"
+  cities:
+    - name: "Baconton city"
+      level: city
+      parentFips: "13205"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Camilla city"
+      level: city
+      parentFips: "13205"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Pelham city"
+      level: city
+      parentFips: "13205"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Sale City city"
+      level: city
+      parentFips: "13205"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: partial
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Mitchell' AND aadt>0
+    altFilter: name LIKE '205-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 205-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 134
+    maxAadt: 12900
+    geoCheck: 130/134 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: OWNER
+    filledCount: 603
+    restUrl: https://services3.arcgis.com/aWsj5IRJJyfqnzyv/arcgis/rest/services/MitchellCounty_UtilityandParcels/FeatureServer/11
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=MitchellCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=937&LayerID=18309&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: '130'
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=MitchellCountyGA&Layer=Parcels&PageType=Report&KeyValue=130
+    verification: 'pattern-tested: real sample ID from PARCEL; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=MitchellCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Baconton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Camilla city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Pelham city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Sale City city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

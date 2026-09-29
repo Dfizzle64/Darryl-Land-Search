@@ -1,0 +1,325 @@
+state: GA
+jurisdiction: Stewart County
+fips: "13259"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "Stewart Parcels2022 (RVRC on shared RC org)"
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2022/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: "totalacres"
+    coverage: county-wide
+    parcelIdField: "Parcel_No"
+    liveCount: 4068
+    liveCount5to150ac: 875
+    geoCheck: "extent center [['13259', 'Stewart County']]; sample [['13259', 'Stewart County']]; extent WGS84 [-85.0669, 31.9204, -84.6385, 32.2345]"
+    fieldMap:
+      Parcel_No: "parcelId"
+      Realkey: "ownerKey"
+      lastname: "ownerName"
+      address1: "mailingAddress"
+      house_no: "situsNumber"
+      street_nam: "situsStreet"
+      totalacres: "acreage"
+      Draw_Acres: "acreageGis"
+      curr_val: "tax.marketValue"
+      sale_val: "lastSale.price"
+      zoningcode: "zoning"
+    notes: >
+      pass1 2026-09-28: County-wide Stewart GA WinGAP-joined parcels (4068, 2022 vintage) on shared RC org
+      Ug5xGQbHsD8zuZzM (Parcels2022 FeatureServer/0). Owner, situs, totalacres, curr_val, sale_val.
+      Vintage 2022 - Pass 2 refresh check.
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer recovered
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Stewart County GA public parcel FeatureServer/MapServer with
+      cadastral polygons recovered (2026-09-24). RVRC_ELA AGOL org Ug5xGQbHsD8zuZzM
+      has CityLimits_Stewart / Stewart_CityLimits / Stewart_Blocks / Stewart_Tracts /
+      Stewart_Roads / Stewart County webmap 06673d6b8819471cb6377f50a05a290e — NO
+      Stewart parcel CAMA (contrast ParcelsChattCo for neighbor Chattahoochee 13053
+      on same org). Official human CAMA/GIS = qPublic App=StewartCountyGA
+      (qpublic.net/ga/stewart topmenu → Application.aspx?App=StewartCountyGA&Layer=
+      Parcels&PageType=Search; Estimate Taxes ga_tax_estimator.php?county=ga_stewart).
+      Cloudflare/bot 403 blocks automated Application.aspx; public for humans.
+      StewartCountyGA_WFS on wfs.schneidercorp.com returns 404. Rejected RVRC
+      Parcels4_2026_HUB / ParcelsChattCo spatial probe at Lumpkin (-84.80,32.05) —
+      0 hits (wrong county). REJECT paid Regrid/ATTOM/DynamoSpatial. GEO-VERIFY
+      GEORGIA FIPS 13259: Stewart_Blocks STATEFP20='13' COUNTYFP20='259' samples
+      ~-84.865,32.226 / ~-84.823,32.181 / ~-84.806,32.049; CityLimits_Stewart
+      Lumpkin INTPT ~-84.798,+32.048 / Richland ~-84.662,+32.089; webmap extent
+      ~[-85.24,31.85]–[-84.22,32.31] — west-central GA seat Lumpkin (NOT Stewart
+      County TN Fort Donelson / Dover ~-87.8,36.5; NOT Stewart FL lookalikes).
+      Skip utilities+AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via qPublic
+      App=StewartCountyGA HTML only. Deep-link KeyValue={parcelId}:
+      Application.aspx?App=StewartCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}.
+      Tax estimator: qpublic7.qpublic.net/ga_tax_estimator.php?county=ga_stewart.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer qPublic Sales Search / Sales List HTML
+      App=StewartCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no public county Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Stewart County GA zoning REST found (2026-09-24). RVRC Stewart layers are
+      census blocks/tracts/roads/city limits only — not Euclidean zoning. Comp Plan /
+      Impact Planning PDF item on RVRC_ELA only.
+    status: gap
+
+  - role: flu
+    name: null — no public county FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Stewart County Future Land Use / Character Areas FeatureServer recovered
+      (2026-09-24). Comp Plan / Impact Planning PDF gap.
+    status: gap
+
+  - role: other
+    name: Stewart_Blocks + CityLimits_Stewart (RVRC scaffold)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Stewart_Blocks/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      GEOID20: blockGeoid
+      COUNTYFP20: countyFp
+    notes: >
+      2020 census blocks (STATEFP20=13 COUNTYFP20=259 = FIPS 13259; live count 624).
+      NOT parcels — use only for county extent / geo-verify. Twin Stewart_Tracts /
+      Stewart_Roads. Preferred municipality polygons: CityLimits_Stewart/0 NAME=
+      Lumpkin / Richland. Companion Stewart_CityLimits (legacy CITY=Richland + blank).
+      Public webmap: arcgis.com mapviewer webmap=06673d6b8819471cb6377f50a05a290e.
+    status: usable
+
+municipalities:
+  - name: Lumpkin
+    level: city
+    parentFips: "13259"
+    joinToCountyParcels: >
+      Spatial CityLimits_Stewart/0 NAME='Lumpkin' GEOID=1347980 (~-84.798,32.048)
+      when county parcels exist; soft situs Lumpkin GA 31815. County seat.
+    layers:
+      - role: parcels
+        name: null — county qPublic HTML + spatial Lumpkin limits
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Lumpkin-owned CAMA FS — county qPublic App=StewartCountyGA HTML.
+        status: gap
+      - role: zoning
+        name: null — no Lumpkin zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Lumpkin city zoning REST found.
+        status: gap
+    gaps:
+      - "No Lumpkin city-owned parcel/zoning/FLU REST — RVRC CityLimits_Stewart + county qPublic HTML."
+      - "Do NOT confuse with Lumpkin County GA (FIPS 13187 / Dahlonega) — different county."
+    status: partial
+
+  - name: Richland
+    level: city
+    parentFips: "13259"
+    joinToCountyParcels: >
+      Spatial CityLimits_Stewart/0 NAME='Richland' GEOID=1365016 (~-84.662,32.089);
+      soft situs Richland GA 31825.
+    layers:
+      - role: parcels
+        name: null — county qPublic + spatial Richland
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Richland-owned CAMA REST.
+        status: gap
+      - role: zoning
+        name: null — no Richland zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Richland city zoning REST found.
+        status: gap
+    gaps:
+      - "Richland city limits usable (RVRC); parcel/FLU still county qPublic HTML."
+    status: partial
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Stewart County GA — qPublic App=StewartCountyGA HTML only."
+  - "StewartCountyGA_WFS 404; Application.aspx Cloudflare/bot 403 automated; public for humans (qpublic.net/ga/stewart)."
+  - "RVRC has Stewart census blocks/tracts/roads/city limits only — no parcel CAMA FS (gap vs Chattahoochee ParcelsChattCo neighbor)."
+  - "REJECT Stewart County TN (~-87.8,36.5 Fort Donelson/Dover); REJECT Lumpkin County GA FIPS 13187 lookalikes when filtering city seat; REJECT paid Regrid/ATTOM."
+  - "Skip utilities+AADT; no emails/phones."
+
+license: >
+  Stewart County Tax Assessor qPublic App=StewartCountyGA (qpublic.net/ga/stewart;
+  stewartcountyga.gov). River Valley Regional Commission RVRC_ELA AGOL org
+  Ug5xGQbHsD8zuZzM — CityLimits_Stewart; Stewart_Blocks / Stewart_Tracts /
+  Stewart_Roads; Stewart County webmap 06673d6b8819471cb6377f50a05a290e (census/
+  roads/city limits only — no parcels). Attribution Stewart County Tax Assessor /
+  RVRC GIS. Public HTML + census scaffold only; no emails/phones; no paid vendors;
+  skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=StewartCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=StewartCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: usable
+  summary: >
+    Stewart Parcels2022 (RVRC on shared RC org):
+    https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2022/FeatureServer/0 -
+    live count 4068 (5-150 ac: 875), parcel ID field Parcel_No. Geography verified against TIGER county
+    polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Lumpkin city"
+      level: city
+      parentFips: "13259"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Richland city"
+      level: city
+      parentFips: "13259"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Stewart' AND aadt>0
+    altFilter: name LIKE '259-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 259-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 39
+    maxAadt: 6740
+    geoCheck: 39/39 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 3946
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2022/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: sale_val=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 3946
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2022/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=stewartCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=stewartCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20001
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=StewartCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Lumpkin city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Richland city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

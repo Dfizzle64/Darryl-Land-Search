@@ -1,0 +1,541 @@
+state: GA
+jurisdiction: Cobb County
+fips: "13067"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide nightly CAMA parcels (owner, mailing, situs, acres, FMV/ASV)
+  - role: parcels
+    name: taxassessorsdaily CobbParcels
+    restUrl: https://gis.cobbcounty.gov/gisserver/rest/services/tax/taxassessorsdaily/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PARID: parcelIdAlt
+      ACRES: acreage
+      ACRE_DEEDED: acreageDeeded
+      LAND_SQFT: landSqft
+      OWNER_NAM1: ownerName
+      OWNER_NAM2: ownerName2
+      OWNER_ADDR: mailingAddress
+      OWNER_CITY: mailingCity
+      OWNER_STAT: mailingState
+      OWNER_ZIP: mailingZip
+      SITUS_ADDR: situsAddress
+      FMV_TOTAL: tax.marketValue
+      FMV_LAND: tax.landMarketValue
+      FMV_BLDG: tax.improvementMarketValue
+      ASV_TOTAL: tax.assessedValue
+      ASV_LAND: tax.landAssessedValue
+      ASV_BLDG: tax.improvementAssessedValue
+      TAXDIST: taxDistrict
+      CLASS: dorCode
+    notes: >
+      Preferred county-wide parcel+CAMA source for land search enrichment. Live count 279635
+      (2026-09-23); ACRES 5–150 band ≈4859 (matches thin in-app ~4.7k footprint). Spatial
+      reference Web Mercator (wkid 102100 / 3857) on this service; maxRecordCount 1000.
+      Geo-verified WGS84 samples ~-84.51,34.07 (northeast Cobb / Lee Waters Rd) and
+      ~-84.68,34.06 (Lake Allatoona) — Cobb County GA, Atlanta MSA NW.
+      Rich nightly CAMA on polygons: owner, mailing, situs, ACRES, FMV_*/ASV_* (ASV≈40% of FMV
+      on taxable samples — GA assessment), CLASS, TAXDIST. NO zoning / NO sale fields on this
+      layer — join PropertySearch (Zoning/FLU/NAME) and ParcelSales table (role=sales) on PIN.
+      Mirror with similar schema/count: cobbpublic/Parcels/MapServer/3 (count 283363) and
+      cobbpublic/PropertySearch/MapServer/0 (geometry+jurisdiction/zoning/FLU, no tax values).
+      Prefer this MapServer when a single-layer parcel+owner+tax source is needed.
+      Enrichment vs thin feed: adds ownerName, mailing*, situs, tax.marketValue/assessedValue,
+      dorCode (CLASS), taxDistrict — thin coverage likely geometry+acreage only.
+    status: usable
+
+  - role: parcels
+    name: PropertySearch (jurisdiction + zoning + FLU attrs on polygons)
+    restUrl: https://gis.cobbcounty.gov/gisserver/rest/services/cobbpublic/PropertySearch/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      SITUS_ADDR: situsAddress
+      ZIP_CODE: situsZip
+      NAME: municipality
+      Zoning: zoning
+      Future_LandUse: flu
+      TAX_DIST: taxDistrict
+      CLASS: dorCode
+      Land_Dist: landDistrict
+      Land_Lot: landLot
+    notes: >
+      Live count 277710. Parcel polygons with joined NAME (city/unincorporated), Zoning, and
+      Future_LandUse (coarse FLU_DESCR1 family: Residential/Commercial/…). NO owner/tax values —
+      join taxassessorsdaily on PIN. Zoning IS NOT NULL ≈209275 (essentially all Unincorporated
+      + Mableton; city parcels mostly null — prefer city zoning REST where available).
+      NAME counts: Unincorporated 172200, Mableton 26399, Smyrna 23556, Marietta 22573,
+      Kennesaw 12007, Acworth 9112, Powder Springs 7747, Austell 4086.
+      Layer also exposes Comm_Phone / Comm_Email — DO NOT scrape or map (standing order).
+      Useful enrichment join for municipality filter + unincorporated zoning/FLU attributes.
+    status: partial
+
+  - role: tax
+    name: taxassessorsdaily CobbParcels (CAMA values on polygons)
+    restUrl: https://gis.cobbcounty.gov/gisserver/rest/services/tax/taxassessorsdaily/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      FMV_TOTAL: tax.marketValue
+      FMV_LAND: tax.landMarketValue
+      FMV_BLDG: tax.improvementMarketValue
+      ASV_TOTAL: tax.assessedValue
+      ASV_LAND: tax.landAssessedValue
+      ASV_BLDG: tax.improvementAssessedValue
+      TAXDIST: taxDistrict
+      CLASS: dorCode
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons (not a separate service).
+      FMV_TOTAL>0 ≈278683; ASV_TOTAL>0 ≈273886. Sample ASV/FMV ≈0.40 (GA 40% assessment).
+      No distinct tax.taxableValue / exemption breakdown on REST. Assessor HTML: qPublic AppID=1051.
+      TAXDIST codes on this layer (e.g. 9, M, 6, 4, 3, 1, 5, 2) differ slightly from PropertySearch
+      TAX_DIST (1=Acworth, 2=Austell, 3=Kennesaw, 4=Marietta, 5=Powder Springs, 6=Smyrna,
+      9=Unincorporated/Mableton) — prefer PropertySearch NAME for municipality filter.
+    status: usable
+
+  - role: sales
+    name: taxassessorsmapwm ParcelSales table
+    restUrl: https://gis.cobbcounty.gov/gisserver/rest/services/tax/taxassessorsmapwm/MapServer/41
+    layerId: 41
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PRICE: lastSale.price
+      SALEDT: lastSale.date
+      STEB: lastSale.qualified
+      SALEVAL: lastSale.saleValCode
+      SALETYPE: lastSale.saleType
+      INSTRTYP: lastSale.instrumentType
+      APRTOT: lastSale.appraisedTotal
+      ASR: lastSale.assessmentSalesRatio
+      NBHD: neighborhood
+    notes: >
+      Non-spatial multi-sale history table. Live count 938727; PRICE>0 ≈681526; PRICE>0 AND
+      STEB='FMV' ≈390619 (2026-09-23). Join to parcels on PIN; take latest SALEDT per PIN as
+      lastSale. Prefer STEB='FMV' as arms-length / fair-market signal for lastSale.qualified
+      (other STEB codes are numeric reject/condition codes). SALEVAL domain includes 00, 08, LP,
+      MC, FC, 17, RE, etc. — not a simple Q/U flag. SALETYPE 1/2/3 sparse. maxRecordCount 1000.
+      No geometry — attribute join only. Major enrichment vs thin feed (sales absent on parcel layer).
+    status: usable
+
+  - role: zoning
+    name: CobbZoningData Zoning Districts (unincorporated + Mableton footprint)
+    restUrl: https://gis.cobbcounty.gov/gisserver/rest/services/comdev/CobbZoningData/MapServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZoningDistrict: zoning
+      ZoningDistrictLabel: zoningLabel
+      PetitionNumber: zoningPetition
+      YearPetitionNumber: zoningPetitionYear
+      StipulationsFlag: zoningStipulationsFlag
+      VerticalZoning: zoningVertical
+      LandDistrict: landDistrict
+      LandLot: landLot
+    notes: >
+      Preferred county zoning POLYGON layer (Community Development). Live count 8468.
+      SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet (102667/2240); maxRecordCount 2000.
+      Official for unincorporated Cobb; Mableton (new city) still largely on this county schema
+      (PropertySearch Zoning filled for all 26399 Mableton parcels). City parcels (Marietta,
+      Smyrna, Kennesaw, etc.) are mostly outside this layer — use city REST (see municipalities).
+      Equivalent FeatureServer: cobbpublic/cobbzoningdatawm/FeatureServer/6 (same count 8468).
+      Spatial-join to parcels (no PIN on this layer). Parcel attr Zoning on PropertySearch is
+      alternate for unincorporated/Mableton. Lookup table ZZONINGINFORMATION
+      (planningzoning/MapServer/20, 53 district defs + municode links) for district names.
+      Zoning District Other layer 7 count 590 (overlays/other).
+    status: usable
+
+  - role: flu
+    name: Future_Land_Use (county FLUM)
+    restUrl: https://gis.cobbcounty.gov/gisserver/rest/services/comdev/Future_Land_Use/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      FLU_ABBR2: flu
+      FLU_DESCR2: fluDescription
+      FLU_DESCR1: fluCategory
+      FLU_CODE1: fluCode1
+      FLU_CODE2: fluCode2
+      FLU_ABBR3: fluAbbr3
+      ACREAGE: acreage
+    notes: >
+      County Future Land Use Map polygons. Live count 2849. Prefer FLU_ABBR2 (LDR, PRC, PI, NAC,
+      RAC, MDR, CAC, VLDR, TCU, HDR, RR, IC, …) over coarse Future_LandUse string on PropertySearch.
+      Spatial-join to parcels. Covers unincorporated + Mableton well; city FLU should prefer
+      city layers (Marietta FLU field, Smyrna FLU_2040, Powder Springs Character Areas, Kennesaw FLU).
+      Mirror MapServer: comdev/Future_Land_Use/MapServer/0; also planningzoning/MapServer/0.
+    status: usable
+
+  - role: other
+    name: existingLanduse (parcel-tied existing land use)
+    restUrl: https://gis.cobbcounty.gov/gisserver/rest/services/cobbpublic/existingLanduse/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRE_CALC
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      CODE: landUseCode
+      DESCRIPTION: landUseDescription
+      LBCS: lbcs
+      CLASS: dorCode
+      ACRE_CALC: acreage
+    notes: >
+      Live count 268316. PIN-joinable existing land use. CODE domain: RES≈160053, CITY≈100496
+      (city stub — no detailed class), COM, CIV, PRC, TCU, MX, IND. Prefer for unincorporated
+      land-use context; CITY-coded rows are not informative. Not FLU.
+    status: partial
+
+  - role: other
+    name: openData Cobb_Cities / comdev City_Limit
+    restUrl: https://gis.cobbcounty.gov/gisserver/rest/services/openData/Cobb_Cities/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+    notes: >
+      Live count 7 city polygons: Austell, Kennesaw, Marietta, Acworth, Powder Springs, Smyrna,
+      Mableton. Prefer comdev/City_Limit/FeatureServer/3 for CityCode (AU/KE/MA/AC/PS/SM/M/CC)
+      plus Unincorporated (CityCode=CC) — count 8. City-poly↔parcel join = spatial intersect or
+      PropertySearch NAME / taxassessorsdaily TAXDIST decode.
+    status: usable
+
+municipalities:
+  - name: Marietta
+    level: city
+    parentFips: "13067"
+    joinToCountyParcels: >
+      Attribute: Parcels_Public_View DLP ≈ county PIN (verified 17020900210). Also spatial
+      intersect City_Limit NAME='Marietta' (CityCode=MA); PropertySearch NAME='Marietta' ≈22573.
+    layers:
+      - role: parcels
+        name: Marietta Parcels Public View (city zoning+FLU on parcels)
+        restUrl: https://services2.arcgis.com/OKqf9cl3ItPM5Rid/arcgis/rest/services/Parcels_Public_View/FeatureServer/138
+        layerId: 138
+        geometry: polygon
+        auth: none
+        acreageField: ACREAGE
+        coverage: city-only
+        fieldMap:
+          DLP: parcelId
+          TAX_ID: parcelIdAlt
+          OWNER: ownerName
+          ADDRESS: situsAddress
+          CITY: situsCity
+          ZIP_CODE: situsZip
+          ACREAGE: acreage
+          ZONING: zoning
+          FLU: flu
+          GLU: landUseCode
+          IN_CITY: inCity
+        notes: >
+          Live count 21484. City of Marietta parcel extract with ZONING (e.g. PRD_SF) and FLU
+          (e.g. MDR) on polygons — preferred Marietta-local zoning/FLU source. Geo-verified
+          ~-84.56,33.92. Prefer county taxassessorsdaily for FMV/ASV/sales; use this for city
+          zoning/FLU. On-prem gis.mariettaga.gov / secure.mariettaga.gov ExternalViewer2 and
+          InternalViewer MapServers returned "not started" / Cloudflare block from research box
+          (2026-09-23) — AGOL Parcels_Public_View is the live public path.
+        status: usable
+    gaps:
+      - "No separate Marietta Zoning FeatureServer distinct from Parcels_Public_View ZONING attr; on-prem Viewers MapServers not started."
+      - "geohub.mariettaga.gov zoning search federates wrong-state lookalikes (Sampson NC, Orange VA) — do not wire those URLs."
+    status: usable
+
+  - name: Smyrna
+    level: city
+    parentFips: "13067"
+    joinToCountyParcels: >
+      OpenGovREST Property Lines PIN / MAT mbl_join ≈ county PIN. Spatial intersect
+      City_Limit NAME='Smyrna' (CityCode=SM); PropertySearch NAME='Smyrna' ≈23556.
+    layers:
+      - role: zoning
+        name: Smyrna OpenGovREST Zoning
+        restUrl: https://services2.arcgis.com/hE9igMm8RoNeQRbh/arcgis/rest/services/OpenGovREST/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+          Name: zoningDescription
+        notes: >
+          Live count 1275. City of Smyrna GA zoning polygons (e.g. ROW, RM-12). Geo-verified
+          ~-84.51,33.89 — Cobb GA (NOT maps.townofsmyrna.org which is Smyrna TN).
+        status: usable
+      - role: flu
+        name: Smyrna OpenGovREST Future Land Use
+        restUrl: https://services2.arcgis.com/hE9igMm8RoNeQRbh/arcgis/rest/services/OpenGovREST/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FLU_2040: flu
+          FULM_Description: fluDescription
+        notes: "Live count 1067. FLU_2040 codes with descriptions. Spatial-join to parcels."
+        status: usable
+      - role: parcels
+        name: Smyrna OpenGovREST Property Lines
+        restUrl: https://services2.arcgis.com/hE9igMm8RoNeQRbh/arcgis/rest/services/OpenGovREST/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          Full_Address: situsAddress
+        notes: >
+          Live count 20643 city property lines (PIN join). MAT layer 0 is address points with
+          owner/zoning (31126) — useful but point geometry; prefer county parcels for outlines.
+          gis.smyrnaga.gov/smyrnagis Parcels MapServer returned 503 during verify — AGOL OpenGovREST preferred.
+        status: partial
+    gaps:
+      - "LandUse_public FeatureServer layers exist but live count 0 — do not wire."
+      - "REJECTED lookalike: maps.townofsmyrna.org (Smyrna TN; sample ~-86.49,36.02) — wrong state."
+    status: usable
+
+  - name: Kennesaw
+    level: city
+    parentFips: "13067"
+    joinToCountyParcels: >
+      Zoning_by_Parcel PIN ≈ county PIN; spatial intersect City_Limit NAME='Kennesaw' (KE);
+      PropertySearch NAME='Kennesaw' ≈12007.
+    layers:
+      - role: zoning
+        name: Kennesaw Zoning Polygons (Zoning City)
+        restUrl: https://services2.arcgis.com/XwGh5SYpBlXQGJEB/arcgis/rest/services/Zoning_Polygons/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: CALCAcres
+        coverage: city-only
+        fieldMap:
+          Zoning_1: zoning
+          Classification: zoningDescription
+          Residential_Housing_Type: zoningResidentialType
+        notes: >
+          Live count 248 zoning-area polygons. Spatial-join to parcels. Hub:
+          gis-cityofkennesaw.hub.arcgis.com (owner KennePaul / cityofkennesaw).
+        status: usable
+      - role: zoning
+        name: Kennesaw Zoning by Parcel / Existing Land Use 2023
+        restUrl: https://services2.arcgis.com/XwGh5SYpBlXQGJEB/arcgis/rest/services/Zoning_by_Parcel/FeatureServer/30
+        layerId: 30
+        geometry: polygon
+        auth: none
+        acreageField: CALCAcres
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          Zoning_1: zoning
+          FLU: flu
+          Classification: landUseDescription
+          LUC: dorCode
+          CALCAcres: acreage
+        notes: >
+          Live count 11485 parcel polygons with Zoning_1 + FLU (e.g. CAC) + LUC. Despite service
+          title "Zoning by Parcel", layer name is Existing Land Use (2023) — still the best
+          PIN-joinable city zoning/FLU attribute extract. Geo-verified ~-84.59,34.05.
+        status: usable
+    gaps: []
+    status: usable
+
+  - name: Powder Springs
+    level: city
+    parentFips: "13067"
+    joinToCountyParcels: >
+      Character_Areas PIN / Parcels PIN ≈ county PIN; spatial City_Limit NAME='Powder Springs'
+      (PS); PropertySearch NAME='Powder Springs' ≈7747.
+    layers:
+      - role: zoning
+        name: Powder Springs Zoning_2025
+        restUrl: https://services6.arcgis.com/hpvhAmRP1z50gTbO/ArcGIS/rest/services/Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Acres
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          CaseNumber: zoningCase
+        notes: >
+          Live count 98 zoning polygons (e.g. MDR, R20). Geo-verified ~-84.69,33.87 Cobb GA.
+          SR 102667/2240. City of Powder Springs AGOL org hpvhAmRP1z50gTbO.
+        status: usable
+      - role: flu
+        name: Powder Springs Character_Areas (FLU 2022)
+        restUrl: https://services6.arcgis.com/hpvhAmRP1z50gTbO/ArcGIS/rest/services/Character_Areas_(FLU_2022)/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          F2022_CA: flu
+          Zoning: zoning
+          PIN: parcelId
+          PROPLOC: situsAddress
+          ACRES: acreage
+        notes: >
+          Live count 7397 parcel-tied character areas (e.g. Suburban Residential Neighborhood)
+          with PIN join + Zoning. Prefer over empty/broken FLU FeatureServer root (Invalid URL
+          on /FLU/FeatureServer/0 during verify — Character_Areas is the live FLU proxy).
+        status: usable
+      - role: parcels
+        name: Powder Springs Parcels (city extract)
+        restUrl: https://services6.arcgis.com/hpvhAmRP1z50gTbO/ArcGIS/rest/services/Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          PARID: parcelIdAlt
+          SITUS_ADDR: situsAddress
+          ACRES: acreage
+          Jurisdiction: municipality
+        notes: >
+          Live count 16951 (broader than city core; includes some outside Jurisdiction). Prefer
+          county taxassessorsdaily for CAMA; city clip for scoped apps. ParcelsJanuary2025
+          alternate count 7560.
+        status: partial
+    gaps:
+      - "Named FLU/FeatureServer root returned Invalid URL — use Character_Areas_(FLU_2022) instead."
+    status: usable
+
+  - name: Mableton
+    level: city
+    parentFips: "13067"
+    joinToCountyParcels: >
+      Spatial intersect City_Limit NAME='Mableton' (CityCode=M); PropertySearch NAME='Mableton'
+      ≈26399. New city (2023) carved from unincorporated — county zoning/FLU attrs still filled
+      on PropertySearch for all Mableton parcels.
+    layers:
+      - role: zoning
+        name: Mableton Zoning Districts (county-published city layer)
+        restUrl: https://services.arcgis.com/HYLRafMc4Ux6DA8c/arcgis/rest/services/Mableton_Zoning_Districts/FeatureServer/47
+        layerId: 47
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoningDistrict: zoning
+          PetitionNumber: zoningPetition
+          YearPetitionNumber: zoningPetitionYear
+          StipulationsFlag: zoningStipulationsFlag
+          LandDistrict: landDistrict
+          LandLot: landLot
+        notes: >
+          Live count 1714. Same schema family as county CobbZoningData/6; published by Cobb GIS
+          (jon-paul.faix_cobbcountyga) for Mableton. Geo-verified ~-84.64,33.87. Prefer this
+          for Mableton district boundaries; PropertySearch Zoning also populated citywide.
+        status: usable
+    gaps:
+      - "cobbpublic/MabletonTownCenter_FLU/MapServer/0 live count 0 — stub; use county Future_Land_Use spatial join."
+      - "No independent City-of-Mableton-owned GIS org found beyond county-hosted layers."
+    status: usable
+
+  - name: Acworth
+    level: city
+    parentFips: "13067"
+    joinToCountyParcels: >
+      Spatial intersect City_Limit NAME='Acworth' (AC); PropertySearch NAME='Acworth' ≈9112;
+      TAX_DIST≈'1' dominant.
+    layers: []
+    notes: >
+      No public city ArcGIS FeatureServer/MapServer for zoning/FLU found (2026-09-23). City posts
+      zoning as PDF (revize CMS). County PropertySearch Zoning/FLU mostly null inside Acworth —
+      zoning gap for city parcels. Use county parcels + city poly for geography only.
+    status: gap
+
+  - name: Austell
+    level: city
+    parentFips: "13067"
+    joinToCountyParcels: >
+      Spatial intersect City_Limit NAME='Austell' (AU); PropertySearch NAME='Austell' ≈4086;
+      TAX_DIST≈'2' dominant. Note: Austell also spans Douglas County — Cobb card covers Cobb side only.
+    layers: []
+    notes: >
+      austellga.gov GIS page exists but no public zoning/FLU FeatureServer found. County
+      PropertySearch Zoning mostly null in city — gap. Multi-county city: Douglas side out of scope.
+    status: gap
+
+gaps:
+  - "taxassessorsdaily parcels have rich owner/tax but NO zoning and NO sales — must join PropertySearch (Zoning/FLU/NAME) and ParcelSales (/41) on PIN for full enrichment."
+  - "County Zoning Districts (8468) + PropertySearch Zoning cover unincorporated + Mableton; Marietta/Smyrna/Kennesaw/Powder Springs have city REST; Acworth and Austell lack public city zoning/FLU REST (gap)."
+  - "PropertySearch Future_LandUse is coarse category (Residential/Commercial/…); prefer comdev Future_Land_Use FLU_ABBR2 polygons or city FLU layers for plan codes."
+  - "existingLanduse CODE='CITY' (~100k) is a stub for municipal parcels — not a real land-use class."
+  - "ParcelSales STEB='FMV' is the practical qualified filter; no Q/U Sale_Quality field like Chatham. Multi-row history per PIN — take max(SALEDT)."
+  - "No distinct tax.taxableValue; ASV is GA 40% assessed. Exempt parcels often ASV_TOTAL=0 with FMV>0."
+  - "PropertySearch exposes Comm_Phone/Comm_Email — do not collect. No paid vendors."
+  - "On-prem Marietta MapServers (ExternalViewer2/InternalViewer) not started; gis.smyrnaga.gov 503; cobbgis.org connection refused — use verified AGOL / gis.cobbcounty.gov endpoints."
+  - "MabletonTownCenter_FLU count 0; named Powder Springs FLU/FeatureServer/0 Invalid URL — use alternates documented above."
+  - "Austell spans Cobb+Douglas — this card is Cobb-side only."
+  - "Rejected lookalikes: maps.townofsmyrna.org (Smyrna TN ~-86.49,36.02); maps.cob.org (City of Boulder CO Grp_Land); geohub.mariettaga.gov federated Sampson County NC Zoning and Orange County VA Zoning; enigma.accgov.com Parcel_Zoning_Types (Athens-Clarke, not Austell/Acworth)."
+  - "qPublic AppID=1051 may CDN/bot-403 automated clients; public for humans. County still sells countywide parcel shapefile commercially — REST used here is free public query."
+  - "Enrichment vs thin in-app (~4.7k in 5–150ac): thin likely geometry+acreage; this card adds owner/mailing/situs, FMV/ASV tax, CLASS, municipality NAME, ParcelSales history, county+city zoning, FLU joins."
+
+license: >
+  Cobb County GIS public ArcGIS Server (gis.cobbcounty.gov/gisserver) — tax/taxassessorsdaily,
+  tax/taxassessorsmapwm ParcelSales, comdev/CobbZoningData + Future_Land_Use + City_Limit,
+  cobbpublic/PropertySearch + existingLanduse + cobbzoningdatawm, openData/Cobb_Cities.
+  Hub: geo-cobbcountyga.hub.arcgis.com / opendata. City of Marietta AGOL (OKqf9cl3ItPM5Rid)
+  Parcels_Public_View; City of Smyrna AGOL (hE9igMm8RoNeQRbh) OpenGovREST; City of Kennesaw
+  (XwGh5SYpBlXQGJEB / KennePaul); City of Powder Springs (hpvhAmRP1z50gTbO); Mableton Zoning
+  via Cobb AGOL (HYLRafMc4Ux6DA8c). qPublic SchneiderCorp AppID=1051 for assessor HTML.
+  Attribution to Cobb County GIS / respective cities. Public fields only; no emails/phones;
+  no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=1051&LayerID=23951&PageTypeID=2&PageID=9967
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "Public Information Researcher"
+  aadt:
+    source: "GDOT / UGA ITOS (OMAT PMED Traffic Data)"
+    restUrl: "https://maps.itos.uga.edu/arcgis/rest/services/GDOT/GDOT_FunctionalClass/MapServer/21"
+    layerId: 21
+    field: "AADT"
+    geography: "state HPMS / traffic segments (polyline)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Public Information Researcher"
+    notes: "Public GDOT FunctionalClass MapServer layer 21 OMAT PMED Traffic Data with AADT; GDOT TADA (drakewell) is interactive/CSV alternative without a simple statewide FeatureServer."

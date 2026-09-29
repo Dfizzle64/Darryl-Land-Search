@@ -1,0 +1,436 @@
+state: GA
+jurisdiction: Chattooga County
+fips: "13055"
+level: county
+markets: [Chattanooga]
+
+layers:
+  - role: parcels
+    name: "Chattooga_Parcels (GMASS 2025 webmap)"
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Chattooga_Webmap_2025_WFL1/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: "ACRES"
+    coverage: county-wide
+    parcelIdField: "MAP_PAR"
+    liveCount: 14501
+    liveCount5to150ac: 3316
+    geoCheck: "extent center [['13055', 'Chattooga County']]; sample [['13055', 'Chattooga County']]; extent WGS84 [-85.5276, 34.2861, -85.1078, 34.5895]"
+    fieldMap:
+      MAP_PAR: "parcelId"
+      PIN: "parcelPin"
+      Realkey: "ownerKey"
+      Owner: "ownerName"
+      House_No: "situsNumber"
+      Road: "situsStreet"
+      Rd_Type: "situsStreetType"
+      ACRES: "acreage"
+      CURR_VAL: "tax.marketValue"
+      Land_Val: "tax.landValue"
+      Class: "dorCode"
+      LEGAL_DESC: "legalDescription"
+    notes: >
+      pass1 2026-09-28: County-wide Chattooga GA parcels (14501) with owner, situs, acres, values on GMASS
+      appraisal org ISpzx3B5ZsVA6e1Z (Chattooga_Webmap_2025_WFL1 layer 3; twin layer 4). Supersedes
+      gap/partial. Alternates: Chattooga_Web_Map_2025_WFL1/3 (14409), services9 eXIsbyIncFwEzqul
+      parcels_zoning/2 (14451).
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — no public county-wide ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Chattooga County GA public county-wide parcel FeatureServer/MapServer
+      recovered (2026-09-24). Official human viewer = qPublic/Beacon App=ChattoogaCountyGA
+      (qpublic.net/ga/chattooga/search.html Accept link → Application.aspx?App=ChattoogaCountyGA
+      &Layer=Parcels&PageType=Search). Cloudflare/bot 403 blocks automated Application.aspx
+      from research box; public for humans. ChattoogaCountyGA_WFS on wfs.schneidercorp.com
+      returns 404. No NWGRC / SGRC / AGOL county parcel org found for full county landbase.
+      Optional academic AOI clip only: Chattooga_Parcels_2026LLLT (see secondary layer) —
+      2572 polys (~partial Lookout Mountain / LLLT AOI; NOT county-wide vs ~14.6k commercial
+      counts). Commercial vendors (Regrid/DynamoSpatial/Equator) rejected.
+      GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13055 CENTLAT +34.4749884 CENTLON
+      -085.3453430 — NW Georgia / Summerville / Chattanooga ring. REJECT Clay lookalikes
+      and any AL/FL Chattooga river corridor confusion; REJECT paid extracts; REJECT
+      chattoogacountygatax.com (DNS fail from research box — tax commissioner, not PA).
+    status: gap
+
+  - role: parcels
+    name: Chattooga_Parcels_2026LLLT (IGT academic AOI clip — NOT county-wide)
+    restUrl: https://services.arcgis.com/UnTXoPXBYERF0OH6/arcgis/rest/services/Chattooga_Parcels_2026LLLT/FeatureServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: sample
+    fieldMap:
+      PARCEL_NO: parcelId
+      F_v_ON: ownerName
+      ACRES: acreage
+      LINK: taxCommissionerHint
+    notes: >
+      Academic Lookout Mountain / LLLT AOI enrichment only (live count 2572; extent WGS84
+      ~-85.53..-85.34 × 34.41..34.59 — correct Chattooga GA geography but partial). Fields
+      are conservation/habitat/outdoor-rec/development scores plus PARCEL_NO / F_v_ON /
+      ACRES. LINK often '//www.chattoogacountygatax.com/taxes' (tax commissioner; DNS fail
+      from box) — NOT qPublic CAMA. Prefer as optional AOI enrichment only; do NOT treat as
+      county landbase. Primary path remains qPublic HTML App=ChattoogaCountyGA.
+    status: partial
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public county-wide REST. Tax/CAMA via qPublic
+      App=ChattoogaCountyGA HTML only. Deep-link KeyValue={parcelId}:
+      Application.aspx?App=ChattoogaCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}.
+      LLLT clip has no value fields.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer qPublic Sales Search / Sales List HTML
+      (App=ChattoogaCountyGA). Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Chattooga County GA Euclidean zoning REST found — planning PDF/staff gap
+      (chattoogacounty.gov Land Development / Comprehensive Plan via NWGRC).
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Chattooga County GA future land use REST found — Comp Plan PDF gap (NWGRC).
+    status: gap
+
+municipalities:
+  - name: Summerville
+    level: city
+    parentFips: "13055"
+    joinToCountyParcels: >
+      No county parcel REST to join — city filter blocked until geometry source exists.
+      County seat Summerville GA (~-85.35,34.48).
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Summerville zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Summerville FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only; LLLT AOI may clip some Summerville fringe only.
+        status: gap
+    gaps:
+      - "No Summerville-owned parcel/zoning/FLU REST; county qPublic HTML only."
+    status: gap
+
+  - name: Trion
+    level: city
+    parentFips: "13055"
+    joinToCountyParcels: No county parcel REST — spatial join blocked.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Trion zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Trion FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Trion-owned zoning/FLU/parcel REST."
+    status: gap
+
+  - name: Lyerly
+    level: city
+    parentFips: "13055"
+    joinToCountyParcels: No county parcel REST — spatial join blocked.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Lyerly zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Lyerly FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Lyerly-owned zoning/FLU/parcel REST."
+    status: gap
+
+  - name: Menlo
+    level: city
+    parentFips: "13055"
+    joinToCountyParcels: No county parcel REST — spatial join blocked.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Menlo zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Menlo FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Menlo-owned zoning/FLU/parcel REST."
+    status: gap
+
+gaps:
+  - "No public county-wide REST parcels/owner/tax/sales/zoning/FLU for Chattooga County GA — qPublic App=ChattoogaCountyGA HTML only."
+  - "ChattoogaCountyGA_WFS 404."
+  - "Chattooga_Parcels_2026LLLT is academic AOI clip (2572) — NOT county-wide landbase."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial/Equator."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Chattooga County Tax Assessor qPublic/Beacon App=ChattoogaCountyGA
+  (qpublic.net/ga/chattooga; chattoogacounty.gov Tax Assessor — Summerville GA 30747).
+  Optional academic LLLT AOI FeatureServer Chattooga_Parcels_2026LLLT (IGT lab). No
+  public county-wide ArcGIS parcel service discovered 2026-09-24. Attribution Chattooga
+  County Tax Assessor. Public HTML + optional AOI; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=ChattoogaCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=ChattoogaCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: partial
+  parcelStatusAfter: usable
+  summary: >
+    Chattooga_Parcels (GMASS 2025 webmap): https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/serv
+    ices/Chattooga_Webmap_2025_WFL1/FeatureServer/3 - live count 14501 (5-150 ac: 3316), parcel ID field
+    MAP_PAR. Geography verified against TIGER county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Lyerly town"
+      level: city
+      parentFips: "13055"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Menlo city"
+      level: city
+      parentFips: "13055"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Summerville city"
+      level: city
+      parentFips: "13055"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Trion town"
+      level: city
+      parentFips: "13055"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Chattooga' AND aadt>0
+    altFilter: name LIKE '055-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 055-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 132
+    maxAadt: 18900
+    geoCheck: 132/132 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - Land_Val
+    - PREV_VAL
+    filledCount: 14389
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Chattooga_Webmap_2025_WFL1/FeatureServer/3
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: Owner
+    filledCount: 14389
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Chattooga_Webmap_2025_WFL1/FeatureServer/3
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=ChattoogaCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: MAP_PAR
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001-001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=ChattoogaCountyGA&Layer=Parcels&PageType=Report&KeyValue=001-001
+    verification: 'pattern-tested: real sample ID from MAP_PAR; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=ChattoogaCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Lyerly town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Menlo city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Summerville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Trion town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

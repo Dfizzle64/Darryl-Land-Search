@@ -1,0 +1,350 @@
+state: GA
+jurisdiction: Echols County
+fips: "13101"
+level: county
+markets: [Valdosta]
+
+layers:
+  - role: parcels
+    name: Echols/echols_parcels Parcel Boundaries — SGRC arcgis MapServer
+    restUrl: https://www.sgrcmaps.com/arcgis/rest/services/Echols/echols_parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PARCELNO: parcelIdAlt
+      REALKEY: ownerKey
+      OWNKEY: ownerKeyAlt
+      LASTNAME: ownerName
+      FIRSTNAME: ownerFirstName
+      MIDDLE: ownerMiddleName
+      ADDRESS1: mailingAddress
+      ADDRESS2: mailingAddress2
+      ADDRESS3: mailingAddress3
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP_1: mailingZip
+      HOUSE_NO: situsNumber
+      STDIRECT: situsStreetDir
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      UNIT: situsUnit
+      TOTALACRES: acreage
+      WOODACRES: acreageWoodland
+      DRWN_ACRE: acreageGis
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      SALE_VAL: lastSale.price
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      DIGSTRAT: dorStrata
+      LAND_TYPE: landType
+      LEGAL_DESC: legalDescription
+      SUBD_NAME: subdivision
+      HOMEEXEMPT: homesteadExempt
+      LANDGMD: georgiaMilitiaDistrict
+      LANDLOT: landLot
+      LANDDIST: landDistrict
+      NEIGHBHOOD: neighborhood
+      LAT: latitude
+      LON: longitude
+      MAP: mapSheet
+      BLOCK: mapBlock
+      PARCEL: mapParcel
+      SUBPARCEL: mapSubParcel
+      Shape.STArea(): shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + WinGAP/CAMA (Southern Georgia Regional
+      Commission SGRC arcgis — Echols/echols_parcels MapServer layer 0 "Parcel Boundaries").
+      Live count 2200 (2026-09-24). Companion annotation layers /1 Owner Name + /2 Parcel
+      Number (same polygons — prefer /0). SR NAD 1983 StatePlane Georgia West FIPS 1002
+      Feet (wkid 102667 / latestWkid 2240). maxRecordCount 1000 — page via resultOffset /
+      spatial envelopes. TOTALACRES 5–150 = 633; CURR_VAL>0 = 2160; LASTNAME filled = 2160;
+      HOUSE_NO>0 = 1357; ZONINGCODE non-blank ≈4 (sparse); ZONING usable non-'000' = 0;
+      MAVCURR>0 = 0 (assessed REST gap); SALE_VAL>0 = 0 / SALELAND1>0 = 0 (sales REST gap).
+      FMVRES>0 = 1200. digclass: R≈1443, V≈391, A≈131, J≈113, E≈62, C≈19, I≈1 (+ blank≈40).
+      TAXDISTRIC soft: 01≈majority / blank — Echols has no incorporated cities (Statenville
+      unincorporated county seat; Census "Echols County consolidated government"). CITY /
+      STATE / ZIP_1 are OWNER mailing (Valdosta / Lake Park / Stockton / Statenville / …)
+      — never municipality filter. Compose situsAddress from HOUSE_NO + STDIRECT +
+      STREET_NAM + STTYPE when HOUSE_NO>0. No qPub_Link field on this REST — deep-link
+      KeyValue={PARCEL_NO} via qPublic App=EcholsCountyGA / AppID=765 LayerID=11801.
+      Schema WATER/SEWER/GAS/ELECTRICTY/ROADSTREET/ROADCLASS — DO NOT collect (skip
+      utilities+AADT). APPRAISER/APPRNAME — DO NOT collect as PII. alma Echols folder
+      empty (Echols_Parcels 500 not found); prefer arcgis Echols/echols_parcels.
+      Geo-verified WGS84 samples ~-82.944,30.861 / ~-83.006,30.825 (N Echols / Lake Park
+      fringe), ~-83.025,30.672 / ~-83.029,30.711 / ~-83.026,30.702 (Statenville / US-129) —
+      Echols County GA / Statenville (Valdosta MSA ring FL border; Census TIGERweb GEOID
+      13101 CENTLAT +30.7101283 CENTLON -082.8938538). REJECT paid Regrid/ATTOM/
+      DynamoSpatial/ParcelVision (~2.1k commercial ads). REJECT FL lookalikes (Jennings FL
+      1235525 in bbox). No emails/phones collected.
+    status: usable
+
+  - role: tax
+    name: echols_parcels CURR_VAL / FMV* / MAV* (on polygons)
+    restUrl: https://www.sgrcmaps.com/arcgis/rest/services/Echols/echols_parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      HOMEEXEMPT: homesteadExempt
+      HISTYR1: tax.histYear1
+      HISTVAL1: tax.histValue1
+      HISTYR2: tax.histYear2
+      HISTVAL2: tax.histValue2
+      HISTYR3: tax.histYear3
+      HISTVAL3: tax.histValue3
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. CURR_VAL>0 = 2160; MAVCURR>0 = 0
+      (assessed REST gap — use qPublic HTML AppID=765 / App=EcholsCountyGA). Assessor HTML:
+      qpublic.net/ga/echols → Application.aspx (Cloudflare/bot 403 automated; public for
+      humans). Deep-link KeyValue={PARCEL_NO}. histyr*/histval* are assessment history —
+      NOT sales.
+    status: usable
+
+  - role: sales
+    name: null — SALE_VAL zero-filled; qPublic Sales Search HTML only
+    restUrl: https://www.sgrcmaps.com/arcgis/rest/services/Echols/echols_parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      SALE_VAL / SALELAND1 / SALELAND2 / SALEIMP1 / SALEIMP2 fields exist but SALE_VAL>0 = 0
+      and SALELAND1>0 = 0 live (2026-09-24). No public REST multi-sale year layers for Echols.
+      qPublic Sales Search / Sales List / Yearly Sales HTML App=EcholsCountyGA / AppID=765.
+      Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public Euclidean zoning FeatureServer (parcel ZONINGCODE sparse)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Echols County Euclidean zoning MapServer/FeatureServer on SGRC arcgis/alma (2026-09-24).
+      Parcel ZONINGCODE non-blank ≈4; ZONING mostly '000' — not usable Euclidean. Planning PDF /
+      staff gap. Secondary only if codes appear later on echols_parcels/0.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Echols County future land use / character-area FeatureServer on SGRC (2026-09-24) — Comp Plan PDF gap.
+    status: gap
+
+  - role: other
+    name: Echols/echols_boundary Echols Co. Boundary
+    restUrl: https://www.sgrcmaps.com/arcgis/rest/services/Echols/echols_boundary/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      County outline only (geo-verify / clip). Companion Regional RegionCounties TILE_NAME=
+      ECHOLS COFIPS=101 CODE=13101 STFIPS=13. Not parcels.
+    status: usable
+
+  - role: other
+    name: Regional RegionCounties Echols (boundary context — NOT parcels)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Regional/RegionCounties/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      COFIPS: countyFips3
+      FIPS: countyFipsNum
+      STFIPS: stateFips
+      CODE: countyFips5
+      TILE_NAME: countyName
+    notes: >
+      Filter COFIPS='101' / CODE='13101' / TILE_NAME='ECHOLS' for Echols County GA boundary
+      (count=1). Geo-verify only — zero parcel/owner/tax/sale fields.
+    status: partial
+
+municipalities:
+  - name: Statenville
+    level: city
+    parentFips: "13101"
+    joinToCountyParcels: >
+      Unincorporated county seat (no Census incorporated place). Soft spatial ~-83.03,30.70
+      / mailing CITY hints when present — never sole filter. No separate city-limits REST.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Statenville zoning FeatureServer — county has no Euclidean zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Statenville FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county echols_parcels/0 spatial Statenville
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County echols_parcels/0 + soft spatial Statenville (~-83.03,30.70).
+        status: gap
+    gaps:
+      - "Statenville unincorporated — no city-owned parcel/zoning/FLU REST; use county echols_parcels/0."
+    status: partial
+
+gaps:
+  - "SALE_VAL>0 = 0 / SALELAND1>0 = 0 on echols_parcels — no REST lastSale.price/date; qPublic AppID=765 / App=EcholsCountyGA Sales Search HTML only."
+  - "MAVCURR>0 = 0 — no usable assessedValue on REST; prefer CURR_VAL market + qPublic HTML for assessed/taxable."
+  - "Parcel ZONINGCODE sparse (≈4); ZONING mostly '000' — no Euclidean zoning REST."
+  - "No public FLU / character-area FeatureServer on SGRC Echols folder."
+  - "echols_parcels maxRecordCount 1000 — page via resultOffset / spatial envelopes."
+  - "No incorporated municipalities in Echols — Statenville unincorporated county seat; TAXDISTRIC soft '01'/blank only."
+  - "Parcel mailing CITY/STATE/ZIP_1 nationwide ring (Valdosta/Lake Park/…) — never municipality filter."
+  - "alma Echols folder empty (Echols_Parcels 500); prefer sgrcmaps.com/arcgis Echols/echols_parcels."
+  - "EcholsCountyGA_WFS 404; qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/echols HTML path public for humans."
+  - "sgrcmaps.com/Echols/ viewer 404 — human GIS via qPublic Maps AppID=765 LayerID=11801."
+  - "Rejected lookalikes / non-preferred: paid Regrid/ATTOM/DynamoSpatial/ParcelVision; FL Jennings town in bbox; alma empty twin."
+  - "Schema WATER/SEWER/GAS/ELECTRICTY/ROAD* + APPRAISER/APPRNAME — DO NOT collect (skip utilities+AADT + PII); no emails/phones."
+
+license: >
+  Southern Georgia Regional Commission GIS sgrcmaps.com/arcgis — Echols/echols_parcels,
+  Echols/echols_boundary; alma Regional/RegionCounties. Assessor qpublic.net/ga/echols
+  AppID=765 / App=EcholsCountyGA (KeyValue={PARCEL_NO}). Attribution SGRC / Echols County
+  Tax Assessor. Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=EcholsCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=765&LayerID=11801&PageTypeID=1&PageID=0
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://www.sgrcmaps.com/arcgis/rest/services/Echols/echols_parcels/MapServer/0 count 2200; extent
+    center [['13101', 'Echols County']]; sample [['13101', 'Echols County']]. No change to field map
+    (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Echols County consolidated government"
+      level: city
+      parentFips: "13101"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Echols' AND aadt>0
+    altFilter: name LIKE '101-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 101-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 32
+    maxAadt: 3150
+    geoCheck: 32/32 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - A_VALUE
+    - FMVRES
+    filledCount: 2160
+    restUrl: https://www.sgrcmaps.com/arcgis/rest/services/Echols/echols_parcels/MapServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: SALE_VAL=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 2160
+    restUrl: https://www.sgrcmaps.com/arcgis/rest/services/Echols/echols_parcels/MapServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=EcholsCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=765&LayerID=11801&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 043    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=EcholsCountyGA&Layer=Parcels&PageType=Report&KeyValue=043%20%20%20%20001
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?AppID=765&LayerID=11801&PageTypeID=1&PageID=0
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Echols County consolidated government
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,427 @@
+state: GA
+jurisdiction: Troup County
+fips: "13285"
+level: county
+markets: [LaGrange]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + acres / zoning / tax-digest (no owner/tax/sale values)
+  - role: parcels
+    name: Parcels (Troup County / LaGrange GIS AGOL)
+    restUrl: https://services.arcgis.com/V4Y8xIvXuYJiVZwF/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Calculated
+    coverage: county-wide
+    fieldMap:
+      Tax_Number: parcelId
+      MAP: map
+      SUBMAP: submap
+      BLOCK: block
+      PARCEL: parcelSuffix
+      Calculated: acreage
+      ZoningCode: zoning
+      AppZone: appraisalZone
+      TAX_DIST: taxDistrict
+      TAX_DIGEST: taxDigest
+      FutDev: fluSoft
+      Neighborho: neighborhood
+      Subdivisio: subdivision
+      COUNTY_NUM: dorCountyNumber
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + acres/zoning/tax-digest (Troup County /
+      City of LaGrange GIS AGOL org V4Y8xIvXuYJiVZwF owner coluadmin — Parcels
+      FeatureServer/0). Live count 33879 (2026-09-24). Companion Address_Parcels/1
+      Parcels (count 35798; same Tax_Number + Calculated + OWNER field but OWNER
+      blank/space on sample — not usable owner REST) and Address_Parcels/0 Address_Point
+      (count 41850; situs HOUSE_NUM/STREET_NAM/STTYPE/COMPLETE_HOU_NUM + CITY_LIMITS
+      + TOWN + ZIP + PARCEL_NO join on Tax_Number). maxRecordCount 2000 — page via
+      resultOffset / envelopes. SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet
+      (102667). Calculated 5–150 ≈4551. ZoningCode top: 01-SFMD≈8157 / 16-R-2≈5436 /
+      01-AGR≈3725 / 16-R-1≈3502 / 01-LR≈2710 / 01-AG≈1491 / 16-C-3≈1442 (prefix 01=
+      unincorporated Troup, 16=LaGrange, 17=West Point, 18=Hogansville). TAX_DIGEST:
+      UNINCORPORATED≈17619 / LAGRANGE≈12779 / HOGANSVILLE≈2050 / WEST POINT≈1430 —
+      soft municipality; prefer spatial County_Boundary NAME or Address_Point
+      CITY_LIMITS. FutDev soft character (LAG/SUB/AGR/URB/LKR/HOG/AG/WP…) — NOT
+      long-range FLU substitute. COUNTY_NUM='141' is GA DOR county number (not FIPS
+      285). NO owner / mailing / market / assessed / sale fields on Parcels/0.
+      Official assessor Beacon/qPublic App=TroupCountyGA / AppID=633 LayerID=18434
+      (qpublic.net/ga/troup → beacon.schneidercorp.com; Cloudflare/bot 403 automated;
+      public for humans). KeyValue={Tax_Number} e.g. '0602A003015' / '0350 000047A'.
+      GEO-VERIFY GEORGIA Troup FIPS 13285 LaGrange seat: WGS84 samples unincorp
+      ~-84.962,32.906 / LaGrange ~-85.083,33.018 / ~-85.028,33.043; County_Boundary
+      STATEFP=13 COUNTYFP=285 CNTYIDFP=13285 (LaGrange / Hogansville / West Point /
+      Troup rows). REJECT maps.lagrange-ga.org REST (TLS cert expired 2026-09-24 —
+      HTML error page) as primary; AGOL org V4Y8xIvXuYJiVZwF is the public REST.
+      REJECT paid Regrid/ATTOM/USLandGrid/DynamoSpatial; skip fire-hydrant / utilities
+      + AADT; skip created_us/last_edite/Creator/Editor staff usernames as PII; no
+      emails/phones.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL/FMV/assessed on public REST; Beacon AppID=633 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Parcels/0 and Address_Parcels have ZoningCode/TAX_DIGEST/Calculated but no
+      market/assessed/taxable value fields. Tax/CAMA values via Beacon/qPublic HTML
+      AppID=633 LayerID=18434 (KeyValue=Tax_Number). Honest REST tax gap. Rejected
+      paid vendor tax extracts.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_PRICE/SALE_DATE on Parcels or Address_Parcels REST. Prefer Beacon
+      AppID=633 sales/history HTML by Tax_Number. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Parcels ZoningCode + Zoning_Update Parcels_City (LaGrange)
+    restUrl: https://services.arcgis.com/V4Y8xIvXuYJiVZwF/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Calculated
+    coverage: county-wide
+    fieldMap:
+      Tax_Number: parcelId
+      ZoningCode: zoning
+      AppZone: appraisalZone
+      TAX_DIGEST: taxDigest
+    notes: >
+      Preferred countywide zoning attribute on Parcels/0 (ZoningCode). Companion
+      LaGrange-focused Zoning_Update/1 Parcels_City (count 13116; TAX_DIGEST≈LAGRANGE
+      13114) with New_Zone / Zone_2 proposed labels (e.g. TN-R / CR-MX) — city
+      rewrite overlay, secondary to ZoningCode. Zoning web map item
+      c1bca7b7ce814850b03149834cb49413. maps.lagrange-ga.org/Zoning/Zoning/MapServer
+      TLS-expired — do not prefer. Skip hydrant/utility layers.
+    status: usable
+
+  - role: flu
+    name: null — FutDev soft only; no public Future Land Use FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No dedicated county FLU FeatureServer recovered (2026-09-24). Parcels FutDev
+      (LAG/SUB/AGR/URB/LKR/HOG/AG/WP/GC…) is soft development character — not
+      long-range FLU. Honest FLU gap.
+    status: gap
+
+  - role: other
+    name: Address_Parcels Address_Point (situs join)
+    restUrl: https://services.arcgis.com/V4Y8xIvXuYJiVZwF/arcgis/rest/services/Address_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Tax_Number: parcelId
+      PARCEL_NO: parcelIdAlt
+      HOUSE_NUM: situsNumber
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      STDIRECT: situsStreetDir
+      COMPLETE_HOU_NUM: situsAddress
+      ZIP: situsZip
+      CITY_LIMITS: cityLimits
+      TOWN: postalTown
+      ZONINGCODE: zoning
+    notes: >
+      Live count 41850 — situs points keyed by Tax_Number/PARCEL_NO. CITY_LIMITS:
+      UNINCORPORATED≈18751 / LAGRANGE≈18159 / HOGANSVILLE≈2603 / WEST POINT≈2073.
+      TOWN is postal/community (e.g. PINE MOUNTAIN) — NOT municipality filter; use
+      CITY_LIMITS or spatial County_Boundary. Skip COMMISSIONER/Editor/Creator PII.
+    status: usable
+
+  - role: other
+    name: County_Boundary (municipal + county polygons)
+    restUrl: https://services.arcgis.com/V4Y8xIvXuYJiVZwF/arcgis/rest/services/County_Boundary/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Calculated_Acerage
+    coverage: county-wide
+    fieldMap:
+      NAME: placeName
+      NAMELSAD: placeNameFull
+      CNTYIDFP: countyGeoid
+      STATEFP: stateFp
+      COUNTYFP: countyFp
+      Calculated_Acerage: acreage
+    notes: >
+      Despite service title, layer holds LaGrange / Hogansville / West Point city
+      limits PLUS Troup county polygon — all STATEFP=13 COUNTYFP=285 CNTYIDFP=13285.
+      Preferred spatial municipality filter (NAME='LaGrange'|'Hogansville'|'West Point').
+      Soft TAX_DIGEST / CITY_LIMITS secondary.
+    status: usable
+
+municipalities:
+  - name: LaGrange
+    level: city
+    parentFips: "13285"
+    joinToCountyParcels: >
+      Spatial County_Boundary/0 NAME='LaGrange' ∩ Parcels/0. Soft TAX_DIGEST='LAGRANGE'
+      (~12779) / Address_Point CITY_LIMITS='LAGRANGE' (~18159) / ZoningCode prefix '16-'
+      secondary; TOWN/postal alone insufficient.
+    layers:
+      - role: parcels
+        name: Parcels/0 spatial LaGrange
+        restUrl: https://services.arcgis.com/V4Y8xIvXuYJiVZwF/arcgis/rest/services/Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Calculated
+        coverage: city-only
+        fieldMap:
+          Tax_Number: parcelId
+          Calculated: acreage
+          ZoningCode: zoning
+          TAX_DIGEST: taxDigest
+        notes: >
+          No separate city CAMA — county Parcels + LaGrange limits. Companion
+          Zoning_Update/1 Parcels_City (~13116 LAGRANGE) for New_Zone overlay.
+          Owner/tax/sale via Beacon AppID=633.
+        status: usable
+      - role: zoning
+        name: Zoning_Update/1 Parcels_City (LaGrange) + Parcels ZoningCode
+        restUrl: https://services.arcgis.com/V4Y8xIvXuYJiVZwF/arcgis/rest/services/Zoning_Update/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Tax_Number: parcelId
+          ZoningCode: zoning
+          New_Zone: zoningProposed
+          Zone_2: zoningProposedAlt
+        notes: LaGrange city parcel zoning rewrite (count ≈13116). Prefer ZoningCode on county Parcels for stable Euclidean; New_Zone secondary.
+        status: usable
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city FLU REST — FutDev soft only.
+        status: gap
+    gaps:
+      - "Owner/tax/sale HTML-only (Beacon AppID=633) even inside LaGrange — no REST CURR_VAL/sale/owner."
+      - "maps.lagrange-ga.org ArcGIS Server TLS cert expired — use AGOL org V4Y8xIvXuYJiVZwF."
+    status: usable
+
+  - name: Hogansville
+    level: city
+    parentFips: "13285"
+    joinToCountyParcels: >
+      Spatial County_Boundary/0 NAME='Hogansville' ∩ Parcels/0. Soft
+      TAX_DIGEST='HOGANSVILLE' (~2050) / CITY_LIMITS='HOGANSVILLE' (~2603) /
+      ZoningCode prefix '18-' secondary.
+    layers:
+      - role: parcels
+        name: Parcels/0 spatial Hogansville
+        restUrl: https://services.arcgis.com/V4Y8xIvXuYJiVZwF/arcgis/rest/services/Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Calculated
+        coverage: city-only
+        fieldMap:
+          Tax_Number: parcelId
+          Calculated: acreage
+          ZoningCode: zoning
+        notes: County Parcels + Hogansville limits; no city-owned CAMA FS.
+        status: usable
+      - role: zoning
+        name: Parcels/0 ZoningCode spatial Hogansville
+        restUrl: https://services.arcgis.com/V4Y8xIvXuYJiVZwF/arcgis/rest/services/Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoningCode: zoning
+        notes: ZoningCode prefix 18-* common in Hogansville.
+        status: usable
+    gaps:
+      - "No City-of-Hogansville separate parcel/CAMA REST."
+    status: usable
+
+  - name: West Point
+    level: city
+    parentFips: "13285"
+    joinToCountyParcels: >
+      Spatial County_Boundary/0 NAME='West Point' ∩ Parcels/0. Soft
+      TAX_DIGEST='WEST POINT' (~1430) / CITY_LIMITS='WEST POINT' (~2073) /
+      ZoningCode prefix '17-' secondary.
+    layers:
+      - role: parcels
+        name: Parcels/0 spatial West Point
+        restUrl: https://services.arcgis.com/V4Y8xIvXuYJiVZwF/arcgis/rest/services/Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Calculated
+        coverage: city-only
+        fieldMap:
+          Tax_Number: parcelId
+          Calculated: acreage
+          ZoningCode: zoning
+        notes: County Parcels + West Point limits; no city-owned CAMA FS.
+        status: usable
+      - role: zoning
+        name: Parcels/0 ZoningCode spatial West Point
+        restUrl: https://services.arcgis.com/V4Y8xIvXuYJiVZwF/arcgis/rest/services/Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoningCode: zoning
+        notes: ZoningCode prefix 17-* common in West Point.
+        status: usable
+    gaps:
+      - "No City-of-West-Point separate parcel/CAMA REST."
+    status: usable
+
+gaps:
+  - "No owner/mailing/market/assessed/SALE_* on Parcels REST — tax/sale/owner via Beacon AppID=633 LayerID=18434 HTML (KeyValue=Tax_Number)."
+  - "Address_Parcels/1 OWNER field present but blank (count filled 0) — not usable owner REST."
+  - "No dedicated FLU FeatureServer — FutDev is soft development character only."
+  - "maps.lagrange-ga.org ArcGIS Server TLS certificate expired (2026-09-24) — prefer AGOL org V4Y8xIvXuYJiVZwF."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "TAX_DIGEST / CITY_LIMITS soft only — prefer spatial County_Boundary NAME for municipality."
+  - "Skip fire hydrant / utility layers + AADT; skip created_us/last_edite/Creator/Editor PII; REJECT paid Regrid/ATTOM/USLandGrid; no emails/phones."
+
+license: >
+  Troup County / City of LaGrange GIS AGOL org V4Y8xIvXuYJiVZwF — Parcels/0,
+  Address_Parcels/0+/1, Zoning_Update/1, County_Boundary/0; Start Here! viewer
+  troupcountyga.maps.arcgis.com/apps/webappviewer/index.html?id=822f5ee9782a44ffb02a71faee6f75ab;
+  Zoning web map c1bca7b7ce814850b03149834cb49413. Assessor Beacon/qPublic
+  App=TroupCountyGA / AppID=633 LayerID=18434 (qpublic.net/ga/troup;
+  beacon.schneidercorp.com). Attribution Troup County Board of Assessors /
+  LaGrange–Troup GIS. Public fields only; no emails/phones; no paid vendors;
+  skip utilities+AADT.
+appraiserSearchUrl: https://beacon.schneidercorp.com/Application.aspx?AppID=633&LayerID=18434&PageTypeID=2
+jurisdictionGisUrl: https://troupcountyga.maps.arcgis.com/apps/webappviewer/index.html?id=822f5ee9782a44ffb02a71faee6f75ab
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services.arcgis.com/V4Y8xIvXuYJiVZwF/arcgis/rest/services/Parcels/FeatureServer/0 count
+    33879; extent center [['13285', 'Troup County']]; sample [['13285', 'Troup County']]. No change to
+    field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Hogansville city"
+      level: city
+      parentFips: "13285"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "LaGrange city"
+      level: city
+      parentFips: "13285"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "West Point city"
+      level: city
+      parentFips: "13285"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Troup' AND aadt>0
+    altFilter: name LIKE '285-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 285-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 273
+    maxAadt: 58200
+    geoCheck: 273/273 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://beacon.schneidercorp.com/Application.aspx?AppID=633&LayerID=18434&PageTypeID=4&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 047A
+    sampleUrl: https://beacon.schneidercorp.com/Application.aspx?AppID=633&LayerID=18434&PageTypeID=4&KeyValue=047A
+    verification: 'pattern-tested: real sample ID from PARCEL; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider Beacon report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://troupcountyga.maps.arcgis.com/apps/webappviewer/index.html?id=822f5ee9782a44ffb02a71faee6f75ab
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Hogansville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: LaGrange city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: West Point city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

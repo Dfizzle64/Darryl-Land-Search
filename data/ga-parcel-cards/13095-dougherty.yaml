@@ -1,0 +1,259 @@
+state: GA
+jurisdiction: Dougherty County
+fips: "13095"
+level: county
+markets: [Albany]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner / situs / acres (Albany-Dougherty albgis AGOL)
+  - role: parcels
+    name: Parcels_Public_View (Dougherty County Land Parcels Dataset)
+    restUrl: https://services6.arcgis.com/VKHi8CC6pMIyYUIs/arcgis/rest/services/Parcels_Public_View/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CalcAcre
+    coverage: county-wide
+    fieldMap:
+      ParcelNum: parcelId
+      Name: ownerName
+      Address: situsAddress
+      StNumber: situsNumber
+      StDirection: situsStreetDir
+      StName: situsStreet
+      STSuffix: situsStreetType
+      SiteCity: situsCity
+      SiteState: situsState
+      SiteZip: situsZip
+      MailAddress1: mailingAddress
+      MailAddress2: mailingAddress2
+      MailCity: mailingCity
+      MailState: mailingState
+      MailZip: mailingZip
+      CalcAcre: acreage
+      TotalAcerage: acreageDeed
+      Jurisdiction: municipalityFlag
+      District: taxDistrict
+      Legal: legalDescription
+      Deed: deedRef
+      Plat: platRef
+      YearBuiltInt: yearBuilt
+      Zone_: zoningAttr
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + owner/situs/acres (City of Albany / Dougherty
+      County AGOL org VKHi8CC6pMIyYUIs — owner jkendall8 "Dougherty County Land Parcels
+      Dataset" Parcels_Public_View FeatureServer layer 0 "Parcels "). Live count 38007
+      (2026-09-24). SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet (102667/2240).
+      maxRecordCount 2000 — page via resultOffset / spatial envelopes. Name filled ≈37567;
+      CalcAcre>0 ≈37964; CalcAcre 5–150 ≈2134; Address filled ≈37970; MailCity filled ≈37562;
+      MailAddress1 filled only ≈3250 (many mail streets blank — fall back to Address when
+      MailAddress1 empty; MailCity/State/Zip still useful). Jurisdiction CITY≈28408 /
+      COUNTY≈9589 — soft municipality flag, prefer spatial Albany city poly for filter;
+      mailing CITY never sole municipality filter. No CURR_VAL/ASSES_VAL on this layer —
+      join TaxMain_DataMap table on ParcelNum=PARCEL_NO for tax; sales via
+      TaxData_SaleInfo_Parcel. Official human GIS: geohub.albanyga.gov + Albany-Dougherty
+      GIS Web Browser albgis.maps.arcgis.com View appid=96a3a31e4a8c4dc6b59153644906936c.
+      Assessor qPublic App=DoughertyCountyGA (dougherty.ga.us Board of Assessors;
+      qpublic.net/ga/dougherty redirects to county). Internal ParcelMap on
+      gisappserv.dougherty.ga.us:6443 not publicly resolvable from research box — prefer
+      AGOL Parcels_Public_View. GEO-VERIFY GEORGIA: WGS84 samples ~-84.004,31.649 /
+      ~-84.006,31.646 (Cordele Rd) / TaxData ~-84.131,31.566 — Dougherty County GA / Albany
+      (Census TIGERweb GEOID 13095 CENTLAT +31.5334096 CENTLON -084.2162561). REJECT East
+      Baton Rouge "Property Ownership Lookup Tool" experience 35130b09abe44b3e929ed52220e928b3
+      (owner EBRGIS — wrong geography). REJECT Dougherty ND / MN lookalikes; paid
+      Regrid/ATTOM/LeadCruncher. Skip utilities/AADT; no emails/phones collected.
+    status: usable
+
+  - role: tax
+    name: TaxMain_DataMap WinGAP vETT_TaxMain (table join) + TaxData CURR_VAL
+    restUrl: https://services6.arcgis.com/VKHi8CC6pMIyYUIs/arcgis/rest/services/TaxMain_DataMap/FeatureServer/0
+    layerId: 0
+    geometry: none
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      OWNER_NAME: ownerName
+      CURR_VAL: tax.marketValue
+      ASSES_VAL: tax.assessedValue
+      PREV_VAL: tax.priorMarketValue
+      LandValue: tax.landValue
+      TOTALACRES: acreage
+      ADDRESS: situsAddress
+      HOUSE_NO: situsNumber
+      STREET_NAM: situsStreet
+      STREET_TYPE: situsStreetType
+      CITY: situsCity
+      PROP_ZIP: situsZip
+      PostalAddress: mailingAddress
+      PostalCity: mailingCity
+      PostalState: mailingState
+      PostalZip5: mailingZip
+      ZONE_CODE: zoning
+      TAXDISTRIC: taxDistrict
+      PROPERTY_CLASS: dorCode
+    notes: >
+      Preferred tax/CAMA TABLE (no geometry) — WinGAP WINGAP_GIS.dbo.vETT_TaxMain on
+      TaxMain_DataMap FeatureServer table 0 (owner mcraig_albgis). Live count 37836;
+      CURR_VAL>0 ≈37820; ASSES_VAL>0 ≈37820; OWNER_NAME filled 37836. Join PARCEL_NO →
+      Parcels_Public_View.ParcelNum for polygons. Companion TaxData_SaleInfo_Parcel also
+      carries CURR_VAL on ~9035 sale polygons (sales-analysis subset — not full digest).
+      Assessor HTML deep-link KeyValue={ParcelNum}: Application.aspx?App=DoughertyCountyGA
+      &Layer=Parcels&PageType=Report&KeyValue={ParcelNum}.
+    status: usable
+
+  - role: sales
+    name: TaxData_SaleInfo_Parcel (sale polygons)
+    restUrl: https://services6.arcgis.com/VKHi8CC6pMIyYUIs/arcgis/rest/services/TaxData_SaleInfo_Parcel/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: LNDACRES
+    coverage: sample
+    fieldMap:
+      ParcelNum: parcelId
+      PARCEL_NO: parcelIdAlt
+      SALESPR: lastSale.price
+      NET_SALESPR: lastSale.netPrice
+      SALEDATE: lastSale.date
+      CURR_VAL: tax.marketValue
+      LNDACRES: acreage
+      SALE_TYPE: lastSale.type
+      RSN_DESCRIPT: lastSale.reason
+      USEDAS_COD: dorCode
+      DESCRIPT: landUseDescription
+    notes: >
+      Preferred public REST last-sale polygons (count 9037; SALESPR>0 =9037 — sales-analysis
+      subset of county, not every parcel). SALEDATE epoch ms. Multi-sale history / full
+      digest still via qPublic Sales Search HTML App=DoughertyCountyGA. Rejected paid
+      Regrid/ATTOM sales extracts. Geo samples ~-84.13,31.57 Albany GA.
+    status: usable
+
+  - role: zoning
+    name: Current_Zoning_Information — Zoning Districts (2026)
+    restUrl: https://services6.arcgis.com/VKHi8CC6pMIyYUIs/arcgis/rest/services/Current_Zoning_Information/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      ZONE: zoning
+      DISTRICT: zoningDistrictName
+      OLDZONE: zoningPrior
+      ZONE1: zoningAlt
+      ACRES: acreage
+      CASE_: zoningCase
+      ORD_: zoningOrdinance
+      STNUM: situsNumber
+      STNAME: situsStreet
+      STSUF: situsStreetType
+    notes: >
+      Preferred Euclidean zoning polygons (layer id 1 "Zoning Districts (2026)"; count 1876).
+      ZONE domain includes AG, R-1/R-2/R-3/R-E/R-MHP, C-1..C-8, M-1/M-2, FH (+ conditional
+      *c variants). DISTRICT human labels (Agricultural, Neighborhood Business, Single Family
+      Residential, …). Spatial join onto Parcels_Public_View. Geo ~-84.0,31.65 Dougherty GA.
+    status: usable
+
+  - role: flu
+    name: Land_Use_Layers — 2026 Future Land Use (FDM) + Character Areas
+    restUrl: https://services3.arcgis.com/7ScJ8q0HhcQyXcHe/arcgis/rest/services/Land_Use_Layers/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRE
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NUM: parcelId
+      FDM: flu
+      NAME: ownerName
+      TOTAL_ACRE: acreageDeed
+      CALC_ACRE: acreage
+      STNUM: situsNumber
+      STNAME: situsStreet
+      STSUF: situsStreetType
+    notes: >
+      Preferred Future Land Use from 2026 Albany/Dougherty Comp Plan Update GIS Data (GMC)
+      AGOL org 7ScJ8q0HhcQyXcHe Land_Use_Layers FeatureServer layer 2 "2026 Future Land Use"
+      (count 37066). FDM sample "Agricultural/Forestry". Companion layer 1 "2026 Character
+      Areas" (count 96; field Character — Agriculture/Conservation/…) for character-area FLU;
+      layer 0 Existing Land Use (Clean_LAND / LANDUSE3; count 47484). Join PARCEL_NUM →
+      ParcelNum or spatial. Geo samples ~-84.01,31.64 / ~-84.22,31.47 Dougherty GA.
+    status: usable
+
+municipalities:
+  - name: Albany
+    level: city
+    parentFips: "13095"
+    joinToCountyParcels: >
+      Soft: Parcels_Public_View Jurisdiction='CITY' (~28408). Prefer spatial City Boundary
+      from Comp Plan Base Reference (2026CompPlan_Base_Reference_Layer/1) or Albany wards /
+      city limits when filtering — mailing CITY='ALBANY' is postal only.
+    layers:
+      - role: zoning
+        name: Current_Zoning_Information spatial Albany
+        restUrl: https://services6.arcgis.com/VKHi8CC6pMIyYUIs/arcgis/rest/services/Current_Zoning_Information/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          ZONE: zoning
+          DISTRICT: zoningDistrictName
+        notes: County Euclidean zoning clipped to Albany city poly / Jurisdiction=CITY.
+        status: usable
+      - role: flu
+        name: 2026 Future Land Use spatial Albany
+        restUrl: https://services3.arcgis.com/7ScJ8q0HhcQyXcHe/arcgis/rest/services/Land_Use_Layers/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: CALC_ACRE
+        coverage: city-only
+        fieldMap:
+          FDM: flu
+          PARCEL_NUM: parcelId
+        notes: Comp Plan FLU spatial to Albany city boundary.
+        status: usable
+      - role: parcels
+        name: County Parcels_Public_View spatial Albany
+        restUrl: https://services6.arcgis.com/VKHi8CC6pMIyYUIs/arcgis/rest/services/Parcels_Public_View/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: CalcAcre
+        coverage: city-only
+        fieldMap:
+          ParcelNum: parcelId
+          Name: ownerName
+          CalcAcre: acreage
+        notes: No Albany-only separate CAMA — county parcels + Jurisdiction=CITY / city poly.
+        status: partial
+    gaps:
+      - "No Albany-owned separate parcel CAMA FeatureServer — county Parcels_Public_View + TaxMain join."
+    status: usable
+
+gaps:
+  - "Parcels_Public_View has no CURR_VAL/ASSES_VAL — join TaxMain_DataMap table (geometry none) on ParcelNum=PARCEL_NO."
+  - "MailAddress1 sparse (~3250/38007) — compose mailing carefully; MailCity filled ≈37562."
+  - "TaxData_SaleInfo_Parcel is sales-analysis subset (~9037) — not full multi-sale history; qPublic Sales Search for complete."
+  - "Internal gisappserv.dougherty.ga.us ParcelMap not publicly resolvable — prefer AGOL Parcels_Public_View."
+  - "REJECT EBRGIS Property Ownership Lookup Tool (East Baton Rouge) experience 35130b09… — wrong geography."
+  - "Parcels + TaxMain maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "Skip utilities/AADT; rejected paid Regrid/ATTOM/LeadCruncher; no emails/phones."
+
+license: >
+  City of Albany / Dougherty County GIS (albgis AGOL org VKHi8CC6pMIyYUIs) —
+  Parcels_Public_View, Current_Zoning_Information/1, TaxMain_DataMap, TaxData_SaleInfo_Parcel.
+  2026 Comp Plan Land_Use_Layers (org 7ScJ8q0HhcQyXcHe — Future Land Use/2, Character Areas/1,
+  Existing Land Use/0). Geohub geohub.albanyga.gov; Albany-Dougherty GIS Web Browser
+  albgis.maps.arcgis.com View appid=96a3a31e4a8c4dc6b59153644906936c. Assessor qPublic
+  App=DoughertyCountyGA (qpublic.net/ga/dougherty; dougherty.ga.us Board of Assessors).
+  Attribution Albany-Dougherty GIS / Tax Assessor. Public fields only; no emails/phones;
+  no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=DoughertyCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://albgis.maps.arcgis.com/apps/View/index.html?appid=96a3a31e4a8c4dc6b59153644906936c
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

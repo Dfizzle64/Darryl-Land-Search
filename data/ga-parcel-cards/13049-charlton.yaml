@@ -1,0 +1,365 @@
+state: GA
+jurisdiction: Charlton County
+fips: "13049"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel polygons (thin PIN + calc acres); CAMA via qPublic HTML
+  - role: parcels
+    name: Parcels Charlton County Tax Parcels (SGRC VALOR AGOL)
+    restUrl: https://services3.arcgis.com/fYt1jp3hqamxgSvI/arcgis/rest/services/Parcels_Charlton_County/FeatureServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: Calc_Acres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      Calc_Acres: acreage
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Southern Georgia Regional Commission /
+      sgrcgis_valor1 AGOL org fYt1jp3hqamxgSvI — Parcels_Charlton_County FeatureServer
+      layer 7 "Tax Parcels"). Live count 7357 (2026-09-24); PARCEL_NO filled ≈7355;
+      Calc_Acres 5–150 ≈1721. Schema is THIN — PARCEL_NO + Calc_Acres + geometry only
+      (no owner/mailing/situs/CURR_VAL/sale on this layer). Join CAMA via qPublic
+      App=CharltonCountyGA / AppID=728 LayerID=11769 HTML (KeyValue={PARCEL_NO}).
+      Geo-verified WGS84 samples ~-82.194,30.496 / ~-82.195,30.497 / ~-82.191,30.493 /
+      ~-82.199,30.497 — Charlton County GA south of Folkston / St. George fringe
+      (~Folkston -82.01,30.83; Okefenokee / FL line). NOT Charlton MA / Ontario lookalikes.
+      REJECTED paid CoreLogic Charlton_GA_Parcel on CGRUSER_USG
+      (services2.arcgis.com/PYn6bWCjT6bhw1z3/.../Charlton_GA_Parcel — licenseInfo
+      "CoreLogic customers only"; vendor ASSD_VAL/SALE_*/MAIL_* schema; no ownerName).
+      Rejected token-gated Charlton_Parcels (jharley_gis1 499). CharltonCountyGA_WFS 404.
+      Official human GIS hub: experience.arcgis.com/experience/e7b0834560024321a4825bb973115065
+      (Charlton County GIS Application — SGRC). Companion SGRC layers: City Limits,
+      County Boundary, Voting Precincts, Roads, Wetlands (skip utilities/AADT).
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on Tax Parcels/7; qPublic AppID=728 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on preferred SGRC Tax Parcels/7. Assessor HTML
+      qpublic.net/ga/charlton → App=CharltonCountyGA / AppID=728 LayerID=11769
+      (Cloudflare/bot 403 automated; public for humans). Deep-link KeyValue={PARCEL_NO}.
+      Rejected CoreLogic ASSD_VAL republish (paid-vendor license).
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No SALEPRICE/SALEDATE on SGRC Tax Parcels/7. qPublic Sales Search AppID=728 HTML
+      only. Rejected CoreLogic SALE_PRICE/SALE_DT layer and paid Regrid/ATTOM.
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Charlton County Euclidean zoning REST found (2026-09-24). Comp Plan character
+      areas (below) are planning character — not Euclidean zoning codes.
+    status: gap
+
+  - role: flu
+    name: Charlton_County_GA_Character_Areas (CRC / Comp Plan character)
+    restUrl: https://services2.arcgis.com/PYn6bWCjT6bhw1z3/arcgis/rest/services/Charlton_County_GA_Character_Areas/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CharacterA: flu
+      COUNTY: countyName
+      FIPSSTCO: fips
+    notes: >
+      Preferred Comp Plan character / FLU polygons (NOT parcel-tied — spatial intersect).
+      Live count 7. CharacterA domain: Conservation-Okefenokee National Wildlife Refuge,
+      City of Homeland, St. George, City of Folkston, Mixed-Use Preferred Development,
+      Conservation-Protected River Corridors, Mixed-Use Transition. FIPSSTCO=13049 /
+      COUNTY=Charlton. Published CGRUSER_USG (Coastal RC / USG) — public; not CoreLogic
+      parcel product. Prefer CharacterA as flu/planning context only.
+    status: usable
+
+  - role: other
+    name: City_Limits_Charlton_County City Limits (SGRC)
+    restUrl: https://services3.arcgis.com/fYt1jp3hqamxgSvI/arcgis/rest/services/City_Limits_Charlton_County/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+    notes: >
+      Count 2 — NAME=FOLKSTON and HOMELAND city-limits polygons. Preferred spatial
+      municipality filter onto Tax Parcels/7. Companion County_Boundary_Charlton FS.
+    status: usable
+
+municipalities:
+  - name: Folkston
+    level: city
+    parentFips: "13049"
+    joinToCountyParcels: >
+      Spatial City_Limits_Charlton_County/2 NAME='FOLKSTON' onto Tax Parcels/7; or
+      CharacterAreas CharacterA='City of Folkston'.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Folkston-owned Euclidean zoning REST found.
+        status: gap
+      - role: flu
+        name: CharacterAreas City of Folkston
+        restUrl: https://services2.arcgis.com/PYn6bWCjT6bhw1z3/arcgis/rest/services/Charlton_County_GA_Character_Areas/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CharacterA: flu
+        notes: Filter CharacterA='City of Folkston' or spatial-clip to city limits.
+        status: usable
+      - role: parcels
+        name: County Tax Parcels/7 spatial Folkston
+        restUrl: https://services3.arcgis.com/fYt1jp3hqamxgSvI/arcgis/rest/services/Parcels_Charlton_County/FeatureServer/7
+        layerId: 7
+        geometry: polygon
+        auth: none
+        acreageField: Calc_Acres
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+        notes: No Folkston-owned parcel CAMA — county Tax Parcels/7 + city limits.
+        status: partial
+    gaps:
+      - "No Folkston-owned parcel/zoning FeatureServer separate from SGRC county layers."
+    status: partial
+
+  - name: Homeland
+    level: city
+    parentFips: "13049"
+    joinToCountyParcels: >
+      Spatial City_Limits_Charlton_County/2 NAME='HOMELAND' onto Tax Parcels/7; or
+      CharacterAreas CharacterA='City of Homeland'.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Homeland zoning REST found.
+        status: gap
+      - role: flu
+        name: CharacterAreas City of Homeland
+        restUrl: https://services2.arcgis.com/PYn6bWCjT6bhw1z3/arcgis/rest/services/Charlton_County_GA_Character_Areas/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CharacterA: flu
+        notes: Filter CharacterA='City of Homeland'.
+        status: usable
+      - role: parcels
+        name: County Tax Parcels/7 spatial Homeland
+        restUrl: https://services3.arcgis.com/fYt1jp3hqamxgSvI/arcgis/rest/services/Parcels_Charlton_County/FeatureServer/7
+        layerId: 7
+        geometry: polygon
+        auth: none
+        acreageField: Calc_Acres
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+        notes: County Tax Parcels/7 + Homeland poly.
+        status: partial
+    gaps:
+      - "No Homeland-owned parcel/zoning REST."
+    status: partial
+
+  - name: St. George
+    level: city
+    parentFips: "13049"
+    joinToCountyParcels: >
+      Spatial CharacterAreas CharacterA='St. George' onto Tax Parcels/7 (CDP / community —
+      not a separate city-limits polygon on City_Limits/2).
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No St. George zoning REST found.
+        status: gap
+      - role: flu
+        name: CharacterAreas St. George
+        restUrl: https://services2.arcgis.com/PYn6bWCjT6bhw1z3/arcgis/rest/services/Charlton_County_GA_Character_Areas/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CharacterA: flu
+        notes: Filter CharacterA='St. George'.
+        status: usable
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Tax Parcels/7 spatial CharacterA St. George.
+        status: gap
+    gaps:
+      - "St. George is Character Area / CDP — no separate City_Limits NAME polygon."
+    status: gap
+
+gaps:
+  - "Tax Parcels/7 is geometry+PARCEL_NO+Calc_Acres only — no owner/mailing/situs/CURR_VAL/sale REST; qPublic AppID=728 HTML for CAMA (bot/CDN may 403)."
+  - "No county-wide Euclidean zoning REST — Comp Plan CharacterAreas only (planning character)."
+  - "No public REST lastSale.price/date — qPublic Sales Search HTML."
+  - "REJECTED CoreLogic Charlton_GA_Parcel (CGRUSER_USG) — paid-vendor licenseInfo; do not wire."
+  - "CharltonCountyGA_WFS 404; token-gated Charlton_Parcels (jharley_gis1) blocked."
+  - "No St. George city-limits polygon on City_Limits/2 (Character Area only)."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial; no emails/phones; skip utilities/AADT."
+
+license: >
+  Southern Georgia Regional Commission (SGRC) VALOR AGOL (sgrcgis_valor1 /
+  fYt1jp3hqamxgSvI) — Parcels_Charlton_County Tax Parcels/7, City_Limits_Charlton_County/2,
+  County Boundary / Voting / Roads companions. Comp Plan Character Areas on Coastal RC
+  CGRUSER_USG (PYn6bWCjT6bhw1z3 Charlton_County_GA_Character_Areas) — public character
+  polygons (not CoreLogic parcels). Human GIS Experience
+  experience.arcgis.com/experience/e7b0834560024321a4825bb973115065. Assessor
+  qpublic.net/ga/charlton App=CharltonCountyGA AppID=728 LayerID=11769. Attribution
+  SGRC / Charlton County Tax Assessors / Coastal RC. Public fields only; no emails/phones;
+  no paid vendors (CoreLogic Charlton_GA_Parcel explicitly rejected).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=CharltonCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://experience.arcgis.com/experience/e7b0834560024321a4825bb973115065
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services3.arcgis.com/fYt1jp3hqamxg
+    SvI/arcgis/rest/services/Parcels_Charlton_County/FeatureServer/7 count 7357; extent center
+    [['13049', 'Charlton County']]; sample [['13049', 'Charlton County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Folkston city"
+      level: city
+      parentFips: "13049"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Homeland city"
+      level: city
+      parentFips: "13049"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Charlton' AND aadt>0
+    altFilter: name LIKE '049-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 049-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 63
+    maxAadt: 10600
+    geoCheck: 63/63 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=CharltonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0006  016
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=CharltonCountyGA&Layer=Parcels&PageType=Report&KeyValue=0006%20%20016
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://experience.arcgis.com/experience/e7b0834560024321a4825bb973115065
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Folkston city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Homeland city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,571 @@
+state: GA
+jurisdiction: Greene County
+fips: "13133"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcels + WinGAP CAMA (owner/mailing/situs/acres/curr_val)
+  - role: parcels
+    name: Parcel_Regions_w_WinGAP_view (GreeneBOC)
+    restUrl: https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Parcel_Regions_w_WinGAP_view/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Deed_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      lastname: ownerName
+      firstname: ownerFirstName
+      middle: ownerMiddleName
+      address1: mailingAddress
+      address2: mailingAddress2
+      address3: mailingAddress3
+      city: mailingCity
+      state: mailingState
+      zip_code: mailingZip
+      house_no: situsNumber
+      stdirect: situsStreetDir
+      street_nam: situsStreet
+      sttype: situsStreetType
+      unit: situsUnit
+      Deed_Acres: acreage
+      Draw_Acres: acreageGis
+      totalacres: acreageTotal
+      woodacres: acreageWoodland
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      mavcurr: tax.assessedValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      sale_val: lastSale.price
+      saleland1: lastSale.landPrice
+      saleimp1: lastSale.improvementPrice
+      zoningcode: zoning
+      zoning: zoningAlt
+      taxdistric: taxDistrict
+      digclass: dorCode
+      digstrat: dorStrata
+      land_type: landType
+      legal_desc: legalDescription
+      subd_name: subdivision
+      homeexempt: homesteadExempt
+      landgmd: georgiaMilitiaDistrict
+      landlot: landLot
+      landdist: landDistrict
+      neighbhood: neighborhood
+      histyr1: tax.histYear1
+      histval1: tax.histValue1
+      histyr2: tax.histYear2
+      histval2: tax.histValue2
+      histyr3: tax.histYear3
+      histval3: tax.histValue3
+      lat: latitude
+      lon: longitude
+      Realkey: ownerKey
+      Ownkey: ownerKeyAlt
+      qPub_Link: appraiserSearchUrl
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + WinGAP CAMA landbase (AGOL org
+      QbbsWI5nIfBp4cMB — owner GreeneBOC / Greene County Board of Commissioners;
+      FeatureServer layer 0 "Parcel_Regions_w_WinGAP"). Live count 17735 (2026-09-24).
+      SR Web Mercator (wkid 102100/3857). maxRecordCount 2000 — page via resultOffset /
+      spatial envelopes. GEO-VERIFY GEORGIA: WGS84 samples ~-83.260,33.536 (Eagle View /
+      Lake Oconee) / ~-83.313,33.576 (Brannon Dr / west Greensboro) / service extent
+      ~-83.41–-82.95, 33.36–33.76 — Greene County GA county seat Greensboro (~-83.18,
+      33.58) / Lake Oconee. REJECT Greene_County_Tax_Parcels on services6…EbVsqZ18sv1kVJ3k
+      (SWIS/RPS fields; extent ~-74.54–-73.77, 42.10–42.46 = Greene County NEW YORK).
+      REJECT greenecountyassessor.org TopoCountyParcels (SR 102697 Missouri West ft —
+      Greene County MISSOURI). REJECT Greene AL/OH/TN/IN lookalikes; REJECT paid
+      Regrid/ATTOM/DynamoSpatial. lastname filled 17735; curr_val>0 =17716; Deed_Acres>0
+      =17642; Deed_Acres 5–150 ≈3009; house_no>0 =13935; qPub_Link filled 17735;
+      sale_val>0 =0; saleland1>0 =0; mavcurr>0 =0; zoningcode usable ≈25 — prefer Euclidean
+      Greene_County_Zoning_Polygons_view. city/state/zip_code are OWNER mailing — never
+      municipality filter. Compose situs house_no+stdirect+street_nam+sttype when
+      house_no>0. Soft taxdistric sample pts (not city codes): 91≈6838 (~-83.26,33.54 Lake
+      Oconee), 81≈1981 (~-83.21,33.53 Greensboro), 12≈1738 (~-83.21,33.54), 11≈1462
+      (~-83.25,33.75 north), 51≈1040 (~-83.31,33.58 west), 23≈864 (~-83.08,33.63 Union
+      Point), 71≈812 (~-83.16,33.37 south), 21≈749 (~-83.05,33.65 Union Point), 31≈743
+      (~-83.21,33.39 Reynolds), 41≈533 (~-83.24,33.68), 61≈329 (~-83.10,33.51 Siloam/White
+      Plains), 65≈243, 46≈194, 34≈191 — no city-limits FeatureServer in GreeneBOC org
+      (2026-09-24); prefer spatial when available. Assessor qPublic App=greeneCountyGA /
+      App=GreeneCountyGA / AppID=698 LayerID=11403 (qPub_Link KeyValue deep-link;
+      qpublic.net/ga/greene; Application.aspx bot 403 automated). Schema may expose
+      appraiser/apprname — DO NOT collect emails/phones. water/sewer/gas/electricty —
+      SKIP per tranche-3.
+    status: usable
+
+  - role: tax
+    name: Parcel_Regions_w_WinGAP curr_val / fmv* (same layer)
+    restUrl: https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Parcel_Regions_w_WinGAP_view/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Deed_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      taxdistric: taxDistrict
+      digclass: dorCode
+      homeexempt: homesteadExempt
+      histyr1: tax.histYear1
+      histval1: tax.histValue1
+      histyr2: tax.histYear2
+      histval2: tax.histValue2
+      histyr3: tax.histYear3
+      histval3: tax.histValue3
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. curr_val>0 =17716; mavcurr>0=0 —
+      no usable assessedValue on REST; use curr_val market + qPublic AppID=698 HTML for
+      assessed/taxable. Deep-link KeyValue={Parcel_No}:
+      Application.aspx?App=greeneCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_No}
+      (also AppID=698&LayerID=11403&PageTypeID=4&KeyValue=). histyr*/histval* are assessment
+      value-year history — NOT sales.
+    status: usable
+
+  - role: sales
+    name: null — sale_val / saleland1 unused on REST
+    restUrl: https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Parcel_Regions_w_WinGAP_view/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      sale_val>0 =0 and saleland1>0 =0 on Parcel_Regions_w_WinGAP_view/0 (2026-09-24).
+      Prefer qPublic Sales Search HTML App=greeneCountyGA / AppID=698. Rejected paid
+      Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Greene_County_Zoning_Polygons_view
+    restUrl: https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Greene_County_Zoning_Polygons_view/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Zoning: zoning
+      Descriptio: zoningDistrictName
+      NOTES: zoningNotes
+    notes: >
+      Preferred Euclidean zoning polygons (GreeneBOC; count 461). Domain: A1≈145, A2≈87,
+      PUD≈83, LR1≈50, B1≈22, LR2≈18, B2≈16, CPUD≈10, LAKE≈9, HI≈5, PR≈4, LI≈3, GREENSBORO≈2,
+      C3≈2, R2≈2, R1≈1, OI≈1, AP≈1. Matches county legend (A1 Agricultural Intensive, A2
+      Ag-Residential, LR1/LR2 Lakeshore, B1/B2 Commercial, HI/LI Industrial, etc.). Parcel
+      zoningcode on WinGAP essentially blank (≈25) — spatial join this layer onto parcels.
+      Official zoning guidance: greenecountyga.gov/820/Identifying-Property-Zoning (also
+      qPublic map County Zoning layer). Geo samples ~-83.16,33.39 Lake Oconee / Greene GA.
+    status: usable
+
+  - role: flu
+    name: Greene_County_Character_Areas_view (comp-plan character areas)
+    restUrl: https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Greene_County_Character_Areas_view/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      Name: flu
+      Designatio: fluCode
+      Acres: acreage
+    notes: >
+      Preferred Future Land Use / character-area polygons (count 45). Names include
+      Farmland and Forestry (~130665 ac), Conservation, Reynolds, West Greene Community,
+      East Greene Community, North Greene/Lake Oconee, Transitional Residential Hub,
+      Greater Greensboro. Spatial join onto Parcel_Regions_w_WinGAP. Not Euclidean zoning
+      — use Zoning_Polygons for zoning codes. Geo ~-83.15,33.47 Greene GA.
+    status: usable
+
+  - role: other
+    name: null — no Greene city-limits FeatureServer in GreeneBOC org
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No dedicated municipal boundary FeatureServer in GreeneBOC org listing (2026-09-24).
+      Soft taxdistric sample pts for Greensboro / Union Point / Lake Oconee districts —
+      prefer future city-limits layer or TIGER places when added. Do NOT filter by owner
+      mailing city. Companion Address Points / Road_Centerlines / Floodplain on same org —
+      not parcel CAMA.
+    status: gap
+
+municipalities:
+  - name: Greensboro
+    level: city
+    parentFips: "13133"
+    joinToCountyParcels: >
+      Soft taxdistric near Greensboro samples 81/12/91 (~-83.21–-83.26, 33.53–33.54) OR
+      situs near Greensboro GA (~-83.18,33.58). No Greensboro city-limits FeatureServer in
+      GreeneBOC. Zoning polys include GREENSBORO stub (count 2) — spatial Zoning clip aid.
+    layers:
+      - role: zoning
+        name: Greene_County_Zoning_Polygons spatial Greensboro
+        restUrl: https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Greene_County_Zoning_Polygons_view/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+          Descriptio: zoningDistrictName
+        notes: County Euclidean zoning spatial to Greensboro; no City-of-Greensboro FS.
+        status: partial
+      - role: flu
+        name: Character Areas spatial Greater Greensboro
+        restUrl: https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Greene_County_Character_Areas_view/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Acres
+        coverage: city-only
+        fieldMap:
+          Name: flu
+        notes: Character area "Greater Greensboro" (Designatio I) as FLU context.
+        status: partial
+      - role: parcels
+        name: null — county WinGAP spatial / soft taxdistric
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Greensboro-only CAMA — county Parcel_Regions_w_WinGAP_view/0 + soft filter.
+        status: gap
+    gaps:
+      - "No Greensboro city-limits/zoning/parcel FeatureServer — county layers + soft taxdistric."
+    status: partial
+
+  - name: Union Point
+    level: city
+    parentFips: "13133"
+    joinToCountyParcels: >
+      Soft taxdistric 21/23 samples ~-83.05–-83.08, 33.63–33.65 OR situs near Union Point
+      GA (~-83.07,33.62). No Union Point city-limits FS.
+    layers:
+      - role: zoning
+        name: County Zoning_Polygons spatial Union Point
+        restUrl: https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Greene_County_Zoning_Polygons_view/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+        notes: County Euclidean zoning spatial; no Union Point-owned GIS.
+        status: partial
+      - role: flu
+        name: null — county Character Areas spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Use county Character Areas spatial.
+        status: gap
+      - role: parcels
+        name: null — county WinGAP + soft taxdistric
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Parcel_Regions_w_WinGAP_view/0 only.
+        status: gap
+    gaps:
+      - "No Union Point city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: White Plains
+    level: city
+    parentFips: "13133"
+    joinToCountyParcels: >
+      Soft taxdistric 61 sample ~-83.10,33.51 OR situs near White Plains GA (~-83.04,33.48).
+      No White Plains city-limits FS.
+    layers:
+      - role: zoning
+        name: County Zoning_Polygons spatial White Plains
+        restUrl: https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Greene_County_Zoning_Polygons_view/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+        notes: County Euclidean zoning spatial.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Character Areas spatial only.
+        status: gap
+      - role: parcels
+        name: null — county WinGAP
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Parcel_Regions_w_WinGAP_view/0 only.
+        status: gap
+    gaps:
+      - "No White Plains city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Siloam
+    level: city
+    parentFips: "13133"
+    joinToCountyParcels: >
+      Soft taxdistric 61 area ~-83.10,33.51 OR situs near Siloam GA (~-83.08,33.54). No
+      Siloam city-limits FS.
+    layers:
+      - role: zoning
+        name: County Zoning_Polygons spatial Siloam
+        restUrl: https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Greene_County_Zoning_Polygons_view/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+        notes: County Euclidean zoning spatial.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Character Areas spatial only.
+        status: gap
+      - role: parcels
+        name: null — county WinGAP
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Parcel_Regions_w_WinGAP_view/0 only.
+        status: gap
+    gaps:
+      - "No Siloam city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Woodville
+    level: city
+    parentFips: "13133"
+    joinToCountyParcels: >
+      Soft taxdistric 11 sample ~-83.25,33.75 OR situs near Woodville GA (~-83.11,33.67).
+      No Woodville city-limits FS.
+    layers:
+      - role: zoning
+        name: County Zoning_Polygons spatial Woodville
+        restUrl: https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Greene_County_Zoning_Polygons_view/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+        notes: County Euclidean zoning spatial.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Character Areas spatial only.
+        status: gap
+      - role: parcels
+        name: null — county WinGAP
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Parcel_Regions_w_WinGAP_view/0 only.
+        status: gap
+    gaps:
+      - "No Woodville city-owned zoning/FLU/parcel REST."
+    status: partial
+
+gaps:
+  - "sale_val / saleland1 unused (0) — no public REST multi-sale history; qPublic App=greeneCountyGA / AppID=698 HTML only."
+  - "mavcurr assessed unused (mavcurr>0=0) — assessed/taxable via qPublic HTML."
+  - "Parcel zoningcode essentially blank — use Greene_County_Zoning_Polygons_view spatial join."
+  - "No municipal boundary FeatureServer in GreeneBOC — soft taxdistric sample pts only for cities."
+  - "REJECTED wrong-state: services6…EbVsqZ18sv1kVJ3k Greene_County_Tax_Parcels (Greene NY SWIS/RPS); greenecountyassessor.org (Greene MO SR 102697)."
+  - "GreeneCountyGA_WFS 404 on wfs.schneidercorp.com; qpublic Application.aspx bot 403 automated."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial; no emails/phones collected."
+  - "water/sewer/gas/electricty skipped (no utilities/AADT per tranche-3)."
+  - "Parcel_Regions_w_WinGAP_view maxRecordCount 2000 — page via resultOffset / envelopes."
+
+license: >
+  Greene County BOC AGOL org QbbsWI5nIfBp4cMB — Parcel_Regions_w_WinGAP_view
+  FeatureServer/0 (WinGAP CAMA), Greene_County_Zoning_Polygons_view/0,
+  Greene_County_Character_Areas_view/0. Human GIS: Greene County Georgia Basemap
+  webmap fc8ff118a56a4753b3af080b26fa5caa; county GIS page greenecountyga.gov/194/
+  Geographic-Information-Systems-GIS-Mappi (downloads via GA GIS Clearinghouse).
+  Assessor HTML qPublic SchneiderCorp App=greeneCountyGA / App=GreeneCountyGA /
+  AppID=698 LayerID=11403 PageID=5857 (qpublic.net/ga/greene; qPub_Link KeyValue
+  deep-links). Attribution Greene County Tax Assessors / Greene County GIS. Public
+  fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=698&LayerID=11403&PageTypeID=2&PageID=5857
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?webmap=fc8ff118a56a4753b3af080b26fa5caa
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services7.arcgis.com/QbbsWI5nIfBp4
+    cMB/arcgis/rest/services/Parcel_Regions_w_WinGAP_view/FeatureServer/0 count 17735; extent center
+    [['13133', 'Greene County']]; sample [['13133', 'Greene County']]. No change to field map (see layer
+    above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Greensboro city"
+      level: city
+      parentFips: "13133"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Siloam town"
+      level: city
+      parentFips: "13133"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Union Point city"
+      level: city
+      parentFips: "13133"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "White Plains city"
+      level: city
+      parentFips: "13133"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Woodville city"
+      level: city
+      parentFips: "13133"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Greene' AND aadt>0
+    altFilter: name LIKE '133-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 133-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 78
+    maxAadt: 34200
+    geoCheck: 78/78 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 17716
+    restUrl: https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Parcel_Regions_w_WinGAP_view/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: sale_val=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 17717
+    restUrl: https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Parcel_Regions_w_WinGAP_view/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=greeneCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=698&LayerID=11403&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 034C000970
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=greeneCountyGA&Layer=Parcels&PageType=Report&KeyValue=034C000970
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?webmap=fc8ff118a56a4753b3af080b26fa5caa
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Greensboro city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Siloam town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Union Point city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: White Plains city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Woodville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,334 @@
+state: GA
+jurisdiction: Lanier County
+fips: "13173"
+level: county
+markets: [Valdosta]
+
+layers:
+  # PRIMARY — county-wide parcel GEOMETRY (SGRC AGOL) + join alma MapServer for owner/taxdistric
+  - role: parcels
+    name: Lanier_Parcels (rstrom_sgrc) + alma Lanier/Parcels owner join
+    restUrl: https://services5.arcgis.com/HA2thkMWRBDb77XN/arcgis/rest/services/Lanier_Parcels/FeatureServer/23
+    layerId: 23
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      TOTALACRES: acreage
+      QPLINK: appraiserSearchUrl
+      LASTNAME: ownerName
+      FIRSTNAME: ownerFirstName
+      LEGAL_DESC: legalDescription
+      TAXDISTRIC: taxDistrict
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY = SGRC AGOL org HA2thkMWRBDb77XN / rstrom_sgrc
+      Lanier_Parcels FeatureServer layer 23 "Parcels" (item 3c9c440d6e1343fe808f5b4abad9499b;
+      "Updated November 2025"). Live count 5968 (2026-09-24). Fields on FS/23: PARCEL_NO,
+      TOTALACRES, QPLINK, edit metadata — NO owner/tax/sale on FS. Join attributes from twin
+      SGRC alma MapServer https://www.sgrcmaps.com/alma/rest/services/Lanier/Parcels/MapServer/2
+      (Parcel Boundaries; same count 5968; fields PARCEL_NO/TOTALACRES/QPLINK/LEGAL_DESC/
+      TAXDISTRIC/LASTNAME/FIRSTNAME) ON PARCEL_NO. WARNING: alma MapServer/0–2 Query
+      returnGeometry=true returns null geometry (Map/Identify still draws rings) — do NOT
+      rely on alma Query for polygons; prefer FS/23 for geometry. SR NAD 1983 StatePlane
+      Georgia West FIPS 1002 Feet (102667/2240). maxRecordCount 2000 on FS — page via
+      resultOffset / envelopes. TOTALACRES>0 =5910; TOTALACRES 5–150 =1410; LASTNAME filled
+      ≈5889 (alma); QPLINK filled 5968. QPLINK template AppID=750 LayerID=11786 PageTypeID=4
+      PageID=5528 KeyValue= — append {PARCEL_NO} (KeyValue empty in stored URL). Soft
+      TAXDISTRIC (alma): 01≈4421 unincorporated, 02≈1430 Lakeland (parcel ids L0*), 15≈38
+      Ray City fringe — prefer spatial MunicipalBoundaries City Limits. CITY mailing N/A on
+      these layers — never municipality filter via owner city. GEO-VERIFY GEORGIA: WGS84
+      samples ~-82.986,31.176 (048 0003) / ~-83.081,31.033 (L05 0031 Lakeland) / service
+      extent projected ~-83.20–-82.97, 30.85–31.18 — Lanier County GA / Lakeland
+      (~-83.07,31.04) Valdosta MSA ring (NOT Lake Lanier / Hall County; NOT Lanier lookalikes
+      outside GA). REJECT GDITAdmin item "Parcels - GA - Lanier County" (subscription
+      canceled SB_0006; pointed at same alma MapServer/2). Rejected paid Regrid/ATTOM/
+      DynamoSpatial/Acres. Skip MajorRoadsAADT on same org (tranche-3). Schema on Addresses
+      exposes PHONE1 — DO NOT collect.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL/FMV/assessed on public REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No CURR_VAL / FMV* / MAVCURR on Lanier_Parcels FS/23 or alma Lanier/Parcels MapServer.
+      Assessor HTML qPublic AppID=750 LayerID=11786 (App=LanierCountyGA; qpublic.net/ga/lanier;
+      bot/CDN 403 automated). Deep-link KeyValue={PARCEL_NO}:
+      Application.aspx?AppID=750&LayerID=11786&PageTypeID=4&PageID=5528&KeyValue={PARCEL_NO}
+      (also App=LanierCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCEL_NO}).
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/saledate fields on Lanier_Parcels FS or alma Parcels MapServer. Prefer qPublic
+      Sales Search HTML AppID=750 / App=LanierCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Lanier/Zoning Land Development Districts (county Euclidean)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Lanier/Zoning/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      lused_code: zoning
+      lused_name: zoningDistrictName
+    notes: >
+      Preferred county Land Development Districts polygons (count 3380). Domain lused_code:
+      A-U Agricultural Use, R-R Rural Residential, R-1 / R-1A Single Family, R-C Rural
+      Commercial, G-B General Business, WLI Wholesale-Light Industrial, M-H-P Manufactured
+      Housing Park, P-D Planned District. Geo samples ~-83.05–-83.01, 31.18 Lanier GA.
+      Companion layer 0 Lakeland Zoning is CITY-ONLY (see municipalities). Spatial join onto
+      Lanier_Parcels FS/23.
+    status: usable
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Future Land Use / character-area FeatureServer confirmed for Lanier GA on SGRC
+      (2026-09-24). Zoning Land Development Districts is Euclidean zoning, not FLU.
+    status: gap
+
+  - role: other
+    name: Lanier/Addresses (situs points — COUNTY=LANIER STATE=GA)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Lanier/Addresses/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ADDRESS: situsAddress
+      STNUM: situsNumber
+      NAME: situsStreet
+      TYPE: situsStreetType
+      PREDIR: situsStreetDir
+      CITY: situsCity
+      ZIP: situsZip
+      COUNTY: countyName
+      STATE: situsState
+      LAT: latitude
+      LON: longitude
+    notes: >
+      Live count 7517. COUNTY='LANIER' STATE='GA' — geo samples ~-83.023,31.138 (24
+      DURRANCE RD LAKELAND) / ~-83.137,31.080 (RAY CITY) / ~-82.999,30.938 (STOCKTON). Soft
+      situs join; GISLINK often blank — spatial join to Lanier_Parcels. DO NOT collect PHONE1
+      / contact fields if present.
+    status: usable
+
+  - role: other
+    name: Lanier/MunicipalBoundaries City Limits
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Lanier/MunicipalBoundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: acres
+    coverage: city-only
+    fieldMap:
+      CITY: cityName
+      acres: acreage
+    notes: >
+      Preferred spatial municipality filter (CITY=LAKELAND ~-83.074,31.040; CITY=RAY CITY
+      ~-83.193,31.061 — Ray City spans Berrien too; prefer Lanier COUNTYFP portion). Soft
+      TAXDISTRIC fallback 02≈Lakeland / 15≈Ray City fringe.
+    status: usable
+
+municipalities:
+  - name: Lakeland
+    level: city
+    parentFips: "13173"
+    joinToCountyParcels: >
+      Spatial MunicipalBoundaries CITY='LAKELAND' (~-83.07,31.04) OR soft TAXDISTRIC='02'
+      (~1430; L0* parcel prefixes) OR Addresses CITY='LAKELAND'. County seat.
+    layers:
+      - role: zoning
+        name: Lanier/Zoning Lakeland Zoning (city Euclidean)
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Lanier/Zoning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE_: zoning
+        notes: >
+          City of Lakeland zoning polygons (count 320). ZONE_ domain: CBD, GB, I, R1, R2,
+          R3, R8, RA, RC. Prefer over county LDD inside city limits.
+        status: usable
+      - role: parcels
+        name: Lanier_Parcels spatial Lakeland
+        restUrl: https://services5.arcgis.com/HA2thkMWRBDb77XN/arcgis/rest/services/Lanier_Parcels/FeatureServer/23
+        layerId: 23
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          TOTALACRES: acreage
+        notes: No Lakeland-only CAMA FS — county Lanier_Parcels + city limits / TAXDISTRIC=02.
+        status: partial
+    gaps:
+      - "No Lakeland-owned separate parcel/CAMA FeatureServer — county layers + city zoning."
+    status: usable
+
+  - name: Ray City
+    level: city
+    parentFips: "13173"
+    joinToCountyParcels: >
+      Spatial MunicipalBoundaries CITY='RAY CITY' (~-83.19,31.06; city also in Berrien) OR
+      soft TAXDISTRIC='15' (~38) OR Addresses CITY='RAY CITY'. Prefer spatial Lanier portion.
+    layers:
+      - role: zoning
+        name: County Land Development Districts spatial Ray City
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Lanier/Zoning/MapServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          lused_code: zoning
+        notes: No Ray City-owned zoning FS on Lanier SGRC folder — county LDD spatial clip.
+        status: partial
+      - role: parcels
+        name: Lanier_Parcels spatial Ray City (Lanier portion)
+        restUrl: https://services5.arcgis.com/HA2thkMWRBDb77XN/arcgis/rest/services/Lanier_Parcels/FeatureServer/23
+        layerId: 23
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+        notes: Lanier County portion only; Berrien side not on this FS.
+        status: partial
+    gaps:
+      - "Ray City spans Lanier+Berrien — this card is Lanier FIPS 13173 portion only."
+      - "No Ray City-owned zoning/parcel REST on Lanier SGRC services."
+    status: partial
+
+gaps:
+  - "No CURR_VAL/FMV/assessed or SALE_* on public REST — tax/sales via qPublic AppID=750 / App=LanierCountyGA HTML only."
+  - "alma Lanier/Parcels MapServer Query returnGeometry=null — use AGOL Lanier_Parcels FS/23 for polygons; join alma for LASTNAME/TAXDISTRIC."
+  - "No FLU FeatureServer confirmed on SGRC Lanier folder."
+  - "Lanier_Parcels FS/23 maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "REJECT GDITAdmin Parcels - GA - Lanier County (subscription canceled); REJECT paid Regrid/ATTOM/DynamoSpatial/Acres."
+  - "Skip MajorRoadsAADT + utilities; DO NOT collect Addresses PHONE1 / emails."
+  - "SGRC LanierElections webapp is elections-only — not cadastral (viewer id=5416d140b29d4f7a96f141c31c473b2f)."
+
+license: >
+  Southern Georgia Regional Commission (SGRC) — AGOL org HA2thkMWRBDb77XN / rstrom_sgrc
+  Lanier_Parcels FeatureServer/23; alma MapServer Lanier/Parcels (owner/taxdistric join),
+  Lanier/Zoning, Lanier/MunicipalBoundaries, Lanier/Addresses. Assessor qPublic SchneiderCorp
+  AppID=750 LayerID=11786 / App=LanierCountyGA (qpublic.net/ga/lanier; QPLINK KeyValue
+  deep-links). Attribution Lanier County Tax Assessors / SGRC GIS. Public fields only; no
+  emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=750&LayerID=11786&PageTypeID=2&PageID=5528
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?layers=3c9c440d6e1343fe808f5b4abad9499b
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services5.arcgis.com/HA2thkMWRBDb77XN/arcgis/rest/services/Lanier_Parcels/FeatureServer/23
+    count 5968; extent center [['13173', 'Lanier County']]; sample [['13173', 'Lanier County']]. No
+    change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Lakeland city"
+      level: city
+      parentFips: "13173"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Lanier' AND aadt>0
+    altFilter: name LIKE '173-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 173-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 65
+    maxAadt: 8380
+    geoCheck: 65/65 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: null
+    restUrl: https://services5.arcgis.com/HA2thkMWRBDb77XN/arcgis/rest/services/Lanier_Parcels/FeatureServer/23
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner field on another REST layer already on this card
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=LanierCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=750&LayerID=11786&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 048 0003
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LanierCountyGA&Layer=Parcels&PageType=Report&KeyValue=048%200003
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?layers=3c9c440d6e1343fe808f5b4abad9499b
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Lakeland city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

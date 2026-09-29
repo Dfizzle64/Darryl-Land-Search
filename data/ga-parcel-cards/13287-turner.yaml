@@ -1,0 +1,450 @@
+state: GA
+jurisdiction: Turner County
+fips: "13287"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner/mailing/situs/tax (SGRC alma); sale thin
+  - role: parcels
+    name: TurnerParcels Parcels (SGRC alma)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Turner/TurnerParcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Draw_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      Draw_Acres: acreage
+      Deed_Acres: deedAcreage
+      totalacres: totalAcreage
+      lastname: ownerName
+      firstname: ownerFirstName
+      address1: mailingAddress
+      city: mailingCity
+      state: mailingState
+      zip_code: mailingZip
+      house_no: situsHouseNo
+      street_nam: situsStreet
+      sttype: situsStreetType
+      stdirect: situsStreetDir
+      zip: situsZip
+      curr_val: tax.marketValue
+      mavcurr: tax.assessedValue
+      digclass: dorCode
+      taxdistric: taxDistrict
+      zoning: zoningOpaque
+      zoningcode: zoningCode
+      sale_val: lastSale.qualified
+      saleland1: lastSale.landPrice
+      saleimp1: lastSale.imprPrice
+      qPub_Link: appraiserReportUrl
+      Shape.STArea(): shapeArea
+      Shape.STLength(): shapeLength
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + owner/mailing/situs/tax (Southern Georgia
+      Regional Commission SGRC alma — Turner/TurnerParcels MapServer/0 "Parcels"). Live
+      count 5714 (2026-09-24). lastname filled ≈5710; curr_val>0 ≈5710; Draw_Acres 5–150
+      =1804; zoning opaque filled ≈5692; SALELAND1>0 only ≈21 (thin sale REST). SR NAD
+      1983 StatePlane Georgia West FIPS 1002 Feet (wkid 102667 / latestWkid 2240).
+      maxRecordCount 1000 — page via resultOffset / envelopes. Parcel_No format e.g.
+      '001    001' (preserve spaces; qPub_Link URL-encodes). Owner often in lastname only
+      (entity/full-name packed); firstname sparse. Build situs from house_no + stdirect +
+      street_nam + sttype when house_no>0. mavcurr mostly 0 — prefer curr_val as
+      tax.marketValue; assessed/taxable via qPublic HTML. digclass tax landbase:
+      R≈3071 / V≈1425 / C≈422 / A≈305 / E≈267 / J≈167 / I≈30 / U≈15 / P≈8. Opaque parcel
+      zoning codes 001≈2183 / 004≈1715 / 007≈1328 / 002≈363 / 005≈71 / 003≈17 / 006≈15 —
+      NOT Euclidean; prefer TurnerZoning/8 ZOTXT for Ashburn Euclidean. Soft TAXDISTRIC
+      (geo-checked): 01≈unincorp (~3200, sample ~-83.80,31.80 NW), 02≈Ashburn (~1982,
+      ~-83.67,31.71), 03≈Sycamore (~350, ~-83.64,31.67), 04≈Rebecca (~178, ~-83.49,31.81)
+      — prefer spatial City Limits over TAXDISTRIC alone. qPub_Link App=turnerCountyGA
+      KeyValue={Parcel_No}; numeric AppID=771 LayerID=11807 (topmenu also App=TurnerCountyGA
+      Search PageID=5913). Twin AGOL TunerParcels FeatureServer/4 (rstrom_sgrc /
+      HA2thkMWRBDb77XN) same count 5714 / rich schema — alma MS preferred for SGRC
+      consistency. Official viewers: experience.arcgis.com/experience/19b7fdc1ffca4a9fb31ad8001bbfec71
+      (Turner County Planning & Zoning); qPublic map tab. GEO-VERIFY GEORGIA Turner FIPS
+      13287 seat Ashburn (~-83.65,31.71): WGS84 samples ~-83.800,31.803 (NW) /
+      ~-83.671,31.707 (Ashburn) / ~-83.491,31.812 (Rebecca). REJECT Turner OR
+      (turneror.maps) / Fairfax Turner Farm / paid Regrid/ATTOM/DynamoSpatial/USLandGrid;
+      no emails/phones (skip appraiser/apprname as staff PII). Skip TurnerTransportation
+      + MajorRoadsAADT per tranche-3.
+    status: usable
+
+  - role: tax
+    name: TurnerParcels curr_val / mavcurr (on parcels layer)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Turner/TurnerParcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      curr_val: tax.marketValue
+      mavcurr: tax.assessedValue
+      mavorig: tax.assessedValueOrig
+      digclass: dorCode
+      taxdistric: taxDistrict
+    notes: >
+      Market value REST usable (curr_val>0 ≈5710/5714). mavcurr mostly zero-filled —
+      assessed/taxable digest via qPublic AppID=771 LayerID=11807 HTML (Cloudflare/bot
+      403 automated; public for humans). Deep-link:
+      Application.aspx?AppID=771&LayerID=11807&PageTypeID=4&KeyValue={Parcel_No}
+      (also App=TurnerCountyGA&Layer=Parcels&PageType=Report&KeyValue=; qPub_Link builds
+      lowercase App=turnerCountyGA). Tax Commissioner payment portal separate (not CAMA).
+    status: usable
+
+  - role: sales
+    name: TurnerParcels saleland1/saleimp1 — thin; qPublic Sales HTML primary
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Turner/TurnerParcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      saleland1: lastSale.landPrice
+      saleimp1: lastSale.imprPrice
+      sale_val: lastSale.qualified
+    notes: >
+      REST sale fields present but THIN — SALELAND1>0 only ≈21 live (2026-09-24); no
+      reliable lastSale.date on layer. Prefer qPublic Sales Search / Yearly Sales HTML
+      AppID=771 / App=TurnerCountyGA. Rejected paid Regrid/ATTOM sales extracts.
+    status: partial
+
+  - role: zoning
+    name: TurnerZoning Zoning, Ashburn (SGRC AGOL Euclidean ZOTXT)
+    restUrl: https://services5.arcgis.com/HA2thkMWRBDb77XN/arcgis/rest/services/TurnerZoning/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZOTXT: zoning
+      ZONING_ID: zoningId
+      Special_Ex: zoningSpecialException
+    notes: >
+      Preferred Euclidean zoning polygons (count 892; layer title "Zoning, Ashburn").
+      ZOTXT top: AU≈249 / RR≈119 / R22≈81 / R20≈79 / GC≈70 / R8M≈65 / R8≈40 / WLI≈39 /
+      R22M≈28 / RP≈22 / HI≈17 / R1≈14 / NC≈10 / R10≈10 / MR≈10 / DC≈8 / SA≈6 / MHP≈6 /
+      CBD≈5 / R12≈3 / R1A≈3 / RC≈7 / RFH≈1. Spatial intersect to parcels (no Parcel_No
+      on zoning). County-wide parcel.zoning opaque 001–007 is secondary only — do not
+      prefer over ZOTXT inside Ashburn. No separate Rebecca/Sycamore-owned zoning FS
+      recovered. Wired in Turner County Planning & Zoning Experience + Turner Zoning
+      Web Map (rstrom_sgrc). Skip flood/NWI/AADT.
+    status: usable
+
+  - role: flu
+    name: null — no public Character Areas / FLU REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Turner Character Areas / Future Land Use FeatureServer on SGRC alma Turner/
+      folder or rstrom_sgrc AGOL catalog (2026-09-24). digclass is tax landbase not FLU.
+      Certify land-use intent vs adopted Comp Plan PDF when needed.
+    status: gap
+
+  - role: other
+    name: TurnerMunicipalities City Limits (Ashburn / Sycamore / Rebecca)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Turner/TurnerMunicipalities/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY: municipality
+    notes: >
+      Preferred spatial municipality filter. Cities: Ashburn (multi-ring), Sycamore
+      (multi-ring), Rebecca; ignore CITY='County' hole/enclave row. Twin AGOL
+      TurnerCityLimits FeatureServer/5 same CITY schema. Join = spatial intersect with
+      TurnerParcels. Do NOT filter by parcel owner mailing city. Companion layer 0
+      County NAME=TURNER — county mask.
+    status: usable
+
+  - role: other
+    name: TurnerAddresses Addresses (SGRC AGOL)
+    restUrl: https://services5.arcgis.com/HA2thkMWRBDb77XN/arcgis/rest/services/TurnerAddresses/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Site address points companion (wired in Planning & Zoning Experience). Use for
+      situs enrichment when house_no/street_nam thin; spatial join to parcels. Schema
+      not fully field-mapped this pass — discover on query.
+    status: partial
+
+municipalities:
+  - name: Ashburn
+    level: city
+    parentFips: "13287"
+    joinToCountyParcels: >
+      Spatial TurnerMunicipalities/1 CITY='Ashburn' (centroid ~-83.657,31.714; satellite
+      ~-83.650,31.736) ∩ TurnerParcels/0; soft TAXDISTRIC='02' (~1982) aid only —
+      prefer spatial. First-class city (county seat).
+    layers:
+      - role: zoning
+        name: TurnerZoning Zoning, Ashburn ZOTXT
+        restUrl: https://services5.arcgis.com/HA2thkMWRBDb77XN/arcgis/rest/services/TurnerZoning/FeatureServer/8
+        layerId: 8
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZOTXT: zoning
+        notes: >
+          Preferred Ashburn Euclidean = TurnerZoning/8 (layer titled Zoning, Ashburn).
+          Sample codes AU/RR/R22/R20/GC/R8M/R8/WLI/CBD/NC/HI. Standing order: city
+          Euclidean over opaque parcel.zoning inside limits. No separate City-of-
+          Ashburn-owned zoning FS beyond SGRC.
+        status: usable
+      - role: flu
+        name: null — no Ashburn FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ashburn Character Areas / FLU FS.
+        status: gap
+      - role: parcels
+        name: null — county TurnerParcels + spatial Ashburn
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Ashburn-only CAMA — county alma TurnerParcels + City Limits. Tax/sale via
+          parcel REST + qPublic HTML. SGRC Ashburn/ folder empty (2026-09-24).
+        status: gap
+    gaps:
+      - "No Ashburn-owned separate CAMA FeatureServer — SGRC county parcels + City Limits."
+      - "No Ashburn FLU REST — Comp Plan PDF certify."
+      - "Skip utilities + AADT per tranche-3."
+    status: usable
+
+  - name: Sycamore
+    level: city
+    parentFips: "13287"
+    joinToCountyParcels: >
+      Spatial TurnerMunicipalities/1 CITY='Sycamore' (main centroid ~-83.631,31.671)
+      ∩ county parcels; soft TAXDISTRIC='03' (~350).
+    layers:
+      - role: zoning
+        name: null — no Sycamore-owned Euclidean; opaque parcel zoning only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          TurnerZoning/8 is Ashburn-titled; no Sycamore Euclidean FS recovered. Fall
+          back to parcel.zoning opaque ∩ Sycamore limits or county Comp Plan PDF.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sycamore FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county parcels + spatial Sycamore
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sycamore-only CAMA REST.
+        status: gap
+    gaps:
+      - "Sycamore city limits usable; no city Euclidean zoning FS; tax/sale county REST + qPublic."
+    status: partial
+
+  - name: Rebecca
+    level: city
+    parentFips: "13287"
+    joinToCountyParcels: >
+      Spatial TurnerMunicipalities/1 CITY='Rebecca' (centroid ~-83.488,31.807) ∩ county
+      parcels; soft TAXDISTRIC='04' (~178).
+    layers:
+      - role: zoning
+        name: null — no Rebecca-owned Euclidean
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Rebecca Euclidean zoning FS — opaque parcel.zoning secondary only.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Rebecca FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county parcels + spatial Rebecca
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Rebecca-only CAMA REST.
+        status: gap
+    gaps:
+      - "Rebecca city limits usable; no city zoning/FLU REST; tax/sale county REST + qPublic."
+    status: partial
+
+gaps:
+  - "SALELAND1>0 only ≈21 — thin REST sale; prefer qPublic AppID=771 Sales Search HTML for lastSale.date/history."
+  - "mavcurr mostly 0 — assessed/taxable via qPublic HTML; prefer curr_val as market."
+  - "Parcel zoning opaque 001–007 — prefer TurnerZoning/8 ZOTXT Euclidean inside Ashburn; no county-wide Euclidean beyond Ashburn layer."
+  - "No public FLU / Character Areas REST — digclass is tax landbase not FLU."
+  - "maxRecordCount 1000 on alma MapServer — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/turner + AppID=771 public for humans."
+  - "TAXDISTRIC soft map 01=unincorp / 02=Ashburn / 03=Sycamore / 04=Rebecca — prefer City Limits spatial."
+  - "Skip TurnerTransportation / MajorRoadsAADT + utilities per tranche-3; skip appraiser/apprname staff fields as PII."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial/USLandGrid; rejected Turner OR / Fairfax Turner Farm lookalikes."
+
+license: >
+  Southern Georgia Regional Commission GIS (sgrcmaps.com/alma) — Turner/TurnerParcels,
+  Turner/TurnerMunicipalities; twin AGOL rstrom_sgrc HA2thkMWRBDb77XN TunerParcels,
+  TurnerZoning, TurnerCityLimits, TurnerAddresses. Official viewer
+  experience.arcgis.com/experience/19b7fdc1ffca4a9fb31ad8001bbfec71 (Turner County
+  Planning & Zoning). Assessor qPublic App=TurnerCountyGA / AppID=771 LayerID=11807
+  (qpublic.net/ga/turner; qPub_Link KeyValue={Parcel_No}). Attribution SGRC / Turner
+  County Tax Assessor. Public fields only; no emails/phones; no paid vendors; skip
+  utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=771&LayerID=11807&PageTypeID=2&PageID=5913
+jurisdictionGisUrl: https://experience.arcgis.com/experience/19b7fdc1ffca4a9fb31ad8001bbfec71
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://www.sgrcmaps.com/alma/rest/services/Turner/TurnerParcels/MapServer/0 count 5714; extent
+    center [['13287', 'Turner County']]; sample [['13287', 'Turner County']]. No change to field map
+    (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Ashburn city"
+      level: city
+      parentFips: "13287"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Rebecca town"
+      level: city
+      parentFips: "13287"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Sycamore city"
+      level: city
+      parentFips: "13287"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Turner' AND aadt>0
+    altFilter: name LIKE '287-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 287-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 96
+    maxAadt: 48600
+    geoCheck: 96/96 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 5710
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Turner/TurnerParcels/MapServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: REST-partial
+    detail: saleland1 >0 only ~21; no date
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Turner/TurnerParcels/MapServer/0
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 5710
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Turner/TurnerParcels/MapServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=turnerCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=771&LayerID=11807&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=turnerCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20001
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://experience.arcgis.com/experience/19b7fdc1ffca4a9fb31ad8001bbfec71
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Ashburn city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Rebecca town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Sycamore city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

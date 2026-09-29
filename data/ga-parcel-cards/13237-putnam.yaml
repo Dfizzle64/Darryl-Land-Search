@@ -1,0 +1,274 @@
+state: GA
+jurisdiction: Putnam County
+fips: "13237"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer recovered
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Putnam County GA public parcel FeatureServer/MapServer recovered
+      (2026-09-24). Official human CAMA/GIS = qPublic App=PutnamCountyGA / AppID=761
+      LayerID=11797 (qpublic.net/ga/putnam; Eatonton GA). Cloudflare/bot 403 blocks
+      automated Application.aspx; public for humans. PutnamCountyGA_WFS 404.
+      Deep-link KeyValue={parcelId} e.g. KeyValue=020%20002:
+      Application.aspx?AppID=761&LayerID=11797&PageTypeID=4&PageID=5583&KeyValue={parcelId}
+      (also App=PutnamCountyGA&Layer=Parcels&PageType=Report&KeyValue=).
+      GEO-VERIFY GEORGIA FIPS 13237: Eatonton Boundary centroid ~-83.388,33.362;
+      Putnam_Boundaries/1 ~-83.540,33.312; Census TIGERweb GEOID 13237 CENTLAT
+      +33.3217392 CENTLON -083.3728641 (Lake Oconee / Eatonton).
+      REJECT putnamcountygis.com Real_Estate/Parcels (Putnam County OHIO — WGS84
+      samples ~-84.11,40.90; GregPutnamGIS). REJECT Putnam_County_NY
+      Putnam_parcels_2024 (dU6jdOIkCUj2UDe9; extent ~-73.98–-73.53, 41.32–41.53).
+      REJECT putcoassessor@yahoo.com / putnamil.maps.arcgis.com (Putnam County IL).
+      REJECT gis.putnam-fl.com / pamap.putnam-fl.gov (Putnam FL). REJECT paid
+      Regrid/ATTOM/DynamoSpatial/Equator. Skip utilities+AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via qPublic App=PutnamCountyGA
+      / AppID=761 HTML. Rejected paid vendor tax extracts.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer qPublic Sales Graph/Search HTML
+      (qpublic.net/ga/putnam/salesinfo.html; App=PutnamCountyGA). Rejected paid
+      Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: PutnamZoningAdmin_GM1 (MGRC mgrcmaps.org) — Euclidean + NEW_PIN
+    restUrl: https://mgrcmaps.org/arcgis/rest/services/PutnamCounty/PutnamZoningAdmin_GM1/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      NEW_PIN: parcelId
+      Zoning: zoning
+      ACRES: acreage
+      District: zoningDistrict
+      ParcelType: parcelType
+      EncumbranceType: encumbranceType
+      Z_Status: zoningStatus
+    notes: >
+      Preferred county Euclidean zoning polygons (Middle Georgia RC mgrcmaps.org
+      PutnamCounty/PutnamZoningAdmin_GM1 FeatureServer/0). Field map from official
+      GARC webmap popupInfo (item 95281106f8fb4b1fb708bbc81386711d / viewer
+      9c4dce50a1d6459ebc12c894f0754b65). NEW_PIN joins qPublic KeyValue when
+      parcel REST absent. Live REST query from research egress timed out / unreachable
+      2026-09-24 (mgrcmaps.org + www.mgrcmaps.org connect fail; GARC proxy 403) —
+      URL is the jurisdiction-published endpoint; re-verify field fill counts when
+      host reachable. Companion SecondaryZoning/2 Zoning+ParcelID; overlay
+      SecondaryZoning/1 NAME. Twin www.mgrcmaps.org host used inside GARC app config.
+      NOT a full CAMA substitute (no owner/sale/market on popup fields).
+    status: partial
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Putnam County GA future land use REST found — Comp Plan/PDF gap.
+    status: gap
+
+  - role: other
+    name: Putnam_Boundaries + Municipal Boundaries (Eatonton)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Putnam_Boundaries/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+    notes: >
+      County boundary polygon NAME='Putnam' (live). Companion layer 0 Eatonton
+      Boundary; Municipal Boundaries also on Commission_District_Map_WFL1/1
+      NAME='Eatonton' only incorporated city. Preferred spatial municipality filter.
+    status: usable
+
+municipalities:
+  - name: Eatonton
+    level: city
+    parentFips: "13237"
+    joinToCountyParcels: >
+      Spatial Eatonton_Boundary / Putnam_Boundaries/0 / Municipal Boundaries
+      NAME='Eatonton' (~-83.388,33.362) OR soft situs near Eatonton when parcel
+      REST exists. County seat; only incorporated municipality recovered.
+    layers:
+      - role: parcels
+        name: null — no city parcel CAMA FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Eatonton-owned parcel FS — county qPublic HTML + spatial city limits.
+        status: gap
+      - role: zoning
+        name: PutnamZoningAdmin_GM1 spatial Eatonton + Historic/Downtown overlays
+        restUrl: https://mgrcmaps.org/arcgis/rest/services/PutnamCounty/PutnamZoningAdmin_GM1/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          NEW_PIN: parcelId
+          Zoning: zoning
+        notes: >
+          Prefer county Zoning inside Eatonton limits. Overlays:
+          HistoricDistrict/0; DwontownBusiness/0 (Downtown Business District) on
+          Ug5xGQbHsD8zuZzM. Live mgrcmaps query unreachable from research box.
+        status: partial
+      - role: other
+        name: Eatonton_Boundary
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Eatonton_Boundary/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          NAME: cityName
+        notes: Live NAME='Eatonton' MUNITYP=City (~-83.388,33.362). Preferred city filter.
+        status: usable
+    gaps:
+      - "No Eatonton-owned parcel CAMA FeatureServer — qPublic county HTML + spatial Eatonton_Boundary."
+      - "mgrcmaps.org zoning REST published but unreachable from research egress 2026-09-24."
+    status: partial
+
+gaps:
+  - "No public REST parcels/owner/tax/sales for Putnam County GA — qPublic App=PutnamCountyGA / AppID=761 LayerID=11797 HTML only."
+  - "PutnamCountyGA_WFS 404; Application.aspx Cloudflare/bot 403 automated."
+  - "mgrcmaps.org PutnamZoningAdmin_GM1 / Putnam_SecondaryZoning published in GARC zoning webmap but REST host unreachable from research box (timeout) — field map from popupInfo; re-verify live."
+  - "No public FLU FeatureServer."
+  - "REJECT Putnam OH putnamcountygis.com; REJECT Putnam NY dU6jdOIkCUj2UDe9; REJECT Putnam IL putnamil; REJECT Putnam FL gis.putnam-fl.com; REJECT paid Regrid/ATTOM/DynamoSpatial/Equator."
+  - "Skip utilities+AADT; no emails/phones; schema LASTEDITOR usernames — do not collect as PII."
+
+license: >
+  Putnam County Tax Assessor qPublic/Beacon App=PutnamCountyGA / AppID=761
+  LayerID=11797 (qpublic.net/ga/putnam; putnamcountyga.us Eatonton GA). Middle
+  Georgia RC / GARC — Putnam Zoning webappviewer
+  garc.maps.arcgis.com/apps/webappviewer/index.html?id=9c4dce50a1d6459ebc12c894f0754b65;
+  mgrcmaps.org PutnamCounty/PutnamZoningAdmin_GM1 + Putnam_SecondaryZoning;
+  Ug5xGQbHsD8zuZzM Eatonton_Boundary / Putnam_Boundaries / HistoricDistrict /
+  DwontownBusiness. Attribution Putnam County Tax Assessor / MGRC GIS. Public
+  fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=PutnamCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://garc.maps.arcgis.com/apps/webappviewer/index.html?id=9c4dce50a1d6459ebc12c894f0754b65
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Eatonton city"
+      level: city
+      parentFips: "13237"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Putnam' AND aadt>0
+    altFilter: name LIKE '237-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 237-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 72
+    maxAadt: 17500
+    geoCheck: 72/72 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=PutnamCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=761&LayerID=11797&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://garc.maps.arcgis.com/apps/webappviewer/index.html?id=9c4dce50a1d6459ebc12c894f0754b65
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Eatonton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

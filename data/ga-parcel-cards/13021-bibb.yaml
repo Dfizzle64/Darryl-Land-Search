@@ -1,0 +1,402 @@
+state: GA
+jurisdiction: Bibb County
+fips: "13021"
+level: county
+markets: [Macon]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons + WinGAP CAMA (owner/mailing/situs/acres/FMV/sales/zoning attr)
+  - role: parcels
+    name: ParcelCAMA_Current_2025 (Macon-Bibb Tax Assessor / WinGAP — AGOL FeatureServer)
+    restUrl: https://services2.arcgis.com/zPFLSOZ5HzUzzTQb/arcgis/rest/services/ParcelCAMA_Current_2025/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES_1
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO_1: parcelId
+      parcel_no: parcelIdAlt
+      MAP_ROUTE: mapRoute
+      MAP_ROUTE_1: mapRouteAlt
+      JOIN_PIN: parcelJoinPin
+      REALKEY_1: ownerKey
+      OWNKEY: ownerKeyAlt
+      LASTNAME: ownerName
+      ADDRESS1: mailingAddress
+      ADDRESS2: mailingAddress2
+      ADDRESS3: mailingAddress3
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP: mailingZip
+      SITEADDRESS: situsAddress
+      HOUSE_NO: situsNumber
+      STDIRECT: situsStreetDir
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      UNIT: situsUnit
+      SITE_ZIP: situsZip
+      TOTALACRES_1: acreage
+      totalacres: acreageAlt
+      CALC_ACRE: acreageGis
+      SALEPRICE: lastSale.price
+      SALEDATE: lastSale.date
+      REASON: lastSale.qualified
+      DEEDPAGE: lastSale.deedPage
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      LANDVAL: tax.landMarketValue
+      ZONINGCODE: zoning
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      DIGSTRAT: dorStrata
+      LEGAL_DESC: legalDescription
+      SUBD_NAME: subdivision
+      NEIGHBHOOD: neighborhood
+      HOMEEXEMPT: homesteadExempt
+      Shape_Area: shapeAreaSqFt
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + WinGAP CAMA landbase for Macon-Bibb
+      (consolidated Bibb County / former City of Macon + Payne City). AGOL org
+      zPFLSOZ5HzUzzTQb (Macon-Bibb) FeatureServer name ParcelCAMA_Current_20250106;
+      serviceItemId 0b8a3dedb19b4c3085f0868fcd4e0f38. Live count 71505 (2026-09-23).
+      Near-identical twin (prefer for April-2025 label / +3 features):
+      https://maconbibb.spatialitics.net/server/rest/services/ParcelCAMA_Current/MapServer/0
+      (count 71508; mapName April2025Update; keywords Parcels,CAMA_Current,Wingap,Tax Assessor).
+      Prefer this FeatureServer (supportsPagination=true, maxRecordCount 2000). SR NAD 1983
+      StatePlane Georgia West FIPS 1002 Feet (wkid 102667 / latestWkid 2240). TOTALACRES_1>0
+      ≈68165; TOTALACRES_1 5–150 ≈3337 (preferred multifamily acreage band); CALC_ACRE 5–150
+      ≈4032 — prefer TOTALACRES_1 when >0, else CALC_ACRE. LASTNAME / SITEADDRESS /
+      ZONINGCODE / ZIP / SITE_ZIP / SALEDATE filled ≈68348; CURR_VAL <> '0' ≈68136;
+      SALEPRICE <> '0' ≈51918 (string field — coerce numeric; many nominal 1/10/100 —
+      filter PRICE not in ('0','1','100') leaves ≈47088). FMVRES <> '0' ≈49795; FMVCOM <> '0'
+      ≈4454. Compose situs from SITEADDRESS (or HOUSE_NO+STDIRECT+STREET_NAM+STTYPE).
+      ADDRESS1 is typical mailing street (sometimes co-owner / DBA / % agent); ADDRESS2
+      secondary line; CITY/STATE/ZIP are OWNER mailing (nationwide — e.g. BROOKLYN NY) —
+      never municipality filter. DIGCLASS: R≈59054, C≈4535, E≈2771, A≈818, V≈596, I≈358,
+      H≈134, null≈3160 (+ J/U/P sparse). TAXDISTRIC soft (no published REST name legend):
+      11≈66549 (vast majority / consolidated Macon-Bibb), 09≈804, 12≈443, 07≈320, 10≈94,
+      17≈73, 19≈51, 18≈10, 08≈4, null≈3160 — special/school/enterprise soft only; do NOT
+      use as city filter (no remaining incorporated cities). ZONINGCODE is parcel-attributed
+      (top R-1A≈15308, R-1AAA≈12182, R-2≈8931, A≈7412, R-1≈4362, PDR≈4074, R-3≈2404,
+      PDE≈2236…); prefer ZoningDistrictsNew / MB_ZoningDistricts_Edit polygons for
+      authoritative district boundaries (parcel codes include PDR/PDE/PDC subtypes +
+      slash combos / typos — soft). REASON is WinGAP sale/transfer reason (FM≈20907,
+      CP≈11963, QD≈5707, UQ≈3870, MP≈2152…) — soft lastSale.qualified; no published
+      REST legend (FM appears arms-length/market; UQ unqualified; QD quitclaim-ish —
+      certify via Assessor). SALEDATE max ≈2025-02-27 UTC on spatialitics twin; string
+      SALEPRICE/CURR_VAL/FMV* need numeric cast. Official viewers: experience Zoning Map
+      a72ae0e878c04e009c033240a6680dd4; maconbibb.maps.arcgis.com webappviewer
+      48e7713100fa4db6b437fded980098e6; Open Data hub macon-bibb-county-open-data-maconbibb.hub.arcgis.com.
+      Assessor HTML: qPublic SchneiderCorp App=BibbCountyGA (qpublic.net/ga/bibb →
+      Application.aspx?App=BibbCountyGA&Layer=Parcels&PageType=Search). Deep-link:
+      Application.aspx?App=BibbCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCEL_NO_1}
+      (MAP_ROUTE dashed form e.g. O130-0278 also used in viewers). Geo-verified WGS84
+      samples ~-83.695,32.847 (Fair St), ~-83.663,32.793 (Triple Hill), ~-83.721,32.745
+      (Hartley Bridge), ~-83.611,32.817 (Walker Swamp / industrial), ~-83.828,32.877
+      (Clay Dr west), county centroid ~-83.70,32.74 — Bibb County GA / Macon MSA
+      (NOT Bibb County AL Centreville; NOT Macon County GA FIPS 13193 Oglethorpe;
+      NOT Macon County AL/TN/IL; NOT Decatur IL "Macon Co. Tax Parcels" on
+      maps.decaturil.gov). Rejected ARC LandPro_2012 stale regional as cadastral;
+      rejected Regrid/ATTOM/CoreLogic paid; rejected AGOL Parcels/TaxParcels BS&A-style
+      as preferred (count ~68958 but LASTUPDATE≈2018-03-02 UTC, PSTLZIP5 filled=0,
+      CNTTXBLVAL>0=0, Midwestern winter/summer tax template, no SALEPRICE — usable only
+      as assessed-value join on PARCELID≈MAP_ROUTE with staleness caveat); rejected
+      LandParcelsMBC (386), Sales_Parcels_WFL1 (342 tax-sale listing), JIRMarch2025Parcels
+      (2068 blight/JIR subset), gis.maconbibb.us/server/rest (Web Adaptor "Could not
+      access any server machines" — blocked/down 2026-09-23).
+    status: usable
+
+  - role: tax
+    name: ParcelCAMA_Current CAMA values (same layer as preferred parcels)
+    restUrl: https://services2.arcgis.com/zPFLSOZ5HzUzzTQb/arcgis/rest/services/ParcelCAMA_Current_2025/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES_1
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO_1: parcelId
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      LANDVAL: tax.landMarketValue
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      HOMEEXEMPT: homesteadExempt
+    notes: >
+      Tax/CAMA market values live on preferred parcel polygons (CURR_VAL / FMV* /
+      LANDVAL as strings|int — coerce). No usable assessedValue / taxableValue on this
+      WinGAP extract (GA 40% assessed typically via qPublic HTML). Alternate assessed
+      join: AGOL Parcels FeatureServer CNTASSDVAL on PARCELID ≈ MAP_ROUTE (LIVE
+      CNTASSDVAL>0 ≈68681) but ownership LASTUPDATE ≈2018-03 — do not prefer for
+      owner/mail; tax-only join with vintage caveat. Assessor HTML: qPublic App=BibbCountyGA;
+      Schneider Application.aspx may CDN/bot 403 automated (observed 403) while
+      qpublic.net/ga/bibb landing 200. Tax Commissioner / payment portals separate from
+      CAMA. Deep-link KeyValue={PARCEL_NO_1}.
+    status: usable
+
+  - role: sales
+    name: lastSale on ParcelCAMA_Current polygons (SALEPRICE / SALEDATE / REASON)
+    restUrl: https://services2.arcgis.com/zPFLSOZ5HzUzzTQb/arcgis/rest/services/ParcelCAMA_Current_2025/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES_1
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO_1: parcelId
+      SALEPRICE: lastSale.price
+      SALEDATE: lastSale.date
+      REASON: lastSale.qualified
+      DEEDPAGE: lastSale.deedPage
+      LASTNAME: ownerName
+    notes: >
+      Sale history is on the parcel polygons (not a multi-sale REST table). SALEPRICE
+      string <> '0' ≈51918; excluding nominal 1/100 ≈47088. SALEDATE present ≈68348
+      (includes non-price transfers); max ≈2025-02-27. REASON soft qualification
+      (FM/CP/QD/UQ/MP…). Prefer REASON='FM' when screening arms-length comps (soft —
+      no published legend). No multi-sale history array on REST — prior sales via qPublic
+      Sales Search HTML. Rejected Sales_Parcels_WFL1 (342; Street_No_/Status fields —
+      tax-sale / listing subset, not countywide deed sales). Rejected paid Regrid/ATTOM.
+    status: partial
+
+  - role: zoning
+    name: ZoningDistrictsNew (official Macon-Bibb digital zoning polygons)
+    restUrl: https://services2.arcgis.com/zPFLSOZ5HzUzzTQb/arcgis/rest/services/ZoningDistrictsNew/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONECLASS: zoning
+      ZONEDESC: zoningDescription
+      PREZONECL: zoningPrevious
+      REZONENO: rezoningNumber
+      REZONEDATE: rezoningDate
+      ZONEURL: zoningOrdinanceUrl
+      SiteAddress: siteAddress
+      PDS: plannedDevelopmentFlag
+    notes: >
+      Preferred public REST zoning POLYGON layer (Macon-Bibb Planning & Zoning /
+      official digital zoning map per CLDR). Live count 1833 (2026-09-23). Spatial
+      intersect default join to parcels (no PARCEL_NO on this layer). ZONECLASS top:
+      C-2≈302, R-3≈215, PDS≈199, R-1AAA≈181, C-1≈144, PDM≈142, A≈116, C-4≈100, M-1≈83,
+      M-2≈78, R-2≈72, R-1A≈49 (+ HR-*/HC/HPD/CBD-*/MHR/C-5/RR/SC/H-BH…). Mirror
+      (fresher count 1915, edit-enabled): https://maconbibb.spatialitics.net/server/rest/services/MB_ZoningDistricts_Edit/FeatureServer/0
+      — query works publicly but capabilities include Create/Update/Delete; prefer AGOL
+      ZoningDistrictsNew for read-only consumers; use spatialitics when needing latest
+      edit copy. Experience Zoning Map embeds ZoningDistrictsNew:
+      https://experience.arcgis.com/experience/a72ae0e878c04e009c033240a6680dd4.
+      Ordinance: mbpz.org/zoning (Municode chapters). Parcel ZONINGCODE (~68347) is
+      fast attribute fallback — prefer this polygon layer for boundaries. Geo-check:
+      RR ~-83.84,32.77; R-1AAA ~-83.71,32.71 — Macon-Bibb GA. maxRecordCount 2000.
+      Rejected WebZoning_2025_WFL1/0 (9 hospital points — wrong layer despite name).
+    status: usable
+
+  - role: zoning
+    name: ParcelCAMA ZONINGCODE (parcel-attributed fallback)
+    restUrl: https://services2.arcgis.com/zPFLSOZ5HzUzzTQb/arcgis/rest/services/ParcelCAMA_Current_2025/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES_1
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO_1: parcelId
+      ZONINGCODE: zoning
+    notes: >
+      Parcel-attributed zoning on preferred parcels (non-null ≈68347). Includes PDR/PDE/PDC
+      planned-development subtypes and occasional slash multi-codes / typos — trim spaces;
+      for authoritative boundaries prefer ZoningDistrictsNew ZONECLASS. Consolidated
+      countywide codes (no city-vs-county split post-2014).
+    status: partial
+
+  - role: flu
+    name: MATS_Future_LandUse_2050 (Macon Area Transportation Study FLU)
+    restUrl: https://services2.arcgis.com/zPFLSOZ5HzUzzTQb/arcgis/rest/services/MATS_Future_LandUse_2050/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FLU2050: flu
+      LUCode2050: fluCode
+    notes: >
+      Preferred public REST Future Land Use. Live count 6902. FLU2050 domain:
+      Residential≈4457, Commercial≈882, Mixed Use≈491, Industrial≈362,
+      Public/Institutional≈214, Rural Residential≈173, Parks/Recreation/Conservation≈139,
+      Agriculture/Forestry≈27, Transportation/Communication/Utilities≈26, blank≈131.
+      LUCode2050: UR≈2524, SR≈1186, CC≈717, MU≈460, IND≈358, INST≈205, RR≈170, PREC≈133,
+      OS≈43, NC≈35, TCU≈20, blank≈1051. Spatial intersect only (no parcel id). MATS MPO
+      FLU may include fringe context tied to 2040/2050 LRTP — certify critical sites
+      against Macon-Bibb 2040 Comprehensive Plan PDF (mbpz.org) and Planning staff.
+      Companion MATS_Exist_LandUse/0 (76149) is existing land-use / ZONINGCODE snapshot —
+      not FLU; do not prefer as future land use. Geo-verified Industrial IND ~-83.64,32.79
+      — Macon-Bibb GA. No separate city FLU (consolidated).
+    status: partial
+
+  - role: other
+    name: County_Boundary (Bibb County polygon)
+    restUrl: https://services2.arcgis.com/zPFLSOZ5HzUzzTQb/arcgis/rest/services/County_Boundary/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      COUNTY: countyFips3
+      CountyName: countyNameAlt
+    notes: >
+      Live count 1 — NAME=Bibb, COUNTY=021 (FIPS 13021). Centroid ~-83.70,32.74.
+      Twins: MaconBibbCountyBoundary, MBCBoundary. Use for geo-fence / reject wrong-state.
+    status: usable
+
+  - role: other
+    name: SiteAddressPoints / AddressPoint (site address points)
+    restUrl: https://services2.arcgis.com/zPFLSOZ5HzUzzTQb/arcgis/rest/services/SiteAddressPoints/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      parcel_no: parcelId
+      concat_address: situsAddress
+      addressnumber: situsNumber
+      streetnamepredirectional: situsStreetDir
+      streetname: situsStreetName
+      streetnameposttype: situsStreetType
+      zipcode: situsZip
+      placename: situsCity
+      statename: situsState
+    notes: >
+      Live count 81858 SiteAddressPoints (parcel_no join key present). Alternate
+      AddressPoint/0 count 67730 (FULLADDR/ZIP_1/City_1 — no parcel_no). Spatialitics
+      Addresses FeatureServer also present. Prefer SiteAddressPoints when parcel_no
+      attribute join needed; else spatial. placename typically MACON — not a municipality
+      filter (consolidated).
+    status: usable
+
+municipalities:
+  - name: Macon-Bibb (consolidated government)
+    level: county
+    parentFips: "13021"
+    joinToCountyParcels: >
+      Entire ParcelCAMA_Current layer IS the consolidated jurisdiction (City of Macon +
+      Bibb County + Payne City consolidated effective 2014-01-01). No remaining
+      incorporated municipalities in Bibb County. Do NOT filter by mailing CITY='MACON'
+      (owner mailing nationwide). Optional soft TAXDISTRIC='11' (~66549) covers almost
+      all taxable parcels but is a tax-district code, not a city boundary.
+    layers:
+      - role: zoning
+        name: ZoningDistrictsNew (countywide = local zoning)
+        restUrl: https://services2.arcgis.com/zPFLSOZ5HzUzzTQb/arcgis/rest/services/ZoningDistrictsNew/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: county-wide
+        fieldMap:
+          ZONECLASS: zoning
+          ZONEDESC: zoningDescription
+        notes: >
+          Standing order city-over-county does not apply as separate cities — consolidated
+          Macon-Bibb zoning IS the local zoning. Official map experience
+          a72ae0e878c04e009c033240a6680dd4; ordinance mbpz.org/zoning.
+        status: usable
+      - role: flu
+        name: MATS_Future_LandUse_2050
+        restUrl: https://services2.arcgis.com/zPFLSOZ5HzUzzTQb/arcgis/rest/services/MATS_Future_LandUse_2050/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: county-wide
+        fieldMap:
+          FLU2050: flu
+          LUCode2050: fluCode
+        notes: >
+          Countywide FLU via MATS; certify vs 2040 Comp Plan PDF. Status partial.
+        status: partial
+      - role: parcels
+        name: ParcelCAMA_Current_2025 (same as county preferred)
+        restUrl: https://services2.arcgis.com/zPFLSOZ5HzUzzTQb/arcgis/rest/services/ParcelCAMA_Current_2025/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES_1
+        coverage: county-wide
+        fieldMap:
+          PARCEL_NO_1: parcelId
+          TOTALACRES_1: acreage
+          LASTNAME: ownerName
+        notes: >
+          No separate city CAMA — consolidated county layer is the parcel source.
+        status: usable
+    gaps:
+      - "City of Macon and Payne City governments dissolved 2014-01-01 into Macon-Bibb County Consolidated Government — no separate city GIS cards or city-only FeatureServers required."
+      - "No remaining incorporated municipalities inside Bibb County FIPS 13021."
+    status: usable
+
+gaps:
+  - "No remaining incorporated municipalities (Macon + Payne City consolidated 2014) — municipalities section is consolidated-only; no city boundary FeatureServer needed for filters."
+  - "gis.maconbibb.us/server/rest Web Adaptor returns 'Could not access any server machines' (2026-09-23) — PlanningAndZoning/Zoning MapServer and legacy portal services blocked/down; use AGOL zPFLSOZ5HzUzzTQb + maconbibb.spatialitics.net instead."
+  - "No assessedValue/taxableValue on preferred WinGAP ParcelCAMA REST — use CURR_VAL market + qPublic HTML for assessed; AGOL Parcels CNTASSDVAL is assessed but ownership LASTUPDATE≈2018-03."
+  - "AGOL Parcels / TaxParcels BS&A-style layer (count ~68958): PSTLZIP5 filled=0, CNTTXBLVAL>0=0, Midwestern winter/summer tax fields, no sales — do NOT prefer over ParcelCAMA_Current."
+  - "SALEPRICE/CURR_VAL/FMV* are strings — numeric cast required; many SALEPRICE='0'/'1'/'100' nominal."
+  - "No multi-sale history array on REST — only latest sale on polygon; prior sales via qPublic HTML (Application.aspx may bot 403)."
+  - "REASON sale codes lack published REST legend — FM/UQ/QD etc. soft only."
+  - "Parcel ZONINGCODE has PDR/PDE/PDC + slash combos / typos; authoritative boundaries = ZoningDistrictsNew ZONECLASS (PDS/PDM)."
+  - "TAXDISTRIC codes lack published name legend — soft only; never city filter."
+  - "Mailing CITY/STATE/ZIP nationwide — never municipality filter."
+  - "MATS_Future_LandUse_2050 is MPO FLU tied to 2050 horizon — certify vs adopted Macon-Bibb 2040 Comp Plan PDF / Planning."
+  - "MATS_Exist_LandUse is existing LU / not FLU — do not prefer as future land use."
+  - "Sales_Parcels_WFL1 (342) is tax-sale listing subset — not countywide sales."
+  - "JIRMarch2025Parcels (2068) and LandParcelsMBC (386) are subsets — not preferred countywide."
+  - "WebZoning_2025_WFL1/0 is 9 hospital points — wrong geography/role despite name."
+  - "MB_ZoningDistricts_Edit is edit-enabled (Query+Editing) — prefer ZoningDistrictsNew for read-only; spatialitics count 1915 slightly ahead of AGOL 1833."
+  - "qPublic Schneider Application.aspx App=BibbCountyGA observed HTTP 403 to automated clients; qpublic.net/ga/bibb landing 200."
+  - "Rejected lookalikes / non-preferred: Bibb County AL (Centreville) GIS; Macon County GA (FIPS 13193, Oglethorpe — different county); Macon County AL/TN/IL; Decatur IL maps.decaturil.gov Public/parcels 'Macon Co. Tax Parcels'; ARC LandPro_2012 stale regional as cadastral; Regrid/ATTOM/CoreLogic/DynamoSpatial paid; AGOL Parcels BS&A as preferred current CAMA; gis.maconbibb.us down services."
+  - "No emails/phones collected; no paid vendors."
+
+license: >
+  Macon-Bibb County Government IT GIS / Tax Assessors Office / Middle Georgia Regional
+  Commission (MGRC) / Planning & Zoning Commission (mbpz.org) — AGOL org
+  services2.arcgis.com/zPFLSOZ5HzUzzTQb (ParcelCAMA_Current_2025, ZoningDistrictsNew,
+  MATS_Future_LandUse_2050, County_Boundary, SiteAddressPoints, Parcels); Spatialitics
+  maconbibb.spatialitics.net (ParcelCAMA_Current April2025, MB_ZoningDistricts_Edit,
+  MB_Parcels, Addresses). Open Data hub macon-bibb-county-open-data-maconbibb.hub.arcgis.com.
+  Official zoning experience a72ae0e878c04e009c033240a6680dd4. Assessor HTML qPublic
+  SchneiderCorp App=BibbCountyGA (qpublic.net/ga/bibb). 2040 Comprehensive Plan PDF via
+  mbpz.org. Attribution to Macon-Bibb County / Tax Assessor / P&Z / MATS / MGRC.
+  Public fields only; no emails/phones; no paid vendors (Regrid/ATTOM/CoreLogic).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BibbCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "Public Information Researcher"
+  aadt:
+    source: "GDOT / UGA ITOS (OMAT PMED Traffic Data)"
+    restUrl: "https://maps.itos.uga.edu/arcgis/rest/services/GDOT/GDOT_FunctionalClass/MapServer/21"
+    layerId: 21
+    field: "AADT"
+    geography: "state HPMS / traffic segments (polyline)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Public Information Researcher"
+    notes: "Public GDOT FunctionalClass MapServer layer 21 OMAT PMED Traffic Data with AADT; GDOT TADA (drakewell) is interactive/CSV alternative without a simple statewide FeatureServer."

@@ -49,6 +49,8 @@ North Carolina rural Opportunity Zone batch 2 loads 5.0–150.0 acre parcels for
 
 North Carolina rural Opportunity Zone batch 3 loads 5.0–150.0 acre parcels for the remaining pass-1 counties starting at Rutherford that were verified or fixed and were not already a complete extract, then fills the batch from the remaining non-OZ North Carolina counties that have a usable public parcel card: Rutherford, Scotland, Swain, Transylvania, Tyrrell, Washington, Watauga, Wilkes, Camden, Clay, Cumberland, Currituck, Gates, Perquimans, and Yancey. No endpoint in that set was unreachable. Every other North Carolina county was already a complete extract and was not re-pulled. No North Carolina county remains unloaded. Swain acreage is a string and the filter uses CAST AS FLOAT plus LegalLandType='AC'. Clay keeps LegalLandT='AC' so a square-foot legal unit is not treated as acres. Transylvania, Clay, Watauga, and Wilkes repeat a parcel id across rows; the extract keeps one geometry per parcel id. Scotland's public price field is DeedStamps, and Yancey's STAMPS field is excise tax; neither is stored as a sale price. Yancey's property-appraiser pattern needs a two-digit card suffix the parcel layer does not publish, so parcel rows do not carry a filled appraiser URL. Swain has no sale date on the public operational layer. Camden has no tax values on the public layer, and a SaleDate of the literal text NULL is not stored. Perquimans stores TAX_VAL as taxable value. Counties were placed on the nearest existing North Carolina shelf: Rutherford, Swain, Transylvania, Watauga, Clay, and Yancey on Asheville; Scotland on Charlotte; Wilkes on Winston-Salem; Tyrrell, Washington, Camden, Cumberland, Currituck, Gates, and Perquimans on Raleigh-Durham. No new market shelf was added. Pass 2 tax, sale, owner, property-appraiser, and county GIS attributes are stored where the card or rural-oz-pass2 result published them. Property-appraiser links are stored from the card or pass-2 pattern and were not requested. A pass-2 sample account id is not copied onto every parcel. Owner phone and email are not ingested. A confidential-owner flag suppresses owner and mailing fields. Sale dates after the pull date are cleared. No Opportunity Zone status was added. NCDOT AADT stays the query-time statewide join. Household income stays ACS B19013_001E. Tract display was not changed.
 
+Georgia rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for the first 20 pass-2 counties whose pass 1 status was usable, that were not already a complete extract, and whose public county GIS endpoint answered: Worth, Bleckley, Chattooga, Dade, Early, Gordon, Hart, Jasper, Jefferson, Johnson, Monroe, Peach, Screven, Stewart, Taylor, Upson, Walker, Wayne, White, and Appling. Carroll and Walton were already complete and were not re-pulled, along with the Atlanta-metro extracts already on main (DeKalb, Cobb, Fulton, and the other finished Georgia shelves). Gilmer and Mitchell are partial clips, not county-wide layers, and were not requested. Franklin and Habersham are Schneider WFS services that timed out and were skipped. The next pass-2 row is Atkinson (order 27). Counties already on a shelf stayed there: Dade and Walker on Chattanooga, Gordon, Jasper, and Monroe on Atlanta, and Screven on Savannah. The others were added to the nearest existing Georgia shelf: Worth and Early on Valdosta; Bleckley, Jefferson, Johnson, Peach, Stewart, Taylor, and Upson on Macon; Chattooga on Chattanooga; Hart and White on Athens; Wayne and Appling on Savannah. No new market shelf was added. Hart, Upson, and Appling publish no acre attribute, so acreage is geodesic polygon area. Worth is the 2021 UGA heirs-property copy of the county landbase. White is the county-wide parcel layer inside the Cleveland water webmap. Pass 2 tax, owner, property-appraiser, and county GIS attributes are stored where that pass said REST. Every county in this batch has HTML-only sales, so sale price and date were not copied. Jasper owner is partial. Property-appraiser links use each parcel's own id from the pass-2 template and were not requested. A sample parcel id is not copied onto every parcel. Owner phone and email are not ingested. A confidential-owner flag suppresses owner and mailing fields. Sale dates after the pull date are cleared. No Opportunity Zone status, school grade, or base flood elevation was added. GDOT AADT stays off the parcel. Household income stays ACS B19013_001E. Tract display was not changed.
+
 Tennessee rural Opportunity Zone batch 3 loads the next 20 pass1-order counties that were not already a complete extract: Benton, Carter, Clay, Fentress, Franklin, Hancock, Hawkins, Humphreys, Jackson, Johnson, Lake, Lawrence, Marion, McMinn, Obion, Pickett, Scott, Sullivan, Tipton, and Wayne. Maury, Shelby, and Sumner were already complete and were not replaced. Geometry and owner stay on Tennessee Property Boundaries Public Use, filtered by the card's Comptroller COUNTY_ID. Acreage is geodesic polygon area, 5.0 through 150.0 inclusive. Sale date, sale price, and appraisal are joined on GISLINK from the card's sales-value layer. Lawrence, McMinn, and Marion are labeled 2025. Tipton is labeled 2026. Fentress has no public bulk sale/value layer, so those fields stay empty. The other fifteen use TN_County_Parcel_Map and are labeled 2023. A sale date later than the pull date is left blank. Sullivan zoning is joined on GISLINK. McMinn, Marion, and Tipton zoning polygons are stamped by centroid, with a later city layer replacing the county code only inside that city. The other counties leave zoning empty. The TPAD link is stored and not requested. Owner phone and email are not ingested. No new market shelf was added. No Opportunity Zone designation, school grade, or base flood elevation was added. AADT and tract-income wiring were not changed.
 
 The next twenty Tennessee rural-OZ counties use the same public-GIS loader. Geometry and owner stay on Tennessee Property Boundaries Public Use, filtered by the card's Comptroller COUNTY_ID. Acreage is geodesic polygon area, 5.0 through 150.0 inclusive. Sale date, sale price, and appraisal are joined on GISLINK from the card's sales-value layer. Hamblen uses the MH-GIS assessor CAMA and is labeled 2026. The other nineteen use TN_County_Parcel_Map and are labeled 2023. A sale date later than the pull date is left blank. The TPAD link is stored and not requested. Owner phone and email are not ingested. Bradley and Grainger were already loaded and were not replaced. No new market shelf was added. No Opportunity Zone designation, school grade, or base flood elevation was added. AADT and tract-income wiring were not changed.
@@ -65,7 +67,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 93,811 | 17 | 0 | 18 |
+| Atlanta | primary | 107,074 | 20 | 0 | 15 |
 | Tampa | primary | 127,713 | 10 | 0 | 0 |
 | Charleston | primary | 113,262 | 18 | 0 | 0 |
 | Nashville | primary | 202,510 | 34 | 0 | 0 |
@@ -81,10 +83,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Birmingham | other | 101,123 | 9 | 0 | 3 |
 | Mobile | other | 51,658 | 4 | 0 | 2 |
 | Huntsville | other | 132,496 | 16 | 0 | 0 |
-| Savannah | other | 19,987 | 5 | 0 | 3 |
+| Savannah | other | 31,657 | 8 | 0 | 2 |
 | Columbia | other | 96,799 | 12 | 0 | 2 |
 | Greenville | other | 91,872 | 10 | 0 | 0 |
-| Chattanooga | other | 51,467 | 10 | 0 | 4 |
+| Chattanooga | other | 64,057 | 13 | 0 | 2 |
 | Knoxville | other | 146,507 | 26 | 0 | 0 |
 | Memphis | other | 102,576 | 20 | 0 | 0 |
 | Jackson | other | 38,676 | 8 | 0 | 0 |
@@ -95,9 +97,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Asheville | other | 121,232 | 21 | 0 | 0 |
 | Tuscaloosa | other | 27,452 | 4 | 0 | 1 |
 | Montgomery | other | 85,425 | 13 | 0 | 1 |
-| Valdosta | other | 5,815 | 1 | 0 | 0 |
-| Macon | other | 3,257 | 1 | 0 | 0 |
-| Athens | other | 2,039 | 1 | 0 | 0 |
+| Valdosta | other | 11,810 | 3 | 0 | 0 |
+| Macon | other | 18,861 | 8 | 0 | 0 |
+| Athens | other | 9,569 | 3 | 0 | 0 |
 | Hilton Head | other | 4,756 | 1 | 0 | 0 |
 | Jackson MS | other | 57,020 | 7 | 0 | 0 |
 
@@ -122,18 +124,18 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Fayette | Georgia | 13113 | complete-gte-5ac | 4,725 | ga-fayette-parcels |
 | Forsyth | Georgia | 13117 | complete-gte-5ac | 3,925 | ga-forsyth-tax-parcels |
 | Fulton | Georgia | 13121 | complete-gte-5ac | 8,274 | ga-fulton-pmv-mapserver-11 |
-| Gordon | Georgia | 13129 | gap | 0 | unavailable |
+| Gordon | Georgia | 13129 | complete-gte-5ac | 5,542 | ga-gordon-parcels-13129 |
 | Gwinnett | Georgia | 13135 | complete-gte-5ac | 6,653 | ga-gwinnett-gc-parcel |
 | Hall | Georgia | 13139 | gap | 0 | unavailable |
 | Haralson | Georgia | 13143 | gap | 0 | unavailable |
 | Heard | Georgia | 13149 | gap | 0 | unavailable |
 | Henry | Georgia | 13151 | complete-gte-5ac | 7,418 | ga-henry-parcels |
 | Jackson | Georgia | 13157 | gap | 0 | unavailable |
-| Jasper | Georgia | 13159 | gap | 0 | unavailable |
+| Jasper | Georgia | 13159 | complete-gte-5ac | 3,211 | ga-jasper-parcels-13159 |
 | Lamar | Georgia | 13171 | gap | 0 | unavailable |
 | Lumpkin | Georgia | 13187 | gap | 0 | unavailable |
 | Meriwether | Georgia | 13199 | gap | 0 | unavailable |
-| Monroe | Georgia | 13207 | gap | 0 | unavailable |
+| Monroe | Georgia | 13207 | complete-gte-5ac | 4,510 | ga-monroe-parcels-13207 |
 | Morgan | Georgia | 13211 | gap | 0 | unavailable |
 | Newton | Georgia | 13217 | complete-gte-5ac | 4,474 | ga-newton-uofmd-parcels |
 | Paulding | Georgia | 13223 | complete-gte-5ac | 5,094 | ga-paulding-parcels |
@@ -417,6 +419,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Appling | Georgia | 13001 | complete-gte-5ac | 4,215 | ga-appling-parcels-13001 |
 | Beaufort | South Carolina | 45013 | complete-gte-5ac | 4,756 | sc-beaufort-energov-parcels |
 | Bryan | Georgia | 13029 | complete-gte-5ac | 2,138 | ga-bryan-property-details |
 | Bulloch | Georgia | 13031 | gap | 0 | unavailable |
@@ -424,7 +427,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Effingham | Georgia | 13103 | complete-gte-5ac | 6,128 | ga-effingham-parcels-2024 |
 | Jasper | South Carolina | 45053 | complete-gte-5ac | 3,682 | sc-jasper-parcels-45053 |
 | Liberty | Georgia | 13179 | gap | 0 | unavailable |
-| Screven | Georgia | 13251 | gap | 0 | unavailable |
+| Screven | Georgia | 13251 | complete-gte-5ac | 3,680 | ga-screven-parcels-13251 |
+| Wayne | Georgia | 13305 | complete-gte-5ac | 3,775 | ga-wayne-parcels-13305 |
 
 ### Columbia
 
@@ -467,7 +471,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Bledsoe | Tennessee | 47007 | complete-gte-5ac | 4,450 | tn-oir-public-use-47007 |
 | Bradley | Tennessee | 47011 | complete-gte-5ac | 6,336 | tn-cleveland-parcels-impact-47011 |
 | Catoosa | Georgia | 13047 | gap | 0 | unavailable |
-| Dade | Georgia | 13083 | gap | 0 | unavailable |
+| Chattooga | Georgia | 13055 | complete-gte-5ac | 3,315 | ga-chattooga-parcels-13055 |
+| Dade | Georgia | 13083 | complete-gte-5ac | 2,700 | ga-dade-parcels-13083 |
 | Grundy | Tennessee | 47061 | complete-gte-5ac | 3,732 | tn-oir-public-use-47061 |
 | Hamilton | Tennessee | 47065 | complete-gte-5ac | 9,162 | tn-hamilton-live-parcels |
 | Marion | Tennessee | 47115 | complete-gte-5ac | 4,903 | tn-oir-public-use-47115 |
@@ -476,7 +481,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Polk | Tennessee | 47139 | complete-gte-5ac | 4,232 | tn-oir-public-use-47139 |
 | Rhea | Tennessee | 47143 | complete-gte-5ac | 3,977 | tn-oir-public-use-47143 |
 | Sequatchie | Tennessee | 47153 | complete-gte-5ac | 3,342 | tn-oir-public-use-47153 |
-| Walker | Georgia | 13295 | gap | 0 | unavailable |
+| Walker | Georgia | 13295 | complete-gte-5ac | 6,575 | ga-walker-parcels-13295 |
 | Whitfield | Georgia | 13313 | gap | 0 | unavailable |
 
 ### Knoxville
@@ -672,19 +677,30 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Early | Georgia | 13099 | complete-gte-5ac | 2,776 | ga-early-parcels-13099 |
 | Lowndes | Georgia | 13185 | complete-gte-5ac | 5,815 | ga-lowndes-valor-taxparcels |
+| Worth | Georgia | 13321 | complete-gte-5ac | 3,219 | ga-worth-parcels-13321 |
 
 ### Macon
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Bibb | Georgia | 13021 | complete-gte-5ac | 3,257 | ga-bibb-parcelcama-2025 |
+| Bleckley | Georgia | 13023 | complete-gte-5ac | 1,778 | ga-bleckley-parcels-13023 |
+| Jefferson | Georgia | 13163 | complete-gte-5ac | 2,987 | ga-jefferson-parcels-13163 |
+| Johnson | Georgia | 13167 | complete-gte-5ac | 2,193 | ga-johnson-parcels-13167 |
+| Peach | Georgia | 13225 | complete-gte-5ac | 2,052 | ga-peach-parcels-13225 |
+| Stewart | Georgia | 13259 | complete-gte-5ac | 875 | ga-stewart-parcels-13259 |
+| Taylor | Georgia | 13269 | complete-gte-5ac | 2,404 | ga-taylor-parcels-13269 |
+| Upson | Georgia | 13293 | complete-gte-5ac | 3,315 | ga-upson-parcels-13293 |
 
 ### Athens
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Clarke | Georgia | 13059 | complete-gte-5ac | 2,039 | ga-clarke-acc-parcels |
+| Hart | Georgia | 13147 | complete-gte-5ac | 3,746 | ga-hart-parcels-13147 |
+| White | Georgia | 13311 | complete-gte-5ac | 3,784 | ga-white-parcels-13311 |
 
 ### Hilton Head
 

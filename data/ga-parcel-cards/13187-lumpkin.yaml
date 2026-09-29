@@ -1,0 +1,290 @@
+state: GA
+jurisdiction: Lumpkin County
+fips: "13187"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — WinGAP-style county-wide CAMA polygons
+  - role: parcels
+    name: Lumpkin_2025Parcels LD_2025parcels (layermanager / county CAMA)
+    restUrl: https://services6.arcgis.com/BAJNi3EgCdtQ1BCG/arcgis/rest/services/Lumpkin_2025Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      REALKEY: parcelKey
+      OWNKEY: ownerKey
+      lastname: ownerName
+      firstname: ownerFirstName
+      ADDRESS1: mailingAddressLine1OrCoOwner
+      ADDRESS2: mailingAddress
+      ADDRESS3: mailingAddress2
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP: mailingZip
+      HOUSE_NO: situsNumber
+      STREET_NAM: situsStreet
+      UNIT: situsUnit
+      TOTALACRES: acreage
+      GIS_ACRES: acreageGis
+      ZONINGCODE: zoning
+      TaxDist: taxDistrict
+      TAXDISTNAM: taxDistrictName
+      DIGCLASS: dorCode
+      DIGSTRAT: dorStrata
+      LEGAL_DESC: legalDescription
+      LANDLOT: landLot
+      LANDDIST: landDistrict
+      ZCTA: situsZipZcta
+      LABL: postalLabel
+      CUVA_2020: cuvaFlag
+      Shape__Area: shapeAreaSqM
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + WinGAP/CAMA landbase (AGOL org
+      BAJNi3EgCdtQ1BCG owner layermanager — Lumpkin County Parcels). Live count 17741
+      (2026-09-24). TOTALACRES 5–150 ≈3872; GIS_ACRES 5–150 ≈3808 — prefer TOTALACRES
+      when non-null else GIS_ACRES. TAXDISTNAM: COUNTY≈14338, CITY≈2382 (Dahlonega),
+      blank≈1021. ZONINGCODE non-blank (excl NULL/space) ≈15506 — still prefer
+      Dahlonega_Zoning CurrentZon inside city. Compose situs from HOUSE_NO +
+      STREET_NAM when HOUSE_NO>0. CITY/STATE/ZIP are OWNER mailing (nationwide) —
+      never municipality filter; prefer TAXDISTNAM='CITY' or Dahlonega zoning spatial.
+      Deprecated twin: services6.arcgis.com/gVx1YCdWTpppaijl Base_Map/FeatureServer/3.
+      OA us/ga/lumpkin addresses pointed at dead roktech Lumpkin_BaseMap — do not use.
+      Geo-verified WGS84 ~-84.117,34.501 / ~-84.118,34.499 (Greenway Rd west fringe),
+      ~-84.016,34.517 (Bulldog Way / Dahlonega) — Lumpkin County GA / Dahlonega
+      (~-83.98,34.53) (NOT Lumpkin lookalikes; NOT Dawson County as substitute).
+      Assessor HTML: qPublic App=LumpkinCountyGA (qpublic.net/ga/lumpkin; bot 403).
+      Rejected Regrid/ATTOM; rejected dead roktech.
+    status: usable
+
+  - role: tax
+    name: null — no FMV/assessed on parcels REST; qPublic HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Lumpkin_2025Parcels has DIGCLASS/DIGSTRAT/TaxDist but no CURR_VAL / FMV / MAV
+      fields. Market/assessed via qPublic App=LumpkinCountyGA HTML. Deep-link:
+      Application.aspx?App=LumpkinCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCEL_NO}.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Lumpkin multi-sale FeatureServer recovered. Prefer qPublic Sales Search HTML.
+      Rejected paid vendors.
+    status: gap
+
+  - role: zoning
+    name: Lumpkin_2025Parcels ZONINGCODE (parcel-attributed fallback)
+    restUrl: https://services6.arcgis.com/BAJNi3EgCdtQ1BCG/arcgis/rest/services/Lumpkin_2025Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ZONINGCODE: zoning
+    notes: >
+      Parcel-attributed zoning (~15506 non-blank). For Dahlonega city limits prefer
+      Dahlonega_Zoning CurrentZon. No separate county Euclidean Zoning FeatureServer
+      recovered beyond parcel attr + character areas.
+    status: partial
+
+  - role: flu
+    name: c25CharacterArea_Project (Lumpkin County Character Areas / FLU)
+    restUrl: https://services6.arcgis.com/BAJNi3EgCdtQ1BCG/arcgis/rest/services/c25CharacterArea_Project/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      LU: fluCode
+      LU_DESCRIP: flu
+      ZONINGCODE: zoning
+      LASTNAME: ownerName
+      TOTALACRES: acreage
+    notes: >
+      Preferred public REST Future Land Use / Character Areas (parcel-keyed). Live count
+      16974. LU_DESCRIP domain: Residential Growth≈5879, Rural Places≈4598, Agricultural
+      Preservation≈2887, City of Dahlonega≈2099, Commerce Corridor≈478, Gateway
+      Corridor≈457, Neighborhood Village Center≈118, Community Village Center≈114,
+      Gateway Corridor Overlay≈110, Industrial≈97, Public/Institutional≈94 (+ sparse).
+      Join PARCEL_NO→parcels.PARCEL_NO. Certify vs Comp Plan PDF.
+    status: usable
+
+municipalities:
+  - name: Dahlonega
+    level: city
+    parentFips: "13187"
+    joinToCountyParcels: >
+      Spatial Dahlonega_Zoning polygons OR soft TAXDISTNAM='CITY' (~2382) OR character
+      LU_DESCRIP='City of Dahlonega' (~2099). Centroid ~-83.98,34.53.
+    layers:
+      - role: zoning
+        name: Dahlonega_Zoning (DahlonegaZoning03032025)
+        restUrl: https://services6.arcgis.com/BAJNi3EgCdtQ1BCG/arcgis/rest/services/Dahlonega_Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          CurrentZon: zoning
+          ZONINGCODE: zoningAlt
+          VariOrCond: zoningVarianceOrConditional
+          LASTNAME: ownerName
+          TOTALACRES: acreage
+          GIS_ACRES: acreageGis
+        notes: >
+          Preferred Dahlonega-local zoning (same org as county parcels). Live count 2139.
+          CurrentZon sample B3/OI; geo ~-83.984,34.532 Park St / ~-83.992,34.527.
+          Prefer CurrentZon over county ZONINGCODE inside city. Twin Base_Map on
+          gVx1YCdWTpppaijl (Dahlonega_GoldCity) deprecated context.
+        status: usable
+      - role: flu
+        name: c25CharacterArea City of Dahlonega extract
+        restUrl: https://services6.arcgis.com/BAJNi3EgCdtQ1BCG/arcgis/rest/services/c25CharacterArea_Project/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          LU_DESCRIP: flu
+          PARCEL_NO: parcelId
+        notes: >
+          Filter LU_DESCRIP='City of Dahlonega' (~2099) or spatial city zoning. No
+          separate city FLU FeatureServer.
+        status: partial
+      - role: parcels
+        name: null — use county Lumpkin_2025Parcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Dahlonega-only CAMA — county parcels + TAXDISTNAM='CITY' / spatial
+          Dahlonega_Zoning.
+        status: gap
+    gaps:
+      - "roktech Lumpkin_BaseMap OA harvest target dead (404/500) — do not use."
+    status: usable
+
+gaps:
+  - "No tax.marketValue / assessedValue on Lumpkin_2025Parcels REST — qPublic App=LumpkinCountyGA HTML only."
+  - "No lastSale REST; no dedicated county Euclidean zoning polygon FS beyond parcel ZONINGCODE + Dahlonega_Zoning."
+  - "Mailing CITY nationwide — never municipality filter; prefer TAXDISTNAM / Dahlonega_Zoning spatial."
+  - "OA us/ga/lumpkin roktech addresses service dead; deprecated Base_Map gVx1YCdWTpppaijl/3 — prefer Lumpkin_2025Parcels."
+  - "Rejected Regrid/ATTOM; rejected wrong-geography lookalikes."
+  - "No emails/phones collected; no paid vendors."
+
+license: >
+  Lumpkin County GIS / layermanager AGOL org BAJNi3EgCdtQ1BCG (Lumpkin_2025Parcels,
+  c25CharacterArea_Project, Dahlonega_Zoning). Assessor HTML qPublic SchneiderCorp
+  App=LumpkinCountyGA (qpublic.net/ga/lumpkin; lumpkincounty.gov GIS). Attribution to
+  Lumpkin County / City of Dahlonega. Public fields only; no emails/phones; no paid
+  vendors (Regrid/ATTOM).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LumpkinCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services6.arcgis.com/BAJNi3EgCdtQ1
+    BCG/arcgis/rest/services/Lumpkin_2025Parcels/FeatureServer/0 count 17741; extent center [['13187',
+    'Lumpkin County']]; sample [['13187', 'Lumpkin County']]. No change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Dahlonega city"
+      level: city
+      parentFips: "13187"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Lumpkin' AND aadt>0
+    altFilter: name LIKE '187-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 187-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 72
+    maxAadt: 23900
+    geoCheck: 72/72 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 11740
+    restUrl: https://services6.arcgis.com/BAJNi3EgCdtQ1BCG/arcgis/rest/services/Lumpkin_2025Parcels/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=LumpkinCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 012    179
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LumpkinCountyGA&Layer=Parcels&PageType=Report&KeyValue=012%20%20%20%20179
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=LumpkinCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Dahlonega city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

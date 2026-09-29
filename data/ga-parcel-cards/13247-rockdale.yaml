@@ -1,0 +1,416 @@
+state: GA
+jurisdiction: Rockdale County
+fips: "13247"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons (PIN, acres, situs, FMV string, tax district, zoning/FLU attrs)
+  - role: parcels
+    name: Parcels (AGOL county landbase)
+    restUrl: https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/Parcels/FeatureServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      Acreage: acreage
+      Calc_Ac: acreageCalc
+      Address: situsNumber
+      Road_name: situsStreet
+      St_Type: situsStreetType
+      BOA_Addres: situsAddress
+      Parcel_Cit: postalCommunity
+      ZiipCode: situsZip
+      tax_Dist: taxDistrict
+      tax_DESCR: taxDistrictDescription
+      County_Zon: zoning
+      City_Zonin: zoningCity
+      Composite_: zoningComposite
+      County_Lan: flu
+      City_Land_: fluCity
+      Composite1: fluComposite
+      Valuation: tax.marketValue
+      Fair_Marke: tax.fairMarketFlag
+      Tax_Year: tax.year
+      subdiv: subdivision
+      realkey: ownerKey
+      Sales_2014: lastSale.sales2014Flag
+      TaxSale201: lastSale.taxSaleFlag
+      Longitude: longitude
+      Latitude: latitude
+    notes: >
+      Preferred county-wide parcel GEOMETRY + attribute source (public AGOL org
+      Tbke9ca9DhtF4VIx / rockdalega.maps.arcgis.com). Live count 37174 (2026-09-23).
+      Acreage>0 ≈29383; Acreage 5–150 = 2661; Calc_Ac>0 ≈37165 (prefer Acreage when
+      >0 else Calc_Ac). Valuation string filled ≈36639 — treat as tax.marketValue
+      (parse float); Fair_Marke flag always 0 — do NOT use as FMV. SR wkid 103263;
+      maxRecordCount 2000. Geo-verified WGS84 samples ~-84.004,33.647 (Walnut /
+      unincorporated postal Conyers), ~-84.033,33.629 (Brookwood), ~-83.979,33.634
+      (Salem Rd SE) — Rockdale County GA, Atlanta MSA east (NOT Village of Rockdale
+      WI ~-89.03,42.97; Rockdale IL township; any non-GA Rockdale). Thin CAMA gaps:
+      NO ownerName / mailing* on this county REST — Conyers SmartGovParcels for city
+      owner/mailing only; county-wide owner via qPublic HTML. NO qualified multi-sale
+      history — Sales_2014 / TaxSale201 are sparse integer flags (≈101 / ≈176), not
+      lastSale.price/date. tax_Dist decode: 01≈30787 COUNTY, 02≈5444 CITY, 03≈505
+      CITY TAD, 04≈2 SALEM GATE; blanks/mismatches ≈427. Parcel_Cit / ZiipCode are
+      postal (Parcel_Cit almost always Conyers) — NOT incorporated municipality;
+      municipality = tax_Dist/tax_DESCR or Conyers City Limits spatial. County_Zon
+      filled ≈31017 (unincorp tax_Dist=01 top: R1≈15806, AR≈5982, R1B≈1300, WP≈1277,
+      R3≈1268, R1A≈1256, MH≈1002, M1, SRC-*); City_Zonin filled ≈5953 — inside city
+      prefer Conyers Zoning/MapServer/8 Zone_Description over City_Zonin abbrev /
+      Composite_ crosswalk. County_Lan='City' ≈6065 stubs inside Conyers — prefer
+      Conyers FLU2025. Composite_ is a crosswalk (R1/AR/COM/…) — useful fallback but
+      not official district label; prefer County_Zon / City_Zonin / Conyers
+      Zone_Description. Attribute Tax_Year/Edit_Date samples still show 2021 —
+      geometry count fresher than CAMA year stamp; re-check Valuation currency before
+      relying on FMV. Hub twin Rockdale_County_Parcels/38 count 36856 (same schema
+      family); thinner Rockdale_Parcels/39 count 36855 (PIN+Acreage+ADDRESS only,
+      July 2023 snapshot). On-prem gis.rockdalecountyga.gov Cadastral/Planning/Hosted
+      folders return Token Required (499) — not public. Enrichment vs thin in-app:
+      full county 37174 outlines + PIN + acres + situs + FMV string + tax district +
+      county zoning/FLU attrs; city zoning/FLU/owner via Conyers REST.
+    status: usable
+
+  - role: parcels
+    name: Rockdale_County_Parcels (Hub twin)
+    restUrl: https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/Rockdale_County_Parcels/FeatureServer/38
+    layerId: 38
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      Acreage: acreage
+      Calc_Ac: acreageCalc
+      BOA_Addres: situsAddress
+      ZiipCode: situsZip
+      Parcel_Cit: postalCommunity
+      tax_Dist: taxDistrict
+      tax_DESCR: taxDistrictDescription
+      County_Zon: zoning
+      City_Zonin: zoningCity
+      Composite_: zoningComposite
+      County_Lan: flu
+      City_Land_: fluCity
+      Valuation: tax.marketValue
+    notes: >
+      Live count 36856 — Hub-listed "Rockdale County Parcels" (same org / schema
+      family as Parcels/9, slightly fewer rows). Prefer Parcels/FeatureServer/9 as
+      primary when a single county-wide URL is needed; this is a valid alternate.
+      Also on gisdatahub-rockdalega.opendata.arcgis.com.
+    status: partial
+
+  - role: tax
+    name: Parcels Valuation (FMV string on polygons)
+    restUrl: https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/Parcels/FeatureServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      Valuation: tax.marketValue
+      Tax_Year: tax.year
+      tax_Dist: taxDistrict
+      tax_DESCR: taxDistrictDescription
+    notes: >
+      Tax/CAMA market values live on preferred parcel polygons (Valuation string;
+      ≈36639 non-blank). No public REST tax.assessedValue / taxableValue. Fair_Marke
+      flag is unused (0). Assessor HTML: qPublic App=RockdaleCountyGA (CDN/bot 403
+      from research box; public for humans). Numeric AppID not recovered from
+      automated fetch — use App=RockdaleCountyGA search URL.
+    status: usable
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      County Parcels expose Sales_2014 (≈101) and TaxSale201 (≈176) integer flags
+      only — not lastSale.price / lastSale.date / lastSale.qualified. No Rockdale
+      multi-sale FeatureServer found (2026-09-23). Use qPublic HTML for humans.
+    status: gap
+
+  - role: zoning
+    name: ZoningPackage Primary_Zoning (parcel-tied county composite)
+    restUrl: https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/ZoningPackage/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      County_Zon: zoning
+      City_Zonin: zoningCity
+      Composite_: zoningComposite
+      County_Lan: flu
+      City_Land_: fluCity
+      tax_Dist: taxDistrict
+      tax_DESCR: taxDistrictDescription
+      Acreage: acreage
+      BOA_Addres: situsAddress
+      Valuation: tax.marketValue
+    notes: >
+      Parcel-tied zoning published in official Zoning instant app webmap. Live count
+      36855. Prefer County_Zon for unincorporated; inside Conyers prefer city
+      Zoning/MapServer/8 Zone_Description. Secondary/Tertiary/Quaternary layers (ids
+      2/1/0) are split-zoning remnants (273 / 10 / 1) — spatial/PIN join only when
+      Composite_ insufficient. Mirror attrs also on Parcels/9. Alternate thinner
+      RockdaleCountyZoning/FeatureServer/1 (count 36584; County_Zoning + City_Zoning).
+      Geo-verified ~-84.004,33.647 Rockdale GA.
+    status: usable
+
+  - role: flu
+    name: County_Land_Use_06_08_2022 Future_LandUse (dissolved districts)
+    restUrl: https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/County_Land_Use_06_08_2022/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Composite: flu
+      Land_Use: fluDescription
+      Area: fluArea
+    notes: >
+      Dissolved FLU polygons used by official Future Land Use instant app. Live
+      count 16. Domain MDR, LDR, WP, City, OOC, HDR, Water, COM, HIST, PRC, ODT,
+      NC, LI, OP, SMU, CRS. Composite='City' is a stub covering Conyers — prefer
+      Conyers FLU2025 inside city limits. Parcel-tied County_Lan / City_Land_ also
+      on Parcels/9 (County_Lan='City'≈6065). Future_LandUse/FeatureServer/3 is a
+      near-identical twin (count 17). Spatial-join.
+    status: usable
+
+  - role: other
+    name: Conyers_City_Limits (county AGOL)
+    restUrl: https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/Conyers_City_Limits/FeatureServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Name: municipality
+    notes: >
+      Live count 1 polygon Name='City of Conyers' (~-84.039,33.655). Only
+      incorporated municipality in Rockdale (Milstead is historic / now inside
+      Conyers). Parcel↔city join = spatial intersect OR tax_Dist IN ('02','03') OR
+      tax_DESCR IN ('CITY','CITY TAD'). Mirrors: Conyers_Boundary/27,
+      Conyers_Boundary2/11 (archived Hub item).
+    status: usable
+
+municipalities:
+  - name: Conyers
+    level: city
+    parentFips: "13247"
+    joinToCountyParcels: >
+      Attribute: Conyers Zoning/SmartGov/FLU PARCEL_NO ≈ county PARCEL_NO (verified
+      C100010002, 0920010086, 067002018B). Also tax_Dist IN ('02','03') ≈5949;
+      spatial Conyers_City_Limits Name='City of Conyers' or city Zoning City Limits.
+    layers:
+      - role: zoning
+        name: City of Conyers Zoning (City Zoning)
+        restUrl: https://maps.conyersga.com/arcgis/rest/services/Zoning/MapServer/8
+        layerId: 8
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          Zone_Description: zoning
+          Zone_Code: zoningCode
+          OrdinanceNumber: zoningOrdinance
+          Ordinanace_Date: zoningOrdinanceDate
+        notes: >
+          Preferred Conyers-local zoning (standing order: city over county City_Zonin
+          / Composite_ stubs). Live count 5928 parcel-tied. Zone_Description domain
+          RS-14≈2269, RM≈1169, TH≈685, MxD≈557, I-D≈235, DE≈181, DCR≈180, GV-UV≈155,
+          GV-RV≈123, O-I≈92, BG≈91, HSB≈45, DCV≈43, BN≈33, RA≈12, TND≈1. Zone_Code
+          integer accompanies description (some null-description code rows — prefer
+          Zone_Description). Geo-verified ~-84.026,33.666 and ~-83.977,33.649 Conyers
+          GA. Viewer: maps.conyersga.com portal webappviewer (Zoning Map). Same
+          MapServer also has Parcels/1, overlays, City Limits.
+        status: usable
+      - role: flu
+        name: City of Conyers FLU2025 Future Land Use
+        restUrl: https://maps.conyersga.com/arcgis/rest/services/FLU2025/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ParcelNumber: parcelId
+          City_Land_: flu
+          Desription: fluDescription
+        notes: >
+          Live count 587 FLU polygons (parcel-tied via ParcelNumber). City_Land_
+          domain MDR, SMU, COM, HDR, OI, ID, NC, PI, PRC (source field typo
+          "Desription"). Prefer over county County_Lan='City' stub / county dissolved
+          Composite='City'. Geo-verified ~-83.940,33.680 / ~-84.015,33.662 Conyers GA.
+        status: usable
+      - role: parcels
+        name: City of Conyers SmartGovParcels (owner + mailing + city zoning code)
+        restUrl: https://maps.conyersga.com/arcgis/rest/services/SmartGovParcels/MapServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          TOTALACRES: acreage
+          WOODACRES: acreageWooded
+          Acerage: acreageAlt
+          HOUSE_NO: situsNumber
+          STDIRECT: situsStreetDir
+          STREET_NAM: situsStreet
+          STTYPE: situsStreetType
+          ZIP: situsZip
+          ZONINGCODE: zoning
+          LASTNAME: ownerName
+          FIRSTNAME: ownerNameFirst
+          MIDDLE: ownerNameMiddle
+          ADDRESS1: mailingAddress
+          ADDRESS2: mailingAddress2
+          ADDRESS3: mailingAddress3
+          CITY: mailingCity
+          STATE: mailingState
+          ZIP_1: mailingZip
+          LEGAL_DESC: legalDescription
+        notes: >
+          Preferred Conyers owner/mailing source (county REST has none). Live count
+          6316; LASTNAME filled ≈6315; TOTALACRES>0 ≈3865; TOTALACRES 5–150 ≈293;
+          ZONINGCODE filled ≈6316 (abbrev RS-14/I-D/MxD — prefer Zoning/8
+          Zone_Description for full labels). Join to county Parcels on PARCEL_NO.
+          Mailing ZIP_1 vs situs ZIP can swap on some rows — validate STATE before
+          treating ZIP as mailing. Acerage is a source typo alias of acreage. Prefer
+          county Parcels/9 for county-wide search geometry; this for Conyers-scoped
+          owner/mailing enrichment. Addresses/0 companion: 10635 site address points.
+        status: usable
+    gaps:
+      - "No Conyers multi-sale REST; use county flags (weak) or qPublic HTML."
+      - "County City_Zonin abbrev (RS-14/RM/…) and Composite_ crosswalk are stubs vs Zoning/8 Zone_Description — must prefer city layer inside Conyers."
+      - "County FLU County_Lan='City' / dissolved Composite='City' stubs — prefer FLU2025."
+    status: usable
+
+gaps:
+  - "No public county-wide REST ownerName / mailing* — only Conyers SmartGovParcels (city-only). County owner/CAMA HTML via qPublic App=RockdaleCountyGA."
+  - "No public REST lastSale.price/date/qualified — Sales_2014/TaxSale201 are sparse flags only."
+  - "No public REST tax.assessedValue/taxableValue — Valuation string is FMV proxy; Fair_Marke unused."
+  - "Attribute Tax_Year/Edit_Date on Parcels still show 2021 on samples — treat Valuation currency as potentially stale; re-verify before underwriting."
+  - "On-prem gis.rockdalecountyga.gov (Cadastral/Planning/Hosted/Utilities) is Token Required (499) — public path is AGOL Tbke9ca9DhtF4VIx + maps.conyersga.com."
+  - "Parcel_Cit / ZiipCode are postal (Conyers) — municipality filter = tax_Dist/tax_DESCR or City Limits only."
+  - "County_Lan='City' ≈6065 and dissolved FLU Composite='City' are stubs — join Conyers FLU2025 / Zoning/8 inside city."
+  - "Rockdale_Parcels/39 is thin PIN+acres snapshot; Parcels_ReProp_COMMIMP is year-built commercial extract — do not prefer over Parcels/9."
+  - "qPublic App=RockdaleCountyGA may CDN/bot-403 automated clients; public for humans. Numeric AppID not recovered here. Do not collect emails/phones."
+  - "Rejected lookalikes: Village of Rockdale WI; Rockdale IL township/any non-GA Rockdale; Atlanta Regional Commission LandPro_2012 third-party (Ug5xGQbHsD8zuZzM); Regrid/paid statewide extracts; token-locked on-prem stubs."
+  - "Only incorporated municipality is Conyers (Milstead historic, now inside city). No other city REST expected."
+  - "Enrichment vs thin in-app (~2.7k Acreage 5–150): full county 37174 geometry+PIN+acres+situs+FMV string+taxDist+county zoning/FLU attrs; Conyers city zoning+FLU+owner/mailing; sales/county-owner remain HTML/gap."
+
+license: >
+  Rockdale County GIS public ArcGIS Online (org Tbke9ca9DhtF4VIx /
+  rockdalega.maps.arcgis.com) — Parcels, Rockdale_County_Parcels, ZoningPackage,
+  RockdaleCountyZoning, County_Land_Use_06_08_2022, Future_LandUse,
+  Conyers_City_Limits, Tax_Maps_WFL1. Hub: gisdatahub-rockdalega.opendata.arcgis.com.
+  City of Conyers GIS (maps.conyersga.com) — Zoning, FLU2025, SmartGovParcels.
+  Assessor HTML: qPublic SchneiderCorp App=RockdaleCountyGA Layer=Parcels.
+  Attribution to Rockdale County GIS / City of Conyers. Public fields only; no
+  emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=RockdaleCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/Parcels/FeatureServer/9 count
+    37174; extent center [['13247', 'Rockdale County']]; sample [['13247', 'Rockdale County']]. No
+    change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Conyers city"
+      level: city
+      parentFips: "13247"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Rockdale' AND aadt>0
+    altFilter: name LIKE '247-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 247-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 148
+    maxAadt: 134000
+    geoCheck: 147/148 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - Fair_Marke
+    - Tax_Year
+    - Valuation
+    filledCount: null
+    restUrl: https://services.arcgis.com/Tbke9ca9DhtF4VIx/arcgis/rest/services/Parcels/FeatureServer/9
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=RockdaleCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 075A010040
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=RockdaleCountyGA&Layer=Parcels&PageType=Report&KeyValue=075A010040
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=RockdaleCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Conyers city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

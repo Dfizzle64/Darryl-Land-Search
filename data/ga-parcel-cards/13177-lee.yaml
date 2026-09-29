@@ -1,0 +1,262 @@
+state: GA
+jurisdiction: Lee County
+fips: "13177"
+level: county
+markets: [Albany]
+
+layers:
+  - role: parcels
+    name: TylerTechnologyMap__State_Plane__WFL1 Parcels — Lee GA AGOL (charles.talley)
+    restUrl: https://services7.arcgis.com/xWHrkwYCAX9v0Owj/arcgis/rest/services/TylerTechnologyMap__State_Plane__WFL1/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: TotalAcres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      PARCEL_NO: parcelIdAlt
+      realkey: ownerKey
+      ownkey: ownerKeyAlt
+      lastname: ownerName
+      FIRSTNAME: ownerNameFirst
+      MIDDLE: ownerMiddleName
+      ADDRESS1: mailingAddressLine1OrCoOwner
+      ADDRESS2: mailingAddress
+      ADDRESS3: mailingAddress2
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP: mailingZip
+      HOUSE_NO: situsNumber
+      STREET_NAM: situsStreet
+      TotalAcres: acreage
+      CalcAcres: acreageGis
+      Calc_Acres: acreageGisAlt
+      TaxDistrict: taxDistrict
+      HomesteadExemption: homesteadExempt
+      YearBuild: yearBuilt
+      SaleDate: lastSale.date
+      DeedBookPage: lastSale.deedBookPage
+      Grantor: lastSale.grantor
+      Grantee: lastSale.grantee
+      LegalDescription: legalDescription
+      SUBDIVNAME: subdivision
+      SUBDIVCODE: subdivisionCode
+      LAT: latitude
+      LON: longitude
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (Lee County GA AGOL org
+      xWHrkwYCAX9v0Owj / owner charles.talley — TylerTechnologyMap__State_Plane__WFL1
+      FeatureServer/8 "Parcels"). Live count 14715 (2026-09-24). lastname filled
+      ≈14601; SaleDate ≈12627; HOUSE_NO>0 ≈12018; CITY letter-filled ≈4075 (soft —
+      includes Albany mail fringe). maxRecordCount 2000 — page via resultOffset.
+      Companion newer geometry-only/thin-CAMA Parcels_09_11_26/0 (count 15197; in
+      official GIS webmap; F_v_ON owner ≈12542; LandValue/Improvemen/SaleDate
+      zero/null — do NOT prefer for tax/sale; join on normalized PARCEL_ID/PIN
+      stripping spaces e.g. '018B   031'↔'018B031'). Addresses_09_18_26/0 (count
+      12721; HOUSE_NO+Address+PARCEL_ID) for situs points. Official assessor HTML:
+      qPublic App=LeeCountyGA (qpublic.net/ga/lee; leecountyga.gov Tax Assessors).
+      Deep-link KeyValue={PARCEL_ID}: Application.aspx?App=LeeCountyGA&Layer=Parcels
+      &PageType=Report&KeyValue={PARCEL_ID}. GEO-VERIFY GEORGIA: WGS84 samples
+      ~-84.288,31.622 / Leesburg limits centroid ~-84.170,31.735 / Smithville
+      ~-84.255,31.900 / county boundary ~-84.308,31.688 — FIPS 13177 seat Leesburg /
+      Albany MSA. REJECT Lee County FL (gismapserver.leegov.com / LeeCountyFLGIS
+      ~-81.9,26.6 Florida West 102659); REJECT Lee AL/MS/NC lookalikes; REJECT paid
+      Regrid/ATTOM. Skip stormwater/streetlights utilities + AADT; no emails/phones.
+      Schema may expose Editor — DO NOT collect as PII.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL/LandValue usable on preferred REST; qPublic HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Tyler/8 has no LandValue/Improvemen/CURR_VAL fields. Parcels_09_11_26 exposes
+      LandValue/Improvemen but live fill >0 =0 (2026-09-24). Prefer qPublic
+      App=LeeCountyGA HTML for market/assessed/taxable. TaxDistrict on Tyler is
+      district code only (e.g. 3) — not value.
+    status: gap
+
+  - role: sales
+    name: TylerTechnologyMap Parcels SaleDate (on polygons)
+    restUrl: https://services7.arcgis.com/xWHrkwYCAX9v0Owj/arcgis/rest/services/TylerTechnologyMap__State_Plane__WFL1/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      SaleDate: lastSale.date
+      DeedBookPage: lastSale.deedBookPage
+      Grantor: lastSale.grantor
+      Grantee: lastSale.grantee
+    notes: >
+      SaleDate filled ≈12627 on Tyler/8 (epoch ms). No sale price/SALE_VAL field on
+      this REST — price via qPublic Sales Search HTML App=LeeCountyGA. Parcels_09_11_26
+      SaleDate null-filled — do not use for sales. Rejected paid Regrid/ATTOM sales.
+    status: partial
+
+  - role: zoning
+    name: Zoning_09_11_26 Euclidean (Lee GA AGOL)
+    restUrl: https://services7.arcgis.com/xWHrkwYCAX9v0Owj/arcgis/rest/services/Zoning_09_11_26/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Zoning_Id: zoning
+      LastZone: zoningPrior
+      Case_: zoningCaseNumber
+      ZoneColor: zoningColorCode
+      SiteLoc: zoningSiteLocation
+      Conditions: zoningConditions
+    notes: >
+      Preferred Euclidean zoning (count 992; in official Zoning + GIS webmaps).
+      Zoning_Id distinct: AG/AGc/R-1/R-1L/R-2/R-3/R-3L/C-1/C-2/C-2c/C-3/C-4/MHP/
+      I/I-1/I-2/PUD. Twin ParcelLevelZoning/0 (count 973) + Parcel_Level_Zoning_March_2025/18
+      + Tyler/18 Parcel Level Zoning — prefer Zoning_09_11_26 for currency. Official
+      viewer: leecounty.maps.arcgis.com webappviewer id=9673277598af407994f9b5ed5e8baac5.
+    status: usable
+
+  - role: flu
+    name: null — no public FLU/CharacterAreas FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No Lee County FutureLandUse / CharacterAreas FeatureServer on charles.talley
+      AGOL (2026-09-24). Zoning Euclidean is not FLU. Comp-plan PDF gap.
+    status: gap
+
+  - role: other
+    name: Leesburg_City_Limits + Smithville_City_Limits + Lee_County_Boundary
+    restUrl: https://services7.arcgis.com/xWHrkwYCAX9v0Owj/arcgis/rest/services/Leesburg_City_Limits/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Layer: boundaryClass
+    notes: >
+      LeesburgCityBoundary centroid ~-84.170,31.735; Smithville_City_Limits/0
+      ~-84.255,31.900; Lee_County_Boundary/0 ~-84.308,31.688. Preferred spatial
+      municipality filters. Soft Tyler CITY='LEESBURG'/'ALBANY' mail-leaning — prefer
+      spatial limits (Albany is Dougherty County seat fringe mail).
+    status: usable
+
+municipalities:
+  - name: Leesburg
+    level: city
+    parentFips: "13177"
+    joinToCountyParcels: >
+      Spatial Leesburg_City_Limits/0 (~-84.170,31.735) ∩ Tyler/8 or Parcels_09_11_26;
+      soft CITY='LEESBURG' attribute aid only (ZIP 31763).
+    layers:
+      - role: zoning
+        name: Zoning_09_11_26 Leesburg spatial extract
+        restUrl: https://services7.arcgis.com/xWHrkwYCAX9v0Owj/arcgis/rest/services/Zoning_09_11_26/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning_Id: zoning
+        notes: County Euclidean zoning ∩ Leesburg city limits — no Leesburg-only zoning FS.
+        status: usable
+      - role: flu
+        name: null — no Leesburg FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city or county FLU FeatureServer recovered.
+        status: gap
+      - role: parcels
+        name: null — county Tyler/8 + spatial Leesburg
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Leesburg-only CAMA — county parcels + Leesburg_City_Limits/0.
+        status: gap
+    gaps:
+      - "No Leesburg city-owned parcel/FLU REST — county layers + spatial Leesburg limits."
+      - "Owner/sale on county Tyler REST; tax via qPublic HTML."
+    status: usable
+
+  - name: Smithville
+    level: city
+    parentFips: "13177"
+    joinToCountyParcels: >
+      Spatial Smithville_City_Limits/0 (~-84.255,31.900) ∩ county parcels.
+    layers:
+      - role: zoning
+        name: Zoning_09_11_26 Smithville spatial extract
+        restUrl: https://services7.arcgis.com/xWHrkwYCAX9v0Owj/arcgis/rest/services/Zoning_09_11_26/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning_Id: zoning
+        notes: County Euclidean ∩ Smithville limits.
+        status: partial
+      - role: parcels
+        name: null — county parcels + spatial Smithville
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Smithville-only CAMA REST.
+        status: gap
+    gaps:
+      - "Smithville city limits usable; parcel/FLU still county layers + qPublic."
+    status: partial
+
+gaps:
+  - "No CURR_VAL/market/assessed on Tyler/8; Parcels_09_11_26 LandValue/Improvemen zero-filled — tax via qPublic App=LeeCountyGA HTML."
+  - "No sale price on REST — SaleDate/DeedBookPage/Grantor/Grantee on Tyler/8 only; price via qPublic Sales Search."
+  - "No public FLU/CharacterAreas FeatureServer for Lee County GA."
+  - "Parcels_09_11_26 newer count 15197 but thin CAMA — join Tyler on normalized PARCEL_ID."
+  - "Mailing CITY includes Albany (Dougherty) fringe — prefer spatial Leesburg/Smithville limits."
+  - "maxRecordCount 2000 — page via resultOffset."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; public for humans (qpublic.net/ga/lee)."
+  - "REJECT Lee FL leegov.com / LeeCountyFLGIS; REJECT Lee AL lookalikes; REJECT paid Regrid/ATTOM; skip utilities+AADT; no emails/phones."
+
+license: >
+  Lee County GA GIS (AGOL org xWHrkwYCAX9v0Owj / charles.talley) —
+  TylerTechnologyMap__State_Plane__WFL1/8 Parcels; Zoning_09_11_26; Parcels_09_11_26;
+  Addresses_09_18_26; Leesburg_City_Limits; Smithville_City_Limits; Lee_County_Boundary.
+  Official viewers leecounty.maps.arcgis.com webappviewer id=0a318a9cd29249bbbb946ddd6ac0a685
+  (GIS Map) / id=9673277598af407994f9b5ed5e8baac5 (Zoning). Assessor qPublic
+  App=LeeCountyGA (qpublic.net/ga/lee; leecountyga.gov). Attribution Lee County GA
+  GIS / Tax Assessor. Public fields only; no emails/phones; no paid vendors; skip
+  utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LeeCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://leecounty.maps.arcgis.com/apps/webappviewer/index.html?id=0a318a9cd29249bbbb946ddd6ac0a685
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

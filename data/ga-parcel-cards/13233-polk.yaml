@@ -1,0 +1,327 @@
+state: GA
+jurisdiction: Polk County
+fips: "13233"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — no public county-wide parcel FeatureServer recovered (2026-09-24)
+  - role: parcels
+    name: null — no public Polk GA county-wide parcel FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Honest REST gap (2026-09-24). Official live assessor / parcel map is qPublic/Beacon
+      App=PolkCountyGA / AppID=690 LayerID=11379 (qpublic.net/ga/polk →
+      qpublic.schneidercorp.com; Cloudflare/bot 403 automated; public for humans).
+      Deep-link KeyValue={ParcelID}:
+      Application.aspx?App=PolkCountyGA&Layer=Parcels&PageType=Report&KeyValue={ParcelID}
+      (also AppID=690&LayerID=11379&PageTypeID=4&KeyValue={ParcelID}). Map search
+      PageTypeID=1 / Search PageTypeID=2. GEO-VERIFY GEORGIA Polk FIPS 13233 Cedartown
+      seat (~-85.25,34.05) / Rockmart (~-85.04,34.00) / Aragon (~-85.06,34.05) — Census
+      TIGER CENTLON ≈-085.188 CENTLAT ≈+34.002. REJECT Polk FL gis.polk-county.net /
+      polk-bocc-gis (~-81.7,28.0 Web Mercator y≈3.2M); REJECT Polk TN Polk_GRC /
+      Thrive Snapshot (~-84.5,35.1); REJECT Polk NC szoellers experience
+      842578cc98ac4ba8a29d2bbb6044443c / Polk_Voting_Districts (~-82.2,35.3); REJECT
+      Polk WI VillageofClearLake Polk_County_Parcels 1PZmkk2mSW5b055Q (y≈5.6M);
+      REJECT Polk TX DETCOG (~-94.8,30.8); REJECT GDITAdmin "Parcels - GA - Polk County"
+      ISpzx3B5ZsVA6e1Z/Parcels (correct GA extent but AGOL subscription canceled SB_0006
+      403 — dead); REJECT Apex_GA_Parcels PEP2025 (only ≈32 Polk rows — outreach CRM
+      Status/Notes, NOT county-wide cadastral); REJECT paid Regrid/ATTOM/DynamoSpatial.
+      qPublic zoning layer noted on Polk Today 2020 for unincorporated parcels — HTML
+      only. Skip utilities+AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — no public REST tax values; qPublic AppID=690 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable FeatureServer. Assessor HTML qpublic.net/ga/polk →
+      App=PolkCountyGA / AppID=690 LayerID=11379 (Cloudflare/bot 403 automated; public
+      for humans). polkga.org Tax Assessors points humans to same portal.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/lastSale on public REST. Prefer qPublic Sales Search / Sales List HTML
+      AppID=690. Rejected paid Regrid/ATTOM sales. (Polk FL sale layers are WRONG
+      geography — do not use.)
+    status: gap
+
+  - role: zoning
+    name: null — no public Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Polk County / Cedartown / Rockmart / Aragon Euclidean zoning FeatureServer
+      recovered on public AGOL (2026-09-24). qPublic parcel-by-parcel zoning layer
+      (unincorporated) is HTML/Beacon only. Joint Comp Plan 2022-2026 PDF via NWGRC
+      (nwgrc.org) — character maps only, not REST. Prefer city ordinance PDF inside
+      city limits until city FS published.
+    status: gap
+
+  - role: flu
+    name: null — Joint Comp Plan PDF only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No public FLU FeatureServer. Polk County Joint Comprehensive Plan 2022-2026
+      (NWGRC PDF with Cedartown/Rockmart/Aragon) — planning character only.
+    status: gap
+
+  - role: other
+    name: Census TIGER county + places (spatial mask only)
+    restUrl: https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      GEOID: fips
+      NAME: countyName
+    notes: >
+      Spatial county mask filter GEOID='13233' / STATE='13'. Companion Places for
+      Cedartown/Rockmart/Aragon via TIGERweb Places. Not cadastral — join to qPublic
+      KeyValue only after human/HTML CAMA.
+    status: usable
+
+municipalities:
+  - name: Cedartown
+    level: city
+    parentFips: "13233"
+    joinToCountyParcels: >
+      Spatial TIGER Places Cedartown (~-85.25,34.05) ∩ future county parcels; soft
+      situs city Cedartown / ZIP 30125. County seat.
+    layers:
+      - role: zoning
+        name: null — no Cedartown zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city Euclidean zoning FS recovered — qPublic HTML / ordinance PDF.
+        status: gap
+      - role: parcels
+        name: null — county qPublic only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cedartown-owned parcel CAMA FS — county qPublic AppID=690 HTML.
+        status: gap
+    gaps:
+      - "No Cedartown city-owned parcel/zoning FeatureServer — qPublic AppID=690 HTML."
+    status: partial
+
+  - name: Rockmart
+    level: city
+    parentFips: "13233"
+    joinToCountyParcels: >
+      Spatial TIGER Places Rockmart (~-85.04,34.00) ∩ future county parcels; soft
+      situs Rockmart / ZIP 30153.
+    layers:
+      - role: zoning
+        name: null — no Rockmart zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Rockmart Euclidean zoning FS recovered.
+        status: gap
+      - role: parcels
+        name: null — county qPublic only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Rockmart-owned parcel CAMA FS.
+        status: gap
+    gaps:
+      - "No Rockmart city-owned parcel/zoning FeatureServer."
+    status: partial
+
+  - name: Aragon
+    level: city
+    parentFips: "13233"
+    joinToCountyParcels: >
+      Spatial TIGER Places Aragon (~-85.06,34.05) ∩ future county parcels; soft situs
+      Aragon / ZIP 30104.
+    layers:
+      - role: zoning
+        name: null — no Aragon zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Aragon Euclidean zoning FS recovered.
+        status: gap
+      - role: parcels
+        name: null — county qPublic only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Aragon-owned parcel CAMA FS.
+        status: gap
+    gaps:
+      - "No Aragon city-owned parcel/zoning FeatureServer."
+    status: partial
+
+gaps:
+  - "No public county-wide parcel/tax/sale/zoning FeatureServer for Polk GA FIPS 13233 — owner/tax/sale/geometry via qPublic AppID=690 LayerID=11379 HTML only."
+  - "GDITAdmin Parcels - GA - Polk County (correct extent) AGOL subscription canceled — dead."
+  - "Apex_GA_Parcels PEP2025 has only ≈32 Polk rows — reject as cadastral."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/polk public for humans."
+  - "REJECT Polk FL (gis.polk-county.net / polk-bocc), Polk TN, Polk NC (szoellers), Polk WI, Polk TX DETCOG; REJECT paid Regrid/ATTOM; skip utilities+AADT; no emails/phones."
+  - "Braswell / Taylorsville fringe multi-county — prefer Paulding/Bartow cards for those seats."
+
+license: >
+  Polk County GA Tax Assessors qPublic/Beacon App=PolkCountyGA / AppID=690 LayerID=11379
+  (qpublic.net/ga/polk; polkga.org Cedartown GA). Joint Comp Plan via Northwest Georgia
+  Regional Commission (nwgrc.org). Census TIGER for spatial mask. Public fields only;
+  no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=690&LayerID=11379&PageTypeID=2
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=690&LayerID=11379&PageTypeID=1
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Aragon city"
+      level: city
+      parentFips: "13233"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Cedartown city"
+      level: city
+      parentFips: "13233"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Rockmart city"
+      level: city
+      parentFips: "13233"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Polk' AND aadt>0
+    altFilter: name LIKE '233-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 233-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 192
+    maxAadt: 23800
+    geoCheck: 192/192 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=PolkCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=690&LayerID=11379&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?AppID=690&LayerID=11379&PageTypeID=1
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Aragon city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Cedartown city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Rockmart city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

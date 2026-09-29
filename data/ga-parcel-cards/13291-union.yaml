@@ -1,0 +1,238 @@
+state: GA
+jurisdiction: Union County
+fips: "13291"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner/situs/acres/tax (GDIT Union_Webmap_2026)
+  - role: parcels
+    name: Union_Webmap_2026_WFL1 / Union_Parcels (GDIT)
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Union_Webmap_2026_WFL1/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      REALKEY: realKey
+      Owner: ownerName
+      HOUSE_NO: situsNumber
+      Road: situsStreet
+      Rd_Type: situsStreetType
+      Acres: acreage
+      DEED_ACRE: acreageDeed
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      Land_Value: tax.landValue
+      Class: dorCode
+      LEGAL_DESC: legalDescription
+      Subdivision: subdivision
+      NBH: neighborhood
+      Homestead: homestead
+      CUV_Year: cuvYear
+      LAND_TYPE: landType
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (AGOL org ISpzx3B5ZsVA6e1Z —
+      Union_Webmap_2026_WFL1 FeatureServer layer 1 titled Union_Parcels; serviceItemId
+      870d9800313e41c5a4728d4bd31c682d; owner graham_ghorley / GDIT sibling of Fannin
+      Union_Webmap pattern). Live count 24391 (2026-09-24). WGS84 samples ~-84.077,+34.859
+      (Chimney Stone Rd / Old Birch Bend) / ~-84.03,+34.99 — Blairsville / Lake Nottely
+      ring. SR Web Mercator 102100; maxRecordCount 2000 — page via resultOffset /
+      envelopes. Schema: PIN (preserve spaces, e.g. '039    102 A13') + Owner (filled
+      ≈24234) + situs HOUSE_NO/Road/Rd_Type + Acres/DEED_ACRE + CURR_VAL/PREV_VAL/
+      Land_Value + Class (R/A/C/I/E/U/V) + Subdivision/NBH/LEGAL_DESC/Homestead/CUV_Year.
+      Acres 5–150 ≈4025; CURR_VAL>0 ≈24233. No mailing address fields on this layer —
+      Owner only (mailing via qPublic HTML). No Euclidean zoning attribute — Flagship
+      human TOC LandUse / Municode. Companion OpenAddresses us/ga/union historically
+      pointed at Union_Parcels2024/0 (same org) — 2026-09-24 Invalid URL / superseded by
+      Union_Webmap_2026_WFL1. Official human GIS = Flagship GIS
+      https://www.georgiagis.com/union/disclaimer.cfm → https://union.georgiagis.com/union
+      (fgis-map-110.flagshipcloud.com mapserver110; no public ArcGIS REST — 403/404 on
+      /arcgis/rest). Assessor qPublic App=UnionCountyGA / AppID=773 LayerID=11809
+      (unioncountyga.gov/317/Tax-Assessor Estimate Taxes link; Search Records
+      App=UnionCountyGA&Layer=Parcels&PageType=Search). Cloudflare/bot 403 automated
+      Application.aspx; public for humans. Deep-link KeyValue={PIN URL-encoded}:
+      Application.aspx?AppID=773&LayerID=11809&PageTypeID=4&KeyValue={PIN}
+      (Search PageTypeID=2; Maps PageTypeID=1; App=UnionCountyGA&Layer=Parcels&PageType=
+      Report&KeyValue={PIN}). GEO-VERIFY GEORGIA Union FIPS 13291 Blairsville seat:
+      Census TIGERweb GEOID 13291 CENTLAT +34.8335103 CENTLON -083.9904717; REJECT
+      Union County SC (maps.union-county.org / Union SC ~-81.62,+34.72); REJECT Union
+      County NC / FL / OR / OH (gis.unionco.org Experience Builder); REJECT Flagship
+      page mgCountyLat/Log 32.8998,-85.4012 (AL-looking center — do not use as geo
+      filter; live parcel centroids are N GA mountains). REJECT paid Regrid/ATTOM/
+      USLandGrid/DynamoSpatial; skip utilities+AADT; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: Union_Webmap_2026_WFL1/1 CURR_VAL / PREV_VAL / Land_Value (same layer)
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Union_Webmap_2026_WFL1/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Owner: ownerName
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      Land_Value: tax.landValue
+      Acres: acreage
+    notes: >
+      Preferred tax/CAMA values live on Union_Parcels/1 (CURR_VAL>0 ≈24233). Treat
+      CURR_VAL as digest FMV (100% market), not 40% assessed — no separate
+      assessed/taxable millage field on this layer; tax bill via Tax Commissioner
+      (uniongatax.com). Companion HTML qPublic AppID=773 for appeal / history detail.
+      Rejected paid vendor tax extracts.
+    status: usable
+
+  - role: sales
+    name: Union_Webmap_2026_WFL1 / Sales_2025
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Union_Webmap_2026_WFL1/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: DEED_ACRE
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      PIN: parcelIdAlt
+      REALKEY: realKey
+      Sale_Price: lastSale.price
+      Sale_Date: lastSale.date
+      QUALIFIER: lastSale.qualified
+      REASON: lastSale.reason
+      Class: dorCode
+      DEED_ACRE: acreageDeed
+    notes: >
+      Live Sales_2025 polygon layer count 1230 (2026-09-24); Sale_Price>0 = 1230.
+      Sale_Date epoch-ms; QUALIFIER domain includes G1/G6/CF; REASON includes FM
+      (fair market) / CA / IS / MH / etc. Join to parcels via PIN / Parcel_No /
+      REALKEY. Companion tables '2025$' (id 2) and webmap$ (id 3) attribute-only.
+      Prefer this REST over qPublic Sales HTML when present. Rejected paid
+      Regrid/ATTOM sales. Flagship human TOC also lists Sales layer (no public REST).
+    status: usable
+
+  - role: zoning
+    name: null — no live public Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Union County GA Euclidean zoning FeatureServer recovered on GDIT org or
+      county AGOL (2026-09-24). Class on parcels is DOR land class (R/A/C/I…), not
+      zoning district. Flagship human TOC LandUse layer for humans; Municode
+      library.municode.com/ga/union_county. City of Blairsville planning — no public
+      zoning FS found. Honest REST zoning gap.
+    status: gap
+
+  - role: flu
+    name: null — no public Future Land Use FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Union County GA Future Land Use / character-areas public FeatureServer
+      recovered (2026-09-24). Honest gap.
+    status: gap
+
+  - role: other
+    name: null — Flagship human viewer only (no live REST boundary FS)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Prefer Census TIGERweb county poly GEOID 13291 for spatial mask. Official human
+      GIS Flagship union.georgiagis.com/union (Aerials 2024/2026, Exemptions, Sales,
+      Subdivisions, LandUse TOC). No public city-limits FeatureServer recovered —
+      soft spatial Blairsville downtown (~-83.96,+34.88; ZIP 30512) when filtering city.
+    status: gap
+
+municipalities:
+  - name: Blairsville
+    level: city
+    parentFips: "13291"
+    joinToCountyParcels: >
+      County seat Blairsville GA (~-83.96,+34.876; ZIP 30512). Soft spatial downtown
+      envelope ∩ Union_Parcels/1 (sample 2 km radius around -83.97,34.86 ≈727 parcels).
+      No separate city-limits FeatureServer recovered — prefer spatial / situs Road
+      + NBH until city polygon publishes. No City-of-Blairsville CAMA REST.
+    layers:
+      - role: parcels
+        name: Union_Webmap_2026_WFL1/1 spatial Blairsville
+        restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Union_Webmap_2026_WFL1/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: Acres
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          Owner: ownerName
+          CURR_VAL: tax.marketValue
+          Acres: acreage
+        notes: No separate Blairsville CAMA — county Union_Parcels + spatial filter; qPublic AppID=773.
+        status: usable
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Blairsville city zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Blairsville FLU REST.
+        status: gap
+    gaps:
+      - "No City-of-Blairsville separate parcel/CAMA/zoning REST — county Union_Parcels/1 + soft spatial."
+      - "No public city-limits FeatureServer for hard clip."
+    status: usable
+
+gaps:
+  - "No mailing address fields on Union_Parcels/1 — Owner + situs only; mailing via qPublic AppID=773 HTML."
+  - "No Euclidean zoning / FLU FeatureServer — Class is DOR land class; Flagship LandUse human TOC + Municode."
+  - "Flagship GIS (union.georgiagis.com) has no public ArcGIS REST (mapserver110 403; /arcgis/rest 404)."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; App=UnionCountyGA / AppID=773 public for humans."
+  - "REJECT Union County SC (maps.union-county.org) / NC / FL / OR / OH (gis.unionco.org); REJECT Flagship mgCountyLat/Log AL-looking center as geo filter; REJECT paid Regrid/ATTOM; skip utilities+AADT; no emails/phones."
+
+license: >
+  GDIT AGOL org ISpzx3B5ZsVA6e1Z — Union_Webmap_2026_WFL1 Union_Parcels/1 +
+  Sales_2025/0 (serviceItemId 870d9800313e41c5a4728d4bd31c682d; owner graham_ghorley).
+  Official human GIS Flagship GIS (georgiagis.com/union → union.georgiagis.com/union;
+  unioncountyga.gov/207/Geographic-Information-System-GIS). Assessor qPublic
+  App=UnionCountyGA / AppID=773 LayerID=11809 (unioncountyga.gov/317/Tax-Assessor).
+  Attribution Union County GIS / Board of Assessors / Flagship GIS. Public fields
+  only; no emails/phones; no paid vendors; skip utilities+AADT. REJECT out-of-state
+  Union County lookalikes.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=773&LayerID=11809&PageTypeID=2
+jurisdictionGisUrl: https://www.georgiagis.com/union/disclaimer.cfm
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

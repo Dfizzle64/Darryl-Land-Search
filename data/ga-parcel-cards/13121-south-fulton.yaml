@@ -1,0 +1,58 @@
+state: GA
+jurisdiction: "South Fulton, Fulton County"
+fips: "13121"
+level: city
+markets: [Atlanta]
+
+layers:
+  - role: zoning
+    name: CurrentZoning
+    restUrl: https://services3.arcgis.com/y2BJK2GUfoTwH7py/arcgis/rest/services/CurrentZoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZClass: zoning
+      ZClassDesc: zoningDescription
+      CaseID: zoningCaseId
+      EffDate: zoningEffectiveDate
+      Overlay: zoningOverlay
+      District: councilDistrict
+    notes: >
+      Official CoSF AGOL (org y2BJK2GUfoTwH7py; owners CoSF_GIS1 / reddyasi_cosfga). Live count 2404
+      (2026-09-23). District polygons — no parcel id; spatial join required. On-prem
+      gis.cityofsouthfultonga.gov Planning/LandBase/Tax folders return Token Required (499) —
+      use AGOL public FeatureServers instead. Hub: cosf-gis-cosfga.hub.arcgis.com.
+    status: usable
+
+  - role: flu
+    name: 2035 Future Land Use
+    restUrl: https://services3.arcgis.com/y2BJK2GUfoTwH7py/arcgis/rest/services/2035_Future_Land_Use/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: AreaAc
+    coverage: city-only
+    fieldMap:
+      CharacterT: flu
+      LandUses: fluDescription
+      Zoning: zoningAllowed
+      AreaAc: acreage
+    notes: >
+      Coarse character-type FLU. Live count 99. Spatial join only. Overlay_Districts also public
+      (8 overlays) if overlay context needed.
+    status: usable
+
+gaps:
+  - "On-prem ArcGIS Server folders require token; public path is AGOL FeatureServers."
+  - "No parcel id on zoning/FLU — spatial intersect with Fulton PMV/11 only."
+
+license: "City of South Fulton GIS (CoSF AGOL / hub); public FeatureServers."
+appraiserSearchUrl: https://fultonassessor.org/
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+notes: >
+  JOIN TO COUNTY PARCELS: Spatial intersect CurrentZoning / 2035 FLU polygons with Fulton PMV
+  MapServer/11 parcel polygons. No shared parcel id field on these layers.

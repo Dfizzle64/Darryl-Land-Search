@@ -1,0 +1,358 @@
+state: GA
+jurisdiction: Taylor County
+fips: "13269"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "Taylor_Parcels (GMASS 2025 webmap)"
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Taylor_Web_Map_2025_WFL1/FeatureServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: "Acres"
+    coverage: county-wide
+    parcelIdField: "PARCEL_NO"
+    liveCount: 6417
+    liveCount5to150ac: 2404
+    geoCheck: "extent center [['13269', 'Taylor County']]; sample [['13269', 'Taylor County']]; extent WGS84 [-84.4529, 32.372, -84.0005, 32.7446]"
+    fieldMap:
+      PARCEL_NO: "parcelId"
+      PIN: "parcelPin"
+      Realkey: "ownerKey"
+      Owner: "ownerName"
+      House_No: "situsNumber"
+      Road: "situsStreet"
+      Rd_Type: "situsStreetType"
+      Acres: "acreage"
+      CURR_VAL: "tax.marketValue"
+      Land_Val: "tax.landValue"
+      Class: "dorCode"
+      LEGAL_DESC: "legalDescription"
+    notes: >
+      pass1 2026-09-28: County-wide Taylor GA parcels (6417) with owner, situs, acres, values on GMASS org
+      ISpzx3B5ZsVA6e1Z (Taylor_Web_Map_2025_WFL1 layer 6).
+    status: usable
+    verifiedAt: 2026-09-28
+
+  # PRIMARY — no public county parcel FeatureServer recovered (honest gap)
+  - role: parcels
+    name: null — no public Taylor County GA parcel FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No usable public COUNTY-WIDE parcel GEOMETRY REST for Taylor County GA FIPS 13269
+      (2026-09-24). River Valley RC / GARC AGOL org Ug5xGQbHsD8zuZzM (owner RVRC_ELA)
+      publishes Taylor_County_Line / TaylorCountyLine / CityLimits_Taylor / Taylor_Roads /
+      Taylor_Blocks / Taylor_Tracts / TaylorCo_Roads5_2023 — boundaries/roads/census only,
+      NO TaxParcels/Parcels layer. AGOL item "Parcels - GA - Taylor County"
+      (0d0fde877bc441d2b0abc01443691d34 / services2.arcgis.com/iXA1dC6ldRMKRwra
+      Taylor_County_Parcels) has GA extent [[-84.45,32.37],[-84.00,32.74]] but item access
+      error SB_0006 "Subscription is canceled" — REST Invalid URL; DO NOT use. Prefer
+      qPublic App=TaylorCountyGA HTML for parcel geometry + CAMA (integrated View Map /
+      Search; Cloudflare/bot 403 automated; public for humans at qpublic.net/ga/taylor).
+      Deep-link pattern:
+      Application.aspx?App=TaylorCountyGA&Layer=Parcels&PageType=Report&KeyValue={ParcelID}.
+      GEO-VERIFY GEORGIA — REJECT Taylor County FL (Perry ~-83.58,30.11;
+      services9.arcgis.com/Gh9awoU677aKree0 Florida_Statewide_Cadastral extracts), REJECT
+      Taylor County TX (Abilene ~-99.7,32.4; Parcels_Taylor_County_Texas
+      services.arcgis.com/pGfbNJoYypmNq86F; Abilene_Taylor_County_WFL1), REJECT Taylor WI /
+      WV lookalikes. Live GA anchors: CityLimits_Taylor Butler tip ~-84.255,32.556 /
+      Reynolds tip ~-84.134,32.563; Taylor_County_Line tip ~-84.363,32.398 — Butler seat
+      (~-84.23,32.55). Rejected paid Regrid/ATTOM. Skip utilities+AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — no public REST CAMA; qPublic App=TaylorCountyGA HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST. Assessor HTML qpublic.net/ga/taylor →
+      App=TaylorCountyGA (Cloudflare/bot 403 automated; public for humans). Deep-link
+      KeyValue={ParcelID}:
+      Application.aspx?App=TaylorCountyGA&Layer=Parcels&PageType=Report&KeyValue={ParcelID}.
+      Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/lastSale public REST. Prefer qPublic Sales Search / Sales List / Yearly
+      Sales HTML App=TaylorCountyGA. Rejected paid Regrid/ATTOM sales. (Taylor FL/TX sale
+      layers are WRONG geography — do not use.)
+    status: gap
+
+  - role: zoning
+    name: null — no county or city Euclidean zoning FeatureServer recovered
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Taylor County GA Euclidean zoning FeatureServer on RVRC_ELA Taylor* services
+      (2026-09-24). No Butler / Reynolds / Junction City zoning FS recovered. Comp-plan
+      PDFs via rivervalleyrc.org/taylor-county — not REST. Honest zoning gap.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU/CharacterAreas FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No Taylor County GA FutureLandUse / CharacterAreas FeatureServer on RVRC_ELA
+      (2026-09-24). Planning docs on rivervalleyrc.org — not REST.
+    status: gap
+
+  - role: other
+    name: CityLimits_Taylor + Taylor_County_Line (RVRC / GARC)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CityLimits_Taylor/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipalityName
+      GEOID: placeGeoid
+      STATEFP: stateFips
+      PLACEFP: placeFips
+    notes: >
+      Preferred spatial municipality filters (count 2): NAME=Butler GEOID=1312120 /
+      NAME=Reynolds GEOID=1364876 — both STATEFP=13. Twin Taylor_County_Line/0 +
+      TaylorCountyLine/0 county polygon mask (tip ~-84.363,32.398). Companion
+      Taylor_Roads / TaylorCo_Roads5_2023 / Taylor_Blocks / Taylor_Tracts — not parcels.
+      RVRC_ELA webmaps "Taylor County" id=c64f2077866547f58418e152456aaf64 /
+      id=11de41845c54415f954d1140c610d45e — planning/context viewers (extent covers GA
+      Taylor). Not a substitute for parcel CAMA.
+    status: usable
+
+municipalities:
+  - name: Butler
+    level: city
+    parentFips: "13269"
+    joinToCountyParcels: >
+      Spatial CityLimits_Taylor/0 NAME='Butler' (~-84.255,32.556; GEOID=1312120) — no
+      county parcel REST to intersect; use qPublic map spatial search inside Butler.
+    layers:
+      - role: zoning
+        name: null — no Butler zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Butler city zoning FS on RVRC_ELA.
+        status: gap
+      - role: flu
+        name: null — no Butler FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city or county FLU FeatureServer recovered.
+        status: gap
+      - role: parcels
+        name: null — no Butler-only CAMA; qPublic county HTML
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: City limits usable for spatial filter only; parcel/tax/sale via qPublic.
+        status: gap
+    gaps:
+      - "Butler city limits usable (RVRC); parcel/FLU/zoning still qPublic HTML / gap."
+      - "Owner/tax/sale via qPublic App=TaylorCountyGA HTML."
+    status: partial
+
+  - name: Reynolds
+    level: city
+    parentFips: "13269"
+    joinToCountyParcels: >
+      Spatial CityLimits_Taylor/0 NAME='Reynolds' (~-84.134,32.563; GEOID=1364876) — no
+      county parcel REST; use qPublic map inside Reynolds.
+    layers:
+      - role: zoning
+        name: null — no Reynolds zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Reynolds city zoning FS on RVRC_ELA.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Reynolds FLU REST.
+        status: gap
+      - role: parcels
+        name: null — qPublic county HTML + spatial Reynolds
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Reynolds-only CAMA REST.
+        status: gap
+    gaps:
+      - "Reynolds city limits usable; parcel/FLU/zoning still qPublic / gap."
+    status: partial
+
+gaps:
+  - "No public Taylor County GA parcel FeatureServer — GDIT Taylor_County_Parcels subscription canceled (SB_0006); RVRC_ELA has limits/roads only. Parcel geometry+CAMA via qPublic App=TaylorCountyGA HTML."
+  - "No owner/mailing/situs/CURR_VAL/MAV*/SALE_* REST — tax/owner/sale via qPublic HTML only."
+  - "No county or city Euclidean zoning / FLU FeatureServer recovered."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/taylor public for humans."
+  - "Numeric AppID/LayerID not recovered (Cloudflare) — use App=TaylorCountyGA&Layer=Parcels&KeyValue={ParcelID}."
+  - "REJECT Taylor FL Florida_Statewide_Cadastral / Perry; REJECT Taylor TX Abilene Parcels_Taylor_County_Texas / Abilene_Taylor_County_WFL1; REJECT Taylor WI/WV lookalikes."
+  - "Rejected paid Regrid/ATTOM; skip utilities+AADT; skip emails/phones as PII."
+  - "Junction City (census place) not in CityLimits_Taylor layer (Butler+Reynolds only)."
+
+license: >
+  River Valley Regional Commission / GARC AGOL (RVRC_ELA / services1.arcgis.com/Ug5xGQbHsD8zuZzM)
+  — CityLimits_Taylor, Taylor_County_Line / TaylorCountyLine, Taylor_Roads,
+  TaylorCo_Roads5_2023, Taylor_Blocks, Taylor_Tracts; webmaps id=c64f2077866547f58418e152456aaf64
+  / id=11de41845c54415f954d1140c610d45e. Assessor qPublic App=TaylorCountyGA
+  (qpublic.net/ga/taylor; taylorcountyga.com Tax Assessors / Board of Assessors, Butler GA).
+  Attribution RVRC / Taylor County Tax Assessor. Public fields only; no emails/phones; no
+  paid vendors; skip utilities+AADT. REJECT Taylor County FL/TX lookalikes. GDIT
+  Taylor_County_Parcels item canceled — do not cite as live REST.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=TaylorCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?webmap=c64f2077866547f58418e152456aaf64
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: usable
+  summary: >
+    Taylor_Parcels (GMASS 2025 webmap): https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/service
+    s/Taylor_Web_Map_2025_WFL1/FeatureServer/6 - live count 6417 (5-150 ac: 2404), parcel ID field
+    PARCEL_NO. Geography verified against TIGER county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Butler city"
+      level: city
+      parentFips: "13269"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Reynolds city"
+      level: city
+      parentFips: "13269"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Taylor' AND aadt>0
+    altFilter: name LIKE '269-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 269-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 82
+    maxAadt: 8580
+    geoCheck: 82/82 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - Land_Val
+    - PREV_VAL
+    filledCount: 6278
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Taylor_Web_Map_2025_WFL1/FeatureServer/6
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: Owner
+    filledCount: 6279
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Taylor_Web_Map_2025_WFL1/FeatureServer/6
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=TaylorCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=TaylorCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20001
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?webmap=c64f2077866547f58418e152456aaf64
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Butler city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Reynolds city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,364 @@
+state: GA
+jurisdiction: Warren County
+fips: "13301"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Warren County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. Official human cadastral + CAMA path =
+      qPublic/Beacon App=WarrenCountyGA / AppID=776 LayerID=12558
+      (qpublic.net/ga/warren → qpublic.schneidercorp.com Application.aspx; county seat
+      Warrenton GA 30828). Cloudflare/bot 403 blocks automated Application.aspx from
+      research box; public for humans. Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=776&LayerID=12558&PageTypeID=4&KeyValue={parcelId}
+      (also App=WarrenCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId};
+      Search PageType=Search / PageTypeID=2). WarrenCountyGA_WFS on wfs.schneidercorp.com
+      → 404. No CSRA RC (csrarc.ga.gov/mapping-gis — contact member governments; only
+      Coronavirus Impact Planning_Warren County PDF on Ug5xGQbHsD8zuZzM) / county AGOL
+      Warren GA parcel org found. Commercial vendors advertise Warren GA extracts —
+      rejected (paid Regrid/ReportAll). GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13301
+      CENTLAT +33.4089262 CENTLON -082.6767165; CSRARC_Counties NAME=WARREN FIPS=301
+      centroid ~-82.70,33.42 — east-central GA CSRA / Augusta ring (Warrenton).
+      REJECT Warren County OH / NJ / NY / VA / KY / TN parcel lookalikes (e.g.
+      services3.arcgis.com/4mb1fO9eRe47EZZx Warren_County_Parcels_2020 extent ~-75 lon =
+      NJ; webgis.bgky.org CCPC_Parcels = KY; Monroe Tax Parcels in Warren County IN) —
+      wrong state. REJECT paid Regrid/ATTOM/USLandGrid; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic/Beacon HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via Beacon/qPublic AppID=776
+      LayerID=12558 HTML only (assessment from last certified tax roll per qPublic
+      disclaimer; 2026 revaluation notices noted on qpublic.net/ga/warren). Deep-link
+      KeyValue={parcelId} on Report page. Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. Prefer Beacon/qPublic Sales Search / Sales
+      List HTML AppID=776 / App=WarrenCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Warren County GA Euclidean zoning FeatureServer on AGOL/CSRA (2026-09-24).
+      Planning & Zoning staff (warrencountyga.com/planning--zoning.html;
+      Planning@WarrenCountyGA.gov) — contact for maps. Joint comprehensive plan with
+      Camak/Norwood/Warrenton via CSRA RC / DCA PDFs (character areas — not parcel REST).
+      Honest gap.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Warren County GA future land use FeatureServer found (2026-09-24). CSRA RC /
+      DCA joint comprehensive plan PDFs have character-area maps — not queryable REST.
+    status: gap
+
+  - role: other
+    name: CSRARC_Counties Warren boundary (context — NOT parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CSRARC_Counties/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      FIPS: countyFips3
+    notes: >
+      Filter NAME='WARREN' / FIPS='301' for Warren County GA outline (count=1;
+      centroid ~-82.70,33.42). Geo-verify / clip only — zero parcel/owner/tax/sale fields.
+      Same shared org Ug5xGQbHsD8zuZzM as other GA CSRA RC layers. Confirms Georgia
+      (reject NJ/OH/etc. Warren parcels).
+    status: partial
+
+municipalities:
+  - name: Warrenton
+    level: city
+    parentFips: "13301"
+    joinToCountyParcels: >
+      No county parcel REST to join — city filter blocked until geometry source exists.
+      County seat Warrenton GA (~-82.66,33.41; ZIP 30828).
+    layers:
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Warrenton-owned CAMA FS — county Beacon/qPublic AppID=776 HTML only.
+        status: gap
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Warrenton zoning FeatureServer found; joint Comp Plan PDF ≠ REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Warrenton FLU REST.
+        status: gap
+    gaps:
+      - "No Warrenton-owned parcel/zoning/FLU REST; county Beacon/qPublic HTML only."
+    status: gap
+
+  - name: Camak
+    level: city
+    parentFips: "13301"
+    joinToCountyParcels: >
+      No county parcel REST — spatial join blocked. Camak GA (incorporated place in
+      Warren; ~-82.65,33.45).
+    layers:
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Beacon/qPublic HTML only.
+        status: gap
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Camak zoning REST; covered by Warren County joint Comp Plan.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Camak FLU REST.
+        status: gap
+    gaps:
+      - "No Camak city-owned zoning/FLU/parcel REST."
+    status: gap
+
+  - name: Norwood
+    level: city
+    parentFips: "13301"
+    joinToCountyParcels: >
+      No county parcel REST — spatial join blocked. Norwood GA (incorporated place in
+      Warren; ~-82.71,33.46).
+    layers:
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Beacon/qPublic HTML only.
+        status: gap
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Norwood zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Norwood FLU REST.
+        status: gap
+    gaps:
+      - "No Norwood city-owned zoning/FLU/parcel REST."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Warren County GA — Beacon/qPublic App=WarrenCountyGA (AppID=776 LayerID=12558) HTML only."
+  - "WarrenCountyGA_WFS 404; Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/warren HTML path public for humans."
+  - "CSRARC_Counties boundary only — not parcels; no Warren GA parcel service on Ug5xGQbHsD8zuZzM."
+  - "CSRA RC mapping-gis directs public to member governments; joint Comp Plan PDF (Camak/Norwood/Warrenton) ≠ REST."
+  - "REJECT Warren OH/NJ/NY/VA/KY/TN parcel FeatureServers (wrong-state extents); REJECT paid Regrid/ATTOM/ReportAll; no emails/phones collected."
+  - "Skipped utilities+AADT per tranche-3."
+
+license: >
+  Warren County Tax Assessor qPublic/Beacon App=WarrenCountyGA / AppID=776
+  LayerID=12558 (qpublic.net/ga/warren; qpublic.schneidercorp.com;
+  warrencountyga.com/tax-assessor.html). CSRA RC CSRARC_Counties boundary on
+  Ug5xGQbHsD8zuZzM. No public ArcGIS parcel service discovered 2026-09-24.
+  Attribution Warren County Tax Assessor. Public HTML only; no emails/phones; no
+  paid vendors; skip utilities+AADT. REJECT non-Georgia Warren County lookalikes.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WarrenCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=776&LayerID=12558&PageTypeID=1
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap. REJECTED
+    services8.arcgis.com/dHLq2sjobnpJcAcz GA_Warren_County_13301_27bb032/FeatureServer/0 (4675):
+    ReportAll USA schema = paid-vendor re-host.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Camak town"
+      level: city
+      parentFips: "13301"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Norwood city"
+      level: city
+      parentFips: "13301"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Warrenton city"
+      level: city
+      parentFips: "13301"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Warren' AND aadt>0
+    altFilter: name LIKE '301-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 301-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 93
+    maxAadt: 29800
+    geoCheck: 91/93 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=WarrenCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=776&LayerID=12558&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?AppID=776&LayerID=12558&PageTypeID=1
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Camak town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Norwood city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Warrenton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

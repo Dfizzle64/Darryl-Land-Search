@@ -1,0 +1,306 @@
+state: GA
+jurisdiction: Taliaferro County
+fips: "13265"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Taliaferro County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. Official human cadastral + CAMA path =
+      qPublic/Beacon App=TaliaferroCountyGA / AppID=798 LayerID=11839 PageID=5765
+      (qpublic.net/ga/taliaferro/search.html → beacon.schneidercorp.com Application.aspx;
+      county seat Crawfordville GA). Cloudflare/bot 403 blocks automated Application.aspx
+      from research box; public for humans. Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=798&LayerID=11839&PageTypeID=4&KeyValue={parcelId}
+      (also App=TaliaferroCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId};
+      Search PageTypeID=2&PageID=5765). TaliaferroCountyGA_WFS on wfs.schneidercorp.com →
+      404; qpublic/beacon Schneider Application.aspx → 403 automated. No CSRA RC
+      (csrarc.ga.gov/mapping-gis — contact member governments; no public parcel FS) /
+      county AGOL Taliaferro GA parcel org found. Parcel_Regions_w_WinGAP (GARC
+      Parcels2025/2 Ug5xGQbHsD8zuZzM) spatial envelope around Crawfordville (~-82.90,33.55)
+      returned 0 features (that layer is Talbot County WinGAP — do not reuse). Commercial
+      vendors advertise Taliaferro extracts (~2300–2400 parcels) — rejected (paid).
+      GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13265 CENTLAT +33.5660724 CENTLON
+      -082.8787686; CSRARC_Counties NAME=TALIAFERRO FIPS=265 centroid ~-82.832,33.567 —
+      east-central GA CSRA / Augusta ring (Crawfordville). REJECT wrong-state lookalikes;
+      REJECT paid Regrid/ATTOM/USLandGrid/DynamoSpatial; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic/Beacon HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via Beacon/qPublic AppID=798
+      LayerID=11839 HTML only (assessment from last certified tax roll per qPublic
+      disclaimer). Deep-link KeyValue={parcelId} on Report page. Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. Prefer Beacon/qPublic Sales Search / Sales
+      List HTML AppID=798 / App=TaliaferroCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Taliaferro County GA Euclidean zoning FeatureServer on AGOL/CSRA (2026-09-24).
+      Planning via CSRA RC joint comprehensive plan PDF (character areas — not parcel REST)
+      / county-city staff. Honest gap.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Taliaferro County GA future land use FeatureServer found (2026-09-24). CSRA RC
+      2025 draft joint comprehensive plan PDF has character-area maps — not queryable REST.
+    status: gap
+
+  - role: other
+    name: CSRARC_Counties Taliaferro boundary (context — NOT parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CSRARC_Counties/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      FIPS: countyFips3
+    notes: >
+      Filter NAME='TALIAFERRO' / FIPS='265' for Taliaferro County GA outline (count=1;
+      centroid ~-82.83,33.57). Geo-verify / clip only — zero parcel/owner/tax/sale fields.
+      Same shared org Ug5xGQbHsD8zuZzM as other GA CSRA RC layers. Confirms Georgia.
+    status: partial
+
+municipalities:
+  - name: Crawfordville
+    level: city
+    parentFips: "13265"
+    joinToCountyParcels: >
+      No county parcel REST to join — city filter blocked until geometry source exists.
+      County seat Crawfordville GA (~-82.90,33.55).
+    layers:
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Crawfordville-owned CAMA FS — county Beacon/qPublic AppID=798 HTML only.
+        status: gap
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Crawfordville zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Crawfordville FLU REST.
+        status: gap
+    gaps:
+      - "No Crawfordville-owned parcel/zoning/FLU REST; county Beacon/qPublic HTML only."
+    status: gap
+
+  - name: Sharon
+    level: city
+    parentFips: "13265"
+    joinToCountyParcels: >
+      No county parcel REST — spatial join blocked. Sharon GA (incorporated place in
+      Taliaferro; ~-82.79,33.56).
+    layers:
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Beacon/qPublic HTML only.
+        status: gap
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sharon zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sharon FLU REST.
+        status: gap
+    gaps:
+      - "No Sharon city-owned zoning/FLU/parcel REST."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Taliaferro County GA — Beacon/qPublic App=TaliaferroCountyGA (AppID=798 LayerID=11839 PageID=5765) HTML only."
+  - "TaliaferroCountyGA_WFS 404; Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/taliaferro HTML path public for humans."
+  - "CSRARC_Counties boundary only — not parcels; Parcels2025/2 WinGAP spatial Crawfordville = 0 (that layer is Talbot)."
+  - "CSRA RC mapping-gis directs public to member governments; joint Comp Plan PDF ≠ REST."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial; no emails/phones collected."
+  - "Skipped utilities+AADT per tranche-3; skip GeoPermits permitting.schneidergis.com as non-parcel."
+
+license: >
+  Taliaferro County Tax Assessor qPublic/Beacon App=TaliaferroCountyGA / AppID=798
+  LayerID=11839 PageID=5765 (qpublic.net/ga/taliaferro; beacon.schneidercorp.com).
+  CSRA RC CSRARC_Counties boundary on Ug5xGQbHsD8zuZzM. No public ArcGIS parcel service
+  discovered 2026-09-24. Attribution Taliaferro County Tax Assessor. Public HTML only;
+  no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://beacon.schneidercorp.com/Application.aspx?AppID=798&LayerID=11839&PageTypeID=2&PageID=5765
+jurisdictionGisUrl: https://beacon.schneidercorp.com/Application.aspx?AppID=798&LayerID=11839&PageTypeID=1
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Crawfordville city"
+      level: city
+      parentFips: "13265"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Sharon city"
+      level: city
+      parentFips: "13265"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Taliaferro' AND aadt>0
+    altFilter: name LIKE '265-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 265-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 40
+    maxAadt: 30100
+    geoCheck: 39/40 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://beacon.schneidercorp.com/Application.aspx?AppID=798&LayerID=11839&PageTypeID=4&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://beacon.schneidercorp.com/Application.aspx?AppID=798&LayerID=11839&PageTypeID=1
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Crawfordville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Sharon city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

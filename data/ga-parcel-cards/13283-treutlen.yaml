@@ -1,0 +1,224 @@
+state: GA
+jurisdiction: Treutlen County
+fips: "13283"
+level: county
+markets: [Savannah]
+
+layers:
+  # PRIMARY — county-wide parcel polygons (THIN: Parcel_no + geometry only)
+  - role: parcels
+    name: Treutlen_CountyWide_View TaxParcels_25 (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Treutlen_CountyWide_View/FeatureServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_no: parcelId
+      Shape__Area: shapeAreaMeters
+      Shape__Length: shapeLengthMeters
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Heart of Georgia Altamaha RC / hogagis org
+      HHvUPZ2XuLOAJxjR — Treutlen_CountyWide_View item a3ed58869ce149968fa01316022242dc
+      FeatureServer/15 TaxParcels_25). Live count 4340 (2026-09-24). Schema THIN —
+      Parcel_no + Shape__Area/Length + geometry only (NO owner / mailing / situs /
+      CURR_VAL / sale / zoning / deeded acres on this layer). Shape__Area units
+      esriMeters (WKID 102100/3857) — GIS acreage proxy ≈ Shape__Area/4046.8564224;
+      Shape__Area 5–150 ac band ≈1565 (not deeded). maxRecordCount 2000 — page via
+      resultOffset / spatial envelopes. Parcel_no format e.g. '001    001' /
+      '002    001A' / '034    007' (preserve spaces for qPublic KeyValue; Haiseal
+      deep-link encodes spaces as '+'). Official assessor HTML: qPublic
+      App=TreutlenCountyGA / AppID=811 LayerID=14327 PageID=6231
+      (qpublic.net/ga/treutlen; Cloudflare/bot 403 automated; public for humans).
+      Deep-link KeyValue={Parcel_no}: Application.aspx?AppID=811&LayerID=14327&
+      PageTypeID=4&PageID=6231&KeyValue={Parcel_no URL-encoded}. GEO-VERIFY GEORGIA
+      Treutlen FIPS 13283 Soperton seat: WGS84 samples ~-82.706,32.394 / ~-82.710,32.387;
+      CountyBoundary/6 STATEFP=13 COUNTYFP=283 CNTYIDFP=13283 NAME=Treutlen bbox
+      ~-82.75..-82.38 × 32.29..32.51; SopertonCityLimits INTPT ~-82.603,32.382.
+      REJECT paid Regrid/ATTOM/USLandGrid/DynamoSpatial; skip City_of_Soperton_View
+      water/sewer/hydrant utilities + AADT; no emails/phones (assessor contacts on
+      qPublic landing — do not scrape into schema).
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL/FMV/assessed on TaxParcels_25; qPublic AppID=811 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on TaxParcels_25. Assessor HTML
+      qpublic.net/ga/treutlen → AppID=811 LayerID=14327 (Cloudflare/bot 403 automated;
+      public for humans). Deep-link KeyValue={Parcel_no}. Honest REST tax/owner gap.
+      Rejected paid vendor tax extracts.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/lastSale on TaxParcels_25. Prefer qPublic Sales Search / Sales List HTML
+      AppID=811. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Treutlen County-wide Euclidean zoning FeatureServer on Treutlen_CountyWide_View
+      (2026-09-24). TaxParcels_25 has no zoning attribute. CharacterAreas/3 is planning
+      character (Downtown Soperton / Urban / Urban Fringe / Highway Corridor /
+      I-16 and State Highway Corridors / Rural Treutlen County) — NOT Euclidean zoning
+      substitute. Honest zoning gap; Soperton local ordinance via city staff if any.
+    status: gap
+
+  - role: flu
+    name: Treutlen_CountyWide_View LandUse (FLULU / EXTLU)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Treutlen_CountyWide_View/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: Acerage
+    coverage: county-wide
+    fieldMap:
+      FLULU: flu
+      FLUDCA: fluClass
+      EXTLU: existingLandUse
+      EXTLUDCA: existingLandUseClass
+      Acerage: acreage
+    notes: >
+      Preferred Future / Existing Land Use polygons (count 5303). FLUDCA top:
+      Agriculture/Forestry≈3371 / Residential≈1644 / Commercial≈215 /
+      Public/Institutional≈32 / Industrial≈13 / Park/Recreation/Conservation≈12.
+      Acerage (sic) on polygons. Spatial join onto TaxParcels_25 — no Parcel_no key.
+      Companion CharacterAreas/3 (count 19) planning character only. Public Land Use
+      viewer HOGARC.maps.arcgis.com webappviewer id=e7e0a7d74f3a4c7b908c21ecdb7b485b.
+    status: usable
+
+  - role: other
+    name: CharacterAreas (planning character)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Treutlen_CountyWide_View/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CHARACTER: characterArea
+      NAME: characterAreaName
+    notes: >
+      Live count 19 — Downtown Soperton / Urban / Urban Fringe / Highway Corridor /
+      I-16 and State Highway Corridors / Rural Treutlen County. Comp-plan character —
+      not Euclidean zoning / not FLU substitute.
+    status: usable
+
+  - role: other
+    name: CountyBoundary + SopertonCityLimits (municipal / county bounds)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Treutlen_CountyWide_View/FeatureServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      NAMELSAD: countyNameFull
+      CNTYIDFP: countyGeoid
+      STATEFP: stateFp
+      COUNTYFP: countyFp
+    notes: >
+      CountyBoundary/6 live count 1 — NAME=Treutlen STATEFP=13 COUNTYFP=283
+      CNTYIDFP=13283. Preferred county extent filter. Companion Soperton city limits:
+      City_of_Soperton_View/9 SopertonCityLimits (count 1; FIPS='283'; ~-82.603,32.382).
+      Skip Soperton water/sewer service area layers (utilities).
+    status: usable
+
+municipalities:
+  - name: Soperton
+    level: city
+    parentFips: "13283"
+    joinToCountyParcels: >
+      Spatial City_of_Soperton_View/9 SopertonCityLimits (FIPS='283' INTPT
+      ~-82.603,+32.382) ∩ TaxParcels_25. CharacterAreas NAME/CHARACTER containing
+      'Soperton' / Downtown Soperton / Urban soft secondary — prefer spatial limits.
+    layers:
+      - role: parcels
+        name: TaxParcels_25 spatial Soperton
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Treutlen_CountyWide_View/FeatureServer/15
+        layerId: 15
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Parcel_no: parcelId
+        notes: >
+          No City-of-Soperton separate parcel/CAMA REST — county TaxParcels_25 +
+          SopertonCityLimits clip; owner/tax/sale via qPublic AppID=811.
+        status: usable
+      - role: zoning
+        name: null — no Soperton Euclidean zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: City_of_Soperton_View has limits / special areas / water-sewer only — no zoning FS. Skip utilities.
+        status: gap
+      - role: flu
+        name: LandUse/14 spatial Soperton
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Treutlen_CountyWide_View/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: Acerage
+        coverage: city-only
+        fieldMap:
+          FLULU: flu
+          FLUDCA: fluClass
+        notes: County LandUse ∩ SopertonCityLimits.
+        status: usable
+    gaps:
+      - "No City-of-Soperton separate parcel/CAMA/zoning REST — county TaxParcels_25 + spatial limits; tax/sale/owner via qPublic AppID=811 HTML."
+      - "Skip SopertonSewerLines / SopertonWaterLines / WaterServiceAreas / SewerServiceAreas (utilities)."
+    status: usable
+
+gaps:
+  - "TaxParcels_25 schema THIN — Parcel_no + geometry only; no owner/mailing/situs/CURR_VAL/sale/zoning/deeded acres on REST."
+  - "Tax / sale / owner via qPublic AppID=811 LayerID=14327 HTML only (Cloudflare/bot 403 automated)."
+  - "No deeded acreage field — GIS proxy Shape__Area (esriMeters) /4046.86; 5–150 ac ≈1565."
+  - "No county Euclidean zoning FeatureServer — CharacterAreas is planning character only."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "REJECT paid Regrid/ATTOM/USLandGrid/DynamoSpatial; skip utilities+AADT; no emails/phones."
+
+license: >
+  Heart of Georgia Altamaha Regional Commission HOGARC/hogagis AGOL org
+  HHvUPZ2XuLOAJxjR — Treutlen_CountyWide_View TaxParcels_25/15 + LandUse/14 +
+  CharacterAreas/3 + CountyBoundary/6 (item a3ed58869ce149968fa01316022242dc);
+  City_of_Soperton_View SopertonCityLimits/9 (item 4b2a7fa91bdc458b80aae2bb320c7375);
+  Land Use viewer e7e0a7d74f3a4c7b908c21ecdb7b485b. Assessor qPublic
+  App=TreutlenCountyGA / AppID=811 LayerID=14327 (qpublic.net/ga/treutlen).
+  Attribution Treutlen County Board of Assessors / HOGARC GIS. Public fields only;
+  no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=811&LayerID=14327&PageTypeID=2
+jurisdictionGisUrl: https://HOGARC.maps.arcgis.com/apps/webappviewer/index.html?id=e7e0a7d74f3a4c7b908c21ecdb7b485b
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

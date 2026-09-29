@@ -1,0 +1,415 @@
+state: TN
+jurisdiction: Tipton County
+fips: '47167'
+level: county
+markets:
+- Memphis
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=84)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 30,129; DEEDAC 5–150 → 5234; id GISLINK populated=True; geo PASS
+    (5/5 centroids in county, 5/5 polys touch county) (35.64067,-89.77013)→Tipton; (35.53423,-89.6368)→Tipton;
+    (35.49585,-89.76462)→Tipton (where COUNTY_ID=84). Service lastEditDate 2026-09-10 (PARCELID suffix
+    2026) — freshest public owner/geometry; no sale/value/CALC_ACRE (DEEDAC often 0 — derive geodesic
+    acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 5530
+- role: parcels
+  name: Tipton County Parcels_COT (county AGOL CAMA)
+  restUrl: https://services3.arcgis.com/dpcWjCfPyDdLMs5n/arcgis/rest/services/Parcels_COT/FeatureServer/53
+  layerId: 53
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    ID: parcelIdDisplay
+    PARCELID: parcelIdFull
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    STNUM: situsAddress.number
+    STNAME: situsAddress.street
+    CALC_ACRE: acreage
+    DEEDAC: acreageDeed
+    CAMA_DEEDA: acreageCamaDeed
+    CAMA_CALCA: acreageCamaCalc
+    LANDMKTVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    ASSESSMENT: tax.assessedValue
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    DEED_BOOK: lastSale.deedBook
+    DEED_PAGE: lastSale.deedPage
+    LANDUSE: dorCode
+    ZONING: zoning
+    CLASS: propType
+    DISTRICT: taxDistrict
+    COUNTY_ID: countyId
+  notes: 'Preferred county CAMA/AGOL (tiptongis00 / Tipton GIS Geo Hub). Live 2026-09-24 ET: 30,135 polys;
+    CALC_ACRE 5–150 & PARCEL_TYP=1 → 5,511. Geo-verify OK — sample centroids ~35.64N, 89.74W (Covington
+    / Tipton TN). Richer than statewide join: IMPVAL, mailing, ZONING attr (often blank on rural), LANDUSE.
+    SALEDATE epoch-ms. TAXYR_NUM observed 2026. OZ 2.0: join national Opportunity Zone 2.0 / rural-eligible
+    tracts by centroid. 2026-09-28 ET TN PIR re-verify: count 30,135; CALC_ACRE 5–150 → 5530; id GISLINK
+    populated=True; geo PASS (5/5 centroids in county, 5/5 polys touch county) (35.63538,-89.74471)→Tipton;
+    (35.51603,-89.89209)→Tipton; (35.43936,-89.70767)→Tipton.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: GISLINK
+  salesValueVintage: 2026
+  sourceEditDate: '2026-09-14'
+- role: parcels
+  name: TN County Parcel Map — Tipton_Parcels (COT join Assessment_Data_84)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/10
+  layerId: 10
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Assessment_Data_84_GISLINK: parcelIdJoin
+    Assessment_Data_84_ID: parcelIdDisplay
+    Assessment_Data_84_OWNER: ownerName
+    Assessment_Data_84_OWNER2: ownerName2
+    Assessment_Data_84_ADDRESS: situsAddress
+    Parcels_CALC_ACRE: acreage
+    Assessment_Data_84_DEEDAC: acreageDeed
+    Assessment_Data_84_LANDMKTVAL: tax.landValue
+    Assessment_Data_84_APPRAISAL: tax.marketValue
+    Assessment_Data_84_SALEDATE: lastSale.date
+    Assessment_Data_84_PRICE: lastSale.price
+    Assessment_Data_84_VI: lastSale.qualified
+    Assessment_Data_84_DEED_BOOK: lastSale.deedBook
+    Assessment_Data_84_DEED_PAGE: lastSale.deedPage
+    Assessment_Data_84_LANDUSE: dorCode
+    Assessment_Data_84_CLASS: propType
+  notes: 'Statewide AGOL twin (count 29,686; 5–150ac 5,551). Prefer Parcels_COT primary — this join lacks
+    IMPVAL/mailing. Geo-verify OK (~35.64N, 89.74W). 2026-09-28 ET TN PIR re-verify: count 29,686; Parcels_CALC_ACRE
+    5–150 → 5551; id Parcels_GISLINK populated=True; geo PASS (5/5 centroids in county, 5/5 polys touch
+    county) (35.63538,-89.74471)→Tipton; (35.51361,-89.89298)→Tipton; (35.43969,-89.7342)→Tipton.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sibling-fallback (2023 sale/value, not primary for this county)
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: IMPACT Parcels (COUNTY_ID=84) — egress-sensitive sibling
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+  notes: 'Filter COUNTY_ID=84 AND PARCEL_TYPE=1. maps.cot.tn.gov often 403 to datacenter egress — prefer
+    Parcels_COT / TN_County_Parcel_Map. Themes JUR=''084'' when IMPACT reachable. 2026-09-28 ET TN PIR:
+    maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: zoning
+  name: Tipton County Zoning
+  restUrl: https://services3.arcgis.com/dpcWjCfPyDdLMs5n/arcgis/rest/services/Zoning/FeatureServer/0
+  layerId: 0
+  coverage: county-wide
+  fieldMap:
+    ZONING: zoning
+    ACRES: acreage
+    LINK: zoningOrdinanceUrl
+  notes: 1,083 district polys (2026-09-24). Codes sampled include R-3 and others; LINK points to county
+    Planning & Development. Pair with Special_Zones_for_Zoning (F / A-1 overlays only — not full district
+    fabric). Confirm ordinance for multifamily-relevant districts.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: zoning
+  name: Town of Atoka Zoning (Con_Zone / Placetypes)
+  restUrl: https://services3.arcgis.com/dpcWjCfPyDdLMs5n/arcgis/rest/services/atoka_zoning_town/FeatureServer/0
+  layerId: 0
+  coverage: city-only
+  fieldMap:
+    Con_Zone: zoning
+    Placetypes: zoningLabel
+    Area5: acreage
+  notes: 'City-only ~5,252 polys. Experience companion: https://experience.arcgis.com/experience/b6435fb5191b410aaa4bc172f610f6c3/'
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: other
+  name: Special Zones for Zoning (F / A-1 overlays)
+  restUrl: https://services3.arcgis.com/dpcWjCfPyDdLMs5n/arcgis/rest/services/Special_Zones_for_Zoning/FeatureServer/0
+  layerId: 0
+  coverage: county-wide
+  fieldMap:
+    Zoning_Dis: zoningOverlay
+    Acreage: acreage
+  notes: Only 2 polys (F, A-1) — overlay/special, not full zoning fabric. Use Zoning layer primary.
+  status: partial
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: flu
+  name: Tipton Land_Use (NLCD-style land cover — NOT adopted FLU)
+  restUrl: https://services3.arcgis.com/dpcWjCfPyDdLMs5n/arcgis/rest/services/Land_Use/FeatureServer/0
+  layerId: 0
+  coverage: county-wide
+  fieldMap:
+    Type: landCover
+    GRIDCODE: landCoverCode
+  notes: ~64k polys of NLCD-style cover (Cultivated Crops, Grassland, Developed…). Not future land use
+    entitlement — do not treat as FLU. Honest FLU gap remains.
+  status: partial
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: other
+  name: Urban Growth Plan
+  restUrl: https://services3.arcgis.com/dpcWjCfPyDdLMs5n/arcgis/rest/services/Urban_Growth_Plan/FeatureServer/0
+  layerId: 0
+  coverage: county-wide
+  fieldMap:
+    REGION: growthRegion
+    ACRES: acreage
+  notes: UGB / growth-plan guidance polygons — not FLU entitlement.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: other
+  name: TDOT Traffic Lines (AADT statewide)
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: state-wide (filter county)
+  fieldMap:
+    AADT: aadt
+    AADTYEAR: aadtYear
+    COUNTY_NUMBER: countyNumberTdot
+    ROUTE_ID: routeId
+    FUNCTIONAL_CLASS: functionalClass
+  notes: >-
+    Added 2026-09-28 ET TN PIR Pass 2. Filter COUNTY_NUMBER='84' AND AADTYEAR='2025' → 1,575 segments
+    (all years 1,763). COUNTY_NUMBER = TDOT alphabetical county no. (NOT FIPS).
+  status: usable
+  auth: none
+  geometry: polyline
+  use: aadt-screening
+gaps:
+- Adopted Future Land Use FeatureServer (Land_Use layer is NLCD cover, not FLU)
+- Covington / Munford / Brighton city zoning REST (Atoka city zoning present)
+- IMPACT maps.cot.tn.gov egress-sensitive
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: Tipton County GIS / Parcels_COT / IMPACT-TPAD public records; Tipton GIS disclaimer applies;
+  attribution required.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+publicGisUrl: https://tiptontn.geopowered.com/PropertySearch/
+jurisdictionGisUrl: https://data-tiptoncountygis.hub.arcgis.com/
+zoningOverall: partial
+packagingNote: 'Wave 1B2 TRANCHE-3 dig 2026-09-24. Primary parcels = Parcels_COT/53 (county CAMA). Secondary
+  TN_County_Parcel_Map/10. TPAD deep-link {GISLINK}. Public GIS = GEO Jobe PSA; hub = data-tiptoncountygis.
+  Skip utilities + AADT. OZ 2.0 = national tract join. RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR):
+  parcels usable; added OIR. LSB-approved parcel setup applied 2026-09-28 (see parcelSetup).'
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=84
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services3.arcgis.com/dpcWjCfPyDdLMs5n/arcgis/rest/services/Parcels_COT/FeatureServer/53
+  joinKey: OIR.GISLINK = GISLINK
+  salesValueVintage: 2026
+  salesValueSourceEditDate: '2026-09-14'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 5530
+  gislinkJoinSample: 10/10 (100%)
+  exception: 'Tipton county AGOL CAMA: max SALEDATE 2026-08-27, LASTUPDATE 2026-08-28, service edit 2026-09-14.'
+aadt:
+  source: TDOT Traffic Lines
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  field: AADT
+  yearField: AADTYEAR
+  preferredYear: '2025'
+  countyFilterField: COUNTY_NUMBER
+  countyNumberTdot: '84'
+  where: COUNTY_NUMBER='84' AND AADTYEAR='2025'
+  count2025: 1575
+  countAllYears: 1763
+  maxAADT2025: 23212
+  segments2025AADTge5000: 51
+  status: usable
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+ownerEntityTypeRule:
+  appliesTo: OWNER + ' ' + OWNER2 (upper-cased; OWNER2 dropped when it starts with C/O, ATTN, %, CARE
+    OF); first match wins
+  order:
+  - type: church
+    regex: \b(CHURCH|BAPTIST|METHODIST|PRESBYTERIAN|LUTHERAN|EPISCOPAL|CATHOLIC|DIOCESE|MINISTR(Y|IES)|CONGREGATION|FELLOWSHIP|TABERNACLE|TEMPLE|CHAPEL|ASSEMBLY
+      OF GOD|CHURCH OF CHRIST|CEMETERY)\b
+  - type: government
+    regex: \b(UNITED STATES|U ?S ?A|USA|STATE OF (TENNESSEE|TN)|TENNESSEE (STATE|DEPT|DEPARTMENT)|DEPT
+      OF|DEPARTMENT OF|COUNTY OF|CITY OF|TOWN OF|BOARD OF EDUCATION|TENNESSEE VALLEY AUTHORITY|TVA|UTILITY
+      DISTRICT|HOUSING AUTHORITY|WILDLIFE RESOURCES|TWRA|CORPS OF ENGINEERS|NATIONAL PARK)\b|\b[A-Z]+
+      COUNTY( GOVERNMENT| BOARD| COMMISSION| SCHOOLS?| HIGHWAY( DEPT)?)?\s*$
+  - type: LLC
+    regex: \b(L\.?\s?L\.?\s?C|P\.?L\.?L\.?C)\b\.?|LIMITED LIABILITY (COMPANY|CO)
+  - type: LP
+    regex: \b(L\.?L\.?L\.?P|L\.?L\.?P|L\.?P|LTD|LIMITED PARTNERSHIP|PARTNERSHIP|PARTNERS)\b
+  - type: INC
+    regex: \b(INC|INCORPORATED)\b\.?
+  - type: CORP
+    regex: \b(CORP|CORPORATION|COMPANY|CO)\b\.?\s*$|\bCORP\b|\bCORPORATION\b
+  - type: TRUST
+    regex: \b(TRUST|TRUSTS|TRUSTEE|TRUSTEES|TRSTE|TR|TRS|RLT|REV(OCABLE)? (LIVING )?TR(UST)?)\b|\(TR\)
+  - type: individual
+    regex: .*
+  noContactInfo: true
+  contactFieldsExcluded:
+  - MAILADDR
+  - MAILCITY
+  - ZIP
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+  status:
+    a: verified
+    b: verified
+    c: verified
+    d: verified
+    e: verified
+    f: verified
+  a_aadt:
+    countyNumberTdot: '84'
+    where: COUNTY_NUMBER='84' AND AADTYEAR='2025'
+    count2025: 1575
+    countAllYears: 1763
+    maxAADT2025: 23212
+    segments2025AADTge5000: 51
+  b_value:
+    source: https://services3.arcgis.com/dpcWjCfPyDdLMs5n/arcgis/rest/services/Parcels_COT/FeatureServer/53
+    fields:
+      LANDMKTVAL: tax.landValue
+      IMPVAL: tax.improvementValue
+      APPRAISAL: tax.marketValue
+      ASSESSMENT: tax.assessedValue
+    populatedCounts:
+      LANDMKTVAL: 30026
+      IMPVAL: 23739
+      APPRAISAL: 30047
+      ASSESSMENT: 29504
+    layerTotal: 30135
+    missingMappedFields: []
+  c_sale:
+    source: https://services3.arcgis.com/dpcWjCfPyDdLMs5n/arcgis/rest/services/Parcels_COT/FeatureServer/53
+    fields:
+      SALEDATE: lastSale.date
+      PRICE: lastSale.price
+      VI: lastSale.qualified
+      DEED_BOOK: lastSale.deedBook
+      DEED_PAGE: lastSale.deedPage
+    populatedCounts:
+      SALEDATE: 29964
+      PRICE: 16282
+      VI: 16296
+      DEED_BOOK: 29964
+      DEED_PAGE: 29964
+    dateField: SALEDATE
+    priceFields:
+    - PRICE
+    liveMaxSaleDate: '2026-08-27'
+    joinedSample5to150:
+      sampleIds: 10
+      matched: 10
+      valuePopulated: 10
+      saleDatePopulated: 10
+    saleHistory: 'Public per-parcel only: TPAD Parcel Details "Sale Information" table (date, price, book/page,
+      vacant/improved, instrument, qualification) via PA deep link; no bulk sale-history layer on public
+      GIS'
+  d_owner:
+    source: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+    filter: COUNTY_ID=84
+    ownerField: OWNER
+    owner2Field: OWNER2
+    total: 30129
+    ownerPopulated: 30123
+    entitySampleN: 2000
+    entityDist:
+      individual: 1564
+      TRUST: 202
+      LLC: 138
+      church: 35
+      government: 29
+      LP: 16
+      INC: 14
+      CORP: 2
+  e_paDeepLink:
+    template: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+    testUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink=084078%20%20%20%2004200
+    testGislink: 084078    04200
+    httpBox: '403'
+    httpExternal: 200 details
+    taxYearShown: '2026'
+    saleHistoryRows: 2
+    note: null
+    perParcelFieldOnOIR: LINK_TPAD
+  f_viewer:
+    url: https://data-tiptoncountygis.hub.arcgis.com/
+    http: '200'
+    arcgisItem: null
+    statewideTPV: https://tnmap.tn.gov/assessment/#/parcel/{GISLINK} (OIR LINK_TPV) HTTP 200
+    isStatewideFallback: false
+  vintage:
+    salesValueVintage: 2026
+    salesValueSourceEditDate: '2026-09-14'
+    liveMaxSaleDate: '2026-08-27'
+    serviceLastEdit: '2026-09-14'
+  notes: []

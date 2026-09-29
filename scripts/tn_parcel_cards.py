@@ -67,6 +67,27 @@ def _matching(layers: list[dict], wanted: str) -> list[dict]:
     return [layer for layer in layers if normalize_rest_url(layer.get("restUrl")) == wanted]
 
 
+def select_primary_layer(card: dict) -> dict:
+    """Geometry layer only, for a card whose sale/value source is an explicit gap."""
+    setup = card.get("parcelSetup") or {}
+    geometry_source = setup.get("geometryOwnerSource")
+    if not geometry_source or sales_source_is_gap(geometry_source):
+        raise RuntimeError(f"{card.get('fips')} parcelSetup is missing geometryOwnerSource")
+    geometry_url = normalize_rest_url(geometry_source)
+    primaries = [
+        layer
+        for layer in parcel_layers(card)
+        if normalize_use(layer.get("use")) in PRIMARY_USES
+    ]
+    hits = _matching(primaries, geometry_url)
+    if len(hits) != 1:
+        raise RuntimeError(
+            f"{card.get('fips')} parcelSetup geometry URL matched {len(hits)} "
+            "primary-geometry layers. The first role:parcels layer is not a fallback."
+        )
+    return hits[0]
+
+
 def select_parcel_layers(card: dict) -> tuple[dict, dict]:
     """Pick geometry and sale/value layers by use, then require parcelSetup to agree.
 
@@ -142,12 +163,22 @@ def _where_and_county_id(setup: dict) -> tuple[str, int | None]:
     return where, None
 
 
+def sales_source_is_gap(value: Any) -> bool:
+    """A card with no public bulk sale/value layer says GAP, not a FeatureServer URL."""
+    text = str(value or "").strip().lower()
+    if not text or text in {"gap", "null", "none", "n/a", "na"}:
+        return True
+    return text.startswith("n/a") or text.startswith("gap")
+
+
 def _vintage(setup: dict) -> str | None:
     value = setup.get("salesValueVintage", None)
     if value is None:
         return None
     text = str(value).strip()
-    if not text or text.lower() == "null":
+    if not text or text.lower() in {"null", "none", "gap", "n/a", "na"}:
+        return None
+    if text.lower().startswith("n/a") or text.lower().startswith("gap"):
         return None
     return text
 
@@ -214,6 +245,39 @@ def _usable_zoning(card: dict) -> bool:
     return False
 
 
+def usable_zoning_layers(card: dict) -> list[dict[str, str]]:
+    """Usable zoning the loader can stamp: a code field on a numbered layer.
+
+    A parcelId field means join on GISLINK. Otherwise the layer is district
+    polygons stamped by centroid. A FeatureServer root with no layer id is
+    not queryable and is left off this list.
+    """
+    found: list[dict[str, str]] = []
+    for layer in card.get("layers") or []:
+        if layer.get("role") != "zoning" or layer.get("status") != "usable":
+            continue
+        url = str(layer.get("restUrl") or "").strip()
+        if not url:
+            continue
+        tail = normalize_rest_url(url).rsplit("/", 1)[-1]
+        if not tail.isdigit():
+            continue
+        fields = canonical_fields(layer)
+        code = fields.get("zoning")
+        if not code:
+            continue
+        found.append(
+            {
+                "name": str(layer.get("name") or "zoning"),
+                "url": query_url(url),
+                "codeField": code,
+                "labelField": fields.get("zoningLabel") or fields.get("zoningDesc") or "",
+                "idField": fields.get("parcelId") or "",
+            }
+        )
+    return found
+
+
 def _portal(card: dict, overlay: dict | None) -> str | None:
     if overlay and overlay.get("portal"):
         return str(overlay["portal"])
@@ -231,14 +295,19 @@ def resolve_card(card: dict, overlay: dict | None = None) -> dict[str, Any]:
     if not fips:
         raise RuntimeError("Parcel card is missing fips")
     setup = card.get("parcelSetup") or {}
-    primary, sales = select_parcel_layers(card)
+    sales_gap = sales_source_is_gap(setup.get("salesValueSource"))
+    if sales_gap:
+        primary = select_primary_layer(card)
+        sales = None
+    else:
+        primary, sales = select_parcel_layers(card)
     acreage_method, acreage_field = resolve_acreage(primary, setup)
     geometry_query = query_url(str(primary.get("restUrl") or ""))
-    sales_query = query_url(str(sales.get("restUrl") or ""))
+    sales_query = "" if sales is None else query_url(str(sales.get("restUrl") or ""))
     where, county_id = _where_and_county_id(setup)
     mode = _mode_for(geometry_query)
-    same_layer = normalize_rest_url(geometry_query) == normalize_rest_url(sales_query)
-    tncpm_layer = None if same_layer else _tncpm_layer_id(sales_query)
+    same_layer = bool(sales_query) and normalize_rest_url(geometry_query) == normalize_rest_url(sales_query)
+    tncpm_layer = None if sales is None or same_layer else _tncpm_layer_id(sales_query)
     name = _county_name(card, overlay)
     row: dict[str, Any] = {
         "fips": fips,
@@ -253,9 +322,11 @@ def resolve_card(card: dict, overlay: dict | None = None) -> dict[str, Any]:
         "acreageMethod": acreage_method,
         "acreageField": acreage_field,
         "primaryUse": normalize_use(primary.get("use")),
-        "salesUse": normalize_use(sales.get("use")),
+        "salesUse": None if sales is None else normalize_use(sales.get("use")),
         "geometryFields": canonical_fields(primary),
         "hasUsableZoning": _usable_zoning(card),
+        "zoningLayers": usable_zoning_layers(card),
+        "salesGap": sales_gap,
         "salesOnGeometry": False,
     }
     if mode == "oir":
@@ -265,6 +336,8 @@ def resolve_card(card: dict, overlay: dict | None = None) -> dict[str, Any]:
         row["portal"] = portal
     if overlay and isinstance(overlay.get("joins"), dict):
         row["joins"] = dict(overlay["joins"])
+    if sales_gap or sales is None:
+        return row
     if tncpm_layer is not None:
         fields = canonical_fields(sales)
         missing_value = {

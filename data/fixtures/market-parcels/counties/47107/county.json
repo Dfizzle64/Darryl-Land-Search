@@ -1,0 +1,56 @@
+{
+  "name": "McMinn",
+  "fips": "47107",
+  "state": "Tennessee",
+  "markets": [
+    "Chattanooga"
+  ],
+  "featureCount": 8070,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "tn-oir-public-use-47107",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+  "gaps": [
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Sale date, sale price, and appraisal are joined from the card sales-value layer (https://services8.arcgis.com/wdIYdjK0MpdHUMcM/arcgis/rest/services/McMinn_Parcels_Joined_3_7_25/FeatureServer/0/query) on GISLINK and labeled 2025 when a value is present. A GISLINK with no match is left without sale or value. The 2023 TN_County_Parcel_Map sibling is not the sale source. Owner phone and email are not ingested.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used.",
+    "Zoning comes from the card's usable zoning layers. A parcel-id layer is joined on that id. Polygon layers are stamped by centroid, and a later city layer replaces an earlier code only inside that city. Outside those layers zoning stays empty."
+  ],
+  "path": "data/fixtures/market-parcels/counties/47107/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47107/lookup.json",
+  "sourceCount": 31388,
+  "dropped": 0,
+  "tileCount": 7,
+  "ingest": {
+    "sourceRows": 31388,
+    "deedAcresInBand": 7981,
+    "droppedGeometry": 0,
+    "droppedOutsideBand": 23318,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 0,
+    "tncpmLayer": null,
+    "tncpmMatched": 0,
+    "saleCount": 7714,
+    "appraisalCount": 7942,
+    "gislinkMatchRate": 0.9853,
+    "cardSalesMatched": 7951,
+    "assessedCount": 7791,
+    "cardMailCount": 7950,
+    "cardZoningCount": 0,
+    "salesVintage": "2025",
+    "cardZoningLayerCount": 3,
+    "cardLayerZoningCount": 123,
+    "kept": 8070,
+    "ownerCount": 8067,
+    "tpadCount": 8070,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
+}

@@ -1,0 +1,153 @@
+state: SC
+jurisdiction: Florence County
+fips: "45041"
+level: county
+markets: [Charleston]
+
+layers:
+  - role: parcels
+    name: County Tax Parcel (REPL_Parcels_Owners)
+    restUrl: https://services1.arcgis.com/40L6yX6OtdCifNez/arcgis/rest/services/County_Tax_Parcel/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      TMSNODASH: parcelIdAlt
+      OWNERNAME: ownerName
+      ADD1: mailingAddress.line1
+      ADD2: mailingAddress.line2
+      ADD3: mailingAddress.cityStateZip
+      ADDR_SITE: situsAddress
+      CALCULATED_ACREAGE: acreage
+      TOTBDGVAL: tax.buildingValue
+      DISTRICT: tax.district
+      PROPERTYCARD: appraiserDeepLink
+      PROPERTYHISTORY: salesHistoryDeepLink
+      MAP: map
+      BLOCK: block
+      PARCEL: parcel
+    notes: 'Verified 2026-09-24: public AGOL FeatureServer (owner rmclaughlin_FlorenceSC), count 70098,
+      no token. Geo-verified sample centroid ≈ (-80.04, 34.09) in Florence County. PROPERTYCARD / PROPERTYHISTORY
+      are per-feature deep links to Florence Co CGI assessor (map/block/parcel query params).
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=70098; 1-feature outSR=4326 sample TMS=''00001-04-001'' vertex
+      (-80.039,34.093) inside Florence County SC bbox; parcel ID field TMS present.'
+    count: 70098
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: County Tax Parcel — tax / owner attributes
+    restUrl: https://services1.arcgis.com/40L6yX6OtdCifNez/arcgis/rest/services/County_Tax_Parcel/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      OWNERNAME: ownerName
+      TOTBDGVAL: tax.buildingValue
+      PROPERTYCARD: appraiserDeepLink
+      PROPERTYHISTORY: salesHistoryDeepLink
+    notes: Same layer as parcels. Building value present; market/assessed land split not on this layer.
+    status: usable
+
+  - role: flu
+    name: FutureLandUse (FlocoGIS)
+    restUrl: https://services1.arcgis.com/otEVSGO5ESloTE5q/arcgis/rest/services/FutureLandUse/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      LANDUSECODE: flu
+    notes: >
+      Verified 2026-09-24: public, count 387. Geo-verified ≈ (-79.45, 33.80) in Florence.
+      Categories include Suburban District. County planning FLU — not municipal zoning.
+    status: usable
+
+gaps:
+  - "No countywide zoning FeatureServer verified on dig day (Olanta downtown + gateway studies only; City of Florence Zoning MapServer is localhost.flocity.local — not public)."
+  - "Assessor CGI deep links are HTTP; pattern uses map/block/parcel from TMS parts."
+  - "Sale multi-history via PROPERTYHISTORY CGI, not attributes on GIS layer."
+
+license: "Florence County / City of Florence AGOL layers (40L6yX6OtdCifNez, otEVSGO5ESloTE5q). Attribute to Florence County. Confirm redistribution before bulk republish."
+appraiserSearchUrl: http://web.florenceco.org/cgi-bin/ta/tax-pr.cgi?step=2&map={map}&block={block}&parcel={parcel}
+publicGisUrl: https://experience.arcgis.com/experience/310ee59e368946cfb111ca6ffc928dbe
+jurisdictionGisUrl: https://flocogis.maps.arcgis.com
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: partial
+    reason: Only TOTBDGVAL (total building value, Integer) + DISTRICT on County_Tax_Parcel; no land/market/assessed
+      totals. RFA Statewide_Parcels Florence rows have Ownership but no M_Value. Full values on county CGI property
+      card (HTML).
+    source: https://services1.arcgis.com/40L6yX6OtdCifNez/arcgis/rest/services/County_Tax_Parcel/FeatureServer/0
+    fieldMap:
+      TOTBDGVAL: tax.buildingValue
+      DISTRICT: tax.district (e.g. "400")
+  sale:
+    status: gap
+    reason: 'No sale date/price on layer. PROPERTYHISTORY CGI (Clerk of Court mbp.cgi) returns deed Book/Page + Grantor/Grantee
+      (tested 00002-04-024: Book A264 Page 1902) but no price/date in the sample. HTML only.'
+    fieldMap:
+      PROPERTYHISTORY: salesHistoryDeepLink (per-feature URL)
+    format: 'n/a (HTML text: "Book: A264 Page: 1902 Grantor: ... Grantee: ...")'
+  owner:
+    status: usable
+    mailingStatus: usable
+    reason: 'OWNERNAME + ADD1-3 mailing on layer (70,098). CAVEAT: GIS owner may lag CAMA - test parcel 00002-04-024
+      shows a different 2026 billing name on the CGI card than OWNERNAME.'
+    source: https://services1.arcgis.com/40L6yX6OtdCifNez/arcgis/rest/services/County_Tax_Parcel/FeatureServer/0
+    fieldMap:
+      OWNERNAME: ownerName
+      ADD1: mailingAddress.line1 (often blank/padded)
+      ADD2: mailingAddress.line2
+      ADD3: 'mailingAddress.cityStateZip (fixed-width "TIMMONSVILLE         SC29161": city=[0:21].strip, state=[21:23],
+        zip=[23:])'
+  paLink:
+    status: usable
+    pattern: http://web.florenceco.org/cgi-bin/ta/tax-pr.cgi?step=2&map={map}&block={block}&parcel={parcel}
+    testedParcelId: 00002-04-024
+    idTransform: Split TMS on "-" -> map (5 digits, zero-padded), block (2), parcel (3); or use MAP/BLOCK/PARCEL fields
+      zero-padded to 5/2/3 (they are stored unpadded, e.g. 2/4/24). PROPERTYCARD field already holds the full URL
+      (trailing space - trim). HTTP only.
+    reason: 'Live test 2026-09-28: tax-pr.cgi?step=2&map=00002&block=04&parcel=024 -> HTTP 200, "Property Card Record
+      for MBP: 00002-04-024 TAX YEAR: 2026". County qPublic (App=FlorenceCountySC) also exists but CGI is the county-native
+      link and is not Cloudflare-gated.'
+  publicGis:
+    status: usable
+    reason: 'publicGisUrl set to FlocoGIS "Parcel Info" Experience (public, updated 2026-08-07, ~211k views); jurisdictionGisUrl
+      kept as FlocoGIS org (Florence County GIS Department, org otEVSGO5ESloTE5q). Note: parcel layer itself is hosted
+      in City of Florence org (40L6yX6OtdCifNez).'
+  gaps:
+  - No market/assessed totals or sale price/date in REST.
+  - GIS owner can lag CAMA billing name.
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) — SCDOT 2025 Statewide Traffic Points, filter CountyName
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28); not
+      re-dug.

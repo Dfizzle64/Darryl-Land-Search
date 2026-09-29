@@ -1,0 +1,489 @@
+{
+  "state": "NC",
+  "jurisdiction": "Henderson County",
+  "fips": "37089",
+  "cntyfips": "089",
+  "slug": "henderson",
+  "level": "county",
+  "markets": [
+    "Asheville"
+  ],
+  "crsPreferred": {
+    "wkid": 102100,
+    "latestWkid": 3857
+  },
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/henderson/parcel-search",
+  "viewerLinkTemplate": "https://lrcpwa.ncptscloud.com/henderson/parcel-detail/{PARCEL_PK}",
+  "gisWebViewerUrl": "https://gisweb.hendersoncountync.gov/gisweb/",
+  "restRoot": "https://gisweb.hendersoncountync.gov/arcgis/rest/services",
+  "joinKeys": [
+    "PIN",
+    "REID",
+    "PARCEL_PK",
+    "parno"
+  ],
+  "parcelIdPreferred": "PIN",
+  "municipalities": [
+    {
+      "name": "Hendersonville",
+      "parcelCityCodes": [
+        "HENDERSONVILLE"
+      ],
+      "approxParcelCount": 7583,
+      "zoning": {
+        "prefer": "https://services1.arcgis.com/UTZTmZoX2rsa9yFA/arcgis/rest/services/COH_Zoning_Test/FeatureServer/0",
+        "alternate": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/83",
+        "count": 413,
+        "fields": [
+          "Zoning",
+          "Zoning_Cla"
+        ]
+      },
+      "flu": {
+        "prefer": "https://services1.arcgis.com/UTZTmZoX2rsa9yFA/arcgis/rest/services/Future_Land_Use/FeatureServer/16",
+        "count": 13778,
+        "fields": [
+          "PIN",
+          "FLU",
+          "ACREAGE"
+        ],
+        "join": "PIN"
+      },
+      "notes": "Prefer city AGOL zoning+FLU; county Zoning_aggregated often Cities stub"
+    },
+    {
+      "name": "Fletcher",
+      "parcelCityCodes": [
+        "FLETCHER"
+      ],
+      "approxParcelCount": 3735,
+      "zoning": {
+        "prefer": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/80",
+        "count": 42,
+        "fields": [
+          "Zoning"
+        ]
+      },
+      "flu": {
+        "status": "gap",
+        "fallback": "county Future Land Use Map 2024 /88"
+      },
+      "notes": "No town AGOL REST; county hosts zoning"
+    },
+    {
+      "name": "Mills River",
+      "parcelCityCodes": [
+        "MILLS RIVER"
+      ],
+      "approxParcelCount": 4445,
+      "zoning": {
+        "prefer": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/81",
+        "count": 32,
+        "fields": [
+          "CLASSIFICA",
+          "AMEND"
+        ]
+      },
+      "flu": {
+        "status": "gap",
+        "fallback": "county Future Land Use Map 2024 /88"
+      },
+      "notes": "County-hosted only"
+    },
+    {
+      "name": "Laurel Park",
+      "parcelCityCodes": [
+        "LAUREL PARK"
+      ],
+      "approxParcelCount": 1859,
+      "zoning": {
+        "prefer": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/82",
+        "count": 12,
+        "fields": [
+          "Zone"
+        ],
+        "includesEtj": true
+      },
+      "flu": {
+        "status": "gap",
+        "fallback": "county Future Land Use Map 2024 /88"
+      },
+      "notes": "Includes ETJ districts"
+    },
+    {
+      "name": "Flat Rock",
+      "parcelCityCodes": [
+        "FLAT ROCK VH",
+        "FLAT ROCK BR",
+        "FLAT ROCK GR"
+      ],
+      "approxParcelCount": 2816,
+      "zoning": {
+        "prefer": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/79",
+        "count": 34,
+        "fields": [
+          "ZONING"
+        ]
+      },
+      "flu": {
+        "status": "gap",
+        "fallback": "county Future Land Use Map 2024 /88"
+      },
+      "notes": "CITY VH/BR/GR tax subtypes \u2014 route via ETJ=FLAT ROCK or municipal boundaries /96"
+    },
+    {
+      "name": "Saluda (tip)",
+      "parcelCityCodes": [
+        "SALUDA"
+      ],
+      "approxParcelCount": 16,
+      "zoning": {
+        "status": "gap"
+      },
+      "flu": {
+        "status": "gap"
+      },
+      "notes": "Mostly Polk County; tip only"
+    }
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "REID",
+        "PARCEL_PK",
+        "parno"
+      ],
+      "bestLayer": "Parcels"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Parcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CALCULATED_ACRES",
+        "ACREAGE"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 6272,
+      "bestLayer": "Parcels"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "PROPERTY_OWNER",
+        "ownname"
+      ],
+      "bestLayer": "Parcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "OWNER_MAIL_1",
+        "OWNER_MAIL_CITY",
+        "OWNER_MAIL_STATE",
+        "OWNER_MAIL_ZIP"
+      ],
+      "bestLayer": "Parcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": false,
+      "fields": [
+        "LOCATION_ADDR",
+        "PHYADDR_STR_NUM",
+        "PHYADDR_STR",
+        "PHYADDR_CITY"
+      ],
+      "bestLayer": "Parcels"
+    },
+    "lastSale": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "PKG_SALE_DATE",
+        "PKG_SALE_PRICE",
+        "LAND_SALE_DATE",
+        "LAND_SALE_PRICE",
+        "DEED_DATE"
+      ],
+      "bestLayer": "Parcels",
+      "caveat": "Latest package/land sale only"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "TOTAL_LAND_VALUE_ASSESSED",
+        "TOTAL_BLDG_VALUE_ASSESSED",
+        "TOTAL_PROP_VALUE",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "Parcels"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "Zoning",
+        "ZONE_CODE",
+        "ZONING",
+        "CLASSIFICA",
+        "Zone",
+        "Zoning_aggregated"
+      ],
+      "bestLayer": "city zoning stack (79-83 / AGOL)",
+      "parcelAttrField": "Zoning_aggregated",
+      "caveat": "Zoning_aggregated often Cities stub \u2014 spatial join city layers"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "FLU",
+        "Land_Use"
+      ],
+      "bestLayer": "Future Land Use Map 2024 + Hendersonville Future_Land_Use/16",
+      "caveat": "No dedicated FLU REST for Fletcher/Mills River/Flat Rock/Laurel Park"
+    },
+    "appraiserLink": {
+      "present": true,
+      "template": "https://lrcpwa.ncptscloud.com/henderson/parcel-detail/{PARCEL_PK}",
+      "fieldOnParcel": "PARCEL_PK"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Parcels",
+      "restUrl": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/Parcels/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "CALCULATED_ACRES",
+      "count": 71350,
+      "countAcres5to150": 6272,
+      "countVacantIshAcres5to150": 3511,
+      "crs": {
+        "wkid": 102100,
+        "latestWkid": 3857
+      },
+      "maxRecordCount": 2000,
+      "wireFirst": true,
+      "status": "usable",
+      "alternateUrls": [
+        "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/19"
+      ]
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "gisacres",
+      "filter": "cntyfips='089'",
+      "count": 75373,
+      "countAcres5to150": 8137,
+      "countImprovZeroAcres5to150": 2573,
+      "maxRecordCount": 5000,
+      "status": "usable",
+      "notes": "Land/improve split fallback; no sale price"
+    },
+    {
+      "role": "zoning",
+      "name": "County Zoning",
+      "restUrl": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/85",
+      "layerId": 85,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 384,
+      "zoningFields": [
+        "ZONE_CODE",
+        "ZONING"
+      ],
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Hendersonville Zoning AGOL",
+      "restUrl": "https://services1.arcgis.com/UTZTmZoX2rsa9yFA/arcgis/rest/services/COH_Zoning_Test/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 413,
+      "zoningFields": [
+        "Zoning",
+        "Zoning_Cla"
+      ],
+      "preferMostLocal": true,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Hendersonville Zoning county host",
+      "restUrl": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/83",
+      "layerId": 83,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 413,
+      "zoningFields": [
+        "Zoning",
+        "Zoning_Cla"
+      ],
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Fletcher Zoning",
+      "restUrl": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/80",
+      "layerId": 80,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 42,
+      "zoningFields": [
+        "Zoning"
+      ],
+      "preferMostLocal": true,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Mills River Zoning",
+      "restUrl": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/81",
+      "layerId": 81,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 32,
+      "zoningFields": [
+        "CLASSIFICA"
+      ],
+      "preferMostLocal": true,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Flat Rock Zoning",
+      "restUrl": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/79",
+      "layerId": 79,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 34,
+      "zoningFields": [
+        "ZONING"
+      ],
+      "preferMostLocal": true,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Laurel Park Zoning and ETJ",
+      "restUrl": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/82",
+      "layerId": 82,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 12,
+      "zoningFields": [
+        "Zone"
+      ],
+      "preferMostLocal": true,
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "Future Land Use Map 2024",
+      "restUrl": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Planning_and_Development/MapServer/88",
+      "layerId": 88,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 354,
+      "fluFields": [
+        "FLU",
+        "Land_Use"
+      ],
+      "wireFirst": true,
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "Hendersonville Future Land Use",
+      "restUrl": "https://services1.arcgis.com/UTZTmZoX2rsa9yFA/arcgis/rest/services/Future_Land_Use/FeatureServer/16",
+      "layerId": 16,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 13778,
+      "fluFields": [
+        "PIN",
+        "FLU",
+        "ACREAGE"
+      ],
+      "preferMostLocal": true,
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "HendersonCountyLandUse",
+      "restUrl": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/Planning/HendersonCountyLandUse/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 70637,
+      "status": "partial",
+      "notes": "Existing-use / ML prediction \u2014 not Comp Plan FLU"
+    },
+    {
+      "role": "other",
+      "name": "MUNICIPAL BOUNDARIES",
+      "restUrl": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/96",
+      "layerId": 96,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 312,
+      "status": "usable"
+    },
+    {
+      "role": "sales",
+      "name": "Parcel package/land sale fields",
+      "restUrl": "https://gisweb.hendersoncountync.gov/arcgis/rest/services/Parcels/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "notes": "Latest PKG_/LAND_ sale on parcels; no multi-xfer FS"
+    }
+  ],
+  "gaps": [
+    "Zoning_aggregated Cities stub inside munis \u2014 join city zoning polygons",
+    "No dedicated public FLU REST for Fletcher, Mills River, Flat Rock, Laurel Park",
+    "No multi-transfer sales FeatureServer",
+    "OneMap vs county acre-count mismatch \u2014 prefer county CALCULATED_ACRES",
+    "Flat Rock CITY VH/BR/GR tax subtypes \u2014 use ETJ or municipal boundary",
+    "Saluda tip mostly Polk",
+    "HendersonCountyLandUse is existing-use/prediction not Comp Plan FLU",
+    "No paid vendor data; no phones/emails collected"
+  ],
+  "license": "Henderson County IT/GIS public ArcGIS REST; City of Hendersonville AGOL; NC OneMap; NCGS disclaimer; attribution recommended",
+  "verifiedAt": "2026-09-23",
+  "verifiedBy": "North Carolina Public Info Researcher"
+}

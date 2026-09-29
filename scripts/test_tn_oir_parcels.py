@@ -16,6 +16,7 @@ from tn_oir_parcels import (
     ROOT,
     acceptable_sale_date,
     chester_parcel_id,
+    choose_spatial_parent,
     in_band,
     positive,
     reject_source_url,
@@ -84,7 +85,38 @@ class TnOirParcelTests(unittest.TestCase):
         self.assertIn("Tennessee_Property_Boundaries_Public_Use", macon["queryUrl"])
         self.assertEqual(BY_FIPS["47081"]["mode"], "hickman")
         self.assertEqual(BY_FIPS["47023"]["mode"], "chester")
-        self.assertEqual(len(BY_FIPS), 20)
+        self.assertEqual(len(BY_FIPS), 80)
+        perry = BY_FIPS["47135"]
+        self.assertTrue(perry.get("spatialParentFallback"))
+        self.assertEqual(perry["tncpmLayer"], 24)
+        self.assertEqual(perry["salesVintage"], "2023")
+        self.assertEqual(BY_FIPS["47121"]["salesVintage"], "2025")
+        self.assertEqual(sales_join_kind(BY_FIPS["47121"]), "mapped")
+        self.assertEqual(len(BY_FIPS["47121"]["zoningLayers"]), 2)
+        self.assertEqual(BY_FIPS["47171"]["salesVintage"], "2026")
+        self.assertTrue(BY_FIPS["47171"]["stampSalesZoning"])
+        self.assertEqual(BY_FIPS["47179"]["salesVintage"], "2026")
+        self.assertEqual(BY_FIPS["47179"]["zoningLayers"][0]["codeField"], "ZONECLASS")
+        self.assertFalse(BY_FIPS["47179"]["stampSalesZoning"])
+        fentress = BY_FIPS["47049"]
+        self.assertTrue(fentress["salesGap"])
+        self.assertIsNone(fentress["salesVintage"])
+        self.assertIsNone(fentress["tncpmLayer"])
+        self.assertNotIn("salesJoin", fentress)
+        lawrence = BY_FIPS["47099"]
+        self.assertEqual(lawrence["salesVintage"], "2025")
+        self.assertIsNone(lawrence["tncpmLayer"])
+        self.assertIn("5SWQTB2G8AH9RQYE", lawrence["salesJoin"]["url"])
+        self.assertTrue(lawrence["stampSalesZoning"])
+        self.assertEqual(lawrence["zoningLayers"], [])
+        self.assertEqual(BY_FIPS["47163"]["zoningLayers"][0]["idField"], "GISLINK")
+        self.assertEqual(BY_FIPS["47163"]["zoningLayers"][0]["codeField"], "Zoning")
+        self.assertEqual(BY_FIPS["47167"]["salesVintage"], "2026")
+        self.assertEqual(BY_FIPS["47167"]["zoningLayers"][0]["codeField"], "ZONING")
+        self.assertEqual(BY_FIPS["47167"]["zoningLayers"][1]["codeField"], "Con_Zone")
+        self.assertEqual(len(BY_FIPS["47115"]["zoningLayers"]), 5)
+        self.assertEqual(len(BY_FIPS["47107"]["zoningLayers"]), 3)
+        self.assertEqual(BY_FIPS["47107"]["salesVintage"], "2025")
 
     def test_cards_match_published_endpoints_and_ignore_layer_order(self) -> None:
         overlay = {
@@ -233,6 +265,14 @@ class TnOirParcelTests(unittest.TestCase):
         self.assertEqual(blank["lastSale"]["date"], "2024-10-24")
         self.assertNotIn("vintage", blank["lastSale"])
         self.assertNotIn("vintage", blank["tax"])
+
+    def test_perry_spatial_parent_prefers_the_same_control_map(self) -> None:
+        child = "068046    02415"
+        same = {"gis": "068046    02400", "price": 10}
+        other = {"gis": "068055    01703", "price": 99}
+        self.assertEqual(choose_spatial_parent([other, same], child)["gis"], "068046    02400")
+        self.assertEqual(choose_spatial_parent([other], child)["gis"], "068055    01703")
+        self.assertIsNone(choose_spatial_parent([], child))
 
     def test_positive_drops_zero_prices(self) -> None:
         self.assertIsNone(positive(0))

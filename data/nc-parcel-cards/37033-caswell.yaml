@@ -1,0 +1,327 @@
+state: NC
+jurisdiction: Caswell County
+fips: '37033'
+level: county
+markets:
+- Raleigh-Durham
+- Greensboro
+slug: caswell
+cntyfips: '033'
+msa: RDU / Greensboro shed
+jurisdictionGisUrl: https://www.webgis.net/nc/caswell/
+appraiserSearchUrl: https://www.bttaxpayerportal.com/ITSPublicCS/AppraisalCard.aspx?id={P_PIN}
+paDeepLinkKey: P_PIN
+parcelIdPreferred: PIN
+countyRestRoot: https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer
+oneMapUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+oneMapFilter: cntyfips='033'
+ncptsDeepLinkTemplate: https://lrcpwa.ncptscloud.com/caswell/parcel-detail/{PIN}
+taxBillDeepLinkTemplate: https://www.bttaxpayerportal.com/ITSPublicCS/TaxBillSearch/Parcel/{PIN}
+comprehensivePlanPdfUrl: https://www.caswellcountync.gov/_files/ugd/ddda14_ce9da4d25a0f4c6798ac6e05e25318e5.pdf
+ptrcLdpUrl: http://www.ptrc.org/caswellldp
+municipalities:
+- name: Yanceyville
+  role: county seat; city-first zoning
+  incorporated: true
+  localGis: false
+  zoningPrefer: NC/Caswell/MapServer/21 ZONE_/ZONENAME
+  zoningUrl: https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/21
+  zoningCount: 125
+  zoneCodes:
+  - RR8
+  - HB
+  - RA
+  - R12
+  - OI
+  - B1
+  - M1
+  - R8
+  - R-MH
+  cityLimitsUrl: https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/4
+  cityLimitsField: FCODE=YANCEYVILLE
+  notes: Primary city; City Zoning layer is Yanceyville districts
+- name: Milton
+  role: city-first zoning
+  incorporated: true
+  localGis: false
+  zoningPrefer: NC/Caswell/MapServer/22 MiltonZoning
+  zoningUrl: https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/22
+  zoningCount: 11
+  zoneCodes:
+  - R-1
+  - R-2
+  - R-2*
+  - C-1/MU
+  - O&I
+  historicDistrictField: HistoricDistrict
+  cityLimitsField: FCODE=MILTON
+  notes: Separate Milton Zoning layer; HistoricDistrict YES/PARTIAL/NO
+- name: Hyco Lake
+  role: special zoning district (not a municipality)
+  incorporated: false
+  localGis: false
+  zoningPrefer: NC/Caswell/MapServer/10 Zone
+  zoningUrl: https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/10
+  zoningCount: 16
+  zoneCodes:
+  - RR
+  - RB
+  - IP
+  zoningMapPdf: https://www.caswellcountync.gov/_files/ugd/2463ad_0e4f0caa56ec4919976cbcfc5e0aa86f.pdf
+  notes: County-administered lake area; Planning FAQ lists with Yanceyville/Milton as only zoned areas
+layers:
+- role: parcels
+  name: NC/Caswell Parcels (PRIMARY CAMA)
+  restUrl: https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/9
+  layerId: 9
+  geometry: polygon
+  auth: none
+  acreageField: AV_ACRES
+  coverage: county-wide
+  fieldMap:
+    PIN: parcelId
+    Account: parcelIdAccount
+    P_PIN: parcelIdAccount
+    NewNumber: parcelIdDashed
+    TID: parcelIdAlt
+    AV_ACRES: acreage
+    Calculated: acreage
+    P_DEEDED_A: acreage
+    N_NAME: ownerName
+    N_NAME2: ownerName
+    N_HOUSE_NR: mailingAddress
+    N_STREET: mailingAddress
+    N_CITY: mailingAddress
+    N_STATE: mailingAddress
+    N_ZIP_FIRS: mailingAddress
+    AA_HOUSE_N: situsAddress
+    AA_STREET: situsAddress
+    AA_CITY: situsAddress
+    AV_FMV_LAN: tax.landValue
+    AV_FMV_IMP: tax.improvementValue
+    P_BOOK: deed.book
+    P_PAGE: deed.page
+    P_YEAR: tax.year
+  notes: PRIMARY wire-first. MaxRecordCount 1000. CRS 102719/2264. No SalePrice/SaleDate. Sample PIN 903100158901
+    / P_PIN 0106010000120000 ≈ -79.29, 36.54.
+  status: usable
+  primary: true
+  counts:
+    total: 17222
+    acres_5_150: 5921
+    calculated_5_150: 5639
+    fmv_land_gt0: 17122
+    fmv_imp_gt0: 11541
+    has_owner: 17147
+- role: parcels
+  name: NC OneMap Parcels (fallback)
+  restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: gisacres
+  coverage: county-wide
+  fieldMap:
+    parno: parcelIdAccount
+    nparno: parcelIdPrefixed
+    altparno: parcelIdAlt
+    ownname: ownerName
+    gisacres: acreage
+    parval: tax.marketValue
+    landval: tax.landValue
+    improvval: tax.improvementValue
+    siteadd: situsAddress
+    mailadd: mailingAddress
+  notes: parno=Account/P_PIN; nparno=37033_{PIN}. No sale. Prefer county /9 for CAMA.
+  status: partial
+  filter: cntyfips='033'
+  counts:
+    total: 17222
+    gisacres_5_150: 5921
+    ownname: 17222
+    parval_gt0: 17124
+    saledate: 0
+    saledatetx: 0
+- role: zoning
+  name: City Zoning (Yanceyville)
+  restUrl: https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/21
+  layerId: 21
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  fieldMap:
+    ZONE_: zoning
+    ZONENAME: zoningDescription
+  notes: Cities-first. Districts RR8/HB/RA/R12/OI/B1/M1/R8/R-MH.
+  status: usable
+  counts:
+    total: 125
+- role: zoning
+  name: Milton Zoning
+  restUrl: https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/22
+  layerId: 22
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  fieldMap:
+    MiltonZoning: zoning
+    HistoricDistrict: other
+  notes: Cities-first. HistoricDistrict YES/PARTIAL/NO.
+  status: usable
+  counts:
+    total: 11
+- role: zoning
+  name: Hyco Lake Zoning
+  restUrl: https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/10
+  layerId: 10
+  geometry: polygon
+  auth: none
+  coverage: special-district
+  fieldMap:
+    Zone: zoning
+    Descriptio: zoningDescription
+    PIN: parcelId
+  notes: RR/RB/IP. County lake district — not a municipality.
+  status: usable
+  counts:
+    total: 16
+- role: other
+  name: City Limits
+  restUrl: https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/4
+  layerId: 4
+  geometry: polygon
+  auth: none
+  coverage: municipal
+  fieldMap:
+    FCODE: municipality
+  notes: YANCEYVILLE, MILTON — routing
+  status: usable
+  counts:
+    total: 2
+- role: other
+  name: Watershed overlays (not base zoning)
+  restUrl: https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer
+  geometry: polygon
+  auth: none
+  coverage: partial
+  fieldMap: {}
+  notes: Haw River, Jordan Lake, Stoney Creek, Dan River Critical/Protected, Watershed — overlay only
+  status: partial
+- role: flu
+  name: Caswell Comprehensive Plan / PTRC LDP (PDF)
+  geometry: none
+  auth: none
+  coverage: county-wide
+  fieldMap: {}
+  notes: No public FLU FeatureServer
+  status: gap
+  pdfUrl: https://www.caswellcountync.gov/_files/ugd/ddda14_ce9da4d25a0f4c6798ac6e05e25318e5.pdf
+  portalUrl: http://www.ptrc.org/caswellldp
+gaps:
+- Sale price and sale date not on public parcel REST (P_YEAR is tax year)
+- No countywide base zoning — only Yanceyville, Milton, Hyco Lake (by design)
+- FLU FeatureServer gap — Comp Plan + PTRC LDP PDF only
+- OneMap saledate/saledatetx empty for Caswell
+- NCPTS deep-link is SPA shell; prefer ITSPublicCS AppraisalCard
+- No phones/emails; no paid vendors; utilities + AADT out of scope
+license: County public GIS / HandP WebGIS; NC OneMap ICDE; attribution as required by sources
+verifiedAt: '2026-09-24'
+verifiedBy: North Carolina Public Info Researcher
+tranche: 3
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/9
+  parcelIdField: PIN
+  acreageFilter: AV_ACRES >= 5 AND AV_ACRES <= 150
+  acres5to150Live: 5921
+  parcelCountLive: 17222
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='CASWELL'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CASWELL%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CASWELL%27&returnCountOnly=true&f=json
+      liveStationCount: 244
+      stationsWithAADT2022: 75
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Caswell'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Caswell%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Caswell%27&returnCountOnly=true&f=json
+      liveStationCount: 242
+      stationsWithAADT2025: 155
+      stationsWithAADT2024: 153
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - AV_FMV_LAN
+    - AV_FMV_IMP
+    allTaxFieldsOnLayer:
+    - AV_FMV_LAN
+    - AV_FMV_IMP
+    - P_YEAR
+    liveNonZero:
+      AV_FMV_LAN: 17122
+      AV_FMV_IMP: 11541
+    status: ok
+  sale:
+    priceFields: []
+    dateFields: []
+    livePriceNonZero: {}
+    liveDateNonNull: {}
+    status: gap
+    note: No sale price/date on REST (P_BOOK/P_PAGE deed refs only; NC OneMap saledatetx empty). ITSPublicCS AppraisalCard PDF has Sales grid (Sale Date / Sale Price).
+  ownerEntity:
+    ownerFields:
+    - N_NAME
+    - N_NAME2
+    primaryOwnerField: N_NAME
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(N_NAME) LIKE '% LLC%' OR UPPER(N_NAME) LIKE '% INC%' OR UPPER(N_NAME) LIKE '% LP%' OR UPPER(N_NAME) LIKE '% LLP%' OR UPPER(N_NAME) LIKE '% LTD%' OR UPPER(N_NAME) LIKE '% TRUST%' OR UPPER(N_NAME) LIKE '% CHURCH%' OR UPPER(N_NAME) LIKE '% COMPANY%' OR UPPER(N_NAME) LIKE '% PARTNERSHIP%' OR UPPER(N_NAME) LIKE '% HOLDINGS%' OR UPPER(N_NAME) LIKE '% PROPERTIES%' OR UPPER(N_NAME) LIKE '% CORP%' OR UPPER(N_NAME) LIKE '%,LLC%' OR UPPER(N_NAME) LIKE '%,INC%' OR UPPER(N_NAME) LIKE 'CITY OF %' OR UPPER(N_NAME) LIKE 'COUNTY OF %' OR UPPER(N_NAME) LIKE 'STATE OF %' OR UPPER(N_NAME) LIKE 'TOWN OF %')
+    liveEntityCountAll: 1481
+    liveEntityCount5to150ac: 588
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://www.bttaxpayerportal.com/ITSPublicCS/AppraisalCard.aspx?id={P_PIN}
+    testedParcelId: '0106010000150000'
+    testedUrl: https://www.bttaxpayerportal.com/ITSPublicCS/AppraisalCard.aspx?id=0106010000150000
+    httpStatus: 200
+    contentType: application/pdf
+    contentVerified: true
+    note: Owner and parcel id verified in the response.
+  gisViewer:
+    url: https://www.webgis.net/nc/caswell/
+    httpStatus: 200
+    pageTitle: Caswell Co WebGIS
+  gaps:
+  - sale gap

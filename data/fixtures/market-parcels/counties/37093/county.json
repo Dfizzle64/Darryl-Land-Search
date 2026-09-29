@@ -1,0 +1,31 @@
+{
+  "name": "Hoke",
+  "fips": "37093",
+  "state": "North Carolina",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "featureCount": 3202,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-hoke-parcels-37093",
+  "queryUrl": "https://services1.arcgis.com/7LEXuvWjhz6cyraH/arcgis/rest/services/June2025/FeatureServer/1/query",
+  "gaps": [
+    "Parcels are Hoke County AGOL Parcels June2025 (PRIMARY geometry — Pass 1 fix) (https://services1.arcgis.com/7LEXuvWjhz6cyraH/arcgis/rest/services/June2025/FeatureServer/1). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 3743 rows; 3202 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax not stated, sale not stated). Pass 2 counted 227 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Hoke uses the county AGOL June2025 layer. That layer has geometry, parcel id, and acreage only, so owner and tax stay empty.",
+    "County maps.hokecounty.org Parcels/0 (and OperationalLayers/6, Overlays/4 zoning) query fails with 400 'Bad login user' (server DB fault). Switched to county AGOL June2025/1 (data 2025-06-27). Geometry + ID + acreage only; no owner/tax. md/json/yaml updated with verifiedAt 2026-09-28.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37093/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37093/lookup.json",
+  "sourceCount": 3743,
+  "dropped": 3,
+  "tileCount": 4,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://maps.hokecounty.org/HokeCountyTaxCards/Default.aspx?Id={TWN_PIN}-",
+  "gisViewerUrl": "https://maps.hokecounty.org/maps/"
+}

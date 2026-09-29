@@ -1,0 +1,663 @@
+{
+  "county": "Mecklenburg",
+  "state": "NC",
+  "msa": "Charlotte MSA",
+  "fips": "37119",
+  "cntyfips": "119",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "viewerLinkTemplate": "https://polaris3g.mecklenburgcountync.gov/pid/{pid}",
+  "joinKeys": [
+    "nc_pin",
+    "pid",
+    "parcelid"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "nc_pin",
+        "pid",
+        "parcelid",
+        "parno"
+      ],
+      "bestLayer": "TaxParcel_camadata"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "TaxParcel_camadata"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "gisacres",
+        "legalacres",
+        "totalac"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 33567,
+      "bestLayer": "TaxParcel_camadata"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "ownrlstnme+ownrfrstnme",
+        "ownname"
+      ],
+      "bestLayer": "TaxParcel_camadata"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "mailaddr1",
+        "mailaddr2",
+        "zipcode",
+        "state",
+        "mailadd"
+      ],
+      "bestLayer": "TaxParcel_camadata"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "address",
+        "streetnumber",
+        "streetname",
+        "loccity",
+        "siteadd"
+      ],
+      "bestLayer": "TaxParcel_camadata"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "saledate",
+        "saleprice"
+      ],
+      "historyLayer": "TaxParcelSales",
+      "bestLayer": "TaxParcel_camadata"
+    },
+    "taxValues": {
+      "present": true,
+      "fields": [
+        "totlandval",
+        "totalbldgval",
+        "totalvalue",
+        "totmarkval",
+        "landval",
+        "improvval",
+        "parval"
+      ],
+      "bestLayer": "TaxParcel_camadata"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "zone_class",
+        "zoneclass",
+        "ZoneClass",
+        "zone_des"
+      ],
+      "bestLayer": "ParcelsZoningZipcode",
+      "split": "Charlotte vs towns"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "PlaceTypeFullTxt",
+        "PlaceTypeCde",
+        "PropLuseTx",
+        "LuDesc"
+      ],
+      "bestLayer": "Charlotte_Future_2040_Policy_Map",
+      "caveat": "2040 Place Types are Charlotte jurisdiction; towns may lack coverage"
+    },
+    "viewerLink": {
+      "present": true,
+      "template": "https://polaris3g.mecklenburgcountync.gov/pid/{pid}",
+      "keyField": "pid"
+    }
+  },
+  "portals": [
+    {
+      "name": "Mecklenburg County GIS",
+      "url": "https://gis.mecknc.gov/",
+      "notes": "County GIS home; POLARIS/GeoPortal/downloads"
+    },
+    {
+      "name": "POLARIS",
+      "url": "https://polaris3g.mecklenburgcountync.gov/",
+      "notes": "Ownership/map viewer; deep link /pid/{pid}"
+    },
+    {
+      "name": "Open Mapping data catalog",
+      "url": "https://maps.mecklenburgcountync.gov/openmapping/data.html",
+      "notes": "Downloads and zoning docs"
+    },
+    {
+      "name": "meckgis ArcGIS REST",
+      "url": "https://meckgis.mecklenburgcountync.gov/server/rest/services",
+      "notes": "Primary tax/zoning/sales services"
+    },
+    {
+      "name": "meckags ArcGIS REST",
+      "url": "https://meckags.mecklenburgcountync.gov/server/rest/services",
+      "notes": "ParcelsViewer and FLU overlays"
+    },
+    {
+      "name": "City of Charlotte GIS REST",
+      "url": "https://gis.charlottenc.gov/arcgis/rest/services",
+      "notes": "CountyData parcels, PLN zoning/AllParcelData"
+    },
+    {
+      "name": "NC OneMap",
+      "url": "https://www.nconemap.gov",
+      "notes": "Statewide parcels FeatureServer"
+    },
+    {
+      "name": "Charlotte 2040 Policy Map viewer",
+      "url": "https://charlotte.maps.arcgis.com/apps/webappviewer/index.html?id=4dc02a1a85974085af7b36c33474efe0",
+      "notes": "Place Types interactive map"
+    }
+  ],
+  "layers": [
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales"
+      ],
+      "name": "TaxParcel_camadata",
+      "id": 0,
+      "url": "https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/FeatureServer/0",
+      "alternateUrlsPass1Fix": ["https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/MapServer/0"],
+      "pass1FixNote": "2026-09-28: MapServer/0 returns null geometry on query; FeatureServer/0 returns polygons with the same fields and counts.",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 448526,
+      "verified": true,
+      "verifiedHow": "query?where=1=1&returnCountOnly=true&f=json; sample attribute query",
+      "fields": {
+        "nc_pin": "NC PIN (id)",
+        "pid": "Parcel ID / POLARIS key",
+        "parcelid": "Parcel id (sales join)",
+        "gisacres": "GIS acreage",
+        "legalacres": "Legal acres",
+        "totalac": "Total acres",
+        "ownrlstnme": "Owner1 last name",
+        "ownrfrstnme": "Owner1 first name",
+        "mailaddr1": "Mailing address 1",
+        "mailaddr2": "Mailing address 2",
+        "zipcode": "Mailing ZIP",
+        "state": "Mailing state",
+        "address": "Situs address",
+        "streetnumber": "Situs street number",
+        "streetname": "Situs street name",
+        "loccity": "Situs city",
+        "saledate": "Last sale date",
+        "saleprice": "Last sale price",
+        "totlandval": "Assessed land value",
+        "totalbldgval": "Assessed building value",
+        "totalvalue": "Total assessed value",
+        "totmarkval": "Total market value"
+      },
+      "notes": "PRIMARY attribute+polygon source. No zoning field \u2014 join ParcelsZoningZipcode. MaxRecordCount 2000."
+    },
+    {
+      "purpose": [
+        "parcels"
+      ],
+      "name": "Tax/ParcelsViewer Parcels",
+      "id": 0,
+      "url": "https://meckags.mecklenburgcountync.gov/server/rest/services/Tax/ParcelsViewer/MapServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 397300,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + layer metadata",
+      "fields": {
+        "nc_pin": "NC PIN",
+        "pid": "Parcel ID",
+        "gisacres": "GIS acres"
+      },
+      "notes": "Geometry/PIN focused; no owner or tax."
+    },
+    {
+      "purpose": [
+        "parcels"
+      ],
+      "name": "CountyData/Parcels",
+      "id": 0,
+      "url": "https://gis.charlottenc.gov/arcgis/rest/services/CountyData/Parcels/MapServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102100,
+      "latestWkid": 3857,
+      "featureCount": 397300,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + layer metadata",
+      "fields": {
+        "NC_PIN": "NC PIN",
+        "PID": "Parcel ID"
+      },
+      "notes": "Thin attributes; Web Mercator. Prefer State Plane county layers."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales"
+      ],
+      "name": "PLN/AllParcelData",
+      "id": 0,
+      "url": "https://gis.charlottenc.gov/arcgis/rest/services/PLN/AllParcelData/MapServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 429007,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + layer metadata",
+      "fields": {
+        "parcelid": "Parcel id",
+        "owner1lastname": "Owner1 last",
+        "owner1firstname": "Owner1 first",
+        "billingaddress": "Mailing",
+        "location_address": "Situs",
+        "saleprice": "Last sale price",
+        "saledate": "Last sale date",
+        "totallandvalue": "Land value",
+        "totalbuildingvalue": "Building value",
+        "totalvalue": "Total value",
+        "totalmarketvalue": "Market value",
+        "legalacres": "Legal acres"
+      },
+      "notes": "City-hosted alternate to TaxParcel_camadata."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "zoning"
+      ],
+      "name": "ParcelsZoningZipcode",
+      "id": 0,
+      "url": "https://meckgis.mecklenburgcountync.gov/server/rest/services/ParcelsZoningZipcode/FeatureServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 454837,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample (zone_class=N1-A)",
+      "fields": {
+        "nc_pin": "NC PIN",
+        "pid": "Parcel ID",
+        "gisacres": "GIS acres",
+        "zone_class": "Zoning code (joined)",
+        "zip": "ZIP",
+        "po_name": "PO name"
+      },
+      "notes": "Best parcel-level zoning join without spatial overlay."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "CityofCharlotteZoning",
+      "id": 0,
+      "url": "https://meckgis.mecklenburgcountync.gov/server/rest/services/CityofCharlotteZoning/MapServer/0",
+      "alternateUrls": [
+        "https://gis.charlottenc.gov/arcgis/rest/services/PLN/Zoning/MapServer/0"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 5689,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + metadata on both hosts",
+      "fields": {
+        "zoneclass": "Zone classification",
+        "zonedes": "Zone description/code",
+        "overlay": "Overlay",
+        "zonepetition": "Petition",
+        "rezonedate": "Rezone date"
+      },
+      "notes": "Charlotte + planning area only."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "UnincorporatedCountyandTownsZoning",
+      "id": 0,
+      "url": "https://meckgis.mecklenburgcountync.gov/server/rest/services/UnincorporatedCountyandTownsZoning/MapServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 977,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + distinct munic values",
+      "fields": {
+        "zone_des": "Zoning description/code",
+        "munic": "Municipality"
+      },
+      "notes": "Towns: Cornelius, Davidson, Huntersville, Matthews, Mint Hill, Pineville, Stallings. Combine with Charlotte zoning."
+    },
+    {
+      "purpose": [
+        "sales"
+      ],
+      "name": "TaxParcelSales",
+      "id": 0,
+      "url": "https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcelSales/FeatureServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 1598048,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample sales query",
+      "fields": {
+        "parcelid": "Join to TaxParcel_camadata.parcelid",
+        "saledate": "Sale date",
+        "saleprice": "Sale price",
+        "grantor": "Grantor",
+        "grantee": "Grantee",
+        "salesvalidity": "Validity flag",
+        "soldasvacantflag": "Sold as vacant",
+        "landuse": "Land use"
+      },
+      "notes": "Full sale history (~1.6M). Filter salesvalidity for comps."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales"
+      ],
+      "name": "NC1Map_Parcels polys",
+      "id": 1,
+      "url": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 442287,
+      "featureCountFilter": "cntyfips='119'",
+      "verified": true,
+      "verifiedHow": "cntyfips=119 returnCountOnly + sample features",
+      "fields": {
+        "parno": "Parcel number",
+        "ownname": "Owner name",
+        "mailadd": "Mailing address",
+        "siteadd": "Situs address",
+        "gisacres": "GIS acres",
+        "saledate": "Last sale date",
+        "parval": "Parcel value",
+        "landval": "Land value",
+        "improvval": "Improvement value",
+        "cntyfips": "County FIPS (119=Mecklenburg)",
+        "cntyname": "County name"
+      },
+      "notes": "Statewide fallback. Filter cntyfips=119. May lag county CAMA."
+    },
+    {
+      "purpose": [
+        "flu"
+      ],
+      "name": "Charlotte Future 2040 Policy Map",
+      "id": 0,
+      "url": "https://services.arcgis.com/9Nl857LBlQVyzq54/arcgis/rest/services/Charlotte_Future_2040_Policy_Map/FeatureServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 5640,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + layer metadata",
+      "fields": {
+        "PlaceTypeFullTxt": "Place Type full text (FLU)",
+        "PlaceTypeCde": "Place Type code",
+        "AdoptionDate": "Adoption date",
+        "CommunityPlanningArea": "Community planning area"
+      },
+      "notes": "Preferred FLU for Charlotte jurisdiction Place Types."
+    },
+    {
+      "purpose": [
+        "flu"
+      ],
+      "name": "Revised Charlotte Future 2040 Policy Map",
+      "id": 0,
+      "url": "https://services.arcgis.com/9Nl857LBlQVyzq54/arcgis/rest/services/Revised_Charlotte_Future_2040_Policy_Map/FeatureServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 12092,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + layer metadata",
+      "fields": {
+        "AdoptedPlaceTypeCde": "Adopted Place Type code",
+        "AdoptedTypeFullTxt": "Adopted Place Type text",
+        "RevisedPlaceTypeCde": "Revised Place Type code",
+        "RevisedPlaceTypeFullTxt": "Revised Place Type text"
+      },
+      "notes": "Revision/working set; prefer adopted Policy Map for production."
+    },
+    {
+      "purpose": [
+        "flu"
+      ],
+      "name": "Future Land Use (area plans overlay)",
+      "id": 1,
+      "url": "https://meckags.mecklenburgcountync.gov/server/rest/services/StormWater/FloodOverlaysTransparent/MapServer/1",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 80313,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample attributes",
+      "fields": {
+        "PropLuseTx": "Proposed land use text",
+        "PropLuseCd": "Proposed land use code",
+        "GenLuse": "General land use",
+        "LuDesc": "Land use description",
+        "PlanName": "Plan name"
+      },
+      "notes": "Legacy neighborhood/area-plan FLU; secondary to 2040 Place Types."
+    }
+  ],
+  "gaps": [
+    "No single countywide zoning service \u2014 Charlotte vs towns split (or use ParcelsZoningZipcode for parcel codes).",
+    "Charlotte 2040 Place Types do not cover all Mecklenburg towns.",
+    "Area-plan Future Land Use overlay is legacy/incomplete vs current policy.",
+    "Owner phones/emails not in public REST (do not scrape).",
+    "vacorimprov vacant filter unreliable in spot check \u2014 validate enums before vacant-land queries.",
+    "NC OneMap parno vs county nc_pin/pid join needs validation.",
+    "MaxRecordCount 2000 on most county layers \u2014 pagination required."
+  ],
+  "handOff": {
+    "wireFirst": "https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/FeatureServer/0",
+    "zoningJoin": "https://meckgis.mecklenburgcountync.gov/server/rest/services/ParcelsZoningZipcode/FeatureServer/0",
+    "salesHistory": "https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcelSales/FeatureServer/0",
+    "flu": "https://services.arcgis.com/9Nl857LBlQVyzq54/arcgis/rest/services/Charlotte_Future_2040_Policy_Map/FeatureServer/0",
+    "fallback": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1?where=cntyfips='119'",
+    "auth": "none observed on listed public query endpoints",
+    "rateLimits": "MaxRecordCount typically 2000 (OneMap 5000); paginate with resultOffset"
+  },
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "pass1": {
+      "status": "fixed",
+      "parcelPolygonLayer": "https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/FeatureServer/0",
+      "polygonCountLive": 448582,
+      "parcelIdField": "nc_pin",
+      "parcelIdFilled": 448582,
+      "acreageField": "gisacres",
+      "acres5to150Live": 33566,
+      "sampleCentroidWgs84": [
+        -80.6302,
+        35.2286
+      ],
+      "note": "TaxParcel_camadata/MapServer/0 answers counts and attributes but returns geometry=null on every query (json and geojson), so polygons do not load. The same service's FeatureServer/0 returns rings with identical fields and counts. Card primary switched to FeatureServer/0; MapServer/0 kept as an alternate. Row count 448,582 is CAMA rows; clean polygon count on Tax/ParcelsViewer/MapServer/0 is 397,384 (condo/multi-row parcels)."
+    },
+    "parcelLayer": "https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/FeatureServer/0",
+    "parcelIdField": "nc_pin",
+    "acreageFilter": "gisacres >= 5 AND gisacres <= 150",
+    "acres5to150Live": 33566,
+    "parcelCountLive": 448582,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='MECKLENBURG'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MECKLENBURG%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MECKLENBURG%27&returnCountOnly=true&f=json",
+        "liveStationCount": 1969,
+        "stationsWithAADT2022": 1793
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Mecklenburg'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Mecklenburg%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Mecklenburg%27&returnCountOnly=true&f=json",
+        "liveStationCount": 1951,
+        "stationsWithAADT2025": 434,
+        "stationsWithAADT2024": 1816,
+        "stationsWith2025or2024": 1833,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "totalvalue",
+        "totmarkval"
+      ],
+      "liveNonZero": {
+        "totalvalue": 432952,
+        "totmarkval": 432952
+      },
+      "status": "ok",
+      "note": "Counts are CAMA rows (448,582 total), not distinct polygons."
+    },
+    "sale": {
+      "priceFields": [
+        "saleprice"
+      ],
+      "dateFields": [
+        "saledate"
+      ],
+      "livePriceNonZero": {
+        "saleprice": 310264
+      },
+      "liveDateNonNull": {
+        "saledate": 447317
+      },
+      "status": "ok",
+      "note": "Full history on TaxParcelSales/FeatureServer/0 (join parcelid)."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "ownrlstnme"
+      ],
+      "primaryOwnerField": "ownrlstnme",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(ownrlstnme) LIKE '% LLC%' OR UPPER(ownrlstnme) LIKE '% INC%' OR UPPER(ownrlstnme) LIKE '% LP%' OR UPPER(ownrlstnme) LIKE '% LLP%' OR UPPER(ownrlstnme) LIKE '% LTD%' OR UPPER(ownrlstnme) LIKE '% TRUST%' OR UPPER(ownrlstnme) LIKE '% CHURCH%' OR UPPER(ownrlstnme) LIKE '% COMPANY%' OR UPPER(ownrlstnme) LIKE '% PARTNERSHIP%' OR UPPER(ownrlstnme) LIKE '% HOLDINGS%' OR UPPER(ownrlstnme) LIKE '% PROPERTIES%' OR UPPER(ownrlstnme) LIKE '% CORP%' OR UPPER(ownrlstnme) LIKE '%,LLC%' OR UPPER(ownrlstnme) LIKE '%,INC%' OR UPPER(ownrlstnme) LIKE 'CITY OF %' OR UPPER(ownrlstnme) LIKE 'COUNTY OF %' OR UPPER(ownrlstnme) LIKE 'STATE OF %' OR UPPER(ownrlstnme) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 107602,
+      "liveEntityCount5to150ac": 18762,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above. ownrlstnme holds the full entity name for non-person owners. Row-based (CAMA rows)."
+    },
+    "paDeepLink": {
+      "template": "https://polaris3g.mecklenburgcountync.gov/pid/{pid}",
+      "testedParcelId": "10511290",
+      "testedUrl": "https://polaris3g.mecklenburgcountync.gov/pid/10511290",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": true,
+      "note": "POLARIS page embeds parcel data in the server HTML (owner name and PID present in the response)."
+    },
+    "gisViewer": {
+      "url": "https://polaris3g.mecklenburgcountync.gov/",
+      "httpStatus": 200,
+      "pageTitle": "Polaris"
+    },
+    "municipalLayerCheck": {
+      "checked": 6,
+      "answering": 6,
+      "layers": [
+        {
+          "url": "https://meckags.mecklenburgcountync.gov/server/rest/services/StormWater/FloodOverlaysTransparent/MapServer/1",
+          "name": "Future Land Use",
+          "liveCount": 80313
+        },
+        {
+          "url": "https://meckgis.mecklenburgcountync.gov/server/rest/services/CityofCharlotteZoning/MapServer/0",
+          "name": "City of Charlotte Zoning",
+          "liveCount": 5700
+        },
+        {
+          "url": "https://meckgis.mecklenburgcountync.gov/server/rest/services/ParcelsZoningZipcode/FeatureServer/0",
+          "name": "ParcelZoningZipcode",
+          "liveCount": 454872
+        },
+        {
+          "url": "https://meckgis.mecklenburgcountync.gov/server/rest/services/UnincorporatedCountyandTownsZoning/MapServer/0",
+          "name": "Unincorporated County and Towns Zoning",
+          "liveCount": 977
+        },
+        {
+          "url": "https://services.arcgis.com/9Nl857LBlQVyzq54/arcgis/rest/services/Charlotte_Future_2040_Policy_Map/FeatureServer/0",
+          "name": "Charlotte Future 2040 Policy Map",
+          "liveCount": 5640
+        },
+        {
+          "url": "https://services.arcgis.com/9Nl857LBlQVyzq54/arcgis/rest/services/Revised_Charlotte_Future_2040_Policy_Map/FeatureServer/0",
+          "name": "Revised Charlotte Future 2040 Policy Map",
+          "liveCount": 12092
+        }
+      ]
+    },
+    "gaps": [
+      "pass1 fixed: MapServer/0 null geometry, switched to FeatureServer/0"
+    ]
+  }
+}

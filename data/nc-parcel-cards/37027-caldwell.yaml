@@ -1,0 +1,356 @@
+state: NC
+jurisdiction: Caldwell County
+fips: "37027"
+level: county
+markets: [Hickory]
+slug: caldwell
+cntyfips: "027"
+
+municipalities:
+  - name: Lenoir
+    role: city-first-zoning
+    zoningLayer: WarehouseServices/Zoning/MapServer/8
+    count: 1100
+    notes: County seat; North Main overlay /7; Living Lenoir 2045 FLU PDF
+  - name: Hudson
+    role: city-first-zoning
+    zoningLayer: WarehouseServices/Zoning/MapServer/6
+    count: 2665
+  - name: Granite Falls
+    role: city-first-zoning
+    zoningLayer: WarehouseServices/Zoning/MapServer/4
+    count: 344
+  - name: Gamewell
+    role: city-first-zoning
+    zoningLayer: WarehouseServices/Zoning/MapServer/3
+    count: 1738
+  - name: Sawmills
+    role: city-first-zoning
+    zoningLayer: WarehouseServices/Zoning/MapServer/11
+    count: 179
+  - name: Cajahs Mountain
+    role: city-first-zoning
+    zoningLayer: WarehouseServices/Zoning/MapServer/1
+    count: 109
+  - name: Cedar Rock
+    role: city-first-zoning
+    zoningLayer: WarehouseServices/Zoning/MapServer/2
+    count: 57
+  - name: Blowing Rock
+    role: city-first-zoning
+    zoningLayer: WarehouseServices/Zoning/MapServer/0
+    count: 17
+    notes: Caldwell fringe; mostly Watauga County
+  - name: Hickory
+    role: city-first-zoning
+    zoningLayer: arcgis.hickorync.gov Hickory_Zoning
+    count: 1740
+    fluRest: true
+    notes: Prefer city native over county Warehouse Zoning/5 (14 polys)
+  - name: Rhodhiss
+    role: gap
+    notes: Dedicated zoning layer miswired (~663 null CITY_NAME ≈ COUNTY); do not use
+  - name: Rutherford College
+    role: partial-zoning
+    zoningLayer: WarehouseServices/Zoning/MapServer/10
+    count: 1
+
+layers:
+  - role: parcels
+    name: NCOnemap NCOneMap Parcels (CAMA + polygons)
+    restUrl: https://gis.caldwellcountync.org/arcgis/rest/services/NCOnemap/NCOneMap/FeatureServer/45
+    alternateUrls:
+      - https://gis.caldwellcountync.org/arcgis/rest/services/Public_Access/MapServer/45
+      - https://gis.caldwellcountync.org/arcgis/rest/services/OpenGov/MapServer/1
+      - https://gis.caldwellcountync.org/arcgis/rest/services/OpenGov/OpenGov/FeatureServer/1
+    layerId: 45
+    geometry: polygon
+    auth: none
+    acreageField: TotalCalcAcres
+    coverage: county-wide
+    fieldMap:
+      PID: parcelId
+      NCPIN: parcelId
+      AcctNumber: parcelIdAccount
+      TotalCalcAcres: acreage
+      AcctName1: ownerName
+      AcctName2: ownerName
+      MailAddr1: mailingAddress
+      MailAddr2: mailingAddress
+      MailAddr3: mailingAddress
+      MailCity: mailingAddress
+      MailState: mailingAddress
+      MailZipCode: mailingAddress
+      FullPropAddress: situsAddress
+      MarketValue: tax.marketValue
+      AssessedValue: tax.assessedValue
+      LandValue: tax.marketValue
+      BuildingValue: tax.marketValue
+      ObxfValue: tax.marketValue
+      DeferredValue: tax.taxableValue
+      ZoningInfo: zoning
+      DeedBook: other
+      DeedPage: other
+    notes: >
+      PRIMARY verified 2026-09-24: count 52754; TotalCalcAcres BETWEEN 5 AND 150 → 8142;
+      MarketValue>0 → 52552; BuildingValue 0/null in range → 4592. CRS 102719/2264.
+      MaxRecordCount 2000. Geo-check NCPIN 2871952916 centroid ≈ -81.44, 35.97 (Caldwell).
+      No last-sale price/date on layer — use AppraisalCard PDF SALES DATA.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      nparno: other
+      ownname: ownerName
+      mailadd: mailingAddress
+      mcity: mailingAddress
+      mstate: mailingAddress
+      mzip: mailingAddress
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.date
+      parval: tax.marketValue
+      landval: tax.marketValue
+      improvval: tax.marketValue
+      cntyfips: other
+    notes: >
+      Statewide fallback. Filter cntyfips='027' → count 52777; gisacres 5–150 → 8136.
+      Join parno ↔ NCPIN (verified 2871952916). saledate IS NOT NULL → 0. No sale price.
+    status: partial
+
+  - role: parcels
+    name: SmartGov_parcels (situs city/zip helper)
+    restUrl: https://gis.caldwellcountync.org/arcgis/rest/services/SmartGov/SmartGovParcels/MapServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NCPIN: parcelId
+      ParcelID: parcelId
+      AcctName1: ownerName
+      FullPropAddress: situsAddress
+      SitusCity: situsCity
+      SitusState: other
+      SitusZip: situsZip
+      MailAddr1: mailingAddress
+      MailCity: mailingAddress
+      MailZipCode: mailingAddress
+    notes: Count 52754. No tax/sale; join for SitusCity/Zip onto primary CAMA.
+    status: partial
+
+  - role: zoning
+    name: Lenoir Zoning
+    restUrl: https://gis.caldwellcountync.org/arcgis/rest/services/WarehouseServices/Zoning/MapServer/8
+    alternateUrls:
+      - https://gis.caldwellcountync.org/arcgis/rest/services/Underlay/MapServer/24
+      - https://gis.caldwellcountync.org/arcgis/rest/services/OpenGov/OpenGov/FeatureServer/5
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+      CITY_NAME: other
+    notes: City-first PRIMARY for Lenoir. Count 1100. North Main overlay layer 7 (S-2).
+    status: usable
+
+  - role: zoning
+    name: Hudson Zoning
+    restUrl: https://gis.caldwellcountync.org/arcgis/rest/services/WarehouseServices/Zoning/MapServer/6
+    alternateUrls:
+      - https://gis.caldwellcountync.org/arcgis/rest/services/Underlay/MapServer/26
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+      CITY_NAME: other
+      CATEGORY: other
+      ACRES: acreage
+    notes: Count 2665.
+    status: usable
+
+  - role: zoning
+    name: Granite Falls Zoning
+    restUrl: https://gis.caldwellcountync.org/arcgis/rest/services/WarehouseServices/Zoning/MapServer/4
+    alternateUrls:
+      - https://gis.caldwellcountync.org/arcgis/rest/services/Underlay/MapServer/21
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+      CITY_NAME: other
+    notes: Count 344.
+    status: usable
+
+  - role: zoning
+    name: Gamewell Zoning
+    restUrl: https://gis.caldwellcountync.org/arcgis/rest/services/WarehouseServices/Zoning/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+      CITY_NAME: other
+      CATEGORY: other
+    notes: Count 1738.
+    status: usable
+
+  - role: zoning
+    name: Sawmills Zoning
+    restUrl: https://gis.caldwellcountync.org/arcgis/rest/services/WarehouseServices/Zoning/MapServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+      CITY_NAME: other
+    notes: Count 179.
+    status: usable
+
+  - role: zoning
+    name: Cajahs Mountain Zoning
+    restUrl: https://gis.caldwellcountync.org/arcgis/rest/services/WarehouseServices/Zoning/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+      CITY_NAME: other
+    notes: Count 109.
+    status: usable
+
+  - role: zoning
+    name: Cedar Rock Zoning
+    restUrl: https://gis.caldwellcountync.org/arcgis/rest/services/WarehouseServices/Zoning/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+      CITY_NAME: other
+    notes: Count 57.
+    status: usable
+
+  - role: zoning
+    name: Blowing Rock Zoning
+    restUrl: https://gis.caldwellcountync.org/arcgis/rest/services/WarehouseServices/Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+      CITY_NAME: other
+    notes: Count 17 — Caldwell fringe.
+    status: usable
+
+  - role: zoning
+    name: Hickory Zoning (city native)
+    restUrl: https://arcgis.hickorync.gov/server/rest/services/Zoning_Overlays/Hickory_Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      Description: other
+      General_Zoning: other
+    notes: Prefer inside Hickory limits over county Warehouse Zoning/5 (14 polys).
+    status: usable
+
+  - role: zoning
+    name: County Zoning (unincorporated)
+    restUrl: https://gis.caldwellcountync.org/arcgis/rest/services/WarehouseServices/Planning/MapServer/2
+    alternateUrls:
+      - https://gis.caldwellcountync.org/arcgis/rest/services/Underlay/MapServer/27
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONE_ID: zoning
+      CITY_NAME: other
+      TYPE1: other
+      TYPE2: other
+      TYPE3: other
+    notes: >
+      Total 874; CITY_NAME='COUNTY' → 663. Also coded city names (thin vs dedicated layers).
+      Filter CITY_NAME='COUNTY' for unincorp. RHODHISS not in domain.
+    status: usable
+
+  - role: flu
+    name: Hickory Future Land Use
+    restUrl: https://arcgis.hickorync.gov/server/rest/services/Zoning_Overlays/Hickory_Future_Land_Use/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      FLU: flu
+    notes: Count 142. Hickory fringe in Caldwell only.
+    status: usable
+
+  - role: flu
+    name: Yadkin Valley / Collettsville Planning Districts
+    restUrl: https://gis.caldwellcountync.org/arcgis/rest/services/WarehouseServices/Planning/MapServer/0
+    alternateUrls:
+      - https://gis.caldwellcountync.org/arcgis/rest/services/WarehouseServices/Planning/MapServer/1
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: sample
+    fieldMap:
+      NAME: flu
+      ACRES: acreage
+    notes: Planning area polygons (count 1 each) — not parcel-level FLU. Prefer Comp Plan PDF.
+    status: partial
+
+gaps:
+  - No public last-sale price or date on county REST parcel layers (AppraisalCard PDF has SALES DATA)
+  - Rhodhiss Zoning layer miswired (do not use for city-first)
+  - County and Lenoir FLU are PDF-only (no county FLU FeatureServer)
+  - No independent city ArcGIS for Lenoir/Hudson/Granite Falls/Gamewell/Sawmills/etc.
+  - OneMap saledate empty for cntyfips='027'
+  - Utilities / AADT / emails / phones / paid vendors excluded by design
+
+license: "Caldwell County GIS; NCGS 132-10 commercial resale limits; attribute Caldwell County GIS (+ Hickory/Lenoir where used)"
+appraiserSearchUrl: "https://gis.caldwellcountync.org/itspublic/AppraisalCard.aspx?id={PID}"
+appraiserSearchUrlNotes: "Replace spaces in PID with +. Alt NCPTS https://lrcpwa.ncptscloud.com/caldwell/parcel-detail/{NCPIN}"
+jurisdictionGisUrl: "https://gis.caldwellcountync.org/maps/default.htm"
+viewerLinkTemplate: "https://gis.caldwellcountync.org/maps/default.htm?pid={NCPIN}"
+verifiedAt: "2026-09-24"
+verifiedBy: "North Carolina Public Info Researcher"

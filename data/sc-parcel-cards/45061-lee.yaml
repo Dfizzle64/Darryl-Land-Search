@@ -1,0 +1,145 @@
+state: SC
+jurisdiction: Lee County
+fips: "45061"
+level: county
+markets: [Columbia]
+
+layers:
+  - role: parcels
+    name: Lee County Web Parcels (Parcel_Polygons joined to CAMA, county AGOL)
+    restUrl: https://services5.arcgis.com/zg6ovB2KKN8L0zFv/arcgis/rest/services/Web_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Parcel_Polygons_GISAC
+    coverage: county-wide
+    count: 13633
+    parcelIdField: Parcel_Polygons_PID
+    fieldMap:
+      Parcel_Polygons_PID: parcelId
+      CAMA_TEMP_Map_Number: parcelIdAlt
+      Parcel_Polygons_GISAC: acreage
+      Parcel_Polygons_DEEDAC: deedAcres
+      CAMA_TEMP_Name: ownerName
+      CAMA_TEMP_Address_1: mailingAddress
+      CAMA_TEMP_Address_3: mailingCityStateZip
+      CAMA_TEMP_Tot_Market_Acres: tax.marketValueLand
+      CAMA_TEMP_Tot_Market_Lots: tax.marketValueLots
+      CAMA_TEMP_Tot_Market_Bldgs: tax.marketValueBldgs
+      CAMA_TEMP_Tot_Taxable_Appr: tax.taxableValue
+      CAMA_TEMP_Instrmnt_Dt_YYYYMMDD: lastSale.date
+      CAMA_TEMP_Consideration: lastSale.price
+      CAMA_TEMP_True_Sale: lastSale.qualified
+      CAMA_TEMP_Class_1: dorCode
+      CAMA_TEMP_District: taxDistrict
+    notes: 'Verified 2026-09-28: NEW source found via ArcGIS Online search. Item 0d2c30c510a2497a94c68eb0dcf61055
+      owned by LeeCounty_2013 (Lee County SC org zg6ovB2KKN8L0zFv); description "hosted feature layer that
+      is updated daily from GIS MAPPING. Last Updated 2026-09-24". count=13633; 4326 extent -80.486,33.951
+      to -80.001,34.368 (= Lee County SC); SR 102100; sample PID 036-00-00-077-000 at (-80.310,34.177),
+      owner mailing Bishopville SC. Capabilities Query only. maxRecordCount 2000. Sale date field is text
+      YYYYMMDD (note max string "90740102" is a bad CAMA value — validate dates). Obvious Pass-2 fields
+      present: owner, mailing, market/taxable, sale date/price/true-sale flag.'
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Assessor / PA public search
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: Public PA/viewer links documented under appraiserSearchUrl / publicGisUrl; owner/tax/sale not REST-verified.
+    status: partial
+
+gaps:
+  - "SCDOT statewide SC_Parcels requires token — not usable as primary."
+  - "Zoning/FLU REST not verified."
+  - "qPublic portal live. Reject Lee FL/AL false hits. (2026-09-28: county AGOL Web_Parcels found — parcels usable.)"
+
+license: "Public county portals where linked; confirm redistribution before bulk republish. Do not scrape emails/phones."
+
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=913&LayerID=17622&PageTypeID=4&PageID=7896&KeyValue={parcelId}
+publicGisUrl: https://experience.arcgis.com/experience/3aa9a4d5a5094058912da9ebe788e8b8
+jurisdictionGisUrl: https://leecoscgis.maps.arcgis.com
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference added in Pass 2 (was missing
+      on card); not re-dug.
+
+fullSuite:
+  tax:
+    status: usable
+    restUrl: https://services5.arcgis.com/zg6ovB2KKN8L0zFv/arcgis/rest/services/Web_Parcels/FeatureServer/0
+    fieldMap:
+      CAMA_TEMP_Tot_Taxable_Appr: tax.taxableValue (Double)
+      CAMA_TEMP_Tot_Market_Acres + CAMA_TEMP_Tot_Market_Lots + CAMA_TEMP_Tot_Market_Bldgs: tax.marketValue (sum)
+      CAMA_TEMP_Tot_Assesd_Acres + CAMA_TEMP_Tot_Assesd_Lots + CAMA_TEMP_Tot_Assesd_Bldgs: tax.assessedValue (sum)
+    populated:
+      CAMA_TEMP_Tot_Taxable_Appr: 13537
+      total: 13633
+    reason: County-published daily CAMA join (Lee County AGOL, data edit 2026-09-24). No single total market/assessed
+      field — sum components.
+  sale:
+    status: usable
+    restUrl: https://services5.arcgis.com/zg6ovB2KKN8L0zFv/arcgis/rest/services/Web_Parcels/FeatureServer/0
+    fieldMap:
+      CAMA_TEMP_Consideration: lastSale.price (Integer $)
+      CAMA_TEMP_Instrmnt_Dt_YYYYMMDD: lastSale.date (STRING "YYYYMMDD", e.g. "20010827")
+      CAMA_TEMP_True_Sale: lastSale.qualified (Y/N)
+      CAMA_TEMP_Deed_Book: deedBook
+      CAMA_TEMP_Deed_Page: deedPage
+    populated:
+      CAMA_TEMP_Consideration: 13537
+      CAMA_TEMP_Instrmnt_Dt_YYYYMMDD: 13537
+    reason: Date is a string YYYYMMDD (not epoch) — parse %Y%m%d.
+  owner:
+    status: usable
+    restUrl: https://services5.arcgis.com/zg6ovB2KKN8L0zFv/arcgis/rest/services/Web_Parcels/FeatureServer/0
+    fieldMap:
+      CAMA_TEMP_Name: ownerName
+      CAMA_TEMP_Address_1: mailingAddress.street
+      CAMA_TEMP_Address_2: mailingAddress.line2
+      CAMA_TEMP_Address_3: mailingAddress.cityState (e.g. "BISHOPVILLE SC")
+    populated:
+      CAMA_TEMP_Name: 13537
+      CAMA_TEMP_Address_1: 13537
+    reason: Owner + mailing public; no separate zip field (zip may be embedded or absent).
+  paDeepLink:
+    status: partial
+    template: https://qpublic.schneidercorp.com/Application.aspx?AppID=913&LayerID=17622&PageTypeID=4&PageID=7896&KeyValue={parcelId}
+    searchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=913&LayerID=17622&PageTypeID=2&PageID=7894
+    testedParcelId: 036-00-00-077-000
+    testedUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=913&LayerID=17622&PageTypeID=4&PageID=7896&KeyValue=036-00-00-077-000
+    httpStatus: 403 (Cloudflare JS challenge from box/WebFetch; not a dead link)
+    contentVerified: false
+    reason: 'Report PageID inferred as search PageID+2 (pattern confirmed on SC Newberry 7247->7249 and Barnwell
+      AppID 898 report 7646). Could not load content from box. ID transform: none assumed — Parcel_Polygons_PID
+      / CAMA_TEMP_Map_Number 036-00-00-077-000 (PIDANNO short form 036-077 is annotation only). Search link from
+      qpublic.net/sc/lee/search.html.'
+  publicGisUrl:
+    status: usable
+    reason: Lee County SC AGOL org urlKey is leecoscgis (card had leecounty.maps.arcgis.com = urlKey "LeeCounty",
+      likely a different Lee County). Public Web Experience "Lee County Features" (3aa9a4d5a5094058912da9ebe788e8b8).
+  gaps:
+  - No single total market/assessed field (sum components).
+  - Mailing zip not a separate field.
+  - PA content not verifiable from box (qPublic Cloudflare).
+  aadtReference: added 2026-09-28 (enrichment.aadt)
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher

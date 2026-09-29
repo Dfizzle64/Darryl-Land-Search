@@ -1,0 +1,29 @@
+{
+  "name": "Montgomery",
+  "fips": "37123",
+  "state": "North Carolina",
+  "markets": [
+    "Charlotte"
+  ],
+  "featureCount": 5957,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-montgomery-parcels-37123",
+  "queryUrl": "https://www.webgis.net/arcgis/rest/services/NC/Montgomery/MapServer/1/query",
+  "gaps": [
+    "Parcels are NC/Montgomery Parcels (CAMA + polygons) (https://www.webgis.net/arcgis/rest/services/NC/Montgomery/MapServer/1). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 6024 rows; 5957 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 398 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37123/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37123/lookup.json",
+  "sourceCount": 6024,
+  "dropped": 0,
+  "tileCount": 8,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://www.webgis.net/nc/montgomery/PropertyCard.php?pid={PinNoDash}&card=0",
+  "gisViewerUrl": "https://www.webgis.net/nc/montgomery/"
+}

@@ -1,0 +1,732 @@
+{
+  "county": "Franklin",
+  "state": "NC",
+  "msa": "Raleigh-Durham footprint",
+  "fips": "37069",
+  "cntyfips": "069",
+  "slug": "franklin",
+  "level": "county",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "publicGisUrl": "https://www.franklincountymaps.net/maps/",
+  "gisViewerUrl": "https://www.franklincountymaps.net/maps/",
+  "countyRestRoot": "https://www.franklincountymaps.net/arcgis/rest/services",
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/franklin/parcel-search",
+  "viewerLinkTemplate": "https://lrcpwa.ncptscloud.com/franklin/parcel-detail/{PARID}",
+  "viewerLinkTemplateAlt": "https://lrcpwa.ncptscloud.com/franklin/parcel-detail/{PIN}",
+  "joinKeys": [
+    "PARID",
+    "PIN",
+    "PID",
+    "ALTID",
+    "PRODNO",
+    "parno"
+  ],
+  "parcelIdPreferred": "PARID",
+  "paDeepLinkKey": "PARID",
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PARID",
+        "PIN",
+        "PID",
+        "ALTID",
+        "PRODNO",
+        "parno"
+      ],
+      "bestLayer": "OperationalLayers/MapServer/0",
+      "caveat": "Prefer county PARID; join to PIN/PID and NC OneMap parno."
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "OperationalLayers/MapServer/0"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "ACRES",
+        "COMPACRES",
+        "MAPACRES",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 8246,
+      "bestLayer": "TaxZoning/MapServer/42",
+      "caveat": "Web View ACRES is string; use numeric TaxZoning ACRES or tax/51 COMPACRES."
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "OWN1",
+        "OWN2",
+        "ownname"
+      ],
+      "bestLayer": "OperationalLayers/MapServer/0"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "ADDR1",
+        "ADDR2",
+        "CITYNAME",
+        "STATECODE",
+        "ZIP1",
+        "mailadd",
+        "mcity",
+        "mstate",
+        "mzip"
+      ],
+      "bestLayer": "OperationalLayers/MapServer/0"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": true,
+      "fields": [
+        "ADRNO",
+        "ADRDIR",
+        "ADRSTR",
+        "ADRSUF",
+        "L_FullAddress",
+        "siteadd"
+      ],
+      "bestLayer": "OperationalLayers/MapServer/1",
+      "caveat": "Join Address Points by PIN/PID; parcel ADR* parts are often empty."
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "PRICE",
+        "SALEDT",
+        "DeedBook",
+        "DeedPage",
+        "RECORDDT",
+        "SALEVAL",
+        "saledate"
+      ],
+      "bestLayer": "OperationalLayers/MapServer/0",
+      "approxCountWithPrice": 29721,
+      "caveat": "Parcel last-sale fields are primary; annual qualified-sales layers are subsets."
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "APRLAND",
+        "APRBLDG",
+        "OBYVAL",
+        "TOT22",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "landImproveSplit": true,
+      "bestLayer": "OperationalLayers/MapServer/0",
+      "caveat": "TOT22 is null on REST; derive market approximately APRLAND+APRBLDG."
+    },
+    "zoning": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "ZONING",
+        "TAXDIST",
+        "ZONECLASS",
+        "ZONELABEL"
+      ],
+      "bestLayer": "OperationalLayers/MapServer/35",
+      "caveat": "County unincorporated polygons plus Youngsville and Wake Forest city-first sources; Louisburg/Franklinton/Bunn lack public zoning FS."
+    },
+    "flu": {
+      "present": false,
+      "fields": [],
+      "bestLayer": null,
+      "caveat": "No public FLU polygon REST; county/town plans are PDF-only."
+    },
+    "appraiserLink": {
+      "present": true,
+      "template": "https://lrcpwa.ncptscloud.com/franklin/parcel-detail/{PARID}",
+      "templateAlt": "https://lrcpwa.ncptscloud.com/franklin/parcel-detail/{PIN}",
+      "searchUrl": "https://lrcpwa.ncptscloud.com/franklin/parcel-search",
+      "fieldOnParcel": "PARID"
+    },
+    "jurisdictionViewer": {
+      "present": true,
+      "template": "https://www.franklincountymaps.net/maps/",
+      "notes": "Franklin County Maps public GIS viewer homepage; use City Limits + local zoning layers for municipal routing."
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Web View Parcels (PRIMARY CAMA polygons)",
+      "restUrl": "https://www.franklincountymaps.net/arcgis/rest/services/OperationalLayers/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "ACRES",
+      "count": 50019,
+      "priceGt0": 29721,
+      "bldgZeroOrNull": 13912,
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "maxRecordCount": 2000,
+      "wireFirst": true,
+      "status": "usable",
+      "fieldMap": {
+        "PARID": "parcelId",
+        "PIN": "parcelIdPin",
+        "ALTID": "parcelIdAlt",
+        "ACRES": "acreage",
+        "OWN1": "ownerName",
+        "OWN2": "ownerName2",
+        "ADDR1": "mailingAddress.street",
+        "ADDR2": "mailingAddress.street2",
+        "CITYNAME": "mailingAddress.city",
+        "STATECODE": "mailingAddress.state",
+        "ZIP1": "mailingAddress.zip",
+        "ADRNO": "situs.number",
+        "ADRDIR": "situs.prefix",
+        "ADRSTR": "situs.street",
+        "ADRSUF": "situs.streetType",
+        "APRLAND": "tax.landValue",
+        "APRBLDG": "tax.improvementValue",
+        "OBYVAL": "tax.obxfValue",
+        "TOT22": "tax.marketValueLegacy",
+        "SALEDT": "lastSale.date",
+        "PRICE": "lastSale.price",
+        "DeedBook": "lastSale.deedBook",
+        "DeedPage": "lastSale.deedPage",
+        "ZONING": "zoning",
+        "CLASS": "dorCode",
+        "TAXDIST": "taxDistrict",
+        "SUBDIV": "subdivision",
+        "LEGAL1": "legalDescription"
+      },
+      "notes": "PRIMARY wire-first. Rich CAMA on polygon; ACRES is string, so use TaxZoning/42 or tax/51 COMPACRES for numeric acreage filters. TOT22 is null on REST; derive market approximately APRLAND+APRBLDG. MaxRecordCount 2000; paginate."
+    },
+    {
+      "role": "parcels",
+      "name": "TaxZoning Parcels (joined CAMA + deeds)",
+      "restUrl": "https://www.franklincountymaps.net/arcgis/rest/services/TaxZoning/MapServer/42",
+      "layerId": 42,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "gisdata.DBO.allparcels.ACRES",
+      "count": 46464,
+      "acres5to150": 8246,
+      "bldgZeroOrNullInRange": 3854,
+      "salePriceGt0InRange": 3423,
+      "crs": {
+        "wkid": 2264,
+        "latestWkid": 2264
+      },
+      "maxRecordCount": 1000,
+      "status": "usable",
+      "fieldMap": {
+        "GISDATA.DBO.ParcelPolys.PARID": "parcelId",
+        "GISDATA.DBO.ParcelPolys.PIN": "parcelIdPin",
+        "GISDATA.DBO.ParcelPolys.COMPACRES": "acreageGis",
+        "GISDATA.DBO.ParcelPolys.MAPACRES": "acreageMap",
+        "gisdata.DBO.allparcels.ACRES": "acreage",
+        "gisdata.DBO.allparcels.OWN1": "ownerName",
+        "gisdata.DBO.allparcels.OWN2": "ownerName2",
+        "gisdata.DBO.allparcels.ADDR1": "mailingAddress.street",
+        "gisdata.DBO.allparcels.CITYNAME": "mailingAddress.city",
+        "gisdata.DBO.allparcels.ZIP1": "mailingAddress.zip",
+        "gisdata.DBO.allparcels.APRLAND": "tax.landValue",
+        "gisdata.DBO.allparcels.APRBLDG": "tax.improvementValue",
+        "gisdata.DBO.allparcels.OBYVAL": "tax.obxfValue",
+        "gisdata.DBO.allparcels.ZONING": "zoning",
+        "gisdata.DBO.allparcels.CLASS": "dorCode",
+        "gisdata.DBO.allparcels.TAXDIST": "taxDistrict",
+        "gisdata.DBO.allparcels.ALTID": "parcelIdAlt",
+        "gisdata.DBO.deeds.PRICE": "lastSale.price",
+        "gisdata.DBO.deeds.SALEDT": "lastSale.date",
+        "gisdata.DBO.deeds.BOOK": "lastSale.deedBook",
+        "gisdata.DBO.deeds.PAGE": "lastSale.deedPage"
+      },
+      "notes": "Prefer for numeric acreage filters and joined deed sale attributes. Prefixed fields must be quoted fully in where/outFields; page by OBJECTID or envelope when pagination is unsupported."
+    },
+    {
+      "role": "parcels",
+      "name": "tax Parcels (geometry + COMPACRES)",
+      "restUrl": "https://www.franklincountymaps.net/arcgis/rest/services/tax/MapServer/51",
+      "layerId": 51,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "COMPACRES",
+      "count": 46464,
+      "acres5to150": 7702,
+      "mapAcres5to150": 2593,
+      "crs": {
+        "wkid": 2264,
+        "latestWkid": 2264
+      },
+      "status": "usable",
+      "fieldMap": {
+        "PARID": "parcelId",
+        "PIN": "parcelIdPin",
+        "PID": "parcelIdPid",
+        "COMPACRES": "acreage",
+        "MAPACRES": "acreageMap",
+        "PRODNO": "parcelIdProd"
+      },
+      "notes": "Geometry-focused. Join on PARID to tax/MapServer/53 allparcels for CAMA; prefer OperationalLayers/0 or TaxZoning/42 for attributes."
+    },
+    {
+      "role": "tax",
+      "name": "allparcels CAMA table",
+      "restUrl": "https://www.franklincountymaps.net/arcgis/rest/services/tax/MapServer/53",
+      "layerId": 53,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "ACRES",
+      "count": 47127,
+      "acres5to150": 7847,
+      "bldgZeroOrNullInRange": 3699,
+      "status": "usable",
+      "fieldMap": {
+        "PARID": "parcelId",
+        "ALTID": "parcelIdAlt",
+        "ACRES": "acreage",
+        "OWN1": "ownerName",
+        "OWN2": "ownerName2",
+        "ADDR1": "mailingAddress.street",
+        "CITYNAME": "mailingAddress.city",
+        "STATECODE": "mailingAddress.state",
+        "ZIP1": "mailingAddress.zip",
+        "APRLAND": "tax.landValue",
+        "APRBLDG": "tax.improvementValue",
+        "OBYVAL": "tax.obxfValue",
+        "ZONING": "zoning",
+        "CLASS": "dorCode",
+        "TAXDIST": "taxDistrict"
+      },
+      "notes": "Table join key PARID. Companion deeds table tax/MapServer/54 count 42580; PRICE>0 count 25467."
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "gisacres",
+      "count": 47981,
+      "filter": "cntyfips='069'",
+      "acres5to150": 7785,
+      "improvZeroOrNullInRange": 3708,
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "maxRecordCount": 5000,
+      "status": "usable",
+      "fieldMap": {
+        "parno": "parcelId",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress.street",
+        "mcity": "mailingAddress.city",
+        "mstate": "mailingAddress.state",
+        "mzip": "mailingAddress.zip",
+        "siteadd": "situsAddress",
+        "scity": "situsCity",
+        "gisacres": "acreage",
+        "saledate": "lastSale.date",
+        "saledatetx": "lastSale.dateText",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "cntyfips": "countyFips"
+      },
+      "notes": "Statewide fallback. No sale price; siteadd often empty. parno approximately county PIN (####-##-####). Alternate host: https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+    },
+    {
+      "role": "zoning",
+      "name": "County Zoning polygons (PRIMARY spatial for unincorporated)",
+      "restUrl": "https://www.franklincountymaps.net/arcgis/rest/services/OperationalLayers/MapServer/35",
+      "layerId": 35,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 848,
+      "status": "usable",
+      "fieldMap": {
+        "ZONING": "zoning"
+      },
+      "notes": "Franklin County Planning area / unincorporated (FCO); not town zoning polygons. Prefer parcel ZONING plus city routing inside Louisburg, Franklinton, Bunn, and other municipalities."
+    },
+    {
+      "role": "zoning",
+      "name": "Youngsville ParcelPolygons zoning (city-first)",
+      "restUrl": "https://services1.arcgis.com/aT1T0pU1ZdpuDk1t/arcgis/rest/services/Youngsville_WFL1/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "acreageField": "COMPACRES",
+      "count": 6759,
+      "acres5to150": 408,
+      "crs": {
+        "wkid": 3857,
+        "latestWkid": 3857
+      },
+      "status": "usable",
+      "municipality": "Youngsville",
+      "fieldMap": {
+        "PARID": "parcelId",
+        "PIN": "parcelIdPin",
+        "PID": "parcelIdPid",
+        "ZONING": "zoning",
+        "COMPACRES": "acreage"
+      },
+      "notes": "Most-local source inside Youngsville. Viewer: https://experience.arcgis.com/experience/cd96cf06c7724708b7349a97be3beed7/"
+    },
+    {
+      "role": "zoning",
+      "name": "Wake Forest Zoning (Wake host — Franklin tip)",
+      "restUrl": "https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/25",
+      "layerId": 25,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 469,
+      "status": "usable",
+      "municipality": "Wake Forest",
+      "fieldMap": {
+        "ZONECLASS": "zoning",
+        "ZONELABEL": "zoningLabel",
+        "ZONEDEFINE": "zoningDefine",
+        "CLASS": "zoningClass"
+      },
+      "notes": "Wake County host; clip to Franklin using city limits NAME=WAKE FOREST. Approximately 1403 Franklin TAXDIST=WKFS parcels."
+    },
+    {
+      "role": "zoning",
+      "name": "Parcel ZONING attribute (multi-jurisdiction stub)",
+      "restUrl": "https://www.franklincountymaps.net/arcgis/rest/services/OperationalLayers/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "ZONING": "zoning",
+        "TAXDIST": "taxDistrict"
+      },
+      "status": "partial",
+      "notes": "Fast attribute route on Web View Parcels. Includes FCO county codes and town codes; spatially join authoritative county/Youngsville/Wake zoning where available."
+    },
+    {
+      "role": "flu",
+      "name": "Future Land Use (public polygon REST)",
+      "restUrl": null,
+      "layerId": null,
+      "geometry": "none",
+      "auth": "n/a",
+      "coverage": "unknown",
+      "status": "gap",
+      "fieldMap": {},
+      "notes": "No public FLU FeatureServer found. County Comprehensive Development Plan and town land-use plans are PDF-only; do not invent a URL."
+    },
+    {
+      "role": "other",
+      "name": "Address Points (situs)",
+      "restUrl": "https://www.franklincountymaps.net/arcgis/rest/services/OperationalLayers/MapServer/1",
+      "layerId": 1,
+      "geometry": "point",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 43997,
+      "status": "usable",
+      "fieldMap": {
+        "L_FullAddress": "situsAddress",
+        "Add_Number": "situs.number",
+        "L_FullName": "situs.street",
+        "Post_Code": "situsZip",
+        "PIN": "parcelIdPin",
+        "PID": "parcelIdPid"
+      },
+      "notes": "Join to parcels on PIN/PID; preferred over sparse ADR* situs parts. Companion tax/MapServer/50 has PARID + ROAD_*."
+    },
+    {
+      "role": "other",
+      "name": "City Limits",
+      "restUrl": "https://www.franklincountymaps.net/arcgis/rest/services/OperationalLayers/MapServer/6",
+      "layerId": 6,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 26,
+      "status": "usable",
+      "fieldMap": {
+        "NAME": "municipality"
+      },
+      "notes": "Multipart city limits. NAME values: LOUISBURG, FRANKLINTON, YOUNGSVILLE, BUNN, WAKE FOREST. Centerville is dissolved and absent."
+    },
+    {
+      "role": "other",
+      "name": "Extra Territorial Jurisdictions",
+      "restUrl": "https://www.franklincountymaps.net/arcgis/rest/services/OperationalLayers/MapServer/41",
+      "layerId": 41,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 11,
+      "status": "usable",
+      "acreageField": "ACRES_CO",
+      "fieldMap": {
+        "ZONE_CO": "etjCode",
+        "ACRES_CO": "etjAcres"
+      },
+      "notes": "ZONE_CO ETJ1–ETJ5; pair with City Limits for planning jurisdiction."
+    },
+    {
+      "role": "sales",
+      "name": "2025 Qualified Sales",
+      "restUrl": "https://www.franklincountymaps.net/arcgis/rest/services/OperationalLayers/MapServer/55",
+      "layerId": 55,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "sample",
+      "acreageField": "COMPACRES",
+      "count": 1409,
+      "status": "usable",
+      "fieldMap": {
+        "PARID": "parcelId",
+        "PIN": "parcelIdPin",
+        "PRICE": "lastSale.price",
+        "SALEDT": "lastSale.date",
+        "RECORDDT": "lastSale.recordDate",
+        "SALEVAL": "lastSale.qualifiedFlag",
+        "COMPACRES": "acreage"
+      },
+      "notes": "Qualified-sales subset. Companion years: 2024/54 (1644), 2023/53, 2022/52, 2021/51. Parcel PRICE/SALEDT remains primary last-sale source."
+    }
+  ],
+  "municipalities": {
+    "Louisburg": {
+      "hasLocalGis": false,
+      "zoningPrefer": "parcel ZONING attribute + County Zoning/35",
+      "fluPrefer": "gap",
+      "publicGisUrl": "https://www.franklincountymaps.net/maps/"
+    },
+    "Franklinton": {
+      "hasLocalGis": false,
+      "zoningPrefer": "parcel ZONING attribute + County Zoning/35",
+      "fluPrefer": "gap",
+      "publicGisUrl": "https://www.franklincountymaps.net/maps/"
+    },
+    "Youngsville": {
+      "hasLocalGis": true,
+      "zoningPrefer": "Youngsville_WFL1/0",
+      "fluPrefer": "gap",
+      "publicGisUrl": "https://experience.arcgis.com/experience/cd96cf06c7724708b7349a97be3beed7/"
+    },
+    "Bunn": {
+      "hasLocalGis": false,
+      "zoningPrefer": "parcel ZONING attribute + County Zoning/35",
+      "fluPrefer": "gap",
+      "publicGisUrl": "https://www.franklincountymaps.net/maps/"
+    },
+    "Wake Forest (Franklin tip)": {
+      "hasLocalGis": true,
+      "zoningPrefer": "Wake Planning/Zoning/25 clipped to Franklin",
+      "fluPrefer": "Wake/local source outside this card",
+      "publicGisUrl": "https://www.franklincountymaps.net/maps/"
+    }
+  },
+  "portals": [
+    {
+      "name": "Franklin County Maps public GIS viewer",
+      "url": "https://www.franklincountymaps.net/maps/",
+      "notes": "Jurisdiction GIS viewer homepage; county parcel, zoning, boundaries, addresses and sales layers"
+    },
+    {
+      "name": "Franklin County ArcGIS REST",
+      "url": "https://www.franklincountymaps.net/arcgis/rest/services",
+      "notes": "OperationalLayers, TaxZoning, tax services"
+    },
+    {
+      "name": "NCPTS property search",
+      "url": "https://lrcpwa.ncptscloud.com/franklin/parcel-search",
+      "notes": "Appraiser/property search; parcel-detail deep link accepts PARID/PIN template"
+    },
+    {
+      "name": "NC OneMap Parcels",
+      "url": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "notes": "Fallback filtered by cntyfips='069'"
+    },
+    {
+      "name": "Youngsville ArcGIS Experience viewer",
+      "url": "https://experience.arcgis.com/experience/cd96cf06c7724708b7349a97be3beed7/",
+      "notes": "City-first zoning viewer"
+    }
+  ],
+  "gaps": [
+    "No public FLU polygon REST; county Comp Plan and town plans are PDF-only",
+    "Louisburg / Franklinton / Bunn lack public zoning FeatureServers; use parcel ZONING + City Limits",
+    "Centerville dissolved; no city-limits polygon (CTVF tax district remains)",
+    "Web View Parcels ACRES is string; use TaxZoning/42 ACRES or tax/51 COMPACRES",
+    "TOT22 market field null on REST; use APRLAND+APRBLDG",
+    "ADR* situs parts often empty; join Address Points",
+    "Hosted/Planning_Opengov FeatureServer token-required",
+    "NCSU Youngsville_File_MS SSL certificate expired (2026-09-24)",
+    "Roktech franklin_GM4 viewer has no public REST root found",
+    "franklincountymaps.net layer queries return 403 without browser User-Agent",
+    "TaxZoning pagination unsupported on some queries; page by OBJECTID/envelope",
+    "No multi-transfer sales history beyond last deed + annual qualified-sales layers",
+    "No paid vendor data; no phones/emails; no AADT/utilities dig"
+  ],
+  "license": "Franklin County public GIS (franklincountymaps.net); NC OneMap; Town of Youngsville AGOL; Wake County Zoning for Wake Forest tip; NCGS disclaimer; attribution recommended",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "liveVerification": {
+    "checkedAt": "2026-09-24",
+    "timezone": "America/New_York",
+    "restQuickChecks": {
+      "OperationalLayers/MapServer/0": "HTTP 200; count 50019; owner OWN1 IS NOT NULL count 49252",
+      "TaxZoning/MapServer/42": "HTTP 200 metadata; joined parcel source usable",
+      "tax/MapServer/53": "HTTP 200; count 47127",
+      "OperationalLayers/MapServer/55": "HTTP 200; count 1409"
+    },
+    "sample": "PARID 029893 returned owner, land/building values, PRICE and SALEDT on primary query",
+    "paSearch": "HTTP 200",
+    "paDeepLinkSample": "HTTP 200 for /franklin/parcel-detail/029893",
+    "publicGis": "HTTP 200 at /maps/"
+  },
+  "tranche3": {
+    "taxSaleOwnerMapped": true,
+    "paDeepLink": "https://lrcpwa.ncptscloud.com/franklin/parcel-detail/{PARID}",
+    "paDeepLinkKey": "PARID",
+    "publicGisUrl": "https://www.franklincountymaps.net/maps/",
+    "jurisdictionGisViewerUrl": "https://www.franklincountymaps.net/maps/"
+  },
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://www.franklincountymaps.net/arcgis/rest/services/OperationalLayers/MapServer/0",
+    "parcelIdField": "PARID",
+    "acreageFilter": "ACRES cast to number, 5–150 (client-side; field is string)",
+    "acres5to150Live": 8310,
+    "parcelCountLive": 50019,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='FRANKLIN'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27FRANKLIN%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27FRANKLIN%27&returnCountOnly=true&f=json",
+        "liveStationCount": 360,
+        "stationsWithAADT2022": 211
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Franklin'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Franklin%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Franklin%27&returnCountOnly=true&f=json",
+        "liveStationCount": 361,
+        "stationsWithAADT2025": 239,
+        "stationsWithAADT2024": 216,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "stations2024CountyFilter": "County='Franklin'",
+        "stations2024LiveCount": 362,
+        "stations2024WithAADT2024": 362,
+        "stations2024Note": "AADT_2024 string field populated on every station in this release",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "APRLAND",
+        "APRBLDG",
+        "TOT22"
+      ],
+      "liveNonZero": {
+        "APRLAND": 49055,
+        "APRBLDG": 36107,
+        "TOT22": 0
+      },
+      "status": "ok-derive-total",
+      "note": "TOT22 is 0 for every row (stale legacy field) — derive market = APRLAND + APRBLDG + OBYVAL."
+    },
+    "sale": {
+      "priceFields": [
+        "PRICE"
+      ],
+      "dateFields": [
+        "SALEDT"
+      ],
+      "livePriceNonZero": {
+        "PRICE": 29721
+      },
+      "liveDateNonNull": {
+        "SALEDT": 47941
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "OWN1",
+        "OWN2"
+      ],
+      "rule": "Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).",
+      "regex": "\\b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "regexExtended": "\\b(LLC|L\\s?L\\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\\b|\\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\\s+OF\\b|\\bOF\\s+(EDUCATION|TRANSPORTATION)\\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\\b",
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "liveEntityCount5to150ac": 1573,
+      "liveEntityCount5to150acExtended": 1666,
+      "countNote": "Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.",
+      "sampleMatches": [
+        "DCWF PROPERTIES LLC",
+        "CABINFARM LLC",
+        "BUNN HENRY THOMAS | DEW DYNAMICS LLC",
+        "BUNN HENRY THOMAS | DEW DYNAMICS LLC"
+      ]
+    },
+    "paDeepLink": {
+      "template": "https://lrcpwa.ncptscloud.com/franklin/parcel-detail/{PARID}",
+      "testedParcelId": "016244",
+      "testedUrl": "https://lrcpwa.ncptscloud.com/franklin/parcel-detail/016244",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": false,
+      "note": "NCPTS PWA returns HTTP 200 SPA shell for any path; parcel resolves client-side. Headless Chrome render from box showed app-level '404 Page Not Found' even for /{tenant}/parcel-search, so resolution is UNVERIFIED (may be headless/network gating). Manual browser check recommended."
+    },
+    "gisViewer": {
+      "url": "https://www.franklincountymaps.net/maps/",
+      "httpStatus": 200,
+      "pageTitle": "Avineon Web Map Template"
+    },
+    "gaps": [
+      "TOT22 all zero — market total must be derived",
+      "PA link is NCPTS SPA only — parcel resolution unverified"
+    ]
+  }
+}

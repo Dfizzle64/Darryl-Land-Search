@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-28T22:27:33Z",
+  "generatedAt": "2026-09-29T03:46:36Z",
   "market": "Wilmington",
   "tier": "other",
-  "parcelCount": 47320,
+  "parcelCount": 100686,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -16,6 +16,49 @@
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
+    {
+      "name": "Beaufort",
+      "fips": "37013",
+      "state": "North Carolina",
+      "featureCount": 8050,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-beaufort-parcels-37013",
+      "queryUrl": "https://services1.arcgis.com/oXsk9nimtmSEU8Ko/arcgis/rest/services/Beaufort_Service/FeatureServer/4/query",
+      "gaps": [
+        "Parcels are Beaufort_Service Parcels (PRIMARY county AGOL CAMA + sale) (https://services1.arcgis.com/oXsk9nimtmSEU8Ko/arcgis/rest/services/Beaufort_Service/FeatureServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 356 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37013/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37013/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 8050
+    },
+    {
+      "name": "Bladen",
+      "fips": "37017",
+      "state": "North Carolina",
+      "featureCount": 8300,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-bladen-parcels-37017",
+      "queryUrl": "https://gis.bladenco.org/server/rest/services/BladenCounty/MapServer/1/query",
+      "gaps": [
+        "Parcels are BladenCounty TaxParcels (PRIMARY CAMA) (https://gis.bladenco.org/server/rest/services/BladenCounty/MapServer/1). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 9242 rows; 8300 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 380 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37017/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37017/lookup.json",
+      "tileCount": 10,
+      "sourceCount": 9242
+    },
     {
       "name": "Brunswick",
       "fips": "37019",
@@ -44,6 +87,28 @@
       "fluJoinedCount": 6368
     },
     {
+      "name": "Carteret",
+      "fips": "37031",
+      "state": "North Carolina",
+      "featureCount": 3283,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-carteret-parcels-37031",
+      "queryUrl": "https://arcgisweb.carteretcountync.gov/arcgis/rest/services/Layers/Parceldata/FeatureServer/0/query",
+      "gaps": [
+        "Parcels are Layers/Parceldata (PRIMARY CAMA) (https://arcgisweb.carteretcountync.gov/arcgis/rest/services/Layers/Parceldata/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 3466 rows; 3283 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 207 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37031/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37031/lookup.json",
+      "tileCount": 12,
+      "sourceCount": 3466
+    },
+    {
       "name": "Columbus",
       "fips": "37047",
       "state": "North Carolina",
@@ -64,6 +129,51 @@
       "sourceCount": 51709
     },
     {
+      "name": "Craven",
+      "fips": "37049",
+      "state": "North Carolina",
+      "featureCount": 5945,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-craven-parcels-37049",
+      "queryUrl": "https://gis.cravencountync.gov/arcgis/rest/services/JustParcels/MapServer/0/query",
+      "gaps": [
+        "Parcels are JustParcels Parcels (PRIMARY county ArcGIS CAMA + sale price) (https://gis.cravencountync.gov/arcgis/rest/services/JustParcels/MapServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 345 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37049/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37049/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 5945
+    },
+    {
+      "name": "Dare",
+      "fips": "37055",
+      "state": "North Carolina",
+      "featureCount": 2066,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-dare-parcels-37055",
+      "queryUrl": "https://services1.arcgis.com/ozZJ6IIlcOT869Kx/arcgis/rest/services/gis_polygons/FeatureServer/0/query",
+      "gaps": [
+        "Parcels are gis_polygons (PRIMARY CAMA ArcGIS REST) (https://services1.arcgis.com/ozZJ6IIlcOT869Kx/arcgis/rest/services/gis_polygons/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 2222 rows; 2066 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale partial). Pass 2 counted 132 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Pass 2 sale: Date: NC OneMap saledate non-null 40,483 of 40,483 for cntyfips='055' (live 2026-09-28; join parcel). Price not on REST; public on Dare PA (property.spatialest.com/nc/dare or tax.darecountync.gov/landtransfer/parcel.php?parcel={parcel}).",
+        "Pass 2 sale join matched 882 of 2066 parcel ids.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37055/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37055/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 2222
+    },
+    {
       "name": "Duplin",
       "fips": "37061",
       "state": "North Carolina",
@@ -81,6 +191,73 @@
       "lookup": "data/fixtures/market-parcels/counties/37061/lookup.json",
       "tileCount": 9,
       "sourceCount": 12297
+    },
+    {
+      "name": "Hyde",
+      "fips": "37095",
+      "state": "North Carolina",
+      "featureCount": 2394,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-hyde-parcels-37095",
+      "queryUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Hyde_AGOL/FeatureServer/3/query",
+      "gaps": [
+        "Parcels are Tax_Parcels (PRIMARY CAMA ArcGIS REST) (https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Hyde_AGOL/FeatureServer/3). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 2414 rows; 2394 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale gap). Pass 2 counted 101 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Pass 2 sale: No sale price/date on Hyde_AGOL/3 or NC OneMap. AGD PRC PDF (scanned image) is the only public source.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37095/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37095/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 2414
+    },
+    {
+      "name": "Jones",
+      "fips": "37103",
+      "state": "North Carolina",
+      "featureCount": 2349,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-jones-parcels-37103",
+      "queryUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Jones_Bitek/FeatureServer/0/query",
+      "gaps": [
+        "Parcels are Jones_Bitek Parcels (PRIMARY county AGOL CAMA + sale) (https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Jones_Bitek/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 2351 rows; 2349 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 140 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37103/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37103/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 2351
+    },
+    {
+      "name": "Lenoir",
+      "fips": "37107",
+      "state": "North Carolina",
+      "featureCount": 5242,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-lenoir-parcels-37107",
+      "queryUrl": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/6/query",
+      "gaps": [
+        "Parcels are Parcels_Zoning_Addressing / Parcels (PRIMARY) (https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/6). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 5326 rows; 5242 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 469 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37107/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37107/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 5326
     },
     {
       "name": "New Hanover",
@@ -190,6 +367,28 @@
       "sourceCount": 6765
     },
     {
+      "name": "Pamlico",
+      "fips": "37137",
+      "state": "North Carolina",
+      "featureCount": 3154,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-pamlico-parcels-37137",
+      "queryUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Pamlico_ParcelService/FeatureServer/5/query",
+      "gaps": [
+        "Parcels are Pamlico_ParcelService Parcel_Poly (PRIMARY county AGOL CAMA + SALE_AMT) (https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Pamlico_ParcelService/FeatureServer/5). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 3155 rows; 3154 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 117 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37137/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37137/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 3155
+    },
+    {
       "name": "Pender",
       "fips": "37141",
       "state": "North Carolina",
@@ -217,6 +416,29 @@
       "sourceCount": 7493,
       "zoningJoinedCount": 7295,
       "fluJoinedCount": 7354
+    },
+    {
+      "name": "Robeson",
+      "fips": "37155",
+      "state": "North Carolina",
+      "featureCount": 12583,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-robeson-parcels-37155",
+      "queryUrl": "https://services7.arcgis.com/miWUVbMhSUq6a8y1/arcgis/rest/services/Robeson_County_Parcels/FeatureServer/0/query",
+      "gaps": [
+        "Parcels are AGOL Robeson County Parcels (PRIMARY CAMA) (https://services7.arcgis.com/miWUVbMhSUq6a8y1/arcgis/rest/services/Robeson_County_Parcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 14307 rows; 12583 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 975 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Robeson pass-2 tax fields are land and improvement assessed values. Those components are not summed into a total market or assessed value.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37155/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37155/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 14307
     }
   ]
 }

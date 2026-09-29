@@ -1,0 +1,449 @@
+state: NC
+jurisdiction: Orange County
+fips: "37135"
+level: county
+markets: [Raleigh-Durham, Triangle]
+
+layers:
+  - role: parcels
+    name: WebParcelService Parcels
+    restUrl: https://gis.orangecountync.gov/arcgis/rest/services/WebParcelService/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PINLINK: parcelIdAlt
+      ACCOUNT: parcelIdAccount
+      CALC_ACRES: acreage
+      SIZE: acreageDeed
+      UOM: acreageUnit
+      OWNER1: ownerName
+      OWNER1_LAST: ownerNameLast
+      OWNER1_FIRST: ownerNameFirst
+      OWNER2: ownerName2
+      ADDRESS1: mailingAddress.street
+      ADDRESS2: mailingAddress.street2
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIPCODE: mailingAddress.zip
+      DATESOLD: lastSale.date
+      DATESOLDTXT: lastSale.dateText
+      STAMPVALUE: lastSale.price
+      TAXSTAMPS: lastSale.taxStamps
+      VALUATION: tax.marketValue
+      LANDVALUE: tax.landValue
+      BLDGVALUE: tax.improvementValue
+      USEVALUE: tax.useValue
+      Zonings: zoning
+      Zoning_Admin: zoningAdmin
+    notes: >
+      PRIMARY verified 2026-09-23: count 59643; CALC_ACRES 5–150 → 9375;
+      UOM='A' SIZE 5–150 → 9505. CRS 102719/2264. No situs. Zonings populated
+      for County Zoning_Admin only. STAMPVALUE is tax-stamp sale proxy.
+      MaxRecordCount 2000.
+    status: usable
+
+  - role: parcels
+    name: WebIdentifyServiceAnalysis Parcels
+    restUrl: https://gis.orangecountync.gov/arcgis/rest/services/WebIdentifyServiceAnalysis/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      OWNER1_LAST: ownerNameLast
+      OWNER1_FIRST: ownerNameFirst
+      ADDRESS1: mailingAddress.street
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIPCODE: mailingAddress.zip
+      CALC_ACRES: acreage
+      SIZE: acreageDeed
+      UOM: acreageUnit
+      LANDVALUE: tax.landValue
+      BLDGVALUE: tax.improvementValue
+      VALUATION: tax.marketValue
+      DATESOLD: lastSale.date
+      STAMPVALUE: lastSale.price
+    notes: >
+      Verified count 60449; CALC_ACRES 5–150 → 9953. Same CAMA family; no
+      Zonings/PINLINK/ACCOUNT. Alternate: WebIdentifyService/MapServer/6.
+    status: usable
+
+  - role: other
+    name: Addresses (situs join)
+    restUrl: https://gis.orangecountync.gov/arcgis/rest/services/WebIdentifyServiceAnalysis/MapServer/1
+    layerId: 1
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Add_St: situsAddress
+      NG_FullAddress: situsAddressAlt
+      HouseNum: situsAddress.number
+      Name: situsAddress.street
+      Type: situsAddress.streetType
+      DirPrefix: situsAddress.prefix
+      DirSuffix: situsAddress.suffix
+      MailingCity: situsCity
+      ZipCode: situsZip
+      State: situsState
+      PrimaryFlag: situsPrimary
+      Inc_Muni: municipality
+      TaxJuris: taxJurisdiction
+    notes: >
+      Verified count 81837. Join on PIN to WebParcelService. Prefer PrimaryFlag.
+      Alternate LRCAMA/WebCamaAddresses/MapServer/0 count 86431.
+    status: usable
+
+  - role: zoning
+    name: WebZoningService Zoning (county districts + muni shells)
+    restUrl: https://gis.orangecountync.gov/arcgis/rest/services/WebZoningService/MapServer/22
+    layerId: 22
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      Zoning: zoning
+      Zoning_Def: zoningDescription
+      Label: zoningLabel
+      Jur: jurisdiction
+      Zoning_Admin: zoningAdmin
+      City_Jur: cityLimitsOrEtj
+      Name: jurisdictionName
+    notes: >
+      Verified count 362. Real district codes only for Jur=County (295).
+      Chapel Hill/Carrboro/Hillsborough/Mebane/Durham rows are limits/ETJ
+      shells (Zoning=CH/CA/HI/ME) — use municipal layers for district codes.
+      Alternates: WebMainService/51, IdentifyAnalysis/21.
+    status: partial
+
+  - role: flu
+    name: Future Land Use Map — Land Use Element Base Data
+    restUrl: https://gis.orangecountync.gov/arcgis/rest/services/Future_Land_Use_Map/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      Legend: flu
+      Acres: acreage
+    notes: >
+      Verified count 143. County comprehensive-plan FLU / transition categories.
+      Mirror schema on layer 5. Not a substitute for Chapel Hill 2050 or
+      Hillsborough MH_LU inside towns.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: recareano
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      recareano: acreage
+      gisacres: acreageGis
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Filter cntyfips='135'. Verified count 59366; recareano 5–150 → 9502.
+      gisacres all 0 and siteadd empty for Orange — use recareano + county
+      address join. Alternate host services.gis.nc.gov. MaxRecordCount 5000.
+    status: partial
+
+  - role: zoning
+    name: Chapel Hill Zoning Districts
+    restUrl: https://gis-portal.townofchapelhill.org/server/rest/services/OpenData/Zoning_Districts/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      NAME: zoningName
+      OLD_ZONING: zoningLegacy
+    notes: >
+      Verified count 313. CRS 2264. Spatial join to county parcels for
+      Zoning_Admin Chapel Hill. Overlay:
+      OpenData/Overlay_Zoning_Districts/FeatureServer/0 count 18.
+    status: usable
+
+  - role: flu
+    name: Chapel Hill Future Land Use Map 2050
+    restUrl: https://services2.arcgis.com/7KRXAKALbBGlCW77/arcgis/rest/services/Future_Land_Use_Map_2050/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      LANDUSE: flu
+      DU_S: fluDensity
+      Description: fluDescription
+    notes: >
+      Verified count 408. CRS 3857 — reproject to 2264 before join to county
+      parcels. Categories include Rural/Low/Medium/High Residential, Mixed Use,
+      Town/Village Center, Commercial, University, Parks/Open Space, Rural Buffer.
+    status: usable
+
+  - role: zoning
+    name: Carrboro ZoningSP base
+    restUrl: https://gis.carrboronc.gov/server/rest/services/SP/ZoningSP/MapServer/30
+    layerId: 30
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      DEFINITION: zoningDescription
+      WEBPAGE: zoningDocUrl
+    notes: >
+      Verified count 81. CRS 2264. Also Conditional/PUD layer 20 (count 18,
+      PINs field) and Overlay layer 10 (count 6). FLU REST gap for Carrboro.
+    status: usable
+
+  - role: zoning
+    name: Hillsborough Zoning districts
+    restUrl: https://services5.arcgis.com/m711BZ7Df3seMOYp/arcgis/rest/services/ZoningLayersII/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZoningType: zoning
+      ZoningCategory: zoningCategory
+    notes: >
+      Verified count 207. CRS 2264. Types AR, R10–R40, MF, OI, NB, CC, GC,
+      HIC, GI, LI, EDD, BP, etc. Overlays on layer 2 (count 3).
+    status: usable
+
+  - role: flu
+    name: Hillsborough Land Use
+    restUrl: https://services5.arcgis.com/m711BZ7Df3seMOYp/arcgis/rest/services/HillsboroughLandUseII/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      MH_LU: flu
+      MH_LUtemp: fluAlt
+    notes: >
+      Verified count 31. CRS 2264. Categories include Town Center, Urban
+      Neighborhood, Mixed Use, Working Farm, Rural Living, Employment, etc.
+    status: usable
+
+  - role: other
+    name: Municipal Boundary
+    restUrl: https://gis.orangecountync.gov/arcgis/rest/services/WebMainService/MapServer/52
+    layerId: 52
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+      CITYCODE: municipalityCode
+    notes: >
+      Verified count 84 (multipart). Route zoning/FLU joins. Values include
+      CHAPEL HILL, HILLSBOROUGH, DURHAM, etc.
+    status: usable
+
+gaps:
+  - Situs not on primary parcel polygons — join Addresses by PIN
+  - County Zoning MapServer lacks district codes for Chapel Hill/Carrboro/Hillsborough (jurisdiction shells only)
+  - Parcel Zonings attribute empty for municipal Zoning_Admin
+  - No public Carrboro FLU FeatureServer
+  - Last sale price is STAMPVALUE (tax-stamp proxy), not multi-sale deed history
+  - NC OneMap gisacres=0 and siteadd empty for Orange — use recareano
+  - Chapel Hill FLU 2050 CRS 3857 vs county 2264
+  - Mebane/Durham edge district zoning not on Orange hosts
+  - No phones/emails collected; no paid vendors
+
+license: "County and municipal public GIS; attribution recommended; not survey grade"
+appraiserSearchUrl: https://property.spatialest.com/nc/orange/#/
+appraiserDeepLinkTemplate: "https://property.spatialest.com/nc/orange/#/property/{PIN}"
+pinLookupUrlTemplate: "https://web.orangecountync.gov/pinmanagementweb/?pin={PIN}"
+viewerUrl: https://gis.orangecountync.gov/orangencgis/default.htm
+verifiedAt: 2026-09-23
+verifiedBy: Grok Bot GIS Researcher
+
+# ---- PASS 2 full-suite upgrade (NC non-OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  pass1:
+    status: verified
+    parcelPolygonLayer: https://gis.orangecountync.gov/arcgis/rest/services/WebParcelService/MapServer/0
+    polygonCountLive: 59643
+    parcelIdField: PIN
+    parcelIdFilled: 59643
+    acreageField: CALC_ACRES
+    acres5to150Live: 9374
+    sampleCentroidWgs84:
+    - -78.9993
+    - 35.9615
+  parcelLayer: https://gis.orangecountync.gov/arcgis/rest/services/WebParcelService/MapServer/0
+  parcelIdField: PIN
+  acreageFilter: CALC_ACRES >= 5 AND CALC_ACRES <= 150
+  acres5to150Live: 9374
+  parcelCountLive: 59643
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='ORANGE'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ORANGE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ORANGE%27&returnCountOnly=true&f=json
+      liveStationCount: 521
+      stationsWithAADT2022: 173
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Orange'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Orange%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Orange%27&returnCountOnly=true&f=json
+      liveStationCount: 518
+      stationsWithAADT2025: 407
+      stationsWithAADT2024: 172
+      stationsWith2025or2024: 498
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - VALUATION
+    - LANDVALUE
+    liveNonZero:
+      VALUATION: 58623
+      LANDVALUE: 54470
+    status: ok
+  sale:
+    priceFields:
+    - STAMPVALUE
+    dateFields:
+    - DATESOLD
+    livePriceNonZero:
+      STAMPVALUE: 32609
+    liveDateNonNull:
+      DATESOLD: 59208
+    status: ok
+    note: STAMPVALUE is the price implied by excise stamps (TAXSTAMPS × 500), not a recorded price.
+  ownerEntity:
+    ownerFields:
+    - OWNER1
+    primaryOwnerField: OWNER1
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(OWNER1) LIKE '% LLC%' OR UPPER(OWNER1) LIKE '% INC%' OR UPPER(OWNER1) LIKE '% LP%' OR UPPER(OWNER1) LIKE '% LLP%' OR UPPER(OWNER1) LIKE '% LTD%' OR UPPER(OWNER1) LIKE '% TRUST%' OR UPPER(OWNER1) LIKE '% CHURCH%' OR UPPER(OWNER1) LIKE '% COMPANY%' OR UPPER(OWNER1) LIKE '% PARTNERSHIP%' OR UPPER(OWNER1) LIKE '% HOLDINGS%' OR UPPER(OWNER1) LIKE '% PROPERTIES%' OR UPPER(OWNER1) LIKE '% CORP%' OR UPPER(OWNER1) LIKE '%,LLC%' OR UPPER(OWNER1) LIKE '%,INC%' OR UPPER(OWNER1) LIKE 'CITY OF %' OR UPPER(OWNER1) LIKE 'COUNTY OF %' OR UPPER(OWNER1) LIKE 'STATE OF %' OR UPPER(OWNER1) LIKE 'TOWN OF %')
+    liveEntityCountAll: 12679
+    liveEntityCount5to150ac: 2002
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above.
+  paDeepLink:
+    template: https://property.spatialest.com/nc/orange/#/property/{PIN}
+    testedParcelId: 0800062560
+    testedUrl: https://property.spatialest.com/nc/orange/#/property/0800062560
+    httpStatus: 200
+    contentType: text/html; charset=UTF-8
+    contentVerified: false
+    note: 'Spatialest SPA (hash route): 200 shell, parcel content cannot be checked server-side. Alt: https://web.orangecountync.gov/pinmanagementweb/?pin={PIN}.'
+  gisViewer:
+    url: https://gis.orangecountync.gov/orangencgis/default.htm
+    httpStatus: 200
+    pageTitle: ''
+  municipalLayerCheck:
+    checked: 14
+    answering: 14
+    layers:
+    - url: https://gis-portal.townofchapelhill.org/server/rest/services/OpenData/Overlay_Zoning_Districts/FeatureServer/0
+      name: Overlay Zoning Districts
+      liveCount: 18
+    - url: https://gis-portal.townofchapelhill.org/server/rest/services/OpenData/Zoning_Districts/FeatureServer/0
+      name: Zoning Districts
+      liveCount: 313
+    - url: https://gis.carrboronc.gov/server/rest/services/SP/ZoningSP/MapServer/10
+      name: Overlay Zoning
+      liveCount: 6
+    - url: https://gis.carrboronc.gov/server/rest/services/SP/ZoningSP/MapServer/20
+      name: Conditional and PUD Zoning
+      liveCount: 18
+    - url: https://gis.carrboronc.gov/server/rest/services/SP/ZoningSP/MapServer/30
+      name: Zoning
+      liveCount: 81
+    - url: https://gis.orangecountync.gov/arcgis/rest/services/Future_Land_Use_Map/MapServer/12
+      name: Land Use Element Base Data
+      liveCount: 143
+    - url: https://gis.orangecountync.gov/arcgis/rest/services/WebIdentifyServiceAnalysis/MapServer/1
+      name: Addresses
+      liveCount: 81891
+    - url: https://gis.orangecountync.gov/arcgis/rest/services/WebMainService/MapServer/52
+      name: Municipal Boundary
+      liveCount: 84
+    - url: https://gis.orangecountync.gov/arcgis/rest/services/WebZoningService/MapServer/22
+      name: Zoning
+      liveCount: 362
+    - url: https://gisweb.townofchapelhill.org/arcgis/rest/services/MapServices/Existing_Land_Use/FeatureServer/0
+      name: Existing Land Use
+      liveCount: 1484
+    - url: https://gisweb.townofchapelhill.org/arcgis/rest/services/OpenGov/OpenGovLayers/MapServer/21
+      name: Zoning_Districts
+      liveCount: 313
+    - url: https://services2.arcgis.com/7KRXAKALbBGlCW77/arcgis/rest/services/Future_Land_Use_Map_2050/FeatureServer/8
+      name: CH_VECTOR.GISADMIN.Future_Land_Use_Map_2050
+      liveCount: 408
+    - url: https://services5.arcgis.com/m711BZ7Df3seMOYp/arcgis/rest/services/HillsboroughLandUseII/FeatureServer/3
+      name: Hillsborough Land Use
+      liveCount: 31
+    - url: https://services5.arcgis.com/m711BZ7Df3seMOYp/arcgis/rest/services/ZoningLayersII/FeatureServer/3
+      name: Zoning
+      liveCount: 207
+  gaps:
+  - PA content not verifiable (SPA)

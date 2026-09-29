@@ -1,0 +1,978 @@
+{
+  "county": "Rowan",
+  "state": "NC",
+  "msa": "Charlotte MSA",
+  "fips": "37159",
+  "cntyfips": "159",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "viewerLinkTemplate": "https://gis.rowancountync.gov/gismaps/",
+  "appraiserSearchUrl": "https://tax.rowancountync.gov/search/commonsearch.aspx?mode=realprop",
+  "openDataUrl": "https://gisdata-rowancountync.opendata.arcgis.com/",
+  "joinKeys": [
+    "PARCEL_ID",
+    "PIN",
+    "parno"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PARCEL_ID",
+        "PIN",
+        "parno"
+      ],
+      "bestLayer": "Open_Data_Downloads/ParcelPolygons",
+      "notes": "PARCEL_ID like '825 080'; PIN like '5722-04-82-6514'; OneMap parno aligns with PARCEL_ID"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Open_Data_Downloads/ParcelPolygons"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CALCACRE",
+        "DEEDACRE",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 10385,
+      "approxCountDeedAc": 10648,
+      "bestLayer": "Open_Data_Downloads/ParcelPolygons"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "OWNNAME+OWN2",
+        "ownname"
+      ],
+      "bestLayer": "Open_Data_Downloads/ParcelPolygons"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "TAXADD1",
+        "TAXADD2",
+        "CITY",
+        "STATE",
+        "ZIPCODE",
+        "mailadd"
+      ],
+      "bestLayer": "Open_Data_Downloads/ParcelPolygons"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": false,
+      "fields": [
+        "PROP_ADDRESS",
+        "PHYSADDR+PHYSSTREET",
+        "ST+ST_NAME+ST_TYPE",
+        "siteadd"
+      ],
+      "bestLayer": "Open_Data_Downloads/ParcelPolygons",
+      "caveat": "Situs ON primary parcel polygons (~83593 non-empty PROP_ADDRESS); address points lack PIN"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "DATESOLD",
+        "SALE_AMT",
+        "QUALCODE",
+        "DEEDYEAR"
+      ],
+      "bestLayer": "Open_Data_Downloads/ParcelPolygons",
+      "caveat": "Last-sale only; ~44068 with SALE_AMT>0; filter QUALCODE for comps; OneMap has date only"
+    },
+    "taxValues": {
+      "present": true,
+      "fields": [
+        "TOT_VAL",
+        "LANDFMV",
+        "IMP_FMV",
+        "LANDLUV",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "Open_Data_Downloads/ParcelPolygons",
+      "caveat": "FMV fields; LANDLUV is present-use/land-use value; no separate assessed taxable verified"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "ZONING",
+        "basedist",
+        "District",
+        "TYPE",
+        "CLASSIFCAT",
+        "ZoningClas",
+        "ZONINGCODE"
+      ],
+      "bestLayer": "Alll_Zoning/MapServer (per municipality or merged /0)",
+      "split": "County unincorporated vs Salisbury/Kannapolis/Cleveland/Landis/Faith/ChinaGrove/Rockwell/Spencer/EastSpencer/GraniteQuarry"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "FLUM",
+        "Char_Dist",
+        "LabelName"
+      ],
+      "bestLayer": "Salisbury EnerGov Future Land Use",
+      "caveat": "Salisbury FLUM + Kannapolis Character Areas only; other towns/unincorporated gap"
+    },
+    "viewerLink": {
+      "present": true,
+      "template": "https://gis.rowancountync.gov/gismaps/",
+      "taxSearch": "https://tax.rowancountync.gov/search/commonsearch.aspx?mode=realprop",
+      "keyField": "PARCEL_ID"
+    }
+  },
+  "portals": [
+    {
+      "name": "GIS Mapping Tool",
+      "url": "https://gis.rowancountync.gov/gismaps/",
+      "notes": "Interactive parcels/zoning viewer"
+    },
+    {
+      "name": "Rowan Open Data Hub",
+      "url": "https://gisdata-rowancountync.opendata.arcgis.com/",
+      "notes": "Downloads for parcels/zoning/addresses"
+    },
+    {
+      "name": "County ArcGIS REST",
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services",
+      "notes": "Public/Open_Data_Downloads, Alll_Zoning, RowanTaxParcels"
+    },
+    {
+      "name": "County GIS page",
+      "url": "https://www.rowancountync.gov/1567/GIS",
+      "notes": "Portal links"
+    },
+    {
+      "name": "Tax Real Property Search",
+      "url": "https://tax.rowancountync.gov/search/commonsearch.aspx?mode=realprop",
+      "notes": "Assessor search by parcel/owner/address"
+    },
+    {
+      "name": "Salisbury Open Data Hub",
+      "url": "https://salisburyncgisdata-salisburyncgis.hub.arcgis.com/",
+      "notes": "City open data"
+    },
+    {
+      "name": "Salisbury GIS REST",
+      "url": "https://gis.salisburync.gov/arcgis/rest/services",
+      "notes": "Salisbury_Parcels FeatureServer, EnerGov FLU/Districts"
+    },
+    {
+      "name": "Kannapolis GIS REST",
+      "url": "https://maps.kannapolisnc.gov/arcgis/rest/services",
+      "notes": "Official_City_Zoning"
+    },
+    {
+      "name": "NC OneMap",
+      "url": "https://www.nconemap.gov",
+      "notes": "Statewide parcels FeatureServer"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "City of Salisbury",
+      "districtLabel": "SALISBURY",
+      "zoning": [
+        {
+          "name": "Salisbury zoning (county host)",
+          "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/2",
+          "field": "ZONING",
+          "featureCount": 570,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "notes": "Preferred fine-grain zoning; CRS match to county parcels"
+        },
+        {
+          "name": "EnerGov Districts (city)",
+          "url": "https://gis.salisburync.gov/arcgis/rest/services/EnerGov/MapServer/2",
+          "field": "CAT_ID",
+          "featureCount": 28,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "notes": "Aggregated district polygons; prefer county host Alll_Zoning/2"
+        }
+      ],
+      "flu": [
+        {
+          "name": "Future Land Use",
+          "url": "https://gis.salisburync.gov/arcgis/rest/services/EnerGov/MapServer/5",
+          "fields": [
+            "FLUM",
+            "COMMENTS",
+            "Link"
+          ],
+          "featureCount": 1513,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "fluCodes": [
+            "AC",
+            "CAC",
+            "DTC",
+            "EC",
+            "EN",
+            "FN",
+            "HCC",
+            "IC",
+            "MFC",
+            "NAC",
+            "OSP",
+            "POI",
+            "PP",
+            "RCC",
+            "RN",
+            "SN",
+            "TN"
+          ]
+        }
+      ],
+      "parcelsOptional": {
+        "name": "Salisbury_Parcels",
+        "url": "https://gis.salisburync.gov/arcgis/rest/services/Salisbury_Parcels/FeatureServer/0",
+        "featureCount": 30326,
+        "wkid": 102719,
+        "latestWkid": 2264,
+        "notes": "City-only; no sale/CALCACRE; prefer county Open_Data parcels"
+      },
+      "joinNotes": "City-only zoning/FLU + county Parcel Polygons. Spatial join in 2264. Attribute key PARCEL_ID."
+    },
+    {
+      "name": "City of Kannapolis",
+      "districtLabel": "KANNAPOLIS",
+      "notes": "Spans Cabarrus + Rowan; filter to Rowan parcels / City Limits / cntyfips 159",
+      "zoning": [
+        {
+          "name": "Alll_Zoning Kannapolis",
+          "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/3",
+          "field": "basedist",
+          "featureCount": 1806,
+          "wkid": 102719,
+          "latestWkid": 2264
+        },
+        {
+          "name": "Official_City_Zoning",
+          "url": "https://maps.kannapolisnc.gov/arcgis/rest/services/Official_City_Zoning/MapServer/0",
+          "field": "ZONINGCODE",
+          "featureCount": 1735,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "Character Areas",
+          "url": "https://services6.arcgis.com/U9SsvkRoA6RuruHj/arcgis/rest/services/CharacterUses/FeatureServer/0",
+          "fields": [
+            "Char_Dist",
+            "LabelName"
+          ],
+          "featureCount": 34,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "joinNotes": "City zoning/Character Areas + Rowan county parcels in 2264."
+    },
+    {
+      "name": "Town of China Grove",
+      "districtLabel": "CHINA GROVE",
+      "zoning": [
+        {
+          "name": "China Grove Zoning",
+          "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/7",
+          "field": "CLASSIFCAT",
+          "featureCount": 79,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Town zoning + county parcels (spatial, 2264). FLU gap."
+    },
+    {
+      "name": "Town of Cleveland",
+      "districtLabel": "CLEVELAND",
+      "zoning": [
+        {
+          "name": "Cleveland Zoning",
+          "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/4",
+          "field": "District",
+          "featureCount": 55,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "notes": "Not on Municipal_Zoning \u2014 use Alll_Zoning"
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Town zoning + county parcels. FLU gap."
+    },
+    {
+      "name": "Town of Landis",
+      "districtLabel": "LANDIS",
+      "zoning": [
+        {
+          "name": "Landis Zoning",
+          "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/5",
+          "field": "ZONING",
+          "featureCount": 343,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Town zoning + county parcels. FLU gap."
+    },
+    {
+      "name": "Town of Faith",
+      "districtLabel": "FAITH",
+      "zoning": [
+        {
+          "name": "Faith Zoning",
+          "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/6",
+          "field": "TYPE",
+          "featureCount": 25,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Town zoning + county parcels. FLU gap."
+    },
+    {
+      "name": "Town of Rockwell",
+      "districtLabel": "ROCKWELL",
+      "zoning": [
+        {
+          "name": "Rockwell Zoning",
+          "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/8",
+          "field": "TYPE",
+          "featureCount": 174,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Town zoning + county parcels. FLU gap."
+    },
+    {
+      "name": "Town of Spencer",
+      "districtLabel": "SPENCER",
+      "zoning": [
+        {
+          "name": "Spencer Zoning",
+          "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/9",
+          "field": "TYPE",
+          "featureCount": 455,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Town zoning + county parcels. FLU gap."
+    },
+    {
+      "name": "Town of East Spencer",
+      "districtLabel": "EAST SPENCER",
+      "zoning": [
+        {
+          "name": "East Spencer Zoning",
+          "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/10",
+          "field": "ZoningClas",
+          "featureCount": 24,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Town zoning + county parcels. FLU gap."
+    },
+    {
+      "name": "City of Granite Quarry",
+      "districtLabel": "GRANITE QUARRY",
+      "zoning": [
+        {
+          "name": "Granite Quarry Zoning",
+          "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/11",
+          "field": "ZONING",
+          "featureCount": 267,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "City zoning + county parcels. FLU gap."
+    },
+    {
+      "name": "Unincorporated Rowan County",
+      "districtLabel": null,
+      "zoning": [
+        {
+          "name": "Rowan County Zoning",
+          "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/12",
+          "field": "ZONING",
+          "featureCount": 567,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "notes": "Unincorporated only"
+        }
+      ],
+      "flu": [],
+      "joinNotes": "County zoning only outside City Limits. Countywide FLU gap (LandUse MapServer empty)."
+    }
+  ],
+  "layers": [
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales",
+        "situs"
+      ],
+      "name": "Open_Data_Downloads Parcel Polygons",
+      "id": 37,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Open_Data_Downloads/MapServer/37",
+      "alternateUrls": [
+        "https://gis.rowancountync.gov/arcgis/rest/services/Public/RowanTaxParcels/MapServer/0",
+        "https://gis.rowancountync.gov/arcgis/rest/services/Public/search/MapServer/2",
+        "https://gis.rowancountync.gov/arcgis/rest/services/Public/MapViewer/MapServer/9"
+      ],
+      "geometry": "polygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "auth": "none",
+      "featureCount": 83767,
+      "acreageField": "CALCACRE",
+      "acreage5to150": 10385,
+      "maxRecordCount": 100000,
+      "primary": true,
+      "fieldMap": {
+        "PARCEL_ID": "parcelId",
+        "PIN": "parcelIdAlt",
+        "CALCACRE": "acreage",
+        "DEEDACRE": "acreageDeed",
+        "OWNNAME": "ownerName",
+        "OWN2": "ownerName2",
+        "TAXADD1": "mailingAddress.street",
+        "TAXADD2": "mailingAddress.street2",
+        "CITY": "mailingAddress.city",
+        "STATE": "mailingAddress.state",
+        "ZIPCODE": "mailingAddress.zip",
+        "PROP_ADDRESS": "situsAddress",
+        "PHYSADDR": "situsAddress.number",
+        "PHYSSTREET": "situsAddress.street",
+        "DATESOLD": "lastSale.date",
+        "SALE_AMT": "lastSale.price",
+        "QUALCODE": "lastSale.qualified",
+        "DEEDYEAR": "lastSale.year",
+        "TOT_VAL": "tax.marketValue",
+        "LANDFMV": "tax.landValue",
+        "IMP_FMV": "tax.improvementValue",
+        "LANDLUV": "tax.landUseValue"
+      },
+      "status": "usable",
+      "notes": "PRIMARY wire-first. Situs on polygons. CRS matches zoning."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales",
+        "situs"
+      ],
+      "name": "RowanTaxParcels",
+      "id": 0,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/RowanTaxParcels/MapServer/0",
+      "geometry": "polygon",
+      "wkid": 102100,
+      "latestWkid": 3857,
+      "auth": "none",
+      "featureCount": 83767,
+      "acreageField": "CALCACRE",
+      "acreage5to150": 10385,
+      "deedAcre5to150": 10648,
+      "propAddressNonEmpty": 83593,
+      "saleAmtPositive": 44068,
+      "qualcodeNonEmpty": 68661,
+      "maxRecordCount": 100000,
+      "status": "usable",
+      "notes": "Web Mercator twin of Open_Data parcels; reproject for zoning join"
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales",
+        "situs"
+      ],
+      "name": "NC OneMap Parcels",
+      "id": 1,
+      "url": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "geometry": "polygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "auth": "none",
+      "featureCount": 83292,
+      "filter": "cntyfips='159'",
+      "acreageField": "gisacres",
+      "acreage5to150": 10356,
+      "maxRecordCount": 5000,
+      "status": "usable",
+      "notes": "Statewide fallback; no sale price; parno\u2194PARCEL_ID"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "All Zoning Classification (merged)",
+      "id": 0,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/0",
+      "geometry": "polygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "auth": "none",
+      "featureCount": 2940,
+      "zoningFields": [
+        "ZONING",
+        "basedist",
+        "District",
+        "TYPE",
+        "CLASSIFCAT",
+        "ZoningClas",
+        "ZONINGCODE"
+      ],
+      "sourceField": "MERGE_SRC",
+      "status": "usable",
+      "notes": "Convenience merge; coalesce zoning field by MERGE_SRC"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Rowan County Zoning",
+      "id": 12,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/12",
+      "geometry": "polygon",
+      "featureCount": 567,
+      "zoningField": "ZONING",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Salisbury zoning",
+      "id": 2,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/2",
+      "geometry": "polygon",
+      "featureCount": 570,
+      "zoningField": "ZONING",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "flu"
+      ],
+      "name": "Salisbury Future Land Use",
+      "id": 5,
+      "url": "https://gis.salisburync.gov/arcgis/rest/services/EnerGov/MapServer/5",
+      "geometry": "polygon",
+      "featureCount": 1513,
+      "fluField": "FLUM",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "parcels"
+      ],
+      "name": "Salisbury_Parcels",
+      "id": 0,
+      "url": "https://gis.salisburync.gov/arcgis/rest/services/Salisbury_Parcels/FeatureServer/0",
+      "geometry": "polygon",
+      "featureCount": 30326,
+      "status": "partial",
+      "notes": "City subset; no sale/CALCACRE"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Kannapolis Zoning (county host)",
+      "id": 3,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/3",
+      "geometry": "polygon",
+      "featureCount": 1806,
+      "zoningField": "basedist",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Kannapolis Official_City_Zoning",
+      "id": 0,
+      "url": "https://maps.kannapolisnc.gov/arcgis/rest/services/Official_City_Zoning/MapServer/0",
+      "geometry": "polygon",
+      "featureCount": 1735,
+      "zoningField": "ZONINGCODE",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "flu"
+      ],
+      "name": "Kannapolis Character Areas",
+      "id": 0,
+      "url": "https://services6.arcgis.com/U9SsvkRoA6RuruHj/arcgis/rest/services/CharacterUses/FeatureServer/0",
+      "geometry": "polygon",
+      "featureCount": 34,
+      "fluFields": [
+        "Char_Dist",
+        "LabelName"
+      ],
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Cleveland Zoning",
+      "id": 4,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/4",
+      "geometry": "polygon",
+      "featureCount": 55,
+      "zoningField": "District",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Landis Zoning",
+      "id": 5,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/5",
+      "geometry": "polygon",
+      "featureCount": 343,
+      "zoningField": "ZONING",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Faith Zoning",
+      "id": 6,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/6",
+      "geometry": "polygon",
+      "featureCount": 25,
+      "zoningField": "TYPE",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "China Grove Zoning",
+      "id": 7,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/7",
+      "geometry": "polygon",
+      "featureCount": 79,
+      "zoningField": "CLASSIFCAT",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Rockwell Zoning",
+      "id": 8,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/8",
+      "geometry": "polygon",
+      "featureCount": 174,
+      "zoningField": "TYPE",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Spencer Zoning",
+      "id": 9,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/9",
+      "geometry": "polygon",
+      "featureCount": 455,
+      "zoningField": "TYPE",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "East Spencer Zoning",
+      "id": 10,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/10",
+      "geometry": "polygon",
+      "featureCount": 24,
+      "zoningField": "ZoningClas",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Granite Quarry Zoning",
+      "id": 11,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/11",
+      "geometry": "polygon",
+      "featureCount": 267,
+      "zoningField": "ZONING",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "City Limits",
+      "id": 41,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Open_Data_Downloads/MapServer/41",
+      "geometry": "polygon",
+      "featureCount": 10,
+      "field": "CITY_NAME",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "ETJ",
+      "id": 42,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Open_Data_Downloads/MapServer/42",
+      "geometry": "polygon",
+      "featureCount": 47,
+      "field": "ZONING",
+      "status": "usable"
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "Open_Data Addressing Points",
+      "id": 1,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Open_Data_Downloads/MapServer/1",
+      "geometry": "point",
+      "featureCount": 78048,
+      "status": "partial",
+      "notes": "No PIN; situs already on parcels"
+    },
+    {
+      "purpose": [
+        "parcels"
+      ],
+      "name": "Present Use Parcels",
+      "id": 0,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/PresentUseParcels/MapServer/0",
+      "geometry": "polygon",
+      "featureCount": 4562,
+      "status": "partial",
+      "notes": "Present-use program subset"
+    },
+    {
+      "purpose": [
+        "parcels"
+      ],
+      "name": "AA502 Parcels",
+      "id": 4,
+      "url": "https://gis.rowancountync.gov/arcgis/rest/services/Public/AA502Data/MapServer/4",
+      "geometry": "polygon",
+      "featureCount": 82738,
+      "status": "partial",
+      "notes": "CAMA-like alternate schema; prefer Open_Data"
+    }
+  ],
+  "gaps": [
+    "No countywide FLU REST \u2014 Salisbury FLUM + Kannapolis Character Areas only",
+    "Zoning field names heterogeneous per municipality \u2014 coalesce via MERGE_SRC or route layers",
+    "LandUse and TaxAppraisalInfo MapServers empty (0 layers)",
+    "Municipal_Zoning omits Cleveland \u2014 use Alll_Zoning",
+    "No multi-transfer public sales history FeatureServer found",
+    "Open_Data address points lack parcel PIN",
+    "No separate assessed/taxable field verified beyond FMV + LANDLUV",
+    "Owner phones/emails not collected",
+    "MaxRecordCount 1000 on some mirrors \u2014 prefer Open_Data/RowanTaxParcels"
+  ],
+  "wireFirst": [
+    "https://gis.rowancountync.gov/arcgis/rest/services/Public/Open_Data_Downloads/MapServer/37",
+    "https://gis.rowancountync.gov/arcgis/rest/services/Public/RowanTaxParcels/MapServer/0",
+    "https://gis.rowancountync.gov/arcgis/rest/services/Public/Alll_Zoning/MapServer/0",
+    "https://gis.salisburync.gov/arcgis/rest/services/EnerGov/MapServer/5",
+    "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+  ],
+  "verifiedLayerCount": 24,
+  "verifiedAt": "2026-09-23",
+  "verifiedBy": "Grok Bot GIS researcher",
+  "license": "County / city open GIS; attribution to Rowan County and respective municipalities; public records",
+  "pass2": {
+    "label": "PASS2 full-suite upgrade \u2014 rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "aadtScreening": {
+      "source": "NCDOT Traffic Survey Group (public AGOL)",
+      "layer": "NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)",
+      "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+      "countyField": "COUNTY",
+      "countyValue": "ROWAN",
+      "valueField": "AADT_2022",
+      "valueType": "string (trim; blank = no count that year)",
+      "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ROWAN%27&returnCountOnly=true&f=json",
+      "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ROWAN%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+      "liveStationCount": 733,
+      "stationsWithAADT2022": 565,
+      "newerYearAvailable": {
+        "available": true,
+        "layer": "NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)",
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "countyField": "County",
+        "countyValue": "Rowan",
+        "valueField": "AADT_2025",
+        "valueType": "integer (null = no count)",
+        "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Rowan%27&returnCountOnly=true&f=json",
+        "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Rowan%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+        "liveStationCount": 732,
+        "stationsWithAADT2025": 269,
+        "stationsWithAADT2024": 555,
+        "segmentsLayer": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide \u2014 spatial filter by county envelope)",
+        "also": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)"
+      },
+      "recommendation": "Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025\u2192AADT_2024\u2192AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title)."
+    },
+    "primaryParcelLayer": {
+      "restUrl": "https://gis.rowancountync.gov/arcgis/rest/services/Public/Open_Data_Downloads/MapServer/37",
+      "acreageField": "CALCACRE",
+      "range5to150Where": "CALCACRE>=5 AND CALCACRE<=150",
+      "liveTotalParcels": 83768,
+      "liveParcels5to150": 10385
+    },
+    "taxValues": {
+      "status": "ok",
+      "fields": {
+        "LANDFMV": "tax.landValue",
+        "IMP_FMV": "tax.improvementValue",
+        "TOT_VAL": "tax.marketValue"
+      },
+      "liveNonZeroCounty": {
+        "LANDFMV": 82298,
+        "IMP_FMV": 63751,
+        "TOT_VAL": 82653
+      },
+      "liveNonZero5to150": {
+        "TOT_VAL": 10294
+      },
+      "notes": "Double fields LANDFMV/IMP_FMV/TOT_VAL (+LANDLUV use value).",
+      "publicFallback": "https://tax.rowancountync.gov/Datalets/Datalet.aspx?UseSearch=no&mode=&pin={PARCEL_ID}"
+    },
+    "saleHistory": {
+      "status": "ok",
+      "priceFields": [
+        "SALE_AMT"
+      ],
+      "dateFields": [
+        "DATESOLD"
+      ],
+      "livePriceGt0County": {
+        "SALE_AMT": 44058
+      },
+      "livePriceGt0_5to150": {
+        "SALE_AMT": 3806
+      },
+      "liveDateNonNullCounty": {
+        "DATESOLD": 79297
+      },
+      "notes": "DATESOLD esriDate; SALE_AMT double; QUALCODE qualified. Last sale only."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "OWNNAME",
+        "OWN2"
+      ],
+      "primaryOwnerField": "OWNNAME",
+      "rule": {
+        "apply": "Uppercase + trim OWNNAME (optionally also OWN2)",
+        "regex": "(?i)(\\bL\\.?\\s?L\\.?\\s?C\\b|\\bINC\\b|\\bCORP|\\bL\\.?\\s?P\\b|\\bLLP\\b|\\bLLLP\\b|\\bLTD\\b|TRUST|CHURCH|MINISTR|\\bCOMPANY\\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\\bHOA\\b|FOUNDATION|AUTHORITY|\\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\\b|^UNITED STATES|^NORTH CAROLINA\\b|\\bCOUNTY$)",
+        "sqlLikeTokens": [
+          "% LLC%",
+          "%,LLC%",
+          "% L L C%",
+          "% INC",
+          "% INC %",
+          "% INC.%",
+          "%,INC%",
+          "% CORP%",
+          "%CORPORATION%",
+          "% LP",
+          "% LP %",
+          "% L P",
+          "% LLP%",
+          "% LTD%",
+          "%TRUST%",
+          "%CHURCH%",
+          "%MINISTR%",
+          "% COMPANY%",
+          "%PARTNERSHIP%",
+          "%HOLDINGS%",
+          "%PROPERTIES%",
+          "%INVESTMENT%",
+          "%ASSOCIATION%",
+          "%FOUNDATION%",
+          "%AUTHORITY%",
+          "CITY OF %",
+          "COUNTY OF %",
+          "STATE OF %",
+          "TOWN OF %",
+          "% COUNTY",
+          "%BOARD OF EDUCATION%",
+          "UNITED STATES%",
+          "NORTH CAROLINA %",
+          "% DEVELOPMENT%"
+        ],
+        "caveats": "TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); \"% COUNTY\" suffix catches e.g. \"PERSON COUNTY\"; bare \"CO\" and \"ESTATE\" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) \u2014 normalize first."
+      },
+      "liveEntityCount5to150": 1707,
+      "liveOwnerNonNull5to150": 10376,
+      "entityQuery": "where=CALCACRE>=5 AND CALCACRE<=150 AND (OWNNAME LIKE '% LLC%' OR OWNNAME LIKE '%,LLC%' OR OWNNAME LIKE '% L L C%' OR OWNNAME LIKE '% INC' OR OWNNAME LIKE '% INC %' OR OWNNAME LIKE '% INC.%' OR OWNNAME LIKE '%,INC%' OR OWNNAME LIKE '% CORP%' OR OWNNAME LIKE '%CORPORATION%' OR OWNNAME LIKE '% LP' OR OWNNAME LIKE '% LP %' OR OWNNAME LIKE '% L P' OR OWNNAME LIKE '% LLP%' OR OWNNAME LIKE '% LTD%' OR OWNNAME LIKE '%TRUST%' OR OWNNAME LIKE '%CHURCH%' OR OWNNAME LIKE '%MINISTR%' OR OWNNAME LIKE '% COMPANY%' OR OWNNAME LIKE '%PARTNERSHIP%' OR OWNNAME LIKE '%HOLDINGS%' OR OWNNAME LIKE '%PROPERTIES%' OR OWNNAME LIKE '%INVESTMENT%' OR OWNNAME LIKE '%ASSOCIATION%' OR OWNNAME LIKE '%FOUNDATION%' OR OWNNAME LIKE '%AUTHORITY%' OR OWNNAME LIKE 'CITY OF %' OR OWNNAME LIKE 'COUNTY OF %' OR OWNNAME LIKE 'STATE OF %' OR OWNNAME LIKE 'TOWN OF %' OR OWNNAME LIKE '% COUNTY' OR OWNNAME LIKE '%BOARD OF EDUCATION%' OR OWNNAME LIKE 'UNITED STATES%' OR OWNNAME LIKE 'NORTH CAROLINA %' OR OWNNAME LIKE '% DEVELOPMENT%')"
+    },
+    "paDeepLink": {
+      "template": "https://tax.rowancountync.gov/Datalets/Datalet.aspx?UseSearch=no&mode=&pin={PARCEL_ID}",
+      "testedUrl": "https://tax.rowancountync.gov/Datalets/Datalet.aspx?UseSearch=no&mode=&pin=813%20061",
+      "httpStatus": 200,
+      "notes": "NEW in pass2 (card previously had search page only). HTTP 200; owner present in server HTML. URL-encode the space in PARCEL_ID ('813 061' \u2192 813%20061)."
+    },
+    "jurisdictionGisViewer": {
+      "url": "https://gis.rowancountync.gov/gismaps/",
+      "httpStatus": 200,
+      "notes": "Rowan County GIS maps"
+    },
+    "gaps": [
+      "AADT_2022 blank at 168 of 733 stations on the 2022 layer (NCDOT counts on a cycle) \u2014 prefer 2025 layer / latest non-blank year",
+      "No multi-transfer sale history on primary layer (last sale only)"
+    ]
+  }
+}

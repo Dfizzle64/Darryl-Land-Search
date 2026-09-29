@@ -1,0 +1,471 @@
+{
+  "county": "Clay",
+  "state": "NC",
+  "msa": "Asheville MSA / Western NC",
+  "fips": "37043",
+  "cntyfips": "043",
+  "slug": "clay",
+  "level": "county",
+  "markets": [
+    "Asheville"
+  ],
+  "crs_preferred": {
+    "wkid": 102100,
+    "latestWkid": 3857,
+    "name": "WGS 1984 Web Mercator (Auxiliary Sphere)"
+  },
+  "crs_notes": "County AGOL Parcels04162026 / Clay_AGOL publish in 102100/3857. Tax disclaimer cites NC State Plane NAD83 feet for source cadastral.",
+  "viewerLinkTemplate": "https://experience.arcgis.com/experience/d706343410ba46c586bfb15b0ca30bdb/",
+  "viewerLinkTemplates": [
+    "https://experience.arcgis.com/experience/d706343410ba46c586bfb15b0ca30bdb/",
+    "https://claynctax.maps.arcgis.com/apps/webappviewer/index.html?id=11da81245de7437a9584a1b9e6a79726",
+    "https://bttaxpayerportal.com/ITSPublicCL/AppraisalCard.aspx?id={ParcelNumb}",
+    "https://lrcpwa.ncptscloud.com/clay/parcel-detail/{ParcelNumb}",
+    "https://www.townofhayesville.com/business"
+  ],
+  "appraiserSearchUrl": "https://bttaxpayerportal.com/ITSPublicCL/AppraisalCard.aspx?id={ParcelNumb}",
+  "appraiserSearchUrlNotes": "Verified 2026-09-24: HTTPS 200 PDF Appraisal Card for id=557100889078 (HORTON VINCENT BRIAN / SalePrice $110,000). Use ParcelNumb; also embedded in Card_Link (HTTP) and Clay_AGOL PRC (HTTPS). BasicSearch.aspx 404 at verify.",
+  "jurisdictionGisUrl": "https://experience.arcgis.com/experience/d706343410ba46c586bfb15b0ca30bdb/",
+  "joinKeys": [
+    "ParcelNumb",
+    "pin",
+    "parno",
+    "ParcelNumber"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "ParcelNumb",
+        "pin",
+        "ParcelNumber",
+        "parno"
+      ],
+      "bestLayer": "Parcels04162026/0",
+      "notes": "12-digit PIN for AppraisalCard id= and NCPTS/OneMap join"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Parcels04162026/0"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "total_calculated_acres",
+        "calculated_acres",
+        "LegalLandU",
+        "LegalLandUnits",
+        "recareano"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 3054,
+      "bestLayer": "Clay_AGOL/5",
+      "notes": "Prefer total_calculated_acres; on Parcels04162026 use LegalLandU only when LegalLandT='AC' (2907 in range). OneMap gisacres broken."
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Name1",
+        "Name2",
+        "ownname"
+      ],
+      "bestLayer": "Parcels04162026/0"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "Address1",
+        "Address2",
+        "City",
+        "State",
+        "ZipCode",
+        "mailadd"
+      ],
+      "bestLayer": "Parcels04162026/0"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "ParcelProp",
+        "FormattedPropertyAddress",
+        "siteadd"
+      ],
+      "bestLayer": "Parcels04162026/0"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SalePrice",
+        "DeedDate"
+      ],
+      "bestLayer": "Parcels04162026/0",
+      "notes": "SalePrice>0 \u2192 9796; DeedDate epoch ms; OneMap saledate/saledatetx empty"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "ParcelLand",
+        "ParcelBuil",
+        "ParcelObxf",
+        "TotalAsses",
+        "MarketValue",
+        "AssessedValue",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "Parcels04162026/0"
+    },
+    "zoning": {
+      "present": true,
+      "coverage": "city-only-pdf",
+      "fields": [],
+      "bestLayer": "Hayesville Zoning & ETJ Map PDF/JPG (no FS)",
+      "notes": "Cities-first Hayesville only; unincorporated largely unzoned; no ZONE FeatureServer"
+    },
+    "flu": {
+      "present": false,
+      "coverage": "pdf-only",
+      "notes": "Hayesville CLUP approved 2022-08-08 PDF; NCDOT CTP \u2260 FLU; no FLU FeatureServer"
+    }
+  },
+  "municipalities": [
+    {
+      "name": "Hayesville",
+      "role": "city-first-zoning",
+      "zoningLayer": null,
+      "zoningCount": null,
+      "zoningField": null,
+      "zoningDocuments": [
+        "https://www.townofhayesville.com/_files/ugd/6b2cde_978a6490f65743119cc06b012962a865.pdf",
+        "https://static.wixstatic.com/media/6b2cde_898b91c92e4641aeb8717e3f6235334f~mv2.jpg",
+        "https://www.townofhayesville.com/_files/ugd/b6d22e_ade1475c18f145bca637fe6df90388bc.doc?dn=ZoningOrds%26SignRegsBookUpdated%207.2022FINALa.doc"
+      ],
+      "cityLimitsUrl": "https://services1.arcgis.com/H71paQpWhqUBnyO1/arcgis/rest/services/Hayesville_Limits04162026/FeatureServer/0",
+      "cityCode": "52",
+      "approxParcelCount": 373,
+      "fluRest": false,
+      "fluDocumentUrl": "https://www.townofhayesville.com/_files/ugd/b6d22e_ca749a700f4c480798868976168c6e1c.pdf",
+      "viewer": "https://www.townofhayesville.com/business",
+      "notes": "Only incorporated municipality / county seat; zoning+ETJ map PDF/JPG + ordinances DOC; CLUP 2022 PDF; no zoning FeatureServer"
+    },
+    {
+      "name": "Unincorporated (Warne, Brasstown, Elf, Tusquittee, \u2026)",
+      "role": "gap",
+      "notes": "No zoning REST \u2014 mountain-county unzoned pattern outside Hayesville/ETJ"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Parcels04162026 (CAMA + polygons)",
+      "restUrl": "https://services1.arcgis.com/H71paQpWhqUBnyO1/arcgis/rest/services/Parcels04162026/FeatureServer/0",
+      "alternateUrls": [
+        "https://services1.arcgis.com/H71paQpWhqUBnyO1/arcgis/rest/services/Parcels_2025/FeatureServer/0",
+        "https://services1.arcgis.com/H71paQpWhqUBnyO1/arcgis/rest/services/Clay_AGOL/FeatureServer/5"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "LegalLandU",
+      "coverage": "county-wide",
+      "count": 17025,
+      "acres5to150": 2907,
+      "salePricePositive": 9796,
+      "assessedValuePositive": 16684,
+      "status": "usable",
+      "primary": true,
+      "fieldMap": {
+        "ParcelNumb": "parcelId",
+        "LegalLandU": "acreage",
+        "LegalLandT": "acreageUnit",
+        "Name1": "ownerName",
+        "Name2": "ownerName",
+        "Address1": "mailingAddress",
+        "Address2": "mailingAddress",
+        "City": "mailingAddress",
+        "State": "mailingAddress",
+        "ZipCode": "mailingAddress",
+        "ParcelProp": "situsAddress",
+        "LegalDescr": "legalDescription",
+        "SalePrice": "lastSale.price",
+        "DeedDate": "lastSale.date",
+        "DeedBook": "deed",
+        "DeedPage": "deed",
+        "ParcelLand": "tax.marketValue",
+        "ParcelBuil": "tax.marketValue",
+        "ParcelObxf": "tax.marketValue",
+        "TotalAsses": "tax.assessedValue",
+        "Card_Link": "appraiserSearchUrl"
+      },
+      "notes": "PRIMARY. MaxRecordCount 2000 \u2014 paginate. CRS 102100/3857. Filter LegalLandT='AC' for acre search (2907 in 5\u2013150). Sample ParcelNumb 557100889078 centroid \u2248 -83.752,35.080."
+    },
+    {
+      "role": "parcels",
+      "name": "Parcels_2025 (CAMA twin + CityCode)",
+      "restUrl": "https://services1.arcgis.com/H71paQpWhqUBnyO1/arcgis/rest/services/Parcels_2025/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "LegalLandU",
+      "coverage": "county-wide",
+      "count": 17018,
+      "status": "usable",
+      "fieldMap": {
+        "ParcelNumb": "parcelId",
+        "CityCode": "municipality",
+        "LegalLandU": "acreage",
+        "Name1": "ownerName",
+        "SalePrice": "lastSale.price",
+        "TotalAsses": "tax.assessedValue",
+        "Card_Link": "appraiserSearchUrl"
+      },
+      "notes": "CityCode 52 = Hayesville (~373); blank = unincorporated (~16645)"
+    },
+    {
+      "role": "parcels",
+      "name": "Clay_AGOL parcel_polygons (richer CAMA)",
+      "restUrl": "https://services1.arcgis.com/H71paQpWhqUBnyO1/arcgis/rest/services/Clay_AGOL/FeatureServer/5",
+      "layerId": 5,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "total_calculated_acres",
+      "coverage": "county-wide",
+      "count": 17004,
+      "acres5to150": 3054,
+      "salePricePositive": 9338,
+      "status": "usable",
+      "fieldMap": {
+        "pin": "parcelId",
+        "ParcelNumber": "parcelId",
+        "total_calculated_acres": "acreage",
+        "calculated_acres": "acreage",
+        "LegalLandUnits": "acreage",
+        "Name1": "ownerName",
+        "Name2": "ownerName",
+        "FormattedPropertyAddress": "situsAddress",
+        "SalePrice": "lastSale.price",
+        "DeedDate": "lastSale.date",
+        "MarketValue": "tax.marketValue",
+        "AssessedValue": "tax.assessedValue",
+        "PRC": "appraiserSearchUrl"
+      },
+      "notes": "Best calculated-acre field; PRC is HTTPS AppraisalCard URL"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "recareano",
+      "coverage": "county-wide",
+      "count": 17018,
+      "acres5to150": 2925,
+      "filter": "cntyfips='043'",
+      "status": "usable",
+      "fieldMap": {
+        "parno": "parcelId",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress",
+        "siteadd": "situsAddress",
+        "recareano": "acreage",
+        "gisacres": "acreage",
+        "parval": "tax.marketValue",
+        "landval": "tax.marketValue",
+        "improvval": "tax.marketValue"
+      },
+      "notes": "Fallback; gisacres broken (0); no sale date/price; owner can lag county \u2014 prefer Parcels04162026"
+    },
+    {
+      "role": "zoning",
+      "name": "Hayesville Zoning (cities-first PDF/JPG \u2014 no FS)",
+      "restUrl": null,
+      "layerId": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": null,
+      "status": "partial",
+      "documents": [
+        "https://www.townofhayesville.com/_files/ugd/6b2cde_978a6490f65743119cc06b012962a865.pdf",
+        "https://static.wixstatic.com/media/6b2cde_898b91c92e4641aeb8717e3f6235334f~mv2.jpg",
+        "https://www.townofhayesville.com/_files/ugd/b6d22e_ade1475c18f145bca637fe6df90388bc.doc?dn=ZoningOrds%26SignRegsBookUpdated%207.2022FINALa.doc"
+      ],
+      "notes": "No public zoning FeatureServer. Route by Hayesville_Limits / CityCode=52. Unincorporated unzoned on REST."
+    },
+    {
+      "role": "other",
+      "name": "Hayesville_Limits04162026",
+      "restUrl": "https://services1.arcgis.com/H71paQpWhqUBnyO1/arcgis/rest/services/Hayesville_Limits04162026/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 5,
+      "status": "usable",
+      "notes": "Limits/ETJ routing polys; twin Hayesville_Limits_2025"
+    },
+    {
+      "role": "flu",
+      "name": "Future Land Use",
+      "restUrl": null,
+      "coverage": "none",
+      "status": "gap",
+      "notes": "No FLU FeatureServer. Hayesville CLUP https://www.townofhayesville.com/_files/ugd/b6d22e_ca749a700f4c480798868976168c6e1c.pdf (approved 2022-08-08); NCDOT Clay CTP is transportation only."
+    }
+  ],
+  "gaps": [
+    "No public Hayesville zoning FeatureServer (PDF/JPG/DOC only)",
+    "No public FLU FeatureServer (Hayesville CLUP 2022 PDF + NCDOT CTP only)",
+    "Unincorporated zoning REST gap outside Hayesville/ETJ",
+    "OneMap gisacres broken (all 0); saledate/saledatetx empty; owner can lag",
+    "LegalLandU requires LegalLandT='AC' filter (LT = lots)",
+    "ITSPublicCL BasicSearch.aspx 404 at verify; use AppraisalCard deep-link",
+    "Legacy disclaimer webappviewer id=a0f2a305\u2026 inaccessible",
+    "Utilities / AADT / emails / phones / paid vendors excluded"
+  ],
+  "license": "Clay County Tax Office / GIS Mapping; NCGS 132-10; attribute Town of Hayesville for municipal zoning/FLU documents",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 8,
+  "tranche": 3,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "pass1": {
+      "status": "verified",
+      "parcelPolygonLayer": "https://services1.arcgis.com/H71paQpWhqUBnyO1/arcgis/rest/services/Parcels04162026/FeatureServer/0",
+      "polygonCountLive": 17025,
+      "parcelIdField": "ParcelNumb",
+      "parcelIdFilled": 17025,
+      "acreageField": "LegalLandU",
+      "acres5to150Live": 2907,
+      "sampleCentroidWgs84": [
+        -83.8094,
+        35.0374
+      ],
+      "note": "LegalLandU is numeric but mixed units: filter LegalLandT='AC' (5-150 = 2,907; 3,093 without the unit filter). ParcelNumb is a Double; cast to integer string for PA links."
+    },
+    "parcelLayer": "https://services1.arcgis.com/H71paQpWhqUBnyO1/arcgis/rest/services/Parcels04162026/FeatureServer/0",
+    "parcelIdField": "ParcelNumb",
+    "acreageFilter": "LegalLandU >= 5 AND LegalLandU <= 150 AND LegalLandT='AC'",
+    "acres5to150Live": 2907,
+    "parcelCountLive": 17025,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='CLAY'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CLAY%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CLAY%27&returnCountOnly=true&f=json",
+        "liveStationCount": 123,
+        "stationsWithAADT2022": 74
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Clay'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Clay%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Clay%27&returnCountOnly=true&f=json",
+        "liveStationCount": 122,
+        "stationsWithAADT2025": 67,
+        "stationsWithAADT2024": 78,
+        "stationsWith2025or2024": 120,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TotalAsses",
+        "ParcelLand"
+      ],
+      "liveNonZero": {
+        "TotalAsses": 16684,
+        "ParcelLand": 16684
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SalePrice"
+      ],
+      "dateFields": [
+        "DeedDate"
+      ],
+      "livePriceNonZero": {
+        "SalePrice": 9796
+      },
+      "liveDateNonNull": {
+        "DeedDate": 15035
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Name1"
+      ],
+      "primaryOwnerField": "Name1",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(Name1) LIKE '% LLC%' OR UPPER(Name1) LIKE '% INC%' OR UPPER(Name1) LIKE '% LP%' OR UPPER(Name1) LIKE '% LLP%' OR UPPER(Name1) LIKE '% LTD%' OR UPPER(Name1) LIKE '% TRUST%' OR UPPER(Name1) LIKE '% CHURCH%' OR UPPER(Name1) LIKE '% COMPANY%' OR UPPER(Name1) LIKE '% PARTNERSHIP%' OR UPPER(Name1) LIKE '% HOLDINGS%' OR UPPER(Name1) LIKE '% PROPERTIES%' OR UPPER(Name1) LIKE '% CORP%' OR UPPER(Name1) LIKE '%,LLC%' OR UPPER(Name1) LIKE '%,INC%' OR UPPER(Name1) LIKE 'CITY OF %' OR UPPER(Name1) LIKE 'COUNTY OF %' OR UPPER(Name1) LIKE 'STATE OF %' OR UPPER(Name1) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 2909,
+      "liveEntityCount5to150ac": 527,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://bttaxpayerportal.com/ITSPublicCL/AppraisalCard.aspx?id={ParcelNumb}",
+      "testedParcelId": "554100679975",
+      "testedUrl": "https://bttaxpayerportal.com/ITSPublicCL/AppraisalCard.aspx?id=554100679975",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://experience.arcgis.com/experience/d706343410ba46c586bfb15b0ca30bdb/",
+      "httpStatus": 200,
+      "pageTitle": "Experience",
+      "arcgisItem": {
+        "access": "public",
+        "title": "Clay NC Map 04/16/2026",
+        "type": "Web Experience"
+      }
+    },
+    "gaps": []
+  }
+}

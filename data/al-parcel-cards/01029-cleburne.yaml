@@ -1,0 +1,113 @@
+state: AL
+jurisdiction: Cleburne County
+fips: 01029
+level: county
+markets:
+- Anniston-Oxford (I-20 corridor)
+layers:
+- role: parcels
+  name: PARCEL (CaptureCAMA Cleburne parcels service, geometry + parcel number only)
+  restUrl: https://maps.capturecama.com/arcgis/rest/services/Cleburne/CleburneParcels_06122024/MapServer/401
+  layerId: 401
+  geometry: polygon
+  auth: none
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    PARCEL_NUM: parcelId (dashed, e.g. 18-16-08-28-0-000-001.000)
+    PRIMARYINDEX: parcelIdAlt
+    CALC_ACRE: acreage
+    DEED_ACRE: acreageDeed
+    SUBDIVISION: subdivision
+  notes: 'Verified live 2026-09-28: anonymous, polygon, count 17058. Sample centroid -85.70,33.61 (Heflin area, Cleburne County AL). This is the parcel layer the county CaptureCAMA Parcel Viewer uses (https://cleburne.capturecama.com/parcelviewer/cdn/17/config.json).
+    OWNER, OWNER_ADDRESS, DEED_REF, CAMA_PNUM and CAMA_PPIN columns exist but are empty for every parcel (count 0), so owner, value, tax and sale come only from the CaptureCAMA record page. The layer also
+    has an owner-contact column that is empty and deliberately not mapped. No KCS ISV (isv.kcsgis.com/al.cleburne_revenue 404). ADOR also lists a Flagship site https://www.alabamagis.com/cleburne/.'
+  status: partial
+gaps:
+- No owner/value/tax/sale attributes populated in the public parcel layer
+- Service snapshot dated 2024-06-12
+- No zoning layer (county largely unzoned; Heflin zoning not found)
+license: Cleburne County Revenue Commission / CaptureCAMA public parcel viewer; use-at-own-risk
+appraiserSearchUrl: https://cleburne.capturecama.com/mapparceldetail/{PIN}
+appraiserSearchUrlAlt: https://www.alabamagis.com/cleburne/
+jurisdictionGisUrl: https://cleburne.capturecama.com/parcelviewer/
+ruralOz2:
+  status: not a rural OZ 2.0 candidate county
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+enrichment:
+  aadt:
+    source: ALDOT TDM Public (TrafficCounterPoint)
+    restUrl: https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0
+    layerId: 0
+    field: AADT
+    yearField: YearAADT
+    year: 2024
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    luCountyId: 15
+    countyWhere: YearAADT=2024 AND LUCountyID=15 AND AADT>0
+    stations2024: 153
+    verifiedAt: '2026-09-28'
+    verifiedBy: Alabama Public Info Researcher
+    notes: LUCountyID=15 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 153 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID,
+      fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/.
+
+pass2Statewide2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://maps.capturecama.com/arcgis/rest/services/Cleburne/CleburneParcels_06122024/MapServer/401
+  featureCount: 17058
+  taxSaleOwner:
+    ownerName:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://cleburne.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    assessedValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://cleburne.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    appraisedOrMarketValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://cleburne.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    landValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://cleburne.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    improvementValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://cleburne.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://cleburne.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    lastSaleDate:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://cleburne.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://cleburne.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    ownerEntityType:
+      derivable: false
+      sourceField: null
+      rule: null
+      likeCounts2026_09_28: null
+      note: No owner in layer; entity type only derivable from CaptureCAMA property-record page https://cleburne.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA).
+  deepLink:
+    pattern: https://cleburne.capturecama.com/mapparceldetail/{PIN}
+    pinField: PARCEL_NUM (viewer also uses Assess_Num)
+    testPin: 18-16-08-28-0-000-001.000
+    verified: browser-only (pattern confirmed from viewer config)
+    method: 'Pattern read from the Cleburne CaptureCAMA Experience Builder config (Embed Parcel Detail widget: mapparceldetail/{Assess_Num} or {PARCEL_NUM}); the page fetched 200 but it''s a React SPA shell
+      (Citizen Access Portal)'
+    note: Not rendered in a browser this run.
+  jurisdictionGisUrl:
+    url: https://cleburne.capturecama.com/parcelviewer/
+    http: 200
+  notes: Owner/CAMA columns exist in the layer but are empty for all 17,058 parcels.

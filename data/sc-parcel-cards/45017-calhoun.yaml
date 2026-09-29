@@ -1,0 +1,47 @@
+state: SC
+jurisdiction: Calhoun County
+fips: "45017"
+level: county
+markets: [Columbia]
+
+layers:
+  - role: parcels
+    name: Calhoun County parcels (public REST)
+    restUrl: null
+    layerId: null
+    geometry: polygon
+    auth: none
+    acreageField: unknown
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Dig 2026-09-24: no anonymous county-native ArcGIS FeatureServer/MapServer parcel
+      endpoint verified. SchoolTaxDistrict AGOL exists (not parcels). No countywide parcel REST verified. qPublic path may 404 — confirm PA portal. SCDOT SC_Parcels MapServer rejected as primary (token
+      required, HTTP 499). Geometry for bulk site search remains a gap until REST or
+      licensed extract is available.
+    status: gap
+
+  - role: tax
+    name: Assessor / PA public search
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: Public PA/viewer links documented under appraiserSearchUrl / publicGisUrl; owner/tax/sale not REST-verified.
+    status: partial
+
+gaps:
+  - "No public county-native parcel REST verified on dig day — parcels status gap."
+  - "SCDOT statewide SC_Parcels requires token — not usable as primary."
+  - "Zoning/FLU REST not verified."
+  - "SchoolTaxDistrict AGOL exists (not parcels). No countywide parcel REST verified. qPublic path may 404 — confirm PA portal."
+
+license: "Public county portals where linked; confirm redistribution before bulk republish. Do not scrape emails/phones."
+appraiserSearchUrl: https://qpublic.net/sc/calhoun/
+publicGisUrl: https://calhouncounty.maps.arcgis.com
+jurisdictionGisUrl: https://calhouncounty.maps.arcgis.com
+verifiedAt: 2026-09-24
+verifiedBy: South Carolina Public Info Researcher

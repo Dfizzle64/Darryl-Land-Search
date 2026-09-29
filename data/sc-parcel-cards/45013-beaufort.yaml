@@ -1,0 +1,292 @@
+state: SC
+jurisdiction: Beaufort County
+fips: "45013"
+level: county
+markets: [Hilton Head]
+
+layers:
+  - role: parcels
+    name: Parcels (EnerGov)
+    restUrl: https://gis.beaufortcountysc.gov/server/rest/services/EnerGov/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: GisFile_Acres
+    coverage: county-wide
+    fieldMap:
+      GisFile_PIN: parcelId
+      ParcelPIN: parcelId
+      GisFile_Owner1: ownerName
+      GisFile_Owner2: ownerName2
+      GisFile_SitusAddre: situsAddress
+      GisFile_MailingAdd: mailingAddress
+      GisFile_City: mailingAddress.city
+      GisFile_State: mailingAddress.state
+      GisFile_ZIP: mailingAddress.zip
+      GisFile_Acres: acreage
+      GisFile_ClassCode: dorCode
+      GisFile_SalePrice: lastSale.price
+      GisFile_SaleDate: lastSale.date
+      GisFile_SaleQualif: lastSale.qualified
+      GisFile_RecordDate: lastSale.recordedDate
+      GisFile_Land: tax.landValue
+      GisFile_Improvemen: tax.improvementValue
+      GisFile_Appraised: tax.marketValue
+      GisFile_Assessed: tax.assessedValue
+      GisFile_Taxable: tax.taxableValue
+      GisFile_Capped: tax.cappedValue
+      GisFile_AreaName: areaName
+    notes: 'Verified 2026-09-23: HTTP 200 pjson + count 141372, no token. Countywide CAMA polygons (Hilton
+      Head, Bluffton, City of Beaufort, Port Royal, unincorporated). WKID 2273. Geo-verified: GisFile_AreaName
+      includes HILTON HEAD / SEA PINES / PALMETTO BLUFF / ST. HELENA; sample R510* PINs fall on Hilton Head
+      Island. GisFile_Acres and GisFile_SalePrice are esriFieldTypeString — CAST(GisFile_Acres AS FLOAT)
+      for 5–150 band (CAST filter count 4771 on 2026-09-23). Prefer over Hosted/AddressParcels (southern-only)
+      and HHI Regional Beaufort_County_Parcels (thin attrs). Legacy Parcels/MapServer LiveParcels returned
+      HTTP 404 on verify day.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=141372; 1-feature outSR=4326 sample GisFile_PIN=''M100 006
+      000 0611 0000'' vertex (-80.701,32.401) inside Beaufort County SC bbox; parcel ID field GisFile_PIN
+      present.'
+    count: 141372
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: parcels
+    name: AddressParcels (Hosted) — southern Beaufort / Bluffton extract
+    restUrl: https://gis.beaufortcountysc.gov/server/rest/services/Hosted/AddressParcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gis_acres
+    coverage: city-only
+    fieldMap:
+      pin_: parcelId
+      owner1: ownerName
+      owner2: ownerName2
+      situsaddress: situsAddress
+      mailingaddress: mailingAddress
+      city: mailingAddress.city
+      state: mailingAddress.state
+      gis_acres: acreage
+      saleprice: lastSale.price
+      saledate: lastSale.date
+      land: tax.landValue
+      improvemen: tax.improvementValue
+      appraised: tax.marketValue
+      assessed: tax.assessedValue
+      taxable: tax.taxableValue
+      classcode: dorCode
+      zoning: zoning
+      zoning_abv: zoningAbbr
+      flu: flu
+      flu_abv: fluAbbr
+      jurisdiction: jurisdiction
+      district: blufftonDistrict
+    notes: >
+      Verified 2026-09-23: public FeatureServer, count 39494; gis_acres 5–150 count 1167.
+      Jurisdiction distinct: County 22352, Bluffton 17052, Hardeeville 88 (null 2) — NO
+      Hilton Head / City of Beaufort / Port Royal. Southern Beaufort only; geo-verified
+      Bluffton sample x/y ≈ -80.92, 32.29. Carries Bluffton UDO zoning + FLU on parcels —
+      use for Bluffton municipal attributes; do NOT label county-wide. Prefer EnerGov/1
+      for countywide parcel ingest.
+    status: partial
+
+  - role: zoning
+    name: Zoning Classification (county Community Development Code)
+    restUrl: https://gis.beaufortcountysc.gov/server/rest/services/Zoning/MapServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FBCode: zoning
+      CodeName: zoningDescription
+      GisCodeName: zoningLabel
+    notes: >
+      Verified 2026-09-23: public, count 3246. Form-based CDC districts (T2R, T1NP, C3NMU,
+      PUD, Lady's Island / Sheldon / Dale CP, Military, etc.). Same polygons on
+      EnerGov/MapServer/2 (Community Developmeent Code; count 3246). Unincorporated county
+      zoning authority — does not replace Town of Hilton Head NEW_ZONE (see
+      45013-hilton-head.yaml) or Bluffton UDO (AddressParcels.zoning where
+      jurisdiction='Bluffton'). Overlay layers on Zoning/MapServer (AICUZ, St Helena
+      Cultural, etc.) are separate.
+    status: usable
+
+  - role: flu
+    name: BC_FLU (Future / Existing Land Use on parcel fabric)
+    restUrl: https://gis.beaufortcountysc.gov/server/rest/services/BC_FLU/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GIS_ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN_: parcelId
+      KEYNO: parcelIdAlt
+      GIS_ACRES: acreage
+      FutureLandUse: flu
+      ExistingLandUse: existingLandUse
+    notes: >
+      Verified 2026-09-23: public, count 77476. Parcel-grain FLU; join key PIN_. Top
+      FutureLandUse values: Neighborhood/Mixed-Use, Rural, Urban/Mixed-Use, Rural Community
+      Preservation, Community/Regional/Core Commercial, Preserved Land, Light Industrial,
+      Military. Join to EnerGov via PIN_ = GisFile_PIN. Not a substitute for town current
+      landuse layers inside Hilton Head (companion card).
+    status: usable
+
+  - role: tax
+    name: Parcels (EnerGov) — tax / sale attributes
+    restUrl: https://gis.beaufortcountysc.gov/server/rest/services/EnerGov/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: GisFile_Acres
+    coverage: county-wide
+    fieldMap:
+      GisFile_PIN: parcelId
+      GisFile_Land: tax.landValue
+      GisFile_Improvemen: tax.improvementValue
+      GisFile_Appraised: tax.marketValue
+      GisFile_Assessed: tax.assessedValue
+      GisFile_Taxable: tax.taxableValue
+      GisFile_Capped: tax.cappedValue
+      GisFile_SalePrice: lastSale.price
+      GisFile_SaleDate: lastSale.date
+      GisFile_SaleQualif: lastSale.qualified
+    notes: >
+      Same layer as primary parcels. Last-sale fields only (no multi-sale history table).
+      SalePrice is string. Assessor HTML search:
+      https://sc-beaufort.publicaccessnow.com/Searches/Real.aspx
+    status: usable
+
+  - role: parcels
+    name: Regional Beaufort County Parcels (Town of Hilton Head mirror)
+    restUrl: https://maps.hiltonheadislandsc.gov/server/rest/services/Regional/Beaufort_County_Parcels/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: GIS_ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN_: parcelId
+      KEYNO: parcelIdAlt
+      GIS_ACRES: acreage
+      PARENT_PAR: parentParcelId
+      DISTRICT: taxDistrict
+    notes: >
+      Verified 2026-09-23: public, count 78721. County parcel geometry hosted by Town of
+      HHI; thin attributes (no owner/sale/tax). Prefer county EnerGov/1; usable geometry
+      fallback if EnerGov unreachable.
+    status: partial
+
+  - role: parcels
+    name: Parcels/MapServer LiveParcels (legacy — down)
+    restUrl: https://gis.beaufortcountysc.gov/server/rest/services/Parcels/MapServer
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Verified 2026-09-23: service root and LiveParcels/0 return HTTP 404 Service not found
+      (older indexes still list LiveParcels). Gap until republished; use EnerGov/1.
+    status: blocked
+
+gaps:
+  - "Hosted/AddressParcels is southern Beaufort only (Bluffton/County/Hardeeville) — not county-wide; missing Hilton Head and northern munis."
+  - "GisFile_Acres / GisFile_SalePrice on EnerGov are strings — CAST or client parse required for numeric filters."
+  - "County Zoning Classification is CDC for unincorporated areas; Town of Hilton Head has its own NEW_ZONE (45013-hilton-head.yaml). Bluffton UDO zoning is on AddressParcels.zoning where jurisdiction='Bluffton' (no separate town FeatureServer found 2026-09-23)."
+  - "City of Beaufort: CobData/MapServer (historic city Zoning Districts) returned HTTP 404. City points public to county GIS mapping + PDF zoning map — no standalone city zoning REST confirmed (gap)."
+  - "Town of Port Royal: zoning published as county-prepared PDF (2019 vintage on county image host) — no dedicated Port Royal zoning FeatureServer found (gap)."
+  - "Bluffton Explorer (townofbluffton.us/map) is the town viewer; no town-hosted ArcGIS REST root resolved. Use county AddressParcels for Bluffton zoning/FLU attributes."
+  - "Legacy Parcels/MapServer (LiveParcels) 404 on 2026-09-23."
+  - "No multi-sale history table on public REST (last-sale fields only)."
+  - "Jasper County (45053) skipped — adjacent but not required for Hilton Head market unless search area expands west."
+  - "AGOL Beaufort_Co_Parcels Green Print snapshot exists; prefer live county EnerGov over AGOL vintage."
+
+license: "Public Beaufort County GIS REST (gis.beaufortcountysc.gov) and Town of Hilton Head Island regional mirrors; attribute to source agency. Confirm redistribution terms on county GIS hub before bulk republish. Do not scrape assessor emails/phones."
+appraiserSearchUrl: https://sc-beaufort.publicaccessnow.com/Searches/Real.aspx
+publicGisUrl: https://experience.arcgis.com/experience/9e534a7884744a2680a0f472e2aabdc3
+jurisdictionGisUrl: https://gis-department-mapping-site-collage-bcscgis.hub.arcgis.com/
+appraiserDeepLink: https://sc-beaufort.publicaccessnow.com/Searches/Real/Detail.aspx?a=&p={parcelId}
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: usable
+    reason: EnerGov/MapServer/1 GisFile_* carries land, improvement, appraised (market), capped, assessed, taxable
+      (Integer).
+    fieldMap:
+      GisFile_Appraised: tax.marketValue
+      GisFile_Assessed: tax.assessedValue
+      GisFile_Taxable: tax.taxableValue
+      GisFile_Capped: tax.cappedValue
+      GisFile_Land: tax.landValue
+      GisFile_Improvemen: tax.improvementValue
+      GisFile_Exemption: tax.exemption (String)
+    note: 'Sample M100 006 000 0611 0000: appraised 138,700 / assessed 5,550 / taxable 5,550.'
+  sale:
+    status: usable
+    reason: Sale price/date/qualification + record date on layer.
+    fieldMap:
+      GisFile_SalePrice: lastSale.price
+      GisFile_SaleDate: lastSale.date
+      GisFile_RecordDate: lastSale.recordedDate
+      GisFile_SaleQualif: lastSale.qualified
+      GisFile_SaleQualCo: lastSale.qualifiedCode
+      GisFile_EventTypeD: lastSale.eventType
+    format: GisFile_SaleDate and GisFile_RecordDate are STRINGS M/D/YYYY ("9/23/2021") - parse; GisFile_SalePrice
+      is a STRING ("130000") - cast; numeric where-clauses on it fail (400). GisFile_EventDate is esri Date epoch
+      ms.
+  owner:
+    status: usable
+    mailingStatus: usable
+    fieldMap:
+      GisFile_Owner1: ownerName
+      GisFile_Owner2: ownerName2
+      GisFile_MailingAdd: mailingAddress.street
+      GisFile_City: mailingAddress.city
+      GisFile_State: mailingAddress.state
+      GisFile_ZIP: mailingAddress.zip
+  paLink:
+    status: partial
+    pattern: https://sc-beaufort.publicaccessnow.com/Searches/Real/Detail.aspx?a=&p={parcelId}
+    testedParcelId: M100 006 000 0611 0000
+    idTransform: p = GisFile_PIN / ParcelPIN as-is with spaces (URL-encode space as + or %20), 22 chars "R600 041
+      000 0002 0000".
+    reason: HTTP 200 Aumentum PublicAccessNow Detail page (General/Assessment/Ownership/Value tabs) loads for tested
+      PIN; parcel data renders client-side so owner text not in raw HTML. Pattern also search-indexed.
+  publicGis:
+    status: usable
+    url: https://experience.arcgis.com/experience/9e534a7884744a2680a0f472e2aabdc3
+    alt: https://gis-department-mapping-site-collage-bcscgis.hub.arcgis.com/
+    reason: Beaufort County "Public Mapping Site" Experience (public AGOL item; replaces WAB apps sunsetting 2026),
+      linked from beaufortcountysc.gov/gis.
+  aadt:
+    status: usable
+    reason: enrichment.aadt already present; confirmed, not re-dug.
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "Public Information Researcher"
+  aadt:
+    source: "SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points)"
+    restUrl: "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0"
+    layerId: 0
+    field: "FactoredAA"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Public Information Researcher"
+    notes: "SCDOT-published 2025 statewide points (~11570); FactoredAA=factored AADT; FactoredA1 companion; filter CountyName. smpesri.scdot.org EGIS has roads but no AADT layer."

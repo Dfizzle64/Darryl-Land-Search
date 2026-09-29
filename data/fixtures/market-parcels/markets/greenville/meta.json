@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-28T22:27:33Z",
+  "generatedAt": "2026-09-29T03:46:36Z",
   "market": "Greenville",
   "tier": "other",
-  "parcelCount": 31164,
+  "parcelCount": 48073,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,20 +20,27 @@
       "name": "Abbeville",
       "fips": "45001",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 5266,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-abbeville-parcels-45001",
+      "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Source query returned 5355 rows; 5266 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are SC RFA Statewide_Parcels filtered to Abbeville County (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "tax gap: RFA value fields (L_Value/M_Value/B_Value) are empty for this county; no county value REST found. Values only via PA (HTML, not bulk).",
+        "sale gap: RFA Statewide_Parcels has no sale date/price fields; no county sale REST found. Sales visible only on PA parcel page (HTML).",
+        "owner partial: Owner name public on RFA layer; no mailing address on any public REST found.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "Parcel polygons now loadable from SC RFA Statewide_Parcels (layer 18, where County='Abbeville County'); state-hosted inside a boundary-program map — fragile, snapshot extracts. No county-published parcel REST found 2026-09-28."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45001/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45001/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 5355
     },
     {
       "name": "Anderson",
@@ -53,6 +60,32 @@
       "lookup": null,
       "tileCount": null,
       "sourceCount": null
+    },
+    {
+      "name": "Cherokee",
+      "fips": "45021",
+      "state": "South Carolina",
+      "featureCount": 6302,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "sc-cherokee-parcels-45021",
+      "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18/query",
+      "gaps": [
+        "Source query returned 6889 rows; 6302 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are SC RFA Statewide_Parcels filtered to Cherokee County (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "tax gap: RFA value fields (L_Value/M_Value/B_Value) are empty for this county; no county value REST found. Values only via PA (HTML, not bulk).",
+        "sale gap: RFA Statewide_Parcels has no sale date/price fields; no county sale REST found. Sales visible only on PA parcel page (HTML).",
+        "owner partial: Owner name public on RFA layer; no mailing address on any public REST found.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "Parcel polygons now loadable from SC RFA Statewide_Parcels (layer 18, where County='Cherokee County'); state-hosted inside a boundary-program map — fragile, snapshot extracts. No county-published parcel REST found 2026-09-28."
+      ],
+      "path": "data/fixtures/market-parcels/counties/45021/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45021/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 6889
     },
     {
       "name": "Greenville",
@@ -84,20 +117,27 @@
       "name": "Greenwood",
       "fips": "45047",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 5341,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-greenwood-parcels-45047",
+      "queryUrl": "https://www.greenwoodsc.gov/arcgis/rest/services/Operational_Layers/Parcels_Search_and_Select/MapServer/0/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Source query returned 5342 rows; 5341 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Parcels (Parcels_Search_and_Select) (https://www.greenwoodsc.gov/arcgis/rest/services/Operational_Layers/Parcels_Search_and_Select/MapServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "Sales_Points is point-based and includes invalid/zero-price source records; it is not a complete parcel sale-history table.",
+        "Greenwood Area/Area_SqFt aliases and observed numeric values require unit validation before converting to acreage.",
+        "No stable PIN-specific assessor deep link verified; use official GIS Quick Search with PIN={parcelId}.",
+        "Reject SCDOT SC_Parcels token-walled services as a primary source; county MapServer above is public and preferred."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45047/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45047/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 5342
     },
     {
       "name": "Laurens",

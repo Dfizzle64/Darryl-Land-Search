@@ -5,19 +5,29 @@
   "markets": [
     "Charleston"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 8615,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-colleton-parcels-45029",
+  "queryUrl": "https://services1.arcgis.com/m0cnLGKdhwao8WvM/arcgis/rest/services/WebDataLayers/FeatureServer/11/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Source query returned 9220 rows; 8615 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are parcels (Colleton WebDataLayers) (https://services1.arcgis.com/m0cnLGKdhwao8WvM/arcgis/rest/services/WebDataLayers/FeatureServer/11). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "No assessed/market/taxable value or sale price/date fields were present in the verified WebDataLayers/11 parcel schema; qPublic is available for interactive tax/sale lookup but no public REST was verified.",
+    "Current ColletonGIS WebDataStaticLayers has no parcels; do not use it as a parcel source.",
+    "Rejected wrong-geography search result: services.arcgis.com/KkJhFbLnXVqahKz2/Assessor_Parcels_Public1 sampled Santa Maria, California, not Colleton County SC.",
+    "Owner and address fields are public in WebDataLayers/11; normalize padded strings before use."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45029/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45029/lookup.json",
+  "sourceCount": 9220,
+  "dropped": 0,
+  "tileCount": 12,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=1046&LayerID=23500&PageTypeID=4&PageID=9800&KeyValue={parcelId}",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/c3ed5805c6fa4ca5bbaf650fb91cd728"
 }

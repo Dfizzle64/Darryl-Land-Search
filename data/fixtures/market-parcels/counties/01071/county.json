@@ -5,19 +5,28 @@
   "markets": [
     "Huntsville"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 13862,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "al-jackson-parcels-01071",
+  "queryUrl": "https://web3.kcsgis.com/kcsgis/rest/services/Jackson/Public_ISV_Jackson/MapServer/1/query",
   "gaps": [
-    "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+    "Source query returned 13878 rows; 13862 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcels (Jackson Public ISV — CAMA join) (https://web3.kcsgis.com/kcsgis/rest/services/Jackson/Public_ISV_Jackson/MapServer/1). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "No lastSale.price (deed book/page/date only)",
+    "No public county or city zoning FeatureServer located this pass",
+    "Do not use gis.mijackson.org (Jackson County MI)"
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/01071/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01071/lookup.json",
+  "sourceCount": 13878,
+  "dropped": 0,
+  "tileCount": 10,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://jacksonproperty.countygovservices.com/Property/Summary?taxyear=2026&ppin={PIN}",
+  "gisViewerUrl": "https://isv.kcsgis.com/al.jackson_revenue/"
 }

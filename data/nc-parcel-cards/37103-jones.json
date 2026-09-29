@@ -1,0 +1,471 @@
+{
+  "state": "NC",
+  "jurisdiction": "Jones County",
+  "county": "Jones",
+  "fips": "37103",
+  "cntyfips": "103",
+  "slug": "jones",
+  "level": "county",
+  "markets": [
+    "Eastern NC"
+  ],
+  "msa": "Eastern NC",
+  "tranche": 3,
+  "crs_preferred": {
+    "wkid": 3404,
+    "latestWkid": 3404,
+    "alternateWkid": 3359,
+    "name": "NAD 1983 NSRS2007 StatePlane North Carolina FIPS 3200 Feet",
+    "notes": "Jones_Bitek native SR is 3359/3404; use outSR=4326 or 102719 when joining OneMap",
+    "oneMapWkid": 102719,
+    "oneMapLatestWkid": 2264
+  },
+  "jurisdictionGisUrl": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=1a75ffe4b94c46748cd14c475ffc94ad",
+  "jurisdictionGisUrlAlt": "https://experience.arcgis.com/experience/8ec0f5cc486646bea1c098c568515e49",
+  "agolAppItemId": "1a75ffe4b94c46748cd14c475ffc94ad",
+  "agolExperienceItemId": "8ec0f5cc486646bea1c098c568515e49",
+  "agolWebMapItemId": "49c38c40624d4d30a7e625853ff6dba6",
+  "countyRestRoot": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services",
+  "jonesBitekUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Jones_Bitek/FeatureServer",
+  "appraiserSearchUrl": "https://www.bttaxpayerportal.com/itspublicjn2.0/AppraisalCard.aspx?id={pin83}",
+  "appraiserSearchUrlNotes": "PRIMARY PA deep-link. pin83/parcelnumber e.g. 440514749900 \u2192 HTTP 200 application/pdf (~126KB). Layer PRC field embeds same URL. Case path ITSPublicJN2.0 also 200.",
+  "paDeepLinkKey": "pin83",
+  "parcelIdPreferred": "pin83",
+  "joinKeys": [
+    "pin83",
+    "parcelnumber",
+    "accountnumber",
+    "parno",
+    "altparno"
+  ],
+  "paBasicSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicJN2.0/BasicSearch",
+  "taxBillSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicJN2.0/TaxBillSearch",
+  "taxPayUrl": "https://www.jonescountytaxes.com/",
+  "munisRealEstateUrl": "https://jonescountync.munisselfservice.com/citizens/RealEstate/Default.aspx",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/jones/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/jones/parcel-detail/{pin83}",
+  "ncptsNotes": "SPA shell HTTP 200 for pin83 path; prefer AppraisalCard PDF for PA",
+  "gisDeepLinkTemplate": "http://apps.agdmaps.com/print/nc/jones/index.html?pin83={pin83}",
+  "gisDeepLinkNotes": "Print_ field on parcels embeds this URL. maps.agdmaps.com/nc/jones/ failed HTTP at verify.",
+  "registerOfDeedsUrl": "https://cotthosting.com/ncjones/LandRecords/protected/v4/SrchName.aspx",
+  "taxDeptUrl": "https://jonescountync.gov/departments/tax-department/",
+  "realPropertyUrl": "https://jonescountync.gov/departments/tax-department/real-property/",
+  "inspectionsUrl": "https://jonescountync.gov/departments/inspections/",
+  "ordinancesUrl": "https://jonescountync.gov/government/ordinances/",
+  "countyLupPdfUrl": "https://connect.ncdot.gov/projects/planning/TPBCTP/Jones%20County/Jones%20County%20Land%20Use%20Plan%202013.pdf",
+  "pollocksvilleZoningOrdinancePdfUrl": "https://www.townofpollocksville.com/media/Zoning%20Ordinance/Zoning-Ordinance-%20Pollocksville%20Clean.pdf",
+  "pollocksvilleMapsGisUrl": "https://www.townofpollocksville.com/MapsGIS",
+  "maysvilleZoningOrdinancePdfUrl": "https://www.townofmaysville.org/DocumentCenter/View/1029/2021-Zoning-Ordinances",
+  "maysvilleUrl": "https://www.townofmaysville.org/",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapAlternateUrl": "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='103'",
+  "rejectLayers": [
+    {
+      "name": "Jones_Bitek utilities (Waterlines/Hydrants/etc.)",
+      "reason": "Out of scope \u2014 no utilities on cards"
+    },
+    {
+      "name": "LandCover FS/13",
+      "reason": "Empty class attributes; not FLU"
+    },
+    {
+      "name": "Jones_NC_Service",
+      "reason": "REST Invalid URL 2026-09-24 (stale Experience reference)"
+    },
+    {
+      "name": "maps.agdmaps.com/nc/jones/",
+      "reason": "HTTP fail/500 at verify"
+    },
+    {
+      "name": "dl.agd.cc/prc/nc/jones/{pin}.pdf",
+      "reason": "HTTP 404 for pin83; use ITSPublicJN2.0 AppraisalCard"
+    },
+    {
+      "name": "property.spatialest.com/nc/jones",
+      "reason": "HTTP 404"
+    },
+    {
+      "name": "WashCo WI Trenton_Zoning FeatureServer",
+      "reason": "Wrong state (Wisconsin)"
+    },
+    {
+      "name": "Jones_Service owner jonesms",
+      "reason": "Wrong state (Jones County MS)"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Trenton",
+      "role": "city-first-seat",
+      "type": "town",
+      "primary": true,
+      "limitsLayer": "Jones_Bitek/FeatureServer/21",
+      "limitsField": "mb_name",
+      "limitsValue": "Trenton",
+      "approxParcelIntersectCount": 276,
+      "zoningSource": "No public zoning ordinance/map REST or PDF verified \u2014 town-hall gap",
+      "fluSource": "County LUP 2013\u20132033 Trenton Existing/Future Land Use maps (PDF)"
+    },
+    {
+      "name": "Pollocksville",
+      "role": "city-first-zoning-pdf",
+      "type": "town",
+      "limitsLayer": "Jones_Bitek/FeatureServer/21",
+      "limitsField": "mb_name",
+      "limitsValue": "Pollocksville",
+      "approxParcelIntersectCount": 265,
+      "zoningSource": "Zoning Ordinance PDF (R-8/R-6/C-1/I-1/CV); Official Zoning Map at Town Hall \u2014 no FS",
+      "fluSource": "County LUP Pollocksville maps (PDF)"
+    },
+    {
+      "name": "Maysville",
+      "role": "city-first-zoning-pdf",
+      "type": "town",
+      "limitsLayer": "Jones_Bitek/FeatureServer/21",
+      "limitsField": "mb_name",
+      "limitsValue": "Maysville",
+      "approxParcelIntersectCount": 734,
+      "zoningSource": "Zoning Ordinance PDF (RA-20/R-12/R-75/R-6/R-75M/C-1/C-2/I-1); Official Map at Town Hall \u2014 no FS",
+      "fluSource": "County LUP Maysville/White Oak maps (PDF)"
+    }
+  ],
+  "townships": [
+    "BEAVER CREEK",
+    "TRENTON",
+    "CHINQUAPIN",
+    "TUCKAHOE",
+    "POLLOCKSVILLE",
+    "CYPRESS CREEK",
+    "WHITE OAK"
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Jones_Bitek Parcels (PRIMARY county AGOL CAMA + sale)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Jones_Bitek/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "calc_acre",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "pin83": "parcelId",
+        "parcelnumber": "parcelIdAlt",
+        "accountnumber": "accountNumber",
+        "name1": "ownerName",
+        "name2": "ownerName2",
+        "address1": "mailingAddress.street",
+        "address2": "mailingAddress.street2",
+        "address3": "mailingAddress.street3",
+        "city": "mailingAddress.city",
+        "state": "mailingAddress.state",
+        "zipcode": "mailingAddress.zip",
+        "formattedpropertyaddress": "situsAddress",
+        "calc_acre": "acreage",
+        "acres": "acreageAlt",
+        "deed_acres": "acreageDeed",
+        "legallandunits": "acreageLegal",
+        "saleprice": "lastSale.price",
+        "deeddate": "lastSale.date",
+        "deedbook": "lastSale.deedBook",
+        "deedpage": "lastSale.deedPage",
+        "marketvalue": "tax.marketValue",
+        "assessedvalue": "tax.assessedValue",
+        "assessedlandvalue": "tax.landValue",
+        "marketlandvalue": "tax.marketLandValue",
+        "totalbuildingvalue": "tax.improvementValue",
+        "buildingvalue": "tax.buildingValue",
+        "obxfvalue": "tax.obxValue",
+        "deferredvalue": "tax.deferredValue",
+        "taxcodes": "taxDistrictCodes",
+        "townshipcode": "township",
+        "legaldescription": "legalDescription",
+        "segment_type": "segmentType",
+        "nbhd_code": "neighborhood",
+        "PRC": "appraiserDeepLink",
+        "Print_": "printDeepLink"
+      },
+      "notes": "PRIMARY wire-first. Verified 2026-09-24: count 9526; calc_acre 5\u2013150 \u2192 2351; acres 5\u2013150 \u2192 2175; legallandunits 5\u2013150 \u2192 2669; saleprice>0 3707; sale+band 854; marketvalue>0 9330; name1 9336; situs 9336; deeddate 8589; vacant band 1500; PRC/Print_ 9526. Geo Trenton Market St pin83 449821245300 \u2248 -77.355, 35.062. MaxRecordCount 1000. CRS 3359/3404. pin83 null 121; parcelnumber null 190.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 9526,
+        "calc_acre_5_150": 2351,
+        "acres_5_150": 2175,
+        "legallandunits_5_150": 2669,
+        "saleprice_gt0": 3707,
+        "saleprice_in_5_150": 854,
+        "marketvalue_gt0": 9330,
+        "name1_nonnull": 9336,
+        "situs_nonnull": 9336,
+        "deeddate_nonnull": 8589,
+        "vacant_band": 1500,
+        "prc_nonnull": 9526
+      }
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (cntyfips='103')",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "filter": "cntyfips='103'",
+      "fieldMap": {
+        "parno": "parcelId",
+        "altparno": "parcelIdAlt",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress.street",
+        "mcity": "mailingAddress.city",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "saledate": "lastSale.date",
+        "saledatetx": "lastSale.dateText",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue"
+      },
+      "notes": "Fallback. Verified 2026-09-24: count 9451; gisacres 5\u2013150 \u2192 2342; parval>0 9294; saledate 9451; improvval 0/null 5263; vacant band 1834. No sale price. Join parno/altparno\u2194pin83. MaxRecordCount 5000. CRS 102719/2264.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 9451,
+        "gisacres_5_150": 2342,
+        "parval_gt0": 9294,
+        "saledate_nonnull": 9451,
+        "improvval_zero_or_null": 5263,
+        "vacant_band": 1834
+      }
+    },
+    {
+      "role": "other",
+      "name": "Addresspoints",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Jones_Bitek/FeatureServer/6",
+      "layerId": 6,
+      "geometry": "point",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "address": "situsAddress",
+        "community": "situsCommunity"
+      },
+      "notes": "~7051 points. No PIN \u2014 spatial join. Prefer parcel formattedpropertyaddress.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 7051
+      }
+    },
+    {
+      "role": "other",
+      "name": "municipal (cities-first router)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Jones_Bitek/FeatureServer/21",
+      "layerId": 21,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "fieldMap": {
+        "mb_name": "municipality",
+        "text_name": "municipalityLabel"
+      },
+      "notes": "3 polys \u2014 Trenton/Pollocksville/Maysville. Parcel intersects 276/265/734. Prefer over taxcodes for city routing.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 3,
+        "trenton_intersect": 276,
+        "pollocksville_intersect": 265,
+        "maysville_intersect": 734
+      }
+    },
+    {
+      "role": "other",
+      "name": "Townships",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Jones_Bitek/FeatureServer/4",
+      "layerId": 4,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "name": "township"
+      },
+      "notes": "7 townships",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 7
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Maysville / Pollocksville zoning (PDF only \u2014 no REST)",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "n/a",
+      "coverage": "city-only",
+      "fieldMap": {},
+      "notes": "Cities-first intent. Maysville districts RA-20/R-12/R-75/R-6/R-75M/C-1/C-2/I-1; Pollocksville R-8/R-6/C-1/I-1/CV. Official maps at Town Hall. Trenton zoning online gap. County unincorporated unzoned.",
+      "status": "gap"
+    },
+    {
+      "role": "flu",
+      "name": "Jones County Land Use Plan 2013\u20132033 (PDF)",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "n/a",
+      "coverage": "county-wide",
+      "fieldMap": {},
+      "notes": "Existing + Future Land Use maps in NCDOT-hosted PDF. No FLU FeatureServer. LandCover FS/13 not usable.",
+      "status": "gap"
+    }
+  ],
+  "gaps": [
+    "No zoning FeatureServer for county or any municipality",
+    "Trenton zoning ordinance/map not published online",
+    "No FLU FeatureServer \u2014 LUP PDF only",
+    "Unincorporated county unzoned (LUP design)",
+    "pin83 null 121; parcelnumber null 190",
+    "AddrPts lack PIN",
+    "Last-sale only (no multi-transfer history FS)",
+    "Jones_NC_Service + maps.agdmaps.com/nc/jones unreachable",
+    "taxcodes C0x unreliable for muni labeling",
+    "No phones/emails; no AADT/utilities; no paid vendors"
+  ],
+  "license": "Jones County / AGD public AGOL + NC OneMap; attribution recommended; no paid vendors",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "method": "Live ArcGIS REST counts + field samples + WGS84 geo-check; ITSPublicJN2.0 AppraisalCard PDF + NCPTS SPA; OneMap cntyfips='103'; municipal PDF/homepage GIS absence; wrong-state rejects",
+  "publicGisUrl": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=1a75ffe4b94c46748cd14c475ffc94ad",
+  "gisViewerUrl": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=1a75ffe4b94c46748cd14c475ffc94ad",
+  "paDeepLinkTemplate": "https://www.bttaxpayerportal.com/itspublicjn2.0/AppraisalCard.aspx?id={pin83}",
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Jones_Bitek/FeatureServer/0",
+    "parcelIdField": "pin83",
+    "acreageFilter": "calc_acre >= 5 AND calc_acre <= 150",
+    "acres5to150Live": 2351,
+    "parcelCountLive": 9526,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='JONES'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27JONES%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27JONES%27&returnCountOnly=true&f=json",
+        "liveStationCount": 140,
+        "stationsWithAADT2022": 37
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Jones'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Jones%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Jones%27&returnCountOnly=true&f=json",
+        "liveStationCount": 139,
+        "stationsWithAADT2025": 91,
+        "stationsWithAADT2024": 79,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "marketvalue",
+        "assessedvalue"
+      ],
+      "allTaxFieldsOnLayer": [
+        "marketvalue",
+        "assessedvalue",
+        "assessedlandvalue",
+        "marketlandvalue",
+        "totalbuildingvalue",
+        "buildingvalue",
+        "obxfvalue",
+        "deferredvalue",
+        "taxcodes"
+      ],
+      "liveNonZero": {
+        "marketvalue": 9330,
+        "assessedvalue": 9330
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "saleprice"
+      ],
+      "dateFields": [
+        "deeddate"
+      ],
+      "livePriceNonZero": {
+        "saleprice": 3707
+      },
+      "liveDateNonNull": {
+        "deeddate": 8589
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "name1",
+        "name2"
+      ],
+      "primaryOwnerField": "name1",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(name1) LIKE '% LLC%' OR UPPER(name1) LIKE '% INC%' OR UPPER(name1) LIKE '% LP%' OR UPPER(name1) LIKE '% LLP%' OR UPPER(name1) LIKE '% LTD%' OR UPPER(name1) LIKE '% TRUST%' OR UPPER(name1) LIKE '% CHURCH%' OR UPPER(name1) LIKE '% COMPANY%' OR UPPER(name1) LIKE '% PARTNERSHIP%' OR UPPER(name1) LIKE '% HOLDINGS%' OR UPPER(name1) LIKE '% PROPERTIES%' OR UPPER(name1) LIKE '% CORP%' OR UPPER(name1) LIKE '%,LLC%' OR UPPER(name1) LIKE '%,INC%' OR UPPER(name1) LIKE 'CITY OF %' OR UPPER(name1) LIKE 'COUNTY OF %' OR UPPER(name1) LIKE 'STATE OF %' OR UPPER(name1) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 939,
+      "liveEntityCount5to150ac": 328,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://www.bttaxpayerportal.com/itspublicjn2.0/AppraisalCard.aspx?id={pin83}",
+      "testedParcelId": "348519933300",
+      "testedUrl": "https://www.bttaxpayerportal.com/itspublicjn2.0/AppraisalCard.aspx?id=348519933300",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=1a75ffe4b94c46748cd14c475ffc94ad",
+      "httpStatus": 200,
+      "pageTitle": "ArcGIS Web Application",
+      "arcgisItem": {
+        "access": "public",
+        "title": "Jones County Web App",
+        "type": "Web Mapping Application",
+        "err": null
+      }
+    },
+    "gaps": []
+  }
+}

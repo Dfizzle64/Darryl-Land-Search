@@ -5,19 +5,27 @@
   "markets": [
     "Charleston"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 6282,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-clarendon-parcels-45027",
+  "queryUrl": "https://gis.clarendoncountysc.gov/server/rest/services/Hosted/Clarendon_County_Map_WFL1/FeatureServer/9/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Parcels are 45027parcels_area (Clarendon County Map WFL1) (https://gis.clarendoncountysc.gov/server/rest/services/Hosted/Clarendon_County_Map_WFL1/FeatureServer/9). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "No public Clarendon REST layer verified with assessed/market/taxable values or sale price/date; qPublic HTML search is available for interactive lookup.",
+    "Layer 9 supplies owner and mailing attributes; layer 8 supplies parcel geometry and GIS acreage; join on TMS/PIN only after normalizing strings.",
+    "qPublic Schneider deep-link was not machine-verified (403 challenge); retain the parcel-ID pattern for interactive use."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45027/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45027/lookup.json",
+  "sourceCount": 6282,
+  "dropped": 0,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=795&LayerID=11833&PageTypeID=4&PageID=5734&KeyValue={parcelId}",
+  "gisViewerUrl": "https://clarendonsc.wthgis.com/"
 }

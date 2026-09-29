@@ -5,20 +5,50 @@
   "markets": [
     "Knoxville"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 3024,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "tn-impact-47063",
-  "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+  "source": "tn-oir-public-use-47063",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
   "gaps": [
-    "Tennessee IMPACT Parcels returned no 5\u2013150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-    "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Sale date, sale price, and appraisal are joined from the card sales-value layer (https://services.mh-gis.com/server/rest/services/ParcelPublishing/Parcels/MapServer/0/query) on GISLINK and labeled 2026 when a value is present. A GISLINK with no match is left without sale or value. The 2023 TN_County_Parcel_Map sibling is not the sale source. Owner phone and email are not ingested.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used.",
+    "The research card lists a usable zoning layer. This ingest does not stamp that layer yet, so zoning stays empty."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": 0,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/47063/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47063/lookup.json",
+  "sourceCount": 30904,
+  "dropped": 0,
+  "tileCount": 4,
+  "ingest": {
+    "sourceRows": 30904,
+    "deedAcresInBand": 1560,
+    "droppedGeometry": 0,
+    "droppedOutsideBand": 27880,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 0,
+    "tncpmLayer": null,
+    "tncpmMatched": 0,
+    "saleCount": 1557,
+    "appraisalCount": 3023,
+    "gislinkMatchRate": 1.0,
+    "cardSalesMatched": 3024,
+    "assessedCount": 0,
+    "cardMailCount": 3024,
+    "cardZoningCount": 0,
+    "salesVintage": "2026",
+    "kept": 3024,
+    "ownerCount": 3022,
+    "tpadCount": 3024,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
 }

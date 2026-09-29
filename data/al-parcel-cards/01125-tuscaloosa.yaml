@@ -1,0 +1,86 @@
+state: AL
+jurisdiction: Tuscaloosa County
+fips: "01125"
+level: county
+markets: [Tuscaloosa]
+
+layers:
+  - role: parcels
+    name: Parcels (County AGOL hosted)
+    restUrl: "https://services.arcgis.com/AWzSDaKZ41uuVges/ArcGIS/rest/services/Parcels/FeatureServer/0"
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: rtMAP_ACRE
+    coverage: county-wide
+    fieldMap:
+      Name: parcelId
+      pclnum: parcelIdAlt
+      ppin: parcelIdAlt2
+      pcloNAME: ownerName
+      AddlNames: ownerName2
+      addSTRT1: mailingAddress.street
+      addSTRT2: mailingAddress.street2
+      addCITY: mailingAddress.city
+      stABBR: mailingAddress.state
+      addZIP: mailingAddress.zip
+      pcliLocati: situsAddress
+      rtMAP_ACRE: acreage
+      rtDEED_ACR: acreageDeeded
+      appraised: tax.marketValue
+      Improvemen: tax.improvementValue
+      TaxClass: dorCode
+      deedDATE: lastSale.date
+      deedBOOK: lastSale.deedBook
+      deedPAGE: lastSale.deedPage
+      tyYEAR: tax.year
+    notes: >
+      Verified 2026-09-23: HTTP 200 + count 111759. CRS WKID 102100/3857.
+      maxRecordCount 2000. Prefer rtMAP_ACRE for 5–150 ac filter (rtDEED_ACR often 0
+      on samples). Owner/mail/situs/appraised present; deedDATE epoch ms — no sale price.
+      Same schema on Parcel_data/FeatureServer/0 (also 111759). Service desc dated
+      9/21/2026. Flagship HTML still at alabamagis.com/tuscaloosa; CaptureCAMA TLS flaky.
+      Do not use paid vendors. Org AWzSDaKZ41uuVges = Tuscaloosa County GIS.
+    status: usable
+
+  - role: zoning
+    name: Unincorporated Tuscaloosa County zoning (none — subdivision / city PJ only)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Verified 2026-09-24: County AGOL org AWzSDaKZ41uuVges lists City_and_Town_Limits,
+      Northport/Vance planning jurisdiction views, and Parcels — no county Zoning
+      FeatureServer. County Public Works publishes subdivision regulations (not zoning).
+      Municipal zoning usable: 01125-city-tuscaloosa (Tuscaloosa_City_Zoning_Districts/3),
+      01125-city-northport (NorthportZoning_Dec2024/0). Unincorporated = true zoning gap.
+    status: gap
+
+gaps:
+  - Unincorporated Tuscaloosa County: no public zoning REST (subdivision + municipal PJ only)
+  - No lastSale.price on public parcel layer (deed date/book/page only)
+  - Prefer rtMAP_ACRE over rtDEED_ACR for acreage filters
+  - County has no public zoning REST — use city cards inside municipalities
+  - Nearby Hale/Pickens/Bibb/Greene: Flagship/CaptureCAMA HTML only this pass (no usable REST)
+
+license: "Tuscaloosa County GIS / Tax Assessor (AGOL); general reference / tax assessment only"
+appraiserSearchUrl: "https://www.alabamagis.com/tuscaloosa/"
+verifiedAt: 2026-09-24
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "Official ALDOT EGISATDServices/TDMPublic MapServer; ~282482 multi-year points (YearAADT 2014–2025). Latest usable AADT year=2024 (~22009 with AADT>0; 2025 shells exist but AADT still null as of 2026-09-24). Filter YearAADT=2024; optional LUCountyID (1–67 alpha county index, e.g. Autauga=1 Jefferson=37 Madison=45). Companion YearAADT field. Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/. Dig: enrichment/AL/aadt-aldot-2026-09-24.md"

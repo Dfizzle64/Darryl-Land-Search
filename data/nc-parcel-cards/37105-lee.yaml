@@ -1,0 +1,388 @@
+state: NC
+jurisdiction: Lee County
+fips: "37105"
+slug: lee
+level: county
+markets: [Raleigh-Durham]
+cntyfips: "105"
+crs_preferred:
+  wkid: 102719
+  latestWkid: 2264
+  name: NAD 1983 StatePlane North Carolina FIPS 3200 Feet
+
+publicGisUrl: https://lee-arcgis.leecountync.gov/parcelmap/
+gisDepartmentUrl: https://leecountync.gov/departments/gis_strategic_services_/index.php
+countyRestRoot: https://lee-arcgis.leecountync.gov/ARCGIS/rest/services
+downloadGisUrl: https://leecountync.gov/departments/gis_strategic_services_/download_gis_layers.php
+appraiserSearchUrl: https://taxaccess.leecountync.gov/pt/search/commonsearch.aspx?mode=realprop
+viewerLinkTemplate: "https://taxaccess.leecountync.gov/pt/datalets/datalet.aspx?LMparent=20&UseSearch=no&jur=000&mode=profileall&pin={PARID}&taxyr=2027"
+viewerLinkTemplateTaxCard: "http://taxaccess.leecountync.gov/PT/Datalets/Datalet.aspx?mode=&UseSearch=no&pin={PARID}&jur=000&taxyr=2027"
+gisViewerUrl: https://lee-arcgis.leecountync.gov/parcelmap/
+parcelIdPreferred: PARID
+paDeepLinkKey: PARID
+joinKeys: [PARID, PIN, parno]
+
+municipalities:
+  - name: Sanford
+    localGis: none-found-consolidated-county
+    publicGisUrl: https://lee-arcgis.leecountync.gov/parcelmap/
+    zoningSource: Zoning shapefile CurrentZon where SANandETJ='Y' (~12222); ZoningHub viewer portal-only
+    fluSource: Place_Types MapServer/0 (Plan SanLee)
+    taxDistrict: CSF
+    parcelFilter: "TAXDIST='CSF'"
+    zoningHubUrl: https://sa2111.zoninghub.com/zoningmap.aspx
+    citySiteGis: https://sanfordnc.net/368/GIS
+    notes: Consolidated with Lee County Strategic Services — no separate city ArcGIS host
+  - name: Broadway
+    localGis: none-found-consolidated-county
+    publicGisUrl: https://lee-arcgis.leecountync.gov/parcelmap/
+    zoningSource: Zoning shapefile CurrentZon (county/Broadway); TAXDIST CBW
+    fluSource: Place_Types MapServer/0
+    taxDistrict: CBW
+    parcelFilter: "TAXDIST='CBW'"
+    notes: No separate town ArcGIS host — county stack first-class
+
+layers:
+  - role: parcels
+    name: JURISDICTIONS Parcels (PRIMARY)
+    restUrl: https://lee-arcgis.leecountync.gov/arcgis/rest/services/Jurisdictions/JURISDICTIONS/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PARID: parcelId
+      PIN: parcelIdDisplay
+      ACRES: acreage
+      Owner1: ownerName
+      Owner2: ownerName2
+      MailADRNO: mailingAddress.number
+      MailADRADD: mailingAddress.numberSuffix
+      MailADRDIR: mailingAddress.streetDir
+      MailADRSTR: mailingAddress.street
+      MailADRSUF: mailingAddress.streetType
+      MailCity: mailingAddress.city
+      MailState: mailingAddress.state
+      MailZip: mailingAddress.zip
+      PropAddr: situsAddress
+      ADRNO: situs.number
+      ADRADD: situs.numberSuffix
+      ADRDIR: situs.streetDir
+      ADRSTR: situs.street
+      ADRSUF: situs.streetType
+      ADRPRE: situs.prefix
+      SaleDate: lastSale.date
+      BOOK: lastSale.deedBook
+      PAGE: lastSale.deedPage
+      APRTOT: tax.marketValue
+      APRLAND: tax.landValue
+      APRBLDG: tax.improvementValue
+      TAXDIST: taxDistrict
+      TaxCard: appraiserSearchUrl
+      LEGAL1: legalDescription
+      SUBDIV: subdivision
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 35438;
+      ACRES 5–150 → 4932; APRBLDG=0/null in 5–150 → 2139; SaleDate NOT NULL in range → 4725.
+      CRS source 102719/2264; service often 3857. MaxRecordCount 1000 — paginate. MapServer only.
+      Rich CAMA on polygons: situs, mailing parts, land/bldg split, SaleDate, TaxCard deep-link.
+      NO SalePrice / Zoning on primary — join Sales layers / Zoning shapefile.
+      TAXDIST top: CSF 14997 (Sanford), FLS 3983, FTW 3707, FCT 3132, FBW 2492, FDR 2071,
+      FWP 1918, FNV 1144, CBW 769 (Broadway), FWS 479, CBD 311, FCW 274.
+      Geo-check PARID 965783891900 ≈ -79.141, 35.602 (Lee). Filter ROW/blank PARID stubs.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-24: cntyfips='105' count 35303; gisacres 5–150 → 4919;
+      improvval=0/null in range → 2144. Geo-check centroids in Lee (~35.48–35.62 N, 79.0–79.25 W).
+      parno tracks PARID (no dashes). Fallback when county host flaky/503.
+      MaxRecordCount 5000. Alternate host services.gis.nc.gov. No sale price.
+    status: usable
+
+  - role: zoning
+    name: Zoning shapefile CurrentZon (PRIMARY — download)
+    restUrl: null
+    downloadUrl: https://drive.google.com/file/d/1S4-VsEgcHJ6LVWa89TcW-HCX0mGTLeVD/view?usp=sharing
+    metadataUrl: https://leecountync.gov/Document%20Center/Department/Gis%20Strategic%20Services/Gis%20layer/zoning.pdf
+    layerId: null
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      CurrentZon: zoning
+      Zoning_06_: zoningLegacy2006
+      Zoning_Pre: zoningPrevious
+      SANandETJ: sanfordEtjFlag
+      LINK_CURR: zoningDescriptionUrl
+      LINK_PROP: zoningProposedDescriptionUrl
+      ORDINANCE: zoningOrdinance
+      CONDITIONA: zoningConditional
+      SPECIALUSE: zoningSpecialUse
+      ACRES: acreage
+      PIN: parcelIdDisplay
+    notes: >
+      PRIMARY zoning polygons. Verified download 2026-09-24: 26807 polys; ACRES 5–150 → 4795;
+      SANandETJ='Y' → 12222 (Sanford+ETJ). CurrentZon top: RA 8416, UN-6 4818, RR 3392,
+      RN-20 3202, RA/MH 1401, SN-9 952, SN-12 876, C-2 781, LI 692, R-20 522, OI 403, CZ 308,
+      CBD 254, HC 208, HI 113 (+ CU/MH variants). CRS 2264.
+      BaseLayers Zoning REST layer IDs (historically 6–11) return Layer not found — shapefile only
+      until county republishes zoning MapServer. Cities-first: SANandETJ='Y' for Sanford/ETJ.
+    status: usable
+
+  - role: zoning
+    name: ZONING_CITYPLAT ZONE_UDO (partial COM/IND REST)
+    restUrl: https://lee-arcgis.leecountync.gov/ARCGIS/rest/services/ZONING_CITYPLAT/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: sample
+    fieldMap:
+      ZONE_UDO: zoning
+      PIN: parcelIdDisplay
+      PARID: parcelId
+      PropAddr: situsAddress
+      TAXDIST: taxDistrict
+      ACRES: acreage
+      TaxCard: appraiserSearchUrl
+    notes: >
+      Partial REST only — count 1461 commercial/industrial UDO joined to parcels.
+      Prefer Zoning shapefile CurrentZon for countywide. Queries intermittently 503.
+    status: partial
+
+  - role: sales
+    name: Sales/Sales ALLSALES* (price + zoning attr)
+    restUrl: https://lee-arcgis.leecountync.gov/ARCGIS/rest/services/Sales/Sales/MapServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PARID: parcelId
+      PIN: parcelIdDisplay
+      PRICE: lastSale.price
+      SALEDT: lastSale.date
+      SaleDate: lastSale.priorDate
+      ZONING: zoning
+      CLASS: landClass
+      LUC: dorCode
+      ACRES: acreage
+      Owner1: ownerName
+      PropAddr: situsAddress
+      TaxCard: appraiserSearchUrl
+      APRTOT: tax.marketValue
+      APRLAND: tax.landValue
+      APRBLDG: tax.improvementValue
+    notes: >
+      Layer 9 = ALLSALES202412 (count 425). Sibling layers 0–8 annual 2015–2023;
+      10–21 monthly 2025; 22–26 monthly 2026 (26=ALLSALES202605). Also qsales2007–2014.
+      Join to primary parcels on PARID/PIN for sale PRICE (absent on primary).
+      Sample ZONING codes: RA, RR, UN-6, CZ, RN-20, SN-9, RA/MH, R-20, C-2, LI, SN-12, …
+    status: usable
+
+  - role: flu
+    name: Place_Types Plan SanLee (PRIMARY FLU)
+    restUrl: https://lee-arcgis.leecountync.gov/ARCGIS/rest/services/Place_Types/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PlaceType: flu
+      Plan: fluPlan
+      TypeLink: fluDescriptionUrl
+      PIN: parcelIdDisplay
+      ACRES: acreage
+    notes: >
+      PRIMARY FLU / place-type polygons (Plan SanLee for Sanford–Broadway–Lee).
+      Verified count 31538. Mirror JURISDICTIONS/MapServer/17 PlaceTypes.
+      Join by PIN to parcels or spatial join in 2264. Queries may 503 under load — retry.
+      Prefer over WithersRavenel Sanford PowerBI LU (consultant ERU copy of PlaceType).
+    status: usable
+
+  - role: flu
+    name: JURISDICTIONS PlaceTypes mirror
+    restUrl: https://lee-arcgis.leecountync.gov/arcgis/rest/services/Jurisdictions/JURISDICTIONS/MapServer/17
+    layerId: 17
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PlaceType: flu
+      Plan: fluPlan
+      TypeLink: fluDescriptionUrl
+    notes: Mirror of Place_Types inside JURISDICTIONS service. Prefer Place_Types/0.
+    status: usable
+
+  - role: other
+    name: City limits + ETJ
+    restUrl: https://lee-arcgis.leecountync.gov/arcgis/rest/services/Jurisdictions/JURISDICTIONS/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      Sanford limits MS/4 (38); Sanford ETJ MS/5 (25); Broadway MS/2 (1); Broadway ETJ MS/3 (1);
+      CountyBoundary MS/8. Use with TAXDIST CSF/CBW and zoning SANandETJ for routing.
+    status: usable
+
+  - role: other
+    name: Appraisal Landuse (CAMA LUC subset)
+    restUrl: https://lee-arcgis.leecountync.gov/ARCGIS/rest/services/Appraisal/APPRAISAL/MapServer/20
+    layerId: 20
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      CLASS: landClass
+      LUC: dorCode
+      Appraised: tax.marketValue
+      Taxable: tax.taxableValue
+      Deferred_A: tax.deferredValue
+      PARID: parcelId
+      PIN: parcelIdDisplay
+    notes: >
+      Count 1787 — mostly use-value/deferred subset. Not comprehensive FLU.
+      Prefer Place_Types for plan FLU; primary parcels for market values.
+    status: partial
+
+gaps:
+  - No countywide zoning MapServer/FeatureServer (BaseLayers Zoning REST removed; shapefile PRIMARY)
+  - No SalePrice on primary parcel layer — join Sales/Sales PRICE
+  - Place_Types and ZONING_CITYPLAT queries intermittently 503
+  - ZONING_PROPOSED service timed out during research
+  - ZoningHub Sanford is SaaS viewer only (no public REST)
+  - No separate Sanford or Broadway ArcGIS hosts
+  - MaxRecordCount 1000 on county layers — paginate
+  - ROW/blank PARID stubs on parcel layer
+  - No AADT/utilities/emails/phones/paid vendors in this card
+
+license: "County public GIS / open download; attribution to Lee County Strategic Services"
+verifiedAt: "2026-09-24"
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://lee-arcgis.leecountync.gov/arcgis/rest/services/Jurisdictions/JURISDICTIONS/MapServer/1
+  parcelIdField: PARID
+  acreageFilter: ACRES >= 5 AND ACRES <= 150
+  acres5to150Live: 4932
+  parcelCountLive: 35438
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='LEE'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27LEE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27LEE%27&returnCountOnly=true&f=json
+      liveStationCount: 431
+      stationsWithAADT2022: 140
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Lee'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Lee%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Lee%27&returnCountOnly=true&f=json
+      liveStationCount: 424
+      stationsWithAADT2025: 271
+      stationsWithAADT2024: 225
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Lee'
+      stations2024LiveCount: 428
+      stations2024WithAADT2024: 428
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - APRTOT
+    - APRLAND
+    liveNonZero:
+      APRTOT: 35224
+      APRLAND: 35214
+    status: ok
+  sale:
+    priceFields: []
+    dateFields:
+    - SaleDate
+    livePriceNonZero: {}
+    liveDateNonNull:
+      SaleDate: 33631
+    status: partial
+    note: SaleDate on parcels (33631 non-null). Price on Sales/Sales MapServer ALLSALES* layers (0–26, yearly 2015–2024 + monthly 2025–2026) field PRICE/SALEDT/PARID; 10 of 27 layers errored on count query 2026-09-28 (400 'Unable to complete operation'); readable layers total 20767 rows, PRICE>0 14658.
+    supplementalSource:
+      url: https://lee-arcgis.leecountync.gov/ARCGIS/rest/services/Sales/Sales/MapServer
+      rowsReadable: 20767
+      price_gt0: 14658
+  ownerEntity:
+    ownerFields:
+    - Owner1
+    - Owner2
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 1153
+    liveEntityCount5to150acExtended: 1279
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - PILGRIM'S PRIDE CORP OF GEORGIA INC
+    - CUMNOCK FARMS LLC
+    - CUMNOCK FARMS LLC
+    - AMMONS FARMLAND LLC
+  paDeepLink:
+    template: https://taxaccess.leecountync.gov/pt/datalets/datalet.aspx?LMparent=20&UseSearch=no&jur=000&mode=profileall&pin={PARID}&taxyr=2027
+    testedParcelId: '965494119300'
+    testedUrl: https://taxaccess.leecountync.gov/pt/datalets/datalet.aspx?LMparent=20&UseSearch=no&jur=000&mode=profileall&pin=965494119300&taxyr=2027
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: true
+    note: Parcel id found in the response body.
+  gisViewer:
+    url: https://lee-arcgis.leecountync.gov/parcelmap/
+    httpStatus: 200
+    pageTitle: ArcGIS Web Application
+  gaps:
+  - Sale price only on per-period ALLSALES* layers; 10 of 27 errored on 2026-09-28

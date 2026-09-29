@@ -1,0 +1,488 @@
+{
+  "county": "Graham",
+  "state": "NC",
+  "msa": "Asheville MSA / Western NC",
+  "fips": "37075",
+  "cntyfips": "075",
+  "slug": "graham",
+  "level": "county",
+  "markets": [
+    "Asheville"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "crs_notes": "GrahamAGOL Parcels use 102719/2264. Project if joining Web Mercator overlays.",
+  "viewerLinkTemplate": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=561a20cc33894cb98ff18aa6925af254",
+  "viewerLinkTemplates": [
+    "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=561a20cc33894cb98ff18aa6925af254",
+    "https://bttaxpayerportal.com/itspublicgr/AppraisalCard.aspx?parcel={PARNUM}",
+    "https://lrcpwa.ncptscloud.com/graham/parcel-detail/{pin}"
+  ],
+  "appraiserSearchUrl": "https://bttaxpayerportal.com/itspublicgr/AppraisalCard.aspx?parcel={PARNUM}",
+  "appraiserSearchUrlNotes": "Verified 2026-09-24: HTTP 200 Appraisal Card for parcel=553800010002 (GIBSON CLAUDINE). Use PARNUM from GrahamAGOL (also embedded in PRC_link). Do not use OneMap/pin as AppraisalCard parcel= key.",
+  "jurisdictionGisUrl": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=561a20cc33894cb98ff18aa6925af254",
+  "mappingPageUrl": "https://www.grahamcounty.org/mapping.html",
+  "taxAssessorUrl": "https://www.grahamcounty.org/tax_assessor.html",
+  "paBasicSearchUrl": "https://bttaxpayerportal.com/itspublicgr/BasicSearch.aspx",
+  "itsRealEstateUrl": "https://bttaxpayerportal.com/itspublicgr/RealEstate.aspx",
+  "itsSalesUrl": "https://bttaxpayerportal.com/itspublicgr/Sales.aspx",
+  "rodSearchUrl": "https://cotthosting.com/ncgraham/LandRecords/protected/v4/SrchName.aspx",
+  "paDeepLinkKey": "PARNUM",
+  "parcelIdPreferred": "PARNUM",
+  "joinKeys": [
+    "PARNUM",
+    "parno",
+    "pin",
+    "PIN_1",
+    "ACCT_NO"
+  ],
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/graham/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/graham/parcel-detail/{pin}",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='075'",
+  "grahamAgolFeatureServer": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer",
+  "rejectedLayers": [
+    {
+      "url": "https://services1.arcgis.com/IaS5ebgfIHqc2kcL/arcgis/rest/services/Tax_View/FeatureServer",
+      "reason": "Token Required (499)"
+    },
+    {
+      "url": "https://grahamconc.maps.arcgis.com/apps/Solutions/s2.html?appid=2a8aac7f18164a0389472dbe52f68ee0",
+      "reason": "Subscription canceled (403)"
+    },
+    {
+      "url": "https://maps.regisnc.org/arcgis/rest/services/GrahZoningCounty/MapServer",
+      "reason": "City of Graham (Alamance County) \u2014 wrong geography"
+    },
+    {
+      "url": "https://maps.regisnc.org/arcgis/rest/services/Graham/GrahZoning/MapServer",
+      "reason": "City of Graham (Alamance County) \u2014 wrong geography"
+    }
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PARNUM",
+        "parno",
+        "pin",
+        "PIN_1",
+        "ACCT_NO"
+      ],
+      "bestLayer": "GrahamAGOL/6",
+      "notes": "PARNUM for AppraisalCard parcel=; pin joins OneMap parno"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "GrahamAGOL/6"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "calcacres",
+        "totalacres",
+        "ACREAGE",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 1963,
+      "bestLayer": "GrahamAGOL/6",
+      "notes": "Prefer calcacres (numeric); ACREAGE is text like 19.6000AC; totalacres 5\u2013150 \u2192 2172"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "OWNER_NAME",
+        "NAME",
+        "ownname"
+      ],
+      "bestLayer": "GrahamAGOL/6"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "ADDR_1",
+        "ADDR_2",
+        "ADDR_3",
+        "CITY",
+        "STATE",
+        "ZIP",
+        "mailadd"
+      ],
+      "bestLayer": "GrahamAGOL/6"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "HOUSE_NUMB",
+        "DIRECTION",
+        "STREET_NM",
+        "STREET_TYP",
+        "STREET_SUF",
+        "ADDRESS",
+        "siteadd"
+      ],
+      "bestLayer": "GrahamAGOL/6"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SALEPRICE",
+        "DEED_DATE",
+        "STAMPS"
+      ],
+      "bestLayer": "GrahamAGOL/6",
+      "notes": "SALEPRICE>0 \u2192 4457; DEED_DATE YYYYMMDD; OneMap saledatetx empty"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "LAND_VALU",
+        "BUILD_VALU",
+        "XFOB_VALUE",
+        "TOTAL_VALU",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "GrahamAGOL/6"
+    },
+    "zoning": {
+      "present": false,
+      "coverage": "pdf-only",
+      "fields": [],
+      "bestLayer": null,
+      "notes": "Cities-first Lake Santeetlah ordinance PDF only; Robbinsville/Fontana Dam/unincorp unzoned on REST; no FeatureServer"
+    },
+    "flu": {
+      "present": false,
+      "coverage": "pdf-only",
+      "notes": "Lake Santeetlah Land Use Plan PDF; NCDOT CTP \u2260 FLU; no FLU FeatureServer"
+    }
+  },
+  "municipalities": [
+    {
+      "name": "Robbinsville",
+      "role": "county-seat",
+      "zoningLayer": null,
+      "zoningCount": null,
+      "fluRest": false,
+      "notes": "County seat; no zoning REST; CPNI 2022 workshop recommended considering zoning"
+    },
+    {
+      "name": "Lake Santeetlah",
+      "role": "city-first-zoning-pdf",
+      "zoningLayer": null,
+      "zoningCount": null,
+      "fluRest": false,
+      "zoningDocs": [
+        "https://www.townoflakesanteetlah.org/uploads/6/9/3/2/69322769/amended_zoning_ordinance_4_14_26.pdf",
+        "https://www.townoflakesanteetlah.org/zoning.html"
+      ],
+      "fluDocs": [
+        "https://www.townoflakesanteetlah.org/uploads/6/9/3/2/69322769/land_use_plan.pdf"
+      ],
+      "notes": "Only muni with published zoning/FLU docs; no public FeatureServer"
+    },
+    {
+      "name": "Fontana Dam",
+      "role": "gap",
+      "notes": "No zoning REST found"
+    },
+    {
+      "name": "Unincorporated Graham",
+      "role": "gap",
+      "notes": "Mountain-county unzoned pattern on public REST"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "GrahamAGOL Parcels (CAMA + polygons)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer/6",
+      "alternateUrls": [
+        "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer/15",
+        "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer/16"
+      ],
+      "layerId": 6,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "calcacres",
+      "coverage": "county-wide",
+      "maxRecordCount": 1000,
+      "fieldMap": {
+        "PARNUM": "parcelId",
+        "parno": "parcelId",
+        "PIN_1": "parcelId",
+        "pin": "parcelIdOneMap",
+        "ACCT_NO": "parcelIdAccount",
+        "calcacres": "acreage",
+        "totalacres": "acreage",
+        "ACREAGE": "acreage",
+        "OWNER_NAME": "ownerName",
+        "NAME": "ownerName",
+        "ADDR_1": "mailingAddress",
+        "ADDR_2": "mailingAddress",
+        "ADDR_3": "mailingAddress",
+        "CITY": "mailingAddress",
+        "STATE": "mailingAddress",
+        "ZIP": "mailingAddress",
+        "HOUSE_NUMB": "situsAddress",
+        "DIRECTION": "situsAddress",
+        "STREET_NM": "situsAddress",
+        "STREET_TYP": "situsAddress",
+        "STREET_SUF": "situsAddress",
+        "ADDRESS": "situsAddress",
+        "LEGAL_1": "legalDescription",
+        "LEGAL_2": "legalDescription",
+        "SALEPRICE": "lastSale.price",
+        "DEED_DATE": "lastSale.date",
+        "STAMPS": "lastSale.price",
+        "DEEDBOOK": "deed",
+        "DEEDPAGE": "deed",
+        "LAND_VALU": "tax.marketValue",
+        "BUILD_VALU": "tax.marketValue",
+        "XFOB_VALUE": "tax.marketValue",
+        "TOTAL_VALU": "tax.assessedValue",
+        "PRC_link": "appraiserSearchUrl"
+      },
+      "notes": "PRIMARY verified 2026-09-24: count 9459; calcacres 5\u2013150 \u2192 1963; SALEPRICE>0 \u2192 4457; TOTAL_VALU>0 \u2192 9117; PRC_link \u2192 9459. Sample PARNUM 553800010002 GIBSON CLAUDINE centroid \u2248 -83.997, 35.243.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 9459,
+        "acres5to150_calcacres": 1963,
+        "acres5to150_totalacres": 2172,
+        "salePriceGt0": 4457,
+        "totalValuGt0": 9117,
+        "ownerNamePresent": 9119,
+        "prcLinkPresent": 9459
+      }
+    },
+    {
+      "role": "parcels",
+      "name": "GrahamAGOL Parcels_AGOL twin",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer/15",
+      "layerId": 15,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "notes": "Same CAMA schema/count 9459 as /6",
+      "status": "usable"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "parno": "parcelId",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "saledatetx": "lastSale.date",
+        "parval": "tax.marketValue",
+        "landval": "tax.marketValue",
+        "improvval": "tax.marketValue"
+      },
+      "notes": "Filter cntyfips='075'; count 9840; gisacres 5\u2013150 \u2192 1968; join parno=county pin; saledatetx empty \u2014 prefer county SALEPRICE.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 9840,
+        "acres5to150": 1968,
+        "parvalGt0": 9105
+      }
+    },
+    {
+      "role": "other",
+      "name": "Municipal Boundaries",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer/14",
+      "layerId": 14,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "MunicipalBoundaryName": "municipality"
+      },
+      "notes": "Robbinsville, Fontana Dam, Lake Santeetlah (count 3)",
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Lake Santeetlah Zoning (cities-first PDF)",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "city-only",
+      "fieldMap": {},
+      "notes": "No FeatureServer. Ordinance + zoning.html PDFs only. Robbinsville/Fontana Dam/unincorp unzoned on REST. Reject REGIS GrahZoning* (Alamance City of Graham).",
+      "status": "gap"
+    },
+    {
+      "role": "flu",
+      "name": "Future Land Use",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "none",
+      "fieldMap": {},
+      "notes": "Lake Santeetlah Land Use Plan PDF; NCDOT Graham CTP \u2260 FLU; no FLU FeatureServer",
+      "status": "gap"
+    }
+  ],
+  "gaps": [
+    "No public zoning FeatureServer (Lake Santeetlah PDF only; Robbinsville/Fontana Dam/unincorp unzoned)",
+    "No public FLU FeatureServer (Santeetlah LUP PDF; NCDOT CTP \u2260 FLU)",
+    "County Tax_View FeatureServer token-gated; grahamconc Tax Map WAB subscription canceled",
+    "ACREAGE is text (use calcacres/totalacres for numeric filters)",
+    "OneMap parno joins county pin not PARNUM",
+    "OneMap saledatetx empty; prefer county SALEPRICE + DEED_DATE",
+    "OneMap count (~9840) exceeds GrahamAGOL (~9459)",
+    "Reject REGIS City-of-Graham (Alamance) GrahZoning* services",
+    "Utilities / AADT / emails / phones / paid vendors excluded"
+  ],
+  "license": "Graham County GIS / Tax Assessor / Land Records; NCGS 132-10; attribute Town of Lake Santeetlah for municipal zoning/FLU PDFs; AGD Online hosts viewer",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 8,
+  "tranche": 3,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer/6",
+    "parcelIdField": "PARNUM",
+    "acreageFilter": "calcacres >= 5 AND calcacres <= 150",
+    "acres5to150Live": 1963,
+    "parcelCountLive": 9459,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='GRAHAM'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GRAHAM%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GRAHAM%27&returnCountOnly=true&f=json",
+        "liveStationCount": 104,
+        "stationsWithAADT2022": 74
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Graham'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Graham%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Graham%27&returnCountOnly=true&f=json",
+        "liveStationCount": 103,
+        "stationsWithAADT2025": 64,
+        "stationsWithAADT2024": 64,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TOTAL_VALU",
+        "LAND_VALU"
+      ],
+      "allTaxFieldsOnLayer": [
+        "LAND_VALU",
+        "BUILD_VALU",
+        "XFOB_VALUE",
+        "TOTAL_VALU"
+      ],
+      "liveNonZero": {
+        "TOTAL_VALU": 9117,
+        "LAND_VALU": 9113
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SALEPRICE",
+        "STAMPS"
+      ],
+      "dateFields": [
+        "DEED_DATE"
+      ],
+      "livePriceNonZero": {
+        "SALEPRICE": 4457,
+        "STAMPS": 866
+      },
+      "liveDateNonNull": {
+        "DEED_DATE": 9021
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "OWNER_NAME",
+        "NAME"
+      ],
+      "primaryOwnerField": "OWNER_NAME",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(OWNER_NAME) LIKE '% LLC%' OR UPPER(OWNER_NAME) LIKE '% INC%' OR UPPER(OWNER_NAME) LIKE '% LP%' OR UPPER(OWNER_NAME) LIKE '% LLP%' OR UPPER(OWNER_NAME) LIKE '% LTD%' OR UPPER(OWNER_NAME) LIKE '% TRUST%' OR UPPER(OWNER_NAME) LIKE '% CHURCH%' OR UPPER(OWNER_NAME) LIKE '% COMPANY%' OR UPPER(OWNER_NAME) LIKE '% PARTNERSHIP%' OR UPPER(OWNER_NAME) LIKE '% HOLDINGS%' OR UPPER(OWNER_NAME) LIKE '% PROPERTIES%' OR UPPER(OWNER_NAME) LIKE '% CORP%' OR UPPER(OWNER_NAME) LIKE '%,LLC%' OR UPPER(OWNER_NAME) LIKE '%,INC%' OR UPPER(OWNER_NAME) LIKE 'CITY OF %' OR UPPER(OWNER_NAME) LIKE 'COUNTY OF %' OR UPPER(OWNER_NAME) LIKE 'STATE OF %' OR UPPER(OWNER_NAME) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 1085,
+      "liveEntityCount5to150ac": 232,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://bttaxpayerportal.com/itspublicgr/AppraisalCard.aspx?parcel={PARNUM}",
+      "testedParcelId": "5538000028120",
+      "testedUrl": "https://bttaxpayerportal.com/itspublicgr/AppraisalCard.aspx?parcel=5538000028120",
+      "httpStatus": 200,
+      "contentType": "text/html; charset=utf-8",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=561a20cc33894cb98ff18aa6925af254",
+      "httpStatus": 200,
+      "pageTitle": "ArcGIS Web Application",
+      "arcgisItem": {
+        "access": "public",
+        "title": "Graham County NC GIS Viewer",
+        "type": "Web Mapping Application",
+        "err": null
+      }
+    },
+    "gaps": []
+  }
+}

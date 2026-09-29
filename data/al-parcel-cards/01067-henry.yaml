@@ -1,0 +1,132 @@
+state: AL
+jurisdiction: Henry County
+fips: "01067"
+level: county
+markets: [Rural OZ 2.0]
+
+layers:
+  - role: parcels
+    name: Parcels (Henry CaptureCAMA 2023-05-04, CAMA join)
+    restUrl: "https://maps.capturecama.com/arcgis/rest/services/Henry/Henry05042023/MapServer/0"
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      GISKEY: parcelIdFormatted
+      NAME: ownerName
+      NAME2: ownerName2
+      MAILING1: mailingAddress.line1
+      MAILING2: mailingAddress.line2
+      MAILING3: mailingAddress.cityStateZip
+      P_ADDRESS: situsAddress
+      TOTALLAND: tax.landValue
+      TOTALBUILD: tax.improvementValue
+      TOTALVALUE: tax.marketValue
+      LANDCUSE: tax.currentUseValue
+      SALEPRICE: lastSale.price
+      SALEYEAR: lastSale.year
+      DEED_B_P_D: lastSale.deedBookPageDate
+      NEIGHCODE: neighborhood
+      STR: sectionTownshipRange
+    notes: >
+      Verified live 2026-09-28: ?f=json 200, anonymous, polygon; 1-feature query with geometry OK. Count 21876 (NAME populated on 21817), maxRecordCount 50000; sample vertex -85.32,31.44 (Abbeville area, Henry AL — not Henry GA/TN). Shapefile-backed: no pagination — page by FID. Values are TEXT strings (cast). No acreage field — compute from geometry. VINTAGE May 2023 (only Henry parcel service; newest viewer still points here).
+    status: usable
+
+gaps:
+  - 2023 vintage (stale ownership)
+  - No acreage field
+  - Numeric values stored as text
+  - No pagination
+
+license: "Henry County (AL) / CaptureCAMA public viewer; use-at-own-risk"
+appraiserSearchUrl: "https://henry.capturecama.com/mapparceldetail/{PIN}"
+appraiserSearchUrlAlt: "https://henry.capturecama.com/propsearch"
+jurisdictionGisUrl: "https://henry.capturecama.com/parcelviewer/"
+ruralOz2:
+  source: "IRS Rev. Proc. 2026-14 appendix (Rural Status=Rural)"
+  ruralEligibleTracts: 2
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    yearField: "YearAADT"
+    year: 2024
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    luCountyId: 34
+    countyWhere: "YearAADT=2024 AND LUCountyID=34 AND AADT>0"
+    stations2024: 162
+    verifiedAt: "2026-09-28"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "LUCountyID=34 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 162 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location. Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/."
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://maps.capturecama.com/arcgis/rest/services/Henry/Henry05042023/MapServer/0
+  featureCount: 21876
+  taxSaleOwner:
+    ownerName:
+      field: NAME
+      status: usable
+    assessedValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://henry.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    appraisedOrMarketValue:
+      field: TOTALVALUE
+      status: usable
+      nonNullOrPositiveCount: 21876
+      ofTotal: 21876
+    landValue:
+      field: TOTALLAND
+      status: usable
+    improvementValue:
+      field: TOTALBUILD
+      status: usable
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://henry.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    lastSaleDate:
+      field: DEED_B_P_D
+      status: partial
+      note: text "book page M/D/YYYY"; parse the trailing date. SALEYEAR also present but usually blank
+    lastSalePrice:
+      field: SALEPRICE
+      status: partial
+      note: text field, usually blank
+    ownerEntityType:
+      derivable: true
+      sourceField: NAME
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 2069
+        INC: 525
+        TRUST: 603
+        CORP: 34
+        CHURCH: 232
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://henry.capturecama.com/mapparceldetail/{PIN}
+    pinField: PARCEL_ID
+    testPin: '2402043003016002'
+    verified: browser-only (pattern confirmed from viewer config)
+    method: 'pattern read from the county CaptureCAMA Experience Builder config (Embed Parcel Detail widget: capturecama.com/mapparceldetail/{PARCEL_ID}); page fetched 200 but is a React SPA shell (Citizen
+      Access Portal, empty #root)'
+    note: 'Renders in the browser only; content cannot be verified by plain fetch. Alt key in the same config: Assess_Num.'
+  jurisdictionGisUrl:
+    url: https://henry.capturecama.com/parcelviewer/
+    http: 200
+  notes: Layer is 2023 vintage (Henry05042023); values stored as text. Layer rejects resultRecordCount pagination — page by objectIds.

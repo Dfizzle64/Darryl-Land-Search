@@ -1,0 +1,31 @@
+{
+  "name": "Bullock",
+  "fips": "01011",
+  "state": "Alabama",
+  "markets": [
+    "Montgomery"
+  ],
+  "featureCount": 3579,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "al-bullock-parcels-01011",
+  "queryUrl": "https://gis.capturecama.com/arcgis/rest/services/BullockAL/BullockCapture/MapServer/3/query",
+  "gaps": [
+    "Source query returned 3952 rows; 3579 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcel Polygon (BullockCapture — CaptureCAMA ArcGIS Server, CAMA join) (https://gis.capturecama.com/arcgis/rest/services/BullockAL/BullockCapture/MapServer/3). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "No sale price/date",
+    "KCS Bullock_Public_ISV not evaluated this pass"
+  ],
+  "path": "data/fixtures/market-parcels/counties/01011/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01011/lookup.json",
+  "sourceCount": 3952,
+  "dropped": 43,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://bullock.capturecama.com/mapparceldetail/{PIN}",
+  "gisViewerUrl": "https://bullock.capturecama.com/parcelviewer/"
+}

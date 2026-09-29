@@ -1,0 +1,141 @@
+state: AL
+jurisdiction: Dallas County
+fips: "01047"
+level: county
+markets: [Rural OZ 2.0]
+
+layers:
+  - role: parcels
+    name: ParcelsJoin (Dallas ParcelViewer — CaptureCAMA AGOL hosted)
+    restUrl: "https://services8.arcgis.com/9e1lVZPGgkrztAhh/ArcGIS/rest/services/Dallas_ParcelViewer_Service/FeatureServer/2"
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: TOTAL_AC
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      ACCOUNT: accountNumber
+      PPIN: parcelIdKey (often null)
+      OWNERNAME: ownerName
+      CONAME: ownerCareOf
+      ADDRESS: mailingAddress.street
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIPCODE: mailingAddress.zip
+      SITUS_ADDR: situsAddress
+      TOTAL_AC: acreage
+      DEEDACRES: acreageDeed
+      LAND_VAL: tax.landValue
+      IMP_VAL: tax.improvementValue
+      TOTALVALUE: tax.marketValue
+      TAXES_DUE: tax.due
+      DISTRICT: tax.district
+      DEED_BOOK: lastSale.deedBook
+      DEED_PAGE: lastSale.deedPage
+      DEED_DATE: lastSale.date
+      YEARBUILT: yearBuilt
+      SQFT: buildingSqft
+      MUNICIPAL: municipalityCode
+      NEIGH_CODE: neighborhood
+      LEGAL: legalDescription
+    notes: >
+      Verified live 2026-09-28: ?f=json 200, anonymous, polygon, count 29996, maxRecordCount 1000; sample centroid -87.05,32.41 (Selma, Dallas AL — not Dallas TX). Discovered in the Experience Builder config of the county CaptureCAMA Parcel Viewer (https://dallas.capturecama.com/parcelviewer/cdn/31/config.json). TOTAL_AC>0 on 14198, DEEDACRES>0 on 16598; 6351 parcels with TOTAL_AC 5–150. Where both are 0 compute acreage from geometry. No sale price (deed book/page/date only). Secondary MapServer gis.capturecama.com/arcgis/rest/services/DallasAL/DallasCapture/MapServer/163 (PARCEL) also referenced — not verified.
+    status: usable
+
+gaps:
+  - No sale price
+  - ~50% of parcels have TOTAL_AC=0 — fall back to DEEDACRES or computed area
+  - Flagship alabamagis.com/dallas is still HTML-only; this AGOL layer is the REST source
+
+license: "Dallas County Tax Assessor / CaptureCAMA public parcel viewer; use-at-own-risk"
+appraiserSearchUrl: "https://dallas.capturecama.com/mapparceldetail/{PIN}"
+appraiserSearchUrlAlt: "https://dallas.capturecama.com/propsearch"
+jurisdictionGisUrl: "https://dallas.capturecama.com/parcelviewer/"
+ruralOz2:
+  source: "IRS Rev. Proc. 2026-14 appendix (Rural Status=Rural)"
+  ruralEligibleTracts: 15
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    yearField: "YearAADT"
+    year: 2024
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    luCountyId: 24
+    countyWhere: "YearAADT=2024 AND LUCountyID=24 AND AADT>0"
+    stations2024: 233
+    verifiedAt: "2026-09-28"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "LUCountyID=24 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 233 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location. Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/."
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://services8.arcgis.com/9e1lVZPGgkrztAhh/ArcGIS/rest/services/Dallas_ParcelViewer_Service/FeatureServer/2
+  featureCount: 29996
+  taxSaleOwner:
+    ownerName:
+      field: OWNERNAME
+      status: usable
+    assessedValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://dallas.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    appraisedOrMarketValue:
+      field: TOTALVALUE
+      status: usable
+      nonNullOrPositiveCount: 29796
+      ofTotal: 29996
+    landValue:
+      field: LAND_VAL
+      status: usable
+    improvementValue:
+      field: IMP_VAL
+      status: usable
+    taxAmount:
+      field: TAXES_DUE
+      status: usable
+      nonNullOrPositiveCount: 25120
+      ofTotal: 29996
+    lastSaleDate:
+      field: DEED_DATE
+      status: usable
+      nonNullOrPositiveCount: 29854
+      ofTotal: 29996
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://dallas.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    ownerEntityType:
+      derivable: true
+      sourceField: OWNERNAME
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 1891
+        INC: 810
+        TRUST: 586
+        CORP: 111
+        CHURCH: 475
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://dallas.capturecama.com/mapparceldetail/{PIN}
+    pinField: PARCEL_ID (viewer field PARCELID)
+    testPin: '1107361002025000'
+    verified: browser-only (pattern confirmed from viewer config)
+    method: 'pattern read from the county CaptureCAMA Experience Builder config (Embed Parcel Detail widget: capturecama.com/mapparceldetail/{PARCEL_ID (viewer field PARCELID)}); page fetched 200 but is
+      a React SPA shell (Citizen Access Portal, empty #root)'
+    note: 'Renders in the browser only; content cannot be verified by plain fetch. Alt key in the same config: Assess_Num.'
+  jurisdictionGisUrl:
+    url: https://dallas.capturecama.com/parcelviewer/
+    http: 200
+  notes: PPIN is mostly 0 in this layer; use PARCEL_ID for the deep link. No assessed value field (TOTALVALUE is the appraised value).

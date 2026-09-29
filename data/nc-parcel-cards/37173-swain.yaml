@@ -1,0 +1,299 @@
+state: NC
+jurisdiction: Swain County
+fips: "37173"
+level: county
+markets: [Asheville]
+slug: swain
+cntyfips: "173"
+
+municipalities:
+  - name: Bryson City
+    role: city-first-zoning
+    zoningLayer: OperationalLayers/MapServer/5 (limits only)
+    zoningField: null
+    count: 1
+    viewer: https://maps.swaincountync.gov/gis/
+    notes: >
+      County seat; city-limits poly only (Op/5 + AGOL Bryson_City_Limits).
+      No zoning district FeatureServer; first zoning/UDO in development (historically unzoned).
+  - name: Unincorporated Swain
+    role: gap
+    notes: >
+      Mountain-county pattern — unzoned on public REST. Qualla Boundary (EBCI) is tribal,
+      not a Swain municipality. CDPs/communities (Alarka, Fontana, Deep Creek, …) place-name only.
+
+layers:
+  - role: parcels
+    name: OperationalLayers Tax Parcels (CAMA + polygons)
+    restUrl: https://maps.swaincountync.gov/server/rest/services/OperationalLayers/MapServer/4
+    alternateUrls:
+      - https://maps.swaincountync.gov/server/rest/services/ParcelsForDownload/FeatureServer/0
+      - https://services3.arcgis.com/bAaHaqP9BvQhS7eE/arcgis/rest/services/Swain_County_Parcels/FeatureServer/0
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: LegalLandUnits
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      ParcelNumber: parcelId
+      AccountNumber: parcelIdAccount
+      LegalLandUnits: acreage
+      DeedAcreage: acreage
+      DEED_ACRE: acreage
+      Name1: ownerName
+      Name2: ownerName
+      Address1: mailingAddress
+      Address2: mailingAddress
+      City: mailingAddress
+      State: mailingAddress
+      ZipCode: mailingAddress
+      HouseNumber: situsAddress
+      StreetDirection: situsAddress
+      StreetName: situsAddress
+      StreetType: situsAddress
+      StreetSuffix: situsAddress
+      ParcelAddr: situsAddress
+      LegalDescription: legalDescription
+      DeedBook: deed
+      DeedPage: deed
+      ParcelLandValue: tax.marketValue
+      ParcelBuildingValue: tax.marketValue
+      ParcelObxfValue: tax.marketValue
+      TotalMarketValue: tax.marketValue
+      TotalAssessedValue: tax.assessedValue
+      ParcelDeferredValue: tax.taxableValue
+      AssessedValue: tax.assessedValue
+    notes: >
+      PRIMARY verified 2026-09-24: count 12669; CAST(LegalLandUnits AS FLOAT) BETWEEN 5 AND 150 → 2522;
+      Shape_Area/43560 5–150 → 2466; Name1 populated → 12690; TotalAssessedValue non-zero → 12655.
+      CRS 102719/2264. MaxRecordCount 2000 — paginate. Sample PARCEL_ID 563500075909
+      DICK HOLDINGS LLC centroid ≈ -83.937, 35.458. Tax/acre fields are strings — CAST for filters.
+      No SalePrice on REST (price on AppraisalCard PDF).
+    status: usable
+
+  - role: parcels
+    name: ParcelsForDownload (extract twin)
+    restUrl: https://maps.swaincountync.gov/server/rest/services/ParcelsForDownload/FeatureServer/0
+    alternateUrls:
+      - https://maps.swaincountync.gov/server/rest/services/ParcelsForDownload/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: LegalLandUnits
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      ParcelNumber: parcelId
+      LegalLandUnits: acreage
+      Name1: ownerName
+      TotalAssessedValue: tax.assessedValue
+      TotalMarketValue: tax.marketValue
+    notes: >
+      Count 12704; LegalLandUnits 5–150 → 2522. MaxRecordCount 1000; Extract capability.
+      Prefer OperationalLayers/4 for viewer parity.
+    status: usable
+
+  - role: parcels
+    name: AGOL Swain_County_Parcels (CAMA mirror + Deed_Date)
+    restUrl: https://services3.arcgis.com/bAaHaqP9BvQhS7eE/arcgis/rest/services/Swain_County_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      Acreage: acreage
+      Name__1: ownerName
+      Name__2: ownerName
+      Address_Line_1: mailingAddress
+      Address_Line_2: mailingAddress
+      City: mailingAddress
+      State: mailingAddress
+      Zip_Code: mailingAddress
+      ParcelPropertyAddress: situsAddress
+      Deed_Date: lastSale.date
+      Deed_Book: deed
+      Deed_Page: deed
+      Land_Value_Parcel: tax.marketValue
+      Building_Value_Parcel: tax.marketValue
+      OBXF_Value_Parcel: tax.marketValue
+      Total_Assessed_Value: tax.assessedValue
+    notes: >
+      Count 13551; Acreage 5–150 → 2906; Total_Assessed_Value>0 → 13448; Deed_Date populated → 12316.
+      Numeric Acreage + int tax fields; Deed_Date without sale price. Project from Web Mercator for NCSP joins.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      altparno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress
+      siteadd: situsAddress
+      gisacres: acreage
+      saledatetx: lastSale.date
+      parval: tax.marketValue
+      landval: tax.marketValue
+      improvval: tax.marketValue
+    notes: >
+      Filter cntyfips='173'; count 12704; gisacres 5–150 → 2474; join altparno=PARCEL_ID OK;
+      parno empty for Swain — use altparno. saledatetx blank; no sale price — prefer county + AppraisalCard.
+    status: usable
+
+  - role: zoning
+    name: Bryson City Limits (cities-first boundary; no districts)
+    restUrl: https://maps.swaincountync.gov/server/rest/services/OperationalLayers/MapServer/5
+    alternateUrls:
+      - https://services3.arcgis.com/bAaHaqP9BvQhS7eE/arcgis/rest/services/Bryson_City_Limits/FeatureServer/0
+    layerId: 5
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      Boundary-only (count 1). No ZoneType/district fields. Spatial-join for municipal routing.
+      Bryson City first zoning/UDO in development — historically unzoned.
+    status: partial
+
+  - role: flu
+    name: Future Land Use
+    restUrl: null
+    geometry: none
+    auth: none
+    coverage: none
+    fieldMap: {}
+    notes: >
+      No FLU FeatureServer. 1994 Swain County Land Use Plan PDF
+      https://www.swaincountync.gov/download/1994-swain-county-land-use-plan/?wpdmdl=6948 ;
+      NCDOT CTP ≠ FLU.
+    status: gap
+
+gaps:
+  - Sale price REST gap — public on ITSPublicSW AppraisalCard PDF only; AGOL Deed_Date has date without price
+  - Zoning district REST gap — Bryson City limits only; UDO/first zoning in development; unincorporated unzoned
+  - FLU REST gap — 1994 Land Use Plan PDF + NCDOT CTP only
+  - OneMap parno empty — join via altparno
+  - County MS tax/acre fields are strings — CAST for numeric filters
+  - TaxBillSearch/RealEstateSearch /Parcel/{id} deep-links 404 — use AppraisalCard ?id=
+  - Spatialest /nc/swain shell not used as PA deep-link
+  - Utilities / AADT / emails / phones / paid vendors excluded
+
+license: "Swain County GIS / Tax Assessor / Mapping; NCGS 132-10; attribute Town of Bryson City for municipal boundary"
+appraiserSearchUrl: "https://www.bttaxpayerportal.com/ITSPublicSW/AppraisalCard.aspx?id={PARCEL_ID}"
+jurisdictionGisUrl: https://maps.swaincountync.gov/gis/
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://maps.swaincountync.gov/server/rest/services/OperationalLayers/MapServer/4
+  parcelIdField: PARCEL_ID
+  acreageFilter: CAST(LegalLandUnits AS FLOAT) >= 5 AND CAST(LegalLandUnits AS FLOAT) <= 150 AND LegalLandType='AC'
+  acres5to150Live: 2521
+  parcelCountLive: 12704
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='SWAIN'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27SWAIN%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27SWAIN%27&returnCountOnly=true&f=json
+      liveStationCount: 142
+      stationsWithAADT2022: 83
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Swain'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Swain%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Swain%27&returnCountOnly=true&f=json
+      liveStationCount: 143
+      stationsWithAADT2025: 93
+      stationsWithAADT2024: 81
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TotalAssessedValue
+    - TotalMarketValue
+    allTaxFieldsOnLayer:
+    - ParcelLandValue
+    - ParcelBuildingValue
+    - ParcelObxfValue
+    - TotalMarketValue
+    - TotalAssessedValue
+    - ParcelDeferredValue
+    - AssessedValue
+    liveNonZero:
+      TotalAssessedValue: 12655
+      TotalMarketValue: 12655
+    status: ok
+    note: 'Value fields are strings: use CAST(field AS FLOAT) > 0.'
+  sale:
+    priceFields: []
+    dateFields: []
+    livePriceNonZero: {}
+    liveDateNonNull: {}
+    status: partial
+    note: No sale fields on OperationalLayers/4. AGOL Swain_County_Parcels/0 Deed_Date non-null = 12,316 of 13,551 (live 2026-09-28); price only on ITSPublicSW AppraisalCard PDF.
+  ownerEntity:
+    ownerFields:
+    - Name1
+    - Name2
+    primaryOwnerField: Name1
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(Name1) LIKE '% LLC%' OR UPPER(Name1) LIKE '% INC%' OR UPPER(Name1) LIKE '% LP%' OR UPPER(Name1) LIKE '% LLP%' OR UPPER(Name1) LIKE '% LTD%' OR UPPER(Name1) LIKE '% TRUST%' OR UPPER(Name1) LIKE '% CHURCH%' OR UPPER(Name1) LIKE '% COMPANY%' OR UPPER(Name1) LIKE '% PARTNERSHIP%' OR UPPER(Name1) LIKE '% HOLDINGS%' OR UPPER(Name1) LIKE '% PROPERTIES%' OR UPPER(Name1) LIKE '% CORP%' OR UPPER(Name1) LIKE '%,LLC%' OR UPPER(Name1) LIKE '%,INC%' OR UPPER(Name1) LIKE 'CITY OF %' OR UPPER(Name1) LIKE 'COUNTY OF %' OR UPPER(Name1) LIKE 'STATE OF %' OR UPPER(Name1) LIKE 'TOWN OF %')
+    liveEntityCountAll: 2176
+    liveEntityCount5to150ac: 462
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://www.bttaxpayerportal.com/ITSPublicSW/AppraisalCard.aspx?id={PARCEL_ID}
+    testedParcelId: '563600311047'
+    testedUrl: https://www.bttaxpayerportal.com/ITSPublicSW/AppraisalCard.aspx?id=563600311047
+    httpStatus: 200
+    contentType: application/pdf
+    contentVerified: true
+    note: Owner and parcel id verified in the response.
+  gisViewer:
+    url: https://maps.swaincountync.gov/gis/
+    httpStatus: 200
+    pageTitle: Swain County, North Carolina GIS
+  acreageNote: The acreage field is a string, so filters need CAST(... AS FLOAT). Swain also filters LegalLandType='AC'.
+  parcelIdNote: Use PARCEL_ID (12-digit, undashed). PIN is empty on every row.
+  gaps:
+  - sale partial

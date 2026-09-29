@@ -1,0 +1,200 @@
+state: NC
+jurisdiction: Halifax County
+fips: "37083"
+level: county
+markets: [Rocky Mount, Raleigh-Durham]
+slug: halifax
+cntyfips: "083"
+
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=872&LayerID=16488&PageTypeID=1&PageID=7289
+publicGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=872&LayerID=16488&PageTypeID=1&PageID=7289
+gisViewerUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=872&LayerID=16488&PageTypeID=1&PageID=7289
+viewerLinkTemplate: "https://qpublic.schneidercorp.com/Application.aspx?AppID=872&LayerID=16488&PageTypeID=4&PageID=7291&KeyValue={PARID}"
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=872&LayerID=16488&PageTypeID=2&PageID=7290
+paDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/halifax/parcel-detail/{PARID}"
+paDeepLinkKey: PARID
+paQpublicDeepLinkTemplate: "https://qpublic.schneidercorp.com/Application.aspx?AppID=872&LayerID=16488&PageTypeID=4&PageID=7291&KeyValue={PARID}"
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/halifax/parcel-search
+ncptsDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/halifax/parcel-detail/{PARID}"
+countyRestRoot: https://services8.arcgis.com/0zS9csrI5fS6Bcym/arcgis/rest/services
+gisDepartmentUrl: https://halifaxnctax.com/geographic-information-system/
+taxAssessorUrl: https://www.halifaxnc.com/226/Tax-Administration
+taxPortalUrl: https://halifaxnctax.com/
+planningZoningUrl: https://www.halifaxnc.com/152/Planning-Zoning
+comprehensivePlanUrl: https://www.halifaxnc.com/449/Halifax-County-Comprehensive-Land-Use-an
+shapefileDownloadsUrl: https://halifaxnctax.com/geographic-information-system/
+oneMapFilter: "cntyfips='083'"
+parcelIdPreferred: PARID
+joinKeys: [PARID, PIN83, APN, parno, altparno]
+
+layers:
+  - role: parcels
+    name: OpenGov_RR_Layers/Halifax_County_Parcels (PRIMARY CAMA)
+    restUrl: https://services8.arcgis.com/0zS9csrI5fS6Bcym/arcgis/rest/services/OpenGov_RR_Layers/FeatureServer/22
+    layerId: 22
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PARID: parcelId
+      PIN83: parcelIdPin
+      APN: parcelIdApn
+      ACREAGE: acreage
+      CALC_ACRE: acreageGis
+      CURRENT_OW: ownerName
+      CURRENT_AD: mailingAddress.street
+      CURRENT_CI: mailingAddress.city
+      CURRENT_ST: mailingAddress.state
+      CURRENT_ZI: mailingAddress.zip
+      PARCEL_ADD: situsAddress
+      SALE_PRICE: lastSale.price
+      DATE_RECOR: lastSale.date
+      BK_PG: lastSale.deedBookPage
+      ASSESSED_V: tax.assessedValue
+      TOTAL_TAX_: tax.taxableValue
+      LAND_TAX_D: tax.landValue
+      PARCEL_CLA: propClass
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 39355; ACREAGE 5–150 → 6461;
+      SALE_PRICE>0 → 14325; sale in band → 1763; APPRAISED blank in band → 4438.
+      CRS 102100/3857. MaxRecordCount 2000 — paginate. Sample PARID 0106888 /
+      PIN83 2898-00-99-7502 ≈ -77.984, 36.190. Prefer PARID for NCPTS/qPublic.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (fallback)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdPin
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      siteadd: situsAddress
+      gisacres: acreage
+      recareano: acreageRecorded
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      saledate: lastSale.date
+    notes: >
+      Filter cntyfips='083'. Verified count 39403; gisacres 5–150 → 6332;
+      recareano 5–150 → 6489. parno↔PARID; altparno↔PIN83. No sale price;
+      landval/improvval empty — prefer OpenGov. Alt host services.gis.nc.gov.
+    status: usable
+
+  - role: zoning
+    name: Roanoke Rapids Zoning2 (city-first PRIMARY)
+    restUrl: https://services8.arcgis.com/0zS9csrI5fS6Bcym/arcgis/rest/services/Roanoke_Rapids_Zoning2_(2)/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+      PARID: parcelId
+      PIN83: parcelIdPin
+      OWN1: ownerName
+      LOCATION: situsAddress
+      CALC_ACRE: acreage
+      SALE_PRICE: lastSale.price
+      SALE_DT: lastSale.date
+      LAND: tax.landValue
+      BUILDINGS: tax.improvementValue
+      TAXABLE: tax.taxableValue
+      LUC: dorCode
+    notes: >
+      CITY-FIRST. Count 9083; ZONE top R-8/R-6/R-12/R-20/B-4. Parcelized CAMA.
+      Alt OpenGov_RR_Layers/14 (9079).
+    status: usable
+
+  - role: zoning
+    name: OpenGov RR_Current_Zoning (alternate)
+    restUrl: https://services8.arcgis.com/0zS9csrI5fS6Bcym/arcgis/rest/services/OpenGov_RR_Layers/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+    notes: Near-duplicate of Zoning2; prefer dedicated FeatureServer.
+    status: usable
+
+  - role: zoning
+    name: RR Entertainment Overlay
+    restUrl: https://services8.arcgis.com/0zS9csrI5fS6Bcym/arcgis/rest/services/OpenGov_RR_Layers/FeatureServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    notes: Count ~68; also Entertainment_Overlay_District standalone FS (~66).
+    status: usable
+
+  - role: zoning
+    name: RR Historic District
+    restUrl: https://services8.arcgis.com/0zS9csrI5fS6Bcym/arcgis/rest/services/Roanoke_Rapids_Historic_District/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    notes: Count 1.
+    status: usable
+
+  - role: zoning
+    name: RR Cross Creek PUD
+    restUrl: https://services8.arcgis.com/0zS9csrI5fS6Bcym/arcgis/rest/services/OpenGov_RR_Layers/FeatureServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    notes: Count 128.
+    status: usable
+
+  - role: other
+    name: RR City Limits
+    restUrl: https://services8.arcgis.com/0zS9csrI5fS6Bcym/arcgis/rest/services/OpenGov_RR_Layers/FeatureServer/18
+    layerId: 18
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    notes: Count 6; ETJ on /19 (3); City+ETJ /20 (1). Zoning router.
+    status: usable
+
+  - role: zoning
+    name: County unincorporated Official Zoning Map
+    restUrl: null
+    geometry: none
+    auth: n/a
+    coverage: county-wide
+    notes: >
+      GAP — ordinance applies to designated unincorporated areas only; no public
+      FeatureServer. Weldon/Enfield/Scotland Neck/Halifax/Littleton/Hobgood also
+      lack municipal zoning REST.
+    status: gap
+
+  - role: flu
+    name: Comprehensive Land Use & Recreation Plan (PDF / in progress)
+    restUrl: null
+    geometry: none
+    auth: n/a
+    coverage: county-wide
+    notes: >
+      FLU GAP — no FLUM FeatureServer. Portal halifaxnc.com/449; Steering Committee
+      Meeting #1 PDF DocumentCenter/View/5026 (2025-09-25).
+    status: gap
+
+gaps:
+  - No county ArcGIS Server root — RR AGOL + OneMap + qPublic
+  - County Official Zoning Map REST gap; other towns zoning REST gaps
+  - FLU FeatureServer gap (Comp Plan PDF/in-progress)
+  - OneMap sale/land/improv weak — prefer OpenGov/22
+  - qPublic/halifaxnctax Cloudflare vs automated clients
+  - No phones/emails; no AADT/utilities; no paid vendors
+license: "Halifax County / City of Roanoke Rapids public GIS + NC OneMap; free shapefile downloads; attribution recommended"
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher

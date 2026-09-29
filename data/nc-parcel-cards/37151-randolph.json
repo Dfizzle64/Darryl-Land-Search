@@ -1,0 +1,577 @@
+{
+  "county": "Randolph",
+  "state": "NC",
+  "msa": "Winston-Salem / Triad footprint",
+  "fips": "37151",
+  "cntyfips": "151",
+  "slug": "randolph",
+  "level": "county",
+  "markets": [
+    "Winston-Salem"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "publicGisUrl": "https://gis.randolphcountync.gov/randolphjs/",
+  "jurisdictionGisUrl": "https://gis.randolphcountync.gov/randolphjs/",
+  "gisViewerUrl": "https://gis.randolphcountync.gov/randolphjs/",
+  "gisViewerUrlAlt": [
+    "https://gis.randolphcountync.gov/randolphts/",
+    "https://gis.randolphcountync.gov/RandolphTS/"
+  ],
+  "gisLandingUrl": "https://gis.randolphcountync.gov/",
+  "gisDepartmentUrl": "https://randolphcountync.gov/255/GIS",
+  "gisDataDownloadsUrl": "https://randolphcountync.gov/432/GIS-Data",
+  "openDataUrl": "https://randolphcounty-randolphctygis.opendata.arcgis.com/",
+  "agolOrgUrl": "https://randolphconc.maps.arcgis.com/",
+  "countyRestRoot": "https://gis.randolphcountync.gov/arcgis/rest/services",
+  "appraiserSearchUrl": "https://txpwa.randolphcountync.gov/camapwa/SearchProperty.aspx",
+  "viewerLinkTemplate": "https://txpwa.randolphcountync.gov/camapwa/PropertySummary.aspx?REID={REID}",
+  "viewerLinkTemplateAlt": "https://txpwa.randolphcountync.gov/camapwa/PropertySummary.aspx?PARCELPK={PARCEL_PK}",
+  "taxDeptUrl": "https://randolphcountync.gov/238/Tax",
+  "planningUrl": "https://randolphcountync.gov/261/Planning-Zoning",
+  "joinKeys": [
+    "REID",
+    "PARCEL_PK",
+    "PIN",
+    "parno",
+    "altparno"
+  ],
+  "parcelIdPreferred": "REID",
+  "paDeepLinkKey": "REID",
+  "municipalities": {
+    "Asheboro": {
+      "cityCode": "01",
+      "zoningLayerCount": 559,
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.randolphcountync.gov/arcgis/rest/services/PW/PW_ParcelMap/FeatureServer/31",
+      "zoningFilter": "JURISDICTION='ASHEBORO'",
+      "zoningField": "ZONE_CODE",
+      "fluPrefer": "Growth Management Areas FeatureServer/33",
+      "publicGisUrl": "https://gis.randolphcountync.gov/randolphjs/",
+      "notes": "County seat; no independent city ArcGIS REST"
+    },
+    "Archdale": {
+      "cityCode": "02",
+      "zoningLayerCount": 206,
+      "hasLocalGis": false,
+      "zoningPrefer": "PW_ParcelMap/FeatureServer/31",
+      "zoningFilter": "JURISDICTION='ARCHDALE'",
+      "zoningField": "ZONE_CODE",
+      "fluPrefer": "GMA/33",
+      "publicGisUrl": "https://gis.randolphcountync.gov/randolphjs/"
+    },
+    "Franklinville": {
+      "cityCode": "03",
+      "zoningLayerCount": 17,
+      "hasLocalGis": false,
+      "zoningFilter": "JURISDICTION='FRANKLINVILLE'",
+      "zoningField": "ZONE_CODE"
+    },
+    "Liberty": {
+      "cityCode": "04",
+      "zoningLayerCount": 79,
+      "hasLocalGis": false,
+      "zoningFilter": "JURISDICTION='LIBERTY'",
+      "zoningField": "ZONE_CODE"
+    },
+    "Ramseur": {
+      "cityCode": "05",
+      "zoningLayerCount": 60,
+      "hasLocalGis": false,
+      "zoningFilter": "JURISDICTION='RAMSEUR'",
+      "zoningField": "ZONE_CODE"
+    },
+    "Randleman": {
+      "cityCode": "06",
+      "zoningLayerCount": 122,
+      "hasLocalGis": false,
+      "zoningFilter": "JURISDICTION='RANDLEMAN'",
+      "zoningField": "ZONE_CODE"
+    },
+    "Seagrove": {
+      "cityCode": "07",
+      "zoningLayerCount": 36,
+      "hasLocalGis": false,
+      "zoningFilter": "JURISDICTION='SEAGROVE'",
+      "zoningField": "ZONE_CODE"
+    },
+    "Staley": {
+      "cityCode": "08",
+      "zoningLayerCount": 14,
+      "hasLocalGis": false,
+      "zoningFilter": "JURISDICTION='STALEY'",
+      "zoningField": "ZONE_CODE"
+    },
+    "Trinity": {
+      "cityCode": "11",
+      "zoningLayerCount": 185,
+      "hasLocalGis": false,
+      "zoningFilter": "JURISDICTION='TRINITY'",
+      "zoningField": "ZONE_CODE"
+    },
+    "High Point": {
+      "cityCode": "09",
+      "zoningLayerCount": 10,
+      "hasLocalGis": false,
+      "zoningFilter": "JURISDICTION='HIGH POINT'",
+      "zoningField": "ZONE_CODE",
+      "notes": "Randolph-side tip only — prefer Guilford/HP card for core"
+    },
+    "Thomasville": {
+      "cityCode": "10",
+      "zoningLayerCount": 10,
+      "hasLocalGis": false,
+      "zoningFilter": "JURISDICTION='THOMASVILLE'",
+      "zoningField": "ZONE_CODE",
+      "notes": "Randolph-side tip only — prefer Davidson card for core"
+    }
+  },
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "REID",
+        "PARCEL_PK",
+        "PIN",
+        "parno",
+        "altparno"
+      ],
+      "bestLayer": "PW/ParcelQuery/0",
+      "caveat": "REID/PARCEL_PK for CAMA deep-link; PIN for OneMap (parno≈PIN, altparno≈REID)"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "PW/ParcelQuery/0"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "TAX_ACRES",
+        "CALC_ACRES",
+        "gisacres",
+        "recareano"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 16961,
+      "approxCountCalcAcres": 16484,
+      "approxCountGisacres": 16449,
+      "bestLayer": "PW/ParcelQuery/0"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "ACCT_NAME",
+        "ownname",
+        "COMPLETE_NAME"
+      ],
+      "bestLayer": "PW/ParcelQuery/0"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "ACCT_ADDR",
+        "ACCT_ADDR2",
+        "ACCT_CITY",
+        "ACCT_STATE",
+        "ACCT_ZIP",
+        "mailadd"
+      ],
+      "bestLayer": "PW/ParcelQuery/0"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": false,
+      "fields": [
+        "LOCADDRESS",
+        "LOCZIP",
+        "FULLADDRESS",
+        "siteadd"
+      ],
+      "bestLayer": "PW/ParcelQuery/0",
+      "caveat": "~20659 No Physical Address — join ParcelAddresses/1 or OneMap siteadd (~60160 present)"
+    },
+    "lastSale": {
+      "present": "partial",
+      "fields": [
+        "saledate",
+        "saledatetx",
+        "DEED_BK_PG",
+        "DOCUMENT_BOOK",
+        "DOCUMENT_PAGE",
+        "DEEDLINK"
+      ],
+      "bestLayer": "NC OneMap (date) + CAMA PropertySummary HTML (price)",
+      "caveat": "No sale price on public REST; PA deep-link HTML shows Land/Package Sale Price"
+    },
+    "taxValues": {
+      "present": true,
+      "fields": [
+        "LAND_VALUE",
+        "BLDG_VALUE",
+        "TOT_REAL_VALUE",
+        "DEF_VALUE",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "PW/ParcelQuery/0",
+      "approxCountWithMarket": 79768,
+      "approxCountWithBuilding": 57475,
+      "approxCountDeferred": 4636
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "ZONE_CODE",
+        "JURISDICTION",
+        "BASECODE"
+      ],
+      "bestLayer": "PW/PW_ParcelMap/31",
+      "caveat": "Cities-first via JURISDICTION filter on single county layer; no city FS"
+    },
+    "flu": {
+      "present": "partial",
+      "fields": [
+        "GMCODE"
+      ],
+      "bestLayer": "PW/PW_ParcelMap/33",
+      "caveat": "Growth management policy areas — not parcel-keyed comprehensive-plan FLUM"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "PW/ParcelQuery Parcels (PRIMARY CAMA)",
+      "restUrl": "https://gis.randolphcountync.gov/arcgis/rest/services/PW/ParcelQuery/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "TAX_ACRES",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 81155,
+        "taxAcres_5_150": 16961,
+        "calcAcres_5_150": 16484,
+        "totRealValue_gt0": 79768,
+        "bldgValue_gt0": 57475,
+        "defValue_gt0": 4636,
+        "situsRealApprox": 60496,
+        "situsNoPhysicalApprox": 20659
+      },
+      "fieldMap": {
+        "REID": "parcelId",
+        "PARCEL_PK": "parcelIdPk",
+        "PIN": "parcelIdPin",
+        "TAX_ACRES": "acreage",
+        "CALC_ACRES": "acreageGis",
+        "ACCT_NAME": "ownerName",
+        "ACCT_ADDR": "mailingAddress.street",
+        "ACCT_CITY": "mailingAddress.city",
+        "ACCT_STATE": "mailingAddress.state",
+        "ACCT_ZIP": "mailingAddress.zip",
+        "LOCADDRESS": "situsAddress",
+        "LOCZIP": "situsZip",
+        "LAND_VALUE": "tax.landValue",
+        "BLDG_VALUE": "tax.improvementValue",
+        "TOT_REAL_VALUE": "tax.marketValue",
+        "DEF_VALUE": "tax.deferredValue",
+        "DEED_BK_PG": "lastSale.deedBookPage"
+      },
+      "relatedTables": [
+        {
+          "id": 1,
+          "name": "ParcelAddresses",
+          "join": "PIN"
+        },
+        {
+          "id": 2,
+          "name": "ParcelOwners",
+          "join": "PIN"
+        }
+      ],
+      "mirrorMapServer": "https://gis.randolphcountync.gov/arcgis/rest/services/PW/ParcelQuery/MapServer/0",
+      "maxRecordCount": 2000,
+      "notes": "PRIMARY wire-first. No sale-price on REST."
+    },
+    {
+      "role": "parcels",
+      "name": "PW/PW_ParcelMap Parcels (thin mirror)",
+      "restUrl": "https://gis.randolphcountync.gov/arcgis/rest/services/PW/PW_ParcelMap/FeatureServer/14",
+      "layerId": 14,
+      "geometry": "polygon",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 81155
+      },
+      "notes": "Same polygons without LAND/BLDG/TOT tax fields — prefer ParcelQuery/0"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "coverage": "county-wide",
+      "status": "usable",
+      "filter": "cntyfips='151'",
+      "verifiedCounts": {
+        "total": 80940,
+        "gisacres_5_150": 16449,
+        "siteadd_present": 60160,
+        "parval_gt0": 79478
+      },
+      "fieldMap": {
+        "parno": "parcelIdPin",
+        "altparno": "parcelId",
+        "ownname": "ownerName",
+        "gisacres": "acreage",
+        "saledate": "lastSale.date",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "siteadd": "situsAddress"
+      },
+      "alternateHost": "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "notes": "Fallback; saledate yes, saleprice no"
+    },
+    {
+      "role": "zoning",
+      "name": "Zoning Districts (cities-first via JURISDICTION)",
+      "restUrl": "https://gis.randolphcountync.gov/arcgis/rest/services/PW/PW_ParcelMap/FeatureServer/31",
+      "layerId": 31,
+      "geometry": "polygon",
+      "coverage": "county-wide",
+      "status": "usable",
+      "zoningField": "ZONE_CODE",
+      "jurisdictionField": "JURISDICTION",
+      "verifiedCounts": {
+        "total": 3601,
+        "byJurisdiction": {
+          "RANDOLPH COUNTY": 2303,
+          "ASHEBORO": 559,
+          "ARCHDALE": 206,
+          "TRINITY": 185,
+          "RANDLEMAN": 122,
+          "LIBERTY": 79,
+          "RAMSEUR": 60,
+          "SEAGROVE": 36,
+          "FRANKLINVILLE": 17,
+          "STALEY": 14,
+          "THOMASVILLE": 10,
+          "HIGH POINT": 10
+        }
+      },
+      "notes": "Single layer — filter JURISDICTION for city-first routing; no independent city FS"
+    },
+    {
+      "role": "flu",
+      "name": "Growth Management Areas",
+      "restUrl": "https://gis.randolphcountync.gov/arcgis/rest/services/PW/PW_ParcelMap/FeatureServer/33",
+      "layerId": 33,
+      "geometry": "polygon",
+      "coverage": "county-wide",
+      "status": "usable",
+      "fluField": "GMCODE",
+      "verifiedCounts": {
+        "total": 77
+      },
+      "categories": {
+        "MUNICIPAL GROWTH AREA": 34,
+        "RURAL GROWTH AREA": 15,
+        "PRIMARY GROWTH AREA": 13,
+        "SECONDARY GROWTH AREA": 12,
+        "ZOO ENVIRONMENTAL AREA": 3
+      },
+      "notes": "FLU-like growth policy; spatial join — not parcel-keyed FLUM"
+    },
+    {
+      "role": "other",
+      "name": "Special Development Districts",
+      "restUrl": "https://gis.randolphcountync.gov/arcgis/rest/services/PW/PW_ParcelMap/FeatureServer/32",
+      "layerId": 32,
+      "geometry": "polygon",
+      "coverage": "sample",
+      "status": "partial",
+      "verifiedCounts": {
+        "total": 4
+      },
+      "types": [
+        "AIRPORT OVERLAY / APPROACH ZONE",
+        "AIRPORT OVERLAY / BUFFER ZONE",
+        "SMALL AREA PLAN / BIRKHEAD WILDERNESS/UWHARRIE NATIONAL FOREST",
+        "SMALL AREA PLAN / NC HWY 705"
+      ]
+    },
+    {
+      "role": "other",
+      "name": "Randolph Municipalities",
+      "restUrl": "https://gis.randolphcountync.gov/arcgis/rest/services/PW/PW_ParcelMap/FeatureServer/42",
+      "layerId": 42,
+      "geometry": "polygon",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 100
+      },
+      "cityCodes": {
+        "01": "Asheboro",
+        "02": "Archdale",
+        "03": "Franklinville",
+        "04": "Liberty",
+        "05": "Ramseur",
+        "06": "Randleman",
+        "07": "Seagrove",
+        "08": "Staley",
+        "09": "High Point",
+        "10": "Thomasville",
+        "11": "Trinity"
+      }
+    },
+    {
+      "role": "other",
+      "name": "Municipal ETJ",
+      "restUrl": "https://gis.randolphcountync.gov/arcgis/rest/services/PW/PW_ParcelMap/FeatureServer/30",
+      "layerId": 30,
+      "geometry": "polygon",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 57
+      },
+      "nameField": "ZONE_DIST"
+    }
+  ],
+  "gaps": [
+    "No sale price on public ArcGIS REST — CAMA PropertySummary HTML has Land/Package Sale Price + dates; OneMap has saledate only",
+    "No independent city ArcGIS FeatureServers (Asheboro, Archdale, Randleman, Liberty, Ramseur, Trinity, etc.) — route zoning via JURISDICTION on county layer 31",
+    "No parcel-keyed comprehensive-plan FLUM — GMA growth-policy areas only; Small Area Plans are overlays on layer 32",
+    "LOCADDRESS 'No Physical Address' on ~20659 — join ParcelAddresses/1 or OneMap siteadd",
+    "High Point / Thomasville zoning rows are Randolph-side tips — prefer Guilford / Davidson cards for core city",
+    "PW_ParcelMap/14 lacks tax value fields — always prefer ParcelQuery/0 for CAMA",
+    "MaxRecordCount 2000 — paginate; no phones/emails; no AADT/utilities; no paid vendors"
+  ],
+  "license": "Randolph County public GIS; NC OneMap; attribution recommended; no paid vendors; NC GS 132-10 resale restrictions noted by county",
+  "tranche3": {
+    "tax": true,
+    "sale": "partial-via-PA-HTML-and-OneMap-date",
+    "owner": true,
+    "paDeepLinkWithParcelId": true,
+    "jurisdictionGisUrl": true
+  },
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://gis.randolphcountync.gov/arcgis/rest/services/PW/ParcelQuery/FeatureServer/0",
+    "parcelIdField": "REID",
+    "acreageFilter": "TAX_ACRES >= 5 AND TAX_ACRES <= 150",
+    "acres5to150Live": 16963,
+    "parcelCountLive": 81157,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='RANDOLPH'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27RANDOLPH%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27RANDOLPH%27&returnCountOnly=true&f=json",
+        "liveStationCount": 1001,
+        "stationsWithAADT2022": 513
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Randolph'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Randolph%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Randolph%27&returnCountOnly=true&f=json",
+        "liveStationCount": 1002,
+        "stationsWithAADT2025": 635,
+        "stationsWithAADT2024": 541,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "stations2024CountyFilter": "County='Randolph'",
+        "stations2024LiveCount": 997,
+        "stations2024WithAADT2024": 997,
+        "stations2024Note": "AADT_2024 string field populated on every station in this release",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TOT_REAL_VALUE",
+        "LAND_VALUE"
+      ],
+      "liveNonZero": {
+        "TOT_REAL_VALUE": 79759,
+        "LAND_VALUE": 79759
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [],
+      "dateFields": [],
+      "livePriceNonZero": {},
+      "liveDateNonNull": {},
+      "status": "partial-date-only",
+      "note": "No sale price/date on ParcelQuery. Sale date via NC OneMap saledate (cntyfips='151', join altparno=REID or parno=PIN): 59122 rows with saledate>1901. Price gap on REST → CAMA PropertySummary (public).",
+      "supplementalSource": {
+        "url": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+        "where": "cntyfips='151' AND saledate > DATE '1901-01-01'",
+        "count": 59122
+      }
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "ACCT_NAME"
+      ],
+      "rule": "Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).",
+      "regex": "\\b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "regexExtended": "\\b(LLC|L\\s?L\\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\\b|\\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\\s+OF\\b|\\bOF\\s+(EDUCATION|TRANSPORTATION)\\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\\b",
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "liveEntityCount5to150ac": 1529,
+      "liveEntityCount5to150acExtended": 2652,
+      "countNote": "Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.",
+      "sampleMatches": [
+        "WALL TIMBERLANDS INC",
+        "SHK TIMBERLANDS OF LEXINGTON LLC",
+        "SHK TIMBERLANDS OF LEXINGTON LLC",
+        "KECK, MARK WAYNE II TRUSTEE (KECK, DEBRA CRANFORD TRUSTEE)"
+      ]
+    },
+    "paDeepLink": {
+      "template": "https://txpwa.randolphcountync.gov/camapwa/PropertySummary.aspx?REID={REID}",
+      "testedParcelId": "64499",
+      "testedUrl": "https://txpwa.randolphcountync.gov/camapwa/PropertySummary.aspx?REID=64499",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": true,
+      "note": "Parcel id found in the response body."
+    },
+    "gisViewer": {
+      "url": "https://gis.randolphcountync.gov/randolphjs/",
+      "httpStatus": 200,
+      "pageTitle": "Randolph County GIS"
+    },
+    "gaps": [
+      "Sale price not on public REST — CAMA PropertySummary only; sale date via OneMap join"
+    ]
+  }
+}

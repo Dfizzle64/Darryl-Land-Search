@@ -1,0 +1,50 @@
+{
+  "name": "Humphreys",
+  "fips": "47085",
+  "state": "Tennessee",
+  "markets": [
+    "Nashville"
+  ],
+  "featureCount": 4798,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "tn-oir-public-use-47085",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+  "gaps": [
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used.",
+    "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
+  ],
+  "path": "data/fixtures/market-parcels/counties/47085/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47085/lookup.json",
+  "sourceCount": 13764,
+  "dropped": 0,
+  "tileCount": 4,
+  "ingest": {
+    "sourceRows": 13764,
+    "deedAcresInBand": 3779,
+    "droppedGeometry": 1,
+    "droppedOutsideBand": 8925,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 40,
+    "tncpmLayer": 46,
+    "tncpmMatched": 4476,
+    "saleCount": 4441,
+    "appraisalCount": 4430,
+    "gislinkMatchRate": 0.9329,
+    "salesVintage": "2023",
+    "kept": 4798,
+    "ownerCount": 4791,
+    "tpadCount": 4798,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
+}

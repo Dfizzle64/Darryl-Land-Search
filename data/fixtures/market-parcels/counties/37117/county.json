@@ -1,0 +1,29 @@
+{
+  "name": "Martin",
+  "fips": "37117",
+  "state": "North Carolina",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "featureCount": 3561,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-martin-parcels-37117",
+  "queryUrl": "https://gis.martincountyncgov.com/server/rest/services/TaxParcels/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are TaxParcels (PRIMARY) (https://gis.martincountyncgov.com/server/rest/services/TaxParcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 3588 rows; 3561 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 316 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37117/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37117/lookup.json",
+  "sourceCount": 3588,
+  "dropped": 20,
+  "tileCount": 7,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://bttaxpayerportal.com/itspublicmt/AppraisalCard.aspx?id={PARCEL_ID}",
+  "gisViewerUrl": "https://gis.martincountyncgov.com/"
+}

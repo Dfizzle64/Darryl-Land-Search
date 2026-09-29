@@ -1,0 +1,137 @@
+state: AL
+jurisdiction: Bullock County
+fips: "01011"
+level: county
+markets: [Rural OZ 2.0]
+
+layers:
+  - role: parcels
+    name: Parcel Polygon (BullockCapture — CaptureCAMA ArcGIS Server, CAMA join)
+    restUrl: "https://gis.capturecama.com/arcgis/rest/services/BullockAL/BullockCapture/MapServer/3"
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: CALC_AREA
+    coverage: county-wide
+    fieldMap:
+      ParcelNo: parcelId
+      ASSESS_NUM: parcelIdAlt
+      PID: parcelIdAlt2
+      OwnerName: ownerName
+      OwnerName2: ownerName2
+      MailAddres: mailingAddress.street
+      MailCity: mailingAddress.city
+      MailState: mailingAddress.state
+      MailZip: mailingAddress.zip
+      PropertyAd: situsAddress
+      CALC_AREA: acreage
+      DEED_AREA: acreageDeed
+      ForestAcre: acreageTimber
+      TotalLandV: tax.landValue
+      TotalImpVa: tax.improvementValue
+      TotalValue: tax.marketValue
+      Assessment: tax.assessmentClass
+      Book1: lastSale.deedBook
+      Page1: lastSale.deedPage
+      Neighborho: neighborhood
+      SubDiv1: subdivision
+      RecordYear: tax.year
+    notes: >
+      Verified live 2026-09-28: ?f=json 200, anonymous, polygon, count 10689; sample centroid -85.74,31.90 (Bullock AL; owner mailing Troy AL). Owner/mail/situs/CALC_AREA (acres)/DEED_AREA/values/book-page present (RecordYear 2025). Dated twin maps.capturecama.com/.../Bullock/Bullock_02172026/MapServer/3. KCS ISV config also references web6.kcsgis.com/kcsgis/rest/services/Bullock/Bullock_Public_ISV/MapServer (not checked).
+    status: usable
+
+gaps:
+  - No sale price/date
+  - KCS Bullock_Public_ISV not evaluated this pass
+
+license: "Bullock County / CaptureCAMA + KCS public viewers; use-at-own-risk"
+appraiserSearchUrl: "https://bullock.capturecama.com/mapparceldetail/{PIN}"
+appraiserSearchUrlAlt: "https://isv.kcsgis.com/al.bullock_revenue/"
+jurisdictionGisUrl: "https://bullock.capturecama.com/parcelviewer/"
+jurisdictionGisUrlAlt: "https://isv.kcsgis.com/al.bullock_revenue/"
+ruralOz2:
+  source: "IRS Rev. Proc. 2026-14 appendix (Rural Status=Rural)"
+  ruralEligibleTracts: 4
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    yearField: "YearAADT"
+    year: 2024
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    luCountyId: 6
+    countyWhere: "YearAADT=2024 AND LUCountyID=6 AND AADT>0"
+    stations2024: 119
+    verifiedAt: "2026-09-28"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "LUCountyID=6 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 119 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location. Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/."
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://gis.capturecama.com/arcgis/rest/services/BullockAL/BullockCapture/MapServer/3
+  featureCount: 10689
+  taxSaleOwner:
+    ownerName:
+      field: OwnerName
+      status: usable
+    assessedValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://bullock.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    appraisedOrMarketValue:
+      field: TotalValue
+      status: usable
+      nonNullOrPositiveCount: 10471
+      ofTotal: 10689
+    landValue:
+      field: TotalLandV
+      status: usable
+    improvementValue:
+      field: TotalImpVa
+      status: usable
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://bullock.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    lastSaleDate:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://bullock.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA); layer has Book1/Page1 only
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://bullock.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    ownerEntityType:
+      derivable: true
+      sourceField: OwnerName
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 1275
+        INC: 179
+        TRUST: 200
+        CORP: 6
+        CHURCH: 161
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://bullock.capturecama.com/mapparceldetail/{PIN}
+    pinField: ASSESS_NUM
+    testPin: '092208280000015.001'
+    verified: browser-only (pattern confirmed from viewer config)
+    method: 'pattern read from the county CaptureCAMA Experience Builder config (Embed Parcel Detail widget: capturecama.com/mapparceldetail/{ASSESS_NUM}); page fetched 200 but is a React SPA shell (Citizen
+      Access Portal, empty #root)'
+    note: 'Renders in the browser only; content cannot be verified by plain fetch. Alt key in the same config: Assess_Num.'
+  jurisdictionGisUrl:
+    url: https://bullock.capturecama.com/parcelviewer/
+    http: 200
+  notes: 'New {PIN} deep link found this pass: Bullock has a CaptureCAMA ExB parcel viewer whose Embed Parcel Detail widget keys on ASSESS_NUM (not ParcelNo). KCS ISV kept as jurisdictionGisUrlAlt; KCS
+    Bullock_Public_ISV/MapServer/32 Parcels has the same owner/value schema (not adopted, CaptureCAMA layer kept).'

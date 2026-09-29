@@ -1,0 +1,32 @@
+{
+  "name": "Calhoun",
+  "fips": "01015",
+  "state": "Alabama",
+  "markets": [
+    "Birmingham"
+  ],
+  "featureCount": 9768,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "al-calhoun-parcels-01015",
+  "queryUrl": "https://gis.calhouncounty.org/arcgis/rest/services/Parcel_Viewer_IPV/MapServer/106/query",
+  "gaps": [
+    "Source query returned 10360 rows; 9768 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Owner Parcels (Calhoun County Parcel_Viewer_IPV) (https://gis.calhouncounty.org/arcgis/rest/services/Parcel_Viewer_IPV/MapServer/106). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "SALE_PRICE often 0",
+    "No county zoning layer",
+    "altags.com deep-link pattern inferred from Lauderdale ISV config; altags.com unreachable from box 2026-09-28"
+  ],
+  "path": "data/fixtures/market-parcels/counties/01015/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01015/lookup.json",
+  "sourceCount": 10360,
+  "dropped": 4,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://altags.com/calhoun_revenue/PropertyDetails.aspx?ppin={PIN}",
+  "gisViewerUrl": "https://gis.calhouncounty.org/Parcelviewer/"
+}

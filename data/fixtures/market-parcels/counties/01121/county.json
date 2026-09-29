@@ -5,19 +5,28 @@
   "markets": [
     "Birmingham"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 9702,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "al-talladega-parcels-01121",
+  "queryUrl": "https://web5.kcsgis.com/kcsgis/rest/services/Talladega911/Public/MapServer/7/query",
   "gaps": [
-    "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+    "Source query returned 9726 rows; 9702 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are OwnerParcel (Talladega911 Public — CAMA + ZoningCode) (https://web5.kcsgis.com/kcsgis/rest/services/Talladega911/Public/MapServer/7). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "No lastSale.price (deed book/page/date only)",
+    "ZoningCode often null outside munis; no standalone zoning polygon layer",
+    "FLU not on Talladega911 Public this pass"
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/01121/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01121/lookup.json",
+  "sourceCount": 9726,
+  "dropped": 0,
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://talladegaproperty.countygovservices.com/Property/Property/Summary?ppin={PIN}&taxyear=2026",
+  "gisViewerUrl": "https://isv.kcsgis.com/al.talladega_revenue/"
 }

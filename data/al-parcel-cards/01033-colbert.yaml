@@ -1,0 +1,145 @@
+state: AL
+jurisdiction: Colbert County
+fips: "01033"
+level: county
+markets: [Rural OZ 2.0]
+
+layers:
+  - role: parcels
+    name: Parcels (Colbert Public ISV — CAMA join)
+    restUrl: "https://al20portal.kcsgis.com/al20server/rest/services/Internal/Colbert_Public_ISV/MapServer/43"
+    layerId: 43
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelIdKey (PPIN deep-link)
+      PARCELID: parcelId
+      Owner: ownerName
+      PreviousOwner: ownerNamePrior
+      MailAdd1: mailingAddress.street
+      MailAdd2: mailingAddress.street2
+      MailCity: mailingAddress.city
+      MailState: mailingAddress.state
+      MailZip1: mailingAddress.zip
+      SitusAddNumber: situsAddress.number
+      SitusAddName: situsAddress.street
+      SitusAddCity: situsCity
+      CalcAcres: acreage
+      DeededAcres: acreageDeed
+      TimberAcres: acreageTimber
+      TTV: tax.marketValue
+      TAV: tax.assessedValue
+      CLandValue: tax.landValue
+      CImpValue: tax.improvementValue
+      TotalTaxDue: tax.due
+      TaxYearDue: tax.year
+      TaxDist: tax.district
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      DeedRecorded: lastSale.date
+      Neighborhood: neighborhood
+      LegalDescription: legalDescription
+      ParcelID_GISlink: parcelIdFormatted
+      GIS_Acres: acreageGis
+      ZoningCode: zoning
+      ZoningDesc: zoningDescription
+    notes: >
+      Verified live 2026-09-28 (?f=json 200 + 1-feature query with geometry, outSR 4326). Count 43311; polygon; sample centroid -87.95,34.85 (Colbert AL). Folder named Internal but anonymous/public (it is the public ISV config service). PARCELID; PIN = deep-link ppin. Owner/mail/situs/GIS_Acres+CalcAcres/TTV/TAV/tax/deed book/page/date; ZoningCode/ZoningDesc attrs present. CalcAcres often 0 — prefer GIS_Acres.
+    status: usable
+
+gaps:
+  - No sale price (deed book/page/date only)
+  - Service lives under Internal/ folder — could be moved; re-check if 404
+
+license: "Colbert County Revenue / KCS GIS Public ISV; use-at-own-risk"
+appraiserSearchUrl: "https://colbertproperty.assurancegov.com/Property/Details?taxyear=2026&ppin={PIN}"
+appraiserSearchUrlAlt: null
+jurisdictionGisUrl: "https://isv.kcsgis.com/al.colbert_revenue/"
+ruralOz2:
+  source: "IRS Rev. Proc. 2026-14 appendix (Rural Status=Rural)"
+  ruralEligibleTracts: 6
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    yearField: "YearAADT"
+    year: 2024
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    luCountyId: 17
+    countyWhere: "YearAADT=2024 AND LUCountyID=17 AND AADT>0"
+    stations2024: 390
+    verifiedAt: "2026-09-28"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "LUCountyID=17 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 390 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location. Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/."
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://al20portal.kcsgis.com/al20server/rest/services/Internal/Colbert_Public_ISV/MapServer/43
+  featureCount: 43311
+  taxSaleOwner:
+    ownerName:
+      field: Owner
+      status: usable
+    assessedValue:
+      field: TAV
+      status: usable
+      nonNullOrPositiveCount: 43001
+      ofTotal: 43311
+    appraisedOrMarketValue:
+      field: TTV
+      status: usable
+      nonNullOrPositiveCount: 43001
+      ofTotal: 43311
+    landValue:
+      field: CLandValue
+      status: usable
+    improvementValue:
+      field: CImpValue
+      status: usable
+    taxAmount:
+      field: TotalTaxDue
+      status: usable
+      nonNullOrPositiveCount: 36109
+      ofTotal: 43311
+    lastSaleDate:
+      field: DeedRecorded
+      status: usable
+      nonNullOrPositiveCount: 23422
+      ofTotal: 43311
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: property-record page at appraiserSearchUrl
+    ownerEntityType:
+      derivable: true
+      sourceField: Owner
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 4262
+        INC: 964
+        TRUST: 1192
+        CORP: 70
+        CHURCH: 502
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://colbertproperty.assurancegov.com/Property/Details?taxyear=2026&ppin={PIN}
+    pinField: PIN
+    testPin: '49754'
+    verified: 'yes'
+    method: plain fetch 200 (AssuranceWeb Property Details Summary)
+    note: Page returned the matching PIN, parcel number and owner; shows values, tax due, deed and acreage. taxyear=2026 is labelled a future/estimate year; use taxyear=2025 for certified values.
+  jurisdictionGisUrl:
+    url: https://isv.kcsgis.com/al.colbert_revenue/
+    http: 200

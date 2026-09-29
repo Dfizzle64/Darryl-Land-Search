@@ -1,0 +1,468 @@
+state: NC
+jurisdiction: Guilford County
+fips: "37081"
+level: county
+markets: [Winston-Salem, Greensboro]
+
+layers:
+  - role: parcels
+    name: GC_Parcels (Guilford County Cadastral)
+    restUrl: https://gcgis.guilfordcountync.gov/arcgis/rest/services/GC_Cadastral_Current/GC_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PIN_PLUS_EXT: parcelIdAlt
+      PARCEL_PK: parcelIdPk
+      REID: parcelIdReid
+      GEOPIN: parcelIdGeopin
+      CALCULATED_ACRES: acreage
+      ACREAGE: acreageDeed
+      TOTAL_ACRES: acreageTotal
+      DEEDED_ACRES: acreageDeedAlt
+      PROPERTY_OWNER: ownerName
+      PROP_OWNER1_FULLNAME: ownerName1
+      PROP_OWNER2_FULLNAME: ownerName2
+      OWNER_MAIL_1: mailingAddress.street
+      OWNER_MAIL_2: mailingAddress.street2
+      OWNER_MAIL_3: mailingAddress.street3
+      OWNER_MAIL_CITY: mailingAddress.city
+      OWNER_MAIL_STATE: mailingAddress.state
+      OWNER_MAIL_ZIP: mailingAddress.zip
+      LOCATION_ADDR: situsAddress
+      PHYADDR_STR_NUM: situs.number
+      PHYADDR_STR: situs.street
+      PHYADDR_STR_TYPE: situs.streetType
+      PHYADDR_CITY: situsCity
+      PHYADDR_ZIP: situsZip
+      CITY: situsMunicipality
+      PKG_SALE_DATE: lastSale.date
+      PKG_SALE_PRICE: lastSale.price
+      LAND_SALE_DATE: lastSale.landDate
+      LAND_SALE_PRICE: lastSale.landPrice
+      DEED_DATE: lastSale.deedDate
+      DEED_BOOK: lastSale.deedBook
+      DEED_PAGE: lastSale.deedPage
+      REVENUE_STAMPS: lastSale.revenueStamps
+      TOTAL_PROP_VALUE: tax.marketValue
+      TOTAL_LAND_VALUE_ASSESSED: tax.landValue
+      TOTAL_BLDG_VALUE_ASSESSED: tax.improvementValue
+      LAND_USE_VALUE: tax.landUseValue
+      ZONING: zoning
+      LAND_CLASS: dorCode
+      WHITE_CARD_URL: appraiserSearchUrl
+      HEATED_AREA: improvementSqFt
+      YEAR_BUILT: yearBuilt
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 223245;
+      CALCULATED_ACRES 5–150 → 12978; ACREAGE 5–150 → 12973;
+      TOTAL_ACRES 5–150 → 12820; BLDG_VALUE=0/null in 5–150 → 5523;
+      PKG_SALE_PRICE>0 in 5–150 → 3588; LAND_SALE_PRICE>0 → 3252.
+      CRS 102719/2264. MaxRecordCount 2000 — paginate.
+      Rich CAMA: land/bldg split, situs parts, zoning attr, WHITE_CARD_URL by PARCEL_PK.
+      CITY distribution (top): Greensboro 106284, null/uninc 50370, High Point 43919,
+      Summerfield 4975, Oak Ridge 4016, Stokesdale 3564, Gibsonville 3183,
+      Pleasant Garden 2351, Jamestown 2081, Burlington 836, Sedalia 587, Whitsett 449.
+      Mirror: Parcels_Ownership FS/0 (same count; ownership-focused publish).
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-24: cntyfips='081' count 222443; gisacres 5–150 → 12953;
+      improvval=0/null in range → 5491. Fallback when county host flaky.
+      MaxRecordCount 5000. Alternate host services.gis.nc.gov.
+      parno often PIN_PLUS_EXT style (##########-000).
+    status: usable
+
+  - role: zoning
+    name: Combined_Zoning (PRIMARY countywide stack)
+    restUrl: https://gcgis.guilfordcountync.gov/arcgis/rest/services/Planning_Zoning/Combined_Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+      BASE_ZONING: zoningBase
+      CLASSIFICATION: zoningClass
+      JURISDICTION: planningJurisdiction
+      New_Zoning_UDO2020: zoningUdo2020
+      CODE: zoningCode
+      DESCRIPTION: zoningDescription
+    notes: >
+      PRIMARY zoning stack. Verified count 6569. By JURISDICTION: GREENSBORO 2949,
+      GUILFORD COUNTY 1720, HIGH POINT 746, SUMMERFIELD 242, GIBSONVILLE 206,
+      OAK RIDGE 179, null 165, STOKESDALE 117, PLEASANT GARDEN 62, JAMESTOWN 50,
+      BURLINGTON 33, ARCHDALE 25, KERNERSVILLE 25, SEDALIA 22, JAMESTOWN ETJ 22,
+      WHITSETT 1. CRS 2264. Prefer city hosts inside GSO/HP limits; Combined is
+      authoritative for Summerfield/Oak Ridge/Stokesdale/Jamestown/Pleasant Garden/
+      Sedalia/Whitsett/Gibsonville tip + county unincorporated.
+    status: usable
+
+  - role: zoning
+    name: GISDV Zoning (county + small towns)
+    restUrl: https://gcgis.guilfordcountync.gov/arcgis/rest/services/GISDV/Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+      BASE_ZONING: zoningBase
+      JURISDICTION: planningJurisdiction
+      ZONE_CLASSIFICATION: zoningClass
+      New_Zoning_UDO2020: zoningUdo2020
+      DESCRIPTION: zoningDescription
+    notes: >
+      Verified count 2079. By JURISDICTION: GUILFORD 1819, STOKESDALE 127,
+      PLEASANT GARDEN 62, WHITSETT 43, SEDALIA 28. Does NOT include Greensboro/
+      High Point/Summerfield/Oak Ridge/Jamestown — use Combined_Zoning or city hosts.
+      Useful Whitsett coverage (43) vs Combined Whitsett=1.
+    status: usable
+
+  - role: zoning
+    name: Greensboro Zoning Districts
+    restUrl: https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/Zoning_MS/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: city-only
+    fieldMap:
+      ZONINGDISTRICT: zoning
+      ZONINGDISTRICTTITLE: zoningTitle
+      CATEGORY: zoningCategory
+      ACREAGE: zoningAcres
+      FROMZONING: zoningFrom
+      TOZONING: zoningTo
+      LINK: zoningCaseLink
+    notes: >
+      Prefer most-local inside Greensboro. Verified count 3248. CRS Web Mercator
+      102100/3857 — reproject before overlay with county 2264 parcels.
+      Mirror also on DevelopmentServices_MS/35 (same count).
+    status: usable
+
+  - role: zoning
+    name: High Point Zoning
+    restUrl: https://gisentapp01.highpointnc.gov/server/rest/services/Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+      DIST: zoningOrdinance
+      FILENAME: zoningFile
+      CASE_No: zoningCase
+    notes: >
+      Prefer most-local inside High Point (Guilford + Forsyth tip). Verified count 781.
+      CRS 2264. Combined_Zoning HIGH POINT 746 is close fallback.
+    status: usable
+
+  - role: flu
+    name: Planning_Zoning FLUM (county Future Land Use)
+    restUrl: https://gcgis.guilfordcountync.gov/arcgis/rest/services/Planning_Zoning/FLUM/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: DW_Acres
+    coverage: county-wide
+    fieldMap:
+      REID: parcelIdReid
+      PIN_PLUS_E: parcelIdAlt
+      FLUM_New: flu
+      DW_FLUM: fluAlt
+      FLUM: fluLegacy
+      DW_Acres: fluAcres
+      GEOPIN: parcelIdGeopin
+    notes: >
+      PRIMARY county FLU. Verified count 50097; DW_Acres 5–150 → 5414.
+      Attribute-join REID↔GC_Parcels.REID (or PIN_PLUS_E↔PIN_PLUS_EXT).
+      Top FLUM_New: Residential 41993, Working Farm/Agriculture 2516,
+      Rural Residential 2031, Office 739, Industrial Inovation 594, Civic/Educational 554.
+      Covers unincorporated + many munis; GSO/HP prefer city CompPlan/Place Types inside limits.
+    status: usable
+
+  - role: flu
+    name: Greensboro CompPlan2040 Future Land Use (Map 7)
+    restUrl: https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/CompPlan2040_MS/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: city-only
+    fieldMap:
+      DISTRICT: flu
+      ToLandUse: fluTo
+      FromLandUse: fluFrom
+      Acres: fluAcres
+      Hyperlink: fluLink
+    notes: >
+      Prefer most-local FLU for Greensboro. Verified count 761. CRS 3857.
+      Companion Place Types layer 9 count 998 (DISTRICT/TAG/Acres).
+    status: usable
+
+  - role: flu
+    name: Greensboro CompPlan2040 Place Types
+    restUrl: https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/CompPlan2040_MS/MapServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: city-only
+    fieldMap:
+      DISTRICT: flu
+      TAG: fluTag
+      Acres: fluAcres
+      ToPlaceType: fluTo
+      FromPlaceType: fluFrom
+    notes: Verified count 998. Place-type FLU companion to Map 7.
+    status: usable
+
+  - role: flu
+    name: High Point Place Types
+    restUrl: https://gisentapp01.highpointnc.gov/server/rest/services/Planning/MapServer/29
+    layerId: 29
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      PlaceTypes: flu
+      PT_All: fluAlt
+      ACRES: fluAcres
+    notes: >
+      Prefer most-local FLU for High Point. Verified count 68 (coarse place types).
+      Existing Land Use layer 30 (~266k; parcel-keyed ELUCLASS) is existing-use not FLU.
+    status: usable
+
+  - role: other
+    name: City Limits
+    restUrl: https://gcgis.guilfordcountync.gov/arcgis/rest/services/CityLimits/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY_NAMES: municipality
+      URL: municipalityUrl
+    notes: >
+      Multi-part polygons for Greensboro, High Point, Summerfield, Oak Ridge,
+      Stokesdale, Jamestown, Pleasant Garden, Sedalia, Whitsett, Gibsonville,
+      Burlington tip, Archdale tip, Kernersville tip, PTI-adjacent, etc.
+    status: usable
+
+  - role: other
+    name: Extra Territorial Jurisdictions
+    restUrl: https://gcgis.guilfordcountync.gov/arcgis/rest/services/GISDV/Extra_Territorial_Jurisdictions/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: etjName
+    notes: >
+      Observed ETJ names: Greensboro ETJ, High Point ETJ, Jamestown ETJ,
+      Oak Ridge ETJ, Gibsonville ETJ. Route zoning authority with Combined_Zoning.
+    status: usable
+
+  - role: sales
+    name: Hosted CommercialSales (narrow)
+    restUrl: https://gcgis.guilfordcountync.gov/arcgis/rest/services/Hosted/Sales_gdb/FeatureServer/0
+    layerId: 0
+    geometry: unknown
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap: {}
+    notes: >
+      Commercial-only sales (~7344). Prefer GC_Parcels PKG_SALE_* / LAND_SALE_*
+      for general last sale; this is not a full transfer history.
+    status: partial
+
+gaps:
+  - Summerfield / Oak Ridge / Stokesdale / Jamestown / Pleasant Garden / Sedalia / Whitsett / Gibsonville lack dedicated public city FeatureServers — use Combined_Zoning (and GISDV Zoning for Whitsett/Stokesdale/Pleasant Garden/Sedalia)
+  - Summerfield publishes PDF zoning map only (no town REST); county Combined SUMMERFIELD 242
+  - Combined_Zoning WHITSETT only 1 polygon — prefer GISDV Zoning WHITSETT 43
+  - Burlington tip / Archdale tip / Kernersville tip are edge fragments; prefer Alamance/Randolph/Forsyth city cards for core of those cities
+  - No multi-transfer sales history REST comparable to Forsyth SalesApp — only last PKG/LAND sale on parcel + commercial Sales_gdb
+  - Greensboro zoning/FLU CRS is 3857 — reproject to 2264 for parcel overlay
+  - GISDV Zoning excludes GSO/HP/Summerfield/Oak Ridge/Jamestown — do not use as sole countywide zoning
+  - FLUM typo category "Industrial Inovation" is source spelling
+  - No paid vendor data; no phones/emails collected; no AADT/utilities dig
+license: "Guilford County / City of Greensboro / City of High Point public GIS; NCGS disclaimer; attribution recommended"
+appraiserSearchUrl: https://lrcpwa.ncptscloud.com/guilford/parcel-search
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (NC non-OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  pass1:
+    status: verified
+    parcelPolygonLayer: https://gcgis.guilfordcountync.gov/arcgis/rest/services/GC_Cadastral_Current/GC_Parcels/FeatureServer/0
+    polygonCountLive: 223244
+    parcelIdField: PIN
+    parcelIdFilled: 223240
+    acreageField: CALCULATED_ACRES
+    acres5to150Live: 12978
+    sampleCentroidWgs84:
+    - -80.0456
+    - 35.921
+  parcelLayer: https://gcgis.guilfordcountync.gov/arcgis/rest/services/GC_Cadastral_Current/GC_Parcels/FeatureServer/0
+  parcelIdField: PIN
+  acreageFilter: CALCULATED_ACRES >= 5 AND CALCULATED_ACRES <= 150
+  acres5to150Live: 12978
+  parcelCountLive: 223244
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='GUILFORD'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GUILFORD%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GUILFORD%27&returnCountOnly=true&f=json
+      liveStationCount: 1995
+      stationsWithAADT2022: 297
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Guilford'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Guilford%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Guilford%27&returnCountOnly=true&f=json
+      liveStationCount: 2053
+      stationsWithAADT2025: 1799
+      stationsWithAADT2024: 381
+      stationsWith2025or2024: 1856
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TOTAL_PROP_VALUE
+    - TOTAL_LAND_VALUE_ASSESSED
+    liveNonZero:
+      TOTAL_PROP_VALUE: 207940
+      TOTAL_LAND_VALUE_ASSESSED: 214758
+    status: ok
+  sale:
+    priceFields:
+    - PKG_SALE_PRICE
+    dateFields:
+    - PKG_SALE_DATE
+    livePriceNonZero:
+      PKG_SALE_PRICE: 158908
+    liveDateNonNull:
+      PKG_SALE_DATE: 158992
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - PROPERTY_OWNER
+    primaryOwnerField: PROPERTY_OWNER
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(PROPERTY_OWNER) LIKE '% LLC%' OR UPPER(PROPERTY_OWNER) LIKE '% INC%' OR UPPER(PROPERTY_OWNER) LIKE '% LP%' OR UPPER(PROPERTY_OWNER) LIKE '% LLP%' OR UPPER(PROPERTY_OWNER) LIKE '% LTD%' OR UPPER(PROPERTY_OWNER) LIKE '% TRUST%' OR UPPER(PROPERTY_OWNER) LIKE '% CHURCH%' OR UPPER(PROPERTY_OWNER) LIKE '% COMPANY%' OR UPPER(PROPERTY_OWNER) LIKE '% PARTNERSHIP%' OR UPPER(PROPERTY_OWNER) LIKE '% HOLDINGS%' OR UPPER(PROPERTY_OWNER) LIKE '% PROPERTIES%' OR UPPER(PROPERTY_OWNER) LIKE '% CORP%' OR UPPER(PROPERTY_OWNER) LIKE '%,LLC%' OR UPPER(PROPERTY_OWNER) LIKE '%,INC%' OR UPPER(PROPERTY_OWNER) LIKE 'CITY OF %' OR UPPER(PROPERTY_OWNER) LIKE 'COUNTY OF %' OR UPPER(PROPERTY_OWNER) LIKE 'STATE OF %' OR UPPER(PROPERTY_OWNER) LIKE 'TOWN OF %')
+    liveEntityCountAll: 51482
+    liveEntityCount5to150ac: 4630
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above.
+  paDeepLink:
+    template: https://lrcpwa.ncptscloud.com/guilford/parcel-detail/{PARCEL_PK}
+    testedParcelId: '99842'
+    testedUrl: https://lrcpwa.ncptscloud.com/guilford/parcel-detail/99842
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: false
+    note: 'NCPTS SPA shell (200, 496 B, client-rendered): parcel content cannot be checked server-side. WHITE_CARD_URL (CustomAttachmentsResource.ashx?parcelPk=) also returns the 496 B shell.'
+  gisViewer:
+    url: https://gisdv.guilfordcountync.gov/Guilford/
+    httpStatus: 200
+    pageTitle: GIS Data Viewer
+  municipalLayerCheck:
+    checked: 10
+    answering: 10
+    layers:
+    - url: https://gcgis.guilfordcountync.gov/arcgis/rest/services/CityLimits/FeatureServer/0
+      name: City Limits
+      liveCount: 56
+    - url: https://gcgis.guilfordcountync.gov/arcgis/rest/services/GISDV/Extra_Territorial_Jurisdictions/FeatureServer/0
+      name: Extra Territorial Jurisdictions
+      liveCount: 16
+    - url: https://gcgis.guilfordcountync.gov/arcgis/rest/services/GISDV/Zoning/FeatureServer/0
+      name: Zoning
+      liveCount: 2081
+    - url: https://gcgis.guilfordcountync.gov/arcgis/rest/services/Planning_Zoning/Combined_Zoning/FeatureServer/0
+      name: Combined Zoning
+      liveCount: 6573
+    - url: https://gcgis.guilfordcountync.gov/arcgis/rest/services/Planning_Zoning/FLUM/FeatureServer/0
+      name: FLUM
+      liveCount: 50097
+    - url: https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/CompPlan2040_MS/MapServer/1
+      name: Map 7 - Future Land Use
+      liveCount: 761
+    - url: https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/CompPlan2040_MS/MapServer/9
+      name: Place Types
+      liveCount: 998
+    - url: https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/Zoning_MS/MapServer/7
+      name: Greensboro Zoning Districts
+      liveCount: 3248
+    - url: https://gisentapp01.highpointnc.gov/server/rest/services/Planning/MapServer/29
+      name: Place Types
+      liveCount: 68
+    - url: https://gisentapp01.highpointnc.gov/server/rest/services/Zoning/MapServer/0
+      name: Zoning
+      liveCount: 781
+  gaps:
+  - PA content not verifiable (SPA)

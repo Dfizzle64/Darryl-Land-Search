@@ -1,0 +1,385 @@
+state: NC
+jurisdiction: Stokes County
+fips: "37169"
+level: county
+markets: [Winston-Salem]
+
+layers:
+  - role: parcels
+    name: AllLayers Parcel Layer (PRIMARY)
+    restUrl: https://stokescountygis.com/server/rest/services/AllLayers/MapServer/24
+    layerId: 24
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PIN_12D: parcelIdAlt
+      PARCEL_PK: parcelIdPk
+      REID: parcelIdReid
+      PARCEL_NUMBER: parcelIdNumber
+      CALCULATED_ACREAGE: acreage
+      TOTAL_ACREAGE: acreageTotal
+      ACREAGE: acreageAssessed
+      DEEDED_ACREAGE: acreageDeeded
+      PROPERTY_OWNER_1: ownerName
+      PROPERTY_OWNER_2: ownerName2
+      OWNER_MAIL_ADDR_1: mailingAddress.street
+      OWNER_MAIL_ADDR_2: mailingAddress.street2
+      OWNER_MAIL_ADDR_3: mailingAddress.street3
+      OWNER_MAIL_ADDR_CITY: mailingAddress.city
+      OWNER_MAIL_ADDR_STATE: mailingAddress.state
+      OWNER_MAIL_ADDR_ZIP: mailingAddress.zip
+      PHYSICAL_ADDRESS: situsAddress
+      PHYS_ADDR_STREET_NUMBER: situsAddress.number
+      PHYS_ADDR_DIR_PREFIX: situsAddress.prefix
+      PHYS_ADDR_STREET_NAME: situsAddress.streetName
+      PHYS_ADDR_STREET_TYPE: situsAddress.streetType
+      PHYS_ADDR_DIR_SUFFIX: situsAddress.suffix
+      PHYS_ADDR_CITY: situsCity
+      PHYS_ADDR_ZIP: situsZip
+      PACKAGE_SALE_DATE: lastSale.date
+      PACKAGE_SALE_PRICE: lastSale.price
+      LAND_SALE_DATE: lastSale.landDate
+      LAND_SALE_PRICE: lastSale.landPrice
+      DEED_DATE: lastSale.deedDate
+      DEED_BOOK: lastSale.deedBook
+      DEED_PAGE: lastSale.deedPage
+      REVENUE_STAMP: lastSale.revenueStamp
+      TOTAL_LAND_VAL_ASSESSED: tax.landValue
+      TOTAL_BLDG_VAL_ASSESSED: tax.improvementValue
+      TOTAL_PROPERTY_VALUE: tax.assessedValue
+      LAND_USE_VALUE: tax.landUseValue
+      USE_VALUE_DEFERRED: tax.useValueDeferred
+      TOTAL_VALUE_DEFERRED: tax.deferredValue
+      ZONING: zoning
+      PLANNING_JURIS: zoningJurisdiction
+      LAND_CLASS: dorCode
+    notes: >
+      PRIMARY wire-first verified 2026-09-23: count 32127;
+      CALCULATED_ACREAGE 5–150 → 8865; TOTAL_BLDG_VAL_ASSESSED=0 in range → 3633;
+      LAND_CLASS=VACANT in range → 4718; PACKAGE_SALE_PRICE>0 → 10143.
+      CRS 102719/2264. Auth none. MaxRecordCount 2000 — paginate.
+      No FeatureServer SOE on county host. Alternate rich mirror:
+      WebApp2026/MapServer/13. Prefer PACKAGE_SALE_* then LAND_SALE_*.
+      PLANNING_JURIS: STOKES/KING/WALNUT COVE/DANBURY.
+    status: usable
+
+  - role: parcels
+    name: WebApp2026 Parcel for Orthos (rich mirror)
+    restUrl: https://stokescountygis.com/server/rest/services/WebApp2026/MapServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PARCEL_PK: parcelIdPk
+      CALCULATED_ACREAGE: acreage
+      PROPERTY_OWNER_1: ownerName
+      TOTAL_PROPERTY_VALUE: tax.assessedValue
+      PACKAGE_SALE_PRICE: lastSale.price
+      ZONING: zoning
+    notes: >
+      Same rich schema/count as AllLayers/24 (32127). Prefer AllLayers/24 as
+      canonical wire-first URL; this is a WebApp2026 mirror.
+    status: usable
+
+  - role: parcels
+    name: Parcels MapServer/2 (thin — no tax/sale)
+    restUrl: https://stokescountygis.com/server/rest/services/Parcels/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      CALCULATED_ACREAGE: acreage
+      PROPERTY_OWNER_1: ownerName
+      OWNER_MAIL_ADDR_1: mailingAddress.street
+      PHYSICAL_ADDRESS: situsAddress
+      DEED_DATE: lastSale.deedDate
+      PLANNING_JURIS: zoningJurisdiction
+    notes: >
+      Verified count 32127; CALC 5–150 → 8865. Lacks assessed values and
+      sale price — prefer AllLayers/24. ParcelsNew/2 similar.
+    status: partial
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-23: cntyfips='169' count 31982; gisacres 5–150 → 8847.
+      parno aligns with PIN. No sale price. MaxRecordCount 5000.
+      Alternate host services.gis.nc.gov. FeatureServer available (unlike county).
+    status: usable
+
+  - role: zoning
+    name: County Zoning (county + munis)
+    restUrl: https://stokescountygis.com/server/rest/services/AllLayers/MapServer/27
+    layerId: 27
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+      ZONING_JURI: zoningJurisdictionCode
+      ZONE_AREA: zoningJurisdiction
+      TOWNSHIP: township
+    notes: >
+      Verified count 34669 — ZONE_AREA County 25614, King 6066,
+      Walnut Cove 2346, Danbury 624. Spatial join to parcels in 2264.
+      Mirrors: WebApp2026/33, Baselayers/17.
+    status: usable
+
+  - role: flu
+    name: Land Use 2035
+    restUrl: https://stokescountygis.com/server/rest/services/WebApp2026/MapServer/34
+    layerId: 34
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      LUP_CODE: flu
+      LUP_DESC: fluDescription
+      LUP_EFFDAT: fluEffectiveDate
+      ZONING_JUR: fluJurisdiction
+      ZONE_AREA: fluZoneArea
+    notes: >
+      Verified count 1518 — ZONING_JUR COUNTY 1058, KING 207,
+      WALNUT COVE 158, DANBURY 95. Codes O-2/G-1/O-1/G-2/G-3A/G-4/G-3B.
+      Spatial join (not PIN-keyed). Mirror Baselayers/18.
+    status: usable
+
+  - role: other
+    name: City Limits
+    restUrl: https://stokescountygis.com/server/rest/services/AllLayers/MapServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Inc_Muni: municipality
+      County: municipalityCounty
+      FTR_CODE: municipalityCode
+    notes: >
+      Verified count 23: KING (Stokes + Forsyth edge), WALNUT COVE, DANBURY.
+      Use to route zoning/FLU; clip King Forsyth polygons when Stokes-only.
+    status: usable
+
+  - role: other
+    name: County ETJ
+    restUrl: https://stokescountygis.com/server/rest/services/WebApp2026/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FTR_CODE: etjMunicipality
+    notes: >
+      Verified count 584 — Danbury 170, Walnut Cove 248, KING ETJ 164.
+    status: usable
+
+  - role: parcels
+    name: City of King Parcels (local host)
+    restUrl: https://www.webgis.net/arcgis/rest/services/NC/CityOfKing/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACREAGE
+    coverage: city-only
+    fieldMap:
+      PIN: parcelId
+      PARCEL_PK: parcelIdPk
+      REID: parcelIdReid
+      CALCULATED_ACREAGE: acreage
+      PROPERTY_OWNER_1: ownerName
+      OWNER_MAIL_ADDR_1: mailingAddress.street
+      PHYSICAL_ADDRESS: situsAddress
+      TOTAL_LAND_VAL_ASSESSED: tax.landValue
+      TOTAL_BLDG_VAL_ASSESSED: tax.improvementValue
+      TOTAL_PROPERTY_VALUE: tax.assessedValue
+      ZONING: zoning
+      PLANNING_JURIS: zoningJurisdiction
+      DEED_DATE: lastSale.deedDate
+    notes: >
+      Prefer most-local for King QA. Verified count 4302; CALC 5–150 → 238.
+      No PACKAGE_SALE_PRICE — use county AllLayers/24 for sales.
+      No separate King zoning polygon layer on this host.
+    status: usable
+
+gaps:
+  - Interactive GIS viewer URL unpublished (stokescountygis.com homepage stub; no webappviewer id)
+  - No FeatureServer SOE on county ArcGIS Server — MapServer query only; MaxRecordCount 2000
+  - Walnut Cove and Danbury — no independent public ArcGIS REST for zoning/FLU
+  - King local parcels lack sale-price fields
+  - PACKAGE_SALE_PRICE sparse (~10143 / 32127); many parcels deed-date only
+  - OneMap has no sale price; may lag county CAMA
+  - King Forsyth-edge limits/parcels — clip to Stokes FIPS 37169 when needed
+  - No phones/emails collected; no paid vendor data
+
+license: "Stokes County GIS public REST; NCGS disclaimer; attribution expected"
+appraiserSearchUrl: https://lrcpwa.ncptscloud.com/stokes/parcel-search
+viewerUrl: https://lrcpwa.ncptscloud.com/stokes/parcel-detail/{PARCEL_PK}
+gisPortalUrl: https://www.stokescountygis.com/
+verifiedAt: 2026-09-23
+verifiedBy: GIS Research Executor
+
+# ---- PASS2 full-suite upgrade (rural OZ) — verifiedAt 2026-09-28 ----
+pass2:
+  label: PASS2 full-suite upgrade — rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  aadtScreening:
+    source: NCDOT Traffic Survey Group (public AGOL)
+    layer: NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)
+    restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+    countyField: COUNTY
+    countyValue: STOKES
+    valueField: AADT_2022
+    valueType: string (trim; blank = no count that year)
+    countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27STOKES%27&returnCountOnly=true&f=json
+    featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27STOKES%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+    liveStationCount: 371
+    stationsWithAADT2022: 136
+    newerYearAvailable:
+      available: true
+      layer: NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      countyField: County
+      countyValue: Stokes
+      valueField: AADT_2025
+      valueType: integer (null = no count)
+      countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Stokes%27&returnCountOnly=true&f=json
+      featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Stokes%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+      liveStationCount: 370
+      stationsWithAADT2025: 214
+      stationsWithAADT2024: 223
+      segmentsLayer: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide — spatial filter by county envelope)
+      also: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)
+    recommendation: Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025→AADT_2024→AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title).
+  primaryParcelLayer:
+    restUrl: https://stokescountygis.com/server/rest/services/AllLayers/MapServer/24
+    acreageField: CALCULATED_ACREAGE
+    range5to150Where: CALCULATED_ACREAGE>=5 AND CALCULATED_ACREAGE<=150
+    liveTotalParcels: 32131
+    liveParcels5to150: 8866
+  taxValues:
+    status: ok
+    fields:
+      TOTAL_LAND_VAL_ASSESSED: tax.landValue
+      TOTAL_BLDG_VAL_ASSESSED: tax.improvementValue
+      TOTAL_PROPERTY_VALUE: tax.assessedValue
+    liveNonZeroCounty:
+      TOTAL_LAND_VAL_ASSESSED: 31874
+      TOTAL_BLDG_VAL_ASSESSED: 21911
+      TOTAL_PROPERTY_VALUE: 30939
+    liveNonZero5to150:
+      TOTAL_PROPERTY_VALUE: 8663
+    notes: Integer fields; TOTAL_PROPERTY_VALUE assessed.
+    publicFallback: https://lrcpwa.ncptscloud.com/stokes/parcel-detail/{PARCEL_PK}
+  saleHistory:
+    status: ok
+    priceFields:
+    - PACKAGE_SALE_PRICE
+    - LAND_SALE_PRICE
+    dateFields:
+    - PACKAGE_SALE_DATE
+    - DEED_DATE
+    livePriceGt0County:
+      PACKAGE_SALE_PRICE: 10147
+      LAND_SALE_PRICE: 5260
+    livePriceGt0_5to150:
+      PACKAGE_SALE_PRICE: 1628
+    liveDateNonNullCounty:
+      PACKAGE_SALE_DATE: 12722
+      DEED_DATE: 31934
+    notes: PACKAGE_SALE_DATE esriDate is sparse (12,722); DEED_DATE is near-complete (31,934) — use DEED_DATE as fallback date. PACKAGE_SALE_PRICE primary; LAND_SALE_PRICE secondary.
+  ownerEntity:
+    ownerFields:
+    - PROPERTY_OWNER_1
+    - PROPERTY_OWNER_2
+    primaryOwnerField: PROPERTY_OWNER_1
+    rule:
+      apply: Uppercase + trim PROPERTY_OWNER_1 (optionally also PROPERTY_OWNER_2)
+      regex: (?i)(\bL\.?\s?L\.?\s?C\b|\bINC\b|\bCORP|\bL\.?\s?P\b|\bLLP\b|\bLLLP\b|\bLTD\b|TRUST|CHURCH|MINISTR|\bCOMPANY\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\bHOA\b|FOUNDATION|AUTHORITY|\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\b|^UNITED STATES|^NORTH CAROLINA\b|\bCOUNTY$)
+      sqlLikeTokens:
+      - '% LLC%'
+      - '%,LLC%'
+      - '% L L C%'
+      - '% INC'
+      - '% INC %'
+      - '% INC.%'
+      - '%,INC%'
+      - '% CORP%'
+      - '%CORPORATION%'
+      - '% LP'
+      - '% LP %'
+      - '% L P'
+      - '% LLP%'
+      - '% LTD%'
+      - '%TRUST%'
+      - '%CHURCH%'
+      - '%MINISTR%'
+      - '% COMPANY%'
+      - '%PARTNERSHIP%'
+      - '%HOLDINGS%'
+      - '%PROPERTIES%'
+      - '%INVESTMENT%'
+      - '%ASSOCIATION%'
+      - '%FOUNDATION%'
+      - '%AUTHORITY%'
+      - CITY OF %
+      - COUNTY OF %
+      - STATE OF %
+      - TOWN OF %
+      - '% COUNTY'
+      - '%BOARD OF EDUCATION%'
+      - UNITED STATES%
+      - NORTH CAROLINA %
+      - '% DEVELOPMENT%'
+      caveats: TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); "% COUNTY" suffix catches e.g. "PERSON COUNTY"; bare "CO" and "ESTATE" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) — normalize first.
+    liveEntityCount5to150: 786
+    liveOwnerNonNull5to150: 8801
+    entityQuery: where=CALCULATED_ACREAGE>=5 AND CALCULATED_ACREAGE<=150 AND (PROPERTY_OWNER_1 LIKE '% LLC%' OR PROPERTY_OWNER_1 LIKE '%,LLC%' OR PROPERTY_OWNER_1 LIKE '% L L C%' OR PROPERTY_OWNER_1 LIKE '% INC' OR PROPERTY_OWNER_1 LIKE '% INC %' OR PROPERTY_OWNER_1 LIKE '% INC.%' OR PROPERTY_OWNER_1 LIKE '%,INC%' OR PROPERTY_OWNER_1 LIKE '% CORP%' OR PROPERTY_OWNER_1 LIKE '%CORPORATION%' OR PROPERTY_OWNER_1 LIKE '% LP' OR PROPERTY_OWNER_1 LIKE '% LP %' OR PROPERTY_OWNER_1 LIKE '% L P' OR PROPERTY_OWNER_1 LIKE '% LLP%' OR PROPERTY_OWNER_1 LIKE '% LTD%' OR PROPERTY_OWNER_1 LIKE '%TRUST%' OR PROPERTY_OWNER_1 LIKE '%CHURCH%' OR PROPERTY_OWNER_1 LIKE '%MINISTR%' OR PROPERTY_OWNER_1 LIKE '% COMPANY%' OR PROPERTY_OWNER_1 LIKE '%PARTNERSHIP%' OR PROPERTY_OWNER_1 LIKE '%HOLDINGS%' OR PROPERTY_OWNER_1 LIKE '%PROPERTIES%' OR PROPERTY_OWNER_1 LIKE '%INVESTMENT%' OR PROPERTY_OWNER_1 LIKE '%ASSOCIATION%' OR PROPERTY_OWNER_1 LIKE '%FOUNDATION%' OR PROPERTY_OWNER_1 LIKE '%AUTHORITY%' OR PROPERTY_OWNER_1 LIKE 'CITY OF %' OR PROPERTY_OWNER_1 LIKE 'COUNTY OF %' OR PROPERTY_OWNER_1 LIKE 'STATE OF %' OR PROPERTY_OWNER_1 LIKE 'TOWN OF %' OR PROPERTY_OWNER_1 LIKE '% COUNTY' OR PROPERTY_OWNER_1 LIKE '%BOARD OF EDUCATION%' OR PROPERTY_OWNER_1 LIKE 'UNITED STATES%' OR PROPERTY_OWNER_1 LIKE 'NORTH CAROLINA %' OR PROPERTY_OWNER_1 LIKE '% DEVELOPMENT%')
+  paDeepLink:
+    template: https://lrcpwa.ncptscloud.com/stokes/parcel-detail/{PARCEL_PK}
+    testedUrl: https://lrcpwa.ncptscloud.com/stokes/parcel-detail/29818
+    httpStatus: 200
+    notes: HTTP 200; NCPTS PWA shell (client-rendered; not server-verifiable).
+  jurisdictionGisViewer:
+    url: https://www.stokescountygis.com/maps/
+    httpStatus: 200
+    notes: stokescountygis.com meta-refreshes to /maps/ (200)
+  gaps:
+  - PACKAGE_SALE_DATE sparse (12,722 of 32,131) — use DEED_DATE fallback
+  - AADT_2022 blank at 235 of 371 stations on the 2022 layer (NCDOT counts on a cycle) — prefer 2025 layer / latest non-blank year
+  - No multi-transfer sale history on primary layer (last sale only)

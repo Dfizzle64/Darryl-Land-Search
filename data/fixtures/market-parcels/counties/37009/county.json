@@ -1,0 +1,30 @@
+{
+  "name": "Ashe",
+  "fips": "37009",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 8966,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-ashe-parcels-37009",
+  "queryUrl": "https://gis.ashecountygov.com/arcgis/rest/services/OpenData/TaxParcel/MapServer/0/query",
+  "gaps": [
+    "Parcels are OpenData TaxParcel (PRIMARY CAMA) (https://gis.ashecountygov.com/arcgis/rest/services/OpenData/TaxParcel/MapServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 9066 rows; 8966 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 222 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Sample needs resultRecordCount (a full-page geometry query returns 500).",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37009/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37009/lookup.json",
+  "sourceCount": 9066,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://gis.ashecountygov.com/ITSPublic/AppraisalCard.aspx?id={parcelId}",
+  "gisViewerUrl": "https://gis.ashecountygov.com/maps/"
+}

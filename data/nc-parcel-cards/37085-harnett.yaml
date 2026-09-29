@@ -1,0 +1,384 @@
+state: NC
+jurisdiction: Harnett County
+fips: "37085"
+level: county
+markets: [Raleigh-Durham]
+
+layers:
+  - role: parcels
+    name: Tax/Parcels (PRIMARY)
+    restUrl: https://gis.harnett.org/arcgis/rest/services/Tax/Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CalculatedLandArea
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PID: parcelIdAlt
+      ParcelID: parcelIdPk
+      AccountNumber: parcelIdAccount
+      REID: parcelIdReid
+      CalculatedLandArea: acreage
+      LegalLandUnits: acreageDeed
+      LegalLandType: acreageDeedUnit
+      Owners: ownerName
+      Owner1: ownerName1
+      Owner2: ownerName2
+      OwnerAddress1: mailingAddress.street
+      OwnerAddress2: mailingAddress.street2
+      OwnerAddress3: mailingAddress.street3
+      OwnerCity: mailingAddress.city
+      OwnerState: mailingAddress.state
+      OwnerZipCode: mailingAddress.zip
+      MailingAddress: mailingAddress.combined
+      PhysicalAddress: situsAddress
+      ParAddress: situsAddress.street
+      ParCity: situsCity
+      ParZipCode: situsZip
+      HouseNumber: situs.number
+      StreetName: situs.street
+      StreetType: situs.streetType
+      StreetDirection: situs.streetDir
+      StreetSuffix: situs.streetSuffix
+      UnitNumber: situs.unit
+      SalePrice: lastSale.price
+      SaleYear: lastSale.year
+      SaleMonth: lastSale.month
+      DeedDate: lastSale.deedDate
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      QualifiedCode: lastSale.qualified
+      SaleVacantOrImproved: lastSale.vacantOrImproved
+      TotalMarketValue: tax.marketValue
+      TotalAssessedValue: tax.assessedValue
+      ParcelLandValue: tax.landValue
+      ParcelBuildingValue: tax.improvementValue
+      ParcelDeferredValue: tax.deferredValue
+      ParcelSpecialLandValue: tax.specialLandValue
+      Zoning: zoning
+      ZoningJurisdiction: planningJurisdiction
+      CityTaxDistrict: municipality
+      UseCode: dorCode
+      Class: landClass
+      Latitude: centroidLat
+      Longitude: centroidLon
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 85736;
+      CalculatedLandArea 5–150 → 11663; LegalLandUnits AC 5–150 → 11240;
+      ParcelBuildingValue=0/null in 5–150 → 7659; SalePrice>0 in 5–150 → 4710.
+      CRS 102719/2264. MaxRecordCount 2000 — paginate. MapServer only (no FeatureServer SOE).
+      Rich CAMA on polygons: situs, mailing parts, land/bldg split, last sale, zoning attr + Jurisdiction.
+      REID samples often "Retired" — prefer PIN / AccountNumber. PIN joins OneMap parno.
+      ZoningJurisdiction top: Harnett County 62132, Dunn 6429, Angier 5245, Lillington 5190,
+      Erwin 4291, Coats 1783 (+ multi-jurisdiction / Broadway / Fuquay tips).
+      CityTaxDistrict: Dunn 5310, Lillington 4576, Angier 4372, Erwin 2697, Coats 1249.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-24: cntyfips='085' count 84508; gisacres 5–150 → 11657;
+      improvval=0/null in range → 5686. Geo-check centroids in Harnett (~35.25–35.51 N, 78.7–79.1 W).
+      PIN match verified (parno=0518-52-7425.000). Fallback when county host flaky.
+      MaxRecordCount 5000. Alternate host services.gis.nc.gov. No sale price.
+    status: usable
+
+  - role: zoning
+    name: Planning ZoningDistricts (PRIMARY multi-jurisdiction stack)
+    restUrl: https://gis.harnett.org/arcgis/rest/services/Planning/Zoning/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZoneClass: zoning
+      ZoneDescription: zoningLabel
+      ZoneDefinition: zoningDefinition
+      Jurisdiction: planningJurisdiction
+      EffectiveDate: zoningDate
+      Ordinance: zoningOrdinance
+      BookPage: zoningBookPage
+      Conditions: zoningConditions
+      Source: zoningSourceUrl
+    notes: >
+      PRIMARY zoning polygons. Verified count 9389. By Jurisdiction: Dunn 5880,
+      Lillington 2330, Harnett County 634, Coats 338, Erwin 106, Angier 97,
+      Broadway 2, Fuquay_Varina 1, Benson 1. CRS 2264. No separate city FeatureServers
+      for Dunn/Lillington/Angier/Coats — this county stack IS the public muni zoning REST.
+      Angier polygon count sparse (97) vs ~5.2k Angier-jurisdiction parcels — prefer parcel
+      Zoning attr + spatial join; Wake Angier MapServer/15 covers Wake-side edge only.
+      Source URL field often points at Municode/PDF ordinances (QA noisy — route by Jurisdiction).
+    status: usable
+
+  - role: zoning
+    name: Planning ETJ
+    restUrl: https://gis.harnett.org/arcgis/rest/services/Planning/Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Jurisdiction: etjName
+    notes: >
+      Verified count 8: Angier, Benson, Broadway, Coats, Dunn, Erwin, Fuquay_Varina, Lillington.
+      Route planning authority with ZoningDistricts.Jurisdiction / parcel ZoningJurisdiction.
+    status: usable
+
+  - role: zoning
+    name: Erwin Town Zoning Map (AGOL 2005 alternate)
+    restUrl: https://services2.arcgis.com/qO6xd1V1VbSyViir/arcgis/rest/services/Erwin_Town_Zoning_Map/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: ACRES_
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      ZONE_DESC: zoningLabel
+      ACRES_: zoningAcres
+    notes: >
+      Legacy 2005 town layer — verified count 28 only. CRS 102716/2261 (NC StatePlane feet
+      variant) — reproject before overlay. Prefer county ZoningDistricts Jurisdiction='Erwin'
+      (106) + parcel Zoning attr inside Erwin.
+    status: partial
+
+  - role: zoning
+    name: Wake Angier Zoning (edge)
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+    notes: >
+      Wake-side Angier edge only (verified count 96 on Wake card). Harnett-side Angier →
+      county ZoningDistricts Jurisdiction='Angier' + parcel Zoning attr.
+    status: usable
+
+  - role: flu
+    name: Planning Future LandUse (PRIMARY county FLU)
+    restUrl: https://gis.harnett.org/arcgis/rest/services/Planning/Planning/MapServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FLU: flu
+    notes: >
+      PRIMARY county FLU. Verified count 718. CRS 2264. Categories: Rural/Agriculture 204,
+      Low Density Residential 136, Municipal/ETJ 92, Conservation 85, Medium Density Residential 75,
+      Employment 46, Parks and Open Space 23, Rural Center 22, Commercial Mixed-use 15,
+      Agricultural Protection Area 7, Historic Community 7, Village 3, Village Center 3.
+      Spatial join to parcels. Municipal/ETJ class is coarse placeholder inside towns —
+      no dedicated city FLU FeatureServers found for Dunn/Lillington/Angier/Erwin/Coats.
+    status: usable
+
+  - role: flu
+    name: Future LandUse Overlay (jetport / military)
+    restUrl: https://gis.harnett.org/arcgis/rest/services/Planning/Planning/MapServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      OverlayName: fluOverlay
+      SafetyZone: fluSafetyZone
+    notes: >
+      Verified count 6 — Jetport Overlay (HRJ AZ-1/2/3) + Military Overlay Buffer.
+      Companion overlays also on Planning MapServer layers 2–3 (Highway/Military Corridor).
+    status: partial
+
+  - role: sales
+    name: Tax/Sales (sale-subset polygons)
+    restUrl: https://gis.harnett.org/arcgis/rest/services/Tax/Sales/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CalculatedLandArea
+    coverage: sample
+    fieldMap:
+      PIN: parcelId
+      SalePrice: lastSale.price
+      SaleYear: lastSale.year
+      QualifiedCode: lastSale.qualified
+      SaleVacantOrImproved: lastSale.vacantOrImproved
+    notes: >
+      Verified count 20199 — parcels with sale attrs (not full multi-transfer history).
+      Prefer last SalePrice/SaleYear/DeedDate on primary Tax/Parcels. Layers 1–2 split >50% / <50%.
+    status: partial
+
+  - role: sales
+    name: QualifiedSales_2024_2025
+    restUrl: https://gis.harnett.org/arcgis/rest/services/Tax/QualifiedSales_2024_2025/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CalculatedLandArea
+    coverage: sample
+    fieldMap:
+      PIN: parcelId
+      SalePrice: lastSale.price
+      SaleYear: lastSale.year
+      IsQualified: lastSale.qualified
+      MarketAcreage: acreage
+    notes: >
+      Verified count 9140 — recent qualified sales window. Supplement to parcel last-sale fields.
+    status: usable
+
+  - role: other
+    name: City Limits
+    restUrl: https://gis.harnett.org/arcgis/rest/services/Boundaries/HC_Boundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY: municipality
+      TAXCODE: municipalityTaxCode
+    notes: >
+      Verified 8: Angier, Benson, Broadway, Coats, Dunn, Erwin, Fuquay Varina, Lillington.
+      Mirror Hosted/CITY_LIMITS FS/0 (city/taxcode; CRS 3857).
+    status: usable
+
+gaps:
+  - No dedicated public city FeatureServers for Dunn, Lillington, Angier, Coats — county ZoningDistricts is the public muni zoning REST (filter Jurisdiction)
+  - Angier ZoningDistricts only 97 polygons vs ~5.2k Angier-jurisdiction parcels — prefer parcel Zoning attribute; Wake Angier layer is Wake-edge only
+  - Erwin AGOL town zoning is 2005 vintage (28 polys) — prefer county ZoningDistricts Erwin=106
+  - No city FLU FeatureServers — county Future LandUse uses Municipal/ETJ placeholder inside towns
+  - Trakit/Trakit MapServer/1 advertises LinktoPropertyCard / FutureLandUse but live queries return 400 — do not wire
+  - Tax/Parcels is MapServer only (FeatureServer SOE missing) — query MapServer/0
+  - REID field often "Retired" — do not use as join key
+  - No multi-transfer sales history comparable to Forsyth SalesApp — last sale on parcel + Sales / QualifiedSales subsets
+  - Zoning Source URL field QA-noisy (bulk Municode URLs) — route by Jurisdiction not Source
+  - Broadway / Benson / Fuquay Varina tips are edge fragments — prefer Lee / Johnston / Wake cards for those city cores
+  - No paid vendor data; no phones/emails collected; no AADT/utilities dig
+license: "Harnett County public GIS; NCGS disclaimer; attribution recommended; no paid vendors"
+appraiserSearchUrl: https://lrcpwa.ncptscloud.com/harnett/parcel-search
+viewerLinkTemplate: "https://lrcpwa.ncptscloud.com/harnett/parcel-detail/{AccountNumber}"
+camaSearchUrl: https://cama.harnett.org/ITSPublicHT/
+gisViewerUrl: https://gis.harnett.org/gisviewer/
+publicGisUrl: https://gis.harnett.org/gisviewer/
+gisDepartmentUrl: https://www.harnett.org/gis/default.asp
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://gis.harnett.org/arcgis/rest/services/Tax/Parcels/MapServer/0
+  parcelIdField: AccountNumber
+  acreageFilter: CalculatedLandArea >= 5 AND CalculatedLandArea <= 150
+  acres5to150Live: 11661
+  parcelCountLive: 85776
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='HARNETT'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27HARNETT%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27HARNETT%27&returnCountOnly=true&f=json
+      liveStationCount: 510
+      stationsWithAADT2022: 174
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Harnett'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Harnett%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Harnett%27&returnCountOnly=true&f=json
+      liveStationCount: 510
+      stationsWithAADT2025: 328
+      stationsWithAADT2024: 294
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Harnett'
+      stations2024LiveCount: 510
+      stations2024WithAADT2024: 510
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TotalMarketValue
+    - TotalAssessedValue
+    liveNonZero:
+      TotalMarketValue: 80682
+      TotalAssessedValue: 80682
+    status: ok
+  sale:
+    priceFields:
+    - SalePrice
+    dateFields:
+    - DeedDate
+    livePriceNonZero:
+      SalePrice: 52332
+    liveDateNonNull:
+      DeedDate: 82408
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - Owner1
+    - Owner2
+    - Owners
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 2130
+    liveEntityCount5to150acExtended: 2905
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - NC DEPARTMENT OF TRANSPORTATION |  | NC DEPARTMENT OF TRANSPORTATION
+    - NC DEPARTMENT OF TRANSPORTATION |  | NC DEPARTMENT OF TRANSPORTATION
+    - NC DEPARTMENT OF TRANSPORTATION |  | NC DEPARTMENT OF TRANSPORTATION
+    - NC DEPARTMENT OF TRANSPORTATION |  | NC DEPARTMENT OF TRANSPORTATION
+  paDeepLink:
+    template: https://cama.harnett.org/ITSPublicHT/RealEstateSearch/Parcel/{AccountNumber}
+    testedParcelId: '1500007930'
+    testedUrl: https://cama.harnett.org/ITSPublicHT/RealEstateSearch/Parcel/1500007930
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: true
+    note: ITSPublic RealEstateSearch/Parcel 200 with ID in page. NCPTS parcel-detail/{AccountNumber} 200 SPA shell only (headless shows app 404) — keep as alt, unverified.
+  gisViewer:
+    url: https://gis.harnett.org/gisviewer/
+    httpStatus: 200
+    pageTitle: Harnett County GIS Viewer
+  gaps: []

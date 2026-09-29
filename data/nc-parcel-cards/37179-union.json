@@ -1,0 +1,920 @@
+{
+  "county": "Union",
+  "state": "NC",
+  "msa": "Charlotte MSA",
+  "fips": "37179",
+  "cntyfips": "179",
+  "crs_preferred": {
+    "wkid": 102100,
+    "latestWkid": 3857,
+    "name": "WGS 1984 Web Mercator (Auxiliary Sphere)",
+    "note": "OperationalLayers parcels + OpLayers town zoning are 3857. UNION_COUNTY_LAYERS town zoning and Stallings city FS are often 102719/2264 \u2014 reproject for spatial joins. NC OneMap is 2264."
+  },
+  "viewerLinkTemplate": "https://unionnc.devnetwedge.com/parcel/view/{PID}",
+  "viewerLinkTemplates": {
+    "wedge": "https://unionnc.devnetwedge.com/parcel/view/{PID}",
+    "wedgeYear": "https://unionnc.devnetwedge.com/parcel/view/{PID}/{year}",
+    "spatialest": "https://property.spatialest.com/nc/union#/property/{PID}/",
+    "ucAtlas": "https://atlas.unioncountync.gov/maps/"
+  },
+  "joinKeys": [
+    "PID",
+    "ACCTNO",
+    "parno"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PID",
+        "ACCTNO",
+        "parno"
+      ],
+      "bestLayer": "OperationalLayers_Parcels_215"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "OperationalLayers_Parcels_215"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "mapped_acres",
+        "gross_acres",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 13149,
+      "bestLayer": "OperationalLayers_Parcels_215"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "CURR_NAME1",
+        "CURR_NAME2",
+        "ownname"
+      ],
+      "bestLayer": "OperationalLayers_Parcels_215"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "CURR_ADDR1",
+        "CURR_ADDR2",
+        "CURR_CITY",
+        "CURR_STATE",
+        "CURR_ZIPCODE",
+        "mailadd"
+      ],
+      "bestLayer": "OperationalLayers_Parcels_215"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "PHYSSTRADD",
+        "siteadd"
+      ],
+      "bestLayer": "OperationalLayers_Parcels_215"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "s1_SALEDATE",
+        "s1_SALESAMT",
+        "s1_DEEDQUAL_CODEDESC",
+        "s2_SALEDATE",
+        "s2_SALESAMT",
+        "s3_SALEDATE",
+        "s3_SALESAMT"
+      ],
+      "historyLayer": "s1/s2/s3 on OperationalLayers_Parcels_215",
+      "bestLayer": "OperationalLayers_Parcels_215"
+    },
+    "taxValues": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "TOTVAL",
+        "FMV_TOTAL",
+        "parval"
+      ],
+      "bestLayer": "OperationalLayers_Parcels_215",
+      "caveat": "FMV_LAND and FMV_IMPRV are 0 on sampled 5-150 ac features; use totals only"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "ZONE",
+        "NEW_ZONING",
+        "NEW_ZONIN",
+        "CurrentZon",
+        "Zoning",
+        "CountyZoning"
+      ],
+      "bestLayer": "route_by_ZoningAdmin",
+      "split": "Union County unincorp vs 14 municipalities; ParcelCentroids stubs CITY for ~78k parcels"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "Land_Use",
+        "Mixed_Use"
+      ],
+      "bestLayer": "Union_County_2050_Secrest_SAP",
+      "caveat": "No countywide FLU FeatureServer; SAP/employment scraps only"
+    },
+    "viewerLink": {
+      "present": true,
+      "template": "https://unionnc.devnetwedge.com/parcel/view/{PID}",
+      "keyField": "PID"
+    }
+  },
+  "portals": [
+    {
+      "name": "Union County GIS & Mapping",
+      "url": "https://www.unioncountync.gov/government/departments-f-p/gis-mapping",
+      "notes": "UC Atlas, downloads, FAQ"
+    },
+    {
+      "name": "UC Atlas",
+      "url": "https://atlas.unioncountync.gov/maps/",
+      "notes": "Interactive parcel/ownership viewer (replaced GoMAPS)"
+    },
+    {
+      "name": "atlas ArcGIS REST",
+      "url": "https://atlas.unioncountync.gov/server/rest/services",
+      "notes": "OperationalLayers, UNION_COUNTY_LAYERS, ParcelCentroids"
+    },
+    {
+      "name": "Downloadable GIS Data",
+      "url": "https://www.unioncountync.gov/government/departments-f-p/gis-mapping/downloadable-gis-data",
+      "notes": "Monthly parcel shapefiles"
+    },
+    {
+      "name": "wEdge Property Tax Inquiry",
+      "url": "https://unionnc.devnetwedge.com/",
+      "notes": "Assessor cards; /parcel/view/{PID}"
+    },
+    {
+      "name": "Spatialest Property Portal",
+      "url": "https://property.spatialest.com/nc/union",
+      "notes": "Market value report; #/property/{PID}/"
+    },
+    {
+      "name": "NC OneMap",
+      "url": "https://www.nconemap.gov",
+      "notes": "Statewide parcels FeatureServer"
+    },
+    {
+      "name": "Waxhaw zoning app",
+      "url": "https://waxhaw.maps.arcgis.com/apps/PublicInformation/index.html?appid=d3559346d3354d9aaca96264ded4a92d",
+      "notes": "Town of Waxhaw interactive zoning"
+    },
+    {
+      "name": "Indian Trail GIS Maps",
+      "url": "https://www.indiantrail.org/163/GIS-Maps",
+      "notes": "Official zoning PDFs + web apps; data from county + town"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Monroe",
+      "approxParcelCentroids": 18009,
+      "hasIndependentRest": false,
+      "zoningLayers": [
+        {
+          "name": "Monroe Zoning (county-hosted)",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/180",
+          "alternateUrls": [
+            "https://atlas.unioncountync.gov/server/rest/services/UNION_COUNTY_LAYERS/MapServer/180"
+          ],
+          "zoneField": "NEW_ZONING",
+          "featureCount": 18551,
+          "wkid": 102100,
+          "latestWkid": 3857,
+          "verified": true,
+          "join": "spatial to OperationalLayers/215 (same 3857); ParcelCentroids ZoningAdmin=Monroe"
+        }
+      ],
+      "flu": "gap \u2014 no verified public FLU FeatureServer",
+      "notes": "Do not use AGOL Monroe_Zoning___Character_Districts (Monroe GA)."
+    },
+    {
+      "name": "Indian Trail",
+      "approxParcelCentroids": 18552,
+      "hasIndependentRest": false,
+      "zoningLayers": [
+        {
+          "name": "Indian Trail Zoning",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/174",
+          "alternateUrls": [
+            "https://atlas.unioncountync.gov/server/rest/services/UNION_COUNTY_LAYERS/MapServer/174"
+          ],
+          "zoneField": "NEW_ZONIN",
+          "featureCount": 18251,
+          "wkid": 102100,
+          "latestWkid": 3857,
+          "verified": true,
+          "join": "prefer OpLayers/174 spatial (3857) or ACCTNO attr-join; UCL/174 is 2264"
+        }
+      ],
+      "flu": "Comp Plan 2041 PDF / planning docs \u2014 no public FLU FeatureServer found",
+      "notes": "Town web apps at indiantrail.org use Union County + town data."
+    },
+    {
+      "name": "Waxhaw",
+      "approxParcelCentroids": 8684,
+      "hasIndependentRest": true,
+      "zoningLayers": [
+        {
+          "name": "Waxhaw Official Zoning (town FS)",
+          "url": "https://services2.arcgis.com/Sa3FPjCP8681JQgz/arcgis/rest/services/Official_Zoning_gdb/FeatureServer/0",
+          "zoneField": "Zoning",
+          "featureCount": 8300,
+          "wkid": 102100,
+          "latestWkid": 3857,
+          "verified": true,
+          "join": "attribute join PID/ACCTNO to county parcels (preferred)"
+        },
+        {
+          "name": "Waxhaw Zoning (county-hosted)",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/183",
+          "zoneField": "Zoning",
+          "featureCount": 8011,
+          "wkid": 102100,
+          "latestWkid": 3857,
+          "verified": true,
+          "join": "ACCTNO attr-join or spatial"
+        }
+      ],
+      "flu": "gap / town planning docs",
+      "notes": "Prefer town Official_Zoning_gdb FeatureServer."
+    },
+    {
+      "name": "Stallings",
+      "approxParcelCentroids": 7507,
+      "hasIndependentRest": true,
+      "zoningLayers": [
+        {
+          "name": "Stallings Zoning Districts (town FS)",
+          "url": "https://services8.arcgis.com/eIIzSLwZoq8C0D6F/arcgis/rest/services/Zoning_Map/FeatureServer/7",
+          "zoneField": "CurrentZon",
+          "featureCount": 7462,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "verified": true,
+          "join": "attribute join ACCTNO; CRS 2264 \u2014 attr-join preferred over spatial to 3857 parcels"
+        },
+        {
+          "name": "Stallings Conditionally Zoned Parcels",
+          "url": "https://services8.arcgis.com/eIIzSLwZoq8C0D6F/arcgis/rest/services/Zoning_Map/FeatureServer/1",
+          "zoneField": "CurrentZoning",
+          "featureCount": 28,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "verified": true,
+          "join": "CZ case metadata overlay"
+        },
+        {
+          "name": "Stallings Zoning (county-hosted)",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/181",
+          "zoneField": "CurrentZon",
+          "featureCount": 7159,
+          "wkid": 102100,
+          "latestWkid": 3857,
+          "verified": true,
+          "join": "ACCTNO attr-join; same CRS as parcels"
+        }
+      ],
+      "flu": "ExistingLandUse field on town FS/7 (coded) \u2014 not full FLU plan",
+      "notes": "Prefer town FeatureServer/7 for CurrentZon + CZ fields."
+    },
+    {
+      "name": "Weddington",
+      "approxParcelCentroids": 5337,
+      "hasIndependentRest": false,
+      "zoningLayers": [
+        {
+          "name": "Weddington Zoning",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/184",
+          "zoneField": "ZONE",
+          "featureCount": 22,
+          "wkid": 102100,
+          "latestWkid": 3857,
+          "verified": true,
+          "join": "spatial (coarse districts)"
+        }
+      ],
+      "flu": "gap"
+    },
+    {
+      "name": "Wesley Chapel",
+      "approxParcelCentroids": 3560,
+      "hasIndependentRest": false,
+      "zoningLayers": [
+        {
+          "name": "Wesley Chapel Zoning",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/UNION_COUNTY_LAYERS/MapServer/185",
+          "zoneField": "ZONE",
+          "featureCount": 199,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "verified": true,
+          "join": "spatial + reproject to 3857 parcels"
+        }
+      ],
+      "flu": "gap"
+    },
+    {
+      "name": "Unionville",
+      "approxParcelCentroids": 3403,
+      "hasIndependentRest": false,
+      "zoningLayers": [
+        {
+          "name": "Unionville Zoning",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/UNION_COUNTY_LAYERS/MapServer/182",
+          "zoneField": "zoning",
+          "featureCount": 3498,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "verified": true,
+          "join": "ACCTNO attr-join"
+        }
+      ],
+      "flu": "gap"
+    },
+    {
+      "name": "Wingate",
+      "approxParcelCentroids": 2439,
+      "hasIndependentRest": false,
+      "zoningLayers": [
+        {
+          "name": "Wingate Zoning",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/186",
+          "zoneField": "ZONE",
+          "featureCount": 65,
+          "wkid": 102100,
+          "latestWkid": 3857,
+          "verified": true,
+          "join": "spatial"
+        }
+      ],
+      "flu": "gap"
+    },
+    {
+      "name": "Marvin",
+      "approxParcelCentroids": 2415,
+      "hasIndependentRest": false,
+      "zoningLayers": [
+        {
+          "name": "Marvin Zoning",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/177",
+          "zoneField": "Marvin_Zon",
+          "featureCount": 263,
+          "wkid": 102100,
+          "latestWkid": 3857,
+          "verified": true,
+          "join": "spatial"
+        }
+      ],
+      "flu": "gap"
+    },
+    {
+      "name": "Fairview",
+      "approxParcelCentroids": 2091,
+      "hasIndependentRest": false,
+      "zoningLayers": [
+        {
+          "name": "Fairview Zoning",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/173",
+          "zoneField": "ZONE",
+          "featureCount": 14,
+          "wkid": 102100,
+          "latestWkid": 3857,
+          "verified": true,
+          "join": "spatial (sparse)"
+        }
+      ],
+      "flu": "gap"
+    },
+    {
+      "name": "Marshville",
+      "approxParcelCentroids": 1727,
+      "hasIndependentRest": false,
+      "zoningLayers": [
+        {
+          "name": "Marshville Zoning",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/176",
+          "zoneField": "Zoning",
+          "featureCount": 1912,
+          "wkid": 102100,
+          "latestWkid": 3857,
+          "verified": true,
+          "join": "ACCTNO attr-join (parcel-attributed layer)"
+        }
+      ],
+      "flu": "gap"
+    },
+    {
+      "name": "Mineral Springs",
+      "approxParcelCentroids": 1569,
+      "hasIndependentRest": false,
+      "zoningLayers": [
+        {
+          "name": "Mineral Springs Zoning",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/UNION_COUNTY_LAYERS/MapServer/178",
+          "zoneField": "ZoneDesc",
+          "featureCount": 53,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "verified": true,
+          "join": "spatial + reproject"
+        }
+      ],
+      "flu": "gap"
+    },
+    {
+      "name": "Lake Park",
+      "approxParcelCentroids": 1409,
+      "hasIndependentRest": false,
+      "zoningLayers": [
+        {
+          "name": "Lake Park Zoning",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/175",
+          "zoneField": "LP_Zone",
+          "featureCount": 151,
+          "wkid": 102100,
+          "latestWkid": 3857,
+          "verified": true,
+          "join": "spatial"
+        }
+      ],
+      "flu": "gap"
+    },
+    {
+      "name": "Mint Hill",
+      "approxParcelCentroids": 4,
+      "hasIndependentRest": false,
+      "zoningLayers": [
+        {
+          "name": "Mint Hill Zoning (Union edge)",
+          "url": "https://atlas.unioncountync.gov/server/rest/services/UNION_COUNTY_LAYERS/MapServer/179",
+          "zoneField": "MH_ZONE",
+          "featureCount": 1,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "verified": true,
+          "join": "negligible in Union \u2014 use Mecklenburg card for Mint Hill"
+        }
+      ],
+      "flu": "see Mecklenburg / Charlotte sources"
+    },
+    {
+      "name": "Hemby Bridge",
+      "approxParcelCentroids": null,
+      "hasIndependentRest": false,
+      "zoningLayers": [],
+      "flu": "gap",
+      "notes": "No dedicated zoning layer on UC Atlas; verify with planning / adjacent layers"
+    }
+  ],
+  "layers": [
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales"
+      ],
+      "name": "OperationalLayers Parcels",
+      "id": 215,
+      "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/215",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102100,
+      "latestWkid": 3857,
+      "featureCount": 118043,
+      "verified": true,
+      "verifiedHow": "query?where=1=1&returnCountOnly=true; mapped_acres BETWEEN 5 AND 150 \u2192 13149; sample attribute query",
+      "fields": {
+        "PID": "Parcel ID / wEdge key",
+        "ACCTNO": "Account number (usually = PID)",
+        "mapped_acres": "GIS acreage",
+        "gross_acres": "Gross acres",
+        "CURR_NAME1": "Owner name 1",
+        "CURR_NAME2": "Owner name 2",
+        "CURR_ADDR1": "Mailing address 1",
+        "CURR_ADDR2": "Mailing address 2",
+        "CURR_CITY": "Mailing city",
+        "CURR_STATE": "Mailing state",
+        "CURR_ZIPCODE": "Mailing ZIP",
+        "PHYSSTRADD": "Situs address",
+        "s1_SALEDATE": "Last sale date",
+        "s1_SALESAMT": "Last sale price",
+        "s1_DEEDQUAL_CODEDESC": "Sale qualification",
+        "TOTVAL": "Total assessed/tax value",
+        "FMV_TOTAL": "Fair market total",
+        "FMV_LAND": "Land FMV (often 0 \u2014 unreliable)",
+        "FMV_IMPRV": "Improvement FMV (often 0 \u2014 unreliable)",
+        "property_use": "Property use code",
+        "DESC1_DESC": "Land use description"
+      },
+      "notes": "PRIMARY. No zoning \u2014 join ParcelCentroids + municipal layers. MaxRecordCount 2000."
+    },
+    {
+      "purpose": [
+        "zoning",
+        "other"
+      ],
+      "name": "ParcelCentroids",
+      "id": 0,
+      "url": "https://atlas.unioncountync.gov/server/rest/services/ParcelCentroids/MapServer/0",
+      "geometry": "esriGeometryPoint",
+      "featureCount": 118043,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + ZoningAdmin groupBy + CountyZoning samples",
+      "fields": {
+        "PID": "Join to Parcels.PID",
+        "CountyZoning": "Unincorp zone code; CITY stub for municipalities",
+        "ZoningAdmin": "Municipality routing key",
+        "MuniAdmin": "Municipal admin",
+        "FireDistrict": "Fire district"
+      },
+      "notes": "~78k CITY stubs require town zoning layers."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Union County Zoning",
+      "id": 190,
+      "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/190",
+      "alternateUrls": [
+        "https://atlas.unioncountync.gov/server/rest/services/UNION_COUNTY_LAYERS/MapServer/190",
+        "https://atlas.unioncountync.gov/server/rest/services/Zoning_Map_MIL1/MapServer/6"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102100,
+      "latestWkid": 3857,
+      "featureCount": 727,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + distinct ZONE/ADMIN",
+      "fields": {
+        "ZONE": "Zoning code",
+        "ADMIN": "Administration",
+        "PETITION": "Petition",
+        "ETJ": "ETJ flag"
+      },
+      "notes": "Unincorporated / county-administered. Prefer OpLayers 3857 for spatial join to parcels."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales"
+      ],
+      "name": "NC1Map_Parcels polys",
+      "id": 1,
+      "url": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 117539,
+      "featureCountFilter": "cntyfips='179'",
+      "verified": true,
+      "verifiedHow": "cntyfips=179 returnCountOnly + sample features; 5-150 ac \u224813178",
+      "fields": {
+        "parno": "Parcel number",
+        "ownname": "Owner name",
+        "mailadd": "Mailing address",
+        "siteadd": "Situs address",
+        "gisacres": "GIS acres",
+        "saledate": "Last sale date",
+        "parval": "Parcel value",
+        "landval": "Land value",
+        "improvval": "Improvement value",
+        "cntyfips": "County FIPS (179=Union)",
+        "cntyname": "County name"
+      },
+      "notes": "Statewide fallback. Filter cntyfips=179."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales"
+      ],
+      "name": "AGOL Parcels_070126_clip",
+      "id": 62,
+      "url": "https://services8.arcgis.com/7YUdLQ8pDBKU1XYI/arcgis/rest/services/Parcels/FeatureServer/62",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 40901,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample (includes UCTXREP/MKREP deep-link HTML)",
+      "fields": {
+        "PID": "Parcel ID",
+        "ACCTNO": "Account",
+        "UCTXREP": "HTML link to wEdge tax report",
+        "MKREP": "HTML link to Spatialest market report"
+      },
+      "notes": "PARTIAL ~41k clip \u2014 not primary inventory. Useful for deep-link pattern confirmation."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Waxhaw Official Zoning (town)",
+      "id": 0,
+      "url": "https://services2.arcgis.com/Sa3FPjCP8681JQgz/arcgis/rest/services/Official_Zoning_gdb/FeatureServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102100,
+      "latestWkid": 3857,
+      "featureCount": 8300,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample Zoning=R1",
+      "fields": {
+        "PID": "Parcel ID",
+        "ACCTNO": "Account",
+        "Zoning": "Zoning code",
+        "gross_acre": "Acres"
+      },
+      "notes": "City-first Waxhaw source; attr-join on PID.",
+      "municipality": "Waxhaw"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Stallings Zoning Districts (town)",
+      "id": 7,
+      "url": "https://services8.arcgis.com/eIIzSLwZoq8C0D6F/arcgis/rest/services/Zoning_Map/FeatureServer/7",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 7462,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample CurrentZon=MU-2",
+      "fields": {
+        "ACCTNO": "Account / join key",
+        "CurrentZon": "Zoning",
+        "CZ_Case": "Conditional case",
+        "CZ_Join": "CZ join key"
+      },
+      "notes": "City-first Stallings source; attr-join ACCTNO. CRS 2264.",
+      "municipality": "Stallings"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Monroe Zoning (county-hosted)",
+      "id": 180,
+      "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/180",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102100,
+      "latestWkid": 3857,
+      "featureCount": 18551,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + distinct NEW_ZONING",
+      "fields": {
+        "NEW_ZONING": "Monroe zoning code"
+      },
+      "notes": "No verified Monroe-NC independent REST.",
+      "municipality": "Monroe"
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Indian Trail Zoning (county-hosted)",
+      "id": 174,
+      "url": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/174",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102100,
+      "latestWkid": 3857,
+      "featureCount": 18251,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + distinct NEW_ZONIN",
+      "fields": {
+        "ACCTNO": "Account",
+        "NEW_ZONIN": "Zoning",
+        "OVERLAY": "Overlay",
+        "CASE_NU": "Case number"
+      },
+      "notes": "Town has no public FeatureServer; county-hosted is authoritative public REST.",
+      "municipality": "Indian Trail"
+    },
+    {
+      "purpose": [
+        "flu"
+      ],
+      "name": "Secrest_SAP_LU_final",
+      "id": 30,
+      "url": "https://atlas.unioncountync.gov/server/rest/services/Union_County_2050_Land_Use_Map_MIL3/MapServer/30",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 51,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + distinct Land_Use",
+      "fields": {
+        "Land_Use": "FLU class",
+        "Mixed_Use": "Mixed use flag"
+      },
+      "notes": "Area-plan FLU only \u2014 not countywide."
+    },
+    {
+      "purpose": [
+        "flu"
+      ],
+      "name": "LUP_Emp_Center",
+      "id": 19,
+      "url": "https://atlas.unioncountync.gov/server/rest/services/Union_County_2050_Land_Use_Map_MIL2/MapServer/19",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 6,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + metadata",
+      "fields": {
+        "AcresCalc": "Acres"
+      },
+      "notes": "Employment center overlay scrap only."
+    }
+  ],
+  "gaps": [
+    "No single countywide zoning service \u2014 must route by municipality (ParcelCentroids ZoningAdmin) and union town layers.",
+    "ParcelCentroids CountyZoning='CITY' for ~78k municipal parcels \u2014 town layers mandatory.",
+    "No countywide Future Land Use FeatureServer (2050 plan docs exist; GIS FLU fragmentary).",
+    "FMV_LAND/FMV_IMPRV zeroed on live Parcels/215 samples \u2014 totals only.",
+    "Hemby Bridge has no dedicated zoning layer.",
+    "CRS mismatch: OperationalLayers 3857 vs UNION_COUNTY_LAYERS/Stallings FS 2264.",
+    "Legacy GoMAPS (gis.unioncountync.gov) is 404.",
+    "AGOL Parcels FeatureServer/62 is a partial clip (~41k).",
+    "Owner phones/emails not in public REST (do not scrape).",
+    "MaxRecordCount typically 2000 \u2014 pagination required."
+  ],
+  "handOff": {
+    "wireFirst": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/215",
+    "zoningRoute": "https://atlas.unioncountync.gov/server/rest/services/ParcelCentroids/MapServer/0",
+    "zoningUnincorp": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/190",
+    "zoningWaxhawCity": "https://services2.arcgis.com/Sa3FPjCP8681JQgz/arcgis/rest/services/Official_Zoning_gdb/FeatureServer/0",
+    "zoningStallingsCity": "https://services8.arcgis.com/eIIzSLwZoq8C0D6F/arcgis/rest/services/Zoning_Map/FeatureServer/7",
+    "flu": "https://atlas.unioncountync.gov/server/rest/services/Union_County_2050_Land_Use_Map_MIL3/MapServer/30",
+    "fallback": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1?where=cntyfips='179'",
+    "auth": "none observed on listed public query endpoints",
+    "rateLimits": "MaxRecordCount typically 2000 (OneMap 5000); paginate with resultOffset",
+    "municipalitiesFirstClass": true
+  },
+  "verifiedAt": "2026-09-23",
+  "verifiedLayerCount": 24,
+  "pass2": {
+    "label": "PASS2 full-suite upgrade \u2014 rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "aadtScreening": {
+      "source": "NCDOT Traffic Survey Group (public AGOL)",
+      "layer": "NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)",
+      "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+      "countyField": "COUNTY",
+      "countyValue": "UNION",
+      "valueField": "AADT_2022",
+      "valueType": "string (trim; blank = no count that year)",
+      "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27UNION%27&returnCountOnly=true&f=json",
+      "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27UNION%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+      "liveStationCount": 755,
+      "stationsWithAADT2022": 354,
+      "newerYearAvailable": {
+        "available": true,
+        "layer": "NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)",
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "countyField": "County",
+        "countyValue": "Union",
+        "valueField": "AADT_2025",
+        "valueType": "integer (null = no count)",
+        "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Union%27&returnCountOnly=true&f=json",
+        "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Union%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+        "liveStationCount": 771,
+        "stationsWithAADT2025": 364,
+        "stationsWithAADT2024": 477,
+        "segmentsLayer": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide \u2014 spatial filter by county envelope)",
+        "also": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)"
+      },
+      "recommendation": "Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025\u2192AADT_2024\u2192AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title)."
+    },
+    "primaryParcelLayer": {
+      "restUrl": "https://atlas.unioncountync.gov/server/rest/services/OperationalLayers/MapServer/215",
+      "acreageField": "mapped_acres",
+      "range5to150Where": "mapped_acres>=5 AND mapped_acres<=150",
+      "liveTotalParcels": 118043,
+      "liveParcels5to150": 13149
+    },
+    "taxValues": {
+      "status": "ok",
+      "fields": {
+        "TOTVAL": "tax.assessedValue",
+        "FMV_TOTAL": "tax.marketValue"
+      },
+      "liveNonZeroCounty": {
+        "TOTVAL": 111686,
+        "FMV_TOTAL": 111686
+      },
+      "liveNonZero5to150": {
+        "FMV_TOTAL": 12212
+      },
+      "notes": "Double fields TOTVAL (assessed) / FMV_TOTAL (market); no land/bldg split on this layer.",
+      "publicFallback": "https://unionnc.devnetwedge.com/parcel/view/{PID}"
+    },
+    "saleHistory": {
+      "status": "ok",
+      "priceFields": [
+        "s1_SALESAMT"
+      ],
+      "dateFields": [
+        "s1_SALEDATE"
+      ],
+      "livePriceGt0County": {
+        "s1_SALESAMT": 69834
+      },
+      "livePriceGt0_5to150": {
+        "s1_SALESAMT": 4678
+      },
+      "liveDateNonNullCounty": {
+        "s1_SALEDATE": 105139
+      },
+      "notes": "s1_SALEDATE esriDate; s1_SALESAMT double; s1_DEEDQUAL_CODEDESC."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "CURR_NAME1",
+        "CURR_NAME2"
+      ],
+      "primaryOwnerField": "CURR_NAME1",
+      "rule": {
+        "apply": "Uppercase + trim CURR_NAME1 (optionally also CURR_NAME2)",
+        "regex": "(?i)(\\bL\\.?\\s?L\\.?\\s?C\\b|\\bINC\\b|\\bCORP|\\bL\\.?\\s?P\\b|\\bLLP\\b|\\bLLLP\\b|\\bLTD\\b|TRUST|CHURCH|MINISTR|\\bCOMPANY\\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\\bHOA\\b|FOUNDATION|AUTHORITY|\\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\\b|^UNITED STATES|^NORTH CAROLINA\\b|\\bCOUNTY$)",
+        "sqlLikeTokens": [
+          "% LLC%",
+          "%,LLC%",
+          "% L L C%",
+          "% INC",
+          "% INC %",
+          "% INC.%",
+          "%,INC%",
+          "% CORP%",
+          "%CORPORATION%",
+          "% LP",
+          "% LP %",
+          "% L P",
+          "% LLP%",
+          "% LTD%",
+          "%TRUST%",
+          "%CHURCH%",
+          "%MINISTR%",
+          "% COMPANY%",
+          "%PARTNERSHIP%",
+          "%HOLDINGS%",
+          "%PROPERTIES%",
+          "%INVESTMENT%",
+          "%ASSOCIATION%",
+          "%FOUNDATION%",
+          "%AUTHORITY%",
+          "CITY OF %",
+          "COUNTY OF %",
+          "STATE OF %",
+          "TOWN OF %",
+          "% COUNTY",
+          "%BOARD OF EDUCATION%",
+          "UNITED STATES%",
+          "NORTH CAROLINA %",
+          "% DEVELOPMENT%"
+        ],
+        "caveats": "TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); \"% COUNTY\" suffix catches e.g. \"PERSON COUNTY\"; bare \"CO\" and \"ESTATE\" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) \u2014 normalize first."
+      },
+      "liveEntityCount5to150": 3387,
+      "liveOwnerNonNull5to150": 13149,
+      "entityQuery": "where=mapped_acres>=5 AND mapped_acres<=150 AND (CURR_NAME1 LIKE '% LLC%' OR CURR_NAME1 LIKE '%,LLC%' OR CURR_NAME1 LIKE '% L L C%' OR CURR_NAME1 LIKE '% INC' OR CURR_NAME1 LIKE '% INC %' OR CURR_NAME1 LIKE '% INC.%' OR CURR_NAME1 LIKE '%,INC%' OR CURR_NAME1 LIKE '% CORP%' OR CURR_NAME1 LIKE '%CORPORATION%' OR CURR_NAME1 LIKE '% LP' OR CURR_NAME1 LIKE '% LP %' OR CURR_NAME1 LIKE '% L P' OR CURR_NAME1 LIKE '% LLP%' OR CURR_NAME1 LIKE '% LTD%' OR CURR_NAME1 LIKE '%TRUST%' OR CURR_NAME1 LIKE '%CHURCH%' OR CURR_NAME1 LIKE '%MINISTR%' OR CURR_NAME1 LIKE '% COMPANY%' OR CURR_NAME1 LIKE '%PARTNERSHIP%' OR CURR_NAME1 LIKE '%HOLDINGS%' OR CURR_NAME1 LIKE '%PROPERTIES%' OR CURR_NAME1 LIKE '%INVESTMENT%' OR CURR_NAME1 LIKE '%ASSOCIATION%' OR CURR_NAME1 LIKE '%FOUNDATION%' OR CURR_NAME1 LIKE '%AUTHORITY%' OR CURR_NAME1 LIKE 'CITY OF %' OR CURR_NAME1 LIKE 'COUNTY OF %' OR CURR_NAME1 LIKE 'STATE OF %' OR CURR_NAME1 LIKE 'TOWN OF %' OR CURR_NAME1 LIKE '% COUNTY' OR CURR_NAME1 LIKE '%BOARD OF EDUCATION%' OR CURR_NAME1 LIKE 'UNITED STATES%' OR CURR_NAME1 LIKE 'NORTH CAROLINA %' OR CURR_NAME1 LIKE '% DEVELOPMENT%')"
+    },
+    "paDeepLink": {
+      "template": "https://unionnc.devnetwedge.com/parcel/view/{PID}",
+      "testedUrl": "https://unionnc.devnetwedge.com/parcel/view/01006007",
+      "httpStatus": 200,
+      "notes": "HTTP 200 \u2192 redirects to /parcel/view/01006007/2026; owner present. (One transient 503 on first attempt; retry OK.) Alt Spatialest https://property.spatialest.com/nc/union#/property/{PID}/ (200)."
+    },
+    "jurisdictionGisViewer": {
+      "url": "https://atlas.unioncountync.gov/maps/",
+      "httpStatus": 200,
+      "notes": "Union County Atlas"
+    },
+    "gaps": [
+      "AADT_2022 blank at 401 of 755 stations on the 2022 layer (NCDOT counts on a cycle) \u2014 prefer 2025 layer / latest non-blank year",
+      "No multi-transfer sale history on primary layer (last sale only)"
+    ]
+  }
+}

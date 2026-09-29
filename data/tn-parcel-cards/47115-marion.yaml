@@ -1,0 +1,455 @@
+state: TN
+jurisdiction: Marion County
+fips: '47115'
+level: county
+markets:
+- Chattanooga
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=58)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 22,228; DEEDAC 5–150 → 3530; id GISLINK populated=True; geo PASS
+    (5/5 centroids in county, 5/5 polys touch county) (35.3149,-85.56671)→Marion; (35.21619,-85.83674)→Marion;
+    (35.11559,-85.40788)→Marion (where COUNTY_ID=58). Service lastEditDate 2026-09-10 (PARCELID suffix
+    2026) — freshest public owner/geometry; no sale/value/CALC_ACRE (DEEDAC often 0 — derive geodesic
+    acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 4908
+- role: parcels
+  name: SETDD Marion Parcels_Joined (CAMA)
+  restUrl: https://services8.arcgis.com/wdIYdjK0MpdHUMcM/arcgis/rest/services/Parcels_Joined_372025/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    ID: parcelIdDisplay
+    PARCELID: parcelIdFull
+    PARCELWP: parcelIdParcelWp
+    CALC_ACRE: acreage
+    CAMA_CALCA: acreageCama
+    CAMA_DEEDA: acreageDeed
+    DEEDAC: acreageDeedAlt
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    CITY: municipalityHint
+    DISTRICT: taxDistrict
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    DEED_BOOK: lastSale.deedBook
+    DEED_PAGE: lastSale.deedPage
+    LANDMKTVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    ASSESSMENT: tax.assessedValue
+    LANDUSE: dorCode
+    ZONING: zoning
+    CLASS: propType
+    TAXYR: taxYear
+    COUNTY_ID: countyId
+    PARCEL_TYP: parcelType
+  notes: 'Preferred SETDD joined CAMA (owner/mail/sale/tax). Live count 22,347; PARCEL_TYP=1 21,942; CALC_ACRE
+    5–150 → 5,234 (2026-09-24 ET). Geo-verify PASS: sample centroids (−85.50612, 35.21000) / (−85.50382,
+    35.20934) WGS84 near Whitwell in Marion; GISLINK prefix 058; COUNTY_ID=58. publicGisUrl: https://experience.arcgis.com/experience/1f97aefa540e426a8c4dcab939963ce3
+    (SETDD Marion County) and https://tnmap.tn.gov/Assessment/ . CAMA ZONING often blank — prefer city
+    polygon layers. Skip WATER/SEWER/ELEC/GAS. CITY hints: 363 JASPER / 381 KIMBALL / 686 SOUTH PITTSBURG
+    / 779 WHITWELL / 586 POWELLS CROSSROADS / 523 NEW HOPE / 492 MONTEAGLE. 2026-09-28 ET TN PIR re-verify:
+    count 22,347; CALC_ACRE 5–150 → 5399; id GISLINK populated=True; geo PASS (5/5 centroids in county,
+    5/5 polys touch county) (35.21012,-85.50589)→Marion; (35.01072,-85.72642)→Marion; (35.13633,-85.6)→Marion.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: GISLINK
+  salesValueVintage: 2025
+  sourceEditDate: '2025-03-12'
+- role: parcels
+  name: TN County Parcel Map — Marion_Parcels (Assessment_Data_58 join)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/35
+  layerId: 35
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Assessment_Data_58_GISLINK: parcelIdAlt
+    Assessment_Data_58_ID: parcelIdDisplay
+    Assessment_Data_58_OWNER: ownerName
+    Assessment_Data_58_OWNER2: ownerName2
+    Assessment_Data_58_ADDRESS: situsAddress
+    Assessment_Data_58_SALEDATE: lastSale.date
+    Assessment_Data_58_PRICE: lastSale.price
+    Assessment_Data_58_VI: lastSale.qualified
+    Assessment_Data_58_LANDMKTVAL: tax.landValue
+    Assessment_Data_58_APPRAISAL: tax.marketValue
+    Assessment_Data_58_LANDUSE: dorCode
+    Parcels_CALC_ACRE: acreage
+    County_Name: countyName
+  notes: 'AGOL HNTB republish sibling; count 21,485 / 5–150=5,169. Prefer SETDD Parcels_Joined for mail/IMPVAL/ASSESSMENT.
+    Geo-verify PASS (same JUR 058 fabric). 2026-09-28 ET TN PIR re-verify: count 21,485; Parcels_CALC_ACRE
+    5–150 → 5169; id Parcels_GISLINK populated=True; geo PASS (5/5 centroids in county, 5/5 polys touch
+    county) (35.31573,-85.56883)→Marion; (35.05937,-85.64796)→Marion; (35.01049,-85.81677)→Marion.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sibling-fallback (2023 sale/value, not primary for this county)
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: IMPACT Parcels sibling (COUNTY_ID=58)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+  notes: 'Filter COUNTY_ID=58 AND PARCEL_TYPE=1. Egress-sensitive (403 common). 2026-09-28 ET TN PIR:
+    maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes sibling (JUR=058)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    CALC_ACRE: acreage
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    LANDUSE: dorCode
+    ZONING: zoning
+    TAXYR: taxYear
+  notes: 'Filter JUR=''058''; prefer latest TAXYR. Query-only. Prefer SETDD when Themes 403. 2026-09-28
+    ET TN PIR: maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: zoning
+  name: Jasper Zoning (SETDD)
+  restUrl: https://services8.arcgis.com/wdIYdjK0MpdHUMcM/arcgis/rest/services/Jasper_Zoning_252024/FeatureServer/0
+  layerId: 0
+  coverage: city-only
+  fieldMap:
+    Zone_Curre: zoning
+  notes: City of Jasper only (~7 polys). Codes A-1/C-1/C-2/C-3/I-1/R-1/R-2. Sample centroid (−85.61109,
+    35.09086) in Jasper. City-only on countywide parcels.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: zoning
+  name: Whitwell Zoning (SETDD)
+  restUrl: https://services8.arcgis.com/wdIYdjK0MpdHUMcM/arcgis/rest/services/Corporate_Zoning_08152024_Dissolve/FeatureServer/0
+  layerId: 0
+  coverage: city-only
+  fieldMap:
+    Zone_Curre: zoning
+  notes: Whitwell Corporate Zoning dissolve (~8). Codes AG/C-1/C-2/I-1/MS-1/MX-1/R-1/R-2. Centroid (−85.50635,
+    35.20409).
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: zoning
+  name: South Pittsburg Zoning (SETDD 2026-05)
+  restUrl: https://services8.arcgis.com/wdIYdjK0MpdHUMcM/arcgis/rest/services/SouthPittsCorpZoning05042026/FeatureServer/0
+  layerId: 0
+  coverage: city-only
+  fieldMap:
+    Zone_Curre: zoning
+  notes: Prefer over older Corporate_Zoning_52824. Codes C-1/C-2/C-3/I-1/I-2/M-1/R-1/R-2/R-3 (~9). Multifamily-relevant
+    R-3 — confirm ordinance.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: zoning
+  name: Kimball Zoning (SETDD 2026-08)
+  restUrl: https://services8.arcgis.com/wdIYdjK0MpdHUMcM/arcgis/rest/services/KimballZoning82426/FeatureServer/0
+  layerId: 0
+  coverage: city-only
+  fieldMap:
+    Zone_Curre: zoning
+  notes: Codes A-1/C-2/I-1/R-1/R-2 (~5 polys). Prefer newest KimballZoning* stamp.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: zoning
+  name: Powells Crossroads (PXR) Zoning (SETDD)
+  restUrl: https://services8.arcgis.com/wdIYdjK0MpdHUMcM/arcgis/rest/services/Corporate_Zoning_02142025/FeatureServer/0
+  layerId: 0
+  coverage: city-only
+  fieldMap:
+    Zone_Curre: zoning
+  notes: PXR Corporate Zoning (~4). Codes AG/C/R-1/R-2.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: other
+  name: Marion UGB 2013 (growth context — not FLU)
+  restUrl: https://services8.arcgis.com/wdIYdjK0MpdHUMcM/arcgis/rest/services/Marion_UGB_2013/FeatureServer/0
+  layerId: 0
+  coverage: county-wide
+  fieldMap: {}
+  notes: ~22 polys. Urban Growth Boundary — policy/growth context only, NOT adopted FLU entitlement. Do
+    not treat as parcel FLU.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: other
+  name: TDOT Traffic Lines (AADT statewide)
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: state-wide (filter county)
+  fieldMap:
+    AADT: aadt
+    AADTYEAR: aadtYear
+    COUNTY_NUMBER: countyNumberTdot
+    ROUTE_ID: routeId
+    FUNCTIONAL_CLASS: functionalClass
+  notes: >-
+    Added 2026-09-28 ET TN PIR Pass 2. Filter COUNTY_NUMBER='58' AND AADTYEAR='2025' → 1,253 segments
+    (all years 1,409). COUNTY_NUMBER = TDOT alphabetical county no. (NOT FIPS).
+  status: usable
+  auth: none
+  geometry: polyline
+  use: aadt-screening
+gaps:
+- Unincorporated Marion countywide zoning FeatureServer not found (city satellites only)
+- New Hope / Monteagle municipal zoning REST not separately verified (Monteagle split Grundy/Marion)
+- Adopted FLU FeatureServer not found — UGB 2013 is growth context only
+- IMPACT Themes often 403 from datacenter egress
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: SETDD / Marion County / Comptroller IMPACT-TPAD public records; attribution required. No paid
+  GIS purchase channel.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+jurisdictionGisUrl: https://experience.arcgis.com/experience/1f97aefa540e426a8c4dcab939963ce3
+zoningOverall: partial
+packagingNote: 'Digged 2026-09-24 ET full-suite TRANCHE-3; prefer SETDD Parcels_Joined over bare IMPACT;
+  geo-verify PASS; skip utilities/AADT. RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable;
+  added OIR. LSB-approved parcel setup applied 2026-09-28 (see parcelSetup).'
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=58
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services8.arcgis.com/wdIYdjK0MpdHUMcM/arcgis/rest/services/Parcels_Joined_372025/FeatureServer/0
+  joinKey: OIR.GISLINK = GISLINK
+  salesValueVintage: 2025
+  salesValueSourceEditDate: '2025-03-12'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 4908
+  gislinkJoinSample: 10/10 (100%)
+  exception: 'SETDD Marion joined CAMA: max SALEDATE 2025-02-25, LASTUPDATE 2025-02-27.'
+aadt:
+  source: TDOT Traffic Lines
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  field: AADT
+  yearField: AADTYEAR
+  preferredYear: '2025'
+  countyFilterField: COUNTY_NUMBER
+  countyNumberTdot: '58'
+  where: COUNTY_NUMBER='58' AND AADTYEAR='2025'
+  count2025: 1253
+  countAllYears: 1409
+  maxAADT2025: 46413
+  segments2025AADTge5000: 54
+  status: usable
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+ownerEntityTypeRule:
+  appliesTo: OWNER + ' ' + OWNER2 (upper-cased; OWNER2 dropped when it starts with C/O, ATTN, %, CARE
+    OF); first match wins
+  order:
+  - type: church
+    regex: \b(CHURCH|BAPTIST|METHODIST|PRESBYTERIAN|LUTHERAN|EPISCOPAL|CATHOLIC|DIOCESE|MINISTR(Y|IES)|CONGREGATION|FELLOWSHIP|TABERNACLE|TEMPLE|CHAPEL|ASSEMBLY
+      OF GOD|CHURCH OF CHRIST|CEMETERY)\b
+  - type: government
+    regex: \b(UNITED STATES|U ?S ?A|USA|STATE OF (TENNESSEE|TN)|TENNESSEE (STATE|DEPT|DEPARTMENT)|DEPT
+      OF|DEPARTMENT OF|COUNTY OF|CITY OF|TOWN OF|BOARD OF EDUCATION|TENNESSEE VALLEY AUTHORITY|TVA|UTILITY
+      DISTRICT|HOUSING AUTHORITY|WILDLIFE RESOURCES|TWRA|CORPS OF ENGINEERS|NATIONAL PARK)\b|\b[A-Z]+
+      COUNTY( GOVERNMENT| BOARD| COMMISSION| SCHOOLS?| HIGHWAY( DEPT)?)?\s*$
+  - type: LLC
+    regex: \b(L\.?\s?L\.?\s?C|P\.?L\.?L\.?C)\b\.?|LIMITED LIABILITY (COMPANY|CO)
+  - type: LP
+    regex: \b(L\.?L\.?L\.?P|L\.?L\.?P|L\.?P|LTD|LIMITED PARTNERSHIP|PARTNERSHIP|PARTNERS)\b
+  - type: INC
+    regex: \b(INC|INCORPORATED)\b\.?
+  - type: CORP
+    regex: \b(CORP|CORPORATION|COMPANY|CO)\b\.?\s*$|\bCORP\b|\bCORPORATION\b
+  - type: TRUST
+    regex: \b(TRUST|TRUSTS|TRUSTEE|TRUSTEES|TRSTE|TR|TRS|RLT|REV(OCABLE)? (LIVING )?TR(UST)?)\b|\(TR\)
+  - type: individual
+    regex: .*
+  noContactInfo: true
+  contactFieldsExcluded:
+  - MAILADDR
+  - MAILCITY
+  - ZIP
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+  status:
+    a: verified
+    b: verified
+    c: verified
+    d: verified
+    e: verified
+    f: verified
+  a_aadt:
+    countyNumberTdot: '58'
+    where: COUNTY_NUMBER='58' AND AADTYEAR='2025'
+    count2025: 1253
+    countAllYears: 1409
+    maxAADT2025: 46413
+    segments2025AADTge5000: 54
+  b_value:
+    source: https://services8.arcgis.com/wdIYdjK0MpdHUMcM/arcgis/rest/services/Parcels_Joined_372025/FeatureServer/0
+    fields:
+      LANDMKTVAL: tax.landValue
+      IMPVAL: tax.improvementValue
+      APPRAISAL: tax.marketValue
+      ASSESSMENT: tax.assessedValue
+    populatedCounts:
+      LANDMKTVAL: 21766
+      IMPVAL: 13683
+      APPRAISAL: 21776
+      ASSESSMENT: 21351
+    layerTotal: 22347
+    missingMappedFields: []
+  c_sale:
+    source: https://services8.arcgis.com/wdIYdjK0MpdHUMcM/arcgis/rest/services/Parcels_Joined_372025/FeatureServer/0
+    fields:
+      SALEDATE: lastSale.date
+      PRICE: lastSale.price
+      VI: lastSale.qualified
+      DEED_BOOK: lastSale.deedBook
+      DEED_PAGE: lastSale.deedPage
+    populatedCounts:
+      SALEDATE: 21970
+      PRICE: 11851
+      VI: 11932
+      DEED_BOOK: 21968
+      DEED_PAGE: 21967
+    dateField: SALEDATE
+    priceFields:
+    - PRICE
+    liveMaxSaleDate: '2025-02-26'
+    joinedSample5to150:
+      sampleIds: 10
+      matched: 10
+      valuePopulated: 10
+      saleDatePopulated: 10
+    saleHistory: 'Public per-parcel only: TPAD Parcel Details "Sale Information" table (date, price, book/page,
+      vacant/improved, instrument, qualification) via PA deep link; no bulk sale-history layer on public
+      GIS'
+  d_owner:
+    source: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+    filter: COUNTY_ID=58
+    ownerField: OWNER
+    owner2Field: OWNER2
+    total: 22228
+    ownerPopulated: 22213
+    entitySampleN: 2000
+    entityDist:
+      individual: 1762
+      LLC: 90
+      TRUST: 66
+      church: 32
+      INC: 20
+      government: 19
+      LP: 7
+      CORP: 4
+  e_paDeepLink:
+    template: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+    testUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink=058083%20%20%20%2002719
+    testGislink: 058083    02719
+    httpBox: '403'
+    httpExternal: 200 details
+    taxYearShown: '2026'
+    saleHistoryRows: 4
+    note: null
+    perParcelFieldOnOIR: LINK_TPAD
+  f_viewer:
+    url: https://experience.arcgis.com/experience/1f97aefa540e426a8c4dcab939963ce3
+    http: '200'
+    arcgisItem:
+      id: 1f97aefa540e426a8c4dcab939963ce3
+      access: public
+      type: Web Experience
+      title: Marion County
+      error: null
+    statewideTPV: https://tnmap.tn.gov/assessment/#/parcel/{GISLINK} (OIR LINK_TPV) HTTP 200
+    isStatewideFallback: false
+  vintage:
+    salesValueVintage: 2025
+    salesValueSourceEditDate: '2025-03-12'
+    liveMaxSaleDate: '2025-02-26'
+    serviceLastEdit: '2025-03-12'
+  notes: []

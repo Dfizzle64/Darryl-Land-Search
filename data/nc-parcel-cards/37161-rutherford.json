@@ -1,0 +1,289 @@
+{
+  "county": "Rutherford",
+  "state": "NC",
+  "msa": "Asheville / Charlotte shed",
+  "fips": "37161",
+  "cntyfips": "161",
+  "slug": "rutherford",
+  "level": "county",
+  "markets": ["Asheville", "Charlotte"],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "crs_notes": "County services use 102719/2264 throughout.",
+  "viewerLinkTemplate": "https://gis.rutherfordcountync.gov/maps/default.htm?pin={Parcel_Number}",
+  "viewerLinkTemplates": [
+    "https://gis.rutherfordcountync.gov/maps/",
+    "https://gis.rutherfordcountync.gov/maps/default.htm?pin={Parcel_Number}",
+    "https://lrcpwa.ncptscloud.com/rutherford/parcel-detail?YearFor=2010&REID={Parcel_Number}",
+    "https://lrcpwa.ncptscloud.com/Rutherford/parcel-search"
+  ],
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/rutherford/parcel-detail?YearFor=2010&REID={Parcel_Number}",
+  "appraiserSearchUrlNotes": "Templates.htm Property Record Card — REID param = tax Parcel_Number (not GeoPIN). Alt SPA parcel-detail/{internalId}.",
+  "jurisdictionGisUrl": "https://gis.rutherfordcountync.gov/maps/",
+  "joinKeys": ["Parcel_Number", "PIN", "ParcelID", "parno", "altparno"],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": ["Parcel_Number", "PIN", "ParcelID", "parno", "altparno"],
+      "bestLayer": "Addressing/MapServer/2",
+      "notes": "Parcel_Number for PA/GIS deep-links; PIN geopin ↔ OneMap altparno; parno ↔ Parcel_Number"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Addressing/MapServer/2"
+    },
+    "acreage": {
+      "present": true,
+      "fields": ["Acreage", "Deeded_Acreage", "gisacres"],
+      "usefulRangeAcres": [5, 150],
+      "approxCountInRange": 11199,
+      "bestLayer": "Addressing/MapServer/2"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": ["Property_Owner", "ownname"],
+      "bestLayer": "Addressing/MapServer/2"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": ["Owner_Mailing_Address_1", "Owner_Mailing_Address_City", "Owner_Mailing_Address_State", "Owner_Mailing_Address_Zip", "mailadd"],
+      "bestLayer": "Addressing/MapServer/2"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": ["Physical_Address", "Physical_Address_City", "Physical_Address_Zip", "siteadd"],
+      "bestLayer": "Addressing/MapServer/2"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": ["Sale_Price", "Package_Sale_Date", "Package_Sale_Price", "Land_Sale_Date", "Land_Sale_Price", "PRICE", "SALE_DATE"],
+      "bestLayer": "Addressing/MapServer/2",
+      "notes": "Sale_Price>0 → 28893 (in-range 4769); Possible Sales points PRICE>0 → 17519; OneMap no sale"
+    },
+    "tax": {
+      "present": true,
+      "fields": ["Total_Property_Value", "Total_Land_Value_Assessed", "Total_Building_Value_Assessed", "parval", "landval", "improvval"],
+      "bestLayer": "Addressing/MapServer/2"
+    },
+    "zoning": {
+      "present": true,
+      "coverage": "city-only",
+      "fields": ["ZONE_CODE", "LR_ZONING", "CITY", "Zoning"],
+      "bestLayer": "NewLayers/MapServer/22",
+      "notes": "Cities-first CITY filter; unincorporated Zoning=NONE"
+    },
+    "flu": {
+      "present": false,
+      "coverage": "pdf-only",
+      "notes": "Forest City Comp LUP PDF; Lake Lure Comp Plan maps; no FLU FeatureServer"
+    }
+  },
+  "municipalities": [
+    {
+      "name": "Forest City",
+      "role": "city-first-zoning",
+      "cityFilter": "FOREST CITY",
+      "zoningCount": 115,
+      "etjCount": 29,
+      "fluRest": false,
+      "fluPdf": true,
+      "parcelTaxCount": 4768
+    },
+    {
+      "name": "Rutherfordton",
+      "role": "city-first-zoning",
+      "cityFilter": "RUTHERFORDTON",
+      "zoningCount": 129,
+      "fluRest": false,
+      "fluPdf": false,
+      "parcelTaxCount": 2587,
+      "notes": "Official Zoning Map PDF; county seat"
+    },
+    {
+      "name": "Spindale",
+      "role": "city-first-zoning",
+      "cityFilter": "SPINDALE",
+      "zoningCount": 66,
+      "fluRest": false,
+      "parcelTaxCount": 2973
+    },
+    {
+      "name": "Lake Lure",
+      "role": "city-first-zoning",
+      "cityFilter": "LAKE LURE",
+      "zoningCount": 120,
+      "fluRest": false,
+      "fluPdf": true,
+      "parcelTaxCount": 5065
+    },
+    {
+      "name": "Ellenboro",
+      "role": "gap",
+      "zoningCount": 0,
+      "parcelTaxCount": 572
+    },
+    {
+      "name": "Bostic",
+      "role": "gap",
+      "zoningCount": 0,
+      "parcelTaxCount": 301
+    },
+    {
+      "name": "Ruth",
+      "role": "gap",
+      "zoningCount": 0,
+      "parcelTaxCount": 255
+    },
+    {
+      "name": "Chimney Rock Village",
+      "role": "gap",
+      "zoningCount": 0,
+      "parcelTaxCount": 525
+    },
+    {
+      "name": "Unincorporated Rutherford",
+      "role": "gap",
+      "notes": "Zoning=NONE ~39914; no county zoning polygons"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Addressing Parcels (CAMA + polygons)",
+      "restUrl": "https://gis.rutherfordcountync.gov/server/rest/services/Addressing/MapServer/2",
+      "alternateUrls": [
+        "https://gis.rutherfordcountync.gov/server/rest/services/EnerGov/EnerGov/FeatureServer/3",
+        "https://gis.rutherfordcountync.gov/server/rest/services/TemplateSite/SearchableLayers/MapServer/1"
+      ],
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "Acreage",
+      "coverage": "county-wide",
+      "count": 57442,
+      "acres5to150": 11199,
+      "salePricePositive": 28893,
+      "salePriceInRange": 4769,
+      "taxValuePositive": 54346,
+      "status": "usable",
+      "primary": true
+    },
+    {
+      "role": "parcels",
+      "name": "EnerGov Parcel FeatureServer",
+      "restUrl": "https://gis.rutherfordcountync.gov/server/rest/services/EnerGov/EnerGov/FeatureServer/3",
+      "layerId": 3,
+      "geometry": "polygon",
+      "auth": "none",
+      "count": 57838,
+      "status": "usable"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "filter": "cntyfips='161'",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "count": 57599,
+      "acres5to150": 11390,
+      "parvalPositive": 54929,
+      "saledateNonNull": 0,
+      "status": "partial"
+    },
+    {
+      "role": "sales",
+      "name": "Possible Sales",
+      "restUrl": "https://gis.rutherfordcountync.gov/server/rest/services/TemplateSite/SearchableLayers/MapServer/3",
+      "layerId": 3,
+      "geometry": "point",
+      "count": 17547,
+      "pricePositive": 17519,
+      "acres5to150": 2960,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "City Zoning (cities-first)",
+      "restUrl": "https://gis.rutherfordcountync.gov/server/rest/services/NewLayers/MapServer/22",
+      "layerId": 22,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 462,
+      "byMunicipality": {
+        "Rutherfordton": 129,
+        "Lake Lure": 120,
+        "Forest City": 115,
+        "Spindale": 66,
+        "ETJ-ForestCity": 29
+      },
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "City Limits",
+      "restUrl": "https://gis.rutherfordcountync.gov/server/rest/services/NewLayers/MapServer/3",
+      "layerId": 3,
+      "geometry": "polygon",
+      "count": 17,
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Forest City And ETJ Area",
+      "restUrl": "https://gis.rutherfordcountync.gov/server/rest/services/EnerGov/EnerGov/FeatureServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "count": 7,
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "Forest City / Lake Lure FLU PDF",
+      "restUrl": null,
+      "coverage": "city-only",
+      "status": "gap",
+      "pdfUrls": [
+        "https://www.townofforestcity.com/sites/default/files/uploads/adopted-comprehensive-lup-10-15-12.pdf",
+        "https://www.townoflakelure.com/bc-zoning/page/comprehensive-plan-maps-0"
+      ]
+    }
+  ],
+  "portals": {
+    "jurisdictionGis": "https://gis.rutherfordcountync.gov/maps/",
+    "gisDeepLink": "https://gis.rutherfordcountync.gov/maps/default.htm?pin={Parcel_Number}",
+    "gisHome": "https://www.rutherfordcountync.gov/departments/planning/gis.php",
+    "planning": "https://www.rutherfordcountync.gov/departments/planning/",
+    "restRoot": "https://gis.rutherfordcountync.gov/server/rest/services",
+    "ncptsSearch": "https://lrcpwa.ncptscloud.com/Rutherford/parcel-search",
+    "ncptsPropertyCard": "https://lrcpwa.ncptscloud.com/rutherford/parcel-detail?YearFor=2010&REID={Parcel_Number}",
+    "taxPay": "https://www.rutherfordcountync.gov/tax_search/index.php#/",
+    "assessor": "https://www.rutherfordcountync.gov/departments/revenue_department_tax_administrator/",
+    "registerOfDeeds": "https://cotthosting.com/NCRUTHERFORDEXTERNAL/LandRecords/protected/v4/SrchBookPage.aspx",
+    "forestCityPlanning": "https://www.townofforestcity.com/planning-code-enforcement/planning-zoning",
+    "rutherfordtonMaps": "https://www.rutherfordton.net/maps/",
+    "lakeLureCompPlanMaps": "https://www.townoflakelure.com/bc-zoning/page/comprehensive-plan-maps-0",
+    "ncOneMap": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+  },
+  "gaps": [
+    "No public FLU FeatureServer (Forest City / Lake Lure Comp Plan PDFs only)",
+    "Unincorporated Rutherford unzoned on public REST (Zoning=NONE ~39.9k)",
+    "Ellenboro / Bostic / Ruth / Chimney Rock Village — no City Zoning polygons",
+    "City Zoning layer disclaimer — confirm with town",
+    "OneMap saledate empty / no sale price — prefer county Sale_Price",
+    "Addressing/2 count slightly behind EnerGov/OneMap (~57.4k vs ~57.6–57.8k)",
+    "Utilities / AADT / emails / phones / paid vendors excluded by design"
+  ],
+  "license": "Rutherford County GIS / Revenue Administration; NCGS 132-10 commercial resale limits; attribute Rutherford County GIS",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "tranche": 3,
+  "verifiedLayerCount": 12
+}

@@ -25,7 +25,11 @@ describe("new metro parcel shelves", () => {
       expect(catalogForMarket({ markets: [] } as never, { markets: [] } as never, { markets: [] } as never, market as "Valdosta").market).toBe(market);
     }
     expect(index.markets.Jackson.counties.map((county) => county.fips)).toEqual([
+      "47005",
+      "47017",
       "47023",
+      "47033",
+      "47039",
       "47071",
       "47113",
       "47183",

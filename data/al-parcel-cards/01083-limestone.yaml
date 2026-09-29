@@ -1,0 +1,203 @@
+state: AL
+jurisdiction: Limestone County
+fips: "01083"
+level: county
+markets: [Huntsville]
+
+layers:
+  - role: parcels
+    name: Limestone ReMap Parcels (official county — preferred)
+    restUrl: "https://gis.limestonecounty-al.gov/arcgis/rest/services/Limestone_Parcels/MapServer/1"
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRE
+    coverage: county-wide
+    fieldMap:
+      ParcelNo: parcelId
+      PID: parcelIdAlt
+      OwnerName: ownerName
+      OwnerName2: ownerName2
+      MailAddress1: mailingAddress.street
+      MailAddress2: mailingAddress.street2
+      MailCity: mailingAddress.city
+      MailState: mailingAddress.state
+      MailZip: mailingAddress.zip
+      PropertyAddr1: situsAddress
+      PropertyCity: situsCity
+      PropertyState: situsState
+      PropertyZip: situsZip
+      CALC_ACRE: acreage
+      StatedArea: acreageAlt
+      ForestAcreage: acreageForest
+      TotalLandValue: tax.landValue
+      TotalImpValue: tax.improvementValue
+      TotalValue: tax.marketValue
+      AssessmentClass: tax.assessmentClass
+      MunicipalityCode: tax.municipality
+      Neighborhood: neighborhood
+      RecordYear: tax.year
+      TIFDist: tax.tifDistrict
+    notes: >
+      Verified 2026-09-23: HTTP 200 pjson + count 39534. CRS WKID 102630 (AL West State
+      Plane Feet). maxRecordCount 2000. Remap 2025 per service description — prefer over
+      layer 0 (count 33527, same schema). Owner/situs/tax/acres present; no sale price/date
+      fields. Many string fields are fixed-width padded — trim before display. FeatureServer
+      twin: /Limestone_Parcels/FeatureServer/1 (same count). ISV:
+      https://isv.kcsgis.com/al.limestone_revenue/. City of Madison / Huntsville hosts also
+      mirror Limestone parcels (city-only extent) — do not treat as county-wide.
+    status: usable
+
+  - role: parcels
+    name: Limestone Parcels (pre-remap — fallback)
+    restUrl: "https://gis.limestonecounty-al.gov/arcgis/rest/services/Limestone_Parcels/MapServer/0"
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRE
+    coverage: county-wide
+    fieldMap:
+      ParcelNo: parcelId
+      PID: parcelIdAlt
+      OwnerName: ownerName
+      CALC_ACRE: acreage
+      TotalValue: tax.marketValue
+      TotalLandValue: tax.landValue
+      TotalImpValue: tax.improvementValue
+    notes: >
+      Verified 2026-09-23: count 33527. Same field schema as Remap layer 1 but older/lower
+      count. Prefer layer 1.
+    status: partial
+
+  - role: parcels
+    name: Limestone County Parcels (Huntsville CombinedParcels mirror)
+    restUrl: "https://maps.huntsvilleal.gov/server/rest/services/Boundaries/CombinedParcels/MapServer/7"
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Present on CombinedParcels; prefer official gis.limestonecounty-al.gov Remap/1 for
+      county-wide CAMA. City of Madison DV_PlanningPro1_MIL1/14 is city-extent only
+      (count ~17461).
+    status: partial
+
+  - role: zoning
+    name: Unincorporated Limestone County zoning (none — subdivision regs only)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Verified 2026-09-24: gis.limestonecounty-al.gov Hosted/Revenue folders have no Zoning
+      service (Revenue token-gated 499). County Engineering publishes subdivision regulations
+      only — no county zoning district map. Municipal zoning where city limits cross into
+      Limestone: Huntsville ZoningDistricts/5 and City of Madison DV_PlanningPro1 layers
+      (see 01089 city cards). Unincorporated = true zoning gap.
+    status: gap
+
+gaps:
+  - Unincorporated Limestone: no county zoning REST (subdivision only; city zoning via Huntsville/Madison cards)
+  - No lastSale.price / lastSale.date on Limestone_Parcels layers
+  - No county zoning/FLU FeatureServer verified this run (municipal zoning via Huntsville /
+    Madison city cards where city limits cross into Limestone)
+  - Revenue/ folder on county GIS returns Token Required (499) — not used
+  - Trim padded OwnerName / address strings
+
+license: "Limestone County / KCS GIS; use-at-own-risk; not for legal survey"
+appraiserSearchUrl: "https://isv.kcsgis.com/isvreports/al.limestone/{PIN}.PDF"
+jurisdictionGisUrl: "https://isv.kcsgis.com/al.limestone_revenue/"
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    luCountyId: 42
+    year: 2024
+    countyWhere: "YearAADT=2024 AND LUCountyID=42 AND AADT>0"
+    stations2024: 366
+    countyCheckedAt: "2026-09-28"
+    countyNote: "LUCountyID=42 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 366 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location."
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "Official ALDOT EGISATDServices/TDMPublic MapServer; ~282482 multi-year points (YearAADT 2014–2025). Latest usable AADT year=2024 (~22009 with AADT>0; 2025 shells exist but AADT still null as of 2026-09-24). Filter YearAADT=2024; optional LUCountyID (1–67 alpha county index, e.g. Autauga=1 Jefferson=37 Madison=45). Companion YearAADT field. Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/. Dig: enrichment/AL/aadt-aldot-2026-09-24.md"
+
+pass1RuralOz2026_09_28:
+  parcelRestUrl: "https://gis.limestonecounty-al.gov/arcgis/rest/services/Limestone_Parcels/MapServer/1"
+  parcelIdField: ParcelNo
+  featureCount: 40139
+  note: >
+    Re-verified live 2026-09-28: ?f=json 200, polygon, count 40139 (was 39534), sample centroid -86.79,34.69 (Limestone AL). ParcelNo (padded, trim) + PID; OwnerName, MailAddress1/City/State/Zip, PropertyAddr1/City/Zip, CALC_ACRE, TotalLandValue/TotalImpValue/TotalValue, Book1/Page1. Strings are space-padded — trim.
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://gis.limestonecounty-al.gov/arcgis/rest/services/Limestone_Parcels/MapServer/1
+  featureCount: 40139
+  taxSaleOwner:
+    ownerName:
+      field: OwnerName
+      status: usable
+    assessedValue:
+      field: null
+      status: gap
+      livesAt: Limestone Revenue Commissioner record (not on the KCS PDF card either)
+    appraisedOrMarketValue:
+      field: TotalValue
+      status: usable
+      nonNullOrPositiveCount: 39548
+      ofTotal: 40139
+    landValue:
+      field: TotalLandValue
+      status: usable
+    improvementValue:
+      field: TotalImpValue
+      status: usable
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: Limestone Revenue Commissioner record (not on the KCS PDF card either)
+    lastSaleDate:
+      field: null
+      status: gap
+      livesAt: Limestone Revenue Commissioner record (not on the KCS PDF card either)
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: Limestone Revenue Commissioner record (not on the KCS PDF card either)
+    ownerEntityType:
+      derivable: true
+      sourceField: OwnerName
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 3862
+        INC: 1746
+        TRUST: 1430
+        CORP: 106
+        CHURCH: 196
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://isv.kcsgis.com/isvreports/al.limestone/{PIN}.PDF
+    pinField: PID
+    testPin: '1706130000175000'
+    verified: 'yes'
+    method: plain fetch 200 application/pdf (KCS ISV property record card; pattern from ISV viewer.js moreDetails prcLink, idProperty PID)
+    note: PDF record card (2024) returned owner RE TODATE LLC, parcel 17 06 13 0 000 175.000, land/improvement/total value; no assessed value, tax due or sale on the card. PID is the 16-digit ParcelNo without
+      spaces.
+  jurisdictionGisUrl:
+    url: https://isv.kcsgis.com/al.limestone_revenue/
+    http: 200
+  notes: County layer carries appraised values only (TotalValue, land, improvement); assessed value, tax due and sale fields are not published in GIS. {PIN} here is the layer PID field.

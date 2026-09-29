@@ -39,10 +39,13 @@ describe("Tuscaloosa and Montgomery MSA parcels", () => {
     expect(montgomery?.coverage).toBe("complete-gte-5ac");
     expect(elmore?.coverage).toBe("complete-gte-5ac");
     expect(autauga?.coverage).toBe("complete-gte-5ac");
-    for (const fips of ["01065", "01107", "01063"]) {
+    const pickens = index.markets.Tuscaloosa.counties.find((item) => item.fips === "01107");
+    expect(pickens?.featureCount).toBe(0);
+    expect(pickens?.coverage).toBe("gap");
+    for (const fips of ["01065", "01063"]) {
       const county = index.markets.Tuscaloosa.counties.find((item) => item.fips === fips);
-      expect(county?.featureCount).toBe(0);
-      expect(county?.coverage).toBe("gap");
+      expect(county?.coverage).toBe("complete-gte-5ac");
+      expect(county?.featureCount).toBeGreaterThan(0);
     }
     const lowndes = index.markets.Montgomery.counties.find((county) => county.fips === "01085");
     expect(lowndes?.featureCount).toBe(0);

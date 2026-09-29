@@ -1,0 +1,534 @@
+{
+  "county": "Polk",
+  "state": "NC",
+  "msa": "Asheville / Charlotte shed",
+  "fips": "37149",
+  "cntyfips": "149",
+  "slug": "polk",
+  "level": "county",
+  "markets": [
+    "Asheville",
+    "Charlotte"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "crs_notes": "Parcels, Zoning1, Municipal boundaries, Addresses use 102719/2264.",
+  "agolOrgId": "23uf7jKvz6SRPFWJ",
+  "countyRestRoot": "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services",
+  "openDataHubUrl": "https://polk-county-open-data-polknc.hub.arcgis.com/",
+  "jurisdictionGisUrl": "https://experience.arcgis.com/experience/842578cc98ac4ba8a29d2bbb6044443c",
+  "viewerLinkTemplate": "https://experience.arcgis.com/experience/842578cc98ac4ba8a29d2bbb6044443c",
+  "viewerLinkTemplates": [
+    "https://experience.arcgis.com/experience/842578cc98ac4ba8a29d2bbb6044443c",
+    "https://polk-county-open-data-polknc.hub.arcgis.com/",
+    "http://parcels.polknc.org:8080/{TMS}.pdf",
+    "https://lrcpwa.ncptscloud.com/polk/parcel-detail/{TMS}",
+    "https://cms.revize.com/revize/apps/polkcounty/searchtaxrecord.php"
+  ],
+  "appraiserSearchUrl": "http://parcels.polknc.org:8080/{TMS}.pdf",
+  "appraiserSearchUrlNotes": "PropertyRecordCard field on Parcels/0 stores full URL. Verified application/pdf for T5-E7, P35-312, P5-65. HTTP :8080 (no HTTPS). NCPTS alt: https://lrcpwa.ncptscloud.com/polk/parcel-detail/{TMS}.",
+  "paDeepLinkKey": "TMS",
+  "parcelIdPreferred": "TMS",
+  "joinKeys": [
+    "TMS",
+    "parno"
+  ],
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/polk/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/polk/parcel-detail/{TMS}",
+  "taxPortalUrl": "https://www.polknc.gov/tax_assessor_and_collector.php",
+  "taxSearchFormUrl": "https://cms.revize.com/revize/apps/polkcounty/searchtaxrecord.php",
+  "gisDepartmentUrl": "https://www.polknc.gov/quick_links/gomaps_gis/index.php",
+  "planningUrl": "https://www.polknc.gov/departments/planning_and_zoning/",
+  "ordinancesDocsUrl": "https://www.polknc.gov/new_ordinances_county_documents_forms.php",
+  "zoningOrdinancePdf": "https://www.polknc.gov/departments/planning_and_zoning/docs/zon.ord.2.17.2025.boc.pdf",
+  "comprehensivePlanPdf": null,
+  "comprehensivePlanNotes": "20/20 Vision Comprehensive listed on ordinances/docs page; public PDF URL not resolved 2026-09-24",
+  "registerOfDeedsUrl": "https://cotthosting.com/ncpolkexternal",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='149'",
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "TMS",
+        "parno"
+      ],
+      "bestLayer": "Parcels/FeatureServer/0",
+      "notes": "TMS for PRC PDF + NCPTS + OneMap parno join"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Parcels/FeatureServer/0"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "TOTAL_CALCULATED_ACRES",
+        "MAP_ACRES",
+        "DEEDED_ACRES",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 4702,
+      "bestLayer": "Parcels/FeatureServer/0"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "OWNAM1",
+        "OWNAM2",
+        "OWNAM3",
+        "JAN1OWNER",
+        "ownname"
+      ],
+      "bestLayer": "Parcels/FeatureServer/0"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "OWADR1",
+        "OWCITY",
+        "OWSTA",
+        "OWZIPA",
+        "mailadd"
+      ],
+      "bestLayer": "Parcels/FeatureServer/0"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "PHYSICAL_STREET_ADDRESS",
+        "ADDRESS",
+        "LAddress",
+        "siteadd"
+      ],
+      "bestLayer": "Parcels/FeatureServer/0",
+      "notes": "PHYSICAL_STREET_ADDRESS often road/SR desc; Addresses layer spatial join for clean street situs"
+    },
+    "lastSale": {
+      "present": "partial",
+      "fields": [
+        "DEED_YEAR",
+        "saledatetx"
+      ],
+      "bestLayer": "Parcels/FeatureServer/0",
+      "notes": "Sale price REST gap. DEED_YEAR and OneMap saledatetx are year text only; saledate null on OneMap"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "LAND_VALUE",
+        "BUILDING_VALUE",
+        "TOTAL_TAX_VALUE",
+        "TOTAL_TAX_OWED",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "Parcels/FeatureServer/0",
+      "notes": "TOTAL_TAX_VALUE \u2248 assessed total (land+bldg)"
+    },
+    "zoning": {
+      "present": true,
+      "coverage": "city-first-partial",
+      "fields": [
+        "MZone",
+        "MZONENAM",
+        "Zone_",
+        "ZONENAM"
+      ],
+      "bestLayer": "Zoning1/FeatureServer/53",
+      "notes": "Cities-first Columbus/Tryon/Saluda via spatial join or C*/T*/S* prefixes; unincorp ETJ spill + sparse county RE/AR/E/EV"
+    },
+    "flu": {
+      "present": false,
+      "coverage": "none",
+      "fields": [],
+      "bestLayer": null,
+      "notes": "FLU FeatureServer gap; 20/20 Vision Comp Plan PDF unresolved; LU_Parcels/153 is NOT FLU"
+    },
+    "appraiserSearchUrl": {
+      "present": true,
+      "template": "http://parcels.polknc.org:8080/{TMS}.pdf",
+      "notes": "TRANCHE-3 PA deep-link with parcel ID; PropertyRecordCard field mirrors URL"
+    }
+  },
+  "municipalities": [
+    {
+      "name": "Columbus",
+      "role": "city-first-zoning",
+      "zoningRest": "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/Zoning1/FeatureServer/53",
+      "zoningCountApprox": 20,
+      "fluRest": null,
+      "codePrefix": "C*",
+      "notes": "County seat; CHC/CR1/CR2/CRE/CTND/CCBD/CI/CPS; Inc_Muni=COLUMBUS"
+    },
+    {
+      "name": "Tryon",
+      "role": "city-first-zoning",
+      "zoningRest": "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/Zoning1/FeatureServer/53",
+      "zoningCountApprox": 27,
+      "fluRest": null,
+      "codePrefix": "T*",
+      "notes": "TR1\u2013TR5/TRM/TP1/TIP/TI1/TGB/TCB/TTBD/TPRD; Inc_Muni=TRYON"
+    },
+    {
+      "name": "Saluda",
+      "role": "city-first-zoning",
+      "zoningRest": "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/Zoning1/FeatureServer/53",
+      "zoningCountApprox": 42,
+      "fluRest": null,
+      "codePrefix": "S*",
+      "notes": "H-C/SC1\u2013SC3/SR1\u2013SR3/SCH/GSND/SOMU; Inc_Muni=SALUDA"
+    },
+    {
+      "name": "Unincorporated Polk",
+      "role": "partial",
+      "zoningRest": "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/Zoning1/FeatureServer/53",
+      "zoningCountApprox": 54,
+      "fluRest": null,
+      "notes": "ETJ municipal codes + sparse county RE/AR/E/EV/MU/Unzoned"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Parcels (CAMA + polygons)",
+      "restUrl": "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/Parcels/FeatureServer/0",
+      "alternateUrls": [
+        "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/Parcel_view/FeatureServer/0"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "TOTAL_CALCULATED_ACRES",
+      "coverage": "county-wide",
+      "count": 17413,
+      "acres5to150": 4702,
+      "taxValueGt0": 17149,
+      "deedYearGt0": 16908,
+      "fieldMap": {
+        "TMS": "parcelId",
+        "OWNAM1": "ownerName",
+        "OWNAM2": "ownerName",
+        "OWNAM3": "ownerName",
+        "JAN1OWNER": "ownerName",
+        "OWADR1": "mailingAddress",
+        "OWCITY": "mailingAddress",
+        "OWSTA": "mailingAddress",
+        "OWZIPA": "mailingAddress",
+        "PHYSICAL_STREET_ADDRESS": "situsAddress",
+        "TOTAL_CALCULATED_ACRES": "acreage",
+        "MAP_ACRES": "acreage",
+        "DEEDED_ACRES": "acreage",
+        "LAND_VALUE": "tax.marketValue",
+        "BUILDING_VALUE": "tax.marketValue",
+        "TOTAL_TAX_VALUE": "tax.assessedValue",
+        "TOTAL_TAX_OWED": "tax.taxableValue",
+        "DEED_YEAR": "lastSale.date",
+        "DEED_BOOK": "other",
+        "DEED_PAGE": "other",
+        "PropertyRecordCard": "appraiserSearchUrl",
+        "CURRENT_OWNER_ID": "other",
+        "DISTRICT_CODE": "other"
+      },
+      "sample": {
+        "TMS": "T5-E7",
+        "OWNAM1": "AVERY MARJORIE",
+        "JAN1OWNER": "REAMY CHARLES J",
+        "TOTAL_TAX_VALUE": 400848,
+        "LAND_VALUE": 135250,
+        "BUILDING_VALUE": 265598,
+        "DEED_YEAR": 2025,
+        "PropertyRecordCard": "http://parcels.polknc.org:8080/T5-E7.pdf",
+        "centroidApprox": [
+          -82.23,
+          35.21
+        ]
+      },
+      "notes": "PRIMARY. Prefer over TaxParcels (stale). MaxRecordCount 2000. Sale price REST gap.",
+      "status": "usable"
+    },
+    {
+      "role": "parcels",
+      "name": "TaxParcels (legacy)",
+      "restUrl": "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/TaxParcels/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "count": 16878,
+      "notes": "Stale vs Parcels/0 on sample TMS; do not prefer",
+      "status": "partial"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "filter": "cntyfips='149'",
+      "count": 18211,
+      "acres5to150": 5310,
+      "parvalGt0": 17924,
+      "fieldMap": {
+        "parno": "parcelId",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "saledatetx": "lastSale.date",
+        "parval": "tax.marketValue",
+        "landval": "tax.marketValue",
+        "improvval": "tax.marketValue",
+        "cntyfips": "other"
+      },
+      "notes": "No sale price; saledate null; saledatetx year text; join parno\u2194TMS",
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Municipal Zoning (Zoning1)",
+      "restUrl": "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/Zoning1/FeatureServer/53",
+      "layerId": 53,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ACREAGE",
+      "coverage": "city-first-partial",
+      "count": 143,
+      "acreageSumApprox": 152147,
+      "fieldMap": {
+        "MZone": "zoning",
+        "MZONENAM": "zoning",
+        "Zone_": "zoning",
+        "ZONENAM": "zoning",
+        "ACREAGE": "acreage"
+      },
+      "muniCentroidCounts": {
+        "COLUMBUS": 20,
+        "TRYON": 27,
+        "SALUDA": 42,
+        "UNINCORP": 54
+      },
+      "notes": "Cities-first PRIMARY; spatial join Municipal_Boundary_view or C*/T*/S* prefixes",
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "County Zoning (PolkPublicData_v2 twin)",
+      "restUrl": "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/PolkPublicData_v2/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "count": 137,
+      "notes": "Hub County Zoning twin; prefer Zoning1/53",
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "Future land use",
+      "restUrl": null,
+      "status": "gap",
+      "notes": "No FLU FeatureServer; 20/20 Vision Comp Plan PDF unresolved; LU_Parcels/153 is truncated CAMA subset not FLU"
+    },
+    {
+      "role": "other",
+      "name": "Addresses (situs points)",
+      "restUrl": "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/Address_view/FeatureServer/8",
+      "alternateUrls": [
+        "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/SiteAddresses/FeatureServer/15",
+        "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/PolkPublicData_v2/FeatureServer/8"
+      ],
+      "layerId": 8,
+      "geometry": "point",
+      "auth": "none",
+      "count": 20829,
+      "incMuniCounts": {
+        "Columbus": 1023,
+        "Tryon": 1815,
+        "Saluda": 787,
+        "Unincorporated": 17203
+      },
+      "fieldMap": {
+        "ADDRESS": "situsAddress",
+        "LAddress": "situsAddress",
+        "FULL_STREET_NAME": "situsAddress",
+        "Inc_Muni": "other",
+        "Post_Comm": "situsCity",
+        "Post_Code": "situsZip"
+      },
+      "notes": "No TMS \u2014 spatial join; exclude phones",
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Municipal Boundary view",
+      "restUrl": "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/Municipal_Boundary_view/FeatureServer/6",
+      "alternateUrls": [
+        "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/CityLimits/FeatureServer/0"
+      ],
+      "layerId": 6,
+      "geometry": "polygon",
+      "auth": "none",
+      "count": 13,
+      "notes": "Inc_Muni COLUMBUS/TRYON/SALUDA for city-first routing",
+      "status": "usable"
+    }
+  ],
+  "gaps": [
+    "Sale price REST gap (DEED_YEAR / OneMap saledatetx year text only)",
+    "FLU FeatureServer gap (20/20 Vision Comp Plan PDF URL unresolved; LU_Parcels \u2260 FLU)",
+    "TaxParcels layer stale vs Parcels/0",
+    "gis.polknc.org ArcGIS Server SSL broken \u2014 use AGOL org 23uf7jKvz6SRPFWJ",
+    "PRC host is HTTP port 8080 (not HTTPS)",
+    "Unincorporated zoning sparse; ETJ municipal codes spill outside city limits"
+  ],
+  "license": "Polk County GIS / Tax Assessor and Collector; municipal zoning as published on county AGOL. Attribute sources. NCGS 132-10 commercial resale. Not survey quality.",
+  "exclusions": [
+    "AADT",
+    "utilities",
+    "emails",
+    "phones",
+    "paid vendors"
+  ],
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 10,
+  "tranche": 3,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/Parcels/FeatureServer/0",
+    "parcelIdField": "TMS",
+    "acreageFilter": "TOTAL_CALCULATED_ACRES >= 5 AND TOTAL_CALCULATED_ACRES <= 150",
+    "acres5to150Live": 4702,
+    "parcelCountLive": 17413,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='POLK'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27POLK%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27POLK%27&returnCountOnly=true&f=json",
+        "liveStationCount": 237,
+        "stationsWithAADT2022": 153
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Polk'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Polk%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Polk%27&returnCountOnly=true&f=json",
+        "liveStationCount": 237,
+        "stationsWithAADT2025": 119,
+        "stationsWithAADT2024": 142,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TOTAL_TAX_VALUE",
+        "LAND_VALUE"
+      ],
+      "allTaxFieldsOnLayer": [
+        "LAND_VALUE",
+        "BUILDING_VALUE",
+        "TOTAL_TAX_VALUE",
+        "TOTAL_TAX_OWED"
+      ],
+      "liveNonZero": {
+        "TOTAL_TAX_VALUE": 17149,
+        "LAND_VALUE": 16983
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [],
+      "dateFields": [
+        "DEED_YEAR"
+      ],
+      "livePriceNonZero": {},
+      "liveDateNonNull": {
+        "DEED_YEAR": 16908
+      },
+      "status": "partial",
+      "note": "DEED_YEAR is year only; price not on REST. Polk PRC PDF has SALES PRICE grid."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "OWNAM1",
+        "OWNAM2",
+        "OWNAM3",
+        "JAN1OWNER"
+      ],
+      "primaryOwnerField": "OWNAM1",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(OWNAM1) LIKE '% LLC%' OR UPPER(OWNAM1) LIKE '% INC%' OR UPPER(OWNAM1) LIKE '% LP%' OR UPPER(OWNAM1) LIKE '% LLP%' OR UPPER(OWNAM1) LIKE '% LTD%' OR UPPER(OWNAM1) LIKE '% TRUST%' OR UPPER(OWNAM1) LIKE '% CHURCH%' OR UPPER(OWNAM1) LIKE '% COMPANY%' OR UPPER(OWNAM1) LIKE '% PARTNERSHIP%' OR UPPER(OWNAM1) LIKE '% HOLDINGS%' OR UPPER(OWNAM1) LIKE '% PROPERTIES%' OR UPPER(OWNAM1) LIKE '% CORP%' OR UPPER(OWNAM1) LIKE '%,LLC%' OR UPPER(OWNAM1) LIKE '%,INC%' OR UPPER(OWNAM1) LIKE 'CITY OF %' OR UPPER(OWNAM1) LIKE 'COUNTY OF %' OR UPPER(OWNAM1) LIKE 'STATE OF %' OR UPPER(OWNAM1) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 3094,
+      "liveEntityCount5to150ac": 835,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "http://parcels.polknc.org:8080/{TMS}.pdf",
+      "testedParcelId": "P78-103",
+      "testedUrl": "http://parcels.polknc.org:8080/P78-103.pdf",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://experience.arcgis.com/experience/842578cc98ac4ba8a29d2bbb6044443c",
+      "httpStatus": 200,
+      "pageTitle": "Experience",
+      "arcgisItem": {
+        "access": "public",
+        "title": "Polk County GIS Viewer",
+        "type": "Web Experience",
+        "err": null
+      }
+    },
+    "gaps": [
+      "sale partial"
+    ]
+  }
+}

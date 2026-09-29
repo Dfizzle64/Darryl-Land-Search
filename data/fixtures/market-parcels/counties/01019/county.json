@@ -1,0 +1,31 @@
+{
+  "name": "Cherokee",
+  "fips": "01019",
+  "state": "Alabama",
+  "markets": [
+    "Huntsville"
+  ],
+  "featureCount": 8068,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "al-cherokee-parcels-01019",
+  "queryUrl": "https://web3.kcsgis.com/kcsgis/rest/services/Cherokee/Public/MapServer/116/query",
+  "gaps": [
+    "Source query returned 8097 rows; 8068 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcels (Cherokee Public — CAMA join) (https://web3.kcsgis.com/kcsgis/rest/services/Cherokee/Public/MapServer/116). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "No sale/deed fields",
+    "CalcAcres missing on ~43% — use DeededAcres or geometry"
+  ],
+  "path": "data/fixtures/market-parcels/counties/01019/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01019/lookup.json",
+  "sourceCount": 8097,
+  "dropped": 0,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://cherokeeproperty.countygovservices.com/Property/Summary?taxyear=2026&ppin={PIN}",
+  "gisViewerUrl": "https://isv.kcsgis.com/al.cherokee_revenue/"
+}

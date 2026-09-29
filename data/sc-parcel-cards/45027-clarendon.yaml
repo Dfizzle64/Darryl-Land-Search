@@ -1,0 +1,150 @@
+state: SC
+jurisdiction: Clarendon County
+fips: "45027"
+level: county
+markets: [Columbia]
+
+layers:
+  - role: parcels
+    name: 45027parcels_area (Clarendon County Map WFL1)
+    restUrl: https://gis.clarendoncountysc.gov/server/rest/services/Hosted/Clarendon_County_Map_WFL1/FeatureServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: deed_acres
+    coverage: county-wide
+    fieldMap:
+      tms: parcelId
+      pin: parcelIdAlt
+      deed_acres: acreage
+      owner_name: ownerName
+      owner_cont: ownerName2
+      owner_mail: mailingAddress.street
+      owner_ma1: mailingAddress.line2
+      owner_city: mailingAddress.city
+      owner_stat: mailingAddress.state
+      owner_zip: mailingAddress.zip
+      district: tax.district
+      luc: dorCode
+    notes: 'Verified 2026-09-24: official Clarendon GIS hosted FeatureServer, no token; count 28,685. Polygon
+      geometry returned in WGS84. Sample coordinates around (-80.25, 33.58) are in Clarendon County, SC;
+      service extent is countywide (approximately -80.50 to -79.86 longitude and 33.49 to 34.02 latitude).
+      Owner and mailing fields are public. deed_acres is a padded string and needs numeric parsing. Layer
+      has no tax value or sale fields.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=28685; 1-feature outSR=4326 sample tms=''145-00-02-036-00''
+      vertex (-80.246,33.576) inside Clarendon County SC bbox; parcel ID field tms present.'
+    count: 28685
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: ParcelPolygons_area (geometry / acreage companion)
+    restUrl: https://gis.clarendoncountysc.gov/server/rest/services/Hosted/Clarendon_County_Map_WFL1/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: gis_acres
+    coverage: county-wide
+    fieldMap:
+      tms: parcelId
+      pin: parcelIdAlt
+      gis_acres: acreage
+      deed_acres: acreageDeed
+    notes: >
+      Verified 2026-09-24: public polygon companion, count 29,173. GIS acreage is a
+      padded string; use this layer for geometry/acreage where layer 9 has a missing
+      or blank owner record. It does not expose owner, assessed value, or sale fields.
+    status: partial
+
+  - role: other
+    name: qPublic assessor search (HTML; no REST)
+    restUrl: https://www.qpublic.net/sc/clarendon/search.html
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Official public assessor portal is linked from the county assessor site. It is
+      an HTML search portal rather than a verified public REST endpoint; tax values
+      and sale history may be available interactively but were not bulk-verified.
+    status: gap
+
+gaps:
+  - "No public Clarendon REST layer verified with assessed/market/taxable values or sale price/date; qPublic HTML search is available for interactive lookup."
+  - "Layer 9 supplies owner and mailing attributes; layer 8 supplies parcel geometry and GIS acreage; join on TMS/PIN only after normalizing strings."
+  - "qPublic Schneider deep-link was not machine-verified (403 challenge); retain the parcel-ID pattern for interactive use."
+
+license: "Clarendon County GIS public services (gis.clarendoncountysc.gov) and linked county assessor portal; attribution required."
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=795&LayerID=11833&PageTypeID=4&PageID=5734&KeyValue={parcelId}
+publicGisUrl: https://clarendonsc.wthgis.com/
+jurisdictionGisUrl: https://gis.clarendoncountysc.gov/portal/home/
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: gap
+    reason: 'No assessed/market/taxable fields on Clarendon WFL1 (layers 8/9 schema checked 2026-09-28: tms,pin,deed_acres,district,luc,owner_*).
+      RFA Statewide_Parcels Clarendon rows have no M_Value/Ownership populated. Values only in qPublic HTML.'
+    fieldMap:
+      district: tax.district (e.g. "00 - Uninc")
+      luc: dorCode (truncated, e.g. "QLR4 - QUA")
+  sale:
+    status: gap
+    reason: No sale date/price/deed fields in any public REST source (county WFL1 or RFA). qPublic has a Sales Search
+      / Yearly Sales layer (HTML/Cloudflare-gated).
+    fieldMap: {}
+    format: n/a
+  owner:
+    status: usable
+    mailingStatus: usable
+    reason: Owner + full mailing on county layer 9 (28,685).
+    source: https://gis.clarendoncountysc.gov/server/rest/services/Hosted/Clarendon_County_Map_WFL1/FeatureServer/9
+    fieldMap:
+      owner_name: ownerName
+      owner_cont: ownerName2
+      owner_mail: mailingAddress.street
+      owner_ma1: mailingAddress.line2
+      owner_city: mailingAddress.city
+      owner_stat: mailingAddress.state
+      owner_zip: mailingAddress.zip (Integer)
+  paLink:
+    status: partial
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?AppID=795&LayerID=11833&PageTypeID=4&PageID=5734&KeyValue={parcelId}
+    testedParcelId: 145-00-02-036-00
+    idTransform: KeyValue expected = tms as-is (###-##-##-###-##). Not confirmed.
+    reason: 'AppID=795/LayerID=11833 confirmed (search page PageTypeID=2 PageID=5732 is linked from qpublic.net/sc/clarendon).
+      Report PageID=5734 is INFERRED from qPublic convention (search N, results N+1, report N+2; matches Aiken 6877->6879);
+      card previously used PageID=5732 with PageTypeID=4. Could not load a report: Schneider Cloudflare 403 to box
+      and WebFetch; no indexed report URL found.'
+  publicGis:
+    status: usable
+    reason: clarendonsc.wthgis.com live (HTTP 200, "Clarendon County, SC Map"). jurisdictionGisUrl moved from bare
+      REST directory to county Enterprise portal home (live 200).
+  gaps:
+  - Tax values and sales not in any public REST; qPublic HTML only.
+  - qPublic report PageID unverified (inferred).
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) — SCDOT 2025 Statewide Traffic Points, filter CountyName
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28); not
+      re-dug.

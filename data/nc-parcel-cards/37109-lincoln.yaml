@@ -1,0 +1,446 @@
+state: NC
+jurisdiction: Lincoln County
+fips: "37109"
+level: county
+markets: [Charlotte]
+
+layers:
+  - role: parcels
+    name: Server_OperationalSP Parcels
+    restUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_OperationalSP/MapServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: MAPPEDACRE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PARCELID: parcelIdAlt
+      AKPAR_: parcelIdAccount
+      MAPPEDACRE: acreage
+      ACRE: acreageDeed
+      NAME1: ownerName
+      NAME2: ownerName2
+      ADDRESS1: mailingAddress.street
+      ADDRESS2: mailingAddress.street2
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIP: mailingAddress.zip
+      PHYSICALADDR: situsAddress
+      STREETNUM: situsAddress.number
+      STREETNAME: situsAddress.street
+      SDATE: lastSale.date
+      SALEPRICE: lastSale.price
+      QUALIFIEDCODE: lastSale.qualified
+      LANDVALUE: tax.landValue
+      IMPROVALUE: tax.improvementValue
+      TOTALVALUE: tax.marketValue
+      LANDASSESSED: tax.assessedValue
+      ZONING: zoning
+      VACANT: vacantOrImproved
+      DISTRICT: taxDistrict
+      TOWNSHIP: township
+    notes: >
+      PRIMARY verified 2026-09-23: count 56998; MAPPEDACRE 5–150 → 6564;
+      SALEPRICE>0 in range → 2131; non-null ZONING → 54039. CRS 102719/2264.
+      MaxRecordCount 2500. Mirror TaxParcelViewerSP/MapServer/0 (same schema).
+      Parcel ZONING may be multi-code/overlay-prefixed — prefer polygon join for clean codes.
+    status: usable
+
+  - role: parcels
+    name: TaxParcelPublishing (TaxParcelViewerSP)
+    restUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_TaxParcelViewerSP/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: MAPPEDACRE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      AKPAR_: parcelIdAccount
+      PARCELID: parcelIdAlt
+      MAPPEDACRE: acreage
+      NAME1: ownerName
+      PHYSICALADDR: situsAddress
+      SALEPRICE: lastSale.price
+      SDATE: lastSale.date
+      TOTALVALUE: tax.marketValue
+      ZONING: zoning
+    notes: >
+      Verified count 56998 — same CAMA schema as OperationalSP/6. Layers 1–2 identical attrs.
+    status: usable
+
+  - role: parcels
+    name: ComDevData MAININFOLIVE_VIEW_FC
+    restUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/ComDevData/MapServer/25
+    layerId: 25
+    geometry: polygon
+    auth: none
+    acreageField: MAPPEDACRE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      AKPAR_: parcelIdAccount
+      NAME1: ownerName
+      PHYSICALADDR: situsAddress
+      MAPPEDACRE: acreage
+      SALEPRICE: lastSale.price
+      TOTALVALUE: tax.marketValue
+      ZONING: zoning
+    notes: >
+      Verified count 56998. MaxRecordCount 1000 — prefer OperationalSP/6.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-23: cntyfips='109' count 56862; gisacres 5–150 → 6543.
+      No sale price. MaxRecordCount 5000. Alternate host services.gis.nc.gov.
+    status: usable
+
+  - role: zoning
+    name: City Zoning Districts (Lincolnton)
+    restUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_OperationalSP/MapServer/23
+    layerId: 23
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONECODE: zoning
+      CUSE: zoningConditionalUse
+      JURISDICTION: jurisdiction
+    notes: >
+      Verified count 779 (LINCOLNTON 776 + CITY 3). CRS 2264.
+      City-only zoning + county parcels (spatial). Mirrors ComDev/28, TRACKiT/28.
+      CUD companion layer 22 count 780.
+    status: usable
+
+  - role: zoning
+    name: County Zoning Districts (unincorporated)
+    restUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_OperationalSP/MapServer/25
+    layerId: 25
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONECODE: zoning
+      CUSE: zoningConditionalUse
+      JURISDICTION: jurisdiction
+    notes: >
+      Verified count 2272. Unincorporated only — NOT Lincolnton coverage.
+      CUD layer 24 count 215; overlays layer 19 count 8 (ELDD, SAP, MHO, SH, MFL, MSFL).
+    status: usable
+
+  - role: zoning
+    name: RevalLayers Zoning Districts (combined)
+    restUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/RevalLayers/MapServer/59
+    layerId: 59
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONECODE: zoning
+      JURISDICTION: jurisdiction
+      CUSE: zoningConditionalUse
+    notes: >
+      Verified count 3114. JURISDICTION: COUNTY 2267, LINCOLNTON 776, MAIDEN 1,
+      LINCOLN 5, CITY 3. Maiden essentially a gap on Lincoln REST.
+      ComDevData/13 mirror count 3114.
+    status: usable
+
+  - role: zoning
+    name: LandReport ZoningReport (parcel join)
+    restUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/LandReport/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelIdAlt
+      PIN: parcelId
+      ZONECLASS: zoning
+      ZONEDESC: zoningLabel
+      JURISDICTION: jurisdiction
+      CONDITIONAL_USE: zoningConditionalUse
+    notes: >
+      Verified count 55999; non-null ZONECLASS 55625. Attribute-friendly parcel∩zoning.
+      JURISDICTION LINCOLNTON 8266, COUNTY 47159, MAIDEN 9.
+    status: usable
+
+  - role: flu
+    name: LandUsePlan2022 (Blueprint 2043)
+    restUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_OperationalSP/MapServer/35
+    layerId: 35
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      LUP_2022: flu
+      Label: fluLabel
+    notes: >
+      Verified count 48745. Codes: LLR/SFN/RL/SC/IC/MFN/WC/SD/RC/OS/WN/SO.
+      Mirror RevalLayers/60. Spatial join to parcels.
+    status: usable
+
+  - role: flu
+    name: LincolntonLandUsePlan
+    restUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_OperationalSP/MapServer/38
+    layerId: 38
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      LANDUSECODE: flu
+      LANDUSEDESC: fluLabel
+      PARCELID: parcelIdAlt
+    notes: >
+      Verified count 137. City-only FLU + county parcels (spatial/attribute).
+      Related Proposed Land Use ComDevData/11 count 251 (legacy/alt).
+    status: usable
+
+  - role: sales
+    name: TaxParcelViewer Sales (history)
+    restUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_TaxParcelViewerSP/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: MAPPEDACRE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      AKPAR_: parcelIdAccount
+      AMDTSL: lastSale.dateInt
+      AMSLAM: lastSale.price
+      AMQFCD: lastSale.qualified
+      VACANT: vacantOrImproved
+    notes: >
+      Verified count 1416245. Multi-sale history. Join PIN/AKPAR_.
+      Also OperationalSP/11 Qualified Sales count 50333; Server_Tables/4 Sales table 315655.
+    status: usable
+
+  - role: other
+    name: Municipal Boundaries
+    restUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_OperationalSP/MapServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+      TYPE: boundaryType
+    notes: >
+      Verified count 22. City: Lincolnton, Lincolnton ETJ, Maiden. Townships also present.
+      Use TYPE='City' to route zoning/FLU layers.
+    status: usable
+
+  - role: other
+    name: SiteAddressPoint
+    restUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/ComDevData/MapServer/2
+    layerId: 2
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FULLADDR: situsAddress
+      MUNICIPALITY: situsCity
+      ZIP: situsZip
+    notes: >
+      Verified count 46685. Optional when PHYSICALADDR null on parcels.
+    status: usable
+
+municipalities:
+  - name: Unincorporated Lincoln
+    zoningRestUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_OperationalSP/MapServer/25
+    zoningField: ZONECODE
+    fluRestUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_OperationalSP/MapServer/35
+    fluField: LUP_2022
+    join: spatial to OperationalSP/Parcels/6 (CRS 2264); includes Denver CDP & rural tax districts
+  - name: City of Lincolnton
+    zoningRestUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_OperationalSP/MapServer/23
+    zoningField: ZONECODE
+    fluRestUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_OperationalSP/MapServer/38
+    fluField: LANDUSECODE
+    join: "city-only zoning/FLU + county parcels (spatial, 2264); ETJ on Municipal Boundaries"
+    cityPortal: https://www.lincolntonnc.org/
+  - name: Town of Maiden
+    zoningRestUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/RevalLayers/MapServer/59
+    zoningField: ZONECODE
+    zoningFilter: "JURISDICTION='MAIDEN'"
+    status: gap
+    notes: >
+      Only 1 zoning polygon / 9 ZoningReport rows on Lincoln REST. Most of Maiden is
+      Catawba County — resolve full zoning/FLU via Catawba GIS. No Maiden FLU REST on Lincoln.
+    join: spatial filter tiny Lincoln footprint against county parcels
+
+gaps:
+  - Maiden zoning/FLU nearly absent on Lincoln REST (town mostly Catawba)
+  - Parcel ZONING field is multi-code/overlay-prefixed — prefer ZONECODE polygons or ZoningReport
+  - No independent City of Lincolnton ArcGIS host — layers via county server only
+  - Denver/East Lincoln/Alexis are districts/CDPs not incorporated zoning jurisdictions
+  - OneMap has sale date but no sale price
+  - Owner phones/emails not collected from public viewers
+  - MaxRecordCount 1000–2500 — pagination required
+
+license: "Lincoln County GIS open public data; attribution to Lincoln County; shapefile downloads available"
+appraiserSearchUrl: https://arcgisserver.lincolncountync.gov/taxparcelviewer/PropertyReport.aspx?akpar={AKPAR_}&vacinity=false
+viewerUrl: https://arcgisserver.lincolncountync.gov/taxparcelviewer/
+verifiedAt: 2026-09-23
+verifiedBy: Grok Bot GIS researcher
+
+# ---- PASS2 full-suite upgrade (rural OZ) — verifiedAt 2026-09-28 ----
+pass2:
+  label: PASS2 full-suite upgrade — rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  aadtScreening:
+    source: NCDOT Traffic Survey Group (public AGOL)
+    layer: NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)
+    restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+    countyField: COUNTY
+    countyValue: LINCOLN
+    valueField: AADT_2022
+    valueType: string (trim; blank = no count that year)
+    countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27LINCOLN%27&returnCountOnly=true&f=json
+    featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27LINCOLN%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+    liveStationCount: 399
+    stationsWithAADT2022: 135
+    newerYearAvailable:
+      available: true
+      layer: NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      countyField: County
+      countyValue: Lincoln
+      valueField: AADT_2025
+      valueType: integer (null = no count)
+      countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Lincoln%27&returnCountOnly=true&f=json
+      featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Lincoln%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+      liveStationCount: 394
+      stationsWithAADT2025: 239
+      stationsWithAADT2024: 243
+      segmentsLayer: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide — spatial filter by county envelope)
+      also: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)
+    recommendation: Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025→AADT_2024→AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title).
+  primaryParcelLayer:
+    restUrl: https://arcgisserver.lincolncountync.gov/arcgis/rest/services/Server_OperationalSP/MapServer/6
+    acreageField: MAPPEDACRE
+    range5to150Where: MAPPEDACRE>=5 AND MAPPEDACRE<=150
+    liveTotalParcels: 57019
+    liveParcels5to150: 6567
+  taxValues:
+    status: ok
+    fields:
+      LANDVALUE: tax.landValue
+      IMPROVALUE: tax.improvementValue
+      TOTALVALUE: tax.marketValue
+      LANDASSESSED: tax.assessedValue
+    liveNonZeroCounty:
+      LANDVALUE: 53602
+      IMPROVALUE: 44340
+      TOTALVALUE: 56542
+      LANDASSESSED: 53602
+    liveNonZero5to150:
+      LANDASSESSED: 6509
+    notes: Integer fields LANDVALUE/IMPROVALUE/TOTALVALUE/LANDASSESSED.
+    publicFallback: https://arcgisserver.lincolncountync.gov/taxparcelviewer/PropertyReport.aspx?akpar={AKPAR_}&vacinity=false
+  saleHistory:
+    status: ok
+    priceFields:
+    - SALEPRICE
+    dateFields:
+    - SDATE
+    livePriceGt0County:
+      SALEPRICE: 27613
+    livePriceGt0_5to150:
+      SALEPRICE: 2138
+    liveDateNonNullCounty:
+      SDATE: 56016
+    notes: SDATE STRING MM/DD/YYYY; SALEPRICE integer. Multi-sale history also on Server_TaxParcelViewerSP/MapServer/3 (AMSLAM price, AMDTSL date int).
+  ownerEntity:
+    ownerFields:
+    - NAME1
+    - NAME2
+    primaryOwnerField: NAME1
+    rule:
+      apply: Uppercase + trim NAME1 (optionally also NAME2)
+      regex: (?i)(\bL\.?\s?L\.?\s?C\b|\bINC\b|\bCORP|\bL\.?\s?P\b|\bLLP\b|\bLLLP\b|\bLTD\b|TRUST|CHURCH|MINISTR|\bCOMPANY\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\bHOA\b|FOUNDATION|AUTHORITY|\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\b|^UNITED STATES|^NORTH CAROLINA\b|\bCOUNTY$)
+      sqlLikeTokens:
+      - '% LLC%'
+      - '%,LLC%'
+      - '% L L C%'
+      - '% INC'
+      - '% INC %'
+      - '% INC.%'
+      - '%,INC%'
+      - '% CORP%'
+      - '%CORPORATION%'
+      - '% LP'
+      - '% LP %'
+      - '% L P'
+      - '% LLP%'
+      - '% LTD%'
+      - '%TRUST%'
+      - '%CHURCH%'
+      - '%MINISTR%'
+      - '% COMPANY%'
+      - '%PARTNERSHIP%'
+      - '%HOLDINGS%'
+      - '%PROPERTIES%'
+      - '%INVESTMENT%'
+      - '%ASSOCIATION%'
+      - '%FOUNDATION%'
+      - '%AUTHORITY%'
+      - CITY OF %
+      - COUNTY OF %
+      - STATE OF %
+      - TOWN OF %
+      - '% COUNTY'
+      - '%BOARD OF EDUCATION%'
+      - UNITED STATES%
+      - NORTH CAROLINA %
+      - '% DEVELOPMENT%'
+      caveats: TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); "% COUNTY" suffix catches e.g. "PERSON COUNTY"; bare "CO" and "ESTATE" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) — normalize first.
+    liveEntityCount5to150: 958
+    liveOwnerNonNull5to150: 6537
+    entityQuery: where=MAPPEDACRE>=5 AND MAPPEDACRE<=150 AND (NAME1 LIKE '% LLC%' OR NAME1 LIKE '%,LLC%' OR NAME1 LIKE '% L L C%' OR NAME1 LIKE '% INC' OR NAME1 LIKE '% INC %' OR NAME1 LIKE '% INC.%' OR NAME1 LIKE '%,INC%' OR NAME1 LIKE '% CORP%' OR NAME1 LIKE '%CORPORATION%' OR NAME1 LIKE '% LP' OR NAME1 LIKE '% LP %' OR NAME1 LIKE '% L P' OR NAME1 LIKE '% LLP%' OR NAME1 LIKE '% LTD%' OR NAME1 LIKE '%TRUST%' OR NAME1 LIKE '%CHURCH%' OR NAME1 LIKE '%MINISTR%' OR NAME1 LIKE '% COMPANY%' OR NAME1 LIKE '%PARTNERSHIP%' OR NAME1 LIKE '%HOLDINGS%' OR NAME1 LIKE '%PROPERTIES%' OR NAME1 LIKE '%INVESTMENT%' OR NAME1 LIKE '%ASSOCIATION%' OR NAME1 LIKE '%FOUNDATION%' OR NAME1 LIKE '%AUTHORITY%' OR NAME1 LIKE 'CITY OF %' OR NAME1 LIKE 'COUNTY OF %' OR NAME1 LIKE 'STATE OF %' OR NAME1 LIKE 'TOWN OF %' OR NAME1 LIKE '% COUNTY' OR NAME1 LIKE '%BOARD OF EDUCATION%' OR NAME1 LIKE 'UNITED STATES%' OR NAME1 LIKE 'NORTH CAROLINA %' OR NAME1 LIKE '% DEVELOPMENT%')
+  paDeepLink:
+    template: https://arcgisserver.lincolncountync.gov/taxparcelviewer/PropertyReport.aspx?akpar={AKPAR_}&vacinity=false
+    testedUrl: https://arcgisserver.lincolncountync.gov/taxparcelviewer/PropertyReport.aspx?akpar=53288&vacinity=false
+    httpStatus: 200
+    notes: HTTP 200; report page populates via JS (owner not in server HTML).
+  jurisdictionGisViewer:
+    url: https://arcgisserver.lincolncountync.gov/taxparcelviewer/
+    httpStatus: 200
+    notes: Lincoln County GIS tax parcel viewer
+  gaps:
+  - AADT_2022 blank at 264 of 399 stations on the 2022 layer (NCDOT counts on a cycle) — prefer 2025 layer / latest non-blank year
+  - Last sale on primary layer; separate sales layer documented in saleHistory.notes

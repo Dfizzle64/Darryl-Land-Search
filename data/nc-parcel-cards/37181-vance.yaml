@@ -1,0 +1,383 @@
+state: NC
+jurisdiction: Vance County
+fips: "37181"
+level: county
+markets: [Raleigh-Durham]
+
+layers:
+  - role: parcels
+    name: Envirolink Parcels_AGS (PRIMARY CAMA polygons)
+    restUrl: https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/Envirolink/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      GeoPIN: parcelIdGeo
+      PARCEL_NUM: parcelIdParcelNum
+      OWNID: parcelIdOwner
+      OWNNAME: ownerName
+      OWNNAME2: ownerName2
+      OWNNAME3: ownerName3
+      OWNADD1: mailingAddress.street
+      OWNADD2: mailingAddress.street2
+      OWNCITY: mailingAddress.city
+      OWNSTATE: mailingAddress.state
+      OWNZIP: mailingAddress.zip
+      PHYSADDRES: situsAddress
+      CALC_ACRE: acreage
+      DEED_ACRE: acreageDeed
+      DEEDACRE: acreageDeedAlt
+      ASSESSMENT: tax.assessedValue
+      YEAR_BUILT: yearBuilt
+      DBOOK: lastSale.deedBook
+      DPAGE: lastSale.deedPage
+      BookPage: lastSale.deedUrl
+      MAP: mapSheet
+      BLOCK: block
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 26557; OWNNAME/ASSESSMENT>0 → 26287;
+      CALC_ACRE 5–150 → 3081; DEEDACRE 5–150 → 2773; DEED_ACRE 5–150 → 1533.
+      CRS 102719/2264. MaxRecordCount 1000 — paginate. Owner, mailing, situs, assessed
+      value, deed book/page, BookPage ROD deep-link on polygon. No sale price/date on
+      REST — join ustaxdata account.cfm?ownerID={OWNID}&parcelID={PIN} for Sold Date /
+      Sold Amount. YEAR_BUILT>0 only ~185 (mostly 0). PIN format "#### #####" (e.g.
+      "0594 03001"); GeoPIN like 1997-76-6801. Sample centroid ~-78.41/36.32 (Henderson).
+      Hosted on Vance AGOL org pET3krhY1T0smsXf (vc-gis.maps.arcgis.com).
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdAlt
+      ownname: ownerName
+      ownname2: ownerName2
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      szip: situsZip
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      parusecode: dorCode
+      parusedesc: landUseDesc
+      sourceref: lastSale.deedRef
+      nparno: parcelIdNational
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-24: cntyfips='181' count 26547; gisacres 5–150 → 3208;
+      improvval=0/null in range → 1670; parval>0 → 26226; siteadd present countywide.
+      saledate entirely null for Vance — no sale price/date. parno ≈ county PIN
+      ("0012 01005"). Land/improve split stronger than county ASSESSMENT alone.
+      MaxRecordCount 5000. Alternate host services.gis.nc.gov. Geo Vance.
+    status: usable
+
+  - role: zoning
+    name: City of Henderson Zoning (city-first PRIMARY inside city)
+    restUrl: https://gis.henderson.nc.gov/arcgis/rest/services/Planning/Planning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRE
+    coverage: city-only
+    fieldMap:
+      PIN: parcelId
+      GPIN: parcelIdGeo
+      Zoning: zoning
+      CALC_ACRE: acreage
+      Street: situsAddress
+      Street_Num: situs.number
+      Own_fname: ownerName
+      Own_addr1: mailingAddress.street
+      Own_addr2: mailingAddress.cityStateZip
+    notes: >
+      Prefer most-local inside City of Henderson. Verified count 7521. Zones: B1/B2/B2A/
+      B3/B4, I1/I2, OI/OIA, R6/R8/R8M/R11/R15/R15M/R20, RA. CRS 3857. Sample centroid
+      ~-78.40/36.34. Companion MapServer same path. City site henderson.nc.gov.
+    status: usable
+
+  - role: zoning
+    name: City of Henderson ETJ Zoning (city-first ETJ)
+    restUrl: https://gis.henderson.nc.gov/arcgis/rest/services/Planning/Planning/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRE
+    coverage: city-only
+    fieldMap:
+      PIN: parcelId
+      GPIN: parcelIdGeo
+      Zoning: zoning
+      CALC_ACRE: acreage
+      Street: situsAddress
+      Own_lname: ownerName
+      Own_addr1: mailingAddress.street
+      Own_addr2: mailingAddress.cityStateZip
+      House_ETJ: structureFlag
+    notes: >
+      Henderson ETJ zoning polygons. Verified count 3129. Zones include B2–B4, CU, I1/I2,
+      OI, R6–R40, R8M/R15M, RA. Prefer over county stack inside Henderson ETJ.
+    status: usable
+
+  - role: zoning
+    name: County AGOL City_ETJ_Zoning combined (Henderson city+ETJ mirror)
+    restUrl: https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/City_ETJ_Zoning_20260306/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRE
+    coverage: city-only
+    fieldMap:
+      PIN: parcelId
+      GPIN: parcelIdGeo
+      Zoning: zoning
+      CALC_ACRE: acreage
+      DEED_ACRE: acreageDeed
+      Street: situsAddress
+      Own_lname: ownerName
+      Own_addr1: mailingAddress.street
+      House_ETJ: structureFlag
+    notes: >
+      Convenience combined city+ETJ layer on Vance AGOL (dated 20260306). Verified count
+      10654 ≈ Henderson city 7521 + ETJ 3129. Zones match city stack (+ RMX). Prefer
+      gis.henderson.nc.gov layers as authoritative city-first; use this when single-host
+      join to county parcels is simpler. CRS 3857.
+    status: usable
+
+  - role: zoning
+    name: Vance County Zoning (unincorporated PRIMARY)
+    restUrl: https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/Vance_County_Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      pin: parcelId
+      zoning_dis: zoning
+      ownname: ownerName
+      ownadd1: mailingAddress.street
+      owncity: mailingAddress.city
+      assessment: tax.assessedValue
+      physaddres: situsAddress
+    notes: >
+      Parcel-attributed county zoning for unincorporated Vance / non-Henderson areas.
+      Verified count 15556. District counts: R30 10962, AR 2704, R20 1141, R10 168, OI 118,
+      GC1 92, HC 89, RMHC 86, OS 69, LI 68, IM 23, EIA 7, CZR10 1 (+ blank 28). CRS 2264.
+      Does NOT replace Henderson city/ETJ layers inside city limits — cities-first routing.
+      Official zoning ordinance PDF: vancecounty.org .../Vance-County-Zoning-Ordinance-Updated-Feb-2024.pdf
+      Official zoning map PDF download via Important County Base Maps page.
+    status: usable
+
+  - role: flu
+    name: Future Land Use (public polygon REST)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      GAP — no public FLU FeatureServer found. County Land Use Plan map is PDF-only
+      (vancecounty.org/wp-content/uploads/2020/07/LUMap_2010.pdf, Important County Base
+      Maps). Do not invent polygon REST URLs.
+    status: gap
+
+  - role: other
+    name: Address Points / ADP (911 situs)
+    restUrl: https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/ADP_CTR/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      full_addre: situsAddress
+      st_number: situs.number
+      st_name: situs.street
+      st_type: situs.streetType
+      zipcode: situsZip
+      Inc_Muni: municipality
+      community: community
+      MSAG_Comm: msagCommunity
+    notes: >
+      Verified count 23898. Inc_Muni values include Henderson, Kittrell, Middleburg,
+      UNINCORPORATED (+ edge WARREN CO). Prefer for structured situs when PHYSADDRES
+      is incomplete. Envirolink/0 Address_Points_AGS is a related alternate.
+    status: usable
+
+  - role: other
+    name: Municipal / ETJ Boundaries
+    restUrl: https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/ETJHendersonZoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Name: municipalityCode
+      NAME_LOCAS: municipality
+    notes: >
+      Verified count 5. NAME_LOCAS: Henderson, Middleburg, Kittrell, ETJ, Vance
+      (unincorporated county remainder). Mirror: MyMapService_Fire_Surrounding_Counties/3
+      (ETJ_Municipalities, same 5 polys). Use for cities-first routing.
+    status: usable
+
+  - role: other
+    name: Tax Neighborhood Parcels (NBHD)
+    restUrl: https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/WebMapTaxNeighborhood/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      OWNID: parcelIdOwner
+      OWNNAME: ownerName
+      ASSESSMENT: tax.assessedValue
+      NBHD_Code: taxNeighborhood
+      CALC_ACRE: acreage
+      PHYSADDRES: situsAddress
+    notes: >
+      Same CAMA attrs as EnviroLink parcels plus NBHD_Code. Verified count 26373.
+      Prefer Envirolink/1 as primary; use for neighborhood filters.
+    status: usable
+
+  - role: sales
+    name: ustaxdata account card (HTML sale join — not REST)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      OWNID: parcelIdOwner
+      PIN: parcelId
+    notes: >
+      No public sale-price FeatureServer. Verified 2026-09-24 HTML deep-link
+      https://vance.ustaxdata.com/account.cfm?ownerID={OWNID}&parcelID={PIN} returns
+      Sold Date, Sold Amount, Assessed Value, deed bk/pg (sample PIN 0005 07019 →
+      Sold 2023-01-31 $50,000; PIN 0594 03001 → Sold 2013-01-02). PIN-only search:
+      list.cfm?parcelNum={PIN}. Do not scrape emails/phones from pages.
+    status: partial
+
+gaps:
+  - No sale price/date on county or OneMap REST polygons — join ustaxdata HTML account card via OWNID+PIN (or deed bk/pg → ROD)
+  - No public FLU polygon REST (Land Use Plan PDF 2010 only)
+  - Middleburg and Kittrell have no dedicated public zoning FeatureServer — use county Vance_County_Zoning + Municipal/ETJ boundaries
+  - NCPTS API (/api/getParcelDetails) returned 500 for Vance tenant on 2026-09-24; SPA parcel-detail/{numericId} loads; prefer ustaxdata for verified sale/PA card
+  - YEAR_BUILT almost entirely 0/null on REST (~185 >0)
+  - County ASSESSMENT is single total (no land/improve split on Envirolink); use OneMap landval/improvval for split
+  - Envirolink MaxRecordCount 1000 — paginate
+  - No paid vendor data; no phones/emails; no AADT/utilities dig
+license: "Vance County public GIS (vc-gis AGOL); City of Henderson GIS (gis.henderson.nc.gov); NC OneMap; Vance County Tax (ustaxdata); NCGS disclaimer; attribution recommended"
+appraiserSearchUrl: https://vance.ustaxdata.com/Search.cfm
+jurisdictionGisUrl: https://vc-gis.maps.arcgis.com/apps/instant/sidebar/index.html?appid=b784ca1b2bd1462bbd4d7d0b01c4fcc9
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/Envirolink/FeatureServer/1
+  parcelIdField: PIN
+  acreageFilter: CALC_ACRE >= 5 AND CALC_ACRE <= 150
+  acres5to150Live: 3081
+  parcelCountLive: 26557
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='VANCE'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27VANCE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27VANCE%27&returnCountOnly=true&f=json
+      liveStationCount: 379
+      stationsWithAADT2022: 149
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Vance'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Vance%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Vance%27&returnCountOnly=true&f=json
+      liveStationCount: 378
+      stationsWithAADT2025: 229
+      stationsWithAADT2024: 227
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Vance'
+      stations2024LiveCount: 376
+      stations2024WithAADT2024: 376
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - ASSESSMENT
+    liveNonZero:
+      ASSESSMENT: 26287
+    status: ok-assessed-only
+    note: Only ASSESSMENT (total assessed) on REST; land/building split via OneMap landval/improvval (cntyfips='181') or ustaxdata card.
+  sale:
+    priceFields: []
+    dateFields: []
+    livePriceNonZero: {}
+    liveDateNonNull: {}
+    status: gap
+    note: 'No sale price/date on Envirolink REST; OneMap saledate empty for 181. Only DBOOK/DPAGE/BookPage deed ref. Public fallback: ustaxdata list/account page (sales history HTML).'
+  ownerEntity:
+    ownerFields:
+    - OWNNAME
+    - OWNNAME2
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 449
+    liveEntityCount5to150acExtended: 546
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - VANCE COMMONS LP | C/O EXCEL PROPERTY MGMT
+    - NC DEPARTMENT OF TRANSPORTATIO
+    - DABNEY EXCHANGE LLC
+    - HENDERSON INVESTORS LLC
+  paDeepLink:
+    template: https://vance.ustaxdata.com/list.cfm?parcelNum={PIN}
+    testedParcelId: 0433 02014
+    testedUrl: https://vance.ustaxdata.com/list.cfm?parcelNum=0433%2002014
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: true
+    note: Parcel id found in the response body.
+  gisViewer:
+    url: https://vc-gis.maps.arcgis.com/apps/instant/sidebar/index.html?appid=b784ca1b2bd1462bbd4d7d0b01c4fcc9
+    httpStatus: 200
+    pageTitle: Sidebar
+  gaps:
+  - No sale price/date on REST — ustaxdata HTML only
+  - CALC_ACRE null/0 on 2932 parcels — 5–150 count understated; DEEDACRE or OneMap gisacres as fallback

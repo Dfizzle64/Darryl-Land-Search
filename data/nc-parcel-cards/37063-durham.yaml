@@ -1,0 +1,462 @@
+state: NC
+jurisdiction: Durham County
+fips: "37063"
+level: county
+markets: [Raleigh-Durham]
+
+layers:
+  - role: parcels
+    name: PublicServices Property Parcels
+    restUrl: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      REID: parcelId
+      PARCEL_PK: parcelIdPk
+      PIN: parcelIdPinUnstable
+      ACREAGE: acreage
+      CALCULATED_ACRES: acreageGis
+      DEEDED_ACRES: acreageDeed
+      PROPERTY_OWNER: ownerName
+      OWNER_MAIL_1: mailingAddress.street
+      OWNER_MAIL_2: mailingAddress.street2
+      OWNER_MAIL_3: mailingAddress.street3
+      OWNER_MAIL_CITY: mailingAddress.city
+      OWNER_MAIL_STATE: mailingAddress.state
+      OWNER_MAIL_ZIP: mailingAddress.zip
+      LOCATION_ADDR: situsAddress
+      PHYADDR_STR_NUM: situsAddress.number
+      PHYADDR_DIR_PFX: situsAddress.prefix
+      PHYADDR_STR: situsAddress.street
+      PHYADDR_STR_TYPE: situsAddress.streetType
+      PHYADDR_STR_SFX: situsAddress.suffix
+      PHYADDR_CITY: situsCity
+      PHYADDR_ZIP: situsZip
+      PKG_SALE_DATE: lastSale.date
+      PKG_SALE_PRICE: lastSale.price
+      LAND_SALE_DATE: lastSale.landDate
+      LAND_SALE_PRICE: lastSale.landPrice
+      TOTAL_PROP_VALUE: tax.marketValue
+      TOTAL_LAND_VALUE_ASSESSED: tax.landValue
+      TOTAL_BLDG_VALUE_ASSESSED: tax.improvementValue
+      TOTAL_OBLDG_VALUE: tax.obxfValue
+      ZONING: zoning
+      LAND_CLASS: dorCode
+      CITY: situsCityJurisdiction
+      ETJ: planningJurisdiction
+    notes: >
+      PRIMARY verified 2026-09-23: count 133548; ACREAGE 5–150 → 4940;
+      CALCULATED_ACRES 5–150 → 4939. CRS 102719/2264. Prefer REID over PIN
+      (PIN unstable per Durham Tax Office). Situs+tax+sale+zoning attr on polygon.
+      ~5231 null ZONING. MaxRecordCount 2000. Epoch ms dates.
+    status: usable
+
+  - role: parcels
+    name: AGOL Parcels_NEW
+    restUrl: https://services2.arcgis.com/G5vR3cOjh6g2Ed8E/arcgis/rest/services/Parcels_NEW/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      REID: parcelId
+      PARCEL_PK: parcelIdPk
+      PIN: parcelIdPinUnstable
+      ACREAGE: acreage
+      PROPERTY_OWNER: ownerName
+      OWNER_MAIL_1: mailingAddress.street
+      OWNER_MAIL_CITY: mailingAddress.city
+      LOCATION_ADDR: situsAddress
+      PKG_SALE_DATE: lastSale.date
+      PKG_SALE_PRICE: lastSale.price
+      TOTAL_PROP_VALUE: tax.marketValue
+      TOTAL_LAND_VALUE_ASSESSED: tax.landValue
+      TOTAL_BLDG_VALUE_ASSESSED: tax.improvementValue
+      ZONING: zoning
+    notes: >
+      Verified count 133548; ACREAGE 5–150 → 4940. Same CAMA family as Property/4;
+      slightly richer schema (VALUE_APPROACH, CITY_CODE). CRS 2264.
+    status: usable
+
+  - role: other
+    name: Property Address Points
+    restUrl: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      SITE_ADDRE: situsAddress
+      HOUSENUM: situsAddress.number
+      STREETNAME: situsAddress.street
+      STREETTYPE: situsAddress.streetType
+      CITY: situsCity
+      ZIPCODE: situsZip
+      PARCEL_ID: parcelId
+      PIN: parcelIdPinUnstable
+    notes: >
+      Verified count 196410. Many-to-one. Primary situs already on parcel LOCATION_ADDR;
+      use for unit-level / missing PHYADDR.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-23: cntyfips='063' count 133075; gisacres 5–150 → 4934.
+      parno tracks Durham PIN (unstable) — resolve REID via county parcels.
+      No sale price. MaxRecordCount 5000. Alternate host services.gis.nc.gov.
+    status: usable
+
+  - role: zoning
+    name: Durham City-County UDO Zoning
+    restUrl: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      ZONE_CODE: zoning
+      UDO_LABEL: zoningLabel
+      UDO_LEGEND: zoningLegend
+      ZONE_GEN: zoningGeneral
+      PDR: zoningPdr
+      CASE_NO: zoningCase
+    notes: >
+      Verified count 2525. CRS 2264. Covers Durham City + unincorporated UDO —
+      NOT Chapel Hill/Morrisville/Raleigh/Cary tips. AGOL mirror
+      Planning/FeatureServer/12 same count. Spatial join to parcels.
+    status: usable
+
+  - role: flu
+    name: Place Type (Comprehensive Plan FLU)
+    restUrl: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/25
+    layerId: 25
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PlaceType: flu
+      PlaceTypeName: fluLabel
+    notes: >
+      Verified count 10288. Types ATH/CI/DT/EC/ER/GI/HC/IC/ME/MR/MUN/NS/PSN/RAR/RC/RE/ROS/SC/TOA/UPW.
+      Durham Comp Plan place types — treat as FLU for City+County planning area.
+      AGOL mirror Planning/FeatureServer/25. Tip-muni FLU gap.
+    status: usable
+
+  - role: zoning
+    name: Chapel Hill Zoning Districts
+    restUrl: https://gis-portal.townofchapelhill.org/server/rest/services/OpenData/Zoning_Districts/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      NAME: zoningName
+      OLD_ZONING: zoningPrior
+    notes: >
+      Verified count 313. CRS 2264. Durham tip ~1319 parcels CITY=CHAPEL HILL.
+      Spatial join to Durham county parcels. FLU ImageServer only (gap for polygons).
+    status: usable
+
+  - role: zoning
+    name: Morrisville Zoning (Wake)
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/22
+    layerId: 22
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+      COND_USE: zoningConditional
+    notes: >
+      Verified count 32. CRS 2264. Alternate raleighnc.gov Planning/Zoning/9 count 29.
+      Durham tip ~65 CITY=MORRISVILLE parcels. FLU gap.
+    status: usable
+
+  - role: zoning
+    name: Raleigh Zoning
+    restUrl: https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      ZONE_TYPE: zoningType
+      ZONE_TYPE_DECODE: zoningLabel
+    notes: >
+      Verified count 3592. CRS 2264. Durham tip ~1111 CITY=RALEIGH parcels.
+      Spatial join; filter to Durham parcels / cntyfips=063. FLU gap for tip.
+    status: usable
+
+  - role: zoning
+    name: Cary Zoning (Wake regional)
+    restUrl: https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+    notes: >
+      Verified count 2736. Only ~2 Durham parcels CITY=CARY — verify before wiring.
+      FLU gap.
+    status: partial
+
+  - role: other
+    name: City of Durham Boundary
+    restUrl: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Administrative/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      LOCALGOV: municipality
+    notes: >
+      Verified count 1. Route City vs County; tip cities via parcel CITY/ETJ.
+    status: usable
+
+  - role: other
+    name: Future Growth Areas
+    restUrl: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      NAME: futureGrowthArea
+    notes: >
+      Verified count 8. Supplementary to Place Type — not primary FLU.
+    status: partial
+
+  - role: other
+    name: Development Tiers
+    restUrl: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      NAME: developmentTier
+      TYPE: developmentTierType
+    notes: >
+      Verified count 14. Types URBAN/DOWNTOWN/CN etc. Secondary planning context.
+    status: partial
+
+gaps:
+  - Tip-muni FLU polygons missing — Chapel Hill Future_Land_Uses is ImageServer only; Morrisville/Raleigh/Cary tip FLU not verified
+  - Parcel ZONING attribute ~5231 null/empty and tip-mixed — spatial-join municipal zoning polygons
+  - PIN unstable (Durham Tax Office) — use REID as parcelId; OneMap parno tracks PIN
+  - Last-sale only (PKG_SALE/LAND_SALE) — no multi-transfer public sales FeatureServer
+  - CachedServices/Future_Land_Use is tile cache — use Place Type Feature/MapServer instead
+  - MaxRecordCount 2000 on county layers — pagination required
+  - Owner phones/emails not collected from CAMA HTML viewers
+  - Cary tip only 2 parcels — low priority
+
+license: "City of Durham / Durham County open GIS; attribution required; public records. Tip-muni layers: Chapel Hill / Wake / Raleigh as attributed."
+appraiserSearchUrl: https://taxcama.dconc.gov/camapwa/
+viewerUrl: https://maps.durhamnc.gov/
+appraiserDeepLinkTemplate: "https://taxcama.dconc.gov/camapwa/PropertySummary.aspx?PARCELPK={PARCEL_PK}"
+appraiserDeepLinkReidTemplate: "https://taxcama.dconc.gov/camapwa/PropertySummary.aspx?REID={REID}"
+verifiedAt: 2026-09-23
+verifiedBy: Grok Bot GIS researcher
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "Public Information Researcher"
+  aadt:
+    source: "NCDOT Traffic Survey Group"
+    restUrl: "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0"
+    layerId: 0
+    field: "AADT_2022"
+    geography: "state AADT station points (HPMS)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Public Information Researcher"
+    notes: "Official NCDOT AADT stations; annual fields AADT_2002–AADT_2022; filter COUNTY; companion Traffic Segmentation FS available."
+
+# ---- PASS 2 full-suite upgrade (NC non-OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  pass1:
+    status: verified
+    parcelPolygonLayer: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4
+    polygonCountLive: 133548
+    parcelIdField: REID
+    parcelIdFilled: 133548
+    acreageField: ACREAGE
+    acres5to150Live: 4940
+    sampleCentroidWgs84:
+    - -78.913
+    - 36.0034
+  parcelLayer: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4
+  parcelIdField: REID
+  acreageFilter: ACREAGE >= 5 AND ACREAGE <= 150
+  acres5to150Live: 4940
+  parcelCountLive: 133548
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='DURHAM'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DURHAM%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DURHAM%27&returnCountOnly=true&f=json
+      liveStationCount: 946
+      stationsWithAADT2022: 111
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Durham'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Durham%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Durham%27&returnCountOnly=true&f=json
+      liveStationCount: 954
+      stationsWithAADT2025: 867
+      stationsWithAADT2024: 189
+      stationsWith2025or2024: 872
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TOTAL_PROP_VALUE
+    - TOTAL_LAND_VALUE_ASSESSED
+    liveNonZero:
+      TOTAL_PROP_VALUE: 131203
+      TOTAL_LAND_VALUE_ASSESSED: 126888
+    status: ok
+  sale:
+    priceFields:
+    - PKG_SALE_PRICE
+    dateFields:
+    - PKG_SALE_DATE
+    livePriceNonZero:
+      PKG_SALE_PRICE: 56637
+    liveDateNonNull:
+      PKG_SALE_DATE: 69913
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - PROPERTY_OWNER
+    primaryOwnerField: PROPERTY_OWNER
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(PROPERTY_OWNER) LIKE '% LLC%' OR UPPER(PROPERTY_OWNER) LIKE '% INC%' OR UPPER(PROPERTY_OWNER) LIKE '% LP%' OR UPPER(PROPERTY_OWNER) LIKE '% LLP%' OR UPPER(PROPERTY_OWNER) LIKE '% LTD%' OR UPPER(PROPERTY_OWNER) LIKE '% TRUST%' OR UPPER(PROPERTY_OWNER) LIKE '% CHURCH%' OR UPPER(PROPERTY_OWNER) LIKE '% COMPANY%' OR UPPER(PROPERTY_OWNER) LIKE '% PARTNERSHIP%' OR UPPER(PROPERTY_OWNER) LIKE '% HOLDINGS%' OR UPPER(PROPERTY_OWNER) LIKE '% PROPERTIES%' OR UPPER(PROPERTY_OWNER) LIKE '% CORP%' OR UPPER(PROPERTY_OWNER) LIKE '%,LLC%' OR UPPER(PROPERTY_OWNER) LIKE '%,INC%' OR UPPER(PROPERTY_OWNER) LIKE 'CITY OF %' OR UPPER(PROPERTY_OWNER) LIKE 'COUNTY OF %' OR UPPER(PROPERTY_OWNER) LIKE 'STATE OF %' OR UPPER(PROPERTY_OWNER) LIKE 'TOWN OF %')
+    liveEntityCountAll: 33569
+    liveEntityCount5to150ac: 2441
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above.
+  paDeepLink:
+    template: https://taxcama.dconc.gov/camapwa/PropertySummary.aspx?REID={REID}
+    testedParcelId: '100805'
+    testedUrl: https://taxcama.dconc.gov/camapwa/PropertySummary.aspx?REID=100805
+    httpStatus: 200
+    contentType: text/html; charset=utf-8
+    contentVerified: true
+    note: Server-rendered CAMA PropertySummary; owner and REID verified.
+  gisViewer:
+    url: https://maps.durhamnc.gov/
+    httpStatus: 200
+    pageTitle: Durham Maps | City of Durham and Durham County
+  municipalLayerCheck:
+    checked: 11
+    answering: 10
+    layers:
+    - url: https://gis-portal.townofchapelhill.org/server/rest/services/OpenData/Zoning_Districts/FeatureServer/0
+      name: Zoning Districts
+      liveCount: 313
+    - url: https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/0
+      name: Raleigh Zoning
+      liveCount: 3592
+    - url: https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/3
+      name: Cary Zoning
+      liveCount: 2736
+    - url: https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/9
+      name: Morrisville Zoning
+      liveCount: 29
+    - url: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/22
+      ok: false
+      error: 'EXC <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protoc'
+      httpRetry: '32'
+    - url: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Administrative/MapServer/1
+      name: City of Durham
+      liveCount: 1
+    - url: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/12
+      name: Zoning
+      liveCount: 2527
+    - url: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/16
+      name: Future Growth Areas
+      liveCount: 8
+    - url: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/25
+      name: Place Type
+      liveCount: 10288
+    - url: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/5
+      name: Development Tiers
+      liveCount: 14
+    - url: https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/0
+      name: Address Points
+      liveCount: 197386
+    note: 'maps.wake.gov Planning/Zoning/MapServer/22 (Morrisville): https TLS EOF from this box, plain http answers (count 32). Morrisville is also on maps.raleighnc.gov Zoning/MapServer/9 (29).'
+  gaps: []

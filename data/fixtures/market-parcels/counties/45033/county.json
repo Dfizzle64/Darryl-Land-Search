@@ -1,0 +1,33 @@
+{
+  "name": "Dillon",
+  "fips": "45033",
+  "state": "South Carolina",
+  "markets": [
+    "Charleston"
+  ],
+  "featureCount": 3507,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "sc-dillon-parcels-45033",
+  "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18/query",
+  "gaps": [
+    "Source query returned 3540 rows; 3507 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are SC RFA Statewide_Parcels filtered to Dillon County (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "tax partial: Market value only (RFA M_Value, Double, dollars); no assessed/taxable field on RFA layer; L_Value/B_Value empty. Assessed/taxable only on PA page.",
+    "sale gap: No sale fields on RFA/18; WTH viewer has in-app sale date/price search (minSaleDate/minSalePrice) but no REST/bulk export verified.",
+    "owner partial: Owner name public on RFA layer; no mailing address on any public REST found.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "Parcel polygons now loadable from SC RFA Statewide_Parcels (layer 18, where County='Dillon County'); state-hosted inside a boundary-program map — fragile, snapshot extracts. No county-published parcel REST found 2026-09-28."
+  ],
+  "path": "data/fixtures/market-parcels/counties/45033/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45033/lookup.json",
+  "sourceCount": 3540,
+  "dropped": 0,
+  "tileCount": 5,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://dillonsc.wthgis.com/?overlay=tgis/custom.aspx?DSID=1042&RequestType=CustomSearchRequest&SearchType=Name&SearchCriteria={ownerLastName}|",
+  "gisViewerUrl": "https://dillonsc.wthgis.com/"
+}

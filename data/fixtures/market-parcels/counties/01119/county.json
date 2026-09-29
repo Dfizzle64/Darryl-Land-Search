@@ -1,0 +1,32 @@
+{
+  "name": "Sumter",
+  "fips": "01119",
+  "state": "Alabama",
+  "markets": [
+    "Tuscaloosa"
+  ],
+  "featureCount": 5461,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "al-sumter-parcels-01119",
+  "queryUrl": "https://maps.capturecama.com/arcgis/rest/services/Sumter/Sumter03282024/MapServer/2/query",
+  "gaps": [
+    "Source query returned 16242 rows; 5461 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are PARCEL (Sumter CaptureCAMA snapshot 2024-03-28) (https://maps.capturecama.com/arcgis/rest/services/Sumter/Sumter03282024/MapServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "The card marks this public parcel layer partial. Attributes that are absent stay empty.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "Owner/value/acreage columns empty — geometry + PARCEL_NUM only",
+    "No pagination; 2024 vintage"
+  ],
+  "path": "data/fixtures/market-parcels/counties/01119/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01119/lookup.json",
+  "sourceCount": 16242,
+  "dropped": 10427,
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://sumter.capturecama.com/mapparceldetail/{PIN}",
+  "gisViewerUrl": "https://sumter.capturecama.com/parcelviewer/"
+}

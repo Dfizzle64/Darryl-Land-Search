@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-28T22:27:33Z",
+  "generatedAt": "2026-09-29T03:46:36Z",
   "market": "Savannah",
   "tier": "other",
-  "parcelCount": 16305,
+  "parcelCount": 19987,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -149,20 +149,27 @@
       "name": "Jasper",
       "fips": "45053",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 3682,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-jasper-parcels-45053",
+      "queryUrl": "https://gis.jaspercountysc.gov/server/rest/services/DataSharing/Parcel_Cama_HDV/FeatureServer/0/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Source query returned 3934 rows; 3682 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Parcel Cama (DataSharing) (https://gis.jaspercountysc.gov/server/rest/services/DataSharing/Parcel_Cama_HDV/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "No verified market-value field in the public Parcel Cama layer; assessed value is available.",
+        "qPublic https://qpublic.net/sc/jasper/ is public, but a KeyValue deep-link pattern was not confirmed.",
+        "Rejected wrong-geography: JascoGIS services6.../Parcels is Jasper County, Missouri.",
+        "Hardeeville AGOL parcel extracts are city-subset only, not countywide."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45053/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45053/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 3934
     },
     {
       "name": "Liberty",

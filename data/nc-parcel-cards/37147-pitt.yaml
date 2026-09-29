@@ -1,0 +1,553 @@
+county: Pitt
+state: NC
+msa: Greenville
+fips: '37147'
+cntyfips: '147'
+slug: pitt
+level: county
+markets:
+- Greenville
+crs_preferred:
+  wkid: 102719
+  latestWkid: 2264
+  name: NAD 1983 StatePlane North Carolina FIPS 3200 Feet
+publicGisUrl: https://gis.pittcountync.gov/opis/
+jurisdictionGisUrl: https://gis.pittcountync.gov/opis/
+gisViewerUrl: https://gis.pittcountync.gov/opis/
+gisDepartmentUrl: https://www.pittcountync.gov/486/OPIS-Maps
+countyRestRoot: https://gis.pittcountync.gov/gis/rest/services
+greenvilleGisUrl: https://gisonline.greenvillenc.gov/greenvillelink/
+greenvilleRestRoot: https://gisonline.greenvillenc.gov/arcgis/rest/services
+taxAdministrationUrl: https://www.pittcountync.gov/159/Tax-Administration
+realPropertyUrl: https://www.pittcountync.gov/1160/Real-Property-Land-Records
+planningZoningUrl: https://www.pittcountync.gov/160/Planning-and-Development
+planningUrlAlt: https://www.pittcountync.gov/227/Planning
+appraiserSearchUrl: https://lrcpwa.ncptscloud.com/pitt/parcel-search
+viewerLinkTemplate: https://lrcpwa.ncptscloud.com/pitt/parcel-detail/{PARCELNUMBER}
+viewerLinkTemplateAlt: https://lrcpwa.ncptscloud.com/pitt/parcel-detail/{REID}
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/Pitt/
+ncptsDeepLinkTemplate: https://lrcpwa.ncptscloud.com/pitt/parcel-detail/{PARCELNUMBER}
+opisUrl: https://gis.pittcountync.gov/opis/
+paDeepLinkKey: PARCELNUMBER
+paDeepLinkKeyAlt: REID
+parcelIdPreferred: PARCELNUMBER
+joinKeys:
+- PARCELNUMBER
+- REID
+- NCPIN
+- parno
+oneMapFilter: cntyfips='147'
+municipalities:
+  Greenville:
+    role: MSA principal city / largest
+    hasLocalGis: true
+    gisViewerUrl: https://gisonline.greenvillenc.gov/greenvillelink/
+    zoningPrefer: https://gisonline.greenvillenc.gov/arcgis/rest/services/OpenData/FeatureServer/21
+    zoningAlternates:
+    - https://gisonline.greenvillenc.gov/arcgis/rest/services/gucdatashare/MapServer/6
+    - https://gisonline.greenvillenc.gov/arcgis/rest/services/GreenvilleLink/MapServer/24
+    zoningCount: 3215
+    zoningField: ZONE
+    fluPrefer: https://gisonline.greenvillenc.gov/arcgis/rest/services/gucdatashare/MapServer/5
+    fluAlternates:
+    - https://gisonline.greenvillenc.gov/arcgis/rest/services/GreenvilleLink/MapServer/23
+    - https://gisonline.greenvillenc.gov/arcgis/rest/services/OpenData/FeatureServer/22
+    fluCount: 931
+    fluField: LANDUSE
+    parcelCountApprox: 32955
+    notes: 'CITY-FIRST. Prefer OpenData FS/21 or gucdatashare/6 for ZONE (county PermitDisplayMap/22
+      ZONE all-null). FLU: gucdatashare/5 LANDUSE; Horizons 2026 CharArea on GreenvilleLink/23
+      + OpenData/22.'
+  Winterville:
+    role: second city
+    hasLocalGis: false
+    townPlanningUrl: https://www.wintervillenc.com/planning
+    zoningPrefer: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/26
+    zoningCount: 25
+    zoningField: ZONING
+    fluPrefer: null
+    parcelCountApprox: 4983
+    notes: CITY-FIRST district polygons (25 codes). Spatial join across town extent;
+      parcel Zoning attr also strong. No town FLU REST.
+  Ayden:
+    hasLocalGis: false
+    zoningPrefer: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/17
+    zoningCount: 479
+    zoningField: ZONE_
+    fluPrefer: null
+    parcelCountApprox: 3166
+    notes: CITY-FIRST. ZONE_ RA-20/R-10/R-8/B-2/B-1/RMX/RR/R-12/CON/MF/L-I/PUD/NMX.
+  Farmville:
+    hasLocalGis: false
+    zoningPrefer: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/20
+    zoningCount: 3184
+    zoningField: ZONE
+    fluPrefer: null
+    parcelCountApprox: 2753
+    notes: CITY-FIRST (parcel-dense). ZONE R5/R15/RA20/R8/ID/CBD/HBD/GBD/RMHA/RMF/OI/LID.
+  Grifton:
+    hasLocalGis: false
+    zoningPrefer: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/23
+    zoningCount: 104
+    zoningField: ZONE
+    fluPrefer: null
+    parcelCountApprox: 1438
+    notes: CITY-FIRST. Edge town straddles Lenoir — use Lenoir card for Lenoir-side.
+  Bethel:
+    hasLocalGis: false
+    zoningPrefer: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/18
+    zoningCount: 87
+    zoningField: ZONING
+    fluPrefer: null
+    parcelCountApprox: 1061
+    notes: CITY-FIRST.
+  Grimesland:
+    hasLocalGis: false
+    zoningPrefer: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/24
+    zoningCount: 35
+    zoningField: ZONE
+    fluPrefer: null
+    parcelCountApprox: 598
+    notes: CITY-FIRST thin district layer.
+  Fountain:
+    hasLocalGis: false
+    zoningPrefer: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/21
+    zoningCount: 67
+    zoningField: ZONING
+    fluPrefer: null
+    parcelCountApprox: 340
+    notes: CITY-FIRST. Codes CBD/HC/M/MR/R/RA.
+  Simpson:
+    role: village
+    hasLocalGis: false
+    zoningPrefer: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/25
+    zoningCount: 204
+    zoningField: ZONE_
+    fluPrefer: null
+    parcelCountApprox: 327
+    notes: CITY-FIRST. ZONE_ AR/GB/MFR/NR/OI/SFR.
+  Falkland:
+    hasLocalGis: false
+    zoningPrefer: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/19
+    zoningCount: 28
+    zoningField: ZONE
+    fluPrefer: null
+    parcelCountApprox: 67
+    notes: CITY-FIRST thin (service title typo Falkand).
+layers:
+- role: parcels
+  name: PittOpenData/CadastralPitt Pitt Parcels (PRIMARY CAMA)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/PittOpenData/CadastralPitt/MapServer/0
+  layerId: 0
+  geometry: polygon
+  auth: none
+  acreageField: CalculatedAcres
+  coverage: county-wide
+  status: usable
+  fieldMap:
+    PARCELNUMBER: parcelId
+    REID: parcelIdAccount
+    NCPIN: parcelIdPin
+    CalculatedAcres: acreage
+    Acres: acreageAlt
+    DeededAcres: acreageDeed
+    OwnerName: ownerName
+    OwnerAddress1: mailingAddress.street
+    OwnerAddress2: mailingAddress.street2
+    OwnerAddress3: mailingAddress.street3
+    CityStateZip: mailingAddress.cityStateZip
+    PhysicalAddress: situsAddress
+    Municipality: situsCity
+    SalesPrice: lastSale.price
+    SalesMonthYear: lastSale.dateText
+    StampSalePrice: lastSale.stampPrice
+    DocumentDate: lastSale.documentDate
+    DeedBook: lastSale.deedBook
+    DeedPage: lastSale.deedPage
+    DeedBkPg: lastSale.deedRef
+    CurTaxValue: tax.marketValue
+    CurLandValue: tax.landValue
+    CurBuildValue: tax.improvementValue
+    CurXFeatValue: tax.obxfValue
+    Zoning: zoning
+    UseCode: dorCode
+    TypeUse: landUseDescription
+    VacOrImp: vacantOrImproved
+    YearBuilt: yearBuilt
+    HeatedSqFt: heatedArea
+    Neighborhood: neighborhood
+  verifiedCounts:
+    total: 81371
+    calculatedAcres_5_150: 7919
+    acres_5_150: 7914
+    buildValue_0_null_in_band: 5705
+    salesPrice_gt0_in_band: 3760
+    stampSalePrice_gt0_in_band: 2728
+    vacOrImp_I: 64446
+    vacOrImp_V: 16925
+  notes: PRIMARY wire-first. Full public CAMA on polygons. CRS 102719/2264. MaxRecordCount
+    2000 — paginate. No FeatureServer twin (500). Prefer CalculatedAcres. Geo-check
+    PARCELNUMBER 33917 / NCPIN 4686270162 ≈ -77.378, 35.572 (Greenville). PARCELNUMBER
+    joins NCPTS/OPIS; NCPIN joins OneMap parno.
+- role: parcels
+  name: GreenvilleLink Tax Parcels (countywide mirror + billed taxes)
+  restUrl: https://gisonline.greenvillenc.gov/arcgis/rest/services/GreenvilleLink/MapServer/3
+  layerId: 3
+  geometry: polygon
+  auth: none
+  acreageField: Acres
+  coverage: county-wide
+  status: usable
+  fieldMap:
+    ParcelNumber: parcelId
+    AccountNumber: parcelIdAccount
+    OwnerName: ownerName
+    PhysicalAddress: situsAddress
+    Municipality: situsCity
+    SalesPrice: lastSale.price
+    SalesMonthYear: lastSale.dateText
+    CurTaxValue: tax.marketValue
+    CurLandValue: tax.landValue
+    CurBuildValue: tax.improvementValue
+    TaxesBilled: tax.billed
+    TaxesDue: tax.due
+    Zoning: zoning
+    Acres: acreage
+  verifiedCounts:
+    total: 82212
+  notes: City-hosted countywide mirror. Extra TaxesBilled/TaxesDue. Prefer CadastralPitt
+    as PRIMARY.
+- role: parcels
+  name: NC OneMap Parcels (fallback)
+  restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  alternateUrls:
+  - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: gisacres
+  coverage: county-wide
+  filter: cntyfips='147'
+  status: usable
+  fieldMap:
+    parno: parcelId
+    ownname: ownerName
+    mailadd: mailingAddress.street
+    mcity: mailingAddress.city
+    mstate: mailingAddress.state
+    mzip: mailingAddress.zip
+    siteadd: situsAddress
+    scity: situsCity
+    gisacres: acreage
+    saledate: lastSale.date
+    parval: tax.marketValue
+    landval: tax.landValue
+    improvval: tax.improvementValue
+    cntyfips: countyFips
+  verifiedCounts:
+    total: 80993
+    gisacres_5_150: 7908
+  notes: Filter cntyfips='147'. No sale price. NCPIN↔parno verified. MaxRecordCount
+    5000.
+- role: addresses
+  name: PermitDisplayMap County Addresses (situs ZIP join)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/7
+  layerId: 7
+  geometry: point
+  auth: none
+  coverage: county-wide
+  status: usable
+  fieldMap:
+    FullAddress: situsAddress
+    Post_Code: situsZip
+    Inc_Muni: situsCity
+    Uninc_Comm: situsUnincorporatedCommunity
+  verifiedCounts:
+    total: 43196
+  notes: Spatial join for situs ZIP (parcels lack ZIP). Greenville OpenData/0 Greenville_Addresses
+    (~57188) has ZIP+PIN city-side.
+- role: zoning
+  name: Greenville Zoning OpenData FS (city-first PRIMARY)
+  restUrl: https://gisonline.greenvillenc.gov/arcgis/rest/services/OpenData/FeatureServer/21
+  layerId: 21
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  status: usable
+  fieldMap:
+    ZONE: zoning
+    COMBINED_Z: zoningCombined
+    PREV_ZONE: zoningPrevious
+  verifiedCounts:
+    total: 3215
+  notes: CITY-FIRST Greenville. Top ZONE RA20/R9S/R6/R6S/R15S/OR/CG/CH/CDF/IU. Do
+    NOT use PermitDisplayMap/22 for codes (ZONE null).
+- role: zoning
+  name: Winterville Zoning (city-first)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/26
+  layerId: 26
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  status: usable
+  fieldMap:
+    ZONING: zoning
+  verifiedCounts:
+    total: 25
+  notes: CITY-FIRST district polygons covering town extent. Complement with parcel
+    Zoning attr.
+- role: zoning
+  name: Ayden Zoning (city-first)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/17
+  layerId: 17
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  status: usable
+  fieldMap:
+    ZONE_: zoning
+    PIN: parcelIdPin
+  verifiedCounts:
+    total: 479
+- role: zoning
+  name: Farmville Zoning (city-first)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/20
+  layerId: 20
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  status: usable
+  fieldMap:
+    ZONE: zoning
+    PIN: parcelIdPin
+  verifiedCounts:
+    total: 3184
+- role: zoning
+  name: Bethel Zoning (city-first)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/18
+  layerId: 18
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  status: usable
+  fieldMap:
+    ZONING: zoning
+  verifiedCounts:
+    total: 87
+- role: zoning
+  name: Falkland Zoning (city-first)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/19
+  layerId: 19
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  status: usable
+  fieldMap:
+    ZONE: zoning
+  verifiedCounts:
+    total: 28
+  notes: 'Service layer title typo: Falkand Zoning.'
+- role: zoning
+  name: Fountain Zoning (city-first)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/21
+  layerId: 21
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  status: usable
+  fieldMap:
+    ZONING: zoning
+  verifiedCounts:
+    total: 67
+- role: zoning
+  name: Grifton Zoning (city-first)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/23
+  layerId: 23
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  status: usable
+  fieldMap:
+    ZONE: zoning
+  verifiedCounts:
+    total: 104
+- role: zoning
+  name: Grimesland Zoning (city-first)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/24
+  layerId: 24
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  status: usable
+  fieldMap:
+    ZONE: zoning
+    DESCRIPTION: zoningDescription
+  verifiedCounts:
+    total: 35
+- role: zoning
+  name: Simpson Zoning (city-first)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/25
+  layerId: 25
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  status: usable
+  fieldMap:
+    ZONE_: zoning
+  verifiedCounts:
+    total: 204
+- role: zoning
+  name: County Zoning (unincorporated / ETJ residual)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/PittOpenData/ZoningPitt/MapServer/0
+  alternateUrls:
+  - https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/15
+  layerId: 0
+  geometry: polygon
+  auth: none
+  coverage: unincorporated
+  status: usable
+  fieldMap:
+    ZONE: zoning
+    USE_: zoningUse
+  verifiedCounts:
+    total: 863
+  notes: Unincorporated Pitt. Top ZONE GC/RA/RR/GI/LI/R40/SR. Prefer city layers inside
+    munis/ETJ.
+- role: zoning
+  name: ZoningCombined (convenience; incomplete vs city-first stack)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/30
+  layerId: 30
+  geometry: polygon
+  auth: none
+  coverage: partial
+  status: partial
+  fieldMap:
+    ZONE: zoning
+    Jurisdiction: zoningJurisdiction
+  verifiedCounts:
+    total: 8243
+    pitt_county: 5040
+    greenville: 3203
+  notes: Jurisdiction labels only PITT COUNTY + GREENVILLE. Prefer explicit city-first
+    layers + County Zoning.
+- role: flu
+  name: County FutureLandUse2045
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/PittOpenData/PlanningPitt/MapServer/4
+  layerId: 4
+  geometry: polygon
+  auth: none
+  coverage: partial-county
+  status: usable
+  fieldMap:
+    FLU: flu
+    FLU_type: fluType
+    FLU_2022: flu2022
+    Acres_Calc: acreage
+    Community_Name: communityName
+    StudyArea: studyArea
+    ZONE: zoningAtPlan
+    PREV_ZONE: zoningPrevious
+  verifiedCounts:
+    total: 1185
+  notes: County FLU codes RA/SR/RR/CXRD/C/RC/HCI/MUNICIPAL. Study-area oriented —
+    not full-county blanket.
+- role: flu
+  name: Greenville FutureLandUse (city-first)
+  restUrl: https://gisonline.greenvillenc.gov/arcgis/rest/services/gucdatashare/MapServer/5
+  layerId: 5
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  status: usable
+  fieldMap:
+    LANDUSE: flu
+    ACRES: acreage
+    Region: fluRegion
+  verifiedCounts:
+    total: 931
+  notes: CITY-FIRST Greenville FLU. LANDUSE COS/C/OIMF/MDR/HDR/VLDR/I/LDR/MOI/MT/MC/OIM.
+- role: flu
+  name: Greenville Horizons 2026 Future Land Use (CharArea)
+  restUrl: https://gisonline.greenvillenc.gov/arcgis/rest/services/GreenvilleLink/MapServer/23
+  alternateUrls:
+  - https://gisonline.greenvillenc.gov/arcgis/rest/services/OpenData/FeatureServer/22
+  layerId: 23
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  status: usable
+  fieldMap:
+    CharArea: flu
+  verifiedCounts:
+    total: 975
+  notes: Horizons 2026 character areas PCOS/C/TNLM/TNMH/LMDR/OI/MU/HDR/IL/UI. OpenData/22
+    alternate uses CT_Areas.
+- role: flu
+  name: ExistingLandUse (current-use inventory)
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/PittOpenData/PlanningPitt/MapServer/15
+  layerId: 15
+  geometry: polygon
+  auth: none
+  coverage: county-wide
+  status: usable
+  fieldMap:
+    ParcelNumber: parcelId
+    CurrentUse: existingLandUse
+    UseCode: existingLandUseCode
+    UseCategories: existingLandUseCategory
+    Acres: acreage
+  verifiedCounts:
+    total: 21149
+  notes: Existing use survey — not future land use. Join on ParcelNumber↔PARCELNUMBER.
+- role: boundaries
+  name: City Limits
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/PittOpenData/CadastralPitt/MapServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  coverage: county-wide
+  status: usable
+  fieldMap:
+    NAME: municipality
+    ICL_OCL: limitType
+  verifiedCounts:
+    total: 10
+  notes: Ayden, Bethel, Falkland, Farmville, Fountain, Greenville, Grifton, Grimesland,
+    Simpson, Winterville.
+- role: boundaries
+  name: ETJ
+  restUrl: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/27
+  layerId: 27
+  geometry: polygon
+  auth: none
+  coverage: county-wide
+  status: usable
+  fieldMap:
+    NAME: etjName
+    ETJ_NAME: etjNameAlt
+    ACREAGE: acreage
+  verifiedCounts:
+    total: 11
+  notes: Route ETJ parcels to matching municipal zoning when layer exists.
+gaps:
+- 'Town FLU REST only for Greenville — Winterville/Ayden/Farmville/others: no public
+  FLU FeatureServer'
+- County FutureLandUse2045 is study-area partial (1185 polys), not full-county blanket
+- PermitDisplayMap Greenville Zoning (22) has null ZONE — use city host
+- ZoningCombined Jurisdiction labels incomplete (only PITT COUNTY/GREENVILLE)
+- Winterville zoning is 25 district polys — spatial join + parcel Zoning attr
+- Situs ZIP not on parcels — join County Addresses Post_Code
+- Sale history is last-sale only (SalesPrice + SalesMonthYear)
+- No public FeatureServer twin for CadastralPitt (MapServer only)
+- Grifton straddles Lenoir — use Lenoir card for non-Pitt side
+- Greenville city planning department page URLs unstable (404s); use gisonline.greenvillenc.gov
+license: Pitt County / City of Greenville public GIS; attribution requested; as-is
+verifiedAt: '2026-09-24'
+verifiedBy: North Carolina Public Info Researcher
+tranche: 3
+excluded:
+- AADT
+- utilities
+- emails
+- phones
+- paid vendors

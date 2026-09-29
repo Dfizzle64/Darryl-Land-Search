@@ -1,0 +1,29 @@
+{
+  "name": "Burke",
+  "fips": "37023",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 7930,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-burke-parcels-37023",
+  "queryUrl": "https://gis.burkenc.org/arcgis/rest/services/ProdParcelViewFC/MapServer/0/query",
+  "gaps": [
+    "Parcels are ProdParcelViewFC CAMA (PRIMARY) (https://gis.burkenc.org/arcgis/rest/services/ProdParcelViewFC/MapServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 8045 rows; 7930 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 502 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37023/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37023/lookup.json",
+  "sourceCount": 8045,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "http://taxweb.burkenc.org/CamaPWA/PropertySummary.aspx?REID={REID}",
+  "gisViewerUrl": "https://gis.burkenc.org/"
+}

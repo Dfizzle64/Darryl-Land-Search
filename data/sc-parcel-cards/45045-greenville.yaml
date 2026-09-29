@@ -1,0 +1,374 @@
+state: SC
+jurisdiction: Greenville County
+fips: "45045"
+level: county
+markets: [Greenville]
+
+layers:
+  - role: parcels
+    name: Tax Parcel (GCGIA FeatureAccess)
+    restUrl: https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: TACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      OWNAM1: ownerName
+      OWNAM2: ownerName2
+      NAMECO: ownerCareOf
+      STREET: mailingAddress
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIP5: mailingAddress.zip
+      STRNUM: situsAddress.number
+      LOCATE: situsAddress.street
+      TACRES: acreage
+      LANDUSE: dorCode
+      SLPRICE: lastSale.price
+      DEEDDATE: lastSale.date
+      CUBOOK: lastSale.deedBook
+      CUPAGE: lastSale.deedPage
+      TAXMKTVAL: tax.marketValue
+      FAIRMKTVAL: tax.fairMarketValue
+      TOTTAX: tax.taxAmount
+      JURIS: jurisdictionCode
+      SUBDIV: subdivision
+      DESCR: legalDescription
+      DIST: tax.district
+    notes: >
+      Verified 2026-09-23: HTTP 200 pjson + count query returned 244178 features, no token.
+      Countywide cadastral polygons with CAMA-like ownership, mailing, situs (STRNUM+LOCATE),
+      estimated acres (TACRES), land use, last deed sale price/date, taxable/fair market values.
+      JURIS codes (export docs): 1=County, 3=DOR. Municipal zoning is NOT on this layer —
+      JOIN Zoning (layer 13) by spatial intersect filtered on JCODE, or Parcel Polygons (43)
+      ZONING/ZONE1–ZONE4 by PIN. Viewer: https://www.gcgis.org/apps/GreenvilleJS/
+      Real Property search: https://www.greenvillecounty.org/AppsAS400/RealProperty/
+      Prefer this over AGOL Greenville_Base_Data…/33 (count ~32011, city-extent subset).
+    status: usable
+
+  - role: tax
+    name: Tax / market values on Tax Parcel (GCGIA/10)
+    restUrl: https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: TACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      TAXMKTVAL: tax.marketValue
+      FAIRMKTVAL: tax.fairMarketValue
+      TOTTAX: tax.taxAmount
+      DIST: tax.district
+    notes: Tax values embedded on Tax Parcel; not a separate service.
+    status: usable
+
+  - role: ownership
+    name: Ownership / mailing on Tax Parcel (GCGIA/10)
+    restUrl: https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      OWNAM1: ownerName
+      OWNAM2: ownerName2
+      NAMECO: ownerCareOf
+      STREET: mailingAddress
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIP5: mailingAddress.zip
+    notes: Ownership embedded on Tax Parcel. STREET/CITY/STATE/ZIP5 are mailing (confirmed off-city mail samples).
+    status: usable
+
+  - role: sales
+    name: Last-sale on Tax Parcel + Sales MapServer history
+    restUrl: https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      SLPRICE: lastSale.price
+      DEEDDATE: lastSale.date
+      CUBOOK: lastSale.deedBook
+      CUPAGE: lastSale.deedPage
+    notes: >
+      Last deed sale on parcel feature. Multi-sale history: GreenvilleNJ/Sales/MapServer/7
+      "All Property Types" (point, count ~370631) fields PIN, SALEDATE, SALEPRICE, SALETYPE,
+      TRUESALE, PROPTYPE, PURNAME, SELLNAME, DEEDBOOK, DEEDPAGE — JOIN to parcels by PIN.
+      Auth none on Sales/7. Status partial because parcel layer is last-sale only; use Sales/7
+      for history table.
+    status: partial
+
+  - role: zoning
+    name: Zoning (GCGIA FeatureAccess) — county + all Greenville Co. municipalities
+    restUrl: https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+      JCODE: jurisdictionCode
+    notes: >
+      Verified 2026-09-23: public, count 14017. Official zoning GIS layer per county UDO.
+      JCODE filter for municipalities (exportable-layer docs): 45045=Greenville County
+      unincorporated (~8975), 30850=City of Greenville (~2581), 30985=City of Greer (~872),
+      45115=City of Mauldin (~501), 66580=City of Simpsonville (~527), 72430=City of
+      Travelers Rest (~250), 27070=City of Fountain Inn (~311). Spatial join to Tax Parcel
+      (PIN). Parcel Polygons layer 43 also carries ZONING/ZONE1–4 on ~248671 polygons
+      (PIN join key). Prefer City of Greenville Regulation REST for JCODE 30850 when available
+      (see companion 45045-greenville-city.yaml).
+    status: usable
+
+  - role: zoning
+    name: Zoning Overlay (GCGIA FeatureAccess)
+    restUrl: https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TYPE: overlayType
+      NAME: overlayName
+      ORDINANCE: ordinance
+      DESCRIPT: overlayDescription
+    notes: Verified count 71. Overlay districts; spatial join to parcels. Not base zoning.
+    status: usable
+
+  - role: flu
+    name: Future Land Use 2020 (GCGIA FeatureAccess)
+    restUrl: https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/21
+    layerId: 21
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      FLU: flu
+      CharacterA: fluCharacter
+      Place: fluPlace
+      Scn1_Trend: fluScenarioTrend
+      Scn2_Focus: fluScenarioFocus
+      Scn3_Infil: fluScenarioInfill
+      MapID: fluMapId
+      Acres: acreage
+    notes: >
+      Verified 2026-09-23: public, count 379. Comprehensive-plan character areas (e.g.
+      Suburban Neighborhood, Traditional Neighborhood). Spatial join to parcels; not
+      parcel-grain. GreenvilleNJ/FLU_Labels/MapServer is labels only.
+    status: usable
+
+  # --- Municipalities (first-class; hosted on county Zoning with JCODE) ---
+  - role: zoning
+    name: City of Greenville zoning via county JCODE 30850 (prefer city REST)
+    restUrl: https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      JCODE: jurisdictionCode
+    notes: >
+      Filter JCODE='30850' (count ~2581). Prefer City of Greenville AddressSearch/Regulation
+      MapServer/7 (ZONING, count 2795, Development Code 2023) — see 45045-greenville-city.yaml.
+      JOIN KEY to county parcels: spatial intersect (no PIN on zoning polygons); optional
+      Parcel Polygons/43 PIN+ZONING for attribute join.
+    status: partial
+
+  - role: zoning
+    name: City of Greer UDO Zoning (prefer over county JCODE 30985)
+    restUrl: https://services1.arcgis.com/bskBH6JV42oEWJvZ/arcgis/rest/services/Greer_UDO_ZoningMap/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Pro_Zoning: zoning
+      IntlZoning_Historic: zoningHistoric
+    notes: >
+      Verified 2026-09-23: public, count 1422. PREFER this local UDO layer over county
+      GCGIA Zoning JCODE='30985' (~872) when parcel is inside Greer. JOIN KEY: spatial
+      intersect to Tax Parcel/10 (PIN). Greer straddles Spartanburg — see companion
+      45045-greer-city.yaml (also FLU + parcels). Fallback county filter JCODE='30985'
+      still on GCGIA/13 if city REST unavailable.
+    status: usable
+
+  - role: zoning
+    name: City of Greer zoning fallback (county JCODE 30985)
+    restUrl: https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      JCODE: jurisdictionCode
+    notes: >
+      Filter JCODE='30985'. Fallback only — prefer Greer_UDO_ZoningMap above / companion card.
+    status: partial
+
+  - role: zoning
+    name: City of Mauldin zoning (county JCODE 45115)
+    restUrl: https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      JCODE: jurisdictionCode
+    notes: >
+      Filter JCODE='45115' (count ~501). Dig 2026-09-23: no city AGOL/open-data zoning
+      FeatureServer (cityofmauldin.org / AGOL owner searches empty; planning pages have
+      no GIS REST). County hosts municipal zoning — keep JCODE filter. Spatial join to
+      Tax Parcel/10.
+    status: usable
+
+  - role: zoning
+    name: City of Simpsonville zoning (county JCODE 66580)
+    restUrl: https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      JCODE: jurisdictionCode
+    notes: >
+      Filter JCODE='66580' (count ~527). Dig 2026-09-23: simpsonville.com planning has
+      PDF zoning maps only; AGOL hit "SimpsonvilleZoning" (owner triples) is Shelby County
+      TN (shelbypz.com links) — wrong-geography, reject. No SC city REST — keep county
+      JCODE. Spatial join to Tax Parcel/10.
+    status: usable
+
+  - role: zoning
+    name: City of Travelers Rest zoning (county JCODE 72430)
+    restUrl: https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      JCODE: jurisdictionCode
+    notes: >
+      Filter JCODE='72430' (count ~250). Dig 2026-09-23: travelersrestsc.com Planning &
+      Zoning explicitly points to Greenville County GIS for maps; no city FeatureServer
+      (AGOL Travelers Rest zoning search empty). Keep county JCODE. Spatial join to
+      Tax Parcel/10.
+    status: usable
+
+  - role: zoning
+    name: City of Fountain Inn zoning (prefer city Zoning_2026; county JCODE 27070 fallback)
+    restUrl: https://services3.arcgis.com/YQLyddqtM8cTAr6Y/arcgis/rest/services/Zoning_2026/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      ZoningLabel: zoningDescription
+    notes: >
+      Verified 2026-09-23: city AGOL Zoning_2026/1 (count 17 dissolved UDO districts;
+      owner mwassonfigis). PREFER over county GCGIA Zoning JCODE='27070' (~311) when
+      parcel is inside Fountain Inn. Companion card 45045-fountain-inn.yaml also lists
+      consultant New_Zoning (count 322; partial) and rejects ZoningFireSewer/2
+      (wrong-geography). City straddles Greenville/Laurens — filter geography carefully.
+      Fallback: GCGIA/13 JCODE='27070'. JOIN: spatial intersect to Tax Parcel/10.
+    status: usable
+
+  - role: parcels
+    name: Parcel Polygons with zoning attributes (GCGIA/43)
+    restUrl: https://www.gcgis.org/arcgis3/rest/services/GCGIA/GCGIA_FeatureAccess/FeatureServer/43
+    layerId: 43
+    geometry: polygon
+    auth: none
+    acreageField: GIS_ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      GIS_ACRES: acreage
+      ZONING: zoning
+      ZONE1: zoning
+      ZONE2: zoningAlt
+      ZONE3: zoningAlt2
+      ZONE4: zoningAlt3
+    notes: >
+      Verified count 248671. Thinner than Tax Parcel/10 (no owner/tax/sale) but carries
+      PIN + ZONING for attribute join. Prefer Tax Parcel/10 for CAMA; use 43 when needing
+      parcel-grain zoning without spatial join to layer 13.
+    status: partial
+
+  - role: parcels
+    name: AGOL Greenville_Base_Data Tax Parcel (subset — do not use as countywide)
+    restUrl: https://services3.arcgis.com/YQLyddqtM8cTAr6Y/ArcGIS/rest/services/Greenville_Base_Data11102023_WFL1/FeatureServer/33
+    layerId: 33
+    geometry: polygon
+    auth: none
+    acreageField: TACRES
+    coverage: sample
+    fieldMap:
+      PIN: parcelId
+      OWNAM1: ownerName
+      STREET: mailingAddress
+      TACRES: acreage
+      SLPRICE: lastSale.price
+      TAXMKTVAL: tax.marketValue
+    notes: >
+      Verified count 32011 only — extent matches city-area subset, not countywide 244k.
+      Same schema family as GCGIA/10. Status wrong-geography for countywide ingest.
+    status: wrong-geography
+
+gaps:
+  - "MUNICIPALITY INVENTORY (incorporated cities checked): Greenville, Greer, Mauldin, Simpsonville, Travelers Rest, Fountain Inn. CDPs (Taylors, Wade Hampton, Five Forks, etc.) are unincorporated — use county zoning."
+  - "Tax Parcel/10 has no zoning — JOIN GCGIA Zoning/13 (JCODE) or Parcel Polygons/43 (PIN) or local city REST."
+  - "City of Greenville: prefer citygis Regulation/7 + companion 45045-greenville-city.yaml over JCODE 30850."
+  - "City of Greer: prefer Greer_UDO_ZoningMap + companion 45045-greer-city.yaml over JCODE 30985; Greer also has FLU REST."
+  - "Mauldin / Simpsonville / Travelers Rest: still no city FeatureServer after 2026-09-23 dig — use county Zoning/13 JCODE 45115/66580/72430. Mauldin: no AGOL/org REST. Simpsonville: PDF maps only; AGOL SimpsonvilleZoning is Shelby TN (wrong-geography). Travelers Rest: city site points to county GIS."
+  - "Fountain Inn: city Zoning_2026 usable (companion 45045-fountain-inn.yaml); county JCODE 27070 remains fallback; consultant New_Zoning partial; ZoningFireSewer/2 wrong-geography."
+  - "Sale history beyond last deed requires GreenvilleNJ/Sales/MapServer/7 (points) join by PIN."
+  - "AGOL Greenville_Base_Data…/33 is a ~32k subset — not countywide (wrong-geography for county ingest)."
+  - "JOIN KEYS: city zoning polygons → Tax Parcel/10 via spatial intersect; Parcel Polygons/43 ZONING via PIN; city Greenville parcels via PIN."
+  - "Do not scrape emails/phones; Real Property HTML is lookup-only."
+
+license: "Public Greenville County GIS REST (gcgis.org/arcgis3). Attribute Greenville County GIS / Planning. Confirm data-distribution / export license at gcgis.org before bulk republish."
+appraiserSearchUrl: https://www.greenvillecounty.org/AppsAS400/RealProperty/
+verifiedAt: 2026-09-23
+verifiedBy: South Carolina Public Info Researcher
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "South Carolina Public Info Researcher"
+  aadt:
+    source: "SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points)"
+    restUrl: "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0"
+    layerId: 0
+    field: "FactoredAA"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "South Carolina Public Info Researcher"
+    notes: "SCDOT-published 2025 statewide points (~11570); FactoredAA=factored AADT; FactoredA1 companion; filter CountyName (stored UPPERCASE; AGOL queries case-insensitive). smpesri.scdot.org EGIS has roads but no AADT layer. Sibling 2025_Statewide_Traffic_Lines also exists (~11575) — points are the stamped source."
+

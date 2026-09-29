@@ -1,0 +1,198 @@
+state: AL
+jurisdiction: Montgomery County
+fips: "01101"
+level: county
+markets: [Montgomery]
+
+layers:
+  - role: parcels
+    name: DBO.Parcels (City of Montgomery GIS — countywide)
+    restUrl: "https://gis.montgomeryal.gov/server/rest/services/Parcels/FeatureServer/0"
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Calc_Acre
+    coverage: county-wide
+    fieldMap:
+      PID: parcelId
+      ParcelNo: parcelIdAlt
+      OwnerName: ownerName
+      OwnerName2: ownerName2
+      MailAddress1: mailingAddress.street
+      MailAddress2: mailingAddress.street2
+      MailCity: mailingAddress.city
+      MailState: mailingAddress.state
+      MailZip: mailingAddress.zip
+      PropertyAddr1: situsAddress
+      PropertyCity: situsCity
+      PropertyState: situsState
+      PropertyZip: situsZip
+      Calc_Acre: acreage
+      ForestAcreage: acreageForest
+      TotalLandValue: tax.landValue
+      TotalImpValue: tax.improvementValue
+      TotalValue: tax.marketValue
+      AssessmentClass: dorCode
+      MunicipalityCode: municipalityCode
+      InstNbr: lastSale.instrument
+      InstDate: lastSale.date
+      RecordYear: tax.year
+      FireDist: fireDistrict
+    notes: >
+      Verified 2026-09-23: HTTP 200 + count 106251. CRS WKID 102629 (AL State Plane).
+      maxRecordCount 2000. AL Montgomery confirmed (PropertyCity MONTGOMERY, etc.).
+      Owner/mail/situs/values present; InstDate often null — no reliable sale price.
+      Strings often fixed-width padded — trim on ingest. Prefer this FeatureServer over
+      KCS mirror. WRONG GEOGRAPHY: services6…/EbVsqZ18sv1kVJ3k Montgomery_County_Parcels
+      is NY East State Plane — do not use.
+    status: usable
+
+  - role: parcels
+    name: Parcels (KCS AL03_Public_ISV mirror)
+    restUrl: "https://web3.kcsgis.com/kcsgis/rest/services/Montgomery/AL03_Public_ISV/MapServer/29"
+    layerId: 29
+    geometry: polygon
+    auth: none
+    acreageField: Calc_Acre
+    coverage: county-wide
+    fieldMap:
+      PID: parcelId
+      ParcelNo: parcelIdAlt
+      OwnerName: ownerName
+      OwnerName2: ownerName2
+      MailAddress1: mailingAddress.street
+      MailCity: mailingAddress.city
+      MailZip: mailingAddress.zip
+      PropertyAddr1: situsAddress
+      PropertyCity: situsCity
+      Calc_Acre: acreage
+      TotalLandValue: tax.landValue
+      TotalImpValue: tax.improvementValue
+      TotalValue: tax.marketValue
+      AssessmentClass: dorCode
+      MunicipalityCode: municipalityCode
+    notes: >
+      Verified 2026-09-23: count 105511. Near-duplicate of gis.montgomeryal.gov schema.
+      Prefer city GIS FeatureServer/0 as primary. ISV viewer:
+      https://isv.kcsgis.com/al.montgomery_revenue/
+    status: partial
+
+  - role: zoning
+    name: Unincorporated Montgomery County zoning (none — city Zoning FS is municipal)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Verified 2026-09-24: gis.montgomeryal.gov Zoning/FeatureServer/0 (count 2049) is
+      City of Montgomery municipal zoning — already filed as 01101-city-montgomery.yaml.
+      No separate countywide unincorporated zoning layer on county/city GIS or KCS
+      AL03_Public_ISV. County permitting exists outside city/Pike Road police jurisdictions
+      but without a county zoning district map REST. Spatial-join city Zoning/0 only inside
+      city limits. WRONG GEOGRAPHY: NY Montgomery AGOL parcels — stay clear.
+    status: gap
+
+gaps:
+  - No unincorporated Montgomery County zoning REST — city Zoning/0 is municipal only
+  - No reliable lastSale.price (InstDate sparse)
+  - Trim padded OwnerName/address strings
+  - City zoning is separate card 01101-city-montgomery — spatial-join inside city
+  - Avoid NY Montgomery AGOL item
+
+license: "City of Montgomery / Montgomery County GIS (gis.montgomeryal.gov); KCS ISV mirror"
+appraiserSearchUrl: "https://isv.kcsgis.com/isvreports/al.montgomery2025/{PIN}.PDF"
+jurisdictionGisUrl: "https://isv.kcsgis.com/al.montgomery_revenue/"
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    luCountyId: 51
+    year: 2024
+    countyWhere: "YearAADT=2024 AND LUCountyID=51 AND AADT>0"
+    stations2024: 958
+    countyCheckedAt: "2026-09-28"
+    countyNote: "LUCountyID=51 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 958 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location."
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "Official ALDOT EGISATDServices/TDMPublic MapServer; ~282482 multi-year points (YearAADT 2014–2025). Latest usable AADT year=2024 (~22009 with AADT>0; 2025 shells exist but AADT still null as of 2026-09-24). Filter YearAADT=2024; optional LUCountyID (1–67 alpha county index, e.g. Autauga=1 Jefferson=37 Madison=45). Companion YearAADT field. Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/. Dig: enrichment/AL/aadt-aldot-2026-09-24.md"
+
+pass1RuralOz2026_09_28:
+  parcelRestUrl: "https://gis.montgomeryal.gov/server/rest/services/Parcels/FeatureServer/0"
+  note: >
+    Batch 3 closing re-verify 2026-09-28 FAILED from the research box: TLS handshake to
+    gis.montgomeryal.gov aborts (SSL unexpected EOF) on every request, including the service
+    root. Status left usable (LSB reports it live with 9954 features in app data); treat as
+    unverified today — likely host-side TLS/firewall issue for this network. verifiedAt kept at 2026-09-24.
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://gis.montgomeryal.gov/server/rest/services/Parcels/FeatureServer/0
+  featureCount: 105511
+  taxSaleOwner:
+    ownerName:
+      field: OwnerName
+      status: usable
+    assessedValue:
+      field: null
+      status: gap
+      livesAt: Montgomery Revenue Commissioner record / KCS PDF record card at appraiserSearchUrl
+    appraisedOrMarketValue:
+      field: TotalValue
+      status: usable
+      nonNullOrPositiveCount: 105491
+      ofTotal: 105511
+    landValue:
+      field: TotalLandValue
+      status: usable
+    improvementValue:
+      field: TotalImpValue
+      status: usable
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: Montgomery Revenue Commissioner record / KCS PDF record card at appraiserSearchUrl
+    lastSaleDate:
+      field: InstDate
+      status: unverified this run (card fieldMap; county server TLS-EOFs from the box; not on the KCS mirror)
+      livesAt: county layer https://gis.montgomeryal.gov/server/rest/services/Parcels/FeatureServer/0
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: Montgomery Revenue Commissioner record / KCS PDF record card at appraiserSearchUrl
+    ownerEntityType:
+      derivable: true
+      sourceField: OwnerName
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 13797
+        INC: 3631
+        TRUST: 1938
+        CORP: 314
+        CHURCH: 1083
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://isv.kcsgis.com/isvreports/al.montgomery2025/{PIN}.PDF
+    pinField: PID
+    testPin: '0107350000001000'
+    verified: 'yes'
+    method: plain fetch 200 application/pdf (KCS ISV property record card; pattern from ISV viewer.js moreDetails prcLink, idProperty PID)
+    note: PDF record card (2025) returned owner MADDOX FAMILY FARMS LTD & BRASSELL PROPERTIES LLC, parcel 01 07 35 0 000 001.000, values. The path contains the year (al.montgomery2025), so it may change
+      when KCS rolls the year.
+  jurisdictionGisUrl:
+    url: https://isv.kcsgis.com/al.montgomery_revenue/
+    http: 200
+  notes: gis.montgomeryal.gov TLS-EOFs from the box, so the card's existing fields were kept. Counts and entity LIKE counts come from the public KCS mirror https://al03montrevenue.kcsgis.com/kcsgis/rest/services/Montgomery/AL03_Public_ISV/MapServer/29
+    (105,511 parcels; same PID/OwnerName/TotalValue schema, RecordYear 2026). Neither layer has assessed value, tax due or sale price.

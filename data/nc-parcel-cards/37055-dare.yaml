@@ -1,0 +1,377 @@
+state: NC
+jurisdiction: Dare County
+fips: "37055"
+level: county
+markets: [Outer Banks, Eastern NC]
+slug: dare
+cntyfips: "055"
+
+jurisdictionGisUrl: https://maps.darecountync.gov/
+publicGisUrl: https://maps.darecountync.gov/
+gisViewerUrl: https://maps.darecountync.gov/
+gisDepartmentUrl: https://www.darenc.gov/departments/information-technology/geographical-information-system-gis
+countyRestRoot: https://services1.arcgis.com/ozZJ6IIlcOT869Kx/arcgis/rest/services
+geoServerUrl: https://gs.darecountync.gov/geoserver/
+taxAdministrationUrl: https://tax.darecountync.gov/
+appraiserSearchUrl: https://property.spatialest.com/nc/dare/
+paDeepLinkTemplate: "https://property.spatialest.com/nc/dare/#/property/{parcel}"
+paDeepLinkTemplateAlt: "https://tax.darecountync.gov/taxbill_view.php?parcel={parcel}"
+paDeepLinkKey: parcel
+landTransferDeepLinkTemplate: "https://tax.darecountync.gov/landtransfer/parcel.php?parcel={parcel}"
+taxCertDeepLinkTemplate: "https://tax.darecountync.gov/taxcert.php?parcel={parcel}"
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/dare/
+ncptsDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/dare/parcel-detail/{parcel}"
+zoningRegulationsUrl: https://www.darenc.gov/departments/planning/zoning-regulations-maps
+camaLupFluPdfUrl: "https://edocs.deq.nc.gov/CoastalManagement/DocView.aspx?dbid=0&id=322794"
+deqLupIndexUrl: https://www.deq.nc.gov/about/divisions/coastal-management/coastal-management-land-use-planning/certified-lups/dare-county
+nagsHeadFocusPlanPdfUrl: https://www.nagsheadnc.gov/DocumentCenter/View/924/FOCUS-Nags-Head-Comprehensive-Plan-July-5-2017-PDF
+oneMapFilter: "cntyfips='055'"
+parcelIdPreferred: parcel
+joinKeys: [parcel, pin, pin14, id, parno, altparno]
+
+layers:
+  - role: parcels
+    name: gis_polygons (PRIMARY CAMA ArcGIS REST)
+    restUrl: https://services1.arcgis.com/ozZJ6IIlcOT869Kx/arcgis/rest/services/gis_polygons/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: calcacre
+    coverage: county-wide
+    fieldMap:
+      parcel: parcelId
+      pin: parcelIdAlt
+      pin14: parcelIdPin14
+      calcacre: acreage
+      docacre: acreageDeed
+      owner1: ownerName
+      owner2: ownerName2
+      mailaddr1: mailingAddress.street
+      mailaddr2: mailingAddress.street2
+      mailcity: mailingAddress.city
+      mailstate: mailingAddress.state
+      mailzip: mailingAddress.zip
+      stnum: situsHouse
+      stdir: situsDir
+      stname: situsStreet
+      stsuffix: situsStreetType
+      stapt: situsUnit
+      zipname: situsCity
+      zip: situsZip
+      totval: tax.marketValue
+      landval: tax.landValue
+      bldgval: tax.improvementValue
+      miscval: tax.otherValue
+      zoning: zoning
+      taxdistnam: municipality
+      taxdist: taxDistrict
+      id: salesJoinId
+      puse: useCode
+      buildtype: buildingType
+      yearbt: yearBuilt
+      livingunit: livingUnits
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 47870; calcacre 5–150 → 2222;
+      totval>0 → 47624; bldgval 0/null in band → 943. CRS 102100/3857. MaxRecordCount 2000.
+      Values stored as strings — cast on ingest. Sale price NOT on this layer (join sales_layer.id
+      or sales_points.parcel or Land Transfer HTML). WFS twin Production:gis_polygons count 47902.
+      Geo-check Duck parcel 010219044 / pin 986805294956 ≈ -75.740,36.152;
+      Hatteras pin 959518405776 ≈ -75.669,35.217.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (fallback)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdAlt
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      saledate: lastSale.date
+      cntyfips: countyFips
+    notes: >
+      Filter cntyfips='055'. Count 40483; gisacres 5–150 → 902; parval>0 → 40079;
+      saledate present. Prefer county gis_polygons for zoning + CAMA. Alt host services.gis.nc.gov.
+    status: usable
+
+  - role: sales
+    name: sales_layer (GeoServer WFS join on id)
+    restUrl: https://gs.darecountync.gov/geoserver/Production/wfs
+    typeName: Production:sales_layer
+    geometry: polygon
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      id: salesJoinId
+      tasaleprice: lastSale.price
+      recorddt: lastSale.date
+      saleval: lastSale.qualified
+      saletype: lastSale.improvedOrVacant
+      saleyear: lastSale.year
+      sfla: lastSale.sfla
+    notes: >
+      Count 7622; all tasaleprice>0; band join hits 352. Join sales_layer.id = gis_polygons.id.
+      No AGOL FeatureServer. saleval Q = qualified; saletype I/V.
+    status: usable
+
+  - role: sales
+    name: sales_points (GeoServer WFS join on parcel)
+    restUrl: https://gs.darecountync.gov/geoserver/Production/wfs
+    typeName: Production:sales_points
+    geometry: point
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      parcel: parcelId
+      sl1price: lastSale.price
+      sl1dt: lastSale.day
+      sl1mo: lastSale.month
+      sl1year: lastSale.year
+      sl1type: lastSale.type
+    notes: >
+      Count 43978; sl1price>0 → 30840; band with price → 1171. Join on parcel.
+    status: usable
+
+  - role: zoning
+    name: Kill Devil Hills Zoning (city-first WFS)
+    restUrl: https://gs.darecountync.gov/geoserver/Production/wfs
+    typeName: Production:kdhzones
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      zone: zoning
+      link: zoningOrdinanceLink
+    notes: Count 19. Codes RL/RH/C/LI-1/LI-2/MFED/G/I/OIR. Route taxdistnam KILL DEVIL HILLS.
+    status: usable
+
+  - role: zoning
+    name: Nags Head Zoning (city-first WFS)
+    restUrl: https://gs.darecountync.gov/geoserver/Production/wfs
+    typeName: Production:nhzones
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      zone: zoning
+    notes: >
+      Count 28. Alt nhzones2 (31) uses zcode/descr (R1/R2/R3/C2/C3/C4/C5/CR/SPD-20/SPD-C/SED-80).
+    status: usable
+
+  - role: zoning
+    name: Manteo Zoning (city-first WFS)
+    restUrl: https://gs.darecountync.gov/geoserver/Production/wfs
+    typeName: Production:manteozones
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      zone: zoning
+    notes: Count 29. Codes R-2/R-2M/R-5/B-1/B-2/B-3/B-4. Route MANTEO IN / MANTEO OUT.
+    status: usable
+
+  - role: zoning
+    name: Kitty Hawk Zoning (city-first WFS)
+    restUrl: https://gs.darecountync.gov/geoserver/Production/wfs
+    typeName: Production:khzones
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      zone: zoning
+    notes: Count 49. VR/BR/BC/BH/VC series + OS/KHW/SSW/ETJ-MH/MS-1.
+    status: usable
+
+  - role: zoning
+    name: Duck Zoning (city-first WFS)
+    restUrl: https://gs.darecountync.gov/geoserver/Production/wfs
+    typeName: Production:duckzones
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      zone: zoning
+    notes: Count 25. RS-1/RS-2/R-2/C-1/C-2/V-C/CPR/S-1.
+    status: usable
+
+  - role: zoning
+    name: Southern Shores Zoning (city-first WFS)
+    restUrl: https://gs.darecountync.gov/geoserver/Production/wfs
+    typeName: Production:sszones
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      zone: zoning
+    notes: Count 17. RS-1/RS-8/RS-10/R-1/C/OSW/G-I.
+    status: usable
+
+  - role: zoning
+    name: County Zoning (unincorporated)
+    restUrl: https://gs.darecountync.gov/geoserver/Production/wfs
+    typeName: Production:countyzones
+    geometry: polygon
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      zone: zoning
+      link: zoningOrdinanceLink
+    notes: >
+      Count 350. Use where no city layer. Codes HML/WR-1/NH/ELNH/C-2/C-3/R-1/R-2/R-3/S-1/VC-2/MHA/SED-1/….
+      Viewer also exposes Production:countyzones WMS.
+    status: usable
+
+  - role: flu
+    name: CAMA Land Use Plans (PDF/edocs — no FS)
+    restUrl: null
+    geometry: none
+    auth: none
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      County FLU = DEQ edocs DocView id=322794 (cert Feb 5, 2024). Town LUPs: KDH/Duck/Nags Head
+      DEQ downloads; Kitty Hawk edocs 345536; Manteo 332118; Southern Shores 333377.
+      Nags Head FOCUS Comp Plan PDF on town site. No public FLU FeatureServer.
+      Production:landClass is NLCD land-cover — do not use as FLU.
+    status: gap
+
+  - role: other
+    name: parcel_poly3857 (geometry-only AGOL)
+    restUrl: https://services1.arcgis.com/ozZJ6IIlcOT869Kx/arcgis/rest/services/parcel_poly3857/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: calcacre
+    coverage: county-wide
+    fieldMap:
+      pin: parcelId
+      calcacre: acreage
+      docacre: acreageDeed
+    notes: Count ~40039. Thin geometry — prefer gis_polygons for CAMA.
+    status: partial
+
+gaps:
+  - No public FLU FeatureServer (CAMA LUP / town LUP PDF-edocs only; landClass is NLCD not FLU)
+  - City zoning polygons are GeoServer WFS/WMS only (no AGOL FeatureServer); parcel.zoning attribute covers all
+  - Sale price missing on parcel FeatureServer — join sales_layer.id / sales_points.parcel or Land Transfer HTML
+  - AGOL gis_polygons count 47870 vs WFS 47902 drift
+  - darenc.gov intermittent 403 from some fetch providers
+
+license: "County/city public GIS; attribution requested where stated"
+verifiedAt: "2026-09-24"
+verifiedBy: North Carolina Public Info Researcher
+tranche: 3
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://services1.arcgis.com/ozZJ6IIlcOT869Kx/arcgis/rest/services/gis_polygons/FeatureServer/0
+  parcelIdField: parcel
+  acreageFilter: calcacre >= 5 AND calcacre <= 150
+  acres5to150Live: 2222
+  parcelCountLive: 47870
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='DARE'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DARE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DARE%27&returnCountOnly=true&f=json
+      liveStationCount: 132
+      stationsWithAADT2022: 33
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Dare'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Dare%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Dare%27&returnCountOnly=true&f=json
+      liveStationCount: 107
+      stationsWithAADT2025: 81
+      stationsWithAADT2024: 66
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - totval
+    - landval
+    allTaxFieldsOnLayer:
+    - totval
+    - landval
+    - bldgval
+    - miscval
+    - taxdist
+    liveNonZero:
+      totval: 47624
+      landval: 46938
+    status: ok
+    note: 'Value fields are strings: use CAST(field AS FLOAT) > 0.'
+  sale:
+    priceFields: []
+    dateFields: []
+    livePriceNonZero: {}
+    liveDateNonNull: {}
+    status: partial
+    note: 'Date: NC OneMap saledate non-null 40,483 of 40,483 for cntyfips=''055'' (live 2026-09-28; join parcel). Price not on REST; public on Dare PA (property.spatialest.com/nc/dare or tax.darecountync.gov/landtransfer/parcel.php?parcel={parcel}).'
+  ownerEntity:
+    ownerFields:
+    - owner1
+    - owner2
+    primaryOwnerField: owner1
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(owner1) LIKE '% LLC%' OR UPPER(owner1) LIKE '% INC%' OR UPPER(owner1) LIKE '% LP%' OR UPPER(owner1) LIKE '% LLP%' OR UPPER(owner1) LIKE '% LTD%' OR UPPER(owner1) LIKE '% TRUST%' OR UPPER(owner1) LIKE '% CHURCH%' OR UPPER(owner1) LIKE '% COMPANY%' OR UPPER(owner1) LIKE '% PARTNERSHIP%' OR UPPER(owner1) LIKE '% HOLDINGS%' OR UPPER(owner1) LIKE '% PROPERTIES%' OR UPPER(owner1) LIKE '% CORP%' OR UPPER(owner1) LIKE '%,LLC%' OR UPPER(owner1) LIKE '%,INC%' OR UPPER(owner1) LIKE 'CITY OF %' OR UPPER(owner1) LIKE 'COUNTY OF %' OR UPPER(owner1) LIKE 'STATE OF %' OR UPPER(owner1) LIKE 'TOWN OF %')
+    liveEntityCountAll: 7504
+    liveEntityCount5to150ac: 477
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://tax.darecountync.gov/taxbill_view.php?parcel={parcel}
+    testedParcelId: 005059000
+    testedUrl: https://tax.darecountync.gov/taxbill_view.php?parcel=005059000
+    httpStatus: 200
+    contentType: text/html; charset=UTF-8
+    contentVerified: true
+    note: 'Uses tax.darecountync.gov taxbill_view.php (server-rendered, id verified). Spatialest #/property/{parcel} is an SPA alternate.'
+  gisViewer:
+    url: https://maps.darecountync.gov/
+    httpStatus: 200
+    pageTitle: Dare County Parcel Data
+  gaps:
+  - sale partial

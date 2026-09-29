@@ -750,6 +750,58 @@ def join_mapped_sales(features: list[dict], row: dict) -> dict:
     }
 
 
+def join_card_zoning(features: list[dict], row: dict, notes: list[str]) -> dict:
+    """Stamp usable zoning from the card. Parcel-id layers join; polygons use the centroid."""
+    layers = [layer for layer in (row.get("zoningLayers") or []) if layer.get("url") and layer.get("codeField")]
+    if not layers:
+        return {}
+    print(f"  card zoning layers {len(layers)}", flush=True)
+    stamped = 0
+    polygon_layers = 0
+    failed: list[str] = []
+    for layer in layers:
+        label = str(layer.get("name") or "zoning")
+        url = layer["url"]
+        code_field = layer["codeField"]
+        label_field = layer.get("labelField") or None
+        id_field = layer.get("idField") or ""
+        if id_field:
+            try:
+                index = attribute_index(url, id_field, [code_field, label_field or ""])
+                added = stamp_attribute_zoning(features, index, code_field, overwrite=False)
+                stamped += added
+                print(f"    {label}: {added} joined on {id_field}", flush=True)
+            except Exception as exc:  # noqa: BLE001
+                print(f"    {label} failed: {exc}", flush=True)
+                failed.append(f"{label} ({exc})")
+            continue
+        try:
+            items = load_polygons(url, code_field=code_field, label_field=label_field)
+        except Exception as exc:  # noqa: BLE001
+            print(f"    {label} failed: {exc}", flush=True)
+            failed.append(f"{label} ({exc})")
+            continue
+        print(f"    {label}: {len(items)} polygons", flush=True)
+        if not items:
+            failed.append(f"{label} (no coded polygons)")
+            continue
+        grid = ZoneGrid()
+        grid.add_many(items)
+        added = grid.stamp(features, overwrite=polygon_layers > 0)
+        polygon_layers += 1
+        stamped += added
+    note = (
+        "Zoning comes from the card's usable zoning layers. "
+        "A parcel-id layer is joined on that id. "
+        "Polygon layers are stamped by centroid, and a later city layer replaces an earlier code only inside that city. "
+        "Outside those layers zoning stays empty."
+    )
+    if failed:
+        note += " These layers did not stamp: " + "; ".join(failed) + "."
+    notes.append(note)
+    return {"cardZoningLayerCount": len(layers), "cardLayerZoningCount": stamped}
+
+
 def apply_card_details(features: list[dict], row: dict) -> dict:
     """Mutate features with card-specific sale, mailing, zoning, and FLU."""
     from tn_parcel_cards import sales_join_kind
@@ -783,9 +835,19 @@ def apply_card_details(features: list[dict], row: dict) -> dict:
         except Exception as exc:  # noqa: BLE001
             notes.append(f"Zoning join failed ({exc}). Zoning was not invented.")
     elif fips not in {"47023", "47133"}:
-        if row.get("hasUsableZoning"):
+        if row.get("zoningLayers"):
+            try:
+                stats.update(join_card_zoning(features, row, notes))
+            except Exception as exc:  # noqa: BLE001
+                notes.append(f"Zoning join failed ({exc}). Zoning was not invented.")
+        elif row.get("hasUsableZoning"):
             notes.append(
                 "The research card lists a usable zoning layer. This ingest does not stamp that layer yet, so zoning stays empty."
+            )
+        elif stats.get("cardZoningCount"):
+            notes.append(
+                "No usable zoning polygon layer is on the research card. "
+                "A non-blank ZONING value on the sales layer is kept. Future land use stays empty."
             )
         else:
             notes.append(

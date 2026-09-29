@@ -1,0 +1,338 @@
+state: SC
+jurisdiction: Lexington County
+fips: "45063"
+level: county
+markets: [Columbia]
+
+layers:
+  - role: parcels
+    name: Parcels (Property MapServer)
+    restUrl: https://maps.lex-co.com/agstserver/rest/services/Property/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      TMS_No_Dash: parcelIdAlt
+      Owner: ownerName
+      MailAddr: mailingAddress
+      MailAddr2: mailingAddress2
+      MailAddr3: mailingAddress3
+      MailAddr_City: mailingAddress.city
+      MailAddr_State: mailingAddress.state
+      MailAddr_Zip: mailingAddress.zip
+      PropAddr_Num: situsAddress.number
+      PropAddr_Str: situsAddress.street
+      PropAddr_Suf: situsAddress.suffix
+      PropAddr2: situsAddress2
+      PropAddr_City: situsCity
+      PropAddr_State: situsState
+      PropAddr_Zip: situsZip
+      Acres: acreage
+      Calc_Area: acreageGis
+      Legal_Area: acreageLegal
+      Zoning: zoning
+      PropTypeCode: dorCode
+      PropTypeDesc: dorCodeDescription
+      SaleDate: lastSale.date
+      SalePrice: lastSale.price
+      Valid: lastSale.qualified
+      MktTotal: tax.marketValue
+      AsmtTotal: tax.assessedValue
+      AsmtLand: tax.landValue
+      AsmtBldg: tax.improvementValue
+      TaxableTotal: tax.taxableValue
+      TaxableLand: tax.taxableLand
+      TaxableBldg: tax.taxableBuilding
+      TaxDist: tax.district
+      TaxYearValues: tax.year
+    notes: >
+      Verified 2026-09-23: HTTP 200 pjson + count query returned 146632 features, no token.
+      Rich CAMA attributes on one countywide polygon layer — preferred Columbia MSA ingest
+      source for Lexington. Sample feature had Acres=5.08, MktTotal, SaleDate/SalePrice, Owner.
+      Zoning attribute often blank inside municipalities — JOIN municipal zoning layers on TMS
+      (Chapin) or spatial join (West Columbia / Cayce / county Zoning NameAbbr).
+      Hub/One Map: https://maps-lexco-gis.hub.arcgis.com/ and https://maps.lex-co.com/OneMap/
+      Older path maps.lex-co.com/arcgis/rest/services/Property/MapServer is 404; use agstserver.
+    status: usable
+
+  - role: tax
+    name: Parcels assessment / market values (Property/4)
+    restUrl: https://maps.lex-co.com/agstserver/rest/services/Property/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      MktTotal: tax.marketValue
+      AsmtTotal: tax.assessedValue
+      AsmtLand: tax.landValue
+      AsmtBldg: tax.improvementValue
+      TaxableTotal: tax.taxableValue
+      TaxDist: tax.district
+      TaxYearValues: tax.year
+    notes: Tax values embedded on Property/4; not a separate service.
+    status: usable
+
+  - role: ownership
+    name: Parcels ownership / mailing (Property/4)
+    restUrl: https://maps.lex-co.com/agstserver/rest/services/Property/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      Owner: ownerName
+      MailAddr: mailingAddress
+      MailAddr_City: mailingAddress.city
+      MailAddr_State: mailingAddress.state
+      MailAddr_Zip: mailingAddress.zip
+    notes: Ownership embedded on Property/4.
+    status: usable
+
+  - role: sales
+    name: Parcels last-sale fields (Property/4)
+    restUrl: https://maps.lex-co.com/agstserver/rest/services/Property/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      SaleDate: lastSale.date
+      SalePrice: lastSale.price
+      Valid: lastSale.qualified
+      CAMA_DeedBook: lastSale.deedBook
+      CAMA_DeedPage: lastSale.deedPage
+    notes: >
+      Last-sale attributes on parcel feature. PropertyHistoric MapServer has annual archived
+      parcel polygons 2000–2025 (layers 0–25) — geometry snapshots, not a sale-history table.
+      Sample Valid value "NOT VALID" — do not invent qualification semantics beyond source codes.
+    status: partial
+
+  - role: zoning
+    name: Zoning (Lexington County PlanZoning)
+    restUrl: https://maps.lex-co.com/agstserver/rest/services/PlanZoning/MapServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NameAbbr: zoning
+      Name: zoningDescription
+      Num: zoningNum
+      PlanningArea: planningArea
+    notes: >
+      Verified 2026-09-23: public, count 7257. County zoning polygons (NameAbbr e.g. RD, RL1).
+      Does not replace municipal zoning inside West Columbia / Cayce / Chapin / Columbia —
+      use city layers below. Spatial join to Property/4 parcels (TMS); parcel Zoning attr often empty.
+    status: usable
+
+  - role: flu
+    name: Lexington County future land use / comprehensive plan FLU
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      PlanZoning exposes Planning Areas (layer 4, count 7257, field PlanningArea) and overlays
+      but no verified countywide Future Land Use FeatureServer this pass. EconDev MapServer
+      has Opportunity Zones only. Treat county FLU as gap pending a public REST URL.
+    status: gap
+
+  # --- Municipalities (first-class; hosted on county PlanZoning) ---
+  - role: zoning
+    name: West Columbia Zoning (PlanZoning)
+    restUrl: https://maps.lex-co.com/agstserver/rest/services/PlanZoning/MapServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      Description: zoningDescription
+      Jurisdiction: jurisdiction
+    notes: >
+      Verified 2026-09-23: public, count 408. Sample Jurisdiction="City of West Columbia"
+      (R1/R3 codes). City-only zoning — JOIN to county parcels Property/4 via spatial intersect
+      (no TMS on this layer). Overlay companion: PlanZoning/2 West Columbia Zoning Overlay.
+    status: usable
+
+  - role: zoning
+    name: Cayce Zoning (PlanZoning)
+    restUrl: https://maps.lex-co.com/agstserver/rest/services/PlanZoning/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      Description: zoningDescription
+      Jurisdiction: jurisdiction
+    notes: >
+      Verified 2026-09-23: public, count 20 (coarse district polygons). Sample C-1/C-2 with
+      Jurisdiction="City of Cayce". City-only — spatial join to Property/4 parcels.
+      Overlay: PlanZoning/11 Cayce Zoning Overlay.
+    status: usable
+
+  - role: zoning
+    name: Chapin Zoning (PlanZoning)
+    restUrl: https://maps.lex-co.com/agstserver/rest/services/PlanZoning/MapServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TMS: parcelId
+      ZoningCode: zoning
+      ZoningName: zoningDescription
+    notes: >
+      Verified 2026-09-23: public, count 1157. Parcel-grain features with TMS join key to
+      Property/4 (TMS = TMS). Prefer attribute join over spatial. Overlay: PlanZoning/10
+      Chapin Architectural Overlay.
+    status: usable
+
+  - role: zoning
+    name: City of Columbia Zoning Districts (covers Lex-side Columbia utility/city parcels)
+    restUrl: https://gis.columbiasc.gov/cola/rest/services/InnercityMap/ZoningInfo/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZoningDistrict: zoning
+      TMS: parcelId
+      County: jurisdictionCounty
+      CityLimit: cityLimitFlag
+    notes: >
+      Verified 2026-09-23: public, count 210579. City of Columbia service-area parcel zoning;
+      description notes Lexington County supplies a data copy. Filter County / CityLimit for
+      Lexington-side features. JOIN KEY to Lexington Property/4: TMS (format may differ —
+      validate dash vs no-dash; Lex also has TMS_No_Dash). See also companion card
+      45079-columbia-city.yaml. Prefer Lex Property/4 for Lexington countywide CAMA;
+      use this for municipal zoning where City of Columbia governs.
+    status: usable
+
+  - role: parcels
+    name: City of Columbia Tax Parcel (LandRecords) — Lex-side overlap
+    restUrl: https://gis.columbiasc.gov/cola/rest/services/InnercityMap/LandRecords/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TMS: parcelId
+      Owner: ownerName
+      Address1: mailingAddress
+      ZoningDistrict: zoning
+      County: jurisdictionCounty
+      CityLimit: cityLimitFlag
+      Address3: dorCode
+    notes: >
+      Same City of Columbia LandRecords layer as Richland card. Prefer Lexington Property/4
+      for countywide acreage/tax/sale; use this only for Columbia municipal attributes /
+      zoning join inside city utility footprint. No Acres/Sale/Mkt fields here.
+    status: partial
+
+  - role: flu
+    name: City of Columbia Future Land Use (EnerGov) — Lex-side Columbia
+    restUrl: https://gis.columbiasc.gov/cola/rest/services/EnerGov/EnergovInformationPublic/MapServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      DevType: flu
+      Name: fluName
+    notes: >
+      Verified count 464. City-only FLU; spatial join to Lex parcels where City of Columbia
+      land-use plan applies. UCMF/UEMF = multifamily FLU types.
+    status: usable
+
+  - role: zoning
+    name: Town of Lexington / Irmo / Batesburg-Leesville / Springdale / South Congaree / Swansea / Gaston municipal zoning
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      No separate public FeatureServer verified for Town of Lexington, Irmo, Batesburg-Leesville,
+      Springdale, South Congaree, Swansea, or Gaston this pass. County PlanZoning/6 may cover
+      unincorporated and some planning areas; municipal districts for these towns remain a gap
+      unless present as unnamed overlays on PlanZoning (inspect before assuming coverage).
+    status: gap
+
+  - role: parcels
+    name: PropertyGranicus (alternate parcels)
+    restUrl: https://maps.lex-co.com/agstserver/rest/services/PropertyGranicus/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      Owner: ownerName
+      MailAddr: mailingAddress
+      PropAddr_Gran: situsAddress
+      PropAddr_City: situsCity
+      PropAddr_Zip: situsZip
+      PropTypeCode: dorCode
+      PropTypeDesc: dorCodeDescription
+    notes: >
+      Verified 2026-09-23: public, count 97753 — fewer features and thinner CAMA than Property/4.
+      Prefer Property/4 for land-search ingest.
+    status: partial
+
+gaps:
+  - "County Property/4 Zoning attribute often blank inside municipalities — join West Columbia / Cayce / Chapin / City of Columbia zoning layers."
+  - "No verified countywide Future Land Use FeatureServer (Planning Areas only)."
+  - "Town of Lexington, Irmo, Batesburg-Leesville, Springdale, South Congaree, Swansea, Gaston: no verified dedicated municipal zoning REST URLs."
+  - "Sale history is last-sale on parcels; PropertyHistoric is annual geometry archives, not transactions."
+  - "maps.lex-co.com/arcgis/rest/services/* legacy paths 404 — use agstserver host."
+  - "County states GIS layers may be purchased via Planning and GIS data request form; One Map remains the free query path."
+  - "SCDOT SC_Parcels requires token (499)."
+
+license: "Public Lexington County GIS REST (maps.lex-co.com/agstserver) and City of Columbia GIS (gis.columbiasc.gov). Attribute Lexington County Planning & GIS / City of Columbia. Confirm hub/data-request license before bulk republish."
+appraiserSearchUrl: https://maps.lex-co.com/OneMap/
+verifiedAt: 2026-09-23
+verifiedBy: South Carolina Public Info Researcher
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "South Carolina Public Info Researcher"
+  aadt:
+    source: "SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points)"
+    restUrl: "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0"
+    layerId: 0
+    field: "FactoredAA"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "South Carolina Public Info Researcher"
+    notes: "SCDOT-published 2025 statewide points (~11570); FactoredAA=factored AADT; FactoredA1 companion; filter CountyName (stored UPPERCASE; AGOL queries case-insensitive). smpesri.scdot.org EGIS has roads but no AADT layer. Sibling 2025_Statewide_Traffic_Lines also exists (~11575) — points are the stamped source."
+

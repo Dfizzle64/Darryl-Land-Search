@@ -1,0 +1,542 @@
+{
+  "state": "NC",
+  "jurisdiction": "Gates County",
+  "county": "Gates",
+  "fips": "37073",
+  "cntyfips": "073",
+  "slug": "gates",
+  "level": "county",
+  "markets": [
+    "Eastern NC"
+  ],
+  "msa": "Eastern NC",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "jurisdictionGisUrl": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=5140b9aee17143cda7e51801b085f10d",
+  "publicGisUrl": "http://www.gatescountygis.com/",
+  "gisViewerUrl": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=5140b9aee17143cda7e51801b085f10d",
+  "gisDeepLinkTemplate": "http://apps.agdmaps.com/print/nc/gates/index.html?pclnbr={pclnbr}",
+  "gisDeepLinkNotes": "AGD short http://www.gatescountygis.com/ \u2192 Parcel App webappviewer. Print deep-link uses pclnbr. Viewer Search sources: Owner (name1), NC GEO PIN (pin), Parcel Number (pclnbr), Address. keepAppState true; no documented ?pin= queryStringParameters.",
+  "agolAppItemId": "5140b9aee17143cda7e51801b085f10d",
+  "agolWebMapItemId": "d3c44735f60a49cb8d71d01f4362e8d0",
+  "countyRestRoot": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services",
+  "gatesParcelServiceUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GatesParcelService/FeatureServer",
+  "gatesStaticUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GatesStatic/FeatureServer",
+  "countyGisPageUrl": "https://gatescountync.gov/gis",
+  "taxAssessorUrl": "https://gatescountync.gov/tax-administration",
+  "appraiserSearchUrl": "https://www.bttaxpayerportal.com/itspublicgt/AppraisalCard.aspx?id={pclnbr}",
+  "appraiserSearchUrlNotes": "PRIMARY PA deep-link. pclnbr e.g. 0100017 \u2192 HTTP 200 application/pdf (~68KB). Layer prc field embeds same URL. Case path ITSPublicGT also 200.",
+  "paDeepLinkTemplate": "https://www.bttaxpayerportal.com/itspublicgt/AppraisalCard.aspx?id={pclnbr}",
+  "paDeepLinkKey": "pclnbr",
+  "paBasicSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicGT/BasicSearch",
+  "taxBillSearchUrl": "https://www.bttaxpayerportal.com/itspublicgt/TaxBillSearch",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/gates/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/gates/parcel-detail/{pclnbr}",
+  "ncptsNotes": "SPA shell HTTP 200 for pclnbr and pin path variants; prefer AppraisalCard PDF for PA",
+  "registerOfDeedsUrl": "https://www.gatesrod.net/",
+  "planningUrl": "https://gatescountync.gov/planning-development",
+  "planningDocumentsUrl": "https://gatescountync.gov/planning-documents",
+  "zoningMapPageUrl": "https://gatescountync.gov/zoning-map",
+  "ordinancesUrl": "https://gatescountync.gov/ordinances",
+  "gatesvilleUrl": "https://gatesville.municipalimpact.com/",
+  "deqCertifiedLupUrl": "https://www.deq.nc.gov/about/divisions/coastal-management/coastal-management-land-use-planning/certified-lups/gates-county",
+  "comprehensivePlanPdfUrl": "https://www.deq.nc.gov/documents/pdf/land-use-plans/gates-county-comp-plan-certified-2-8-2017-web-ready/download",
+  "gatesvilleLupEdocsUrl": "https://edocs.deq.nc.gov/CoastalManagement/DocView.aspx?dbid=0&id=339252",
+  "agdShapefileDownloadUrl": "https://storage.googleapis.com/dl.agdmaps.com/downloads/gates/gatesshp.zip",
+  "agdShapefileNotes": "Linked from Parcel App config; HTTP 404 as of 2026-09-24",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapAlternateUrl": "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='073'",
+  "parcelIdPreferred": "pclnbr",
+  "joinKeys": [
+    "pclnbr",
+    "pin",
+    "parcelnumber",
+    "accountnumber",
+    "parno",
+    "altparno"
+  ],
+  "tranche": 3,
+  "municipalities": [
+    {
+      "name": "Gatesville",
+      "type": "town",
+      "primary": true,
+      "limitsLayer": "GatesStatic/FeatureServer/9",
+      "limitsField": "municipality",
+      "limitsValue": "GATESVILLE",
+      "approxParcelIntersectCount": 283,
+      "zoningSource": "county Zoning FS/6 + parcel zoning attr (no separate town FS)",
+      "fluSource": "Town of Gatesville DEQ LUP 2025 PDF; else county Comp Plan 2017"
+    }
+  ],
+  "unincorporatedCommunities": [
+    "Sunbury",
+    "Hobbsville",
+    "Eure",
+    "Corapeake",
+    "Gates",
+    "Roduco"
+  ],
+  "townships": [
+    "HUNTERS MILL",
+    "MINTONSVILLE",
+    "GATESVILLE",
+    "HALL",
+    "HASLETT",
+    "HOLLY GROVE",
+    "REYNOLDSON"
+  ],
+  "zoningCodes": {
+    "A-1": {
+      "parcelAttr": 4392,
+      "zoningFs": 4503
+    },
+    "R-1": {
+      "parcelAttr": 2997,
+      "zoningFs": 3080
+    },
+    "RMH-1": {
+      "parcelAttr": 249,
+      "zoningFs": 251
+    },
+    "C-1": {
+      "parcelAttr": 159,
+      "zoningFs": 164
+    },
+    "O&I": {
+      "parcelAttr": 15,
+      "zoningFs": 14
+    },
+    "I-1": {
+      "parcelAttr": 5,
+      "zoningFs": 5
+    },
+    "RMF-72": {
+      "parcelAttr": 2,
+      "zoningFs": 2
+    }
+  },
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "pclnbr",
+        "pin",
+        "parcelnumber",
+        "accountnumber",
+        "parno",
+        "altparno"
+      ],
+      "bestLayer": "GatesParcelService/FeatureServer/5",
+      "notes": "pclnbr preferred for PA/print/NCPTS; OneMap parno=pin, altparno=pclnbr (swapped)"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "GatesParcelService/FeatureServer/5"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "acres",
+        "legallandunits",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 2331,
+      "bestLayer": "GatesParcelService/FeatureServer/5",
+      "notes": "acres 5-150 \u2192 2331; legallandunits 5-150 \u2192 2553; OneMap gisacres 5-150 \u2192 2173"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "name1",
+        "name2",
+        "ownname"
+      ],
+      "bestLayer": "GatesParcelService/FeatureServer/5"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "address1",
+        "address2",
+        "city",
+        "state",
+        "zipcode"
+      ],
+      "bestLayer": "GatesParcelService/FeatureServer/5",
+      "notes": "city is mailing city, not situs municipality"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "formattedpropertyaddress",
+        "siteadd"
+      ],
+      "bestLayer": "GatesParcelService/FeatureServer/5"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "saleprice",
+        "deeddate",
+        "bookpage"
+      ],
+      "bestLayer": "GatesParcelService/FeatureServer/5",
+      "notes": "saleprice>0 \u2192 2999; sale+band \u2192 877; OneMap saledate/saledatetx empty"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "marketvalue",
+        "assessedlandvalue",
+        "totalbuildingvalue",
+        "deferredvalue",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "GatesParcelService/FeatureServer/5"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "zoning"
+      ],
+      "bestLayer": "GatesParcelService/FeatureServer/6",
+      "notes": "Countywide FS + parcel attr; Gatesville uses same districts (no city FS)"
+    },
+    "flu": {
+      "present": false,
+      "fields": [],
+      "bestLayer": null,
+      "notes": "PDF only \u2014 County Comp Plan 2017 + Gatesville LUP 2025; Land_Cover_Poly is vegetation \u2260 FLU"
+    },
+    "appraiserLink": {
+      "present": true,
+      "fields": [
+        "prc",
+        "Print_",
+        "pclnbr"
+      ],
+      "templates": [
+        "https://www.bttaxpayerportal.com/itspublicgt/AppraisalCard.aspx?id={pclnbr}",
+        "https://lrcpwa.ncptscloud.com/gates/parcel-detail/{pclnbr}",
+        "http://apps.agdmaps.com/print/nc/gates/index.html?pclnbr={pclnbr}"
+      ]
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "GatesParcelService parcels (PRIMARY)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GatesParcelService/FeatureServer/5",
+      "layerId": 5,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "acres",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "pclnbr": "parcelId",
+        "pin": "parcelIdPin",
+        "parcelnumber": "parcelIdNumeric",
+        "accountnumber": "accountNumber",
+        "name1": "ownerName",
+        "name2": "ownerName2",
+        "address1": "mailingAddress.street",
+        "address2": "mailingAddress.street2",
+        "city": "mailingAddress.city",
+        "state": "mailingAddress.state",
+        "zipcode": "mailingAddress.zip",
+        "formattedpropertyaddress": "situsAddress",
+        "acres": "acreage",
+        "legallandunits": "acreageLegal",
+        "saleprice": "lastSale.price",
+        "deeddate": "lastSale.date",
+        "bookpage": "lastSale.deedBookPage",
+        "marketvalue": "tax.marketValue",
+        "assessedlandvalue": "tax.assessedLandValue",
+        "totalbuildingvalue": "tax.buildingValue",
+        "deferredvalue": "tax.deferredValue",
+        "zoning": "zoning",
+        "prc": "appraiserSearchUrl",
+        "Print_": "printUrl",
+        "townshipcode": "townshipCode",
+        "taxcodes": "taxCodes",
+        "parcelclasscode": "dorCode",
+        "legaldescription": "legalDescription"
+      },
+      "notes": "PRIMARY wire-first verified 2026-09-24: count 8014; acres 5\u2013150 \u2192 2331; legallandunits 5\u2013150 \u2192 2553; saleprice>0 \u2192 2999; sale+band \u2192 877; marketvalue>0 \u2192 7928; band vacant \u2192 1345; owner \u2192 7928; situs \u2192 7735; zoning attr \u2192 7820. CRS 102719/2264. MaxRecordCount 1000. Sample pclnbr 0100017 / pin 6967136631000 \u2248 -76.752, 36.404 (Gatesville). Auth: none. Sale price on layer.",
+      "status": "usable",
+      "verifiedCount": 8014
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "filter": "cntyfips='073'",
+      "fieldMap": {
+        "parno": "parcelIdPin",
+        "altparno": "parcelId",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress.street",
+        "mcity": "mailingAddress.city",
+        "mstate": "mailingAddress.state",
+        "mzip": "mailingAddress.zip",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "parval": "tax.marketValue",
+        "landval": "tax.assessedLandValue",
+        "improvval": "tax.buildingValue"
+      },
+      "notes": "count 7997; gisacres 5\u2013150 \u2192 2173; parval>0 \u2192 7922; landval>0 \u2192 7915; improvval>0 \u2192 5157; saledate/saledatetx empty. JOIN: parno=county pin; altparno=county pclnbr (IDs swapped vs many NC counties). Prefer county for saleprice/deeddate.",
+      "status": "usable",
+      "verifiedCount": 7997
+    },
+    {
+      "role": "zoning",
+      "name": "Zoning (countywide)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GatesParcelService/FeatureServer/6",
+      "layerId": 6,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "zoning": "zoning",
+        "pclnbr": "parcelId",
+        "pin": "parcelIdPin",
+        "acres": "acreage"
+      },
+      "notes": "count 8027. Codes A-1/R-1/RMH-1/C-1/O&I/I-1/RMF-72. Applies inside Gatesville (no separate town zoning FS). Parcel attr zoning is backup.",
+      "status": "usable",
+      "verifiedCount": 8027
+    },
+    {
+      "role": "other",
+      "name": "Towns (Gatesville limits)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GatesStatic/FeatureServer/9",
+      "layerId": 9,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "fieldMap": {
+        "municipality": "municipality"
+      },
+      "notes": "1 poly GATESVILLE. Cities-first router; ~283 parcels intersect. Only incorporated municipality.",
+      "status": "usable",
+      "verifiedCount": 1
+    },
+    {
+      "role": "other",
+      "name": "Townships",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GatesStatic/FeatureServer/10",
+      "layerId": 10,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "district_n": "township"
+      },
+      "notes": "7 townships: HUNTERS MILL, MINTONSVILLE, GATESVILLE, HALL, HASLETT, HOLLY GROVE, REYNOLDSON. Prefer spatial-join over townshipcode alone.",
+      "status": "usable",
+      "verifiedCount": 7
+    },
+    {
+      "role": "flu",
+      "name": "Future Land Use (PDF gap)",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {},
+      "notes": "No FLU FeatureServer. County Comp Plan certified 2017-02-08 PDF + Town of Gatesville LUP certified 2025-03-10. Land_Cover_Poly/7 is vegetation classification \u2014 not FLU.",
+      "status": "gap",
+      "pdfUrls": [
+        "https://www.deq.nc.gov/documents/pdf/land-use-plans/gates-county-comp-plan-certified-2-8-2017-web-ready/download",
+        "https://edocs.deq.nc.gov/CoastalManagement/DocView.aspx?dbid=0&id=339252"
+      ]
+    },
+    {
+      "role": "other",
+      "name": "Land_Cover_Poly (NOT FLU)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GatesStatic/FeatureServer/7",
+      "layerId": 7,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "fcode": "landCoverCode",
+        "type": "landCoverType"
+      },
+      "notes": "count 2311. VEGETATION / NON-VEGETATION \u2014 do not use as FLU.",
+      "status": "partial",
+      "verifiedCount": 2311
+    }
+  ],
+  "rejectedLayers": [
+    {
+      "name": "Spatialest Gates",
+      "url": "https://property.spatialest.com/nc/gates/",
+      "reason": "HTTP 404 \u2014 not used"
+    },
+    {
+      "name": "AGD gatesshp.zip",
+      "url": "https://storage.googleapis.com/dl.agdmaps.com/downloads/gates/gatesshp.zip",
+      "reason": "HTTP 404 as of 2026-09-24 (still linked from Parcel App config)"
+    }
+  ],
+  "gaps": [
+    "FLU FeatureServer gap \u2014 Comp Plan 2017 + Gatesville LUP 2025 PDFs only; Land_Cover_Poly is vegetation \u2260 FLU",
+    "No separate Gatesville zoning FeatureServer \u2014 county Zoning FS/6 applies inside town; county zoning-map page is office-only for static map",
+    "OneMap saledate/saledatetx empty for cntyfips='073' \u2014 use county saleprice/deeddate",
+    "OneMap ID swap: parno=pin, altparno=pclnbr (opposite of many NC counties)",
+    "AGD shapefile download 404; Spatialest /nc/gates/ 404",
+    "County tax page cites ~11200 parcels on record vs ~8014 REST polygons (exempt/personal/other; use REST for geometry)",
+    "Utilities / AADT / emails / phones / paid vendors intentionally out of scope"
+  ],
+  "license": "County public GIS / open AGOL REST; attribution to Gates County NC GIS / Tax Administration / AGD",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "pass1": {
+      "status": "verified",
+      "parcelPolygonLayer": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GatesParcelService/FeatureServer/5",
+      "polygonCountLive": 8014,
+      "parcelIdField": "pclnbr",
+      "parcelIdFilled": 8001,
+      "acreageField": "acres",
+      "acres5to150Live": 2331,
+      "sampleCentroidWgs84": [
+        -76.7517,
+        36.4044
+      ]
+    },
+    "parcelLayer": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GatesParcelService/FeatureServer/5",
+    "parcelIdField": "pclnbr",
+    "acreageFilter": "acres >= 5 AND acres <= 150",
+    "acres5to150Live": 2331,
+    "parcelCountLive": 8014,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='GATES'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GATES%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GATES%27&returnCountOnly=true&f=json",
+        "liveStationCount": 187,
+        "stationsWithAADT2022": 99
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Gates'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Gates%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Gates%27&returnCountOnly=true&f=json",
+        "liveStationCount": 181,
+        "stationsWithAADT2025": 124,
+        "stationsWithAADT2024": 78,
+        "stationsWith2025or2024": 168,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "marketvalue",
+        "assessedlandvalue"
+      ],
+      "liveNonZero": {
+        "marketvalue": 7928,
+        "assessedlandvalue": 7921
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "saleprice"
+      ],
+      "dateFields": [
+        "deeddate"
+      ],
+      "livePriceNonZero": {
+        "saleprice": 2999
+      },
+      "liveDateNonNull": {
+        "deeddate": 7837
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "name1"
+      ],
+      "primaryOwnerField": "name1",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(name1) LIKE '% LLC%' OR UPPER(name1) LIKE '% INC%' OR UPPER(name1) LIKE '% LP%' OR UPPER(name1) LIKE '% LLP%' OR UPPER(name1) LIKE '% LTD%' OR UPPER(name1) LIKE '% TRUST%' OR UPPER(name1) LIKE '% CHURCH%' OR UPPER(name1) LIKE '% COMPANY%' OR UPPER(name1) LIKE '% PARTNERSHIP%' OR UPPER(name1) LIKE '% HOLDINGS%' OR UPPER(name1) LIKE '% PROPERTIES%' OR UPPER(name1) LIKE '% CORP%' OR UPPER(name1) LIKE '%,LLC%' OR UPPER(name1) LIKE '%,INC%' OR UPPER(name1) LIKE 'CITY OF %' OR UPPER(name1) LIKE 'COUNTY OF %' OR UPPER(name1) LIKE 'STATE OF %' OR UPPER(name1) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 797,
+      "liveEntityCount5to150ac": 333,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://www.bttaxpayerportal.com/itspublicgt/AppraisalCard.aspx?id={pclnbr}",
+      "testedParcelId": "0600288",
+      "testedUrl": "https://www.bttaxpayerportal.com/itspublicgt/AppraisalCard.aspx?id=0600288",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=5140b9aee17143cda7e51801b085f10d",
+      "httpStatus": 200,
+      "pageTitle": "ArcGIS Web Application",
+      "arcgisItem": {
+        "access": "public",
+        "title": "Gates Parcel App",
+        "type": "Web Mapping Application"
+      }
+    },
+    "gaps": []
+  }
+}

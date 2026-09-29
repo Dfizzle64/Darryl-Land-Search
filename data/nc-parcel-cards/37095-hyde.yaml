@@ -1,0 +1,348 @@
+state: NC
+jurisdiction: Hyde County
+county: Hyde
+fips: '37095'
+cntyfips: 095
+slug: hyde
+level: county
+markets:
+- Eastern NC
+- Outer Banks
+msa: Eastern NC / Outer Banks
+crsPreferred:
+  wkid: 102719
+  latestWkid: 2264
+  name: NAD 1983 StatePlane North Carolina FIPS 3200 Feet
+jurisdictionGisUrl: https://experience.arcgis.com/experience/7d56b8f7909d453bbbf899299b53104d
+publicGisUrl: http://hydecountygis.com/
+gisViewerUrl: https://experience.arcgis.com/experience/7d56b8f7909d453bbbf899299b53104d
+gisViewerUrlLegacy: https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=4ee8283fa9114430a31cb573a30ab04d
+countyRestRoot: https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services
+hydeAgolFeatureServer: https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Hyde_AGOL/FeatureServer
+countyWebsiteUrl: https://www.hydecountync.gov/
+taxDepartmentUrl: https://www.hydecountync.gov/departments/tax_dept.php
+planningUrl: https://www.hydecountync.gov/departments/planning_and_economic_development.php
+camaLupPageUrl: https://www.hydecountync.gov/departments/hyde_county_cama_land_use_plan.php
+appraiserSearchUrl: https://dl.agd.cc/prc/nc/hyde/{REID_1}.pdf
+paDeepLinkTemplate: https://dl.agd.cc/prc/nc/hyde/{REID_1}.pdf
+paDeepLinkKey: REID_1
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/Hyde/parcel-search
+ncptsDeepLinkTemplate: https://lrcpwa.ncptscloud.com/Hyde/parcel-detail/{REID_1}
+ncptsHubUrl: https://lrcpwa.ncptscloud.com/Hyde/
+agdGisZipUrl: https://dl.agd.cc/downloads/HydeNC_GIS.zip
+municodeZoningChapterUrl: https://library.municode.com/nc/hyde_county/codes/code_of_ordinances?nodeId=PTIICOOR_CH36ZO
+deqCertifiedLupUrl: https://www.deq.nc.gov/about/divisions/coastal-management/coastal-management-land-use-planning/certified-lups/hyde-county
+camaLupPlanPdfUrl: https://files.nc.gov/ncdeq/Coastal%20Management/documents/PDF/LUB/Plan.pdf
+camaLupAppendicesPdfUrl: https://www.deq.nc.gov/documents/pdf/lub/hyde-appendices/download
+oneMapUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+oneMapAlternateUrl: https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+oneMapFilter: cntyfips='095'
+parcelIdPreferred: REID_1
+joinKeys:
+- REID_1
+- Pin_Num
+- parno
+- altparno
+- REID
+- PIN_NUM
+tranche: 3
+municipalities: []
+unincorporatedCommunities:
+  Ocracoke:
+    role: PRIMARY cities-first (only zoned community)
+    type: CDP / village
+    parcelCountApprox: 1546
+    routing: Pin_Num LIKE '95%' OR Township name=Ocracoke
+    zoningPrefer: Municode Ch.36 Zoning / Ocracoke Development Ordinance (no zoning
+      FeatureServer)
+    zoningUrl: https://library.municode.com/nc/hyde_county/codes/code_of_ordinances?nodeId=PTIICOOR_CH36ZO
+    fluPrefer: DEQ Hyde CAMA LUP PDF + map groups
+    notes: No incorporated munis in Hyde. Ocracoke is cities-first PRIMARY under county
+      ODO.
+  Swan Quarter:
+    role: county seat CDP
+    type: CDP
+    routing: Township=Swan Quarter
+    zoningPrefer: unzoned at REST
+    notes: Mainland unzoned; CAMA LUP + Subdivision only
+  Engelhard:
+    role: mainland community
+    type: unincorporated
+    zoningPrefer: unzoned at REST
+  Fairfield:
+    role: township community
+    type: unincorporated
+    routing: Township=Fairfield
+    zoningPrefer: unzoned at REST
+  Scranton:
+    role: mainland community
+    type: unincorporated
+    zoningPrefer: unzoned at REST
+  Ponzer:
+    role: mainland community
+    type: unincorporated
+    zoningPrefer: unzoned at REST
+townships:
+- Currituck
+- Fairfield
+- Lake Landing
+- Lake Mattamuskeet
+- Swan Quarter
+- Ocracoke
+layers:
+- role: parcels
+  name: Tax_Parcels (PRIMARY CAMA ArcGIS REST)
+  restUrl: https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Hyde_AGOL/FeatureServer/3
+  layerId: 3
+  geometry: polygon
+  auth: none
+  acreageField: Assessed_Acreage
+  coverage: county-wide
+  status: usable
+  verifiedCount: 7794
+  fieldMap:
+    Pin_Num: parcelIdPin
+    REID_1: parcelId
+    mapid: mapId
+    pclnbr: parcelNumberUnused
+    Owner_Name: ownerName
+    Owner_Address: mailingAddress
+    Street_Num: situsNumber
+    Street_Name: situsStreet
+    Assessed_Acreage: acreage
+    calcacres: acreageGis
+    Deeded_Acreage: acreageDeed
+    deedacres: acreageDeedAlt
+    Parcel_Land_Value_Assd: tax.landValue
+    Res_Bldg_Misc_Imprv_Assd_Value: tax.buildingValue
+    Parcel_Misc_Imprv_Value_Assd: tax.miscValue
+    Parcel_Total_Value: tax.marketValue
+    Parcel_Total_Taxable_Value: tax.taxableValue
+    Parcel_Total_Def_Exempt_Value: tax.deferredValue
+    Ownership_Deed_Book: deed.book
+    Ownership_Deed_Page: deed.page
+    deed_ref: deed.reference
+    Property_Description: legalDescription
+    PRC_LINK: appraiserDeepLinkStub
+    Print_Link: printUrlStub
+  notes: 'PRIMARY wire-first. Count 7794; Assessed_Acreage 5-150 → 2414; Parcel_Total_Value>0
+    → 7481; Owner_Name → 7495; vacant band → 2179; Pin 95* Ocracoke → 1546. CRS 102719/2264.
+    MaxRecordCount 1000. Sale price NOT on layer — join Sales_For_GIS/12. PRC_LINK/Print_Link
+    null — synthesize https://dl.agd.cc/prc/nc/hyde/{REID_1}.pdf. Geo: Ocracoke Pin_Num=9500176901
+    REID_1=14885 ≈ -75.985,35.108; mainland Pin_Num=7629022217 REID_1=3485 ≈ -76.576,35.628.'
+- role: sales
+  name: Sales_For_GIS (sale price join)
+  restUrl: https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Hyde_AGOL/FeatureServer/12
+  layerId: 12
+  geometry: polygon
+  auth: none
+  coverage: county-wide sample
+  status: usable
+  verifiedCount: 228
+  fieldMap:
+    Sale_Price: lastSale.price
+    Sale_Year_For: lastSale.year
+    REID: parcelId
+    PIN_NUM: parcelIdPin
+    Pin_Num_1: parcelIdPinAlt
+    ASSESSED_ACREAGE: acreage
+    PRIMARY_OWNER: ownerName
+    SECONDARY_OWNER: ownerName2
+    PHYSICAL_ADDRESS: situsAddress
+    TOWNSHIP: township
+    Township_Desc: townshipName
+    LAND_VALUE: tax.landValue
+    BUILDING_VALUE: tax.buildingValue
+    TOTAL_ASSESSED: tax.marketValue
+    TAXABLE_VALUE: tax.taxableValue
+    MAILING_ADDRESS: mailingAddress
+  notes: '228 features all Sale_Price>0; ASSESSED_ACREAGE 5-150 → 43. Join REID=REID_1
+    or PIN_NUM=Pin_Num. Sparse qualified-sale overlay, not full history. Township
+    counts: Ocracoke 80, Currituck 61, Lake Landing 47, Swan Quarter 26, Fairfield
+    14.'
+- role: parcels
+  name: NC OneMap Parcels
+  restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: gisacres
+  coverage: county-wide
+  filter: cntyfips='095'
+  status: usable
+  verifiedCount: 7698
+  fieldMap:
+    parno: parcelIdPin
+    altparno: parcelId
+    ownname: ownerName
+    gisacres: acreage
+    recareano: acreageRecorded
+    parval: tax.marketValue
+    landval: tax.landValue
+    improvval: tax.buildingValue
+    siteadd: situsAddress
+    mailadd: mailingAddress
+  notes: cntyfips='095' count 7698; gisacres 5-150 → 1935; recareano 5-150 → 1048;
+    parval>0 → 7222; saledate/saledatetx empty. JOIN parno=Pin_Num, altparno=REID_1.
+    Prefer county for tax split + sales.
+- role: other
+  name: Townships
+  restUrl: https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Hyde_AGOL/FeatureServer/7
+  layerId: 7
+  geometry: polygon
+  auth: none
+  coverage: county-wide
+  status: usable
+  verifiedCount: 6
+  fieldMap:
+    name: township
+  notes: '6 townships: Currituck, Fairfield, Lake Landing, Lake Mattamuskeet, Swan
+    Quarter, Ocracoke. Spatial-join for community routing.'
+- role: zoning
+  name: Ocracoke Development Ordinance (cities-first; no FeatureServer)
+  restUrl: null
+  geometry: none
+  auth: none
+  coverage: ocracoke-only
+  status: partial
+  fieldMap: {}
+  notes: PRIMARY cities-first. Municode Ch.36 Zoning / ODO applies to Ocracoke Island
+    outside Cape Hatteras NS. No public zoning FeatureServer 2026-09-24. Route Pin_Num
+    95* / Township=Ocracoke. Mainland townships unzoned at REST.
+  pdfUrls:
+  - https://library.municode.com/nc/hyde_county/codes/code_of_ordinances?nodeId=PTIICOOR_CH36ZO
+- role: flu
+  name: Future Land Use (CAMA LUP PDF gap)
+  restUrl: null
+  geometry: none
+  auth: none
+  coverage: county-wide
+  status: gap
+  fieldMap: {}
+  notes: DEQ-certified Hyde CAMA Land Use Plan + appendices + map groups. No labeled
+    FLU FeatureServer 2026-09-24.
+  pdfUrls:
+  - https://files.nc.gov/ncdeq/Coastal%20Management/documents/PDF/LUB/Plan.pdf
+  - https://www.deq.nc.gov/documents/pdf/lub/hyde-appendices/download
+  - https://www.deq.nc.gov/about/divisions/coastal-management/coastal-management-land-use-planning/certified-lups/hyde-county
+gaps:
+- No incorporated municipalities — cities-first = Ocracoke Development Ordinance (Municode
+  Ch.36); no city zoning FeatureServers
+- No zoning FeatureServer for Ocracoke or mainland
+- FLU FeatureServer gap — CAMA LUP PDFs only
+- Sale price not on Tax_Parcels — join sparse Sales_For_GIS/12 (228 features; 43 in
+  5-150 acre band)
+- OneMap cntyfips='095' saledate/saledatetx empty
+- PRC_LINK and Print_Link fields null on Tax_Parcels; AGD print portal 404 — synthesize
+  PRC from REID_1
+- pclnbr mostly 0 — do not use as PA key
+- calcacres is string; prefer numeric Assessed_Acreage for 5-150 filters
+- Utilities / AADT / emails / phones / paid vendors intentionally out of scope
+license: County public GIS / open AGOL REST; attribution to Hyde County NC GIS / Tax
+  / AGD
+verifiedAt: '2026-09-24'
+verifiedBy: North Carolina Public Information Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Hyde_AGOL/FeatureServer/3
+  parcelIdField: REID_1
+  acreageFilter: Assessed_Acreage >= 5 AND Assessed_Acreage <= 150
+  acres5to150Live: 2414
+  parcelCountLive: 7794
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='HYDE'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27HYDE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27HYDE%27&returnCountOnly=true&f=json
+      liveStationCount: 101
+      stationsWithAADT2022: 42
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Hyde'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Hyde%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Hyde%27&returnCountOnly=true&f=json
+      liveStationCount: 95
+      stationsWithAADT2025: 59
+      stationsWithAADT2024: 60
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - Parcel_Total_Value
+    - Parcel_Total_Taxable_Value
+    allTaxFieldsOnLayer:
+    - Parcel_Land_Value_Assd
+    - Res_Bldg_Misc_Imprv_Assd_Value
+    - Parcel_Misc_Imprv_Value_Assd
+    - Parcel_Total_Value
+    - Parcel_Total_Taxable_Value
+    - Parcel_Total_Def_Exempt_Value
+    liveNonZero:
+      Parcel_Total_Value: 7481
+      Parcel_Total_Taxable_Value: 7229
+    status: ok
+  sale:
+    priceFields: []
+    dateFields: []
+    livePriceNonZero: {}
+    liveDateNonNull: {}
+    status: gap
+    note: No sale price/date on Hyde_AGOL/3 or NC OneMap. AGD PRC PDF (scanned image) is the only public source.
+  ownerEntity:
+    ownerFields:
+    - Owner_Name
+    primaryOwnerField: Owner_Name
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(Owner_Name) LIKE '% LLC%' OR UPPER(Owner_Name) LIKE '% INC%' OR UPPER(Owner_Name) LIKE '% LP%' OR UPPER(Owner_Name) LIKE '% LLP%' OR UPPER(Owner_Name) LIKE '% LTD%' OR UPPER(Owner_Name) LIKE '% TRUST%' OR UPPER(Owner_Name) LIKE '% CHURCH%' OR UPPER(Owner_Name) LIKE '% COMPANY%' OR UPPER(Owner_Name) LIKE '% PARTNERSHIP%' OR UPPER(Owner_Name) LIKE '% HOLDINGS%' OR UPPER(Owner_Name) LIKE '% PROPERTIES%' OR UPPER(Owner_Name) LIKE '% CORP%' OR UPPER(Owner_Name) LIKE '%,LLC%' OR UPPER(Owner_Name) LIKE '%,INC%' OR UPPER(Owner_Name) LIKE 'CITY OF %' OR UPPER(Owner_Name) LIKE 'COUNTY OF %' OR UPPER(Owner_Name) LIKE 'STATE OF %' OR UPPER(Owner_Name) LIKE 'TOWN OF %')
+    liveEntityCountAll: 1376
+    liveEntityCount5to150ac: 454
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://dl.agd.cc/prc/nc/hyde/{REID_1}.pdf
+    testedParcelId: '14749'
+    testedUrl: https://dl.agd.cc/prc/nc/hyde/14749.pdf
+    httpStatus: 200
+    contentType: application/pdf
+    contentVerified: false
+    note: 200 application/pdf; scanned-image PDF (no text layer), so owner cannot be text-verified.
+  gisViewer:
+    url: https://experience.arcgis.com/experience/7d56b8f7909d453bbbf899299b53104d
+    httpStatus: 200
+    pageTitle: Experience
+    arcgisItem:
+      access: public
+      title: Hyde NC GIS Viewer
+      type: Web Experience
+      err: null
+  gaps:
+  - sale gap

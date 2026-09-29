@@ -1,0 +1,266 @@
+state: NC
+jurisdiction: Watauga County
+fips: "37189"
+level: county
+markets: [Boone, Asheville]
+slug: watauga
+cntyfips: "189"
+msa: Boone / Asheville shed
+
+municipalities:
+  - name: Boone
+    role: city-first-zoning
+    zonePrefix: [BO, BOM, BOR, BOB, BOOI, BOU1, BORA, BORR, E2]
+    parcelZoneCountApprox: 5673
+    hasLocalGis: true
+    zoningPrefer: https://gisviewer.townofboone.net/arcgis/rest/services/planning/Zoning_Mobile/MapServer/5
+    zoningAlt: https://gisviewer.townofboone.net/arcgis/rest/services/gisviewer/Boone_Zoning/MapServer/12
+    zoningCountyMirror: https://gissvr.watgov.org/arcgis/rest/services/GIS_Map_Search_PRD/MapServer/36
+    zoningField: ZONE_TYPE
+    zoningCount: 407
+    viewerUrl: https://gisviewer.boonenc.gov/maps/default.htm
+    notes: County seat; prefer town native over county mirror; E2* = Boone ETJ on parcel ZONE
+  - name: Blowing Rock
+    role: city-first-zoning
+    zonePrefix: [BR, BRR15]
+    parcelZoneCountApprox: 1894
+    hasLocalGis: false
+    zoningPrefer: parcel ZONE BR* attrs on parcelsdbf
+    zoningFringeCaldwell: https://gis.caldwellcountync.org/arcgis/rest/services/OpenGov/OpenGov/MapServer/11
+    zoningFringeCount: 17
+    notes: Straddles Watauga/Caldwell; no Watauga-hosted BR polygon FS
+  - name: Beech Mountain
+    role: city-first-zoning
+    zonePrefix: [BM]
+    parcelZoneCountApprox: 4356
+    hasLocalGis: partial
+    zoningPrefer: parcel ZONE BM-* attrs on parcelsdbf
+    notes: Also Avery County; town interactive zoning map retired — contact Planning for official determination
+  - name: Seven Devils
+    role: city-first-zoning
+    zonePrefix: [SD]
+    parcelZoneCountApprox: 1
+    hasLocalGis: false
+    townLimits: https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/SevenDevils_TownLimits/FeatureServer
+    notes: Thin SD-* attribution; also Avery; zoning ordinance/PDF gap
+  - name: Unincorporated Watauga
+    role: county-corridor-zoning
+    zonePrefix: [FC]
+    parcelZoneCountApprox: 292
+    zoningNotes: Foscoe–Grandfather Corridor FC-*; Valle Crucis historic/region on Zoned Municipalities; large unzoned remainder
+
+crs_preferred:
+  wkid: 102719
+  latestWkid: 2264
+  name: NAD 1983 StatePlane North Carolina FIPS 3200 Feet
+
+jurisdictionGisUrl: https://gissvr.watgov.org/maps/
+gisDeepLinkNotes: Avineon SPA — PIN querystring not confirmed; open maps then search or use Datalet/NCPTS
+countyRestRoot: https://gissvr.watgov.org/arcgis/rest/services
+taxSearchUrl: https://gissvr.watgov.org/maps/#1
+legacyMapUrl: https://tax.watgov.org/WataugaNC/maps/mapadv.aspx
+appraiserSearchUrl: https://tax.watgov.org/WataugaNC/datalets/datalet.aspx?mode=summary&UseSearch=no&pin={PID}&jur=095&taxyr=2026
+appraiserSearchUrlSales: https://tax.watgov.org/WataugaNC/datalets/datalet.aspx?mode=sales&UseSearch=no&pin={PID}&jur=095&taxyr=2026
+appraiserSearchUrlNotes: Patriot/Schneider Datalet; PID = unhyphenated PIN (e.g. 1879504388000). taxyr=2026 verified; SalesComp taxcard embeds taxyr=2022 — bump year.
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/watauga/parcel-search
+ncptsDeepLinkTemplate: https://lrcpwa.ncptscloud.com/watauga/parcel-detail/{PIN}
+paDeepLinkKey: PID
+parcelIdPreferred: PIN
+joinKeys: [PIN, PARCELID, PID, TXACCOUNT, parno, altparno]
+oneMapUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+oneMapFilter: "cntyfips='189'"
+booneRestRoot: https://gisviewer.townofboone.net/arcgis/rest/services
+planningUrl: https://www.wataugacounty.org/App_Pages/Dept/Planning/home.aspx
+comprehensivePlanUrl: https://www.wataugacounty.org/App_Pages/Dept/Planning/comprehensiveplan.aspx
+comprehensivePlanPdf: https://www.wataugacounty.org/App_Pages/Dept/Planning/Forms/WataugaCitizenPlan.pdf
+gatewayPlansUrl: https://www.wataugacounty.org/App_Pages/Dept/Planning/gatewayplan.aspx
+landRecordsUrl: https://www.wataugacounty.org/App_Pages/Dept/Tax/landrecords.aspx
+
+layers:
+  - role: parcels
+    name: TaxParcels parcelsdbf
+    restUrl: https://gissvr.watgov.org/arcgis/rest/services/TaxParcels/parcelsdbf/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TX_ACREAGE
+    coverage: county-wide
+    status: usable
+    fieldMap:
+      PIN: parcelId
+      PARCELID: parcelId
+      PID: parcelIdAlt
+      TX_ACREAGE: acreage
+      TXACCTNAME: ownerName
+      TXADDRESS: mailingAddress
+      TXCITYST: mailingCityState
+      TXZIP: mailingZip
+      PROPADDRES: situsAddress
+      DATERECORD: lastSale.date
+      SALEPRICE: lastSale.price
+      TAXLAND: tax.landValue
+      TAXBLDG: tax.buildingValue
+      TAXTOTAL: tax.assessedValue
+      APLANDVAL: tax.marketLand
+      APBLDGVAL: tax.marketBuilding
+      APTOTALVAL: tax.marketValue
+      ZONE: zoning
+      LANDUSE: dorCode
+      DEEDBOOK: deed.book
+      DEEDPAGE: deed.page
+      TXACCOUNT: accountId
+    notes: PRIMARY CAMA — tax/sale/owner. Count 47364; acres 5-150 = 7413; SALEPRICE>0 = 23593 (in-range 2817). MaxRecordCount 1000.
+    verifiedCount: 47364
+    acresInRange5to150: 7413
+    salePricePositive: 23593
+    salePricePositiveInRange: 2817
+    taxTotalPositive: 46401
+    zoneNonEmpty: 12222
+
+  - role: parcels
+    name: SalesComp Tax Parcels
+    restUrl: https://gissvr.watgov.org/arcgis/rest/services/SalesComp/ParcelSales/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    coverage: county-wide
+    status: usable
+    fieldMap:
+      pin: parcelId
+      pid: parcelIdAlt
+      txacctname: ownerName
+      saleprice: lastSale.price
+      daterecorded: lastSale.date
+      taxtotal: tax.assessedValue
+      taxcard: appraiserSearchUrl
+    notes: Twin with embedded taxcard URL; count ~48002; prefer parcelsdbf for typed numerics
+    verifiedCount: 48002
+
+  - role: sales
+    name: Parcel Sales 2020-2021
+    restUrl: https://gissvr.watgov.org/arcgis/rest/services/SalesComp/ParcelSales/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: sample
+    status: partial
+    fieldMap:
+      pin: parcelId
+      saleprice: lastSale.price
+      daterecorded: lastSale.date
+    notes: Recent-sales subset count 3592 — not full history
+    verifiedCount: 3592
+
+  - role: parcels
+    name: NC OneMap Parcels
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    status: usable
+    filter: "cntyfips='189'"
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdAlt
+      ownname: ownerName
+      mailadd: mailingAddress
+      siteadd: situsAddress
+      gisacres: acreage
+      parval: tax.assessedValue
+      landval: tax.landValue
+      improvval: tax.buildingValue
+      saledate: lastSale.date
+    notes: Fallback geometry/owner/tax; saledate populated; NO saleprice. Count 47388; acres 5-150 = 7474
+    verifiedCount: 47388
+    acresInRange5to150: 7474
+
+  - role: zoning
+    name: Boone Zoning Districts
+    restUrl: https://gisviewer.townofboone.net/arcgis/rest/services/planning/Zoning_Mobile/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    status: usable
+    fieldMap:
+      ZONE_TYPE: zoning
+      DESCRIPTION: zoningDescription
+      DISTRICT: jurisdiction
+      ALPHA: zoningLabel
+    notes: PRIMARY Boone zoning; count 407. SSL may need client trust on townofboone.net
+    verifiedCount: 407
+
+  - role: zoning
+    name: Boone_Zoning
+    restUrl: https://gisviewer.townofboone.net/arcgis/rest/services/gisviewer/Boone_Zoning/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    status: usable
+    fieldMap:
+      ALPHA: zoning
+      DISTRICT: jurisdiction
+    verifiedCount: 407
+
+  - role: zoning
+    name: County Boone_Zoning mirror
+    restUrl: https://gissvr.watgov.org/arcgis/rest/services/GIS_Map_Search_PRD/MapServer/36
+    layerId: 36
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    status: partial
+    fieldMap:
+      ZONE_TYPE: zoning
+      DISTRICT: jurisdiction
+    notes: Prefer town host; county count 325
+    verifiedCount: 325
+
+  - role: zoning
+    name: Zoned Municipalities
+    restUrl: https://gissvr.watgov.org/arcgis/rest/services/GIS_Map_Search_PRD/MapServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    coverage: county-wide
+    status: usable
+    fieldMap:
+      ALPHA: municipalityOrDistrict
+    notes: Boone limits/ETJ, Blowing Rock+ETJ, Beech Mtn, Seven Devils, Valle Crucis, Foscoe Grandfather Corridor districts
+
+  - role: zoning
+    name: Parcel ZONE attribute
+    restUrl: https://gissvr.watgov.org/arcgis/rest/services/TaxParcels/parcelsdbf/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: partial
+    status: usable
+    fieldMap:
+      ZONE: zoning
+    notes: Muni-prefixed codes on ~12222 parcels; cities-first polygon layers win inside Boone
+
+  - role: flu
+    name: 2025 Comprehensive Plan / Citizen Plan
+    restUrl: null
+    geometry: none
+    auth: none
+    coverage: county-wide
+    status: gap
+    notes: PDF only via comprehensiveplan.aspx → WataugaCitizenPlan.pdf; Gateway corridor strategy PDFs exist — no FLU FeatureServer
+
+gaps:
+  - No public FLU FeatureServer (Comp Plan PDF gap)
+  - Blowing Rock / Beech Mountain / Seven Devils lack Watauga-hosted zoning polygons
+  - Seven Devils SD-* parcel attribution nearly empty
+  - ~35k parcels blank ZONE (unzoned unincorporated outside corridors)
+  - OneMap saledate without saleprice
+  - Avineon GIS PIN deep-link unconfirmed (SPA)
+
+license: Watauga County Tax/GIS; Town of Boone GIS; High Country COG where used. Tax/reference only — not a survey. NCGS 132-10.
+verifiedAt: "2026-09-24"
+verifiedBy: North Carolina Public Info Researcher
+verifiedLayerCount: 12

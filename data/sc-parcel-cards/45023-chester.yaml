@@ -1,0 +1,197 @@
+state: SC
+jurisdiction: Chester County
+fips: "45023"
+level: county
+markets: [Charlotte]
+
+layers:
+  - role: parcels
+    name: Parcels_10_7_24 (Chester SC AGOL)
+    restUrl: https://services8.arcgis.com/7uCc8YS9s04rg0sr/arcgis/rest/services/Parcels_10_7_24/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GIS_ACRES
+    coverage: county-wide
+    fieldMap:
+      TAXMAP_NO: parcelId
+      Map_Number: parcelIdAlt
+      Name: parcelIdLabel
+      TMS: parcelIdTmsSuffix
+      Name_1: ownerName
+      Name_2: ownerName2
+      Mailing_Ad: mailingAddress
+      Mailing__1: mailingAddress.cityState
+      Zip_Code: mailingAddress.zip
+      DEED_ACRES: acreageDeed
+      GIS_ACRES: acreage
+      StatedArea: acreageStated
+      Calculated: acreageCalculated
+      Appraised_: tax.marketValue
+      Appraised1: tax.marketValueAlt
+      Buildings: buildingCount
+      Bedrooms: bedrooms
+      Stories: stories
+      LOT_NO: lotNumber
+      SUBDIV_NO: subdivision
+    notes: 'Verified 2026-09-24: public FeatureServer on ChesCnty org 7uCc8YS9s04rg0sr (owner EMA_Chester),
+      count 22300 polygons, auth none. Sample centroid ~34.78950,-81.27658 (WGS84) in Chester County SOUTH
+      CAROLINA — NOT Chester County PA (chesco.org) or TN. REJECT gisprodops.chesco.org and any Pennsylvania
+      Chester layers. CAMA-ish attrs: owners Name_1/Name_2, mailing, GIS/deed acres, Appraised_/Appraised1
+      (integer appraisal fields; land vs total not labeled in pjson — validate against Beacon). Snapshot
+      dated 2024-10-07 in layer name. No situs street field (owner mailing only).
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=22300; 1-feature outSR=4326 sample TAXMAP_NO=''047-00-00-066-000''
+      vertex (-81.277,34.789) inside Chester County SC bbox; parcel ID field TAXMAP_NO present.'
+    count: 22300
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Appraised values on Parcels_10_7_24
+    restUrl: https://services8.arcgis.com/7uCc8YS9s04rg0sr/arcgis/rest/services/Parcels_10_7_24/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GIS_ACRES
+    coverage: county-wide
+    fieldMap:
+      TAXMAP_NO: parcelId
+      Appraised_: tax.marketValue
+      Appraised1: tax.marketValueAlt
+    notes: >
+      Two integer appraised fields without clear land/improvement split in field aliases.
+      Prefer Beacon PA for official assessed breakdown; use these for coarse filter only.
+    status: partial
+
+  - role: ownership
+    name: Ownership / mailing on Parcels_10_7_24
+    restUrl: https://services8.arcgis.com/7uCc8YS9s04rg0sr/arcgis/rest/services/Parcels_10_7_24/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TAXMAP_NO: parcelId
+      Name_1: ownerName
+      Name_2: ownerName2
+      Mailing_Ad: mailingAddress
+      Mailing__1: mailingAddress.cityState
+      Zip_Code: mailingAddress.zip
+    notes: Ownership embedded on parcel polygons. Mailing__1 often packs city + state.
+    status: usable
+
+  - role: zoning
+    name: County zoning (public REST)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap 2026-09-24: no public countywide zoning FeatureServer found in ChesCnty
+      AGOL org (7uCc8YS9s04rg0sr). Building & Zoning pages on chestercountysc.gov returned
+      403 to research egress; no ArcGIS REST discovered. Do not invent municipal zoning URLs.
+    status: gap
+
+  - role: flu
+    name: Future land use (public REST)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No public FLU FeatureServer found for Chester County SC (2026-09-24).
+    status: gap
+
+gaps:
+  - "CRITICAL: Chester County SC (FIPS 45023, Charlotte market) — reject PA chesco.org and TN Chester."
+  - "No public zoning or FLU FeatureServer found; status gap."
+  - "No last-sale date/price fields on Parcels_10_7_24 — sales via Beacon/assessor HTML only."
+  - "No situs address field on AGOL parcels; mailing only."
+  - "chestercountysc.gov assessor/GIS pages often 403 from datacenter egress; browser PA still valid."
+  - "Affected_Parcels / boundary-change layers are remapping subsets — not countywide CAMA."
+  - "Skip utilities / AADT per full-suite scope."
+
+license: "Chester County SC public AGOL (org 7uCc8YS9s04rg0sr). Attribute Chester County / EMA GIS. Confirm redistribution before bulk republish."
+appraiserSearchUrl: https://beacon.schneidercorp.com/Application.aspx?AppID=217&LayerID=2943&PageTypeID=4&PageID=1669&KeyValue={parcelId}
+publicGisUrl: https://beacon.schneidercorp.com/Application.aspx?AppID=217&LayerID=2943&PageTypeID=1&PageID=0
+jurisdictionGisUrl: https://chestercountysc.gov/departments/tax-and-finance-departments/assessor/
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: partial
+    reason: 'Market-type values only: Appraised_ (integer, total appraisal; Appraised1 usually 0) on 2024-10-07 county
+      snapshot, and RFA M_Value/L_Value (20,251 of 22,377 >0, ~2026-01). No assessed/taxable field in public REST;
+      Beacon report has assessed.'
+    sources:
+    - https://services8.arcgis.com/7uCc8YS9s04rg0sr/arcgis/rest/services/Parcels_10_7_24/FeatureServer/0
+    - https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18
+      (where County='Chester County')
+    fieldMap:
+      Appraised_: tax.marketValue (county layer; sample 087-00-00-013-000 = 270000)
+      Appraised1: tax.marketValueAlt (mostly 0; meaning unlabeled)
+      M_Value: tax.marketValue (RFA, fresher)
+      L_Value: tax.landValue (RFA)
+  sale:
+    status: gap
+    reason: No sale date/price/deed fields on Parcels_10_7_24 or RFA layer 18. Sales history only on Beacon report
+      page (HTML, Cloudflare-gated).
+    fieldMap: {}
+    format: n/a
+  owner:
+    status: usable
+    mailingStatus: usable
+    reason: Name_1/Name_2 + mailing on county layer (2024-10 snapshot); RFA Ownership fresher (21,979/22,377).
+    fieldMap:
+      Name_1: ownerName
+      Name_2: ownerName2 (continuation, e.g. trust name)
+      Mailing_Ad: mailingAddress.street
+      Mailing__1: mailingAddress.cityState (space-padded "CHESTER               SC" - split on whitespace run)
+      Zip_Code: mailingAddress.zip (Integer; loses leading zeros)
+      Ownership: ownerName (RFA)
+  paLink:
+    status: usable
+    pattern: https://beacon.schneidercorp.com/Application.aspx?AppID=217&LayerID=2943&PageTypeID=4&PageID=1669&KeyValue={parcelId}
+    testedParcelId: 152-00-00-007-000
+    idTransform: 'KeyValue = 17-char TMS ###-##-##-###-### = TAXMAP_NO / Map_Number as-is = RFA T_Map_Number as-is.
+      Do NOT use Name/TMS (TMS is the 3-digit parcel suffix only).'
+    reason: 'Report page PageTypeID=4 PageID=1669 confirmed from a saved Beacon report (Chester County, SC - Report:
+      152-00-00-007-000) carrying this exact URL. Card had PageTypeID=1 map URL with no KeyValue - upgraded. Direct
+      box fetch is Cloudflare 403.'
+  publicGis:
+    status: partial
+    reason: No county AGOL parcel viewer (org chescosc has only boundary/fire/voter apps). Public parcel map = Beacon
+      map page (PageTypeID=1). chestercountysc.gov returns 403 to box; Assessor page (links "GIS Mapping") used as
+      jurisdictionGisUrl.
+  gaps:
+  - No public sale fields in any REST source.
+  - County parcel layer is a 2024-10-07 snapshot; prefer RFA for owner/value freshness.
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) — SCDOT 2025 Statewide Traffic Points, filter CountyName
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28); not
+      re-dug.

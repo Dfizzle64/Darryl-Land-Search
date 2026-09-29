@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-29T03:45:27Z",
+  "generatedAt": "2026-09-29T04:08:47Z",
   "market": "South Florida",
   "tier": "shelf",
   "parcelCount": 40322,
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -28,7 +28,7 @@
       "source": "fl-broward-bcpa-jan26-16",
       "queryUrl": "https://gisweb-adapters.bcpa.net/arcgis/rest/services/BCPA_EXTERNAL_JAN26/MapServer/16/query",
       "gaps": [
-        "Partial. BCPA MapServer/16 (BCPA_EXTERNAL_JAN26) is folio and geometry only. Acreage is the polygon area, 5.0\u2013150.0 inclusive. gis.bcpa.net does not resolve. The service name rotates yearly.",
+        "Partial. BCPA MapServer/16 (BCPA_EXTERNAL_JAN26) is folio and geometry only. Acreage is the polygon area, 5.0–150.0 inclusive. gis.bcpa.net does not resolve. The service name rotates yearly.",
         "Countywide CAMA is not on that layer. The FDOR CO_NO=16 join (PARCEL_ID=FOLIO) did not return from batched queries, so owner, sale, and value are not on these rows. BMSDParcelAddress is an unincorporated subset and is not the county roll.",
         "BMSD zoning covers unincorporated Broward only. The city zoning mosaic (MapServer/9) is partial: many ZONE_NAME values are blank, N/A, or WATER, and it is not a city ordinance. Authoritative city zoning was not invented.",
         "County land use (MapServer/10) stores numeric SLUC1 codes, not plain-language future-land-use labels. BCPA sales layers were not queried.",
@@ -53,7 +53,7 @@
       "queryUrl": "https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/26/query",
       "gaps": [
         "15268 rows matched the acreage filter; 14192 kept after the parcel-id and geometry checks.",
-        "Miami-Dade parcels are MD_LandInformation/MapServer/26. Acreage is LOT_SIZE square feet / 43560, 5.0\u2013150.0 inclusive. Multipart rows are deduped on FOLIO. Condo units do not inherit parent acreage, so there is no condo filter.",
+        "Miami-Dade parcels are MD_LandInformation/MapServer/26. Acreage is LOT_SIZE square feet / 43560, 5.0–150.0 inclusive. Multipart rows are deduped on FOLIO. Condo units do not inherit parent acreage, so there is no condo filter.",
         "PRIMARY_ZONE is a property-appraiser neighborhood code, not a zoning district. The parcel layer has no sale. The roll sale comes from FDOR.",
         "FDOR joins need CO_NO=23 and FOLIO exactly. No Opportunity Zone status is stored.",
         "Zoning or future land use carried forward for 14063 parcel ids that still match."
@@ -83,8 +83,8 @@
         "Monroe TLS verification failed. Ingest used the documented certificate fallback for mcgis4.monroecounty-fl.gov.",
         "Monroe zoning joined 5473/6492. FLUM joined 6273/6492.",
         "Monroe is mcgis4 Parcels/MapServer/0. The host sends only the leaf certificate, so reads use the pinned DigiCert Global G2 TLS RSA SHA256 2020 CA1 intermediate in scripts/certs. An unverified TLS context is not used.",
-        "FDOR joins need CO_NO=54 and PARCEL_ID = SEC+TWP+' '+RNG+' '+RECHAR with '-' removed from RECHAR. Acreage is the polygon area, 5.0\u2013150.0 inclusive. Shape.STArea() is rejected in the where clause, and AREA1 is not the stored acreage.",
-        "Monroe parcel count on mcgis4 with the pinned DigiCert intermediate was 89422. The 5.0\u2013150.0 acre extract is the polygon-area shelf already on this county."
+        "FDOR joins need CO_NO=54 and PARCEL_ID = SEC+TWP+' '+RNG+' '+RECHAR with '-' removed from RECHAR. Acreage is the polygon area, 5.0–150.0 inclusive. Shape.STArea() is rejected in the where clause, and AREA1 is not the stored acreage.",
+        "Monroe parcel count on mcgis4 with the pinned DigiCert intermediate was 89422. The 5.0–150.0 acre extract is the polygon-area shelf already on this county."
       ],
       "path": "data/fixtures/market-parcels/counties/12087/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12087/lookup.json",

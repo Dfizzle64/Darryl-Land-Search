@@ -1,0 +1,461 @@
+{
+  "state": "NC",
+  "jurisdiction": "Yancey County",
+  "county": "Yancey",
+  "fips": "37199",
+  "cntyfips": "199",
+  "slug": "yancey",
+  "level": "county",
+  "markets": [
+    "Asheville"
+  ],
+  "msa": "Asheville",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "jurisdictionGisUrl": "https://gis.yanceycountync.org/maps/",
+  "gisDeepLinkTemplate": "https://gis.yanceycountync.org/maps/?pin={PIN}",
+  "gisDeepLinkNotes": "SPA map viewer; ?pin={PIN} query accepted for TaxParcels search",
+  "countyRestRoot": "https://gis.yanceycountync.org/server/rest/services",
+  "appraiserSearchUrl": "https://yancey.ias-clt.com/parcel.detail.php?id={PIN}{Card}",
+  "appraiserSearchUrlNotes": "IAS-CLT Tyler. Internal id = 15-digit PIN + 2-digit Card (01 typical improved; 00 some vacant; 02+ multi-card). Verified 07070001934000001 \u2192 MELTON / 1951 OGLE MEADOWS RD / Sales History 56000 on 2020-08-03. Bare PIN fails with Unable to select item.",
+  "paBasicSearchUrl": "https://yancey.ias-clt.com/parcel.list.php",
+  "paDeepLinkKey": "PIN+Card",
+  "parcelIdPreferred": "PIN",
+  "joinKeys": [
+    "PIN",
+    "parno"
+  ],
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/yancey/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/yancey/parcel-detail/{PIN}",
+  "taxPortalUrl": "https://secure.webtaxpay.com/?county=yancey&state=NC",
+  "countyGisPageUrl": "https://www.yanceycountync.gov/184/GIS",
+  "burnsvilleUrl": "https://townofburnsville.org/",
+  "burnsvilleClupPdf": "https://townofburnsville.org/wp-content/uploads/Burnsville-Comprehensive-Land-Use-Plan-Draft.pdf",
+  "burnsvilleZoningMapPage": "https://townofburnsville.org/burnsville-zoning-map-2022/",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='199'",
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "parno"
+      ],
+      "bestLayer": "OperationalLayers2025/0",
+      "notes": "PIN (15-digit) for NCPTS + viewer ?pin=; IAS detail needs PIN+Card"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "OperationalLayers2025/0"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CALCULATED_ACREAGE",
+        "ASSESSED_ACREAGE",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 4555,
+      "bestLayer": "OperationalLayers2025/0"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "OWNER_NAME",
+        "OWNER",
+        "ownname"
+      ],
+      "bestLayer": "OperationalLayers2025/0",
+      "notes": "Prefer OWNER_NAME (matches OneMap ownname)"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "MAILING_ADDRESS1",
+        "MAILING_ADDRESS2",
+        "CITY",
+        "STATE_OR_COUNTRY",
+        "ZIP_CODE"
+      ],
+      "bestLayer": "OperationalLayers2025/0"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "PROPERTY_LOCATION",
+        "STREET_NUMBER",
+        "STREET_NAME",
+        "siteadd"
+      ],
+      "bestLayer": "OperationalLayers2025/0"
+    },
+    "lastSale": {
+      "present": "partial",
+      "fields": [
+        "DEED_DATE",
+        "STAMPS",
+        "TRANSACTION_DATE"
+      ],
+      "bestLayer": "OperationalLayers2025/0",
+      "notes": "No SALE_PRICE REST field. STAMPS = NC deed-excise proxy (\u2248 consideration/500); can lag DEED_DATE. IAS Sales History has Price."
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "CURRENT_TOTAL_VALUE",
+        "CURRENT_LAND_VALUE",
+        "CURRENT_BLDG_VALUE",
+        "AG_LAND_VALUE"
+      ],
+      "bestLayer": "OperationalLayers2025/0",
+      "approxWithValue": 17216
+    },
+    "zoning": {
+      "present": true,
+      "coverage": "cities-first",
+      "fields": [
+        "Zoning"
+      ],
+      "bestLayer": "Reference/0",
+      "notes": "Burnsville only (10 polys). Unincorp unzoned on REST."
+    },
+    "flu": {
+      "present": false,
+      "coverage": "gap",
+      "notes": "Burnsville CLUP 2021 PDF only; no FLU FeatureServer"
+    }
+  },
+  "municipalities": [
+    {
+      "name": "Burnsville",
+      "role": "county seat; city-first zoning",
+      "incorporated": true,
+      "localGis": false,
+      "zoningPrefer": "Reference/MapServer/0 Zoning",
+      "zoningUrl": "https://gis.yanceycountync.org/server/rest/services/Reference/MapServer/0",
+      "zoningCount": 10,
+      "zoneCodes": [
+        "C-1",
+        "C-2",
+        "C-3",
+        "I-1",
+        "R-10"
+      ],
+      "cityLimitsUrl": "https://gis.yanceycountync.org/server/rest/services/Reference/MapServer/5",
+      "cityLimitsFilter": "TOWNSHIP_N='Town of Burnsville'",
+      "fluDocumentUrl": "https://townofburnsville.org/wp-content/uploads/Burnsville-Comprehensive-Land-Use-Plan-Draft.pdf",
+      "notes": "Only incorporated municipality in Yancey County"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "OperationalLayers2025 TaxParcels (PRIMARY CAMA)",
+      "restUrl": "https://gis.yanceycountync.org/server/rest/services/OperationalLayers2025/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CALCULATED_ACREAGE",
+      "coverage": "county-wide",
+      "primary": true,
+      "status": "usable",
+      "maxRecordCount": 2000,
+      "counts": {
+        "total": 17394,
+        "acres5to150": 4555,
+        "assessedAcres5to150": 4723,
+        "taxValueGt0": 17216,
+        "stampsGt0": 7581,
+        "stampsGt0InAcreRange": 1576,
+        "ownerNameNonEmpty": 17275,
+        "deedDateNonEmpty": 16938
+      },
+      "sample": {
+        "PIN": "070700019340000",
+        "OWNER_NAME": "MELTON, MICHAEL K & DALE W",
+        "PROPERTY_LOCATION": "1951 OGLE MEADOWS RD",
+        "CALCULATED_ACREAGE": 8.93,
+        "CURRENT_TOTAL_VALUE": 465500,
+        "DEED_DATE": "2020-08-03",
+        "STAMPS": "21.00",
+        "centroidApprox": [
+          -82.37,
+          35.82
+        ]
+      },
+      "fieldMap": {
+        "PIN": "parcelId",
+        "CALCULATED_ACREAGE": "acreage",
+        "ASSESSED_ACREAGE": "acreage",
+        "OWNER_NAME": "ownerName",
+        "OWNER": "ownerName",
+        "MAILING_ADDRESS1": "mailingAddress",
+        "MAILING_ADDRESS2": "mailingAddress",
+        "CITY": "mailingAddress",
+        "STATE_OR_COUNTRY": "mailingAddress",
+        "ZIP_CODE": "mailingAddress",
+        "PROPERTY_LOCATION": "situsAddress",
+        "STREET_NUMBER": "situsAddress",
+        "STREET_NAME": "situsAddress",
+        "DEED_DATE": "lastSale.date",
+        "TRANSACTION_DATE": "lastSale.date",
+        "STAMPS": "lastSale.price",
+        "CURRENT_TOTAL_VALUE": "tax.marketValue",
+        "CURRENT_LAND_VALUE": "tax.landValue",
+        "CURRENT_BLDG_VALUE": "tax.improvementValue",
+        "AG_LAND_VALUE": "tax.otherValue"
+      },
+      "alternateUrls": [
+        "https://gis.yanceycountync.org/server/rest/services/OperationalLayers/MapServer/6",
+        "https://gis.yanceycountync.org/server/rest/services/QueryLayers/MapServer/2"
+      ],
+      "notes": "PRIMARY. STAMPS = NC deed-excise proxy (\u2248 consideration/500); can lag DEED_DATE. No dedicated SALE_PRICE."
+    },
+    {
+      "role": "parcels",
+      "name": "OperationalLayers TaxParcels (legacy twin)",
+      "restUrl": "https://gis.yanceycountync.org/server/rest/services/OperationalLayers/MapServer/6",
+      "layerId": 6,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ASSESSED_ACREAGE",
+      "coverage": "county-wide",
+      "status": "usable",
+      "counts": {
+        "total": 17306
+      },
+      "notes": "No CALCULATED_ACREAGE \u2014 prefer Op2025"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "filter": "cntyfips='199'",
+      "status": "partial",
+      "counts": {
+        "total": 17378,
+        "acres5to150": 4552,
+        "ownnameNonEmpty": 17378,
+        "parvalGt0": 0,
+        "saledateNonNull": 0
+      },
+      "fieldMap": {
+        "parno": "parcelId",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "parval": "tax.marketValue",
+        "saledatetx": "lastSale.date"
+      },
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "notes": "Geometry/owner fallback; empty tax/sale for Yancey"
+    },
+    {
+      "role": "zoning",
+      "name": "Reference Zoning \u2014 Town of Burnsville",
+      "restUrl": "https://gis.yanceycountync.org/server/rest/services/Reference/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "counts": {
+        "total": 10
+      },
+      "zoneCodes": [
+        "C-1",
+        "C-2",
+        "C-3",
+        "I-1",
+        "R-10"
+      ],
+      "fieldMap": {
+        "Zoning": "zoning"
+      },
+      "notes": "Cities-first Burnsville only"
+    },
+    {
+      "role": "other",
+      "name": "Reference Townships (Burnsville limits routing)",
+      "restUrl": "https://gis.yanceycountync.org/server/rest/services/Reference/MapServer/5",
+      "layerId": 5,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "municipal",
+      "status": "usable",
+      "fieldMap": {
+        "TOWNSHIP_N": "other",
+        "TOWN_CODE": "other"
+      },
+      "notes": "TOWN_CODE=12 Town of Burnsville = incorporated limits"
+    },
+    {
+      "role": "flu",
+      "name": "Burnsville Comprehensive Land Use Plan 2021 (PDF)",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "city-only",
+      "documentUrl": "https://townofburnsville.org/wp-content/uploads/Burnsville-Comprehensive-Land-Use-Plan-Draft.pdf",
+      "status": "gap",
+      "notes": "No public FLU FeatureServer"
+    }
+  ],
+  "gaps": [
+    "No dedicated SALE_PRICE on REST \u2014 STAMPS is NC deed-excise proxy (\u2248 consideration/500) and can lag DEED_DATE; prefer IAS Sales History Price",
+    "FLU REST gap \u2014 Burnsville CLUP 2021 PDF only; no county FLU FeatureServer",
+    "Unincorporated Yancey has no countywide zoning REST (cities-first Burnsville only)",
+    "OneMap parval/saledate empty for cntyfips='199'; no sale price on OneMap",
+    "OperationalLayers/6 lacks CALCULATED_ACREAGE \u2014 prefer Op2025 TaxParcels/0",
+    "IAS PA id requires PIN + 2-digit Card suffix (01 typical; 00 some vacant; 02+ multi-card)",
+    "Utilities / AADT / emails / phones / paid vendors intentionally excluded"
+  ],
+  "license": "Yancey County GIS / Tax Administration; Town of Burnsville; Tyler CLT / IAS. Not survey quality. Commercial resale subject to NCGS 132-10.",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 6,
+  "tranche": 3,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "pass1": {
+      "status": "verified",
+      "parcelPolygonLayer": "https://gis.yanceycountync.org/server/rest/services/OperationalLayers2025/MapServer/0",
+      "polygonCountLive": 17393,
+      "parcelIdField": "PIN",
+      "parcelIdFilled": 17383,
+      "acreageField": "CALCULATED_ACREAGE",
+      "acres5to150Live": 4555,
+      "sampleCentroidWgs84": [
+        -82.2116,
+        35.9066
+      ]
+    },
+    "parcelLayer": "https://gis.yanceycountync.org/server/rest/services/OperationalLayers2025/MapServer/0",
+    "parcelIdField": "PIN",
+    "acreageFilter": "CALCULATED_ACREAGE >= 5 AND CALCULATED_ACREAGE <= 150",
+    "acres5to150Live": 4555,
+    "parcelCountLive": 17393,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='YANCEY'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27YANCEY%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27YANCEY%27&returnCountOnly=true&f=json",
+        "liveStationCount": 152,
+        "stationsWithAADT2022": 103
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Yancey'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Yancey%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Yancey%27&returnCountOnly=true&f=json",
+        "liveStationCount": 148,
+        "stationsWithAADT2025": 100,
+        "stationsWithAADT2024": 101,
+        "stationsWith2025or2024": 146,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "CURRENT_TOTAL_VALUE",
+        "CURRENT_LAND_VALUE"
+      ],
+      "liveNonZero": {
+        "CURRENT_TOTAL_VALUE": 17226,
+        "CURRENT_LAND_VALUE": 17207
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "STAMPS"
+      ],
+      "dateFields": [
+        "DEED_DATE",
+        "TRANSACTION_DATE"
+      ],
+      "livePriceNonZero": {
+        "STAMPS": 7586
+      },
+      "liveDateNonNull": {
+        "DEED_DATE": 16949,
+        "TRANSACTION_DATE": 17351
+      },
+      "status": "ok",
+      "note": "STAMPS is NC excise stamps (string): price ≈ CAST(STAMPS AS FLOAT) × 500. Actual Sales History price is on the IAS-CLT parcel page."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "OWNER_NAME"
+      ],
+      "primaryOwnerField": "OWNER_NAME",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(OWNER_NAME) LIKE '% LLC%' OR UPPER(OWNER_NAME) LIKE '% INC%' OR UPPER(OWNER_NAME) LIKE '% LP%' OR UPPER(OWNER_NAME) LIKE '% LLP%' OR UPPER(OWNER_NAME) LIKE '% LTD%' OR UPPER(OWNER_NAME) LIKE '% TRUST%' OR UPPER(OWNER_NAME) LIKE '% CHURCH%' OR UPPER(OWNER_NAME) LIKE '% COMPANY%' OR UPPER(OWNER_NAME) LIKE '% PARTNERSHIP%' OR UPPER(OWNER_NAME) LIKE '% HOLDINGS%' OR UPPER(OWNER_NAME) LIKE '% PROPERTIES%' OR UPPER(OWNER_NAME) LIKE '% CORP%' OR UPPER(OWNER_NAME) LIKE '%,LLC%' OR UPPER(OWNER_NAME) LIKE '%,INC%' OR UPPER(OWNER_NAME) LIKE 'CITY OF %' OR UPPER(OWNER_NAME) LIKE 'COUNTY OF %' OR UPPER(OWNER_NAME) LIKE 'STATE OF %' OR UPPER(OWNER_NAME) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 2297,
+      "liveEntityCount5to150ac": 605,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://yancey.ias-clt.com/parcel.detail.php?id={PIN}{Card}",
+      "testedParcelId": "070800148426000",
+      "testedUrl": "https://yancey.ias-clt.com/parcel.detail.php?id=07080014842600000",
+      "httpStatus": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "contentVerified": true,
+      "note": "IAS id = 15-digit PIN + 2-digit card. Card 01 returned \"Unable to select item\" for this vacant parcel; card 00 returned the owner. LSB: try 01 then 00."
+    },
+    "gisViewer": {
+      "url": "https://gis.yanceycountync.org/maps/",
+      "httpStatus": 200,
+      "pageTitle": "Avineon Web Map Template"
+    },
+    "gaps": []
+  }
+}

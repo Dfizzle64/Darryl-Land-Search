@@ -1,0 +1,237 @@
+state: SC
+jurisdiction: Kershaw County
+fips: "45055"
+level: county
+markets: [Columbia]
+
+layers:
+  - role: parcels
+    name: Kershaw County Parcel Boundaries (Parcels_view)
+    restUrl: https://services6.arcgis.com/kyYrMHheB5jkAnFA/arcgis/rest/services/Parcels_view/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: taxTotalAc
+    coverage: county-wide
+    fieldMap:
+      PRSNTP_ID: parcelId
+      taxTotalAc: acreage
+      GlobalID: sourceGlobalId
+    notes: 'Verified 2026-09-24: official KershawGIS public FeatureServer, count 43646 polygons; 43226 have
+      non-null acreage and parcel ID. Sample centroid approximately (-80.4818, 34.5577) WGS84 inside Kershaw
+      County, South Carolina. Parcel service is geometry, parcel-ID, and acreage only; it does not expose
+      owner, sale, or assessment values.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=43646; 1-feature outSR=4326 sample PRSNTP_ID=''???'' vertex
+      (-80.597,34.250) inside Kershaw County SC bbox; parcel ID field PRSNTP_ID present.'
+    count: 43646
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Parcel acreage only (Parcels_view)
+    restUrl: https://services6.arcgis.com/kyYrMHheB5jkAnFA/arcgis/rest/services/Parcels_view/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: taxTotalAc
+    coverage: county-wide
+    fieldMap:
+      PRSNTP_ID: parcelId
+      taxTotalAc: acreage
+    notes: >
+      Public parcel REST exposes acreage but no marketValue, assessedValue, taxableValue,
+      tax year, or tax district. Use official qPublic assessor search by parcel ID for tax/CAMA details.
+    status: partial
+
+  - role: ownership
+    name: Official assessor ownership search (qPublic)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Public qPublic search supports owner, address, parcel/TMS, assessment, and map lookup;
+      no public county REST ownership layer verified. Search URL is the PA link; use
+      parcelId in the qPublic parcel/TMS search form.
+    status: partial
+
+  - role: sales
+    name: Public assessor / register-of-deeds sale lookup
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No public Kershaw county REST sale-history table verified. qPublic provides parcel
+      assessment/map records; recorded ownership and deed transactions are handled through
+      the county Register of Deeds search. Do not infer last-sale fields from Parcels_view.
+    status: gap
+
+  - role: zoning
+    name: Kershaw County Zoning
+    restUrl: https://services6.arcgis.com/kyYrMHheB5jkAnFA/arcgis/rest/services/Kershaw_County_Zoning/FeatureServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+    notes: >
+      Verified 2026-09-24: official KershawGIS public FeatureServer, count 1982 polygons;
+      sample centroid approximately (-80.4955, 34.4690) WGS84 inside Kershaw County SC.
+      Spatial join to Parcels_view.
+    status: usable
+
+  - role: parcels
+    name: SC RFA Kershaw_Parcels (county-specific layer w/ CAMA, boundary program map)
+    restUrl: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Fairfield_Kershaw_Richland_Map_WFL1/FeatureServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: taxTotalAc
+    coverage: county-wide
+    count: 43383
+    parcelIdField: PRSNTP_ID
+    fieldMap:
+      PRSNTP_ID: parcelId
+      taxParcelI: parcelIdAlt
+      taxAccount: taxAccount
+      taxTotalAc: acreage
+      taxOwnerNa: ownerName
+      taxMailing: mailingAddress.street
+      taxMaili2: mailingAddress.city
+      taxMailSta: mailingAddress.state
+      taxMaili3: mailingAddress.zip
+      taxLocStre: situsAddress
+      taxTotFull: tax.marketValue
+      taxTaxable: tax.assessedValue
+      taxTotalTa: tax.taxableMarketValue
+      taxSaleDat: lastSale.date
+      taxSalePri: lastSale.price
+      taxSaleTyp: lastSale.qualified
+      taxDeedBoo: lastSale.bookPage
+      taxDistric: tax.district
+      ZONING: zoning
+    notes: 'Verified 2026-09-28 (Pass 2): public, Query, no token; extent = Kershaw County SC; 43,383 features; owner
+      42,968, market 42,868, sale price 37,891 populated. Created 2025-10 by christine.jacobs_rfa (SC RFA). Joins to
+      county Parcels_view on PRSNTP_ID. FRAGILE: lives in RFA County Boundary Program map - snapshot.'
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+gaps:
+  - "Owner, market/assessed/taxable values, and sale history are not present in the public Parcels_view REST layer; use qPublic / county deed search for PA verification."
+  - "No stable parcel-specific qPublic deep-link pattern verified; official search URL supports parcelId/TMS lookup."
+  - "Camden is within Kershaw County and is covered by the countywide sources above; no separate Camden county card is needed."
+  - "Reject SCDOT SC_Parcels token-walled services as a primary source; KershawGIS Parcels_view is public and preferred."
+
+license: "Kershaw County GIS public ArcGIS Hub/FeatureServer and county qPublic search; attribute Kershaw County GIS/Assessor. Confirm redistribution terms before bulk republish."
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=KershawCountySC&PageType=Search
+publicGisUrl: https://kershawcountydataportal-kershawcounty.hub.arcgis.com/
+jurisdictionGisUrl: https://kershawcountydataportal-kershawcounty.hub.arcgis.com/
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  newSource:
+    role: parcels+cama
+    name: SC RFA Kershaw_Parcels (county-specific layer w/ CAMA, boundary program map)
+    restUrl: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Fairfield_Kershaw_Richland_Map_WFL1/FeatureServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    count: 43383
+    parcelIdField: PRSNTP_ID
+    notes: 'Verified 2026-09-28: public, Query; 4326 extent -80.879,34.070 to -80.284,34.615 (= Kershaw County SC);
+      created 2025-10 by christine.jacobs_rfa. Same PRSNTP_ID as county Parcels_view -> joinable. Owner populated
+      42,968; taxTotFull>0 42,868; taxSalePri>0 37,891. Same fragility caveat as RFA statewide layer (lives in a boundary-dispute
+      project map).'
+    status: usable
+  tax:
+    status: usable
+    reason: Full CAMA values on RFA Kershaw_Parcels (layer 7); county Parcels_view has none.
+    source: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Fairfield_Kershaw_Richland_Map_WFL1/FeatureServer/7
+    fieldMap:
+      taxTotFull: tax.marketValue (full market)
+      taxTotalTa: tax.taxableMarketValue (post-cap)
+      taxTaxable: tax.assessedValue (assessed/taxable, e.g. 11100 on 212700 market)
+      taxTotalBl: tax.buildingValue
+      taxTotalYa: tax.yardItemsValue
+      taxDistric: tax.district
+      M_Value: tax.marketValue (RFA statewide join; sparsely populated here)
+  sale:
+    status: usable
+    reason: Last + previous sale on RFA layer 7.
+    source: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Fairfield_Kershaw_Richland_Map_WFL1/FeatureServer/7
+    fieldMap:
+      taxSaleDat: lastSale.date
+      taxSalePri: lastSale.price
+      taxSaleTyp: lastSale.qualified ("True Sale" / other text)
+      taxDeedBoo: lastSale.bookPage ("2669-191")
+      taxGrantor: lastSale.seller
+      taxPrevSal: prevSale.date
+      taxPrevS1: prevSale.price
+      taxPrevDee: prevSale.bookPage
+    format: taxSaleDat esri Date epoch ms (midnight UTC; e.g. 1273622400000 = 2010-05-12); taxSalePri Integer dollars;
+      taxSaleTyp text.
+  owner:
+    status: usable
+    mailingStatus: usable
+    reason: Owner + mailing on RFA layer 7 (county layer has none).
+    source: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Fairfield_Kershaw_Richland_Map_WFL1/FeatureServer/7
+    fieldMap:
+      taxOwnerNa: ownerName
+      taxOwner1: ownerName1
+      taxOwner2: ownerName2
+      taxMailing: mailingAddress.street
+      taxMaili1: mailingAddress.line2
+      taxMaili2: mailingAddress.city
+      taxMailSta: mailingAddress.state
+      taxMaili3: mailingAddress.zip
+      taxLocStre: situsAddress
+  paLink:
+    status: partial
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?App=KershawCountySC&PageType=Search
+    testedParcelId: 002-00-00-002
+    idTransform: 'Search by PRSNTP_ID / taxParcelI (###-##-##-###) in parcel-number box. Candidate deep link (UNVERIFIED
+      Schneider friendly form): https://qpublic.schneidercorp.com/Application.aspx?App=KershawCountySC&Layer=Parcels&PageType=Report&KeyValue={parcelId}'
+    reason: County AGOL items "qPublic Search"/"qPublic Map" confirm App=KershawCountySC. Numeric AppID/LayerID/report
+      PageID not found (qpublic.net/sc/kershaw has no numeric link; no indexed report). Cloudflare blocks direct test.
+      No parcel-specific deep link confirmed.
+  publicGis:
+    status: usable
+    reason: Kershaw County SC GIS Open Data Portal hub (org kyYrMHheB5jkAnFA) is the county public GIS entry; county
+      also publishes qPublic Map as its parcel viewer.
+  gaps:
+  - County-published Parcels_view has no owner/value/sale; CAMA comes only from the state RFA boundary-program layer
+    (fragile).
+  - qPublic numeric AppID/report PageID not found - PA link is search-level only.
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) — SCDOT 2025 Statewide Traffic Points, filter CountyName
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28); not
+      re-dug.

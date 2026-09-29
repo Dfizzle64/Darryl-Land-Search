@@ -1,0 +1,369 @@
+state: NC
+jurisdiction: Person County
+fips: "37145"
+level: county
+markets: [Raleigh-Durham]
+
+layers:
+  - role: parcels
+    name: Tax/BitekParcelInfo Tax Parcels (PRIMARY)
+    restUrl: https://gis.personcountync.gov/arcgis/rest/services/Tax/BitekParcelInfo/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Calculated_Area_in_Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      RECN: parcelIdRecn
+      Record_Number: parcelIdAccount
+      TaxMapParcel: parcelIdTaxMap
+      Calculated_Area_in_Acres: acreage
+      Stated_Area: acreageDeedText
+      Acre_or_Lot: acreageUnit
+      Primary_Owner: ownerName
+      Secondary_Owner: ownerName2
+      Postal_Address: mailingAddress.street
+      Postal_City: mailingAddress.city
+      Postal_State: mailingAddress.state
+      Postal_Zip: mailingAddress.zip
+      Site_Address: situsAddress
+      Sale_Price: lastSale.price
+      Sale_Date: lastSale.date
+      Sales_Code: lastSale.qualified
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      Plat_Book_and_Page: lastSale.platBookPage
+      Land_Value: tax.landValue
+      Current_Structure_Value: tax.improvementValue
+      Other_Building_Value: tax.otherBuildingValue
+      Current_Assessed_Value: tax.assessedValue
+      Previous_Structure_Value: tax.previousImprovementValue
+      Assessing_Use_Code: dorCode
+      Assessing_Use_Description: landUse
+      Property_Class_Code: landClassCode
+      Property_Class: landClass
+      Tax_District_Code: taxDistrictCode
+      Tax_District_Description: municipality
+      Township: township
+      Building_Area: buildingArea
+      Residential_Floor_Area: residentialFloorArea
+      Residential_Year_Built: yearBuilt
+      Property_Description: legalDescription
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 28456 (PIN 100%);
+      Calculated_Area_in_Acres 5–150 → 6018; Building_Area=0/null in range → 3627;
+      Current_Structure_Value=0/null in range → 3699; Sale_Price>0 in range → 2935.
+      CRS published 102100/3857 on FeatureServer (reproject as needed). MaxRecordCount 2000 — paginate.
+      Rich CAMA on polygons: owner, postal mailing parts, situs Site_Address, land/structure/other
+      building values, Current_Assessed_Value (total ≈ land+structure+other), last sale price/date/code,
+      deed book/page. Record_Number/RECN present on ~28,245 (prefer PIN as stable join; RECN for NCPTS).
+      Tax_District_Description: COUNTY 23763, ROXBORO 4482, null 211.
+      Assessing_Use top: Dwelling 17242, Vacant 7441, Other 1836, Exempt 703, Commercial 633.
+      Sales_Code top among Sale_Price>0: Q 8555 (qualified), 2 2636, 5 1273, 22 696.
+      MapServer twin: .../Tax/BitekParcelInfo/MapServer/1. EnerGov/EnerGov/FeatureServer/8 is thinner twin (~28245).
+      PIN joins OneMap parno (verified 0905-06-38-3375.000). Geo-check centroid ≈ -78.98854, 36.38306 (Roxboro).
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-24: cntyfips='145' count 28272; gisacres 5–150 → 5990;
+      improvval=0/null in range → 2939. scity blank for Person extract. Geo-check centroids in Person
+      (~36.2–36.55 N, 78.85–79.2 W). PIN↔parno verified. Fallback when county host flaky.
+      MaxRecordCount 5000. Alternate host services.gis.nc.gov. No sale price.
+    status: usable
+
+  - role: zoning
+    name: PlanZone City of Roxboro (PRIMARY city-first)
+    restUrl: https://gis.personcountync.gov/arcgis/rest/services/PlanZone/Zoning/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONECLASS: zoning
+      ZONEDESC: zoningLabel
+      TYPE: planningJurisdiction
+      LASTUPDATE: zoningDate
+    notes: >
+      PRIMARY Roxboro zoning. Verified count 686; TYPE='City'. CRS 3857.
+      Classes: R-6 239, R-12 164, B-1 137, I-2 39, I-1 31, O/I 30, B-2 16, B-3 15,
+      R-8 5, PUD 4 (+ minor label noise). MapServer twin layer 1. No separate Roxboro city GIS host —
+      county PlanZone IS the public city zoning REST. Prefer over county Zoning inside city limits.
+    status: usable
+
+  - role: zoning
+    name: PlanZone Zoning (county / unincorporated)
+    restUrl: https://gis.personcountync.gov/arcgis/rest/services/PlanZone/Zoning/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONECLASS: zoning
+      ZONEDESC: zoningLabel
+      TYPE: planningJurisdiction
+      LASTUPDATE: zoningDate
+    notes: >
+      Unincorporated / county zoning. Verified count 126; TYPE='County'.
+      Classes: B1 68, GI 22, RC 16, B2 11, R 8, AP 1. Spatial join outside Roxboro City Limits.
+    status: usable
+
+  - role: zoning
+    name: PlanZone Conditional District
+    restUrl: https://gis.personcountync.gov/arcgis/rest/services/PlanZone/Zoning/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      ZONECLASS: zoning
+      ZONEDESC: zoningLabel
+      TYPE: planningJurisdiction
+    notes: >
+      Verified count 2: CD-RC, CD-GI (TYPE=County). Overlay on county Zoning as needed.
+    status: usable
+
+  - role: zoning
+    name: EnerGov ZoningDistrict (combined City+County mirror)
+    restUrl: https://gis.personcountync.gov/arcgis/rest/services/EnerGov/EnerGov/FeatureServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONECLASS: zoning
+      ZONEDESC: zoningLabel
+      TYPE: planningJurisdiction
+    notes: >
+      Combined mirror verified count 812 (TYPE City 686 + County 126). Prefer PlanZone split
+      layers for city-first routing; use this when a single stack is simpler. Does not separately
+      expose Conditional District layer (CDs typed County inside PlanZone/3).
+    status: usable
+
+  - role: flu
+    name: PlanZone FLUM Future Land Use Map (PRIMARY)
+    restUrl: https://gis.personcountync.gov/arcgis/rest/services/PlanZone/FLUM/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FLU: flu
+      FLU_Code: fluCode
+      LastUpdateDate: fluDate
+    notes: >
+      PRIMARY county FLU. Verified count 12 (coarse policy polygons, countywide extent in 3857).
+      Codes: ACA Airport Compatibility Area, C Commercial, CMP Campus District, GA Growth Areas,
+      HLR Hyco Lake, I Industrial, MLR Mayo Lake, RA Rural, RN Residential Neighborhoods,
+      UC Uptown, UMU Urban Mixed Use, UT Uptown Transition. Spatial join to parcels.
+      No separate Roxboro city FLU FeatureServer — FLUM covers city + county.
+    status: usable
+
+  - role: other
+    name: AdminArea City Limits (Roxboro)
+    restUrl: https://gis.personcountync.gov/arcgis/rest/services/AdminArea/CityLimits/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Inc_Muni: municipality
+      MUNITYP: municipalityType
+      MUNIAREA: municipalityAreaSqMi
+    notes: >
+      Verified 6 polygons — all Inc_Muni='Roxboro' (multipart city limit). Only incorporated
+      municipality in Person County. Route city-first zoning with PlanZone/Zoning/1.
+    status: usable
+
+  - role: other
+    name: Annexation/Annexations
+    restUrl: https://gis.personcountync.gov/arcgis/rest/services/Annexation/Annexations/FeatureServer
+    layerId: null
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      Roxboro annexation history on county host; AGOL mirror services7.../Roxboro_Annexations.
+      Optional for ETJ/annexation context — not required for parcel/zoning wire.
+    status: partial
+
+gaps:
+  - Only incorporated municipality is Roxboro — no other city FeatureServers (Timberlake/Semora/etc. are CDPs)
+  - No dedicated Roxboro city GIS host — county PlanZone/Zoning/1 IS city-first zoning
+  - FLUM is coarse (12 countywide polys) — not parcel-grain; no separate city FLU FS
+  - ~211 parcels with null Tax_District_Description; ~211 lack Record_Number — prefer PIN
+  - No multi-transfer sales history REST — last sale fields on parcel only
+  - Sales_Code legend not fully published on REST (Q appears to be qualified) — treat as opaque code
+  - OneMap scity blank for Person extract — use siteadd / county Site_Address
+  - County FeatureServer CRS is 3857 (not NC StatePlane 2264) — reproject for OneMap overlays
+  - personcountync.gov website often 403 to automated fetchers — use gis.personcountync.gov REST/viewer
+  - No paid vendor data; no phones/emails collected; no AADT/utilities dig
+license: "Person County public GIS; NCGS disclaimer; attribution recommended; no paid vendors"
+appraiserSearchUrl: https://lrcpwa.ncptscloud.com/person/parcel-search
+viewerLinkTemplate: "https://lrcpwa.ncptscloud.com/person/parcel-detail/{Record_Number}"
+viewerLinkTemplateAlt: "https://lrcpwa.ncptscloud.com/person/parcel-detail/{PIN}"
+camaSearchUrl: https://www.bttaxpayerportal.com/ITSPublicPR
+gisViewerUrl: https://gis.personcountync.gov/taxparcelviewer/
+publicGisUrl: https://gis.personcountync.gov/taxparcelviewer/
+gisDepartmentUrl: https://www.personcountync.gov/gis
+countyRestRoot: https://gis.personcountync.gov/arcgis/rest/services
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS2 full-suite upgrade (rural OZ) — verifiedAt 2026-09-28 ----
+pass2:
+  label: PASS2 full-suite upgrade — rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  aadtScreening:
+    source: NCDOT Traffic Survey Group (public AGOL)
+    layer: NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)
+    restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+    countyField: COUNTY
+    countyValue: PERSON
+    valueField: AADT_2022
+    valueType: string (trim; blank = no count that year)
+    countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27PERSON%27&returnCountOnly=true&f=json
+    featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27PERSON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+    liveStationCount: 335
+    stationsWithAADT2022: 129
+    newerYearAvailable:
+      available: true
+      layer: NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      countyField: County
+      countyValue: Person
+      valueField: AADT_2025
+      valueType: integer (null = no count)
+      countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Person%27&returnCountOnly=true&f=json
+      featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Person%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+      liveStationCount: 335
+      stationsWithAADT2025: 205
+      stationsWithAADT2024: 195
+      segmentsLayer: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide — spatial filter by county envelope)
+      also: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)
+    recommendation: Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025→AADT_2024→AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title).
+  primaryParcelLayer:
+    restUrl: https://gis.personcountync.gov/arcgis/rest/services/Tax/BitekParcelInfo/FeatureServer/1
+    acreageField: Calculated_Area_in_Acres
+    range5to150Where: Calculated_Area_in_Acres>=5 AND Calculated_Area_in_Acres<=150
+    liveTotalParcels: 28456
+    liveParcels5to150: 6018
+  taxValues:
+    status: ok
+    fields:
+      Land_Value: tax.landValue
+      Current_Structure_Value: tax.improvementValue
+      Current_Assessed_Value: tax.assessedValue
+    liveNonZeroCounty:
+      Land_Value: 28040
+      Current_Structure_Value: 18027
+      Current_Assessed_Value: 28040
+    liveNonZero5to150:
+      Current_Assessed_Value: 5822
+    notes: Double fields; Current_Assessed_Value ≈ land+structure+other.
+    publicFallback: https://lrcpwa.ncptscloud.com/person/parcel-detail/{Record_Number}
+  saleHistory:
+    status: ok
+    priceFields:
+    - Sale_Price
+    dateFields:
+    - Sale_Date
+    livePriceGt0County:
+      Sale_Price: 16364
+    livePriceGt0_5to150:
+      Sale_Price: 2935
+    liveDateNonNullCounty:
+      Sale_Date: 27219
+    notes: Sale_Date STRING MM/DD/YYYY; Sale_Price double; Sales_Code 'Q' ≈ qualified. Last sale only.
+  ownerEntity:
+    ownerFields:
+    - Primary_Owner
+    - Secondary_Owner
+    primaryOwnerField: Primary_Owner
+    rule:
+      apply: Uppercase + trim Primary_Owner (optionally also Secondary_Owner)
+      regex: (?i)(\bL\.?\s?L\.?\s?C\b|\bINC\b|\bCORP|\bL\.?\s?P\b|\bLLP\b|\bLLLP\b|\bLTD\b|TRUST|CHURCH|MINISTR|\bCOMPANY\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\bHOA\b|FOUNDATION|AUTHORITY|\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\b|^UNITED STATES|^NORTH CAROLINA\b|\bCOUNTY$)
+      sqlLikeTokens:
+      - '% LLC%'
+      - '%,LLC%'
+      - '% L L C%'
+      - '% INC'
+      - '% INC %'
+      - '% INC.%'
+      - '%,INC%'
+      - '% CORP%'
+      - '%CORPORATION%'
+      - '% LP'
+      - '% LP %'
+      - '% L P'
+      - '% LLP%'
+      - '% LTD%'
+      - '%TRUST%'
+      - '%CHURCH%'
+      - '%MINISTR%'
+      - '% COMPANY%'
+      - '%PARTNERSHIP%'
+      - '%HOLDINGS%'
+      - '%PROPERTIES%'
+      - '%INVESTMENT%'
+      - '%ASSOCIATION%'
+      - '%FOUNDATION%'
+      - '%AUTHORITY%'
+      - CITY OF %
+      - COUNTY OF %
+      - STATE OF %
+      - TOWN OF %
+      - '% COUNTY'
+      - '%BOARD OF EDUCATION%'
+      - UNITED STATES%
+      - NORTH CAROLINA %
+      - '% DEVELOPMENT%'
+      caveats: TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); "% COUNTY" suffix catches e.g. "PERSON COUNTY"; bare "CO" and "ESTATE" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) — normalize first.
+    liveEntityCount5to150: 868
+    liveOwnerNonNull5to150: 5929
+    entityQuery: where=Calculated_Area_in_Acres>=5 AND Calculated_Area_in_Acres<=150 AND (Primary_Owner LIKE '% LLC%' OR Primary_Owner LIKE '%,LLC%' OR Primary_Owner LIKE '% L L C%' OR Primary_Owner LIKE '% INC' OR Primary_Owner LIKE '% INC %' OR Primary_Owner LIKE '% INC.%' OR Primary_Owner LIKE '%,INC%' OR Primary_Owner LIKE '% CORP%' OR Primary_Owner LIKE '%CORPORATION%' OR Primary_Owner LIKE '% LP' OR Primary_Owner LIKE '% LP %' OR Primary_Owner LIKE '% L P' OR Primary_Owner LIKE '% LLP%' OR Primary_Owner LIKE '% LTD%' OR Primary_Owner LIKE '%TRUST%' OR Primary_Owner LIKE '%CHURCH%' OR Primary_Owner LIKE '%MINISTR%' OR Primary_Owner LIKE '% COMPANY%' OR Primary_Owner LIKE '%PARTNERSHIP%' OR Primary_Owner LIKE '%HOLDINGS%' OR Primary_Owner LIKE '%PROPERTIES%' OR Primary_Owner LIKE '%INVESTMENT%' OR Primary_Owner LIKE '%ASSOCIATION%' OR Primary_Owner LIKE '%FOUNDATION%' OR Primary_Owner LIKE '%AUTHORITY%' OR Primary_Owner LIKE 'CITY OF %' OR Primary_Owner LIKE 'COUNTY OF %' OR Primary_Owner LIKE 'STATE OF %' OR Primary_Owner LIKE 'TOWN OF %' OR Primary_Owner LIKE '% COUNTY' OR Primary_Owner LIKE '%BOARD OF EDUCATION%' OR Primary_Owner LIKE 'UNITED STATES%' OR Primary_Owner LIKE 'NORTH CAROLINA %' OR Primary_Owner LIKE '% DEVELOPMENT%')
+  paDeepLink:
+    template: https://lrcpwa.ncptscloud.com/person/parcel-detail/{Record_Number}
+    testedUrl: https://lrcpwa.ncptscloud.com/person/parcel-detail/10020
+    httpStatus: 200
+    notes: 'HTTP 200; NCPTS PWA shell (content client-rendered; not server-verifiable). Alt BT CAMA: https://www.bttaxpayerportal.com/ITSPublicPR'
+  jurisdictionGisViewer:
+    url: https://gis.personcountync.gov/taxparcelviewer/
+    httpStatus: 200
+    notes: Person County tax parcel viewer (ArcGIS Web App)
+  gaps:
+  - AADT_2022 blank at 206 of 335 stations on the 2022 layer (NCDOT counts on a cycle) — prefer 2025 layer / latest non-blank year
+  - No multi-transfer sale history on primary layer (last sale only)

@@ -1,0 +1,29 @@
+{
+  "name": "Bertie",
+  "fips": "37015",
+  "state": "North Carolina",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "featureCount": 4411,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-bertie-parcels-37015",
+  "queryUrl": "https://services3.arcgis.com/tiupcc8dC1j2CPV5/arcgis/rest/services/Bertie_Parcel_Viewer/FeatureServer/4/query",
+  "gaps": [
+    "Parcels are Bertie_Parcel_Viewer Parcels (PRIMARY county AGOL CAMA + STAMPS) (https://services3.arcgis.com/tiupcc8dC1j2CPV5/arcgis/rest/services/Bertie_Parcel_Viewer/FeatureServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 4455 rows; 4411 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 254 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37015/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37015/lookup.json",
+  "sourceCount": 4455,
+  "dropped": 0,
+  "tileCount": 7,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://dl.agd.cc/prc/nc/bertie/{parcelId}.pdf",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/35c1e586958d4014b177c8b4082a9051"
+}

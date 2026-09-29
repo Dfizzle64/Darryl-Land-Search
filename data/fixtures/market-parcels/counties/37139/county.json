@@ -1,0 +1,30 @@
+{
+  "name": "Pasquotank",
+  "fips": "37139",
+  "state": "North Carolina",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "featureCount": 2779,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-pasquotank-parcels-37139",
+  "queryUrl": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/PasquotankCountyNC_20260101/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are PasquotankCountyNC_20260101 (PRIMARY CAMA) (https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/PasquotankCountyNC_20260101/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 2814 rows; 2779 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale partial). Pass 2 counted 213 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Pass 2 sale: Price not on REST; Pasquotank taxcard.cfm?PP2= page is the public sale source.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37139/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37139/lookup.json",
+  "sourceCount": 2814,
+  "dropped": 0,
+  "tileCount": 4,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://link.co.pasquotank.nc.us/taxcard/taxcard.cfm?PP2={PPN_2}",
+  "gisViewerUrl": "https://pasquotankcounty.maps.arcgis.com/apps/instant/basic/index.html?appid=38fc8f0292b04ba0a300f801f17ae902"
+}

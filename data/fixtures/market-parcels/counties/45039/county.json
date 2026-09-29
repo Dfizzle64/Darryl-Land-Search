@@ -5,19 +5,29 @@
   "markets": [
     "Columbia"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 5031,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-fairfield-parcels-45039",
+  "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Source query returned 5061 rows; 5031 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are SC RFA Statewide_Parcels filtered to Fairfield County (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "tax gap: Both RFA layers (Statewide/18 and Fairfield_Kershaw_Richland_Map_WFL1/8) have value fields but 0 populated for Fairfield; no county value REST found. Values only via Beacon PA.",
+    "sale gap: RFA Statewide_Parcels has no sale date/price fields; no county sale REST found. Sales visible only on PA parcel page (HTML).",
+    "owner gap: Ownership empty for Fairfield on both RFA layers; no public owner REST found. Owner only via Beacon PA page.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "Parcel polygons now loadable from SC RFA Statewide_Parcels (layer 18, where County='Fairfield County') plus RFA county-specific layer; state-hosted inside boundary-program maps — fragile, snapshot extracts. No county-published parcel REST found 2026-09-28."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45039/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45039/lookup.json",
+  "sourceCount": 5061,
+  "dropped": 11,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://beacon.schneidercorp.com/Application.aspx?AppID=796&LayerID=11834&PageTypeID=4&PageID=5738&KeyValue={parcelId}",
+  "gisViewerUrl": "https://beacon.schneidercorp.com/Application.aspx?AppID=796&LayerID=11834&PageTypeID=2&PageID=5736"
 }

@@ -1,0 +1,851 @@
+{
+  "county": "Anson",
+  "state": "NC",
+  "msa": "Charlotte MSA",
+  "fips": "37007",
+  "cntyfips": "007",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "viewerLinkTemplate": "https://ansoncountygis.com/maps/",
+  "appraiserSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicAN/",
+  "taxBillSearchUrl": "https://www.bttaxpayerportal.com/itspublican/TaxBillSearch",
+  "joinKeys": [
+    "PIN",
+    "ACCTNUMBER",
+    "parno"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "ACCTNUMBER",
+        "parno"
+      ],
+      "bestLayer": "Vector/Parcels"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Vector/Parcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "ASSESSEDACREAGE",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 5820,
+      "bestLayer": "Vector/Parcels"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "NAME1+NAME2",
+        "ownname"
+      ],
+      "bestLayer": "Vector/Parcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "MAILADDRESS",
+        "MAILCITY",
+        "MAILSTATE",
+        "MAILZIP",
+        "mailadd"
+      ],
+      "bestLayer": "Vector/Parcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": false,
+      "fields": [
+        "SITUSADDRESS",
+        "PHYSADDRESS",
+        "siteadd",
+        "ADDR"
+      ],
+      "bestLayer": "Vector/Parcels",
+      "caveat": "SITUSADDRESS on ~17381 parcels; address points lack PIN (spatial only)"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SALEPRICE",
+        "DATEFLD"
+      ],
+      "bestLayer": "Vector/Parcels",
+      "caveat": "DATEFLD epoch ms UTC; ~6610 with SALEPRICE>0; last-sale only; OneMap date often null / no price"
+    },
+    "taxValues": {
+      "present": true,
+      "fields": [
+        "TOTMKT",
+        "CURTOTLND",
+        "CURTOTBLD",
+        "CURTOTTOT",
+        "DEFERVL",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "Vector/Parcels"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "CountyZoning",
+        "ZONECODE",
+        "ZONECODE2",
+        "ZONE_ID",
+        "ZoningDistrict",
+        "TYPE"
+      ],
+      "bestLayer": "ZoningLayers/MapServer (per municipality) + parcel CountyZoning",
+      "split": "Unincorporated CountyZoning vs Wadesboro/Ansonville(+ETJ)/Lilesville/Morven; Peachland/Polkton empty REST"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "LandUsePlan",
+        "CT_CAT",
+        "FLU_20"
+      ],
+      "bestLayer": "Vector/Parcels LandUsePlan attr",
+      "caveat": "MUN stub inside towns; Vision 2040 PDF for policy legend; FLU_20 sparse on polygon layer"
+    },
+    "viewerLink": {
+      "present": true,
+      "template": "https://ansoncountygis.com/maps/",
+      "taxSearch": "https://www.bttaxpayerportal.com/ITSPublicAN/",
+      "taxBillSearch": "https://www.bttaxpayerportal.com/itspublican/TaxBillSearch",
+      "keyField": "PIN"
+    }
+  },
+  "portals": [
+    {
+      "name": "Anson County ArcGIS Map",
+      "url": "https://ansoncountygis.com/maps/",
+      "notes": "Primary interactive viewer"
+    },
+    {
+      "name": "Legacy GIS viewer",
+      "url": "https://ansoncountygis.com/legacy/",
+      "notes": "Old Anson County GIS System"
+    },
+    {
+      "name": "County ArcGIS REST",
+      "url": "https://ansoncountygis.com/arcgis/rest/services",
+      "notes": "Vector, WebApp2026, ZoningLayers"
+    },
+    {
+      "name": "GIS / Mapping (Tax Assessor)",
+      "url": "https://www.co.anson.nc.us/190/Geographic-Information-System-Mapping",
+      "notes": "Official mapping page"
+    },
+    {
+      "name": "GIS Data Downloads",
+      "url": "https://www.co.anson.nc.us/252/GIS-Data-Downloads",
+      "notes": "ZIP shapefiles; NCGS 132-10 resale prohibited"
+    },
+    {
+      "name": "BT Taxpayer Portal Basic Search",
+      "url": "https://www.bttaxpayerportal.com/ITSPublicAN/",
+      "notes": "Owner / account / parcel"
+    },
+    {
+      "name": "BT Taxpayer Portal Tax Bill Search",
+      "url": "https://www.bttaxpayerportal.com/itspublican/TaxBillSearch",
+      "notes": "Tax bills by name/account/parcel"
+    },
+    {
+      "name": "Planning & Zoning",
+      "url": "https://www.co.anson.nc.us/177/Planning",
+      "notes": "Ordinance + PDF town zoning maps"
+    },
+    {
+      "name": "Vision for 2040",
+      "url": "https://www.co.anson.nc.us/DocumentCenter/View/575/Anson-County-Vision-2040_FINAL-April-2021-PDF",
+      "notes": "FLU policy PDF"
+    },
+    {
+      "name": "NC OneMap",
+      "url": "https://www.nconemap.gov",
+      "notes": "Statewide parcels FeatureServer"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Town of Wadesboro",
+      "districtLabel": "WADESBORO",
+      "cityHostedGis": false,
+      "zoning": [
+        {
+          "name": "Wadesboro Zoning",
+          "url": "https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/4",
+          "alternateUrls": [
+            "https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/66"
+          ],
+          "field": "ZONECODE",
+          "featureCount": 78,
+          "codesSample": [
+            "GB",
+            "LI",
+            "NB",
+            "R-6",
+            "HI",
+            "R0",
+            "R-20",
+            "CB",
+            "R-10",
+            "UK",
+            "R-8",
+            "R20-SU"
+          ],
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "downloads": [
+        "https://www.co.anson.nc.us/DocumentCenter/View/228/Wadesboro-Zoning-Lines-ZIP"
+      ],
+      "joinNotes": "Town zoning + county Vector Parcels (spatial, 2264) where CountyZoning='Mun.'. No independent city GIS."
+    },
+    {
+      "name": "Town of Ansonville",
+      "districtLabel": "ANSONVILLE",
+      "cityHostedGis": false,
+      "zoning": [
+        {
+          "name": "Ansonville Zoning",
+          "url": "https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/0",
+          "field": "ZONE_ID",
+          "featureCount": 76,
+          "codesSample": [
+            "R-1",
+            "R-A",
+            "R-2",
+            "G-B",
+            "M"
+          ],
+          "wkid": 102719,
+          "latestWkid": 2264
+        },
+        {
+          "name": "Ansonville ETJ Zoning",
+          "url": "https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/1",
+          "field": "ZONECODE",
+          "featureCount": 26,
+          "codesSample": [
+            "R20",
+            "LI",
+            "RA1",
+            "HB",
+            "I"
+          ],
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "downloads": [
+        "https://www.co.anson.nc.us/DocumentCenter/View/204/Ansonville-Zoning-Lines-ZIP"
+      ],
+      "joinNotes": "Town layer inside limits; ETJ layer with Municipal ETJ (Vector/13)."
+    },
+    {
+      "name": "Town of Lilesville",
+      "districtLabel": "LILESVILLE",
+      "cityHostedGis": false,
+      "zoning": [
+        {
+          "name": "Lilesville Zoning",
+          "url": "https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/2",
+          "field": "ZoningDistrict",
+          "featureCount": 54,
+          "codesSample": [
+            "R",
+            "TCD",
+            "GB-LI",
+            "RMH"
+          ],
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Town zoning + county parcels. FLU gap (parcel MUN)."
+    },
+    {
+      "name": "Town of Morven",
+      "districtLabel": "MORVEN",
+      "cityHostedGis": false,
+      "zoning": [
+        {
+          "name": "Morven Zoning",
+          "url": "https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/3",
+          "alternateUrls": [
+            "https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/65"
+          ],
+          "field": "TYPE",
+          "featureCount": 87,
+          "codesSample": [
+            "SFR-3",
+            "CIV",
+            "AG",
+            "SFR-2",
+            "MU-1",
+            "C-52",
+            "RMST",
+            "MS",
+            "IND",
+            "VSR"
+          ],
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "downloads": [
+        "https://www.co.anson.nc.us/DocumentCenter/View/220/Morven-Zoning-Lines-ZIP"
+      ],
+      "joinNotes": "Town zoning + county parcels. FLU gap."
+    },
+    {
+      "name": "Town of Peachland",
+      "districtLabel": "PEACHLAND",
+      "cityHostedGis": false,
+      "zoning": [
+        {
+          "name": "Peachland Zoning (EMPTY)",
+          "url": "https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/63",
+          "field": "ZONE_ID",
+          "featureCount": 0,
+          "status": "gap",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "downloads": [
+        "https://www.co.anson.nc.us/DocumentCenter/View/222/Peachland-Zoning-Lines-ZIP"
+      ],
+      "joinNotes": "REST empty — use ZIP shapefile or leave zoning null."
+    },
+    {
+      "name": "Town of Polkton",
+      "districtLabel": "POLKTON",
+      "cityHostedGis": false,
+      "zoning": [
+        {
+          "name": "Polkton Zoning (EMPTY)",
+          "url": "https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/64",
+          "field": "ZONE_ID",
+          "featureCount": 0,
+          "status": "gap",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "REST empty; no ZIP in downloads catalog; PDF/Vision 2040 only. Boundary on MunicipalBoundaries."
+    },
+    {
+      "name": "Town of McFarlan",
+      "districtLabel": "MCFARLAN",
+      "cityHostedGis": false,
+      "zoning": [],
+      "flu": [],
+      "joinNotes": "Municipal boundary only — zoning REST gap."
+    },
+    {
+      "name": "White Store / Lanesboro / Burnsville / Gulledge",
+      "districtLabel": null,
+      "cityHostedGis": false,
+      "zoning": [],
+      "flu": [],
+      "notes": "Township/PDF zoning maps on Planning DocumentCenter only — no queryable REST.",
+      "joinNotes": "Treat as zoning gap for wire integration."
+    }
+  ],
+  "layers": [
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales",
+        "situs",
+        "zoning",
+        "flu"
+      ],
+      "name": "Vector/Parcels",
+      "id": 10,
+      "url": "https://ansoncountygis.com/arcgis/rest/services/Vector/MapServer/10",
+      "alternateUrls": [
+        "https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/10"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 19153,
+      "acreage5to150": 5820,
+      "salePricePopulated": 6610,
+      "situsNonEmpty": 17381,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + ASSESSEDACREAGE 5-150 + SALEPRICE>0 + sample attrs",
+      "maxRecordCount": 1000,
+      "auth": "none",
+      "fields": {
+        "PIN": "12-digit parcel id (preferred)",
+        "ACCTNUMBER": "Tax account number",
+        "ASSESSEDACREAGE": "Assessed acres",
+        "NAME1": "Owner name 1",
+        "NAME2": "Owner name 2",
+        "MAILADDRESS": "Mailing street",
+        "MAILCITY": "Mailing city",
+        "MAILSTATE": "Mailing state",
+        "MAILZIP": "Mailing ZIP",
+        "SITUSADDRESS": "Situs / physical address text",
+        "PHYSADDRESS": "Partial physical address",
+        "SALEPRICE": "Last sale price (int)",
+        "DATEFLD": "Last sale date (epoch ms UTC)",
+        "TOTMKT": "Total market value",
+        "CURTOTLND": "Current land value",
+        "CURTOTBLD": "Current building value",
+        "CURTOTTOT": "Current total / assessed",
+        "DEFERVL": "Deferred value",
+        "CountyZoning": "Joined zoning code (Mun. = municipal)",
+        "LandUsePlan": "Joined FLU code (MUN = municipal stub)"
+      },
+      "countyZoningDistinct": {
+        "Mun.": 6835,
+        "RA-5": 5418,
+        "R-20": 2721,
+        "RA-3": 1632,
+        "R-40": 914,
+        "RA-1": 824,
+        "L-I": 302,
+        "RA-2": 232,
+        "H-I": 153,
+        "HB": 48,
+        "GB": 38,
+        "NB": 6
+      },
+      "landUsePlanDistinct": {
+        "MUN": 6838,
+        "RL": 6664,
+        "WF": 3336,
+        "SFN": 1065,
+        "LLR": 868,
+        "LIC": 137,
+        "POS": 90,
+        "SC": 79,
+        "HIC": 31,
+        "AIR": 18,
+        "MFN": 7,
+        "WATER": 5,
+        "ROS": 5,
+        "SO": 3
+      },
+      "notes": "PRIMARY wire-first. When CountyZoning='Mun.' spatial-join town zoning."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "ZoningLayers (group)",
+      "url": "https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "verified": true,
+      "verifiedHow": "per-layer returnCountOnly + objectIds attribute samples",
+      "queryQuirk": "where=1=1&outFields=* may return 0 features; use returnIdsOnly then objectIds batches",
+      "notes": "Layers: Ansonville/0 (76), AnsonvilleETJ/1 (26), Lilesville/2 (54), Morven/3 (87), Wadesboro/4 (78), County/5 (800)."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Anson County Zoning (unincorporated)",
+      "id": 5,
+      "url": "https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/5",
+      "alternateUrls": [
+        "https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/5"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 800,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + objectIds ZONECODE/ZONECODE2 samples",
+      "fields": {
+        "ZONECODE": "Zoning code (compact)",
+        "ZONECODE2": "Zoning code hyphenated (preferred)",
+        "Acres": "Zone acres",
+        "Split_Zoning_Jur": "Split zoning jurisdiction"
+      },
+      "notes": "Prefer ZONECODE2. Includes Mun. polygons — still join town layers for real codes."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Wadesboro Zoning",
+      "id": 4,
+      "url": "https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/4",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 78,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + objectIds ZONECODE enumeration",
+      "fields": {
+        "ZONECODE": "Zoning code"
+      }
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Ansonville Zoning",
+      "id": 0,
+      "url": "https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/0",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 76,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + objectIds ZONE_ID enumeration",
+      "fields": {
+        "ZONE_ID": "Zoning code"
+      }
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Ansonville ETJ Zoning",
+      "id": 1,
+      "url": "https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/1",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 26,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + objectIds ZONECODE enumeration",
+      "fields": {
+        "ZONECODE": "Zoning code"
+      }
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Lilesville Zoning",
+      "id": 2,
+      "url": "https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/2",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 54,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + objectIds ZoningDistrict enumeration",
+      "fields": {
+        "ZoningDistrict": "Zoning code",
+        "ZoningDistrictDef": "Zoning description"
+      }
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Morven Zoning",
+      "id": 3,
+      "url": "https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/3",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 87,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + objectIds TYPE enumeration",
+      "fields": {
+        "TYPE": "Zoning code"
+      }
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Peachland Zoning",
+      "id": 63,
+      "url": "https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/63",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 0,
+      "verified": true,
+      "verifiedHow": "returnCountOnly → 0",
+      "status": "gap",
+      "notes": "Empty REST; ZIP fallback on county downloads page."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Polkton Zoning",
+      "id": 64,
+      "url": "https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/64",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 0,
+      "verified": true,
+      "verifiedHow": "returnCountOnly → 0",
+      "status": "gap",
+      "notes": "Empty REST; no ZIP in downloads catalog."
+    },
+    {
+      "purpose": [
+        "flu"
+      ],
+      "name": "Land Use Plan",
+      "id": 17,
+      "url": "https://ansoncountygis.com/arcgis/rest/services/Vector/MapServer/17",
+      "alternateUrls": [
+        "https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/17"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 13322,
+      "flu20NonEmpty": 246,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + FLU_20/CT_CAT samples",
+      "fields": {
+        "PIN": "Parcel pin",
+        "Land_use": "Existing land use (often blank)",
+        "CT_CAT": "Category code",
+        "FLU_20": "Future land use code (sparse)",
+        "DEV_STAT": "Development status AGR|DEV|UNDEV|UNDER"
+      },
+      "notes": "Prefer parcel LandUsePlan attr for wire; polygon FLU_20 sparse."
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "Address Points",
+      "id": 3,
+      "url": "https://ansoncountygis.com/arcgis/rest/services/Vector/MapServer/3",
+      "geometry": "esriGeometryPoint",
+      "featureCount": 13907,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + field metadata",
+      "notes": "No PIN — spatial join only."
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "Municipal Boundaries",
+      "id": 12,
+      "url": "https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/12",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 8,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + NAME enumeration",
+      "fields": {
+        "NAME": "Municipality name"
+      },
+      "names": [
+        "ANSONVILLE",
+        "LILESVILLE",
+        "MCFARLAN",
+        "MORVEN",
+        "PEACHLAND",
+        "POLKTON",
+        "WADESBORO"
+      ]
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales"
+      ],
+      "name": "NC OneMap Parcels (polys)",
+      "id": 1,
+      "url": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 19127,
+      "acreage5to150": 5815,
+      "filter": "cntyfips='007'",
+      "verified": true,
+      "verifiedHow": "returnCountOnly cntyfips=007 + gisacres 5-150 + sample ownname/parno",
+      "maxRecordCount": 5000,
+      "fields": {
+        "parno": "Parcel number (↔ PIN)",
+        "ownname": "Owner",
+        "mailadd": "Mailing address",
+        "mcity": "Mailing city",
+        "mstate": "Mailing state",
+        "mzip": "Mailing ZIP",
+        "siteadd": "Site address (often empty)",
+        "gisacres": "GIS acres",
+        "saledate": "Sale date (often null)",
+        "parval": "Parcel value",
+        "landval": "Land value",
+        "improvval": "Improvement value"
+      },
+      "notes": "Fallback. Filter stub parno. Prefer county Vector/Parcels."
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "PUV (Present-Use Value)",
+      "id": 91,
+      "url": "https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/91",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 3636,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + field metadata",
+      "notes": "Optional agricultural deferred-value overlay."
+    }
+  ],
+  "gaps": [
+    "Peachland and Polkton zoning MapServer layers empty (count 0)",
+    "McFarlan / White Store / Lanesboro — no public zoning REST (PDF only)",
+    "Municipal FLU is LandUsePlan='MUN' stub; no town FLU FeatureServers",
+    "CountyZoning='Mun.' (~6835 parcels) requires spatial join to town layers",
+    "ZoningLayers where=1=1 attribute query quirk — use objectIds batches",
+    "Last-sale only; no multi-transfer sales FeatureServer",
+    "Address points lack PIN join key",
+    "OneMap Anson situs/sale sparse; stub out-of-county PINs",
+    "MaxRecordCount 1000 on county layers — paginate",
+    "NCGS 132-10 commercial resale limits on downloads",
+    "No independent city GIS hosts; no paid vendor data; no phones/emails"
+  ],
+  "handoff": {
+    "wireFirst": "https://ansoncountygis.com/arcgis/rest/services/Vector/MapServer/10",
+    "acreageFilter": "ASSESSEDACREAGE BETWEEN 5 AND 150",
+    "municipalZoningRule": "If CountyZoning='Mun.' (or centroid in MunicipalBoundaries), spatial-join matching town ZoningLayers layer in 2264",
+    "fluRule": "Use parcel LandUsePlan; treat MUN as unknown municipal FLU",
+    "fallback": "NC OneMap FeatureServer/1 where cntyfips='007'",
+    "auth": "none"
+  },
+  "license": "Anson County GIS public REST + downloads; NCGS 132-10 commercial resale prohibited; attribution expected",
+  "verifiedAt": "2026-09-23",
+  "verifiedBy": "GIS Research Executor",
+  "verifiedLayerCount": 15,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://ansoncountygis.com/arcgis/rest/services/Vector/MapServer/10",
+    "parcelIdField": "PIN",
+    "acreageFilter": "ASSESSEDACREAGE >= 5 AND ASSESSEDACREAGE <= 150",
+    "acres5to150Live": 5820,
+    "parcelCountLive": 19153,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='ANSON'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ANSON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ANSON%27&returnCountOnly=true&f=json",
+        "liveStationCount": 395,
+        "stationsWithAADT2022": 254
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Anson'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Anson%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Anson%27&returnCountOnly=true&f=json",
+        "liveStationCount": 390,
+        "stationsWithAADT2025": 71,
+        "stationsWithAADT2024": 249,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "stations2024CountyFilter": "County='Anson'",
+        "stations2024LiveCount": 390,
+        "stations2024WithAADT2024": 390,
+        "stations2024Note": "AADT_2024 string field populated on every station in this release",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TOTMKT",
+        "CURTOTTOT"
+      ],
+      "liveNonZero": {
+        "TOTMKT": 19060,
+        "CURTOTTOT": 19060
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SALEPRICE"
+      ],
+      "dateFields": [
+        "DATEFLD"
+      ],
+      "livePriceNonZero": {
+        "SALEPRICE": 6610
+      },
+      "liveDateNonNull": {
+        "DATEFLD": 18788
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "NAME1",
+        "NAME2"
+      ],
+      "rule": "Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).",
+      "regex": "\\b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "regexExtended": "\\b(LLC|L\\s?L\\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\\b|\\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\\s+OF\\b|\\bOF\\s+(EDUCATION|TRANSPORTATION)\\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\\b",
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "liveEntityCount5to150ac": 1201,
+      "liveEntityCount5to150acExtended": 1263,
+      "countNote": "Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.",
+      "sampleMatches": [
+        "STATE OF NORTH CAROLINA",
+        "STATE OF NORTH CAROLINA",
+        "WEYERHAEUSER FOREST HOLDINGS INC",
+        "STATE OF NORTH CAROLINA"
+      ]
+    },
+    "paDeepLink": {
+      "template": "https://www.bttaxpayerportal.com/ITSPublicAN/TaxBillSearch/Parcel/{PIN}",
+      "testedParcelId": "646000707992",
+      "testedUrl": "https://www.bttaxpayerportal.com/ITSPublicAN/TaxBillSearch/Parcel/646000707992",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": true,
+      "note": "Parcel id found in the response body."
+    },
+    "gisViewer": {
+      "url": "https://ansoncountygis.com/maps/",
+      "httpStatus": 200,
+      "pageTitle": "Avineon Web Map Template"
+    },
+    "gaps": []
+  }
+}

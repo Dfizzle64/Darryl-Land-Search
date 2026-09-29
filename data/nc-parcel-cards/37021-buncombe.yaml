@@ -1,0 +1,432 @@
+state: NC
+jurisdiction: Buncombe County
+fips: "37021"
+level: county
+markets: [Asheville]
+
+layers:
+  - role: parcels
+    name: opendata Property (Buncombe County)
+    restUrl: https://gis.buncombecounty.org/arcgis/rest/services/opendata/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      AccountNumber: parcelIdAlt
+      Acreage: acreage
+      Owner: ownerName
+      Address: mailingAddress.street
+      CityName: mailingAddress.city
+      State: mailingAddress.state
+      Zipcode: mailingAddress.zip
+      CareOf: mailingAddress.careOf
+      HouseNumber: situsAddress.number
+      NumberSuffix: situsAddress.numberSuffix
+      StreetPrefix: situsAddress.prefix
+      StreetName: situsAddress.street
+      StreetType: situsAddress.type
+      StreetPostDirection: situsAddress.postDir
+      DeedDate: lastSale.date
+      SalePrice: lastSale.price
+      Stamps: lastSale.stamps
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      TotalMarketValue: tax.marketValue
+      AppraisedValue: tax.appraisedValue
+      TaxValue: tax.assessedValue
+      LandValue: tax.landValue
+      BuildingValue: tax.improvementValue
+      City: municipalityCode
+      Class: dorCode
+      Improved: improved
+      LandUse: landUse
+      NeighborhoodCode: neighborhood
+      PropCard: appraiserSearchUrl
+      Township: township
+    notes: >
+      PRIMARY wire-first verified 2026-09-23: count 135287;
+      Acreage 5–150 → 10526; Improved blank/N in 5–150 → 4405;
+      SalePrice non-zero → 28305 (string; validate vs Spatialest — values often
+      look stamp-like/low). Address=mailing; compose situs from HouseNumber/Street*.
+      Tax values are strings — cast. CRS 102719/2264. MaxRecordCount 2000.
+      MapServer mirror opendata/MapServer/1. Host alias gis.buncombenc.gov.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-23: cntyfips='021' count 134741; gisacres>0 → 0 (UNUSABLE
+      for acreage / 5–150 filter); parval>0 → 116307. Geometry OK. No sale price.
+      Prefer county Property for acres. MaxRecordCount 5000. Alt host services.gis.nc.gov.
+    status: partial
+
+  - role: zoning
+    name: Buncombe County Zoning (unincorporated)
+    restUrl: https://gis.buncombecounty.org/arcgis/rest/services/opendata/FeatureServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZoningCode: zoning
+      Resolution: zoningResolution
+      DateZoned: zoningDate
+      Comment: zoningComment
+    notes: >
+      PRIMARY for UNINC only. Verified count 623. Codes: AI, BDM, CR, CS, EMP,
+      NS, OU, PS, R-1, R-2, R-3, R-LD. Does NOT cover Asheville/towns.
+      Mirrors: opendata/MapServer/5; bcmapimage2_B/MapServer/32 (ZONING_CODE).
+    status: usable
+
+  - role: zoning
+    name: County Zoning Overlay
+    restUrl: https://gis.buncombecounty.org/arcgis/rest/services/bcmapimage2_B/MapServer/33
+    layerId: 33
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      type: zoningOverlayType
+      PARKWAY: parkwayOverlay
+      GRIDCODE: overlayGridCode
+    notes: Verified count 30171. Overlay constraints (e.g. Parkway) — not base districts.
+    status: usable
+
+  - role: zoning
+    name: City of Asheville Zoning Districts
+    restUrl: https://gis.ashevillenc.gov/server/rest/services/Districts/ZoningDistricts/FeatureServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: acreage
+    coverage: city-only
+    fieldMap:
+      districts: zoning
+      ordinance: zoningOrdinance
+      hyperlink: zoningHyperlink
+      overlay_type: zoningOverlayType
+      status: zoningStatus
+      type: zoningType
+      acreage: zoningAcres
+    notes: >
+      Prefer most-local for CAS. Verified count 738; 46 distinct districts
+      (CBD, RM16, RS8, IND, UV, …). County stub bcmapimage2_B/29.
+    status: usable
+
+  - role: zoning
+    name: Asheville Property Zoning Categories
+    restUrl: https://gis.ashevillenc.gov/server/rest/services/Planning/PropertyZoningCategories/FeatureServer/79
+    layerId: 79
+    geometry: polygon
+    auth: none
+    acreageField: tax_acreage
+    coverage: city-only
+    fieldMap:
+      pinnum: parcelId
+      pin: parcelIdShort
+      address: situsAddress
+      tax_acreage: acreage
+      districts: zoning
+    notes: >
+      Parcel-attributed zoning for Asheville. Verified count 39803.
+      Join pinnum↔PIN. Cross-check spatial ZoningDistricts for authority.
+    status: usable
+
+  - role: zoning
+    name: Town of Weaverville Zoning (AGOL)
+    restUrl: https://services5.arcgis.com/lA7fMEY4qaPiZF6g/arcgis/rest/services/Zoning_ForApp/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Code: zoning
+    notes: >
+      Prefer most-local for CWV. Verified count 55. Codes C-1, C-2, CZD, I-1,
+      R-1, R-12, R-2, R-3. Alt polygons TOW_Zoning_WFL1_view/2 (145);
+      Zoning_ByParcels/0 with WVL_Zoning (2887). Experience viewer available.
+      Not on county bcmapimage2_B.
+    status: usable
+
+  - role: zoning
+    name: Town of Black Mountain Zoning (county host)
+    restUrl: https://gis.buncombecounty.org/arcgis/rest/services/bcmapimage2_B/MapServer/31
+    layerId: 31
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZoneCode: zoning
+    notes: >
+      Verified count 12. Codes CB, CR-1, HB-8, HI-0, ICD, LI-8, NMU-8, OI-6,
+      SR-2, TND, TR-4, UR-8. Alt bcmap_vt/61. No separate town FS found.
+    status: usable
+
+  - role: zoning
+    name: Town of Woodfin Zoning (county host)
+    restUrl: https://gis.buncombecounty.org/arcgis/rest/services/bcmapimage2_B/MapServer/30
+    layerId: 30
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZoneCode: zoning
+    notes: >
+      Verified count 9. Codes Community Shopping, Heavy Industrial, Light Industrial,
+      Mountain Village, R-7, R-10, R-21, R-43, Transitional District. Alt bcmap_vt/59.
+      County stub — town does not publish own public FS.
+    status: usable
+
+  - role: zoning
+    name: Montreat Zoning
+    restUrl: https://gis.buncombecounty.org/arcgis/rest/services/Montreat_Map/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+    notes: >
+      Verified count 8. Codes Conservation, Institutional, Institutional Residential,
+      R-1, R-1 CZ, R-2, R-3, Woodland. Alt bcmap_vt/66.
+    status: usable
+
+  - role: zoning
+    name: Town of Biltmore Forest Zoning
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      No public ArcGIS REST verified. Town publishes zoning PDF only
+      (biltmoreforest.org/planning-zoning/maps). County parcels City=CBF usable;
+      do not invent county Zoning coverage for CBF.
+    status: gap
+
+  - role: flu
+    name: Asheville Future Land Use Overlay
+    restUrl: https://gis.ashevillenc.gov/server/rest/services/Planning/FutureLandUseOverlay/FeatureServer/67
+    layerId: 67
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      commtype: flu
+    notes: >
+      Verified count 24 (coarse). Types: Downtown, Town Center, Urban Center,
+      Urban/Traditional Corridor, Traditional/Residential Neighborhood,
+      Neighborhood Centers, Employment / Anchor Institution,
+      Industrial / Manufacturing, Parks and Open Space, Regional Corridor.
+      Spatial join only — no PIN.
+    status: usable
+
+  - role: flu
+    name: Growth Equity Conservation Map (county)
+    restUrl: https://gis.buncombecounty.org/arcgis/rest/services/bcmap_vt/MapServer/57
+    layerId: 57
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Name: flu
+    notes: >
+      FLU-adjacent comprehensive-plan categories. Verified count 202.
+      Names: CWL, INST, MU1, MU2, MUN, MUNIC, PPL, RC, WDC.
+      Not a full municipal FLU substitute. Comp Land Use Plan 2013 is map/PDF.
+    status: partial
+
+  - role: other
+    name: Incorporated Areas
+    restUrl: https://gis.buncombecounty.org/arcgis/rest/services/opendata/FeatureServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      DistCode: municipalityCode
+      Description: municipality
+    notes: >
+      Codes CAS Asheville, CBF Biltmore Forest, CBM Black Mountain, CMT Montreat,
+      CWV Weaverville, CWO Woodfin. Pair with parcel City for routing.
+    status: usable
+
+  - role: sales
+    name: Property SalePrice / DeedDate (on parcels)
+    restUrl: https://gis.buncombecounty.org/arcgis/rest/services/opendata/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      DeedDate: lastSale.date
+      SalePrice: lastSale.price
+      Stamps: lastSale.stamps
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+    notes: >
+      No separate sales FeatureServer verified. SalePrice string ~28305 non-zero;
+      validate against Spatialest PropCard. Stamps + DeedDate available.
+    status: partial
+
+gaps:
+  - No zoning attribute on primary Property layer — spatial join by municipality required
+  - County Zoning FS/5 is unincorporated only — never treat as countywide
+  - Biltmore Forest zoning REST missing (PDF only)
+  - No dedicated public FLU REST for Weaverville, Black Mountain, Woodfin, Montreat, Biltmore Forest
+  - County FLU limited to GEC coarse categories + 2013 Comp Plan map/PDF
+  - Asheville FLU only 24 coarse commtype polygons
+  - NC OneMap gisacres all 0 for Buncombe — do not use for 5–150 acreage filter
+  - SalePrice reliability uncertain (stamp-like/low samples) — validate via Spatialest
+  - Tax/value fields are strings — cast to number
+  - Situs must be composed from HouseNumber/Street* (Address is mailing)
+  - MaxRecordCount 2000 on county opendata — paginate
+  - No paid vendor data; no phones/emails collected
+license: "Buncombe County / City of Asheville / town public GIS; NCGS Chapter 132 / county GIS disclaimer; attribution recommended"
+appraiserSearchUrl: https://prc-buncombe.spatialest.com/
+verifiedAt: 2026-09-23
+verifiedBy: North Carolina Public Info Researcher
+jurisdictionGisUrl: https://gis.buncombenc.gov/buncomap/
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://gis.buncombecounty.org/arcgis/rest/services/opendata/FeatureServer/1
+  parcelIdField: PIN
+  acreageFilter: Acreage >= 5 AND Acreage <= 150
+  acres5to150Live: 10526
+  parcelCountLive: 135323
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='BUNCOMBE'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27BUNCOMBE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27BUNCOMBE%27&returnCountOnly=true&f=json
+      liveStationCount: 879
+      stationsWithAADT2022: 823
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Buncombe'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Buncombe%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Buncombe%27&returnCountOnly=true&f=json
+      liveStationCount: 878
+      stationsWithAADT2025: 155
+      stationsWithAADT2024: 673
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TotalMarketValue
+    - TaxValue
+    allTaxFieldsOnLayer:
+    - TotalMarketValue
+    - AppraisedValue
+    - TaxValue
+    - LandValue
+    - BuildingValue
+    liveNonZero:
+      TotalMarketValue: 130873
+      TaxValue: 130872
+    status: ok
+    note: 'Value fields are strings: use CAST(field AS FLOAT) > 0.'
+  sale:
+    priceFields:
+    - SalePrice
+    dateFields:
+    - DeedDate
+    livePriceNonZero:
+      SalePrice: 28302
+    liveDateNonNull:
+      DeedDate: 135323
+    status: ok
+    note: SalePrice and DeedDate are strings; CAST SalePrice AS FLOAT.
+  ownerEntity:
+    ownerFields:
+    - Owner
+    primaryOwnerField: Owner
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(Owner) LIKE '% LLC%' OR UPPER(Owner) LIKE '% INC%' OR UPPER(Owner) LIKE '% LP%' OR UPPER(Owner) LIKE '% LLP%' OR UPPER(Owner) LIKE '% LTD%' OR UPPER(Owner) LIKE '% TRUST%' OR UPPER(Owner) LIKE '% CHURCH%' OR UPPER(Owner) LIKE '% COMPANY%' OR UPPER(Owner) LIKE '% PARTNERSHIP%' OR UPPER(Owner) LIKE '% HOLDINGS%' OR UPPER(Owner) LIKE '% PROPERTIES%' OR UPPER(Owner) LIKE '% CORP%' OR UPPER(Owner) LIKE '%,LLC%' OR UPPER(Owner) LIKE '%,INC%' OR UPPER(Owner) LIKE 'CITY OF %' OR UPPER(Owner) LIKE 'COUNTY OF %' OR UPPER(Owner) LIKE 'STATE OF %' OR UPPER(Owner) LIKE 'TOWN OF %')
+    liveEntityCountAll: 31255
+    liveEntityCount5to150ac: 3102
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://prc-buncombe.spatialest.com/#/property/{PIN}
+    testedParcelId: '878064941500000'
+    testedUrl: https://prc-buncombe.spatialest.com/#/property/878064941500000
+    httpStatus: 200
+    contentType: text/html; charset=UTF-8
+    contentVerified: false
+    note: 'Spatialest SPA (hash route): 200 shell, parcel content cannot be checked server-side.'
+  gisViewer:
+    url: https://gis.buncombenc.gov/buncomap/
+    httpStatus: 200
+    pageTitle: Buncombe County GIS
+    note: Card URL https://gis.buncombenc.gov/buncomap_new/ now returns 404 (http too); use /buncomap/ (200, ArcGIS JS viewer).
+    previousUrl404: https://gis.buncombenc.gov/buncomap_new/
+  gaps:
+  - jurisdictionGisUrl buncomap_new 404, replaced with /buncomap/

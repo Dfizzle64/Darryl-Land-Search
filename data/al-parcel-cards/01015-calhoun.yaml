@@ -1,0 +1,143 @@
+state: AL
+jurisdiction: Calhoun County
+fips: "01015"
+level: county
+markets: [Rural OZ 2.0]
+
+layers:
+  - role: parcels
+    name: Owner Parcels (Calhoun County Parcel_Viewer_IPV)
+    restUrl: "https://gis.calhouncounty.org/arcgis/rest/services/Parcel_Viewer_IPV/MapServer/106"
+    layerId: 106
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NUMBER: parcelId
+      PPIN: parcelIdKey (deep-link)
+      NAME: ownerName
+      PREVIOUS_OWNER: ownerNamePrior
+      ADDRESS_1: mailingAddress.line1
+      ADDRESS_2: mailingAddress.street
+      ADDRESS_3: mailingAddress.line3
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIPCODE: mailingAddress.zip
+      STREET_ADDRESS: situsAddress
+      CALCULATED_ACRES: acreage
+      DEEDED_ACRES: acreageDeed
+      TOTAL_LAND_VALUE: tax.landValue
+      TOTAL_IMPROVEMENT_VALUE: tax.improvementValue
+      TOTAL_VALUE: tax.marketValue
+      TOTAL_ASSD_VALUE: tax.assessedValue
+      TAX_DISTRICT: tax.district
+      SALE_PRICE: lastSale.price
+      SALE_DATE: lastSale.date
+      GOOD_SALE: lastSale.qualified
+      LAST_DEED_BOOK: lastSale.deedBook
+      LAST_DEED_PAGE: lastSale.deedPage
+      LAND_USE: dorCode
+      CURRENT_USE: currentUse
+      NEIGHBORHOOD: neighborhood
+      SUBDIVISION_DESC: subdivision
+      IMP_YEAR_BUILT: yearBuilt
+    notes: >
+      Verified live 2026-09-28: ?f=json 200, anonymous, polygon, count 75424, maxRecordCount 10000; sample centroid -85.81,33.86 (Jacksonville, Calhoun AL — not Calhoun GA/IL). County-hosted ArcGIS Server 12 (gis.calhouncounty.org/arcgis/rest/services, directory browsable). Owner/mail/situs/CALCULATED_ACRES/values/SALE_PRICE+SALE_DATE+GOOD_SALE/LAND_USE present. Layer 105 Sales mirrors same schema/count. Other service layers: Subdivisions/80, FEMA Flood/91, city limits 92-100. No county zoning layer.
+    status: usable
+
+gaps:
+  - SALE_PRICE often 0
+  - No county zoning layer
+  - altags.com deep-link pattern inferred from Lauderdale ISV config; altags.com unreachable from box 2026-09-28
+
+license: "Calhoun County Revenue Commission; online viewing free; shapefile DVD requires agreement"
+appraiserSearchUrl: "https://altags.com/calhoun_revenue/PropertyDetails.aspx?ppin={PIN}"
+appraiserSearchUrlAlt: "https://altags.com/calhoun_revenue/property.aspx"
+jurisdictionGisUrl: "https://gis.calhouncounty.org/Parcelviewer/"
+ruralOz2:
+  source: "IRS Rev. Proc. 2026-14 appendix (Rural Status=Rural)"
+  ruralEligibleTracts: 16
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    yearField: "YearAADT"
+    year: 2024
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    luCountyId: 8
+    countyWhere: "YearAADT=2024 AND LUCountyID=8 AND AADT>0"
+    stations2024: 655
+    verifiedAt: "2026-09-28"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "LUCountyID=8 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 655 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location. Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/."
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://gis.calhouncounty.org/arcgis/rest/services/Parcel_Viewer_IPV/MapServer/106
+  featureCount: 75424
+  taxSaleOwner:
+    ownerName:
+      field: NAME
+      status: usable
+    assessedValue:
+      field: TOTAL_ASSD_VALUE
+      status: usable
+      nonNullOrPositiveCount: 74282
+      ofTotal: 75424
+    appraisedOrMarketValue:
+      field: TOTAL_VALUE
+      status: usable
+      nonNullOrPositiveCount: 74482
+      ofTotal: 75424
+    landValue:
+      field: TOTAL_LAND_VALUE
+      status: usable
+    improvementValue:
+      field: TOTAL_IMPROVEMENT_VALUE
+      status: usable
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: property-record page at appraiserSearchUrl
+    lastSaleDate:
+      field: SALE_DATE
+      status: usable
+      nonNullOrPositiveCount: 57598
+      ofTotal: 75424
+    lastSalePrice:
+      field: SALE_PRICE
+      status: usable
+      nonNullOrPositiveCount: 32698
+      ofTotal: 75424
+    ownerEntityType:
+      derivable: true
+      sourceField: NAME
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 6120
+        INC: 1722
+        TRUST: 1661
+        CORP: 228
+        CHURCH: 982
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://altags.com/calhoun_revenue/PropertyDetails.aspx?ppin={PIN}
+    pinField: PPIN
+    testPin: '37896'
+    verified: 'yes'
+    method: fetched via external fetcher (box gets TLS EOF from altags.com)
+    note: Page returned PPIN 37896, parcel 07-08-28-0-000-011.000, owner, appraised/assessed, tax due, deed date and book/page; matches layer.
+  jurisdictionGisUrl:
+    url: https://gis.calhouncounty.org/Parcelviewer/
+    http: 200

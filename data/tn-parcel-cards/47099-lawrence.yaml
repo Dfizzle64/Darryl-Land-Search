@@ -1,0 +1,366 @@
+state: TN
+jurisdiction: Lawrence County
+fips: '47099'
+level: county
+markets:
+- Nashville
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=50)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 25,786; DEEDAC 5–150 → 6540; id GISLINK populated=True; geo PASS (5/5 centroids
+    in county, 5/5 polys touch county) (35.45036,-87.4302)→Lawrence; (35.33727,-87.4746)→Lawrence; (35.23476,-87.4279)→Lawrence
+    (where COUNTY_ID=50). Service lastEditDate 2026-09-10 (PARCELID suffix 2026) — freshest public owner/geometry;
+    no sale/value/CALC_ACRE (DEEDAC often 0 — derive geodesic acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 7699
+- role: parcels
+  name: Lawrence County Parcels (magnumpc25 / Lawrence GDB CAMA)
+  restUrl: https://services9.arcgis.com/5SWQTB2G8AH9RQYE/arcgis/rest/services/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    ID: parcelIdDisplay
+    PARCELID: parcelIdFull
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    ST_NUM: situsAddress.number
+    STREET: situsAddress.street
+    CALC_ACRE: acreage
+    CAMADEEDAC: acreageDeed
+    CAMACALCAC: acreageCamaCalc
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    DEEDBKPG: lastSale.deedBookPage
+    LANDUSE: dorCode
+    ZONING: zoning
+    PROPTYPE: propType
+    DISTRICT: taxDistrict
+    COUNTY_ID: countyId
+    JUR: jurisdictionCode
+  notes: 'Preferred county CAMA/AGOL — Lawrence is ABSENT from statewide TN_County_Parcel_Map (no Lawrence_Parcels
+    layer among 84). Live 2026-09-24 ET: 26,039 polys; CALC_ACRE 5–150 → 7,920. Geo-verify PASS — sample centroids
+    ~35.46N, 87.44W WGS84 (Lawrenceburg / Lawrence TN). GISLINK/JUR prefix 050; COUNTY_ID=50. Richer than statewide
+    joins: IMPVAL, mailing, ZONING attr (often blank rural). TAXYR observed 2025 on PARCELID. OZ 2.0: national tract
+    join by centroid. 2026-09-28 ET TN PIR re-verify: count 26,039; CALC_ACRE 5–150 → 7920; id GISLINK populated=True;
+    geo PASS (5/5 centroids in county, 5/5 polys touch county) (35.45485,-87.4376)→Lawrence; (35.23149,-87.46358)→Lawrence;
+    (35.0204,-87.55788)→Lawrence.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: GISLINK
+  salesValueVintage: 2025
+  sourceEditDate: '2025-09-11'
+- role: parcels
+  name: IMPACT Parcels (COUNTY_ID=50) — egress-sensitive sibling
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+  notes: 'Filter COUNTY_ID=50 AND PARCEL_TYPE=1. maps.cot.tn.gov 403 from box egress 2026-09-24 — prefer magnumpc25
+    Parcels. Themes JUR=''050'' when IMPACT reachable. 2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP 403 from box —
+    not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes (JUR='050') — CAMA when IMPACT reachable
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    ADDRESS: situsAddress
+    CALC_ACRE: acreage
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    LANDUSE: dorCode
+    ZONING: zoning
+    TAXYR: taxYear
+  notes: 'Filter JUR=''050''; prefer latest TAXYR. Prefer magnumpc25 when IMPACT blocked. 2026-09-28 ET TN PIR:
+    maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: zoning
+  name: City of Lawrenceburg TN Zoning service — city parcels / UGB (NOT county zoning districts)
+  restUrl: https://services1.arcgis.com/sPTEq2CjjwVxhAIM/arcgis/rest/services/City_of_Lawrenceburg_TN_Zoning/FeatureServer
+  layerId: null
+  coverage: city-only
+  fieldMap: {}
+  notes: 'Collier Engineering service: layers include City of Lawrenceburg Parcels (3), Urban Growth Potential (4),
+    City Boundary (5), UGB (8), FEMA/Wetlands — no named zoning-district polygon layer observed. Countywide zoning
+    REST honest gap. Do not treat as county zoning fabric.'
+  status: partial
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: flu
+  name: null — no public FLU FeatureServer
+  restUrl: null
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: unknown
+  fieldMap: {}
+  notes: No adopted FLU FeatureServer found (2026-09-24).
+  status: gap
+- role: other
+  name: TDOT Traffic Lines (AADT statewide)
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: state-wide (filter county)
+  fieldMap:
+    AADT: aadt
+    AADTYEAR: aadtYear
+    COUNTY_NUMBER: countyNumberTdot
+    ROUTE_ID: routeId
+    FUNCTIONAL_CLASS: functionalClass
+  notes: Added 2026-09-28 ET TN PIR Pass 2. Filter COUNTY_NUMBER='50' AND AADTYEAR='2025' → 1,823 segments (all
+    years 1,998). COUNTY_NUMBER = TDOT alphabetical county no. (NOT FIPS).
+  status: usable
+  auth: none
+  geometry: polyline
+  use: aadt-screening
+gaps:
+- Lawrence absent from statewide TN_County_Parcel_Map AGOL (use county magnumpc25 CAMA)
+- No countywide zoning FeatureServer (Lawrenceburg city service lacks district polys)
+- No adopted FLU FeatureServer
+- IMPACT maps.cot.tn.gov egress-sensitive (403)
+- Avoid Lawrence County PA / NC / IN twins; avoid New Castle PA Tax Map 2.0 experience
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings only.
+license: Lawrence County / magnumpc25 AGOL CAMA / IMPACT-TPAD public records — attribution required. No paid GIS
+  purchase channel.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+publicGisUrl: https://lawcotn.giswebtechguru.com/
+jurisdictionGisUrl: https://lawrencecountytn.gov/government/departments/assessor-of-property/
+zoningOverall: gap
+packagingNote: 'Wave 3C TRANCHE-3 dig 2026-09-24. Primary = magnumpc25 Parcels/0 (JUR 050) — not on statewide TN_County_Parcel_Map.
+  TPAD {GISLINK}. Public GIS = lawcotn.giswebtechguru.com + tnmap Assessment. Skip utilities + AADT. OZ 2.0 = national
+  tract join. RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added OIR. LSB-approved parcel setup
+  applied 2026-09-28 (see parcelSetup).'
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=50
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services9.arcgis.com/5SWQTB2G8AH9RQYE/arcgis/rest/services/Parcels/FeatureServer/0
+  joinKey: OIR.GISLINK = GISLINK
+  salesValueVintage: 2025
+  salesValueSourceEditDate: '2025-09-11'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 7699
+  gislinkJoinSample: 10/10 (100%)
+  exception: Lawrence is ABSENT from TN_County_Parcel_Map; county magnumpc25 CAMA layer (service edit 2025-09-11,
+    TAXYR field 2026, sales into late 2024+) is the sale/value source.
+aadt:
+  source: TDOT Traffic Lines
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  field: AADT
+  yearField: AADTYEAR
+  preferredYear: '2025'
+  countyFilterField: COUNTY_NUMBER
+  countyNumberTdot: '50'
+  where: COUNTY_NUMBER='50' AND AADTYEAR='2025'
+  count2025: 1823
+  countAllYears: 1998
+  maxAADT2025: 23218
+  segments2025AADTge5000: 51
+  status: usable
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+ownerEntityTypeRule:
+  appliesTo: OWNER + ' ' + OWNER2 (upper-cased; OWNER2 dropped when it starts with C/O, ATTN, %, CARE OF); first
+    match wins
+  order:
+  - type: church
+    regex: \b(CHURCH|BAPTIST|METHODIST|PRESBYTERIAN|LUTHERAN|EPISCOPAL|CATHOLIC|DIOCESE|MINISTR(Y|IES)|CONGREGATION|FELLOWSHIP|TABERNACLE|TEMPLE|CHAPEL|ASSEMBLY
+      OF GOD|CHURCH OF CHRIST|CEMETERY)\b
+  - type: government
+    regex: \b(UNITED STATES|U ?S ?A|USA|STATE OF (TENNESSEE|TN)|TENNESSEE (STATE|DEPT|DEPARTMENT)|DEPT OF|DEPARTMENT
+      OF|COUNTY OF|CITY OF|TOWN OF|BOARD OF EDUCATION|TENNESSEE VALLEY AUTHORITY|TVA|UTILITY DISTRICT|HOUSING AUTHORITY|WILDLIFE
+      RESOURCES|TWRA|CORPS OF ENGINEERS|NATIONAL PARK)\b|\b[A-Z]+ COUNTY( GOVERNMENT| BOARD| COMMISSION| SCHOOLS?|
+      HIGHWAY( DEPT)?)?\s*$
+  - type: LLC
+    regex: \b(L\.?\s?L\.?\s?C|P\.?L\.?L\.?C)\b\.?|LIMITED LIABILITY (COMPANY|CO)
+  - type: LP
+    regex: \b(L\.?L\.?L\.?P|L\.?L\.?P|L\.?P|LTD|LIMITED PARTNERSHIP|PARTNERSHIP|PARTNERS)\b
+  - type: INC
+    regex: \b(INC|INCORPORATED)\b\.?
+  - type: CORP
+    regex: \b(CORP|CORPORATION|COMPANY|CO)\b\.?\s*$|\bCORP\b|\bCORPORATION\b
+  - type: TRUST
+    regex: \b(TRUST|TRUSTS|TRUSTEE|TRUSTEES|TRSTE|TR|TRS|RLT|REV(OCABLE)? (LIVING )?TR(UST)?)\b|\(TR\)
+  - type: individual
+    regex: .*
+  noContactInfo: true
+  contactFieldsExcluded:
+  - MAILADDR
+  - MAILCITY
+  - ZIP
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+  status:
+    a: verified
+    b: verified
+    c: verified
+    d: verified
+    e: verified
+    f: verified
+  a_aadt:
+    countyNumberTdot: '50'
+    where: COUNTY_NUMBER='50' AND AADTYEAR='2025'
+    count2025: 1823
+    countAllYears: 1998
+    maxAADT2025: 23218
+    segments2025AADTge5000: 51
+  b_value:
+    source: https://services9.arcgis.com/5SWQTB2G8AH9RQYE/arcgis/rest/services/Parcels/FeatureServer/0
+    fields:
+      LANDVAL: tax.landValue
+      IMPVAL: tax.improvementValue
+      APPRAISAL: tax.marketValue
+    populatedCounts:
+      LANDVAL: 24948
+      IMPVAL: 18858
+      APPRAISAL: 24957
+    layerTotal: 26039
+    missingMappedFields: []
+  c_sale:
+    source: https://services9.arcgis.com/5SWQTB2G8AH9RQYE/arcgis/rest/services/Parcels/FeatureServer/0
+    fields:
+      SALEDATE: lastSale.date
+      PRICE: lastSale.price
+      VI: lastSale.qualified
+      DEEDBKPG: lastSale.deedBookPage
+      V_SALEDATE: (live, unmapped)
+      V_PRICE: (live, unmapped)
+      V_VI: (live, unmapped)
+      V_DEEDBKPG: (live, unmapped)
+    populatedCounts:
+      SALEDATE: 14028
+      PRICE: 14027
+      VI: 14026
+      DEEDBKPG: 14028
+      V_SALEDATE: 10319
+      V_PRICE: 10316
+      V_VI: 10319
+      V_DEEDBKPG: 10319
+    dateField: SALEDATE
+    priceFields:
+    - PRICE
+    - V_PRICE
+    liveMaxSaleDate: 2025-06-25 (string SALEDATE MM/DD/YYYY parsed)
+    joinedSample5to150:
+      sampleIds: 10
+      matched: 10
+      valuePopulated: 10
+      saleDatePopulated: 10
+    saleHistory: 'Public per-parcel only: TPAD Parcel Details "Sale Information" table (date, price, book/page,
+      vacant/improved, instrument, qualification) via PA deep link; no bulk sale-history layer on public GIS'
+  d_owner:
+    source: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+    filter: COUNTY_ID=50
+    ownerField: OWNER
+    owner2Field: OWNER2
+    total: 25786
+    ownerPopulated: 25778
+    entitySampleN: 2000
+    entityDist:
+      individual: 1819
+      TRUST: 79
+      LLC: 40
+      church: 29
+      CORP: 15
+      INC: 9
+      government: 9
+  e_paDeepLink:
+    template: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+    testUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink=050088%20%20%20%2004600
+    testGislink: 050088    04600
+    httpBox: '403'
+    httpExternal: 200 details
+    taxYearShown: '2027'
+    saleHistoryRows: 5
+    note: Lawrence absent from TNCPM but present in TPAD
+    perParcelFieldOnOIR: LINK_TPAD
+  f_viewer:
+    url: https://lawrencecountytn.gov/government/departments/assessor-of-property/
+    http: '200'
+    arcgisItem: null
+    statewideTPV: https://tnmap.tn.gov/assessment/#/parcel/{GISLINK} (OIR LINK_TPV) HTTP 200
+    isStatewideFallback: false
+  vintage:
+    salesValueVintage: 2025
+    salesValueSourceEditDate: '2025-09-11'
+    liveMaxSaleDate: 2025-06-25 (string SALEDATE MM/DD/YYYY parsed)
+    serviceLastEdit: '2025-09-11'
+  notes:
+  - Max SALEDATE (string MM/DD/YYYY, parsed) = 2025-06-25 (280 rows in 2025, 0 in 2026), consistent with vintage
+    2025 / service edit 2025-09-11. V_SALEDATE/V_PRICE/V_VI/V_DEEDBKPG are live but unmapped (10,319 populated);
+    primary lastSale = SALEDATE/PRICE.

@@ -1,0 +1,755 @@
+{
+  "county": "Davidson",
+  "state": "NC",
+  "msa": "Winston-Salem MSA",
+  "fips": "37057",
+  "cntyfips": "057",
+  "note": "North Carolina Davidson County (Winston-Salem MSA) \u2014 NOT Davidson County, Tennessee",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "viewerLinkTemplate": "https://webgis.co.davidson.nc.us/DavidsonGIS/",
+  "appraiserSearchUrl": "https://taxsearch.co.davidson.nc.us/RealEstateSearch",
+  "basicSearchUrl": "https://taxsearch.co.davidson.nc.us/",
+  "gisDownloadsUrl": "https://dcnet.co.davidson.nc.us/GIS/Web_GISDownloads.aspx",
+  "joinKeys": [
+    "PIN",
+    "PinNumber",
+    "PARCEL_ID",
+    "AccountNumber",
+    "parno"
+  ],
+  "cityCodeMap": {
+    "07": "Lexington",
+    "28": "Thomasville",
+    "32": "Midway",
+    "33": "Denton",
+    "34": "Wallburg",
+    "39": "High Point",
+    "null": "Unincorporated"
+  },
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "PinNumber",
+        "PARCEL_ID",
+        "AccountNumber",
+        "parno"
+      ],
+      "bestLayer": "OpenGov/TaxParcels"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "OpenGov/TaxParcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "LegalLandUnits",
+        "LegalLandType",
+        "gisacres",
+        "Shape.STArea()"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountLegalAc": 12102,
+      "approxCountShapeArea": 11781,
+      "bestLayer": "OpenGov/TaxParcels"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Name1+Name2",
+        "ownname"
+      ],
+      "bestLayer": "OpenGov/TaxParcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "Address1",
+        "Address2",
+        "Address3",
+        "City",
+        "State",
+        "ZipCode",
+        "mailadd"
+      ],
+      "bestLayer": "OpenGov/TaxParcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": false,
+      "fields": [
+        "PropertyAddress",
+        "HouseNumber+StreetName+StreetType",
+        "siteadd",
+        "FAddress"
+      ],
+      "bestLayer": "OpenGov/TaxParcels",
+      "caveat": "On primary TaxParcels polygons; address points lack PIN (spatial join only)"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SaleYear1",
+        "SaleMonth1",
+        "SalePrice1",
+        "QualifiedCode1",
+        "Sale*2-5",
+        "SalePropertyReal_*"
+      ],
+      "bestLayer": "OpenGov/TaxParcels",
+      "caveat": "Compose date from SaleYear+SaleMonth; up to 5 transfers; Qualified Sales layer for post-2022 comps"
+    },
+    "taxValues": {
+      "present": true,
+      "fields": [
+        "TotalMarketValue",
+        "TotalAssessedValue",
+        "ParcelLandValue",
+        "ParcelBuildingValue",
+        "ParcelObxfValue",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "OpenGov/TaxParcels"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "LandZoning",
+        "ZoningDistrict",
+        "ZONING",
+        "ZONE_CODE"
+      ],
+      "bestLayer": "OpenGov/TaxParcels LandZoning + municipal polygons",
+      "split": "County unincorporated vs Lexington/Thomasville/Wallburg/Midway/Denton/High Point"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "FLU"
+      ],
+      "bestLayer": "Wallburg_LDP_2026 Future Land Use",
+      "caveat": "Wallburg only on public REST; other munis gap"
+    },
+    "viewerLink": {
+      "present": true,
+      "template": "https://webgis.co.davidson.nc.us/DavidsonGIS/",
+      "taxSearch": "https://taxsearch.co.davidson.nc.us/RealEstateSearch",
+      "keyField": "PIN"
+    }
+  },
+  "portals": [
+    {
+      "name": "Davidson WebGIS",
+      "url": "https://webgis.co.davidson.nc.us/DavidsonGIS/",
+      "notes": "Interactive parcels/zoning/qualified sales"
+    },
+    {
+      "name": "County ArcGIS REST",
+      "url": "https://webgis.co.davidson.nc.us/arcgis/rest/services",
+      "notes": "OpenGov, Lexington, FrameworkData, webGIS, EconDev, Parcels"
+    },
+    {
+      "name": "Tax Real Estate Search",
+      "url": "https://taxsearch.co.davidson.nc.us/RealEstateSearch",
+      "notes": "Assessor search; also BasicSearch root"
+    },
+    {
+      "name": "GIS Downloads",
+      "url": "https://dcnet.co.davidson.nc.us/GIS/Web_GISDownloads.aspx",
+      "notes": "Parcels, addresses, CountyZoning shapefiles"
+    },
+    {
+      "name": "Tax Database Downloads",
+      "url": "https://co.davidson.nc.us/866/Tax-Database-Downloads",
+      "notes": "CSV/TXT CAMA extracts"
+    },
+    {
+      "name": "Lexington Hub",
+      "url": "https://lexingtonnc-cityoflexington.hub.arcgis.com/",
+      "notes": "City zoning FeatureServer + apps"
+    },
+    {
+      "name": "Lexington Zoning & Land Use app",
+      "url": "https://cityoflexington.maps.arcgis.com/apps/webappviewer/index.html?id=e81ad2a083634782a0bd4f17328ff950",
+      "notes": "City web map"
+    },
+    {
+      "name": "PTRC ArcGIS REST",
+      "url": "https://maps.ptrc.org/arcgis/rest/services",
+      "notes": "Thomasville, Wallburg LDP, Lexington CityLimits"
+    },
+    {
+      "name": "NC OneMap",
+      "url": "https://www.nconemap.gov",
+      "notes": "Statewide parcels FeatureServer"
+    }
+  ],
+  "wireFirst": {
+    "name": "OpenGov TaxParcels",
+    "restUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/OpenGov/OpenGov/MapServer/6",
+    "layerId": 6,
+    "acreageFilter": "LegalLandType='AC' AND LegalLandUnits BETWEEN 5 AND 150",
+    "featureCount": 99204,
+    "acreageFilterCount": 12102,
+    "maxRecordCount": 2000,
+    "auth": "none"
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "OpenGov TaxParcels",
+      "restUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/OpenGov/OpenGov/MapServer/6",
+      "layerId": 6,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "LegalLandUnits",
+      "coverage": "county-wide",
+      "featureCount": 99204,
+      "acreage5to150Count": 12102,
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "fieldMap": {
+        "PIN": "parcelId",
+        "PinNumber": "parcelIdAlt",
+        "PARCEL_ID": "parcelIdAlt2",
+        "AccountNumber": "parcelIdAccount",
+        "LegalLandUnits": "acreage",
+        "LegalLandType": "acreageUnit",
+        "Name1": "ownerName",
+        "Name2": "ownerName2",
+        "Address1": "mailingAddress.street",
+        "City": "mailingAddress.city",
+        "State": "mailingAddress.state",
+        "ZipCode": "mailingAddress.zip",
+        "PropertyAddress": "situsAddress",
+        "HouseNumber": "situsAddress.number",
+        "StreetName": "situsAddress.street",
+        "StreetType": "situsAddress.streetType",
+        "SaleYear1": "lastSale.year",
+        "SaleMonth1": "lastSale.month",
+        "SalePrice1": "lastSale.price",
+        "QualifiedCode1": "lastSale.qualified",
+        "TotalMarketValue": "tax.marketValue",
+        "TotalAssessedValue": "tax.assessedValue",
+        "ParcelLandValue": "tax.landValue",
+        "ParcelBuildingValue": "tax.improvementValue",
+        "ParcelObxfValue": "tax.obxfValue",
+        "LandZoning": "zoning",
+        "CityCode": "municipalityCode"
+      },
+      "status": "usable",
+      "primary": true,
+      "notes": "PRIMARY wire-first. Situs on polygon. Up to 5 sales. LandZoning ~98736 non-empty."
+    },
+    {
+      "role": "parcels",
+      "name": "LexingtonService Parcels (countywide mirror)",
+      "restUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/Lexington/LexingtonService/FeatureServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "featureCount": 99204,
+      "acreage5to150Count": 12102,
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "status": "usable",
+      "notes": "Folder named Lexington but countywide; same schema family as OpenGov"
+    },
+    {
+      "role": "other",
+      "name": "Lexington Site Address Points",
+      "restUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/Lexington/LexingtonService/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "point",
+      "auth": "none",
+      "coverage": "county-wide",
+      "featureCount": 99503,
+      "status": "usable",
+      "notes": "No PIN; spatial join. Inc_Muni includes Archdale/Denton/High Point/Lexington/Midway/Thomasville/Unincorporated/Wallburg"
+    },
+    {
+      "role": "parcels",
+      "name": "Parcels MapServer",
+      "restUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/Parcels/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "featureCount": 99204,
+      "status": "usable",
+      "notes": "Mirror; prefer OpenGov/6"
+    },
+    {
+      "role": "parcels",
+      "name": "FrameworkData Parcels",
+      "restUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/FrameworkData/FrameworkLayers/FeatureServer/3",
+      "layerId": 3,
+      "geometry": "polygon",
+      "featureCount": 99200,
+      "status": "usable"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrl": "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "featureCount": 98799,
+      "acreage5to150Count": 11767,
+      "filter": "cntyfips='057'",
+      "maxRecordCount": 5000,
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "status": "partial",
+      "notes": "saledate non-null count 0 for Davidson; good situs/owner fallback"
+    },
+    {
+      "role": "zoning",
+      "name": "OpenGov Zoning",
+      "restUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/OpenGov/OpenGov/MapServer/10",
+      "layerId": 10,
+      "geometry": "polygon",
+      "featureCount": 1304,
+      "field": "ZONE_CODE",
+      "status": "usable",
+      "notes": "Unincorporated districts; no CITY ZONING placeholders"
+    },
+    {
+      "role": "zoning",
+      "name": "webGIS County Zoning",
+      "restUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/webGIS/DC_webGIS/MapServer/29",
+      "layerId": 29,
+      "geometry": "polygon",
+      "featureCount": 1806,
+      "field": "ZONE_CODE",
+      "status": "partial",
+      "notes": "Includes city placeholders \u2014 filter for detailed codes"
+    },
+    {
+      "role": "zoning",
+      "name": "EconDev County Zoning Districts",
+      "restUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/EconDev/EconDev/MapServer/18",
+      "layerId": 18,
+      "geometry": "polygon",
+      "featureCount": 1806,
+      "field": "ZONE_CODE",
+      "status": "partial"
+    },
+    {
+      "role": "zoning",
+      "name": "Lexington CITY ZONING DISTRICTS",
+      "restUrl": "https://services3.arcgis.com/Z7ioXMhIaRIEQx1O/arcgis/rest/services/CITY_ZONING_DISTRICTS_view/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "featureCount": 9283,
+      "fields": [
+        "ZoningDistrict",
+        "ZoningDistrictName",
+        "PIN",
+        "PARCEL_ID"
+      ],
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "coverage": "city-only",
+      "status": "usable",
+      "notes": "Parcel-keyed attribute join for Lexington"
+    },
+    {
+      "role": "zoning",
+      "name": "Thomasville Zoning PTRC",
+      "restUrl": "https://maps.ptrc.org/arcgis/rest/services/Thomasville/Thomasville/MapServer/14",
+      "layerId": 14,
+      "geometry": "polygon",
+      "featureCount": 249,
+      "field": "ZONING",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "coverage": "city-only",
+      "status": "usable"
+    },
+    {
+      "role": "parcels",
+      "name": "Thomasville Parcels PTRC",
+      "restUrl": "https://maps.ptrc.org/arcgis/rest/services/Thomasville/Thomasville/MapServer/4",
+      "layerId": 4,
+      "geometry": "polygon",
+      "featureCount": 13267,
+      "coverage": "city-only",
+      "status": "partial",
+      "notes": "Mostly small lots; Zoning often null; prefer county TaxParcels"
+    },
+    {
+      "role": "flu",
+      "name": "Wallburg Future Land Use",
+      "restUrl": "https://maps.ptrc.org/arcgis/rest/services/Wallburg/Wallburg_LDP_2026/MapServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "featureCount": 36,
+      "field": "FLU",
+      "fluCategories": [
+        "AG",
+        "COM",
+        "IND",
+        "LDR",
+        "MDR",
+        "MIX",
+        "PI",
+        "REC"
+      ],
+      "coverage": "city-only",
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Wallburg Zoning Clip",
+      "restUrl": "https://maps.ptrc.org/arcgis/rest/services/Wallburg/Wallburg_LDP_2026/MapServer/3",
+      "layerId": 3,
+      "geometry": "polygon",
+      "featureCount": 34,
+      "field": "ZONE_CODE",
+      "coverage": "city-only",
+      "status": "usable"
+    },
+    {
+      "role": "sales",
+      "name": "Qualified Property Sales since 2022",
+      "restUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/webGIS/DC_webGIS/MapServer/76",
+      "layerId": 76,
+      "geometry": "polygon",
+      "featureCount": 12136,
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Municipal Boundary",
+      "restUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/EconDev/EconDev/MapServer/20",
+      "layerId": 20,
+      "geometry": "polygon",
+      "field": "CITY_NAME",
+      "values": [
+        "DENTON",
+        "HIGH POINT",
+        "LEXINGTON",
+        "MIDWAY",
+        "THOMASVILLE",
+        "WALLBURG"
+      ],
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Thomasville ETJ",
+      "restUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/OpenGov/OpenGov/MapServer/11",
+      "layerId": 11,
+      "geometry": "polygon",
+      "featureCount": 11,
+      "status": "usable"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "City of Lexington",
+      "cityCode": "07",
+      "districtLabel": "LEXINGTON",
+      "approxParcelCount": 10147,
+      "zoning": [
+        {
+          "name": "CITY ZONING DISTRICTS (AGOL)",
+          "url": "https://services3.arcgis.com/Z7ioXMhIaRIEQx1O/arcgis/rest/services/CITY_ZONING_DISTRICTS_view/FeatureServer/0",
+          "fields": [
+            "ZoningDistrict",
+            "ZoningDistrictName"
+          ],
+          "featureCount": 9283,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "notes": "Parcel-keyed; join on PIN/PARCEL_ID"
+        }
+      ],
+      "flu": [],
+      "viewer": "https://cityoflexington.maps.arcgis.com/apps/webappviewer/index.html?id=e81ad2a083634782a0bd4f17328ff950",
+      "hub": "https://lexingtonnc-cityoflexington.hub.arcgis.com/",
+      "joinNotes": "Attribute join city zoning \u2192 county TaxParcels on PIN. County layer only has LEXINGTON CITY ZONING placeholder. FLU public REST gap."
+    },
+    {
+      "name": "City of Thomasville",
+      "cityCode": "28",
+      "districtLabel": "THOMASVILLE",
+      "approxParcelCount": 11896,
+      "zoning": [
+        {
+          "name": "Thomasville Zoning (PTRC)",
+          "url": "https://maps.ptrc.org/arcgis/rest/services/Thomasville/Thomasville/MapServer/14",
+          "field": "ZONING",
+          "featureCount": 249,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "parcelsOptional": {
+        "name": "Thomasville Parcels PTRC",
+        "url": "https://maps.ptrc.org/arcgis/rest/services/Thomasville/Thomasville/MapServer/4",
+        "featureCount": 13267,
+        "notes": "Prefer county TaxParcels for 5\u2013150 acre search"
+      },
+      "etj": "https://webgis.co.davidson.nc.us/arcgis/rest/services/OpenGov/OpenGov/MapServer/11",
+      "joinNotes": "Spatial join PTRC zoning \u2192 county TaxParcels (CityCode=28). FLU PDF only; no public FLU REST."
+    },
+    {
+      "name": "Town of Midway",
+      "cityCode": "32",
+      "districtLabel": "MIDWAY",
+      "approxParcelCount": 1159,
+      "zoning": [],
+      "flu": [],
+      "joinNotes": "No dedicated public zoning FeatureServer. Use TaxParcels LandZoning (R20/R15/MUD/NB/HB/\u2026) + Municipal Boundary MIDWAY. FLU gap."
+    },
+    {
+      "name": "Town of Denton",
+      "cityCode": "33",
+      "districtLabel": "DENTON",
+      "approxParcelCount": 1660,
+      "zoning": [],
+      "flu": [],
+      "joinNotes": "No dedicated zoning FeatureServer. Use LandZoning + county placeholders DENTON TOWN ZONING / DENTON ETJ. PTRC has stormwater only. FLU gap."
+    },
+    {
+      "name": "Town of Wallburg",
+      "cityCode": "34",
+      "districtLabel": "WALLBURG",
+      "approxParcelCount": 2427,
+      "zoning": [
+        {
+          "name": "Wallburg Zoning Clip",
+          "url": "https://maps.ptrc.org/arcgis/rest/services/Wallburg/Wallburg_LDP_2026/MapServer/3",
+          "field": "ZONE_CODE",
+          "featureCount": 34,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "Future Land Use (LDP 2026)",
+          "url": "https://maps.ptrc.org/arcgis/rest/services/Wallburg/Wallburg_LDP_2026/MapServer/1",
+          "field": "FLU",
+          "featureCount": 36,
+          "categories": [
+            "AG",
+            "COM",
+            "IND",
+            "LDR",
+            "MDR",
+            "MIX",
+            "PI",
+            "REC"
+          ],
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "joinNotes": "Spatial join Wallburg FLU/zoning \u2192 county TaxParcels. Town largely uses county zoning districts."
+    },
+    {
+      "name": "City of High Point (Davidson edge)",
+      "cityCode": "39",
+      "districtLabel": "HIGH POINT",
+      "approxParcelCount": 2621,
+      "zoning": [],
+      "flu": [],
+      "joinNotes": "No verified High Point public zoning REST on this pass. Use TaxParcels LandZoning + county placeholder CITY OF HIGH POINT. Filter Municipal Boundary HIGH POINT."
+    }
+  ],
+  "gaps": [
+    "No countywide FLU REST \u2014 Wallburg LDP only",
+    "Midway / Denton / High Point lack dedicated public zoning FeatureServers",
+    "County Zoning CITY ZONING placeholders lack city district codes",
+    "NC OneMap Davidson saledate always null",
+    "LexingtonService folder name misleading (countywide)",
+    "Thomasville PTRC parcels weak for 5\u2013150 acre land search",
+    "MaxRecordCount 2000 on county layers \u2014 paginate",
+    "Owner phones/emails not collected"
+  ],
+  "handoff": [
+    "Wire first: OpenGov/OpenGov/MapServer/6 TaxParcels; filter LegalLandType='AC' AND LegalLandUnits BETWEEN 5 AND 150 (~12102)",
+    "Situs: PropertyAddress on same layer; fallback OneMap siteadd or address-point spatial join",
+    "Zoning: LandZoning attribute + Lexington AGOL (PIN join) + Thomasville PTRC + Wallburg clip; OpenGov Zoning for unincorporated",
+    "FLU: Wallburg_LDP_2026/1 only",
+    "Sales: Sale*1\u20135 on TaxParcels; Qualified Sales MapServer/76 for comps",
+    "Fallback: NC OneMap cntyfips='057' (no sale date)",
+    "Join keys: PIN/PinNumber, PARCEL_ID, AccountNumber, parno",
+    "Auth: none on listed public endpoints",
+    "Cities first-class \u2014 never treat county zoning as countywide detailed coverage"
+  ],
+  "verifiedLayerCount": 17,
+  "license": "County / city open GIS; attribution to Davidson County and respective municipalities; public records",
+  "verifiedAt": "2026-09-23",
+  "verifiedBy": "Grok Bot GIS researcher",
+  "pass2": {
+    "label": "PASS2 full-suite upgrade \u2014 rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "aadtScreening": {
+      "source": "NCDOT Traffic Survey Group (public AGOL)",
+      "layer": "NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)",
+      "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+      "countyField": "COUNTY",
+      "countyValue": "DAVIDSON",
+      "valueField": "AADT_2022",
+      "valueType": "string (trim; blank = no count that year)",
+      "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DAVIDSON%27&returnCountOnly=true&f=json",
+      "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DAVIDSON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+      "liveStationCount": 961,
+      "stationsWithAADT2022": 437,
+      "newerYearAvailable": {
+        "available": true,
+        "layer": "NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)",
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "countyField": "County",
+        "countyValue": "Davidson",
+        "valueField": "AADT_2025",
+        "valueType": "integer (null = no count)",
+        "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Davidson%27&returnCountOnly=true&f=json",
+        "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Davidson%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+        "liveStationCount": 973,
+        "stationsWithAADT2025": 647,
+        "stationsWithAADT2024": 434,
+        "segmentsLayer": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide \u2014 spatial filter by county envelope)",
+        "also": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)"
+      },
+      "recommendation": "Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025\u2192AADT_2024\u2192AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title)."
+    },
+    "primaryParcelLayer": {
+      "restUrl": "https://webgis.co.davidson.nc.us/arcgis/rest/services/OpenGov/OpenGov/MapServer/6",
+      "acreageField": "LegalLandUnits",
+      "range5to150Where": "LegalLandType='AC' AND LegalLandUnits>=5 AND LegalLandUnits<=150",
+      "liveTotalParcels": 99264,
+      "liveParcels5to150": 12102
+    },
+    "taxValues": {
+      "status": "ok",
+      "fields": {
+        "ParcelLandValue": "tax.landValue",
+        "ParcelBuildingValue": "tax.improvementValue",
+        "TotalMarketValue": "tax.marketValue",
+        "TotalAssessedValue": "tax.assessedValue"
+      },
+      "liveNonZeroCounty": {
+        "ParcelLandValue": 98006,
+        "ParcelBuildingValue": 73256,
+        "TotalMarketValue": 98008,
+        "TotalAssessedValue": 98008
+      },
+      "liveNonZero5to150": {
+        "TotalAssessedValue": 12059
+      },
+      "notes": "Double fields; TotalMarketValue/TotalAssessedValue + Parcel* components.",
+      "publicFallback": "https://taxsearch.co.davidson.nc.us/RealEstateSearch"
+    },
+    "saleHistory": {
+      "status": "ok",
+      "priceFields": [
+        "SalePrice1"
+      ],
+      "dateFields": [
+        "SaleYear1",
+        "SaleMonth1"
+      ],
+      "livePriceGt0County": {
+        "SalePrice1": 65676
+      },
+      "livePriceGt0_5to150": {
+        "SalePrice1": 6016
+      },
+      "liveDateNonNullCounty": {
+        "SaleYear1": 96820,
+        "SaleMonth1": 96820
+      },
+      "notes": "No full sale date on parcel: SaleYear1 + SaleMonth1; SalePrice1; QualifiedCode1. Full deed dates on Qualified Sales since 2022 layer webGIS/DC_webGIS/MapServer/76 (SalePropertyReal_DeedDate)."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Name1",
+        "Name2"
+      ],
+      "primaryOwnerField": "Name1",
+      "rule": {
+        "apply": "Uppercase + trim Name1 (optionally also Name2)",
+        "regex": "(?i)(\\bL\\.?\\s?L\\.?\\s?C\\b|\\bINC\\b|\\bCORP|\\bL\\.?\\s?P\\b|\\bLLP\\b|\\bLLLP\\b|\\bLTD\\b|TRUST|CHURCH|MINISTR|\\bCOMPANY\\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\\bHOA\\b|FOUNDATION|AUTHORITY|\\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\\b|^UNITED STATES|^NORTH CAROLINA\\b|\\bCOUNTY$)",
+        "sqlLikeTokens": [
+          "% LLC%",
+          "%,LLC%",
+          "% L L C%",
+          "% INC",
+          "% INC %",
+          "% INC.%",
+          "%,INC%",
+          "% CORP%",
+          "%CORPORATION%",
+          "% LP",
+          "% LP %",
+          "% L P",
+          "% LLP%",
+          "% LTD%",
+          "%TRUST%",
+          "%CHURCH%",
+          "%MINISTR%",
+          "% COMPANY%",
+          "%PARTNERSHIP%",
+          "%HOLDINGS%",
+          "%PROPERTIES%",
+          "%INVESTMENT%",
+          "%ASSOCIATION%",
+          "%FOUNDATION%",
+          "%AUTHORITY%",
+          "CITY OF %",
+          "COUNTY OF %",
+          "STATE OF %",
+          "TOWN OF %",
+          "% COUNTY",
+          "%BOARD OF EDUCATION%",
+          "UNITED STATES%",
+          "NORTH CAROLINA %",
+          "% DEVELOPMENT%"
+        ],
+        "caveats": "TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); \"% COUNTY\" suffix catches e.g. \"PERSON COUNTY\"; bare \"CO\" and \"ESTATE\" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) \u2014 normalize first."
+      },
+      "liveEntityCount5to150": 2472,
+      "liveOwnerNonNull5to150": 12102,
+      "entityQuery": "where=LegalLandType='AC' AND LegalLandUnits>=5 AND LegalLandUnits<=150 AND (Name1 LIKE '% LLC%' OR Name1 LIKE '%,LLC%' OR Name1 LIKE '% L L C%' OR Name1 LIKE '% INC' OR Name1 LIKE '% INC %' OR Name1 LIKE '% INC.%' OR Name1 LIKE '%,INC%' OR Name1 LIKE '% CORP%' OR Name1 LIKE '%CORPORATION%' OR Name1 LIKE '% LP' OR Name1 LIKE '% LP %' OR Name1 LIKE '% L P' OR Name1 LIKE '% LLP%' OR Name1 LIKE '% LTD%' OR Name1 LIKE '%TRUST%' OR Name1 LIKE '%CHURCH%' OR Name1 LIKE '%MINISTR%' OR Name1 LIKE '% COMPANY%' OR Name1 LIKE '%PARTNERSHIP%' OR Name1 LIKE '%HOLDINGS%' OR Name1 LIKE '%PROPERTIES%' OR Name1 LIKE '%INVESTMENT%' OR Name1 LIKE '%ASSOCIATION%' OR Name1 LIKE '%FOUNDATION%' OR Name1 LIKE '%AUTHORITY%' OR Name1 LIKE 'CITY OF %' OR Name1 LIKE 'COUNTY OF %' OR Name1 LIKE 'STATE OF %' OR Name1 LIKE 'TOWN OF %' OR Name1 LIKE '% COUNTY' OR Name1 LIKE '%BOARD OF EDUCATION%' OR Name1 LIKE 'UNITED STATES%' OR Name1 LIKE 'NORTH CAROLINA %' OR Name1 LIKE '% DEVELOPMENT%')"
+    },
+    "paDeepLink": {
+      "template": null,
+      "testedUrl": "https://taxsearch.co.davidson.nc.us/RealEstateSearch",
+      "httpStatus": 200,
+      "notes": "GAP: no GET deep link. Detail view is AJAX POST RealEstateSearch/ViewParcel (JSON parcelNumber/taxYear) \u2014 returned 500 for PIN/PARCEL_ID/Account tests; not usable as a link. Use search page with PIN placeholder."
+    },
+    "jurisdictionGisViewer": {
+      "url": "https://webgis.co.davidson.nc.us/DavidsonGIS/",
+      "httpStatus": 200,
+      "notes": "Davidson WebGIS (Avineon template)"
+    },
+    "gaps": [
+      "PA deep link: no GET URL with parcel id (search page only) \u2014 no GET deep link. Detail view is AJAX POST RealEstateSearch/ViewParcel (JSON parcelNumber/taxYear) \u2014 returned 500 for PIN/PARCEL_ID/Account tests; not usable as",
+      "Sale date is year+month only on parcel layer (no day)",
+      "AADT_2022 blank at 524 of 961 stations on the 2022 layer (NCDOT counts on a cycle) \u2014 prefer 2025 layer / latest non-blank year",
+      "Last sale on primary layer; separate sales layer documented in saleHistory.notes"
+    ]
+  }
+}

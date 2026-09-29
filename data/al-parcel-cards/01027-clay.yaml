@@ -1,0 +1,113 @@
+state: AL
+jurisdiction: Clay County
+fips: "01027"
+level: county
+markets: [Rural OZ 2.0]
+
+layers:
+  - role: parcels
+    name: Parcels — no public REST
+    restUrl: null
+    layerId: null
+    geometry: polygon
+    auth: blocked (HTML viewer only)
+    acreageField: null
+    coverage: unknown
+    fieldMap:
+      {}
+    notes: >
+      Tried 2026-09-28 (batch 2): KCS ISV config probe (isv.kcsgis.com/al.clay_revenue — none/404); CaptureCAMA parcel viewer probe + browsable dirs gis/maps.capturecama.com (no Clay folder); AGD pattern (wms.agdmaps.com/geoserver/ClayAL — 404; no ClayAL_Service/Clay_Web_Service on AGOL); AGOL title search (only PowerSouth Alabama_Parcel_Data = REJECTED Regrid-derived, plus same-name counties in other states); ADOR county page links only to Flagship alabamagis.com (MapGuide WMS/WFS has no parcel feature types). Result: Flagship HTML only.
+    status: gap
+
+gaps:
+  - No public ArcGIS parcel layer
+  - Do not use PowerSouth Alabama_Parcel_Data (Regrid-derived)
+
+license: "County Flagship/revenue HTML viewer"
+appraiserSearchUrl: "https://www.alabamagis.com/Clay/"
+appraiserSearchUrlAlt: "https://www.claycountyrevenue.com/"
+jurisdictionGisUrl: "https://clay.alabamagis.com/clay/"
+ruralOz2:
+  source: "IRS Rev. Proc. 2026-14 appendix (Rural Status=Rural)"
+  ruralEligibleTracts: 2
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+pass1RuralOz2026_09_28:
+  parcelRestUrl: null
+  parcelIdField: null
+  featureCount: null
+  note: >
+    Batch 3 addendum 2026-09-28: NSGIC 2025 Parcel Portal lists a Clay AGOL viewer (arcgis.com/apps/View appid=8fe4cc7fc296423ba7dcfd2bd2911712) but the item is deleted/private (CONT_0001 'does not exist or is inaccessible'). Still gap; Flagship alabamagis.com/Clay is the only public viewer.
+
+enrichment:
+  aadt:
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    yearField: "YearAADT"
+    year: 2024
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    luCountyId: 14
+    countyWhere: "YearAADT=2024 AND LUCountyID=14 AND AADT>0"
+    stations2024: 133
+    verifiedAt: "2026-09-28"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "LUCountyID=14 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 133 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location. Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/."
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  scope: 'Flagship gap county: (a) AADT, (c) deep-link check, (d) viewer URL only; (b) field mapping = gap'
+  parcelRestUrl: null
+  taxSaleOwner:
+    ownerName:
+      field: null
+      status: gap
+      livesAt: Flagship CAMA search (POST form, no REST) at jurisdictionGisUrl / Revenue Commissioner record
+    assessedValue:
+      field: null
+      status: gap
+      livesAt: Flagship CAMA search (POST form, no REST) at jurisdictionGisUrl / Revenue Commissioner record
+    appraisedOrMarketValue:
+      field: null
+      status: gap
+      livesAt: Flagship CAMA search (POST form, no REST) at jurisdictionGisUrl / Revenue Commissioner record
+    landValue:
+      field: null
+      status: gap
+      livesAt: Flagship CAMA search (POST form, no REST) at jurisdictionGisUrl / Revenue Commissioner record
+    improvementValue:
+      field: null
+      status: gap
+      livesAt: Flagship CAMA search (POST form, no REST) at jurisdictionGisUrl / Revenue Commissioner record
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: Flagship CAMA search (POST form, no REST) at jurisdictionGisUrl / Revenue Commissioner record
+    lastSaleDate:
+      field: null
+      status: gap
+      livesAt: Flagship CAMA search (POST form, no REST) at jurisdictionGisUrl / Revenue Commissioner record
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: Flagship CAMA search (POST form, no REST) at jurisdictionGisUrl / Revenue Commissioner record
+    ownerEntityType:
+      derivable: false
+      sourceField: null
+      rule: null
+      note: No public parcel REST layer; owner entity type only derivable from the Flagship CAMA search results.
+  deepLink:
+    pattern: null
+    verified: no (Flagship has no GET parcel deep link)
+    method: 'Checked Clarke as the Flagship template: https://www.alabamagis.com/Clarke/CamaTemplates/reports/SearchSearch.cfm is a POST form (ACTION=SearchResults.CFM, target=resultFrame); a test POST
+      returned a ColdFusion 500, and BasicSearch/SearchSearch for Bibb, Butler and Walker returned 503 on 2026-09-28'
+    note: No {PIN} URL pattern exists; the existing appraiserSearchUrl (Flagship index/search page) is left unchanged.
+  jurisdictionGisUrl:
+    url: https://clay.alabamagis.com/clay/
+    http: 200

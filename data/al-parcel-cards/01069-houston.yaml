@@ -1,0 +1,157 @@
+state: AL
+jurisdiction: Houston County
+fips: 01069
+level: county
+markets:
+- Dothan
+layers:
+- role: parcels
+  name: Parcels (Houston Public ISV, CAMA join)
+  restUrl: https://web6.kcsgis.com/kcsgis/rest/services/Houston/Houston_Public_ISV/MapServer/29
+  layerId: 29
+  geometry: polygon
+  auth: none
+  acreageField: CalculatedAcres
+  coverage: county-wide
+  fieldMap:
+    PPIN: parcelIdKey (PPIN deep-link)
+    ParcelNum: parcelId
+    AccountNum: parcelIdAlt
+    Owner: ownerName
+    PrevOwner: ownerNamePrior
+    MailAddr1: mailingAddress.street
+    MailAddr2: mailingAddress.street2
+    CityName: mailingAddress.city
+    StateAbbr: mailingAddress.state
+    ZipCode: mailingAddress.zip
+    PhysAddr: situsAddress
+    CalculatedAcres: acreage
+    DeededAcres: acreageDeed
+    TimberAcres: acreageTimber
+    TotalMktValue: tax.marketValue
+    TotalAssdValue: tax.assessedValue
+    LandValue: tax.landValue
+    ImprovementsValue: tax.improvementValue
+    TotalTaxDue: tax.due
+    TaxYear: tax.year
+    TaxDist: tax.district
+    MunCode: tax.municipality
+    DeedDate: lastSale.date
+    SalePrice: lastSale.price
+    SubDivision: subdivision
+    LegalDesc: legalDescription
+    Neighborhood: neighborhood
+  notes: Verified live 2026-09-28 (?f=json 200, anonymous query). Count 63731; polygon; maxRecordCount 2000. Sample PPIN 15 centroid -85.17,31.31 (Houston County AL, east of Dothan; not Houston TX). Found
+    via KCS ISV config https://isv.kcsgis.com/al.houston_revenue/js/config/viewer.js (prcLink ingproperty.com Houston_Revenue, idProperty PPIN). Owner, mail, situs, values, tax due, deed date and sale price
+    all present.
+  status: usable
+- role: zoning
+  name: City of Dothan zoning (Dothan.SDE.Zoning)
+  restUrl: https://services.arcgis.com/UXN4FGWBfn79LLPC/arcgis/rest/services/Dothan_SDE_Zoning073026/FeatureServer/3
+  layerId: 3
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: City of Dothan only
+  fieldMap:
+    ZONE: zoningCode
+    Zone_description: zoningDescription
+    ORDNUM2: ordinance
+  notes: 'Verified 2026-09-28: 849 polygons, anonymous. Found in the City of Dothan public web map (dothan.maps.arcgis.com webappviewer aff5fb0a3bcf43ee844c3b0c63630636, web map 12286fabbb2444c19051a8e4216010dc),
+    linked from https://www.dothan.org/274/Dothan-GIS-Maps. The same map also has County Parcel Data at services.arcgis.com/UXN4FGWBfn79LLPC/.../Parcels_County_Current_050323/FeatureServer/0 (2023 snapshot;
+    the KCS layer is primary).'
+  status: usable
+gaps:
+- No county (unincorporated) zoning layer seen
+- SalePrice often 0 or null
+license: Houston County Revenue Commissioner / KCS GIS Public ISV; use-at-own-risk
+appraiserSearchUrl: https://www.ingproperty.com/Houston_Revenue/PropertyDetails.aspx?taxyear=2026&ppin={PIN}
+appraiserSearchUrlAlt: null
+jurisdictionGisUrl: https://isv.kcsgis.com/al.houston_revenue/
+ruralOz2:
+  status: not a rural OZ 2.0 candidate county
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+enrichment:
+  aadt:
+    source: ALDOT TDM Public (TrafficCounterPoint)
+    restUrl: https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0
+    layerId: 0
+    field: AADT
+    yearField: YearAADT
+    year: 2024
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    luCountyId: 35
+    countyWhere: YearAADT=2024 AND LUCountyID=35 AND AADT>0
+    stations2024: 658
+    verifiedAt: '2026-09-28'
+    verifiedBy: Alabama Public Info Researcher
+    notes: LUCountyID=35 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 658 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID,
+      fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/.
+
+pass2Statewide2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://web6.kcsgis.com/kcsgis/rest/services/Houston/Houston_Public_ISV/MapServer/29
+  featureCount: 63731
+  taxSaleOwner:
+    ownerName:
+      field: Owner
+      status: usable
+    assessedValue:
+      field: TotalAssdValue
+      status: usable
+      nonNullOrPositiveCount: 62606
+      ofTotal: 63731
+    appraisedOrMarketValue:
+      field: TotalMktValue
+      status: usable
+      nonNullOrPositiveCount: 62610
+      ofTotal: 63731
+    landValue:
+      field: LandValue
+      status: usable
+    improvementValue:
+      field: ImprovementsValue
+      status: usable
+    taxAmount:
+      field: TotalTaxDue
+      status: usable
+      nonNullOrPositiveCount: 55812
+      ofTotal: 63731
+    lastSaleDate:
+      field: DeedDate
+      status: usable
+      nonNullOrPositiveCount: 51157
+      ofTotal: 63731
+    lastSalePrice:
+      field: SalePrice
+      status: usable
+      nonNullOrPositiveCount: 28747
+      ofTotal: 63731
+    ownerEntityType:
+      derivable: true
+      sourceField: Owner
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 6935
+        INC: 1829
+        TRUST: 1868
+        CORP: 133
+        CHURCH: 675
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://www.ingproperty.com/Houston_Revenue/PropertyDetails.aspx?taxyear=2026&ppin={PIN}
+    pinField: PPIN
+    testPin: '8'
+    verified: 'yes'
+    method: fetched via external fetcher (box gets TLS EOF from ingproperty.com); pattern from KCS ISV viewer.js prcLink
+    note: Page returned PPIN 8, parcel 01-04-19-0-000-001.000, owner ROGERS MICHAEL CANNON & EILEEN B (matches layer), assessed 560, tax due, deed date 5/24/1991.
+  jurisdictionGisUrl:
+    url: https://isv.kcsgis.com/al.houston_revenue/
+    http: 200
+  notes: SalePrice is >0 for 28,747 of 63,731 parcels. Dothan zoning layer recorded on the card as a zoning layer.

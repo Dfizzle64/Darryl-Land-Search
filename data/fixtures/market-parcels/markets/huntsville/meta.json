@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-28T22:27:33Z",
+  "generatedAt": "2026-09-29T03:46:36Z",
   "market": "Huntsville",
   "tier": "other",
-  "parcelCount": 29598,
+  "parcelCount": 123857,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -17,42 +17,197 @@
   ],
   "counties": [
     {
+      "name": "Cherokee",
+      "fips": "01019",
+      "state": "Alabama",
+      "featureCount": 8068,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "al-cherokee-parcels-01019",
+      "queryUrl": "https://web3.kcsgis.com/kcsgis/rest/services/Cherokee/Public/MapServer/116/query",
+      "gaps": [
+        "Source query returned 8097 rows; 8068 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Parcels (Cherokee Public — CAMA join) (https://web3.kcsgis.com/kcsgis/rest/services/Cherokee/Public/MapServer/116). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Property-appraiser links are stored from the card pattern and were not requested.",
+        "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+        "No sale/deed fields",
+        "CalcAcres missing on ~43% — use DeededAcres or geometry"
+      ],
+      "path": "data/fixtures/market-parcels/counties/01019/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01019/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 8097
+    },
+    {
       "name": "Cullman",
       "fips": "01043",
       "state": "Alabama",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 14885,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "al-cullman-parcels-01043",
+      "queryUrl": "https://al25portal.kcsgis.com/al25server/rest/services/Cullman_Public_ISV/MapServer/107/query",
       "gaps": [
-        "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+        "Source query returned 15679 rows; 14885 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Parcels (Cullman Public ISV — CAMA join) (https://al25portal.kcsgis.com/al25server/rest/services/Cullman_Public_ISV/MapServer/107). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Property-appraiser links are stored from the card pattern and were not requested.",
+        "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+        "No lastSale.price (deed book/page/date only)",
+        "Countywide unincorporated zoning not published; city Cullman zoning only (layer 116)",
+        "FLU not on county Public ISV this pass"
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/01043/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01043/lookup.json",
+      "tileCount": 10,
+      "sourceCount": 15679
+    },
+    {
+      "name": "DeKalb",
+      "fips": "01049",
+      "state": "Alabama",
+      "featureCount": 16704,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "al-dekalb-parcels-01049",
+      "queryUrl": "https://al28portal.kcsgis.com/al28server/rest/services/Dekalb_Public_ISV/MapServer/48/query",
+      "gaps": [
+        "Source query returned 17413 rows; 16704 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Current Parcels (DeKalb Public ISV — CAMA join) (https://al28portal.kcsgis.com/al28server/rest/services/Dekalb_Public_ISV/MapServer/48). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Property-appraiser links are stored from the card pattern and were not requested.",
+        "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+        "No lastSale.price (deed book/page/date only)",
+        "No county zoning layer seen on Public ISV (subdivision/lot only)"
+      ],
+      "path": "data/fixtures/market-parcels/counties/01049/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01049/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 17413
+    },
+    {
+      "name": "Franklin",
+      "fips": "47051",
+      "state": "Tennessee",
+      "featureCount": 5483,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "tn-oir-public-use-47051",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "gaps": [
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
+      ],
+      "path": "data/fixtures/market-parcels/counties/47051/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47051/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 26824
+    },
+    {
+      "name": "Franklin",
+      "fips": "01059",
+      "state": "Alabama",
+      "featureCount": 7927,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "al-franklin-parcels-01059",
+      "queryUrl": "https://web6.kcsgis.com/kcsgis/rest/services/Franklin/Franklin_Public_ISV/MapServer/105/query",
+      "gaps": [
+        "Source query returned 7965 rows; 7927 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Parcels (Franklin Public ISV — CAMA join) (https://web6.kcsgis.com/kcsgis/rest/services/Franklin/Franklin_Public_ISV/MapServer/105). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Property-appraiser links are stored from the card pattern and were not requested.",
+        "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+        "No sale price (deed book/page/date only)",
+        "No county zoning layer seen"
+      ],
+      "path": "data/fixtures/market-parcels/counties/01059/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01059/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 7965
+    },
+    {
+      "name": "Giles",
+      "fips": "47055",
+      "state": "Tennessee",
+      "featureCount": 7028,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "tn-oir-public-use-47055",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "gaps": [
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
+      ],
+      "path": "data/fixtures/market-parcels/counties/47055/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47055/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 18826
     },
     {
       "name": "Jackson",
       "fips": "01071",
       "state": "Alabama",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 13862,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "al-jackson-parcels-01071",
+      "queryUrl": "https://web3.kcsgis.com/kcsgis/rest/services/Jackson/Public_ISV_Jackson/MapServer/1/query",
       "gaps": [
-        "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+        "Source query returned 13878 rows; 13862 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Parcels (Jackson Public ISV — CAMA join) (https://web3.kcsgis.com/kcsgis/rest/services/Jackson/Public_ISV_Jackson/MapServer/1). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Property-appraiser links are stored from the card pattern and were not requested.",
+        "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+        "No lastSale.price (deed book/page/date only)",
+        "No public county or city zoning FeatureServer located this pass",
+        "Do not use gis.mijackson.org (Jackson County MI)"
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/01071/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01071/lookup.json",
+      "tileCount": 10,
+      "sourceCount": 13878
+    },
+    {
+      "name": "Lauderdale",
+      "fips": "01077",
+      "state": "Alabama",
+      "featureCount": 3840,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "al-lauderdale-parcels-01077",
+      "queryUrl": "https://al41portal.kcsgis.com/al41server/rest/services/Lauderdale_Public_ISV/MapServer/120/query",
+      "gaps": [
+        "Source query returned 3951 rows; 3840 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Parcels (Lauderdale Public ISV — CAMA join) (https://al41portal.kcsgis.com/al41server/rest/services/Lauderdale_Public_ISV/MapServer/120). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Property-appraiser links are stored from the card pattern and were not requested.",
+        "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+        "SalePrice frequently 0",
+        "CalculatedAcres often 0; use DeededAcres or geometry area",
+        "altags.com deep link timed out from box 2026-09-28 (pattern from ISV config)"
+      ],
+      "path": "data/fixtures/market-parcels/counties/01077/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01077/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 3951
     },
     {
       "name": "Limestone",
@@ -82,21 +237,24 @@
       "name": "Lincoln",
       "fips": "47103",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 6630,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47103",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-oir-public-use-47103",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "Zoning comes from the card's usable zoning layers. A parcel-id layer is joined on that id. Polygon layers are stamped by centroid, and a later city layer replaces an earlier code only inside that city. Outside those layers zoning stays empty."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47103/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47103/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 19967
     },
     {
       "name": "Madison",
@@ -149,6 +307,29 @@
       "sourceCount": 12207
     },
     {
+      "name": "Moore",
+      "fips": "47127",
+      "state": "Tennessee",
+      "featureCount": 1751,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "tn-oir-public-use-47127",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "gaps": [
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
+      ],
+      "path": "data/fixtures/market-parcels/counties/47127/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47127/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 4260
+    },
+    {
       "name": "Morgan",
       "fips": "01103",
       "state": "Alabama",
@@ -168,6 +349,30 @@
       "lookup": "data/fixtures/market-parcels/counties/01103/lookup.json",
       "tileCount": 6,
       "sourceCount": 1516
+    },
+    {
+      "name": "Winston",
+      "fips": "01133",
+      "state": "Alabama",
+      "featureCount": 8081,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "al-winston-parcels-01133",
+      "queryUrl": "https://web3.kcsgis.com/kcsgis/rest/services/Winston/Winston_Public_ISV/MapServer/141/query",
+      "gaps": [
+        "Source query returned 8299 rows; 8081 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Parcels (Winston Public ISV — CAMA join) (https://web3.kcsgis.com/kcsgis/rest/services/Winston/Winston_Public_ISV/MapServer/141). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Property-appraiser links are stored from the card pattern and were not requested.",
+        "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+        "No sale price (deed book/page/date only)",
+        "No county zoning layer seen"
+      ],
+      "path": "data/fixtures/market-parcels/counties/01133/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01133/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 8299
     }
   ]
 }

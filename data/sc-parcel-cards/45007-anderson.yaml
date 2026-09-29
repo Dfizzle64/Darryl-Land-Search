@@ -1,0 +1,266 @@
+state: SC
+jurisdiction: Anderson County
+fips: "45007"
+level: county
+markets: [Greenville]
+
+layers:
+  - role: parcels
+    name: Parcels (NewPropertyViewer MapServer)
+    restUrl: https://propertyviewer.andersoncountysc.org/arcgis/rest/services/NewPropertyViewer/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      ACPASS_LOOKUP: appraiserLookupId
+      JOINFLD: parcelIdJoin
+      PHYS_ADDR: situsAddress
+      DESCRIPTIO: legalDescription
+      SALE_PRICE: lastSale.price
+      SALE_YEAR: lastSale.date
+      DBOOK: lastSale.deedBook
+      DPAGE: lastSale.deedPage
+      MRKT_VALUE: tax.marketValue
+      TAX_DIST: tax.district
+      TAXOWNSTR: tax.ownershipStructureCode
+      PARENT: parentParcelId
+      CPLAT: platReference
+      DIMENSIONS: dimensionsText
+    notes: 'Verified 2026-09-24: HTTP 200 pjson + count 120473, no token (curl -k if local issuer fails).
+      Geo-verified WGS84 centroids in Anderson Co (~34.53–34.64 N, −82.57 to −82.68 W; SR 102733 SC StatePlane
+      ft). CAMA-like attrs: TMS, situs PHYS_ADDR, last sale SALE_PRICE/SALE_YEAR (~116k with SALE_PRICE>0),
+      MRKT_VALUE, deed book/page. NO owner name on public GIS — TAXOWNSTR is ownership-structure code (e.g.
+      003/901), not ownerName (only ~535 non-null). Acreage: no dedicated acres field; parse from DESCRIPTIO
+      (e.g. ".57 AC" / "19.93 AC") or derive Shape.STArea()/43560 (ft²). ACPASS_LOOKUP (e.g. 0169010102600000)
+      keys Real Property search. Viewer: https://propertyviewer.andersoncountysc.org/mapsjs/ Prefer over
+      Address_Viewer/4 (same schema family + CITY/ZIPCODE) and Opengov/MAT/13 (same count/schema; NewPropertyViewer
+      is the public property-viewer source).
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=120475; 1-feature outSR=4326 sample TMS=''2750204004'' vertex
+      (-82.408,34.451) inside Anderson County SC bbox; parcel ID field TMS present.'
+    count: 120475
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Market value on NewPropertyViewer Parcels/5
+    restUrl: https://propertyviewer.andersoncountysc.org/arcgis/rest/services/NewPropertyViewer/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      MRKT_VALUE: tax.marketValue
+      TAX_DIST: tax.district
+    notes: Market value embedded on parcels; assessed/taxable values via ACPASS HTML only.
+    status: usable
+
+  - role: ownership
+    name: Ownership — gap on public GIS (use ACPASS)
+    restUrl: https://propertyviewer.andersoncountysc.org/arcgis/rest/services/NewPropertyViewer/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      TAXOWNSTR: tax.ownershipStructureCode
+      ACPASS_LOOKUP: appraiserLookupId
+    notes: >
+      No ownerName / mailing fields on public parcel REST. TAXOWNSTR ≠ owner name.
+      Lookup owner via ACPASS Real Property (QryMapNo=TMS) — see appraiserSearchUrl.
+    status: gap
+
+  - role: sales
+    name: Last-sale on NewPropertyViewer Parcels/5
+    restUrl: https://propertyviewer.andersoncountysc.org/arcgis/rest/services/NewPropertyViewer/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      SALE_PRICE: lastSale.price
+      SALE_YEAR: lastSale.date
+      DBOOK: lastSale.deedBook
+      DPAGE: lastSale.deedPage
+    notes: >
+      Last-sale on parcel feature (SALE_YEAR is year integer, not full date).
+      Seed lead Parcel_Sales/MapServer is empty (0 layers) as of 2026-09-24 — no multi-sale
+      history REST. Status partial for history table.
+    status: partial
+
+  - role: zoning
+    name: Parcel Zoning (Opengov/MAT) — zoned areas only
+    restUrl: https://propertyviewer.andersoncountysc.org/arcgis/rest/services/Opengov/MAT/MapServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: partial
+    fieldMap:
+      TMS: parcelId
+      ZONE1: zoning
+      ZONE2: zoningAlt
+      DISTNAME: zoningDescription
+      VOT_PREC: votingPrecinct
+      NOTES: zoningNotes
+    notes: >
+      Verified 2026-09-24: public, count 33349 (~28% of 120k parcels), no token.
+      Geo-verified Williamston-area samples (ZONE1=C-2, DISTNAME=Highway Commercial).
+      Sample districts: R-20, R-A, R-D, C-1/C-2/C-3, I-2, PD, S-1, R-MHP, C-1N.
+      JOIN KEY to parcels: TMS (attribute join). Many unincorporated parcels unzoned —
+      coverage partial, not county-wide zoning polygons.
+      Seed lead Overlays/MapServer/6 "Parcel Zoning" is STALE: Overlays service gutted
+      2026-06-22 to Subdivisions only (layer 2); legend still lists old layers but query
+      on /6 errors. Prefer Opengov/MAT/6.
+    status: partial
+
+  - role: zoning
+    name: Overlay districts on NewPropertyViewer (not base zoning)
+    restUrl: https://propertyviewer.andersoncountysc.org/arcgis/rest/services/NewPropertyViewer/MapServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap: {}
+    notes: >
+      Overlay polygons only: 13=East-WestPkwy Overlay Dist, 14=Royal American Overlay,
+      15=Gateway to Anderson. Also on Opengov/MAT layers 8–10. Not base zoning — spatial
+      join as overlays. Same overlays mirrored on Opengov/MAT.
+    status: partial
+
+  - role: flu
+    name: Future Land Use
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Dig 2026-09-24: no public FLU FeatureServer/MapServer under
+      propertyviewer.andersoncountysc.org REST root (no land-use/FLU service name).
+    status: gap
+
+  - role: parcels
+    name: Overlays/MapServer Parcel Zoning seed — REJECT (service gutted)
+    restUrl: https://propertyviewer.andersoncountysc.org/arcgis/rest/services/Overlays/MapServer/6
+    layerId: 6
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Seed lead. Service description updated 2026-06-22; live layers list only
+      Subdivisions (id 2). Direct /6 query returns error. Use Opengov/MAT/6 instead.
+    status: gap
+
+  - role: sales
+    name: Parcel_Sales MapServer seed — REJECT (empty)
+    restUrl: https://propertyviewer.andersoncountysc.org/arcgis/rest/services/Parcel_Sales/MapServer
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: "Verified 2026-09-24: 0 layers / 0 tables. Last-sale remains on Parcels/5."
+    status: gap
+
+gaps:
+  - "Owner name / mailing not on public parcel REST — use ACPASS Real Property (QryMapNo=TMS / ACPASS_LOOKUP)."
+  - "TAXOWNSTR is ownership-structure code, NOT ownerName."
+  - "No dedicated acreage field — parse DESCRIPTIO or Shape.STArea()/43560."
+  - "Zoning Opengov/MAT/6 covers ~33k/120k parcels (zoned areas); unincorporated often unzoned."
+  - "Overlays/MapServer Parcel Zoning seed stale (gutted 2026-06); Parcel_Sales MapServer empty."
+  - "No public FLU REST found."
+  - "Municipal inventory: Anderson, Belton, Williamston, Honea Path, Pendleton, Iva, West Pelzer, Pelzer, Starr — no separate city zoning FeatureServer verified this pass; municipal zones appear on MAT/6 where mapped."
+  - "Do not scrape emails/phones; ACPASS HTML is lookup-only."
+
+license: "Public Anderson County GIS REST (propertyviewer.andersoncountysc.org). Attribute Anderson County GIS / Assessor. Confirm redistribution before bulk republish."
+appraiserSearchUrl: https://acpass.andersoncountysc.org/real_prop_search.htm
+publicGisUrl: https://propertyviewer.andersoncountysc.org/mapsjs/
+jurisdictionGisUrl: https://propertyviewer.andersoncountysc.org/mapsjs/
+appraiserDeepLink: https://acpass.andersoncountysc.org/asrdetails.cgi?mapno={parcelId}
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: partial
+    reason: MRKT_VALUE (total market) on NewPropertyViewer/5; no assessed/taxable or land/bldg split on public REST.
+      RFA M_Value duplicate (116,683/118,047).
+    fieldMap:
+      MRKT_VALUE: tax.marketValue
+      TAX_DIST: tax.district
+      TAXOWNSTR: tax.ownershipStructureCode
+    note: Sample TMS 1420007063 MRKT_VALUE 259,060.
+  sale:
+    status: partial
+    reason: SALE_PRICE (Double) + SALE_YEAR (year only, Integer) + DBOOK/DPAGE; no full sale date or qualification
+      flag.
+    fieldMap:
+      SALE_PRICE: lastSale.price
+      SALE_YEAR: lastSale.year
+      DBOOK: lastSale.deedBook
+      DPAGE: lastSale.deedPage
+    format: SALE_YEAR integer (2025) - store as year, not a date. DBOOK has trailing spaces. SALE_PRICE Double (260000).
+  owner:
+    status: partial
+    mailingStatus: gap
+    reason: County REST exposes NO owner fields. Owner name from RFA Statewide_Parcels Ownership (117,150/118,047)
+      keyed T_Map_Number = TMS as-is. No public mailing address in REST.
+    source: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18
+      (County='Anderson County')
+    fieldMap:
+      Ownership: ownerName (RFA)
+  paLink:
+    status: partial
+    pattern: https://acpass.andersoncountysc.org/asrdetails.cgi?mapno={parcelId}
+    testedParcelId: 1420007063 -> mapno=0142000706300000
+    idTransform: mapno = ACPASS_LOOKUP field as-is; or '0' + TMS(10) + '00000' (16 chars).
+    reason: Pattern from search-indexed ACPASS detail pages (asrdetails.cgi?mapno=0133040100200000) + ACPASS_LOOKUP
+      field. acpass host unreachable from box (TLS EOF) and 504 via external fetch today - not live-confirmed.
+  publicGis:
+    status: usable
+    url: https://propertyviewer.andersoncountysc.org/mapsjs/
+    reason: Anderson County GIS Property Viewer (HTTP 200, title "Anderson County, South Carolina GIS").
+  aadt:
+    status: usable
+    reason: enrichment.aadt already present; confirmed, not re-dug.
+  gaps:
+  - No owner/mailing on county REST (RFA owner name only).
+  - No assessed/taxable values; sale date = year only.
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "South Carolina Public Info Researcher"
+  aadt:
+    source: "SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug"
+    restUrl: "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0"
+    layerId: 0
+    field: "FactoredAA"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "South Carolina Public Info Researcher"
+    notes: "Statewide SCDOT points; filter CountyName. Skip per full-suite pattern (no county re-dig)."

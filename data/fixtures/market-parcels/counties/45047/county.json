@@ -5,19 +5,29 @@
   "markets": [
     "Greenville"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 5341,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-greenwood-parcels-45047",
+  "queryUrl": "https://www.greenwoodsc.gov/arcgis/rest/services/Operational_Layers/Parcels_Search_and_Select/MapServer/0/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Source query returned 5342 rows; 5341 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcels (Parcels_Search_and_Select) (https://www.greenwoodsc.gov/arcgis/rest/services/Operational_Layers/Parcels_Search_and_Select/MapServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "Sales_Points is point-based and includes invalid/zero-price source records; it is not a complete parcel sale-history table.",
+    "Greenwood Area/Area_SqFt aliases and observed numeric values require unit validation before converting to acreage.",
+    "No stable PIN-specific assessor deep link verified; use official GIS Quick Search with PIN={parcelId}.",
+    "Reject SCDOT SC_Parcels token-walled services as a primary source; county MapServer above is public and preferred."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45047/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45047/lookup.json",
+  "sourceCount": 5342,
+  "dropped": 0,
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://www.greenwoodsc.gov/Property_Report_TS/Default.aspx?pin={parcelId}&isTinyScreen=false",
+  "gisViewerUrl": "https://www.greenwoodsc.gov/greenwoodnj/"
 }

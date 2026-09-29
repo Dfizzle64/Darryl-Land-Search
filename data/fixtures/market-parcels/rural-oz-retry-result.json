@@ -1,0 +1,62 @@
+{
+  "pulledOn": "2026-09-29",
+  "pulled": [
+    {
+      "fips": "45085",
+      "name": "Sumter",
+      "state": "South Carolina",
+      "featureCount": 6759,
+      "sourceCount": 7347,
+      "dropped": 119,
+      "queryUrl": "https://gis.sumter-sc.com/server/rest/services/BaseMaps/Sumter_City_County/FeatureServer/7/query",
+      "markets": ["Columbia"],
+      "shelf": "Columbia",
+      "source": "sc-sumter-parcels-45085",
+      "note": "Calculated_ACREAGE 5.0–150.0 returned 7347 rows. 6759 distinct parcel ids stayed after the geometry and parcel-id checks. The county was already on Columbia. No new shelf."
+    }
+  ],
+  "skipped": [
+    {
+      "fips": "13035",
+      "name": "Butts",
+      "state": "Georgia",
+      "queryUrl": "https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/0",
+      "reason": "wfs.schneidercorp.com layer metadata, a 10-feature page, returnIdsOnly, and OBJECTID>=1 AND OBJECTID<=25 returned {\"status\":\"error\",\"messages\":[\"Could not access any server machines. Please contact your system administrator.\"]}. Round 5 of six timed out on all four requests (TimeoutError: The read operation timed out). The services directory https://wfs.schneidercorp.com/arcgis/rest/services?f=json timed out (TimeoutError: The read operation timed out). The card has no other public parcel polygon endpoint."
+    },
+    {
+      "fips": "13119",
+      "name": "Franklin",
+      "state": "Georgia",
+      "queryUrl": "https://wfs.schneidercorp.com/arcgis/rest/services/FranklinCountyGA_WFS/MapServer/0",
+      "reason": "wfs.schneidercorp.com layer metadata, a 10-feature page, returnIdsOnly, and OBJECTID>=1 AND OBJECTID<=25 returned {\"status\":\"error\",\"messages\":[\"Could not access any server machines. Please contact your system administrator.\"]} on all six rounds. The card records no other public county parcel FeatureServer."
+    },
+    {
+      "fips": "13131",
+      "name": "Grady",
+      "state": "Georgia",
+      "queryUrl": "https://wfs.schneidercorp.com/arcgis/rest/services/GradyCountyGA_WFS/MapServer/0",
+      "reason": "wfs.schneidercorp.com layer metadata, a 10-feature page, returnIdsOnly, and OBJECTID>=1 AND OBJECTID<=25 returned {\"status\":\"error\",\"messages\":[\"Could not access any server machines. Please contact your system administrator.\"]} on all six rounds. The card has no other public parcel polygon endpoint."
+    },
+    {
+      "fips": "13137",
+      "name": "Habersham",
+      "state": "Georgia",
+      "queryUrl": "https://wfs.schneidercorp.com/arcgis/rest/services/HabershamCountyGA_WFS/MapServer/4",
+      "reason": "wfs.schneidercorp.com layer metadata, a 10-feature page, returnIdsOnly, and OBJECTID>=1 AND OBJECTID<=25 returned {\"status\":\"error\",\"messages\":[\"Could not access any server machines. Please contact your system administrator.\"]} on all six rounds. Historical card endpoints https://arcgis4.roktech.net/arcgis/rest/services/habersham/habersham_rokmaps/MapServer/8 and https://arcgis5.roktech.net/arcgis/rest/services/habersham/habersham_rokmaps/MapServer/8 returned {\"error\":{\"code\":500,\"message\":\"Service habersham/habersham_rokmaps/MapServer not found \",\"details\":[]}}."
+    }
+  ],
+  "attempts": {
+    "rounds": 6,
+    "backoffSeconds": [0, 20, 40, 60, 90, 120],
+    "strategies": [
+      "layer metadata",
+      "resultRecordCount 10",
+      "returnIdsOnly",
+      "OBJECTID 1-25"
+    ],
+    "envelopeTiles": "not run; the layer never returned an extent",
+    "tlsVerify": true,
+    "servicesDirectory": "https://wfs.schneidercorp.com/arcgis/rest/services?f=json TimeoutError: The read operation timed out"
+  },
+  "totalParcels": 6759
+}

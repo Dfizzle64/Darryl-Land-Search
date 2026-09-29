@@ -1,0 +1,567 @@
+state: GA
+jurisdiction: Habersham County
+fips: "13137"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "Habersham Parcels (Schneider WFS)"
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/HabershamCountyGA_WFS/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: "PriorAcres"
+    coverage: county-wide
+    parcelIdField: "Parcel_PAR"
+    liveCount: 24413
+    liveCount5to150ac: 4772
+    geoCheck: "extent center [['13137', 'Habersham County']]; sample [['13137', 'Habersham County']]; extent WGS84 [-83.6839, 34.4298, -83.3368, 34.8281]"
+    fieldMap:
+      Parcel_PAR: "parcelId"
+      Address: "situsAddress"
+      PhysAddress: "situsAddressAlt"
+      LandValue: "tax.landValue"
+      ImprValue: "tax.improvementValue"
+      SaleP: "lastSale.price"
+      SaleY: "lastSale.year"
+      ZoningCode: "zoning"
+      PriorAcres: "acreage"
+    notes: >
+      pass1 2026-09-28: Schneider-hosted HabershamCountyGA_WFS MapServer layer 4 (24413) with situs,
+      land/improvement values, sale price/year, zoning, prior acres. Supersedes 2026-09-24 gap.
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — ROKMAPS MapServer dead; qPublic HTML + human ROKMAPS viewer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no live Habersham County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. Historically indexed service
+      arcgis4/5.roktech.net/arcgis/rest/services/habersham/habersham_rokmaps/MapServer
+      (Parcels layer 8; Parcels and Land 7; AGOL item "Parcels - GA - Habersham County"
+      GDITAdmin) now returns HTTP 500 "Service … not found"; folder habersham absent from
+      arcgis4/5.roktech.net root (folders list has Paulding/robeson/etc., no habersham).
+      Official human GIS = ROKMAPS™ https://maps.roktech.net/ROKMAPS_Habersham/ (maps2
+      redirects to maps; county GIS Mapping / GIS Department pages link public mapping;
+      digital county-wide datasets are FEE/purchase per GIS fee schedule — not free REST).
+      Companion HTML parcel table maps.roktech.net/HabershamSearch/VW_ParcelSearch (no
+      public ArcGIS query API recovered). Assessor CAMA + maps = qPublic AppID=1010
+      LayerID=20413 (habershamga.com/taxassessors_online → Application.aspx; also
+      App=HabershamCountyGA; qpublic.net/ga/habersham). Cloudflare/bot 403 blocks automated
+      Application.aspx from research box; public for humans. Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=1010&LayerID=20413&PageTypeID=4&PageID=8926&KeyValue={parcelId}
+      (Search PageTypeID=2 PageID=8924). HabershamCountyGA_WFS wfs.schneidercorp.com → 404;
+      qpublic.schneidercorp.com HabershamCountyGA_WFS → 403. AECOM Bridge_PTIP
+      qpublic_parcel1/61 "habersham (qpublic)" → server error — reject. No GMRC/NEGRC/AGOL
+      Habersham GA parcel FS (title search 0 usable). Commercial extracts (Regrid/ATTOM/
+      USLandGrid) — rejected (paid). GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13137
+      CENTLAT +34.6309646 CENTLON -083.5311316 — Habersham / Clarkesville–Cornelia NE GA
+      mountains (NOT Habersham SC lookalikes). Skip utilities (Baldwin/Clarkesville/
+      Cornelia/Demorest/MtAiry/Tallulah Falls water/sewer/hydrants layers on historical
+      ROKMAPS TOC) + AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic AppID=1010 LayerID=20413
+      (updated weekly per county). Deep-link KeyValue={parcelId} on Report page. Tax
+      Commissioner habershamtax.com / habershamga.governmentwindow.com/tax.html — bills/pay
+      only, not CAMA REST. Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. Prefer qPublic Sales Search / Sales List HTML
+      AppID=1010 / App=HabershamCountyGA. Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no live public zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Historical ROKMAPS TOC listed zoning among map layers, but habersham_rokmaps MapServer
+      is dead (2026-09-24) — no queryable zoning FS recovered. City zoning ordinances/PDF
+      (e.g. Clarkesville zoning ordinance) — not county REST. Honest gap.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Habersham County GA future land use FeatureServer found (2026-09-24). Comp Plan / PDF path only.
+    status: gap
+
+municipalities:
+  - name: Clarkesville
+    level: city
+    parentFips: "13137"
+    joinToCountyParcels: >
+      County seat. Soft spatial ~-83.53,34.61 (Census place) when parcels restore. No
+      separate city parcel REST — county qPublic / ROKMAPS only.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Clarkesville zoning FeatureServer — ordinance/PDF only (clarkesvillega.com).
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Clarkesville FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic AppID=1010 HTML only.
+        status: gap
+    gaps:
+      - "No Clarkesville city-owned GIS REST; county ROKMAPS viewer + qPublic HTML."
+    status: gap
+
+  - name: Cornelia
+    level: city
+    parentFips: "13137"
+    joinToCountyParcels: Soft spatial Cornelia GA (~-83.53,34.51) when county parcels available. Largest city.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cornelia zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cornelia FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Cornelia city-owned GIS REST."
+    status: gap
+
+  - name: Demorest
+    level: city
+    parentFips: "13137"
+    joinToCountyParcels: Soft spatial Demorest GA (~-83.54,34.57) when parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Demorest zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Demorest FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Demorest city-owned GIS REST."
+    status: gap
+
+  - name: Baldwin
+    level: city
+    parentFips: "13137"
+    joinToCountyParcels: >
+      Soft spatial Baldwin GA (~-83.54,34.49). May touch Banks County — prefer Habersham
+      qPublic when parcel id is Habersham; do not assume Baldwin geometry is Habersham-only.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Baldwin-only zoning REST — county/city PDF gap.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Baldwin FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Baldwin city-owned GIS REST; may span Habersham/Banks."
+    status: gap
+
+  - name: Alto
+    level: city
+    parentFips: "13137"
+    joinToCountyParcels: Soft spatial Alto GA (~-83.57,34.47). May touch Banks — prefer Habersham qPublic for Habersham parcels.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Alto zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Alto FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Alto city-owned GIS REST."
+    status: gap
+
+  - name: Mount Airy
+    level: city
+    parentFips: "13137"
+    joinToCountyParcels: Soft spatial Mount Airy GA (~-83.50,34.52) when parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Mount Airy zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Mount Airy FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Mount Airy city-owned GIS REST."
+    status: gap
+
+  - name: Tallulah Falls
+    level: city
+    parentFips: "13137"
+    joinToCountyParcels: >
+      Soft spatial Tallulah Falls GA (~-83.39,34.73). Town may touch Rabun — prefer Habersham
+      qPublic when parcel is Habersham.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Tallulah Falls zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Tallulah Falls FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Tallulah Falls city-owned GIS REST."
+    status: gap
+
+gaps:
+  - "No live public REST parcels/owner/tax/sales/zoning/FLU for Habersham County GA — qPublic AppID=1010 LayerID=20413 HTML + ROKMAPS human viewer only."
+  - "Historical habersham/habersham_rokmaps MapServer (arcgis4/5.roktech.net …/MapServer/8 Parcels) returns 500 Service not found; folder removed from Roktech root (2026-09-24)."
+  - "HabershamCountyGA_WFS 404/403; no GMRC/NEGRC/county AGOL Habersham GA parcel FeatureServer."
+  - "Digital GIS data fee/purchase per county GIS fee schedule — not free open REST."
+  - "AECOM Bridge_PTIP qpublic_parcel1/61 dead — reject; REJECT paid Regrid/ATTOM/USLandGrid."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/habersham + AppID=1010 Search/Maps public for humans."
+  - "Tax Commissioner habershamtax.com / governmentwindow — bills/pay only, not CAMA REST."
+  - "Skip utilities (city water/sewer/hydrants on historical ROKMAPS) + AADT; no emails/phones."
+
+license: >
+  Habersham County GIS ROKMAPS (maps.roktech.net/ROKMAPS_Habersham/; habershamga.com
+  GIS Mapping). Tax Assessor qPublic/Beacon AppID=1010 LayerID=20413 /
+  App=HabershamCountyGA (qpublic.net/ga/habersham; Clarkesville GA). Tax Commissioner
+  habershamtax.com. Historical Roktech MapServer currently unavailable. Attribution
+  Habersham County GIS / Tax Assessors. Public HTML + human viewer; no emails/phones;
+  no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=1010&LayerID=20413&PageTypeID=2&PageID=8924
+jurisdictionGisUrl: https://maps.roktech.net/ROKMAPS_Habersham/
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: usable
+  summary: >
+    Habersham Parcels (Schneider WFS):
+    https://wfs.schneidercorp.com/arcgis/rest/services/HabershamCountyGA_WFS/MapServer/4 - live count
+    24413 (5-150 ac: 4772), parcel ID field Parcel_PAR. Geography verified against TIGER county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Baldwin city"
+      level: city
+      parentFips: "13137"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Clarkesville city"
+      level: city
+      parentFips: "13137"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Cornelia city"
+      level: city
+      parentFips: "13137"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Demorest city"
+      level: city
+      parentFips: "13137"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Mount Airy town"
+      level: city
+      parentFips: "13137"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Tallulah Falls town"
+      level: city
+      parentFips: "13137"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Habersham' AND aadt>0
+    altFilter: name LIKE '137-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 137-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 172
+    maxAadt: 40100
+    geoCheck: 172/172 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - LandValue
+    filledCount: 23679
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/HabershamCountyGA_WFS/MapServer/4
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=HabershamCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=1010&LayerID=20413&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 029 158
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HabershamCountyGA&Layer=Parcels&PageType=Report&KeyValue=029%20158
+    verification: 'pattern-tested: real sample ID from Parcel; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://maps.roktech.net/ROKMAPS_Habersham/
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Baldwin city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Clarkesville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Cornelia city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Demorest city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Mount Airy town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Tallulah Falls town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

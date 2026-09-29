@@ -1,0 +1,782 @@
+state: GA
+jurisdiction: Lowndes County
+fips: "13185"
+level: county
+markets: [Valdosta]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons + WinGAP/REALPROP CAMA (owner/mailing/situs/acres/FMV/zoning attr)
+  - role: parcels
+    name: TaxOffice TaxParcels Parcel Boundaries (VALOR / Valdosta-Lowndes Regional GIS)
+    restUrl: https://www.valorgis.com/arcgis/rest/services/TaxOffice/TaxParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PARCEL_NO2: parcelIdAlt
+      SKEY: parcelKey
+      MAP: mapSheet
+      BLOCK: mapBlock
+      PARCEL: mapParcel
+      SUBPAR: mapSubParcel
+      REALKEY: ownerKey
+      OWNKEY: ownerKeyAlt
+      LASTNAME: ownerName
+      FIRSTNAME: ownerFirstName
+      MIDDLE: ownerMiddleName
+      ADDRESS1: mailingAddressLine1OrCoOwner
+      ADDRESS2: mailingAddress
+      ADDRESS3: mailingAddress2
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP: mailingZip
+      HOUSE_NO: situsNumber
+      STDIRECT: situsStreetDir
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      UNIT: situsUnit
+      TOTALACRES: acreage
+      D_ACRES: acreageGis
+      WOODACRES: acreageWoodland
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      MAVRES: tax.assessedValueResidential
+      MAVCOM: tax.assessedValueCommercial
+      MAVACC: tax.assessedValueAccessory
+      SALE_VAL: lastSale.price
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      DIGSTRAT: dorStrata
+      LAND_TYPE: landType
+      LEGAL_DESC: legalDescription
+      SUBD_NAME: subdivision
+      HOMEEXEMPT: homesteadExempt
+      LANDGMD: georgiaMilitiaDistrict
+      LANDLOT: landLot
+      LANDDIST: landDistrict
+      NEIGHBHOOD: neighborhood
+      HISTYR1: tax.histYear1
+      HISTVAL1: tax.histValue1
+      HISTYR2: tax.histYear2
+      HISTVAL2: tax.histValue2
+      HISTYR3: tax.histYear3
+      HISTVAL3: tax.histValue3
+      LASTUPDATE: lastUpdate
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA landbase (VALOR — Valdosta-Lowndes
+      Regional GIS / Southern Georgia Regional Commission, valorgis.com ArcGIS Server 11.3).
+      Live count 66316 (2026-09-23). Identical count twins: TaxParcels/MapServer/0,
+      TaxParcels_CY/MapServer/0, Valor/Parcels/MapServer/0, ACC_TaxParcels/MapServer/0.
+      Prefer FeatureServer/0 (supportsPagination=true, supportsStatistics=true,
+      maxRecordCount 100000). SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet
+      (wkid 102667 / latestWkid 2240). TOTALACRES>0 ≈49847; TOTALACRES 5–150 ≈6774
+      (preferred acreage band for multifamily screening); D_ACRES>0 =66316 (GIS calc
+      always filled) and D_ACRES 5–150 ≈6253 — prefer TOTALACRES when non-null, else
+      D_ACRES. LASTNAME filled ≈65784; PARCEL_NO filled =66316; HOUSE_NO>0 ≈59005;
+      CURR_VAL>0 ≈65746; FMVRES|FMVCOM|FMVACC>0 ≈57073; ZONINGCODE non-blank ≈65011;
+      ZONING field sparsely filled ≈842 (do NOT prefer over ZONINGCODE); SALE_VAL>0
+      only ≈914 (prefer TaxOffice/property_sales year layers for sales; on-parcel
+      SALE_VAL is thin). MAVCURR>0 =0 live (MAV* fields present but unused — do NOT
+      rely on MAVCURR as assessed; prefer CURR_VAL as market and compose FMV components
+      when needed; assessed/taxable via qPublic HTML). Compose situsAddress from
+      HOUSE_NO + STDIRECT + STREET_NAM + STTYPE when HOUSE_NO>0. ZIP is essentially
+      empty (filled ≈4) — mailingZip GAP on this layer; situs zip via spatial
+      Valor/Addresses ZIPCODE or Valor/zipcode polygons. CITY/STATE/ADDRESS2 are owner
+      mailing (nationwide — e.g. INDIANAPOLIS ≈13460 institutional mail, SPRINGFIELD MO,
+      BOCA RATON, JACKSONVILLE) — never municipality filter. ADDRESS1 often co-owner /
+      DBA line (filled ≈20145); street typically ADDRESS2 (≈65272). TAXDISTRIC soft map
+      (geo-checked, no published REST legend): 01≈Valdosta (~21464, ~-83.28,30.80–30.87),
+      02≈unincorporated (~32862), 03≈Dasher area (~512, ~-83.22,30.75), 05≈Remerton
+      (~255, ~-83.28,30.83), 08≈Hahira (~1462, ~-83.37–83.40,30.99), 12≈Lake Park
+      (~643, ~-83.18,30.69), 04/18/19/20≈special / mixed (~5820/354/1821/591 — soft only);
+      prefer spatial MunicipalBoundaries NOTE_ or Addresses MAPZONE over TAXDISTRIC.
+      DIGCLASS: R≈42147, C≈17298, A≈2252, V≈1853, E≈1660, blank≈532, J≈244, I≈213,
+      U≈104. LAND_TYPE 1≈41503 / 3≈24233 / 0≈580 (ACC_TaxParcels symbology uses Land
+      Type 3 rural). HISTYR*/HISTVAL* are assessment value-year history — NOT sales.
+      LASTUPDATE max ≈2024-01-17 UTC (layer not daily-fresh). Official viewers:
+      VALOR Live Map webappviewer b4fd4dbc09ea46c08e5a3144677c3595;
+      experience bbd87fb43280497ba50a9cde6756b776. Assessor claims ~50932 parcels /
+      509 sq mi on lowndescounty.com/210 — REST 66316 includes non-taxable / ROW /
+      splits. Schema also exposes HOMEPHONE/WORKPHONE/CELLPHONE/EMAIL/SSN/SSN1 —
+      DO NOT collect (standing order). Geo-verified WGS84 samples ~-83.397,31.001
+      (Sonny Rogers / Hahira fringe), ~-83.266,30.891 (Valdosta N), ~-83.240,30.698
+      (Lake Park / Loch Laurel), ~-83.212,31.024 (N Lowndes Hwy 122), county ~-83.28,30.83
+      — Lowndes County GA / Valdosta MSA (NOT Lowndes County MS Columbus; NOT Lowndes
+      County AL; NOT Valdosta lookalikes outside GA). Rejected ARC LandPro_2012; rejected
+      Regrid/ATTOM/CoreLogic paid; rejected ACC_TaxParcels as preferred (same count but
+      ACC-symbolized rural subset presentation — use TaxParcels FS for full CAMA).
+    status: usable
+
+  - role: tax
+    name: TaxParcels CAMA values (same layer as preferred parcels)
+    restUrl: https://www.valorgis.com/arcgis/rest/services/TaxOffice/TaxParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      HOMEEXEMPT: homesteadExempt
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. CURR_VAL>0 ≈65746;
+      FMV components >0 ≈57073; MAVCURR>0 =0 (assessed REST gap — use qPublic HTML).
+      Assessor HTML: qPublic SchneiderCorp App=LowndesCountyGA Layer=Parcels
+      (qpublic.net/ga/lowndes/search.html → Application.aspx?App=LowndesCountyGA&Layer=Parcels&PageType=Search).
+      Schneider CDN/bot Cloudflare 403 from research box on Application.aspx; public for
+      humans. Legacy mirror http://qpublic7.qpublic.net/ga_search.php?county=ga_lowndes.
+      Tax Commissioner payment portal lowndescountytax.com (not CAMA). Deep-link pattern:
+      Application.aspx?App=LowndesCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCEL_NO}
+      (AppID/LayerID numeric not recovered from public HTML — App= name form works).
+    status: usable
+
+  - role: sales
+    name: TaxOffice property_sales (annual sale polygons 2009–2021)
+    restUrl: https://www.valorgis.com/arcgis/rest/services/TaxOffice/property_sales/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      SALEPRICE: lastSale.price
+      SALEDATE: lastSale.date
+      SALECLASS: lastSale.qualified
+      SALEKEY: lastSale.key
+      GRANTOR: lastSale.grantor
+      GRANTEE: lastSale.grantee
+      DEEDPAGE: lastSale.deedPage
+      TOTALACRES: acreage
+      CURR_VAL: tax.marketValue
+      LASTNAME: ownerName
+      ADDRESS2: mailingAddress
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP_1: mailingZip
+    notes: >
+      Preferred public REST sales source. Year layers 0=2021 (3163; SALEPRICE>0 ≈2201)
+      through 12=2009 (≈3376–4478/yr). Fields SALEPRICE / SALEDATE / SALECLASS (R/A/C/V/E/I/J)
+      / GRANTOR / GRANTEE / DEEDPAGE / PARCEL_NO. Join PARCEL_NO→parcels.PARCEL_NO.
+      Geo-verified sale samples ~-83.205,30.986 / ~-83.309,31.002 / ~-83.259,30.937 —
+      Lowndes GA. GAP: no 2022+ year layers on this MapServer (stale through 2021 as of
+      2026-09-23); post-2021 sales via qPublic Sales Search HTML only (bot 403). On-parcel
+      SALE_VAL (~914) is NOT a substitute multi-sale history. Rejected paid Regrid/ATTOM
+      sales; rejected Lowndes MS/AL sales services (wrong state).
+    status: partial
+
+  - role: zoning
+    name: PlanningDevelopment Zoning_Detailed (city + county Euclidean)
+    restUrl: https://www.valorgis.com/arcgis/rest/services/PlanningDevelopment/Zoning_Detailed/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZOTXT: zoning
+      ULDC: zoningUldcOrIsland
+      PREV_ZONE: zoningPrevious
+      PARC_NO: parcelId
+      CONDITION: zoningCondition
+      CONDITIONA: zoningConditional
+      MIN_LOT_A: minLotArea
+      NOTE_: zoningNote
+    notes: >
+      Preferred authoritative zoning district POLYGONS (VALOR joint city+county map).
+      Live count 9871. Spatial intersect default join to parcels (PARC_NO sparsely
+      filled — do not rely on attribute join). ZOTXT top: R-10≈1557, R-1≈1257, C-H≈1139,
+      R-6≈830, E-A≈765, R-21≈509, R-A≈498, R-15≈489, C-C≈454, P-D≈417, R-P≈301, CON≈222,
+      M-1≈162, M-2≈150, MAZ-2≈125, R-M≈116, MAZ-3≈92 (+ C-G/C-N/C-D/O-P/O-I/M-F/PRD*…).
+      ULDC field carries county ULDC codes when set; blank ULDC common inside Valdosta /
+      Hahira city footprints (city LDR codes live in ZOTXT). Geo-check: Valdosta downtown
+      ~-83.28,30.83 → R-6/C-H/C-D; Hahira ~-83.37,30.99 → R-15/C-H/C-N; rural west →
+      E-A/R-A/R-1/R-10. Companion Zoning_General/0 (9140) coarser — prefer Detailed.
+      Parcel-attributed ZONINGCODE on TaxParcels (~65011) is a useful fallback / screen
+      but prefer this polygon layer for district boundaries. Official static PDFs:
+      valorgis.com/maps/locozone42.pdf (county), ValdostaZoningMapNovember2022.pdf,
+      Hahira_Zoning.pdf; county digital map DocumentCenter/View/4329; UlDC
+      lowndescounty.com/157. Draft 2026 Comp Plan update in progress (DocumentCenter
+      View/4628) — zoning REST remains current operational layer. maxRecordCount 1000 —
+      page via resultOffset or spatial envelopes.
+    status: usable
+
+  - role: zoning
+    name: TaxParcels ZONINGCODE (parcel-attributed fallback)
+    restUrl: https://www.valorgis.com/arcgis/rest/services/TaxOffice/TaxParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+    notes: >
+      Parcel-attributed zoning on preferred parcels (ZONINGCODE non-blank ≈65011; 209
+      distinct incl. MAZ-1≈13544, R-10≈10724, R-6≈7310, E-A≈5584, R-15≈3973, R-21≈3931,
+      R-1≈3729, P-D≈3546, C-H≈2180…). Fast attribute filter; for authoritative boundaries
+      prefer Zoning_Detailed polygons. Mix of city LDR + county ULDC + Moody Activity
+      Zone (MAZ) codes on one field — spatial MunicipalBoundaries to separate city vs
+      unincorporated when needed.
+    status: partial
+
+  - role: flu
+    name: PlanningDevelopment character_areas (Greater Lowndes Character Areas / FLU)
+    restUrl: https://www.valorgis.com/arcgis/rest/services/PlanningDevelopment/character_areas/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Character_: flu
+      CA_Descrip: fluCode
+      CA_Desc2: fluDescription
+      FDM_PLU: fluAlt
+      FDM_Plan_D: fluPlanDate
+    notes: >
+      Preferred public REST Future Land Use / Character Areas. Live count 946. Character_
+      domain: Park/Recreation/Conservation≈226, Agriculture/Forestry≈142, Established
+      Residential≈117, Neighborhood Activity Center≈89, Community Activity Center≈76,
+      Suburban Area≈58, Rural Residential≈51, Industrial Activity Center≈35,
+      Institutional Activity Center≈35, Transportation/Communication/Utilities≈34,
+      Transitional Neighborhood≈24, Downtown≈20, Linear Greenspace/Trails≈15, Regional
+      Activity Center≈12, Rural Activity Center≈5, Remerton Neighborhood Village≈3,
+      Mill Town≈2, Moody Activity Zone≈2. Spatial intersect only. FDM_Plan_D epoch
+      ≈2006-11-01 — vintage Character Areas tied to older FDM; 2021 Greater Lowndes
+      Comprehensive Plan PDF (DocumentCenter/View/1512) + DRAFT 2026 Comp Plan Update
+      (View/4628 / /501) may supersede map detail — certify critical sites against
+      adopted plan PDFs. FDM_PLU mostly blank. Older_Zoning_Info/MapServer group
+      "Pre 2006 Future Land Use" is legacy only — do not prefer. No separate city FLU
+      FeatureServer for Valdosta/Hahira/Lake Park/Dasher/Remerton recovered.
+    status: partial
+
+  - role: other
+    name: Valor MunicipalBoundaries_CitiesShaded (incorporated cities)
+    restUrl: https://www.valorgis.com/arcgis/rest/services/Valor/MunicipalBoundaries_CitiesShaded/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NOTE_: municipality
+      CPOLY: municipalityPolyId
+      Shape_STAr: shapeAreaSqFt
+    notes: >
+      Preferred spatial municipality filter. Live count 6 polys: Valdosta, Hahira,
+      Lake Park (×2 parts), Dasher, Remerton. NOTE_ is the city name. Twin
+      MunicipalBoundaries_Outline/0 includes County + city polys (12 features) — use
+      CitiesShaded for incorporated-only or filter Outline NOTE_ <> 'County'. Join =
+      spatial intersect (default). Do NOT filter by parcel mailing CITY.
+    status: usable
+
+  - role: other
+    name: Valor Addresses (site address points)
+    restUrl: https://www.valorgis.com/arcgis/rest/services/Valor/Addresses/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ADDRESSPTI: addressId
+      ADDRESS: situsAddress
+      HOUSE_NUM: situsNumber
+      PRE_DIR: situsStreetDir
+      STREET_NAM: situsStreetName
+      STREET_TYP: situsStreetType
+      ADD_ST: situsStreet
+      UNIT_NUM: situsUnit
+      CITY: situsCity
+      ZIPCODE: situsZip
+      MAPZONE: municipalityZone
+      POINTTYPE: addressPointType
+      PRIMADD: primaryAddressFlag
+    notes: >
+      Live count 54240 address points. ZIPCODE filled (situs zip gap-fill for parcels).
+      MAPZONE domain: LOWNDES≈28180, VALDOSTA≈21671, HAHIRA≈1767, LAKE PARK≈603,
+      DASHER≈494, MOODY≈369, REMERTON≈334, MOODY AFB≈12 (+ typos VALODSTA/LOWMDES —
+      soft). CITY postal includes VALDOSTA/HAHIRA/LAKE PARK/NAYLOR/RAY CITY/MOODY AFB
+      (Naylor & Ray City are not incorporated Lowndes municipalities). Spatial join to
+      parcels for situs zip / building-level; no stable PARCEL_NO on this layer.
+      Geo-verified ~-83.265,30.814 (S Patterson Valdosta). Mirror Valor/Addresses_Existing
+      FeatureServer also present.
+    status: usable
+
+  - role: other
+    name: Valor zipcode (ZIP Code polygons)
+    restUrl: https://www.valorgis.com/arcgis/rest/services/Valor/zipcode/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZIPCODE: zipCode
+      ZIP_CITY: zipCity
+      NAME: zipName
+    notes: >
+      Live count 17 ZIP polys spanning Lowndes + fringe: 31601/31602/31605/31606 Valdosta,
+      31632 Hahira, 31636 Lake Park, 31641 Naylor, 31699 Moody AFB, plus adjacent Quitman /
+      Ray City / Lakeland / Statenville / FL spill. Spatial situs-zip join when Addresses
+      point missing. Not a municipality filter.
+    status: usable
+
+municipalities:
+  - name: Valdosta
+    level: city
+    parentFips: "13185"
+    joinToCountyParcels: >
+      Spatial MunicipalBoundaries_CitiesShaded NOTE_='Valdosta' (~-83.28,30.83) OR
+      Addresses MAPZONE='VALDOSTA' (~21671) OR soft TAXDISTRIC='01' (~21464). Mailing
+      CITY='VALDOSTA' is owner mailing — never sole filter.
+    layers:
+      - role: zoning
+        name: Zoning_Detailed city extract (+ Valdosta Zoning Map PDF Nov 2022)
+        restUrl: https://www.valorgis.com/arcgis/rest/services/PlanningDevelopment/Zoning_Detailed/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZOTXT: zoning
+          ULDC: zoningUldcOrIsland
+        notes: >
+          Preferred Valdosta-local zoning on public REST = Zoning_Detailed spatial to
+          Valdosta poly (standing order: city over county stub). Sample city codes R-6,
+          R-10, R-15, C-H, C-D, C-C, C-N, R-P, M-1/M-2, O-P, O-I, M-F, P-D, PRD*. Official
+          static map valorgis.com/maps/ValdostaZoningMapNovember2022.pdf; City Zoning
+          Division valdostacity.com/zoning-division-0 points to VALOR. No separate
+          City-of-Valdosta-owned FeatureServer recovered — VALOR is the joint city/county
+          system. Parcel ZONINGCODE filtered to city spatial is fallback. Rejected
+          Valdosta TX / other Valdosta lookalikes (wrong geography).
+        status: usable
+      - role: flu
+        name: character_areas city extract (county Comp Plan character — no city FLU REST)
+        restUrl: https://www.valorgis.com/arcgis/rest/services/PlanningDevelopment/character_areas/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Character_: flu
+        notes: >
+          No Valdosta-only FLU FeatureServer. Use Greater Lowndes character_areas spatial
+          (Downtown, Established Residential, Activity Centers, Mill Town, etc.) + 2021
+          Comp Plan PDF; draft 2026 update pending. Status partial — certify via Planning.
+        status: partial
+      - role: parcels
+        name: null — use county TaxParcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Valdosta-only CAMA FeatureServer — county TaxParcels + spatial Valdosta poly
+          / TAXDISTRIC=01 soft.
+        status: gap
+    gaps:
+      - "No Valdosta-owned separate zoning/FLU FeatureServer — VALOR Zoning_Detailed + Nov 2022 PDF; FLU via county character_areas / Comp Plan PDF."
+      - "Rejected non-GA Valdosta lookalike GIS (wrong geography)."
+    status: usable
+
+  - name: Hahira
+    level: city
+    parentFips: "13185"
+    joinToCountyParcels: >
+      Spatial MunicipalBoundaries_CitiesShaded NOTE_='Hahira' (~-83.37,30.99) OR
+      Addresses MAPZONE='HAHIRA' (~1767) OR soft TAXDISTRIC='08' (~1462).
+    layers:
+      - role: zoning
+        name: Zoning_Detailed Hahira extract (+ Hahira_Zoning.pdf)
+        restUrl: https://www.valorgis.com/arcgis/rest/services/PlanningDevelopment/Zoning_Detailed/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZOTXT: zoning
+        notes: >
+          Preferred Hahira zoning = Zoning_Detailed spatial (sample R-15, C-H, C-N, M-1,
+          R-10). Static PDF valorgis.com/maps/Hahira_Zoning.pdf. Hahira/ folder on VALOR
+          REST is utilities/stormwater/DDA only — no Hahira Zoning FeatureServer. Parcel
+          ZONINGCODE city-filter fallback.
+        status: usable
+      - role: flu
+        name: null — county character_areas only
+        restUrl: https://www.valorgis.com/arcgis/rest/services/PlanningDevelopment/character_areas/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Character_: flu
+        notes: >
+          No Hahira city FLU FeatureServer — gap beyond county character_areas spatial.
+        status: gap
+      - role: parcels
+        name: null — use county TaxParcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Hahira-only CAMA — county TaxParcels + spatial Hahira / TAXDISTRIC=08.
+        status: gap
+    gaps:
+      - "Hahira VALOR folder has utilities only; zoning via joint Zoning_Detailed + Hahira_Zoning.pdf."
+      - "No Hahira city FLU REST."
+    status: partial
+
+  - name: Lake Park
+    level: city
+    parentFips: "13185"
+    joinToCountyParcels: >
+      Spatial MunicipalBoundaries_CitiesShaded NOTE_='Lake Park' (multipart) OR
+      Addresses MAPZONE='LAKE PARK' (~603) OR soft TAXDISTRIC='12' (~643). Centroid
+      ~-83.18,30.69.
+    layers:
+      - role: zoning
+        name: Zoning_Detailed Lake Park extract
+        restUrl: https://www.valorgis.com/arcgis/rest/services/PlanningDevelopment/Zoning_Detailed/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZOTXT: zoning
+        notes: >
+          No Lake-Park-owned zoning FeatureServer / dedicated zoning PDF on valorgis
+          index (LakePark/ folder = cemetery + utilities). Prefer Zoning_Detailed spatial
+          + parcel ZONINGCODE; certify with City of Lake Park Planning. Status partial.
+        status: partial
+      - role: flu
+        name: null — county character_areas only
+        restUrl: https://www.valorgis.com/arcgis/rest/services/PlanningDevelopment/character_areas/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Character_: flu
+        notes: >
+          No Lake Park city FLU REST — gap.
+        status: gap
+      - role: parcels
+        name: null — use county TaxParcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          County TaxParcels + spatial Lake Park / TAXDISTRIC=12.
+        status: gap
+    gaps:
+      - "No Lake Park zoning PDF/FeatureServer on VALOR index; LakePark/ folder utilities+cemetery only."
+      - "No Lake Park city FLU REST."
+    status: partial
+
+  - name: Dasher
+    level: city
+    parentFips: "13185"
+    joinToCountyParcels: >
+      Spatial MunicipalBoundaries_CitiesShaded NOTE_='Dasher' (~-83.23,30.73) OR
+      Addresses MAPZONE='DASHER' (~494) OR soft TAXDISTRIC='03' (~512).
+    layers:
+      - role: zoning
+        name: Zoning_Detailed Dasher extract
+        restUrl: https://www.valorgis.com/arcgis/rest/services/PlanningDevelopment/Zoning_Detailed/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZOTXT: zoning
+        notes: >
+          No Dasher-owned GIS folder / zoning PDF recovered. Prefer Zoning_Detailed
+          spatial (sample R-1, A-U near Dasher) + parcel ZONINGCODE. Status partial.
+        status: partial
+      - role: flu
+        name: null — county character_areas only
+        restUrl: https://www.valorgis.com/arcgis/rest/services/PlanningDevelopment/character_areas/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Character_: flu
+        notes: >
+          No Dasher city FLU REST — gap.
+        status: gap
+      - role: parcels
+        name: null — use county TaxParcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          County TaxParcels + spatial Dasher / TAXDISTRIC=03.
+        status: gap
+    gaps:
+      - "No Dasher city zoning/FLU FeatureServer or VALOR folder."
+    status: partial
+
+  - name: Remerton
+    level: city
+    parentFips: "13185"
+    joinToCountyParcels: >
+      Spatial MunicipalBoundaries_CitiesShaded NOTE_='Remerton' (~-83.28,30.83, small)
+      OR Addresses MAPZONE='REMERTON' (~334) OR soft TAXDISTRIC='05' (~255).
+    layers:
+      - role: zoning
+        name: Zoning_Detailed Remerton extract
+        restUrl: https://www.valorgis.com/arcgis/rest/services/PlanningDevelopment/Zoning_Detailed/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZOTXT: zoning
+        notes: >
+          No Remerton-owned zoning FeatureServer. Prefer Zoning_Detailed spatial + parcel
+          ZONINGCODE. Character area includes 'Remerton Neighborhood Village' (FLU context).
+        status: partial
+      - role: flu
+        name: character_areas Remerton Neighborhood Village
+        restUrl: https://www.valorgis.com/arcgis/rest/services/PlanningDevelopment/character_areas/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Character_: flu
+        notes: >
+          character_areas includes Remerton Neighborhood Village≈3 polys — soft city FLU
+          context only; no Remerton city FLU REST.
+        status: partial
+      - role: parcels
+        name: null — use county TaxParcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          County TaxParcels + spatial Remerton / TAXDISTRIC=05.
+        status: gap
+    gaps:
+      - "No Remerton city zoning FeatureServer; very small footprint inside Valdosta urban area."
+    status: partial
+
+gaps:
+  - "Mailing ZIP essentially empty on TaxParcels (ZIP filled ≈4) — mailingZip GAP; situs zip via Addresses ZIPCODE spatial or zipcode polygons; sales layers expose ZIP_1."
+  - "MAVCURR/MAV* assessed fields present but MAVCURR>0=0 live — no usable assessedValue on REST; use CURR_VAL market + qPublic HTML for assessed/taxable."
+  - "On-parcel SALE_VAL>0 only ≈914; multi-sale REST property_sales stops at 2021 (layers 2009–2021) — 2022+ sales gap / qPublic HTML only (Schneider bot 403)."
+  - "HISTYR*/HISTVAL* are assessment value years — NOT sales."
+  - "character_areas FDM_Plan_D ≈2006 vintage; 2021 Comp Plan PDF + DRAFT 2026 Comp Plan Update may supersede — certify FLU against adopted PDFs."
+  - "Older_Zoning_Info Pre 2006 Future Land Use is legacy — do not prefer."
+  - "TAXDISTRIC codes lack published REST name legend — soft map 01=Valdosta / 02=unincorp / 03=Dasher / 05=Remerton / 08=Hahira / 12=Lake Park / 04·18·19·20=special; prefer MunicipalBoundaries spatial."
+  - "Parcel mailing CITY/STATE nationwide (INDIANAPOLIS institutional cluster ≈13460) — never municipality filter."
+  - "ZONING field on parcels sparsely filled (≈842) — use ZONINGCODE or Zoning_Detailed ZOTXT."
+  - "Zoning_Detailed maxRecordCount 1000 — page via resultOffset / spatial envelopes."
+  - "TaxParcels LASTUPDATE max ≈2024-01-17 — not daily-fresh; Assessor site notes monthly ownership lag after deeds."
+  - "Schema contains HOMEPHONE/WORKPHONE/CELLPHONE/EMAIL/SSN/SSN1 — DO NOT collect (standing order)."
+  - "Lake Park / Dasher / Remerton: no city-hosted zoning FeatureServer; Hahira folder utilities-only; Valdosta uses joint VALOR Zoning_Detailed + Nov 2022 PDF."
+  - "Naylor and Ray City appear in Addresses CITY / zip polys but are not incorporated Lowndes municipalities (Naylor CDP; Ray City is Berrien County)."
+  - "Moody AFB / Moody MAPZONE — federal installation context, not a city municipality card."
+  - "No city-only CAMA FeatureServers — always county TaxParcels + spatial city poly."
+  - "qPublic Schneider App=LowndesCountyGA Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/lowndes search HTML 200."
+  - "Rejected lookalikes / non-preferred: Lowndes County MS (Columbus MS) GIS; Lowndes County AL GIS; non-GA Valdosta lookalikes; ARC LandPro_2012 stale regional as cadastral; Regrid Nationwide Parcel Boundaries (appeared in AGOL search — paid vendor); ATTOM/CoreLogic/DynamoSpatial paid extracts; ACC_TaxParcels as preferred (same data, rural ACC symbology presentation); TaxParcels_Historic CY19/18/17 snapshots as preferred current; Valor/Parcels MapServer twin OK but prefer TaxOffice/TaxParcels FeatureServer/0."
+  - "No emails/phones collected; no paid vendors."
+
+license: >
+  Valdosta-Lowndes Regional GIS (VALOR) / Southern Georgia Regional Commission
+  (valorgis.com ArcGIS Server) — TaxOffice/TaxParcels, TaxOffice/property_sales,
+  PlanningDevelopment/Zoning_Detailed, PlanningDevelopment/character_areas,
+  Valor/MunicipalBoundaries_*, Valor/Addresses, Valor/zipcode. Viewers: webappviewer
+  b4fd4dbc09ea46c08e5a3144677c3595; experience bbd87fb43280497ba50a9cde6756b776.
+  County site lowndescounty.com (Planning / Board of Assessors / ULDC). City of Valdosta
+  Zoning Division valdostacity.com + ValdostaZoningMapNovember2022.pdf. Hahira_Zoning.pdf
+  / locozone42.pdf on valorgis.com/maps. Assessor HTML: qPublic SchneiderCorp
+  App=LowndesCountyGA (qpublic.net/ga/lowndes). Tax Commissioner lowndescountytax.com.
+  2021 Greater Lowndes Comprehensive Plan DocumentCenter/View/1512; DRAFT 2026 Comp Plan
+  Update DocumentCenter/View/4628. Attribution to VALOR / Lowndes County / City of
+  Valdosta / partner cities / SGRC. Public fields only; no emails/phones; no paid vendors
+  (Regrid/ATTOM/CoreLogic/DynamoSpatial).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LowndesCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "Public Information Researcher"
+  aadt:
+    source: "GDOT / UGA ITOS (OMAT PMED Traffic Data)"
+    restUrl: "https://maps.itos.uga.edu/arcgis/rest/services/GDOT/GDOT_FunctionalClass/MapServer/21"
+    layerId: 21
+    field: "AADT"
+    geography: "state HPMS / traffic segments (polyline)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Public Information Researcher"
+    notes: "Public GDOT FunctionalClass MapServer layer 21 OMAT PMED Traffic Data with AADT; GDOT TADA (drakewell) is interactive/CSV alternative without a simple statewide FeatureServer."
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://www.valorgis.com/arcgis/rest/services/TaxOffice/TaxParcels/FeatureServer/0 count 66316;
+    extent center [['13185', 'Lowndes County']]; sample [['13185', 'Lowndes County']]. No change to
+    field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Dasher town"
+      level: city
+      parentFips: "13185"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Hahira city"
+      level: city
+      parentFips: "13185"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Lake Park city"
+      level: city
+      parentFips: "13185"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Remerton city"
+      level: city
+      parentFips: "13185"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Valdosta city"
+      level: city
+      parentFips: "13185"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Lowndes' AND aadt>0
+    altFilter: name LIKE '185-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 185-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 350
+    maxAadt: 60900
+    geoCheck: 350/350 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - A_VALUE
+    - FMVRES
+    filledCount: 65746
+    restUrl: https://www.valorgis.com/arcgis/rest/services/TaxOffice/TaxParcels/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: REST-partial
+    detail: 'VALOR TaxOffice/property_sales year layers 0-12 (2021 back to 2009): SALEPRICE, SALEDATE, SALECLASS,
+      GRANTOR, GRANTEE, DEEDPAGE; nothing after 2021 on REST. Primary parcels SALE_VAL>0 only 914'
+    restUrl: https://www.valorgis.com/arcgis/rest/services/TaxOffice/property_sales/MapServer/0
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 65784
+    restUrl: https://www.valorgis.com/arcgis/rest/services/TaxOffice/TaxParcels/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=LowndesCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0046D 004
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LowndesCountyGA&Layer=Parcels&PageType=Report&KeyValue=0046D%20004
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.valorgis.com/
+    note: county GIS site
+    cities:
+    - name: Dasher town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Hahira city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Lake Park city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Remerton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Valdosta city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

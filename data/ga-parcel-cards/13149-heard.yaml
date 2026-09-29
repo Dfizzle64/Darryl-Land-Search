@@ -1,0 +1,527 @@
+state: GA
+jurisdiction: Heard County
+fips: "13149"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY INTENT — county-wide cadastral polygons (live REST dead; no OA parcel snapshot fallback)
+  - role: parcels
+    name: HeardCountyParcels (hcarcgis / heardco.maps.arcgis.com — LIVE REST BLOCKED)
+    restUrl: https://services7.arcgis.com/shlUlNKW81IHLNtJ/arcgis/rest/services/HeardCountyParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: token
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      INTENDED county-wide parcel FeatureServer (AGOL org shlUlNKW81IHLNtJ / hcarcgis
+      item "HeardCountyParcels" 7bb261edec274d7894c84781117d8f50; listed public in AGOL
+      search but live query 2026-09-23 returned Token Required 499; item metadata +
+      /data endpoints 403 SB_0006 "Subscription is canceled, the item is not accessible").
+      Item last-modified epoch ms 1531083837000 ≈ 2018-07-08 17:03 ET — stale even if
+      restored. Sibling hcarcgis layers (HeardCityBoundary, Heard_County_Boundary,
+      StreetsUpdated, Flood/FEMA, census blocks, water) ALL return Token Required 499
+      same day — entire heardco org effectively locked. No public field map recoverable.
+      OpenAddresses us/ga/heard has ADDRESSES only (no parcels layer) — unlike Carroll,
+      there is NO usable OA NDJSON geometry+pid fallback. Commercial mirrors claim
+      ~7.0–7.1k parcels (DynamoSpatial ~7041; Regrid ~7039–7139) — do NOT wire paid
+      vendors. Official human parcel viewer = qPublic/Beacon App=HeardCountyGA Layer=Parcels
+      (qpublic.net/ga/heard → qpublic.schneidercorp.com; Cloudflare/bot 403 automated).
+      Deep-link patterns:
+      Application.aspx?App=HeardCountyGA&Layer=Parcels&PageType=Search and
+      PageTypeID=4&KeyValue={PARCEL_ID} when numeric AppID/LayerID exposed to humans
+      (numeric AppID not recovered automated 2026-09-23). Also legacy
+      qpublic7.qpublic.net/ga_search.php?county=ga_heard. Geo target Heard County GA
+      west of Atlanta on AL border — TIGER county GEOID 13149 centroid ~-85.128,+33.297
+      (NOT Franklin County GA FIPS 13119 ~-83.23,+34.38; NOT Heard Island Australia;
+      NOT Franklin Springs city GEOID 1331320). Rejected ARC LandPro_2012; rejected
+      Regrid/ATTOM/DynamoSpatial/USLandGrid/Equator/ReportAll/Zoneomics paid. Prefer
+      re-check live REST periodically; until restored county geometry+CAMA = HTML-only
+      gap for land-search polygons.
+    status: blocked
+
+  - role: parcels
+    name: AECOM Bridge_PTIP qpublic_parcel1 MapServer (Heard mirror if/when started) — NOT STARTED
+    restUrl: https://solutions.aecomonline.net/arcgis/rest/services/Bridge_PTIP/qpublic_parcel1/MapServer
+    layerId: null
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Indexed AECOM Bridge_PTIP qPublic parcel mirror folder (same pattern as Haralson
+      layer 64). Live 2026-09-23: Bridge_PTIP folder lists zero running services;
+      qpublic_parcel1/MapServer returns 500 "Service ... not started". Document as
+      discovered but unusable; do not prefer if/when restarted without field verification
+      + geo check (~-85.1,33.3). Not a substitute for county hosted CAMA.
+    status: blocked
+
+  - role: other
+    name: OpenAddresses Heard County addresses snapshot (OA job 915126 — points only, NOT parcels)
+    restUrl: https://v2.openaddresses.io/batch-prod/job/915126/source.geojson.gz
+    layerId: null
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      number: situsNumber
+      street: situsStreet
+      region: situsState
+    notes: >
+      Soft SITUS enrichment only — NOT a cadastral polygon fallback (standing-order
+      open GeoJSON; addresses layer only). Source us/ga/heard.json (Census geoid 13149);
+      harvest Success 2026-09-18; count 7794 points; bounds WGS84
+      [[-85.294,33.130],[-84.938,33.429]] — geo-verified Heard GA (AL border / west
+      Atlanta). CSV twin https://data.openaddresses.io/cache/us-ga-heard_county.csv
+      (LNG,LAT,STR,DISTRICT,REGION); DISTRICT soft labels heard≈7630 / carroll≈75 /
+      coweta≈56 / troup≈33 — border bleed; do NOT use DISTRICT alone as county filter.
+      No pid/owner/tax/sale/acres on OA product. Prefer only after parcels REST restores
+      (spatial-join soft situs) or as address-point context; never as parcel outlines.
+    status: partial
+
+  - role: tax
+    name: null — no public REST CAMA values
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer with Land Value / Building Value / Accessory /
+      FMV / assessed / taxable for Heard County found (2026-09-23). Assessor HTML only:
+      qPublic/Beacon App=HeardCountyGA (Cloudflare/bot 403 automated; public for humans).
+      Field definitions (qpublic.net/ga/heard/field_def.html) document Parcel Number,
+      Location Address, Land/Building/Accessory Value, Sale Date/Price/Qualification —
+      HTML schema only, not REST. Tax estimator:
+      qpublic7.qpublic.net/ga_tax_estimator.php?county=ga_heard. Tax Commissioner / pay
+      via heardcountyga.com (no open REST). Rejected paid vendor tax enrichment.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Heard GA multi-sale FeatureServer/MapServer found (2026-09-23). No GMASS
+      Heard_Sales_ExportFeatures sibling on org ISpzx3B5ZsVA6e1Z (Carroll has commercial
+      sales subset; Heard does not — Heard_* Probe Invalid URL). Prefer qPublic Sales
+      Search / Sales List HTML (App=HeardCountyGA) when available to humans — field_def
+      documents Date of Sale, Sales Price, Qualification, Deed Book & Page. Rejected ARC
+      LandPro_2012 and paid Regrid/ATTOM as sales substitutes. Rejected wrong-state /
+      wrong-topic Heard lookalike AGOL (Heard Island nautical charts; shots-heard demos).
+    status: gap
+
+  - role: zoning
+    name: Heard County Zoning Map PDF (Sep 2020 — no REST)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer with Euclidean zoning polygons found (2026-09-23).
+      Official map PDF: heardcountyga.com/Heard%20County%20Zoning%20Map.pdf (HTTP 200;
+      ≈2.97MB; Esri ArcMap 10.3; CreationDate 2020-09-16 ET; plotted 9/16/2020; "Last
+      Zoning Update: 2020 September"; compiled by Middle Georgia Mapping LLC from Tax
+      Assessors + Zoning Dept). Legend districts include A1 Agricultural, RD Rural
+      Development, R1 Single Family Residential, MR Multi Family Residential, MHP
+      Manufactured Home Park, GC General Commercial, I Industrial, H Historic Area,
+      CITY Area (municipal footprints called out on map). Ordinance text: Municode
+      Chapter 46 Zoning (library.municode.com/ga/heard_county — A-1/RD/R-1/MR/MHP/GC/
+      Industrial + overlays). Building & Zoning: heardcountyga.com/bzHome.html (Zoning
+      Map menu link). 2026 ELA / solar / data-center ordinance amendments on county site
+      are text PDFs — not GIS. Inside cities prefer city zoning products when/if published;
+      none found (Franklin/Centralhatchee/Ephesus sites lack zoning REST/maps). 
+      Unincorporated certification = Building & Zoning staff / official Zoning Map PDF.
+      Rejected ARC LandPro as zoning; rejected Zoneomics paid code mirror.
+    status: partial
+
+  - role: flu
+    name: null — Joint Comp Plan 2022-2042 character areas PDF only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No public county FLU FeatureServer found (2026-09-23). Official plan: Heard County
+      & the Town of Centralhatchee, the City of Franklin, and the City of Ephesus Joint
+      Comprehensive Plan 2022-2042 —
+      heardcountyga.com/revised%20heardcountyjointcomprehensiveplan%202022-2042.pdf
+      (live PDF ≈11.4MB; Three Rivers Regional Commission / DCA reviewed; character areas
+      + land use chapter for county + each municipality). Spatial REST for character/FLU
+      polygons not published. Comp Plan work program notes intent to "Develop GIS program
+      integrating zoning & planning, tax offices, and 911" — not delivered as public REST
+      as of research date. Prefer city FLU REST when/if published; until then PDF +
+      Planning / Building & Zoning staff. Rejected ARC LandPro_2012 stale regional.
+    status: gap
+
+  - role: other
+    name: Census TIGER Incorporated Places (municipality filter join)
+    restUrl: https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      GEOID: placeGeoid
+      NAME: municipality
+      BASENAME: municipalityBase
+      CENTLON: centroidLon
+      CENTLAT: centroidLat
+      AREALAND: landAreaSqMeters
+    notes: >
+      Preferred public spatial join for municipality filter while HeardCityBoundary REST
+      is Token Required / subscription-canceled (standing order). Live query STATE=13
+      BASENAME in (Franklin,Centralhatchee,Ephesus) returns 3 places — all geo-verified
+      inside Heard County: Franklin city GEOID=1331292 ~-85.099,+33.280 (county seat);
+      Centralhatchee town GEOID=1315026 ~-85.104,+33.369; Ephesus city GEOID=1327708
+      ~-85.257,+33.407. REJECT Franklin Springs city GEOID=1331320 ~-83.151,+34.285
+      (Franklin County GA — wrong county). REJECT Franklin County GA FIPS 13119
+      (~-83.229,+34.375). County boundary verify: TIGER State_County GEOID=13149 centroid
+      ~-85.128,+33.297 — west Atlanta MSA / Alabama border. Soft postal CITY= never sole
+      municipality filter.
+    status: usable
+
+  - role: other
+    name: HeardCityBoundary / Heard_County_Boundary (hcarcgis — BLOCKED twins)
+    restUrl: https://services7.arcgis.com/shlUlNKW81IHLNtJ/arcgis/rest/services/HeardCityBoundary/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: token
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Intended municipal + county boundary FeatureServers on same hcarcgis org as
+      HeardCountyParcels (items abfacaddea54437a9b0d5e5ada33c3a6 / c9c47112c20f46dbb00fb4976ff5a7aa).
+      Live 2026-09-23: Token Required 499; item access blocked with SB_0006 subscription
+      canceled. Prefer Census TIGER Places + State_County until restored. Do not treat as
+      usable municipality join.
+    status: blocked
+
+  - role: other
+    name: Greater West Georgia JDA SelectGeorgia site selector (NOT cadastral)
+    restUrl: https://services.selectgeorgia.com/arcgis/rest/services/GreaterWestGeorgiaJDA/MapServer
+    layerId: null
+    geometry: unknown
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap: {}
+    notes: >
+      Georgia Power / SelectGeorgia Greater West Georgia JDA webmap (AGOL item
+      918864bac8fc4ef880b73ad8ec16cf0c) references MapServer layers Counties/Sites/
+      Industrial Buildings. Live 2026-09-23: services.selectgeorgia.com MapServer returned
+      404 Service not found. Context only if restored — not parcels/zoning/FLU/CAMA. Do
+      not prefer for land search.
+    status: blocked
+
+municipalities:
+  - name: Franklin
+    level: city
+    parentFips: "13149"
+    joinToCountyParcels: >
+      Spatial TIGER Places GEOID=1331292 / NAME='Franklin city' (~-85.099,+33.280,
+      AREALAND≈8.3e6 m²) OR soft situs city when CAMA restored. County seat. REJECT
+      Franklin Springs (GEOID 1331320) and Franklin County GA (FIPS 13119). No city
+      FeatureServer found (2026-09-23). HeardCityBoundary blocked.
+    layers:
+      - role: zoning
+        name: null — no Franklin GA city zoning REST (county Zoning Map PDF marks CITY Area)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No City of Franklin (Heard) public FeatureServer / GeoJSON zoning found
+          (2026-09-23). franklinga.com resolves to parked /lander redirect (no planning
+          GIS). County Zoning Map PDF labels CITY Area footprints including Franklin;
+          Municode Ch.46 is county ordinance. Prefer city clerk / council certification
+          inside limits over county stub when city districts differ; until city product
+          publishes, county PDF + staff. Joint Comp Plan character areas cover Franklin
+          in PDF only. Rejected Franklin County GA / Franklin Springs / out-of-state
+          Franklin municipal GIS lookalikes.
+        status: gap
+      - role: flu
+        name: null — Joint Comp Plan character areas PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Franklin Future Development / character areas in Heard Joint Comp Plan
+          2022-2042 PDF (Three Rivers RC) — no city FLU FeatureServer.
+        status: gap
+      - role: parcels
+        name: null — use county parcels when REST restored; else qPublic HTML
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Franklin-owned CAMA FeatureServer — county HeardCountyParcels (blocked) +
+          spatial TIGER Franklin poly / qPublic HTML.
+        status: gap
+    gaps:
+      - "No Franklin (Heard) public zoning/FLU/parcel FeatureServer — county Zoning Map PDF CITY Area + Comp Plan PDF character areas + qPublic HTML."
+      - "franklinga.com is parked /lander — no city open data."
+      - "County parcel REST blocked — city extract unavailable until hcarcgis restores HeardCountyParcels or county publishes alternate."
+      - "Rejected Franklin County GA (13119) and Franklin Springs city lookalikes."
+    status: gap
+
+  - name: Centralhatchee
+    level: town
+    parentFips: "13149"
+    joinToCountyParcels: >
+      Spatial TIGER Places GEOID=1315026 / NAME='Centralhatchee town' (~-85.104,+33.369,
+      AREALAND≈8.5e6 m²). Northeastern Heard. No town FeatureServer found (2026-09-23).
+    layers:
+      - role: zoning
+        name: null — no Centralhatchee zoning REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Town of Centralhatchee — centralhatchee.com parked /lander; TRRC/DCA notes
+          historically flagged codes not posted online. County Zoning Map PDF marks CITY
+          Area; Joint Comp Plan character areas (historic corridor, developing residential,
+          agriculture/rural residential, rural gateway corridor) PDF-only. Prefer town
+          clerk / council + county Building & Zoning certification. No FeatureServer.
+        status: gap
+      - role: flu
+        name: null — Joint Comp Plan character areas PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Centralhatchee character areas in Joint Comp Plan 2022-2042 PDF — no FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county REST blocked; qPublic HTML
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Centralhatchee-owned CAMA FeatureServer.
+        status: gap
+    gaps:
+      - "No Centralhatchee town GIS REST — TIGER place poly + Comp Plan PDF + county Zoning Map PDF + qPublic HTML only."
+      - "centralhatchee.com parked /lander."
+    status: gap
+
+  - name: Ephesus
+    level: city
+    parentFips: "13149"
+    joinToCountyParcels: >
+      Spatial TIGER Places GEOID=1327708 / NAME='Ephesus city' (~-85.257,+33.407,
+      AREALAND≈9.6e6 m²). Northwestern Heard. No city FeatureServer found (2026-09-23).
+      Note: do NOT confuse with biblical/tourism Ephesus lookalikes or non-GA places.
+    layers:
+      - role: zoning
+        name: null — no Ephesus GA zoning REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City of Ephesus (ephesusga.com — civic info/council/payments; no zoning/GIS
+          downloads found 2026-09-23). County Zoning Map PDF CITY Area + Joint Comp Plan
+          character areas PDF. Prefer city clerk / council + county Building & Zoning.
+          Rejected wrong-geography Ephesus lookalikes.
+        status: gap
+      - role: flu
+        name: null — Joint Comp Plan character areas PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Ephesus Future Development / character areas in Joint Comp Plan PDF only.
+        status: gap
+      - role: parcels
+        name: null — county REST blocked; qPublic HTML
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Ephesus-owned CAMA FeatureServer.
+        status: gap
+    gaps:
+      - "No Ephesus GA city GIS REST — TIGER place poly + Comp Plan PDF + county Zoning Map PDF + qPublic HTML only."
+      - "ephesusga.com has no zoning/parcel open data."
+    status: gap
+
+gaps:
+  - "Live county parcel FeatureServer HeardCountyParcels BLOCKED (Token Required 499 + item 403 SB_0006 subscription canceled 2026-09-23); hcarcgis item 7bb261edec274d7894c84781117d8f50 last modified ≈2018-07-08 ET; entire heardco org siblings likewise token-locked."
+  - "No OpenAddresses us/ga/heard PARCELS harvest — OA is addresses-only (job 915126; 7794 points) — cannot fall back to OA NDJSON geometry+pid (Carroll-style) for this county."
+  - "AECOM Bridge_PTIP/qpublic_parcel1/MapServer not started (500) — no Heard qPublic static mirror."
+  - "No public REST Euclidean zoning polygons — Zoning Map PDF Sep 2020 (partial) + Municode Ch.46 text; 2026 ELA/solar/data-center amendments are text PDFs only."
+  - "No public REST county or city FLU — Joint Comp Plan 2022-2042 PDF character/land-use maps only (Three Rivers RC / heardcountyga.com)."
+  - "No public REST tax.marketValue/assessedValue or lastSale — qPublic/Beacon App=HeardCountyGA HTML only (Cloudflare/bot 403 automated); field_def.html documents sale/value schema for humans."
+  - "City Euclidean zoning REST: none for Franklin / Centralhatchee / Ephesus — all gap (PDF/staff). franklinga.com + centralhatchee.com parked /lander."
+  - "HeardCityBoundary FeatureServer blocked — municipality filter = Census TIGER Places only until restored."
+  - "Georgia GIS Clearinghouse / data.georgiaspatial.org cookie/login wall — no anonymous Heard parcel download recovered."
+  - "SelectGeorgia GreaterWestGeorgiaJDA MapServer 404 — not a cadastral substitute."
+  - "Rejected lookalikes / non-preferred: Franklin County GA FIPS 13119 (~-83.23,+34.38); Franklin Springs city GEOID 1331320; Heard Island / Approaches to Heard Island AGOL image services (Australia — wrong geography/topic); shots-fired/shots-heard density demos; AMSIS Heard and MacDonald Islands fishery; ARC LandPro_2012 (Ug5xGQbHsD8zuZzM / ryanbarrett) stale regional LC/LU as preferred cadastral; HEARD_CO_13149_20100819 JC_Butler Document Link (not live REST); Boundary Solutions / Princeton 2019 Heard parcels (restricted); Regrid/ATTOM/CoreLogic/DynamoSpatial/USLandGrid/Equator/ReportAll/AcreValue/Zoneomics/ParcelVision paid vendors; maps.itos.uga.edu FrameWork Boundaries (no tax parcels)."
+  - "No emails/phones collected (assessor/building contact schema ignored); no paid vendors."
+  - "Enrichment vs thin in-app: county geometry+CAMA+zoning polygons+FLU+sales all blocked/gap/HTML/PDF as of 2026-09-23; usable public spatial = Census TIGER places for municipality filter + county boundary verify; partial = Zoning Map PDF + OA address points (not polygons)."
+
+license: >
+  hcarcgis / heardco.maps.arcgis.com AGOL org shlUlNKW81IHLNtJ — HeardCountyParcels
+  FeatureServer (blocked; item 7bb261edec274d7894c84781117d8f50) + HeardCityBoundary /
+  Heard_County_Boundary (blocked). Assessor HTML: qPublic/Beacon SchneiderCorp
+  App=HeardCountyGA Layer=Parcels (qpublic.net/ga/heard → qpublic.schneidercorp.com;
+  field_def.html). County: heardcountyga.com (Building & Zoning Zoning Map PDF Sep 2020;
+  Joint Comprehensive Plan 2022-2042 PDF; Board of Tax Assessors). Municode Chapter 46
+  Zoning (library.municode.com/ga/heard_county). Three Rivers Regional Commission plan
+  review. OpenAddresses us/ga/heard addresses (job 915126). Census TIGER Places /
+  State_County (tigerweb.geo.census.gov). AECOM solutions.aecomonline.net Bridge_PTIP
+  qpublic_parcel1 (not started). Attribution to Heard County / partner municipalities /
+  TRRC / Census / OA. Public fields only; no emails/phones; no paid vendors
+  (Regrid/ATTOM/CoreLogic/DynamoSpatial/USLandGrid/Equator/ReportAll/Zoneomics).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HeardCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: blocked
+  parcelStatusAfter: blocked
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays blocked.
+    HeardCountyParcels (services7 shlUlNKW81IHLNtJ) still Token Required 499 on 2026-09-28; AECOM mirror
+    not started.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Centralhatchee town"
+      level: city
+      parentFips: "13149"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Ephesus city"
+      level: city
+      parentFips: "13149"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Franklin city"
+      level: city
+      parentFips: "13149"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: blocked
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Heard' AND aadt>0
+    altFilter: name LIKE '149-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 149-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 55
+    maxAadt: 9410
+    geoCheck: 55/55 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=HeardCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=HeardCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Centralhatchee town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Ephesus city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Franklin city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

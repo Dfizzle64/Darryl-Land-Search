@@ -1,0 +1,366 @@
+state: GA
+jurisdiction: Columbia County
+fips: "13073"
+level: county
+markets: [Augusta]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner + tax + last sale (PublicAccess LandData)
+  - role: parcels
+    name: LandData Parcels (Columbia County GA GIS)
+    restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/LandData/FeatureServer/1003
+    layerId: 1003
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Calculated_Acres
+    coverage: county-wide
+    fieldMap:
+      ParcelNum: parcelId
+      Tax_OwnerName1: ownerName
+      Tax_OwnerName2: ownerName2
+      Tax_Mailing_Address1: mailingAddress
+      Tax_Mailing_City: mailingCity
+      Tax_Mailing_State: mailingState
+      Tax_Mailing_Zipcode: mailingZip
+      Tax_Physical_Address: situsAddress
+      GIS_Calculated_Acres: acreage
+      Tax_Deed_Acreage: acreageDeed
+      Tax_Total_Value: tax.marketValue
+      Tax_Land_Value: tax.landValue
+      Tax_Improvement_Value: tax.improvementValue
+      Tax_SaleAmount: lastSale.price
+      Tax_Last_Sale_Date: lastSale.date
+      Tax_SaleInstrument: lastSale.instrument
+      Tax_Deed_Book: deedBook
+      Tax_Deed_Page: deedPage
+      Tax_Deed_Year: deedYear
+      Tax_Property_Use: dorCode
+      Tax_Neighborhood_Code: neighborhood
+      Tax_Legal_Description1: legalDescription
+      Tax_Actual_Year_Built: yearBuilt
+      Tax_Total_Finished_Area: heatedArea
+      Method: geometryMethod
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (Columbia County GA GIS host
+      gis.columbiacountyga.gov PublicAccess/LandData FeatureServer layer 1003 "Parcels";
+      twin MapServer/1003 identical). Live count 68982 (2026-09-24). SR NAD 1983 StatePlane
+      Georgia East FIPS 1001 Feet (102666/2239). maxRecordCount 2000 — page via resultOffset /
+      spatial envelopes. GIS_Calculated_Acres 5–150 ≈4338; Tax_Total_Value>0 ≈68019;
+      Tax_OwnerName1 filled ≈68854; Tax_SaleAmount>0 ≈42912. Prefer GIS_Calculated_Acres for
+      GIS acres; Tax_Deed_Acreage when deed acres needed. Compose situs from
+      Tax_Physical_Address (may be "0 STREET" for vacant). Tax_Mailing_* are OWNER mailing —
+      never municipality filter. Official Maps Online https://maps.columbiacountyga.gov/ ;
+      hub columbia-county-green-guide-columbiagagis.hub.arcgis.com; Experience
+      experience.arcgis.com/experience/2a544ed178534a61ae173ab7e0b418d2. Companion AGOL
+      Parcels_Columbia_County_GA (org XqCfDEcWKHtcTHsa) is GEOMETRY-THIN (PIN/Calc_Acre only;
+      count 66097) — prefer LandData/1003 for CAMA. Geo-verified WGS84 samples
+      ~-82.253,33.506 (Evans / Dublin Loop), ~-82.146,33.486 (Collins Dr), ~-82.263,33.394
+      (Leitner Mill), ~-82.200,33.638 (Savannah River), ~-82.152,33.601 (Champions Pky) —
+      Columbia County GA / Evans–Martinez–Grovetown (Augusta MSA). REJECTED Columbia SC
+      (~-81.03,33.99 Richland); REJECTED Columbia County WA TaxParcels
+      services9.arcgis.com/zq1Ay6bxXC1T1CBk/.../TaxParcels (Dayton WA ~-117.98,46.32;
+      Hyperlink PropertyAccess WA). Rejected paid Regrid/ATTOM. Skip WaterDistribution /
+      utilities layers. No emails/phones collected.
+    status: usable
+
+  - role: tax
+    name: LandData Parcels Tax_* values (on polygons)
+    restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/LandData/FeatureServer/1003
+    layerId: 1003
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Calculated_Acres
+    coverage: county-wide
+    fieldMap:
+      ParcelNum: parcelId
+      Tax_Total_Value: tax.marketValue
+      Tax_Land_Value: tax.landValue
+      Tax_Improvement_Value: tax.improvementValue
+      Tax_OwnerName1: ownerName
+      Tax_Property_Use: dorCode
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. Tax_Total_Value>0 ≈68019. No separate
+      assessed/MAV field on REST — prefer Tax_Total_Value as market; assessed/taxable via
+      qPublic HTML when needed. Assessor HTML: App=ColumbiaCountyGA /
+      AppID=1261 LayerID=41898 PageTypeID=2 PageID=15366 (county Tax Assessor page +
+      tax.columbiacountyga.gov/656/Maps-Online-and-qPublic). Deep-link KeyValue={ParcelNum}:
+      Application.aspx?AppID=1261&LayerID=41898&PageTypeID=4&PageID=15368&KeyValue={ParcelNum}.
+    status: usable
+
+  - role: sales
+    name: LandData Tax_SaleAmount / Tax_Last_Sale_Date (on polygons)
+    restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/LandData/FeatureServer/1003
+    layerId: 1003
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ParcelNum: parcelId
+      Tax_SaleAmount: lastSale.price
+      Tax_Last_Sale_Date: lastSale.date
+      Tax_SaleInstrument: lastSale.instrument
+      Tax_Deed_Book: deedBook
+      Tax_Deed_Page: deedPage
+      Tax_Deed_Year: deedYear
+    notes: >
+      Last-sale fields on preferred parcels (Tax_SaleAmount>0 ≈42912 of 68982). Date is
+      string MM/DD/YYYY (e.g. 09/07/2021). Single last-sale only — multi-sale history via
+      qPublic Sales Search HTML AppID=1261. Rejected paid Regrid/ATTOM sales extracts.
+    status: usable
+
+  - role: zoning
+    name: Planning Zoning (county Euclidean)
+    restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/Planning/FeatureServer/79
+    layerId: 79
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      ZONE: zoning
+      NEW_ZONE: zoningProposed
+      PARCEL_ID: parcelId
+      AKPAR: parcelIdAlt
+      ACRES: acreage
+      ETC: evansTownCenterOverlay
+      RCO: residentialClusterOverlay
+      CPOD: corridorProtectionOverlay
+      NPOD: nodeProtectionOverlay
+      ZONE_FILE: zoningCase
+      CURRENTZONEREF: zoningReference
+    notes: >
+      Preferred county zoning polygons (count 5740). ZONE domain top: PUD≈930, C-2≈847,
+      R-2≈802, R-1≈516, R-A≈484, R-3≈388, S-1≈376, R-4≈232, M-1≈230, A-R≈205, P-1≈171,
+      C-1≈139, M-2≈119, T-R≈93, C-3≈57, PDD≈56 (+ C-C/PRD/R-3A/D-C/R-1A/A-R10). PARCEL_ID /
+      AKPAR often blank — join spatial to LandData/1003 (default). Overlay flags ETC/RCO/
+      CPOD/NPOD coincide with Planning layers 74–77. Twin MapServer/79. Geo Columbia GA.
+    status: usable
+
+  - role: flu
+    name: Planning Character Areas (HL_CharacterArea)
+    restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/Planning/FeatureServer/80
+    layerId: 80
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      HL_CharacterArea: flu
+    notes: >
+      Preferred Future Land Use / character-area polygons (count 355). Domain
+      HL_CharacterArea: Public/Semi-Public≈180, Open Space and Conservation Areas≈85,
+      Urban Residential≈29, Community Commercial≈27, Technology and Industrial≈9,
+      Traditional Neighborhood≈4, Medium-Density Residential≈4, Regional Commercial≈4,
+      Rural Residential/Agricultural≈3, Commercial≈3, Town Center≈3, Water≈2, Fort Gordon≈1.
+      Spatial join onto LandData parcels. Twin MapServer/80.
+    status: usable
+
+  - role: other
+    name: LandData Tax Districts
+    restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/LandData/FeatureServer/1055
+    layerId: 1055
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TAXDIST: taxDistrict
+      NAME: taxDistrictName
+      DISTRICTID: taxDistrictId
+    notes: >
+      Soft tax-district polys. Sample TAXDIST: 21/22/23/24 unincorp-leaning; 25 NAME=GROVETOWN;
+      26 NAME=HARLEM. Prefer spatial CityBoundaries / city zoning for municipality over
+      TAXDIST alone. Companion Address Points layer 1054 (situs aid).
+    status: partial
+
+  - role: other
+    name: CityBoundaries_11042025_View (incorporated)
+    restUrl: https://services3.arcgis.com/XqCfDEcWKHtcTHsa/arcgis/rest/services/CityBoundaries_11042025_View/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+    notes: >
+      Preferred spatial municipality filter (ColumbiaCountyGA_publisher AGOL org
+      XqCfDEcWKHtcTHsa). Live polys: Grovetown, Harlem. Evans / Martinez are CDPs —
+      unincorporated Columbia (no city poly here); do NOT treat mailing CITY as municipality.
+    status: usable
+
+municipalities:
+  - name: Grovetown
+    level: city
+    parentFips: "13073"
+    joinToCountyParcels: >
+      Spatial CityBoundaries NAME='Grovetown' OR soft Tax Districts TAXDIST='25' /
+      NAME='GROVETOWN'. mailing CITY='GROVETOWN' is postal — never sole filter.
+    layers:
+      - role: zoning
+        name: City of Grovetown Zoning
+        restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/Planning/FeatureServer/81
+        layerId: 81
+        geometry: polygon
+        auth: none
+        acreageField: Calc_Acre
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          ZONING_OLD: zoningPrior
+          PIN: parcelId
+          Calc_Acre: acreage
+          COMMENTS: zoningComments
+        notes: >
+          Preferred Grovetown city zoning (count 5825). Join PIN→LandData.ParcelNum or
+          spatial. County Planning/79 as unincorporated fallback outside city poly.
+        status: usable
+      - role: flu
+        name: Character Areas spatial Grovetown
+        restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/Planning/FeatureServer/80
+        layerId: 80
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          HL_CharacterArea: flu
+        notes: Filter spatial to Grovetown city limits.
+        status: usable
+      - role: parcels
+        name: County LandData Parcels spatial Grovetown
+        restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/LandData/FeatureServer/1003
+        layerId: 1003
+        geometry: polygon
+        auth: none
+        acreageField: GIS_Calculated_Acres
+        coverage: city-only
+        fieldMap:
+          ParcelNum: parcelId
+          Tax_OwnerName1: ownerName
+          Tax_Total_Value: tax.marketValue
+        notes: No Grovetown-only CAMA — county parcels + spatial Grovetown / TAXDIST=25.
+        status: partial
+    gaps:
+      - "No Grovetown-owned separate parcel CAMA FeatureServer — county LandData + city zoning."
+    status: usable
+
+  - name: Harlem
+    level: city
+    parentFips: "13073"
+    joinToCountyParcels: >
+      Spatial CityBoundaries NAME='Harlem' OR soft Tax Districts TAXDIST='26' / NAME='HARLEM'.
+    layers:
+      - role: zoning
+        name: City of Harlem Zoning
+        restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/Planning/FeatureServer/82
+        layerId: 82
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          PIN: parcelId
+        notes: Preferred Harlem city zoning (count 1801). Join PIN→ParcelNum or spatial.
+        status: usable
+      - role: flu
+        name: Character Areas spatial Harlem
+        restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/Planning/FeatureServer/80
+        layerId: 80
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          HL_CharacterArea: flu
+        notes: Filter spatial to Harlem city limits.
+        status: usable
+      - role: parcels
+        name: County LandData Parcels spatial Harlem
+        restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/LandData/FeatureServer/1003
+        layerId: 1003
+        geometry: polygon
+        auth: none
+        acreageField: GIS_Calculated_Acres
+        coverage: city-only
+        fieldMap:
+          ParcelNum: parcelId
+        notes: County parcels + spatial Harlem / TAXDIST=26.
+        status: partial
+    gaps:
+      - "No Harlem-owned separate parcel CAMA FeatureServer."
+    status: usable
+
+  - name: Evans
+    level: cdp
+    parentFips: "13073"
+    joinToCountyParcels: >
+      Evans is a CDP (unincorporated) — no CityBoundaries poly. Soft: spatial near Evans
+      (~-82.14,33.52) + Evans Town Center Overlay (Planning/77) / ETC='Yes' on Zoning/79.
+      mailing CITY='EVANS' is postal only.
+    layers:
+      - role: zoning
+        name: County Zoning + Evans Town Center Overlay
+        restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/Planning/FeatureServer/79
+        layerId: 79
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          ZONE: zoning
+          ETC: evansTownCenterOverlay
+        notes: No separate City-of-Evans zoning — county ZONE + Planning/77 ETC overlay.
+        status: partial
+      - role: flu
+        name: Character Areas (Evans area)
+        restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/Planning/FeatureServer/80
+        layerId: 80
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          HL_CharacterArea: flu
+        notes: Spatial filter to Evans CDP area.
+        status: partial
+      - role: parcels
+        name: County LandData Parcels (Evans CDP)
+        restUrl: https://gis.columbiacountyga.gov/host/rest/services/PublicAccess/LandData/FeatureServer/1003
+        layerId: 1003
+        geometry: polygon
+        auth: none
+        acreageField: GIS_Calculated_Acres
+        coverage: city-only
+        fieldMap:
+          ParcelNum: parcelId
+        notes: County parcels only — Evans unincorporated.
+        status: partial
+    gaps:
+      - "Evans is CDP/unincorporated — no city-owned GIS; use county layers + ETC overlay."
+    status: partial
+
+gaps:
+  - "No separate assessedValue/MAV on LandData REST — prefer Tax_Total_Value market; qPublic AppID=1261 for assessed/taxable when needed."
+  - "Tax_SaleAmount is single last-sale only — multi-sale history via qPublic Sales Search HTML."
+  - "Zoning PARCEL_ID/AKPAR often blank — spatial join to parcels required."
+  - "AGOL Parcels_Columbia_County_GA is geometry-thin (PIN/Calc_Acre) — do not prefer over LandData/1003."
+  - "Evans/Martinez are CDPs — CityBoundaries only Grovetown+Harlem; mailing CITY never municipality filter."
+  - "LandData maxRecordCount 2000 — page via resultOffset / spatial envelopes."
+  - "REJECTED wrong-geography: Columbia County WA TaxParcels (zq1Ay6bxXC1T1CBk Dayton WA); Columbia SC Richland lookalikes; paid Regrid/ATTOM."
+  - "Skip PublicAccess/WaterDistribution / WaterConveyance / utilities; no AADT; no emails/phones."
+
+license: >
+  Columbia County GA GIS — gis.columbiacountyga.gov PublicAccess LandData (Parcels/1003,
+  Tax Districts/1055, Address Points/1054), Planning (Zoning/79, Character Areas/80,
+  Grovetown Zoning/81, Harlem Zoning/82, overlays 74–78). Maps Online
+  maps.columbiacountyga.gov. AGOL org ColumbiaCountyGA_publisher (XqCfDEcWKHtcTHsa)
+  CityBoundaries + thin Parcels_Columbia_County_GA. Assessor qPublic App=ColumbiaCountyGA /
+  AppID=1261 LayerID=41898. Attribution Columbia County GIS / Tax Assessor. Public fields
+  only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=1261&LayerID=41898&PageTypeID=4&PageID=15368&KeyValue=
+jurisdictionGisUrl: https://maps.columbiacountyga.gov/
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

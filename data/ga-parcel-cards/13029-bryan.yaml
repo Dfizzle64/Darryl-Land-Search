@@ -1,0 +1,463 @@
+state: GA
+jurisdiction: Bryan County
+fips: "13029"
+level: county
+markets: [Savannah]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons + WinGAP-style CAMA (owner/mailing/situs/acres/FMV/CURR_VAL/zoning attr)
+  - role: parcels
+    name: PropertyDetails Parcels (official Bryan County GA ArcGIS Server)
+    restUrl: https://bryangis.bryan-county.org/arcgis/rest/services/PropertyDetails/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PARCEL_N_1: parcelIdAlt
+      REALKEY: ownerKey
+      OWNKEY: ownerKeyAlt
+      LASTNAME: ownerName
+      ADDRESS1: mailingAddressLine1OrCoOwner
+      ADDRESS2: mailingAddress
+      ADDRESS3: mailingAddress2
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP_1: mailingZip
+      HOUSE_NO: situsNumber
+      STDIRECT: situsStreetDir
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      UNIT: situsUnit
+      ZIP: situsZipPostal
+      TOTALACRES: acreage
+      WOODACRES: acreageWoodland
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      MAVRES: tax.assessedValueResidential
+      MAVCOM: tax.assessedValueCommercial
+      MAVACC: tax.assessedValueAccessory
+      ZONINGCODE: zoning
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      DIGSTRAT: dorStrata
+      LEGAL_DESC: legalDescription
+      SUBD_NAME: subdivision
+      HOMEEXEMPT: homesteadExempt
+      LANDGMD: georgiaMilitiaDistrict
+      HISTYR1: tax.histYear1
+      HISTVAL1: tax.histValue1
+      HISTYR2: tax.histYear2
+      HISTVAL2: tax.histValue2
+      HISTYR3: tax.histYear3
+      HISTVAL3: tax.histValue3
+      FLD_ZONE: floodZone
+      Shape_Area: shapeAreaSqFt
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA landbase (Bryan County GIS,
+      bryangis.bryan-county.org ArcGIS Server 10.71). Live count 23200 (2026-09-23).
+      SR NAD 1983 StatePlane Georgia East FIPS 1001 Feet (wkid 102666 / latestWkid 2239).
+      maxRecordCount 1000; supportsPagination=false / supportsStatistics=false /
+      supportsOrderBy=false — page via objectIds or spatial envelopes, not resultOffset.
+      TOTALACRES>0 ≈22367; TOTALACRES 5–150 ≈2232 (preferred acreage band); LASTNAME filled
+      ≈23200; HOUSE_NO>0 ≈19728; CURR_VAL>0 ≈22426; FMVRES+FMVCOM+FMVACC>0 ≈18495;
+      ZONINGCODE non-blank ≈22019; MAVCURR>0 = 0 on live query (MAV* fields present but
+      unused — do NOT rely on MAVCURR as assessed; prefer CURR_VAL as market and compose
+      FMV components when needed). Compose situsAddress from HOUSE_NO + STDIRECT +
+      STREET_NAM + STTYPE when HOUSE_NO>0. ZIP tracks situs postal (31324 Richmond Hill /
+      31321 Pembroke samples even when mailing CITY=ALPHARETTA) — treat as situsZipPostal;
+      ZIP_1 tracks mailing (out-of-state samples e.g. SC 29485, TX 75572, CA 91320) —
+      mailingZip. CITY/STATE/ADDRESS2 are owner mailing (nationwide) — never municipality
+      filter. TAXDISTRIC soft map (geo-checked): 1≈Pembroke (~1403, ~-81.62,32.12),
+      2≈Richmond Hill (~7704, ~-81.27–81.32,31.90), 3≈unincorporated (~13319),
+      0≈non-taxable/ROW stubs (~774) — prefer spatial MunicipalBoundaries over TAXDISTRIC.
+      DIGCLASS: R≈20437, C≈800, E≈386, A≈307, V≈284, I≈83, J≈79, U≈46, blank≈774.
+      HISTYR*/HISTVAL* are assessment value-year history (sample HISTYR1=2025) — NOT sales.
+      Multipart parcels exist (same PARCEL_NO multiple FID, e.g. 065028×2). Official GIS:
+      bryancountyga.gov GIS/Mapping (interactive maps page may Akamai-403 automated;
+      REST open). Stale/broken twin URL Parcels/MapServer returns 500 "Service not found"
+      — use PropertyDetails. Thinner Evolve/MapServer/1 Parcels count 19727 lacks FMV/
+      CURR_VAL — do not prefer. Geo-verified WGS84 samples ~-81.255,31.765 (Hwy 144 south
+      Bryan), ~-81.27–81.33,31.85–31.91 (Richmond Hill), ~-81.58–81.63,32.10–32.15
+      (Pembroke), county boundary centroid ~-81.42,32.00 — Bryan County GA SW of Savannah
+      (NOT Bryan TX, NOT Bryan OK, NOT Pembroke NC). Rejected ARC LandPro; rejected
+      Regrid/ATTOM/DynamoSpatial paid; rejected SAGIS (Chatham-only, no Bryan folder).
+    status: usable
+
+  - role: tax
+    name: PropertyDetails CAMA values (same layer as preferred parcels)
+    restUrl: https://bryangis.bryan-county.org/arcgis/rest/services/PropertyDetails/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      HOMEEXEMPT: homesteadExempt
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. Prefer CURR_VAL as
+      tax.marketValue (≈22426 >0). Compose optional component FMV ≈ FMVRES+FMVCOM+FMVACC
+      (≈18495 >0). MAVCURR/MAVRES/MAVCOM/MAVACC present in schema but MAVCURR>0 count=0
+      live — no usable assessedValue REST field; GA 40% assessed detail via Beacon/qPublic
+      HTML. HISTYR1–3 / HISTVAL1–3 are prior digest value years, not sales. Assessor HTML:
+      Beacon SchneiderCorp AppID=639 LayerID=11303 (qpublic.net/ga/bryan →
+      beacon.schneidercorp.com; Cloudflare/bot 403 automated; public for humans).
+      Deep-link pattern: Application.aspx?AppID=639&LayerID=11303&PageTypeID=4&KeyValue={PARCEL_NO}.
+      Tax Commissioner / paytaxes: bryancounty.paytaxes.net (HTML).
+    status: usable
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Bryan GA multi-sale FeatureServer/MapServer found (2026-09-23). Preferred parcels
+      expose no SALE_PRICE/SALE_DATE/Sale_Quality. HISTYR*/HISTVAL* are assessment history
+      only — do not map as lastSale. Beacon/qPublic AppID=639 Sales Search HTML only
+      (Cloudflare/bot 403 automated). Rejected ARC LandPro_2012 and paid Regrid/ATTOM/
+      DynamoSpatial as sales substitutes. Rejected Bryan TX / Bryan OK sales services
+      (wrong state).
+    status: gap
+
+  - role: zoning
+    name: Zoning ZoningDistrict2 (county UDO Euclidean polygons)
+    restUrl: https://bryangis.bryan-county.org/arcgis/rest/services/Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONECLASS: zoning
+      ZONEDESC: zoningDescription
+      LASTUPDATE: zoningLastUpdate
+    notes: >
+      Preferred county zoning DISTRICT polygons (Bryan County UDO). Live count 16
+      (dissolved by ZONECLASS — large multipolygons, not parcel-tied). Domain: A-5
+      Agricultural, RR-1 / RR-1.5 / RR-2.5 Rural Residential, R-15 Low/Med Density
+      Residential, R-M Multi-Family, R-MH Manufactured Housing Park, B-1 Neighborhood
+      Commercial, B-2 General Commercial, C-I Interchange Commercial, I-1 Light
+      Industrial, I-2 General Industrial, PD Planned Development, P/I Public/
+      Institutional, DM-1 Dunes and Marshlands, WB Waterfront Business. Spatial-join
+      only (no PIN). Inside cities prefer parcel ZONINGCODE (city Euclidean codes PUD/
+      R1/R2/R3/C1/C2/CITY…) + city Official Zoning Map PDF over this county layer.
+      Research mirror (do not prefer): services2.arcgis.com/I9cUOJUZvdGAJncI CoastalZoning
+      FeatureServer/10 "Bryan Zoning" count 16 (ZONE/ZONEDESC + canopy attrs; sourced from
+      county interactive maps Mar 2024 by tgiarrusso). Geo-verified ~-81.3,31.9 Bryan GA.
+    status: usable
+
+  - role: zoning
+    name: PropertyDetails ZONINGCODE (parcel-attributed; county + city codes mixed)
+    restUrl: https://bryangis.bryan-county.org/arcgis/rest/services/PropertyDetails/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ZONINGCODE: zoning
+      TAXDISTRIC: taxDistrict
+    notes: >
+      Parcel-attributed zoning string (filled ≈22019). Mixes county UDO codes (R-15≈4522,
+      RR-1≈3068, PD≈2915, A-5≈1578, RR-2.5≈358, B-2≈223, I-2≈85, B-1≈38, C-I≈16, R-MH≈15,
+      DM-1≈9, WB≈6, P/I≈1, slash splits ≈76) with city-style codes common inside Richmond
+      Hill / Pembroke (PUD≈4310, R2≈1773, R-1≈1101, R3≈405, CITY stub≈368, R1≈336, C1≈172,
+      C2≈121, B-3≈72, I1≈55, I-1≈47, R-2≈41, blank≈1181). Prefer this field for city parcels
+      when city FeatureServer is absent; certify Richmond Hill against Official Zoning Map
+      PDF (Apr 15 2026). COUNTY Zoning polygon spatial join remains authoritative Euclidean
+      for unincorporated. CITY≈368 is a stub — not a district code.
+    status: partial
+
+  - role: flu
+    name: 2023ComprehensivePlan Future Land Use and Character Areas 2023
+    restUrl: https://bryangis.bryan-county.org/arcgis/rest/services/2023ComprehensivePlan/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      LANDUSEDESC: flu
+      LANDUSECODE: fluCode
+      LASTUPDATE: fluLastUpdate
+    notes: >
+      Preferred county Future Land Use / Character Areas (adopted 2023 Comp Plan). Live
+      count 11 dissolved polys. LANDUSEDESC domain: Industrial, Rural Residential, Low
+      Density Residential, Emerging Suburban, Mixed Use, Conservation, Redevelopment
+      Corridor, Suburban, Low Density Coastal Residential, Village Center, Fort Stewart
+      Buffer. LANDUSECODE null on all rows — use LANDUSEDESC. Spatial-join only. Overlay
+      companions on same MapServer: Community Crossroads/0 (16 points), Coastal Access/1
+      (16 points), Village Center/2 (11 polys), Fort Stewart Buffer/3 (11 polys). Older
+      ComprehensiveLandUsePlans/MapServer/0 (count 14) retained as legacy — includes
+      city-name STUBS "Richmond Hill City Limits" and "Pembroke City Center" (not city
+      official FLU detail). Prefer 2023 layer; inside cities city FLU REST not found (gap).
+      Geo-verified ~-81.3–81.6,31.8–32.2 Bryan GA.
+    status: usable
+
+  - role: flu
+    name: ComprehensiveLandUsePlans Future Land Use and Character Areas (legacy)
+    restUrl: https://bryangis.bryan-county.org/arcgis/rest/services/ComprehensiveLandUsePlans/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      LANDUSEDESC: flu
+      LANDUSECODE: fluCode
+    notes: >
+      Legacy FLU/character (count 14). Includes Mixed Use, Rural Residential Transitioning,
+      Industrial, Community Crossroads, Pembroke City Center (stub), Groover Hill District,
+      Low Density and Agricultural, State of GA Coastal Conservation Lands, Conservation
+      Lands, Low Density Residential, Low Density Suburban Characteristics, Richmond Hill
+      City Limits (stub), Private Lands in Marsh Areas, Commercial Corridor. Prefer
+      2023ComprehensivePlan/4 for current plan; keep this for historical / stub city
+      footprint context only.
+    status: partial
+
+  - role: other
+    name: MunicipalBoundaries (cities)
+    restUrl: https://bryangis.bryan-county.org/arcgis/rest/services/MunicipalBoundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+      MUNITYP: municipalityType
+      MUNIAREA: municipalityAreaSqMi
+      LOCALFIPS: placeFipsLocal
+      LASTUPDATE: municipalityLastUpdate
+    notes: >
+      Live count 2: PEMBROKE (City, ≈7.52 sq mi, LOCALFIPS=60004, centroid ~-81.620,32.145,
+      LASTUPDATE≈2024-11-08 ET) and RICHMOND HILL (City, ≈32.39 sq mi, LOCALFIPS=65044,
+      centroid ~-81.269,31.909, LASTUPDATE≈2025-10-27 ET). Preferred spatial join for
+      municipality filter (standing order). No unincorporated poly on this layer — invert
+      city polys or use AddressPoints MUNICIPALITY / TAXDISTRIC=3 soft. CountyBoundary
+      MapServer/0 also exposes BRYAN / FORT STEWART / NORTH BRYAN / SOUTH BRYAN context
+      polys (centroid Bryan ~-81.422,32.002).
+    status: usable
+
+  - role: other
+    name: AddressPoints Site Address Points
+    restUrl: https://bryangis.bryan-county.org/arcgis/rest/services/AddressPoints/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      SITEADDID: addressId
+      FULLADDR: situsAddress
+      ADDRNUM: situsNumber
+      FULLNAME: situsStreet
+      ROADNAME: situsStreetName
+      ROADTYPE: situsStreetType
+      RDPREDIR: situsStreetDir
+      UNITID: situsUnit
+      ZIPCODE: situsZip
+      MUNICIPALITY: municipality
+      PLACENAME: placeName
+      PARCELNO: parcelId
+      LAT: latitude
+      LONG: longitude
+    notes: >
+      Live count 22038 address points. MUNICIPALITY domain: Unincorporated Bryan County
+      ≈12294, City of Richmond Hill ≈6969, City of Pembroke ≈1235, Unincorporated ≈31.
+      ZIPCODE filled ≈20550. PARCELNO join sparsely filled (≈59) — prefer spatial to
+      parcels for situs zip/building-level. PLACENAME is subdivision/community (Buckhead
+      East, Wicklow, etc.) — soft only. Geo-verified Bryan GA.
+    status: usable
+
+municipalities:
+  - name: Richmond Hill
+    level: city
+    parentFips: "13029"
+    joinToCountyParcels: >
+      Spatial MunicipalBoundaries NAME='RICHMOND HILL' (~-81.269,31.909, ≈32.39 sq mi) OR
+      AddressPoints MUNICIPALITY='City of Richmond Hill' (~6969) OR soft TAXDISTRIC=2
+      (~7704 — tax district soft only; spatial preferred). Mailing CITY='RICHMOND HILL'
+      is owner mailing — never sole filter.
+    layers:
+      - role: zoning
+        name: PropertyDetails ZONINGCODE city extract (+ Official Zoning Map PDF)
+        restUrl: https://bryangis.bryan-county.org/arcgis/rest/services/PropertyDetails/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          ZONINGCODE: zoning
+          TAXDISTRIC: taxDistrict
+        notes: >
+          Preferred Richmond Hill-local zoning on public REST = parcel ZONINGCODE filtered
+          to city spatial / TAXDISTRIC=2 (standing order: city over county stub). Sample
+          city codes PUD, R1, R2, R3, C1, C2, C3, B-3, CITY stub, I1. No City-of-Richmond-
+          Hill FeatureServer found (2026-09-23). Official Zoning Map PDF current
+          DocumentCenter/View/6429/4-15-26-CURRENT-ZONING-MAP (effective/current Apr 15
+          2026) + UDO richmondhill-ga.gov — certify critical sites against PDF. County
+          Zoning/0 Euclidean may paint city footprint with county ZONECLASS — do not
+          prefer inside city limits. Rejected Richmond IN gisweb4.co.wayne.in.us
+          Richmond_Zoning_Registered (wrong state); rejected Richmond VA City GIS.
+        status: partial
+      - role: flu
+        name: null — county FLU stub only; no city FLU REST
+        restUrl: https://bryangis.bryan-county.org/arcgis/rest/services/ComprehensiveLandUsePlans/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          LANDUSEDESC: flu
+        notes: >
+          Legacy FLU has single stub poly LANDUSEDESC='Richmond Hill City Limits'
+          (~-81.313,31.835) — not city official Future Land Use districts. 2023 county
+          Comp Plan FLU covers character around city but is county plan. No Richmond Hill
+          city FLU FeatureServer found — gap; certify via Planning.
+        status: gap
+      - role: parcels
+        name: null — use county PropertyDetails filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Richmond Hill-only CAMA FeatureServer — county PropertyDetails + spatial
+          MunicipalBoundaries / TAXDISTRIC=2.
+        status: gap
+    gaps:
+      - "No Richmond Hill-owned public zoning/FLU FeatureServer — parcel ZONINGCODE + Official Zoning Map PDF Apr 15 2026; FLU stub only."
+      - "Rejected Richmond IN / Richmond VA lookalike zoning services (wrong geography)."
+      - "County Zoning/0 and CoastalZoning/10 are county UDO Euclidean — not city official map."
+    status: partial
+
+  - name: Pembroke
+    level: city
+    parentFips: "13029"
+    joinToCountyParcels: >
+      Spatial MunicipalBoundaries NAME='PEMBROKE' (~-81.620,32.145, ≈7.52 sq mi) OR
+      AddressPoints MUNICIPALITY='City of Pembroke' (~1235) OR soft TAXDISTRIC=1 (~1403).
+      Mailing CITY soft only.
+    layers:
+      - role: zoning
+        name: PropertyDetails ZONINGCODE city extract
+        restUrl: https://bryangis.bryan-county.org/arcgis/rest/services/PropertyDetails/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          ZONINGCODE: zoning
+          TAXDISTRIC: taxDistrict
+        notes: >
+          Preferred Pembroke-local zoning on public REST = parcel ZONINGCODE filtered to
+          city spatial / TAXDISTRIC=1 (sample R-1, RR-1/R-1 splits). City Interactive Map
+          (pembrokega.net) advertises Zoning Map but no public FeatureServer recovered
+          (2026-09-23). Municode library.municode.com/ga/pembroke for ordinance text.
+          Rejected Town of Pembroke NC UDO PDF lookalike (wrong state). County Zoning/0
+          for unincorporated surround only.
+        status: partial
+      - role: flu
+        name: null — county FLU stub only; no city FLU REST
+        restUrl: https://bryangis.bryan-county.org/arcgis/rest/services/ComprehensiveLandUsePlans/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          LANDUSEDESC: flu
+        notes: >
+          Legacy FLU stub LANDUSEDESC='Pembroke City Center' (~-81.610,32.166) — not
+          detailed city FLU. No Pembroke city FLU FeatureServer found — gap.
+        status: gap
+      - role: parcels
+        name: CRC Pembroke_Housing Survey Parcels (2013 — NOT preferred)
+        restUrl: https://maps.crc.ga.gov/crcarcgis/rest/services/Bryan/Pembroke_Housing/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: GIS_Acres
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          PIN: parcelIdAlt
+          GIS_Acres: acreage
+          TOTALACRES: acreageAlt
+          TAXDISTRIC: taxDistrict
+          DIGCLASS: dorCode
+        notes: >
+          Coastal Regional Commission housing survey extract count 930 — 2013 vintage with
+          curb-appeal survey attrs; incomplete vs county PropertyDetails. Prefer county
+          parcels + spatial Pembroke poly. Document only as non-preferred city subset.
+        status: partial
+    gaps:
+      - "No Pembroke-owned public zoning/FLU FeatureServer; Interactive Map / Municode only."
+      - "Rejected Pembroke NC UDO PDF (wrong geography)."
+      - "CRC Pembroke_Housing/1 is 2013 survey — not preferred cadastral."
+    status: partial
+
+gaps:
+  - "No public REST lastSale.price/date/qualified — Beacon/qPublic AppID=639 LayerID=11303 Sales Search HTML only (Cloudflare/bot 403 automated). HISTYR*/HISTVAL* are assessment value years — not sales."
+  - "MAVCURR/MAV* assessed fields present but MAVCURR>0 count=0 live — no usable assessedValue on REST; use CURR_VAL market + Beacon HTML for assessed/taxable."
+  - "PropertyDetails MapServer: no pagination / no outStatistics / maxRecordCount 1000 — clients must objectId-batch or spatial-envelope page."
+  - "Broken twin URL https://bryangis.bryan-county.org/arcgis/rest/services/Parcels/MapServer returns 500 Service not found — wire PropertyDetails/MapServer/0 only."
+  - "Evolve/MapServer/1 Parcels (19727) thinner, no CURR_VAL/FMV — do not prefer over PropertyDetails."
+  - "ZIP on parcels is situs postal; ZIP_1 is mailingZip — CITY/STATE/ADDRESS2 are owner mailing (nationwide); never municipality filter."
+  - "TAXDISTRIC 0/1/2/3 lack published REST name legend — soft map 1=Pembroke / 2=Richmond Hill / 3=unincorp / 0=ROW; prefer MunicipalBoundaries spatial."
+  - "County Zoning/0 is 16 dissolved UDO polys — spatial OK for unincorporated; inside cities prefer parcel ZONINGCODE + city Official Zoning Map PDF (RH Apr 15 2026)."
+  - "ZONINGCODE='CITY' (~368) is a stub — not Euclidean district."
+  - "Richmond Hill / Pembroke: no city-hosted zoning or FLU FeatureServer; county FLU stubs 'Richmond Hill City Limits' / 'Pembroke City Center' only."
+  - "AddressPoints PARCELNO sparsely filled (~59) — spatial join for situs."
+  - "Multipart parcels (same PARCEL_NO multiple FID) — dissolve/union on ingest."
+  - "bryancountyga.gov interactive-maps page Akamai/Edge 403 to automated fetch; REST at bryangis.bryan-county.org remains open."
+  - "SAGIS (pub.sagis.org) is Chatham/Savannah MPC — no Bryan folder; adjacency only, do not wire Chatham Pictometry for Bryan parcels."
+  - "Rejected lookalikes / non-preferred: Bryan County OK voter precincts (csagis-uok.opendata.arcgis.com); Bryan TX municipal GIS; Richmond IN Wayne County Richmond_Zoning_Registered; Richmond VA City GIS; Pembroke NC Town UDO PDF; ARC LandPro_2012 stale regional as cadastral; Regrid/ATTOM/CoreLogic/DynamoSpatial paid Bryan extracts; CRC Bryan/Pembroke_Housing 2013 survey as preferred parcels; CoastalZoning FeatureServer/10 research canopy mirror (prefer official Zoning/0); stale Parcels/MapServer URL."
+  - "No emails/phones collected (FireDistricts CONTACT/PHONE/EMAIL schema ignored); no paid vendors."
+
+license: >
+  Bryan County, Georgia GIS (bryangis.bryan-county.org ArcGIS Server) — PropertyDetails
+  Parcels, Zoning ZoningDistrict2, MunicipalBoundaries, AddressPoints,
+  2023ComprehensivePlan, ComprehensiveLandUsePlans, CountyBoundary, Evolve,
+  ImpactFeeDistricts, FireDistricts. County site bryancountyga.gov GIS/Mapping /
+  Planning & Zoning UDO. Assessor HTML: Beacon/qPublic SchneiderCorp AppID=639
+  LayerID=11303 (qpublic.net/ga/bryan → beacon.schneidercorp.com). City of Richmond Hill
+  Official Zoning Map PDF DocumentCenter/View/6429 (Apr 15 2026) + UDO
+  richmondhill-ga.gov. City of Pembroke Interactive Map / Planning & Zoning
+  pembrokega.net + Municode ga/pembroke. Coastal Regional Commission (maps.crc.ga.gov)
+  Bryan/Pembroke_Housing (2013 survey — non-preferred). Research mirror CoastalZoning
+  (AGOL I9cUOJUZvdGAJncI / tgiarrusso) — not preferred. Attribution to Bryan County GIS
+  / partner cities. Public fields only; no emails/phones; no paid vendors
+  (Regrid/ATTOM/CoreLogic/DynamoSpatial).
+appraiserSearchUrl: https://qpublic.net/ga/bryan/
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"

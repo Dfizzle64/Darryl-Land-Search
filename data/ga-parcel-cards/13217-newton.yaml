@@ -1,0 +1,561 @@
+state: GA
+jurisdiction: Newton County
+fips: "13217"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons + CAMA-style attrs (owner/situs house# scrubbed; mailing+sales+acres+land value present)
+  - role: parcels
+    name: Newton Parcels PARCEL_VIEW (UofMD AGOL redistributed WinGAP-style CAMA)
+    restUrl: https://services1.arcgis.com/qTQ6qYkHpxlu0G82/arcgis/rest/services/Newton_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TotalAcres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PARCELNO: parcelIdCompact
+      DXF_TEXT: parcelLabel
+      M_B_P: mapBlockParcel
+      Parent_Par: parentParcel
+      StreetNumb: situsNumber
+      StreetDire: situsStreetDir
+      StreetName: situsStreet
+      StreetType: situsStreetType
+      StreetExte: situsStreetExt
+      Unit: situsUnit
+      ParcelAddr: situsAddress
+      ParcelCity: postalCommunity
+      ParcelZip: situsZip
+      OwnersName: ownerName
+      OwnersNa00: ownerName2
+      Additional: ownerNameAdditional
+      Address1: mailingAddress
+      Address2: mailingAddress2
+      City: mailingCity
+      State: mailingState
+      ZipCode: mailingZip
+      TaxDistric: taxDistrict
+      LegalDescr: legalDescription
+      DeedBook: deedBook
+      DeedPage: deedPage
+      Subdivisio: subdivision
+      Neighborho: neighborhood
+      Qualifying: lastSale.qualified
+      SaleDate: lastSale.date
+      SalesPrice: lastSale.price
+      TotalAcres: acreage
+      AcresInTim: acreageTimber
+      AcresInCov: acreageCovenant
+      LandValue: tax.landValue
+      TotalResIm: tax.improvementResidential
+      TotalCommI: tax.improvementCommercial
+      TotalMHImp: tax.improvementMH
+      TotalImpVa: tax.improvementTotal
+      LastYearsP: tax.priorMarketValue
+      TotalParce: tax.marketValue
+      StrataLand: dorCode
+      HSEXEMPT: tax.homesteadExempt
+      COVEXMPT: tax.covenantExempt
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + attribute landbase (public AGOL org
+      qTQ6qYkHpxlu0G82 / mhackman_UofMD — redistributed "Parcels for Newton County GA"
+      item 40743c9b9c87460a94aaff77c787a705; created/modified 2022-02-26; NOT official
+      Newton County GIS live feed). Live count 45755 (2026-09-23); distinct PARCEL_NO
+      ≈45684 (minor duplicate rows — dissolve/group by PARCEL_NO). SR StatePlane GA
+      West FIPS 1002 Feet (102667/2240); GIS acres ≈ Shape__Area/43560 (5–150 ≈4296).
+      Deeded TotalAcres filled 45755; TotalAcres 5–150 = 4474; TotalAcres=0/null ≈825.
+      Geo-verified WGS84 samples ~-84.021,33.541 (00010… / SW Covington postal),
+      ~-83.924,33.704 (00200… / Oxford postal), ~-83.788,33.449 (01070… / Mansfield
+      postal) — Newton County GA, Atlanta MSA SE (~-83.85,33.55) (NOT Newton KS/MO/MS/
+      TX/IN/NC; NOT Covington VA/WA/KY; NOT RTI Newton County AR/MO extent). KEY CAMA
+      gaps on this redistribute: OwnersName / OwnersNa00 / Additional / ParcelAddr /
+      StreetNumb / TaxDistric / Qualifying / Neighborho are ALL blank (space) —
+      ownerName and situs house-number scrubbed; compose soft situs from StreetName +
+      StreetType + ParcelCity + ParcelZip only, OR spatial-join GeoComm Site Structure
+      Address Points (AddNumber). Mailing usable: Address1 filled ≈45462; City/State/
+      ZipCode present. Sales: SaleDate non-'--' ≈43630 (format MM-DD-YYYY; currency
+      tops out 2021 — 2019≈3377, 2020≈4208, 2021≈3431, 2022+=0); SalesPrice>0 ≈30343;
+      Qualifying blank — lastSale.qualified unavailable. Tax: LandValue>0 ≈45650
+      (land-only); TotalImpVa / TotalResIm / TotalCommI / LastYearsP / TotalParce all
+      0/blank on this snapshot — do NOT treat as full tax.marketValue; use qPublic HTML
+      for current FMV/assessed. StrataLand is GA DOR strata class (R1/R3/R4/A5/C3/…).
+      ParcelCity is POSTAL (Covington≈35540, Oxford≈4378, Social Circle≈1234,
+      Mansfield≈929, Porterdale≈818, Conyers≈704, Newborn≈513, Loganville≈61) — NOT
+      incorporated municipality filter (Covington postal dominates unincorporated);
+      municipality = spatial GeoComm Incorporated Municipality Boundary OR Address
+      MSAGComm. Official county Tax Parcel / Zoning / FLU digital data is FEE ($100
+      per dataset per newtoncountyga.gov Fee Schedule View/809) — no public county
+      FeatureServer from co.newton.ga.us / newtoncountyga.gov hosts. Twin GDITAdmin
+      "Parcels - GA - Newton County" item 7037a0cb6e43452eb3c520051686402f is
+      subscription-canceled 403 — do not use. Enrichment vs thin in-app: county
+      outlines + PARCEL_NO + mailing + TotalAcres + LandValue + lastSale date/price
+      (thru 2021) + StrataLand; owner/situs#/full FMV/Euclidean zoning via joins or
+      HTML/PDF/paid request.
+    status: usable
+
+  - role: tax
+    name: Newton Parcels LandValue (partial — land-only on redistributed layer)
+    restUrl: https://services1.arcgis.com/qTQ6qYkHpxlu0G82/arcgis/rest/services/Newton_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TotalAcres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      LandValue: tax.landValue
+      HSEXEMPT: tax.homesteadExempt
+      COVEXMPT: tax.covenantExempt
+    notes: >
+      LandValue only on preferred parcels layer (≈45650 >0). Improvement and total
+      market/assessed fields zeroed on this 2022 redistribute. Assessor HTML: qPublic
+      SchneiderCorp App=NewtonCountyGA / AppID=794 LayerID=15762
+      (qpublic.net/ga/newton / qpublic.schneidercorp.com). CDN/bot 403 from research
+      box on Application.aspx; public for humans. Deep-link:
+      Application.aspx?App=NewtonCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCEL_NO}
+      or AppID=794&LayerID=15762&PageTypeID=4&KeyValue={PARCEL_NO}. Official live CAMA
+      also sold as Digital Data Dataset 4 (Tax Parcel Data includes CAMA) $100 —
+      not a free REST.
+    status: partial
+
+  - role: sales
+    name: Newton Parcels SaleDate/SalesPrice (snapshot thru 2021)
+    restUrl: https://services1.arcgis.com/qTQ6qYkHpxlu0G82/arcgis/rest/services/Newton_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TotalAcres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      SaleDate: lastSale.date
+      SalesPrice: lastSale.price
+      Qualifying: lastSale.qualified
+    notes: >
+      Last-sale fields on preferred parcels layer (SaleDate filled ≈43630; SalesPrice>0
+      ≈30343). Date format MM-DD-YYYY; no sales dated 2022+ on this snapshot —
+      treat as stale vs live qPublic. Qualifying blank — not a qualified-sale flag.
+      No separate multi-sale history FeatureServer found (2026-09-23). Prefer qPublic
+      Sales Search HTML for current/qualified sales. Rejected ARC LandPro_2012 and
+      paid Regrid/USLandGrid as sales substitutes.
+    status: partial
+
+  - role: zoning
+    name: null — no public Euclidean county zoning REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer with Euclidean Newton County zoning districts
+      (UDO / overlays Almon, Brickstore, Salem) found (2026-09-23). County Zoning page
+      newtoncountyga.gov/210/Zoning points to Development Services certifications;
+      Fee Schedule Dataset 5H "Zoning (including Overlays)" is paid digital data ($100),
+      not open REST. Inside cities prefer city zoning when available (Covington
+      Zoning_FLUM legend-only blocked query; Oxford 2012 webmap FC + 2013 PDF;
+      Social Circle via Walton choosewalton REST). Unincorporated Euclidean zoning =
+      gap / paid request / qPublic HTML certification.
+    status: gap
+
+  - role: flu
+    name: NEGRC CA - Newton County - 2023 (character areas)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/454
+    layerId: 454
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FDM_Short: fluCode
+      FDM_Long: flu
+      ID: fluFeatureId
+    notes: >
+      Preferred public county Future Land Use / character REST (dissolved; spatial-join
+      only — no Parcel_No). Live count 87. Domain FDM_Long: Emerging Suburban≈44, Low
+      Density Rural Residential≈14, Live/Work Corridors≈12, Established Suburban
+      Core≈9, Conservation & Recreation Area≈5, Industrial/Heavy Commercial≈3.
+      Geo-verified ~-83.94,33.64 / ~-83.81,33.66 Newton GA. Org Ug5xGQbHsD8zuZzM
+      (NEGRC / NEGARC_ELA) — same org hosts LandPro_2012 (reject as cadastral).
+      Official county FLU also Fee Schedule Dataset 5I (paid) and Comp Plan PDFs via
+      Development Services — prefer this NEGRC layer for open REST. Twin point layer
+      CA Centers - Newton County - 2023 /453 (15 points) is activity-center markers
+      only. Prefer city FLU inside municipalities (Covington FLU 447; Oxford/
+      Porterdale/Mansfield/Newborn CA layers).
+    status: usable
+
+  - role: other
+    name: Incorporated Municipality Boundary (GeoComm NG911)
+    restUrl: https://services.arcgis.com/mq0BGE5kHpm8mHFz/arcgis/rest/services/Incorporated_Municipality_Boundary/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Inc_Muni: municipality
+      AT_NAME: municipalityAlt
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Live count 6 municipality polygons (SR 102667 feet): City of Covington
+      (~-83.834,33.615), City of Oxford (~-83.872,33.628), City of Porterdale
+      (~-83.895,33.573), City of Mansfield (~-83.734,33.519), Town of Newborn
+      (~-83.697,33.516), City of Social Circle (~-83.701,33.619 — Newton-side;
+      city also in Walton). Parcel↔city join = spatial default (preferred). Soft
+      filters: Address Points MSAGComm; ParcelCity is postal only. Same org
+      mq0BGE5kHpm8mHFz (rnordine_Geo_Comm) hosts Provisioning/Fire/EMS/Police
+      boundaries and Road Centerlines for Newton GA NG911.
+    status: usable
+
+  - role: other
+    name: Site Structure Address Point (GeoComm NG911 situs)
+    restUrl: https://services.arcgis.com/mq0BGE5kHpm8mHFz/arcgis/rest/services/Site_Structure_Address_Point/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      AddNumber: situsNumber
+      AddNum_Pre: situsNumberPrefix
+      AddNum_Suf: situsNumberSuffix
+      St_Name: situsStreet
+      LSt_PreDir: situsStreetDir
+      LSt_Name: situsStreetName
+      LSt_Typ: situsStreetType
+      LSt_PosDir: situsStreetPosDir
+      MSAGComm: municipalityOrPostal
+      ESN: emergencyServiceNumber
+    notes: >
+      Live count 51175 situs address points — preferred source for situs house
+      numbers (parcel layer StreetNumb scrubbed). No parcelId join key — spatial
+      intersect to parcels default. MSAGComm domain: COVINGTON≈43001, OXFORD≈3814,
+      SOCIAL CIRCLE≈1189, MANSFIELD≈803, PORTERDALE≈798, CONYERS≈825, NEWBORN≈368,
+      LOGANVILLE≈(remainder), NEWTON COUNTY≈32, blank. Geo-verified ~-83.87,33.38
+      Covington GA. Compose situsAddress = AddNumber + LSt_PreDir + LSt_Name +
+      LSt_Typ.
+    status: usable
+
+municipalities:
+  - name: Covington
+    level: city
+    parentFips: "13217"
+    joinToCountyParcels: >
+      Spatial intersect GeoComm Incorporated Municipality Boundary
+      Inc_Muni='City of Covington' (~-83.834,33.615) OR Address MSAGComm='COVINGTON'
+      (postal, not city-only). Do NOT use ParcelCity='Covington' alone (≈35540 postal
+      includes most unincorporated county).
+    layers:
+      - role: zoning
+        name: Covington Zoning_FLUM_Trails Zoning (MapServer — query blocked)
+        restUrl: https://gis.cityofcovington.org/server/rest/services/Basemap_Data/Zoning_FLUM_Trails/MapServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City of Covington on-prem GIS (gis.cityofcovington.org). Legend exposes
+          Euclidean Zoning layerId 1 domains: CM Corridor Mixed Use, CR Corridor
+          Residential, M-1 Light Industrial, M-2 Heavy Industrial, NM Neighborhood
+          Mixed Use, NR-1/NR-2/NR-3 Neighborhood Residential, TCM Town Center Mixed
+          Use, TCR Town Center Residential. Layer list empty + /query and /identify
+          return 400/500/empty (2026-09-23) — REST query BLOCKED/broken despite
+          public legend. Basemap Covington_Basemap MapServer is Token Required
+          (499). Document for recovery; do not treat as usable query source until
+          fixed. Prefer NEGRC FLU - Covington - 2023 for open FLU; Euclidean zoning
+          certification remains gap/HTML/PDF/staff.
+        status: blocked
+      - role: flu
+        name: Covington Zoning_FLUM_Trails Future Land Use (MapServer — query blocked)
+        restUrl: https://gis.cityofcovington.org/server/rest/services/Basemap_Data/Zoning_FLUM_Trails/MapServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Legend layerId 2 Future Land Use domains match NEGRC Covington FLU
+          (COM/IND/MFR/MXC/MXD/MXN/OP/PRC/PUB/SFR/TCU). Query blocked same as Zoning
+          — prefer NEGRC FeatureServer/447.
+        status: blocked
+      - role: flu
+        name: NEGRC FLU - Covington - 2023
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/447
+        layerId: 447
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Preferred Covington-local FLU REST (standing order: city over county CA).
+          Live count 651. Domain Single-Family Residential≈283, Mixed-Use
+          Neighborhood≈73, Commercial≈57, Mixed-Use Coridor≈51, Public/Institutional≈45,
+          Mixed-Use Downtown≈42, Industrial≈38, Office/Professional≈22,
+          Parks/Recreation/Conservation≈21, Multi-Family Residential≈14, TCU≈5.
+          Spatial-join. Geo-verified ~-83.84,33.575 Covington GA (NOT Covington VA
+          covingtonva.maps.arcgis.com / CovingtonAdmin — REJECTED; NOT Covington WA
+          tianzhe.wang Zoning). Official city GIS page cityofcovington.org section
+          GIS3 (joint City/County/Water Authority); Comp Plan 2022 PDF via DCA.
+        status: usable
+    gaps:
+      - "Covington Euclidean zoning REST query blocked on Zoning_FLUM_Trails/1 — legend-only evidence of CM/CR/M-1/M-2/NM/NR-*/TCM/TCR."
+      - "No Covington parcel CAMA REST on city server (Public folder = cemeteries only; Basemap token 499)."
+      - "ParcelCity='Covington' is postal — not a city-limits filter."
+    status: partial
+
+  - name: Oxford
+    level: city
+    parentFips: "13217"
+    joinToCountyParcels: >
+      Spatial Inc_Muni='City of Oxford' (~-83.872,33.628) OR MSAGComm='OXFORD'
+      (≈3814). ParcelCity='Oxford' ≈4378 postal — prefer spatial.
+    layers:
+      - role: zoning
+        name: Oxford Zoning Map - 2012 (webmap featureCollection — not FeatureServer)
+        restUrl: null
+        layerId: null
+        geometry: polygon
+        auth: none
+        acreageField: TOTACRES
+        coverage: city-only
+        fieldMap:
+          ZONING_NEW: zoning
+          DXF_TEXT: parcelLabel
+          M_B_P: mapBlockParcel
+          NAME1: ownerName
+          NAME2: ownerName2
+          ADDRESS1: mailingAddress
+          CITY: mailingCity
+          ST: mailingState
+          ZIP: mailingZip
+          LOCATION: situsStreet
+          LOCNUM_: situsNumber
+          TOTACRES: acreage
+          LNDVALUE: tax.landValue
+          BLDGVALUE: tax.improvementValue
+          SALEPRICE: lastSale.price
+          SALEYR: lastSale.year
+        notes: >
+          AGOL webmap a20458b8f4ea430da2f3c7d5f56a60c0 (osmanercin) embeds Zoning
+          featureCollection (726 polygons) + Special Zoning Districts (30; Category
+          e.g. SUG). ZONING_NEW domain: R20≈232, R15≈192, R30≈126, RR≈69, IC≈26,
+          TC≈21, INST≈20, R75≈20, CON≈10, AG≈6, RTH≈3, OP≈1 — aligns with Oxford
+          Official Zoning Map PDF revised 2013 (R-20/R-15/R-30/R-7.5/RR/AG/CON/TC/
+          INST/IC/OP/Townhomes). NOT a queryable FeatureServer — export from webmap
+          data only; treat as STALE 2012-era (owners/sales present on FC). Official
+          PDF: oxfordgeorgia.org/Assets/Files/Oxford Zoning Map/OX_Zoning_Map.pdf.
+          Prefer PDF + NEGRC CA for current planning; Euclidean REST = gap.
+        status: partial
+      - role: flu
+        name: NEGRC CA - Oxford - 2023
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/450
+        layerId: 450
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 104. Domain Town Neighborhood≈36, Historic Oxford≈34,
+          Estate/Rural Residential≈15, null≈12, Town Center≈4, Rural≈3.
+          Spatial-join. Geo-verified ~-83.87,33.64 Oxford GA (NOT Oxford MS/OH/UK).
+          City Complete Streets Plan 2022 StoryMap on NEGARC_ELA.
+        status: usable
+    gaps:
+      - "No live Oxford zoning FeatureServer — 2012 webmap FC + 2013 PDF only."
+      - "No Oxford parcel CAMA REST beyond county redistribute."
+    status: partial
+
+  - name: Porterdale
+    level: city
+    parentFips: "13217"
+    joinToCountyParcels: >
+      Spatial Inc_Muni='City of Porterdale' (~-83.895,33.573) OR MSAGComm='PORTERDALE'
+      (≈798). ParcelCity='Porterdale' ≈818.
+    layers:
+      - role: flu
+        name: NEGRC CA - Porterdale - 2026
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/451
+        layerId: 451
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 256. Domain Historic Porterdale Mill Residential≈110,
+          Neighborhood Residential≈42, Conservation and Active Recreational Area≈40,
+          Mixed Use≈33, Commercial Node≈9, Industrial≈7, Institutions≈7, Porterdale
+          Town Center≈7, Osprey Historic Mill≈1. Spatial-join. Geo-verified
+          ~-83.912,33.59 Porterdale GA. Rejected student AGOL "Porterdale, GA Layers"
+          (wilcao208 / cwacta_scad_edu — My Points/Buffers junk, worldwide extent).
+          No official City of Porterdale Euclidean zoning FeatureServer found
+          (2026-09-23); cityofporterdale.com site live but no public REST.
+        status: usable
+    gaps:
+      - "No Porterdale Euclidean zoning REST — NEGRC CA only + county gap."
+      - "No Porterdale parcel CAMA REST beyond county redistribute."
+    status: partial
+
+  - name: Mansfield
+    level: city
+    parentFips: "13217"
+    joinToCountyParcels: >
+      Spatial Inc_Muni='City of Mansfield' (~-83.734,33.519) OR MSAGComm='MANSFIELD'
+      (≈803). ParcelCity='Mansfield' ≈929.
+    layers:
+      - role: flu
+        name: NEGRC CA - Mansfield - 2026
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/448
+        layerId: 448
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 62. Domain Traditional Residential≈29, Downtown≈16, Rural
+          Residential≈9, Agriculture≈6, Business Park≈2. Spatial-join. Geo-verified
+          ~-83.74,33.51 Mansfield GA (NOT Mansfield OH/TX/MA). No city zoning REST
+          found (2026-09-23).
+        status: usable
+    gaps:
+      - "No Mansfield Euclidean zoning / parcel CAMA REST — NEGRC CA + county redistribute only."
+    status: partial
+
+  - name: Newborn
+    level: city
+    parentFips: "13217"
+    joinToCountyParcels: >
+      Spatial Inc_Muni='Town of Newborn' (~-83.697,33.516) OR MSAGComm='NEWBORN'
+      (≈368). ParcelCity='Newborn' ≈513.
+    layers:
+      - role: flu
+        name: NEGRC CA - Newborn - 2024
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/449
+        layerId: 449
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 54. Domain Town Neighborhood≈25, Estate/Rural Neighborhood≈10,
+          Rural≈8, Historic Newborn≈6, Major Corridor≈5. Spatial-join. Geo-verified
+          ~-83.696,33.516 Newborn GA. Town of Newborn 2024 Comp Plan Update StoryMap
+          on NEGARC_ELA. No city zoning REST found (2026-09-23).
+        status: usable
+    gaps:
+      - "No Newborn Euclidean zoning / parcel CAMA REST — NEGRC CA + county redistribute only."
+    status: partial
+
+  - name: Social Circle
+    level: city
+    parentFips: "13217"
+    joinToCountyParcels: >
+      Spatial Inc_Muni='City of Social Circle' (~-83.701,33.619 Newton-side) OR
+      MSAGComm='SOCIAL CIRCLE' (≈1189 on Newton address points). ParcelCity='Social
+      Circle' ≈1234 on Newton landbase. City spans Walton + Newton — Walton card
+      holds preferred city zoning REST (choosewalton Social_Circle_Zoning/35); use
+      same layer spatially for Newton-side parcels.
+    layers:
+      - role: zoning
+        name: Social Circle Zoning (choosewalton — cross-listed from Walton card)
+        restUrl: https://services.arcgis.com/ftUt0Vfnzfo0Cs96/arcgis/rest/services/Social_Circle_Zoning/FeatureServer/35
+        layerId: 35
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Name: parcelIdAlt
+          Zoning: zoning
+          Description: zoningDescription
+          Shape__Area: shapeAreaSqM
+        notes: >
+          Preferred Social Circle Euclidean zoning (Walton Development Authority /
+          choosewalton org ftUt0Vfnzfo0Cs96). Live count 2298 (citywide Walton+Newton).
+          Domain R-15≈832, RMD≈537, PUD≈250, R-25≈213, AG≈212, IO≈69, I-1≈68, GC≈51,
+          CBD≈40, plus I-2/AG-2/NC/RHD/SSBP-T1. SR UTM 26917. Join = spatial default
+          (Name SC* not reliable Parcel_No). Geo-verified ~-83.731,33.645. Full notes
+          on Walton County card 13297-walton.yaml.
+        status: usable
+      - role: flu
+        name: NEGRC CA - Social Circle - 2025
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/469
+        layerId: 469
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 189 character areas. Spatial-join. Same layer as Walton card.
+          Geo-verified ~-83.73,33.68.
+        status: usable
+    gaps:
+      - "Social Circle multi-county — do not treat Newton ParcelCity/MSAGComm as city-only statewide."
+      - "No Social Circle parcel CAMA on Newton redistribute beyond county fields; qPublic HTML for CAMA."
+    status: usable
+
+gaps:
+  - "No official Newton County public FeatureServer — GIS hosts gis/maps.newtoncountyga.gov / co.newton.ga.us do not resolve; digital Tax Parcel/Zoning/FLU sold $100/dataset (Fee Schedule View/809 Dataset 4 + 5H/5I)."
+  - "Preferred parcels layer is 2022 UofMD redistribute (mhackman_UofMD) — ownerName / situs house# / TaxDistric / Qualifying scrubbed; improvement/total FMV fields zeroed; sales currency ends 2021. Still best open county-wide geometry+PIN+mailing+TotalAcres+LandValue+SaleDate/Price."
+  - "No public REST Euclidean county zoning (UDO + Almon/Brickstore/Salem overlays) — paid Dataset 5H or Development Services certification / qPublic HTML."
+  - "Covington city Zoning_FLUM_Trails MapServer legend shows Euclidean + FLU but layer query/identify blocked (400/500); Basemap token 499."
+  - "City Euclidean zoning REST usable only for Social Circle (choosewalton); Oxford stale 2012 FC + 2013 PDF; Porterdale/Mansfield/Newborn zoning certification gap (NEGRC CA only)."
+  - "Situs house numbers not on parcel polygons — spatial-join GeoComm Site Structure Address Points (51175; no PIN key)."
+  - "ParcelCity / MSAGComm='COVINGTON' are postal-heavy — use GeoComm Inc_Muni spatial for true city limits."
+  - "qPublic App=NewtonCountyGA / AppID=794 LayerID=15762 may CDN/bot-403 automated clients; public for humans. Deep-link KeyValue={PARCEL_NO}."
+  - "GDITAdmin Parcels - GA - Newton County subscription-canceled 403 — dead twin of same geography."
+  - "Rejected lookalikes: Covington VA (CovingtonAdmin / covingtonva.maps.arcgis.com webapp b4c12fb539e34a47a3db289f8c11c6d3 Tax Parcels extent ~-80.05,37.74); Covington WA Zoning (tianzhe.wang ~-122.14,47.34); RTI Newton County webmap 8ca02d2bf1f84aee8717dc0ea16d036a + Newton Parcels v1 aroGeoAdmin extent ~-94.6,36.7 (AR/MO); GDITAdmin Parcels - MS/TX - Newton County; DETCOG Newton County TX Municipal Boundaries; Newton Twp OH zoning (tharner@mvrpc.org); Blueprint Newton / City of Newton NC planning storymaps; ARC LandPro_2012 (Ug5xGQbHsD8zuZzM / ryanbarrett); UGA Parcels (campus-only); Porterdale student layers wilcao208; Regrid/USLandGrid/ATTOM paid vendors; token-locked Covington Basemap."
+  - "Enrichment vs thin in-app: county 45755 geometry+PARCEL_NO+mailing+TotalAcres+LandValue+lastSale(thru 2021)+StrataLand; GeoComm city limits + address situs; NEGRC county CA + Covington/Oxford/Porterdale/Mansfield/Newborn/Social Circle FLU/CA; Social Circle Euclidean zoning; Covington Euclidean + county Euclidean + owner/situs#/full FMV remain gap/HTML/PDF/paid."
+
+license: >
+  Redistributed Newton Parcels Feature Service org qTQ6qYkHpxlu0G82 (mhackman_UofMD /
+  item 40743c9b9c87460a94aaff77c787a705) — public AGOL; provenance unofficial
+  redistribute of Newton County GA CAMA/parcel geography (verify currency vs
+  qPublic). Newton County GIS (newtoncountyga.gov/259/GIS; GIS@co.newton.ga.us;
+  Fee Schedule DocumentCenter/View/809) — official digital Tax Parcel / Zoning /
+  FLU / City Limits sold per fee schedule; joint City of Covington GIS
+  (cityofcovington.org GIS; gis.cityofcovington.org). GeoComm NG911 org
+  mq0BGE5kHpm8mHFz (rnordine_Geo_Comm) — Incorporated Municipality Boundary, Site
+  Structure Address Point. Northeast Georgia Regional Commission (NEGRC /
+  Ug5xGQbHsD8zuZzM / NEGARC_ELA) — NEGRC_Future_Development_Map_Inventory_WFL1
+  layers 447–451, 453–454, 469. Walton/choosewalton org ftUt0Vfnzfo0Cs96 — Social
+  Circle Zoning (cross-county). Oxford Zoning Map PDF (oxfordgeorgia.org). Assessor
+  HTML: qPublic SchneiderCorp App=NewtonCountyGA AppID=794 LayerID=15762
+  (qpublic.net/ga/newton). Attribution to Newton County / City of Covington /
+  NEGRC / GeoComm / choosewalton / Oxford. Public fields only; no emails/phones;
+  no paid vendors (Regrid/ATTOM/CoreLogic/USLandGrid).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=NewtonCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"

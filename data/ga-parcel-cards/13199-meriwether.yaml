@@ -1,0 +1,463 @@
+state: GA
+jurisdiction: Meriwether County
+fips: "13199"
+level: county
+markets: [Atlanta]
+
+layers:
+  - role: parcels
+    name: MeriwetherParcels (AGOL hosted — WinGAP-style CAMA)
+    restUrl: https://services9.arcgis.com/Xv8vRekQ4FVHSSIe/arcgis/rest/services/MeriwetherParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      Realkey: ownerKey
+      Ownkey: ownerKeyAlt
+      lastname: ownerName
+      firstname: ownerFirstName
+      address1: mailingAddress
+      address2: mailingAddress2
+      address3: mailingAddress3
+      city: mailingCity
+      state: mailingState
+      zip_code: mailingZip
+      house_no: situsNumber
+      stdirect: situsStreetDir
+      street_nam: situsStreet
+      sttype: situsStreetType
+      unit: situsUnit
+      zip: situsZip
+      totalacres: acreage
+      Deed_Acres: acreageDeed
+      Draw_Acres: acreageDraw
+      woodacres: acreageWoodland
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      digclass: dorCode
+      digstrat: dorStrata
+      zoningcode: zoning
+      zoning: zoningAlt
+      taxdistric: taxDistrict
+      legal_desc: legalDescription
+      neighbhood: neighborhood
+      subd_name: subdivision
+      homeexempt: homesteadExempt
+      histyr1: tax.histYear1
+      histval1: tax.histValue1
+      qPub_Link: appraiserDeepLink
+      lat: latitude
+      lon: longitude
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + WinGAP-style CAMA (AGOL item MeriwetherParcels
+      id 20c26b48afd342708ebdbee8cd88a2b0; owner mbrown619; org Xv8vRekQ4FVHSSIe; access
+      public; title/desc Meriwether County Georgia Parcels). Live count 16511 (2026-09-24).
+      SR Web Mercator 102100/3857. maxRecordCount 2000. totalacres>0 ≈14966; totalacres
+      5–150 ≈4931; curr_val>0 ≈16479; lastname filled ≈16481; house_no>0 ≈10364; mavcurr>0
+      =0 (schema present unused — prefer curr_val as market). zoningcode essentially blank
+      (≈2 non-blank) — do NOT rely on parcel zoningcode; city Manchester Zoning Map_WFL1
+      for Manchester only. Compose situs from house_no+stdirect+street_nam+sttype when
+      house_no>0. city/state/zip_code are owner mailing — never municipality filter.
+      taxdistric soft geo-map (2026-09-24 samples): 01≈unincorporated (~11258; e.g.
+      ~-84.86,32.89 Dallas Mill / Pine Mountain postal), 03≈Greenville (~612; ~-84.73,33.03),
+      04≈Manchester (~2780; ~-84.63,32.87), 05≈Warm Springs (~372; ~-84.69,32.91),
+      06≈Woodbury (~702; ~-84.59,32.99 Greenville postal spill), 07≈Gay (~131; ~-84.58,33.09),
+      08≈Lone Oak (~80; ~-84.82,33.18 Grantville postal), 09≈Luthersville (~498; ~-84.75,33.21),
+      10≈Pine Mountain city pocket (~42; ~-84.85,32.88) — prefer spatial city polys when
+      available (none county-hosted found). qPub_Link deep-links App=meriwetherCountyGA
+      KeyValue={Parcel_No}. Geo-verified extent ~-84.87–-84.49, 32.84–33.23 Meriwether GA
+      (Greenville seat) — NOT Meriwether TN. Schneider MeriwetherCountyGA_WFS 404 — AGOL
+      only. Rejected paid Regrid/ATTOM/USLandGrid/DynamoSpatial.
+    status: usable
+
+  - role: tax
+    name: MeriwetherParcels curr_val / fmv* (same layer)
+    restUrl: https://services9.arcgis.com/Xv8vRekQ4FVHSSIe/arcgis/rest/services/MeriwetherParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      digclass: dorCode
+      homeexempt: homesteadExempt
+      taxdistric: taxDistrict
+    notes: >
+      Prefer curr_val as tax.marketValue (≈16479 >0). mavcurr/mav* present but mavcurr>0=0
+      live — no usable assessedValue on REST; GA 40% assessed via qPublic HTML
+      App=meriwetherCountyGA. histyr*/histval* assessment history — NOT sales.
+    status: usable
+
+  - role: sales
+    name: null — no public REST sale history on MeriwetherParcels
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No SALEPRICE/SALEDATE fields on MeriwetherParcels. sale_val/saleland* appear internal
+      stubs — do not map as lastSale. qPublic Sales Search HTML only.
+    status: gap
+
+  - role: zoning
+    name: MeriwetherParcels zoningcode (parcel-attributed — essentially empty)
+    restUrl: https://services9.arcgis.com/Xv8vRekQ4FVHSSIe/arcgis/rest/services/MeriwetherParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      zoningcode: zoning
+      zoning: zoningAlt
+      taxdistric: taxDistrict
+    notes: >
+      zoningcode non-blank ≈2 of 16511 — unusable as county zoning source. No county
+      Euclidean Zoning FeatureServer found (2026-09-24). Manchester city Zoning Map_WFL1
+      available (see municipalities). Greenville/Warm Springs/Woodbury/etc. PDF/gap.
+    status: gap
+
+  - role: flu
+    name: null — no public county FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Meriwether FLU/Comp Plan FeatureServer recovered — gap.
+    status: gap
+
+municipalities:
+  - name: Greenville
+    level: city
+    parentFips: "13199"
+    joinToCountyParcels: "Soft taxdistric='03' (~612; ~-84.73,33.03). No county MunicipalBoundaries layer — spatial city poly gap; soft tax district only."
+    layers:
+      - role: zoning
+        name: null — no city zoning REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County seat; no Greenville zoning FeatureServer — PDF/gap.
+        status: gap
+      - role: parcels
+        name: null — county MeriwetherParcels soft taxdistric=03
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County parcels filtered taxdistric='03'.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Greenville FLU REST.
+        status: gap
+    gaps:
+      - "No Greenville municipal boundary or zoning REST — soft taxdistric=03 only."
+    status: partial
+
+  - name: Manchester
+    level: city
+    parentFips: "13199"
+    joinToCountyParcels: "Soft taxdistric='04' (~2780; ~-84.63,32.87)."
+    layers:
+      - role: zoning
+        name: Manchester Zoning Map_WFL1
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Manchester_Zoning_Map_WFL1/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City of Manchester Zoning Map FeatureService (owner TRRC_ELA; extent ~-84.70–-84.59,
+          32.84–32.88 Meriwether GA). Prefer inside Manchester over blank county zoningcode.
+          Inspect layer fields on use; ARC org Ug5xGQbHsD8zuZzM — geo-verified Manchester GA
+          not Manchester NH/UK.
+        status: partial
+      - role: parcels
+        name: null — county soft taxdistric=04
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County MeriwetherParcels taxdistric='04'.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Manchester FLU REST.
+        status: gap
+    gaps:
+      - "Manchester zoning WFL1 only city REST zoning found; no city parcel/FLU REST."
+    status: partial
+
+  - name: Warm Springs
+    level: city
+    parentFips: "13199"
+    joinToCountyParcels: "Soft taxdistric='05' (~372; ~-84.69,32.91)."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Warm Springs zoning REST — gap.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County taxdistric='05'.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Warm Springs FLU REST.
+        status: gap
+    gaps:
+      - "No Warm Springs zoning/FLU REST."
+    status: partial
+
+  - name: Woodbury
+    level: city
+    parentFips: "13199"
+    joinToCountyParcels: "Soft taxdistric='06' (~702; ~-84.59,32.99)."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Woodbury zoning REST — gap.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County taxdistric='06'.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Woodbury FLU REST.
+        status: gap
+    gaps:
+      - "No Woodbury zoning/FLU REST; taxdistric soft only."
+    status: partial
+
+gaps:
+  - "zoningcode blank on ~16509/16511 parcels — county zoning REST gap except Manchester Zoning Map_WFL1."
+  - "mavcurr>0 count=0 — no usable assessedValue on REST; use curr_val market + qPublic HTML."
+  - "No lastSale.price/date on REST — qPublic meriwetherCountyGA Sales Search HTML only."
+  - "No county MunicipalBoundaries FeatureServer — city filter soft taxdistric 03–10 only."
+  - "No MeriwetherCountyGA_WFS on wfs.schneidercorp.com (404)."
+  - "Rejected paid Regrid/ATTOM/USLandGrid/DynamoSpatial; rejected wrong-state Meriwether lookalikes."
+  - "No emails/phones; no paid vendors."
+
+license: >
+  Meriwether County Georgia Parcels AGOL (services9.arcgis.com/Xv8vRekQ4FVHSSIe
+  MeriwetherParcels; item 20c26b48afd342708ebdbee8cd88a2b0; accessInformation Meriwether
+  County Georgia). Assessor HTML qpublic.net/ga/meriwether → App=meriwetherCountyGA.
+  Manchester Zoning Map_WFL1 (TRRC_ELA / Ug5xGQbHsD8zuZzM). Attribution to Meriwether
+  County Tax Assessor / GIS partners. Public fields only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=meriwetherCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services9.arcgis.com/Xv8vRekQ4FVHSSIe/arcgis/rest/services/MeriwetherParcels/FeatureServer/0
+    count 16511; extent center [['13199', 'Meriwether County']]; sample [['13199', 'Meriwether
+    County']]. No change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Gay town"
+      level: city
+      parentFips: "13199"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Greenville city"
+      level: city
+      parentFips: "13199"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Lone Oak town"
+      level: city
+      parentFips: "13199"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Luthersville city"
+      level: city
+      parentFips: "13199"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Manchester city"
+      level: city
+      parentFips: "13199"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Warm Springs city"
+      level: city
+      parentFips: "13199"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Woodbury city"
+      level: city
+      parentFips: "13199"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Meriwether' AND aadt>0
+    altFilter: name LIKE '199-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 199-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 146
+    maxAadt: 58200
+    geoCheck: 143/146 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 16479
+    restUrl: https://services9.arcgis.com/Xv8vRekQ4FVHSSIe/arcgis/rest/services/MeriwetherParcels/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: sale_val=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 16481
+    restUrl: https://services9.arcgis.com/Xv8vRekQ4FVHSSIe/arcgis/rest/services/MeriwetherParcels/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=meriwetherCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 021    037
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=meriwetherCountyGA&Layer=Parcels&PageType=Report&KeyValue=021%20%20%20%20037
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=meriwetherCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Gay town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Greenville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Lone Oak town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Luthersville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Manchester city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Warm Springs city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Woodbury city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

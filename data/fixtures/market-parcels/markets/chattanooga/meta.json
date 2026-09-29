@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T05:27:18Z",
+  "generatedAt": "2026-09-29T05:44:36Z",
   "market": "Chattanooga",
   "tier": "other",
-  "parcelCount": 51467,
+  "parcelCount": 64057,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -81,23 +81,54 @@
       "sourceCount": null
     },
     {
+      "name": "Chattooga",
+      "fips": "13055",
+      "state": "Georgia",
+      "featureCount": 3315,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "ga-chattooga-parcels-13055",
+      "queryUrl": "https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Chattooga_Webmap_2025_WFL1/FeatureServer/3/query",
+      "gaps": [
+        "Parcels are Chattooga_Parcels (GMASS 2025 webmap) (https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Chattooga_Webmap_2025_WFL1/FeatureServer/3). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Source query returned 3316 rows; 3315 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Counted 3315 distinct parcel ids.",
+        "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/13055/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13055/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 3316
+    },
+    {
       "name": "Dade",
       "fips": "13083",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 2700,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-dade-parcels-13083",
+      "queryUrl": "https://services2.arcgis.com/9rZSWj5rVGcJbHoU/arcgis/rest/services/EPL_Map/FeatureServer/4/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Parcels are Dade Parcels (EPL_Map, WinGAP join ~2022) (https://services2.arcgis.com/9rZSWj5rVGcJbHoU/arcgis/rest/services/EPL_Map/FeatureServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Source query returned 2715 rows; 2700 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Counted 2700 distinct parcel ids.",
+        "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13083/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13083/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 2715
     },
     {
       "name": "Grundy",
@@ -291,20 +322,24 @@
       "name": "Walker",
       "fips": "13295",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 6575,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-walker-parcels-13295",
+      "queryUrl": "https://services7.arcgis.com/tzrZqCyu9DgupjuD/arcgis/rest/services/Walker_Fire_ISO_gdb/FeatureServer/5/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Parcels are Walker County Parcel_Regions_w_WinGAP (Walker Fire ISO gdb) (https://services7.arcgis.com/tzrZqCyu9DgupjuD/arcgis/rest/services/Walker_Fire_ISO_gdb/FeatureServer/5). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13295/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13295/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 6575
     },
     {
       "name": "Whitfield",

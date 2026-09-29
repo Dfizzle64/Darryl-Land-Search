@@ -1,0 +1,426 @@
+state: GA
+jurisdiction: Pierce County
+fips: "13229"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: Pierce ParcelInformation Tax Parcels (SGRC / sgrcmaps)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Pierce/ParcelInformation/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PAR_ID: parcelIdAlt
+      PARCEL_NO2: parcelPinAlt
+      REAL_KEY: ownerKey
+      OWNKEY: ownerKeyAlt
+      LASTNAME: ownerName
+      FIRSTNAME: ownerFirstName
+      MIDDLE: ownerMiddleName
+      ADDRESS1: mailingAddressLine1OrCoOwner
+      ADDRESS2: mailingAddress
+      ADDRESS3: mailingAddress2
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP_1: mailingZip
+      HOUSE_NO: situsNumber
+      STDIRECT: situsStreetDir
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      UNIT: situsUnit
+      EXTENSION: situsExtension
+      TOTALACRES: acreage
+      AC: acreageGis
+      WOODACRES: acreageWoodland
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      MAVORIG: tax.assessedValueOriginal
+      A_VALUE: tax.aValue
+      P_VALUE: tax.pValue
+      SALE_VAL: lastSale.price
+      SALELAND1: lastSale.landPrice1
+      SALEIMP1: lastSale.improvPrice1
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      DIGSTRAT: dorStrata
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+      LEGAL_DESC: legalDescription
+      SUBD_NAME: subdivision
+      HOMEEXEMPT: homesteadExempt
+      LANDLOT: landLot
+      LANDDIST: landDistrict
+      LANDGMD: georgiaMilitiaDistrict
+      NEIGHBHOOD: neighborhood
+      QPUBLIC: appraiserSearchUrl
+      Shape.STArea(): shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (Southern Georgia Regional Commission
+      GIS; sgrcmaps.com/alma Pierce/ParcelInformation MapServer/0 "Tax Parcels"; official
+      Tax Assessors Mapping Application sgrc.maps.arcgis.com webappviewer
+      id=83a7e536995d4a16932a41001432d990 — Pierce Tax Office Web Application /
+      rstrom_sgrc). Live count 12893 (2026-09-24). SR StatePlane GA East FIPS 1001 Feet
+      (102666/2239). maxRecordCount 1000 — page via resultOffset / spatial envelopes.
+      TOTALACRES 5–150 = 3031; CURR_VAL>0 = 12885; LASTNAME filled = 12800; HOUSE_NO>0 =
+      9039; FMVRES>0 = 6572; MAVCURR>0 = 0 (assessed REST gap); SALE_VAL>0 = 0 /
+      SALELAND1>0 = 0 (sales REST gap). ZONINGCODE filled = 12837 distinct AF/C/I/LI/MF/
+      MHP/NC/P/I/PI/PRC/PUD/SF/SF & FH/TCU; ZONING filled = 11803. DIGCLASS: A/C/E/I/J/R/
+      U/V. Compose situsAddress from HOUSE_NO + STDIRECT + STREET_NAM + STTYPE when
+      HOUSE_NO>0. CITY/STATE/ZIP_1 are OWNER mailing (BLACKSHEAR≈7762 soft mail count /
+      out-of-county) — never municipality filter; prefer spatial City Limits.
+      TAXDISTRIC soft (envelope-checked, no published REST legend): 01≈unincorporated /
+      county (~9851), 02≈Blackshear city (~2072; Blackshear envelope mixes 01+02),
+      03≈Patterson (~590; Patterson envelope majority 03), 04≈small (~42), 05≈Offerman
+      (~331; Offerman envelope majority 05) — soft only. Every feature carries QPUBLIC
+      deep-link stub AppID=683 LayerID=11373 (append KeyValue={PARCEL_NO}). Companion
+      PropertyLayers/4 Tax Parcels + MunicipalBoundaries City Limits — prefer
+      ParcelInformation/0 for CAMA. Official assessor HTML: qPublic App=PierceCountyGA
+      (qpublic.net/ga/pierce; piercecountyga.gov Property Assessor). Deep-link
+      KeyValue={PARCEL_NO}: Application.aspx?App=PierceCountyGA&Layer=Parcels&PageType=
+      Report&KeyValue={PARCEL_NO} (also AppID=683&LayerID=11373). GEO-VERIFY GEORGIA —
+      REJECT Pierce County WA (services2.arcgis.com/1UvBaQ5y1ubjUPmd Tax_Parcels /
+      piercecountywa.gov / Tacoma–Puyallup ~-122.4,47.2): WGS84 samples ~-82.396,31.426 /
+      ~-82.392,31.428; Blackshear City Limits tip ~-82.213,31.347; Patterson ~-82.143,31.374;
+      Offerman ~-82.125,31.399 — FIPS 13229 seat Blackshear SE GA. Schema exposes
+      WATER/SEWER/GAS/ELECTRICTY + APPRAISER/APPRNAME/FUSERID — DO NOT collect utilities
+      or staff PII. Rejected paid Regrid/ATTOM; skip AADT.
+    status: usable
+
+  - role: tax
+    name: ParcelInformation CURR_VAL / FMV* (on polygons)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Pierce/ParcelInformation/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      HOMEEXEMPT: homesteadExempt
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons (CURR_VAL>0 = 12885; FMVRES>0 =
+      6572). MAVCURR>0 = 0 — assessed/digest via qPublic App=PierceCountyGA HTML when
+      needed. Assessor HTML Cloudflare/bot 403 automated; public for humans
+      (qpublic.net/ga/pierce).
+    status: usable
+
+  - role: sales
+    name: null — SALE_* fields present but zero-filled
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Pierce/ParcelInformation/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      SALE_VAL: lastSale.price
+      SALELAND1: lastSale.landPrice1
+      SALEIMP1: lastSale.improvPrice1
+    notes: >
+      SALE_VAL / SALELAND1 / SALEIMP1 zero-filled on live REST (2026-09-24). Prefer qPublic
+      Sales Search / Sales List HTML App=PierceCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: ParcelInformation ZONINGCODE / ZONING (parcel-attributed)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Pierce/ParcelInformation/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+    notes: >
+      Parcel-attributed zoning county-wide (ZONINGCODE filled 12837). Distinct codes:
+      AF / C / I / LI / MF / MHP / NC / P/I / PI / PRC / PUD / SF / SF & FH / TCU — not a
+      separate Euclidean zoning FeatureServer. No city-only zoning FS recovered for
+      Blackshear/Patterson/Offerman.
+    status: partial
+
+  - role: flu
+    name: null — no public FLU/CharacterAreas FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No Pierce County GA FutureLandUse / CharacterAreas FeatureServer on sgrcmaps Pierce
+      folder (2026-09-24). Comp-plan PDF on piercecountyga.gov (PC 2022 Joint Comprehensive
+      Plan) — not REST.
+    status: gap
+
+  - role: other
+    name: AdministrativeLayers City Limits + County Line (SGRC)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Pierce/AdministrativeLayers/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipalityName
+    notes: >
+      City Limits NAME=BLACKSHEAR / PATTERSON / OFFERMAN / WAYCROSS (Ware fringe). Twin
+      MunicipalBoundaries/0 City Limits + /1 County. Preferred spatial municipality
+      filters. Companion Addresses/0 — situs points aid. Elections webapp
+      id=82d5ffa871474874b076fe7fad3557ef is districts — not parcels.
+    status: usable
+
+municipalities:
+  - name: Blackshear
+    level: city
+    parentFips: "13229"
+    joinToCountyParcels: >
+      Spatial AdministrativeLayers/4 or MunicipalBoundaries/0 NAME='BLACKSHEAR'
+      (~-82.213,31.347) ∩ ParcelInformation/0; soft TAXDISTRIC='02' / mailing CITY=
+      'BLACKSHEAR' aid only (ZIP 31516).
+    layers:
+      - role: zoning
+        name: ParcelInformation ZONINGCODE Blackshear spatial extract
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Pierce/ParcelInformation/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONINGCODE: zoning
+        notes: County parcel-attributed zoning ∩ Blackshear city limits — no Blackshear-only zoning FS.
+        status: partial
+      - role: flu
+        name: null — no Blackshear FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city or county FLU FeatureServer recovered.
+        status: gap
+      - role: parcels
+        name: null — county ParcelInformation/0 + spatial Blackshear
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Blackshear-only CAMA — county Tax Parcels + City Limits. Tax/sale on county REST / qPublic.
+        status: gap
+    gaps:
+      - "No Blackshear city-owned parcel/FLU REST — county layers + spatial Blackshear limits."
+      - "Owner/tax on county ParcelInformation REST; sale/assessed via qPublic when REST blank."
+    status: usable
+
+  - name: Patterson
+    level: city
+    parentFips: "13229"
+    joinToCountyParcels: >
+      Spatial City Limits NAME='PATTERSON' (~-82.143,31.374) ∩ county parcels; soft
+      TAXDISTRIC='03'.
+    layers:
+      - role: zoning
+        name: ParcelInformation ZONINGCODE Patterson spatial extract
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Pierce/ParcelInformation/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONINGCODE: zoning
+        notes: County parcel zoning ∩ Patterson limits.
+        status: partial
+      - role: parcels
+        name: null — county parcels + spatial Patterson
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Patterson-only CAMA REST.
+        status: gap
+    gaps:
+      - "Patterson city limits usable; parcel/FLU still county layers + qPublic."
+    status: partial
+
+  - name: Offerman
+    level: city
+    parentFips: "13229"
+    joinToCountyParcels: >
+      Spatial City Limits NAME='OFFERMAN' (~-82.125,31.399) ∩ county parcels; soft
+      TAXDISTRIC='05'.
+    layers:
+      - role: zoning
+        name: ParcelInformation ZONINGCODE Offerman spatial extract
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Pierce/ParcelInformation/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONINGCODE: zoning
+        notes: County parcel zoning ∩ Offerman limits.
+        status: partial
+      - role: parcels
+        name: null — county parcels + spatial Offerman
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Offerman-only CAMA REST.
+        status: gap
+    gaps:
+      - "Offerman city limits usable; parcel/FLU still county layers."
+    status: partial
+
+gaps:
+  - "MAVCURR assessed REST zero-filled — assessed/taxable via qPublic App=PierceCountyGA HTML when needed."
+  - "SALE_VAL/SALELAND*/SALEIMP* zero-filled — sale price via qPublic Sales Search HTML."
+  - "No separate Euclidean zoning FeatureServer — parcel ZONINGCODE/ZONING only; no city-only zoning FS."
+  - "No public FLU/CharacterAreas FeatureServer for Pierce County GA."
+  - "Mailing CITY includes Blackshear/out-of-county — prefer spatial City Limits (BLACKSHEAR/PATTERSON/OFFERMAN); WAYCROSS is Ware County fringe."
+  - "maxRecordCount 1000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; public for humans (qpublic.net/ga/pierce)."
+  - "REJECT Pierce WA Tax_Parcels services2.arcgis.com/1UvBaQ5y1ubjUPmd / piercecountywa.gov / Tacoma–Puyallup; REJECT paid Regrid/ATTOM; skip WATER/SEWER/GAS/ELECTRICTY + AADT; skip APPRAISER/APPRNAME/emails/phones as PII."
+
+license: >
+  Southern Georgia Regional Commission GIS (sgrcmaps.com/alma Pierce folder; SGRC AGOL
+  rstrom_sgrc) — ParcelInformation/0 Tax Parcels; AdministrativeLayers City Limits;
+  MunicipalBoundaries; Addresses; PropertyLayers. Official Tax Assessors Mapping Application
+  sgrc.maps.arcgis.com webappviewer id=83a7e536995d4a16932a41001432d990. Assessor qPublic
+  App=PierceCountyGA / AppID=683 LayerID=11373 (qpublic.net/ga/pierce; piercecountyga.gov).
+  Attribution SGRC / Pierce County Tax Assessor. Public fields only; no emails/phones; no
+  paid vendors; skip utilities+AADT. REJECT Pierce County WA lookalikes.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=PierceCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://sgrc.maps.arcgis.com/apps/webappviewer/index.html?id=83a7e536995d4a16932a41001432d990
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://www.sgrcmaps.com/alma/rest/services/Pierce/ParcelInformation/MapServer/0 count 12893; extent
+    center [['13229', 'Pierce County']]; sample [['13229', 'Pierce County']]. No change to field map
+    (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Blackshear city"
+      level: city
+      parentFips: "13229"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Offerman city"
+      level: city
+      parentFips: "13229"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Patterson city"
+      level: city
+      parentFips: "13229"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Pierce' AND aadt>0
+    altFilter: name LIKE '229-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 229-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 71
+    maxAadt: 18500
+    geoCheck: 71/71 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - A_VALUE
+    - FMVRES
+    filledCount: 12885
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Pierce/ParcelInformation/MapServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: SALE_VAL=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 12800
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Pierce/ParcelInformation/MapServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=PierceCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=683&LayerID=11373&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=PierceCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20001
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://sgrc.maps.arcgis.com/apps/webappviewer/index.html?id=83a7e536995d4a16932a41001432d990
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Blackshear city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Offerman city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Patterson city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

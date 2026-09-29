@@ -1,0 +1,410 @@
+state: GA
+jurisdiction: Twiggs County
+fips: "13289"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner/mailing/situs/tax (MGRC AGOL)
+  - role: parcels
+    name: Twiggs_County_Parcels Twiggs County Parcels (MGRC)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Twiggs_County_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES_1
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      TOTALACRES_1: acreage
+      TOTALACRES: acreageText
+      LASTNAME: ownerName
+      ADDRESS: situsAddress
+      STREET_NAM: situsStreet
+      CITY: mailingCity
+      STATE: mailingState
+      ZIPCODE: mailingZip
+      CURR_VAL: tax.marketValue
+      Shape__Area: shapeArea
+      Shape__Length: shapeLength
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + owner/situs/tax (Middle Georgia Regional
+      Commission MGRC org Ug5xGQbHsD8zuZzM — Twiggs_County_Parcels item
+      2441fbcfbefc48f5af6bf47325eca275 FeatureServer/0; owner nwilliams_MGRC; snippet
+      "Data received from Tax Assessor's office Aug 2024"). Live count 7069
+      (2026-09-24). LASTNAME filled ≈7027; CURR_VAL>0 ≈7024; TOTALACRES_1 5–150 =2100.
+      Schema THIN but has owner+tax: PARCEL_NO / TOTALACRES(+_1) / STREET_NAM /
+      CURR_VAL / LASTNAME / CITY / STATE / ADDRESS / ZIPCODE + geometry. NO mailing
+      street separate from situs ADDRESS; CITY/STATE/ZIPCODE treated as mailing when
+      present. NO mav*/assessed / SALE_* / zoning / qPub_Link on this layer. SR Web
+      Mercator (wkid 102100 / 3857). maxRecordCount 2000 — page via resultOffset /
+      envelopes. PARCEL_NO format e.g. 'DV01   001' / 'T121   019' / 'JV01   001'
+      (preserve spaces for KeyValue). Join Euclidean zoning via
+      Twiggs_County_Zoning_Districts/0 MAPID = PARCEL_NO (parcel-scale zoning polys
+      confirmed join T121   019). Companion TwiggsParcels_Jan2026 FeatureServer/16
+      (jpaino_MGRC; count 6832) is geometry+CALCACRE/DEEDACRES/PARCELID only — thinner
+      on owner/tax; prefer Twiggs_County_Parcels for CAMA attributes. GEO-VERIFY
+      GEORGIA Twiggs FIPS 13289 seat Jeffersonville (~-83.35,32.69): WGS84 samples
+      ~-83.258,32.617 (Hwy 80 / Danville area) / ~-83.345,32.686 (Jeffersonville) /
+      county boundary centroid ~-83.500,32.617. REJECT paid Regrid/ATTOM/USLandGrid;
+      no emails/phones. Skip Broadband*/CableModem/ADSL/Fiber/utilities + AADT per
+      tranche-3. Assessor HTML qPublic App=TwiggsCountyGA / AppID=684 LayerID=11374.
+    status: usable
+
+  - role: tax
+    name: Twiggs_County_Parcels CURR_VAL (on parcels layer)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Twiggs_County_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CURR_VAL: tax.marketValue
+    notes: >
+      Market value REST usable (CURR_VAL>0 ≈7024/7069). No mav*/assessed/taxable REST
+      on Twiggs_County_Parcels — assessed/taxable digest via qPublic AppID=684
+      LayerID=11374 HTML (Cloudflare/bot 403 automated; public for humans). Deep-link:
+      Application.aspx?AppID=684&LayerID=11374&PageTypeID=4&KeyValue={PARCEL_NO}
+      (also App=TwiggsCountyGA&Layer=Parcels&PageType=Report&KeyValue=). Tax
+      Commissioner payment portal separate (not CAMA).
+    status: usable
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/lastSale on Twiggs_County_Parcels or TwiggsParcels_Jan2026
+      (2026-09-24). Prefer qPublic Sales Search / Sales List HTML AppID=684 /
+      App=TwiggsCountyGA. Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: Twiggs_County_Zoning_Districts Zoning Districts (MGRC)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Twiggs_County_Zoning_Districts/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+      ZONINGTYPE: zoningType
+      MAPID: parcelId
+      Acres: acreage
+    notes: >
+      Preferred county Euclidean / district zoning polygons (count 7355; owner
+      nwilliams_MGRC). ZONING top: R-AG≈2504 / R-1≈2446 / AG≈1385 / null≈947 /
+      GC≈48 / GI≈24 / R-2≈1. ZONINGTYPE: County≈6408 / City≈947. MAPID aligns to
+      PARCEL_NO (parcel-scale polys — attribute join preferred over spatial-only).
+      Official viewer: experience.arcgis.com/experience/e11d694d30bb48c095d9e33529d842e3
+      (Twiggs County Zoning Web Map). Also wired in Twiggs County Zoning web map
+      item 0e201a8857e4498f949e6e95523f617f. Null ZONING rows (~947) often
+      ZONINGTYPE=City — city-context polygons may lack code; certify vs ordinance.
+    status: usable
+
+  - role: flu
+    name: null — no public FLU / Character Areas REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Twiggs Comp-Plan Future Land Use / Character Areas FeatureServer on MGRC
+      catalog (2026-09-24). Zoning Districts is Euclidean zoning not FLU. Certify
+      land-use intent vs adopted Comp Plan PDF when needed.
+    status: gap
+
+  - role: other
+    name: Municipal_Boundaries + Twiggs_CountyBoundary (Jeffersonville / Danville)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Municipal_Boundaries/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: MUNIAREA
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+      LOCALFIPS: localFips
+    notes: >
+      Preferred spatial municipality filter (count 2): Jeffersonville (~-83.345,32.686),
+      Danville (~-83.246,32.606). Twin on Twiggs_County_Commission_District_Map_WFL1
+      FeatureServer/1 same schema. Join = spatial intersect with Twiggs_County_Parcels.
+      Do NOT filter by parcel owner mailing city. County mask:
+      Twiggs_CountyBoundary FeatureServer/5 NAME=Twiggs (~-83.500,32.617). Allentown
+      (shared Twiggs/Wilkinson) NOT published on this Municipal_Boundaries layer —
+      honest city gap. Companion Commission Districts/0 TwiggsCCSB-2022 — reference only.
+    status: usable
+
+municipalities:
+  - name: Jeffersonville
+    level: city
+    parentFips: "13289"
+    joinToCountyParcels: >
+      Spatial Municipal_Boundaries/8 NAME='Jeffersonville' (centroid ~-83.345,32.686)
+      ∩ Twiggs_County_Parcels/0. PARCEL_NO prefix JV* soft aid only — prefer spatial.
+      First-class city (county seat).
+    layers:
+      - role: zoning
+        name: Twiggs_County_Zoning_Districts ∩ Jeffersonville (ZONINGTYPE City/County)
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Twiggs_County_Zoning_Districts/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Acres
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          MAPID: parcelId
+        notes: >
+          No Jeffersonville-owned separate zoning FS — county Zoning Districts spatial
+          to city limits (and/or MAPID join). ZONINGTYPE='City' subset (~947 county-wide)
+          may include Jeff polygons; many City rows have null ZONING — certify. Standing
+          order: city context over unincorporated AG/R-AG stubs inside limits.
+        status: partial
+      - role: flu
+        name: null — no Jeffersonville FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city FLU — county gap.
+        status: gap
+      - role: parcels
+        name: null — county Twiggs_County_Parcels + spatial Jeffersonville
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Jeffersonville-only CAMA — county /0 + City Limits. Tax via CURR_VAL; sale qPublic HTML.
+        status: gap
+    gaps:
+      - "No Jeffersonville-owned separate CAMA/FLU FeatureServer — MGRC county parcels + Municipal_Boundaries."
+      - "City ZONINGTYPE rows often null ZONING — certify vs ordinance / Experience map."
+    status: usable
+
+  - name: Danville
+    level: city
+    parentFips: "13289"
+    joinToCountyParcels: >
+      Spatial Municipal_Boundaries/8 NAME='Danville' (centroid ~-83.246,32.606) ∩
+      Twiggs_County_Parcels/0. PARCEL_NO prefix DV* soft aid only — prefer spatial.
+    layers:
+      - role: zoning
+        name: Twiggs_County_Zoning_Districts ∩ Danville
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Twiggs_County_Zoning_Districts/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Acres
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          MAPID: parcelId
+        notes: County Zoning Districts spatial/MAPID to Danville — no Danville-owned zoning FS.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Danville FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county parcels + spatial Danville
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Danville-only CAMA REST.
+        status: gap
+    gaps:
+      - "Danville city limits usable; parcel tax/sale still county REST + qPublic HTML."
+    status: partial
+
+  - name: Allentown
+    level: city
+    parentFips: "13289"
+    joinToCountyParcels: >
+      No Municipal_Boundaries Allentown polygon published (shared Twiggs/Wilkinson).
+      Optional TIGER/place or Wilkinson twin when available — mailing city never sole filter.
+    layers:
+      - role: zoning
+        name: null — no Allentown limits/zoning on MGRC Twiggs layers
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Honest gap — Allentown not on Twiggs Municipal_Boundaries/8.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Allentown FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Allentown city limits on MGRC Twiggs publish — county parcels only.
+        status: gap
+    gaps:
+      - "Allentown (Twiggs/Wilkinson shared) absent from Twiggs Municipal_Boundaries — no city polygon/zoning this pass."
+    status: gap
+
+gaps:
+  - "No SALE_*/lastSale REST — sale history via qPublic AppID=684 HTML only."
+  - "No mav*/assessed/taxable REST — prefer CURR_VAL market + qPublic HTML for assessed."
+  - "No FLU / Character Areas REST — Zoning Districts is Euclidean not FLU."
+  - "TwiggsParcels_Jan2026 is geometry+acres only — prefer Twiggs_County_Parcels for owner/CURR_VAL."
+  - "Allentown not on Municipal_Boundaries — Jeff + Danville only."
+  - "ZONING null ≈947 (often ZONINGTYPE=City) — certify city codes vs ordinance."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/twiggs + AppID=684 Search PageID=5848 public for humans."
+  - "Skip Broadband*/CableModem/ADSL/Fiber/Optical_Carrier + AADT per tranche-3; no emails/phones."
+  - "Rejected paid Regrid/ATTOM/USLandGrid Twiggs extracts."
+
+license: >
+  Middle Georgia Regional Commission GIS (MGRC / services1.arcgis.com/Ug5xGQbHsD8zuZzM)
+  — Twiggs_County_Parcels, Twiggs_County_Zoning_Districts, Municipal_Boundaries,
+  Twiggs_CountyBoundary, Twiggs_County_Commission_District_Map_WFL1; companion
+  TwiggsParcels_Jan2026. Official zoning viewer
+  experience.arcgis.com/experience/e11d694d30bb48c095d9e33529d842e3. Assessor qPublic
+  App=TwiggsCountyGA / AppID=684 LayerID=11374 (qpublic.net/ga/twiggs; topmenu Search
+  PageID=5848). Attribution MGRC / Twiggs County Board of Assessors. Public fields
+  only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=684&LayerID=11374&PageTypeID=2&PageID=5848
+jurisdictionGisUrl: https://experience.arcgis.com/experience/e11d694d30bb48c095d9e33529d842e3
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services1.arcgis.com/Ug5xGQbHsD8zu
+    ZzM/arcgis/rest/services/Twiggs_County_Parcels/FeatureServer/0 count 7069; extent center [['13289',
+    'Twiggs County']]; sample [['13289', 'Twiggs County']]. No change to field map (see layer above).
+    Newer MGRC refresh also available: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/service
+    s/TwiggsParcels_Jan2026/FeatureServer/16 (6832, PARCELID).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Allentown city"
+      level: city
+      parentFips: "13289"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Danville town"
+      level: city
+      parentFips: "13289"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Jeffersonville city"
+      level: city
+      parentFips: "13289"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Twiggs' AND aadt>0
+    altFilter: name LIKE '289-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 289-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 85
+    maxAadt: 26900
+    geoCheck: 85/85 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    filledCount: 7024
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Twiggs_County_Parcels/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 7027
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Twiggs_County_Parcels/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=TwiggsCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=684&LayerID=11374&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: DV01   001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=TwiggsCountyGA&Layer=Parcels&PageType=Report&KeyValue=DV01%20%20%20001
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://experience.arcgis.com/experience/e11d694d30bb48c095d9e33529d842e3
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Allentown city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Danville town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Jeffersonville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

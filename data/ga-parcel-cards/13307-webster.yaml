@@ -1,0 +1,309 @@
+state: GA
+jurisdiction: Webster County
+fips: "13307"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer recovered
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Webster County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. RVRC_ELA AGOL org Ug5xGQbHsD8zuZzM has
+      Webster_Blocks / Webster_Tracts / Webster_Roads only — NO Webster parcel CAMA
+      (contrast ParcelsChattCo / Clay_County_Parcels / Sumter KCS portal for neighbors).
+      Spatial probe Parcels4_2026_HUB envelope around Preston (~-84.60..-84.45 ×
+      32.00..32.15) → count 0 (wrong-county Harris/West Point stack). Official human
+      cadastral + CAMA path = qPublic/Beacon AppID=774 LayerID=11810
+      (qpublic.net/ga/webster topmenu → Application.aspx; county seat Preston GA 31824;
+      Unified Government of Webster County since 2009). Cloudflare/bot 403 blocks
+      automated Application.aspx from research box; public for humans. Deep-link
+      KeyValue={parcelId}:
+      Application.aspx?AppID=774&LayerID=11810&PageTypeID=4&KeyValue={parcelId}
+      (Search PageTypeID=2 PageID=5649; Estimate Taxes PageID=5916). WebsterCountyGA_WFS
+      on wfs.schneidercorp.com → 404. Rejected paid Regrid/ATTOM/USLandGrid/MappingSolutions.
+      GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13307 CENTLAT +32.0468060 CENTLON
+      -084.5510799; Webster_Blocks STATEFP20='13' COUNTYFP20='307' samples
+      ~-84.53,32.09 / ~-84.63,32.17 — southwest GA River Valley / Preston seat.
+      REJECT Webster County NY (~-77.4,43.2) / Webster County IA (~-94.3,40.3) /
+      Webster TX CDP lookalike parcel FeatureServers — wrong state. No emails/phones;
+      skip utilities+AADT.
+    status: gap
+
+  - role: tax
+    name: null — qPublic/Beacon HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via Beacon/qPublic AppID=774
+      LayerID=11810 HTML only (assessment from most current published tax digest per
+      qpublic.net/ga/webster). Deep-link KeyValue={parcelId} on Report page. Estimate
+      Taxes PageID=5916. Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. Prefer Beacon/qPublic Sales Search /
+      Sales List HTML AppID=774. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no public county Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Webster County GA Euclidean zoning FeatureServer on RVRC_ELA (2026-09-24).
+      Unified Government / DCA Comp Plan PDFs (character areas) — not queryable REST.
+      Honest gap.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Webster County GA future land use FeatureServer found (2026-09-24). Unified
+      Government Comp Plan update PDFs via DCA / River Valley RC — not REST.
+    status: gap
+
+  - role: other
+    name: Webster_Blocks (RVRC scaffold — NOT parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Webster_Blocks/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      GEOID20: blockGeoid
+      COUNTYFP20: countyFp
+      STATEFP20: stateFp
+    notes: >
+      2020 census blocks (STATEFP20=13 COUNTYFP20=307 = FIPS 13307; live count 313).
+      NOT parcels — use only for county extent / geo-verify. Twin Webster_Tracts /
+      Webster_Roads on same org. Confirms Georgia (reject NY/IA Webster parcels).
+    status: partial
+
+municipalities:
+  - name: Preston
+    level: city
+    parentFips: "13307"
+    joinToCountyParcels: >
+      Former city — consolidated into Unified Government of Webster County effective
+      2009-01-01 (charter surrendered with Weston). Remains county seat / unincorporated
+      community (~-84.54,32.05; ZIP 31824). No separate city parcel REST; no county
+      parcel REST to join.
+    layers:
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Preston-owned CAMA FS — county Beacon/qPublic AppID=774 HTML only.
+          Unified government; not a separate municipal parcel source.
+        status: gap
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Preston zoning FeatureServer; unified Comp Plan PDF ≠ REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Preston FLU REST.
+        status: gap
+    gaps:
+      - "Preston unincorporated after 2009 unification; no city-owned parcel/zoning/FLU REST; county qPublic AppID=774 HTML only."
+    status: gap
+
+  - name: Weston
+    level: city
+    parentFips: "13307"
+    joinToCountyParcels: >
+      Former town — consolidated into Unified Government of Webster County effective
+      2009-01-01. Unincorporated community in Webster (~-84.62,32.04). No separate
+      city parcel REST.
+    layers:
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Beacon/qPublic AppID=774 HTML only.
+        status: gap
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Weston zoning REST; covered by Unified Government Comp Plan.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Weston FLU REST.
+        status: gap
+    gaps:
+      - "Weston unincorporated after 2009 unification; no city-owned zoning/FLU/parcel REST."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Webster County GA — Beacon/qPublic AppID=774 LayerID=11810 HTML only."
+  - "WebsterCountyGA_WFS 404; Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/webster HTML path public for humans."
+  - "RVRC Webster_Blocks/Tracts/Roads only — not parcels; Parcels4_2026_HUB Preston envelope count 0."
+  - "Unified Government (Preston+Weston+county since 2009) — no separate municipal parcel sources; Comp Plan PDF ≠ REST."
+  - "REJECT Webster NY/IA/TX parcel FeatureServers (wrong-state extents); REJECT paid Regrid/ATTOM/USLandGrid/MappingSolutions; no emails/phones collected."
+  - "Skipped utilities+AADT per tranche-3."
+
+license: >
+  Webster County Tax Assessor qPublic/Beacon AppID=774 LayerID=11810
+  (qpublic.net/ga/webster; qpublic.schneidercorp.com; webstercountyga.org/taxassessor/;
+  Preston GA 31824). River Valley Regional Commission RVRC_ELA AGOL org
+  Ug5xGQbHsD8zuZzM — Webster_Blocks/Tracts/Roads boundary scaffold only. No public
+  ArcGIS parcel service discovered 2026-09-24. Attribution Webster County Tax Assessor /
+  RVRC GIS. Public HTML only; no emails/phones; no paid vendors; skip utilities+AADT.
+  REJECT non-Georgia Webster County lookalikes.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=774&LayerID=11810&PageTypeID=2&PageID=5649
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=774&LayerID=11810&PageTypeID=1
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Webster County unified government"
+      level: city
+      parentFips: "13307"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Webster' AND aadt>0
+    altFilter: name LIKE '307-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 307-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 36
+    maxAadt: 6720
+    geoCheck: 35/36 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=WebsterCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=774&LayerID=11810&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: inferred {County}CountyGA convention
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?AppID=774&LayerID=11810&PageTypeID=1
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Webster County unified government
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

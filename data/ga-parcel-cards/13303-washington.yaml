@@ -1,0 +1,401 @@
+state: GA
+jurisdiction: Washington County
+fips: "13303"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Washington County GA public parcel FeatureServer/MapServer with
+      cadastral polygons recovered (2026-09-24). Official human viewer = qPublic/Beacon
+      App=WashingtonCountyGA / AppID=720 LayerID=11437 PageID=5873 (qpublic.net/ga/washington
+      topmenu.html → qpublic.schneidercorp.com Application.aspx; county seat Sandersville
+      GA 31082; washingtoncountyga.gov/193/Tax-Assessors). Cloudflare/bot 403 blocks
+      automated Application.aspx from research box; public for humans.
+      WashingtonCountyGA_WFS not listed on wfs.schneidercorp.com (only CityOfWashingtonGA_WFS
+      = City of Washington in Wilkes County GA ~-82.755,33.751 — REJECT for this card).
+      maps.itos.uga.edu Archway/WashingtonCounty MapServer referenced by chamber.washingtonga
+      Economic Development web map 9a9aea78713e464e9eaffad28c9dacf7 but live REST returns
+      404 Service not found (2026-09-24; Archway folder now only HartCounty). Development
+      Authority washingtoncountyga.giswebtechguru.com / washingtondev.com interactive-maps
+      are site-selector / marketing UI — not cadastral FS. No CSRA / HOGARC / SGRC / MGRC /
+      AGOL county parcel org recovered for Washington GA.
+      GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13303 NAME=Washington County STATE=13
+      COUNTY=303 CENTLAT +32.9694831 CENTLON -082.7958701 — east-central GA (Sandersville
+      seat). REJECT washingtonco-search.gsacorp.io (Washington County CO — accessibility
+      contact @co.washington.co.us / 970 area). REJECT experience.arcgis.com
+      e6f99fb948e24f00a0e10fb696ceed6b (Washington County ID parcels; owner
+      Idaho_State_Tax_Comm). REJECT Washington NC / OR / WA / PA / WI lookalikes; REJECT
+      CityOfWashingtonGA_WFS (Wilkes). Rejected paid Regrid/ATTOM/USLandGrid/MappingSolutions.
+      Skip utilities+AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via qPublic App=WashingtonCountyGA /
+      AppID=720 LayerID=11437 HTML only. Deep-link KeyValue={parcelId}:
+      Application.aspx?App=WashingtonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+      (also AppID=720&LayerID=11437&PageTypeID=4&KeyValue=). Estimate Taxes
+      AppID=720&LayerID=11437&PageTypeID=2&PageID=5873.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer qPublic Sales Search / Sales List HTML
+      App=WashingtonCountyGA / AppID=720. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Washington County GA Euclidean zoning FeatureServer found (2026-09-24). City of
+      Sandersville Building and Zoning (sandersvillega.org/buildingandzoning.cfm) is HTML /
+      ordinance — not REST.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Washington County GA Future Land Use / Character Areas FeatureServer found
+      (2026-09-24). Comp-plan / planning PDF gap.
+    status: gap
+
+  - role: other
+    name: null — no Sandersville/Tennille city-limits FeatureServer confirmed
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No dedicated Sandersville / Tennille / Davisboro / Deepstep / Riddleville / Oconee
+      city-limits FeatureServer confirmed (2026-09-24). Soft spatial Census places when
+      parcels exist. Do NOT filter by owner mailing city. REJECT City of Washington (Wilkes)
+      CityOfWashingtonGA_WFS as municipality for this county.
+    status: gap
+
+municipalities:
+  - name: Sandersville
+    level: city
+    parentFips: "13303"
+    joinToCountyParcels: >
+      County seat / primary incorporated place (~-82.81,32.98 soft; ZIP 31082) when parcels
+      become available. No separate city parcel REST — county qPublic AppID=720 HTML only.
+      REJECT City of Washington GA (Wilkes County; CityOfWashingtonGA_WFS ~-82.755,33.751).
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Sandersville zoning FeatureServer — sandersvillega.org Building and Zoning HTML/ordinance only.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sandersville FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic AppID=720 HTML only; no city-owned CAMA FS.
+        status: gap
+    gaps:
+      - "No Sandersville city-owned parcel/zoning/FLU REST — county qPublic App=WashingtonCountyGA HTML only."
+    status: partial
+
+  - name: Tennille
+    level: city
+    parentFips: "13303"
+    joinToCountyParcels: >
+      Soft spatial Tennille GA (Washington FIPS 13303; ~-82.81,32.94) when parcels exist.
+      No city CAMA REST — county qPublic AppID=720.
+    layers:
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Tennille-only CAMA REST.
+        status: gap
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Tennille zoning FS.
+        status: gap
+    gaps:
+      - "Tennille city limits soft only; parcel/tax/sale via county qPublic."
+    status: partial
+
+  - name: Davisboro
+    level: city
+    parentFips: "13303"
+    joinToCountyParcels: >
+      Soft spatial Davisboro GA (Washington FIPS 13303) when parcels exist; county qPublic only.
+    layers:
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Davisboro-only CAMA REST.
+        status: gap
+    gaps:
+      - "No city parcel REST — county qPublic AppID=720."
+    status: partial
+
+  - name: Deepstep
+    level: city
+    parentFips: "13303"
+    joinToCountyParcels: >
+      Soft spatial Deepstep GA (Washington FIPS 13303) when parcels exist; county qPublic only.
+    layers:
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Deepstep-only CAMA REST.
+        status: gap
+    gaps:
+      - "No city parcel REST — county qPublic AppID=720."
+    status: partial
+
+  - name: Riddleville
+    level: city
+    parentFips: "13303"
+    joinToCountyParcels: >
+      Soft spatial Riddleville GA (Washington FIPS 13303) when parcels exist; county qPublic only.
+    layers:
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Riddleville-only CAMA REST.
+        status: gap
+    gaps:
+      - "No city parcel REST — county qPublic AppID=720."
+    status: partial
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Washington County GA — qPublic App=WashingtonCountyGA / AppID=720 LayerID=11437 PageID=5873 HTML only."
+  - "WashingtonCountyGA_WFS absent; CityOfWashingtonGA_WFS is Wilkes County city (~-82.755,33.751) — REJECT."
+  - "maps.itos.uga.edu Archway/WashingtonCounty MapServer 404 (advertised by chamber.washingtonga economic-dev web map; Archway now HartCounty-only)."
+  - "REJECT washingtonco-search.gsacorp.io (Washington CO); REJECT experience e6f99fb948e24f00a0e10fb696ceed6b (Washington ID); REJECT Washington NC/OR/WA lookalikes."
+  - "Rejected paid Regrid/ATTOM/USLandGrid/MappingSolutions Washington GA extracts."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/washington + AppID=720 Search/Maps public for humans."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Washington County Tax Assessor qPublic/Beacon App=WashingtonCountyGA / AppID=720
+  LayerID=11437 PageID=5873 (qpublic.net/ga/washington; washingtoncountyga.gov Tax
+  Assessors; Sandersville GA 31082). Chamber/ITOS Archway/WashingtonCounty MapServer
+  referenced historically but 404 as of 2026-09-24. No public ArcGIS parcel service
+  discovered. Attribution Washington County Board of Tax Assessors. Public HTML only;
+  no emails/phones; no paid vendors; skip utilities+AADT. REJECT Washington County
+  CO/ID/NC/OR/WA and City of Washington (Wilkes) lookalikes.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WashingtonCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=720&LayerID=11437&PageTypeID=1
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Davisboro city"
+      level: city
+      parentFips: "13303"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Deepstep town"
+      level: city
+      parentFips: "13303"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Harrison town"
+      level: city
+      parentFips: "13303"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Oconee city"
+      level: city
+      parentFips: "13303"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Riddleville town"
+      level: city
+      parentFips: "13303"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Sandersville city"
+      level: city
+      parentFips: "13303"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Tennille city"
+      level: city
+      parentFips: "13303"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Washington' AND aadt>0
+    altFilter: name LIKE '303-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 303-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 144
+    maxAadt: 18500
+    geoCheck: 143/144 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=WashingtonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=720&LayerID=11437&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?AppID=720&LayerID=11437&PageTypeID=1
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Davisboro city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Deepstep town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Harrison town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Oconee city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Riddleville town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Sandersville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Tennille city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

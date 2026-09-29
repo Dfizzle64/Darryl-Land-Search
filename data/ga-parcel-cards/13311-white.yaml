@@ -1,0 +1,348 @@
+state: GA
+jurisdiction: White County
+fips: "13311"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "White County Parcels (GMRC Cleveland water 2023)"
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Cleveland_Water_2023_WFL1/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: "GIS_ACRES"
+    coverage: county-wide
+    parcelIdField: "PIN"
+    liveCount: 19990
+    liveCount5to150ac: 3995
+    geoCheck: "extent center [['13311', 'White County']]; sample [['13311', 'White County']]; extent WGS84 [-83.8778, 34.5032, -83.6155, 34.8013]"
+    fieldMap:
+      PIN: "parcelId"
+      GIS_ACRES: "acreage"
+      DEED_ACRES: "acreageDeed"
+      Zoning: "zoning"
+      TAX_DIST_N: "taxDistrictName"
+      TAX_CLASS: "dorCode"
+    notes: >
+      pass1 2026-09-28: County-wide White GA parcels (19990) on shared RC org Ug5xGQbHsD8zuZzM
+      (Cleveland_Water_2023_WFL1 layer 8; twins in Cleveland_Sewer_2023 etc.). PIN, GIS_ACRES, DEED_ACRES,
+      zoning, tax district/class. 2023 vintage.
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — ROKMAPS MapServer dead; qPublic HTML + county Mapping/GIS portal
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no live White County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. Historically indexed service
+      arcgis4/5.roktech.net/arcgis/rest/services/white/white_rokmaps/MapServer returns HTTP 500
+      "Service … not found"; folder white absent from arcgis4/5.roktech.net root (folders list
+      has Paulding/robeson/SeminoleFL/etc., no white — same pattern as Habersham/Stephens).
+      maps.roktech.net/ROKMAPS_White/ (and ROKMAPS_WhiteCounty / WhiteSearch) returns human
+      "The Page requested cannot be located." — not a live viewer. Official county Mapping &
+      GIS portal whitecountyga.gov/296/Mapping-GIS (Map Gallery /411) states assessment
+      information and parcel maps are hosted by qPublic (search by owner/address; property
+      lines / aerial / streams). Assessor CAMA + maps = qPublic AppID=982 LayerID=19945
+      (qpublic.net/ga/white → Application.aspx; also App=WhiteCountyGA; Search PageID=8692).
+      Legacy qpublic7.qpublic.net/ga_search_dw.php?county=ga_white (HTTP 530 from research
+      box 2026-09-24). Cloudflare/bot 403 blocks automated Application.aspx; public for
+      humans. Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=982&LayerID=19945&PageTypeID=4&KeyValue={parcelId}
+      (Search PageTypeID=2 PageID=8692; Maps PageTypeID=1;
+      App=WhiteCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}). No GMRC/NEGRC/
+      county AGOL White GA parcel FS (title/bbox searches 0 usable). Commercial extracts
+      (Regrid/ATTOM/ReportAll/GetParcelData/Equator) — rejected (paid). GEO-VERIFY GEORGIA:
+      Census TIGERweb GEOID 13311 CENTLAT +34.6463307 CENTLON -083.7471139 — NE Georgia
+      Cleveland / Helen / Unicoi State Park ring (Chattahoochee NF; NOT White County AR
+      Searcy; NOT White County TN; NOT White County IL; NOT "White" lookalikes). Skip
+      utilities (Mapping & GIS page lists water/sewer lines among staff datasets — do not
+      collect) + AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic AppID=982 LayerID=19945 /
+      App=WhiteCountyGA (qpublic.net/ga/white; Cleveland GA 30528; Cloudflare/bot 403
+      automated; public for humans). Deep-link KeyValue={parcelId} on Report page. Tax
+      Commissioner whitecountyga.gov/168/Tax-Commissioner / pay — bills/pay only, not CAMA
+      REST. Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. Prefer qPublic Sales Search / Sales List HTML
+      AppID=982 / App=WhiteCountyGA. Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no live public zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      County White County Zoning page whitecountyga.gov/458/White-County-Zoning (Map Gallery
+      sibling) — document/map portal, not a queryable FeatureServer (2026-09-24). No live
+      Euclidean zoning FS recovered (white_rokmaps dead). City of Cleveland / City of Helen
+      planning-zoning pages — ordinance/HTML; no city zoning FeatureServer found.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No White County GA Future Land Use FeatureServer found. Map Gallery has Mountain
+      Protection / River Corridor / Environmental Planning Criteria (wetlands) / Groundwater
+      Recharge / Trout Stream / Water Supply Watersheds — protection overlays, not FLU REST.
+    status: gap
+
+  - role: other
+    name: null — no live public county boundary FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Prefer Census TIGERweb county poly GEOID 13311 for spatial mask until a live county
+      boundary FeatureServer is published. Reject White County AR/TN/IL lookalike AGOL items.
+    status: gap
+
+municipalities:
+  - name: Cleveland
+    level: city
+    parentFips: "13311"
+    joinToCountyParcels: >
+      County seat Cleveland GA (~-83.76,34.60; ZIP 30528). No county parcel REST to join —
+      city filter blocked until geometry source exists. City site cityofclevelandga.org /
+      clevelandga.org planning-zoning — no city parcel REST; tax maps via county qPublic.
+    layers:
+      - role: zoning
+        name: null — city planning/zoning HTML; no FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City of Cleveland Planning/Zoning (cityofclevelandga.org) — no public zoning
+          FeatureServer recovered.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cleveland FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cleveland city-owned parcel REST — county AppID=982 / Mapping-GIS portal.
+        status: gap
+    gaps:
+      - "No Cleveland city-owned parcel/zoning/FLU REST — county qPublic AppID=982 + Mapping & GIS portal."
+    status: gap
+
+  - name: Helen
+    level: city
+    parentFips: "13311"
+    joinToCountyParcels: >
+      Soft spatial Helen GA (~-83.73,34.70; Alpine Helen tourism) when parcels available.
+      No county parcel REST. City site cityofhelen.org planning-design-review — no city
+      parcel REST.
+    layers:
+      - role: zoning
+        name: null — city planning/design review; no FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City of Helen Planning & Design Review Board (cityofhelen.org) — no public zoning
+          FeatureServer recovered.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Helen FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Helen city-owned GIS REST."
+    status: gap
+
+gaps:
+  - "No live public REST parcels/owner/tax/sales/zoning/FLU for White County GA — qPublic AppID=982 LayerID=19945 HTML + whitecountyga.gov/296/Mapping-GIS portal only."
+  - "Historical white/white_rokmaps MapServer (arcgis4/5.roktech.net) returns 500 Service not found; folder removed from Roktech root; maps.roktech.net/ROKMAPS_White/ page cannot be located (2026-09-24)."
+  - "No GMRC/NEGRC/county AGOL White GA parcel FeatureServer."
+  - "REJECT White County AR/TN/IL lookalike AGOL items; REJECT paid Regrid/ATTOM/ReportAll/GetParcelData/Equator."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/white + AppID=982 Search/Maps public for humans; legacy qpublic7 ga_search_dw county=ga_white HTTP 530 automated."
+  - "Skip utilities (water/sewer noted on Mapping & GIS page) + AADT; no emails/phones."
+
+license: >
+  White County Mapping & GIS (whitecountyga.gov/296/Mapping-GIS; Map Gallery /411).
+  Tax Assessor qPublic/Beacon AppID=982 LayerID=19945 / App=WhiteCountyGA
+  (qpublic.net/ga/white; Cleveland GA 30528). Historical Roktech MapServer / ROKMAPS_White
+  currently unavailable. City of Cleveland (cityofclevelandga.org) + City of Helen
+  (cityofhelen.org) planning pages — tax maps via county assessor. Attribution White County
+  GIS / Tax Assessors. Public HTML + county portal; no emails/phones; no paid vendors; skip
+  utilities+AADT. REJECT White County AR/TN/IL lookalikes.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=982&LayerID=19945&PageTypeID=2&PageID=8692
+jurisdictionGisUrl: https://www.whitecountyga.gov/296/Mapping-GIS
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: usable
+  summary: >
+    White County Parcels (GMRC Cleveland water 2023): https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcg
+    is/rest/services/Cleveland_Water_2023_WFL1/FeatureServer/8 - live count 19990 (5-150 ac: 3995),
+    parcel ID field PIN. Geography verified against TIGER county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Cleveland city"
+      level: city
+      parentFips: "13311"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Helen city"
+      level: city
+      parentFips: "13311"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='White' AND aadt>0
+    altFilter: name LIKE '311-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 311-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 63
+    maxAadt: 15900
+    geoCheck: 63/63 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=WhiteCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=982&LayerID=19945&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PIN
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 089   077A
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WhiteCountyGA&Layer=Parcels&PageType=Report&KeyValue=089%20%20%20077A
+    verification: 'pattern-tested: real sample ID from PIN; box test HTTP 403 Cloudflare challenge (expected; pattern
+      follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.whitecountyga.gov/296/Mapping-GIS
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Cleveland city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Helen city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

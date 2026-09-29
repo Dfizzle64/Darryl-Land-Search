@@ -1,0 +1,293 @@
+state: GA
+jurisdiction: Seminole County
+fips: "13253"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Seminole County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. Official human cadastral + CAMA path =
+      qPublic/Beacon App=SeminoleCountyGA / AppID=790 LayerID=11822 (qpublic.net/ga/seminole
+      → Application.aspx; county seat Donalsonville GA 39845; seminolecountyga.com links
+      View/Search Records → qpublic). Cloudflare/bot 403 blocks automated Application.aspx
+      from research box; public for humans. Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=790&LayerID=11822&PageTypeID=4&KeyValue={parcelId}
+      (also App=SeminoleCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId};
+      Search PageTypeID=2 / PageType=Search; Maps PageType=Maps / PageTypeID=1).
+      SeminoleCountyGA_WFS on wfs.schneidercorp.com → 404; qpublic.schneidercorp.com
+      SeminoleCountyGA_WFS → 403. Companion HTML CAMA:
+      seminoleproperty.assurancegov.com/Property/Search (AssuranceWeb titled "SEMINOLE
+      COUNTY, GEORGIA") — HTML search only, no public ArcGIS query API recovered. No
+      SWGRC / SWGARC / RVRC / SGRC / GARC AGOL Seminole GA parcel FS (SGRC sgrcmaps folders
+      are Southern GA Valdosta ring — no Seminole folder; SW Georgia RC is the planning
+      partner for this county but no public parcel REST). Commercial extracts
+      (DynamoSpatial ~8090 parcels / Regrid/ATTOM) — rejected (paid). GEO-VERIFY GEORGIA:
+      Census TIGERweb GEOID 13253 CENTLAT +30.9387165 CENTLON -084.8688566 — SW Georgia
+      Donalsonville / Iron City / Lake Seminole–Chattahoochee (NOT Seminole County FL
+      Sanford ~-81.3,28.7 — REJECT seminolegis.maps.arcgis.com / seminolecountyfl.gov /
+      SeminoleCountyGIS Information Kiosk / Florida_Statewide_Cadastral / City of
+      Casselberry Parcels / Pinellas_Seminole_Zoning / Seminole County Zoning TritenRE;
+      REJECT Seminole OK / Seminole Tribe FL lookalikes). Skip utilities+AADT; no
+      emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic / AssuranceWeb HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic AppID=790 LayerID=11822
+      / App=SeminoleCountyGA (qpublic.net/ga/seminole; Cloudflare/bot 403 automated; public
+      for humans). Alternate HTML: seminoleproperty.assurancegov.com Property Search.
+      Deep-link KeyValue={parcelId} on qPublic Report page. Tax Commissioner billing is
+      separate from CAMA GIS — not REST.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. Prefer qPublic Sales Search / Sales List HTML
+      AppID=790 / App=SeminoleCountyGA. Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Seminole County GA Euclidean zoning REST found — Planning & Development
+      seminolecountyga.com/189/Planning-Development PDF/staff gap. REJECT Seminole FL /
+      Casselberry / Pinellas_Seminole_Zoning lookalikes.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Seminole County GA Future Land Use FeatureServer found — Comp Plan PDF / SWGRC staff gap.
+    status: gap
+
+municipalities:
+  - name: Donalsonville
+    level: city
+    parentFips: "13253"
+    joinToCountyParcels: >
+      County seat Donalsonville GA (~-84.88,31.04; ZIP 39845). No county parcel REST to join —
+      city filter blocked until geometry source exists.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Donalsonville city zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Donalsonville FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic / AssuranceWeb HTML only — no Donalsonville-owned parcel REST.
+        status: gap
+    gaps:
+      - "No Donalsonville city-owned parcel/zoning/FLU REST — county qPublic AppID=790 HTML only."
+    status: gap
+
+  - name: Iron City
+    level: city
+    parentFips: "13253"
+    joinToCountyParcels: >
+      Soft spatial Iron City GA (~-84.81,31.01) when parcels available. No county parcel REST.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Iron City zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Iron City FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Iron City city-owned parcel/zoning/FLU REST."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Seminole County GA — qPublic App=SeminoleCountyGA / AppID=790 LayerID=11822 HTML + AssuranceWeb HTML only."
+  - "SeminoleCountyGA_WFS 404/403; no SWGRC/SGRC/GARC Seminole GA parcel FeatureServer."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/seminole + AppID=790 Search/Maps public for humans."
+  - "REJECT Seminole County FL (Sanford) seminolegis.maps.arcgis.com / Florida statewide cadastral / Casselberry / Pinellas_Seminole_Zoning; REJECT paid Regrid/ATTOM/DynamoSpatial."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Seminole County Tax Assessor qPublic/Beacon App=SeminoleCountyGA / AppID=790
+  LayerID=11822 (qpublic.net/ga/seminole; seminolecountyga.com). Alternate HTML CAMA
+  seminoleproperty.assurancegov.com (AssuranceWeb — Seminole County, Georgia). No public
+  ArcGIS parcel service discovered 2026-09-24. Attribution Seminole County Tax Assessor.
+  Public HTML only; no emails/phones; no paid vendors; skip utilities+AADT. REJECT
+  Seminole County FL lookalikes.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=790&LayerID=11822&PageTypeID=2
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=SeminoleCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Donalsonville city"
+      level: city
+      parentFips: "13253"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Iron City town"
+      level: city
+      parentFips: "13253"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Seminole' AND aadt>0
+    altFilter: name LIKE '253-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 253-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 66
+    maxAadt: 8990
+    geoCheck: 66/66 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=SeminoleCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=790&LayerID=11822&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=SeminoleCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Donalsonville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Iron City town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

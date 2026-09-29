@@ -1,0 +1,290 @@
+state: GA
+jurisdiction: Elbert County
+fips: "13105"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Elbert County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. Official human cadastral + CAMA path =
+      qPublic/Beacon App=ElbertCountyGA / AppID=667 LayerID=11830 (qpublic.net/ga/elbert →
+      qpublic.schneidercorp.com Application.aspx; county seat Elberton GA 30635).
+      Cloudflare/bot 403 blocks automated Application.aspx from research box; public for
+      humans. Deep-link KeyValue={parcelId}:
+      Application.aspx?App=ElbertCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+      (also AppID=667&LayerID=11830 PageTypeID=4 + KeyValue). ElbertCountyGA_WFS on
+      wfs.schneidercorp.com → 404. No NEGRC / GARC / county AGOL Elbert GA parcel FS
+      (AGOL title/tag searches 0 for Elbert+Georgia+parcels). Commercial vendors advertise
+      ~14k parcels (DynamoSpatial/Regrid/USLandGrid/Acres) — rejected (paid).
+      GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13105 CENTLAT +34.1167799 CENTLON
+      -082.8400099 bbox ~-83.10..-82.56 lon × 33.96..34.29 lat — Elbert County GA /
+      Elberton–Bowman (NEGA Savannah River / SC border). REJECT Elbert County CO
+      geohub-elbertcounty.hub.arcgis.com / maps.elbertcounty-co.gov / org ElbertCountyCO
+      (Kiowa CO ~-104.3,39.3 — wrong state). REJECT paid Regrid/ATTOM/DynamoSpatial
+      Elbert GA extracts. No emails/phones collected.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic App=ElbertCountyGA /
+      AppID=667 LayerID=11830 (qpublic.net/ga/elbert; Estimate Taxes link confirms
+      AppID=667&LayerID=11830). Tax Commissioner elbertcountypay.com / elbertga.us — bills
+      only, not CAMA REST. Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. qPublic Sales Search / Sales List HTML
+      App=ElbertCountyGA / AppID=667 only (bot 403 automated). Rejected paid Regrid/ATTOM
+      sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Elbert County GA Euclidean zoning FeatureServer on AGOL/NEGRC (2026-09-24).
+      County Code Enforcement / Planning & Zoning (elbertga.us) — Comp Plan PDF / staff
+      gap, not public REST. City of Elberton local zoning not recovered as public FS.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Elbert County GA future land use FeatureServer found (2026-09-24). Comp Plan PDF
+      on elbertga.us (ElbertCounty_CP_FullDocument.pdf) — not REST.
+    status: gap
+
+municipalities:
+  - name: Elberton
+    level: city
+    parentFips: "13105"
+    joinToCountyParcels: >
+      No county parcel REST to join. Soft spatial: Elberton city (~-82.87,34.11; Census
+      GEOID 1326616) when parcels become available. Elberton is the county seat.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Elberton zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Elberton FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city or county parcel REST — qPublic HTML county-wide.
+        status: gap
+    gaps:
+      - "No Elberton-owned parcel/zoning/FLU REST; county qPublic HTML only."
+    status: gap
+
+  - name: Bowman
+    level: city
+    parentFips: "13105"
+    joinToCountyParcels: >
+      No county parcel REST. Soft spatial Bowman (~-83.03,34.20; Census GEOID 1309712)
+      when parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Bowman zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Bowman FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Bowman city-owned GIS REST."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Elbert County GA — qPublic App=ElbertCountyGA (AppID=667 LayerID=11830) HTML only."
+  - "ElbertCountyGA_WFS 404; no NEGRC/GARC/county AGOL Elbert GA parcel FeatureServer."
+  - "REJECT Elbert County CO GeoHub (geohub-elbertcounty.hub.arcgis.com / maps.elbertcounty-co.gov / ElbertCountyCO) — wrong state."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial/USLandGrid/Acres Elbert GA parcel downloads."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/elbert HTML path + App=ElbertCountyGA Search/Maps public for humans."
+  - "Comp Plan PDF on elbertga.us — not a FeatureServer."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Elbert County Tax Assessor qPublic/Beacon App=ElbertCountyGA / AppID=667 LayerID=11830
+  (qpublic.net/ga/elbert; Elberton GA). Tax Commissioner elbertcountypay.com. County
+  government elbertga.us. No public ArcGIS parcel service discovered 2026-09-24.
+  Attribution Elbert County Tax Assessor. Public HTML only; no emails/phones; no paid
+  vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=ElbertCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=667&LayerID=11830&PageTypeID=1&PageID=0
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Bowman city"
+      level: city
+      parentFips: "13105"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Elberton city"
+      level: city
+      parentFips: "13105"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Elbert' AND aadt>0
+    altFilter: name LIKE '105-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 105-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 163
+    maxAadt: 21600
+    geoCheck: 162/163 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=ElbertCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=667&LayerID=11830&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?AppID=667&LayerID=11830&PageTypeID=1&PageID=0
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Bowman city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Elberton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

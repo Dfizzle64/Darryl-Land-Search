@@ -1,0 +1,501 @@
+state: GA
+jurisdiction: Tattnall County
+fips: "13267"
+level: county
+markets: [Savannah]
+
+layers:
+  # PRIMARY — county-wide parcel polygons (THIN schema: Parcel_PIN + Calc_Acres)
+  - role: parcels
+    name: Tattnall_CountyWide_GeoData_View TaxParcels_25 (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Tattnall_CountyWide_GeoData_View/FeatureServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: Calc_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_PIN: parcelId
+      Calc_Acres: acreage
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Heart of Georgia Altamaha RC / hogagis org
+      HHvUPZ2XuLOAJxjR — Tattnall_CountyWide_GeoData_View item da678d0031a444db8fc6fc5d3864197b
+      FeatureServer/13 TaxParcels_25). Live count 12858 (2026-09-24). Schema THIN —
+      Parcel_PIN + Calc_Acres + geometry only (NO owner / mailing / situs / CURR_VAL /
+      sale / zoning on this layer). Calc_Acres 5–150 = 3624. maxRecordCount 2000 — page
+      via resultOffset / spatial envelopes. Parcel_PIN format e.g. '001    001' /
+      '001    001A' / '002    002' (preserve spaces for qPublic KeyValue). CountyBoundary/3
+      CNTYIDFP=13267 NAME=Tattnall RDC=Heart of Georgia-Altamaha geo-verified. WGS84
+      samples ~-82.225,32.310 / ~-82.225,32.317; CountyBoundary tip ~-81.996,32.150 —
+      Tattnall County GA / Reidsville seat (~-82.12,32.08) SE GA. Join CAMA via qPublic
+      App=TattnallCountyGA HTML (KeyValue={Parcel_PIN}). Open data explore
+      hogarc-hogarc.opendata.arcgis.com datasets …tattnall-countywide-geodata-view.
+      Rejected paid Regrid/USLandGrid/ATTOM. Skip utilities+AADT; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on TaxParcels_25; qPublic App=TattnallCountyGA HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on TaxParcels_25. Assessor HTML
+      qpublic.net/ga/tattnall → App=TattnallCountyGA (Cloudflare/bot 403 automated;
+      public for humans). Deep-link KeyValue={Parcel_PIN}:
+      Application.aspx?App=TattnallCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_PIN}.
+      Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/lastSale on TaxParcels_25. Prefer qPublic Sales Search / Sales List HTML
+      App=TattnallCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean; city zoning only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Tattnall County-wide Euclidean zoning FeatureServer on
+      Tattnall_CountyWide_GeoData_View (2026-09-24). Prefer city Euclidean: Reidsville ZONE
+      / Glennville Zoning / Cobbtown ZONING / Collins ZONING (see municipalities). Manassas
+      lacks zoning layer. Comp-plan CharacterAreas/6 (count 81; Rural Tattnall /
+      Reidsville Urban / Glennville Urban / Cobbtown Remainder / Collins Remainder /
+      Manassas Remainder / Ohoopee River Corridor / Altamaha River Corridor/Big Hammock
+      WMA / Georgia State Prison Area / ACUB Buffer / Greater Glennville Growth Area /
+      Tattnall County High School Area…) — planning character only, not Euclidean zoning.
+      Companion SpecialAreas/7 (count 33).
+    status: gap
+
+  - role: flu
+    name: Tattnall_CountyWide_GeoData_View LandUse_22 (FLULU / EXTLU)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Tattnall_CountyWide_GeoData_View/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: Calc_Acres
+    coverage: county-wide
+    fieldMap:
+      FLULU: flu
+      FLULUDCA: fluDca
+      EXTLU: existingLandUse
+      EXTLUDCA: existingLandUseDca
+      Calc_Acres: acreage
+      Acres: acreageAlt
+    notes: >
+      Comp-plan / existing+future land-use polygons (count 16850). FLULU top:
+      Agriculture≈6015 / Forestry≈5518 / Residential≈4144 / Commercial≈716 /
+      Transportation/Communication/Utilities≈200 / Public/Institutional≈115 /
+      Industrial≈68 / Park/Recreation/Conservation≈41 / Agriculture/Forestry≈1.
+      Companion CharacterAreas/6 for named corridors. Not a substitute for Euclidean
+      zoning. Prefer FLULU as flu; EXTLU as existing. Legacy LandUse Old/12 — prefer /14.
+    status: usable
+
+  - role: other
+    name: Tattnall_CountyWide_GeoData_View CountyBoundary (GA FIPS 13267)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Tattnall_CountyWide_GeoData_View/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      CNTYIDFP: countyFips
+      STATEFP: stateFips
+    notes: >
+      Layer 3 CountyBoundary NAME=Tattnall CNTYIDFP=13267 STATEFP=13
+      RDC=Heart of Georgia-Altamaha. Preferred spatial county mask. Companion
+      CharacterAreas/6 / SpecialAreas/7 / Roads/2 — not parcels. Skip FloodZones/Soils/
+      Wetlands unless needed for site context (not CAMA).
+    status: usable
+
+municipalities:
+  - name: Reidsville
+    level: city
+    parentFips: "13267"
+    joinToCountyParcels: >
+      Spatial City_of_Reidsville_GeoData_View/0 ReidsvilleCityLimits (~-82.157,32.119;
+      CITY='Reidsville' FIPS='267') ∩ TaxParcels_25. Mailing city never sole filter.
+    layers:
+      - role: zoning
+        name: City_of_Reidsville_GeoData_View ReidsvilleZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Reidsville_GeoData_View/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE: zoning
+          ZONING_: zoningOpaqueId
+        notes: >
+          City Euclidean ZONE (count 214). Distinct filled: R-1≈59 / R-2≈37 / A-1≈24 /
+          R-3≈15 / C-4≈11 / C-2≈10 / I-L≈6 / C-1≈4 / C-3≈3 (+ blank≈45). Skip
+          ReidsvilleWaterLines/SewerLines/Wells/LiftStations per tranche-3.
+        status: usable
+      - role: flu
+        name: null — use county LandUse_22 ∩ Reidsville limits
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city-owned FLU — county LandUse_22/14 ∩ ReidsvilleCityLimits/0.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial Reidsville
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Reidsville-only CAMA — county /13 + CityLimits/0. Tax/sale qPublic HTML.
+        status: gap
+    gaps:
+      - "No Reidsville city-owned parcel/FLU REST — county TaxParcels_25 + spatial limits."
+      - "Owner/tax/sale via qPublic App=TattnallCountyGA HTML even inside city."
+    status: usable
+
+  - name: Glennville
+    level: city
+    parentFips: "13267"
+    joinToCountyParcels: >
+      Spatial City_of_Glennville_GeoData_View/9 GlennvilleCityLimits (~-81.935,31.916;
+      Name='Glennville' FIPS='267') ∩ TaxParcels_25.
+    layers:
+      - role: zoning
+        name: City_of_Glennville_GeoData_View GlennvilleZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Glennville_GeoData_View/FeatureServer/18
+        layerId: 18
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+        notes: >
+          City Euclidean Zoning (count 3036; Zoning IS NOT NULL ≈2170). Distinct codes:
+          AG / C1 / C2 / C3 / L1 / OR / R1A / R1B / R1C / R2 / R3 / R3A. Skip
+          GlennvilleWaterLiness/SewerLines/Well/PumpStations per tranche-3.
+        status: usable
+      - role: flu
+        name: null — county LandUse_22 ∩ Glennville limits
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Glennville FLU REST — county LandUse_22 ∩ GlennvilleCityLimits.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial Glennville
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Glennville-only CAMA.
+        status: gap
+    gaps:
+      - "No Glennville city-owned parcel/FLU REST — county layers + spatial Glennville City Limits."
+    status: usable
+
+  - name: Cobbtown
+    level: city
+    parentFips: "13267"
+    joinToCountyParcels: >
+      Spatial City_of_Cobbtown_GeoData_View/0 CobbtownCityLimits (~-82.139,32.270;
+      Name='Cobbtown' FIPS='267') ∩ TaxParcels_25.
+    layers:
+      - role: zoning
+        name: City_of_Cobbtown_GeoData_View CobbtownZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Cobbtown_GeoData_View/FeatureServer/10
+        layerId: 10
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          DESCRIPTIO: zoningDescription
+          ZONINGDESC: zoningLabel
+        notes: >
+          City Euclidean ZONING (count 15). Distinct: AG / R-15 / R-20 / R-30 / RM-15 /
+          B-1 / B-3 / I. Companion CobbtownZoning_Unapproved/1 — prefer approved /10.
+          Skip CobbtownWaterlines/Wells per tranche-3.
+        status: usable
+      - role: flu
+        name: null — county LandUse_22 ∩ Cobbtown
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cobbtown FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial Cobbtown
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cobbtown-only CAMA.
+        status: gap
+    gaps:
+      - "No Cobbtown city-owned parcel/FLU REST."
+    status: usable
+
+  - name: Collins
+    level: city
+    parentFips: "13267"
+    joinToCountyParcels: >
+      Spatial City_of_Collins_GeoData_View/0 CollinsCityLimits (~-82.109,32.190;
+      FIPS='267') ∩ TaxParcels_25.
+    layers:
+      - role: zoning
+        name: City_of_Collins_GeoData_View CollinsZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Collins_GeoData_View/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          DESCRIPTIO: zoningDescription
+          ZONEDESCRI: zoningLabel
+        notes: >
+          City Euclidean ZONING (count 30). Distinct: R-15≈9 / R-30≈5 / R-20≈4 / B-1≈4 /
+          RM-15≈4 / AG≈3 / I≈1. Skip Collins Water/Sewer/Wells/LiftStations per tranche-3.
+        status: usable
+      - role: flu
+        name: null — county LandUse_22 ∩ Collins
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Collins FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial Collins
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Collins-only CAMA.
+        status: gap
+    gaps:
+      - "No Collins city-owned parcel/FLU REST."
+    status: usable
+
+  - name: Manassas
+    level: city
+    parentFips: "13267"
+    joinToCountyParcels: >
+      Spatial City_of_Manassas_GeoData_View/0 ManassasCityLimits (~-82.020,32.168;
+      Name='Manassas' FIPS='267') ∩ TaxParcels_25.
+    layers:
+      - role: zoning
+        name: null — no ManassasZoning layer published
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: City_of_Manassas_GeoData_View has limits/special areas/water only — no zoning FS.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Manassas FLU REST — county LandUse_22 ∩ limits.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels_25 + ManassasCityLimits. Skip ManassasWaterLines/Wells.
+        status: gap
+    gaps:
+      - "No Manassas zoning/parcel/FLU REST — city limits only + county parcels."
+    status: partial
+
+gaps:
+  - "No owner/mailing/situs/CURR_VAL/MAV*/SALE_* on TaxParcels_25 REST — tax/owner/sale via qPublic App=TattnallCountyGA HTML only."
+  - "No county-wide Euclidean zoning FS — prefer city ZONE/Zoning/ZONING; CharacterAreas planning only."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/tattnall public for humans."
+  - "Numeric AppID/LayerID not recovered (Cloudflare) — use App=TattnallCountyGA&Layer=Parcels&KeyValue={Parcel_PIN}."
+  - "Skip city Water/Sewer/Wells/LiftStations + AADT per tranche-3; skip emails/phones as PII."
+  - "Rejected paid Regrid/USLandGrid/ATTOM."
+
+license: >
+  Heart of Georgia Altamaha RC GIS (hogagis / services5.arcgis.com/HHvUPZ2XuLOAJxjR) —
+  Tattnall_CountyWide_GeoData_View TaxParcels_25/13, LandUse_22/14, CountyBoundary/3,
+  CharacterAreas/6; City_of_Reidsville_GeoData_View, City_of_Glennville_GeoData_View,
+  City_of_Cobbtown_GeoData_View, City_of_Collins_GeoData_View, City_of_Manassas_GeoData_View.
+  Assessor qPublic App=TattnallCountyGA (qpublic.net/ga/tattnall; tattnallcountyga.com Tax
+  Assessors). Attribution HOGARC / Tattnall County Tax Assessor. Public fields only; no
+  emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=TattnallCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://hogarc-hogarc.opendata.arcgis.com/datasets/HHvUPZ2XuLOAJxjR::tattnall-countywide-geodata-view/explore
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/HHvUPZ2XuLOAJ
+    xjR/arcgis/rest/services/Tattnall_CountyWide_GeoData_View/FeatureServer/13 count 12858; extent
+    center [['13267', 'Tattnall County']]; sample [['13267', 'Tattnall County']]. No change to field map
+    (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Cobbtown city"
+      level: city
+      parentFips: "13267"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Collins city"
+      level: city
+      parentFips: "13267"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Glennville city"
+      level: city
+      parentFips: "13267"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Manassas city"
+      level: city
+      parentFips: "13267"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Reidsville city"
+      level: city
+      parentFips: "13267"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Tattnall' AND aadt>0
+    altFilter: name LIKE '267-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 267-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 92
+    maxAadt: 10500
+    geoCheck: 92/92 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=TattnallCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_PIN
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=TattnallCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20001
+    verification: 'pattern-tested: real sample ID from Parcel_PIN; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://hogarc-hogarc.opendata.arcgis.com/datasets/HHvUPZ2XuLOAJxjR::tattnall-countywide-geodata-view/explore
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Cobbtown city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Collins city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Glennville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Manassas city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Reidsville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

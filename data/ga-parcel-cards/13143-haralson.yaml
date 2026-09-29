@@ -1,0 +1,517 @@
+state: GA
+jurisdiction: Haralson County
+fips: "13143"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY INTENT — county-wide cadastral polygons (live REST dead; no OA snapshot fallback)
+  - role: parcels
+    name: Haralson_Parcels (GDITAdmin / GMASS — LIVE REST BLOCKED)
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/ArcGIS/rest/services/Haralson_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: token
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      INTENDED county-wide parcel FeatureServer (AGOL org ISpzx3B5ZsVA6e1Z / GDITAdmin
+      item "Parcels - GA - Haralson County" d5f20b6ea2134179aa17e1dd5570f1e4; same GMASS
+      appraisal-export pattern as Carroll_Parcels_20240923_ExportFeatures). Live query
+      2026-09-23 returned Invalid URL; item data endpoint 403 SB_0006 "Subscription is
+      canceled, the item is not accessible" (item last modified epoch ms 1658091628000
+      ≈ 2022-07-17 ET). No public field map recoverable. No OpenAddresses us/ga/haralson
+      source or batch harvest found (GitHub sources/us/ga has no haralson.json; batch API
+      job total=0) — unlike Carroll, there is NO usable OA NDJSON geometry+pid fallback.
+      Commercial mirrors claim ~17k parcels (DynamoSpatial 17224; Regrid ~17054) — do NOT
+      wire paid vendors. Official human parcel viewer = qPublic/Beacon AppID=744
+      LayerID=11781 (qpublic.net/ga/haralson → qpublic.schneidercorp.com; Cloudflare/bot
+      403 automated). Deep-link pattern:
+      Application.aspx?AppID=744&LayerID=11781&PageTypeID=4&KeyValue={PARCEL_ID} and
+      App=HaralsonCountyGA&Layer=Parcels&PageType=Search. Geo target Haralson County GA
+      west of Atlanta — TIGER county GEOID 13143 centroid ~-85.211,+33.794 (NOT Town of
+      Haralson Coweta ~-84.569,+33.229; NOT Haralson lookalikes elsewhere). Rejected ARC
+      LandPro; rejected Regrid/ATTOM/DynamoSpatial/USLandGrid/RockfordMap/Equator/
+      ReportAll paid. Prefer re-check live REST periodically; until restored county
+      geometry+CAMA = HTML-only gap for land-search polygons.
+    status: blocked
+
+  - role: parcels
+    name: AECOM Bridge_PTIP qpublic_parcel1 MapServer/64 haralson (qpublic) (static) — NOT STARTED
+    restUrl: https://solutions.aecomonline.net/arcgis/rest/services/Bridge_PTIP/qpublic_parcel1/MapServer/64
+    layerId: 64
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Indexed AECOM Bridge_PTIP qPublic parcel mirror layer titled "haralson (qpublic)
+      (static)". Live 2026-09-23: service returns 500 "Service Bridge_PTIP/qpublic_parcel1/
+      MapServer not started". Bridge_PTIP folder lists no running services. Document as
+      discovered but unusable; do not prefer if/when restarted without field verification
+      + geo check (~-85.2,33.8). Not a substitute for county hosted CAMA.
+    status: blocked
+
+  - role: tax
+    name: null — no public REST CAMA values
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer with CURR_VAL / FMV / assessed / taxable for
+      Haralson County found (2026-09-23). Assessor HTML only: qPublic/Beacon AppID=744
+      LayerID=11781 (Cloudflare/bot 403 automated; public for humans). Estimate Taxes
+      page AppID=744 LayerID=11781 PageTypeID=2. Tax Commissioner / pay: contact via
+      haralsoncountyga.gov Board of Tax Assessors (no open REST). Rejected paid vendor
+      tax enrichment.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Haralson GA multi-sale FeatureServer/MapServer found (2026-09-23). No GMASS
+      Haralson_Sales_ExportFeatures sibling live on org ISpzx3B5ZsVA6e1Z (Carroll has
+      commercial sales subset; Haralson does not). Prefer qPublic Sales Search HTML when
+      available to humans. Rejected ARC LandPro_2012 and paid Regrid/ATTOM as sales
+      substitutes. Rejected wrong-state Haralson lookalike sales services.
+    status: gap
+
+  - role: zoning
+    name: null — county Euclidean zoning PDF/staff only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer with unincorporated Haralson County Euclidean
+      zoning found (2026-09-23). County Zoning and Permits (haralsoncountyga.gov
+      planning-and-zoning.cfm) administers ordinance + Zoning Map via staff / Document
+      Center "Zoning and Permits" folder (applications/process PDFs; no downloadable
+      current zoning GIS). Inside cities prefer city zoning products (Tallapoosa JPG;
+      Buchanan ordinance+clerk map; Bremen/Waco staff). Unincorporated certification =
+      Zoning and Permits staff / official Zoning Map. Rejected ARC LandPro as zoning.
+    status: gap
+
+  - role: flu
+    name: null — Joint Comp Plan 2022-2026 character/FLU PDF only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No public county FLU FeatureServer found (2026-09-23). Official plan: Northwest
+      Georgia Regional Commission "A Joint Comprehensive Plan for Haralson County
+      2022-2026" including Bremen, Buchanan, Tallapoosa, and Waco —
+      www.nwgrc.org/wp-content/uploads/HaralsonCo.JointCompPln.Approved.pdf (live PDF
+      ≈11.8MB; character-area Future Development maps for county/Bremen/Buchanan/Waco;
+      Tallapoosa uses parcel-style Future Land Use categories in plan narrative). Spatial
+      REST for character/FLU polygons not published. Prefer city FLU REST when/if
+      published; until then PDF + Planning staff. Rejected ARC LandPro_2012 stale regional.
+    status: gap
+
+  - role: other
+    name: Census TIGER Incorporated Places (municipality filter join)
+    restUrl: https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      GEOID: placeGeoid
+      NAME: municipality
+      BASENAME: municipalityBase
+      CENTLON: centroidLon
+      CENTLAT: centroidLat
+      AREALAND: landAreaSqMeters
+    notes: >
+      Preferred public spatial join for municipality filter while county has no
+      MunicipalBoundaries REST (standing order). Live query STATE=13 BASENAME in
+      (Buchanan,Tallapoosa,Bremen,Waco,Haralson) returns 5 places — USE ONLY the four
+      Haralson municipalities; REJECT BASENAME='Haralson' GEOID=1336528 (Town of Haralson
+      in Coweta County, centroid ~-84.569,+33.229). Haralson County municipalities
+      (2020/current TIGER): Buchanan city GEOID=1311616 ~-85.180,+33.802; Tallapoosa city
+      GEOID=1375300 ~-85.286,+33.733; Bremen city GEOID=1310132 ~-85.150,+33.708
+      (multi-county Haralson+Carroll — filter spatially to FIPS 13143 on this card);
+      Waco city GEOID=1379808 ~-85.190,+33.702. County boundary verify: TIGER
+      State_County GEOID=13143 centroid ~-85.211,+33.794 — west Atlanta MSA / Alabama
+      border. Soft postal CITY= never sole municipality filter.
+    status: usable
+
+  - role: other
+    name: Panattoni / West Georgia Business Park conceptual layouts (NOT cadastral)
+    restUrl: https://services3.arcgis.com/TT92hc92M7cmve5i/arcgis/rest/services/Panattoni_Site_Conceptual_Layout/FeatureServer
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap: {}
+    notes: >
+      Georgia Power / site-selector conceptual layouts in Haralson County (Site Boundary,
+      Building, Parking, etc.). Twin West_Georgia_Business_Park_Conceptual_Layout on same
+      org. Context only — not parcels/zoning/FLU/CAMA. Do not prefer for land search.
+    status: partial
+
+municipalities:
+  - name: Buchanan
+    level: city
+    parentFips: "13143"
+    joinToCountyParcels: >
+      Spatial TIGER Places GEOID=1311616 / NAME='Buchanan city' (~-85.180,+33.802,
+      AREALAND≈4.6e6 m²) OR soft situs city when CAMA restored. County seat. No city
+      FeatureServer found (2026-09-23).
+    layers:
+      - role: zoning
+        name: null — Buchanan Zoning Ordinance PDF + clerk Zoning District Map (no REST)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City of Buchanan Zoning Ordinance (buchananga.gov uploads) references official
+          "Zoning District Map" on file with City Clerk — no public FeatureServer/
+          GeoJSON found (2026-09-23). Prefer clerk/PDF certification inside city over
+          county zoning stub. Joint Comp Plan character areas cover Buchanan footprint
+          in PDF only. Rejected wrong-geography Buchanan lookalikes.
+        status: gap
+      - role: flu
+        name: null — Joint Comp Plan character areas PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Future Development / character areas for Buchanan in NWGRC Joint Comp Plan
+          2022-2026 PDF — no city FLU FeatureServer.
+        status: gap
+      - role: parcels
+        name: null — use county parcels when REST restored; else qPublic HTML
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Buchanan-owned CAMA FeatureServer — county Haralson_Parcels (blocked) +
+          spatial TIGER Buchanan poly / qPublic HTML.
+        status: gap
+    gaps:
+      - "No Buchanan public zoning/FLU/parcel FeatureServer — ordinance PDF + clerk Zoning District Map; Comp Plan PDF character areas."
+      - "County parcel REST blocked — city extract unavailable until GDITAdmin/GMASS restores Haralson_Parcels or county publishes alternate."
+    status: gap
+
+  - name: Tallapoosa
+    level: city
+    parentFips: "13143"
+    joinToCountyParcels: >
+      Spatial TIGER Places GEOID=1375300 / NAME='Tallapoosa city' (~-85.286,+33.733,
+      AREALAND≈2.6e7 m²). No city parcel FeatureServer found (2026-09-23).
+    layers:
+      - role: zoning
+        name: Tallapoosa Official Zoning Map JPG (NWGRC GIS product, Oct 2020)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Preferred Tallapoosa-local zoning product on public web = static map image
+          tallapoosaga.gov/wp-content/uploads/2021/03/tallapoosa-zoning-map-large-v20201021-scaled.jpg
+          (HTTP 200; ≈823KB JPEG; Version October 2020; product of Northwest Georgia
+          Regional Commission GIS — "does not constitute a legal representation"). Page:
+          tallapoosaga.gov/tallapoosa-zoning-map/. City Zoning Ordinance PDF (amended
+          2024) defines districts RH-1/RH-2/RH-25/RHH-1, commercial, industrial, etc. —
+          no FeatureServer. Certify critical sites against City Clerk Official Zoning Map.
+          Standing order: prefer this city product over county zoning stub inside limits.
+        status: partial
+      - role: flu
+        name: null — Tallapoosa Future Land Use in Joint Comp Plan PDF (parcel-style categories)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Joint Comp Plan uses Future Land Use map (Residential/Commercial/Industrial/
+          Public-Institutional/Park-Recreation-Conservation/Mixed Use) for Tallapoosa
+          rather than character areas alone — still PDF-only; no city FLU FeatureServer.
+        status: gap
+      - role: parcels
+        name: null — county REST blocked; qPublic HTML
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Tallapoosa-owned CAMA FeatureServer.
+        status: gap
+    gaps:
+      - "Tallapoosa zoning = NWGRC JPG Oct 2020 + ordinance PDF — not queryable polygons."
+      - "No Tallapoosa FLU/parcel REST."
+    status: partial
+
+  - name: Bremen
+    level: city
+    parentFips: "13143"
+    joinToCountyParcels: >
+      Multi-county (Haralson primary + small Carroll portion). Spatial TIGER Places
+      GEOID=1310132 / NAME='Bremen city' (~-85.150,+33.708; bbox ≈ lon -85.196..-85.105
+      lat 33.669..33.747) INTERSECT county FIPS 13143 for this card. Carroll-side parcels
+      belong on Carroll card 13045. No Bremen city FeatureServer found (2026-09-23).
+      Soft postal CITY='BREMEN' unreliable across county line.
+    layers:
+      - role: zoning
+        name: null — no Bremen Euclidean zoning REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City of Bremen (bremenga.gov Planning & Zoning) — Cloudflare-protected site;
+          Zone Districts / rezoning packet referenced via DCA/plan docs; no public
+          FeatureServer recovered (2026-09-23). Joint Comp Plan character areas PDF cover
+          Bremen. Prefer city Planning & Zoning staff / PDF over county stub inside
+          limits. Carroll card also flags Bremen gap on Carroll-side.
+        status: gap
+      - role: flu
+        name: null — Joint Comp Plan character areas PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Bremen Future Development / character areas in NWGRC Joint Comp Plan PDF —
+          no city FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county REST blocked; multi-county filter required
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Bremen-owned CAMA FeatureServer. When county parcels restore, clip to
+          Bremen∩Haralson; Carroll-side on 13045.
+        status: gap
+    gaps:
+      - "Bremen multi-county (Haralson+Carroll) — Haralson-side only on this card; no city REST."
+      - "bremenga.gov bot/Cloudflare friction for automated research; staff/PDF zoning certification."
+    status: gap
+
+  - name: Waco
+    level: city
+    parentFips: "13143"
+    joinToCountyParcels: >
+      Spatial TIGER Places GEOID=1379808 / NAME='Waco city' (~-85.190,+33.702,
+      AREALAND≈5.1e6 m²). No Waco city FeatureServer found (2026-09-23). Note: do NOT
+      confuse with Waco TX.
+    layers:
+      - role: zoning
+        name: null — no Waco GA zoning REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City of Waco listed in Joint Comp Plan partners; no public zoning/FLU/parcel
+          FeatureServer. County PDF / staff / Comp Plan character areas only. Rejected
+          Waco TX municipal GIS (wrong geography).
+        status: gap
+      - role: flu
+        name: null — Joint Comp Plan character areas PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Waco Future Development map in Joint Comp Plan PDF only.
+        status: gap
+    gaps:
+      - "No Waco GA city GIS REST — TIGER place poly + Comp Plan PDF + qPublic HTML only."
+      - "Rejected Waco TX lookalike GIS."
+    status: gap
+
+gaps:
+  - "Live county parcel FeatureServer Haralson_Parcels BLOCKED (Invalid URL + item 403 SB_0006 subscription canceled 2026-09-23); GDITAdmin item d5f20b6ea2134179aa17e1dd5570f1e4 last modified ≈2022-07-17 ET."
+  - "No OpenAddresses us/ga/haralson harvest — cannot fall back to OA NDJSON geometry+pid (Carroll-style) for this county."
+  - "AECOM Bridge_PTIP/qpublic_parcel1/MapServer/64 haralson (qpublic) static mirror Service not started (500)."
+  - "No public REST Euclidean county zoning — Zoning and Permits staff / Zoning Map PDF path only."
+  - "No public REST county or city FLU — Joint Comp Plan 2022-2026 PDF character/FLU maps only (nwgrc.org)."
+  - "No public REST tax.marketValue/assessedValue or lastSale — qPublic/Beacon AppID=744 LayerID=11781 HTML only (Cloudflare/bot 403 automated)."
+  - "City Euclidean zoning REST: none. Tallapoosa = NWGRC zoning JPG Oct 2020 (partial). Buchanan/Bremen/Waco = gap (PDF/staff)."
+  - "Bremen multi-county (Haralson+Carroll) — filter spatially to 13143; Carroll card covers Carroll-side."
+  - "Georgia GIS Clearinghouse (data.georgiaspatial.org) cookie/login wall — no anonymous Haralson parcel download recovered."
+  - "NWGRC GIS assists locals but points public to Clearinghouse — no public NWGRC Haralson FeatureServer."
+  - "Rejected lookalikes / non-preferred: Town of Haralson Coweta County GA (GEOID 1336528 / FIPS parent 13077, centroid ~-84.569,+33.229 — NOT Haralson County); Waco TX municipal GIS; Haralson person-name AGOL demos (haralson.3_APRI typhoon/helicopter/population story maps — wrong topic); Wetlands_Haralson / Haralson_Production occupation layers (not cadastral); Panattoni/West Georgia Business Park conceptual layouts as parcels; ARC LandPro_2012 (Ug5xGQbHsD8zuZzM) stale regional as preferred cadastral; Regrid/ATTOM/CoreLogic/DynamoSpatial/USLandGrid/RockfordMap/Equator/ReportAll/AcreValue paid vendors; maps.itos.uga.edu FrameWork Boundaries (no tax parcels)."
+  - "No emails/phones collected (assessor contact schema ignored); no paid vendors."
+  - "Enrichment vs thin in-app: county geometry+CAMA+zoning+FLU+sales all blocked/gap/HTML/PDF as of 2026-09-23; only usable public spatial join = Census TIGER places for municipality filter + county boundary verify."
+
+license: >
+  GDITAdmin / GMASS AGOL org ISpzx3B5ZsVA6e1Z — Haralson_Parcels FeatureServer (blocked;
+  item d5f20b6ea2134179aa17e1dd5570f1e4). Assessor HTML: qPublic/Beacon SchneiderCorp
+  AppID=744 LayerID=11781 (qpublic.net/ga/haralson → qpublic.schneidercorp.com;
+  App=HaralsonCountyGA). County: haralsoncountyga.gov (Zoning and Permits; Board of Tax
+  Assessors). Northwest Georgia Regional Commission Joint Comprehensive Plan 2022-2026
+  PDF (www.nwgrc.org/wp-content/uploads/HaralsonCo.JointCompPln.Approved.pdf) + Tallapoosa
+  zoning map JPG (NWGRC GIS Oct 2020 via tallapoosaga.gov). City of Buchanan Zoning
+  Ordinance PDF (buchananga.gov). City of Bremen Planning & Zoning (bremenga.gov).
+  Census TIGER Places / State_County (tigerweb.geo.census.gov). AECOM
+  solutions.aecomonline.net Bridge_PTIP qpublic_parcel1 (not started). Attribution to
+  Haralson County / partner cities / NWGRC / Census. Public fields only; no emails/phones;
+  no paid vendors (Regrid/ATTOM/CoreLogic/DynamoSpatial/USLandGrid/RockfordMap/Equator/
+  ReportAll).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HaralsonCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: blocked
+  parcelStatusAfter: blocked
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays blocked.
+    Haralson_Parcels (ISpzx) and AECOM Bridge_PTIP qpublic_parcel1 still dead (Invalid URL / service not
+    started) 2026-09-28.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Bremen city"
+      level: city
+      parentFips: "13143"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Buchanan city"
+      level: city
+      parentFips: "13143"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Tallapoosa city"
+      level: city
+      parentFips: "13143"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Waco city"
+      level: city
+      parentFips: "13143"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: blocked
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Haralson' AND aadt>0
+    altFilter: name LIKE '143-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 143-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 123
+    maxAadt: 43600
+    geoCheck: 122/123 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=HaralsonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=744&LayerID=11781&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=HaralsonCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Bremen city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Buchanan city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Tallapoosa city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Waco city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

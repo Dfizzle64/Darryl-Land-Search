@@ -1,0 +1,164 @@
+state: GA
+jurisdiction: Worth County
+fips: "13321"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "Worth County parcels (UGA heirs-property project copy of county WinGAP landbase)"
+    restUrl: https://services2.arcgis.com/PYn6bWCjT6bhw1z3/arcgis/rest/services/Worth_Heirs_Concentration_Census_Block_WFL1/FeatureServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: "CALC_ACRES"
+    coverage: county-wide
+    parcelIdField: "Parcel_No"
+    liveCount: 12726
+    liveCount5to150ac: 3244
+    geoCheck: "extent center [['13321', 'Worth County']]; sample [['13321', 'Worth County']]; extent WGS84 [-84.0329, 31.3183, -83.6494, 31.8489]"
+    fieldMap:
+      Parcel_No: "parcelId"
+      PIN: "parcelPin"
+      R_Key: "ownerKey"
+      OWNER: "ownerName"
+      ADDRESS_NU: "situsNumber"
+      STREET: "situsStreet"
+      CALC_ACRES: "acreage"
+      TOTAL_ACRE: "acreageDeed"
+      DIG_CLASS: "dorCode"
+      ZONING: "zoning"
+      DIST_NAME: "taxDistrictName"
+      LEGAL_DESC: "legalDescription"
+    notes: >
+      pass1 2026-09-28: County-wide Worth GA parcel landbase hosted in UGA AGOL org PYn6bWCjT6bhw1z3
+      (Worth heirs-property concentration project). Extent covers full county. Last edit stamp 2021-08
+      (editor HPENNY, same vendor as Early County) - vintage ~2021, treat as static snapshot; CAMA
+      owner/deed acres on layer. Pass 2: refresh/validate against qPublic App=WorthCountyGA.
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: tax
+    name: null - qPublic HTML only (Pass 2)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      New card 2026-09-28 (never carded in 2026-09-24 waves). Tax/CAMA via qPublic
+      (qpublic.net/ga/worth). Owner/deed acres present on the parcel layer above; values/sales Pass 2.
+    status: gap
+
+gaps:
+  - Parcel layer is a UGA research copy (~2021 vintage), not a county-maintained service; no values/sales on REST.
+license: "Public AGOL layer (UGA heirs-property project); county assessor data - verify reuse terms"
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WorthCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://www.qpublic.net/ga/worth/
+verifiedAt: 2026-09-28
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: nocard
+  parcelStatusAfter: usable
+  summary: >
+    Worth County parcels (UGA heirs-property project copy of county WinGAP landbase): https://services2.
+    arcgis.com/PYn6bWCjT6bhw1z3/arcgis/rest/services/Worth_Heirs_Concentration_Census_Block_WFL1/Feature
+    Server/4 - live count 12726 (5-150 ac: 3244), parcel ID field Parcel_No. Geography verified against
+    TIGER county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Poulan city"
+      level: city
+      parentFips: "13321"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Sumner town"
+      level: city
+      parentFips: "13321"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Sylvester city"
+      level: city
+      parentFips: "13321"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Warwick city"
+      level: city
+      parentFips: "13321"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Worth' AND aadt>0
+    altFilter: name LIKE '321-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 321-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 141
+    maxAadt: 19500
+    geoCheck: 137/141 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: PB_PGE=80'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: OWNER
+    filledCount: 12468
+    restUrl: https://services2.arcgis.com/PYn6bWCjT6bhw1z3/arcgis/rest/services/Worth_Heirs_Concentration_Census_Block_WFL1/FeatureServer/4
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=WorthCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: SV060077
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WorthCountyGA&Layer=Parcels&PageType=Report&KeyValue=SV060077
+    verification: 'pattern-tested: real sample ID from Parcel_No; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.qpublic.net/ga/worth/
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Poulan city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Sumner town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Sylvester city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Warwick city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

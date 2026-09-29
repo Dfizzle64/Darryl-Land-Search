@@ -1,0 +1,340 @@
+state: GA
+jurisdiction: McIntosh County
+fips: "13191"
+level: county
+markets: [Brunswick]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner/mailing + stated/calculated acres (NO tax/sale values on REST)
+  - role: parcels
+    name: McIntosh/PropertyData_GovWell TaxParcels_GovWell (SEGRASS / CRC)
+    restUrl: https://portal.segrass.org/crcarcgis/rest/services/McIntosh/PropertyData_GovWell/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: StatedArea
+    coverage: county-wide
+    fieldMap:
+      Name: parcelId
+      GISParcelNumber: parcelIdCompact
+      Owner: ownerName
+      MailingAddressL1: mailingAddress
+      MailingAddressL2: mailingAddress2
+      MailingAddressL3: mailingAddress3
+      MailingCity: mailingCity
+      MailingtState: mailingState
+      MailingZIP: mailingZip
+      StatedArea: acreage
+      CalculatedArea: acreageGis
+      LowParcelID: parcelIdLow
+      BuildingNum: buildingNumber
+      UnitNum: unitNumber
+      Shape.STArea(): shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + owner/mailing (Coastal Regional Commission /
+      SEGRASS portal.segrass.org McIntosh/PropertyData_GovWell MapServer/0 TaxParcels_GovWell).
+      Live count 13318 (2026-09-24). maxRecordCount 2000 — page via resultOffset / spatial
+      envelopes. Prefer over thin Property_Data/MapServer/1 TaxParcels (same geometry count
+      13321 but NO Owner/mailing — Parcel Fabric Name/GISParcelNumber/StatedArea only).
+      Owner filled ≈13213; StatedArea 5–150 = 1453; CalculatedArea 5–150 = 1635. Prefer
+      StatedArea (deed/stated acres) for acreage band; CalculatedArea GIS aid. NO curr_val /
+      mav* / SALE_* / lastSale.date on REST — tax/sale via qPublic App=McintoshCountyGA /
+      AppID=717 LayerID=11430 HTML (mcintoshassessor.com; qpublic.net/ga/mcintosh). Parcel id
+      formats: Name e.g. '0064C  0027' (preserve spaces for KeyValue) / GISParcelNumber
+      '0064C0027' compact. SR 103027 / 6445 (Georgia East feet). Schema created_user /
+      last_edited_user — DO NOT collect as PII. Skip Transportation/Environmental flood /
+      utilities+AADT per tranche-3. Companion maps.crc.ga.gov McIntosh/* (McIntoshCountyViewer
+      currently empty layers). Official GIS gallery:
+      segrass.maps.arcgis.com instant filtergallery appid=91a17fe1f67343a2a6897c3f7917217f
+      (linked from mcintoshcountyga.com/211/MAPS). GEO-VERIFY GEORGIA: WGS84 samples
+      ~-81.395,31.431 / ~-81.397,31.433 (Darien area) — Census TIGERweb GEOID 13191 CENTLAT
+      +31.4837791 CENTLON -081.3755277 (Brunswick MSA / Golden Isles / Sapelo). REJECT paid
+      Regrid/ATTOM; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL/FMV/assessed on public REST; qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      PropertyData_GovWell has Owner/mailing only — no market/assessed/taxable value fields.
+      Tax/CAMA via qPublic App=McintoshCountyGA / AppID=717 LayerID=11430 HTML only. Deep-link
+      KeyValue={Name}: Application.aspx?AppID=717&LayerID=11430&PageTypeID=4&KeyValue={Name}
+      (preserve spaces; GISParcelNumber compact alternate). Search PageTypeID=2; Maps
+      PageTypeID=1. Also App=McintoshCountyGA&Layer=Parcels&PageType=Search. Rejected paid
+      vendor tax extracts.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_VAL/SALEDATE on PropertyData_GovWell or Property_Data TaxParcels. Prefer qPublic
+      Sales Search / Sales List HTML App=McintoshCountyGA / AppID=717. Rejected paid
+      Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: McIntosh/Landuse_Planning Zoning - McIntosh
+    restUrl: https://portal.segrass.org/crcarcgis/rest/services/McIntosh/Landuse_Planning/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      Zoning: zoning
+      ZoneDesc: zoningDescription
+      Jurisdiction: zoningJurisdiction
+      ELU: existingLandUse
+      FLU: flu
+      FLU_PlanYear: fluPlanYear
+      Zoning_Prev: zoningPrevious
+    notes: >
+      Preferred Euclidean county zoning polygons (count 11976) with parcel TMS join key.
+      Zoning top: R2≈5343, R1≈4154, AF≈1014, AR≈350, HH≈302 (Hog Hammock / Sapelo context),
+      CG≈249, CP≈246, CN≈101, CI≈83, R3≈50, IR≈42, IG≈10, PUD≈7, RVP≈4. ZoneDesc labels e.g.
+      'One and Two Family Residential District'. FLU attribute on same polygons usable as
+      parcel-tied future land use. Companion Zoning - Darien/1 for city. Overlay Districts -
+      Darien/4 secondary.
+    status: usable
+
+  - role: flu
+    name: Landuse_Planning Zoning FLU attr + Character Areas
+    restUrl: https://portal.segrass.org/crcarcgis/rest/services/McIntosh/Landuse_Planning/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FLU: flu
+      ELU: existingLandUse
+      TMS: parcelId
+    notes: >
+      Preferred FLU is attribute on Zoning - McIntosh/2 (parcel-tied via TMS). FLU top:
+      One- and Two-Family Residential≈5324, Single-Family Residential≈4066, General
+      Agriculture-Forestry≈1053, Residential Agriculture≈344, Hog Hammock≈302, General
+      Commercial≈249, Conservation Preservation≈224…. Companion Character Areas/0 (count 10;
+      Vernon Square-Columbus Square / West Darien / East Darien Historic Districts / CHT
+      subareas / Residential-Forestry) — planning character only. maps.crc.ga.gov
+      McIntosh_FutureDevelopment2018 may exist but layers empty/unavailable at dig time.
+    status: usable
+
+  - role: other
+    name: McIntosh/Addresses (situs points)
+    restUrl: https://portal.segrass.org/crcarcgis/rest/services/McIntosh/Addresses/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      fulladdr: situsAddress
+      addrnum: situsNumber
+      roadname: situsStreet
+      roadtype: situsStreetType
+      roadpostdir: situsStreetDir
+      USPS_City: situsCity
+      ZIP: situsZip
+      municipality: municipalityName
+      unitid: situsUnit
+    notes: >
+      Live count 11322. Join spatially to parcels (Join_ID sparse). USPS_City top: Townsend≈6573,
+      Darien≈4297, Sapelo Island≈251, Riceboro≈201. municipality: Unincorporated McIntosh≈9574,
+      Darien≈1748 — prefer municipality / spatial City Limits over mailing city alone.
+      Companion Addresses - Darien/1 (count 1748).
+    status: usable
+
+  - role: other
+    name: Jurisdiction_Boundaries City Limits (Darien)
+    restUrl: https://portal.segrass.org/crcarcgis/rest/services/McIntosh/Jurisdiction_Boundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      NAME: cityName
+      GEOID: placeGeoid
+    notes: >
+      City Limits polygons (NAME=Darien). Preferred spatial municipality filter for Darien.
+      Layer 1 County Boundary. Soft Addresses municipality='Darien' (~1748) as attribute aid.
+    status: usable
+
+municipalities:
+  - name: Darien
+    level: city
+    parentFips: "13191"
+    joinToCountyParcels: >
+      Spatial Jurisdiction_Boundaries/0 City Limits NAME='Darien' OR Addresses
+      municipality='Darien' (~1748) / Addresses - Darien/1. MailingCity='DARIEN' alone is NOT
+      authoritative (countywide mail-to-Darien).
+    layers:
+      - role: zoning
+        name: Landuse_Planning Zoning - Darien
+        restUrl: https://portal.segrass.org/crcarcgis/rest/services/McIntosh/Landuse_Planning/MapServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Parcel: parcelId
+          GIS_Parcel: parcelIdCompact
+          Zoning: zoning
+          Zoning_Previous: zoningPrevious
+        notes: >
+          City Euclidean zoning (count 1502). Zoning top: R1≈1166, C2≈146, RMH≈99, RA≈67,
+          R2≈10, PUD≈7, C1≈3, WFC≈3, R3≈1. Prefer Darien Zoning ∩ City Limits; county Zoning -
+          McIntosh/2 as secondary outside/near city.
+        status: usable
+      - role: flu
+        name: Character Areas + county FLU Darien extract
+        restUrl: https://portal.segrass.org/crcarcgis/rest/services/McIntosh/Landuse_Planning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          NAME: flu
+          ACRES: acreage
+        notes: >
+          Darien historic / CHT character areas (Vernon Square-Columbus Square / West Darien /
+          East Darien / CHT-HD Historic Downtown…). County Zoning/2 FLU attribute clipped to
+          Darien limits as parcel-tied FLU aid.
+        status: usable
+      - role: parcels
+        name: null — use county TaxParcels_GovWell filtered to Darien
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Darien-only CAMA FeatureServer — county PropertyData_GovWell/0 + spatial City
+          Limits / Addresses municipality. Owner/mailing on REST; tax/sale still qPublic
+          AppID=717 HTML.
+        status: gap
+    gaps:
+      - "No City-of-Darien separate parcel/CAMA REST — county GovWell parcels + spatial Darien limits."
+      - "Tax/sale HTML-only (qPublic) even inside city."
+    status: usable
+
+gaps:
+  - "No curr_val / mav* / assessed / SALE_* on PropertyData_GovWell REST — tax/sale via qPublic App=McintoshCountyGA / AppID=717 LayerID=11430 HTML only."
+  - "Thin Property_Data/1 TaxParcels lacks Owner/mailing — do not prefer over PropertyData_GovWell/0."
+  - "PropertyData_GovWell maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "No FeatureServer twin for PropertyData_GovWell / Landuse_Planning at dig time (MapServer only)."
+  - "maps.crc.ga.gov McIntoshCountyViewer layers empty; prefer portal.segrass.org services."
+  - "Municipality filter: prefer spatial City Limits / Addresses municipality — not Owner mailing city."
+  - "Schema created_user / last_edited_user — DO NOT collect as PII; skip utilities+AADT / flood detail unless needed."
+  - "qPublic / mcintoshassessor.com Cloudflare/bot 403 automated; AppID=717 public for humans."
+  - "Rejected paid Regrid/ATTOM; no emails/phones."
+
+license: >
+  Coastal Regional Commission / SEGRASS GIS (portal.segrass.org crcarcgis) — McIntosh
+  PropertyData_GovWell, Property_Data, Landuse_Planning (Zoning McIntosh/Darien, Character
+  Areas), Addresses, Jurisdiction_Boundaries. Assessor qPublic App=McintoshCountyGA /
+  AppID=717 LayerID=11430 (qpublic.net/ga/mcintosh; mcintoshassessor.com; mcintoshcountyga.com
+  Tax Assessors). Public GIS gallery segrass.maps.arcgis.com filtergallery
+  appid=91a17fe1f67343a2a6897c3f7917217f. Attribution CRC / SEGRASS / McIntosh County Tax
+  Assessor. Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=717&LayerID=11430&PageTypeID=2
+jurisdictionGisUrl: https://segrass.maps.arcgis.com/apps/instant/filtergallery/index.html?appid=91a17fe1f67343a2a6897c3f7917217f
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://portal.segrass.org/crcarcgis/rest/services/McIntosh/PropertyData_GovWell/MapServer/0 count
+    13318; extent center [['13191', 'McIntosh County']]; sample [['13191', 'McIntosh County']]. No
+    change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Darien city"
+      level: city
+      parentFips: "13191"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='McIntosh' AND aadt>0
+    altFilter: name LIKE '191-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 191-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 54
+    maxAadt: 62400
+    geoCheck: 54/54 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: Owner
+    filledCount: 13213
+    restUrl: https://portal.segrass.org/crcarcgis/rest/services/McIntosh/PropertyData_GovWell/MapServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=McintoshCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=717&LayerID=11430&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Name
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0064C  0027
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=McintoshCountyGA&Layer=Parcels&PageType=Report&KeyValue=0064C%20%200027
+    verification: 'pattern-tested: real sample ID from Name; box test HTTP 403 Cloudflare challenge (expected; pattern
+      follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://segrass.maps.arcgis.com/apps/instant/filtergallery/index.html?appid=91a17fe1f67343a2a6897c3f7917217f
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Darien city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,251 @@
+state: GA
+jurisdiction: Bacon County
+fips: "13005"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Bacon County GA public parcel FeatureServer/MapServer with cadastral
+      polygons recovered (2026-09-24). Official human viewer = qPublic/Beacon
+      App=BaconCountyGA / AppID=711 LayerID=11416 (qpublic.net/ga/bacon →
+      qpublic.schneidercorp.com Application.aspx; county seat Alma GA 31510).
+      Cloudflare/bot 403 blocks automated Application.aspx from research box; public for
+      humans. SGRC Map21/Bacon (sgrcmaps.com/alma) exposes Roads + Alma city limits +
+      County boundary ONLY — NOT tax parcels (do not wire as parcels).
+      BaconCountyGA_WFS on wfs.schneidercorp.com returns 404. Commercial vendors advertise
+      ~6.5k parcels (DynamoSpatial/Regrid/ReportAll/Georgia GIS Clearinghouse paid) —
+      rejected. REJECT UGA_Parcels AGOL (campus survey lines, not county CAMA).
+      Geo-context: Census 2026 gaz INTPT 31.55676,-82.451909; SGRC County poly WGS84
+      extent ~-82.63..-82.23 lon × 31.42..31.71 lat STATEFP=13 CNTY=005 — Bacon GA SE
+      (NOT Bacon TN/elsewhere).
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via qPublic App=BaconCountyGA
+      HTML only. Deep-link KeyValue={parcelId}:
+      Application.aspx?App=BaconCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+      (or AppID=711&LayerID=11416 PageTypeID=3 + KeyValue).
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history. qPublic Yearly Sales / Sales Search / Sales List HTML
+      (App=BaconCountyGA). Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Bacon County GA Euclidean zoning REST found — planning PDF/staff gap.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Bacon County GA future land use REST found — Comp Plan PDF gap.
+    status: gap
+
+  - role: other
+    name: Map21/Bacon Alma + County (SGRC boundaries — NOT parcels)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Map21/Bacon/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      PLACEFP: placeFips
+      STATEFP: stateFips
+      ANPSADPI: placeName
+      INTPTLAT: latitude
+      INTPTLNG: longitude
+    notes: >
+      Alma city-limits polygon count=1 (layer 1). Companion County boundary layer 2
+      (count=1; CNTY=005 STATEFP=13 ANPSADPI='Bacon County'). Useful geo/municipality
+      context only — zero parcel/owner/tax/sale fields. Prefer spatial Alma poly for
+      city filter once parcel geometry source exists. Attribution Southern Georgia
+      Regional Commission (sgrcmaps.com).
+    status: partial
+
+municipalities:
+  - name: Alma
+    level: city
+    parentFips: "13005"
+    joinToCountyParcels: >
+      No county parcel REST to join. Soft spatial: Map21/Bacon FeatureServer/1 Alma
+      polygon (~-82.47,31.54) when parcels become available. Alma is the only
+      incorporated municipality in Bacon County.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Alma zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Alma FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city or county parcel REST — qPublic HTML county-wide.
+        status: gap
+    gaps:
+      - "No Alma-owned parcel/zoning/FLU REST; county qPublic HTML only."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Bacon County GA — qPublic App=BaconCountyGA (AppID=711) HTML only."
+  - "SGRC Map21/Bacon is Roads + Alma + County boundary only — not cadastral parcels."
+  - "BaconCountyGA_WFS 404."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial/ReportAll/Georgia GIS Clearinghouse parcel downloads."
+  - "Rejected UGA_Parcels AGOL (wrong schema/campus)."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Bacon County Tax Assessor qPublic/Beacon App=BaconCountyGA / AppID=711
+  (qpublic.net/ga/bacon; baconcounty.org Tax Office). SGRC Map21/Bacon boundaries
+  (sgrcmaps.com/alma). No public ArcGIS parcel service discovered 2026-09-24.
+  Attribution Bacon County Tax Assessor / SGRC. Public HTML + boundary REST only;
+  no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BaconCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BaconCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Alma city"
+      level: city
+      parentFips: "13005"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Bacon' AND aadt>0
+    altFilter: name LIKE '005-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 005-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 75
+    maxAadt: 10100
+    geoCheck: 75/75 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=BaconCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=711&LayerID=11416&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=BaconCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Alma city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

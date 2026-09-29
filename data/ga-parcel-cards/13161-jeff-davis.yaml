@@ -1,0 +1,325 @@
+state: GA
+jurisdiction: Jeff Davis County
+fips: "13161"
+level: county
+markets: [Savannah]
+
+layers:
+  - role: parcels
+    name: JeffDavis_County_Wide_GeoData_view TaxParcels_22 (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/JeffDavis_County_Wide_GeoData_view/FeatureServer/19
+    layerId: 19
+    geometry: polygon
+    auth: none
+    acreageField: Calc_Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Calc_Acres: acreage
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Heart of Georgia Altamaha RC / hogagis org
+      HHvUPZ2XuLOAJxjR — JeffDavis_County_Wide_GeoData_view item ba9cf215fcf44743aca304cf44521a3f
+      FeatureServer/19 TaxParcels_22). Live count 8417 (2026-09-24); PIN filled 8417;
+      Calc_Acres 5–150 = 2616. Schema is THIN — PIN + Calc_Acres + geometry only (no
+      owner/mailing/situs/CURR_VAL/sale on this layer). Older TaxParcels18/18 (count 8586)
+      has bloated junk schema (flood/recreation/landuse fields mixed) — prefer TaxParcels_22.
+      maxRecordCount 2000 — page via resultOffset / spatial envelopes. PIN format e.g.
+      '0001  001' / '0001  002A' (preserve spaces for KeyValue). Geo-verified WGS84 samples
+      ~-82.831,31.813 / ~-82.811,31.810 / ~-82.825,31.796 — Jeff Davis County GA /
+      Hazlehurst (FIPS 13161; seat Hazlehurst ~-82.60,31.86). CountyBoundary/2
+      CNTYIDFP=13161 / NAME=Jeff Davis / STATEFP=13 / RDC=Heart of Georgia-Altamaha
+      geo-verified. Census TIGERweb GEOID 13161 CENTLAT +31.8055738 CENTLON -082.6370270.
+      Join CAMA via qPublic AppID=743 LayerID=11780 HTML (KeyValue={PIN}). No
+      JeffDavisCountyGA_WFS (404). REJECT Jeff Davis County TX TaxNetUSA / paid
+      Regrid/ATTOM/DynamoSpatial/USLandGrid; no emails/phones; skip utilities+AADT
+      (Hazlehurst water/sewer layers exist — DO NOT collect).
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on TaxParcels_22; qPublic AppID=743 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on TaxParcels_22. Assessor HTML
+      qpublic.net/ga/jeffdavis → App=JeffDavisCountyGA / AppID=743 LayerID=11780
+      (Cloudflare/bot 403 automated; public for humans). Deep-link KeyValue={PIN}:
+      Application.aspx?AppID=743&LayerID=11780&PageTypeID=4&KeyValue={PIN}
+      (also App=JeffDavisCountyGA&Layer=Parcels&PageType=Report&KeyValue={PIN}).
+      Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No SALEPRICE/SALEDATE on TaxParcels_22. Prefer qPublic Sales Search / Sales List /
+      Yearly Sales HTML AppID=743. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Jeff Davis County-wide Euclidean zoning REST (2026-09-24). City of Hazlehurst
+      Euclidean published separately (City_of_Hazlehurst_View HazlehurstZoning_ParcelNew/5).
+      County Landuse/11 is FLU/existing land-use polygons, not zoning codes. Comp Plan
+      SpecialAreas/17 (count 21; Bullard Creek WMA / Ocmulgee / Altamaha corridors / U.S.
+      341 / U.S. 221) — planning character only, not Euclidean zoning.
+    status: gap
+
+  - role: flu
+    name: JeffDavis_County_Wide_GeoData_view Landuse (EXTLU / FLULU)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/JeffDavis_County_Wide_GeoData_view/FeatureServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      FLULU: flu
+      FLUDCA: fluDca
+      EXTLU: existingLandUse
+      EXTLUDCA: existingLandUseDca
+      Acreage: acreage
+      Calc_Acres: acreageGis
+    notes: >
+      Preferred Future / existing land-use polygons (NOT parcel-tied — spatial intersect).
+      Live count 8416. FLULU: Residential≈4768, Agriculture≈1608, Forestry≈1211,
+      Commercial≈644, Industrial≈113, Public/Institutional≈38,
+      Park/Recreation/Conservation≈15, Transportation/Communication/Utilities≈1, blank≈18.
+      Prefer FLULU as flu; EXTLU as existing. Companion SpecialAreas/17 — planning character
+      only. Skip utility layers.
+    status: usable
+
+municipalities:
+  - name: Hazlehurst
+    level: city
+    parentFips: "13161"
+    joinToCountyParcels: >
+      Spatial City_of_Hazlehurst_View HazlehurstCityLimits/1 (CITY=HAZLEHURST; ACRES≈2885;
+      centroid ~-82.598,31.862; FIPS place-ish '167' on layer — soft only) onto county
+      TaxParcels_22 PIN. Or attribute join HazlehurstZoning_ParcelNew/5 PIN onto TaxParcels_22.
+      Mailing city alone insufficient.
+    layers:
+      - role: zoning
+        name: City_of_Hazlehurst_View HazlehurstZoning_ParcelNew
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Hazlehurst_View/FeatureServer/5
+        layerId: 5
+        geometry: polygon
+        auth: none
+        acreageField: Calc_Acres
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          ZONING: zoning
+          Calc_Acres: acreage
+          Address: situsAddress
+        notes: >
+          Preferred Hazlehurst Euclidean zoning on parcel polygons (item
+          0189c23ed3ed4efbac737922e6deb31d). Live count 3169. ZONING: CO≈1166, R-3≈495,
+          R-1A≈424, R-1B≈309, C-2≈239, C-3≈195, R-2≈147, C-1≈110, L-1≈62, H-1≈22.
+          Companion district polygons HazlehurstZoning/4 (count 45; C-1/C-2/C-3/H-1/L-1/
+          R-1A/R-1B/R-2/R-3) — prefer ParcelNew for PIN join. Skip WaterServiceAreas/
+          SewerServiceAreas/hydrants (utilities).
+        status: usable
+      - role: flu
+        name: County Landuse spatial Hazlehurst
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/JeffDavis_County_Wide_GeoData_view/FeatureServer/11
+        layerId: 11
+        geometry: polygon
+        auth: none
+        acreageField: Acreage
+        coverage: city-only
+        fieldMap:
+          FLULU: flu
+        notes: County FLU spatial intersect HazlehurstCityLimits.
+        status: usable
+      - role: parcels
+        name: null — use county TaxParcels_22 filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Hazlehurst-only CAMA FeatureServer — county TaxParcels_22 + spatial
+          HazlehurstCityLimits / join Zoning_ParcelNew PIN. Owner/tax via qPublic AppID=743.
+        status: gap
+    gaps:
+      - "No Hazlehurst-owned parcel CAMA FeatureServer — thin county PIN geometry + qPublic HTML; skip city water/sewer/hydrants."
+    status: partial
+
+  - name: Denton
+    level: city
+    parentFips: "13161"
+    joinToCountyParcels: >
+      Spatial City_of_Denton_View DentonCityLimits/1 onto TaxParcels_22 when filtering.
+      Denton is incorporated Jeff Davis place (~-82.70,31.72 soft).
+    layers:
+      - role: zoning
+        name: null — no Denton city zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City_of_Denton_View has city limits / special areas / road anno — NO zoning
+          polygons. County zoning gap; no Euclidean for Denton.
+        status: gap
+      - role: flu
+        name: County Landuse spatial Denton
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/JeffDavis_County_Wide_GeoData_view/FeatureServer/11
+        layerId: 11
+        geometry: polygon
+        auth: none
+        acreageField: Acreage
+        coverage: city-only
+        fieldMap:
+          FLULU: flu
+        notes: County FLU spatial DentonCityLimits.
+        status: usable
+      - role: parcels
+        name: null — county TaxParcels_22 spatial Denton
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels_22 + spatial DentonCityLimits; qPublic AppID=743 CAMA.
+        status: gap
+    gaps:
+      - "No Denton city-owned zoning/parcel CAMA REST — county layers + city limits only."
+    status: partial
+
+gaps:
+  - "TaxParcels_22 thin PIN+Calc_Acres only — no REST owner/mailing/situs/tax/sale; qPublic AppID=743 LayerID=11780 HTML for CAMA."
+  - "No county-wide Euclidean zoning FeatureServer; Hazlehurst city zoning only (ParcelNew/5)."
+  - "TaxParcels_22 maxRecordCount 2000 — page via resultOffset / spatial envelopes."
+  - "TaxParcels18 bloated junk schema — do not prefer over TaxParcels_22."
+  - "JeffDavisCountyGA_WFS 404; no SGRC alma JeffDavis folder."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/jeffdavis + AppID=743 Search/Maps public for humans."
+  - "REJECT Jeff Davis TX TaxNetUSA; REJECT paid Regrid/ATTOM/DynamoSpatial/USLandGrid Jeff Davis GA extracts."
+  - "Hazlehurst WaterServiceAreas/SewerServiceAreas/hydrants — DO NOT collect (skip utilities+AADT); no emails/phones."
+
+license: >
+  Heart of Georgia Altamaha Regional Commission GIS (AGOL org HHvUPZ2XuLOAJxjR owner
+  hogagis) — JeffDavis_County_Wide_GeoData_view FeatureServer/19 TaxParcels_22; Landuse/11;
+  CountyBoundary/2; City_of_Hazlehurst_View HazlehurstZoning_ParcelNew/5; City_of_Denton_View
+  limits. Assessor qPublic App=JeffDavisCountyGA / AppID=743 LayerID=11780
+  (qpublic.net/ga/jeffdavis; Hazlehurst GA 31539). Attribution HOGARC / Jeff Davis County
+  Tax Assessor. Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=743&LayerID=11780&PageTypeID=2
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/JeffDavis_County_Wide_GeoData_view/FeatureServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/HHvUPZ2XuLOAJ
+    xjR/arcgis/rest/services/JeffDavis_County_Wide_GeoData_view/FeatureServer/19 count 8417; extent
+    center [['13161', 'Jeff Davis County']]; sample [['13161', 'Jeff Davis County']]. No change to field
+    map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Denton city"
+      level: city
+      parentFips: "13161"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Hazlehurst city"
+      level: city
+      parentFips: "13161"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Jeff Davis' AND aadt>0
+    altFilter: name LIKE '161-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 161-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 64
+    maxAadt: 15600
+    geoCheck: 64/64 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=JeffDavisCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=743&LayerID=11780&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PIN
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0001  001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=JeffDavisCountyGA&Layer=Parcels&PageType=Report&KeyValue=0001%20%20001
+    verification: 'pattern-tested: real sample ID from PIN; box test HTTP 403 Cloudflare challenge (expected; pattern
+      follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/JeffDavis_County_Wide_GeoData_view/FeatureServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Denton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Hazlehurst city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,381 @@
+state: GA
+jurisdiction: Floyd County
+fips: "13115"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcels + owner / situs / acres / VALUE_2026 (Rome-Floyd GIS AGOL)
+  - role: parcels
+    name: CurrentParcels (Rome-Floyd GIS — as of 6/30/2026)
+    restUrl: https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/CurrentParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      OWNERNAME: ownerName
+      ADDRESS1: mailingAddress
+      ADDRESS2: mailingAddress2
+      ADDRESS3: mailingAddress3
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP: mailingZip
+      LOCATION: situsAddress
+      LEGAL_DESC: legalDescription
+      TAXDISTRIC: taxDistrict
+      HOMEEXEMPT: homesteadExempt
+      DIGCLASS: dorCode
+      DIGSTRAT: digestStrat
+      LAND_VAL: tax.landValue
+      IMP_VAL: tax.improvementValue
+      TOTALACRES: acreage
+      Calc_Ac: acreageGis
+      VALUE_2026: tax.marketValue
+      VALUE_2025: tax.priorMarketValue
+      VALUE_2024: tax.marketValue2024
+      VALUE_2023: tax.marketValue2023
+      VALUE_2022: tax.marketValue2022
+      qpublic: appraiserSearchUrl
+      Old_Map_No: mapRef
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + owner/mailing/situs/acres/VALUE_2026
+      (Rome/Floyd County GIS AGOL org nV67H1IJR8GS6SAA — CurrentParcels FeatureServer
+      layer 0 "Parcels"; service description "Parcel data for Floyd County as of
+      6/30/2026"). Live count 50273 (2026-09-24). OWNERNAME filled ≈49759; VALUE_2026>0
+      ≈49803; TOTALACRES>0 ≈45124; TOTALACRES 5–150 ≈7576; LOCATION filled ≈49804.
+      SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet (102667/2240). maxRecordCount
+      2000 — page via resultOffset / spatial envelopes. Parcel_No formats mix spaced
+      ("A12 001") and compact ("I14W001"); qpublic field deep-links AppID=802 KeyValue=
+      {Parcel_No}. Companion dated snapshot Parcels20260228/0 (similar schema, VALUE_2025
+      newest); older Current_Parcels/5 (updated 04/01/23; PARCEL/NAME/VALUE2022) —
+      prefer CurrentParcels. AGD ParcelViewerData (services3…nJbIFHiSnaX0z0hS) mirrors
+      PIN/OWNER/LOCATION + recordcard → romefloyd.agdmaps.com/prc — secondary. Official
+      human GIS: Floyd County Map Viewer romefloydgis.maps.arcgis.com webappviewer
+      id=51fd62729e134a95848be61fdcfae6f4; county site also lists Atlas AGD
+      romefloyd.agdmaps.com/parcelviewer. Assessor qPublic AppID=802 / App=FloydCountyGA.
+      GEO-VERIFY GEORGIA: WGS84 samples ~-85.448,34.279 / ~-85.452,34.286 (Halls Valley
+      Rd) — Census TIGERweb GEOID 13115 CENTLAT +34.2630727 CENTLON -085.2143786 (Rome
+      GA). REJECT Adjoining_Town_Tax_Maps / Rome NY (org IxPw3aIgkKzsK9Lc; SR 26918);
+      REJECT Floyd County IN/VA lookalikes; REJECT paid Regrid/ATTOM. Skip utilities
+      (WaterMains*/Sewer_*/Storm_*/Hydrants*) + AADT; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: CurrentParcels VALUE_2026 / LAND_VAL / IMP_VAL (same layer)
+    restUrl: https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/CurrentParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      OWNERNAME: ownerName
+      VALUE_2026: tax.marketValue
+      LAND_VAL: tax.landValue
+      IMP_VAL: tax.improvementValue
+      VALUE_2025: tax.priorMarketValue
+      TOTALACRES: acreage
+    notes: >
+      Preferred tax/CAMA values live on CurrentParcels (VALUE_2026≈49803 >0; LAND_VAL/
+      IMP_VAL). No separate assessed/taxable field — market digest value only. Assessor
+      HTML deep-link KeyValue={Parcel_No}: Application.aspx?AppID=802&LayerID=13374&
+      PageTypeID=4&PageID=6034&KeyValue={Parcel_No} (also App=FloydCountyGA&Layer=Parcels&
+      PageType=Report&KeyValue=). qPublic search AppID=802 LayerID=13374 PageTypeID=2
+      PageID=6035 (qpublic.net/ga/floyd/search.html).
+    status: usable
+
+  - role: sales
+    name: SalesQuery20250531 Sales_Query$ (table join)
+    restUrl: https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/SalesQuery20250531/FeatureServer/0
+    layerId: 0
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      SALEPRICE: lastSale.price
+      SALEDATE: lastSale.date
+      GRANTEE: lastSale.grantee
+      GRANTOR: lastSale.grantor
+      DEEDPAGE: lastSale.deedRef
+      REASON: lastSale.qualified
+    notes: >
+      Preferred public REST multi-sale TABLE (no geometry) — live count 333759; SALEPRICE>0
+      ≈142652 (2026-09-24). SALEDATE epoch ms. Join to CurrentParcels by normalizing
+      Parcel_No spaces: REPLACE(Parcel_No,' ','') = PARCEL_NO (e.g. "A12 001"↔"A12001";
+      compact I14W001 already matches). Companion Sales_QueryJune25/1. Multi-sale history
+      also via qPublic Sales Search HTML AppID=802. Rejected paid Regrid/ATTOM sales.
+      Geo via parcel join — Floyd GA.
+    status: usable
+
+  - role: zoning
+    name: CurrentZoning Zoning_2026_08_Aug
+    restUrl: https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/CurrentZoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Zoning: zoning
+      Name: zoningDistrictName
+    notes: >
+      Preferred Euclidean zoning polygons (service "Floyd County zoning districts as of
+      8/31/2026"; count 16 district multipolygons). Zoning domain: A-R Agricultural
+      Residential, C-B-C Central Business Commercial, C-C Community Commercial, D-R
+      Duplex Residential, H-C General Heavy Commercial, H-I Heavy Industrial, H-T-R
+      High-density Traditional Residential, L-I Light Industrial, L-T-R Low-density
+      Traditional Residential, M-R Multi-family Residential, N-O-C Neighborhood Office
+      Commercial, O-I Office Institutional, P-D Planned Development, S-R Suburban
+      Residential, U-M-U Urban Mixed Use (+ None). Spatial join onto CurrentParcels.
+      Companion Zoning20260228 / CurrentZoning_view. Geo samples ~-85.17,34.25 Rome GA.
+      Rezoning viewer romefloydgis webappviewer id=621a165e37844bd7880eadf77d0f14c5.
+    status: usable
+
+  - role: flu
+    name: Future_Land_Use_Updated FutureLandUse20201101
+    restUrl: https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/Future_Land_Use_Updated/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FLU: flu
+    notes: >
+      Preferred Future Land Use polygons (count 11 class multipolygons; dated 2020-11-01).
+      FLU domain: Agricultural, Commercial, Conservation, High Density Residential,
+      Industrial, Low Density Residential, Medium Density Residential, Mixed Use, Park,
+      Public/Institutional, Rural Residential. Spatial join onto CurrentParcels. Companion
+      FutureLanUse/1 same FLU; FutureLanUse/0 ParcelWithData20210519 is older parcel-tied.
+      Human FLU instant app romefloydgis appid=9cd8817ec8104f1aa1e6ba79fcfee968. Geo
+      ~-85.28,34.08 Floyd GA.
+    status: usable
+
+  - role: other
+    name: RomeBoundary_20251201
+    restUrl: https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/RomeBoundary_20251201/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      City of Rome municipal boundary (count 1) — preferred spatial clip for Rome
+      municipality filter of CurrentParcels. Companion RomeBoundary20250601.
+    status: usable
+
+municipalities:
+  - name: Rome
+    level: city
+    parentFips: "13115"
+    joinToCountyParcels: >
+      Spatial RomeBoundary_20251201/0 clip of CurrentParcels/0. Soft: TAXDISTRIC city
+      districts when present — prefer spatial boundary over mailing CITY='ROME'.
+    layers:
+      - role: zoning
+        name: CurrentZoning spatial Rome
+        restUrl: https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/CurrentZoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+          Name: zoningDistrictName
+        notes: County Euclidean zoning clipped to RomeBoundary (city districts concentrated in Rome).
+        status: usable
+      - role: flu
+        name: Future_Land_Use_Updated spatial Rome
+        restUrl: https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/Future_Land_Use_Updated/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FLU: flu
+        notes: County FLU spatial to Rome city boundary.
+        status: usable
+      - role: parcels
+        name: CurrentParcels spatial Rome
+        restUrl: https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/CurrentParcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          Parcel_No: parcelId
+          OWNERNAME: ownerName
+          TOTALACRES: acreage
+          VALUE_2026: tax.marketValue
+        notes: No Rome-only separate CAMA — county CurrentParcels + RomeBoundary clip.
+        status: partial
+    gaps:
+      - "No Rome-owned separate parcel CAMA FeatureServer — county CurrentParcels + RomeBoundary."
+    status: usable
+
+  - name: Cave Spring
+    level: city
+    parentFips: "13115"
+    joinToCountyParcels: >
+      Spatial clip of CurrentParcels when Cave Spring city limits layer available; else
+      soft TAXDISTRIC / situs near Cave Spring GA (~-85.26,34.11). No dedicated Cave Spring
+      city limits FeatureServer confirmed in org listing (2026-09-24).
+    layers:
+      - role: zoning
+        name: null — use county CurrentZoning spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cave Spring-only zoning REST — county CurrentZoning spatial.
+        status: gap
+      - role: flu
+        name: null — use county FLU spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cave Spring-only FLU REST — county Future_Land_Use_Updated spatial.
+        status: gap
+      - role: parcels
+        name: null — county CurrentParcels spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County CurrentParcels only.
+        status: gap
+    gaps:
+      - "No Cave Spring city limits/zoning/FLU/parcel REST confirmed — county layers only."
+    status: partial
+
+gaps:
+  - "Sales join requires REPLACE(Parcel_No,' ','') = PARCEL_NO (spaced vs compact parcel ids)."
+  - "CurrentZoning / FLU are district multipolygons (16 / 11) — spatial intersect, not parcel-tied codes."
+  - "No separate assessed/taxable REST field — VALUE_2026 is digest market value."
+  - "romefloyd.agdmaps.com timed out from research box — prefer romefloydgis Floyd County Map Viewer; AGD still listed on romefloyd.com GIS page."
+  - "Skip WaterMains*/Sewer_*/Storm_*/Hydrants* utilities + AADT; REJECT Rome NY Adjoining_Town_Tax_Maps; REJECT paid Regrid/ATTOM."
+  - "CurrentParcels maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "No emails/phones collected."
+
+license: >
+  Rome / Floyd County GIS (romefloydgis AGOL org nV67H1IJR8GS6SAA) — CurrentParcels,
+  CurrentZoning, Future_Land_Use_Updated, SalesQuery20250531, RomeBoundary_20251201.
+  Floyd County Map Viewer romefloydgis.maps.arcgis.com webappviewer
+  id=51fd62729e134a95848be61fdcfae6f4; Atlas Geographic Data parcel viewer
+  romefloyd.agdmaps.com/parcelviewer (county GIS page). Assessor qPublic
+  AppID=802 LayerID=13374 / App=FloydCountyGA (qpublic.net/ga/floyd/). Attribution
+  Rome-Floyd GIS / Board of Assessors. Public fields only; no emails/phones; no paid
+  vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=802&LayerID=13374&PageTypeID=2&PageID=6035
+jurisdictionGisUrl: https://romefloydgis.maps.arcgis.com/apps/webappviewer/index.html?id=51fd62729e134a95848be61fdcfae6f4
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/CurrentParcels/FeatureServer/0
+    count 50273; extent center [['13115', 'Floyd County']]; sample [['13115', 'Floyd County']]. No
+    change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Cave Spring city"
+      level: city
+      parentFips: "13115"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Rome city"
+      level: city
+      parentFips: "13115"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Floyd' AND aadt>0
+    altFilter: name LIKE '115-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 115-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 345
+    maxAadt: 36000
+    geoCheck: 345/345 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - LAND_VAL
+    - IMP_VAL
+    filledCount: 48888
+    restUrl: https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/CurrentParcels/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: REST
+    detail: 'Floyd SalesQuery20250531/FeatureServer/0 multi-sale table: SALEPRICE, SALEDATE, GRANTOR, GRANTEE, DEEDPAGE
+      (333759 rows; SALEPRICE>0 ~142652); join REPLACE(Parcel_No,'' '','''')=PARCEL_NO'
+    restUrl: https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/SalesQuery20250531/FeatureServer/0
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: OWNERNAME
+    filledCount: 49759
+    restUrl: https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/CurrentParcels/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?AppID=802&LayerID=13374&PageTypeID=4&PageID=6034&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?App=FloydCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: A12 001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=802&LayerID=13374&PageTypeID=4&PageID=6034&KeyValue=A12%20001
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://romefloydgis.maps.arcgis.com/apps/webappviewer/index.html?id=51fd62729e134a95848be61fdcfae6f4
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Cave Spring city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Rome city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

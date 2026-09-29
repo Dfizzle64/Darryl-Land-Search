@@ -1,0 +1,161 @@
+state: GA
+jurisdiction: Wilkinson County
+fips: "13319"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null - no public county-wide parcel REST found (pass1 2026-09-28)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      New card 2026-09-28. See pass1_2026-09-28 block for everything tried. Partial city-only
+      source: City of Gordon zoning x parcels (Ug5xGQbHsD8zuZzM City_of_Gordon_Zoning_Map_WFL1/6).
+    status: gap
+
+  - role: parcels
+    name: City of Gordon zoning parcels (city-only clip of MGRC Wilkinson_County_Parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/City_of_Gordon_Zoning_Map_WFL1/FeatureServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    parcelIdField: "Parcel_No"
+    liveCount: 1273
+    fieldMap:
+      Parcel_No: parcelId
+      PARCELID: parcelIdAlt
+      ZONECLASS: zoning
+      ZONEDESC: zoningDescription
+    notes: >
+      Geo-verified Wilkinson GA (extent -83.370..-83.298, 32.859..32.910 = Gordon). City-only.
+    status: partial
+
+gaps:
+  - No public county-wide parcel REST; MGRC ArcGIS Server mgrcmaps.org unreachable from research box.
+  - ReportAll-schema re-host (uCLHikoEKcQwv9tD Tax_Parcels/51) rejected as paid-vendor data.
+license: "n/a"
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WilkinsonCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://www.qpublic.net/ga/wilkinson/
+verifiedAt: 2026-09-28
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: nocard
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 (new card). Wilkinson never carded before.
+    City of Gordon zoning layer (Ug5 City_of_Gordon_Zoning_Map_WFL1/6, 1273, field
+    FID_Wilkinson_County_Parcels) shows MGRC holds a Wilkinson_County_Parcels layer internally but no
+    public county-wide copy was found. mgrcmaps.org (MGRC ArcGIS Server, which hosts Monroe per
+    GDITAdmin catalog) drops the TLS handshake from the research box and WebFetch times out -
+    unreachable. REJECTED services1.arcgis.com/uCLHikoEKcQwv9tD Tax_Parcels/FeatureServer/51 'Wilkinson'
+    (7543): ReportAll USA schema (ROBUST_ID, CTY_ROW_ID, USPS_RESID) = paid-vendor re-host.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Gordon city"
+      level: city
+      parentFips: "13319"
+      parcelsRest: "https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/City_of_Gordon_Zoning_Map_WFL1/FeatureServer/6 (zoning x parcels, 1273, Parcel_No)"
+    - name: "Irwinton city"
+      level: city
+      parentFips: "13319"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Ivey city"
+      level: city
+      parentFips: "13319"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "McIntyre town"
+      level: city
+      parentFips: "13319"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Toomsboro city"
+      level: city
+      parentFips: "13319"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Wilkinson' AND aadt>0
+    altFilter: name LIKE '319-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 319-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 95
+    maxAadt: 7870
+    geoCheck: 95/95 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=WilkinsonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No (city layer City_of_Gordon_Zoning_Map_WFL1/FeatureServer/6)
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 023    022
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WilkinsonCountyGA&Layer=Parcels&PageType=Report&KeyValue=023%20%20%20%20022
+    verification: 'pattern-tested: real sample ID from Parcel_No (city layer City_of_Gordon_Zoning_Map_WFL1/FeatureServer/6);
+      box test HTTP 403 Cloudflare challenge (expected; pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.qpublic.net/ga/wilkinson/
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Gordon city
+      gisUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/City_of_Gordon_Zoning_Map_WFL1/FeatureServer/6
+      note: null
+    - name: Irwinton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Ivey city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: McIntyre town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Toomsboro city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

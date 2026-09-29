@@ -1,0 +1,420 @@
+state: GA
+jurisdiction: Houston County
+fips: "13153"
+level: county
+markets: [Warner Robins]
+
+layers:
+  - role: parcels
+    name: HoustonCoParcels_withOwner — Houston County Parcels (MGRC AGOL)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/HoustonCoParcels_withOwner/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PIN: parcelPin
+      LASTNAME: ownerName
+      OWNKEY_1: ownerKey
+      ADDRESS: situsAddress
+      ParcelCity: situsCity
+      ZIP_CODE: situsZip
+      STATE: situsState
+      TOTALACRES: acreage
+      CURR_VAL: tax.marketValue
+      ZONINGCODE: zoning
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + owner/CAMA (Middle Georgia Regional
+      Commission / GARC AGOL org Ug5xGQbHsD8zuZzM — HoustonCoParcels_withOwner
+      FeatureServer/0 "Houston County Parcels"). Live count 68166 (2026-09-24).
+      maxRecordCount 2000 — page via resultOffset / spatial envelopes. SR Web
+      Mercator (102100/3857). CURR_VAL>0 ≈67944; LASTNAME ≈67891; TOTALACRES 5–150
+      ≈3897; ZONINGCODE ≈67791; ADDRESS/ParcelCity filled 68166. ParcelCity soft
+      situs/mail-leaning (NOT authoritative municipality — includes Byron/Hawkinsville
+      fringe): Warner Robins≈32932, Perry≈11282, Bonaire≈8687, Kathleen≈7483,
+      Centerville≈2661, Byron≈2145, Elko≈1467, Hawkinsville≈1223 — prefer spatial
+      Houston_County_Municipal_Boundaries/0 NAME in (Warner Robins, Perry,
+      Centerville). ZONINGCODE top: R1≈21121, R2≈16218, R3≈9761, RAG≈7778,
+      PUD≈4236, C2≈2683, R4≈2386, RMH≈1452. LAT/LON fields are map-book refs
+      (e.g. '49E-74') — NOT WGS84; use geometry. Schema thin vs full WinGAP:
+      NO SALE_*/FMV*/MAV*/mailing ADDRESS1–3/HOUSE_NO split on this layer.
+      Companion North_Houston_REPI_2_0_WFL1/5 HoustonCoParcels2023 (count 68166)
+      exposes richer WinGAP tax/sale/situs fields (CURR_VAL/FMV*/SALE_*/HOUSE_NO/
+      STREET_NAM/TAXDISTRIC/DIGCLASS) but labeled 2023 REPI snapshot — join on
+      PARCEL_NO/PIN if needed; do NOT prefer over withOwner for live owner.
+      Thinner Centerville Zoning Map WFL1 layers 8/9 HoustonCountyParcels
+      (count 70883; Parcel_No+Calc_Ac only) — geometry aid only. Official assessor
+      HTML: qPublic App=HoustonCountyGA Layer=Parcels (qpublic.net/ga/houston;
+      houstoncountyga.gov Tax Assessor). Deep-link KeyValue={PARCEL_NO} or {PIN}:
+      Application.aspx?App=HoustonCountyGA&Layer=Parcels&PageType=Report&KeyValue=
+      {PARCEL_NO}. GEO-VERIFY GEORGIA (REJECT Houston TX ~-95.37,29.76 / Houston
+      County AL): WGS84 samples ~-83.715,32.597 (Warner Robins), ~-83.721,32.451
+      (Perry), ~-83.688,32.626 (Centerville) — FIPS 13153 seat Perry / Warner
+      Robins MSA. Rejected paid Regrid/ATTOM; skip utilities+AADT; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: HoustonCoParcels_withOwner CURR_VAL (on polygons)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/HoustonCoParcels_withOwner/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      CURR_VAL: tax.marketValue
+    notes: >
+      Market value live on preferred parcels (CURR_VAL>0 ≈67944). No MAV/assessed/
+      FMV* on withOwner REST — assessed/taxable via qPublic App=HoustonCountyGA HTML.
+      REPI/5 HoustonCoParcels2023 has FMV*/MAV*/A_VALUE/P_VALUE/HIST* (2023 snapshot).
+    status: usable
+
+  - role: sales
+    name: null — no SALE_* on preferred withOwner REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Preferred HoustonCoParcels_withOwner has no SALE_VAL/date. REPI/5 exposes
+      SALE_VAL/SALELAND*/SALEIMP* fields (fill rates not verified 2026-09-24) —
+      treat as snapshot aid only. Prefer qPublic Sales Search HTML
+      App=HoustonCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: HoustonCoParcels_withOwner ZONINGCODE + Centerville Euclidean
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/HoustonCoParcels_withOwner/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ZONINGCODE: zoning
+    notes: >
+      Parcel-attributed ZONINGCODE county-wide (R1/R2/R3/RAG/PUD…). No county-wide
+      Euclidean zoning FeatureServer recovered. City of Centerville Zoning
+      City_of_Centerville_Zoning_Map_WFL1/19 (count 4229; ZONING R-1/R-3…;
+      TAXDISTRIC='3') — city-only Euclidean. County zoning map PDF on
+      houstoncountyga.gov (2016) — not REST. municode/planning PDF gap for
+      ordinance labels beyond ZONINGCODE.
+    status: partial
+
+  - role: flu
+    name: Houston_County_Character_Areas_WFL1 (MGRC)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Houston_County_Character_Areas_WFL1/FeatureServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TYPE: flu
+    notes: >
+      Comp-plan character areas (Agricultural Areas/9 TYPE='Agricultural Areas'
+      centroid ~-83.77,32.42; also Suburban Residential/18, Industrial/16,
+      Conservation/11, Downtown/19, Traditional Neighborhoods/20, Gateway/
+      In-Town Corridors, Base Environs, Rural Village, Redevelopment, Emerging
+      Town Center, Commercial/Neighborhood Nodes). Multi-layer service — spatial
+      intersect preferred parcels. Viewer: garc.maps.arcgis.com webappviewer
+      id=bc820c2f01784c4f8e47e7327e866932 (Houston County Character Areas
+      2022-2026). Not a substitute for Euclidean zoning.
+    status: usable
+
+  - role: other
+    name: Houston_County_Municipal_Boundaries
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Houston_County_Municipal_Boundaries/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: cityName
+      MUNITYP: municipalityType
+      MUNIAREA: municipalityArea
+      LOCALFIPS: localFips
+    notes: >
+      Live count 3 — Centerville (~-83.687,32.638), Warner Robins (~-83.645,32.588),
+      Perry (~-83.704,32.483). Preferred spatial municipality filter. Twin
+      HoustonCounty_MunincipalBoundaries + City_Limits_of_Warner_Robins_WFL1
+      also published. Soft ParcelCity is NOT sole city filter (Bonaire/Kathleen/
+      Elko CDP mail cities; Byron=Peach; Hawkinsville=Pulaski fringe).
+    status: usable
+
+municipalities:
+  - name: Warner Robins
+    level: city
+    parentFips: "13153"
+    joinToCountyParcels: >
+      Spatial Houston_County_Municipal_Boundaries/0 NAME='Warner Robins'
+      (~-83.645,32.588) OR City_Limits_of_Warner_Robins_WFL1/0; soft
+      ParcelCity='Warner Robins' (~32932) is attribute aid only.
+    layers:
+      - role: zoning
+        name: Parcel ZONINGCODE Warner Robins extract
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/HoustonCoParcels_withOwner/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONINGCODE: zoning
+        notes: >
+          No City-of-Warner-Robins Euclidean zoning FeatureServer recovered —
+          county ZONINGCODE + spatial city limits. wrga.gov city-maps page
+          HTML/PDF only.
+        status: partial
+      - role: flu
+        name: Character Areas Warner Robins spatial
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Houston_County_Character_Areas_WFL1/FeatureServer/18
+        layerId: 18
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          TYPE: flu
+        notes: County character areas (Suburban Residential/Downtown/etc.) clipped to WR limits.
+        status: usable
+      - role: parcels
+        name: null — use county HoustonCoParcels_withOwner spatial WR
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No WR-only CAMA FeatureServer — county parcels + spatial municipal boundary.
+        status: gap
+    gaps:
+      - "No Warner Robins city-owned parcel/zoning Euclidean REST — county layers + spatial NAME='Warner Robins'."
+      - "Owner/tax on county REST; sale via qPublic HTML."
+    status: usable
+
+  - name: Perry
+    level: city
+    parentFips: "13153"
+    joinToCountyParcels: >
+      Spatial Houston_County_Municipal_Boundaries/0 NAME='Perry' (~-83.704,32.483)
+      OR soft ParcelCity='Perry' (~11282). CityofPerryParcels FeatureServer item
+      inaccessible/CONT_0001 (2026-09-24) — do not rely on.
+    layers:
+      - role: zoning
+        name: Parcel ZONINGCODE Perry extract
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/HoustonCoParcels_withOwner/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONINGCODE: zoning
+        notes: County ZONINGCODE + spatial Perry — no Perry Euclidean zoning REST recovered.
+        status: partial
+      - role: flu
+        name: Character Areas Perry spatial (layer 0 named Perry)
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Houston_County_Character_Areas_WFL1/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Character Areas service includes named Perry layer — spatial intersect county FLU nodes.
+        status: partial
+      - role: parcels
+        name: null — county parcels + spatial Perry
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: CityofPerryParcels FS inaccessible; use county withOwner + municipal boundary.
+        status: gap
+    gaps:
+      - "CityofPerryParcels FeatureServer inaccessible (CONT_0001) — county parcels + spatial Perry only."
+    status: partial
+
+  - name: Centerville
+    level: city
+    parentFips: "13153"
+    joinToCountyParcels: >
+      Spatial Houston_County_Municipal_Boundaries/0 NAME='Centerville'
+      (~-83.687,32.638) OR soft ParcelCity='Centerville' (~2661) OR
+      Centerville Zoning TAXDISTRIC='3'.
+    layers:
+      - role: zoning
+        name: City_of_Centerville_Zoning_Map_WFL1 Centerville Zoning
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/City_of_Centerville_Zoning_Map_WFL1/FeatureServer/19
+        layerId: 19
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Parcel_No: parcelId
+          ZONING: zoning
+          TAXDISTRIC: taxDistrict
+        notes: >
+          Preferred Centerville Euclidean/parcel-attributed zoning (count 4229;
+          ZONING e.g. R-1/R-3; TAXDISTRIC='3'). Join to county parcels on Parcel_No.
+        status: usable
+      - role: flu
+        name: Character Areas Centerville spatial
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Houston_County_Character_Areas_WFL1/FeatureServer/18
+        layerId: 18
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          TYPE: flu
+        notes: County character areas spatial Centerville.
+        status: partial
+      - role: parcels
+        name: null — county + Centerville boundary
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County HoustonCoParcels_withOwner + spatial Centerville; zoning layer carries Parcel_No.
+        status: gap
+    gaps:
+      - "Centerville zoning usable on WFL1/19; parcel CAMA still county withOwner."
+    status: usable
+
+gaps:
+  - "No SALE_*/lastSale.date on preferred HoustonCoParcels_withOwner REST — qPublic App=HoustonCountyGA Sales Search HTML; REPI/5 2023 snapshot may expose SALE_* (fill unverified)."
+  - "No MAV/assessed/FMV* on withOwner — CURR_VAL market only; assessed via qPublic HTML."
+  - "LAT/LON on withOwner are map-book refs — use polygon geometry / outSR=4326."
+  - "ParcelCity includes non-municipal mail cities (Bonaire/Kathleen/Elko) and out-of-county fringe (Byron/Hawkinsville) — prefer spatial Municipal_Boundaries."
+  - "No county-wide Euclidean zoning FeatureServer — parcel ZONINGCODE + Centerville/19 only."
+  - "CityofPerryParcels FS inaccessible; GISWebTech Development Authority viewer houstoncountyga.giswebtechguru.com may timeout automated."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; public for humans (qpublic.net/ga/houston)."
+  - "Rejected Houston TX / Houston County AL lookalikes; rejected paid Regrid/ATTOM; skip utilities+broadband+AADT; no emails/phones."
+
+license: >
+  Middle Georgia Regional Commission / GARC AGOL org Ug5xGQbHsD8zuZzM —
+  HoustonCoParcels_withOwner; Houston_County_Municipal_Boundaries;
+  Houston_County_Character_Areas_WFL1; City_of_Centerville_Zoning_Map_WFL1;
+  City_Limits_of_Warner_Robins_WFL1; North_Houston_REPI_2_0_WFL1/5 snapshot.
+  Assessor qPublic App=HoustonCountyGA (qpublic.net/ga/houston;
+  houstoncountyga.gov Tax Assessor). Attribution MGRC / Houston County Tax
+  Assessor. Public fields only; no emails/phones; no paid vendors; skip
+  utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HoustonCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://garc.maps.arcgis.com/apps/webappviewer/index.html?id=bc820c2f01784c4f8e47e7327e866932
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services1.arcgis.com/Ug5xGQbHsD8zu
+    ZzM/arcgis/rest/services/HoustonCoParcels_withOwner/FeatureServer/0 count 68166; extent center
+    [['13153', 'Houston County']]; sample [['13153', 'Houston County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Centerville city"
+      level: city
+      parentFips: "13153"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Perry city"
+      level: city
+      parentFips: "13153"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Warner Robins city"
+      level: city
+      parentFips: "13153"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Houston' AND aadt>0
+    altFilter: name LIKE '153-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 153-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 312
+    maxAadt: 72400
+    geoCheck: 310/312 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    filledCount: 67944
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/HoustonCoParcels_withOwner/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 67891
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/HoustonCoParcels_withOwner/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=HoustonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 00049E    074000
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HoustonCountyGA&Layer=Parcels&PageType=Report&KeyValue=00049E%20%20%20%20074000
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://garc.maps.arcgis.com/apps/webappviewer/index.html?id=bc820c2f01784c4f8e47e7327e866932
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Centerville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Perry city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Warner Robins city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

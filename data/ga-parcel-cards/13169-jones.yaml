@@ -1,0 +1,278 @@
+state: GA
+jurisdiction: Jones County
+fips: "13169"
+level: county
+markets: [Macon]
+
+layers:
+  # PRIMARY — honest gap: no county-wide public parcel FeatureServer/MapServer recovered
+  - role: parcels
+    name: null — no public county-wide ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Jones County GA county-wide public parcel
+      FeatureServer/MapServer recovered. Official human cadastral + CAMA path = qPublic
+      App=JonesCountyGA (qpublic.net/ga/jones → qpublic.schneidercorp.com Application.aspx;
+      also linked from DOR property-records-online and jonescountygataxassessor.com).
+      County seat Gray GA (~-83.54,33.01). Middle Georgia Regional Commission (MGRC / GARC
+      org Ug5xGQbHsD8zuZzM) publishes Jones_County_Boundary, Jones_County_Commission_District_Map_WFL1
+      (incl. City of Gray layer), broadband/recycling — NOT tax parcels / CAMA.
+      JonesCountyGA_WFS on wfs.schneidercorp.com → 404. Cloudflare/bot 403 on Application.aspx
+      automated; public for humans. Numeric AppID/LayerID not recovered automated (2026-09-24).
+      REJECT lookalikes: Map_of_Jones_County_Final_WFL1 / Final_Map_of_Jones_County_NC_WFL1
+      (UNCW org EhkUu6sHoRi5xjBh — Jones County NORTH CAROLINA flood study); GDITAdmin /
+      catalog "Parcels - MS - Jones County", "Parcels - SD - Jones County", "Parcels - TX -
+      Jones County" / jonescad.org (Jones CAD Abilene TX); Jones County IA/MS lookalikes;
+      gcgeog Parcels services3…2apYAev6EzpKDen5 (only ~40 Salamander Springs study parcels
+      straddling Jones+Baldwin GA — NOT county-wide digest). Rejected paid Regrid (~15–16k) /
+      USLandGrid / DynamoSpatial / Acres Jones GA extracts. Geo intent: Mid-Georgia Gray /
+      Haddock / Round Oak corridor north of Macon (~-83.54,33.01), NOT NC/MS/IA/TX.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic App=JonesCountyGA
+      Layer=Parcels. Deep-link pattern: Application.aspx?App=JonesCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+      (PageType=Search for search UI). Tax Commissioner jonescountytaxes.com is bills /
+      payments only — not CAMA REST.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer recovered. Prefer qPublic Sales Search HTML
+      App=JonesCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no public county Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Jones County GA Euclidean zoning FeatureServer on AGOL/MGRC (2026-09-24). Planning /
+      Zoning contact via jonescountyga.org / Planning & Zoning — PDF/HTML gap, not REST.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Jones County GA Future Land Use FeatureServer recovered — Comp Plan PDF gap.
+    status: gap
+
+  - role: other
+    name: Jones_County_Commission_District_Map_WFL1 (MGRC — districts + City of Gray)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Jones_County_Commission_District_Map_WFL1/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      NAME: cityName
+      LOCALFIPS: placeFips
+    notes: >
+      Companion (not parcels): layer 1 City of Gray, GA polygon (NAME='Gray', LOCALFIPS=34512;
+      WGS84 centroid ~-83.5406,33.0094 — geo-verified Jones GA). Layer 0 = Commission
+      Districts; layer 2 = Jones County outline. Human experience:
+      experience.arcgis.com/experience/6b1d664a128340c09e7d89f1f4c1c48a. Twin boundary FS
+      Jones_County_Boundary (nwilliams_MGRC). Do NOT treat as CAMA.
+    status: usable
+
+municipalities:
+  - name: Gray
+    level: city
+    parentFips: "13169"
+    joinToCountyParcels: >
+      Spatial Jones_County_Commission_District_Map_WFL1/1 NAME='Gray' (~-83.54,33.01) when
+      county parcel REST appears; until then qPublic App=JonesCountyGA HTML only. County seat.
+    layers:
+      - role: zoning
+        name: null — no Gray city zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Gray-owned zoning REST recovered.
+        status: gap
+      - role: parcels
+        name: null — no county or city parcel REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: qPublic county HTML only until county parcel FS published.
+        status: gap
+    gaps:
+      - "No Gray-owned parcel/CAMA/zoning FeatureServer — county qPublic HTML + MGRC city limits only."
+    status: partial
+
+  - name: Haddock
+    level: city
+    parentFips: "13169"
+    joinToCountyParcels: >
+      Unincorporated / CDP near ~-83.48,33.03 — no Haddock city-limits FeatureServer on MGRC
+      Jones commission map (only Gray). Soft situs via qPublic when available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Haddock zoning REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: qPublic county HTML only.
+        status: gap
+    gaps:
+      - "No Haddock city-limits or parcel REST."
+    status: gap
+
+gaps:
+  - "No public REST parcels/tax/sales/zoning/FLU for Jones County GA — qPublic App=JonesCountyGA HTML only."
+  - "JonesCountyGA_WFS 404; numeric AppID/LayerID not recovered (Cloudflare 403 automated)."
+  - "MGRC Jones layers are boundary/commission/broadband/recycling — not cadastral CAMA."
+  - "REJECT Jones NC (UNCW Map_of_Jones_County_Final_WFL1); REJECT Jones MS/SD/TX GDITAdmin/CAD; REJECT Jones IA; REJECT gcgeog Salamander Springs 40-parcel subset."
+  - "Rejected paid Regrid/USLandGrid/DynamoSpatial/Acres Jones GA extracts."
+  - "No emails/phones; no paid vendors; utilities + AADT skipped (tranche-3)."
+
+license: >
+  Jones County Board of Tax Assessors qPublic/Beacon App=JonesCountyGA (qpublic.net/ga/jones;
+  DOR property-records-online link; jonescountygataxassessor.com). MGRC/GARC AGOL org
+  Ug5xGQbHsD8zuZzM — Jones_County_Boundary / Jones_County_Commission_District_Map_WFL1
+  (City of Gray) for municipal outline only. No public ArcGIS parcel service discovered
+  2026-09-24. Attribution Jones County Tax Assessors / MGRC GIS. Public HTML + boundary
+  fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=JonesCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=JonesCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap. Only a
+    40-feature ParcelsAppend layer (services3 2apYAev6EzpKDen5) - not county-wide.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Gray city"
+      level: city
+      parentFips: "13169"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Jones' AND aadt>0
+    altFilter: name LIKE '169-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 169-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 81
+    maxAadt: 18600
+    geoCheck: 80/81 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=JonesCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=JonesCountyGA&Layer=Parcels&PageType=Search
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Gray city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

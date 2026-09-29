@@ -1,0 +1,510 @@
+state: GA
+jurisdiction: Spalding County
+fips: "13255"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — official county-wide cadastral polygons (PIN + jurisdiction; CAMA thin)
+  - role: parcels
+    name: Spalding County Parcels (public view)
+    restUrl: https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/Parcels_Public_View/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      JURISDICTION: municipalityFlag
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + PIN landbase (Spalding County Government
+      AGOL org IBG8fFojdkoiHAvQ / spaldingcounty.maps.arcgis.com / creagan_spalding;
+      item 502614321301421dbb1af81ab5b36a07 "Spalding County Parcels (public view)";
+      created 2025-08-04, modified 2025-08-11). Live count 33700 (2026-09-23). Fields
+      exposed on public view: PARCEL_ID, JURISDICTION only (Shape__Area not returned in
+      outFields — compute GIS acres from polygon geometry in StatePlane GA West FIPS
+      1002 Feet 102667/2240: acres = shoelace_sqft/43560). JURISDICTION domain:
+      COUNTY≈23431, CITY≈10269 — CITY ≈ City of Griffin only (Orchard Hill parcels
+      remain COUNTY; Sunny Side charter repealed Jan 2024). GIS acres 5–150 ≈3834
+      (CITY≈200, COUNTY≈3634). Geo-verified WGS84 samples ~-84.257,33.321 (244 02001B),
+      ~-84.230,33.252 (120 02008APU), ~-84.209,33.257 (212 01032D) — Spalding County GA
+      south of Atlanta (~-84.25,33.25) (NOT Spalding other states; NOT Griffin IN/GA-lookalike
+      TN KGIS). No ownerName / mailing / situs / tax / lastSale / Euclidean zoning on
+      this layer — join Buildings_View spatially for situs; County Zoning LABEL
+      spatially for unincorporated; qPublic/Beacon HTML for CAMA. Twin thin parcels
+      on fdsustartup SpaldingCounty/FeatureServer/7 (33261; PARCEL_ID+JURISDICTI+Shape
+      area) — prefer official Public_View/1. Stormwater SWU_Billing_Rates/24 (23422)
+      mirrors PARCEL_ID+JURISDICTION + IMPERVIOUS_SQFT only. Enrichment vs thin in-app:
+      full-county outlines + PARCEL_ID + JURISDICTION + GIS acres; owner/tax/sale via
+      HTML or rejected Regrid-schema redistribute (do not prefer).
+    status: usable
+
+  - role: tax
+    name: null — no public REST tax/CAMA values
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer exposes tax.marketValue / assessedValue /
+      taxableValue for Spalding (2026-09-23). Official parcels public view is PIN+jurisdiction
+      only. Assessor HTML: qPublic/Beacon SchneiderCorp AppID=766 LayerID=11802
+      (qpublic.net/ga/spalding; beacon.schneidercorp.com links on county assessor page;
+      also App=SpaldingCountyGA&Layer=Parcels). CDN/bot Cloudflare 403 from research
+      box on Application.aspx; public for humans. Deep-link:
+      Application.aspx?AppID=766&LayerID=11802&PageTypeID=4&KeyValue={PARCEL_ID}
+      or App=SpaldingCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCEL_ID}.
+      Alternate HTML: spaldingproperty.assurancegov.com/Property/Search (AssuranceWeb;
+      live 302 — not REST). Rejected mhackman_UofMD ga_spalding_shp landval/parval
+      (all 0; Regrid-schema ll_* provenance — not a free official CAMA feed).
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Spalding multi-sale FeatureServer/MapServer found (2026-09-23). Official
+      parcels expose no saleprice/saledate. UofMD ga_spalding_shp saleprice>0 and
+      saledate all null on live query — useless for lastSale. Prefer qPublic/Beacon
+      AppID=766 Sales Search HTML. Rejected ARC LandPro_2012 and paid
+      Regrid/USLandGrid/ATTOM as sales substitutes.
+    status: gap
+
+  - role: zoning
+    name: Spalding County Zoning (public view)
+    restUrl: https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/Spalding_County_Zoning_(public_view)/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      LABEL: zoning
+      DESCRIPTION: zoningDescription
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Preferred unincorporated Spalding Euclidean zoning (SCWA GIS for Community
+      Development; item f99e932ac69c4dceaa8625516660513e; created/modified 2025-08-11).
+      Live count 1335 district polygons (NOT parcel-tied — spatial intersect default).
+      SR 102667 feet. Domain LABEL (top): AR1≈410 Agricultural and Residential,
+      R2≈274, R1≈180 Single-Family Residential, C1≈131 Highway Commercial, R4≈78,
+      C2≈60 Manufacturing, C1B≈41 Heavy Commercial, R5≈38, PDD≈22 Planned Development,
+      AAR≈17 Active Adult Residential, AR2≈17 Rural Reserve, OI≈15, C1A≈11 Neighborhood
+      Commercial, R3≈11 Multifamily (mixed DESCRIPTION labels), VN≈7 Village Node,
+      plus R2A/R6/AT/PRRRD/C3/R1A rare. Geo-verified ~-84.195,33.224 / ~-84.291,33.323
+      Spalding GA. IMPORTANT: does NOT cover City of Griffin — sample CITY-jurisdiction
+      parcel centroid returns 0 zoning intersects; Orchard Hill town (~-84.209,33.188)
+      IS covered (e.g. R1). Inside Griffin prefer city Zoning PDF / staff certification
+      (no public city zoning FeatureServer found 2026-09-23). Former Sunny Side (now
+      unincorporated as of 2024-01-01 HB542) falls under this county layer.
+    status: usable
+
+  - role: flu
+    name: null — Comp Plan Future Development Map PDF only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer Future Land Use / character areas for Spalding
+      found (2026-09-23). Official FLU is Map 4 Future Development Map in Spalding
+      County Comprehensive Plan 2042 (joint with Orchard Hill & Sunny Side; DCA plan
+      page + county website CDN PDF
+      cdn.prod.website-files.com/.../SpaldingCompPlan2042_Main%20Document.pdf ≈4.3MB
+      mirror; full DCA package ~60MB). Planning & Zoning: spaldingcounty.com/business/
+      planning-zoning (UDO + Official Zoning Map maintained by Community Development;
+      FLU advisory). Rejected ARC LandPro_2012 (Ug5xGQbHsD8zuZzM) as cadastral/FLU
+      substitute. City of Griffin Character Areas / Existing Land Use listed as PDF
+      maps on cityofgriffin.com GIS page — no open REST.
+    status: gap
+
+  - role: other
+    name: City of Griffin (municipal boundary)
+    restUrl: https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/City_of_Griffin/FeatureServer/67
+    layerId: 67
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Live count 1 Griffin city-limit polygon (~-84.27,33.25). Parcel↔city join =
+      spatial default OR parcels JURISDICTION='CITY' (≈10269 soft Griffin filter;
+      Orchard Hill is COUNTY). Twin bdurden org ZizkogZ4y0zJK5Cv City_of_Griffin/0
+      (LABEL field) and fdsustartup SpaldingCounty/9 Griffin_City_Limits — prefer
+      official creagan_spalding service.
+    status: usable
+
+  - role: other
+    name: Buildings View (situs building footprints)
+    restUrl: https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/Buildings_View/FeatureServer/60
+    layerId: 60
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ADDRESS: situsAddress
+      NUMBER_: situsNumber
+      PREFIX: situsStreetDir
+      STREET: situsStreet
+      CAD: situsStreetAlt
+      SUFFIX: situsStreetType
+      UNIT_NUMBER: situsUnit
+      JURISDICTION: municipalityFlag
+      CITY: postalCommunity
+      ZIP: situsZip
+      TYPE: buildingType
+    notes: >
+      Live count 57391 building footprints; ADDRESS filled ≈33056; NUMBER_/STREET
+      filled ≈33054/33056. Preferred situs source (parcel layer has no situs). No
+      PARCEL_ID join key — spatial intersect to parcels default. Compose situsAddress
+      from NUMBER_ + PREFIX + STREET + SUFFIX when ADDRESS blank/space. JURISDICTION
+      COUNTY≈40670 / CITY≈16721. CITY is POSTAL (GRIFFIN≈30287 dominates including
+      unincorporated; WILLIAMSON≈776, LOCUST GROVE≈761, HAMPTON≈670, BROOKS≈455,
+      SUNNY SIDE≈27) — NOT incorporated municipality filter. Geo-verified
+      ~-84.270,33.190 Griffin postal Spalding GA. TYPE e.g. RESIDENTIAL.
+    status: usable
+
+  - role: other
+    name: Spalding County boundary
+    restUrl: https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/Spalding_County/FeatureServer/50
+    layerId: 50
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Live count 1 county outline for reference / clip. Geo-verified Spalding GA.
+    status: usable
+
+  - role: other
+    name: SWU Billing Rates 2026 PublicView (impervious — not CAMA)
+    restUrl: https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/SWU_Billing_Rates_2026_PublicView/FeatureServer/24
+    layerId: 24
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      JURISDICTION: municipalityFlag
+      IMPERVIOUS_SQFT: imperviousSqFt
+      SWU_DETACHED_DWELLING: swuDwellingClass
+    notes: >
+      Live count 23422 stormwater billing polygons (subset of parcels). PIN-join on
+      PARCEL_ID. Useful for utility context only — not tax/sale/owner. Public viewer
+      appid b2a18f62f61a4b26a7350e5c6a0a1fc5.
+    status: partial
+
+municipalities:
+  - name: Griffin
+    level: city
+    parentFips: "13255"
+    joinToCountyParcels: >
+      Spatial City_of_Griffin/67 (~-84.27,33.25) OR parcels JURISDICTION='CITY'
+      (≈10269). Buildings CITY='GRIFFIN' is postal (~30287) — prefer spatial /
+      JURISDICTION.
+    layers:
+      - role: other
+        name: City of Griffin boundary (county-hosted)
+        restUrl: https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/City_of_Griffin/FeatureServer/67
+        layerId: 67
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Shape__Area: shapeAreaSqFt
+        notes: >
+          Preferred Griffin city-limits REST (standing-order spatial join). Live count
+          1. Geo-verified ~-84.274,33.246 Griffin GA (NOT Griffin IN; NOT Knoxville
+          TN KGIS "City Control Points" mis-hit from "Griffin Control Point" search).
+        status: usable
+      - role: zoning
+        name: null — City of Griffin Euclidean zoning REST missing (PDF maps only)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No public Griffin zoning FeatureServer/MapServer found (2026-09-23). City
+          GIS page cityofgriffin.com/.../gis lists PDF maps: Zoning, Character Areas,
+          Existing Land Use, plus overlay districts (Airport, Medical, Mixed Use–
+          Transit, Main Street, BID, etc.). County Spalding_County_Zoning public view
+          does NOT apply inside CITY jurisdiction (0 intersects on sample). Planning
+          & Development (cityofgriffin.com/services/planning-development) maintains
+          Comp Plan / Land Use Map / Zoning Map / UDC — certification / PDF / staff.
+          bdurden Griffin AGOL (ZizkogZ4y0zJK5Cv) has boundary + orthos + commissioner
+          districts + basemap VT only — no zoning layer.
+        status: gap
+      - role: flu
+        name: null — Griffin Character Areas / Existing Land Use PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Character Areas and Existing Land Use listed as PDF maps on City GIS page;
+          no open REST. Prefer city PDF over county Comp Plan stubs inside Griffin.
+        status: gap
+      - role: parcels
+        name: null — no Griffin-only CAMA REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Use county Parcels_Public_View filtered JURISDICTION='CITY' or spatial
+          City_of_Griffin. CAMA via qPublic AppID=766.
+        status: gap
+    gaps:
+      - "No Griffin Euclidean zoning / FLU FeatureServer — PDF maps on city GIS page + Planning & Development certification only."
+      - "County zoning public view excludes CITY jurisdiction — do not spatial-join county LABEL inside Griffin."
+      - "Buildings CITY='GRIFFIN' is postal — not a city-limits filter."
+      - "No Griffin parcel CAMA REST beyond county thin Public_View + qPublic HTML."
+    status: partial
+
+  - name: Orchard Hill
+    level: city
+    parentFips: "13255"
+    joinToCountyParcels: >
+      Spatial Orchard_Hill_City_Limits (~-84.209,33.188) on fdsustartup
+      SpaldingCounty/FeatureServer/8. Parcels inside remain JURISDICTION='COUNTY'
+      (≈160 envelope sample) — do NOT use JURISDICTION='CITY'. Census place GEOID
+      1358296 Orchard Hill town.
+    layers:
+      - role: other
+        name: Orchard_Hill_City_Limits (fdsustartup fire/GIS composite)
+        restUrl: https://services8.arcgis.com/jNUIWEZv9aaHqUtJ/arcgis/rest/services/SpaldingCounty/FeatureServer/8
+        layerId: 8
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          LABEL: municipality
+          Shape__Area: shapeAreaSqFt
+        notes: >
+          Live count 1; LABEL='ORCHARD HILL'. Geo-verified ~-84.209,33.188 Orchard
+          Hill GA (NOT UMass Orchard Hill / other Orchard Hill subdivisions). Org
+          jNUIWEZv9aaHqUtJ / fdsustartup — unofficial fire-department composite but
+          only public Orchard Hill limit polygon found (2026-09-23); official county
+          org has City of Griffin but not Orchard Hill. Prefer spatial join.
+        status: usable
+      - role: zoning
+        name: Spalding County Zoning (covers Orchard Hill)
+        restUrl: https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/Spalding_County_Zoning_(public_view)/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          LABEL: zoning
+          DESCRIPTION: zoningDescription
+        notes: >
+          Orchard Hill is under county UDO/zoning REST (point sample LABEL=R1). No
+          separate town zoning FeatureServer. Joint Comp Plan with county (Orchard
+          Hill & Sunny Side). Spatial-join county zoning.
+        status: usable
+      - role: flu
+        name: null — joint Comp Plan 2042 PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          FLU/character in Spalding County Comp Plan 2042 (DCA joint plan with Orchard
+          Hill & Sunny Side) — PDF only; no town REST.
+        status: gap
+    gaps:
+      - "Orchard Hill city-limits REST only on third-party fdsustartup composite — not on creagan_spalding org."
+      - "No Orchard Hill-local Euclidean zoning REST beyond county public view."
+      - "No Orchard Hill parcel CAMA REST — county Public_View + qPublic."
+    status: partial
+
+  - name: Sunny Side
+    level: city
+    parentFips: "13255"
+    joinToCountyParcels: >
+      Former city — charter repealed by GA HB542 / Act 279 effective 2024-01-01;
+      duties transferred to Spalding County; now Historic Sunny Side Community /
+      Census CDP GEOID 1374572 (~-84.297,33.343). No current incorporated city
+      limits REST. Soft: Buildings CITY='SUNNY SIDE' (≈27 postal) or Census TIGER
+      CDP polygon. Treat as unincorporated for zoning (county LABEL).
+    layers:
+      - role: zoning
+        name: Spalding County Zoning (former Sunny Side now unincorporated)
+        restUrl: https://services5.arcgis.com/IBG8fFojdkoiHAvQ/arcgis/rest/services/Spalding_County_Zoning_(public_view)/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: county-wide
+        fieldMap:
+          LABEL: zoning
+          DESCRIPTION: zoningDescription
+        notes: >
+          Post-dissolution use county zoning REST. No Sunny Side city zoning server.
+          Comp Plan 2042 still references Sunny Side historically.
+        status: usable
+      - role: other
+        name: null — no Sunny Side city-limits FeatureServer (dissolved)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: unknown
+        fieldMap: {}
+        notes: >
+          No creagan_spalding / official Sunny Side boundary layer. Optional Census
+          TIGER CDP Places layer GEOID 1374572 for historic extent research only.
+        status: gap
+    gaps:
+      - "Sunny Side no longer an incorporated municipality (charter repealed 2024-01-01) — do not treat as active city for city-prefer zoning."
+      - "No Sunny Side city-limits or city zoning/FLU REST."
+    status: partial
+
+gaps:
+  - "Official Parcels_Public_View is PIN+JURISDICTION+geometry only — no ownerName, mailing, situs, deeded acres, tax, or lastSale on REST."
+  - "No deeded acreage field — GIS acres from StatePlane geometry /43560 (5–150 ≈3834 of 33700)."
+  - "Shape__Area not queryable as outField on public parcels view — compute from rings."
+  - "No public REST tax.marketValue/assessedValue — qPublic/Beacon AppID=766 LayerID=11802 HTML (Cloudflare/bot 403 automated); AssuranceWeb spaldingproperty.assurancegov.com HTML alternate."
+  - "No public REST lastSale.price/date/qualified — qPublic Sales Search HTML only."
+  - "No public REST county or city Future Land Use — Comp Plan 2042 PDF (DCA / county CDN) only; Griffin Character Areas PDF only."
+  - "County zoning usable for unincorporated + Orchard Hill; does NOT cover Griffin CITY jurisdiction."
+  - "No City of Griffin Euclidean zoning FeatureServer — PDF maps on cityofgriffin.com GIS page."
+  - "Situs not on parcel polygons — spatial-join Buildings_View (ADDRESS≈33056/57391; no PIN key); CITY is postal."
+  - "JURISDICTION='CITY' ≈ Griffin only; Orchard Hill / former Sunny Side are COUNTY."
+  - "Sunny Side municipal charter repealed effective 2024-01-01 (HB542) — CDP/historic community only."
+  - "Rejected lookalikes / non-preferred: mhackman_UofMD ga_spalding_shp (Regrid/ll_* schema; owner/mail/situs present but landval/parval/saleprice/zoning blank — paid-vendor provenance, do not prefer); USLandGrid/Regrid/ATTOM paid parcel extracts; ARC LandPro_2012 (Ug5xGQbHsD8zuZzM / ryanbarrett) stale regional land-cover; Spalding_ROE_Status_Parcels (ian.wilson_r2tinc — 84-parcel project subset with Phone/Email PII — do not harvest); Knoxville TN KGIS City Control Points (wrong Griffin); fdsustartup SpaldingCounty hydrant composite as cadastral CAMA; any non-GA Spalding / Griffin IN; token/paid orthos Pictometry EagleView mosaics on county org."
+  - "Enrichment vs thin in-app: official 33700 geometry+PARCEL_ID+JURISDICTION+GIS acres; county Euclidean zoning (unincorporated+Orchard Hill); Buildings situs; Griffin + Orchard Hill limits; SWU impervious PIN; Griffin zoning/FLU + county FLU + owner/tax/sale remain gap/HTML/PDF."
+
+license: >
+  Spalding County Government AGOL org IBG8fFojdkoiHAvQ (spaldingcounty.maps.arcgis.com
+  / creagan_spalding; SCWA GIS hosts zoning for Community Development) —
+  Parcels_Public_View, Spalding_County_Zoning_(public_view), City_of_Griffin,
+  Spalding_County, Buildings_View, Road_Centerlines, SWU_Billing_Rates_2026_PublicView,
+  SWU_Impervious_Surfaces_2025_PublicView. Viewers: Stormwater Utility Impervious
+  Surfaces instant app b2a18f62f61a4b26a7350e5c6a0a1fc5; Public Information
+  ae0ac03af0c74bda8312a4c366396409. City of Griffin GIS (cityofgriffin.com GIS;
+  bdurden org ZizkogZ4y0zJK5Cv — boundary/orthos/basemap). Orchard Hill limits via
+  fdsustartup SpaldingCounty/8 (composite). Comp Plan 2042: Georgia DCA Spalding
+  County w Cities of Orchard Hill & Sunny Side; county CDN PDF. Assessor HTML:
+  qPublic/Beacon SchneiderCorp AppID=766 LayerID=11802 (qpublic.net/ga/spalding);
+  AssuranceWeb spaldingproperty.assurancegov.com. Attribution to Spalding County /
+  SCWA GIS / City of Griffin. Public fields only; no emails/phones; no paid vendors
+  (Regrid/ATTOM/CoreLogic/USLandGrid).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=SpaldingCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/IBG8fFojdkoiH
+    AvQ/arcgis/rest/services/Parcels_Public_View/FeatureServer/1 count 33700; extent center [['13255',
+    'Spalding County']]; sample [['13255', 'Spalding County']]. No change to field map (see layer
+    above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Griffin city"
+      level: city
+      parentFips: "13255"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Spalding' AND aadt>0
+    altFilter: name LIKE '255-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 255-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 216
+    maxAadt: 95300
+    geoCheck: 215/216 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=SpaldingCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=766&LayerID=11802&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_ID
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 267A02041
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=SpaldingCountyGA&Layer=Parcels&PageType=Report&KeyValue=267A02041
+    verification: 'pattern-tested: real sample ID from PARCEL_ID; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=SpaldingCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Griffin city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

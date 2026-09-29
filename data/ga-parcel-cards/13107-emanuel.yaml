@@ -1,0 +1,493 @@
+state: GA
+jurisdiction: Emanuel County
+fips: "13107"
+level: county
+markets: [Savannah]
+
+layers:
+  - role: parcels
+    name: Emanuel_CountyWide_GeoData_View TaxParcels_25 (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Emanuel_CountyWide_GeoData_View/FeatureServer/20
+    layerId: 20
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      Realkey: ownerKey
+      Ownkey: ownerKeyAlt
+      lastname: ownerName
+      firstname: ownerNameFirst
+      address1: mailingAddressAlt
+      address2: mailingAddress
+      address3: mailingAddress2
+      city: mailingCity
+      state: mailingState
+      zip_code: mailingZip
+      house_no: situsNumber
+      stdirect: situsStreetDir
+      street_nam: situsStreet
+      sttype: situsStreetType
+      unit: situsUnit
+      totalacres: acreage
+      Draw_Acres: acreageGis
+      Deed_Acres: acreageDeed
+      woodacres: acreageWoodland
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      a_value: tax.landValue
+      p_value: tax.improvementValue
+      sale_val: lastSale.price
+      saleland1: lastSale.landPrice1
+      saleimp1: lastSale.impPrice1
+      zoning: zoningCode
+      zoningcode: zoningAlt
+      taxdistric: taxDistrict
+      digclass: dorCode
+      digstrat: dorStrata
+      land_type: landType
+      legal_desc: legalDescription
+      subd_name: subdivision
+      homeexempt: homesteadExempt
+      landgmd: georgiaMilitiaDistrict
+      landlot: landLot
+      landdist: landDistrict
+      neighbhood: neighborhood
+      histyr1: tax.histYear1
+      histval1: tax.histValue1
+      histyr2: tax.histYear2
+      histval2: tax.histValue2
+      histyr3: tax.histYear3
+      histval3: tax.histValue3
+      lat: latitude
+      lon: longitude
+      qPub_Link: appraiserSearchUrl
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (Heart of Georgia Altamaha RC /
+      hogagis org HHvUPZ2XuLOAJxjR — Emanuel_CountyWide_GeoData_View item
+      ce624eb2abcb4434a0d7e43887d11d30 FeatureServer/20 TaxParcels_25). Older thin
+      TaxParcels19/18 (count 14739; Parcel_No+Par_Label only) — do not prefer.
+      Live count 14974 (2026-09-24). maxRecordCount 2000 — page via resultOffset /
+      spatial envelopes. totalacres 5–150 = 4498; Draw_Acres 5–150 = 4376;
+      curr_val>0 = 14887; mavcurr>0 = 0 (assessed REST gap); sale_val>0 = 0;
+      saleland1>0 = 0 / saleimp1>0 = 0 (sale REST gap); lastname ≈14887;
+      address1 ≈10873 / address2 ≈5330 (coalesce mailing street: prefer non-blank
+      address2 else address1 — address1 sometimes farm/name when address2 is street);
+      house_no>0 ≈8734; fmvres>0 ≈8154; a_value>0 ≈13043; p_value>0 ≈2371;
+      histval1>0 ≈14659; qPub_Link filled 14974. Compose situs from
+      house_no+stdirect+street_nam+sttype when house_no>0. Prefer totalacres for
+      acreage band; Draw_Acres GIS aid. zoning field coded 004≈8195 / 005≈3955 /
+      001≈1746 / 002≈642… — NOT Euclidean ordinance labels; zoningcode text sparse
+      ≈28. digclass: R≈10208, V≈2164, C≈782, A≈747, E≈745, J≈205, I≈32.
+      taxdistric soft geo-checked: 01≈8832 Adrian/unincorp west (~-82.64,32.51),
+      02≈3767 Swainsboro (~-82.37,32.61), 03≈885 Twin City (~-82.17,32.60),
+      07≈388 Stillmore (~-82.23,32.44), 08≈427 south/Lyons fringe, 04≈155 Garfield,
+      05≈226, 06≈112, 09≈95 Nunez — prefer spatial city limits when published.
+      Schema water/sewer/gas/electricty/roadstreet present — SKIP utilities+AADT.
+      Parcel_No format e.g. '001    001' / '001    004A' (preserve spaces for
+      KeyValue). Official assessor HTML: qPublic App=EmanuelCountyGA / AppID=668
+      LayerID=11350 (qpublic.net/ga/emanuel; emanuelco-ga.gov Tax Assessors).
+      qPub_Link embeds App=emanuelCountyGA&Layer=Parcels&PageType=Report&KeyValue=.
+      CountyBoundary/1 CNTYIDFP=13107 / NAME=Emanuel / STATEFP=13 geo-verified.
+      WGS84 samples ~-82.643,32.512 / ~-82.367,32.611 / ~-82.172,32.604 —
+      Emanuel County GA / Adrian–Swainsboro–Twin City (FIPS 13107; seat Swainsboro
+      ~-82.34,32.60). REJECT paid Regrid/ATTOM/DynamoSpatial/USLandGrid; no
+      emails/phones collected.
+    status: usable
+
+  - role: tax
+    name: TaxParcels_25 curr_val / fmv* / mav* (on polygons)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Emanuel_CountyWide_GeoData_View/FeatureServer/20
+    layerId: 20
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      a_value: tax.landValue
+      p_value: tax.improvementValue
+      taxdistric: taxDistrict
+      digclass: dorCode
+      homeexempt: homesteadExempt
+      histyr1: tax.histYear1
+      histval1: tax.histValue1
+      histyr2: tax.histYear2
+      histval2: tax.histValue2
+      histyr3: tax.histYear3
+      histval3: tax.histValue3
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. curr_val>0 = 14887;
+      mavcurr>0 = 0 (assessed REST gap — use qPublic HTML). a_value>0 ≈13043;
+      p_value>0 ≈2371; histval1>0 ≈14659 (assessment history — NOT sales).
+      Assessor HTML: AppID=668 LayerID=11350. Deep-link KeyValue={Parcel_No}:
+      Application.aspx?App=EmanuelCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_No}
+      (also AppID=668&LayerID=11350 PageTypeID=4 + KeyValue; qPub_Link embeds same).
+    status: usable
+
+  - role: sales
+    name: TaxParcels_25 sale_val/saleland*/saleimp* zero-filled — qPublic HTML
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Emanuel_CountyWide_GeoData_View/FeatureServer/20
+    layerId: 20
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      sale_val: lastSale.price
+      saleland1: lastSale.landPrice1
+      saleland2: lastSale.landPrice2
+      saleimp1: lastSale.impPrice1
+      saleimp2: lastSale.impPrice2
+    notes: >
+      sale_val>0 = 0; saleland1>0 = 0; saleimp1>0 = 0 live (no usable REST sale
+      components / no lastSale.date). Prefer qPublic Sales Search / Sales List HTML
+      App=EmanuelCountyGA / AppID=668. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: TaxParcels_25 zoning (coded) — no Euclidean FeatureServer
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Emanuel_CountyWide_GeoData_View/FeatureServer/20
+    layerId: 20
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      zoning: zoningCode
+      zoningcode: zoningAlt
+    notes: >
+      Parcel-attributed zoning codes only (004/005/001/002…). No public Euclidean
+      zoning FeatureServer for Emanuel County GA (2026-09-24). City of Swainsboro
+      GeoData has city limits / utilities — no zoning layer. municode / planning PDF
+      gap for ordinance labels.
+    status: partial
+
+  - role: flu
+    name: Emanuel_CountyWide_GeoData_View Landuse (EXTLU / FLULU)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Emanuel_CountyWide_GeoData_View/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      FLULU: flu
+      FLUDCA: fluDca
+      EXTLU: existingLandUse
+      EXTLUDCA: existingLandUseDca
+      Acreage: acreage
+    notes: >
+      Preferred Future / existing land-use polygons (NOT parcel-tied — spatial
+      intersect). Live count 16566. FLULU: Residential≈9694, Forestry≈2812,
+      Agriculture≈2409, Commercial≈819, Public/Institutional≈675, Industrial≈74,
+      Park/Recreation/Conservation≈44, Transportation/Communication/Utilities≈28.
+      Prefer FLULU as flu; EXTLU as existing. Companion CharacterAreas/7 (count 48;
+      NAME_ Swainsboro / Downtown / Greater Swainsboro / Adrian / Twin City /
+      Garfield / Stillmore / Ohoopee River / George L. Smith State Park / corridors
+      / Industrial Park…) — planning character only. Skip utility layers.
+    status: usable
+
+municipalities:
+  - name: Swainsboro
+    level: city
+    parentFips: "13107"
+    joinToCountyParcels: >
+      Soft taxdistric='02' (~3767; ~-82.37,32.61) OR spatial City_of_Swainsboro_GeoData_View
+      SwainsboroCityLimits/2 when filtering; mailing city='SWAINSBORO' is NOT authoritative.
+    layers:
+      - role: zoning
+        name: null — no Swainsboro city zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City_of_Swainsboro_GeoData_View has city limits / sewer / water — NO zoning
+          polygons. Skip utilities per tranche-3. County zoning codes only.
+        status: gap
+      - role: flu
+        name: County Landuse / CharacterAreas spatial Swainsboro
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Emanuel_CountyWide_GeoData_View/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: Acreage
+        coverage: city-only
+        fieldMap:
+          FLULU: flu
+        notes: County FLU spatial intersect SwainsboroCityLimits; CharacterAreas Swainsboro/Downtown/Greater Swainsboro.
+        status: usable
+      - role: parcels
+        name: null — use county TaxParcels_25 filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Swainsboro-only CAMA — county TaxParcels_25 + taxdistric=02 / spatial.
+        status: gap
+    gaps:
+      - "No Swainsboro-owned zoning/parcel CAMA FeatureServer — county layers + soft taxdistric=02; skip city water/sewer."
+    status: partial
+
+  - name: Twin City
+    level: city
+    parentFips: "13107"
+    joinToCountyParcels: >
+      Soft taxdistric='03' (~885; ~-82.17,32.60) OR spatial City_of_TwinCity_View limits when published.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Twin City Euclidean zoning REST recovered.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Use county Landuse / CharacterAreas spatial Twin City.
+        status: partial
+      - role: parcels
+        name: null — county TaxParcels_25 + taxdistric=03
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels_25 + soft taxdistric=03.
+        status: gap
+    gaps:
+      - "No Twin City city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Adrian
+    level: city
+    parentFips: "13107"
+    joinToCountyParcels: >
+      Soft taxdistric='01' majority west / City_of_Adrian_GeoData_View city limits when published
+      (~-82.64,32.51); mailing city alone insufficient.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Adrian city zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County CharacterAreas NAME_='Adrian' stub + Landuse spatial.
+        status: partial
+      - role: parcels
+        name: null — county TaxParcels_25 spatial Adrian
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County parcels spatial to Adrian city limits (taxdistric=01 is mostly unincorp — do not equate).
+        status: gap
+    gaps:
+      - "taxdistric=01 is majority unincorporated west — prefer spatial Adrian city limits over district filter."
+    status: partial
+
+gaps:
+  - "mavcurr>0 = 0 — no usable assessedValue on REST; prefer curr_val market + qPublic AppID=668 HTML for assessed/taxable."
+  - "sale_val/saleland1/saleimp1 all zero-filled — no REST lastSale.price/date; qPublic Sales Search HTML AppID=668."
+  - "zoning field is coded 001–008 (not Euclidean ordinance labels); zoningcode text ≈28 only; no Euclidean zoning FeatureServer county-wide."
+  - "No Swainsboro/Twin City/Adrian city Euclidean zoning FeatureServers."
+  - "Mailing street coalesce address2||address1 (address1 sometimes name/farm when address2 is street)."
+  - "TaxParcels_25 maxRecordCount 2000 — page via resultOffset / spatial envelopes."
+  - "taxdistric soft only — prefer spatial city limits; mailing CITY never sole municipality filter."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; public for humans."
+  - "Rejected lookalikes/paid: Regrid/ATTOM/DynamoSpatial/USLandGrid Emanuel extracts."
+  - "Schema water/sewer/gas/electricty/road* — DO NOT collect (skip utilities+AADT); no emails/phones."
+
+license: >
+  Heart of Georgia Altamaha Regional Commission GIS (AGOL org HHvUPZ2XuLOAJxjR owner
+  hogagis) — Emanuel_CountyWide_GeoData_View FeatureServer/20 TaxParcels_25; Landuse/14;
+  CharacterAreas/7; CountyBoundary/1. Assessor qPublic App=EmanuelCountyGA / AppID=668
+  LayerID=11350 (qpublic.net/ga/emanuel; emanuelco-ga.gov Tax Assessors Office).
+  Attribution HOGARC / Emanuel County Tax Assessor. Public fields only; no emails/phones;
+  no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=668&LayerID=11350&PageTypeID=2
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Emanuel_CountyWide_GeoData_View/FeatureServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/HHvUPZ2XuLOAJ
+    xjR/arcgis/rest/services/Emanuel_CountyWide_GeoData_View/FeatureServer/20 count 14974; extent center
+    [['13107', 'Emanuel County']]; sample [['13107', 'Emanuel County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Adrian city"
+      level: city
+      parentFips: "13107"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Garfield city"
+      level: city
+      parentFips: "13107"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Nunez city"
+      level: city
+      parentFips: "13107"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Oak Park town"
+      level: city
+      parentFips: "13107"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Stillmore city"
+      level: city
+      parentFips: "13107"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Summertown city"
+      level: city
+      parentFips: "13107"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Swainsboro city"
+      level: city
+      parentFips: "13107"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Twin City city"
+      level: city
+      parentFips: "13107"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Emanuel' AND aadt>0
+    altFilter: name LIKE '107-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 107-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 201
+    maxAadt: 24100
+    geoCheck: 201/201 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 14887
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Emanuel_CountyWide_GeoData_View/FeatureServer/20
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: sale_val=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 14887
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Emanuel_CountyWide_GeoData_View/FeatureServer/20
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=emanuelCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=668&LayerID=11350&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=emanuelCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20001
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Emanuel_CountyWide_GeoData_View/FeatureServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Adrian city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Garfield city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Nunez city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Oak Park town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Stillmore city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Summertown city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Swainsboro city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Twin City city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

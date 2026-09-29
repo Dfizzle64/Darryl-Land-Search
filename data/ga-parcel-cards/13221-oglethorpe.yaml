@@ -1,0 +1,318 @@
+state: GA
+jurisdiction: Oglethorpe County
+fips: "13221"
+level: county
+markets: [Athens]
+
+layers:
+  # PRIMARY — county-wide parcel REST blocked (OCBOC AGOL subscription disabled / Token Required)
+  - role: parcels
+    name: null — OCBOC Tax_Parcels FeatureServer Token Required (subscription disabled)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: token
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No usable COUNTY-WIDE public parcel FeatureServer/MapServer for Oglethorpe County GA
+      FIPS 13221 (Lexington seat; Athens MSA). OCBOC ArcGIS Online org IX9GvidKl201KteW
+      (owner mspoonerOCBOC) publishes Tax_Parcels item a715d91b8ffc4e2f9de7ca90d10885c9
+      URL https://services1.arcgis.com/IX9GvidKl201KteW/arcgis/rest/services/Tax_Parcels/FeatureServer
+      (extent ~-83.31..-82.78, 33.69..34.05 — geo-correct GA) but live query returns Token
+      Required 499; item/data JSON returns Subscription is disabled SB_0005. Same block on
+      Oglethorpe_Parcels_view, Zoning_Districts, Official Zoning Map WFL1, ParcelsWithinMaxeys,
+      acreage subset layers. Do NOT treat as usable REST. Thin NEGRC corridor extract
+      Parcels_Oglethrope_AffectedFFT_Alignment1_2022/32 (count 146 only; NOT county-wide)
+      exposes Parcel_No + lastname + qPub_Link — document schema hint only; do NOT prefer as
+      landbase. qPub_Link proves App=oglethorpeCountyGA KeyValue={Parcel_No} (preserve spaces
+      e.g. '008    145'). Assessor HTML qPublic SchneiderCorp App=oglethorpeCountyGA
+      (qpublic.net/ga/oglethorpe; oglethorpecountyga.gov Tax Assessor; Lexington GA 30648).
+      Deep-link: Application.aspx?App=oglethorpeCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_No}
+      (Search PageType=Search). Numeric AppID/LayerID not recovered (bot 403). GEO-VERIFY
+      GEORGIA: City_Limits_Oglethorpe COUNTYFP=221 Lexington ~-83.110,33.872 / Crawford
+      ~-83.156,33.883 / Arnoldsville ~-83.215,33.914 / Maxeys ~-83.176,33.755; FFT samples
+      ~-83.267,33.960. Census TIGERweb GEOID 13221 (~CENTLAT +33.87 CENTLON -083.08).
+      REJECT City of Oglethorpe / Macon County lookalike Oglethorpe_Zones (extent ~-84.06,
+      32.29 — Macon County seat; see 13193-macon); REJECT paid Regrid/ATTOM/USLandGrid/
+      Georgia GIS Clearinghouse paid parcel downloads; skip utilities+AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — no public REST tax values; qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST. Assessor HTML qPublic App=oglethorpeCountyGA only.
+      Deep-link KeyValue={Parcel_No}:
+      Application.aspx?App=oglethorpeCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_No}.
+      Rejected paid vendor tax extracts. FFT lastname is owner surname sample only (146
+      corridor parcels) — not county-wide tax digest.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALEPRICE/SALEDATE on any public Oglethorpe REST. Prefer qPublic Sales Search /
+      Sales List HTML App=oglethorpeCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — OCBOC Euclidean Zoning Districts Token Required / subscription disabled
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: token
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Official Zoning Map / Zoning_Districts FeatureServers on org IX9GvidKl201KteW are
+      Token Required / subscription disabled (same OCBOC block as Tax_Parcels). Public
+      zoning viewer shell still HTTP 200 at ocboc.maps.arcgis.com View
+      appid=5643c99adc814fbea3c8f6a31e773e28 — layers behind it may not query anonymously.
+      Prefer NEGRC character areas for planning FLU only (not Euclidean substitute).
+      REJECT RVRC Oglethorpe_Zones (Macon County City of Oglethorpe — wrong geography).
+    status: gap
+
+  - role: flu
+    name: NEGRC Future Development Map Inventory CA - Oglethorpe County - 2023
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/463
+    layerId: 463
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FDM_Short: fluCode
+      FDM_Long: flu
+      ID: fluId
+    notes: >
+      Comp-plan character areas (count 260) — Back Forty≈116 / Rural Living≈71 / Gateway
+      Corridor≈36 / Residential Transition≈25 / Country Crossroads≈10 / Employment Center≈2.
+      Planning character only — not Euclidean zoning. Companion city CA layers: Lexington/461
+      (count 47), Arnoldsville/459 (40), Crawford/460 (89), Maxeys/462 (31).
+    status: usable
+
+  - role: other
+    name: City_Limits_Oglethorpe (NEGRC / Ug5xGQbHsD8zuZzM) — Lexington + cities
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/City_Limits_Oglethorpe/FeatureServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: cityName
+      NAMELSAD: placeNameFull
+      PLACEFP: placeFips
+      COUNTYFP: countyFips
+      STATEFP: stateFips
+    notes: >
+      Live count 4 — Lexington (PLACEFP 46188; ~-83.110,33.872), Crawford (20288;
+      ~-83.156,33.883), Arnoldsville (03124; ~-83.215,33.914), Maxeys (50260;
+      ~-83.176,33.755). STATEFP=13 COUNTYFP=221 confirms Oglethorpe County GA (not Macon).
+      Preferred spatial municipality filter when parcel geometry available. Soft mailing city
+      alone insufficient.
+    status: usable
+
+  - role: other
+    name: Parcels_Oglethrope_AffectedFFT_Alignment1_2022 (NEGRC corridor sample ONLY)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels_Oglethrope_AffectedFFT_Alignment1_2022/FeatureServer/32
+    layerId: 32
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      Parcel_No: parcelId
+      lastname: ownerName
+      qPub_Link: appraiserSearchUrl
+    notes: >
+      FFT alignment corridor extract ONLY (count 146) — NOT county-wide cadastral landbase.
+      Useful for qPublic deep-link pattern (App=oglethorpeCountyGA KeyValue=Parcel_No) and
+      surname sample. Alignments 2/3 are sibling corridor extracts — same limitation. Do NOT
+      prefer over restoring OCBOC Tax_Parcels if subscription returns.
+    status: partial
+
+municipalities:
+  - name: Lexington
+    level: city
+    parentFips: "13221"
+    joinToCountyParcels: >
+      Spatial City_Limits_Oglethorpe/16 NAME='Lexington' (PLACEFP 46188; ~-83.110,33.872).
+      County seat. No city-owned parcel CAMA REST — owner/tax/sale via qPublic
+      App=oglethorpeCountyGA when PIN known.
+    layers:
+      - role: flu
+        name: NEGRC CA - Lexington - 2023
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/461
+        layerId: 461
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Long: flu
+          FDM_Short: fluCode
+        notes: >
+          Lexington character areas (count 47) — Residential Transition≈23 / Gateway
+          Corridor≈22 / Country Crossroads≈1 / Rural Living≈1. Planning only.
+        status: usable
+      - role: zoning
+        name: null — OCBOC city/county Euclidean blocked
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: token
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No public Euclidean zoning REST (OCBOC subscription disabled).
+        status: gap
+      - role: parcels
+        name: null — no city or county-wide public parcel REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County OCBOC Tax_Parcels blocked; qPublic HTML for CAMA.
+        status: gap
+    gaps:
+      - "No Lexington-owned parcel/CAMA or Euclidean zoning REST — NEGRC CA + qPublic HTML only."
+    status: partial
+
+  - name: Crawford
+    level: city
+    parentFips: "13221"
+    joinToCountyParcels: >
+      Spatial City_Limits_Oglethorpe/16 NAME='Crawford' (~-83.156,33.883).
+    layers:
+      - role: flu
+        name: NEGRC CA - Crawford - 2023
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/460
+        layerId: 460
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Long: flu
+        notes: Crawford character areas (count 89).
+        status: usable
+      - role: parcels
+        name: null — qPublic / blocked OCBOC
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city parcel REST.
+        status: gap
+    gaps:
+      - "No Crawford parcel/zoning REST — NEGRC CA + qPublic."
+    status: partial
+
+  - name: Arnoldsville
+    level: city
+    parentFips: "13221"
+    joinToCountyParcels: >
+      Spatial City_Limits_Oglethorpe/16 NAME='Arnoldsville' (~-83.215,33.914).
+    layers:
+      - role: flu
+        name: NEGRC CA - Arnoldsville - 2023
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/459
+        layerId: 459
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Long: flu
+        notes: Arnoldsville character areas (count 40).
+        status: usable
+      - role: parcels
+        name: null — qPublic / blocked OCBOC
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city parcel REST.
+        status: gap
+    gaps:
+      - "No Arnoldsville parcel/zoning REST."
+    status: partial
+
+  - name: Maxeys
+    level: city
+    parentFips: "13221"
+    joinToCountyParcels: >
+      Spatial City_Limits_Oglethorpe/16 NAME='Maxeys' (~-83.176,33.755).
+    layers:
+      - role: flu
+        name: NEGRC CA - Maxeys - 2023
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/462
+        layerId: 462
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Long: flu
+        notes: Maxeys character areas (count 31). OCBOC ParcelsWithinMaxeys also Token Required.
+        status: usable
+      - role: parcels
+        name: null — qPublic / blocked OCBOC
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city parcel REST.
+        status: gap
+    gaps:
+      - "No Maxeys parcel/zoning REST; OCBOC ParcelsWithinMaxeys Token Required."
+    status: partial
+
+gaps:
+  - "No county-wide public parcel geometry REST — OCBOC Tax_Parcels / Oglethorpe_Parcels_view Token Required 499 + Subscription disabled SB_0005; FFT corridor (146) is sample-only."
+  - "No REST owner/mailing/situs/tax/sale/Euclidean zoning — qPublic App=oglethorpeCountyGA HTML for CAMA; numeric AppID/LayerID unrecovered (Cloudflare/bot 403)."
+  - "OCBOC Official Zoning Map / Zoning_Districts FS blocked same subscription — viewer shell HTTP 200 but anonymous REST unusable."
+  - "REJECT Macon County City of Oglethorpe Oglethorpe_Zones (~-84.06,32.29); reject paid Regrid/ATTOM/USLandGrid/Georgia GIS Clearinghouse; skip utilities+AADT; no emails/phones."
+
+license: >
+  Oglethorpe County (OCBOC AGOL org IX9GvidKl201KteW / ocboc.maps.arcgis.com) — Tax_Parcels
+  + Official Zoning Map published but subscription currently disabled for anonymous REST.
+  Usable public layers: NEGRC City_Limits_Oglethorpe/16; NEGRC Future Development Map
+  Inventory CA - Oglethorpe County/463 + Lexington/461 + Arnoldsville/459 + Crawford/460 +
+  Maxeys/462 (Ug5xGQbHsD8zuZzM). Assessor qPublic App=oglethorpeCountyGA
+  (qpublic.net/ga/oglethorpe; oglethorpecountyga.gov Tax Assessor; Lexington GA 30648).
+  Attribution Oglethorpe County / NEGRC GIS / Tax Assessor. Public fields only; no
+  emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=oglethorpeCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://ocboc.maps.arcgis.com/apps/View/index.html?appid=5643c99adc814fbea3c8f6a31e773e28
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

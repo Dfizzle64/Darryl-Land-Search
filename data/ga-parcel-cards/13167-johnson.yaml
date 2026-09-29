@@ -1,0 +1,372 @@
+state: GA
+jurisdiction: Johnson County
+fips: "13167"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "Johnson TaxParcels_25 (HOGARC)"
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Johnson_CountyWide_GeoData_View/FeatureServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: "Draw_Acres"
+    coverage: county-wide
+    parcelIdField: "Parcel_No"
+    liveCount: 5813
+    liveCount5to150ac: 2193
+    geoCheck: "extent center [['13167', 'Johnson County']]; sample [['13167', 'Johnson County']]; extent WGS84 [-82.957, 32.5093, -82.4341, 32.8243]"
+    fieldMap:
+      Parcel_No: "parcelId"
+      Draw_Acres: "acreage"
+      zoning: "zoning"
+      qPub_Link: "appraiserDeepLink"
+    notes: >
+      pass1 2026-09-28: County-wide Johnson GA 2025 tax parcels (5813) on HOGARC
+      Johnson_CountyWide_GeoData_View layer 12. Parcel_No, Draw_Acres, zoning, qPub_Link.
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Johnson County GA public parcel FeatureServer/MapServer with
+      cadastral polygons recovered (2026-09-24). Official human viewer = qPublic/Beacon
+      App=JohnsonCountyGA / AppID=692 LayerID=11390 PageID=5852 (qpublic.net/ga/johnson
+      topmenu.html → qpublic.schneidercorp.com Application.aspx; county seat Wrightsville
+      GA 31096). Cloudflare/bot 403 blocks automated Application.aspx from research box;
+      public for humans. JohnsonCountyGA_WFS on wfs.schneidercorp.com returns JSON 404
+      "Service not found". REJECT JohnsonCountyIN_WFS (Indiana lookalike; service listed
+      but "not started" 500). REJECT Johnson County KS open data
+      (jocogov-aims.opendata.arcgis.com ~-95..-94, 38.7..39.3). REJECT Johnson County IN
+      GIS (jc-gis.maps.arcgis.com). REJECT Johnson TX (Cleburne) and Wrightsville Beach NC
+      AGOL hits. No AGOL FeatureServer titled Johnson/Wrightsville GA parcels. Commercial
+      vendors (Regrid/DynamoSpatial) — rejected paid. GEO-VERIFY GEORGIA: USA_Counties FIPS
+      13167 bbox ~-82.962..-82.439 lon × 32.511..32.822 lat; Wrightsville ~-82.719,32.730;
+      Kite ~-82.515,32.692; county centroid ~-82.637,32.694 — Johnson GA (HOGARC region).
+      Schema on HTML may expose contact — DO NOT collect emails/phones. Skip utilities+AADT.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via qPublic App=JohnsonCountyGA /
+      AppID=692 HTML only. Deep-link KeyValue={parcelId}:
+      Application.aspx?App=JohnsonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+      (also AppID=692&LayerID=11390&PageTypeID=4&KeyValue=).
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer qPublic Sales Search / Yearly Sales HTML
+      App=JohnsonCountyGA / AppID=692. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Johnson County GA Euclidean zoning FeatureServer found (2026-09-24) — municode /
+      HOGARC planning PDF gap (library.municode.com/ga/johnson_county).
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Johnson County GA Future Land Use FeatureServer found (2026-09-24) — Comp Plan /
+      HOGARC PDF gap.
+    status: gap
+
+  - role: other
+    name: null — no Wrightsville/Kite city-limits FeatureServer confirmed
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No dedicated Wrightsville / Kite / Johnson city-limits FeatureServer confirmed
+      (2026-09-24). Soft spatial Wrightsville GA (~-82.72,32.73) / Kite (~-82.51,32.69) or
+      TIGER places when parcels exist. Do NOT filter by owner mailing city. REJECT
+      Wrightsville Beach NC AGOL services.
+    status: gap
+
+municipalities:
+  - name: Wrightsville
+    level: city
+    parentFips: "13167"
+    joinToCountyParcels: >
+      No county parcel REST to join. Soft spatial: Wrightsville GA ~-82.719,32.730 (Johnson
+      FIPS 13167) when parcels become available. County seat.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Wrightsville zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Wrightsville FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city or county parcel REST — qPublic HTML county-wide App=JohnsonCountyGA.
+        status: gap
+    gaps:
+      - "No Wrightsville-owned parcel/zoning/FLU REST; county qPublic HTML only."
+    status: gap
+
+  - name: Kite
+    level: city
+    parentFips: "13167"
+    joinToCountyParcels: >
+      No county parcel REST to join. Soft spatial: Kite GA ~-82.515,32.692 (Johnson FIPS
+      13167) when parcels become available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Kite zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Kite FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only — no Kite-only CAMA REST.
+        status: gap
+    gaps:
+      - "No Kite city-owned zoning/FLU/parcel REST."
+    status: gap
+
+  - name: Adrian
+    level: city
+    parentFips: "13167"
+    joinToCountyParcels: >
+      Adrian spans Johnson + Emanuel counties. Soft spatial near Adrian GA when parcels
+      exist; also check Emanuel County (FIPS 13107) card for cross-county portion. No
+      Adrian city-limits FeatureServer confirmed.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Adrian-only zoning REST in Johnson GA dig.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Adrian FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Multi-county city — Johnson qPublic HTML + Emanuel sources for remainder.
+        status: gap
+    gaps:
+      - "Adrian multi-county (Johnson+Emanuel); no city-owned REST; Johnson portion via county qPublic HTML only."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Johnson County GA — qPublic App=JohnsonCountyGA (AppID=692 LayerID=11390 PageID=5852) HTML only."
+  - "JohnsonCountyGA_WFS JSON 404 on wfs.schneidercorp.com."
+  - "REJECTED wrong-state: JohnsonCountyIN_WFS (IN); jocogov-aims Johnson KS; jc-gis Johnson IN; Wrightsville Beach NC AGOL; Johnson TX lookalikes."
+  - "qpublic Application.aspx Cloudflare/bot 403 automated; public for humans (qpublic.net/ga/johnson)."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial; no emails/phones collected."
+  - "No municipal boundary FeatureServer — Wrightsville/Kite/Adrian soft spatial only."
+  - "Skipped utilities+AADT per tranche-3."
+
+license: >
+  Johnson County Tax Assessors qPublic/Beacon App=JohnsonCountyGA / AppID=692
+  LayerID=11390 PageID=5852 (qpublic.net/ga/johnson; johnsonco.org/assessors). No public
+  ArcGIS parcel FeatureServer/MapServer discovered 2026-09-24. Attribution Johnson County
+  Tax Assessors / Schneider. Public HTML only; no emails/phones; no paid vendors; skip
+  utilities+AADT. Geo-verified FIPS 13167 Georgia — not Johnson TX/IN/KS.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=692&LayerID=11390&PageTypeID=2&PageID=5852
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=JohnsonCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: usable
+  summary: >
+    Johnson TaxParcels_25 (HOGARC): https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/J
+    ohnson_CountyWide_GeoData_View/FeatureServer/12 - live count 5813 (5-150 ac: 2193), parcel ID field
+    Parcel_No. Geography verified against TIGER county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Kite city"
+      level: city
+      parentFips: "13167"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Wrightsville city"
+      level: city
+      parentFips: "13167"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Johnson' AND aadt>0
+    altFilter: name LIKE '167-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 167-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 65
+    maxAadt: 4690
+    geoCheck: 65/65 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=johnsonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=692&LayerID=11390&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=johnsonCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20001
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=JohnsonCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Kite city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Wrightsville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,584 @@
+state: GA
+jurisdiction: Pickens County
+fips: "13227"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY INTENT — county-wide cadastral polygons (no live public REST; OA harvest URL dead)
+  - role: parcels
+    name: Utilities_Map_WFL1 /21 (OpenAddresses us/ga/pickens harvest target — LIVE REST DEAD)
+    restUrl: https://services5.arcgis.com/SEeZQA9vkEJAQ8dk/arcgis/rest/services/Utilities_Map_WFL1/FeatureServer/21
+    layerId: 21
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      parcel_id: parcelId
+      street_num: situsNumber
+      street: situsStreet
+    notes: >
+      INTENDED county parcel/address FeatureServer referenced by OpenAddresses
+      sources/us/ga/pickens.json (Census geoid 13227; both addresses + parcels layers
+      point at the same FeatureServer/21 with conform pid=parcel_id / number=street_num /
+      street=street). Live 2026-09-23: org SEeZQA9vkEJAQ8dk (owner Pickens_GA) lists ONLY
+      Roads_2026 FeatureServer; Utilities_Map_WFL1/FeatureServer returns Invalid URL 400 —
+      harvest target gone. No OA batch zip / results.openaddresses.io latest run for
+      us/ga/pickens recovered (404). Sibling usable public layer on same org: Roads_2026/0
+      (3901 centerlines; extent Web Mercator ~-84.55..-84.20 × 34.35..34.60 — geo-verified
+      Pickens GA). No alternate county Tax_Parcels / WinGAP / Schneider WFS FeatureServer
+      found (wfs.schneidercorp.com has Butts/Franklin/Grady/Habersham GA_WFS twins but NO
+      PickensCountyGA_WFS). AECOM Bridge_PTIP/qpublic_parcel1/MapServer not started (500;
+      Bridge_PTIP folder empty). Commercial mirrors claim ~22k parcels (Regrid ≈22091 as of
+      2025-12-09; DynamoSpatial/USLandGrid/Equator advertise shapefile extracts) — do NOT
+      wire paid vendors. Georgia GIS Clearinghouse (georgiagisclearinghouse.com) sells
+      countywide parcel shapefile+CAMA — paid; rejected. Official human parcel viewer =
+      qPublic/Beacon SchneiderCorp App=PickensCountyGA / AppID=627 LayerID=11193
+      (qpublic.net/ga/pickens → qpublic.schneidercorp.com; Cloudflare/bot 403 automated;
+      public for humans). Deep-link patterns:
+      Application.aspx?App=PickensCountyGA&Layer=Parcels&PageType=Search
+      Application.aspx?AppID=627&LayerID=11193&PageTypeID=4&KeyValue={PARCEL_ID}
+      (PageTypeID=2&PageID=5816 linked from assessor homepage as map/search entry).
+      Legacy qpublic7.qpublic.net/ga_search.php?county=ga_pickens (DNS/1016 from research
+      box). Soft point enrichment only: keasterwood1 Structures FeatureServer (role=other
+      below) carries PARCEL_ID+OWNERNAME+ADDRESS — NOT cadastral polygons. Geo target
+      Pickens County GA north of Atlanta — TIGER State_County GEOID 13227 centroid
+      ~-84.466,+34.464 (AREALAND≈6.01e8 m²) (NOT Pickens County SC FIPS 45077 / GISpickens
+      org 59960rq18IxUcAVI / EasleyZoningMap parcels ~-82.7,+34.6; NOT Pickens County AL
+      FIPS 01107; NOT Jasper County GA FIPS 13159 / qPublic App=JasperCountyGA Monticello;
+      NOT Jasper AL jasperalmapping Zoning Map experience extent ~-87.27,+33.85; NOT Tate
+      City CDP Towns County GEOID 1375580 ~-83.554,+34.979). Rejected ARC LandPro_2012
+      (Ug5xGQbHsD8zuZzM — LC/LU only, no CAMA parcels). Prefer re-check Utilities_Map_WFL1
+      / county-hosted CAMA periodically; until restored county geometry+CAMA = HTML-only
+      gap for land-search polygons.
+    status: blocked
+
+  - role: parcels
+    name: AECOM Bridge_PTIP qpublic_parcel1 MapServer (Pickens mirror if/when started) — NOT STARTED
+    restUrl: https://solutions.aecomonline.net/arcgis/rest/services/Bridge_PTIP/qpublic_parcel1/MapServer
+    layerId: null
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Indexed AECOM Bridge_PTIP qPublic parcel mirror folder (same pattern as Haralson
+      layer 64 / Heard). Live 2026-09-23: Bridge_PTIP folder lists zero running services;
+      qpublic_parcel1/MapServer returns 500 "Service ... not started". Document as
+      discovered but unusable; do not prefer if/when restarted without field verification
+      + geo check (~-84.45,34.45). Not a substitute for county-hosted CAMA.
+    status: blocked
+
+  - role: other
+    name: Structures (keasterwood1) — address/structure POINTS with PARCEL_ID (NOT parcels)
+    restUrl: https://services9.arcgis.com/uUkF1ujSTIH0KtfM/arcgis/rest/services/Structures/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      OWNERNAME: ownerName
+      ADDRESS: situsAddress
+      STREET_NUM: situsNumber
+      RD_NAME: situsStreet
+      CITY: situsCityPostal
+      STATE: situsState
+      ZIP: situsZip
+      COMMUNITY: communityOrSubdivision
+      LATITUDE: latitude
+      STRUCTURE_TYPE: structureType
+    notes: >
+      Soft SITUS/owner enrichment ONLY — NOT cadastral polygon fallback (standing-order
+      open FeatureServer; points). Live count 18951 (2026-09-23); twin on
+      Critical_Infrastruture_Map_WFL1/FeatureServer/2 count 18962. PARCEL_ID filled ≈18115;
+      OWNERNAME filled ≈18633. Geo-verified WGS84 samples ~-84.511,+34.555 (PARCEL_ID
+      "001 006 002" Talking Rock), ~-84.516,+34.555, ~-84.474,+34.560 — Pickens GA north of
+      Atlanta. COMMUNITY is postal/subdivision label (top: JASPER≈8411, TALKING ROCK≈2013,
+      BIG CANOE≈1545, BENT TREE≈1177, FAIRMOUNT≈401, BALL GROUND≈374, RANGER≈290, MARBLE
+      HILL≈247, TATE≈226, NELSON≈114) — NOT municipality filter (BALL GROUND/CANTON/
+      FAIRMOUNT/RANGER/DAWSONVILLE/WALESKA bleed neighboring counties; prefer TIGER Places
+      spatial). No acreage/tax/sale/zoning on this layer. Prefer only after parcels REST
+      restores (join on PARCEL_ID) or as address-point context; never as parcel outlines.
+      SR NAD 1983 Georgia Statewide Lambert (102118) on Structures service; Critical twin
+      Web Mercator 102100.
+    status: partial
+
+  - role: tax
+    name: null — no public REST CAMA values
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer with Land Value / Building Value / Accessory /
+      FMV / assessed / taxable for Pickens County GA found (2026-09-23). Assessor HTML
+      only: qPublic/Beacon AppID=627 LayerID=11193 / App=PickensCountyGA (Cloudflare/bot
+      403 automated; public for humans). Tax Commissioner / pay: pickensgatax.com (no open
+      REST). 2026 Assessment notices referenced on qpublic.net/ga/pickens (mailed June 30
+      2026; appeal window noted on homepage). Rejected paid vendor tax enrichment
+      (Regrid/ATTOM/DynamoSpatial/USLandGrid/Georgia GIS Clearinghouse paid CAMA).
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Pickens GA multi-sale FeatureServer/MapServer found (2026-09-23). Prefer qPublic
+      Sales Search / Sales List HTML (App=PickensCountyGA / AppID=627) when available to
+      humans. Assessor site publishes DOAA Sales Ratio Studies PDFs (docs/ on
+      qpublic.net/ga/pickens — 2012–2025 Preliminary) — ratio studies only, not parcel sale
+      rows. Rejected ARC LandPro_2012 and paid Regrid/ATTOM as sales substitutes. Rejected
+      Pickens SC Energov_AGOL / Open_data parcels (SALEDT/SALEP on EasleyZoningMap/7 —
+      wrong state ~-82.7,+34.6).
+    status: gap
+
+  - role: zoning
+    name: null — county Euclidean zoning PDF/staff only (Land Use Intensity Map)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer with unincorporated Pickens County Euclidean
+      zoning found (2026-09-23). Official product = "Map of Pickens County Zones" /
+      OFFICIAL LAND USE INTENSITY MAP (pickenscountyga.gov DocumentCenter/View/273;
+      HTTP 200 ≈2.45MB PDF; Acrobat capture; legend COUNTY ZONING CODES observed: AG, RR,
+      SPC, HB, SA, SR, SRPC-1, ER, UR, NC). Planning & Development
+      (pickenscountyga.gov/171/Planning-Development) administers rezoning / special use /
+      variance via PDF applications — certify critical sites with Planning staff / official
+      Zoning Map. Inside cities prefer city zoning products (Jasper PDF 2023; Talking Rock
+      Comprehensive Zoning Map PDF Aug 20 2018; Nelson Municode/staff — see municipalities).
+      Rejected ARC LandPro_2012 as zoning. Rejected Pickens SC / Jasper AL zoning services.
+    status: gap
+
+  - role: flu
+    name: null — Joint Comp Plan 2023-2027 character areas PDF only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No public county FLU FeatureServer found (2026-09-23). Official plan: Northwest
+      Georgia Regional Commission "Pickens County Joint Comprehensive Plan 2023-2027"
+      including municipalities of Jasper, Nelson, and Talking Rock — adopted Pickens County
+      May 18 2023 / Jasper June 5 2023 / Nelson June 5 2023 / Talking Rock June 12 2023.
+      Live PDFs: pickenscountyga.gov DocumentCenter/View/364 (≈7.3MB) and phase3.biz mirror
+      Pickens.Jasper.Nelson.TalkingRock.JointComprehensivePlan.Adopted2023RD.pdf (≈7.2MB).
+      Character-area Future Development maps (PDF only; NWGRC GIS Officers Chase/Shane
+      Holden) — county examples: Arterial Commercial Corridor (Hwy 515), Crossroad
+      Communities (Blaine/Hinton/Marble Hill/Tate), East Pickens Conservation Area,
+      Foothills Crossroads, Rural Residential, Suburban Residential (+ Bent Tree / Big
+      Canoe private-community narrative under SRPC zoning). City character sections:
+      Jasper (Historic Downtown, Arterial Commercial Corridor, Traditional Neighborhood,
+      North/South/West/East Jasper Gateway Corridors); Nelson (Suburban Residential,
+      Traditional Neighborhood, Town Center); Talking Rock (Rural Residential, Suburban
+      Residential, Traditional Neighborhood, Town Center). Spatial REST for character/FLU
+      polygons not published. Prefer city FLU REST when/if published; until then PDF +
+      Planning staff. Rejected ARC LandPro_2012 stale regional LC/LU as preferred FLU.
+    status: gap
+
+  - role: other
+    name: Critical_Infrastruture_Map_WFL1 citylimits (stale place polys — soft only)
+    restUrl: https://services9.arcgis.com/uUkF1ujSTIH0KtfM/arcgis/rest/services/Critical_Infrastruture_Map_WFL1/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      AREANAME: municipality
+      CLASS: placeClass
+      PLACEFIP: placeFips
+      STFIPS: stateFips
+      POPULATION: population
+      HOUSEUNITS: housingUnits
+    notes: >
+      Live count 3 (2026-09-23): Jasper (PLACEFIP 41932), Nelson (54572), Talking Rock
+      (75272) — ST=GA STFIPS=13. Extent Web Mercator geo-checks Pickens GA. POPULATION/
+      HOUSEUNITS look Census-vintage (Jasper POP 2167) — stale vs current TIGER; prefer
+      Census TIGER Incorporated Places (role=other below) for municipality filter. Missing
+      any CDP/unincorporated community polys (Tate/Marble Hill are communities inside
+      Nelson-Tate-Marble Hill CCD — not incorporated). Soft only.
+    status: partial
+
+  - role: other
+    name: Census TIGER Incorporated Places (municipality filter join)
+    restUrl: https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      GEOID: placeGeoid
+      NAME: municipality
+      BASENAME: municipalityBase
+      CENTLON: centroidLon
+      CENTLAT: centroidLat
+      AREALAND: landAreaSqMeters
+    notes: >
+      Preferred public spatial join for municipality filter while county has no live parcel
+      REST (standing order). Live query STATE=13 BASENAME in (Jasper, Nelson, Talking Rock)
+      returns 3 incorporated places: Jasper city GEOID=1341932 ~-84.450,+34.471
+      (AREALAND≈2.22e7 m²); Nelson city GEOID=1354572 ~-84.365,+34.373 (AREALAND≈7.28e6 m²;
+      bbox ≈ lon -84.383..-84.346 lat 34.352..34.399 — MULTI-COUNTY Cherokee+Pickens; filter
+      spatially to FIPS 13227 on this card; Cherokee-side on card 13057); Talking Rock town
+      GEOID=1375272 ~-84.490,+34.524 (AREALAND≈5.34e6 m²). County boundary verify: TIGER
+      State_County GEOID=13227 centroid ~-84.466,+34.464 — north Atlanta MSA / Appalachian
+      foothills. County subdivisions (CCD layer): Jasper, Talking Rock, Ludville,
+      Nelson-Tate-Marble Hill — CCDs are NOT municipalities. REJECT Tate City CDP GEOID
+      1375580 (~-83.554,+34.979 Towns County) — NOT the unincorporated Tate community in
+      Pickens. Soft postal CITY= / Structures.COMMUNITY never sole municipality filter.
+    status: usable
+
+  - role: other
+    name: Roads_2026 (Pickens_GA AGOL — centerlines context only)
+    restUrl: https://services5.arcgis.com/SEeZQA9vkEJAQ8dk/arcgis/rest/services/Roads_2026/FeatureServer/0
+    layerId: 0
+    geometry: polyline
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Only live FeatureServer on official-ish Pickens_GA AGOL org SEeZQA9vkEJAQ8dk (item
+      8333846b0afb4701aa338b75ab9413e3). Live count 3901. Extent geo-verified Pickens GA.
+      Context / addressing support only — not parcels/zoning/FLU/CAMA.
+    status: partial
+
+municipalities:
+  - name: Jasper
+    level: city
+    parentFips: "13227"
+    joinToCountyParcels: >
+      Spatial TIGER Places GEOID=1341932 / NAME='Jasper city' (~-84.450,+34.471) OR
+      Critical citylimits AREANAME='Jasper' OR soft Structures.COMMUNITY in ('JASPER',
+      'CITY OF JASPER') when CAMA restored. County seat. No city parcel FeatureServer
+      found (2026-09-23).
+    layers:
+      - role: zoning
+        name: City of Jasper Official Zoning Map PDF (2023) + Municode Ch. 94
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Preferred Jasper-local zoning product on public web = static map PDF
+          jasper-ga.us/pdf/jasper_zoning_map2023rd.pdf (HTTP 200 ≈219KB; "DOWNLOAD ZONING
+          MAP FOR CITY OF JASPER") + legend image on jasper-ga.us/planning.htm. Districts
+          (Sec. 94-15 / Municode Ch. 94 + Chapter-94-Zoning.pdf): R-A Residential
+          Agriculture; R-1 Low Density SF; R-2 Medium Density SF; R-3 High Density SF;
+          SFA / SFR Single-Family Attached/Residential; MFR Multifamily Residential;
+          DRI-6 Dense Residential In-fill; C1-A / C-1A Office-Residential; C-1 Neighborhood
+          Commercial; C-2 General Commercial; CBD Central Business District; M-1 General
+          Industry. No public FeatureServer/GeoJSON recovered (2026-09-23). REJECT
+          experience.arcgis.com/experience/34a6994cd2144bdf921de3364093c389 "Jasper Zoning
+          Map" (owner jasperalmapping; extent ~-87.27,+33.85 — City of Jasper ALABAMA —
+          wrong geography). Standing order: prefer this city PDF/Municode over county
+          Land Use Intensity Map stub inside Jasper limits. Certify with Zoning Official /
+          Development Director (jasper-ga.us/planning.htm).
+        status: partial
+      - role: flu
+        name: null — Jasper Character Areas in Joint Comp Plan PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Jasper Character Areas in NWGRC Joint Comp Plan 2023-2027 PDF (Historic Downtown
+          Jasper, Jasper Arterial Commercial Corridor, Jasper Traditional Neighborhood,
+          North Jasper Corridor, South/West/East Jasper Gateway Corridors) — no city FLU
+          FeatureServer.
+        status: gap
+      - role: parcels
+        name: null — use county parcels when REST restored; else qPublic HTML
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Jasper-owned CAMA FeatureServer — county Utilities_Map_WFL1 (blocked) +
+          spatial TIGER Jasper poly / qPublic App=PickensCountyGA HTML.
+        status: gap
+    gaps:
+      - "Jasper zoning = 2023 PDF map + Municode Ch. 94 — not queryable polygons."
+      - "No Jasper FLU/parcel REST."
+      - "Rejected Jasper AL jasperalmapping Zoning Map Experience (wrong state)."
+      - "Rejected Jasper County GA qPublic App=JasperCountyGA (Monticello — wrong county)."
+    status: partial
+
+  - name: Nelson
+    level: city
+    parentFips: "13227"
+    joinToCountyParcels: >
+      MULTI-COUNTY (Cherokee + Pickens). Spatial TIGER Places GEOID=1354572 /
+      NAME='Nelson city' (~-84.365,+34.373; bbox ≈ lon -84.383..-84.346 lat 34.352..34.399)
+      INTERSECT county FIPS 13227 for this card. Cherokee-side parcels belong on Cherokee
+      card 13057 (Cherokee documents Nelson gap; Zoning=CITY stub only). Soft postal
+      CITY='NELSON' / Structures.COMMUNITY='NELSON' (≈114 points) unreliable across county
+      line. No Nelson city FeatureServer found (2026-09-23).
+    layers:
+      - role: zoning
+        name: null — Nelson GA Municode / staff; no public zoning REST or map GIS
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City of Nelson GA (nelsongeorgia.com; Municode library.municode.com/ga/nelson).
+          Research-box TLS EOF failures fetching nelsongeorgia.com (2026-09-23) —
+          Cloudflare/host friction; Municode HTTP 200. No public FeatureServer / downloadable
+          current zoning GIS recovered. Joint Comp Plan character areas PDF cover Nelson
+          footprint. Prefer city staff / Municode / Comp Plan over county Land Use Intensity
+          Map stub inside Nelson∩Pickens. REJECT cityofnelson.com (Nelson NEBRASKA —
+          wrong geography). Cherokee card also flags Nelson gap on Cherokee-side.
+        status: gap
+      - role: flu
+        name: null — Nelson Character Areas in Joint Comp Plan PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Nelson Suburban Residential / Traditional Neighborhood / Town Center character
+          areas in Joint Comp Plan 2023-2027 PDF — no city FLU FeatureServer. Plan covers
+          whole city including Cherokee footprint; this card only wires Pickens-side.
+        status: gap
+      - role: parcels
+        name: null — county REST blocked; multi-county filter required
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Nelson-owned CAMA FeatureServer. When county parcels restore, clip to
+          Nelson∩Pickens; Cherokee-side on 13057. qPublic App=PickensCountyGA for
+          Pickens-side HTML; Cherokee Spatialest/qPublic for Cherokee-side.
+        status: gap
+    gaps:
+      - "Nelson multi-county (Cherokee+Pickens) — Pickens-side only on this card; no city REST."
+      - "nelsongeorgia.com TLS friction from research box; Municode + Comp Plan PDF + staff zoning certification."
+      - "Rejected cityofnelson.com Nelson NE lookalike."
+    status: gap
+
+  - name: Talking Rock
+    level: city
+    parentFips: "13227"
+    joinToCountyParcels: >
+      Spatial TIGER Places GEOID=1375272 / NAME='Talking Rock town' (~-84.490,+34.524)
+      OR Critical citylimits AREANAME='Talking Rock'. Town (not city) — incorporated.
+      No Talking Rock parcel FeatureServer found (2026-09-23).
+    layers:
+      - role: zoning
+        name: Comprehensive Zoning Map of the Town of Talking Rock PDF (Aug 20 2018)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Preferred Talking Rock-local zoning product = talkingrockga.com/pdf/
+          Comprehensive-Zoning-Map.pdf (HTTP 200 ≈694KB). Ordinance text on
+          talkingrockga.com/planning.html adopts map entitled "Comprehensive Zoning Map of
+          the Town of Talking Rock, Georgia, dated August 20, 2018" certified by the Mayor;
+          Historic District demarcated as Districts H-C and H-R on that map. Annexation/
+          Zoning Application PDF also posted. No FeatureServer. Standing order: prefer this
+          town PDF over county Land Use Intensity Map stub inside Talking Rock limits.
+          Certify with Town Council / Planning & Development.
+        status: partial
+      - role: flu
+        name: null — Talking Rock Character Areas in Joint Comp Plan PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Talking Rock Rural Residential / Suburban Residential / Traditional Neighborhood /
+          Town Center character areas in Joint Comp Plan 2023-2027 PDF — no town FLU
+          FeatureServer.
+        status: gap
+      - role: parcels
+        name: null — county REST blocked; qPublic HTML
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Talking Rock-owned CAMA FeatureServer.
+        status: gap
+    gaps:
+      - "Talking Rock zoning = Aug 20 2018 Comprehensive Zoning Map PDF — not queryable polygons."
+      - "No Talking Rock FLU/parcel REST."
+    status: partial
+
+gaps:
+  - "Live county parcel FeatureServer referenced by OpenAddresses us/ga/pickens (Utilities_Map_WFL1/FeatureServer/21 on org SEeZQA9vkEJAQ8dk / Pickens_GA) returns Invalid URL 400 (2026-09-23); org currently publishes only Roads_2026."
+  - "No OpenAddresses batch harvest zip for us/ga/pickens recovered (results/data.openaddresses.io 404) — cannot fall back to OA NDJSON geometry+pid."
+  - "AECOM Bridge_PTIP/qpublic_parcel1/MapServer not started (500) — no Pickens qPublic static mirror."
+  - "No Schneider wfs.schneidercorp.com PickensCountyGA_WFS (unlike Butts/Franklin/Grady/Habersham GA twins)."
+  - "No public REST Euclidean county zoning — Land Use Intensity Map PDF DocumentCenter/View/273 only (codes AG/RR/SPC/HB/SA/SR/SRPC-1/ER/UR/NC)."
+  - "No public REST county or city FLU — Joint Comp Plan 2023-2027 PDF character maps only (NWGRC; DocumentCenter/View/364 + phase3.biz mirror)."
+  - "No public REST tax.marketValue/assessedValue or lastSale — qPublic/Beacon AppID=627 LayerID=11193 HTML only (Cloudflare/bot 403 automated)."
+  - "Structures points (keasterwood1, 18951) usable as soft PARCEL_ID/owner/situs enrichment only — NOT parcel polygons; COMMUNITY is subdivision/postal not municipality."
+  - "City Euclidean zoning REST: none. Jasper = 2023 zoning map PDF (partial). Talking Rock = Aug 2018 Comprehensive Zoning Map PDF (partial). Nelson = Municode/staff gap (TLS friction on nelsongeorgia.com)."
+  - "Nelson multi-county (Cherokee+Pickens) — filter spatially to 13227; Cherokee card 13057 covers Cherokee-side and also flags Nelson gap."
+  - "Tate / Marble Hill / Blaine / Hinton / Big Canoe / Bent Tree are unincorporated communities (Crossroad Communities / private communities in Comp Plan; Nelson-Tate-Marble Hill CCD) — NOT municipalities; no independent GIS REST."
+  - "Georgia GIS Clearinghouse sells Pickens parcel shapefile+CAMA — paid vendor; rejected. NWGRC GIS assists locals / authored Comp Plan maps but no public Pickens FeatureServer."
+  - "Rejected lookalikes / non-preferred: Pickens County SC (GISpickens / pickenscosc Hub / EasleyZoningMap_2022/FeatureServer/7 Pickens County Parcels count 16349 sample ~-82.85,+34.62; Pickens_Open_data Parcels layer 6 — wrong state); Pickens County AL cemetery/church layers (WARC); Jasper AL Zoning Map Experience 34a6994cd2144bdf921de3364093c389 owner jasperalmapping extent ~-87.27,+33.85; Jasper County GA qPublic App=JasperCountyGA (Monticello FIPS 13159); Tate City CDP Towns County GEOID 1375580 ~-83.554,+34.979 (NOT Pickens Tate community); cityofnelson.com Nelson NE; ARC LandPro_2012 (Ug5xGQbHsD8zuZzM) stale regional LC/LU as preferred cadastral; Regrid/ATTOM/CoreLogic/DynamoSpatial/USLandGrid/Equator/ReportAll/AcreValue/Zoneomics paid vendors; maps.itos.uga.edu FrameWork (no tax parcels)."
+  - "No emails/phones collected (assessor contact schema on qpublic.net/ga/pickens ignored); no paid vendors."
+  - "Enrichment vs thin in-app: county geometry+CAMA+zoning polygons+FLU+sales all blocked/gap/HTML/PDF as of 2026-09-23; usable public spatial = Census TIGER places for municipality filter + county boundary verify; partial = Structures points + citylimits + Roads_2026 + Jasper/Talking Rock zoning PDFs + Joint Comp Plan PDF."
+
+license: >
+  OpenAddresses sources/us/ga/pickens.json harvest target Utilities_Map_WFL1 (org
+  SEeZQA9vkEJAQ8dk / Pickens_GA — live REST dead 2026-09-23; Roads_2026 remains).
+  Assessor HTML: qPublic/Beacon SchneiderCorp AppID=627 LayerID=11193
+  (qpublic.net/ga/pickens → qpublic.schneidercorp.com; App=PickensCountyGA). County:
+  pickenscountyga.gov (Planning & Development; Tax Assessor; DocumentCenter Zoning Map
+  View/273 + Comp Plan View/364). Soft structures/citylimits: AGOL owner keasterwood1 org
+  uUkF1ujSTIH0KtfM (Critical_Infrastruture_Map_WFL1 / Structures). Northwest Georgia
+  Regional Commission Joint Comprehensive Plan 2023-2027 PDF (phase3.biz mirror + county
+  DocumentCenter). City of Jasper Planning & Zoning (jasper-ga.us/planning.htm; zoning map
+  PDF 2023; Municode Ch. 94). Town of Talking Rock Planning & Development
+  (talkingrockga.com; Comprehensive Zoning Map PDF Aug 20 2018). City of Nelson GA
+  (nelsongeorgia.com / Municode ga/nelson — multi-county). Census TIGER Places /
+  State_County (tigerweb.geo.census.gov). AECOM solutions.aecomonline.net Bridge_PTIP
+  qpublic_parcel1 (not started). Attribution to Pickens County / partner municipalities /
+  NWGRC / Census. Public fields only; no emails/phones; no paid vendors
+  (Regrid/ATTOM/CoreLogic/DynamoSpatial/USLandGrid/Equator/ReportAll/Georgia GIS
+  Clearinghouse paid extracts).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=PickensCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: blocked
+  parcelStatusAfter: blocked
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays blocked.
+    Utilities_Map_WFL1/21 (Pickens_GA org) still Invalid URL 2026-09-28; AECOM mirror not started. Web
+    search: county offers PDFs + qPublic only.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Jasper city"
+      level: city
+      parentFips: "13227"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Talking Rock town"
+      level: city
+      parentFips: "13227"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: blocked
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Pickens' AND aadt>0
+    altFilter: name LIKE '227-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 227-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 73
+    maxAadt: 34500
+    geoCheck: 73/73 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: OWNERNAME
+    filledCount: null
+    restUrl: https://services9.arcgis.com/uUkF1ujSTIH0KtfM/arcgis/rest/services/Structures/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner field on another REST layer already on this card
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=JasperCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=627&LayerID=11193&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=JasperCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Jasper city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Talking Rock town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

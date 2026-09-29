@@ -1,0 +1,176 @@
+state: GA
+jurisdiction: Catoosa County
+fips: "13047"
+level: county
+markets: [Chattanooga]
+
+layers:
+  # PRIMARY geometry — county parcel-tied zoning polygons double as cadastral landbase
+  - role: parcels
+    name: ZoningFeatureLayer_withDescriptions_Feb2026 (parcel polygons — thin CAMA)
+    restUrl: https://services5.arcgis.com/UWegEIVn0JwnAZjA/arcgis/rest/services/ZoningFeatureLayer_withDescriptions_Feb2026_view/FeatureServer/83
+    layerId: 83
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      house_no: situsNumber
+      street_nam: situsStreet
+      zoningcode: zoning
+      descriptio: zoningNotes
+      Case_Number: zoningCase
+      ReZone_Date: zoningDate
+      Notes: notes
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY source found (2026-09-24): official
+      Catoosa County Government AGOL org UWegEIVn0JwnAZjA / CatoosaCounty — hosted
+      view ZoningFeatureLayer_withDescriptions_Feb2026_view layer 83. Live count
+      24007 (all have Parcel_No + zoningcode). SR StatePlane GA West FIPS 1002 Feet
+      (102667/2240); GIS-acres ≈ Shape__Area/43560 (no deeded totalacres field).
+      house_no>0 ≈21474. Geo-verified WGS84 samples ~-85.240,34.976 / ~-85.201,34.944
+      / ~-85.149,34.954 — Catoosa County GA (Ringgold / Fort Oglethorpe / Lakeview
+      fringe) Chattanooga MSA GA ring (NOT Catoosa OK ~-95.7,36.2; NOT Hamilton TN
+      ~-85.3,35.0). Parcel_No format e.g. '00010001', '0012D038', '0012D03800A'.
+      Thin attributes only (no owner/mailing/FMV/sale on REST) — enrich owner/tax/
+      sales via qPublic AppID=677 (CatoosaCountyGA; county property-record page +
+      catoosaassessor.com FAQ). Official Zoning Viewer experience
+      ea458edb5a9b4e729642031c221a20dd; webmap 219d1c5e497d4f268f692c70ed990649.
+      No separate county Parcels FeatureServer/MapServer in org (only Zoning +
+      Road_Centerlines). Rejected AECOM Bridge_PTIP static qpublic scrape; rejected
+      paid MappingSolutions/Regrid; rejected CHCRPA LandUse_SF (~10 Catoosa rows,
+      Hamilton TN dominant).
+    status: partial
+
+  - role: zoning
+    name: ZoningFeatureLayer_withDescriptions_Feb2026 (official county zoning)
+    restUrl: https://services5.arcgis.com/UWegEIVn0JwnAZjA/arcgis/rest/services/ZoningFeatureLayer_withDescriptions_Feb2026_view/FeatureServer/83
+    layerId: 83
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      zoningcode: zoning
+      descriptio: zoningNotes
+      Case_Number: zoningCase
+      ReZone_Date: zoningDate
+    notes: >
+      Preferred Euclidean zoning (parcel-tied). Live count 24007. Domain zoningcode:
+      R-1≈14959, A-1≈5085, R-3≈1161, PUD≈914, RTZ≈647, C-1≈476, R-A≈210, C-R≈162,
+      R-2≈102, C-2≈101, I-1≈94, SZ≈75, PCFD≈15, R-4≈2, C-3≈2, I-2≈2. descriptio holds
+      full district name (e.g. 'Single-Family Residential District (22,000 sq. ft.)').
+      Same layer as preferred parcels geometry. Viewer: experience
+      ea458edb5a9b4e729642031c221a20dd. Geo-verified Catoosa GA.
+    status: usable
+
+  - role: tax
+    name: null — no public REST CAMA values
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer with land_value / marketValue / assessedValue
+      found (2026-09-24). Zoning layer has no tax fields. Prefer qPublic AppID=677
+      HTML report (Cloudflare/bot 403 from research box; public for humans).
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Catoosa multi-sale FeatureServer/MapServer found. qPublic AppID=677 Sales
+      Search HTML only. Rejected CHCRPA / paid extracts as sales substitutes.
+    status: gap
+
+  - role: flu
+    name: null — no county-wide public FLU REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Catoosa Future Land Use FeatureServer found in county AGOL org or public
+      search (2026-09-24). Comp Plan / FLU likely PDF via county Planning / DCA.
+      Rejected CHCRPA Current_Land_Use_Plans_2021 / LandUse_SF (TPO/Hamilton-centric).
+    status: gap
+
+  - role: other
+    name: Road_Centerlines (context only)
+    restUrl: https://services5.arcgis.com/UWegEIVn0JwnAZjA/arcgis/rest/services/Road_Centerlines/FeatureServer/6
+    layerId: 6
+    geometry: polyline
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      County road centerlines on Zoning WebMap — not parcels/zoning/FLU. Skip AADT/
+      utilities per standing order; listed only as org companion layer.
+    status: partial
+
+municipalities:
+  - name: Ringgold
+    level: city
+    parentFips: "13047"
+    joinToCountyParcels: >
+      Spatial intersect county zoning/parcel polygons near Ringgold (~-85.11,34.92) —
+      no dedicated taxdistric field on REST layer. Soft: situs street_nam / city staff.
+    layers: []
+    notes: >
+      No City of Ringgold ArcGIS FeatureServer for parcels/zoning/FLU found
+      (2026-09-24). ringgold.maps.arcgis.com resolves to unrelated school portal.
+      Geography via county ZoningFeatureLayer; city zoning certification gap vs
+      county R-1/A-1/….
+    status: gap
+
+  - name: Fort Oglethorpe
+    level: city
+    parentFips: "13047"
+    joinToCountyParcels: >
+      Spatial near Fort Oglethorpe (~-85.25,34.95) on county parcel polygons. City
+      straddles Catoosa + Walker — this card Catoosa-side footprint only.
+    layers: []
+    notes: >
+      No Fort Oglethorpe city FeatureServer found (fortogov.com civic only). Multi-
+      county with Walker — defer Walker card for Walker-side. County zoning polygons
+      for Catoosa-side geography.
+    status: gap
+
+gaps:
+  - "No public REST owner/mailing/FMV/assessed/sale — ZoningFeatureLayer is geometry+Parcel_No+situs parts+zoning only; CAMA via qPublic AppID=677 HTML (Cloudflare/bot 403 automated)."
+  - "No deeded acreage field — derive GIS-acres from Shape__Area/43560 (SR 102667 feet)."
+  - "No county FLU REST — Comp Plan PDF / staff."
+  - "No municipality polygons / taxdistric on public REST — Ringgold / Fort Oglethorpe filter = spatial only."
+  - "No Ringgold / Fort Oglethorpe city zoning or parcel CAMA FeatureServer."
+  - "No dedicated county Parcels CAMA MapServer (gis.catoosacountyga.gov DNS dead; county AGOL has Zoning+Roads only)."
+  - "Rejected lookalikes: Catoosa OK city limits (sier0011_uok); Hamilton TN / CHCRPA LandUse_SF & TPO layers; AECOM Bridge_PTIP qpublic_parcel1/21 static; DeKalb GA / Pike PA / Sumter / Glynn parcel services; paid MappingSolutions/Regrid/ATTOM."
+  - "Enrichment vs thin in-app: 24007 parcel polygons + Parcel_No + situs parts + zoningcode/descriptio; owner/tax/sales/FLU/city limits remain gap/HTML/PDF."
+
+license: >
+  Catoosa County Government AGOL org UWegEIVn0JwnAZjA (CatoosaCounty /
+  catoosacounty.maps.arcgis.com) — ZoningFeatureLayer_withDescriptions_Feb2026_view
+  (item 4233cbfb75b84311947258277cdb804e), Road_Centerlines; Zoning Viewer experience
+  ea458edb5a9b4e729642031c221a20dd; webmap 219d1c5e497d4f268f692c70ed990649.
+  Assessor HTML: qPublic SchneiderCorp AppID=677 BaseDoc=CatoosaCountyGA
+  (qpublic.net/ga/catoosa; catoosaassessor.com). Attribution to Catoosa County.
+  Public fields only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=677&BaseDoc=CatoosaCountyGA
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

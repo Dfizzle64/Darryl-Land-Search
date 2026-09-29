@@ -1,0 +1,451 @@
+state: GA
+jurisdiction: Tift County
+fips: "13277"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner/situs (SGRC alma); tax/sale via qPublic HTML
+  - role: parcels
+    name: Tift_Parcels Parcels (SGRC alma)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ParcelNum: parcelId
+      OwnerName: ownerName
+      Situs: situsAddress
+      QPLINK: appraiserReportUrl
+      Shape.STArea(): shapeArea
+      Shape.STLength(): shapeLength
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + owner/situs (Southern Georgia Regional
+      Commission SGRC alma — Tift/Tift_Parcels MapServer/0 "Parcels"). Live count
+      19194 (2026-09-24). OwnerName filled ≈19181; Situs filled ≈19177; ParcelNum
+      filled =19194. SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet (wkid 102667
+      / latestWkid 2240). maxRecordCount default — page via resultOffset / envelopes.
+      NO acreage / CURR_VAL / SALE / zoning / tax-district attributes on this layer —
+      acreage+tax+sale via qPublic App=TiftCountyGA HTML; land-use class + TAXDISTRIC
+      via companion Tift_LandUse/0 (join ParcelNum not on LandUse — spatial intersect);
+      Euclidean zoning via Tift_Zoning/0. QPLINK deep-links qpublic.schneidercorp.com
+      AppID=691 LayerID=11381 PageTypeID=4 PageID=4813 KeyValue={ParcelNum}. Official
+      public viewers: garc.maps.arcgis.com webappviewer id=8549dd1b9a1e4a6fb795e76cc3ea539e
+      (Tift County - App; wires Tift_Parcels + Tift_Addresses); qPublic map tab. Twin
+      Tifton/Parcels city folder exists — prefer county Tift_Parcels for coverage.
+      GEO-VERIFY GEORGIA Tift FIPS 13277 seat Tifton (~-83.51,31.45): WGS84 samples
+      ~-83.603,31.525 (NW county Hickory Springs) / ~-83.637,31.547 (Gibson Rd) /
+      ~-83.518,31.458 (Tifton centroid via City Limits). REJECT paid Regrid/ATTOM/
+      GetParcelData; no Tift lookalike county of same name outside GA recovered.
+      Skip Tift_Utilities* + AADT; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on Tift_Parcels; qPublic AppID=691 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: Tift_Parcels REST carries owner/situs only — no market/assessed/
+      land/improvement value fields. Tax/CAMA digest via qPublic SchneiderCorp
+      App=TiftCountyGA / AppID=691 LayerID=11381 (qpublic.net/ga/tift → Application.aspx).
+      Deep-link report: Application.aspx?AppID=691&LayerID=11381&PageTypeID=4&PageID=4813&KeyValue={ParcelNum}
+      (Search PageTypeID=2 PageID=4811). Cloudflare/bot 403 automated; public for humans.
+      Companion Tift_LandUse/0 exposes DIGCLASS (R/C/V/A/E/I) + TAXDISTRIC + HOMEEXEMPT
+      as landbase class — NOT dollar values. Tax Commissioner payment portal separate
+      (not CAMA).
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search / Yearly Sales HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history on Tift_Parcels or companion SGRC Tift services
+      (2026-09-24). qPublic Sales Search / Yearly Sales HTML AppID=691. Rejected paid
+      Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: Tift_Zoning Zoning (SGRC alma; city+county Euclidean)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CLASS: zoning
+      NOTE_: zoningNote
+      DATE_: zoningDate
+      CONDITIONA: zoningConditional
+      Ordinance: zoningOrdinance
+      Comments: zoningComments
+      Special_Ex: zoningSpecialException
+    notes: >
+      Preferred authoritative zoning district POLYGONS (count 2565). CLASS top:
+      A-U≈487, G-B≈392, R-14≈305, R-8≈182, R-8-M≈146, R-1≈122, R-10≈121, R-20≈120,
+      WLI≈101, R-R≈99, M-R≈79, R-12≈70, R-P≈69, N-C≈61, R-1A≈39, CBD≈34, C-C≈33,
+      H-I≈27, M-H-P≈26 (+ R-14-M/S-A/R-R1/A-U2/R-21). Twin Tifton/Zoning MapServer/3
+      same CLASS schema/count 2565 — joint city/county layer; prefer Tift_Zoning/0.
+      Spatial intersect default join to parcels (no ParcelNum on zoning). Official
+      static/PDF certify for edge cases. Skip utilities folders.
+    status: usable
+
+  - role: flu
+    name: Tift_Character_Areas Character Areas (Comp Plan FLU)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_Character_Areas/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Name: flu
+      Abbrevation: fluCode
+      Plan_Date: fluPlanDate
+      City: fluCityContext
+    notes: >
+      Preferred public REST Future Land Use / Character Areas (count 67). Name domain:
+      Residential≈17, Urban Commercial Corridor≈13, Conservation≈10, Interchange≈6,
+      Old Neighborhood Redevelopment≈5, Rural Highway Corridor≈4, Agricultural≈4,
+      Village Activity Center≈3, Hospital/High School≈2, Industrial≈2, Agricultural
+      Education≈1. Note source field typo Abbrevation (not Abbreviation). Plan_Date
+      epoch ≈2008-08-13 — certify critical sites against adopted Comp Plan PDF.
+      Twin Tifton/Zoning MapServer/4 Character Areas same schema. Spatial intersect
+      only. Companion Tift_LandUse/0 is DIGCLASS tax-landbase (R/C/V/A/E…) — NOT FLU;
+      do not prefer as character areas.
+    status: usable
+
+  - role: other
+    name: Tift_LandUse Land Use (DIGCLASS tax landbase — not FLU)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_LandUse/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      DIGCLASS: dorCode
+      TAXDISTRIC: taxDistrict
+      HOMEEXEMPT: homesteadExempt
+    notes: >
+      Parcel-scale tax landbase (count 17213). DIGCLASS: R≈13333, C≈1600, V≈939,
+      A≈653, E≈625, I≈58. Soft TAXDISTRIC (geo-checked vs City Limits centroids):
+      01≈unincorporated (~10692, sample ~-83.63,31.60 N county), 02≈Tifton
+      (~5594, sample ~-83.55,31.46; city centroid ~-83.52,31.46), 03≈Omega
+      (~576, sample ~-83.60,31.35; city centroid ~-83.59,31.34), 04≈Ty Ty
+      (~330, sample ~-83.64,31.47; city centroid ~-83.65,31.47) — prefer spatial
+      Tift_Boundaries City Limits/0 over TAXDISTRIC alone. NOT a FLU layer.
+    status: usable
+
+  - role: other
+    name: Tift_Boundaries City Limits (Omega / Tifton / Ty Ty)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_Boundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+    notes: >
+      Preferred spatial municipality filter (count 3): Omega, Tifton, Ty Ty. Join =
+      spatial intersect with Tift_Parcels. Do NOT filter by parcel owner mailing.
+      Companion layers on same MS: school/commission/legislative/fire districts +
+      County/10 — usable reference; skip if not needed.
+    status: usable
+
+  - role: other
+    name: Tift_Addresses Addresses
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_Addresses/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Site address points companion to parcels (wired in Tift County - App viewer).
+      Use for situs enrichment / geocode aid when Situs string thin; spatial join to
+      parcels. Schema not fully field-mapped this pass — discover on query.
+    status: partial
+
+municipalities:
+  - name: Tifton
+    level: city
+    parentFips: "13277"
+    joinToCountyParcels: >
+      Spatial Tift_Boundaries/0 NAME='Tifton' (centroid ~-83.518,31.458) ∩
+      Tift_Parcels/0; soft TAXDISTRIC='02' (~5594) aid only — prefer spatial.
+      First-class city (county seat).
+    layers:
+      - role: zoning
+        name: Tift_Zoning / Tifton Zoning CLASS (joint city+county)
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_Zoning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CLASS: zoning
+        notes: >
+          Preferred Tifton zoning = Tift_Zoning spatial to Tifton City Limits (twin
+          Tifton/Zoning/3 identical CLASS). Sample city codes R-8/R-14/R-10/CBD/
+          G-B/N-C/C-C/WLI/M-R. Standing order: city over county stub inside limits.
+          No separate City-of-Tifton-owned zoning FeatureServer beyond SGRC joint.
+        status: usable
+      - role: flu
+        name: Tift_Character_Areas Tifton spatial extract
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_Character_Areas/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Name: flu
+        notes: >
+          Character Areas spatial to Tifton (Residential, Urban Commercial Corridor,
+          Old Neighborhood Redevelopment, Hospital/High School, etc.). No Tifton-only
+          FLU FS beyond SGRC. Certify vs Comp Plan PDF.
+        status: usable
+      - role: parcels
+        name: null — county Tift_Parcels + spatial Tifton
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Tifton/Parcels folder exists on SGRC but county Tift_Parcels + City Limits
+          is preferred single CAMA geometry. Tax/sale via qPublic HTML.
+        status: gap
+    gaps:
+      - "No Tifton-owned separate CAMA FeatureServer — SGRC county parcels + City Limits."
+      - "Tax/sale REST gap county-wide — qPublic HTML."
+      - "Skip Tifton UtilitiesGas/Sewer/Water folders per tranche-3."
+    status: usable
+
+  - name: Ty Ty
+    level: city
+    parentFips: "13277"
+    joinToCountyParcels: >
+      Spatial Tift_Boundaries/0 NAME='Ty Ty' (centroid ~-83.651,31.472) ∩ county
+      parcels; soft TAXDISTRIC='04' (~330).
+    layers:
+      - role: zoning
+        name: Tift_Zoning Ty Ty spatial extract
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_Zoning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CLASS: zoning
+        notes: County/joint zoning ∩ Ty Ty limits — no Ty-Ty-owned zoning FS.
+        status: partial
+      - role: flu
+        name: Tift_Character_Areas Ty Ty spatial extract
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_Character_Areas/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Name: flu
+        notes: Character Areas ∩ Ty Ty — Village Activity Center / Agricultural context.
+        status: partial
+      - role: parcels
+        name: null — county parcels + spatial Ty Ty
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ty-Ty-only CAMA REST.
+        status: gap
+    gaps:
+      - "Ty Ty city limits usable; parcel tax/sale still county qPublic HTML."
+    status: partial
+
+  - name: Omega
+    level: city
+    parentFips: "13277"
+    joinToCountyParcels: >
+      Spatial Tift_Boundaries/0 NAME='Omega' (centroid ~-83.595,31.339) ∩ county
+      parcels; soft TAXDISTRIC='03' (~576).
+    layers:
+      - role: zoning
+        name: Tift_Zoning Omega spatial extract
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_Zoning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CLASS: zoning
+        notes: County/joint zoning ∩ Omega limits — no Omega-owned zoning FS.
+        status: partial
+      - role: flu
+        name: Tift_Character_Areas Omega spatial extract
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_Character_Areas/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Name: flu
+        notes: Character Areas ∩ Omega.
+        status: partial
+      - role: parcels
+        name: null — county parcels + spatial Omega
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Omega-only CAMA REST.
+        status: gap
+    gaps:
+      - "Omega city limits usable; parcel tax/sale still county qPublic HTML."
+    status: partial
+
+gaps:
+  - "Tift_Parcels REST has owner/situs/ParcelNum/QPLINK only — no acreage, CURR_VAL, assessed, or SALE fields; tax/sale/acreage via qPublic AppID=691 HTML."
+  - "No public FeatureServer twin for Tift_Parcels (FS 500) — MapServer/0 queryable auth none."
+  - "Tift_LandUse DIGCLASS is tax landbase not FLU — prefer Tift_Character_Areas for FLU."
+  - "Character Areas Plan_Date ≈2008 vintage — certify vs current Comp Plan PDF."
+  - "TAXDISTRIC soft map 01=unincorp / 02=Tifton / 03=Omega / 04=Ty Ty — prefer City Limits spatial."
+  - "qPublic Schneider App=TiftCountyGA Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/tift public for humans."
+  - "Skip Tift_Utilities* / Tifton UtilitiesGas|Sewer|Water + AADT per tranche-3."
+  - "Rejected paid Regrid/ATTOM/GetParcelData Tift extracts; no emails/phones."
+
+license: >
+  Southern Georgia Regional Commission GIS (sgrcmaps.com/alma) — Tift/Tift_Parcels,
+  Tift/Tift_Zoning, Tift/Tift_Character_Areas, Tift/Tift_LandUse, Tift/Tift_Boundaries,
+  Tift/Tift_Addresses; twin Tifton/Zoning. Official viewer garc.maps.arcgis.com
+  webappviewer id=8549dd1b9a1e4a6fb795e76cc3ea539e (Tift County - App). County site
+  tiftcounty.org Tax Assessor. Assessor HTML: qPublic SchneiderCorp App=TiftCountyGA
+  / AppID=691 LayerID=11381 (qpublic.net/ga/tift). Attribution SGRC / Tift County /
+  City of Tifton. Public fields only; no emails/phones; no paid vendors; skip
+  utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=TiftCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://garc.maps.arcgis.com/apps/webappviewer/index.html?id=8549dd1b9a1e4a6fb795e76cc3ea539e
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_Parcels/MapServer/0 count 19194; extent center
+    [['13277', 'Tift County']]; sample [['13277', 'Tift County']]. No change to field map (see layer
+    above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Omega city"
+      level: city
+      parentFips: "13277"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Tifton city"
+      level: city
+      parentFips: "13277"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Ty Ty city"
+      level: city
+      parentFips: "13277"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Tift' AND aadt>0
+    altFilter: name LIKE '277-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 277-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 267
+    maxAadt: 59700
+    geoCheck: 264/267 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: OwnerName
+    filledCount: 19181
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Tift/Tift_Parcels/MapServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?AppID=691&LayerID=11381&PageTypeID=4&PageID=4813&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?App=TiftCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    parcelIdField: ParcelNum
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0017  010A
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=691&LayerID=11381&PageTypeID=4&PageID=4813&KeyValue=0017%20%20010A
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = ParcelNum;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://garc.maps.arcgis.com/apps/webappviewer/index.html?id=8549dd1b9a1e4a6fb795e76cc3ea539e
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Omega city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Tifton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Ty Ty city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,549 @@
+state: GA
+jurisdiction: Jefferson County
+fips: "13163"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "Jefferson_Parcels (GMASS 2025 commercial webmap)"
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Jefferson_Commercial_Web_Map_2025_WFL1/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: "TOTALACRES"
+    coverage: county-wide
+    parcelIdField: "PARCEL_NO"
+    liveCount: 12002
+    liveCount5to150ac: 2987
+    geoCheck: "extent center [['13163', 'Jefferson County']]; sample [['13163', 'Jefferson County']]; extent WGS84 [-82.6623, 32.7605, -82.2325, 33.3134]"
+    fieldMap:
+      PARCEL_NO: "parcelId"
+      PIN: "parcelPin"
+      REALKEY: "ownerKey"
+      Owner: "ownerName"
+      House_No: "situsNumber"
+      Road: "situsStreet"
+      Rd_Type: "situsStreetType"
+      TOTALACRES: "acreage"
+      CURR_VAL: "tax.marketValue"
+      Land_Val: "tax.landValue"
+      Class: "dorCode"
+      LEGAL_DESC: "legalDescription"
+    notes: >
+      pass1 2026-09-28: County-wide Jefferson GA parcels (12002) with owner, situs, acres, values on GMASS
+      org ISpzx3B5ZsVA6e1Z (Jefferson_Commercial_Web_Map_2025_WFL1 layer 3). Alternate
+      Jefferson_Web_Map_2024_WFL1/3 (12003).
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Jefferson County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. Official human cadastral + CAMA path =
+      qPublic/Beacon App=JeffersonCountyGA / AppID=670 LayerID=11355 (qpublic.net/ga/jefferson
+      → qpublic.schneidercorp.com Application.aspx; county seat Louisville GA 30434;
+      jeffersoncountyga.gov). Cloudflare/bot 403 blocks automated Application.aspx from
+      research box; public for humans. Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=670&LayerID=11355&PageTypeID=4&KeyValue={parcelId}
+      (also App=JeffersonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId};
+      PageType=Search / PageType=Maps / PageTypeID=2). JeffersonCountyGA_WFS on
+      wfs.schneidercorp.com → 404; qpublic.schneidercorp.com …WFS → 403. No CSRA RC /
+      HOGARC / county AGOL Jefferson GA parcel FS (AGOL Jefferson+parcels hits are
+      wrong-state lookalikes — see REJECT). Commercial vendors advertise Jefferson GA
+      extracts (~11942 parcels Dynamospatial) — rejected (paid). GEO-VERIFY GEORGIA:
+      Census TIGERweb GEOID 13163 CENTLAT +33.0546778 CENTLON -082.4181800 — Jefferson
+      County GA / Louisville–Wrens–Wadley (CSRA belt). CSRARC_Counties NAME=JEFFERSON
+      FIPS=163 (services1…Ug5xGQbHsD8zuZzM) — boundary only, not parcels. REJECT Jefferson
+      County AL Unincorporated_Parcels (services7…GWcL4L1LrmhPd7DI; StatePlaneALWest);
+      REJECT Jefferson County KY PVA Parcela / Parcels_GR (Louisville Metro KY —
+      l23kE3b7uPnZIuaB / eGSDp8lpKe5izqVc); REJECT Jefferson FL / Jefferson LA / Jefferson
+      NY qPublic lookalikes; REJECT City of Jeffersonville GA voting districts (Twiggs —
+      not this county). REJECT paid Regrid/ATTOM/DynamoSpatial/MappingSolutions. No
+      emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic App=JeffersonCountyGA /
+      AppID=670 LayerID=11355 (qpublic.net/ga/jefferson; Louisville GA 30434;
+      Cloudflare/bot 403 automated; public for humans). Deep-link KeyValue={parcelId} on
+      Report page. 2026 assessment notices mailed Jun 12 2026 (appeal deadline Jul 27
+      2026 per qPublic landing) — values on HTML Report; still no public REST. Honest
+      REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. qPublic Sales Search / Sales List / Yearly
+      Sales HTML AppID=670 only (bot 403 automated). Rejected paid Regrid/ATTOM sales
+      extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Jefferson County GA Euclidean zoning FeatureServer on AGOL/CSRA (2026-09-24).
+      Planning/zoning via jeffersoncountyga.gov Code Enforcement / staff or PDF if
+      adopted — not public REST.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Jefferson County GA future land use FeatureServer found (2026-09-24). Comp Plan
+      PDF / CSRA gap. CSRA Coronavirus Impact Planning_Jefferson County is PDF only —
+      not parcel/FLU REST.
+    status: gap
+
+  - role: other
+    name: CSRARC_Counties Jefferson boundary (context — NOT parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CSRARC_Counties/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      FIPS: countyFips3
+    notes: >
+      Filter NAME='JEFFERSON' / FIPS='163' for Jefferson County GA outline (count=1).
+      Geo-verify / clip only — zero parcel/owner/tax/sale fields. Same shared org
+      Ug5xGQbHsD8zuZzM as other GA CSRA RC layers. Confirms Georgia (not AL/KY/FL/LA).
+    status: partial
+
+municipalities:
+  - name: Louisville
+    level: city
+    parentFips: "13163"
+    joinToCountyParcels: >
+      County seat / primary incorporated place (~-82.41,32.97 Census place soft) when
+      parcels become available. No separate city parcel REST — county qPublic HTML only.
+      REJECT Louisville KY Metro PVA parcels (wrong state).
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Louisville GA zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Louisville GA FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic AppID=670 HTML only.
+        status: gap
+    gaps:
+      - "No Louisville GA city-owned GIS REST; county qPublic HTML only. REJECT Louisville KY PVA."
+    status: gap
+
+  - name: Wrens
+    level: city
+    parentFips: "13163"
+    joinToCountyParcels: >
+      Incorporated place (~-82.39,33.21 soft). No city parcel/zoning REST — county qPublic.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Wrens city zoning FeatureServer.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Wrens FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic AppID=670.
+        status: gap
+    gaps:
+      - "No Wrens city-owned GIS REST."
+    status: gap
+
+  - name: Wadley
+    level: city
+    parentFips: "13163"
+    joinToCountyParcels: >
+      Incorporated place (~-82.40,32.87 soft). No city parcel/zoning REST — county qPublic.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Wadley city zoning FeatureServer.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Wadley FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic AppID=670.
+        status: gap
+    gaps:
+      - "No Wadley city-owned GIS REST."
+    status: gap
+
+  - name: Stapleton
+    level: city
+    parentFips: "13163"
+    joinToCountyParcels: Soft spatial when parcels available; county qPublic only.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Stapleton zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Stapleton FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic AppID=670.
+        status: gap
+    gaps:
+      - "No Stapleton city GIS REST."
+    status: gap
+
+  - name: Bartow
+    level: city
+    parentFips: "13163"
+    joinToCountyParcels: Soft spatial when parcels available; county qPublic only.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Bartow GA zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Bartow FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic AppID=670.
+        status: gap
+    gaps:
+      - "No Bartow city GIS REST."
+    status: gap
+
+  - name: Avera
+    level: city
+    parentFips: "13163"
+    joinToCountyParcels: Soft spatial when parcels available; county qPublic only.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Avera zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Avera FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic AppID=670.
+        status: gap
+    gaps:
+      - "No Avera city GIS REST."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Jefferson County GA — qPublic App=JeffersonCountyGA / AppID=670 LayerID=11355 HTML only."
+  - "JeffersonCountyGA_WFS 404/403; no CSRA/HOGARC/county AGOL Jefferson GA parcel FeatureServer."
+  - "CSRARC_Counties boundary only (NAME=JEFFERSON FIPS=163) — not parcels."
+  - "REJECT Jefferson AL Unincorporated_Parcels (GWcL4L1LrmhPd7DI StatePlaneALWest); REJECT Jefferson KY PVA Parcela/Parcels_GR (Louisville Metro); REJECT Jefferson FL/LA/NY lookalikes; REJECT Jeffersonville GA (Twiggs) voting districts."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial/MappingSolutions Jefferson GA extracts."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/jefferson + AppID=670 Search/Maps public for humans."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Jefferson County Tax Assessor qPublic/Beacon App=JeffersonCountyGA / AppID=670
+  LayerID=11355 (qpublic.net/ga/jefferson; Louisville GA 30434; jeffersoncountyga.gov).
+  CSRA RC CSRARC_Counties boundary on Ug5xGQbHsD8zuZzM (filter JEFFERSON FIPS=163). No
+  public ArcGIS parcel service discovered 2026-09-24. Attribution Jefferson County Tax
+  Assessor. Public HTML only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=670&LayerID=11355&PageTypeID=2
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=670&LayerID=11355&PageTypeID=1
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: usable
+  summary: >
+    Jefferson_Parcels (GMASS 2025 commercial webmap): https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgi
+    s/rest/services/Jefferson_Commercial_Web_Map_2025_WFL1/FeatureServer/3 - live count 12002 (5-150 ac:
+    2987), parcel ID field PARCEL_NO. Geography verified against TIGER county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Avera city"
+      level: city
+      parentFips: "13163"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Bartow town"
+      level: city
+      parentFips: "13163"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Louisville city"
+      level: city
+      parentFips: "13163"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Stapleton city"
+      level: city
+      parentFips: "13163"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Wadley city"
+      level: city
+      parentFips: "13163"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Wrens city"
+      level: city
+      parentFips: "13163"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Jefferson' AND aadt>0
+    altFilter: name LIKE '163-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 163-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 130
+    maxAadt: 12800
+    geoCheck: 130/130 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - Land_Val
+    - PREV_VAL
+    filledCount: 11941
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Jefferson_Commercial_Web_Map_2025_WFL1/FeatureServer/3
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: Owner
+    filledCount: 11971
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/arcgis/rest/services/Jefferson_Commercial_Web_Map_2025_WFL1/FeatureServer/3
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=JeffersonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=670&LayerID=11355&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0001 001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=JeffersonCountyGA&Layer=Parcels&PageType=Report&KeyValue=0001%20001
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?AppID=670&LayerID=11355&PageTypeID=1
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Avera city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Bartow town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Louisville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Stapleton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Wadley city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Wrens city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

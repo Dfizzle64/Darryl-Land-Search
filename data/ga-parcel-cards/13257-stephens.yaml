@@ -1,0 +1,368 @@
+state: GA
+jurisdiction: Stephens County
+fips: "13257"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — ROKMAPS MapServer dead; qPublic HTML + human ROKMAPS viewer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no live Stephens County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. Historically indexed service
+      arcgis4/5.roktech.net/arcgis/rest/services/stephens/stephens_rokmaps/MapServer now
+      returns HTTP 500 "Service … not found"; folder stephens absent from arcgis4/5.roktech.net
+      root (folders list has Paulding/robeson/SeminoleFL/etc., no stephens — same pattern as
+      Habersham). Official human GIS = ROKMAPS™ https://maps.roktech.net/ROKMAPS_Stephens/
+      (maps2 redirects to maps; stephenscountyga.gov/property-maps-gis "Click here to access
+      the map system" — cadastral + ownership/assessed/zoning for humans; weekly update per
+      county; digital datasets proprietary / fee printouts from assessor — not free REST).
+      Companion StephensSearch shell maps.roktech.net/StephensSearch/ (SPA; no public ArcGIS
+      query API recovered). Assessor CAMA + maps = qPublic AppID=779 LayerID=11815
+      (qpublic.net/ga/stephens → Application.aspx; also App=StephensCountyGA; usparcelmaps /
+      assessorsearch document AppID=779 LayerID=11815 PageTypeID=1 Maps). Cloudflare/bot 403
+      blocks automated Application.aspx from research box; public for humans. Deep-link
+      KeyValue={parcelId}:
+      Application.aspx?AppID=779&LayerID=11815&PageTypeID=4&KeyValue={parcelId}
+      (Search PageTypeID=2; Maps PageTypeID=1 / PageType=Maps;
+      App=StephensCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}).
+      StephensCountyGA_WFS on wfs.schneidercorp.com → 404; qpublic.schneidercorp.com → 403.
+      No NEGRC / GMRC / county AGOL Stephens GA parcel FS (title/bbox searches 0 usable).
+      REJECT AGOL item "Stephens County Data" services.arcgis.com/3xOwF6p0r7IHIjfn
+      Stephens_County_Data/FeatureServer (owner twoody_uok — OKLAHOMA Stephens County
+      transportation/muni extent ~-98.5..-97.1, 34.14..34.83 — WRONG state; FIPS 40137 —
+      do not use). City of Toccoa planning cityoftoccoa.com/planning points tax maps to
+      Stephens County Tax Assessor (qPublic) — no city parcel REST. Commercial extracts
+      (Equator/Regrid/ATTOM) — rejected (paid). GEO-VERIFY GEORGIA: Census TIGERweb GEOID
+      13257 CENTLAT +34.5540651 CENTLON -083.2931832 — NE Georgia Toccoa / Martin / Avalon
+      (Chattahoochee NF / Lake Hartwell ring; NOT Stephens County OK Duncan; NOT Stephens
+      County TX; NOT St. Stephen's / Stephen lookalikes). Skip utilities (county GIS page
+      notes water/sewer as county systems — do not collect) + AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic AppID=779 LayerID=11815 /
+      App=StephensCountyGA (qpublic.net/ga/stephens; Cloudflare/bot 403 automated; public for
+      humans). Deep-link KeyValue={parcelId} on Report page. Tax Commissioner
+      (706)886-4753 / billing — bills/pay only, not CAMA REST. Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. Prefer qPublic Sales Search / Sales List HTML
+      AppID=779 / App=StephensCountyGA. Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no live public zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      County planning/zoning referenced on stephenscountyga.gov and ROKMAPS human TOC
+      historically, but no live public Euclidean zoning FeatureServer recovered (2026-09-24).
+      City of Toccoa maintains separate city zoning/historic district (PDF/document center on
+      cityoftoccoa.com/planning) — no Toccoa zoning FeatureServer found.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Stephens County GA Future Land Use FeatureServer found. Toccoa Comprehensive Plan
+      2021 PDF on cityoftoccoa.com/planning — not REST.
+    status: gap
+
+  - role: other
+    name: null — ROKMAPS human viewer only (no live REST boundary FS)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Prefer Census TIGERweb county poly GEOID 13257 for spatial mask until a live county
+      boundary FeatureServer is published. Reject Oklahoma Stephens_County_Data FS.
+    status: gap
+
+municipalities:
+  - name: Toccoa
+    level: city
+    parentFips: "13257"
+    joinToCountyParcels: >
+      County seat Toccoa GA (~-83.33,34.58; ZIP 30577). No county parcel REST to join —
+      city filter blocked until geometry source exists. City planning points tax maps to
+      county qPublic.
+    layers:
+      - role: zoning
+        name: null — city PDF/document center; no FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City of Toccoa Planning (cityoftoccoa.com/planning) — rezoning/use permits +
+          historic district map PDF; no public zoning FeatureServer recovered.
+        status: gap
+      - role: flu
+        name: null — Comp Plan 2021 PDF
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Toccoa Comprehensive Plan 2021 PDF — not REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Toccoa city-owned parcel REST — county AppID=779 / ROKMAPS human viewer.
+        status: gap
+    gaps:
+      - "No Toccoa city-owned parcel/zoning/FLU REST — county qPublic AppID=779 + ROKMAPS human viewer."
+    status: gap
+
+  - name: Martin
+    level: city
+    parentFips: "13257"
+    joinToCountyParcels: Soft spatial Martin GA (~-83.20,34.49) when parcels available. No county parcel REST.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Martin zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Martin FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Martin city-owned GIS REST."
+    status: gap
+
+  - name: Avalon
+    level: city
+    parentFips: "13257"
+    joinToCountyParcels: Soft spatial Avalon GA (~-83.20,34.50) when parcels available. No county parcel REST.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Avalon zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Avalon FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Avalon city-owned GIS REST."
+    status: gap
+
+gaps:
+  - "No live public REST parcels/owner/tax/sales/zoning/FLU for Stephens County GA — qPublic AppID=779 LayerID=11815 HTML + ROKMAPS human viewer only."
+  - "Historical stephens/stephens_rokmaps MapServer (arcgis4/5.roktech.net) returns 500 Service not found; folder removed from Roktech root (2026-09-24)."
+  - "StephensCountyGA_WFS 404/403; no NEGRC/GMRC/county AGOL Stephens GA parcel FeatureServer."
+  - "REJECT Stephens County OK Stephens_County_Data FS (services.arcgis.com/3xOwF6p0r7IHIjfn — extent ~OK); REJECT Stephens TX / paid Regrid/ATTOM/Equator."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/stephens + AppID=779 Search/Maps + maps.roktech.net/ROKMAPS_Stephens/ public for humans."
+  - "Skip utilities (water/sewer noted on county GIS page) + AADT; no emails/phones."
+
+license: >
+  Stephens County GIS ROKMAPS (maps.roktech.net/ROKMAPS_Stephens/;
+  stephenscountyga.gov/property-maps-gis). Tax Assessor qPublic/Beacon AppID=779
+  LayerID=11815 / App=StephensCountyGA (qpublic.net/ga/stephens; Toccoa GA). Historical
+  Roktech MapServer currently unavailable. City of Toccoa Planning (cityoftoccoa.com/planning)
+  — Comp Plan / historic district PDF, tax maps via county assessor. Attribution Stephens
+  County GIS / Tax Assessors. Public HTML + human viewer; no emails/phones; no paid vendors;
+  skip utilities+AADT. REJECT Stephens County OK lookalikes.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=779&LayerID=11815&PageTypeID=2
+jurisdictionGisUrl: https://maps.roktech.net/ROKMAPS_Stephens/
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Avalon town"
+      level: city
+      parentFips: "13257"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Martin town"
+      level: city
+      parentFips: "13257"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Toccoa city"
+      level: city
+      parentFips: "13257"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Stephens' AND aadt>0
+    altFilter: name LIKE '257-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 257-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 166
+    maxAadt: 22200
+    geoCheck: 166/166 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=StephensCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=779&LayerID=11815&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://maps.roktech.net/ROKMAPS_Stephens/
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Avalon town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Martin town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Toccoa city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

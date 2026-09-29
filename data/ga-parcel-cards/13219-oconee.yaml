@@ -1,0 +1,377 @@
+state: GA
+jurisdiction: Oconee County
+fips: "13219"
+level: county
+markets: [Athens]
+
+layers:
+  # PRIMARY — county-wide parcel polygons (PIN + acres; NO owner/mailing/situs/tax/sale on live fabric)
+  - role: parcels
+    name: Services_Public/Parcel_Fabric_Public Tax Parcels (OCGIS ocgis.oconee.ga.us)
+    restUrl: https://ocgis.oconee.ga.us/server/rest/services/Services_Public/Parcel_Fabric_Public/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: StatedArea
+    coverage: county-wide
+    fieldMap:
+      Name: parcelId
+      DisplayName: parcelIdDisplay
+      RealKey: ownerKey
+      StatedArea: acreage
+      CalculatedArea: acreageCalculated
+      ERROR_ACRES: acreageError
+      RecordReference: platReference
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY for Oconee County GA FIPS 13219 (Watkinsville
+      seat; Athens MSA). Live OCGIS Enterprise Parcel Fabric Tax Parcels/2 count 19977
+      (2026-09-24). SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet (wkid 102667 /
+      latestWkid 2240). maxRecordCount 2000 — page via resultOffset / spatial envelopes.
+      Name is PIN (e.g. 'A 01A 008B', 'W 13  004', 'C 01AA003RA') — NOT owner; preserve
+      internal spaces for qPublic KeyValue. RealKey filled ≈19974 (CAMA join key).
+      Prefer StatedArea for acreage band (5–150 ≈3724); CalculatedArea 5–150 ≈3611;
+      Shape__Area is StatePlane sq ft (GIS acres ≈ Shape__Area/43560). Schema is THIN —
+      no ownerName/mailing/situs/CURR_VAL/sale on live fabric (Name/DisplayName = PIN only).
+      Companion layers: Points/1, Right of Way/3, Subdivisions/4. Stale AGOL snapshot
+      March_2021_Parcels (services7 JBTLpuRiIpQ2vA5Y count 18844; PARCELID+DEED_ACRES) —
+      do NOT prefer over live fabric. Open Data hub opendata-ocga-gis.hub.arcgis.com
+      (org JBTLpuRiIpQ2vA5Y / OCGA-GIS; MattDBealGIS). Official viewers: Location Viewer
+      experience.arcgis.com/experience/9b3dee158c1742938afc87a8a557ff9b ; Zoning Map App
+      ocga-gis.maps.arcgis.com instant basic appid=f51d61748aad4becb315148355bd6626 ;
+      Subdivision Map portal appid=cc74ab0fe6c64eedab5540bc4262fff2. Assessor HTML qPublic
+      SchneiderCorp App=OconeeCountyGA / AppID=686 LayerID=11376 PageID=4791
+      (qpublic.net/ga/oconee; oconeecountyga.gov Property Appraisal). Deep-link
+      KeyValue={Name}: Application.aspx?AppID=686&LayerID=11376&PageTypeID=4&KeyValue={Name}
+      (also App=OconeeCountyGA&Layer=Parcels&PageType=Report&KeyValue={Name}). GEO-VERIFY
+      GEORGIA: county boundary FULL_FIPS=13219 centroid ~-83.471,33.831; parcel samples
+      ~-83.581,33.909 / ~-83.486,33.904 / ~-83.411,33.859 (Watkinsville). Census TIGERweb
+      GEOID 13219 CENTLAT ~+33.83 CENTLON ~-083.44 (Athens MSA / NE Georgia). REJECT
+      Oconee County SC lookalike arcserver2.oconeesc.com Parcels_OpenData (Walhalla ~-83.0,
+      34.75); REJECT City of Ocoee FL maps.ocoee.org TaxParcel; REJECT paid Regrid/ATTOM/
+      Georgia GIS Clearinghouse paid downloads; skip Water/Sewer/Stormwater utilities+AADT
+      (Water_Resources_* / OCGIS_Stormwater_Public — DO NOT collect); no emails/phones;
+      schema created_user/last_edited_user/parcel_edit_user — DO NOT collect as PII.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL/FMV/assessed on live Parcel Fabric; qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Live Tax Parcels/2 has no market/assessed/taxable value fields. Assessor HTML
+      qPublic App=OconeeCountyGA / AppID=686 LayerID=11376 only. Deep-link
+      KeyValue={Name}: Application.aspx?AppID=686&LayerID=11376&PageTypeID=4&KeyValue={Name}.
+      Search PageTypeID=2&PageID=4791. Historical sales WFL MKTVAL/MAVVAL unused (0) on
+      samples — not a live tax digest REST. Rejected paid vendor tax extracts.
+    status: gap
+
+  - role: sales
+    name: Property_Sales_by_Home_Price_WFL1 (historical 2021–2022 only; partial)
+    restUrl: https://services7.arcgis.com/JBTLpuRiIpQ2vA5Y/arcgis/rest/services/Property_Sales_by_Home_Price_WFL1/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: DEED_ACRES
+    coverage: sample
+    fieldMap:
+      PARCELID: parcelId
+      RealKey: ownerKey
+      SALEPRICE: lastSale.price
+      SALEDATE: lastSale.date
+      QUALIFIER: lastSale.qualified
+      GRANTEE: saleBuyer
+      GRANTOR: saleSeller
+      SALECLASS: saleClass
+      REASON: saleReason
+      NET_SP: lastSale.netPrice
+      DEED_ACRES: acreage
+      CALC_ACRES: acreageCalculated
+    notes: >
+      Historical parcel-sale polygons ONLY — layer 0 = 2022 through 08/17/2022 (count 934);
+      layer 1 = 2021 Parcel Sales (count 1320). NOT a live rolling sales feed; GRANTEE is
+      buyer at sale (not current owner). Join to live fabric on RealKey / PARCELID≈Name.
+      Prefer qPublic Sales Search / Sales List HTML AppID=686 for current sales. Rejected
+      paid Regrid/ATTOM sales.
+    status: partial
+
+  - role: zoning
+    name: OCGIS_Zoning_Public Zoning - Oconee County (Euclidean)
+    restUrl: https://ocgis.oconee.ga.us/server/rest/services/OCGIS_Zoning_Public/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZoningCode: zoning
+      ZoningDesc: zoningName
+      ZoningAgency: zoningAgency
+    notes: >
+      Preferred Euclidean zoning polygons (count 1070). ZoningCode top: AG≈285, AR≈232,
+      R-1≈134, B-2≈99, OIP≈71, B-1≈64, R-2≈56, AR-3≈43, OBP≈24, A-1≈23, R-3≈14, I≈12,
+      M-H≈5, CBD≈3, AR-2≈3, A-2≈2. ZoningAgency: Oconee County≈1021, North High Shoals≈33,
+      Bishop≈11, Bogart≈3 (Watkinsville NOT a separate ZoningAgency — city uses county
+      Euclidean + spatial City Limits). Companion Overlay Districts/1 (count 43; field
+      Overlay), Zoning Actions/2, Parks and Recreation Corridor/0. Zoning Map App
+      appid=f51d61748aad4becb315148355bd6626.
+    status: usable
+
+  - role: flu
+    name: NEGRC Future Development Map Inventory CA - Oconee County - 2023
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/457
+    layerId: 457
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FDM_Short: fluCode
+      FDM_Long: flu
+      ID: fluId
+    notes: >
+      Comp-plan character areas (count 939) — Suburban Neighborhood≈236 / Country
+      Estates≈161 / Traditional Neighborhood≈83 / Parks/Recreation/Conservation≈74 /
+      Regional Center≈66 / Agricultural Preservation≈46 / Civic Center≈46 / Rural Places≈43
+      / Community Village≈37 / Public Institutional≈32 / Neighborhood Village≈21 /
+      Downtown≈21 / Historic Main Street≈20 / Workplace Center≈18 / Corridor Commercial≈14
+      / Gateway Corridor≈10 / City Living≈8 / Mixed-Use Office≈3. Planning character —
+      not Euclidean zoning substitute. Companion CA Parks, Recreation & Conservation -
+      Oconee County - 2023 /456.
+    status: usable
+
+  - role: other
+    name: Address_Points_Public Site Address Points (situs)
+    restUrl: https://ocgis.oconee.ga.us/server/rest/services/Services_Public/Address_Points_Public/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FullAddr: situsAddress
+      FullStNm: situsStreet
+      Add_Number: situsNumber
+      Post_Comm: situsCity
+      Post_Code: situsZip
+      Inc_Muni: municipality
+      Lat: situsLat
+      Long: situsLon
+      LocalUniqueID: addressLocalId
+    notes: >
+      E911/site address points (count 19419). Inc_Muni: Unincorporated≈16582,
+      Watkinsville≈1628, Bogart≈565, North High Shoals≈232, Bishop≈161, Eastville≈149,
+      Farmington≈102. Spatial join to Tax Parcels (no PIN on this layer). Prefer for situs
+      when fabric has none. Skip utilities context.
+    status: usable
+
+  - role: other
+    name: OCGIS_Administrative_Boundaries_Public City Limits
+    restUrl: https://ocgis.oconee.ga.us/server/rest/services/Services_Public/OCGIS_Administrative_Boundaries_Public/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY_NAME: cityName
+      PLACE_TYPE: placeType
+      PLACE_FIPS: placeFips
+      FULL_FIPS: placeGeoid
+    notes: >
+      Live count 6 — Watkinsville city (GEOID 1380788; ~-83.405,33.864), Bogart (1309068;
+      ~-83.536,33.943), Bishop (1308200; ~-83.439,33.816), North High Shoals (1356308;
+      ~-83.504,33.822), plus unincorporated Eastville / Farmington. Preferred spatial
+      municipality filter. Companion County Boundary/1 FULL_FIPS=13219 (~-83.471,33.831).
+      Soft mailing/Post_Comm alone insufficient.
+    status: usable
+
+municipalities:
+  - name: Watkinsville
+    level: city
+    parentFips: "13219"
+    joinToCountyParcels: >
+      Spatial Administrative_Boundaries/0 CITY_NAME='Watkinsville' (GEOID 1380788;
+      ~-83.405,33.864) onto Parcel_Fabric Name. Soft Inc_Muni='Watkinsville' on Address
+      Points (~1628) as situs aid — mailing city alone insufficient. County seat.
+    layers:
+      - role: zoning
+        name: County Zoning spatial Watkinsville (no city ZoningAgency)
+        restUrl: https://ocgis.oconee.ga.us/server/rest/services/OCGIS_Zoning_Public/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoningCode: zoning
+          ZoningDesc: zoningName
+        notes: >
+          Watkinsville is NOT a separate ZoningAgency on OCGIS Zoning/3 — prefer spatial
+          City Limits ∩ county Euclidean ZoningCode. Soft Downtown / Historic Main Street
+          NEGRC CA as planning character only.
+        status: usable
+      - role: flu
+        name: NEGRC CA - Oconee County spatial Watkinsville
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/457
+        layerId: 457
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Long: flu
+          FDM_Short: fluCode
+        notes: County character areas clipped to Watkinsville city limits (Downtown /
+          Historic Main Street / City Living / Traditional Neighborhood…).
+        status: usable
+      - role: parcels
+        name: null — use county Parcel Fabric spatial Watkinsville
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Watkinsville-only CAMA FeatureServer — county Tax Parcels/2 + spatial city
+          limits; owner/tax/sale via qPublic AppID=686.
+        status: gap
+    gaps:
+      - "No City-of-Watkinsville separate parcel/CAMA or ZoningAgency REST — county fabric + spatial limits; qPublic HTML for owner/tax/sale."
+    status: usable
+
+  - name: Bogart
+    level: city
+    parentFips: "13219"
+    joinToCountyParcels: >
+      Spatial City Limits CITY_NAME='Bogart' (GEOID 1309068; ~-83.536,33.943). Note Bogart
+      also straddles Clarke — Clarke Board of Assessors appraises Clarke-side parcels
+      (see 13059-clarke). Soft Inc_Muni='Bogart' (~565) situs aid only.
+    layers:
+      - role: zoning
+        name: OCGIS ZoningAgency='Bogart' + spatial limits
+        restUrl: https://ocgis.oconee.ga.us/server/rest/services/OCGIS_Zoning_Public/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoningCode: zoning
+          ZoningAgency: zoningAgency
+        notes: ZoningAgency='Bogart' sparsely attributed (≈3) — prefer spatial city limits ∩ Zoning/3.
+        status: partial
+      - role: parcels
+        name: null — county fabric spatial Bogart
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Tax Parcels + spatial Bogart limits; qPublic AppID=686 for Oconee-side CAMA.
+        status: gap
+    gaps:
+      - "Bogart multi-county (Oconee + Clarke) — use correct county assessor by parcel side."
+    status: partial
+
+  - name: Bishop
+    level: city
+    parentFips: "13219"
+    joinToCountyParcels: >
+      Spatial City Limits CITY_NAME='Bishop' (GEOID 1308200; ~-83.439,33.816) OR soft
+      ZoningAgency='Bishop' (~11).
+    layers:
+      - role: zoning
+        name: OCGIS ZoningAgency='Bishop'
+        restUrl: https://ocgis.oconee.ga.us/server/rest/services/OCGIS_Zoning_Public/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoningCode: zoning
+          ZoningAgency: zoningAgency
+        notes: ZoningAgency='Bishop' ≈11 + spatial city limits.
+        status: usable
+      - role: parcels
+        name: null — county fabric spatial Bishop
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Tax Parcels + spatial Bishop; qPublic AppID=686.
+        status: gap
+    gaps:
+      - "No Bishop-owned parcel CAMA REST."
+    status: partial
+
+  - name: North High Shoals
+    level: city
+    parentFips: "13219"
+    joinToCountyParcels: >
+      Spatial City Limits CITY_NAME='North High Shoals' (GEOID 1356308; ~-83.504,33.822) OR
+      ZoningAgency='North High Shoals' (~33).
+    layers:
+      - role: zoning
+        name: OCGIS ZoningAgency='North High Shoals'
+        restUrl: https://ocgis.oconee.ga.us/server/rest/services/OCGIS_Zoning_Public/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoningCode: zoning
+          ZoningAgency: zoningAgency
+        notes: ZoningAgency='North High Shoals' ≈33 + spatial limits.
+        status: usable
+      - role: parcels
+        name: null — county fabric spatial North High Shoals
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Tax Parcels + spatial limits; qPublic AppID=686.
+        status: gap
+    gaps:
+      - "No North High Shoals-owned parcel CAMA REST."
+    status: partial
+
+gaps:
+  - "Live Parcel Fabric Tax Parcels thin Name(PIN)+RealKey+StatedArea only — no REST owner/mailing/situs/tax/sale; qPublic AppID=686 LayerID=11376 HTML for CAMA."
+  - "Property_Sales_by_Home_Price_WFL1 is historical 2021–2022 snapshot only (not live sales) — prefer qPublic Sales Search for current."
+  - "Watkinsville has no separate ZoningAgency — city Euclidean via spatial City Limits ∩ county Zoning/3."
+  - "Parcel Fabric maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/oconee + AppID=686 public for humans."
+  - "REJECT Oconee SC arcserver2.oconeesc.com + Ocoee FL maps.ocoee.org lookalikes; reject paid Regrid/ATTOM/Georgia GIS Clearinghouse; skip utilities+AADT; no emails/phones."
+
+license: >
+  Oconee County GIS / OCGIS (ocgis.oconee.ga.us; org JBTLpuRiIpQ2vA5Y OCGA-GIS) —
+  Services_Public/Parcel_Fabric_Public Tax Parcels/2; OCGIS_Zoning_Public Zoning/3;
+  Address_Points_Public/0; Administrative_Boundaries City Limits/0 + County Boundary/1.
+  Open Data hub opendata-ocga-gis.hub.arcgis.com (oconeecounty.com/openGIS). NEGRC
+  Future Development Map Inventory CA - Oconee County /457 (Ug5xGQbHsD8zuZzM). Assessor
+  qPublic App=OconeeCountyGA / AppID=686 LayerID=11376 (qpublic.net/ga/oconee;
+  oconeecountyga.gov Property Appraisal; Watkinsville GA 30677). Attribution Oconee
+  County GIS / Property Appraisal. Public fields only; no emails/phones; no paid vendors;
+  skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=686&LayerID=11376&PageTypeID=2&PageID=4791
+jurisdictionGisUrl: https://experience.arcgis.com/experience/9b3dee158c1742938afc87a8a557ff9b/
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

@@ -1,0 +1,450 @@
+state: GA
+jurisdiction: Morgan County
+fips: "13211"
+level: county
+markets: [Atlanta]
+
+layers:
+  - role: parcels
+    name: Parcels (official Morgan County GA AGOL — owner tgiddens86)
+    restUrl: https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      Parcels_Pa: parcelIdAlt
+      REALKEY: ownerKey
+      OWNKEY: ownerKeyAlt
+      HOUSE_NO: situsNumber
+      STDIRECT: situsStreetDir
+      STTYPE: situsStreetType
+      STREET_NAM: situsStreet
+      TOTALACRES: acreage
+      Draw_Acres: acreageDraw
+      CURR_VAL: tax.marketValue
+      ZONINGCODE: zoning
+      LEGAL_DESC: legalDescription
+      NEIGHBHOOD: neighborhood
+      Qpub_link_: appraiserDeepLink
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA subset (Morgan County GIS AGOL org
+      mr2xH531NAL4tt7e; owner tgiddens86). Live count 12190 (2026-09-24). maxRecordCount 1000.
+      TOTALACRES 5–150 ≈4496; CURR_VAL>0 ≈12143; HOUSE_NO>0 ≈9166. NO owner/mailing/SALEPRICE
+      on this layer — owner via qPublic; sales via 2023_SALES. Qpub_link_ App=morganCountyGA
+      KeyValue={Parcel_No}. Geo-verified ~-83.501,33.817 Morgan GA Madison (~-83.5,33.6).
+      REJECT Utah: experience 4999dc223c6c468e8435e212e93acac6 (MorganRecorder GRAMA);
+      services1…/Parcels_Morgan; org 9zdKz4c9IFXMrlCe (~-111.8,40.8). MorganCountyGA_WFS 404.
+      Rejected paid Regrid/ATTOM.
+    status: usable
+
+  - role: tax
+    name: Parcels CURR_VAL (same layer)
+    restUrl: https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      CURR_VAL: tax.marketValue
+    notes: >
+      CURR_VAL market-style ≈12143 >0. No assessedValue on parcels REST; sales layers carry
+      MKTVAL/MAVVAL/DIGEST_VAL. Assessor HTML qpublic.net/ga/morgan App=morganCountyGA.
+    status: usable
+
+  - role: sales
+    name: 2023_SALES_20240503
+    restUrl: https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/2023_SALES_20240503/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: SALEACRES
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      SALEDATE: lastSale.date
+      SALEPRICE: lastSale.price
+      QUALIFIER: lastSale.qualified
+      SALECLASS: lastSale.class
+      REASON: lastSale.reason
+      DEEDPAGE: lastSale.docRef
+      GRANTEE: lastSale.grantee
+      GRANTOR: lastSale.grantor
+      MKTVAL: tax.marketValue
+      MAVVAL: tax.assessedValue
+      DIGEST_VAL: tax.digestValue
+      NET_SP: lastSale.netPrice
+    notes: >
+      Count 533 sales extract. Join Parcel_No/REALKEY. Companions 2023_FM/LM/FL_SALES;
+      LM_Sales 2017–2020 layers. Geo Morgan GA.
+    status: usable
+
+  - role: zoning
+    name: Zoning (parcel-shaped; county + city attrs)
+    restUrl: https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_N_2: parcelId
+      Zoning: zoning
+      Madison_Zo: zoningMadison
+      Bostwick_Z: zoningBostwick
+      Rutledge_Z: zoningRutledge
+      Buckhead_Z: zoningBuckhead
+      REALKEY: ownerKey
+      TOTALACRES: acreage
+      GIS_ACRES: acreageGis
+    notes: >
+      Count 11957. Domain AR≈3494, City≈3207, AG≈2910, LR-1≈871, R-1≈547, PUD≈281, R-2≈260,
+      LR-2≈188, C-2≈60, I-1≈23, C-1≈18, R-3≈17, I-2≈11, C-3≈9. Zoning='City' stub — use
+      Madison_Zo/Bostwick_Z/Rutledge_Z/Buckhead_Z or Municipal_Boundaries spatial.
+    status: usable
+
+  - role: flu
+    name: null — no public county FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Morgan GA FLU FeatureServer in tgiddens86 org (2026-09-24) — Comp Plan PDF gap.
+    status: gap
+
+  - role: other
+    name: Municipal_Boundaries
+    restUrl: https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Municipal_Boundaries/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Name: municipality
+    notes: >
+      Count 12 (triplicate of Madison/Bostwick/Rutledge/Buckhead) — dissolve on Name.
+      Preferred spatial municipality filter.
+    status: usable
+
+  - role: other
+    name: AddressPoint
+    restUrl: https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/AddressPoint/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      Full_Address: situsAddress
+      WG_ST_N: situsNumber
+      WG_STREET: situsStreet
+      Zoning: zoning
+    notes: Count 9976; situs enrichment join.
+    status: usable
+
+municipalities:
+  - name: Madison
+    level: city
+    parentFips: "13211"
+    joinToCountyParcels: "Spatial Municipal_Boundaries Name='Madison'."
+    layers:
+      - role: zoning
+        name: Zoning.Madison_Zo spatial
+        restUrl: https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_N_2: parcelId
+          Madison_Zo: zoning
+          Zoning: zoningCounty
+        notes: Prefer Madison_Zo when non-blank; else parcel ZONINGCODE / city PDF.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Madison FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Parcels + Madison poly.
+        status: gap
+    gaps:
+      - "Certify critical sites against city zoning map when Madison_Zo blank."
+    status: usable
+
+  - name: Bostwick
+    level: city
+    parentFips: "13211"
+    joinToCountyParcels: "Spatial Name='Bostwick'."
+    layers:
+      - role: zoning
+        name: Zoning.Bostwick_Z
+        restUrl: https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_N_2: parcelId
+          Bostwick_Z: zoning
+        notes: Prefer Bostwick_Z when filled.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Bostwick FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Parcels spatial.
+        status: gap
+    gaps:
+      - "No Bostwick-owned separate zoning FeatureServer."
+    status: partial
+
+  - name: Rutledge
+    level: city
+    parentFips: "13211"
+    joinToCountyParcels: "Spatial Name='Rutledge'."
+    layers:
+      - role: zoning
+        name: Zoning.Rutledge_Z
+        restUrl: https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_N_2: parcelId
+          Rutledge_Z: zoning
+        notes: Prefer Rutledge_Z when filled.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Rutledge FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Parcels spatial.
+        status: gap
+    gaps:
+      - "No Rutledge-owned separate zoning FeatureServer."
+    status: partial
+
+  - name: Buckhead
+    level: city
+    parentFips: "13211"
+    joinToCountyParcels: "Spatial Name='Buckhead'. NOT Atlanta Buckhead (Fulton)."
+    layers:
+      - role: zoning
+        name: Zoning.Buckhead_Z
+        restUrl: https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_N_2: parcelId
+          Buckhead_Z: zoning
+        notes: Prefer Buckhead_Z when filled. Not Fulton/Atlanta Buckhead.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Buckhead FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Parcels spatial.
+        status: gap
+    gaps:
+      - "Do not confuse with Atlanta Buckhead (Fulton County)."
+    status: partial
+
+gaps:
+  - "Parcels have CURR_VAL + situs but NO ownerName/mailing — qPublic HTML for owner."
+  - "No county FLU FeatureServer."
+  - "Zoning='City' (~3207) stub — use city attrs or Municipal_Boundaries."
+  - "Municipal_Boundaries triplicate (12/4) — dissolve on Name."
+  - "REJECT Utah Morgan experience 4999dc… / Parcels_Morgan / MorganRecorder org."
+  - "MorganCountyGA_WFS 404."
+  - "Rejected paid Regrid/ATTOM."
+  - "No emails/phones; no paid vendors."
+
+license: >
+  Morgan County GIS AGOL (org mr2xH531NAL4tt7e tgiddens86 — Parcels, Zoning,
+  Municipal_Boundaries, AddressPoint, 2023_*_SALES). Assessor qpublic.net/ga/morgan
+  App=morganCountyGA. Utah Morgan experience/Parcels_Morgan rejected. Attribution Morgan
+  County GIS / Tax Assessor. Public fields only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=morganCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Parcels/FeatureServer/0 count
+    12190; extent center [['13211', 'Morgan County']]; sample [['13211', 'Morgan County']]. No change to
+    field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Bostwick city"
+      level: city
+      parentFips: "13211"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Buckhead town"
+      level: city
+      parentFips: "13211"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Madison city"
+      level: city
+      parentFips: "13211"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Rutledge city"
+      level: city
+      parentFips: "13211"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Morgan' AND aadt>0
+    altFilter: name LIKE '211-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 211-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 138
+    maxAadt: 40800
+    geoCheck: 138/138 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    filledCount: 12143
+    restUrl: https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Parcels/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: REST-partial
+    detail: '2023_SALES_20240503/FeatureServer/0 extract (533 sales, 2023 only): SALEDATE, SALEPRICE, QUALIFIER'
+    restUrl: https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/2023_SALES_20240503/FeatureServer/0
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=morganCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=morganCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20001
+    verification: 'pattern-tested: real sample ID from Parcel_No; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=morganCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Bostwick city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Buckhead town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Madison city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Rutledge city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

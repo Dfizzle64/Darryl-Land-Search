@@ -1,0 +1,401 @@
+state: GA
+jurisdiction: Wilkes County
+fips: "13317"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no county-wide public ArcGIS parcel FeatureServer; City of Washington WFS city-only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Wilkes County GA COUNTY-WIDE public parcel
+      FeatureServer/MapServer with cadastral polygons recovered. Official human
+      cadastral + CAMA = qPublic/Beacon App=WilkesCountyGA / AppID=693 LayerID=11393
+      PageID=5853 (qpublic.net/ga/wilkes → qpublic.schneidercorp.com Application.aspx;
+      wilkescountyga.org Tax Assessor; county seat Washington GA 30673 — NOT Washington
+      County FIPS 13303). Cloudflare/bot 403 blocks automated Application.aspx; public
+      for humans. Deep-link KeyValue={parcelId}:
+      Application.aspx?App=WilkesCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+      (also AppID=693&LayerID=11393&PageTypeID=4&KeyValue=). WilkesCountyGA_WFS on
+      wfs.schneidercorp.com → 404 Service not found. CSRA RC (csrarc.ga.gov/mapping-gis)
+      publishes no open county parcel REST. GARC/MGRC Parcels2025 Parcel_Regions_w_WinGAP
+      (Ug5xGQbHsD8zuZzM) spatial envelope around Washington GA (~-82.74,33.74) returned
+      0 features (that layer is a different county WinGAP extract — do not reuse).
+      CityOfWashingtonGA_WFS MapServer/0 is CITY OF WASHINGTON only (~2394 polys;
+      TaxDistDescr=WASHINGTON; ~-82.755,33.751) — see municipalities.Washington; NOT
+      county-wide. GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13317 NAME=Wilkes County
+      STATE=13 COUNTY=317 CENTLAT +33.7818930 CENTLON -082.7431991; CSRARC_Counties
+      NAME=WILKES FIPS=317 sample ~-82.646,33.985 — east-central GA CSRA / Augusta ring
+      (seat Washington). REJECT gis.wilkescounty.net Parcels_Data/MapServer (Wilkes
+      County NORTH CAROLINA — samples ~-81.45,36.16; HMWebSite Zoning North Wilkesboro /
+      Wilkesboro). REJECT Washington County GA 13303 (Sandersville) and City of
+      Washington lookalikes outside Wilkes. Rejected paid Regrid/ATTOM/USLandGrid;
+      no emails/phones; skip utilities+AADT.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only (county); City WFS has no CURR_VAL/assessed
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public county REST. Tax/CAMA via qPublic
+      App=WilkesCountyGA / AppID=693 LayerID=11393 HTML only. CityOfWashingtonGA_WFS/0
+      has owner (_v_ON) + Acres + StreetAddr but NO market/assessed/taxable value fields.
+      Deep-link KeyValue={parcelId} on Report page.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE for Wilkes GA county-wide or on
+      CityOfWashingtonGA_WFS/0. Prefer qPublic Sales Search / Sales List HTML
+      App=WilkesCountyGA / AppID=693 (also qpublic7.qpublic.net/ga_search.php?county=ga_wilkes&search=sales).
+      Rejected paid Regrid/ATTOM sales. REJECT gis.wilkescounty.net NC SALEPRICE fields
+      (wrong state).
+    status: gap
+
+  - role: zoning
+    name: null — no public county Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Wilkes County GA Euclidean zoning FeatureServer found (2026-09-24). City of
+      Washington (wga.gov) zoning change PDF / ordinance path — not REST. REJECT
+      gis.wilkescounty.net Zoning North Wilkesboro / Wilkesboro (NC).
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Wilkes County GA Future Land Use / Character Areas FeatureServer found
+      (2026-09-24). Comp-plan / CSRA RC planning PDF gap.
+    status: gap
+
+  - role: other
+    name: CSRARC_Counties Wilkes boundary (context — NOT parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CSRARC_Counties/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      FIPS: countyFips3
+    notes: >
+      Filter NAME='WILKES' / FIPS='317' for Wilkes County GA outline (count=1;
+      sample ~-82.65,33.98). Geo-verify / clip only — zero parcel/owner/tax/sale fields.
+      Same shared org Ug5xGQbHsD8zuZzM as other GA RC layers. Soft municipal polygons
+      also on CityOfWashingtonGA_WFS MapServer/5 (Rayle / Tignall / Washington;
+      County='Wilkes') — city limits context when joining city parcels.
+    status: partial
+
+municipalities:
+  - name: Washington
+    level: city
+    parentFips: "13317"
+    joinToCountyParcels: >
+      FIRST-CLASS city (county seat Washington GA / Washington-Wilkes; PLACEFP 80704;
+      ~-82.74,33.74; ZIP 30673). Do NOT confuse with Washington County GA FIPS 13303
+      (Sandersville). Soft spatial CityOfWashingtonGA_WFS/5 NAME='Washington' ∩ city
+      parcels/0. County-wide parcels still qPublic HTML only — mailing city never sole filter.
+    layers:
+      - role: parcels
+        name: CityOfWashingtonGA_WFS Parcels (city-only)
+        restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/CityOfWashingtonGA_WFS/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Acres
+        coverage: city-only
+        fieldMap:
+          Parcel_No: parcelId
+          QPID: parcelIdAlt
+          _v_ON: ownerName
+          StreetAddr: situsAddress
+          HouseNumber: situsHouseNumber
+          StreetDir: situsStreetDir
+          StreetName: situsStreetName
+          StreeType: situsStreetType
+          Acres: acreage
+          TaxDistCode: taxDistrictCode
+          TaxDistDescr: taxDistrict
+        notes: >
+          Preferred CITY OF WASHINGTON GA parcel GEOMETRY + owner/situs/acres
+          (Schneider WFS CityOfWashingtonGA_WFS MapServer/0; FeatureServer SOE absent —
+          use MapServer). Live count 2394 (2026-09-24); StreetAddr filled ≈2392;
+          TaxDistDescr=WASHINGTON / TaxDistCode=01 only; Acres 5–150 ≈115.
+          Schema: Parcel_No / QPID / _v_ON / StreetAddr / HouseNumber / StreetDir /
+          StreetName / StreeType (source typo) / Acres / TaxDist* + polygon. NO
+          CURR_VAL/assessed / SALE_* / zoning on this layer — tax/sale via county
+          qPublic AppID=693 HTML. SR GA East (wkid 102666 / 2239). maxRecordCount 2000.
+          GEO-VERIFY: WGS84 samples ~-82.755,33.751 / ~-82.753,33.749 (N Bypass /
+          Washington GA) — matches Census Wilkes seat; REJECT Washington County 13303
+          and Washington DC/IL/IA lookalikes. minScale 65000 on layer — zoom in for draw.
+        status: usable
+      - role: tax
+        name: null — no tax values on City WFS; county qPublic HTML
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: City WFS lacks market/assessed; use qPublic AppID=693 KeyValue={Parcel_No}.
+        status: gap
+      - role: sales
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No SALE_* on CityOfWashingtonGA_WFS — qPublic Sales HTML AppID=693.
+        status: gap
+      - role: zoning
+        name: null — no City of Washington zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: wga.gov zoning change application PDF / ordinance only — not REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Washington GA FLU REST.
+        status: gap
+    gaps:
+      - "City parcels usable (owner/situs/acres) but no tax/sale REST — county qPublic AppID=693 HTML."
+      - "City-only (~2394) — does NOT substitute for county-wide Wilkes parcels."
+      - "Do NOT confuse City of Washington (Wilkes) with Washington County GA 13303."
+    status: usable
+
+  - name: Tignall
+    level: city
+    parentFips: "13317"
+    joinToCountyParcels: >
+      Soft spatial CityOfWashingtonGA_WFS/5 NAME='Tignall' (PLACEFP 76532; ~-82.74,33.88)
+      when county parcels exist; no Tignall-only CAMA REST — county qPublic AppID=693.
+    layers:
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Tignall-only parcel FS; city limits polygon on CityOfWashingtonGA_WFS/5.
+        status: gap
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Tignall zoning FS.
+        status: gap
+    gaps:
+      - "Tignall limits soft only; parcel/tax/sale via county qPublic App=WilkesCountyGA."
+    status: partial
+
+  - name: Rayle
+    level: city
+    parentFips: "13317"
+    joinToCountyParcels: >
+      Soft spatial CityOfWashingtonGA_WFS/5 NAME='Rayle' (PLACEFP 63756; ~-82.89,33.79)
+      when county parcels exist; no Rayle-only CAMA REST — county qPublic AppID=693.
+    layers:
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Rayle-only parcel FS; city limits polygon on CityOfWashingtonGA_WFS/5.
+        status: gap
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Rayle zoning FS.
+        status: gap
+    gaps:
+      - "Rayle limits soft only; parcel/tax/sale via county qPublic App=WilkesCountyGA."
+    status: partial
+
+gaps:
+  - "No public COUNTY-WIDE REST parcels/owner/tax/sales/zoning/FLU for Wilkes County GA — qPublic App=WilkesCountyGA / AppID=693 LayerID=11393 PageID=5853 HTML only."
+  - "CityOfWashingtonGA_WFS/0 usable city-only (2394; owner+situs+acres; no tax/sale REST) — NOT county-wide."
+  - "WilkesCountyGA_WFS absent (404); GARC Parcels2025 WinGAP envelope miss for Washington GA."
+  - "REJECT gis.wilkescounty.net (Wilkes NC ~-81.45,36.16; North Wilkesboro/Wilkesboro zoning)."
+  - "REJECT Washington County GA 13303 (Sandersville) confusion with seat City of Washington (Wilkes)."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/wilkes + AppID=693 Search/Maps public for humans."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Wilkes County Tax Assessor qPublic/Beacon App=WilkesCountyGA / AppID=693
+  LayerID=11393 PageID=5853 (qpublic.net/ga/wilkes; wilkescountyga.org Tax Assessor;
+  seat Washington GA 30673). City of Washington Schneider WFS
+  CityOfWashingtonGA_WFS MapServer (city parcels + Census city boundaries). CSRA RC
+  CSRARC_Counties boundary on Ug5xGQbHsD8zuZzM. No public county-wide ArcGIS parcel
+  service discovered 2026-09-24. Attribution Wilkes County Board of Tax Assessors /
+  City of Washington GA. Public fields only; no emails/phones; no paid vendors; skip
+  utilities+AADT. REJECT Wilkes NC gis.wilkescounty.net and Washington County GA 13303.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=693&LayerID=11393&PageTypeID=2&PageID=5853
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=693&LayerID=11393&PageTypeID=1
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap. REJECTED
+    services1.arcgis.com/YwCV9A7cLN6cgxhP Basemap/FeatureServer/3 GA_Wilkes_County_13317 (7749):
+    ReportAll USA schema (ROBUST_ID, CTY_ROW_ID, USPS_RESID) = paid-vendor re-host. City of Washington
+    parcels are public on Schneider WFS (CityOfWashingtonGA_WFS/MapServer/0, 2394, Parcel_No) - city-
+    only.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Rayle town"
+      level: city
+      parentFips: "13317"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Tignall town"
+      level: city
+      parentFips: "13317"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Washington city"
+      level: city
+      parentFips: "13317"
+      parcelsRest: "https://wfs.schneidercorp.com/arcgis/rest/services/CityOfWashingtonGA_WFS/MapServer/0 (2394, Parcel_No)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Wilkes' AND aadt>0
+    altFilter: name LIKE '317-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 317-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 94
+    maxAadt: 5970
+    geoCheck: 94/94 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=WilkesCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=693&LayerID=11393&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_No (city layer CityOfWashingtonGA_WFS/MapServer/0)
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 062    013A01
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WilkesCountyGA&Layer=Parcels&PageType=Report&KeyValue=062%20%20%20%20013A01
+    verification: 'pattern-tested: real sample ID from Parcel_No (city layer CityOfWashingtonGA_WFS/MapServer/0);
+      box test HTTP 403 Cloudflare challenge (expected; pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?AppID=693&LayerID=11393&PageTypeID=1
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Rayle town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Tignall town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Washington city
+      gisUrl: https://wfs.schneidercorp.com/arcgis/rest/services/CityOfWashingtonGA_WFS/MapServer/0
+      note: null
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

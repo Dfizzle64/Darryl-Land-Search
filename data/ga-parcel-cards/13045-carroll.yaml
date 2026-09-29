@@ -1,0 +1,702 @@
+state: GA
+jurisdiction: Carroll County
+fips: "13045"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY INTENT — county-wide cadastral polygons (live REST dead as of 2026-09-18+; OA snapshot below is usable geometry+pid fallback)
+  - role: parcels
+    name: Carroll_Parcels_20240923_ExportFeatures (GMASS / graham_ghorley — LIVE REST BLOCKED)
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/ArcGIS/rest/services/Carroll_Parcels_20240923_ExportFeatures/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: token
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_no: parcelId
+      House_No: situsNumber
+      Road: situsStreet
+      Rd_Type: situsStreetType
+    notes: >
+      INTENDED county-wide WinGAP-style parcel FeatureServer (org ISpzx3B5ZsVA6e1Z /
+      graham_ghorley GMASS appraisal exports; also referenced as GDITAdmin item
+      "Parcels - GA - Carroll County" 88fdb4ec7c3c41aeba794a9c4942c511). Live query
+      returned Invalid URL / item inaccessible on 2026-09-23 (same failure mode as
+      OpenAddresses us/ga/carroll job 915222 Fail 2026-09-18 and GitHub issue #7724
+      token/broken source). Last successful public harvest: OpenAddresses job 910028
+      Success 2026-09-11 — count 55412 polygons; bounds WGS84
+      [[-85.338,33.426],[-84.810,33.812]] — Carroll County GA west of Atlanta
+      (~-85.1,33.6) (NOT Carroll MD/TN/OH/IA/IL; NOT Carrollton TX/KY). Confirmed
+      source fields via OA conform + twin commercial ExportFeatures on same org:
+      Parcel_no (pid), House_No, Road, Rd_Type (addresses layer harvested 54932).
+      Full CAMA field list not recoverable from dead metadata — twin Commurban/
+      Commimps layers expose Owner/Acres/CURR_VAL/Land_Value/PIN/Legal for commercial
+      subset only. Prefer OpenAddresses NDJSON snapshot (below) for county-wide
+      geometry+pid until live REST returns; enrich with City of Carrollton CITY_PARCEL,
+      Villa Rica Map/1 Carroll extract, and commercial ExportFeatures. Rejected
+      GDITAdmin live URL twin (Invalid URL). Do not prefer paid Regrid/USLandGrid/
+      MappingSolutions.
+    status: blocked
+
+  - role: parcels
+    name: OpenAddresses Carroll County parcels snapshot (2026-09-11 OA job 910028)
+    restUrl: https://v2.openaddresses.io/batch-prod/job/910028/source.geojson.gz
+    layerId: null
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      pid: parcelId
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + PIN landbase while live FeatureServer
+      is blocked (standing-order open GeoJSON fallback). Gzipped NDJSON Feature
+      stream (not FeatureServer query); live download size ≈6.6MB; count 55412;
+      properties = {hash, pid} only (OA parcels conform maps Parcel_no→pid — no
+      owner/mailing/situs/tax/sale/acres on snapshot). Addresses twin job 910027
+      (https://v2.openaddresses.io/batch-prod/job/910027/source.geojson.gz; 54932
+      points; number+street from House_No/Road/Rd_Type) — spatial-join for soft
+      situs. GIS acres from WGS84 polygon ≈9640 in 5–150 band (equirectangular
+      estimate). Geo-verified samples ~-85.075,33.458 (pid 095 0070) Carroll GA.
+      Source provenance: harvest of Carroll_Parcels_20240923_ExportFeatures on
+      2026-09-11 — treat as Sep 2024–2026 vintage; re-check live REST. Enrichment
+      vs thin in-app: county outlines + Parcel_no; owner/tax/sale/acres/zoning via
+      city layers, commercial ExportFeatures, or qPublic HTML.
+    status: partial
+
+  - role: tax
+    name: Carroll_Commurban / Commimps ExportFeatures (commercial subset only)
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/ArcGIS/rest/services/Carroll_Commurban_ExportFeatures/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: sample
+    fieldMap:
+      Parcel_no: parcelId
+      PIN: parcelIdAlt
+      Owner: ownerName
+      House_No: situsNumber
+      Road: situsStreet
+      Rd_Type: situsStreetType
+      Acres: acreage
+      TOTALACRES: acreage
+      Land_Value: tax.landValue
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      Class: dorCode
+      Legal: legalDescription
+      TAXDISTRIC: taxDistrict
+    notes: >
+      Partial commercial/urban CAMA polygons on GMASS org (live 2026-09-23).
+      Commurban count 2838 (TOTALACRES 5–150 ≈410); Commimps twin
+      Carroll_commimps_ExportFeatures/0 count 2461 (Acres 5–150 ≈372; Parcel_Value
+      as FMV). Geo-verified ~-85.078,33.511 Carroll GA. NOT county-wide residential
+      CAMA — Class domain C/I on related sales. Prefer City of Carrollton CITY_PARCEL
+      CURR_VAL inside city; county-wide FMV/assessed = qPublic/Beacon HTML AppID=663
+      LayerID=15076 (CDN/bot Cloudflare 403 automated; public for humans). Deep-link:
+      Application.aspx?AppID=663&LayerID=15076&PageTypeID=4&KeyValue={Parcel_no}
+      (space-padded PINs e.g. 140++++0048). Also App=CarrollCountyGA pattern when
+      exposed. Rejected paid Regrid landval.
+    status: partial
+
+  - role: sales
+    name: Carroll_Sales_ExportFeatures (commercial/industrial sales subset)
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/ArcGIS/rest/services/Carroll_Sales_ExportFeatures/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      Parcel_no: parcelId
+      Sale_Date: lastSale.date
+      Sale_Price: lastSale.price
+      QUALIFIER: lastSale.qualified
+      Class: dorCode
+      REASON: lastSale.reason
+      Strata: dorStrata
+    notes: >
+      Live count 988 sale polygons (Class C/I only — not full residential sales
+      history). Sale_Date epoch ms; range 2020-01-02 → 2024-05-15 UTC; Sale_Price>0
+      ≈497. QUALIFIER domain includes G1/TU/AB/MP/PM/RP/SC/TC/TS/TW/WY/16 — treat
+      G1-style as qualified-sale hint (verify vs assessor). Join on Parcel_no to
+      OA/city parcels. Geo-verified ~-85.078,33.511 / ~-85.038,33.591 Carroll GA.
+      No multi-sale history FeatureServer for full county found (2026-09-23). Prefer
+      qPublic Sales Search HTML for residential/current sales. Rejected ARC
+      LandPro_2012 and paid Regrid/USLandGrid as sales substitutes.
+    status: partial
+
+  - role: zoning
+    name: null — county Euclidean zoning PDF only (2025 Zoning Map)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer with unincorporated Carroll County Euclidean
+      zoning found (2026-09-23). Official map: carrollcountyga.gov/687/Maps →
+      DocumentCenter/View/6512/Zoning-Map-2025 (legend A-Agriculture, C-Commercial,
+      I-Industrial, TP-Technology Park, OI-Office/Institutional, MFR-Multi-Family
+      Residential, HDDR, MHS, PUD, R/R1/R3/R30 Single-Family — several R* repealed
+      from ordinance). Inside cities prefer city zoning REST (Carrollton ZONING;
+      Villa Rica Map/0 Proposed_Z). Unincorporated certification = Community
+      Development / PDF / staff.
+    status: gap
+
+  - role: flu
+    name: null — county Future Land Use Map PDF only (2023)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public county FLU FeatureServer found (2026-09-23). Official map:
+      carrollcountyga.gov/687/Maps → DocumentCenter/View/6514/Future-Land-Use-Map
+      (2023). Prefer City of Carrollton FUTURE_LAND_USE (F2023FLU) and Villa Rica
+      Map/3 District inside municipalities. Rejected ARC LandPro_2012
+      (Ug5xGQbHsD8zuZzM / ryanbarrett) and Maryland CarrollCo_MD_CompPlanning
+      "Carroll County Future Land Use" webmap (extent ~-76.9,39.5 — wrong state).
+    status: gap
+
+  - role: other
+    name: Carroll_Soils (GMASS soils — not cadastral)
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/ArcGIS/rest/services/Carroll_Soils/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Soils polygons on same GMASS Carroll 2024 webmap (item ca7fc98db86b45439db2384c0b6924e5).
+      Context only — not parcels/zoning/FLU/CAMA.
+    status: partial
+
+municipalities:
+  - name: Carrollton
+    level: city
+    parentFips: "13045"
+    joinToCountyParcels: >
+      Spatial CITY_LIMITS (22 multipart polygons; ~-85.09,33.58) OR CITY_PARCEL /
+      ZONING Parcel_no present. Soft: OA pid prefix C## (city map/block style) —
+      verify spatially; TAXDISTRIC on CITY_PARCEL domain 01/02/10 (not a clean
+      city-only filter vs county). Do NOT use postal CITY='CARROLLTON' alone.
+    layers:
+      - role: parcels
+        name: City of Carrollton CITY_PARCEL
+        restUrl: https://services1.arcgis.com/T9kPZugHsZ2SNOXt/arcgis/rest/services/CITY_PARCEL/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          Parcel_no: parcelId
+          PARCEL_N_1: parcelIdAlt
+          LASTNAME: ownerName
+          FIRSTNAME: ownerNameFirst
+          MIDDLE: ownerNameMiddle
+          ADDRESS1: mailingAddress
+          ADDRESS2: mailingAddress2
+          ADDRESS3: mailingAddress3
+          CITY: mailingCity
+          STATE: mailingState
+          ZIP_1: mailingZip
+          HOUSE_NO: situsNumber
+          STDIRECT: situsStreetDir
+          STREET_NAM: situsStreet
+          STTYPE: situsStreetType
+          UNIT: situsUnit
+          ZIP: situsZip
+          ACRES: acreageGis
+          TOTALACRES: acreage
+          CURR_VAL: tax.marketValue
+          PREV_VAL: tax.priorMarketValue
+          TAXDISTRIC: taxDistrict
+          LEGAL_DESC: legalDescription
+          SUBD_NAME: subdivision
+          DIGCLASS: dorCode
+        notes: >
+          Preferred Carrollton-local CAMA + geometry (city AGOL org T9kPZugHsZ2SNOXt /
+          hbeaver / carrolltonga.maps.arcgis.com). Live count 8976. TOTALACRES 5–150
+          ≈424; ACRES 5–150 ≈328. Owner LASTNAME filled ≈8497; mailing ADDRESS1
+          ≈8436; HOUSE_NO>0 ≈8283. Geo-verified ~-85.049,33.560 Carrollton GA
+          (NOT Carrollton TX ~-96.9,33.0; NOT Carrollton KY ~-85.12,38.68). SR of
+          hosted Shape__Area is 102100 — prefer TOTALACRES/ACRES over Shape__Area/43560.
+          Viewers: Zoning Map instant appid 8e28b42ff1a1407; experience
+          e20d22196c114b12b78e28665bf10b55.
+        status: usable
+      - role: zoning
+        name: City of Carrollton ZONING
+        restUrl: https://services1.arcgis.com/T9kPZugHsZ2SNOXt/arcgis/rest/services/ZONING/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Acreage
+        coverage: city-only
+        fieldMap:
+          Parcel_no: parcelId
+          Zoning: zoning
+          ADDRESS: situsAddress
+          HOUSE_NO: situsNumber
+          STDIRECT: situsStreetDir
+          STREET_NAM: situsStreet
+          STTYPE: situsStreetType
+          Acreage: acreage
+          OVERLAY: zoningOverlay
+          WARD: ward
+          TAXDISTRIC: taxDistrict
+        notes: >
+          Preferred city Euclidean zoning (parcel-tied; join Parcel_no). Live count
+          8989. Domain (top): R-20≈2275, PD-RES≈1452, R-M≈1033, R-15≈1028, R-10≈752,
+          C-2≈651, M-1≈322, O-I≈242, C-1≈224, R-8≈213, C-3≈171, ER-1≈122, M-2≈111,
+          plus ER-3/MHP/PD-MIXEDUSE/PD-NONRES/R-M-10/R-M-15/R-O-I/R-T/Lake/Private Dr.
+          Geo-verified ~-85.074,33.552. Standing order: prefer over county PDF stubs
+          inside city limits.
+        status: usable
+      - role: flu
+        name: City of Carrollton FUTURE_LAND_USE
+        restUrl: https://services1.arcgis.com/T9kPZugHsZ2SNOXt/arcgis/rest/services/FUTURE_LAND_USE/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: acres
+        coverage: city-only
+        fieldMap:
+          pin: parcelId
+          F2023FLU: flu
+          acres: acreage
+        notes: >
+          Preferred city FLU (2023). Live count 9060. Domain F2023FLU: Residential≈714,
+          Public/Institutional≈395, Commercial≈330, Residential -County≈315,
+          Commercial-County≈62, Industrial≈44, Park/Recreation/Conservation≈38,
+          Industrial-County≈37, Downtown Mixed Use≈25, plus TCU / Public Institutional-
+          County / LAKE / RAILROAD / PRIVATE ST / LITTLE TALLA noise labels. Do NOT
+          harvest FAXNUMBER (PII — standing order). Viewer experience
+          77c46b807a1242a7b791568749b3722c. Spatial/pin join; prefer over county FLU PDF
+          inside city.
+        status: usable
+      - role: other
+        name: City of Carrollton CITY_LIMITS
+        restUrl: https://services1.arcgis.com/T9kPZugHsZ2SNOXt/arcgis/rest/services/CITY_LIMITS/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Live count 22 multipart city-limit polygons (FeatureNam='City Limits').
+          Preferred spatial join target for municipality filter.
+        status: usable
+    gaps:
+      - "No Carrollton-only sales REST beyond county commercial Sales_ExportFeatures + qPublic HTML."
+      - "County Euclidean zoning PDF does not apply inside city — use ZONING FeatureServer."
+      - "FAXNUMBER present on FUTURE_LAND_USE — do not collect."
+    status: usable
+
+  - name: Villa Rica
+    level: city
+    parentFips: "13045"
+    joinToCountyParcels: >
+      Spatial Map/FeatureServer/8 City Boundary (Cityname='Villa Rica'; ~-84.951,33.678)
+      OR Zoning Districts PIN / Carroll County Parcels Parcel_no. Multi-county
+      (Carroll+Douglas) — this card is Carroll-side; Douglas card 13097 holds
+      Douglas-side (TAX_DISTRICT=04 / non-V PIN). Carroll-side PINs often V## on
+      zoning layer (≈4103 V* per Douglas card) and Parcel_no on Map/1.
+    layers:
+      - role: zoning
+        name: Villa Rica Interactive Map Zoning Districts
+        restUrl: https://services2.arcgis.com/dW3WG2w9z33TTLpl/arcgis/rest/services/Map/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          Proposed_Z: zoning
+        notes: >
+          Preferred Villa Rica-local zoning (standing order: city over county PDF).
+          Live count 10576 parcel-tied (citywide Carroll+Douglas). Proposed_Z domain
+          counts: PUD≈4176, C2≈4073, R2≈670, R1≈457, AG≈289, CMU≈214, SFA≈208, C1≈170,
+          I2≈98, CBD≈64, OMI≈62, I1≈56, MF1≈22, MF2≈8, TPOD≈5. Geo-verified Carroll
+          samples ~-84.949,33.688; Douglas ~-84.90,33.72. Org dW3WG2w9z33TTLpl
+          (smyers_villarica). Viewer experience fd285d189e4c4bb0bccaf3ed80d82cab.
+          Field named Proposed_Z — treat as current published interactive-map zoning;
+          confirm against official map if critical. Twin georec vrZoning/0 (414 district
+          polys; Zoningcode DO-*/R20/R14/GC/…) is older code set — prefer smyers Map/0.
+        status: usable
+      - role: flu
+        name: Villa Rica Interactive Map Future Land Use
+        restUrl: https://services2.arcgis.com/dW3WG2w9z33TTLpl/arcgis/rest/services/Map/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          District: flu
+        notes: >
+          Live count 29 FLU district polygons (Suburban Village, Downtown, Carroll/
+          Douglas County Future Growth Area, Industrial/Commercial/Neighborhood
+          villages, etc.). Spatial-join (no PIN). Citywide — filter spatially to
+          Carroll footprint for this card.
+        status: usable
+      - role: parcels
+        name: Villa Rica Interactive Map Carroll County Parcels (city extract)
+        restUrl: https://services2.arcgis.com/dW3WG2w9z33TTLpl/arcgis/rest/services/Map/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          Parcel_no: parcelId
+          Address: situsAddress
+          LASTNAME: ownerName
+          ACRES: acreage
+          CURR_VAL: tax.marketValue
+          PREV_VAL: tax.priorMarketValue
+        notes: >
+          Live count 4882 Carroll-side city parcel extract; ACRES 5–150 ≈235.
+          Geo-verified ~-84.946,33.676. Thin vs full county OA landbase — prefer for
+          Villa Rica Carroll-side CAMA hints; join Parcel_no to OA pid. Douglas-side
+          extract is Map/2 (3392) — see Douglas card.
+        status: partial
+      - role: other
+        name: Villa Rica City Boundary
+        restUrl: https://services2.arcgis.com/dW3WG2w9z33TTLpl/arcgis/rest/services/Map/FeatureServer/8
+        layerId: 8
+        geometry: polygon
+        auth: none
+        acreageField: Acres
+        coverage: city-only
+        fieldMap:
+          Cityname: municipality
+        notes: >
+          Live count 1; Cityname='Villa Rica'. Preferred spatial join for multi-county
+          city filter. Twin georec vrPlanning/0 City Limits.
+        status: usable
+    gaps:
+      - "Villa Rica spans Carroll+Douglas — do not treat citywide layer counts as Carroll-only."
+      - "Proposed_Z naming — confirm currency vs adopted ordinance when critical."
+      - "georec vrPlanning/4 'Future Land Use' is parcel-attr Request field (6157) — prefer Map/3 District polygons for FLU."
+    status: usable
+
+  - name: Temple
+    level: city
+    parentFips: "13045"
+    joinToCountyParcels: >
+      Spatial Census TIGER place / city limits when available; soft postal filters
+      unreliable. No Temple city FeatureServer found (2026-09-23).
+    layers:
+      - role: zoning
+        name: null — no Temple Euclidean zoning REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No public Temple GA zoning/FLU FeatureServer found. City site templega.us
+          (verify) / county Community Development certification; county Zoning Map
+          2025 PDF may not apply inside city — staff confirm.
+        status: gap
+    gaps:
+      - "No Temple parcel CAMA / zoning / FLU REST — county OA pid + qPublic HTML only."
+    status: gap
+
+  - name: Bremen
+    level: city
+    parentFips: "13045"
+    joinToCountyParcels: >
+      Multi-county (Haralson primary + small Carroll portion). Spatial city limits
+      when available; this card covers Carroll-side parcels only. No Bremen city
+      FeatureServer found (2026-09-23).
+    layers:
+      - role: zoning
+        name: null — no Bremen Euclidean zoning REST on Carroll research
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City of Bremen listed on carrollcountyga.gov/292/Cities; primarily Haralson
+          County. No public Bremen zoning FeatureServer found in Carroll pass —
+          defer to Haralson card / city Planning & Zoning staff / PDF.
+        status: gap
+    gaps:
+      - "Bremen multi-county (Haralson+Carroll) — Carroll-side geography only on this card; no city REST."
+    status: gap
+
+  - name: Mount Zion
+    level: city
+    parentFips: "13045"
+    joinToCountyParcels: >
+      Spatial city limits / Census place when available; no Mount Zion FeatureServer
+      found (2026-09-23).
+    layers:
+      - role: zoning
+        name: null — no Mount Zion zoning REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No public Mount Zion GA zoning/FLU/parcel FeatureServer found. County PDF /
+          qPublic / staff certification.
+        status: gap
+    gaps:
+      - "No Mount Zion city GIS REST — OA + qPublic only."
+    status: gap
+
+  - name: Bowdon
+    level: city
+    parentFips: "13045"
+    joinToCountyParcels: >
+      Spatial city limits / Census place; TRRC_ELA has Comp Plan survey forms only
+      (not zoning REST).
+    layers:
+      - role: zoning
+        name: null — no Bowdon zoning REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No public Bowdon Euclidean zoning FeatureServer. StoryMap llovvorn
+          "Bowdon, Georgia" and TRRC survey forms only — not cadastral/zoning REST.
+        status: gap
+    gaps:
+      - "No Bowdon city parcel/zoning/FLU REST."
+    status: gap
+
+  - name: Whitesburg
+    level: city
+    parentFips: "13045"
+    joinToCountyParcels: >
+      Spatial town limits / Census place; no Whitesburg FeatureServer found
+      (2026-09-23). Note: Douglas card flags Whitesburg as postal/CDP noise on
+      address points — prefer spatial limits.
+    layers:
+      - role: zoning
+        name: null — no Whitesburg zoning REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Town of Whitesburg on official county cities list; no public zoning/FLU REST.
+        status: gap
+    gaps:
+      - "No Whitesburg town GIS REST."
+    status: gap
+
+  - name: Roopville
+    level: city
+    parentFips: "13045"
+    joinToCountyParcels: >
+      Spatial town limits / Census place; TRRC_ELA Comp Plan 2023 survey only.
+    layers:
+      - role: zoning
+        name: null — no Roopville zoning REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Town of Roopville; TRRC Comp Plan survey FeatureService only — not zoning.
+        status: gap
+    gaps:
+      - "No Roopville town GIS REST."
+    status: gap
+
+gaps:
+  - "Live county parcel FeatureServer Carroll_Parcels_20240923_ExportFeatures BLOCKED (Invalid URL / item inaccessible 2026-09-23); OA job 915222 Fail 2026-09-18; previously public through OA harvest 2026-09-11 (55412)."
+  - "Preferred county-wide geometry is OpenAddresses NDJSON snapshot (pid+polygon only) — no owner/mailing/situs/tax/sale/acres on download; GIS acres ~9640 in 5–150."
+  - "No public REST Euclidean county zoning — 2025 Zoning Map PDF only (DocumentCenter/View/6512)."
+  - "No public REST county FLU — 2023 Future Land Use Map PDF only (DocumentCenter/View/6514)."
+  - "County-wide residential tax.marketValue/assessedValue and lastSale REST missing — commercial ExportFeatures subset only (Commurban 2838 / Commimps 2461 / Sales 988 Class C/I); else qPublic/Beacon AppID=663 LayerID=15076 HTML (Cloudflare/bot 403 automated)."
+  - "City Euclidean zoning/FLU REST usable for Carrollton + Villa Rica only; Temple/Bremen/Mount Zion/Bowdon/Whitesburg/Roopville = gap (PDF/staff)."
+  - "Villa Rica and Bremen are multi-county — filter spatially; Douglas card covers Villa Rica Douglas-side."
+  - "GDITAdmin Parcels - GA - Carroll County item URL dead (Invalid URL) — same geography as blocked ExportFeatures."
+  - "admincloudpermit Carroll_County_GA FeatureServer token 499 — do not use."
+  - "Rejected lookalikes / non-preferred: Carroll County MD (Uf0DiYpD9NOFO5YH Parcels_CarrollCounty / AgPreservation / Zoning / CompPlanning FLU webmaps extent ~-76.9,39.5; CC_Property_Parcels fWPkIR8HhOCRcYjp SR 26918); carroll.countygis.org (Carroll County OH HTML5 mapper); CCAuditorGIS Carroll_Parcels (WebMercator OH auditor); arcsrv.mfc.ms.gov Carroll Parcels (Mississippi); GDITAdmin Parcels - IL - Carroll County; Vincent_Properties0700 Carroll parcels (global junk extent); Carrollton TX/KY AGOL (halff / cityofcarrollton.com ~-96.9,33.0); New Carrollton MD; West Carrollton OH; ARC LandPro_2012 (Ug5xGQbHsD8zuZzM); Regrid/USLandGrid/ATTOM/MappingSolutions paid vendors; token-locked maps.crc.ga.gov is Coastal Regional Commission (wrong region)."
+  - "Enrichment vs thin in-app: county 55412 geometry+pid (OA); Carrollton 8976 full CAMA+zoning+FLU; Villa Rica zoning/FLU + 4882 Carroll parcel extract; commercial sales/tax subset; county zoning/FLU + full residential CAMA/sales remain gap/HTML/PDF."
+
+license: >
+  GMASS / graham_ghorley AGOL org ISpzx3B5ZsVA6e1Z — Carroll_Parcels_20240923_ExportFeatures
+  (blocked), Carroll_Sales_ExportFeatures, Carroll_commimps_ExportFeatures,
+  Carroll_Commurban_ExportFeatures, Carroll_Soils; webmap "Carroll - 2024"
+  9a6c8d84b16342689e7a5f8a325955ce. OpenAddresses us/ga/carroll (jobs 910027/910028
+  2026-09-11 snapshots on v2.openaddresses.io). City of Carrollton AGOL
+  T9kPZugHsZ2SNOXt / hbeaver / carrolltonga.maps.arcgis.com — CITY_PARCEL, ZONING,
+  FUTURE_LAND_USE, CITY_LIMITS. City of Villa Rica AGOL dW3WG2w9z33TTLpl /
+  smyers_villarica — Map FeatureServer; georec KqlaqVP5Rs5GgFBB vrZoning/vrPlanning
+  twins. County maps: carrollcountyga.gov/687/Maps (Zoning Map 2025; FLU Map 2023);
+  cities list carrollcountyga.gov/292/Cities. Assessor HTML: qPublic/Beacon
+  SchneiderCorp AppID=663 LayerID=15076 (qpublic.net/ga/carroll; openaddresses sample
+  KeyValue). Attribution to Carroll County / City of Carrollton / City of Villa Rica /
+  GMASS exports / OpenAddresses. Public fields only; no emails/phones/FAXNUMBER; no
+  paid vendors (Regrid/ATTOM/CoreLogic/USLandGrid/MappingSolutions).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=663&LayerID=15076&PageTypeID=1
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: partial
+  parcelStatusAfter: partial
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays partial (live REST blocked; OA NDJSON snapshot + city layers only). Live
+    county FS Carroll_Parcels_20240923_ExportFeatures and GDITAdmin Carroll_Parcels both Invalid URL
+    (re-checked 2026-09-28). City layers found: Carrollton CITY_PARCEL
+    services1.arcgis.com/T9kPZugHsZ2SNOXt/.../CITY_PARCEL/FeatureServer/0 (8976, WinGAP join with
+    owner/acres); Villa Rica services2.arcgis.com/dW3WG2w9z33TTLpl/.../Map/FeatureServer/1 (4882). GMASS
+    Carroll_commimps/Sales exports are subsets (2461/988). App already has Carroll live (from OA
+    snapshot) so county-wide geometry is covered in-app; REST remains blocked.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Bowdon city"
+      level: city
+      parentFips: "13045"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Carrollton city"
+      level: city
+      parentFips: "13045"
+      parcelsRest: "https://services1.arcgis.com/T9kPZugHsZ2SNOXt/arcgis/rest/services/CITY_PARCEL/FeatureServer/0 (8976, Parcel_no)"
+    - name: "Mount Zion city"
+      level: city
+      parentFips: "13045"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Roopville town"
+      level: city
+      parentFips: "13045"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Temple city"
+      level: city
+      parentFips: "13045"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Villa Rica city"
+      level: city
+      parentFips: "13045"
+      parcelsRest: "https://services2.arcgis.com/dW3WG2w9z33TTLpl/arcgis/rest/services/Map/FeatureServer/1 (4882, Parcel_no)"
+    - name: "Whitesburg city"
+      level: city
+      parentFips: "13045"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: partial
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Carroll' AND aadt>0
+    altFilter: name LIKE '045-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 045-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 311
+    maxAadt: 76200
+    geoCheck: 310/311 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - Land_Value
+    - PREV_VAL
+    filledCount: null
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/ArcGIS/rest/services/Carroll_Commurban_ExportFeatures/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: REST-partial
+    detail: 'Carroll_Sales_ExportFeatures/FeatureServer/0: Sale_Date, Sale_Price, QUALIFIER, commercial/industrial
+      only (988 rows, 2020-2024)'
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/ArcGIS/rest/services/Carroll_Sales_ExportFeatures/FeatureServer/0
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: Owner
+    filledCount: null
+    restUrl: https://services.arcgis.com/ISpzx3B5ZsVA6e1Z/ArcGIS/rest/services/Carroll_Commurban_ExportFeatures/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner field on another REST layer already on this card
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=CarrollCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=663&LayerID=15076&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_no (city layer CITY_PARCEL/FeatureServer/0)
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: C06 0230101
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=CarrollCountyGA&Layer=Parcels&PageType=Report&KeyValue=C06%200230101
+    verification: 'pattern-tested: real sample ID from Parcel_no (city layer CITY_PARCEL/FeatureServer/0); box test
+      HTTP 403 Cloudflare challenge (expected; pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=CarrollCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Bowdon city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Carrollton city
+      gisUrl: https://services1.arcgis.com/T9kPZugHsZ2SNOXt/arcgis/rest/services/CITY_PARCEL/FeatureServer/0
+      note: null
+    - name: Mount Zion city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Roopville town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Temple city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Villa Rica city
+      gisUrl: https://services2.arcgis.com/dW3WG2w9z33TTLpl/arcgis/rest/services/Map/FeatureServer/1
+      note: null
+    - name: Whitesburg city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

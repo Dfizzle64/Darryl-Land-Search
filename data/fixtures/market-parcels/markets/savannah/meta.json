@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T05:27:18Z",
+  "generatedAt": "2026-09-29T05:44:36Z",
   "market": "Savannah",
   "tier": "other",
-  "parcelCount": 38540,
+  "parcelCount": 45995,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -28,13 +28,14 @@
       "source": "ga-appling-parcels-13001",
       "queryUrl": "https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Appling_County_Wide_View/FeatureServer/19/query",
       "gaps": [
-        "Parcels are Appling_County_Wide_View TaxParcels25 (HOGARC) (https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Appling_County_Wide_View/FeatureServer/19). The parcel layer has no usable acre field, so acreage is geodesic polygon area, 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Parcels are Appling_County_Wide_View TaxParcels25 (HOGARC) (https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Appling_County_Wide_View/FeatureServer/19). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
         "Source query returned 12828 rows; 4215 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
-        "Pass 2 enrichment is from rural-oz-pass2 csv (tax HTML-only, sale HTML-only, owner HTML-only). GDOT AADT stays the query-time statewide join.",
-        "Pass 2 tax is HTML-only. qPublic was not requested, and no tax value was copied from an HTML report.",
-        "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
-        "Pass 2 owner is HTML-only. Owner and mailing were not copied from an HTML report.",
-        "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
+        "Counted 4215 distinct parcel ids.",
+        "Pass 2 tax is HTML-only, sale is HTML-only, and owner is HTML-only. HTML-only values were not scraped.",
+        "Pass 2 tax is HTML-only. Assessed value and tax bills were not copied off qPublic.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Pass 2 owner name is HTML-only and was not copied."
       ],
       "path": "data/fixtures/market-parcels/counties/13001/tiles",
       "lookup": "data/fixtures/market-parcels/counties/13001/lookup.json",
@@ -272,20 +273,50 @@
       "name": "Screven",
       "fips": "13251",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 3680,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-screven-parcels-13251",
+      "queryUrl": "https://portal.segrass.org/crcarcgis/rest/services/Screven/Property_Data/MapServer/2/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Parcels are Screven Parcels with WinGAP CAMA (CRC portal.segrass.org) (https://portal.segrass.org/crcarcgis/rest/services/Screven/Property_Data/MapServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13251/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13251/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 3680
+    },
+    {
+      "name": "Wayne",
+      "fips": "13305",
+      "state": "Georgia",
+      "featureCount": 3775,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "ga-wayne-parcels-13305",
+      "queryUrl": "https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wayne_2026_test/FeatureServer/7/query",
+      "gaps": [
+        "Parcels are Wayne Tax Parcels (HOGARC Wayne_2026_test) (https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wayne_2026_test/FeatureServer/7). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Source query returned 4141 rows; 3775 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Counted 3775 distinct parcel ids.",
+        "Pass 2 tax is HTML-only, sale is HTML-only, and owner is HTML-only. HTML-only values were not scraped.",
+        "Pass 2 tax is HTML-only. Assessed value and tax bills were not copied off qPublic.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Pass 2 owner name is HTML-only and was not copied."
+      ],
+      "path": "data/fixtures/market-parcels/counties/13305/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13305/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 4141
     }
   ]
 }

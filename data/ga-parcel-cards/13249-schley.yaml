@@ -1,0 +1,241 @@
+state: GA
+jurisdiction: Schley County
+fips: "13249"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Schley County GA public parcel FeatureServer/MapServer with cadastral
+      polygons recovered (2026-09-24). Official human viewer = qPublic/Beacon AppID=793
+      LayerID=11824 (qpublic.net/ga/schley Search Records → Application.aspx?AppID=793&
+      LayerID=11824&PageTypeID=2&PageID=0; also App=SchleyCountyGA name pattern). County
+      seat Ellaville GA (P O Box 1141 / Annex area Ellaville GA 31806; schleycountyga.us
+      Taxes; Chief Appraiser Joe Wright — office contact only, DO NOT collect as PII in
+      field maps). Cloudflare/bot 403 blocks automated Application.aspx from research box;
+      public for humans. SchleyCountyGA_WFS on wfs.schneidercorp.com returns 404. River
+      Valley Regional Commission RVRC_ELA AGOL org Ug5xGQbHsD8zuZzM has CityLimits_Schley /
+      Schley_CityLimits / SchleyAddresses / EllavilleAddresses / EllavilleCityLimits /
+      Schley_Roads / Schley_Blocks / Schley_Tracts / SchleyCommissioners2020 — NO Schley
+      parcel FS (contrast ParcelsChattCo for Chattahoochee on same org). Rejected paid
+      Regrid/ATTOM/USLandGrid/DynamoSpatial Schley parcel downloads. GEO-VERIFY GEORGIA:
+      Census TIGERweb GEOID 13249 CENTLAT +32.2616537 CENTLON -084.3147019; CityLimits_Schley
+      Ellaville INTPT ~-84.309,+32.238 (GEOID 1326980 STATEFP=13); SchleyAddresses samples
+      ~-84.239,32.166 / ~-84.189,32.218 (F1='CO13249'); EllavilleAddresses ~-84.308,32.226
+      — west-central GA Ellaville / Americus ring (NOT lookalike counties elsewhere).
+      Skip utilities+AADT (schleycountyga.us Public Works & Utilities PDFs — DO NOT collect
+      as parcel GIS); no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via qPublic AppID=793 /
+      App=SchleyCountyGA HTML only. Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=793&LayerID=11824&PageTypeID=4&KeyValue={parcelId}
+      (or App=SchleyCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}). Sample PIN
+      forms from county tax-sale PDF: E0120080004 / E0130020026 (preserve leading letter).
+      Rejected paid vendor tax extracts.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer qPublic Sales Search / Sales List HTML
+      (AppID=793 / App=SchleyCountyGA). County publishes delinquent tax-sale PDF lists
+      (schleycountyga.us/uploads/*tax-property-sale*.pdf) — HTML/PDF only, not GIS REST.
+      Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer (PDF map only)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Schley County GA Euclidean zoning REST found (2026-09-24). Official static Zoning
+      Map (2021) PDF: schleycountyga.us/uploads/zoning36x24-january-2021.pdf ; Book of
+      County Codes PDF schleycountyga.us/uploads/schley-county-book-of-codes.pdf — not GIS
+      polygons. RVRC Impact Planning PDF only (no FLU/zoning FeatureServer).
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Schley County GA Future Land Use / Character Areas FeatureServer recovered.
+      RVRC_ELA "Schley County Impact Planning" is PDF only.
+    status: gap
+
+  - role: other
+    name: CityLimits_Schley — Ellaville city (RVRC_ELA; STATEFP=13)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CityLimits_Schley/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      NAME: cityName
+      GEOID: placeGeoid
+      INTPTLAT: latitude
+      INTPTLON: longitude
+      STATEFP: stateFp
+      PLACEFP: placeFp
+    notes: >
+      Preferred spatial municipality filter (count 1; NAME='Ellaville'; GEOID=1326980;
+      STATEFP='13'; INTPTLAT='+32.2376624' INTPTLON='-084.3091139'). Twin
+      EllavilleCityLimits/0 and Schley_CityLimits/0 are geometry-only stubs — prefer
+      CityLimits_Schley for NAME/GEOID. Not a parcel substitute. Ellaville is the only
+      incorporated municipality in Schley County.
+    status: usable
+
+  - role: other
+    name: EllavilleAddresses (RVRC_ELA situs points — city-only)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/EllavilleAddresses/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      NUMBER_: situsNumber
+      ADDRESS: situsStreet
+      STREET_NAM: situsStreetName
+      STREET_TYP: situsStreetType
+      APARTMENT: situsUnit
+      COMMUNITY: situsCity
+      COUNTY: countyName
+      MAIN_CPN: parcelIdSoft
+      X: situsLon
+      Y: situsLat
+    notes: >
+      Live count 817; COMMUNITY='ELLAVILLE' COUNTY='SCHLEY'. Geo samples ~-84.308,32.226 /
+      ~-84.305,32.225. MAIN_CPN sparsely useful (often blank or building name — soft only).
+      Companion SchleyAddresses/0 (count 1324; F1='CO13249' confirms FIPS 13249) is thin
+      census-block-ish points (F7 house# / F11 street) — prefer EllavilleAddresses for
+      city situs. No county-wide owner/tax join. Skip CREATION_U/MODIFY_USE editor names
+      as PII; skip POWER utility context.
+    status: usable
+
+  - role: other
+    name: SchleyAddresses (RVRC_ELA county address points — FIPS aid)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/SchleyAddresses/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      F1: countyFipsAid
+      F7: situsNumber
+      F11: situsStreet
+      F12: situsStreetType
+      F17: situsZip
+      Loaction: countyLabel
+    notes: >
+      Live count 1324; F1='CO13249' / F2='13' / F3='249' confirms Schley GA. Soft situs aid
+      only — prefer EllavilleAddresses inside city; no PIN/owner/tax. Schema field typo
+      'Loaction'. Not a parcel substitute.
+    status: partial
+
+municipalities:
+  - name: Ellaville
+    level: city
+    parentFips: "13249"
+    joinToCountyParcels: >
+      Spatial CityLimits_Schley/0 NAME='Ellaville' (GEOID 1326980; ~-84.309,32.238) OR
+      EllavilleAddresses points — county parcel REST still missing; qPublic HTML only for
+      CAMA. Only incorporated city in Schley; county seat.
+    layers:
+      - role: zoning
+        name: null — no Ellaville city zoning REST (county PDF only)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ellaville GA city zoning FeatureServer; county Zoning Map PDF 2021 only.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ellaville FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML + spatial city limits
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Ellaville-owned CAMA FS. Soft situs: EllavilleAddresses/0. CAMA via county
+          qPublic AppID=793.
+        status: gap
+    gaps:
+      - "No Ellaville city-owned parcel/zoning/FLU REST — RVRC city limits + addresses only; CAMA via county qPublic."
+    status: partial
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Schley County GA — qPublic AppID=793 LayerID=11824 (App=SchleyCountyGA) HTML only."
+  - "SchleyCountyGA_WFS 404; no RVRC_ELA Schley parcel FeatureServer (city limits + addresses only)."
+  - "Zoning = static PDF only (zoning36x24-january-2021.pdf); Impact Planning PDF only — not Euclidean/FLU REST."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; public for humans (qpublic.net/ga/schley)."
+  - "REJECT paid Regrid/ATTOM/USLandGrid/DynamoSpatial; reject wrong-state lookalikes; skip utilities+AADT; no emails/phones."
+
+license: >
+  Schley County Tax Assessor qPublic/Beacon AppID=793 LayerID=11824 /
+  App=SchleyCountyGA (qpublic.net/ga/schley; schleycountyga.us Taxes). River Valley
+  Regional Commission RVRC_ELA AGOL org Ug5xGQbHsD8zuZzM — CityLimits_Schley;
+  EllavilleAddresses; SchleyAddresses (FIPS aid); EllavilleCityLimits. Zoning Map PDF
+  schleycountyga.us/uploads/zoning36x24-january-2021.pdf. No public ArcGIS parcel service
+  discovered 2026-09-24. Attribution Schley County Tax Assessor / RVRC GIS. Public fields
+  only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=793&LayerID=11824&PageTypeID=2&PageID=0
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=SchleyCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

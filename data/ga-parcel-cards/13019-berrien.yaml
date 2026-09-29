@@ -1,0 +1,297 @@
+state: GA
+jurisdiction: Berrien County
+fips: "13019"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county-wide ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Berrien County GA public parcel FeatureServer/MapServer
+      recovered. Official human cadastral + CAMA path = qPublic/Beacon App=BerrienCountyGA
+      (qpublic.net/ga/berrien → qpublic.schneidercorp.com Application.aspx). County seat
+      Nashville GA (~-83.25,31.21). Southern Georgia Regional Commission (SGRC) hosts
+      Berrien Board of Elections webapp only (sgrcmaps.com/BerrienElections →
+      sgrc.maps.arcgis.com webappviewer id=d93d95da9ac5447bb69205285128778a) — NOT parcels.
+      VALOR (valorgis.com) folders are Lowndes-centric; no Berrien TaxParcels twin.
+      BerrienCountyGA_WFS on wfs.schneidercorp.com → 404. Cloudflare/bot 403 blocks
+      automated Application.aspx from research box; public for humans. REJECT lookalikes:
+      Berrien County MI parcels (AGOL Berrien_County_Parcels_2024 / Village of Berrien
+      Springs / SWMPC Galien watershed — wrong state ~-86.4,42.1); Berrien Springs MI;
+      paid Regrid/ATTOM/DynamoSpatial Berrien GA extracts. Commercial vendors advertise
+      ~10–12k parcels — not wired (paid). Geo intent: South Georgia / Nashville–Ray City–
+      Alapaha corridor, NOT Michigan.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic App=BerrienCountyGA
+      (also AppID=781 LayerID=11817 on Estimate Taxes PageTypeID=2). Deep-link pattern:
+      Application.aspx?App=BerrienCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}.
+      Tax Commissioner payment portal tax.berriencountypay.com is bills only — not CAMA REST.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. qPublic Sales Search / Yearly Sales HTML
+      App=BerrienCountyGA only (bot 403 automated).
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Berrien County GA Euclidean zoning FeatureServer on AGOL/SGRC/VALOR (2026-09-24).
+      Planning/PDF gap. City of Nashville / Ray City / Alapaha / Enigma local zoning not
+      recovered as public REST.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Berrien County GA Future Land Use FeatureServer recovered — Comp Plan PDF gap.
+    status: gap
+
+municipalities:
+  - name: Nashville
+    level: city
+    parentFips: "13019"
+    joinToCountyParcels: >
+      No county parcel REST to join — city filter blocked until geometry source exists.
+      County seat ~-83.25,31.21.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Nashville (Berrien) city zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Nashville city FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city or county parcel REST — qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Nashville city GIS FeatureServer; qPublic is county assessor path."
+    status: gap
+
+  - name: Ray City
+    level: city
+    parentFips: "13019"
+    joinToCountyParcels: "No county parcel REST — blocked. CAUTION: Ray City also appears in Lowndes Addresses CITY as postal fringe — not a Lowndes municipality."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ray City zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ray City FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: qPublic county HTML only.
+        status: gap
+    gaps:
+      - "No Ray City-owned parcel/zoning FeatureServer."
+    status: gap
+
+gaps:
+  - "No public REST parcels/zoning/FLU/tax/sales for Berrien County GA — qPublic App=BerrienCountyGA HTML only."
+  - "BerrienCountyGA_WFS 404; no VALOR/SGRC parcel FeatureServer."
+  - "SGRC BerrienElections webapp is elections-only — not cadastral."
+  - "REJECT Berrien County MI / Berrien Springs MI AGOL parcels and SWMPC Galien layers (wrong state)."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial Berrien GA extracts."
+  - "No emails/phones; no paid vendors; utilities + AADT skipped (tranche-3)."
+
+license: >
+  Berrien County Tax Assessor qPublic/Beacon App=BerrienCountyGA (qpublic.net/ga/berrien;
+  Application.aspx App=BerrienCountyGA / AppID=781). SGRC Berrien Board of Elections
+  viewer (non-parcel). No public ArcGIS parcel service discovered 2026-09-24.
+  Attribution Berrien County Tax Assessor. Public HTML only; no emails/phones; no paid
+  vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BerrienCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BerrienCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap. Only
+    city-level: SGRC Berrien/NashvilleZoning/MapServer/0 (2523, PARCEL_NO) - City of Nashville zoning
+    parcels, not county-wide.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Alapaha town"
+      level: city
+      parentFips: "13019"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Enigma town"
+      level: city
+      parentFips: "13019"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Nashville city"
+      level: city
+      parentFips: "13019"
+      parcelsRest: "https://www.sgrcmaps.com/alma/rest/services/Berrien/NashvilleZoning/MapServer/0 (zoning parcels, 2523, PARCEL_NO)"
+    - name: "Ray City city"
+      level: city
+      parentFips: "13019"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Berrien' AND aadt>0
+    altFilter: name LIKE '019-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 019-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 83
+    maxAadt: 10700
+    geoCheck: 83/83 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=BerrienCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO (city layer Berrien/NashvilleZoning/MapServer/0)
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: N06     86 001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BerrienCountyGA&Layer=Parcels&PageType=Report&KeyValue=N06%20%20%20%20%2086%20001
+    verification: 'pattern-tested: real sample ID from PARCEL_NO (city layer Berrien/NashvilleZoning/MapServer/0);
+      box test HTTP 403 Cloudflare challenge (expected; pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=BerrienCountyGA&Layer=Parcels&PageType=Search
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Alapaha town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Enigma town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Nashville city
+      gisUrl: https://www.sgrcmaps.com/alma/rest/services/Berrien/NashvilleZoning/MapServer/0
+      note: null
+    - name: Ray City city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,33 @@
+{
+  "name": "Edgefield",
+  "fips": "45037",
+  "state": "South Carolina",
+  "markets": [
+    "Columbia"
+  ],
+  "featureCount": 5811,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "sc-edgefield-parcels-45037",
+  "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Edgefield_McCormick_Greenwood_Web_Map_WFL1/FeatureServer/9/query",
+  "gaps": [
+    "Source query returned 5818 rows; 5811 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are SC RFA Edgefield Parcels (county CAMA join) — Edgefield_McCormick_Greenwood_Web_Map_WFL1 layer 9 (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Edgefield_McCormick_Greenwood_Web_Map_WFL1/FeatureServer/9). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "tax usable: RFA Edgefield Parcels layer 9 (new this pass) carries county CAMA; 2025-11 vintage. RFA/18 M_Value = Tot_Market only (acres component).",
+    "sale usable: Parse Instrmnt_D with %Y%m%d; Considerat is a String. Stale ~2025-11.",
+    "owner usable: Owner + mailing public on RFA layer 9 (also Ownership on RFA/18, 19438).",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "SCDOT statewide SC_Parcels requires token — not usable as primary."
+  ],
+  "path": "data/fixtures/market-parcels/counties/45037/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45037/lookup.json",
+  "sourceCount": 5818,
+  "dropped": 1,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=859&LayerID=16089&PageTypeID=4&PageID=7162&KeyValue={parcelId}",
+  "gisViewerUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=859&LayerID=16089&PageTypeID=2&PageID=7160"
+}

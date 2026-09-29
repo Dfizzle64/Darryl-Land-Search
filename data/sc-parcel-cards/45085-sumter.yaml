@@ -1,0 +1,165 @@
+state: SC
+jurisdiction: Sumter County
+fips: "45085"
+level: county
+markets: [Columbia]
+
+layers:
+  - role: parcels
+    name: Parcel (Sumter City/County)
+    restUrl: https://gis.sumter-sc.com/server/rest/services/BaseMaps/Sumter_City_County/FeatureServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: Calculated_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      parcel_number: parcelId
+      parid: parcelIdAlt
+      owner_name: ownerName
+      owner_address_one: mailingAddress.street
+      owner_address_two: mailingAddress.street2
+      owner_city: mailingAddress.city
+      owner_state: mailingAddress.state
+      owner_zip: mailingAddress.zip
+      parcel_address_one: situsAddress
+      Calculated_ACREAGE: acreage
+      deedacre: acreageDeed
+      assessed_value_land: tax.assessedLand
+      assessed_value_building: tax.assessedImprovement
+      market_value_land: tax.landValue
+      market_value_building: tax.improvementValue
+      market_value_total: tax.marketValue
+      deed_book: lastSale.deedBook
+      deed_page: lastSale.deedPage
+      legal_description: legalDescription
+      WebURL: appraiserDeepLink
+      JURISDICTION: jurisdiction
+    notes: 'Verified 2026-09-24: public FeatureServer, count 61681, no token. Geo-verified sample centroid
+      ≈ (-80.48, 34.16) in Sumter County. WebURL embeds qPublic deep link with KeyValue=parcel_number (AppID=1154).
+      Covers city + county (JURISDICTION field).
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=61680; 1-feature outSR=4326 sample parcel_number=''144-00-03-001''
+      vertex (-80.486,34.165) inside Sumter County SC bbox; parcel ID field parcel_number present.'
+    count: 61680
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Parcel — tax / ownership
+    restUrl: https://gis.sumter-sc.com/server/rest/services/BaseMaps/Sumter_City_County/FeatureServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: Calculated_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      parcel_number: parcelId
+      owner_name: ownerName
+      market_value_total: tax.marketValue
+      assessed_value_land: tax.assessedLand
+      assessed_value_building: tax.assessedImprovement
+      WebURL: appraiserDeepLink
+    notes: Same layer. Sale price not on attributes; use qPublic via WebURL.
+    status: usable
+
+  - role: zoning
+    name: Zoning (City and County of Sumter)
+    restUrl: https://gis.sumter-sc.com/server/rest/services/Planning/Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONECLASS: zoning
+      ZONEDESC: zoningDescription
+      ZONECODE: zoningCode
+      ZONEREG: zoningRegs
+    notes: >
+      Verified 2026-09-24: public, count 3562. Geo-verified ≈ (-80.34, 33.94) in Sumter.
+      UDO district codes (e.g. GR General Residential). Same content on Planning/Zoning/MapServer/0.
+    status: usable
+
+gaps:
+  - "Sale price/date not on parcel attributes; use qPublic WebURL / AppID 1154."
+  - "FLU separate layer not verified on dig day."
+
+license: "City/County of Sumter GIS (gis.sumter-sc.com). Attribute to Sumter City/County."
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=1154&LayerID=30904&PageTypeID=4&PageID=12534&KeyValue={parcelId}
+publicGisUrl: https://sumtercity.maps.arcgis.com/apps/webappviewer/index.html?id=aa383018b7d847deaf23163aedf70704
+jurisdictionGisUrl: https://sumtercity.maps.arcgis.com/apps/webappviewer/index.html?id=aa383018b7d847deaf23163aedf70704
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: usable
+    reason: Market (land/bldg/total) + assessed (land/bldg) on county layer; ExtractDate stamp = 2026-09-28 (fresh
+      CAMA extract).
+    source: https://gis.sumter-sc.com/server/rest/services/BaseMaps/Sumter_City_County/FeatureServer/7
+    fieldMap:
+      market_value_total: tax.marketValue
+      market_value_land: tax.landValue
+      market_value_building: tax.improvementValue
+      assessed_value_land + assessed_value_building: tax.assessedValue (sum; no total field)
+      assessed_value_land: tax.assessedLand
+      assessed_value_building: tax.assessedImprovement
+  sale:
+    status: partial
+    reason: 'Only deed_book/deed_page on layer; no sale date/price fields (schema checked 2026-09-28: sale-like fields
+      = deedacre, deed_book, deed_page, ExtractDate). Date/price via qPublic report (WebURL).'
+    source: https://gis.sumter-sc.com/server/rest/services/BaseMaps/Sumter_City_County/FeatureServer/7
+    fieldMap:
+      deed_book: lastSale.deedBook
+      deed_page: lastSale.deedPage
+    format: deed_book/deed_page strings (null when unknown). ExtractDate is the CAMA extract timestamp, not a sale
+      date.
+  owner:
+    status: usable
+    mailingStatus: usable
+    reason: Owner + full mailing on county layer.
+    source: https://gis.sumter-sc.com/server/rest/services/BaseMaps/Sumter_City_County/FeatureServer/7
+    fieldMap:
+      owner_name: ownerName
+      owner_address_one: mailingAddress.street
+      owner_address_two: mailingAddress.street2
+      owner_city: mailingAddress.city
+      owner_state: mailingAddress.state
+      owner_zip: mailingAddress.zip (String)
+  paLink:
+    status: usable
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?AppID=1154&LayerID=30904&PageTypeID=4&PageID=12534&KeyValue={parcelId}
+    testedParcelId: 144-00-03-001
+    idTransform: KeyValue = parcel_number as-is (###-##-##-###). parid is the same without dashes (1440003001) - re-insert
+      dashes 3-2-2-3 if starting from parid. WebURL field already holds the full link (with a Q= cache token that
+      can be dropped).
+    reason: 'VERIFIED AppID=1154: county-published WebURL field on 61,411 parcels = https://qpublic.schneidercorp.com/Application.aspx?AppID=1154&LayerID=30904&PageTypeID=4&PageID=12534&Q=...&KeyValue=144-00-03-001
+      - matches card pattern exactly (LayerID 30904, PageID 12534). Direct fetch Cloudflare 403 (browser OK).'
+  publicGis:
+    status: usable
+    reason: Viewer item aa383018b7d847deaf23163aedf70704 = "Sumter County Parcel, Road, and Address Map", public,
+      owner gis_SumterSC, updated 2026-06-18, ~146k views.
+  gaps:
+  - No sale date/price in REST (deed book/page only).
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) — SCDOT 2025 Statewide Traffic Points, filter CountyName
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28); not
+      re-dug.

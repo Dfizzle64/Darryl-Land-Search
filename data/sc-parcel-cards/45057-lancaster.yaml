@@ -1,0 +1,286 @@
+state: SC
+jurisdiction: Lancaster County
+fips: "45057"
+level: county
+markets: [Charlotte]
+
+layers:
+  - role: parcels
+    name: LC_Parcels (countywide polygons + owner/sale)
+    restUrl: https://services3.arcgis.com/rJcpRneDUBgTeCT3/arcgis/rest/services/LC_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PIN2: parcelIdAlt
+      OWNER_NAME: ownerName
+      O_NAME_CON: ownerName2
+      OWNER_ADDR: mailingAddress
+      OWNER_CITY: mailingAddress.city
+      OWNER_STAT: mailingAddress.state
+      OWNER_ZIP: mailingAddress.zip
+      PROP_LOCAT: situsAddress
+      ACRES: acreage
+      GIS_Acres: acreageGis
+      Deed_Acres: acreageDeed
+      SALE_PRICE: lastSale.price
+      SALE_MONTH: lastSale.month
+      SALE_DAY: lastSale.day
+      SALE_YEAR: lastSale.year
+      DEED_BOOK: lastSale.deedBook
+      DEED_PAGE: lastSale.deedPage
+      TAX_DIST: tax.district
+      CLASS: dorCode
+      PLAT_BOOK: platBook
+      PLAT_PAGE: platPage
+    notes: 'Verified 2026-09-24: public LANCOGIS AGOL, count 56493 polygons, auth none. Sample centroid
+      ~34.85614,-80.84781 (WGS84) in Lancaster County SC. Prefer as primary countywide geometry. CAMA depth
+      thinner than Patriot View (no market/assessed values here) — JOIN Patriot by PIN when needed. Hub:
+      https://lancaster-launch-lancogis.hub.arcgis.com/ REJECT SC statewide centroid-only extracts as primary.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=56496; 1-feature outSR=4326 sample PIN=''0016-00-027.03''
+      vertex (-80.833,34.933) inside Lancaster County SC bbox; parcel ID field PIN present.'
+    count: 56496
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: parcels
+    name: SDE County Parcels Patriot View (CAMA-rich subset)
+    restUrl: https://services3.arcgis.com/rJcpRneDUBgTeCT3/arcgis/rest/services/SDE_County_Parcels_Patriot_View/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TotalAcres
+    coverage: partial
+    fieldMap:
+      PIN: parcelId
+      ParcelID: parcelIdAlt
+      AccountNumber: tax.accountNumber
+      Owner1: ownerName
+      Owner2: ownerName2
+      Owner3: ownerName3
+      BillingAddress: mailingAddress
+      BillingAddress2: mailingAddress2
+      City: mailingAddress.city
+      State: mailingAddress.state
+      Zip: mailingAddress.zip
+      StreetNum: situsAddress.number
+      StreetName: situsAddress.street
+      Location: situsAddress
+      TotalAcres: acreage
+      Zone1: zoning
+      LUC: dorCode
+      LUCDescription: dorCodeDescription
+      SalePrice: lastSale.price
+      LegalRefDate: lastSale.date
+      LegalReference: lastSale.deedRef
+      Grantor: lastSale.grantor
+      PrevSalePrice: priorSale.price
+      TotalLandValue: tax.landValue
+      TotalBuildingBalue: tax.improvementValue
+      TotalValue: tax.marketValue
+      YearBuilt: yearBuilt
+      FinArea: buildingSqft
+    notes: >
+      Verified 2026-09-24: count 31436 — thinner than LC_Parcels 56493; treat as partial CAMA
+      enrichment, not sole countywide geometry. Sample ~34.91223,-80.84080 (Lancaster SC).
+      JOIN KEY to LC_Parcels: PIN. Source field TotalBuildingBalue is a vendor typo (Balue).
+    status: partial
+
+  - role: tax
+    name: Tax / market values via Patriot View
+    restUrl: https://services3.arcgis.com/rJcpRneDUBgTeCT3/arcgis/rest/services/SDE_County_Parcels_Patriot_View/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TotalAcres
+    coverage: partial
+    fieldMap:
+      PIN: parcelId
+      TotalLandValue: tax.landValue
+      TotalBuildingBalue: tax.improvementValue
+      TotalValue: tax.marketValue
+      TotalYardItemValue: tax.yardItemValue
+    notes: >
+      Market/land/building values on Patriot View only (~31k). LC_Parcels has no assessed/market
+      value fields — join by PIN or accept value gap where Patriot is missing.
+    status: partial
+
+  - role: ownership
+    name: Ownership on LC_Parcels
+    restUrl: https://services3.arcgis.com/rJcpRneDUBgTeCT3/arcgis/rest/services/LC_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      OWNER_NAME: ownerName
+      O_NAME_CON: ownerName2
+      OWNER_ADDR: mailingAddress
+      OWNER_CITY: mailingAddress.city
+      OWNER_STAT: mailingAddress.state
+      OWNER_ZIP: mailingAddress.zip
+    notes: Countywide ownership on LC_Parcels; Patriot has alternate Owner1–3 for subset.
+    status: usable
+
+  - role: sales
+    name: Last-sale on LC_Parcels (+ Patriot prior sale)
+    restUrl: https://services3.arcgis.com/rJcpRneDUBgTeCT3/arcgis/rest/services/LC_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      SALE_PRICE: lastSale.price
+      SALE_MONTH: lastSale.month
+      SALE_DAY: lastSale.day
+      SALE_YEAR: lastSale.year
+      DEED_BOOK: lastSale.deedBook
+      DEED_PAGE: lastSale.deedPage
+    notes: >
+      Sale date split across SALE_MONTH/DAY/YEAR integers on LC_Parcels (compose ISO in ETL).
+      Patriot adds SalePrice/LegalRefDate and PrevSalePrice for subset join by PIN.
+    status: partial
+
+  - role: zoning
+    name: LC_Zoning
+    restUrl: https://services3.arcgis.com/rJcpRneDUBgTeCT3/arcgis/rest/services/LC_Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Zoning: zoning
+      OldZone: zoningPrior
+      DevAgree: developmentAgreement
+      Acres: acreage
+    notes: >
+      Verified 2026-09-24: count 43097, sample ~34.93027,-80.82869 (Lancaster SC).
+      PIN present — attribute join to LC_Parcels preferred when PIN matches.
+    status: usable
+
+  - role: zoning
+    name: Zoning Overlays (LANCOGIS)
+    restUrl: https://services3.arcgis.com/rJcpRneDUBgTeCT3/arcgis/rest/services/Zoning_Overlays/FeatureServer
+    layerId: null
+    geometry: mixed
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Overlay: overlayName
+    notes: >
+      Multi-layer service: 0 Carolina Thread Trail (polyline), 1 Carolina Heelsplitter,
+      2 Equestrian, 3 Highway Corridor, 4 Aviation. Overlay districts — spatial join to parcels;
+      not base zoning. Use LC_Zoning for base district.
+    status: usable
+
+  - role: flu
+    name: Small Area Plan Recommended Land Use
+    restUrl: https://services3.arcgis.com/rJcpRneDUBgTeCT3/arcgis/rest/services/Small_Area_Plan_Recommended_Land_Use/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: sample
+    fieldMap:
+      LandUse: flu
+      Acres: acreage
+      Notes: fluNotes
+    notes: >
+      Verified 2026-09-24: count only 23 polygons — small-area plan coverage, NOT countywide FLU.
+      Sample ~34.91276,-80.82038. Status partial for countywide future land use.
+    status: partial
+
+gaps:
+  - "Patriot View (~31436) is CAMA-rich but incomplete vs LC_Parcels (~56493) — do not use Patriot alone as countywide parcels."
+  - "No countywide FLU FeatureServer found; only Small_Area_Plan_Recommended_Land_Use (23 polys)."
+  - "Municipal zoning companions (Kershaw, Heath Springs, Van Wyck) exist on LANCOGIS org — dig separately if city grain needed."
+  - "Assessor HTML: county departments + lancastersctax.qpaybill.com tax portal; qPublic App=LancasterCountySC 403 from research egress (may work in browser)."
+  - "Skip utilities / AADT per full-suite scope."
+
+license: "Lancaster County SC LANCOGIS public AGOL (org rJcpRneDUBgTeCT3). Attribute Lancaster County GIS. Confirm hub license before bulk republish."
+appraiserSearchUrl: https://lancastersctax.qpaybill.com/Taxes/TaxesDefaultType4.aspx
+publicGisUrl: https://experience.arcgis.com/experience/dd25a372d14a44dcbb74ab40609f5a48
+jurisdictionGisUrl: https://lancaster-launch-LANCOGIS.hub.arcgis.com
+appraiserDeepLink: https://qpublic.schneidercorp.com/Application.aspx?AppID=211&KeyValue={parcelId}
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: partial
+    reason: LC_Parcels/0 (countywide 56,496) has NO value fields. SDE_County_Parcels_Patriot_View/0 has TotalValue/TotalLandValue/TotalBuildingBalue
+      but covers only 31,436 parcels (data edit 2026-05-20) and stores values as STRINGS. RFA layer 18 M_Value null
+      for Lancaster.
+    source: https://services3.arcgis.com/rJcpRneDUBgTeCT3/arcgis/rest/services/SDE_County_Parcels_Patriot_View/FeatureServer/0
+    fieldMap:
+      TotalValue: tax.marketValue (String -> cast)
+      TotalLandValue: tax.landValue (String, often null)
+      TotalBuildingBalue: tax.improvementValue (sic field name)
+    note: Sample 0016-00-027.01 TotalValue 10,468,800. No assessed/taxable.
+  sale:
+    status: usable
+    reason: LC_Parcels has SALE_PRICE + SALE_MONTH/DAY/YEAR + DEED_BOOK/PAGE countywide.
+    fieldMap:
+      SALE_PRICE: lastSale.price (String -> cast)
+      SALE_YEAR / SALE_MONTH / SALE_DAY: lastSale.date (compose YYYY-MM-DD)
+      DEED_BOOK: lastSale.deedBook
+      DEED_PAGE: lastSale.deedPage
+      Grantor (Patriot view): lastSale.grantor
+      PrevNAL (Patriot view): lastSale.qualified text
+    format: Date split into 3 Integer fields (2018/9/21) - compose; SALE_PRICE String ("1800000") - cast before
+      numeric filters.
+  owner:
+    status: usable
+    mailingStatus: usable
+    fieldMap:
+      OWNER_NAME: ownerName
+      O_NAME_CON: ownerName2
+      OWNER_ADDR: mailingAddress.street
+      OWNER_CITY: mailingAddress.city
+      OWNER_STAT: mailingAddress.state
+      OWNER_ZIP: mailingAddress.zip
+  paLink:
+    status: partial
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?AppID=211&KeyValue={parcelId}
+    testedParcelId: 0016-00-027.01 (indexed example 0015O-0L-021.00)
+    idTransform: KeyValue = PIN as-is (dashed, e.g. 0016-00-027.01); PIN2 space-form -> use PIN.
+    reason: qPublic AppID=211 = Lancaster County SC (search-indexed map link AppID=211&KeyValue=0015O-0L-021.00).
+      Cloudflare 403 from box; not machine-confirmed. Card appraiserSearchUrl (qpaybill) is the Treasurer tax bill
+      site.
+  publicGis:
+    status: usable
+    url: https://experience.arcgis.com/experience/dd25a372d14a44dcbb74ab40609f5a48
+    alt: https://lancaster-launch-LANCOGIS.hub.arcgis.com
+    reason: '"Lancaster County Parcels" Experience + county GIS Portal hub (public, lancogis org).'
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) - SCDOT 2025 Statewide Traffic Points, CountyName=LANCASTER
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28);
+      not re-dug.

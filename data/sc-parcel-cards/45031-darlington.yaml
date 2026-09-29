@@ -1,0 +1,164 @@
+state: SC
+jurisdiction: Darlington County
+fips: "45031"
+level: county
+markets: [Charleston]
+
+layers:
+  - role: parcels
+    name: PARCELS (Darlington County GIS)
+    restUrl: https://services5.arcgis.com/8FJikaProY6O3ncx/arcgis/rest/services/PARCELS/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: GIS_ACRES
+    coverage: county-wide
+    fieldMap:
+      MBP: parcelId
+      Map_Number: parcelIdAlt
+      Name_1: ownerName
+      Name_2_1: ownerName2
+      Address_1: mailingAddress.street
+      Address_2_: mailingAddress.cityState
+      Zip_Code: mailingAddress.zip
+      GIS_ACRES: acreage
+      E911_STNUM: situsAddress.number
+      E911_STREE: situsAddress.street
+      TOT_MARKET: tax.marketValue
+      ASSESSED_V: tax.assessedValue
+      TAXABLE_V: tax.taxableValue
+      Deed_Book: lastSale.deedBook
+      Deed_Page_: lastSale.deedPage
+      ZONE: zoning
+      LANDUSE: dorCode
+      URL: appraiserDeepLink
+    notes: 'Verified 2026-09-24: public Darlington County AGOL FeatureServer, count 41766, no token. Geo-verified
+      sample polygon centroid area ≈ (-80.0686, 34.2389), Darlington County SC. Official SC DNR CountyBND
+      geo-check centroid ≈ (-79.9574, 34.3323). Sample fields include MBP, GIS_ACRES, owner, address, market/assessed/taxable
+      values, zoning and deed references. County web map publishes this layer as the parcel layer.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=41766; 1-feature outSR=4326 sample MBP=''063-00-01-016'' vertex
+      (-80.068,34.239) inside Darlington County SC bbox; parcel ID field MBP present.'
+    count: 41766
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: PARCELS — tax and ownership fields
+    restUrl: https://services5.arcgis.com/8FJikaProY6O3ncx/arcgis/rest/services/PARCELS/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: GIS_ACRES
+    coverage: county-wide
+    fieldMap:
+      MBP: parcelId
+      Name_1: ownerName
+      GIS_ACRES: acreage
+      TOT_MARKET: tax.marketValue
+      ASSESSED_V: tax.assessedValue
+      TAXABLE_V: tax.taxableValue
+      Deed_Book: lastSale.deedBook
+      Deed_Page_: lastSale.deedPage
+      URL: appraiserDeepLink
+    notes: Same public parcel layer; sales price/date were not exposed in fields reviewed.
+    status: usable
+
+  - role: zoning
+    name: ZONE field on PARCELS
+    restUrl: https://services5.arcgis.com/8FJikaProY6O3ncx/arcgis/rest/services/PARCELS/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      MBP: parcelId
+      ZONE: zoning
+    notes: ZONE is present on the county parcel layer; null/blank coverage and code dictionary need downstream validation.
+    status: partial
+
+gaps:
+  - "No public last-sale price/date fields were verified on the parcel layer; URL may provide an assessor deep link."
+  - "ZONE is present but code definitions and completeness were not confirmed."
+  - "Rejected SCDOT SC_Parcels token layer; county AGOL layer above is the usable source."
+
+license: "Darlington County GIS public AGOL (8FJikaProY6O3ncx). Attribute to Darlington County; confirm redistribution before bulk republish."
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=858&LayerID=16088&PageTypeID=4&PageID=7158&KeyValue={parcelId}
+publicGisUrl: https://darco.maps.arcgis.com/apps/View/index.html?appid=4834a19bc5394061806a275be631c91e
+jurisdictionGisUrl: https://darco.maps.arcgis.com/home/index.html
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: usable
+    reason: Market, assessed and taxable integers on county PARCELS/1 (41,766).
+    source: https://services5.arcgis.com/8FJikaProY6O3ncx/arcgis/rest/services/PARCELS/FeatureServer/1
+    fieldMap:
+      TOT_MARKET: tax.marketValue
+      ASSESSED_V: tax.assessedValue
+      TAXABLE_V: tax.taxableValue (appears to be ag-use/taxable basis, e.g. market 39000 vs taxable 3900 on AG parcel)
+      District_1: tax.district
+      LANDUSE: dorCode (text)
+      TYPE: propertyType (RESIDENTIAL/AG/...)
+  sale:
+    status: partial
+    reason: Only deed reference on layer (Deed_Book/Deed_Page populated 38,370/41,766); no sale date or price. Date/price
+      via qPublic report.
+    source: https://services5.arcgis.com/8FJikaProY6O3ncx/arcgis/rest/services/PARCELS/FeatureServer/1
+    fieldMap:
+      Deed_Book: lastSale.deedBook
+      Deed_Page_: lastSale.deedPage
+      Plat_Book: platBook
+      Plat_Page: platPage
+    format: Deed_Book/Deed_Page strings (blank = " "). No date/price fields. EDITDATE is a GIS edit stamp (Integer
+      MDDYYYY/MMDDYYYY, e.g. 11192020), NOT a sale date.
+  owner:
+    status: usable
+    mailingStatus: usable
+    reason: Owner + mailing on county layer.
+    source: https://services5.arcgis.com/8FJikaProY6O3ncx/arcgis/rest/services/PARCELS/FeatureServer/1
+    fieldMap:
+      Name_1: ownerName
+      Name_2_1: ownerName2
+      Address_1: mailingAddress.street
+      Address_2_: mailingAddress.cityState ("Lamar SC")
+      Zip_Code: mailingAddress.zip (Integer ZIP+4 run together, e.g. 290690000 -> 29069-0000)
+  paLink:
+    status: usable
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?AppID=858&LayerID=16088&PageTypeID=4&PageID=7158&KeyValue={parcelId}
+    testedParcelId: 172-00-01-006
+    idTransform: KeyValue = MBP as-is (###-##-##-###).
+    reason: 'Report URL AppID=858&LayerID=16088&PageTypeID=4&PageID=7158&KeyValue=172-00-01-006 cited in an EPA HRS
+      documentation record (semspub.epa.gov 400935); county AGOL item "Tax Assessor''s Property Search" (6b06c65c123a4f068a883d90d543115a)
+      points to search PageID=7156 (report = +2). Card had map page w/o KeyValue - upgraded. Direct fetch Cloudflare
+      403. Note: layer URL field holds zoning-code (municode) links, not PA links (7,837 populated).'
+  publicGis:
+    status: usable
+    reason: Replaced item-page URL with the county app "Darlington County Parcel Viewer" (darco.maps.arcgis.com appid
+      4834a19bc5394061806a275be631c91e, owner mpeshoff_darco); jurisdictionGisUrl -> Darlington County Geospatial
+      Data Portal (darco.maps.arcgis.com).
+  gaps:
+  - No sale date/price in REST (deed book/page only).
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) — SCDOT 2025 Statewide Traffic Points, filter CountyName
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28); not
+      re-dug.

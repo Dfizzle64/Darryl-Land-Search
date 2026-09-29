@@ -1,0 +1,266 @@
+state: SC
+jurisdiction: York County
+fips: "45091"
+level: county
+markets: [Charlotte]
+
+layers:
+  - role: parcels
+    name: Parcels (York County SC AGOL CAMA)
+    restUrl: https://services1.arcgis.com/2AGLxyiJoNiVHKwq/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GISSizeAC
+    coverage: county-wide
+    fieldMap:
+      TAXMAPID: parcelId
+      ParcelID: parcelIdAlt
+      AprAccNum: tax.accountNumber
+      Owner1: ownerName
+      Owner2: ownerName2
+      Owner3: ownerName3
+      PreviousOwner: priorOwner
+      MailAddr1: mailingAddress
+      MailAddr2: mailingAddress2
+      MailApt: mailingAddress.unit
+      MailCity: mailingAddress.city
+      MailState: mailingAddress.state
+      MailZip: mailingAddress.zip
+      PropertyAddress: situsAddress
+      deededacres: acreage
+      GISSizeAC: acreageGis
+      Assessed_Area: acreageAssessed
+      Assessed_Units: acreageAssessedUnit
+      LandUse: dorCode
+      LandUseDesc: dorCodeDescription
+      DateSold: lastSale.date
+      SalePrice: lastSale.price
+      SaleLandUse: lastSale.landUse
+      TransferBook: lastSale.deedBook
+      TransferPage: lastSale.deedPage
+      AprTotVal: tax.marketValue
+      AprLandVal: tax.landValue
+      AprBldgVal: tax.improvementValue
+      AprMiscVal: tax.otherValue
+      TaxTotVal: tax.taxableValue
+      TaxLandVal: tax.taxableLand
+      TaxBldgVal: tax.taxableBuilding
+      AsdTotVal: tax.assessedValue
+      AsdLandVal: tax.assessedLand
+      AsdBldgVal: tax.assessedBuilding
+      TotalAgCredit: tax.agCredit
+      SchSpeTaxDist: tax.schoolDistrict
+      MuniTaxDist: tax.municipalDistrict
+      FireTaxDist: tax.fireDistrict
+      LegalDescription: legalDescription
+      subdivision: subdivision
+      YearBuilt: yearBuilt
+      FinishedSQFT: buildingSqft
+      HOMESTEAD: homestead
+    notes: 'Verified 2026-09-24: public AGOL FeatureServer, count 134497 polygons, auth none. Sample centroid
+      ~34.90413,-80.99908 (WGS84) inside York County SC — NOT York County VA. REJECT seed maps.yorkcounty.gov
+      Landrecords_Service (Virginia; sample ~37.37,-76.73). Prefer this CAMA-rich AGOL. Viewer: York One
+      Map / Experience https://experience.arcgis.com/experience/e827d330f20a4508aa6777bf2c0b94e3/ Open data:
+      yorkcountysc.gov GIS Data Download. Assessor qPublic + Evolve linked from county Assessor page.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=134497; 1-feature outSR=4326 sample TAXMAPID=''6291901005''
+      vertex (-81.020,34.941) inside York County SC bbox; parcel ID field TAXMAPID present.'
+    count: 134497
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Tax / market / assessed values on Parcels
+    restUrl: https://services1.arcgis.com/2AGLxyiJoNiVHKwq/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GISSizeAC
+    coverage: county-wide
+    fieldMap:
+      TAXMAPID: parcelId
+      AprTotVal: tax.marketValue
+      AprLandVal: tax.landValue
+      AprBldgVal: tax.improvementValue
+      TaxTotVal: tax.taxableValue
+      AsdTotVal: tax.assessedValue
+      TotalAgCredit: tax.agCredit
+    notes: Tax and appraisal values embedded on Parcels; not a separate service.
+    status: usable
+
+  - role: ownership
+    name: Ownership / mailing on Parcels
+    restUrl: https://services1.arcgis.com/2AGLxyiJoNiVHKwq/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TAXMAPID: parcelId
+      Owner1: ownerName
+      Owner2: ownerName2
+      Owner3: ownerName3
+      MailAddr1: mailingAddress
+      MailCity: mailingAddress.city
+      MailState: mailingAddress.state
+      MailZip: mailingAddress.zip
+    notes: Ownership and mailing embedded on Parcels.
+    status: usable
+
+  - role: sales
+    name: Last-sale on Parcels
+    restUrl: https://services1.arcgis.com/2AGLxyiJoNiVHKwq/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TAXMAPID: parcelId
+      DateSold: lastSale.date
+      SalePrice: lastSale.price
+      TransferBook: lastSale.deedBook
+      TransferPage: lastSale.deedPage
+      PreviousOwner: lastSale.grantor
+      SaleLandUse: lastSale.landUse
+    notes: >
+      Last deed/sale attributes on parcel feature only (no multi-sale history table on public REST).
+      Companion sales reports via Assessor qPublic.
+    status: partial
+
+  - role: zoning
+    name: Zoning (York County regions)
+    restUrl: https://services1.arcgis.com/2AGLxyiJoNiVHKwq/arcgis/rest/services/York%20County%20Zoning%20(regions)/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      zone: zoning
+      TaxMapID: parcelId
+      ConditionalZoning: zoningConditional
+      RezoningCaseNumber: rezoningCase
+      CouncilAdoptionDate: zoningAdoptionDate
+    notes: >
+      Verified 2026-09-24: count 5567 polygons, sample centroid ~34.86343,-81.04870 (York SC).
+      Primary county zoning. Spatial join to Parcels; TaxMapID present on some features.
+    status: usable
+
+  - role: zoning
+    name: Rock Hill Zoning (municipal companion)
+    restUrl: https://services1.arcgis.com/2AGLxyiJoNiVHKwq/arcgis/rest/services/Rock%20Hill%20Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+    notes: >
+      Verified 2026-09-24: count 646, sample ~34.91941,-81.03528 (Rock Hill). Prefer inside
+      Rock Hill city limits. JOIN KEY: spatial intersect to Parcels/TAXMAPID.
+    status: usable
+
+  - role: flu
+    name: Land Use Plan / Comprehensive Plan (2035)
+    restUrl: https://services1.arcgis.com/2AGLxyiJoNiVHKwq/arcgis/rest/services/Land%20Use%20Plan%20(2035)/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FLU: flu
+      LandUseCategory: fluCategory
+    notes: >
+      Verified 2026-09-24: count 611, sample centroid ~34.99324,-81.10193 (York SC).
+      Service title Comprehensive Plan (2035); FLU = future land use. Spatial join to parcels.
+    status: usable
+
+gaps:
+  - "REJECT maps.yorkcounty.gov AGOservices/Landrecords_Service — York County VIRGINIA (wrong-geography)."
+  - "Municipal zoning beyond Rock Hill (Fort Mill, Tega Cay, York city, Clover, etc.) not separately carded — use county Zoning (regions) or dig city REST."
+  - "Sale history beyond last sale not on parcel FeatureServer."
+  - "Skip utilities / AADT per full-suite scope."
+
+license: "York County SC public AGOL (org 2AGLxyiJoNiVHKwq). Attribute York County GIS. Confirm redistribution terms before bulk republish."
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=YorkCountySC&Layer=Parcels&PageType=Search
+publicGisUrl: https://experience.arcgis.com/experience/e827d330f20a4508aa6777bf2c0b94e3
+jurisdictionGisUrl: https://opendata-yorkcosc.hub.arcgis.com
+appraiserDeepLink: https://qpublic.schneidercorp.com/Application.aspx?App=YorkCountySC&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: usable
+    reason: Parcels/0 carries appraised (market), taxable and assessed totals with land/bldg/misc splits + ag credit.
+    fieldMap:
+      AprTotVal: tax.marketValue
+      AsdTotVal: tax.assessedValue
+      TaxTotVal: tax.taxableValue
+      AprLandVal: tax.landValue
+      AprBldgVal: tax.improvementValue
+      AprMiscVal: tax.otherValue
+      TotalAgCredit: tax.agCredit
+    note: 'Sample 6291901005: AprTotVal 420,300 / TaxTotVal 235,405 / AsdTotVal 9,416.'
+  sale:
+    status: usable
+    reason: DateSold + SalePrice + TransferBook/Page + PreviousOwner + SaleLandUse.
+    fieldMap:
+      DateSold: lastSale.date
+      SalePrice: lastSale.price
+      TransferBook: lastSale.deedBook
+      TransferPage: lastSale.deedPage
+      PreviousOwner: lastSale.grantor
+      SaleLandUse / SaleLandUseDesc: lastSale.landUse
+    format: DateSold esri Date epoch ms (1339718400000 = 2012-06-15); SalePrice Double. No explicit qualified flag.
+  owner:
+    status: usable
+    mailingStatus: usable
+    fieldMap:
+      Owner1: ownerName
+      Owner2: ownerName2
+      Owner3: ownerName3
+      MailAddr1: mailingAddress.street
+      MailAddr2: mailingAddress.street2
+      MailApt: mailingAddress.unit
+      MailCity: mailingAddress.city
+      MailState: mailingAddress.state
+      MailZip: mailingAddress.zip
+  paLink:
+    status: partial
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?App=YorkCountySC&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    testedParcelId: '6291901005'
+    idTransform: KeyValue = TAXMAPID (10-digit, no dashes) as-is.
+    reason: County links qPublic App=YorkCountySC (search); report deep link on Schneider named-app pattern; Cloudflare
+      403 from box - not machine-confirmed.
+  publicGis:
+    status: usable
+    url: https://experience.arcgis.com/experience/e827d330f20a4508aa6777bf2c0b94e3
+    alt: https://opendata-yorkcosc.hub.arcgis.com
+    reason: '"York County One Map" Experience (public, yorkcosc org) + Open Data hub.'
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) - SCDOT 2025 Statewide Traffic Points, CountyName=YORK
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28);
+      not re-dug.

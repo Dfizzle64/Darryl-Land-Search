@@ -1,0 +1,260 @@
+state: SC
+jurisdiction: Oconee County
+fips: "45073"
+level: county
+markets: [Greenville]
+
+layers:
+  - role: parcels
+    name: Parcels with owner (PARCELDATA_owner MapServer)
+    restUrl: https://arcserver2.oconeesc.com/arcgis/rest/services/PARCELDATA_owner/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: TMS_ACRES
+    coverage: county-wide
+    fieldMap:
+      TMS_NUMBER: parcelId
+      GPIN: parcelIdAlt
+      GPIN_TEXT: parcelIdAltText
+      TMS_ACRES: acreage
+      GIS_ACRES: acreageGis
+      current_owner: ownerName
+      owner_street: mailingAddress
+      owner_citystate: mailingAddress.cityState
+      owner_zip: mailingAddress.zip
+      deed_book: lastSale.deedBook
+      deed_page: lastSale.deedPage
+      legal_descr: legalDescription
+      SUBDIVSION: subdivision
+      LOTNUMBER: lotNumber
+      fire_district: fireDistrict
+      EXEMPTSTATUS_: tax.exemptStatus
+      PROP_CLASS: dorCode
+    notes: 'Verified 2026-09-24: public, count 63443, no token (curl -k / verify=False if cert fails). Geo-verified
+      WGS84 (~34.95 N, −83.01 W — Oconee Co; SR 2273). Preferred CAMA-ish source: TMS + acres + current_owner
+      + mailing + deed book/page + legal. No sale price / market value / situs address on this layer — those
+      via qPublic AppID=1030. Same geometry count as Parcels_OpenData/0 and PARCELDATA/1 (geometry twin
+      without owner). Layer is "Parcels (labels 5,000 scale)" under group 0. Viewer: http://oconeesc.maps.arcgis.com/apps/webappviewer/index.html?id=3c4999804a15458c83353a3a5fb327cf
+      REJECT maps.ocoee.org — City of Ocoee, Florida (wrong geography / wrong state).
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=63447; 1-feature outSR=4326 sample TMS_NUMBER=''036-00-04-031''
+      vertex (-83.011,34.950) inside Oconee County SC bbox; parcel ID field TMS_NUMBER present.'
+    count: 63447
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: parcels
+    name: Parcels_OpenData (geometry + acres; no owner)
+    restUrl: https://arcserver2.oconeesc.com/arcgis/rest/services/Parcels_OpenData/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TMS_ACRES
+    coverage: county-wide
+    fieldMap:
+      TMS_NUMBER: parcelId
+      GPIN: parcelIdAlt
+      TMS_ACRES: acreage
+      GIS_ACRES: acreageGis
+      PROP_CLASS: dorCode
+      DEEDREF: deedReference
+      PLATREF: platReference
+    notes: >
+      Seed lead. Count 63443 — open-data geometry extract without ownership. Prefer
+      PARCELDATA_owner/1 when owner/mailing needed; use this for geometry-only ingest.
+    status: partial
+
+  - role: tax
+    name: Tax / market values
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable value fields on PARCELDATA_owner, Parcels_OpenData, or
+      PARCELDATA_owner_Assr public layers (Assr layer schema matches owner — still no
+      values). Use qPublic AppID=1030 for valuation.
+    status: gap
+
+  - role: ownership
+    name: Ownership / mailing on PARCELDATA_owner/1
+    restUrl: https://arcserver2.oconeesc.com/arcgis/rest/services/PARCELDATA_owner/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS_NUMBER: parcelId
+      current_owner: ownerName
+      owner_street: mailingAddress
+      owner_citystate: mailingAddress.cityState
+      owner_zip: mailingAddress.zip
+    notes: Ownership embedded. owner_citystate is combined "WEST UNION SC" string.
+    status: usable
+
+  - role: sales
+    name: Deed book/page only (no sale price on GIS)
+    restUrl: https://arcserver2.oconeesc.com/arcgis/rest/services/PARCELDATA_owner/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS_NUMBER: parcelId
+      deed_book: lastSale.deedBook
+      deed_page: lastSale.deedPage
+    notes: >
+      Deed references only — no SALE_PRICE/SALEDATE on public GIS. Sale history/price via
+      qPublic. Status gap for price/date on REST.
+    status: gap
+
+  - role: zoning
+    name: Zoning (ZoningMap) — citizen-initiated districts only
+    restUrl: https://arcserver2.oconeesc.com/arcgis/rest/services/ZoningMap/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: partial
+    fieldMap:
+      ZONING: zoning
+      Descript: zoningDescription
+    notes: >
+      Verified 2026-09-24: public, count 12 district polygons only. Geo-verified in Oconee
+      (e.g. AD/ARD/CCD/CD/CFD ~34.5–34.7 N, −83.0 W). Codes: AD, ARD, CCD, CD, CFD, ID,
+      LRD, PDD, PRLD, RD, TRD. Per county ZEO, land defaults to Control Free District (CFD)
+      until citizen-initiated rezoning — hence sparse layer. Spatial join to parcels; most
+      parcels have no intersecting non-default district. Zoning_Map MapServer is twin
+      (count ~10 on /1). Split Zoning layer 2 (count 55, TMS_NUMBER+ZONING) for split lots.
+      Overlay Regions layer 0 (count 5: Carolina Gateway, Fair Play Village, Keowee
+      Jocassee 750, etc.) — overlays not base zoning.
+    status: partial
+
+  - role: zoning
+    name: Split Zoning (ZoningMap/2)
+    restUrl: https://arcserver2.oconeesc.com/arcgis/rest/services/ZoningMap/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      TMS_NUMBER: parcelId
+      ZONING: zoning
+      OVERLAY: overlay
+      FLOOD: flood
+    notes: Count 55 split-zoning polygons keyed by TMS_NUMBER. Join to parcels by TMS.
+    status: partial
+
+  - role: flu
+    name: Future Land Use
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: "Dig 2026-09-24: no public FLU FeatureServer on arcserver2.oconeesc.com REST root."
+    status: gap
+
+  - role: parcels
+    name: maps.ocoee.org — REJECT (Florida Ocoee)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Seed warning confirmed: maps.ocoee.org is City of Ocoee, Orange County FL — wrong
+      geography. Use arcserver2.oconeesc.com only.
+    status: wrong-geography
+
+gaps:
+  - "No sale price / market / assessed values on public GIS — use qPublic AppID=1030."
+  - "No situs address field on PARCELDATA_owner — owner mailing only; situs via qPublic."
+  - "Zoning is citizen-initiated / sparse (12 base polygons); default CFD for most land — honest partial, not countywide district coverage."
+  - "No FLU REST found."
+  - "Municipal inventory: Walhalla, Seneca, Westminster, Salem, West Union — no separate city zoning FeatureServer verified; county ZoningMap hosts county ZEO districts."
+  - "REJECT maps.ocoee.org (Florida)."
+  - "Do not scrape emails/phones; qPublic HTML is lookup-only."
+
+license: "Public Oconee County GIS REST (arcserver2.oconeesc.com). Attribute Oconee County GIS. Download/shapefile options via oconeesc.com/departments/gis — confirm redistribution terms."
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=1030&LayerID=21692&PageTypeID=2&PageID=9256
+publicGisUrl: https://oconeesc.maps.arcgis.com/apps/webappviewer/index.html?id=3c4999804a15458c83353a3a5fb327cf
+jurisdictionGisUrl: https://oconeesc.com/departments/gis
+appraiserDeepLink: https://qpublic.schneidercorp.com/Application.aspx?AppID=1030&LayerID=21692&PageTypeID=4&KeyValue={parcelId}
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: gap
+    reason: PARCELDATA_owner/1 and Parcels_OpenData/0 carry no value fields (only EXEMPTSTATUS_, PROP_CLASS); RFA
+      layer 18 M_Value null for all Oconee rows. Values only in qPublic.
+    fieldMap:
+      EXEMPTSTATUS_: tax.exemptStatus
+      PROP_CLASS: dorCode
+  sale:
+    status: gap
+    reason: No sale price or sale date on any public Oconee layer - only deed_book/deed_page (and DEEDREF on OpenData).
+      Deed reference usable as a pointer only.
+    fieldMap:
+      deed_book: lastSale.deedBook
+      deed_page: lastSale.deedPage
+      DEEDREF: deedReference (OpenData)
+    format: deed_book / deed_page are space-padded strings (" 2013", "  326") - trim.
+  owner:
+    status: usable
+    mailingStatus: usable
+    fieldMap:
+      current_owner: ownerName (space-padded, trim)
+      owner_street: mailingAddress.street
+      owner_citystate: mailingAddress.cityState (single string "WEST UNION SC")
+      owner_zip: mailingAddress.zip (padded)
+  paLink:
+    status: partial
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?AppID=1030&LayerID=21692&PageTypeID=4&KeyValue={parcelId}
+    testedParcelId: 036-00-04-031
+    idTransform: KeyValue = TMS_NUMBER as-is (ddd-dd-dd-ddd); RFA T_Map_Number identical.
+    reason: qPublic AppID=1030 LayerID=21692 confirmed from county qpublic.net nav (search PageID=9256). Report
+      PageID not confirmed (Cloudflare 403 from box) - pattern omits PageID; confirm in browser.
+  publicGis:
+    status: usable
+    url: https://oconeesc.maps.arcgis.com/apps/webappviewer/index.html?id=3c4999804a15458c83353a3a5fb327cf
+    reason: Oconee County "Parcel Viewer" (public AGOL WAB app linked from oconeesc.com/departments/gis).
+  aadt:
+    status: usable
+    reason: enrichment.aadt already present; confirmed, not re-dug.
+  gaps:
+  - No public values or sale price/date for Oconee in REST (county or RFA) - qPublic only.
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "South Carolina Public Info Researcher"
+  aadt:
+    source: "SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug"
+    restUrl: "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0"
+    layerId: 0
+    field: "FactoredAA"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "South Carolina Public Info Researcher"
+    notes: "Statewide SCDOT points; filter CountyName. Skip per full-suite pattern."

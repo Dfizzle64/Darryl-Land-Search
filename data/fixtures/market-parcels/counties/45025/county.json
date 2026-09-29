@@ -1,0 +1,33 @@
+{
+  "name": "Chesterfield",
+  "fips": "45025",
+  "state": "South Carolina",
+  "markets": [
+    "Columbia"
+  ],
+  "featureCount": 8287,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "sc-chesterfield-parcels-45025",
+  "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18/query",
+  "gaps": [
+    "Source query returned 8356 rows; 8287 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are SC RFA Statewide_Parcels filtered to Chesterfield County (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "tax partial: Only on third-party-hosted alt layer (evolvesoftware ChesterFieldParcels/2, last edit 2025-07-22; WTH-derived CAMA). No assessed/taxable field. RFA layer 18 L_Value (15046 populated) appears to carry BUILDING value for Chesterfield (086 000 000 085: L_Value 72000 = taxTotBldg 72000) — do not treat as land value.",
+    "sale partial: Sale fields only on third-party alt layer (stale ~2025-07); parse string date with %m/%d/%Y %I:%M:%S %p.",
+    "owner usable: Owner name on state RFA layer; mailing address only on third-party alt layer (partial currency).",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "Primary parcels now SC RFA Statewide_Parcels (layer 18, where County='Chesterfield County'), state-hosted inside a boundary-program map — fragile; alt source retained."
+  ],
+  "path": "data/fixtures/market-parcels/counties/45025/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45025/lookup.json",
+  "sourceCount": 8356,
+  "dropped": 0,
+  "tileCount": 11,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://citizenportal.springbrooksoftware.com/chesterfield_county_sc/assessor_search",
+  "gisViewerUrl": "https://chesterfieldsc.wthgis.com/"
+}

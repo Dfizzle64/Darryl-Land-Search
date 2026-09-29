@@ -5,19 +5,29 @@
   "markets": [
     "Charlotte"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 5369,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-chester-parcels-45023",
+  "queryUrl": "https://services8.arcgis.com/7uCc8YS9s04rg0sr/arcgis/rest/services/Parcels_10_7_24/FeatureServer/0/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Source query returned 5437 rows; 5369 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcels_10_7_24 (Chester SC AGOL) (https://services8.arcgis.com/7uCc8YS9s04rg0sr/arcgis/rest/services/Parcels_10_7_24/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "CRITICAL: Chester County SC (FIPS 45023, Charlotte market) — reject PA chesco.org and TN Chester.",
+    "No public zoning or FLU FeatureServer found; status gap.",
+    "No last-sale date/price fields on Parcels_10_7_24 — sales via Beacon/assessor HTML only.",
+    "No situs address field on AGOL parcels; mailing only."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45023/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45023/lookup.json",
+  "sourceCount": 5437,
+  "dropped": 13,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://beacon.schneidercorp.com/Application.aspx?AppID=217&LayerID=2943&PageTypeID=4&PageID=1669&KeyValue={parcelId}",
+  "gisViewerUrl": "https://beacon.schneidercorp.com/Application.aspx?AppID=217&LayerID=2943&PageTypeID=1&PageID=0"
 }

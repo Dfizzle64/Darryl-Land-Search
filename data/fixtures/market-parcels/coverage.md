@@ -8,9 +8,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | ---: | ---: | ---: | ---: |
 | Atlanta | primary | 93,811 | 17 | 0 | 18 |
 | Tampa | primary | 127,713 | 10 | 0 | 0 |
-| Charleston | primary | 22,649 | 3 | 0 | 4 |
+| Charleston | primary | 86,151 | 14 | 0 | 1 |
 | Nashville | primary | 127,947 | 16 | 0 | 3 |
-| Charlotte | primary | 106,650 | 12 | 0 | 3 |
+| Charlotte | primary | 112,019 | 13 | 0 | 2 |
 | Raleigh-Durham | primary | 151,530 | 17 | 0 | 0 |
 | South Florida | shelf | 41,693 | 3 | 1 | 0 |
 | SWFL | other | 32,749 | 4 | 0 | 0 |
@@ -22,9 +22,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Birmingham | other | 38,101 | 3 | 0 | 6 |
 | Mobile | other | 42,446 | 3 | 0 | 2 |
 | Huntsville | other | 29,598 | 4 | 0 | 3 |
-| Savannah | other | 16,305 | 4 | 0 | 4 |
-| Columbia | other | 14,613 | 1 | 1 | 8 |
-| Greenville | other | 31,164 | 2 | 0 | 6 |
+| Savannah | other | 19,987 | 5 | 0 | 3 |
+| Columbia | other | 49,244 | 5 | 1 | 7 |
+| Greenville | other | 48,073 | 5 | 0 | 4 |
 | Chattanooga | other | 22,817 | 4 | 0 | 6 |
 | Knoxville | other | 58,475 | 10 | 0 | 3 |
 | Memphis | other | 45,278 | 8 | 0 | 3 |
@@ -103,12 +103,20 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Allendale | South Carolina | 45005 | complete-gte-5ac | 1,911 | sc-allendale-parcels-45005 |
+| Bamberg | South Carolina | 45009 | complete-gte-5ac | 3,095 | sc-bamberg-parcels-45009 |
+| Barnwell | South Carolina | 45011 | complete-gte-5ac | 4,150 | sc-barnwell-parcels-45011 |
 | Berkeley | South Carolina | 45015 | complete-gte-5ac | 7,886 | sc-berkeley-addr-muni |
 | Charleston | South Carolina | 45019 | complete-gte-5ac | 7,989 | sc-charleston-energov-ent |
-| Clarendon | South Carolina | 45027 | gap | 0 | unavailable |
-| Colleton | South Carolina | 45029 | gap | 0 | unavailable |
+| Clarendon | South Carolina | 45027 | complete-gte-5ac | 6,282 | sc-clarendon-parcels-45027 |
+| Colleton | South Carolina | 45029 | complete-gte-5ac | 8,615 | sc-colleton-parcels-45029 |
+| Darlington | South Carolina | 45031 | complete-gte-5ac | 6,449 | sc-darlington-parcels-45031 |
+| Dillon | South Carolina | 45033 | complete-gte-5ac | 3,507 | sc-dillon-parcels-45033 |
 | Dorchester | South Carolina | 45035 | complete-gte-5ac | 6,774 | sc-dorchester-parcels-public |
-| Georgetown | South Carolina | 45043 | gap | 0 | unavailable |
+| Florence | South Carolina | 45041 | complete-gte-5ac | 10,091 | sc-florence-parcels-45041 |
+| Georgetown | South Carolina | 45043 | complete-gte-5ac | 3,963 | sc-georgetown-parcels-45043 |
+| Hampton | South Carolina | 45049 | complete-gte-5ac | 3,402 | sc-hampton-parcels-45049 |
+| Horry | South Carolina | 45051 | complete-gte-5ac | 12,037 | sc-horry-parcels-45051 |
 | Orangeburg | South Carolina | 45075 | gap | 0 | unavailable |
 
 ### Nashville
@@ -142,7 +150,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Anson | North Carolina | 37007 | complete-gte-5ac | 5,820 | nc-anson-vector-37007 |
 | Cabarrus | North Carolina | 37025 | complete-gte-5ac | 6,983 | nc-cabarrus-tax-parcels-37025 |
 | Catawba | North Carolina | 37035 | complete-gte-5ac | 8,502 | nc-onemap-37035 |
-| Chester | South Carolina | 45023 | gap | 0 | unavailable |
+| Chester | South Carolina | 45023 | complete-gte-5ac | 5,369 | sc-chester-parcels-45023 |
 | Cleveland | North Carolina | 37045 | complete-gte-5ac | 9,310 | nc-onemap-37045 |
 | Davidson | North Carolina | 37057 | complete-gte-5ac | 12,063 | nc-davidson-opengov-37057 |
 | Gaston | North Carolina | 37071 | complete-gte-5ac | 6,815 | nc-gaston-publicgis-37071 |
@@ -297,7 +305,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Bulloch | Georgia | 13031 | gap | 0 | unavailable |
 | Chatham | Georgia | 13051 | complete-gte-5ac | 3,283 | sagis-chatham-ga-parcel-digest |
 | Effingham | Georgia | 13103 | complete-gte-5ac | 6,128 | ga-effingham-parcels-2024 |
-| Jasper | South Carolina | 45053 | gap | 0 | unavailable |
+| Jasper | South Carolina | 45053 | complete-gte-5ac | 3,682 | sc-jasper-parcels-45053 |
 | Liberty | Georgia | 13179 | gap | 0 | unavailable |
 | Screven | Georgia | 13251 | gap | 0 | unavailable |
 
@@ -305,8 +313,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Aiken | South Carolina | 45003 | complete-gte-5ac | 15,502 | sc-aiken-parcels-45003 |
 | Calhoun | South Carolina | 45017 | gap | 0 | unavailable |
-| Fairfield | South Carolina | 45039 | gap | 0 | unavailable |
+| Chesterfield | South Carolina | 45025 | complete-gte-5ac | 8,287 | sc-chesterfield-parcels-45025 |
+| Edgefield | South Carolina | 45037 | complete-gte-5ac | 5,811 | sc-edgefield-parcels-45037 |
+| Fairfield | South Carolina | 45039 | complete-gte-5ac | 5,031 | sc-fairfield-parcels-45039 |
 | Kershaw | South Carolina | 45055 | gap | 0 | unavailable |
 | Lee | South Carolina | 45061 | gap | 0 | unavailable |
 | Lexington | South Carolina | 45063 | complete-gte-5ac | 13,975 | sc-lexington-property-4 |
@@ -320,10 +331,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Abbeville | South Carolina | 45001 | gap | 0 | unavailable |
+| Abbeville | South Carolina | 45001 | complete-gte-5ac | 5,266 | sc-abbeville-parcels-45001 |
 | Anderson | South Carolina | 45007 | gap | 0 | unavailable |
+| Cherokee | South Carolina | 45021 | complete-gte-5ac | 6,302 | sc-cherokee-parcels-45021 |
 | Greenville | South Carolina | 45045 | complete-gte-5ac | 14,959 | sc-greenville-gcgia-tax-parcel |
-| Greenwood | South Carolina | 45047 | gap | 0 | unavailable |
+| Greenwood | South Carolina | 45047 | complete-gte-5ac | 5,341 | sc-greenwood-parcels-45047 |
 | Laurens | South Carolina | 45059 | gap | 0 | unavailable |
 | Oconee | South Carolina | 45073 | gap | 0 | unavailable |
 | Pickens | South Carolina | 45077 | gap | 0 | unavailable |

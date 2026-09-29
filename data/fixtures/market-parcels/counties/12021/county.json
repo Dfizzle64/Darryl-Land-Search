@@ -15,11 +15,16 @@
   "gaps": [
     "Collier sales are not on the ParcelJoin REST layer (Parcels Join, FeatureServer layer 42). Sale price and date are omitted. They were not filled from a paid vendor.",
     "ParcelJoin has owner and total acres only. No situs, city, zip, zoning, or assessed value. Naples, Marco Island, and Everglades City are listed in data/swfl-municipalities.json and are not spatially joined.",
-    "Florida DOH EHWATER Collier layer 10 does carry NAL sales. This extract stays on county ParcelJoin so that missing-sales gap stays visible. FGDL zoning was not used."
+    "Florida DOH EHWATER Collier layer 10 does carry NAL sales. This extract stays on county ParcelJoin so that missing-sales gap stays visible. FGDL zoning was not used.",
+    "Collier acreage is CAST(TOTALACRES AS FLOAT) on Parcels/FeatureServer/42. A numeric compare of the string field is not the filter. ParcelJoin/0 is dead and is not queried.",
+    "FDOR joins need CO_NO=21 and FOLIO exactly, with leading zeros kept."
   ],
   "path": "data/fixtures/market-parcels/counties/12021/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12021/lookup.json",
   "sourceCount": 13889,
   "dropped": 0,
-  "tileCount": 17
+  "tileCount": 17,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://www.collierappraiser.com/Main_Search/RecordDetail.html?FolioID={id}",
+  "gisViewerUrl": "https://maps.collierappraiser.com/"
 }

@@ -20,7 +20,8 @@
     "Parcel_by_Municipality_Ownership is municipal-owned parcels, not city limits, and is not the municipality layer.",
     "The Accela parcel layer has land and building values but no just value, taxable value, sale price, or sale date. Those tax fields stay empty. The appraiser link is the BCPAO search page, not a parcel deep link.",
     "Situs CITY on the parcel is a post-office place (Mims, Merritt Island, and similar) and is not the legal city. Legal cities come from the City polygon.",
-    "No owner phone or email is copied."
+    "No owner phone or email is copied.",
+    "FDOR joins need CO_NO=15 and PARCEL_ID exactly, including spaces, dashes, and '*'. The property-appraiser account is TaxAcct, not PARCEL_ID."
   ],
   "path": "data/fixtures/market-parcels/counties/12009/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12009/lookup.json",
@@ -215,5 +216,8 @@
     "note": "Accela zoning and future land use cover unincorporated Brevard. A downtown Melbourne point does not hit the zoning layer. Incorporated cities are named from General/City and are not given county districts."
   },
   "zoningJoinedCount": 3809,
-  "fluJoinedCount": 3813
+  "fluJoinedCount": 3813,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://www.bcpao.us/PropertySearch/#/account/{id}",
+  "gisViewerUrl": "https://www.bcpao.us/map/"
 }

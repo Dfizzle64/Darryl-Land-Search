@@ -16,11 +16,15 @@
     "Acreage is PAO Calculated_Acres, 5.0\u2013150.0 inclusive. The root Parcels FeatureServer was not used (it is token-gated, not the public PAO layer).",
     "County Zoning.ZON and FLUM.FLUM are attribute-joined on PARCELNO = STRAP_NUM. STRAP is not the zoning key.",
     "Sebring, Avon Park, and Lake Placid have no public city zoning REST. County zoning and FLUM are used inside those cities. City codes are not invented.",
-    "Highlands attribute join on PARCELNO: zoning 5163/5857, FLUM 5163/5857. 3993 parcels sit in Sebring, Avon Park, or Lake Placid and keep the county code."
+    "Highlands attribute join on PARCELNO: zoning 5163/5857, FLUM 5163/5857. 3993 parcels sit in Sebring, Avon Park, or Lake Placid and keep the county code.",
+    "FDOR joins need CO_NO=38 and PARCELNO exactly. STRAP is a different key and is only the property-appraiser link."
   ],
   "path": "data/fixtures/market-parcels/counties/12055/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12055/lookup.json",
   "sourceCount": 5857,
   "dropped": 0,
-  "tileCount": 11
+  "tileCount": 11,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://www.hcpao.org/Search/Parcel/{id}",
+  "gisViewerUrl": "https://www.hcpao.org/gis/"
 }

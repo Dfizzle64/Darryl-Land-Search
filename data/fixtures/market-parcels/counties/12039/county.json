@@ -5,22 +5,24 @@
   "markets": [
     "Big Bend"
   ],
-  "featureCount": 5917,
-  "coverage": "sample",
+  "featureCount": 6170,
+  "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-gadsden-arpc-par-071218-12039",
-  "queryUrl": "https://services8.arcgis.com/N3lCn6dEKCL6LidU/arcgis/rest/services/Gadsden_FLUM2/FeatureServer/0/query",
+  "source": "fl-fdor-cadastral-2025-12039",
+  "queryUrl": "https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/Florida_Statewide_Cadastral/FeatureServer/0/query",
   "gaps": [
-    "Partial. Parcels are Apalachee RPC Gadsden_FLUM2 layer Par_071218 (a 2018 roll), not a live county host. Deed acres are a zero-padded string. Rows stored as 0 are omitted instead of guessed from the polygon.",
-    "Quincy zoning is a PDF at https://www.myquincy.net/building-planning/page/maps, not a FeatureServer. Quincy FLUM categories are joined as future land use inside those polygons and are not zoning codes. Havana zoning districts are joined from the city zoning layer. Midway, Gretna, Chattahoochee, and Greensboro publish FLUM only and are not joined. The roll's situs city is a post office and is not the zoning jurisdiction. Eligible tracts in this county stay eligible and are not designated QOZs.",
-    "County FLUM categories are joined outside Quincy. Property appraiser search is https://gadsdenpa.com/.",
-    "Join counts: quincyFlu=108, havanaZoning=29, countyFlu=5683, county=5780"
+    "Gadsden polygons are FDOR Cadastral 2025, CO_NO=30, LND_SQFOOT 217800–6534000, fetched in 0.1° tiles. The county Gadsden_GIS_Feature_Layers service was rejected (duplicated and incomplete). MIL1 2023 is not the polygon source.",
+    "FDOR joins need CO_NO=30 and PARCEL_ID exactly. No Opportunity Zone status is stored.",
+    "Zoning or future land use carried forward for 5644 parcel ids that still match."
   ],
   "path": "data/fixtures/market-parcels/counties/12039/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12039/lookup.json",
-  "sourceCount": 5984,
-  "dropped": 10,
-  "tileCount": 6
+  "sourceCount": 6170,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=814&LayerID=14537&PageTypeID=4&KeyValue={id}",
+  "gisViewerUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=GadsdenCountyFL&PageType=Search"
 }

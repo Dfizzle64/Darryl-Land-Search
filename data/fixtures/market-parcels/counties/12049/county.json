@@ -18,11 +18,16 @@
     "County zoning and future land use are a spatial intersect (no parcel id on those layers).",
     "Wauchula, Bowling Green, and Zolfo Springs zoning and FLU join on PARCEL / Parcel_Id when it matches PIN_DSP, otherwise by intersect. They do not cover unincorporated Hardee.",
     "InfoMap has the last situs and owner. It has no sale price or assessed value.",
-    "Hardee county spatial join: zoning 5188/5303, FLU 5297/5303. City override zoning 112, FLU 112 (Wauchula, Bowling Green, Zolfo Springs)."
+    "Hardee county spatial join: zoning 5188/5303, FLU 5297/5303. City override zoning 112, FLU 112 (Wauchula, Bowling Green, Zolfo Springs).",
+    "The parcel id is PIN_DSP. The field named PARCEL_ID is an HTML link and is not ingested.",
+    "FDOR joins need CO_NO=35 and PIN_DSP with '-' removed."
   ],
   "path": "data/fixtures/market-parcels/counties/12049/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12049/lookup.json",
   "sourceCount": 5303,
   "dropped": 0,
-  "tileCount": 6
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=813&LayerID=14471&PageTypeID=4&PageID=6254&KeyValue={id}",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/991bd3fbd52b4ea48fda046422d63283"
 }

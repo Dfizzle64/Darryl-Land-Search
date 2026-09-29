@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-28T22:27:33Z",
+  "generatedAt": "2026-09-29T00:00:42Z",
   "market": "Big Bend",
   "tier": "other",
-  "parcelCount": 35793,
+  "parcelCount": 53214,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -12,10 +12,30 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
+    {
+      "name": "Calhoun",
+      "fips": "12013",
+      "state": "Florida",
+      "featureCount": 4121,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-fdor-cadastral-2025-12013",
+      "queryUrl": "https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/Florida_Statewide_Cadastral/FeatureServer/0/query",
+      "gaps": [
+        "Calhoun polygons are FDOR Cadastral 2025, CO_NO=17, LND_SQFOOT 217800\u20136534000, fetched in 0.1\u00b0 tiles. MIL1 2023 is not the polygon source.",
+        "FDOR joins need CO_NO=17 and PARCEL_ID exactly. Placeholder ids such as WATER are dropped. No Opportunity Zone status is stored."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12013/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12013/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 4121
+    },
     {
       "name": "Dixie",
       "fips": "12029",
@@ -30,7 +50,7 @@
       "gaps": [
         "3252 rows matched the acreage filter; 3251 kept after the parcel-id and geometry checks.",
         "SRWMD layer 4 replaces the Big Bend gap. FDOR joins need CO_NO=25.",
-        "Acreage is AREANO, 5.0–150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
+        "Acreage is AREANO, 5.0\u2013150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
         "No Opportunity Zone status is stored. Zoning and future land use are not on this SRWMD roll."
       ],
       "path": "data/fixtures/market-parcels/counties/12029/tiles",
@@ -42,23 +62,42 @@
       "name": "Gadsden",
       "fips": "12039",
       "state": "Florida",
-      "featureCount": 5917,
-      "coverage": "sample",
+      "featureCount": 6170,
+      "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-gadsden-arpc-par-071218-12039",
-      "queryUrl": "https://services8.arcgis.com/N3lCn6dEKCL6LidU/arcgis/rest/services/Gadsden_FLUM2/FeatureServer/0/query",
+      "source": "fl-fdor-cadastral-2025-12039",
+      "queryUrl": "https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/Florida_Statewide_Cadastral/FeatureServer/0/query",
       "gaps": [
-        "Partial. Parcels are Apalachee RPC Gadsden_FLUM2 layer Par_071218 (a 2018 roll), not a live county host. Deed acres are a zero-padded string. Rows stored as 0 are omitted instead of guessed from the polygon.",
-        "Quincy zoning is a PDF at https://www.myquincy.net/building-planning/page/maps, not a FeatureServer. Quincy FLUM categories are joined as future land use inside those polygons and are not zoning codes. Havana zoning districts are joined from the city zoning layer. Midway, Gretna, Chattahoochee, and Greensboro publish FLUM only and are not joined. The roll's situs city is a post office and is not the zoning jurisdiction. Eligible tracts in this county stay eligible and are not designated QOZs.",
-        "County FLUM categories are joined outside Quincy. Property appraiser search is https://gadsdenpa.com/.",
-        "Join counts: quincyFlu=108, havanaZoning=29, countyFlu=5683, county=5780"
+        "Gadsden polygons are FDOR Cadastral 2025, CO_NO=30, LND_SQFOOT 217800\u20136534000, fetched in 0.1\u00b0 tiles. The county Gadsden_GIS_Feature_Layers service was rejected (duplicated and incomplete). MIL1 2023 is not the polygon source.",
+        "FDOR joins need CO_NO=30 and PARCEL_ID exactly. No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 5644 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12039/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12039/lookup.json",
       "tileCount": 6,
-      "sourceCount": 5984
+      "sourceCount": 6170
+    },
+    {
+      "name": "Jackson",
+      "fips": "12063",
+      "state": "Florida",
+      "featureCount": 11461,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-fdor-cadastral-2025-12063",
+      "queryUrl": "https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/Florida_Statewide_Cadastral/FeatureServer/0/query",
+      "gaps": [
+        "Jackson polygons are FDOR Cadastral 2025, CO_NO=42, LND_SQFOOT 217800\u20136534000, fetched in 0.1\u00b0 tiles. No newer public county or property-appraiser parcel service was on the card. MIL1 2023 is not the polygon source.",
+        "FDOR joins need CO_NO=42 and PARCEL_ID exactly. No Opportunity Zone status is stored."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12063/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12063/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 11461
     },
     {
       "name": "Jefferson",
@@ -94,7 +133,7 @@
       "source": "fl-leon-overlay-parcel-12073",
       "queryUrl": "https://intervector.leoncountyfl.gov/intervector/rest/services/MapServices/TLC_OverlayParcel_D_WM/MapServer/0/query",
       "gaps": [
-        "Usable countywide 5–150 acre extract from TLC_OverlayParcel_D_WM/MapServer/0 (TAXID and CALC_ACREA). Property Appraiser link is https://search.leonpa.gov/Property/Details/{TAXID}. Eligible tracts in this county stay eligible and are not designated QOZs.",
+        "Usable countywide 5\u2013150 acre extract from TLC_OverlayParcel_D_WM/MapServer/0 (TAXID and CALC_ACREA). Property Appraiser link is https://search.leonpa.gov/Property/Details/{TAXID}. Eligible tracts in this county stay eligible and are not designated QOZs.",
         "Tallahassee and unincorporated Leon County are separate jurisdictions. The city-limits polygon sets Tallahassee. Zoning polygons keep City versus County. PropInfo supplies situs, future land use, and tax. AccelaXAPO supplies owner and mailing address.",
         "The overlay parcel layer has no owner or value. PropInfo has no sale date, no situs ZIP, and no DOR use code.",
         "Join counts: tallahassee=1101, leonCounty=4584, zoning=5595, flu=5586, owners=5685, propinfo=5596"
@@ -103,6 +142,26 @@
       "lookup": "data/fixtures/market-parcels/counties/12073/lookup.json",
       "tileCount": 6,
       "sourceCount": 5685
+    },
+    {
+      "name": "Liberty",
+      "fips": "12077",
+      "state": "Florida",
+      "featureCount": 1586,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-fdor-cadastral-2025-12077",
+      "queryUrl": "https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/Florida_Statewide_Cadastral/FeatureServer/0/query",
+      "gaps": [
+        "Liberty polygons are FDOR Cadastral 2025, CO_NO=49, LND_SQFOOT 217800\u20136534000, fetched in 0.1\u00b0 tiles. MIL1 2023 is not the polygon source.",
+        "FDOR joins need CO_NO=49 and PARCEL_ID exactly. Multi-ring parcels are joined by id. No Opportunity Zone status is stored."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12077/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12077/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 1586
     },
     {
       "name": "Madison",
@@ -117,7 +176,7 @@
       "queryUrl": "http://gis.srwmd.state.fl.us/arcgis/rest/services/SRWMDGIS/SRWMD_Parcels/FeatureServer/10/query",
       "gaps": [
         "SRWMD layer 10 replaces the Big Bend gap. FDOR joins need CO_NO=50.",
-        "Acreage is AREANO, 5.0–150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
+        "Acreage is AREANO, 5.0\u2013150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
         "No Opportunity Zone status is stored. Zoning and future land use are not on this SRWMD roll."
       ],
       "path": "data/fixtures/market-parcels/counties/12079/tiles",
@@ -139,7 +198,7 @@
       "gaps": [
         "3814 rows matched the acreage filter; 3813 kept after the parcel-id and geometry checks.",
         "SRWMD layer 12 replaces the Big Bend gap. FDOR joins need CO_NO=72.",
-        "Acreage is AREANO, 5.0–150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
+        "Acreage is AREANO, 5.0\u2013150.0 inclusive. The id is PARNO (PARCELID is empty except Levy). Leading spaces are trimmed. Placeholder ids are dropped. http only.",
         "No Opportunity Zone status is stored. Zoning and future land use are not on this SRWMD roll."
       ],
       "path": "data/fixtures/market-parcels/counties/12123/tiles",

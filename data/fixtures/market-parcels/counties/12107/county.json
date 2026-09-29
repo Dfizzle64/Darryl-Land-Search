@@ -5,27 +5,25 @@
   "markets": [
     "North-Central Florida"
   ],
-  "featureCount": 7560,
+  "featureCount": 5899,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-putnam-doh-municipal-12107",
-  "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/53/query",
+  "source": "fl-putnam-parcels-pa-12107",
+  "queryUrl": "https://pamap.putnam-fl.gov/server/rest/services/CadastralData/FeatureServer/2/query",
   "gaps": [
-    "Optional Putnam pull. Parcel polygons and tax attributes are Florida DOH EHWATER layer 53.",
-    "The property-appraiser COMMUNITY field is Unincorporated on essentially every row, so it is not used as a municipality.",
-    "Municipal zoning is a centroid join to ReferenceMap/Zoning_R city layers when those layers published a zone field.",
-    "Unincorporated zoning and future land use services returned an error and were not joined.",
-    "Crescent City, Interlachen, Pomona Park, and Welaka future land use was not on a verified public layer separate from zoning.",
-    "Stored jurisdiction counts: {'Unincorporated Putnam County': 7220, 'Palatka': 108, 'Interlachen': 95, 'Pomona Park': 75, 'Crescent City': 40, 'Welaka': 22}.",
-    "PHY_CITY remains the postal city. It is not the municipality.",
-    "Palatka future-land-use service did not load. Palatka FLU was left blank.",
-    "8810 source rows stored as 7560 parcels (0 failed the acreage or county-extent check; the rest were duplicate parcel ids)."
+    "5911 rows matched the acreage filter; 5899 kept after the parcel-id and geometry checks.",
+    "Putnam has no acreage on the property-appraiser layer. Acreage is FDOR 2025 LND_SQFOOT / 43560 for CO_NO=64.",
+    "FDOR joins need CO_NO=64 and trim(PARCELID). Blank ids and '<New parcel>' placeholders are dropped. No Opportunity Zone status is stored.",
+    "Zoning or future land use carried forward for 5752 parcel ids that still match."
   ],
   "path": "data/fixtures/market-parcels/counties/12107/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12107/lookup.json",
-  "sourceCount": 8810,
-  "dropped": 0,
-  "tileCount": 9
+  "sourceCount": 5911,
+  "dropped": 12,
+  "tileCount": 9,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://apps.putnam-fl.com/pa/property/?type=api&parcel={id}",
+  "gisViewerUrl": "https://pamap.putnam-fl.gov/PropertyAppraiserPublicMap/"
 }

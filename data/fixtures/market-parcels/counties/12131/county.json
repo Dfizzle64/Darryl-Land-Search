@@ -5,35 +5,25 @@
   "markets": [
     "Pensacola"
   ],
-  "featureCount": 8930,
+  "featureCount": 8931,
   "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-panhandle-12131",
+  "source": "fl-walton-energov-12131",
   "queryUrl": "https://services1.arcgis.com/TaXHPwWfIMuzJ7Ov/arcgis/rest/services/EnerGov/FeatureServer/4/query",
   "gaps": [
-    "Joined zoning on 8801 of 8930 parcels and FLU on 8867. Owner 8852, situs 0, sale price 0, sale date 8492.",
-    "9632 source rows became 8930 parcel ids. 756 split pieces with a new shape were merged. 18 repeated rows with the same polygon (stacked units or duplicate ids) were collapsed to one feature. Acreage and tax values are not summed across those rows. Rows that failed the WGS84 or county-extent check were dropped.",
-    "Situs is a gap on EnerGov Parcels/4. Sale price is a gap (SALE_DATE_1 only; book/page is not a price and is not stored).",
-    "County EnerGov zoning/19 (ZONE_CLASS) and FLU/15 (FLU_TYPE code, FLU_CLASS label) apply outside city limits. DeFuniak Springs, Freeport, and Paxton use city layers. County districts are not applied inside those cities. Hits: county 8956, DeFuniak Springs 208, Freeport 335, Paxton 83.",
-    "DeFuniak Springs zoning and FLU join on PARCELNO (WeeklyUpdatesDFS/7 and /6), with a spatial fallback on the same city layers.",
-    "Freeport zoning (WeeklyUpdatesFreeport/7) is numeric and Description was blank on the samples. Observed zoning codes in this extract: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12. Do not treat the number as a named district until the city LDC legend is confirmed.",
-    "Freeport FLU (WeeklyUpdatesFreeport/6) Land_Use was numeric and Description was blank on first ingest. Observed Land_Use codes: 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12. The code is stored. No legend was invented.",
-    "Paxton FLU is WeeklyUpdatesPaxton/6 (FLU_CLASS). SubType is numeric and is not expanded into a name. Paxton zoning is a gap.",
-    "A Monroe County layer titled Walton County Tax Parcels was rejected as wrong geography.",
-    "Appraiser link is the Walton PA portal. No verified per-parcel deep link is on the layer. Search uses PARCELNO.",
-    "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077)."
+    "9623 rows matched the acreage filter; 8931 kept after the parcel-id and geometry checks.",
+    "Walton parcels are EnerGov/FeatureServer/4. Acreage is GIS_ACRES, 5.0–150.0 inclusive. The object id field is OBJECTID_1.",
+    "FDOR joins need CO_NO=76 and PARCELNO with '-' removed. Sale price is the FDOR roll price. Sale dates after the load date are cleared. No Opportunity Zone status is stored.",
+    "Zoning or future land use carried forward for 8888 parcel ids that still match."
   ],
   "path": "data/fixtures/market-parcels/counties/12131/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12131/lookup.json",
-  "sourceCount": 9632,
+  "sourceCount": 9623,
   "dropped": 1,
   "tileCount": 8,
-  "zoningJoinedCount": 8801,
-  "fluJoinedCount": 8867,
-  "salePriceCount": 0,
-  "saleDateCount": 8492,
-  "situsCount": 0,
-  "ownerCount": 8852
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://beacon.schneidercorp.com/Application.aspx?AppID=835&LayerID=15172&PageTypeID=4&KeyValue={id}",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/9ec6ea2db6424876ac7ba73a85b6fede"
 }

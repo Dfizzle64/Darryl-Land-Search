@@ -143,7 +143,7 @@ describe("Panhandle Florida municipal zoning and future land use", () => {
     const bay = JSON.parse(
       readFileSync(path.join(root, "data/fixtures/market-parcels/counties/12005/county.json"), "utf8"),
     ) as { source: string; featureCount: number };
-    expect(bay.source).toBe("fl-panhandle-12005");
+    expect(bay.source).toBe("fl-bay-test-parcels-12005");
     expect(bay.featureCount).toBeGreaterThan(0);
   });
 

@@ -5,19 +5,27 @@
   "markets": [
     "Atlanta"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 4931,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "ga-meriwether-parcels-13199",
+  "queryUrl": "https://services9.arcgis.com/Xv8vRekQ4FVHSSIe/arcgis/rest/services/MeriwetherParcels/FeatureServer/0/query",
   "gaps": [
-    "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+    "Parcels are MeriwetherParcels (AGOL hosted — WinGAP-style CAMA) (https://services9.arcgis.com/Xv8vRekQ4FVHSSIe/arcgis/rest/services/MeriwetherParcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+    "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+    "Pass 2 sale date and price are HTML-only and were not copied.",
+    "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/13199/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13199/lookup.json",
+  "sourceCount": 4931,
+  "dropped": 0,
+  "tileCount": 5,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=meriwetherCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=meriwetherCountyGA&Layer=Parcels&PageType=Map",
+  "pulledOn": "2026-09-29"
 }

@@ -1,0 +1,31 @@
+{
+  "name": "Toombs",
+  "fips": "13279",
+  "state": "Georgia",
+  "markets": [
+    "Savannah"
+  ],
+  "featureCount": 3545,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-toombs-parcels-13279",
+  "queryUrl": "https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Toombs_County_Wide_View/FeatureServer/19/query",
+  "gaps": [
+    "Parcels are Toombs_County_Wide_View TaxParcels_25 (HOGARC) (https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Toombs_County_Wide_View/FeatureServer/19). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+    "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+    "Pass 2 sale date and price are HTML-only and were not copied.",
+    "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13279/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13279/lookup.json",
+  "sourceCount": 3545,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=toombsCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://hogarc-hogarc.opendata.arcgis.com/datasets/HHvUPZ2XuLOAJxjR::toombs-county-wide-view/explore",
+  "pulledOn": "2026-09-29"
+}

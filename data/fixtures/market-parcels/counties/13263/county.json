@@ -1,0 +1,31 @@
+{
+  "name": "Talbot",
+  "fips": "13263",
+  "state": "Georgia",
+  "markets": [
+    "Macon"
+  ],
+  "featureCount": 2168,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-talbot-parcels-13263",
+  "queryUrl": "https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2/query",
+  "gaps": [
+    "Parcels are Parcels2025 / Parcel_Regions_w_WinGAP (RVRC_ELA — Talbot WinGAP) (https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels2025/FeatureServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+    "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+    "Pass 2 sale date and price are HTML-only and were not copied.",
+    "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13263/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13263/lookup.json",
+  "sourceCount": 2168,
+  "dropped": 0,
+  "tileCount": 4,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=talbotCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=680&LayerID=11370&PageTypeID=1",
+  "pulledOn": "2026-09-29"
+}

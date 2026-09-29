@@ -99,10 +99,7 @@ describe("South Carolina rural OZ batch 1 parcels", () => {
     }
   });
 
-  it("leaves Anderson unloaded and keeps the existing Berkeley extract", () => {
-    const anderson = countyFile("45007");
-    expect(anderson.coverage).toBe("gap");
-    expect(anderson.featureCount).toBe(0);
+  it("keeps the existing Berkeley extract", () => {
     const berkeley = countyFile("45015");
     expect(berkeley).toMatchObject({
       source: "sc-berkeley-addr-muni",

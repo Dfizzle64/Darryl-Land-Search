@@ -5,19 +5,29 @@
   "markets": [
     "Charlotte"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 11749,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-york-parcels-45091",
+  "queryUrl": "https://services1.arcgis.com/2AGLxyiJoNiVHKwq/arcgis/rest/services/Parcels/FeatureServer/0/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Source query returned 11750 rows; 11749 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcels (York County SC AGOL CAMA) (https://services1.arcgis.com/2AGLxyiJoNiVHKwq/arcgis/rest/services/Parcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "REJECT maps.yorkcounty.gov AGOservices/Landrecords_Service — York County VIRGINIA (wrong-geography).",
+    "Municipal zoning beyond Rock Hill (Fort Mill, Tega Cay, York city, Clover, etc.) not separately carded — use county Zoning (regions) or dig city REST.",
+    "Sale history beyond last sale not on parcel FeatureServer.",
+    "Skip utilities / AADT per full-suite scope."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45091/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45091/lookup.json",
+  "sourceCount": 11750,
+  "dropped": 1,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=YorkCountySC&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/e827d330f20a4508aa6777bf2c0b94e3"
 }

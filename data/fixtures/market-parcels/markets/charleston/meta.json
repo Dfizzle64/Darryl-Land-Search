@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T05:15:33Z",
+  "generatedAt": "2026-09-29T05:19:20Z",
   "market": "Charleston",
   "tier": "primary",
-  "parcelCount": 86151,
+  "parcelCount": 113262,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -372,23 +372,107 @@
       "sourceCount": 14961
     },
     {
+      "name": "Marion",
+      "fips": "45067",
+      "state": "South Carolina",
+      "featureCount": 3697,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "sc-marion-parcels-45067",
+      "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18/query",
+      "gaps": [
+        "Source query returned 3793 rows; 3697 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are SC RFA Statewide_Parcels filtered to Marion County (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "tax gap: RFA value fields (L_Value/M_Value/B_Value) are empty for this county; no county value REST found. Values only via PA (HTML, not bulk).",
+        "sale gap: No sale fields on RFA/18; WTH viewer sale search in-app only.",
+        "owner partial: Owner name public on RFA layer; no mailing address on any public REST found.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "Parcel polygons now loadable from SC RFA Statewide_Parcels (layer 18, where County='Marion County'); state-hosted inside a boundary-program map — fragile, snapshot extracts. No county-published parcel REST found 2026-09-28."
+      ],
+      "path": "data/fixtures/market-parcels/counties/45067/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45067/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 3793
+    },
+    {
+      "name": "Marlboro",
+      "fips": "45069",
+      "state": "South Carolina",
+      "featureCount": 3632,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "sc-marlboro-parcels-45069",
+      "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18/query",
+      "gaps": [
+        "Source query returned 3707 rows; 3632 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are SC RFA Statewide_Parcels filtered to Marlboro County (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "tax partial: Market value only (RFA M_Value, Double, dollars); no assessed/taxable field on RFA layer; L_Value/B_Value empty. Assessed/taxable only on PA page.",
+        "sale gap: RFA Statewide_Parcels has no sale date/price fields; no county sale REST found. Sales visible only on PA parcel page (HTML).",
+        "owner partial: Owner name public on RFA layer; no mailing address on any public REST found.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "Parcel polygons now loadable from SC RFA Statewide_Parcels (layer 18, where County='Marlboro County'); state-hosted inside a boundary-program map — fragile, snapshot extracts. No county-published parcel REST found 2026-09-28."
+      ],
+      "path": "data/fixtures/market-parcels/counties/45069/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45069/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 3707
+    },
+    {
       "name": "Orangeburg",
       "fips": "45075",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 12608,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-orangeburg-parcels-45075",
+      "queryUrl": "https://services2.arcgis.com/bUKn95BqgpYYTnx3/arcgis/rest/services/Main_Public_Tax_Parcel_Map_WFL1/FeatureServer/0/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Source query returned 12735 rows; 12608 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Tax Parcels (Public Tax Parcel Map) (https://services2.arcgis.com/bUKn95BqgpYYTnx3/arcgis/rest/services/Main_Public_Tax_Parcel_Map_WFL1/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "Zoning layer FS/33 is effectively empty/unusable (null codes); county zoning REST gap.",
+        "No sale price/date fields on public Tax Parcels layer; use FriendlyLink / assessor for sales.",
+        "Market/assessed tax values not on public parcel fields reviewed.",
+        "Rejected SCDOT SC_Parcels MapServer (token required)."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45075/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45075/lookup.json",
+      "tileCount": 13,
+      "sourceCount": 12735
+    },
+    {
+      "name": "Williamsburg",
+      "fips": "45089",
+      "state": "South Carolina",
+      "featureCount": 7174,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "sc-williamsburg-parcels-45089",
+      "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Georgetown_Williamsburg_Web_Map_WFL1/FeatureServer/4/query",
+      "gaps": [
+        "Source query returned 7514 rows; 7174 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are SC RFA Williamsburg Parcels (county-specific layer w/ CAMA, boundary program map) (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Georgetown_Williamsburg_Web_Map_WFL1/FeatureServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "Parcel polygons now loadable from SC RFA Statewide_Parcels (layer 18, where County='Williamsburg County') plus RFA county-specific layer; state-hosted inside boundary-program maps — fragile, snapshot extracts. No county-published parcel REST found 2026-09-28.",
+        "No countywide zoning or FLU REST layer verified.",
+        "Rejected SCDOT SC_Parcels token layer."
+      ],
+      "path": "data/fixtures/market-parcels/counties/45089/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45089/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 7514
     }
   ]
 }

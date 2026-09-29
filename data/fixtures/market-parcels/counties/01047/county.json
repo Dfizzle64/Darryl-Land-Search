@@ -1,0 +1,31 @@
+{
+  "name": "Dallas",
+  "fips": "01047",
+  "state": "Alabama",
+  "markets": [
+    "Montgomery"
+  ],
+  "featureCount": 6351,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "al-dallas-parcels-01047",
+  "queryUrl": "https://services8.arcgis.com/9e1lVZPGgkrztAhh/ArcGIS/rest/services/Dallas_ParcelViewer_Service/FeatureServer/2/query",
+  "gaps": [
+    "Parcels are ParcelsJoin (Dallas ParcelViewer — CaptureCAMA AGOL hosted) (https://services8.arcgis.com/9e1lVZPGgkrztAhh/ArcGIS/rest/services/Dallas_ParcelViewer_Service/FeatureServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "No sale price",
+    "~50% of parcels have TOTAL_AC=0 — fall back to DEEDACRES or computed area",
+    "Flagship alabamagis.com/dallas is still HTML-only; this AGOL layer is the REST source"
+  ],
+  "path": "data/fixtures/market-parcels/counties/01047/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01047/lookup.json",
+  "sourceCount": 6351,
+  "dropped": 0,
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://dallas.capturecama.com/mapparceldetail/{PIN}",
+  "gisViewerUrl": "https://dallas.capturecama.com/parcelviewer/"
+}

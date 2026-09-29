@@ -1,0 +1,246 @@
+state: AL
+jurisdiction: Mobile County
+fips: "01097"
+level: county
+markets: [Mobile]
+
+layers:
+  - role: parcels
+    name: Revenue Tax Parcels (Mobile County AGOL / Facilities service)
+    restUrl: "https://services2.arcgis.com/dJHAcAx6kccDBtM6/arcgis/rest/services/Mobile_County_Facilities/FeatureServer/0"
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: StatedArea
+    coverage: county-wide
+    fieldMap:
+      Parcel_Number: parcelId
+      Account_Number: parcelIdAlt
+      PID: parcelIdAlt2
+      Name1: ownerName
+      Name2: ownerName2
+      Address1: mailingAddress.street
+      Address2: mailingAddress.street2
+      City: mailingAddress.city
+      State: mailingAddress.state
+      Zip: mailingAddress.zip
+      PropAddr1: situsAddress
+      PropCity: situsCity
+      PropZip: situsZip
+      StatedArea: acreage
+      PriAcreage: acreageAlt
+      TotalValue: tax.marketValue
+      ApprValue: tax.marketValueAlt
+      AssdValue: tax.assessedValue
+      TotalLandValue: tax.landValue
+      TotalImpValue: tax.improvementValue
+      Zoning: zoning
+      URL_Revenue: appraiserSearchUrl
+    notes: >
+      Verified 2026-09-23: HTTP 200 pjson + count 211181; acreage filter sample returns
+      private owners (e.g. LOFTON, TENSAW LAND & TIMBER) — NOT limited to county-owned
+      facilities despite parent service name. Layer description: polygons + 2024 ownership
+      join dated 2023/06/21 (treat as possibly stale vs CaptureCAMA geometry). Has
+      URL_Revenue deep-link pattern
+      https://esearch.mobilecopropertytax.com/Property/View/{Account_Number}?year=2024.
+      Prefer this for owner/tax/situs; join fresher geometry from CaptureCAMA if needed.
+      CRS WKID 102100/3857. maxRecordCount 2000.
+    status: usable
+
+  - role: parcels
+    name: Tax Parcels (CaptureCAMA MapServer — geometry-strong)
+    restUrl: "https://maps.capturecama.com/arcgis/rest/services/Mobile/Mobile03182025/MapServer/20"
+    layerId: 20
+    geometry: polygon
+    auth: none
+    acreageField: StatedArea
+    coverage: county-wide
+    fieldMap:
+      Parcel_Num: parcelId
+      Account_Nu: parcelIdAlt
+      StatedArea: acreage
+      Calculated: acreageGis
+      Subdivisio: subdivision
+    notes: >
+      Verified 2026-09-23: folder Mobile lists Mobile03182025 (newest) and
+      Mobile_County_Map_09042024. Both Tax Parcels layer 20 count 212064.
+      Fields are parcel fabric / stated area only — NO owner, tax, situs, or sale.
+      09042024 uses full names (Parcel_Number, Account_Number, CalculatedArea);
+      03182025 truncates many field names. Public viewer:
+      https://mobile.capturecama.com/parcelviewer/. Use as geometry companion to AGOL
+      ownership layer. maxRecordCount 1000 on 09042024.
+    status: partial
+
+  - role: parcels
+    name: Parcels (City of Mobile EG_Data_MS — county Revenue data hosted by city)
+    restUrl: "https://maps.cityofmobile.org/arcgis/rest/services/EG_Data_MS/MapServer/1"
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      parcel: parcelId
+      name: ownerName
+      streetno: situsAddress.number
+      streetname: situsAddress.street
+      loc_city: situsCity
+      mail_addr1: mailingAddress.street
+      mail_addr2: mailingAddress.street2
+      mail_city: mailingAddress.city
+      mail_state: mailingAddress.state
+      mail_zip: mailingAddress.zip
+      land_value: tax.landValue
+      improv_value: tax.improvementValue
+      fmkt_value: tax.marketValue
+      yr_sale: lastSale.date
+      sq_feet: areaSqFt
+      landuse: dorCode
+    notes: >
+      Verified 2026-09-23: count 213791 (county-scale, not city-only). Iteminfo/copyright
+      references Mobile County Revenue Commission. Parcel IDs use R-prefix format different
+      from CaptureCAMA/AGOL. Sample situs (streetno/streetname/loc_city) often null;
+      fmkt_value and yr_sale often null in sample; acreage via sq_feet/43560.
+      Prefer AGOL FeatureServer/0 for CAMA join + deep-link; keep this as alternate host.
+      CRS WKID 102630 (AL West State Plane Feet). maxRecordCount 2000.
+    status: partial
+
+  - role: other
+    name: Bisclient Mobile CAD viewer (no public parcel REST extracted)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      https://gis.bisclient.com/alabama/mobilecad/ loads; config.json points at
+      bisgis.maps.arcgis.com / revenue.maps.arcgis.com hubs only — no MapServer/FeatureServer
+      parcel URL extracted this run. Do not scrape HTML.
+    status: gap
+
+  - role: zoning
+    name: Unincorporated Mobile County zoning (none — official)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Verified 2026-09-24: Mobile County Development and Zoning page states explicitly
+      "There is no zoning in the unincorporated areas of Mobile County."
+      https://www.mobilecountyal.gov/government/departments/engineering/engineering-services/planning-and-development/development-and-zoning/
+      AGOL org dJHAcAx6kccDBtM6 and CaptureCAMA Mobile hosts have no Zoning FeatureServer.
+      Parcel attribute Zoning on Facilities/0 is sparse/empty. Municipal zoning inside
+      city limits: 01097-city-mobile.yaml (EG_Data_MS/20). ETJ/PJ permitting may apply
+      near municipalities — not a county zoning district layer.
+    status: gap
+
+gaps:
+  - No county Zoning FeatureServer/MapServer — true gap, not missing URL
+  - Unincorporated Mobile County has no zoning ordinance (official county statement 2026-09-24)
+  - CaptureCAMA Tax Parcels lack owner/tax/sale — geometry only
+  - AGOL ownership join dated 2023/06/21 per layer description (may lag current CAMA)
+  - lastSale.price not on AGOL layer; yr_sale on city layer mostly null in sample
+  - Zoning attribute sparse/empty on AGOL sample; no separate county zoning FeatureServer verified
+  - FLU not found on public Mobile REST this run
+  - Dead URL: do not use al05 / unknown KCS Mobile hosts without re-probe
+
+  - Municipal zoning: see 01097-city-mobile.yaml (EG_Data_MS/20); spatial-join onto AGOL parcels
+
+license: "Mobile County / City of Mobile GIS; use-at-own-risk; not for legal survey"
+appraiserSearchUrl: "https://esearch.mobilecopropertytax.com/Property/View/{PIN}"
+jurisdictionGisUrl: "https://gis.bisclient.com/alabama/mobilecad/"
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    luCountyId: 49
+    year: 2024
+    countyWhere: "YearAADT=2024 AND LUCountyID=49 AND AADT>0"
+    stations2024: 1216
+    countyCheckedAt: "2026-09-28"
+    countyNote: "LUCountyID=49 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 1216 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location."
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "Official ALDOT EGISATDServices/TDMPublic MapServer; ~282482 multi-year points (YearAADT 2014–2025). Latest usable AADT year=2024 (~22009 with AADT>0; 2025 shells exist but AADT still null as of 2026-09-24). Filter YearAADT=2024; optional LUCountyID (1–67 alpha county index, e.g. Autauga=1 Jefferson=37 Madison=45). Companion YearAADT field. Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/. Dig: enrichment/AL/aadt-aldot-2026-09-24.md"
+
+pass1RuralOz2026_09_28:
+  parcelRestUrl: https://services2.arcgis.com/dJHAcAx6kccDBtM6/arcgis/rest/services/Mobile_County_Facilities/FeatureServer/0
+  parcelIdField: Parcel_Number
+  featureCount: 211181
+  note: >
+    Batch 3 closing re-verify 2026-09-28: live count 211181, 1-feature query with polygon geometry OK (sample vertex [-88.08,31.11]), parcel ID field Parcel_Number present. No field changes checked beyond ID.
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://services2.arcgis.com/dJHAcAx6kccDBtM6/arcgis/rest/services/Mobile_County_Facilities/FeatureServer/0
+  featureCount: 211181
+  taxSaleOwner:
+    ownerName:
+      field: Name1
+      status: usable
+    assessedValue:
+      field: AssdValue
+      status: usable
+      nonNullOrPositiveCount: 210692
+      ofTotal: 211181
+    appraisedOrMarketValue:
+      field: TotalValue
+      status: usable
+      nonNullOrPositiveCount: 211106
+      ofTotal: 211181
+    landValue:
+      field: TotalLandValue
+      status: usable
+    improvementValue:
+      field: TotalImpValue
+      status: usable
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: esearch property page at appraiserSearchUrl (it has deed date and sale price)
+    lastSaleDate:
+      field: null
+      status: gap
+      livesAt: esearch property page at appraiserSearchUrl (it has deed date and sale price)
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: esearch property page at appraiserSearchUrl (it has deed date and sale price)
+    ownerEntityType:
+      derivable: true
+      sourceField: Name1
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 16456
+        INC: 7091
+        TRUST: 3199
+        CORP: 1451
+        CHURCH: 1619
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://esearch.mobilecopropertytax.com/Property/View/{PIN}
+    pinField: Account_Number with leading zeros removed
+    testPin: '14870'
+    verified: 'yes'
+    method: plain fetch 200 (Mobile County esearch Property View)
+    note: Account_Number 00014870 returned NotFoundProperty; 14870 returned parcel 0208280000002XXX, owner LOFTON SHIRLEY REGINA & ADRIAN KEITH, and a sales table with deed date/type/sale price. The old
+      card pattern with {Account_Number}?year=2024 as-is (zero padded) fails.
+  jurisdictionGisUrl:
+    url: https://gis.bisclient.com/alabama/mobilecad/
+    http: null
+  notes: Layer is Mobile_County_Facilities/0 (parcels). No tax, sale date or sale price in the layer; all are on the esearch page.

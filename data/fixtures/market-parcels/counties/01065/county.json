@@ -5,20 +5,28 @@
   "markets": [
     "Tuscaloosa"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 6068,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "al-hale-parcels-01065",
+  "queryUrl": "https://services9.arcgis.com/AhiZvN2uMZkZVfSu/arcgis/rest/services/Hale_Web_Service/FeatureServer/10/query",
   "gaps": [
-    "Hale County has Flagship/CaptureCAMA HTML only. No usable public parcel REST in this pull. Polygons were not invented."
+    "Source query returned 6084 rows; 6068 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are PARCELS (Hale County AGOL Hale_Web_Service) (https://services9.arcgis.com/AhiZvN2uMZkZVfSu/arcgis/rest/services/Hale_Web_Service/FeatureServer/10). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "No public zoning / FLU REST for Hale County",
+    "No lastSale.price (deed book/page/date only)",
+    "CaptureCAMA/alabamagis Flagship portals absent; use AGOL Hale_Web_Service/10"
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null,
-  "join": null
+  "path": "data/fixtures/market-parcels/counties/01065/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01065/lookup.json",
+  "sourceCount": 6084,
+  "dropped": 0,
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "http://apps.agdmaps.com/print/al/hale/index.html?PARCELID={PIN}",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/72a1479e2a384853bf7b3c512083c308"
 }

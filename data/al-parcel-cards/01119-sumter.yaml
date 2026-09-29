@@ -1,0 +1,112 @@
+state: AL
+jurisdiction: Sumter County
+fips: "01119"
+level: county
+markets: [Rural OZ 2.0]
+
+layers:
+  - role: parcels
+    name: PARCEL (Sumter CaptureCAMA snapshot 2024-03-28)
+    restUrl: "https://maps.capturecama.com/arcgis/rest/services/Sumter/Sumter03282024/MapServer/2"
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NUM: parcelId
+      PRIMARYIND: featureKey
+    notes: >
+      Verified live 2026-09-28: ?f=json 200, anonymous, polygon; 1-feature query with geometry OK. Count 16242; sample vertex -88.31,32.94 (Sumter AL — not Sumter SC/GA/FL). Shapefile-backed: NO pagination (resultOffset/resultRecordCount rejected) — page by FID ranges (where=FID>=n AND FID<m), maxRecordCount 1000. OWNER/OWNER_ADDR/CALC_ACRE/DEED_ACRE/CAMA_* columns exist but are EMPTY/0 on all features (checked OWNER<>blank=0, CALC_ACRE>0=0) — compute acreage from geometry. Only 2 Sumter services (…05202021, …03282024); no gis.capturecama.com SumterAL folder.
+    status: partial
+
+gaps:
+  - Owner/value/acreage columns empty — geometry + PARCEL_NUM only
+  - No pagination; 2024 vintage
+
+license: "Sumter County (AL) / CaptureCAMA public viewer; use-at-own-risk"
+appraiserSearchUrl: "https://sumter.capturecama.com/mapparceldetail/{PIN}"
+appraiserSearchUrlAlt: "https://sumter.capturecama.com/propsearch"
+jurisdictionGisUrl: "https://sumter.capturecama.com/parcelviewer/"
+ruralOz2:
+  source: "IRS Rev. Proc. 2026-14 appendix (Rural Status=Rural)"
+  ruralEligibleTracts: 4
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    yearField: "YearAADT"
+    year: 2024
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    luCountyId: 60
+    countyWhere: "YearAADT=2024 AND LUCountyID=60 AND AADT>0"
+    stations2024: 125
+    verifiedAt: "2026-09-28"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "LUCountyID=60 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 125 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location. Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/."
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://maps.capturecama.com/arcgis/rest/services/Sumter/Sumter03282024/MapServer/2
+  featureCount: 16242
+  taxSaleOwner:
+    ownerName:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://sumter.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    assessedValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://sumter.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    appraisedOrMarketValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://sumter.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    landValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://sumter.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    improvementValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://sumter.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://sumter.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    lastSaleDate:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://sumter.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://sumter.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    ownerEntityType:
+      derivable: false
+      sourceField: null
+      rule: null
+      likeCounts2026_09_28: null
+      note: Layer has no populated owner; entity type needs the record page (CaptureCAMA property-record page https://sumter.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)) or a manual CAMA
+        join on PARCEL_NUM.
+  deepLink:
+    pattern: https://sumter.capturecama.com/mapparceldetail/{PIN}
+    pinField: PARCEL_NUM
+    testPin: 60-13-09-30-0-000-002.000
+    verified: browser-only (pattern confirmed from viewer config)
+    method: 'pattern read from the county CaptureCAMA Experience Builder config (Embed Parcel Detail widget: capturecama.com/mapparceldetail/{PARCEL_NUM}); page fetched 200 but is a React SPA shell (Citizen
+      Access Portal, empty #root)'
+    note: 'Renders in the browser only; content cannot be verified by plain fetch. Alt key in the same config: Assess_Num.'
+  jurisdictionGisUrl:
+    url: https://sumter.capturecama.com/parcelviewer/
+    http: 200
+  notes: Partial layer (geometry + parcel ID only). OWNER field exists but is blank; OWNER_PHON contact field deliberately not used.

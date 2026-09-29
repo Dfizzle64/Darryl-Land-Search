@@ -6,19 +6,28 @@
     "Birmingham",
     "Huntsville"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 14885,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "al-cullman-parcels-01043",
+  "queryUrl": "https://al25portal.kcsgis.com/al25server/rest/services/Cullman_Public_ISV/MapServer/107/query",
   "gaps": [
-    "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+    "Source query returned 15679 rows; 14885 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcels (Cullman Public ISV — CAMA join) (https://al25portal.kcsgis.com/al25server/rest/services/Cullman_Public_ISV/MapServer/107). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "No lastSale.price (deed book/page/date only)",
+    "Countywide unincorporated zoning not published; city Cullman zoning only (layer 116)",
+    "FLU not on county Public ISV this pass"
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/01043/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01043/lookup.json",
+  "sourceCount": 15679,
+  "dropped": 0,
+  "tileCount": 10,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://cullmanproperty.countygovservices.com/Property/Summary?taxyear=2026&ppin={PIN}",
+  "gisViewerUrl": "https://isv.kcsgis.com/al.cullman_revenue/"
 }

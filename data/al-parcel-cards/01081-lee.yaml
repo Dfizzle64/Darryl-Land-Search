@@ -1,0 +1,174 @@
+state: AL
+jurisdiction: Lee County
+fips: 01081
+level: county
+markets:
+- Auburn-Opelika
+layers:
+- role: parcels
+  name: LeeCountyTaxParcels (Lee County AL hosted feature layer, CAMA join)
+  restUrl: https://services5.arcgis.com/swomwLs3iGyK80EW/arcgis/rest/services/LeeCountyTaxParcels/FeatureServer/9
+  layerId: 9
+  geometry: polygon
+  auth: none
+  acreageField: Calc_Acres
+  coverage: county-wide
+  fieldMap:
+    Parcel_k_1: parcelIdKey (16-digit, deep-link parcelnum)
+    GISKEY: parcelId
+    ACCOUNT_NO: parcelIdAlt
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILING1: mailingAddress.line1
+    MAILING2: mailingAddress.line2
+    MAILING3: mailingAddress.line3
+    P_ADDRESS1: situsAddress
+    Calc_Acres: acreage
+    TOTALLAND: tax.landValue
+    TOTALBLDG: tax.improvementValue
+    TOTALVALUE: tax.marketValue
+    TaxDistDes: tax.district
+    DEEDDATE: lastSale.date
+    SALESYEAR: lastSale.saleDate
+    SALEPRICE: lastSale.price
+    DEEDBOOK: lastSale.deedBook
+    DEEDPAGE: lastSale.deedPage
+    NEIGHNAME: neighborhood
+    SUBNAME: subdivision
+    CAMALink: appraiserUrl
+  notes: 'Verified live 2026-09-28: public AGOL item (Lee County AL org services5 swomwLs3iGyK80EW, same org as the county''s ElectionDistricts/ZoningDistrict services used by leeco.us), anonymous query,
+    count 74994, polygon, last edit mid-2026. Sample centroid -85.14,32.70 (Smiths Station, Lee County AL; COUNTYNAME=Lee, not Lee FL/SC/GA/VA). Values, deed date and sale price are TEXT fields (cast before
+    math). The companion _view service exposes only OWNER/DEEDBOOK/DEEDPAGE. Found from the org service list after leeco.us GIS links. Wrong-state traps skipped: Lee County FL (LeeCountyFLGIS), Lee County
+    VA.'
+  status: usable
+- role: zoning
+  name: City of Auburn zoning
+  restUrl: https://gisportal.auburnalabama.org/server/rest/services/PublicServices/COAMap/MapServer/17
+  layerId: 17
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: City of Auburn only
+  fieldMap:
+    Zone_Type: zoningCode
+    Description: zoningDescription
+    Ordinance: ordinance
+  notes: 'Verified 2026-09-28: 1833 polygons, anonymous. Same service also has Zoning Overlay/16 and a city-area Parcels/37 (33666, owner/values/deed but not county-wide).'
+  status: usable
+- role: zoning
+  name: City of Opelika zoning (UseZones)
+  restUrl: https://services7.arcgis.com/rJ3cjDyDh65fslIZ/arcgis/rest/services/Opelika_GIS_WFL1/FeatureServer/14
+  layerId: 14
+  geometry: polygon
+  auth: none
+  acreageField: Acres
+  coverage: City of Opelika only
+  fieldMap:
+    ZONING: zoningCode
+  notes: 'Verified 2026-09-28: 20 polygons (dissolved by zone code, e.g. R1, R2), anonymous; owner OpelikaGIS AGOL org. Coarse, with no ordinance/date fields.'
+  status: usable
+- role: zoning
+  name: Lee County zoning districts (county-administered areas)
+  restUrl: https://services5.arcgis.com/swomwLs3iGyK80EW/arcgis/rest/services/ZoningDistrict_Public/FeatureServer/0
+  layerId: 0
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: partial (county-zoned areas only)
+  fieldMap:
+    ZONECLASS: zoningCode
+    ZONEDESC: zoningDescription
+  notes: 'Verified 2026-09-28: 1693 polygons; classes CR/OP/RC/RP only.'
+  status: partial
+gaps:
+- No assessed value or tax due in the parcel layer
+- Deep link (altags Lee PropertyPage) is login-gated
+license: Lee County, Alabama public GIS; use-at-own-risk
+appraiserSearchUrl: null
+appraiserSearchUrlAlt: https://www.leecountyrevenuecommissioner.com/
+jurisdictionGisUrl: https://lee.alabamagis.com/lee/
+ruralOz2:
+  status: not a rural OZ 2.0 candidate county
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+enrichment:
+  aadt:
+    source: ALDOT TDM Public (TrafficCounterPoint)
+    restUrl: https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0
+    layerId: 0
+    field: AADT
+    yearField: YearAADT
+    year: 2024
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    luCountyId: 41
+    countyWhere: YearAADT=2024 AND LUCountyID=41 AND AADT>0
+    stations2024: 736
+    verifiedAt: '2026-09-28'
+    verifiedBy: Alabama Public Info Researcher
+    notes: LUCountyID=41 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 736 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID,
+      fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/.
+
+pass2Statewide2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://services5.arcgis.com/swomwLs3iGyK80EW/arcgis/rest/services/LeeCountyTaxParcels/FeatureServer/9
+  featureCount: 74994
+  taxSaleOwner:
+    ownerName:
+      field: OWNER
+      status: usable
+    assessedValue:
+      field: null
+      status: gap
+      livesAt: Lee County Revenue Commissioner (https://www.leecountyrevenuecommissioner.com/) / login-gated altags page
+    appraisedOrMarketValue:
+      field: TOTALVALUE
+      status: usable (text field)
+      nonNullOrPositiveCount: 73291
+      ofTotal: 74994
+    landValue:
+      field: TOTALLAND
+      status: usable
+    improvementValue:
+      field: TOTALBLDG
+      status: usable
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: Lee County Revenue Commissioner (https://www.leecountyrevenuecommissioner.com/) / login-gated altags page
+    lastSaleDate:
+      field: DEEDDATE
+      status: usable (text m/d/yyyy; SALESYEAR holds the sale date as text too)
+      nonNullOrPositiveCount: 73736
+      ofTotal: 74994
+    lastSalePrice:
+      field: SALEPRICE
+      status: usable (text field)
+      nonNullOrPositiveCount: 62421
+      ofTotal: 74994
+    ownerEntityType:
+      derivable: true
+      sourceField: OWNER
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 9499
+        INC: 2487
+        TRUST: 1661
+        CORP: 207
+        CHURCH: 351
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://www.altags.com/lee/PropertyPage.aspx?parcelnum={PIN}&taxyear=2027&autologin=true
+    pinField: Parcel_k_1 (16-digit parcel; also in layer field Link)
+    testPin: '0105210000175000'
+    verified: no (login-gated)
+    method: Pattern taken from the layer's own CAMALink field; the external fetcher got an altags 'Login Page' both with and without autologin=true (the box gets TLS EOF from altags.com)
+    note: Not a public GET deep link, so the top-level appraiserSearchUrl is left null. The Revenue Commissioner site https://www.leecountyrevenuecommissioner.com/ is a hash-routed SPA and was not mapped.
+  jurisdictionGisUrl:
+    url: https://lee.alabamagis.com/lee/
+    http: 200
+  notes: Counts for text fields exclude '0'/blank. No assessed value or tax due in the layer.

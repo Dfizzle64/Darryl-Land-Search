@@ -1,0 +1,169 @@
+state: AL
+jurisdiction: Autauga County
+fips: "01001"
+level: county
+markets: [Montgomery]
+
+layers:
+  - role: parcels
+    name: Autauga_Parcels (Prattville AGOL hosted — owner/tax rich)
+    restUrl: "https://services1.arcgis.com/fWUhmUATXl9W5CJW/arcgis/rest/services/Autauga_Parcels/FeatureServer/0"
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      PARCEL_NUMBER: parcelIdAlt
+      OWNER_NAME1: ownerName
+      MAILING_ADDRESS1: mailingAddress.street
+      MAILING_CITY: mailingAddress.city
+      MAILING_STATE: mailingAddress.state
+      MAILING_ZIP: mailingAddress.zip
+      PROPERTY_ADDRESS1: situsAddress
+      CALC_ACRE: acreage
+      TOTAL_LAND_VALUE: tax.landValue
+      TOTAL_IMP__VALUE: tax.improvementValue
+      TOTAL_VALUE: tax.marketValue
+      ASSD_VALUE: tax.assessedValue
+      MUNICIPALITY_CODE: municipalityCode
+    notes: >
+      Verified 2026-09-23: HTTP 200 + count 33726. Hosted on City of Prattville AGOL
+      org fWUhmUATXl9W5CJW but attributes are Autauga CAMA (owner/mail/values).
+      Prefer over county Ering geometry-only. Autauga_Parcel_24 similar (33503).
+      CaptureCAMA HTML: https://autauga.capturecama.com/parcelviewer
+    status: usable
+
+  - role: parcels
+    name: Parcel (Autauga County EringMapServiceFS — geometry)
+    restUrl: "https://autaugagis.autauga.com/arcgis/rest/services/Mapping/EringMapServiceFS/MapServer/185"
+    layerId: 185
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      PID2: parcelIdAlt
+      CALC_ACRE: acreage
+    notes: >
+      Verified 2026-09-23 via curl -k (county SSL cert chain incomplete): count 33992.
+      Geometry + PARCELID/CALC_ACRE only — no owner/tax. Use as official boundary
+      fallback; prefer Autauga_Parcels AGOL for attributes.
+    status: partial
+
+  - role: zoning
+    name: Unincorporated Autauga County zoning (none — plat/subdivision only)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Verified 2026-09-24: autaugagis.autauga.com folders (Mapping/APV/Hosted/etc.) have no
+      Zoning service; county Property Development page covers plat/subdivision review only.
+      Municipal zoning inside Prattville: 01001-city-prattville (partial ZONING_JULY_2017).
+      Unincorporated = true zoning gap.
+    status: gap
+
+gaps:
+  - Unincorporated Autauga: no county zoning REST (plat/subdivision only; Prattville municipal partial)
+  - No sale price on Autauga_Parcels
+  - Official county server needs insecure SSL workaround; AGOL mirror preferred
+  - No Autauga county zoning REST; municipal zoning via Prattville card inside city
+
+license: "Autauga County GIS / Prattville AGOL mirror of Autauga parcels; CaptureCAMA HTML also available"
+appraiserSearchUrl: "https://autauga.capturecama.com/mapparceldetail/{PIN}"
+jurisdictionGisUrl: "https://autauga.capturecama.com/parcelviewer/"
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    luCountyId: 1
+    year: 2024
+    countyWhere: "YearAADT=2024 AND LUCountyID=1 AND AADT>0"
+    stations2024: 264
+    countyCheckedAt: "2026-09-28"
+    countyNote: "LUCountyID=1 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 264 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location."
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "Official ALDOT EGISATDServices/TDMPublic MapServer; ~282482 multi-year points (YearAADT 2014–2025). Latest usable AADT year=2024 (~22009 with AADT>0; 2025 shells exist but AADT still null as of 2026-09-24). Filter YearAADT=2024; optional LUCountyID (1–67 alpha county index, e.g. Autauga=1 Jefferson=37 Madison=45). Companion YearAADT field. Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/. Dig: enrichment/AL/aadt-aldot-2026-09-24.md"
+
+pass1RuralOz2026_09_28:
+  parcelRestUrl: https://services1.arcgis.com/fWUhmUATXl9W5CJW/arcgis/rest/services/Autauga_Parcels/FeatureServer/0
+  parcelIdField: PARCELID
+  featureCount: 33726
+  note: >
+    Batch 3 closing re-verify 2026-09-28: live count 33726, 1-feature query with polygon geometry OK (sample vertex [-86.43,32.46]), parcel ID field PARCELID present. No field changes checked beyond ID.
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://services1.arcgis.com/fWUhmUATXl9W5CJW/arcgis/rest/services/Autauga_Parcels/FeatureServer/0
+  featureCount: 33726
+  taxSaleOwner:
+    ownerName:
+      field: OWNER_NAME1
+      status: usable
+    assessedValue:
+      field: ASSD_VALUE
+      status: usable
+      nonNullOrPositiveCount: 32101
+      ofTotal: 33726
+    appraisedOrMarketValue:
+      field: TOTAL_VALUE
+      status: usable
+      nonNullOrPositiveCount: 32103
+      ofTotal: 33726
+    landValue:
+      field: TOTAL_LAND_VALUE
+      status: usable
+    improvementValue:
+      field: TOTAL_IMP__VALUE
+      status: usable
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://autauga.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    lastSaleDate:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://autauga.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://autauga.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    ownerEntityType:
+      derivable: true
+      sourceField: OWNER_NAME1
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 2419
+        INC: 520
+        TRUST: 298
+        CORP: 87
+        CHURCH: 250
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://autauga.capturecama.com/mapparceldetail/{PIN}
+    pinField: PARCELID
+    testPin: '19011130000010000'
+    verified: browser-only (not rendered this run)
+    method: 'plain fetch 200 but React SPA shell (Citizen Access Portal, empty #root); same CaptureCAMA mapparceldetail pattern as Dallas/Bullock'
+    note: Not rendered in a browser this run; content not confirmed.
+  jurisdictionGisUrl:
+    url: https://autauga.capturecama.com/parcelviewer/
+    http: null
+  notes: Previous appraiserSearchUrl was the parcel viewer (no PIN); it moved to jurisdictionGisUrl.

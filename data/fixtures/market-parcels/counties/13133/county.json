@@ -1,0 +1,32 @@
+{
+  "name": "Greene",
+  "fips": "13133",
+  "state": "Georgia",
+  "markets": [
+    "Athens"
+  ],
+  "featureCount": 3009,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-greene-parcels-13133",
+  "queryUrl": "https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Parcel_Regions_w_WinGAP_view/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are Parcel_Regions_w_WinGAP_view (GreeneBOC) (https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Parcel_Regions_w_WinGAP_view/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+    "WinGAP a_value is stored as land value. It is not the 40 percent assessed amount, and mavcurr is empty, so assessed value stays blank.",
+    "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+    "Pass 2 sale date and price are HTML-only and were not copied.",
+    "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13133/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13133/lookup.json",
+  "sourceCount": 3009,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=greeneCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://www.arcgis.com/apps/mapviewer/index.html?webmap=fc8ff118a56a4753b3af080b26fa5caa",
+  "pulledOn": "2026-09-29"
+}

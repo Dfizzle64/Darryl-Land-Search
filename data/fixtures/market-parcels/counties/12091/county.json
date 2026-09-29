@@ -20,7 +20,9 @@
     "Fort Walton Beach zoning is gis.fwb.org Maps/Zoning/0. FLU prefers Maps/FLU/0 and falls back to the FLU attributes on the zoning layer.",
     "Crestview, Niceville, Valparaiso, Mary Esther, Laurel Hill, Cinco Bayou, and Shalimar have no verified public city FeatureServer this pass. Unincorporated county codes are not copied onto those cities.",
     "Appraiser link is the Okaloosa PA portal. The layer does not publish a verified per-parcel URL. Search uses PATPCL_PIN.",
-    "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077)."
+    "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077).",
+    "FDOR joins need CO_NO=56 and PATPCL_PIN with '-' removed. PATPCL_STRAP is a different key and is not the FDOR id.",
+    "Sale dates after the load date are cleared. Owner phone and email are not ingested."
   ],
   "path": "data/fixtures/market-parcels/counties/12091/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12091/lookup.json",
@@ -32,5 +34,8 @@
   "salePriceCount": 9562,
   "saleDateCount": 9749,
   "situsCount": 0,
-  "ownerCount": 9956
+  "ownerCount": 9956,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=855&LayerID=15999&PageTypeID=4&KeyValue={id}",
+  "gisViewerUrl": "https://webgis.myokaloosa.com/webgis/"
 }

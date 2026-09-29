@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-28T22:27:33Z",
+  "generatedAt": "2026-09-29T00:00:42Z",
   "market": "Pensacola",
   "tier": "other",
-  "parcelCount": 66434,
+  "parcelCount": 66437,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -30,7 +30,7 @@
       "gaps": [
         "17989 source rows collapsed to 17987 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county.",
         "Municipal join: Daphne zoning 294 (key 293, spatial 1); Fairhope zoning 184 (key 177, spatial 7); Baldwin County Zoning/42 baseline 6991; Fairhope AO/MO overlay enrichment 156 parcels (overlay names are not zoning codes); Daphne FLU 668 (key 621, spatial 47); Daphne cleared county Zoning/42 on 288 parcels that only matched the city FLU layer.",
-        "Baldwin County parcels are web6 Baldwin_Public_ISV/MapServer/31. Acreage is CalcAcre, inclusive 5–150. The al05baldrevenue Baldwin/Public URL is not used.",
+        "Baldwin County parcels are web6 Baldwin_Public_ISV/MapServer/31. Acreage is CalcAcre, inclusive 5\u2013150. The al05baldrevenue Baldwin/Public URL is not used.",
         "Parcel ZoningCode is usually empty. County Zoning/42 (ZONE_1) is the unincorporated baseline and is replaced inside Daphne and Fairhope.",
         "Daphne zoning is Zoning_Current_view FeatureServer/0. Class is the zoning code (R1, B2, PUD). The Zoning field is the long label. Join is PID, PIN, or PARCELID, then centroid. Coverage is city-only.",
         "Daphne FLU is Placetypes_for_Future_Development_APRIL_2026 FeatureServer/2 field Future_Dev. Land_Use is the label. The older Envision_Placetype_Map layer is not used. Overlays_view is not base zoning.",
@@ -49,28 +49,23 @@
       "name": "Bay",
       "fips": "12005",
       "state": "Florida",
-      "featureCount": 4861,
+      "featureCount": 4863,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-panhandle-12005",
-      "queryUrl": "https://gis.baycountyfl.gov/arcgis/rest/services/Hosted/Parcels/FeatureServer/0/query",
+      "source": "fl-bay-test-parcels-12005",
+      "queryUrl": "https://gis.baycountyfl.gov/arcgis/rest/services/TEST_Parcels/FeatureServer/1/query",
       "gaps": [
-        "Joined zoning on 4768 of 4861 parcels and FLU on 4777. Owner 4861, situs 4861, sale price 4083, sale date 4363.",
-        "5667 source rows became 4861 parcel ids. 830 split pieces with a new shape were merged. 2 repeated rows with the same polygon (stacked units or duplicate ids) were collapsed to one feature. Acreage and tax values are not summed across those rows. Rows that failed the WGS84 or county-extent check were dropped.",
-        "Official zoning and FLU come from LandUsePlanning MapServer 1 and 2 (spatial). Parcel zoning/flu attributes are often null and are not used.",
-        "Panama City Beach uses city Land_Use_and_Zoning FeatureServer 47 (zoning) and 49 (FLU) when the centroid hits those polygons; otherwise SUB_ZONING on the county layer (1 Bay County, 2 Callaway, 3 Lynn Haven, 4 Mexico Beach, 5 Panama City, 6 Panama City Beach). PCB zoning hits 264, county zoning hits 5267.",
-        "Parker and Springfield have no dedicated city REST this pass. They are not separate SUB_ZONING codes. A parcel there keeps the county multi-jurisdiction district only when that polygon intersects it.",
-        "Situs on rural samples is often legal or acre text (dsiteaddr), not a street address. The field is still the published situs.",
-        "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077)."
+        "5800 rows matched the acreage filter; 4863 kept after the parcel-id and geometry checks.",
+        "Bay parcels are TEST_Parcels/FeatureServer/1 (DTAXACRES 5.0\u2013150.0). The layer is queried only; it advertises public edits and is not written. Hosted/Parcels is the 2022 snapshot and is not this extract.",
+        "FDOR joins need CO_NO=13 and A1RENUM with '-' removed. No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 4499 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12005/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12005/lookup.json",
       "tileCount": 8,
-      "sourceCount": 5667,
-      "zoningJoinedCount": 4768,
-      "fluJoinedCount": 4777
+      "sourceCount": 5800
     },
     {
       "name": "Escambia",
@@ -95,9 +90,7 @@
       "path": "data/fixtures/market-parcels/counties/12033/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12033/lookup.json",
       "tileCount": 9,
-      "sourceCount": 9240,
-      "zoningJoinedCount": 8487,
-      "fluJoinedCount": 8487
+      "sourceCount": 9240
     },
     {
       "name": "Holmes",
@@ -111,7 +104,7 @@
       "source": "fl-holmes-taxparcels-12059",
       "queryUrl": "https://services.arcgis.com/yghUoIoA2Cd2cWki/arcgis/rest/services/Holmes_Parcels/FeatureServer/0/query",
       "gaps": [
-        "Holmes TaxParcels (Holmes_Parcels/0). Acreage is Gis_Acres, 5.0–150.0 inclusive. The id is PARCELNO.",
+        "Holmes TaxParcels (Holmes_Parcels/0). Acreage is Gis_Acres, 5.0\u2013150.0 inclusive. The id is PARCELNO.",
         "Owner is not on this layer. The Panda maintenance-request layer is not this source and is not ingested.",
         "No Opportunity Zone status is stored. FDOR joins need CO_NO=40 and a PARCELNO with '.' and '-' removed."
       ],
@@ -139,14 +132,14 @@
         "Fort Walton Beach zoning is gis.fwb.org Maps/Zoning/0. FLU prefers Maps/FLU/0 and falls back to the FLU attributes on the zoning layer.",
         "Crestview, Niceville, Valparaiso, Mary Esther, Laurel Hill, Cinco Bayou, and Shalimar have no verified public city FeatureServer this pass. Unincorporated county codes are not copied onto those cities.",
         "Appraiser link is the Okaloosa PA portal. The layer does not publish a verified per-parcel URL. Search uses PATPCL_PIN.",
-        "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077)."
+        "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077).",
+        "FDOR joins need CO_NO=56 and PATPCL_PIN with '-' removed. PATPCL_STRAP is a different key and is not the FDOR id.",
+        "Sale dates after the load date are cleared. Owner phone and email are not ingested."
       ],
       "path": "data/fixtures/market-parcels/counties/12091/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12091/lookup.json",
       "tileCount": 9,
-      "sourceCount": 9956,
-      "zoningJoinedCount": 9449,
-      "fluJoinedCount": 9470
+      "sourceCount": 9956
     },
     {
       "name": "Santa Rosa",
@@ -171,45 +164,36 @@
         "Pace and Navarre Beach are not separate cities on this card.",
         "Appraiser link is https://srcpa.gov/search. No verified per-parcel deep link is on the layer. Search uses ParNum.",
         "Mailing city/state/zip are parsed from MailingCityStZip. The combined MailingAddr blob repeats the owner name and is not stored.",
-        "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077)."
+        "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077).",
+        "Santa Rosa Basemap/1 is one row per address. The extract is deduped on Parcel. Acreage 5.0\u2013150.0 is the distinct Parcel count.",
+        "FDOR joins need CO_NO=67 and the dashed Parcel. ParNum with the dashes removed does not match. The field named ParcelID is the object id and is not the parcel id."
       ],
       "path": "data/fixtures/market-parcels/counties/12113/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12113/lookup.json",
       "tileCount": 8,
-      "sourceCount": 16194,
-      "zoningJoinedCount": 8901,
-      "fluJoinedCount": 8900
+      "sourceCount": 16194
     },
     {
       "name": "Walton",
       "fips": "12131",
       "state": "Florida",
-      "featureCount": 8930,
+      "featureCount": 8931,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-panhandle-12131",
+      "source": "fl-walton-energov-12131",
       "queryUrl": "https://services1.arcgis.com/TaXHPwWfIMuzJ7Ov/arcgis/rest/services/EnerGov/FeatureServer/4/query",
       "gaps": [
-        "Joined zoning on 8801 of 8930 parcels and FLU on 8867. Owner 8852, situs 0, sale price 0, sale date 8492.",
-        "9632 source rows became 8930 parcel ids. 756 split pieces with a new shape were merged. 18 repeated rows with the same polygon (stacked units or duplicate ids) were collapsed to one feature. Acreage and tax values are not summed across those rows. Rows that failed the WGS84 or county-extent check were dropped.",
-        "Situs is a gap on EnerGov Parcels/4. Sale price is a gap (SALE_DATE_1 only; book/page is not a price and is not stored).",
-        "County EnerGov zoning/19 (ZONE_CLASS) and FLU/15 (FLU_TYPE code, FLU_CLASS label) apply outside city limits. DeFuniak Springs, Freeport, and Paxton use city layers. County districts are not applied inside those cities. Hits: county 8956, DeFuniak Springs 208, Freeport 335, Paxton 83.",
-        "DeFuniak Springs zoning and FLU join on PARCELNO (WeeklyUpdatesDFS/7 and /6), with a spatial fallback on the same city layers.",
-        "Freeport zoning (WeeklyUpdatesFreeport/7) is numeric and Description was blank on the samples. Observed zoning codes in this extract: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12. Do not treat the number as a named district until the city LDC legend is confirmed.",
-        "Freeport FLU (WeeklyUpdatesFreeport/6) Land_Use was numeric and Description was blank on first ingest. Observed Land_Use codes: 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12. The code is stored. No legend was invented.",
-        "Paxton FLU is WeeklyUpdatesPaxton/6 (FLU_CLASS). SubType is numeric and is not expanded into a name. Paxton zoning is a gap.",
-        "A Monroe County layer titled Walton County Tax Parcels was rejected as wrong geography.",
-        "Appraiser link is the Walton PA portal. No verified per-parcel deep link is on the layer. Search uses PARCELNO.",
-        "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077)."
+        "9623 rows matched the acreage filter; 8931 kept after the parcel-id and geometry checks.",
+        "Walton parcels are EnerGov/FeatureServer/4. Acreage is GIS_ACRES, 5.0\u2013150.0 inclusive. The object id field is OBJECTID_1.",
+        "FDOR joins need CO_NO=76 and PARCELNO with '-' removed. Sale price is the FDOR roll price. Sale dates after the load date are cleared. No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 8888 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12131/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12131/lookup.json",
       "tileCount": 8,
-      "sourceCount": 9632,
-      "zoningJoinedCount": 8801,
-      "fluJoinedCount": 8867
+      "sourceCount": 9623
     }
   ]
 }

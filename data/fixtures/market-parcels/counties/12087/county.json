@@ -19,11 +19,17 @@
     "City zoning (Key West, Marathon, and the other municipalities) was not inventoried. County Land Use Districts and the FLUM are the joined layers.",
     "maps.monroecounty.gov Hosted Parcels_Public is Monroe County, New York, and was not used.",
     "Monroe TLS verification failed. Ingest used the documented certificate fallback for mcgis4.monroecounty-fl.gov.",
-    "Monroe zoning joined 5473/6492. FLUM joined 6273/6492."
+    "Monroe zoning joined 5473/6492. FLUM joined 6273/6492.",
+    "Monroe is mcgis4 Parcels/MapServer/0. The host sends only the leaf certificate, so reads use the pinned DigiCert Global G2 TLS RSA SHA256 2020 CA1 intermediate in scripts/certs. An unverified TLS context is not used.",
+    "FDOR joins need CO_NO=54 and PARCEL_ID = SEC+TWP+' '+RNG+' '+RECHAR with '-' removed from RECHAR. Acreage is the polygon area, 5.0\u2013150.0 inclusive. Shape.STArea() is rejected in the where clause, and AREA1 is not the stored acreage.",
+    "Monroe parcel count on mcgis4 with the pinned DigiCert intermediate was 89422. The 5.0\u2013150.0 acre extract is the polygon-area shelf already on this county."
   ],
   "path": "data/fixtures/market-parcels/counties/12087/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12087/lookup.json",
   "sourceCount": 6492,
   "dropped": 0,
-  "tileCount": 22
+  "tileCount": 22,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=605&LayerID=9946&PageTypeID=4&PageID=7635&KeyValue={id}",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/258386d78ff64749be0acbfdb81d3e85"
 }

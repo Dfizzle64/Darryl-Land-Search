@@ -53,11 +53,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Raleigh-Durham | primary | 151,530 | 17 | 0 | 0 |
 | South Florida | shelf | 41,693 | 3 | 1 | 0 |
 | SWFL | other | 32,749 | 4 | 0 | 0 |
-| Vero Beach | other | 23,009 | 5 | 0 | 0 |
+| Vero Beach | other | 23,480 | 5 | 0 | 0 |
 | Melbourne | other | 41,026 | 5 | 0 | 0 |
 | Jacksonville | other | 26,878 | 5 | 0 | 0 |
-| Big Bend | other | 35,793 | 4 | 3 | 0 |
-| Pensacola | other | 66,434 | 7 | 0 | 0 |
+| Big Bend | other | 53,214 | 8 | 2 | 0 |
+| Pensacola | other | 66,437 | 7 | 0 | 0 |
 | Birmingham | other | 38,101 | 3 | 0 | 6 |
 | Mobile | other | 42,446 | 3 | 0 | 2 |
 | Huntsville | other | 29,598 | 4 | 0 | 3 |
@@ -71,7 +71,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Winston-Salem | other | 92,199 | 9 | 0 | 0 |
 | Wilmington | other | 47,320 | 6 | 0 | 0 |
 | Heartland | shelf | 21,163 | 4 | 1 | 0 |
-| North-Central Florida | other | 94,271 | 12 | 0 | 0 |
+| North-Central Florida | other | 103,358 | 13 | 0 | 0 |
 | Asheville | other | 16,793 | 2 | 0 | 0 |
 | Tuscaloosa | other | 11,596 | 1 | 0 | 3 |
 | Montgomery | other | 26,759 | 3 | 0 | 1 |
@@ -241,7 +241,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Brevard | Florida | 12009 | complete-gte-5ac | 6,802 | fl-brevard-accela-12009 |
 | Indian River | Florida | 12061 | complete-gte-5ac | 3,779 | fl-ircpa-parcels-12061 |
 | Martin | Florida | 12085 | complete-gte-5ac | 3,790 | fl-martin-geoweb-12085 |
-| Okeechobee | Florida | 12093 | complete-gte-5ac | 3,053 | fl-okeechobee-planning-12093 |
+| Okeechobee | Florida | 12093 | complete-gte-5ac | 3,524 | fl-okeechobee-tyler-12093 |
 | St. Lucie | Florida | 12111 | complete-gte-5ac | 5,585 | fl-slc-parcels-12111 |
 
 ### Melbourne
@@ -268,10 +268,13 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Calhoun | Florida | 12013 | complete-gte-5ac | 4,121 | fl-fdor-cadastral-2025-12013 |
 | Dixie | Florida | 12029 | complete-gte-5ac | 3,251 | fl-srwmd-parcels-12029 |
-| Gadsden | Florida | 12039 | sample | 5,917 | fl-gadsden-arpc-par-071218-12039 |
+| Gadsden | Florida | 12039 | complete-gte-5ac | 6,170 | fl-fdor-cadastral-2025-12039 |
+| Jackson | Florida | 12063 | complete-gte-5ac | 11,461 | fl-fdor-cadastral-2025-12063 |
 | Jefferson | Florida | 12065 | sample | 5,165 | fl-jefferson-pa-parcels-12065 |
 | Leon | Florida | 12073 | complete-gte-5ac | 5,685 | fl-leon-overlay-parcel-12073 |
+| Liberty | Florida | 12077 | complete-gte-5ac | 1,586 | fl-fdor-cadastral-2025-12077 |
 | Madison | Florida | 12079 | complete-gte-5ac | 7,178 | fl-srwmd-parcels-12079 |
 | Taylor | Florida | 12123 | complete-gte-5ac | 3,813 | fl-srwmd-parcels-12123 |
 | Wakulla | Florida | 12129 | sample | 4,784 | fl-wakulla-county-parcels-12129 |
@@ -281,12 +284,12 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Baldwin | Alabama | 01003 | complete-gte-5ac | 17,987 | al-baldwin-public-isv |
-| Bay | Florida | 12005 | complete-gte-5ac | 4,861 | fl-panhandle-12005 |
+| Bay | Florida | 12005 | complete-gte-5ac | 4,863 | fl-bay-test-parcels-12005 |
 | Escambia | Florida | 12033 | complete-gte-5ac | 9,240 | fl-panhandle-12033 |
 | Holmes | Florida | 12059 | complete-gte-5ac | 6,532 | fl-holmes-taxparcels-12059 |
 | Okaloosa | Florida | 12091 | complete-gte-5ac | 9,956 | fl-panhandle-12091 |
 | Santa Rosa | Florida | 12113 | complete-gte-5ac | 8,928 | fl-panhandle-12113 |
-| Walton | Florida | 12131 | complete-gte-5ac | 8,930 | fl-panhandle-12131 |
+| Walton | Florida | 12131 | complete-gte-5ac | 8,931 | fl-walton-energov-12131 |
 
 ### Birmingham
 
@@ -465,13 +468,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Alachua | Florida | 12001 | complete-gte-5ac | 15,539 | fl-alachua-parcels35-12001 |
 | Bradford | Florida | 12007 | complete-gte-5ac | 3,292 | fl-srwmd-parcels-12007 |
 | Citrus | Florida | 12017 | complete-gte-5ac | 5,992 | fl-citrus-swfwmd-12017 |
+| Columbia | Florida | 12023 | complete-gte-5ac | 10,748 | fl-columbia-parcels-12023 |
 | Gilchrist | Florida | 12041 | complete-gte-5ac | 6,395 | fl-doh-ehwaters-12041 |
 | Hamilton | Florida | 12047 | complete-gte-5ac | 4,149 | fl-srwmd-parcels-12047 |
 | Hernando | Florida | 12053 | complete-gte-5ac | 6,601 | fl-hernando-parcels-12053 |
 | Lafayette | Florida | 12067 | complete-gte-5ac | 3,165 | fl-srwmd-parcels-12067 |
 | Levy | Florida | 12075 | complete-gte-5ac | 9,645 | fl-srwmd-parcels-12075 |
 | Marion | Florida | 12083 | complete-gte-5ac | 17,730 | fl-marion-parcels-12083 |
-| Putnam | Florida | 12107 | complete-gte-5ac | 7,560 | fl-putnam-doh-municipal-12107 |
+| Putnam | Florida | 12107 | complete-gte-5ac | 5,899 | fl-putnam-parcels-pa-12107 |
 | Suwannee | Florida | 12121 | complete-gte-5ac | 11,856 | fl-srwmd-parcels-12121 |
 | Union | Florida | 12125 | complete-gte-5ac | 2,347 | fl-srwmd-parcels-12125 |
 

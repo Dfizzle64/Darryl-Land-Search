@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-28T22:27:33Z",
+  "generatedAt": "2026-09-29T00:00:42Z",
   "market": "Heartland",
   "tier": "shelf",
   "parcelCount": 21163,
@@ -12,7 +12,7 @@
   },
   "notes": [
     "Loaded only when this market is selected.",
-    "Viewport tiles use the same 0.25° grid as Orlando (origin lon -83, lat 27).",
+    "Viewport tiles use the same 0.25\u00b0 grid as Orlando (origin lon -83, lat 27).",
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
@@ -53,7 +53,8 @@
         "Parcels are AGOL glades_parcels_2026_06_01. Acreage is the acreage field.",
         "Zoning (GladesCounty_Zoning_03192026 layer 4) and FLU (GladesCounty_FLU_03192026) are spatial. Neither layer has a parcel id.",
         "gis1.hcpao.org Glades MapServers were not used (query disabled).",
-        "Glades spatial join: zoning 2244/2256, FLU 2218/2256 (March 2026 layers)."
+        "Glades spatial join: zoning 2244/2256, FLU 2218/2256 (March 2026 layers).",
+        "FDOR joins need CO_NO=32 and PARCELNO with '-' removed. The dashed PARCELNO does not match FDOR."
       ],
       "path": "data/fixtures/market-parcels/counties/12043/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12043/lookup.json",
@@ -76,7 +77,9 @@
         "County zoning and future land use are a spatial intersect (no parcel id on those layers).",
         "Wauchula, Bowling Green, and Zolfo Springs zoning and FLU join on PARCEL / Parcel_Id when it matches PIN_DSP, otherwise by intersect. They do not cover unincorporated Hardee.",
         "InfoMap has the last situs and owner. It has no sale price or assessed value.",
-        "Hardee county spatial join: zoning 5188/5303, FLU 5297/5303. City override zoning 112, FLU 112 (Wauchula, Bowling Green, Zolfo Springs)."
+        "Hardee county spatial join: zoning 5188/5303, FLU 5297/5303. City override zoning 112, FLU 112 (Wauchula, Bowling Green, Zolfo Springs).",
+        "The parcel id is PIN_DSP. The field named PARCEL_ID is an HTML link and is not ingested.",
+        "FDOR joins need CO_NO=35 and PIN_DSP with '-' removed."
       ],
       "path": "data/fixtures/market-parcels/counties/12049/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12049/lookup.json",
@@ -98,7 +101,9 @@
         "Parcels are Parcels_Feb2024 (February 2024 vintage), not a later Hendry roll. Acreage is MAP_ACRES.",
         "County zoning is an attribute join on PIN / PARCELNO. Current_Zo values LABELLE and CLEWISTON are city names, not districts, and stay blank.",
         "Future land use is a spatial intersect. LaBelle city limits mark the city boundary only. No LaBelle zoning layer was joined.",
-        "Hendry Feb 2024 roll. Zoning attribute join 2575/3070. 152 city-name sentinels left blank. 121 parcels fall inside LaBelle city limits. FLU spatial 2902/3070."
+        "Hendry Feb 2024 roll. Zoning attribute join 2575/3070. 152 city-name sentinels left blank. 121 parcels fall inside LaBelle city limits. FLU spatial 2902/3070.",
+        "Hendry does not ingest SSN1, SSN2, SS1CD, SS2CD, or CONFD. Owner phone and email are not ingested.",
+        "FDOR joins need CO_NO=36 and PARCELNO exactly, including spaces, the dash, and the dot."
       ],
       "path": "data/fixtures/market-parcels/counties/12051/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12051/lookup.json",
@@ -117,10 +122,11 @@
       "source": "fl-highlands-pao-12055",
       "queryUrl": "https://gis.highlandsfl.gov/server/rest/services/Layers/PAO_Parcels/FeatureServer/0/query",
       "gaps": [
-        "Acreage is PAO Calculated_Acres, 5.0–150.0 inclusive. The root Parcels FeatureServer was not used (it is token-gated, not the public PAO layer).",
+        "Acreage is PAO Calculated_Acres, 5.0\u2013150.0 inclusive. The root Parcels FeatureServer was not used (it is token-gated, not the public PAO layer).",
         "County Zoning.ZON and FLUM.FLUM are attribute-joined on PARCELNO = STRAP_NUM. STRAP is not the zoning key.",
         "Sebring, Avon Park, and Lake Placid have no public city zoning REST. County zoning and FLUM are used inside those cities. City codes are not invented.",
-        "Highlands attribute join on PARCELNO: zoning 5163/5857, FLUM 5163/5857. 3993 parcels sit in Sebring, Avon Park, or Lake Placid and keep the county code."
+        "Highlands attribute join on PARCELNO: zoning 5163/5857, FLUM 5163/5857. 3993 parcels sit in Sebring, Avon Park, or Lake Placid and keep the county code.",
+        "FDOR joins need CO_NO=38 and PARCELNO exactly. STRAP is a different key and is only the property-appraiser link."
       ],
       "path": "data/fixtures/market-parcels/counties/12055/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12055/lookup.json",

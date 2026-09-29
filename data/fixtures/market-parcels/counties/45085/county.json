@@ -5,19 +5,27 @@
   "markets": [
     "Columbia"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 6759,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-sumter-parcels-45085",
+  "queryUrl": "https://gis.sumter-sc.com/server/rest/services/BaseMaps/Sumter_City_County/FeatureServer/7/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Source query returned 7347 rows; 6759 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcel (Sumter City/County) (https://gis.sumter-sc.com/server/rest/services/BaseMaps/Sumter_City_County/FeatureServer/7). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "Sale price/date not on parcel attributes; use qPublic WebURL / AppID 1154.",
+    "FLU separate layer not verified on dig day."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45085/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45085/lookup.json",
+  "sourceCount": 7347,
+  "dropped": 119,
+  "tileCount": 10,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=1154&LayerID=30904&PageTypeID=4&PageID=12534&KeyValue={parcelId}",
+  "gisViewerUrl": "https://sumtercity.maps.arcgis.com/apps/webappviewer/index.html?id=aa383018b7d847deaf23163aedf70704"
 }

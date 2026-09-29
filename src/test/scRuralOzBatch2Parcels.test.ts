@@ -101,8 +101,13 @@ describe("South Carolina rural OZ batch 2 parcels", () => {
     }
   });
 
-  it("leaves Sumter and Calhoun unloaded and keeps Lexington and Spartanburg", () => {
-    expect(countyFile("45085")).toMatchObject({ coverage: "gap", featureCount: 0 });
+  it("leaves Calhoun unloaded, keeps Lexington and Spartanburg, and records the later Sumter retry", () => {
+    expect(countyFile("45085")).toMatchObject({
+      source: "sc-sumter-parcels-45085",
+      coverage: "complete-gte-5ac",
+      featureCount: 6759,
+      markets: ["Columbia"],
+    });
     expect(countyFile("45017")).toMatchObject({ coverage: "gap", featureCount: 0 });
     expect(countyFile("45063")).toMatchObject({
       source: "sc-lexington-property-4",

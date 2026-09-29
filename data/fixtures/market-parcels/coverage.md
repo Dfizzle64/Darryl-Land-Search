@@ -23,7 +23,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Mobile | other | 51,658 | 4 | 0 | 2 |
 | Huntsville | other | 132,496 | 16 | 0 | 0 |
 | Savannah | other | 62,356 | 18 | 0 | 0 |
-| Columbia | other | 96,799 | 12 | 0 | 2 |
+| Columbia | other | 103,558 | 13 | 0 | 1 |
 | Greenville | other | 91,872 | 10 | 0 | 0 |
 | Chattanooga | other | 76,655 | 15 | 0 | 1 |
 | Knoxville | other | 146,507 | 26 | 0 | 0 |
@@ -395,7 +395,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Orangeburg | South Carolina | 45075 | complete-gte-5ac | 12,608 | sc-orangeburg-parcels-45075 |
 | Richland | South Carolina | 45079 | complete-gte-5ac | 8,677 | sc-richland-parcels-45079 |
 | Saluda | South Carolina | 45081 | complete-gte-5ac | 5,735 | sc-saluda-parcels-45081 |
-| Sumter | South Carolina | 45085 | gap | 0 | unavailable |
+| Sumter | South Carolina | 45085 | complete-gte-5ac | 6,759 | sc-sumter-parcels-45085 |
 
 ### Greenville
 

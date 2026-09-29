@@ -1,0 +1,29 @@
+{
+  "name": "Clay",
+  "fips": "13061",
+  "state": "Georgia",
+  "markets": [
+    "Macon"
+  ],
+  "featureCount": 729,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-clay-parcels-13061",
+  "queryUrl": "https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Clay_County_Parcels_10_23/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are Clay_County_Parcels_10_23 Parcel_Regions_w_WinGAP — RVRC_ELA FeatureServer (https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Clay_County_Parcels_10_23/FeatureServer/0). Published acreage is filtered to 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Pass 2 enrichment is from rural-oz-pass2 csv (tax REST, sale HTML-only, owner REST). GDOT AADT stays the query-time statewide join.",
+    "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+    "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13061/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13061/lookup.json",
+  "sourceCount": 729,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=clayCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://garc.maps.arcgis.com/apps/webappviewer/index.html?id=603ec184e56e4d07b16939aa1f660e89"
+}

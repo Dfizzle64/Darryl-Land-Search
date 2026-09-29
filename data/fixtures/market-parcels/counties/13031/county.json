@@ -5,19 +5,27 @@
   "markets": [
     "Savannah"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 8833,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "ga-bulloch-parcels-13031",
+  "queryUrl": "https://services6.arcgis.com/XxfLDid4CNOqpdhy/arcgis/rest/services/Bullochparcels_CAMA/FeatureServer/1189/query",
   "gaps": [
-    "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+    "Parcels are Bullochparcels_CAMA (official Bulloch GIS AGOL — owner cbrown72) (https://services6.arcgis.com/XxfLDid4CNOqpdhy/arcgis/rest/services/Bullochparcels_CAMA/FeatureServer/1189). Published acreage is filtered to 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 9617 rows; 8833 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+    "Pass 2 enrichment is from rural-oz-pass2 csv (tax HTML-only, sale HTML-only, owner REST). GDOT AADT stays the query-time statewide join.",
+    "Pass 2 tax is HTML-only. qPublic was not requested, and no tax value was copied from an HTML report.",
+    "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+    "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/13031/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13031/lookup.json",
+  "sourceCount": 9617,
+  "dropped": 12,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=BullochCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=BullochCountyGA&Layer=Parcels&PageType=Map"
 }

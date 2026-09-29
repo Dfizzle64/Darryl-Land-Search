@@ -1,0 +1,32 @@
+{
+  "name": "Charlton",
+  "fips": "13049",
+  "state": "Georgia",
+  "markets": [
+    "Valdosta"
+  ],
+  "featureCount": 1704,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-charlton-parcels-13049",
+  "queryUrl": "https://services3.arcgis.com/fYt1jp3hqamxgSvI/arcgis/rest/services/Parcels_Charlton_County/FeatureServer/7/query",
+  "gaps": [
+    "Parcels are Parcels Charlton County Tax Parcels (SGRC VALOR AGOL) (https://services3.arcgis.com/fYt1jp3hqamxgSvI/arcgis/rest/services/Parcels_Charlton_County/FeatureServer/7). Published acreage is filtered to 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 1721 rows; 1704 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+    "Pass 2 enrichment is from rural-oz-pass2 csv (tax HTML-only, sale HTML-only, owner HTML-only). GDOT AADT stays the query-time statewide join.",
+    "Pass 2 tax is HTML-only. qPublic was not requested, and no tax value was copied from an HTML report.",
+    "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+    "Pass 2 owner is HTML-only. Owner and mailing were not copied from an HTML report.",
+    "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13049/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13049/lookup.json",
+  "sourceCount": 1721,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=CharltonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/e7b0834560024321a4825bb973115065"
+}

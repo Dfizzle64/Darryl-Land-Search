@@ -1,0 +1,31 @@
+{
+  "name": "Decatur",
+  "fips": "13087",
+  "state": "Georgia",
+  "markets": [
+    "Valdosta"
+  ],
+  "featureCount": 3520,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-decatur-parcels-13087",
+  "queryUrl": "https://services5.arcgis.com/TIhHfn6hMXyrVHu4/arcgis/rest/services/SmartGov_Parcel_Layer_6_2025/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are SmartGov_Parcel_Layer_6_2025 (BainbridgeGA) (https://services5.arcgis.com/TIhHfn6hMXyrVHu4/arcgis/rest/services/SmartGov_Parcel_Layer_6_2025/FeatureServer/0). Published acreage is filtered to 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 3546 rows; 3520 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+    "Pass 2 enrichment is from rural-oz-pass2 csv (tax HTML-only, sale HTML-only, owner REST). GDOT AADT stays the query-time statewide join.",
+    "Pass 2 tax is HTML-only. qPublic was not requested, and no tax value was copied from an HTML report.",
+    "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+    "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13087/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13087/lookup.json",
+  "sourceCount": 3546,
+  "dropped": 8,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=DecaturCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/TIhHfn6hMXyrVHu4/arcgis/rest/services/SmartGov_Parcel_Layer_6_2025/FeatureServer"
+}

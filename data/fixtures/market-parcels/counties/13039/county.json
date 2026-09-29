@@ -1,0 +1,31 @@
+{
+  "name": "Camden",
+  "fips": "13039",
+  "state": "Georgia",
+  "markets": [
+    "Savannah"
+  ],
+  "featureCount": 3218,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-camden-parcels-13039",
+  "queryUrl": "https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/2025_Tax_Parcels/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are 2025 Tax Parcels OwnerParcels06042026 (CCBOC AGOL) (https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/2025_Tax_Parcels/FeatureServer/0). Published acreage is filtered to 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 3241 rows; 3218 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+    "Pass 2 enrichment is from rural-oz-pass2 csv (tax REST, sale HTML-only, owner REST). GDOT AADT stays the query-time statewide join.",
+    "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+    "Tax values joined from https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/Juvare_Parcels/FeatureServer/0 on PARCEL_NO: 805 parcel ids matched, 805 value fields filled.",
+    "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13039/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13039/lookup.json",
+  "sourceCount": 3241,
+  "dropped": 16,
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=CamdenCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://gishub-ccboc.hub.arcgis.com"
+}

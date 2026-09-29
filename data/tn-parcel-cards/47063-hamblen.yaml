@@ -1,0 +1,378 @@
+state: TN
+jurisdiction: Hamblen County
+fips: '47063'
+level: county
+markets:
+- Knoxville
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=32)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 30,904; DEEDAC 5–150 → 1560; id GISLINK populated=True; geo PASS (5/5 centroids
+    in county, 5/5 polys touch county) (36.29323,-83.18938)→Hamblen; (36.24596,-83.28657)→Hamblen; (36.21461,-83.17896)→Hamblen
+    (where COUNTY_ID=32). Service lastEditDate 2026-09-10 (PARCELID suffix 2026) — freshest public owner/geometry;
+    no sale/value/CALC_ACRE (DEEDAC often 0 — derive geodesic acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 3024
+- role: parcels
+  name: MH-GIS Hamblen County Parcels (Assessor CAMA)
+  restUrl: https://services.mh-gis.com/server/rest/services/ParcelPublishing/Parcels/MapServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    CALC_ACRE: acreage
+    CAMADEEDAC: acreageDeed
+    CAMACALCAC: acreageCama
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    ST_NUM: situsAddress.number
+    STREET: situsAddress.street
+    CITYNUM: taxDistrict
+    LANDUSE: dorCode
+    APPRAISAL: tax.marketValue
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    OBYVAL: tax.obxfValue
+    V_SALEDATE: lastSale.date
+    V_PRICE: lastSale.price
+    V_DEEDBKPG: lastSale.deedRef
+    Tax_Card: appraiserCardUrl
+  notes: 'Preferred county CAMA over IMPACT. Live 30,990 polys; CALC_ACRE 5–150 → 3,028 (2026-09-24 ET). Geo-verify
+    PASS: centroids ~36.31,-83.19 WGS84; GISLINK 032…. Tax_Card = https://tnmap.tn.gov/assessment/#/parcel/{GISLINK}.
+    CITYNUM in {space,500,773}. publicGisUrl: https://mh-gis.maps.arcgis.com/apps/instant/basic/index.html?appid=f46ec38f5019423aa502307
+    and https://tnmap.tn.gov/Assessment/. V_* sale fields often vacant-oriented — confirm improved sales on TPAD.
+    2026-09-28 ET TN PIR re-verify: count 30,990; CALC_ACRE 5–150 → 3028; id GISLINK populated=True; geo PASS (5/5
+    centroids in county, 5/5 polys touch county) (36.30528,-83.19707)→Hamblen; (36.21537,-83.35605)→Hamblen; (36.18155,-83.24587)→Hamblen.
+    Vintage: MapServer has no editingInfo; V_SALEDATE values include 12/31/2025 → CAMA current through at least
+    late 2025.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: GISLINK
+  salesValueVintage: 2026
+  sourceEditDate: n/a (MapServer, no editingInfo)
+- role: parcels
+  name: TN County Parcel Map — Hamblen_Parcels sibling (Assessment_Data_32)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/55
+  layerId: 55
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Parcels_CALC_ACRE: acreage
+    Assessment_Data_32_OWNER: ownerName
+    Assessment_Data_32_OWNER2: ownerName2
+    Assessment_Data_32_ADDRESS: situsAddress
+    Assessment_Data_32_SALEDATE: lastSale.date
+    Assessment_Data_32_PRICE: lastSale.price
+    Assessment_Data_32_VI: lastSale.qualified
+    Assessment_Data_32_LANDMKTVAL: tax.landValue
+    Assessment_Data_32_APPRAISAL: tax.marketValue
+    Assessment_Data_32_LANDUSE: dorCode
+    Assessment_Data_32_ID: parcelIdDisplay
+  notes: 'AGOL Comptroller join sibling (~30,285). Prefer live MH-GIS when available. Geo-verify PASS (36.328,-83.168).
+    2026-09-28 ET TN PIR re-verify: count 30,285; Parcels_CALC_ACRE 5–150 → 2990; id Parcels_GISLINK populated=True;
+    geo PASS (5/5 centroids in county, 5/5 polys touch county) (36.30528,-83.19707)→Hamblen; (36.22887,-83.35762)→Hamblen;
+    (36.17032,-83.33031)→Hamblen.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sibling-fallback (2023 sale/value, not primary for this county)
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: IMPACT Parcels sibling (COUNTY_ID=32)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+  notes: 'Filter COUNTY_ID=32. Egress-sensitive 403 common. Sibling OK — geo verified via MH-GIS/AGOL. 2026-09-28
+    ET TN PIR: maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes sibling (JUR=032)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    OWNER: ownerName
+    MAILADDR: mailingAddress.street
+    ADDRESS: situsAddress
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    APPRAISAL: tax.marketValue
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    LANDUSE: dorCode
+    TAXYR: taxYear
+  notes: 'Filter JUR=''032''. Query-only. Prefer MH-GIS when Themes blocked. 2026-09-28 ET TN PIR: maps.cot.tn.gov
+    HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: zoning
+  name: Hamblen County Zoning Districts (MH-GIS)
+  restUrl: https://services.mh-gis.com/server/rest/services/LandUsePlanning/ZoningDistricts/FeatureServer/1
+  layerId: 1
+  coverage: county-wide
+  fieldMap:
+    ZONECLASS: zoning
+    ZONEDESC: zoningLabel
+  notes: Unincorporated county districts (~254). Codes A-1/R-1/R-2/C-1/PBD/I-1/I-2.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: zoning
+  name: City of Morristown Zoning Districts (MH-GIS)
+  restUrl: https://services.mh-gis.com/server/rest/services/LandUsePlanning/ZoningDistricts/FeatureServer/3
+  layerId: 3
+  coverage: city-only
+  fieldMap:
+    ZONECLASS: zoning
+    ZONEDESC: zoningLabel
+  notes: City-only on countywide parcels (~279). Resolve CITYNUM / city limits before join.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: other
+  name: TDOT Traffic Lines (AADT statewide)
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: state-wide (filter county)
+  fieldMap:
+    AADT: aadt
+    AADTYEAR: aadtYear
+    COUNTY_NUMBER: countyNumberTdot
+    ROUTE_ID: routeId
+    FUNCTIONAL_CLASS: functionalClass
+  notes: Added 2026-09-28 ET TN PIR Pass 2. Filter COUNTY_NUMBER='32' AND AADTYEAR='2025' → 1,888 segments (all
+    years 2,162). COUNTY_NUMBER = TDOT alphabetical county no. (NOT FIPS).
+  status: usable
+  auth: none
+  geometry: polyline
+  use: aadt-screening
+gaps:
+- FLU FeatureServer not found
+- Improved sale history may need TPAD when V_* blank
+- CITYNUM 500/773 municipality labels need city-limits QA
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted 2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings only.
+license: Hamblen County Assessor / MHGIS / Comptroller IMPACT-TPAD public records; attribution required.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+jurisdictionGisUrl: https://mh-gis.maps.arcgis.com/apps/instant/basic/index.html?appid=f46ec38f5019423aa502307
+zoningOverall: usable
+packagingNote: 'Digged 2026-09-24 ET; prefer MH-GIS CAMA over IMPACT; geo-verify PASS; TRANCHE-3 complete; skip
+  utilities/AADT. RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added OIR. LSB-approved parcel
+  setup applied 2026-09-28 (see parcelSetup).'
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=32
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services.mh-gis.com/server/rest/services/ParcelPublishing/Parcels/MapServer/0
+  joinKey: OIR.GISLINK = GISLINK
+  salesValueVintage: 2026
+  salesValueSourceEditDate: n/a (MapServer, no editingInfo)
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 3024
+  gislinkJoinSample: 10/10 (100%)
+  exception: MH-GIS Hamblen Assessor CAMA; sales dated through 2025-12-31.
+  salesValueVintageCorrection: 'Pass 2 (2026-09-28 ET): salesValueVintage 2025 → 2026. Live 2026-09-28: V_SALEDATE
+    is a MM/DD/YYYY string; 256 rows match ''%/2026'' (417 ''%/2025''); parsed max = 2026-08-24. TPAD sample 032036    02500
+    also shows a 5/5/2026 sale. The MH-GIS MapServer is refreshed from CAMA during 2026; vintage corrected 2025
+    → 2026.'
+aadt:
+  source: TDOT Traffic Lines
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  field: AADT
+  yearField: AADTYEAR
+  preferredYear: '2025'
+  countyFilterField: COUNTY_NUMBER
+  countyNumberTdot: '32'
+  where: COUNTY_NUMBER='32' AND AADTYEAR='2025'
+  count2025: 1888
+  countAllYears: 2162
+  maxAADT2025: 48823
+  segments2025AADTge5000: 83
+  status: usable
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+ownerEntityTypeRule:
+  appliesTo: OWNER + ' ' + OWNER2 (upper-cased; OWNER2 dropped when it starts with C/O, ATTN, %, CARE OF); first
+    match wins
+  order:
+  - type: church
+    regex: \b(CHURCH|BAPTIST|METHODIST|PRESBYTERIAN|LUTHERAN|EPISCOPAL|CATHOLIC|DIOCESE|MINISTR(Y|IES)|CONGREGATION|FELLOWSHIP|TABERNACLE|TEMPLE|CHAPEL|ASSEMBLY
+      OF GOD|CHURCH OF CHRIST|CEMETERY)\b
+  - type: government
+    regex: \b(UNITED STATES|U ?S ?A|USA|STATE OF (TENNESSEE|TN)|TENNESSEE (STATE|DEPT|DEPARTMENT)|DEPT OF|DEPARTMENT
+      OF|COUNTY OF|CITY OF|TOWN OF|BOARD OF EDUCATION|TENNESSEE VALLEY AUTHORITY|TVA|UTILITY DISTRICT|HOUSING AUTHORITY|WILDLIFE
+      RESOURCES|TWRA|CORPS OF ENGINEERS|NATIONAL PARK)\b|\b[A-Z]+ COUNTY( GOVERNMENT| BOARD| COMMISSION| SCHOOLS?|
+      HIGHWAY( DEPT)?)?\s*$
+  - type: LLC
+    regex: \b(L\.?\s?L\.?\s?C|P\.?L\.?L\.?C)\b\.?|LIMITED LIABILITY (COMPANY|CO)
+  - type: LP
+    regex: \b(L\.?L\.?L\.?P|L\.?L\.?P|L\.?P|LTD|LIMITED PARTNERSHIP|PARTNERSHIP|PARTNERS)\b
+  - type: INC
+    regex: \b(INC|INCORPORATED)\b\.?
+  - type: CORP
+    regex: \b(CORP|CORPORATION|COMPANY|CO)\b\.?\s*$|\bCORP\b|\bCORPORATION\b
+  - type: TRUST
+    regex: \b(TRUST|TRUSTS|TRUSTEE|TRUSTEES|TRSTE|TR|TRS|RLT|REV(OCABLE)? (LIVING )?TR(UST)?)\b|\(TR\)
+  - type: individual
+    regex: .*
+  noContactInfo: true
+  contactFieldsExcluded:
+  - MAILADDR
+  - MAILCITY
+  - ZIP
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+  status:
+    a: verified
+    b: verified
+    c: verified
+    d: verified
+    e: verified
+    f: verified
+  a_aadt:
+    countyNumberTdot: '32'
+    where: COUNTY_NUMBER='32' AND AADTYEAR='2025'
+    count2025: 1888
+    countAllYears: 2162
+    maxAADT2025: 48823
+    segments2025AADTge5000: 83
+  b_value:
+    source: https://services.mh-gis.com/server/rest/services/ParcelPublishing/Parcels/MapServer/0
+    fields:
+      APPRAISAL: tax.marketValue
+      LANDVAL: tax.landValue
+      IMPVAL: tax.improvementValue
+      OBYVAL: tax.obxfValue
+    populatedCounts:
+      APPRAISAL: 30899
+      LANDVAL: 30896
+      IMPVAL: 25324
+      OBYVAL: 22024
+    layerTotal: 30990
+    missingMappedFields: []
+  c_sale:
+    source: https://services.mh-gis.com/server/rest/services/ParcelPublishing/Parcels/MapServer/0
+    fields:
+      V_SALEDATE: lastSale.date
+      V_PRICE: lastSale.price
+      V_DEEDBKPG: lastSale.deedRef
+    populatedCounts:
+      V_SALEDATE: 13664
+      V_PRICE: 13452
+      V_DEEDBKPG: 13664
+    dateField: V_SALEDATE
+    priceFields:
+    - V_PRICE
+    liveMaxSaleDate: 2026-08-24 (parsed from string V_SALEDATE MM/DD/YYYY; 256 rows in 2026)
+    joinedSample5to150:
+      sampleIds: 10
+      matched: 10
+      valuePopulated: 10
+      saleDatePopulated: 10
+    saleHistory: 'Public per-parcel only: TPAD Parcel Details "Sale Information" table (date, price, book/page,
+      vacant/improved, instrument, qualification) via PA deep link; no bulk sale-history layer on public GIS'
+  d_owner:
+    source: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+    filter: COUNTY_ID=32
+    ownerField: OWNER
+    owner2Field: OWNER2
+    total: 30904
+    ownerPopulated: 30890
+    entitySampleN: 2000
+    entityDist:
+      individual: 1846
+      TRUST: 63
+      LLC: 40
+      government: 22
+      INC: 15
+      church: 12
+      CORP: 1
+      LP: 1
+  e_paDeepLink:
+    template: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+    testUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink=032036%20%20%20%2002500
+    testGislink: 032036    02500
+    httpBox: '403'
+    httpExternal: 200 details
+    taxYearShown: '2027'
+    saleHistoryRows: 5
+    note: TPAD shows a 5/5/2026 sale — fresher than the carded 2025 Hamblen layer
+    perParcelFieldOnOIR: LINK_TPAD
+  f_viewer:
+    url: https://mh-gis.maps.arcgis.com/apps/instant/basic/index.html?appid=f46ec38f5019423aa502307
+    http: '200'
+    arcgisItem: null
+    statewideTPV: https://tnmap.tn.gov/assessment/#/parcel/{GISLINK} (OIR LINK_TPV) HTTP 200
+    isStatewideFallback: false
+  vintage:
+    salesValueVintage: 2026
+    salesValueSourceEditDate: n/a (MapServer, no editingInfo)
+    liveMaxSaleDate: '2026-08-24'
+    serviceLastEdit: null
+    salesValueVintageCorrection: 'Pass 2 (2026-09-28 ET): salesValueVintage 2025 → 2026. Live 2026-09-28: V_SALEDATE
+      is a MM/DD/YYYY string; 256 rows match ''%/2026'' (417 ''%/2025''); parsed max = 2026-08-24. TPAD sample 032036    02500
+      also shows a 5/5/2026 sale. The MH-GIS MapServer is refreshed from CAMA during 2026; vintage corrected 2025
+      → 2026.'
+  notes: []

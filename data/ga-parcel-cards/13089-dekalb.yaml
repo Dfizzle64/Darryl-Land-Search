@@ -1,0 +1,660 @@
+state: GA
+jurisdiction: DeKalb County
+fips: "13089"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide Assessment View parcels (owner, mailing, situs parts, acres, FMV/ASV, zoning/FLU attrs)
+  - role: parcels
+    name: Tax_Parcels_Assessment_View Tax Parcels_ASMT
+    restUrl: https://dcgis.dekalbcountyga.gov/mapping/rest/services/Tax_Parcels_Assessment_View/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      OWNERNME1: ownerName
+      OWNERNME2: ownerName2
+      PSTLADDRESS: mailingAddress
+      PSTLCITY: mailingCity
+      PSTLSTATE: mailingState
+      PSTLZIP5: mailingZip
+      SITEADDRESS: situsAddress
+      CITY: situsCity
+      ZIP: situsZip
+      ACREAGE: acreage
+      TOTAPR1: tax.marketValue
+      CNTASSDVAL: tax.assessedValue
+      LAND_VALUE: tax.landMarketValue
+      BUILD_VALUE: tax.improvementMarketValue
+      LNDVALUE: tax.landValueAlt
+      ZONING: zoning
+      LANDUSE: flu
+      CVTTXCD: taxDistrict
+      CVTTXDSCRP: municipality
+      CLASSDSCRP: dorCode
+      TAX_YEAR: tax.year
+    notes: >
+      Preferred county-wide parcel+CAMA source for enrichment. Live count 246146 (2026-09-23);
+      ACREAGE 5–150 band = 3410 (matches thin in-app ~3.4k footprint). SR Web Mercator
+      (102100/3857); maxRecordCount 2000. Geo-verified WGS84 samples ~-84.229,33.639 (Ellenwood /
+      unincorporated south DeKalb, Amsler Rd) and city layers ~-84.26..-84.34, 33.64..33.94 — DeKalb
+      County GA, Atlanta MSA east core (NOT DeKalb AL/IL/IN/TN).
+      Rich CAMA on polygons: owner, mailing, SITEADDRESS situs string (also ADDRESS_NUMBER+FULL_STREET_NAME parts),
+      ACREAGE, TOTAPR1 (FMV), CNTASSDVAL (GA ~40% assessed; live ratio ≈0.40), LAND_VALUE /
+      BUILD_VALUE, ZONING, LANDUSE, CVTTXDSCRP municipality/tax district, TAX_YEAR≈2026.
+      CNTTXBLVAL field exists but live >0 count = 0 — no tax.taxableValue. NO sale price/date on
+      this or any county REST layer discovered (sales gap — HTML Property Appraisal / Tax
+      Commissioner only).
+      ZONING non-null ≈139783 — essentially UNINCORPORATED (≈137993/138256); city tax districts
+      nearly all null on parcel attr — prefer city REST (municipalities). LANDUSE attr similarly
+      unincorporated-heavy. CITY/ZIP are postal/CDP (e.g. Ellenwood) — municipality filter =
+      CVTTXDSCRP or Municipal_Boundary spatial join (normalize ANNEX/TAD/CID variants).
+      Mirrors (same count 246146): TaxParcels/FeatureServer/0 (has SITEADDRESS single situs string
+      + ACREAGE/TOTAPR1/CNTASSDVAL/ZONING — good situs alternate), PropertyAppraisal/
+      Parcels_IASWorld/FeatureServer/0, iasWorldParcels/MapServer/0, hosted Parcels/MapServer/0
+      (STATEDAREA string; avoid for acreage). hosted Tax_Parcels/FeatureServer/0 count 245816
+      lacks ACREAGE/TOTAPR1 — do not prefer.
+      Enrichment vs thin feed (~3.4k): thin ≈ geometry+acreage in 5–150 band; this card adds full
+      county 246146, owner/mailing/situs, FMV/ASV/land/improvement, municipality, unincorporated
+      zoning/FLU attrs, plus city zoning/FLU joins.
+    status: usable
+
+  - role: parcels
+    name: TaxParcels (SITEADDRESS situs mirror)
+    restUrl: https://dcgis.dekalbcountyga.gov/mapping/rest/services/TaxParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      OWNERNME1: ownerName
+      OWNERNME2: ownerName2
+      PSTLADDRESS: mailingAddress
+      PSTLCITY: mailingCity
+      PSTLSTATE: mailingState
+      PSTLZIP5: mailingZip
+      SITEADDRESS: situsAddress
+      CITY: situsCity
+      ZIP: situsZip
+      ACREAGE: acreage
+      TOTAPR1: tax.marketValue
+      CNTASSDVAL: tax.assessedValue
+      ZONING: zoning
+      LANDUSE: flu
+      CVTTXDSCRP: municipality
+    notes: >
+      Live count 246146. Same footprint as Assessment_View; prefer when a single SITEADDRESS string
+      is needed. Assessment_View preferred for LAND_VALUE/BUILD_VALUE/TAX_YEAR.
+    status: usable
+
+  - role: tax
+    name: Tax_Parcels_Assessment_View (CAMA values on polygons)
+    restUrl: https://dcgis.dekalbcountyga.gov/mapping/rest/services/Tax_Parcels_Assessment_View/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      TOTAPR1: tax.marketValue
+      CNTASSDVAL: tax.assessedValue
+      LAND_VALUE: tax.landMarketValue
+      BUILD_VALUE: tax.improvementMarketValue
+      TAX_YEAR: tax.year
+      CVTTXCD: taxDistrict
+      CLASSDSCRP: dorCode
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. TOTAPR1>0 ≈242280; CNTASSDVAL>0 ≈237575;
+      LAND_VALUE>0 ≈241942; BUILD_VALUE>0 ≈228377. Sample ASV/FMV ≈0.40 (GA assessment). CNTTXBLVAL
+      live >0 = 0 — no distinct taxableValue on REST. TAX_YEAR 2026 for ≈245307 rows.
+    status: usable
+
+  - role: zoning
+    name: Zoning_District (county zoning polygons)
+    restUrl: https://dcgis.dekalbcountyga.gov/mapping/rest/services/Zoning_District/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONECLASS: zoning
+      ZONEDESC: zoningDescription
+    notes: >
+      Preferred county zoning POLYGON layer. Live count 4890. Spatial-join to parcels (no parcel id).
+      Parcel attr ZONING on Assessment_View is alternate for unincorporated. Official for
+      unincorporated DeKalb; city parcels should prefer city REST (see municipalities). Top codes
+      include R-75, R-100, C-1, RSM, R-85, OI, MR-2, M. MapServer twin available. Geo sample
+      ~-84.228,33.719 south-central DeKalb GA.
+    status: usable
+
+  - role: flu
+    name: LandUse (county comprehensive / future land-use polygons)
+    restUrl: https://dcgis.dekalbcountyga.gov/mapping/rest/services/LandUse/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      LANDUSECODE: flu
+      LANDUSEDESC: fluDescription
+    notes: >
+      County FLU / land-use plan polygons. Live count 3439. Codes: SUB (dominant), TN, CRC, TC,
+      LIND, COS, NC, INS, RC, IND. LANDUSEDESC often null — prefer LANDUSECODE. Spatial-join.
+      Parcel attr LANDUSE on Assessment_View is related parcel-tied code (unincorporated-heavy).
+      City FLU/character layers preferred inside municipalities.
+    status: usable
+
+  - role: sales
+    name: null — no public REST sales table found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No FeatureServer/MapServer sales-history table found on dcgis.dekalbcountyga.gov (hosted,
+      mapping, PropertyAppraisal, OPAL) during live pass 2026-09-23. Sales appear only in Property
+      Appraisal HTML and Tax Commissioner publicaccess — not wireable as REST. Honest gap vs Cobb
+      ParcelSales / Gwinnett Land Value Table. Do not scrape emails/phones.
+    status: gap
+
+  - role: other
+    name: Municipal_Boundary
+    restUrl: https://dcgis.dekalbcountyga.gov/mapping/rest/services/Municipal_Boundary/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+      TYPE: municipalityType
+      LOCALFIPS: placeFips
+      MUNIAREA: areaSqMi
+    notes: >
+      Live count 13 city polygons: Atlanta, Avondale Estates, Brookhaven, Chamblee, Clarkston,
+      Decatur, Doraville, Dunwoody, Lithonia, Pine Lake, Stone Mountain, Stonecrest, Tucker.
+      Unincorporated = Hosted/Unincorporated_DeKalb_County/FeatureServer/0 (count 1) or
+      CVTTXDSCRP='UNINCORPORATED'. Parcel↔city join = spatial intersect or CVTTXDSCRP (normalize
+      ANNEX/TAD/CID suffixes).
+    status: usable
+
+  - role: other
+    name: Overlay_Districts Overlay District
+    restUrl: https://dcgis.dekalbcountyga.gov/mapping/rest/services/Overlay_Districts/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      OVLDISTRICT: overlayDistrict
+      OVLDESC: overlayDescription
+    notes: "Live count 3027 overlay polygons. Historic District layer 0 count 2631 (HISTDISTRICT/HISTDESC)."
+    status: usable
+
+municipalities:
+  - name: Decatur
+    level: city
+    parentFips: "13089"
+    joinToCountyParcels: >
+      City_of_Decatur_Parcels PARCELID ≈ county PARCELID (verified 15 234 07 028). Spatial
+      Municipal_Boundary NAME='Decatur'; CVTTXDSCRP DECATUR / DECATUR-ANNEX / Decatur City TAD*
+      (≈8164+). County ZONING attr ≈null in city — prefer city REST.
+    layers:
+      - role: zoning
+        name: Decatur_Zoning
+        restUrl: https://services.arcgis.com/36QtML6Mf01B1N0W/arcgis/rest/services/Decatur_Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONECLASS: zoning
+          ZONEDESC: zoningDescription
+        notes: >
+          Live count 482. Geo-verified ~-84.302,33.786 Decatur GA. REJECT maps.decaturil.gov
+          Decatur IL (~-88.98,39.82). Org 36QtML6Mf01B1N0W = City of Decatur GA open data.
+        status: usable
+      - role: flu
+        name: Decatur_Future_Land_Use
+        restUrl: https://services.arcgis.com/36QtML6Mf01B1N0W/arcgis/rest/services/Decatur_Future_Land_Use/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          LANDUSECODE: flu
+          LANDUSEDESC: fluDescription
+        notes: "Live count 536 (e.g. RL Low Density Residential). Spatial-join."
+        status: usable
+      - role: parcels
+        name: City_of_Decatur_Parcels
+        restUrl: https://services.arcgis.com/36QtML6Mf01B1N0W/arcgis/rest/services/City_of_Decatur_Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACREAGE
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          OWNERNME1: ownerName
+          SITEADDRESS: situsAddress
+          PSTLADDRESS: mailingAddress
+          PSTLCITY: mailingCity
+          PSTLSTATE: mailingState
+          PSTLZIP5: mailingZip
+          ACREAGE: acreage
+          TOTAPR1: tax.marketValue
+          CNTASSDVAL: tax.assessedValue
+          ZONING: zoning
+          LANDUSE: flu
+        notes: >
+          Live count 8666 city extract with ZONING on parcels (e.g. R-60). Prefer county
+          Assessment_View for county-wide search; use for Decatur zoning-on-parcel enrichment.
+          Geo ~-84.289,33.769.
+        status: usable
+    gaps: []
+    status: usable
+
+  - name: Brookhaven
+    level: city
+    parentFips: "13089"
+    joinToCountyParcels: >
+      Zoning PARCELID ≈ county PARCELID (verified 18 243 02 043). Spatial NAME='Brookhaven';
+      CVTTXDSCRP BROOKHAVEN / BROOKHAVEN ANNEX / BROOKHAVEN ANX B / Lenox Park CID / Perimeter CID
+      BROOKHAVEN (≈15116+). County ZONING attr 0 in city — city REST required.
+    layers:
+      - role: zoning
+        name: Brookhaven LandUsePlanning Zoning
+        restUrl: https://gis.brookhavenga.gov/arcgis/rest/services/LandUsePlanning/LandUsePlanning/MapServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONECLASS: zoning
+          ZONEDESC: zoningDescription
+          PARCELID: parcelId
+        notes: >
+          Live count 15178 parcel-tied zoning (e.g. RS-50). Geo ~-84.317,33.862 Brookhaven GA.
+          Mirror maps.brookhavenga.gov same path.
+        status: usable
+      - role: flu
+        name: Brookhaven Character Areas
+        restUrl: https://gis.brookhavenga.gov/arcgis/rest/services/LandUsePlanning/LandUsePlanning/MapServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          NAME: flu
+        notes: "Live count 14 character-area polygons (e.g. Ashford Park-Drew Valley) — coarse FLU proxy."
+        status: partial
+    gaps:
+      - "No parcel-level FLU codes beyond Character Areas (14 polys)."
+    status: usable
+
+  - name: Dunwoody
+    level: city
+    parentFips: "13089"
+    joinToCountyParcels: >
+      Parcel ParcelID / PARCEL_ID ≈ county PARCELID (verified 06 278 01 001). Spatial NAME='Dunwoody';
+      CVTTXDSCRP DUNWOODY / Perimeter CID DUNWOODY (≈13478+). County ZONING attr 0 in city.
+    layers:
+      - role: zoning
+        name: Dunwoody Zoning
+        restUrl: https://dungisapp.dunwoodyga.gov/arcgis/rest/services/Zoning/MapServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+          Label: zoningLabel
+        notes: >
+          Live count 426. OpenData/MapServer/10 same count. Geo ~-84.272,33.939 Dunwoody GA.
+        status: usable
+      - role: parcels
+        name: Dunwoody Parcel (zoning + assessment attrs)
+        restUrl: https://dungisapp.dunwoodyga.gov/arcgis/rest/services/Parcel/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ParcelID: parcelId
+          PARCEL_ID: parcelIdAlt
+          Zoning: zoning
+          OWNER_NAME: ownerName
+          Address: situsAddress
+          CurrTotAsmt40: tax.assessedValue
+        notes: >
+          Live count 13670. Prefer county Assessment_View for FMV/TOTAPR1; city for Zoning-on-parcel.
+          Geo ~-84.270,33.929.
+        status: usable
+      - role: flu
+        name: Dunwoody Comp_Plan_Character_Area (OpenData/11)
+        restUrl: https://dungisapp.dunwoodyga.gov/arcgis/rest/services/OpenData/MapServer/11
+        layerId: 11
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Name: flu
+        notes: "Live count 11 character-area polygons — FLU proxy."
+        status: partial
+    gaps: []
+    status: usable
+
+  - name: Chamblee
+    level: city
+    parentFips: "13089"
+    joinToCountyParcels: >
+      FutureLandUseParcels PARCELID ≈ county PARCELID (verified 18 195 06 001). Spatial NAME='Chamblee';
+      CVTTXDSCRP CHAMBLEE / CHAMBLEE-ANNEX / CHAMBLEE DORAVILLE CID* (≈2813+4282 annex).
+    layers:
+      - role: flu
+        name: Chamblee FutureLandUseParcels
+        restUrl: https://gis.chambleega.gov/arcgis/rest/services/Planning_and_Development/FutureLandUseParcels/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACREAGE_1
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          LANDUSECODE: flu
+          LANDUSEDESC: fluDescription
+          ACREAGE_1: acreage
+        notes: >
+          Live count 7254. Geo ~-84.307,33.845 Chamblee GA. PRIORZONING on related extracts is
+          historical only — not current zoning.
+        status: usable
+      - role: other
+        name: Chamblee CurrentLandUseParcels
+        restUrl: https://gis.chambleega.gov/arcgis/rest/services/Planning_and_Development/CurrentLandUseParcels/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          LANDUSECODE: landUseCode
+          LANDUSEDESC: landUseDescription
+        notes: "Live count 7264 existing land use (not FLU)."
+        status: partial
+    gaps:
+      - >
+        Planning_and_Development/TaxParcelZoning MapServer live-broken (HTTP 500 / empty layers)
+        2026-09-23 — no usable Chamblee current-zoning REST; county ZONING attr also null in city.
+    status: partial
+
+  - name: Doraville
+    level: city
+    parentFips: "13089"
+    joinToCountyParcels: >
+      Zoning Districts PARCELID ≈ county PARCELID (verified 06 248 01 003). Spatial NAME='Doraville';
+      CVTTXDSCRP DORAVILLE / DORAVILLE-ANNEX / DORAVILLE CITYTAD* (≈2714+1095 annex).
+    layers:
+      - role: zoning
+        name: Doraville Zoning Districts (parcel-tied)
+        restUrl: https://services5.arcgis.com/HPK9d3vzjakSFUjJ/arcgis/rest/services/Zoning_and_Land_Use_Map___City_of_Doraville_WFL1/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          ZONE_ID: zoning
+          ZDistNm: zoningDescription
+          OWNERNME1: ownerName
+          SITEADDRES: situsAddress
+        notes: >
+          Live count 4021. Geo ~-84.259,33.917 Doraville GA. DoraView hub. ZONE_ID e.g. T-5.
+        status: usable
+      - role: flu
+        name: Doraville Future Land Use 2022-2024
+        restUrl: https://services5.arcgis.com/HPK9d3vzjakSFUjJ/arcgis/rest/services/Zoning_and_Land_Use_Map___City_of_Doraville_WFL1/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          LU_NAME: flu
+          ACRES: acreage
+        notes: "Live count 3446; LU_NAME e.g. COMMERCIAL."
+        status: usable
+    gaps: []
+    status: usable
+
+  - name: Tucker
+    level: city
+    parentFips: "13089"
+    joinToCountyParcels: >
+      Zoning PARCEL_ID ≈ county PARCELID (verified 18 219 01 078). Spatial NAME='Tucker';
+      CVTTXDSCRP TUCKER / TUCKER ANNEX / Stone Mountain CID TUCKER / Tucker - Northlake CID*
+      (≈13024+).
+    layers:
+      - role: zoning
+        name: Tucker Planning Zoning
+        restUrl: https://tuckergis.interdev.com/arcgis/rest/services/Planning/Zoning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACREAGE
+        coverage: city-only
+        fieldMap:
+          PARCEL_ID: parcelId
+          ZONING: zoning
+          ACREAGE: acreage
+          FULL_STREE: situsStreet
+          ZIP: situsZip
+        notes: >
+          Live count 13583. Geo ~-84.160,33.851 Tucker GA. Hub tucker-open-data-tucker-ga.hub.arcgis.com.
+        status: usable
+      - role: flu
+        name: Tucker Planning FutureLandUse
+        restUrl: https://tuckergis.interdev.com/arcgis/rest/services/Planning/FutureLandUse/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          LANDUSECOD: flu
+          LANDUSEDES: fluDescription
+        notes: "Live count 13675 (e.g. SUB Suburban). Spatial-join (no parcel id)."
+        status: usable
+    gaps: []
+    status: usable
+
+  - name: Stonecrest
+    level: city
+    parentFips: "13089"
+    joinToCountyParcels: >
+      Zoning_view / FLU_2038 PARCELID ≈ county PARCELID (verified 16 073 02 122). Spatial
+      NAME='Stonecrest'; CVTTXDSCRP STONECREST / EAST METRO STCST (≈20238+). County ZONING attr
+      ≈7 only — city REST required.
+    layers:
+      - role: zoning
+        name: Stonecrest Zoning_view
+        restUrl: https://services8.arcgis.com/2Oj4p0oK7rnTYNHA/arcgis/rest/services/Zoning_view/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          ZONECLASS: zoning
+          LANDUSECODE: flu
+          LANDUSEDESC: fluDescription
+          OVERLAYDIST: overlayDistrict
+        notes: >
+          Live count 18875. Geo ~-84.155,33.707 Stonecrest GA. Org 2Oj4p0oK7rnTYNHA.
+          Open data: data-stonecrestga.opendata.arcgis.com.
+        status: usable
+      - role: flu
+        name: Stonecrest FLU_2038
+        restUrl: https://services8.arcgis.com/2Oj4p0oK7rnTYNHA/arcgis/rest/services/FLU_2038/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          FLU10_30: flu
+        notes: "Live count 18808 parcel-tied FLUM (e.g. City Center)."
+        status: usable
+    gaps: []
+    status: usable
+
+  - name: Atlanta
+    level: city
+    parentFips: "13089"
+    joinToCountyParcels: >
+      LotsWithZoning PIN ≈ county PARCELID (DeKalb-side PINs often '15 …'; live PIN LIKE '15 %'
+      ≈12960). Spatial Municipal_Boundary NAME='Atlanta' (DeKalb footprint; CVTTXDSCRP ATLANTA
+      ≈14014 + ATLANTA-ANNEX/EMORY). Multi-county city — Fulton side out of scope.
+    layers:
+      - role: zoning
+        name: Atlanta LotsWithZoning (DeKalb-side filter required)
+        restUrl: https://gis.atlantaga.gov/dpcd/rest/services/LandUsePlanning/LotsWithZoning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: GIS_ACRES
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          ZONING_CLASSIFICATION: zoning
+          ZONINGCODE: zoningDescription
+          GIS_ACRES: acreage
+        notes: >
+          Citywide count 151122 (Fulton+DeKalb). ALWAYS filter to DeKalb Municipal_Boundary Atlanta
+          poly or county parcels CVTTXDSCRP like 'ATLANTA%' — do not ingest full count as DeKalb.
+          Geo sample PIN 15 175 04 037 ~-84.338,33.740 (DeKalb-side). Prefer ZONING_CLASSIFICATION
+          (e.g. R-4) over ZONINGCODE category string.
+        status: partial
+    gaps:
+      - "Atlanta layer is citywide; DeKalb card must spatially subset. Fulton Atlanta out of scope."
+    status: partial
+
+  - name: Stone Mountain
+    level: city
+    parentFips: "13089"
+    joinToCountyParcels: >
+      Spatial Municipal_Boundary NAME='Stone Mountain'; CVTTXDSCRP STONE MOUNTAIN / STONE MOUNTAIN
+      TAD / ANNEX (≈2153+).
+    layers: []
+    notes: >
+      No public city-owned zoning/FLU FeatureServer found (2026-09-23). County parcel ZONING attr
+      null in city — gap. Use county parcels + city poly for geography only.
+    status: gap
+
+  - name: Avondale Estates
+    level: city
+    parentFips: "13089"
+    joinToCountyParcels: >
+      Spatial NAME='Avondale Estates'; CVTTXDSCRP AVONDALE ESTATES* (≈1426+).
+    layers: []
+    notes: "No public city zoning/FLU REST found. County ZONING attr null in city — gap."
+    status: gap
+
+  - name: Clarkston
+    level: city
+    parentFips: "13089"
+    joinToCountyParcels: >
+      Spatial NAME='Clarkston'; CVTTXDSCRP CLARKSTON / CLARKSTON-ANNEX (≈1084+).
+    layers: []
+    notes: "No public city zoning/FLU REST found — gap."
+    status: gap
+
+  - name: Lithonia
+    level: city
+    parentFips: "13089"
+    joinToCountyParcels: >
+      Spatial NAME='Lithonia'; CVTTXDSCRP LITHONIA / LITHONIA-ANNEX (≈787+).
+    layers: []
+    notes: "No public city zoning/FLU REST found — gap."
+    status: gap
+
+  - name: Pine Lake
+    level: city
+    parentFips: "13089"
+    joinToCountyParcels: >
+      Spatial NAME='Pine Lake'; CVTTXDSCRP PINE LAKE / PINE LAKE-ANNEX (≈434+).
+    layers: []
+    notes: "Tiny city; no public zoning/FLU REST — gap."
+    status: gap
+
+gaps:
+  - "NO public REST sales history (lastSale.price/date/qualified) — major enrichment gap vs Cobb/Gwinnett; Appraisal HTML / publicaccess.dekalbtax.org only."
+  - "CNTTXBLVAL field exists on Assessment_View but live >0 count = 0 — no tax.taxableValue."
+  - "County parcel ZONING + LANDUSE attrs cover unincorporated almost completely; city tax districts nearly all null — must join city REST (Decatur, Brookhaven, Dunwoody, Doraville, Tucker, Stonecrest) or mark gap (Chamblee zoning broken; Stone Mountain, Avondale Estates, Clarkston, Lithonia, Pine Lake)."
+  - "Chamblee TaxParcelZoning MapServer broken (500) — FLU parcels usable; current zoning gap."
+  - "Atlanta LotsWithZoning is citywide (Fulton+DeKalb); filter to DeKalb footprint — do not ingest full 151k as DeKalb."
+  - "CITY / SITEADDRESS city tokens are postal/CDP (e.g. Ellenwood); municipality filter = CVTTXDSCRP or Municipal_Boundary spatial."
+  - "CVTTXDSCRP includes ANNEX / TAD / CID variants — normalize when building municipality facets."
+  - "County LandUse LANDUSEDESC often null; use LANDUSECODE. Character-area FLU for Brookhaven/Dunwoody is coarse."
+  - "Assessment_View includes SITEADDRESS; TaxParcels mirror also carries SITEADDRESS."
+  - "Do not collect emails/phones. No paid vendors. qPublic AppID=940 bot-403 from research box; prefer propertyappraisal.dekalbcountyga.gov / publicaccess.dekalbtax.org."
+  - "Enrichment vs thin in-app (~3.4k): thin ≈ ACREAGE 5–150 band (3410); full county 246146 with owner/mailing/situs, TOTAPR1/CNTASSDVAL/LAND_VALUE/BUILD_VALUE, CVTTXDSCRP, unincorporated zoning/FLU, city zoning/FLU joins."
+  - "Rejected lookalikes: maps.decaturil.gov Public/zoning (Decatur IL ~-88.98,39.82); City_Parcel_Zoning_Public AGOL Yx1h0qHJ9wIpQWuU (Ontario ~-79.21,43.13); other DeKalb counties AL/IL/IN/TN; gis.dekalbcounty.org TLS fail — official host dcgis.dekalbcountyga.gov."
+
+license: >
+  DeKalb County GIS public ArcGIS Server (dcgis.dekalbcountyga.gov) — Tax_Parcels_Assessment_View,
+  TaxParcels, Zoning_District, LandUse, Municipal_Boundary, Overlay_Districts, PropertyAppraisal/
+  Parcels_IASWorld, hosted Parcels. Open data: dekalbinsights-dekalbgis.opendata.arcgis.com /
+  dcgis-dekalbgis.hub.arcgis.com. City of Decatur GA AGOL (36QtML6Mf01B1N0W); City of Brookhaven
+  (gis.brookhavenga.gov); City of Dunwoody (dungisapp.dunwoodyga.gov); City of Chamblee
+  (gis.chambleega.gov); City of Doraville DoraView (HPK9d3vzjakSFUjJ); City of Tucker
+  (tuckergis.interdev.com); City of Stonecrest (2Oj4p0oK7rnTYNHA / data-stonecrestga.opendata.arcgis.com);
+  City of Atlanta DPCD (gis.atlantaga.gov/dpcd) for DeKalb-side Atlanta only. Property Appraisal
+  HTML: propertyappraisal.dekalbcountyga.gov; Tax Commissioner: publicaccess.dekalbtax.org.
+  Attribution to DeKalb County GIS / respective cities. Public fields only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://propertyappraisal.dekalbcountyga.gov/
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "Public Information Researcher"
+  aadt:
+    source: "GDOT / UGA ITOS (OMAT PMED Traffic Data)"
+    restUrl: "https://maps.itos.uga.edu/arcgis/rest/services/GDOT/GDOT_FunctionalClass/MapServer/21"
+    layerId: 21
+    field: "AADT"
+    geography: "state HPMS / traffic segments (polyline)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Public Information Researcher"
+    notes: "Public GDOT FunctionalClass MapServer layer 21 OMAT PMED Traffic Data with AADT; GDOT TADA (drakewell) is interactive/CSV alternative without a simple statewide FeatureServer."

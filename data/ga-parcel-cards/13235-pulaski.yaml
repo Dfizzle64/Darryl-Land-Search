@@ -1,0 +1,283 @@
+state: GA
+jurisdiction: Pulaski County
+fips: "13235"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner/situs/acres/zoning (MGRC / GARC AGOL)
+  - role: parcels
+    name: Hawkinsville_Pulaski_Zoning_Classifications (MGRC / GARC)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Hawkinsville_Pulaski_Zoning_Classifications/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALCACRES
+    coverage: county-wide
+    fieldMap:
+      PAR_ID: parcelId
+      OwnerName: ownerName
+      Address: situsAddress
+      CALCACRES: acreage
+      Survey_Acr: surveyAcreage
+      ZoningClass: zoning
+      Plat: platRef
+      Deed: deedRef
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + thin CAMA (Middle Georgia RC / GARC AGOL
+      org Ug5xGQbHsD8zuZzM — owner nwilliams_MGRC / mgrembowski; FeatureServer/0 titled
+      "City of Hawkinsville-Pulaski County Zoning"). Live count 6872 (2026-09-24). SR
+      GA West 102667/2240. maxRecordCount 2000 — page via resultOffset / envelopes.
+      Schema: PAR_ID / OwnerName (≈6258 filled) / Address / CALCACRES / Survey_Acr /
+      ZoningClass / Plat / Deed — NO CURR_VAL / MAV* / SALE_* / mailing split. CALCACRES
+      5–150 = 1672. PAR_ID samples '2T081380005' / '105W0020004HAW' / 'H0040020044'
+      (preserve for KeyValue). GEO-VERIFY GEORGIA Pulaski FIPS 13235 Hawkinsville seat
+      (~-83.48,32.28): WGS84 samples ~-83.527,32.209 / ~-83.481,32.306 / ~-83.495,32.289;
+      companion Pulaski_County_Boundary STCOFIPS='13235' centroid ~-83.477,32.282.
+      REJECT Town of Pulaski Candler County Pulaski_GeoData_View (hogagis
+      HHvUPZ2XuLOAJxjR — FIPS='043' Candler; extent ~-81.96,32.39 — already under
+      Candler card); REJECT Pulaski AR (~-92.4,34.7) / KY / VA lookalikes; REJECT paid
+      Regrid/ATTOM. Official live assessor HTML: qPublic App=PulaskiCountyGA / AppID=760
+      LayerID=11796 (qpublic.net/ga/pulaski; Cloudflare/bot 403 automated; public for
+      humans). Deep-link KeyValue={PAR_ID}:
+      Application.aspx?App=PulaskiCountyGA&Layer=Parcels&PageType=Report&KeyValue={PAR_ID}
+      (also AppID=760&LayerID=11796&PageTypeID=4&KeyValue={PAR_ID}). Skip
+      PulaskiOpticalCarrierFiber / Served_Unserved / Yard Waste / Collection Zones /
+      buildings as utilities-adjacent per tranche-3; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on Zoning_Classifications; qPublic AppID=760 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on Hawkinsville_Pulaski_Zoning_Classifications.
+      Assessor HTML qpublic.net/ga/pulaski → App=PulaskiCountyGA / AppID=760
+      LayerID=11796. Honest REST tax gap (owner present on polygons).
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/lastSale on Zoning_Classifications. Prefer qPublic Sales Search HTML
+      AppID=760. Rejected paid Regrid/ATTOM sales. (Pulaski AR/KY sale layers are WRONG
+      geography — do not use.)
+    status: gap
+
+  - role: zoning
+    name: Hawkinsville_Pulaski_Zoning_Classifications ZoningClass (on parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Hawkinsville_Pulaski_Zoning_Classifications/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALCACRES
+    coverage: county-wide
+    fieldMap:
+      PAR_ID: parcelId
+      ZoningClass: zoning
+    notes: >
+      Euclidean ZoningClass on preferred parcels (same FS as parcels). Domain counts:
+      I-A≈2063 / R≈1125 / R-1≈612 / M-U≈611 / blank≈567 / R-2≈543 / R-3≈474 / G-A≈298 /
+      B-2≈203 / R-4≈158 / B-1≈102 / I≈86 / P/I≈10 / P≈9 / A-1≈4 / A4≈2 / P/R/C≈2.
+      Consolidated city-county zoning (Hawkinsville–Pulaski). Public viewer:
+      experience.arcgis.com/experience/7aa5090946604eb0ad53e77221b15aaf. Mirror webmap
+      e2f1597e14eb4f53bc51210c405d1c92. Reject Candler Town-of-Pulaski PulaskiZoning
+      (ZoneType AG/R-40 — wrong county).
+    status: usable
+
+  - role: flu
+    name: null — no separate FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Pulaski County FLU/character FeatureServer recovered distinct from ZoningClass
+      (2026-09-24). ZoningClass is Euclidean, not a substitute for long-range FLU.
+    status: gap
+
+  - role: other
+    name: Pulaski_County_Boundary + Hawkinsville_Boundary
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Pulaski_County_Boundary/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      STCOFIPS: fips
+    notes: >
+      County boundary NAME=Pulaski STCOFIPS=13235 (count 1). Companion
+      Hawkinsville_Boundary/0 Municipal Boundaries (~-83.48,32.30) for city spatial
+      filter. Preferred spatial masks.
+    status: usable
+
+municipalities:
+  - name: Hawkinsville
+    level: city
+    parentFips: "13235"
+    joinToCountyParcels: >
+      Spatial Hawkinsville_Boundary/0 (~-83.48,32.30) ∩ Zoning_Classifications OR soft
+      PAR_ID / Address containing HAW / Hawkinsville. Consolidated city-county seat.
+    layers:
+      - role: zoning
+        name: Hawkinsville_Pulaski_Zoning_Classifications (same county FS)
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Hawkinsville_Pulaski_Zoning_Classifications/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: CALCACRES
+        coverage: city-only
+        fieldMap:
+          ZoningClass: zoning
+          PAR_ID: parcelId
+        notes: >
+          Consolidated zoning covers city + county — spatial clip to Hawkinsville_Boundary
+          for city-only. Prefer ZoningClass over any Candler Town-of-Pulaski lookalike.
+        status: usable
+      - role: parcels
+        name: Zoning_Classifications spatial Hawkinsville
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Hawkinsville_Pulaski_Zoning_Classifications/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: CALCACRES
+        coverage: city-only
+        fieldMap:
+          PAR_ID: parcelId
+          OwnerName: ownerName
+          CALCACRES: acreage
+        notes: No separate Hawkinsville-only CAMA — county FS + city boundary clip.
+        status: usable
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city FLU REST.
+        status: gap
+    gaps:
+      - "No separate Hawkinsville-only parcel CAMA — use county Zoning_Classifications + Hawkinsville_Boundary."
+      - "Tax/sale via qPublic AppID=760 HTML even inside city."
+      - "Skip Yard Waste / Collection Zones / OpticalCarrierFiber per tranche-3."
+    status: usable
+
+gaps:
+  - "No CURR_VAL/MAV*/SALE_* on Hawkinsville_Pulaski_Zoning_Classifications — tax/sale via qPublic AppID=760 LayerID=11796 HTML only."
+  - "No separate FLU FeatureServer — ZoningClass is Euclidean only."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/pulaski public for humans."
+  - "REJECT Candler Town of Pulaski Pulaski_GeoData_View (FIPS 043 / ~-81.96,32.39); REJECT Pulaski AR/KY/VA; REJECT paid Regrid/ATTOM; skip utilities+AADT; no emails/phones."
+
+license: >
+  Middle Georgia Regional Commission / GARC AGOL org Ug5xGQbHsD8zuZzM —
+  Hawkinsville_Pulaski_Zoning_Classifications, Pulaski_County_Boundary,
+  Hawkinsville_Boundary (nwilliams_MGRC / mgrembowski). Public zoning viewer
+  experience.arcgis.com/experience/7aa5090946604eb0ad53e77221b15aaf. Assessor
+  qPublic App=PulaskiCountyGA / AppID=760 LayerID=11796 (qpublic.net/ga/pulaski;
+  hawkinsville-pulaski.org). Attribution Pulaski County / City of Hawkinsville /
+  MGRC GIS. Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=760&LayerID=11796&PageTypeID=2
+jurisdictionGisUrl: https://experience.arcgis.com/experience/7aa5090946604eb0ad53e77221b15aaf
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services1.arcgis.com/Ug5xGQbHsD8zu
+    ZzM/arcgis/rest/services/Hawkinsville_Pulaski_Zoning_Classifications/FeatureServer/0 count 6872;
+    extent center [['13235', 'Pulaski County']]; sample [['13235', 'Pulaski County']]. No change to
+    field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Hawkinsville city"
+      level: city
+      parentFips: "13235"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Pulaski' AND aadt>0
+    altFilter: name LIKE '235-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 235-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 61
+    maxAadt: 11000
+    geoCheck: 61/61 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: REST-partial
+    detail: Deed (book page, e.g. "195  218") on primary parcel layer (3453/6872 filled); no sale date/price
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Hawkinsville_Pulaski_Zoning_Classifications/FeatureServer/0
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: OwnerName
+    filledCount: 6258
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Hawkinsville_Pulaski_Zoning_Classifications/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=PulaskiCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=760&LayerID=11796&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PAR_ID
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 2T081380005
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=PulaskiCountyGA&Layer=Parcels&PageType=Report&KeyValue=2T081380005
+    verification: 'pattern-tested: real sample ID from PAR_ID; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://experience.arcgis.com/experience/7aa5090946604eb0ad53e77221b15aaf
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Hawkinsville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

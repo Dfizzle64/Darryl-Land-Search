@@ -5,19 +5,29 @@
   "markets": [
     "Atlanta"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 3211,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "ga-jasper-parcels-13159",
+  "queryUrl": "https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/JasperCo_FDM_Online_2023_Working_WFL1/FeatureServer/2/query",
   "gaps": [
-    "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+    "Parcels are JasperCo_FDM_Online_2023_Working FDM_JasperCo_2023 (NEGRC parcel+FLU join) (https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/JasperCo_FDM_Online_2023_Working_WFL1/FeatureServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+    "Source query returned 3267 rows; 3211 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+    "Counted 3211 distinct parcel ids.",
+    "Pass 2 tax is REST, sale is HTML-only, and owner is REST-partial. HTML-only values were not scraped.",
+    "Pass 2 sale date and price are HTML-only and were not copied.",
+    "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/13159/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13159/lookup.json",
+  "sourceCount": 3267,
+  "dropped": 8,
+  "tileCount": 5,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=JasperCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=JasperCountyGA&Layer=Parcels&PageType=Map",
+  "pulledOn": "2026-09-29"
 }

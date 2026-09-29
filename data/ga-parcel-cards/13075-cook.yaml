@@ -1,0 +1,530 @@
+state: GA
+jurisdiction: Cook County
+fips: "13075"
+level: county
+markets: [Valdosta]
+
+layers:
+  - role: parcels
+    name: Cook/Cook_Parcels Parcels — SGRC alma MapServer
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      Realkey: ownerKey
+      Ownkey: ownerKeyAlt
+      lastname: ownerName
+      firstname: ownerFirstName
+      middle: ownerMiddleName
+      address1: mailingAddressLine1OrCoOwner
+      address2: mailingAddress
+      address3: mailingAddress2
+      city: mailingCity
+      state: mailingState
+      zip: mailingZip
+      house_no: situsNumber
+      stdirect: situsStreetDir
+      street_nam: situsStreet
+      sttype: situsStreetType
+      unit: situsUnit
+      totalacres: acreage
+      woodacres: acreageWoodland
+      Deed_Acres: acreageDeed
+      Draw_Acres: acreageGis
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      sale_val: lastSale.price
+      zoningcode: zoning
+      zoning: zoningAlt
+      taxdistric: taxDistrict
+      digclass: dorCode
+      digstrat: dorStrata
+      land_type: landType
+      legal_desc: legalDescription
+      subd_name: subdivision
+      homeexempt: homesteadExempt
+      landgmd: georgiaMilitiaDistrict
+      landlot: landLot
+      landdist: landDistrict
+      neighbhood: neighborhood
+      lat: latitude
+      lon: longitude
+      qPub_Link: appraiserReportUrl
+      Map: mapSheet
+      Block: mapBlock
+      Parcel: mapParcel
+      SubParcel: mapSubParcel
+      Shape.STArea(): shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (Southern Georgia Regional Commission
+      SGRC alma — Cook/Cook_Parcels MapServer layer 0 "Parcels"). Live count 10432
+      (2026-09-24). Identical-rich twin Cook/CookParcels/MapServer/1 — prefer Cook_Parcels/0.
+      SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet (wkid 102667 / latestWkid 2240).
+      maxRecordCount 1000 — page via resultOffset / spatial envelopes. TOTALACRES 5–150 =
+      2437; curr_val>0 = 10364; lastname filled = 10364; house_no>0 = 6721; zoningcode
+      non-blank = 6 (sparse — prefer Euclidean Cook_Zoning/0); mavcurr>0 = 0 (assessed REST
+      gap); sale_val>0 = 0 (sales REST gap). digclass: R≈7459, V≈1344, C≈759, E≈430, A≈303,
+      I≈31, J≈24, P≈14. taxdistric soft (geo-checked vs City Limits): 01≈Adel (~2858;
+      ~-83.43,31.14), 02≈Cecil (~227; ~-83.39,31.05), 03≈Lenox (~648; ~-83.48,31.26),
+      04≈Sparks (~1138; ~-83.44,31.17), 05≈unincorporated (~5493) — prefer spatial
+      Cook_Boundaries/0 City Limits Name for municipality. Compose situsAddress from
+      house_no + stdirect + street_nam + sttype when house_no>0. city/state/zip are OWNER
+      mailing (nationwide — Tifton / Moultrie / Kitty Hawk / Jacksonville FL / …) — never
+      municipality filter. qPub_Link fills all 10432 with Schneider deep-link
+      App=cookCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_No}. Numeric AppID=664
+      (cookcountypay.com). Schema water/sewer/gas/electricty/roadstreet — DO NOT collect
+      (skip utilities+AADT). Cook_Addresses DAY_PHONE/RESIDENT — DO NOT collect PII.
+      Geo-verified WGS84 samples ~-83.543,31.150 / ~-83.556,31.142 (N Cook / Adel fringe),
+      ~-83.428,31.137 (Adel) — Cook County GA / Adel (Valdosta MSA ring; NOT Cook County IL
+      maps.cookcountyil.gov / hub-cookcountyil; NOT Cook County MN/others). Rejected paid
+      Regrid/ATTOM/DynamoSpatial/ParcelVision. No emails/phones collected.
+    status: usable
+
+  - role: tax
+    name: Cook_Parcels curr_val / FMV* / MAV* (on polygons)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      taxdistric: taxDistrict
+      digclass: dorCode
+      homeexempt: homesteadExempt
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. curr_val>0 = 10364; mavcurr>0 = 0
+      (assessed REST gap — use qPublic HTML AppID=664 / App=cookCountyGA). Assessor HTML:
+      qpublic.net/ga/cook → Application.aspx (Cloudflare/bot 403 automated; public for
+      humans). Deep-link KeyValue={Parcel_No} via qPub_Link pattern. Tax Commissioner
+      cookcountypay.com (payments — not CAMA).
+    status: usable
+
+  - role: sales
+    name: null — sale_val zero-filled; qPublic Sales Search HTML only
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      sale_val / saleland1 / saleland2 / saleimp1 / saleimp2 fields exist but sale_val>0 = 0
+      live (2026-09-24). No public REST multi-sale year layers for Cook. qPublic Sales Search
+      HTML App=cookCountyGA / AppID=664. Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: Cook/Cook_Zoning Zoning (Euclidean)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+      ZONING_DAS: zoningDescription
+      EXCEPTION_: zoningException
+      UPDATED: zoningUpdated
+    notes: >
+      Preferred Euclidean zoning polygons (live count 1095). ZONING top: GB≈157, R10≈108,
+      R1≈93, R8≈80, WLI≈80, RR≈67, R22≈66, R8M≈64, RP≈61, AU≈53, R22M≈44, B1≈35, R2≈35,
+      HI≈31, R15≈29, MHP≈18, R1A≈13, DC≈13, AG≈11, I≈9 (+ MR/CBD/R10M/RC/NC/R2M). Parcel
+      zoningcode on Cook_Parcels sparse (≈6) — spatial-join this layer. Geo-verified
+      ~-83.482,31.305 / ~-83.428,31.140 / ~-83.505,31.155 — Cook GA.
+    status: usable
+
+  - role: zoning
+    name: Cook_Parcels zoningcode (parcel-attributed; secondary)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      zoningcode: zoning
+      zoning: zoningAlt
+    notes: >
+      Secondary only. zoningcode non-blank ≈6 — prefer Euclidean Cook_Zoning/0 ZONING.
+    status: partial
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Cook County future land use / character-area FeatureServer on SGRC alma Cook folder
+      (2026-09-24). Comp Plan PDF gap.
+    status: gap
+
+  - role: other
+    name: Cook/Cook_Boundaries City Limits
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Boundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Name: municipality
+    notes: >
+      Preferred spatial municipality filter. Live polys: Adel (×2), Sparks, Lenox (×2),
+      Cecil. Companion CookBoundaries/0 Cities + /1 County; Cook_Boundaries also has Fire /
+      House / Senate / Congressional / Judicial / Commissioner / County. Do NOT filter by
+      parcel mailing city. Soft taxdistric as attribute fallback only.
+    status: usable
+
+  - role: other
+    name: Cook/Cook_Addresses Addresses
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Addresses/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ADD1: situsAddress
+      ADD_NUM: situsNumber
+      ST_NAME: situsStreetName
+      TYPE: situsStreetType
+      Community: postalCommunity
+      ZIP_CODE: situsZip
+      STATE: situsState
+      Municipali: municipalityHint
+    notes: >
+      Address points for situs gap-fill. Schema exposes DAY_PHONE / RESIDENT — DO NOT
+      collect (PII). Prefer Cook_Boundaries/0 City Limits spatial for municipality over
+      Community/Municipali. Skip utilities companions on Cook/Electric|Gas|Sewer|Water
+      (sgrcmaps.com/arcgis utilities folder — skip per tranche-3).
+    status: usable
+
+municipalities:
+  - name: Adel
+    level: city
+    parentFips: "13075"
+    joinToCountyParcels: >
+      Spatial Cook_Boundaries/0 City Limits Name='Adel' (~-83.43,31.14) OR soft
+      taxdistric='01' (~2858). mailing city is postal — never sole filter.
+    layers:
+      - role: zoning
+        name: Cook_Zoning spatial Adel
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Zoning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+        notes: Spatial-clip Cook_Zoning to Adel City Limits; no Adel-owned separate zoning FS.
+        status: usable
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Adel FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Cook_Parcels + spatial Adel
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Cook_Parcels/0 + spatial Adel / taxdistric=01.
+        status: gap
+    gaps:
+      - "No Adel-owned separate zoning/FLU/parcel FeatureServer — SGRC Cook_Zoning + Boundaries."
+    status: usable
+
+  - name: Sparks
+    level: city
+    parentFips: "13075"
+    joinToCountyParcels: >
+      Spatial Cook_Boundaries/0 Name='Sparks' (~-83.44,31.17) OR soft taxdistric='04' (~1138).
+    layers:
+      - role: zoning
+        name: Cook_Zoning spatial Sparks
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Zoning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+        notes: Prefer Cook_Zoning spatial to Sparks poly. No Sparks-owned GIS.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sparks FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Cook_Parcels + spatial Sparks
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Cook_Parcels/0 + spatial Sparks / taxdistric=04.
+        status: gap
+    gaps:
+      - "No Sparks city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Lenox
+    level: city
+    parentFips: "13075"
+    joinToCountyParcels: >
+      Spatial Cook_Boundaries/0 Name='Lenox' (~-83.48,31.26) OR soft taxdistric='03' (~648).
+    layers:
+      - role: zoning
+        name: Cook_Zoning spatial Lenox
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Zoning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+        notes: Prefer Cook_Zoning spatial + taxdistric=03. No Lenox-owned GIS.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Lenox FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Cook_Parcels + spatial Lenox
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Cook_Parcels/0 + spatial Lenox / taxdistric=03.
+        status: gap
+    gaps:
+      - "No Lenox city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Cecil
+    level: city
+    parentFips: "13075"
+    joinToCountyParcels: >
+      Spatial Cook_Boundaries/0 Name='Cecil' (~-83.39,31.05) OR soft taxdistric='02' (~227).
+    layers:
+      - role: zoning
+        name: Cook_Zoning spatial Cecil
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Zoning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+        notes: Prefer Cook_Zoning spatial. No Cecil-owned GIS.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cecil FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Cook_Parcels + spatial Cecil
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Cook_Parcels/0 + spatial Cecil / taxdistric=02.
+        status: gap
+    gaps:
+      - "No Cecil city-owned zoning/FLU/parcel REST."
+    status: partial
+
+gaps:
+  - "sale_val>0 = 0 on Cook_Parcels — no REST lastSale.price/date; qPublic AppID=664 / App=cookCountyGA Sales Search HTML only."
+  - "mavcurr>0 = 0 — no usable assessedValue on REST; prefer curr_val market + qPublic HTML for assessed/taxable."
+  - "Parcel zoningcode sparse (≈6) — prefer Euclidean Cook_Zoning/0 ZONING."
+  - "No public FLU / character-area FeatureServer on SGRC Cook folder."
+  - "Cook_Parcels maxRecordCount 1000 — page via resultOffset / spatial envelopes."
+  - "taxdistric soft map 01=Adel / 02=Cecil / 03=Lenox / 04=Sparks / 05=unincorp — prefer City Limits spatial."
+  - "Parcel mailing city/state/zip nationwide — never municipality filter."
+  - "No city-only CAMA FeatureServers — always county Cook_Parcels/0 + spatial City Limits."
+  - "sgrcmaps.com/Cook/ viewer 404; qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/cook HTML 200."
+  - "Rejected lookalikes / non-preferred: Cook County IL (maps.cookcountyil.gov CookViewer / hub-cookcountyil); Cook County MN/others; paid Regrid/ATTOM/DynamoSpatial/ParcelVision/GetParcelData; SGRC Cook/Electric|Gas|Sewer|Water utilities."
+  - "Schema water/sewer/gas/electricty/road* + Addresses DAY_PHONE/RESIDENT — DO NOT collect (skip utilities+AADT + PII); no emails/phones."
+
+license: >
+  Southern Georgia Regional Commission GIS sgrcmaps.com/alma — Cook/Cook_Parcels,
+  Cook/CookParcels, Cook/Cook_Zoning, Cook/Cook_Boundaries, Cook/Cook_Addresses,
+  Cook/Cook_Transportation / Natural_Features / Census (skip utilities on
+  sgrcmaps.com/arcgis Cook/Electric|Gas|Sewer|Water). Assessor qpublic.net/ga/cook
+  AppID=664 / App=cookCountyGA (qPub_Link KeyValue={Parcel_No}). Tax Commissioner
+  cookcountypay.com. Attribution SGRC / Cook County Tax Assessor. Public fields only;
+  no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=664&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=cookCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Parcels/MapServer/0 count 10432; extent center
+    [['13075', 'Cook County']]; sample [['13071', 'Colquitt County']]. No change to field map (see layer
+    above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Adel city"
+      level: city
+      parentFips: "13075"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Cecil city"
+      level: city
+      parentFips: "13075"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Lenox town"
+      level: city
+      parentFips: "13075"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Sparks town"
+      level: city
+      parentFips: "13075"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Cook' AND aadt>0
+    altFilter: name LIKE '075-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 075-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 127
+    maxAadt: 54300
+    geoCheck: 127/127 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 10364
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Parcels/MapServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: sale_val=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 10364
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Parcels/MapServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=cookCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0002  001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=cookCountyGA&Layer=Parcels&PageType=Report&KeyValue=0002%20%20001
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=cookCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Adel city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Cecil city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Lenox town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Sparks town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

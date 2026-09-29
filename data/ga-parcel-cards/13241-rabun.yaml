@@ -1,0 +1,425 @@
+state: GA
+jurisdiction: Rabun County
+fips: "13241"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — ROKMAPS MapServer dead; qPublic HTML + human ROKMAPS viewer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no live Rabun County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. Historically indexed service
+      arcgis4/5.roktech.net/arcgis/rest/services/rabun/rabun_rokmaps/MapServer returns
+      HTTP 500 "Service … not found"; folder rabun absent from arcgis4/5.roktech.net root
+      (folders list has Paulding/robeson/etc., no rabun — same pattern as Habersham).
+      Official human GIS = ROKMAPS™ https://maps.roktech.net/ROKMAPS_Rabun/ (maps2
+      redirects; Mapping & Addressing / Tax Assessor pages). Assessor CAMA + maps =
+      qPublic AppID=674 LayerID=11359 (App=RabunCountyGA; qpublic.net/ga/rabun;
+      rabuncounty.ga.gov/taxassessor → Search). Cloudflare/bot 403 blocks automated
+      Application.aspx from research box; public for humans. Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=674&LayerID=11359&PageTypeID=4&KeyValue={parcelId}
+      (Search PageTypeID=2; estimate PageID=5839). RabunCountyGA_WFS wfs.schneidercorp.com
+      → 404; qpublic.schneidercorp.com RabunCountyGA_WFS → 403. AECOM Bridge_PTIP
+      qpublic_parcel1/110 "rabun (qpublic) (static)" returns empty/error — reject as
+      production CAMA. GM_ELA AGOL webmap "Rabun County" (3c5295253bb74742bd168853fc78e2b9)
+      embeds only a tiny featureCollection (6 polys) — not county parcels. No GMRC public
+      parcel FS recovered. Commercial extracts (Regrid/ATTOM/USLandGrid) — rejected (paid).
+      GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13241 CENTLAT +34.8817296 CENTLON
+      -083.4021522 — Rabun / Clayton NE GA mountains (~34.88,-83.41; Tallulah Gorge /
+      Lake Burton). Seat Clayton. Skip utilities+AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic AppID=674 LayerID=11359
+      / App=RabunCountyGA. Deep-link KeyValue={parcelId} on Report page. Tax Commissioner
+      rabuncountytax.com — bills/pay only, not CAMA REST. Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. Prefer qPublic Sales Search / Sales List HTML
+      AppID=674 / App=RabunCountyGA. Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no live public zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Rabun County GA Euclidean zoning FeatureServer recovered (2026-09-24). Planning /
+      Zoning + Municode code of ordinances on rabuncounty.ga.gov — PDF/HTML, not REST.
+      Honest gap.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Rabun County GA Future Land Use FeatureServer found (2026-09-24). Comp Plan / PDF path only.
+    status: gap
+
+municipalities:
+  - name: Clayton
+    level: city
+    parentFips: "13241"
+    joinToCountyParcels: >
+      County seat / largest city. Soft spatial ~-83.40,34.88 (Census place / courthouse)
+      when parcels restore. No separate city parcel REST — county qPublic / ROKMAPS only.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Clayton zoning FeatureServer — ordinance/PDF only.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Clayton FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic AppID=674 HTML only.
+        status: gap
+    gaps:
+      - "No Clayton city-owned GIS REST; county ROKMAPS viewer + qPublic HTML."
+    status: gap
+
+  - name: Dillard
+    level: city
+    parentFips: "13241"
+    joinToCountyParcels: Soft spatial Dillard GA (~-83.39,34.97) when county parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Dillard zoning FeatureServer found.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Dillard city-owned GIS REST."
+    status: gap
+
+  - name: Sky Valley
+    level: city
+    parentFips: "13241"
+    joinToCountyParcels: Soft spatial Sky Valley GA (~-83.33,34.99) when parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sky Valley zoning FeatureServer found.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Sky Valley city-owned GIS REST."
+    status: gap
+
+  - name: Mountain City
+    level: city
+    parentFips: "13241"
+    joinToCountyParcels: Soft spatial Mountain City GA (~-83.39,34.92) when parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Mountain City zoning FeatureServer found.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Mountain City city-owned GIS REST."
+    status: gap
+
+  - name: Tallulah Falls
+    level: city
+    parentFips: "13241"
+    joinToCountyParcels: >
+      Soft spatial Tallulah Falls GA (~-83.39,34.74). May touch Habersham County —
+      prefer Rabun qPublic when parcel id is Rabun; do not assume Tallulah Falls geometry
+      is Rabun-only.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Tallulah Falls zoning FeatureServer found.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only; multi-county caution with Habersham.
+        status: gap
+    gaps:
+      - "Tallulah Falls straddles Rabun+Habersham — multi-county caution."
+    status: gap
+
+  - name: Tiger
+    level: city
+    parentFips: "13241"
+    joinToCountyParcels: Soft spatial Tiger GA (~-83.43,34.85) when parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Tiger zoning FeatureServer found.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Tiger city-owned GIS REST."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Rabun County GA — qPublic App=RabunCountyGA / AppID=674 LayerID=11359 HTML only."
+  - "Historical rabun/rabun_rokmaps MapServer dead (HTTP 500); folder rabun absent from roktech root — same as Habersham."
+  - "ROKMAPS_Rabun human viewer live (maps.roktech.net) but no public ArcGIS query API recovered."
+  - "AECOM Bridge_PTIP qpublic_parcel1/110 and GM_ELA Rabun featureCollection — not usable county CAMA."
+  - "Tallulah Falls may straddle Habersham — multi-county caution."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/rabun + AppID=674 Search/Maps public for humans."
+  - "REJECT paid Regrid/ATTOM/USLandGrid; skip utilities+AADT; no emails/phones."
+
+license: >
+  Rabun County Tax Assessor qPublic/Beacon App=RabunCountyGA / AppID=674 LayerID=11359
+  (qpublic.net/ga/rabun; rabuncounty.ga.gov/taxassessor; Clayton GA 30525). Official human
+  GIS ROKMAPS™ maps.roktech.net/ROKMAPS_Rabun/ (Mapping & Addressing). No public ArcGIS
+  parcel service discovered 2026-09-24 (rabun_rokmaps MapServer dead). Attribution Rabun
+  County Tax Assessor / ROK Technologies. Public HTML + human viewer only; no emails/phones;
+  no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=RabunCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://maps.roktech.net/ROKMAPS_Rabun/
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Clayton city"
+      level: city
+      parentFips: "13241"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Dillard city"
+      level: city
+      parentFips: "13241"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Mountain City town"
+      level: city
+      parentFips: "13241"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Sky Valley city"
+      level: city
+      parentFips: "13241"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Tiger town"
+      level: city
+      parentFips: "13241"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Rabun' AND aadt>0
+    altFilter: name LIKE '241-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 241-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 82
+    maxAadt: 24000
+    geoCheck: 82/82 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=RabunCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=674&LayerID=11359&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://maps.roktech.net/ROKMAPS_Rabun/
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Clayton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Dillard city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Mountain City town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Sky Valley city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Tiger town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

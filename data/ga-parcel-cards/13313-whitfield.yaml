@@ -1,0 +1,386 @@
+state: GA
+jurisdiction: Whitfield County
+fips: "13313"
+level: county
+markets: [Chattanooga]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons + CAMA (owner, mailing, situs parts, acres, values, zoning)
+  - role: parcels
+    name: Parcels_and_Development Parcels (official Whitfield GIS)
+    restUrl: https://gis.whitfieldcountyga.com/server/rest/services/Parcels_and_Development/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_FUL: parcelId
+      lastname: ownerName
+      address1: mailingAddress
+      address2: mailingAddress2
+      address3: mailingAddress3
+      city: mailingCity
+      state: mailingState
+      zip: mailingZip
+      house_no: situsNumber
+      stdirect: situsStreetDir
+      street_nam: situsStreet
+      sttype: situsStreetType
+      unit: situsUnit
+      extension: situsExtension
+      totalacres: acreage
+      Zoning: zoning
+      taxdistric: taxDistrict
+      descrip: municipality
+      legal_desc: legalDescription
+      land_value: tax.landValue
+      Res_Imp: tax.improvementValueResidential
+      Comm_Imp: tax.improvementValueCommercial
+      ACC_Imp: tax.improvementValueAccessory
+      land_type: dorCode
+      SubDetails: subdivision
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA landbase (Whitfield County GIS;
+      gis.whitfieldcountyga.com ArcGIS Server 11.5; Parcels_and_Development item
+      22f9ff3eb84a4051b6539a197c9c363a). Live count 46673 (2026-09-24). SR StatePlane
+      GA West FIPS 1002 Feet (102667/2240). totalacres>0 = 45917; totalacres 5–150 =
+      7074; lastname filled = 46020; land_value>0 = 45713. Geo-verified WGS84 samples
+      ~-84.971,34.738 (PARCEL_FUL 12-313-12-000 Dalton fringe) and ~-85.028,34.804
+      (12-150-01-017 Rocky Face) — Whitfield County GA NW of Atlanta / Chattanooga MSA
+      GA ring (NOT Whitfield TN; NOT Hamilton TN ~-85.3,35.0). PARCEL_FUL format e.g.
+      '12-313-12-000'. Situs = house_no + stdirect + street_nam + sttype (+ unit);
+      city/state/zip are MAILING (postal community Dalton/Rocky Face/…). taxdistric /
+      descrip live decode: 06 County≈31840, 01 City of Dalton≈10821, 09 Varnell≈1000,
+      15 Tunnel Hill≈522, 07 Cohutta≈507, plus TAD/DDA overlays (30 TAD1 City of Dalton
+      ≈342, 10 Varnell TAD≈272, 31 TAD1 DDA≈249, 20 Whitfield Acres≈111, 32 TAD3≈99,
+      29 Varnell Whitfield Acres≈97, 34 TAD5 Dalton≈91, 05 Downtown Dev Authority≈44,
+      33 TAD4 Dalton≈25). Zoning field on parcels mirrors Zoning layer (R-5/R-2/…).
+      land_value + Res_Imp/Comm_Imp/ACC_Imp are published CAMA components — no single
+      Total_Taxable_FMV / assessedValue REST field. Twin TaxAssessMapping/MapServer/11
+      same 27-field schema. Official portal: gis.whitfieldcountyga.com/GIS/WCGIS/ and
+      Search Parcel Data. Rejected paid Regrid/USLandGrid/ATTOM; rejected Hamilton TN
+      CHCRPA LandUse_SF as Whitfield substitute.
+    status: usable
+
+  - role: tax
+    name: Parcels land_value / Res_Imp / Comm_Imp / ACC_Imp (on polygons)
+    restUrl: https://gis.whitfieldcountyga.com/server/rest/services/Parcels_and_Development/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_FUL: parcelId
+      land_value: tax.landValue
+      Res_Imp: tax.improvementValueResidential
+      Comm_Imp: tax.improvementValueCommercial
+      ACC_Imp: tax.improvementValueAccessory
+      taxdistric: taxDistrict
+      descrip: municipality
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons (land_value>0 = 45713). No
+      public REST tax.assessedValue / taxableValue / single marketValue rollup —
+      sum land_value + Res_Imp + Comm_Imp + ACC_Imp as published FMV components when
+      needed. Assessor HTML: qPublic/Beacon (qpublic.net/ga/whitfield historically;
+      CDN/bot 403 from research box 2026-09-24). Prefer live MapServer/4 over HTML.
+    status: usable
+
+  - role: sales
+    name: Recent Sales (saleyear only — no price)
+    restUrl: https://gis.whitfieldcountyga.com/server/rest/services/Parcels_and_Development/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_FUL: parcelId
+      saleyear: lastSale.year
+    notes: >
+      Live count 43106 polygon flags with saleyear string only (domain spans ~1952–
+      2025; recent years e.g. 2025≈1218, 2024≈1088, 2023≈1118, 2022≈1545). NO
+      lastSale.price / qualified / deed date fields on this layer or on Parcels/4.
+      TaxAssessMapping/MapServer/7 Recent Sales twin; /1 Last 4 LM Sale Years exposes
+      Maxsaleyear only. Join saleyear to parcels on PARCEL_FUL. Treat as partial sale
+      year enrichment — not full sales CAMA. qPublic Sales Search HTML for price.
+    status: partial
+
+  - role: zoning
+    name: Parcels_and_Development Zoning (parcel-tied Euclidean + city stubs)
+    restUrl: https://gis.whitfieldcountyga.com/server/rest/services/Parcels_and_Development/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_FUL: parcelId
+      Zoning: zoning
+      CODE: zoningMapStatus
+      DISTRICT: landDistrict
+      LANDLOT: landLot
+      PARCEL: parcelShort
+      SUBPARCEL: subParcel
+      MapNumber: zoningMapSheet
+      Sub_Name: subdivision
+      Zoning_Old: zoningPrior
+    notes: >
+      Preferred zoning polygons (parcel-tied; live count 46669 ≈ parcel count). Use
+      Zoning as zoning code/label. Domain (top): Rural Residential (R-5)≈13858, Low
+      Density Single Family Residential (R-2)≈13430, Medium Density Single Family
+      Residential (R-3)≈3378, General Agriculture (GA)≈2995, Estate Residential (R-1)
+      ≈2324, General Commercial (C-2)≈2324, High Density Residential (R-7)≈2020, Heavy
+      Manufacturing (M-2)≈1575, Suburban Agriculture (SA)≈626, Planned Unit Development
+      (PUD)≈580, Zoned within the City of Tunnel Hill≈561, Transitional Residential
+      (R-6)≈551, Zoned within the City of Cohutta≈545, Zero Lot Line Residential (R-4)
+      ≈378, Neighborhood Commercial (C-1)≈289, Transitional Commercial (C-4)≈258,
+      Central Business District (C-3)≈247, plus Cond variants / Limited Commercial
+      (C-1A) / Light Manufacturing (M-1). City stubs 'Zoned within the City of Tunnel
+      Hill/Cohutta' are NOT Euclidean city codes — prefer city certification inside
+      those limits; Dalton Euclidean appears encoded in county R-/C-/M- classes (no
+      separate Dalton-only FeatureServer found). Geo-verified Whitfield GA. Also on
+      parcels layer Zoning field for PIN join without spatial.
+    status: usable
+
+  - role: flu
+    name: Future Development (Comp Plan FLU districts)
+    restUrl: https://gis.whitfieldcountyga.com/server/rest/services/Parcels_and_Development/MapServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FLU: flu
+    notes: >
+      Preferred Future Land Use / Future Development district polygons (NOT parcel-
+      tied — spatial intersect). Live count 468. Domain: Emerging Suburban and
+      Exurban Areas≈198, Town Neighborhood≈122, Downtown/Town Center≈69, Community
+      Activity Center≈64, plus singleton character areas (Airport, Cohutta, Commercial,
+      Dalton State/College Drive, Industrial, Interchange, Medical District, Preserve,
+      Regional Activity Center, Ridge Conservation, Rural Neighborhood - Revitalization,
+      Rural Residential, Rural/Agricultural Reserve, Suburban, Town Neighborhood
+      Revitalization). Geo extent matches county parcels. Prefer over third-party
+      CHCRPA LandUse_SF (Hamilton TN–heavy; only ~10 Catoosa GA SF rows — wrong scope).
+    status: usable
+
+  - role: other
+    name: Boundaries Town Boundaries (municipalities)
+    restUrl: https://gis.whitfieldcountyga.com/server/rest/services/Boundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      City: municipality
+    notes: >
+      Live count 4 municipality polygons: Dalton, Tunnel Hill, Cohutta, Varnell.
+      Preferred spatial join target for municipality filter (standing order). Soft
+      attribute join via parcels taxdistric/descrip (01 Dalton, 15 Tunnel Hill, 07
+      Cohutta, 09 Varnell). City attribute is name (not postal).
+    status: usable
+
+  - role: other
+    name: Addressing_Points Address Points
+    restUrl: https://gis.whitfieldcountyga.com/server/rest/services/Addressing_Points/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FULL_ADDRE: situsAddress
+      HNUM: situsNumber
+      STREET: situsStreet
+      COMMUNITY: postalCommunity
+      City: postalCityShort
+      M_ADDRESS: mailingAddress
+      M_COMM: mailingCity
+      M_STATE: mailingState
+      M_ZIP: mailingZip
+      STRUCTURE: structureType
+    notes: >
+      Live count 40383 address points. COMMUNITY/City are postal/community labels
+      (County / RESACA samples) — NOT municipality filter; prefer Town Boundaries /
+      taxdistric. No PARCEL_FUL on this layer — spatial join to Parcels. Geo-verified
+      ~-84.966,34.621 Whitfield GA. Twin Addressing/MapServer/0.
+    status: usable
+
+municipalities:
+  - name: Dalton
+    level: city
+    parentFips: "13313"
+    joinToCountyParcels: >
+      Spatial Boundaries/Town Boundaries City='Dalton' (~-84.97,34.77) OR taxdistric
+      in (01,30,31,34,33,05) City of Dalton / TAD1 / TAD1 DDA / TAD5 / TAD4 / Downtown
+      Dev Authority (≈11572 soft). mailing city='DALTON' is postal — prefer spatial /
+      taxdistric.
+    layers: []
+    notes: >
+      No official City of Dalton-only ArcGIS FeatureServer/MapServer for zoning/FLU/
+      parcels found (2026-09-24). County Zoning Euclidean codes cover Dalton interiors
+      (R-2/R-5/C-2/M-2/…); no 'Zoned within City of Dalton' stub. cityofdalton-ga.gov
+      civic site without public ArcGIS catalog. Geography/CAMA via taxdistric + county
+      parcels; city zoning certification via county Zoning layer or city staff/PDF.
+    status: partial
+
+  - name: Varnell
+    level: city
+    parentFips: "13313"
+    joinToCountyParcels: >
+      Spatial City='Varnell' OR taxdistric in (09,10,29) Varnell / Varnell TAD /
+      Varnell Whitfield Acres (≈1369 soft).
+    layers: []
+    notes: >
+      No Varnell-only zoning/FLU REST found. County Zoning applies; geography via
+      taxdistric / Town Boundaries.
+    status: gap
+
+  - name: Tunnel Hill
+    level: city
+    parentFips: "13313"
+    joinToCountyParcels: >
+      Spatial City='Tunnel Hill' OR taxdistric='15' Tunnel Hill (≈522).
+    layers: []
+    notes: >
+      County Zoning domain includes stub 'Zoned within the City of Tunnel Hill'
+      (≈561) — not Euclidean city codes. No city FeatureServer; PDF/staff for true
+      city zoning. Geography via taxdistric / Town Boundaries.
+    status: gap
+
+  - name: Cohutta
+    level: city
+    parentFips: "13313"
+    joinToCountyParcels: >
+      Spatial City='Cohutta' OR taxdistric='07' Cohutta (≈507).
+    layers: []
+    notes: >
+      County Zoning stub 'Zoned within the City of Cohutta' (≈545). No city
+      FeatureServer. FLU Future Development has singleton 'Cohutta' character poly.
+      Geography via taxdistric / Town Boundaries.
+    status: gap
+
+gaps:
+  - "No public REST lastSale.price / qualified / deed date — Recent Sales layer has saleyear string only (43106); qPublic Sales Search HTML for price (bot/CDN may 403)."
+  - "No single tax.marketValue / assessedValue / taxableValue REST field — use land_value + Res_Imp + Comm_Imp + ACC_Imp components on Parcels/4."
+  - "City Euclidean zoning REST gap for Tunnel Hill / Cohutta (county stubs only); Dalton appears encoded in county R-/C-/M- classes with no city-only FeatureServer."
+  - "No Dalton / Varnell / Tunnel Hill / Cohutta city-only parcel CAMA — county Parcels/4 + taxdistric / Town Boundaries spatial."
+  - "Addressing_Points COMMUNITY/City are postal — municipality filter = Town Boundaries spatial or taxdistric/descrip only."
+  - "qpublic.net/ga/whitfield returned 403 from research box (2026-09-24); public for humans — do not invent AppID/LayerID."
+  - "Rejected lookalikes / non-preferred: Hamilton County TN / CHCRPA LandUse_SF (cclAu9OKhOfjeUdr — STATE=TN Hamilton dominant; only ~10 Catoosa GA rows); Whitfield TN lookalikes; moonassoc/Vincent_Properties private Walker parcels (wrong county or token-locked); paid Regrid/USLandGrid/ATTOM/MappingSolutions; AECOM Bridge_PTIP static qpublic scrapes."
+  - "Enrichment vs thin in-app: county 46673 geometry+PARCEL_FUL+owner/mailing/situs parts+totalacres(5–150=7074)+land/imp values+taxdist+Zoning; Zoning 46669; FLU 468; Town Boundaries 4; address points 40383; saleyear partial; sale price / assessed / city-only zoning remain gap/HTML."
+
+license: >
+  Whitfield County GIS gis.whitfieldcountyga.com — Parcels_and_Development (Parcels/4,
+  Zoning/2, Future Development/6, Recent Sales/0), TaxAssessMapping, Boundaries,
+  Addressing / Addressing_Points, Elections, Hydrography, Public_Works, Transportation,
+  Ortho basemaps. Portal: gis.whitfieldcountyga.com/GIS/WCGIS/ (View Online Maps /
+  Search Parcel Data). Attribution to Whitfield County GIS. Public fields only; no
+  emails/phones; no paid vendors (Regrid/ATTOM/CoreLogic/USLandGrid).
+appraiserSearchUrl: https://gis.whitfieldcountyga.com/GIS/WCGIS/searchparceldata.asp
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://gis.whitfieldcountyga.com/server/rest/services/Parcels_and_Development/MapServer/4 count
+    46673; extent center [['13313', 'Whitfield County']]; sample [['13313', 'Whitfield County']]. No
+    change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Cohutta city"
+      level: city
+      parentFips: "13313"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Dalton city"
+      level: city
+      parentFips: "13313"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Tunnel Hill city"
+      level: city
+      parentFips: "13313"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Varnell city"
+      level: city
+      parentFips: "13313"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Whitfield' AND aadt>0
+    altFilter: name LIKE '313-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 313-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 283
+    maxAadt: 88200
+    geoCheck: 283/283 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - land_value
+    filledCount: 45713
+    restUrl: https://gis.whitfieldcountyga.com/server/rest/services/Parcels_and_Development/MapServer/4
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: REST-partial
+    detail: Parcels_and_Development/MapServer/0 saleyear only (43106); no price/deed
+    restUrl: https://gis.whitfieldcountyga.com/server/rest/services/Parcels_and_Development/MapServer/0
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 45994
+    restUrl: https://gis.whitfieldcountyga.com/server/rest/services/Parcels_and_Development/MapServer/4
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=WhitfieldCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_FUL
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 12-313-12-000
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WhitfieldCountyGA&Layer=Parcels&PageType=Report&KeyValue=12-313-12-000
+    verification: 'pattern-tested: real sample ID from PARCEL_FUL; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: inferred {County}CountyGA convention
+  jurisdictionGisUrl:
+    county: https://gis.whitfieldcountyga.com/GIS/WCGIS/
+    note: county GIS site
+    cities:
+    - name: Cohutta city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Dalton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Tunnel Hill city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Varnell city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

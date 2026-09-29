@@ -1,0 +1,408 @@
+state: GA
+jurisdiction: Wilcox County
+fips: "13315"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel polygons (PIN + Calc_Acres; no owner/tax/sale on REST)
+  - role: parcels
+    name: Wilcox_County_Wide_View TaxParcels_25 (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wilcox_County_Wide_View/FeatureServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: Calc_Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Calc_Acres: acreage
+      OBJECTID: objectId
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + PIN + Calc_Acres (Heart of Georgia Altamaha RC /
+      hogagis org HHvUPZ2XuLOAJxjR — Wilcox_County_Wide_View item 6e205698951b4f6aa47f3afd5b36f5bd
+      FeatureServer/12 TaxParcels_25). Live count 6169 (2026-09-24). Schema: PIN (string; spaced
+      map-block style e.g. "001    002") + Calc_Acres + Shape__Area/Length + polygon — NO owner /
+      mailing / situs / CURR_VAL / sale on REST. Shape__Area is AGOL metric area (Web Mercator),
+      NOT deed acres — prefer Calc_Acres for acreageField. maxRecordCount 2000 — page via
+      resultOffset / spatial envelopes. Sample WGS84 ≈ -83.61..-83.58 × 32.11..32.10 — Wilcox
+      County GA / Abbeville seat. CountyBoundary/9 CNTYIDFP=13315 NAME=Wilcox STATEFP=13
+      COUNTYFP=315 RDC=Heart of Georgia-Altamaha geo-verified. Census TIGERweb GEOID 13315
+      CENTLAT +31.9728716 CENTLON -083.4323216. Join CAMA via qPublic App=WilcoxCountyGA /
+      AppID=939 LayerID=18333 HTML (KeyValue={parcelId}; Search PageID=8178). REJECT
+      maps.capturecama.com Wilcox/* MapServer — sample pt ≈ -87.08,32.02 is Wilcox County
+      ALABAMA (Camden AL ring; PARCEL_NUM style 66-17-04-…; OWNER_PHON PII) — WRONG state
+      FIPS 01131; do not use. REJECT gis.wilco.org county_wcad_parcels — Williamson County
+      Appraisal District TEXAS (copyright WCAD; extent ~Austin TX) — WRONG state. Rejected
+      paid Regrid/ATTOM/USLandGrid/ReportAll/NETR; no emails/phones; skip utilities+AADT.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on TaxParcels_25; qPublic AppID=939 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on TaxParcels_25. Assessor HTML
+      qpublic.net/ga/wilcox → App=WilcoxCountyGA / AppID=939 LayerID=18333
+      (Cloudflare/bot 403 automated on Application.aspx; qpublic.net public for humans;
+      Abbeville GA 31001). Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=939&LayerID=18333&PageTypeID=4&KeyValue={parcelId}
+      (Search PageTypeID=2 PageID=8178; also App=WilcoxCountyGA&Layer=Parcels&PageType=Report
+      &KeyValue=). Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/lastSale on TaxParcels_25. Prefer qPublic Sales Search / Sales List HTML
+      AppID=939 / App=WilcoxCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean; city zoning only (Abbeville + Rochelle)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Wilcox County-wide Euclidean zoning FeatureServer on Wilcox_County_Wide_View
+      (2026-09-24). Prefer city Euclidean: AbbevilleZoningRevised + RochelleZoning (see
+      municipalities). Pineview / Pitts lack zoning layers.
+    status: gap
+
+  - role: flu
+    name: Wilcox_County_Wide_View Landuse2023
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wilcox_County_Wide_View/FeatureServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      FLULU: flu
+      FLUDCA: fluCategory
+      EXTLU: existingLandUse
+      EXTLUDCA: existingLandUseCategory
+      Acreage: acreage
+    notes: >
+      County FLU / existing land-use polygons (live count 17828; 2026-09-24). FLULU codes
+      observed: Agriculture / Forestry / Residential / Industrial / Public/Institutional
+      (FLUDCA Agriculture/Forestry | Residential | Public/Institutional). Companion
+      SpecialAreas/8 SPECIAL_AR + NAME (e.g. Ocmulgee River Corridor Natural/Cultural
+      Resources) — planning character corridors; not a substitute for Euclidean zoning.
+      maxRecordCount 2000 — page via resultOffset / envelopes.
+    status: usable
+
+  - role: other
+    name: Wilcox_County_Wide_View CountyBoundary (GA FIPS 13315)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wilcox_County_Wide_View/FeatureServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      CNTYIDFP: countyFips
+      STATEFP: stateFips
+      COUNTYFP: countyFp
+      RDC: regionalCommission
+    notes: >
+      Preferred spatial county mask — NAME=Wilcox CNTYIDFP=13315 STATEFP=13 COUNTYFP=315
+      RDC=Heart of Georgia-Altamaha. Do NOT map DA_PHONE (PII — skip). Companion
+      EMADistricts/6 / Roads/5 / FloodZones09/2 / Soils/0 — not parcels. Skip
+      FloodZones/Soils/Roads/Wetlands as non-CAMA; skip utilities+AADT.
+    status: usable
+
+municipalities:
+  - name: Abbeville
+    level: city
+    parentFips: "13315"
+    joinToCountyParcels: >
+      County seat. Spatial City_of_Abbeville_GeoData_View/10 AbbevilleCityLimits
+      (~-83.32,32.00; Name=Abbeville FIPS='315') ∩ TaxParcels_25. Mailing city never sole
+      filter.
+    layers:
+      - role: zoning
+        name: City_of_Abbeville_GeoData_View AbbevilleZoningRevised
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Abbeville_GeoData_View/FeatureServer/9
+        layerId: 9
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoningID: zoning
+          Zoning: zoningDescription
+        notes: >
+          Preferred city Euclidean (live count 742; Zoning filled ≈575; 2026-09-24).
+          ZoningID codes: AG / B-1 / B-3 / I / R-20 / R-30 / R2-15 / RM-15 (Zoning text
+          includes district names). Companion legacy AbbevilleZoning/0 (count 26; field ID
+          only — prefer /9). Skip AbbevilleWaterSewer_ServiceArea per tranche-3.
+        status: usable
+      - role: flu
+        name: null — county Landuse2023 + spatial Abbeville
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Abbeville-only FLU REST — county Landuse2023/13 + city limits.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial Abbeville
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Abbeville-only CAMA — county /12 + AbbevilleCityLimits/10. Tax/sale qPublic HTML.
+        status: gap
+    gaps:
+      - "No Abbeville city-owned parcel/FLU REST — county TaxParcels_25 + spatial limits."
+      - "Owner/tax/sale via qPublic AppID=939 HTML even inside city."
+    status: usable
+
+  - name: Rochelle
+    level: city
+    parentFips: "13315"
+    joinToCountyParcels: >
+      Spatial City_of_Rochelle_GeoData_View/0 RochelleCityLimits (~-83.47,31.95; Name=Rochelle
+      FIPS='315') ∩ TaxParcels_25.
+    layers:
+      - role: zoning
+        name: City_of_Rochelle_GeoData_View RochelleZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Rochelle_GeoData_View/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE: zoning
+        notes: >
+          City ZONE text (live count 63; ZONE filled ≈28 non-blank; 2026-09-24). Codes:
+          AG / B-1 / B-3 / I / IND / R-15 / R-20 / R-30 / R2-15 / RM-15. Skip
+          RochelleWaterSewer_ServiceArea per tranche-3.
+        status: usable
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial Rochelle
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Rochelle-only CAMA REST.
+        status: gap
+    gaps:
+      - "No Rochelle city-owned parcel/FLU REST — county TaxParcels_25 + spatial limits."
+    status: usable
+
+  - name: Pineview
+    level: city
+    parentFips: "13315"
+    joinToCountyParcels: >
+      Spatial City_of_Pineview_GeoData_View/0 PineviewCityLimits (~-83.49,32.10; Name=Pineview
+      FIPS='315') ∩ TaxParcels_25.
+    layers:
+      - role: zoning
+        name: null — no PineviewZoning layer published
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: City_of_Pineview_GeoData_View has limits/special areas/water only — no zoning FS.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial Pineview
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Pineview-only CAMA. Skip PineviewHydrants / WaterLines / WaterValves per tranche-3.
+        status: gap
+    gaps:
+      - "No Pineview zoning/parcel/FLU REST — city limits only + county parcels."
+    status: partial
+
+  - name: Pitts
+    level: city
+    parentFips: "13315"
+    joinToCountyParcels: >
+      Spatial City_of_Pitts_gdb_View/0 PittsCityLimits (~-83.55,31.94; Name=Pitts FIPS='315')
+      ∩ TaxParcels_25.
+    layers:
+      - role: zoning
+        name: null — no PittsZoning layer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: City_of_Pitts_gdb_View has limits/special areas/water only — no zoning FS.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial Pitts
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Pitts-only CAMA. Skip PittsWaterSewer_ServiceArea per tranche-3.
+        status: gap
+    gaps:
+      - "No Pitts zoning/parcel/FLU REST — city limits only + county parcels."
+    status: partial
+
+gaps:
+  - "TaxParcels_25 REST has PIN + Calc_Acres geometry — no owner/mailing/situs/CURR_VAL/sale; tax/owner/sale via qPublic AppID=939 LayerID=18333 HTML only."
+  - "No county-wide Euclidean zoning FeatureServer — city AbbevilleZoningRevised + RochelleZoning only; Landuse2023 FLU + SpecialAreas planning character."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/wilcox + AppID=939 Search/Maps public for humans."
+  - "REJECT maps.capturecama.com Wilcox/* (Wilcox County AL ~-87,32 — wrong state); REJECT gis.wilco.org WCAD (Williamson County TX); REJECT paid Regrid/ATTOM/USLandGrid/ReportAll."
+  - "Skip city Water/Sewer/Hydrant + AADT per tranche-3; no emails/phones; do not map CountyBoundary DA_PHONE."
+
+license: >
+  Heart of Georgia Altamaha RC GIS (hogagis / services5.arcgis.com/HHvUPZ2XuLOAJxjR) —
+  Wilcox_County_Wide_View TaxParcels_25/12, Landuse2023/13, CountyBoundary/9, SpecialAreas/8;
+  City_of_Abbeville_GeoData_View, City_of_Rochelle_GeoData_View, City_of_Pineview_GeoData_View,
+  City_of_Pitts_gdb_View. Assessor qPublic App=WilcoxCountyGA / AppID=939 LayerID=18333
+  (qpublic.net/ga/wilcox; Abbeville GA 31001). Attribution HOGARC / Wilcox County Tax
+  Assessor. Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+  REJECT Wilcox AL capturecama + Williamson TX wilco.org lookalikes.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=939&LayerID=18333&PageTypeID=2&PageID=8178
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wilcox_County_Wide_View/FeatureServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/HHvUPZ2XuLOAJ
+    xjR/arcgis/rest/services/Wilcox_County_Wide_View/FeatureServer/12 count 6169; extent center
+    [['13315', 'Wilcox County']]; sample [['13315', 'Wilcox County']]. No change to field map (see layer
+    above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Abbeville city"
+      level: city
+      parentFips: "13315"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Pineview town"
+      level: city
+      parentFips: "13315"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Pitts city"
+      level: city
+      parentFips: "13315"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Rochelle city"
+      level: city
+      parentFips: "13315"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Wilcox' AND aadt>0
+    altFilter: name LIKE '315-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 315-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 65
+    maxAadt: 3890
+    geoCheck: 65/65 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=WilcoxCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=939&LayerID=18333&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PIN
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    002
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WilcoxCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20002
+    verification: 'pattern-tested: real sample ID from PIN; box test HTTP 403 Cloudflare challenge (expected; pattern
+      follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wilcox_County_Wide_View/FeatureServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Abbeville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Pineview town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Pitts city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Rochelle city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

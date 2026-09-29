@@ -1,0 +1,60 @@
+state: GA
+jurisdiction: "Johns Creek, Fulton County"
+fips: "13121"
+level: city
+markets: [Atlanta]
+
+layers:
+  - role: zoning
+    name: Zoning (Current)
+    restUrl: https://services1.arcgis.com/bqfNVPUK3HOnCFmA/arcgis/rest/services/Zoning_Current/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZoningClassAbbrev: zoning
+      ZoningClass: zoningDescription
+      CaseNumber: zoningCaseId
+      Address: situsAddress
+      DecisionDate: zoningEffectiveDate
+    notes: >
+      Official JohnsCreekGA AGOL FeatureServer (org bqfNVPUK3HOnCFmA). Live count 648 (2026-09-23).
+      Case/district polygons — no ParcelID on this layer; spatial join required. Viewer:
+      johnscreekga.maps.arcgis.com instant app (Zoning Current).
+    status: usable
+
+  - role: flu
+    name: Future Land Use
+    restUrl: https://services1.arcgis.com/bqfNVPUK3HOnCFmA/arcgis/rest/services/Future_Land_Use/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: city-only
+    fieldMap:
+      ParcelID: parcelId
+      FutureLandUse: flu
+      CurrentLandUse: currentLandUse
+      CommunityArea: fluPattern
+      Acres: acreage
+      SusceptibilityOfChange: fluChangeSusceptibility
+    notes: >
+      Parcel-attributed FLU. Live count 25440. ParcelID matches Fulton PMV/11 format
+      (e.g. "11 008000321703"). Prefer attribute join for FLU; spatial intersect as fallback.
+    status: usable
+
+gaps:
+  - "Zoning_Current lacks ParcelID (spatial only); FLU and city Parcels have ParcelID."
+  - "City Parcels FeatureServer includes JCZoning convenience field but CAMA values may be null — use Fulton PMV/11 for tax."
+
+license: "City of Johns Creek GIS (JohnsCreekGA AGOL org); public FeatureServers."
+appraiserSearchUrl: https://fultonassessor.org/
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+notes: >
+  JOIN TO COUNTY PARCELS: Zoning — spatial intersect with Fulton PMV MapServer/11.
+  FLU — attribute join ParcelID = PMV/11 ParcelID (verified same format), else spatial intersect.
+  Optional city Parcels (.../Parcels/FeatureServer/0) also exposes ParcelID + JCZoning but is not
+  a replacement for county digest values.

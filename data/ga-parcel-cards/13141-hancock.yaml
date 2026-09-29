@@ -1,0 +1,263 @@
+state: GA
+jurisdiction: Hancock County
+fips: "13141"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Hancock County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. Official human cadastral + CAMA path =
+      qPublic/Beacon App=HancockCountyGA (qpublic.net/ga/hancock →
+      qpublic.schneidercorp.com Application.aspx; county seat Sparta GA 31087;
+      hancockcountyga.gov/tax-assessor). Cloudflare/bot 403 blocks automated Application.aspx
+      from research box; public for humans. Numeric AppID/LayerID not recovered automated
+      (assessorsearch + county pages expose App=HancockCountyGA name form only). Deep-link
+      KeyValue={parcelId}:
+      Application.aspx?App=HancockCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+      (also PageType=Search / PageType=Maps). HancockCountyGA_WFS on wfs.schneidercorp.com
+      → 404; qpublic.schneidercorp.com HancockCountyGA_WFS → 403. No CSRA RC / HOGARC /
+      county AGOL Hancock GA parcel FS (AGOL "Hancock+Georgia+parcels" hits are wrong-state
+      lookalikes — see REJECT). RedClay hancock.app.redclayservices.com is gov/meeting SPA
+      (auth.prod.redclayservices.com) — not parcel REST. Commercial vendors advertise
+      Hancock GA extracts — rejected (paid). GEO-VERIFY GEORGIA: Census TIGERweb GEOID
+      13141 CENTLAT +33.2703816 CENTLON -083.0007402 — Hancock County GA / Sparta (CSRA /
+      Lake Sinclair–Oconee belt). CSRARC_Counties NAME=HANCOCK FIPS=141 centroid context
+      (~services1…Ug5xGQbHsD8zuZzM) — boundary only, not parcels. REJECT Hancock County MS
+      arcsrv.mfc.ms.gov …/Parcels/MapServer/20 (SR 26915 Gulf MS); REJECT Hancock County IL
+      services6…BN5dINZZvv0oeIev Hancock_Parcel (desc "Hancock County, IL"); REJECT Indiana
+      Parcel Boundaries / Hancock IN; REJECT Maine addisonhcpc parcels20260506 (SR 26919);
+      REJECT Hancock MA FeatureServer. REJECT paid Regrid/ATTOM. No emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic App=HancockCountyGA
+      (qpublic.net/ga/hancock; Cloudflare/bot 403 automated; public for humans). Deep-link
+      KeyValue={parcelId} on Report page. GMASS county-wide revaluation inspections
+      Sep 2025–Apr 2026 (notice on qPublic landing) — values may refresh on HTML after
+      digest, still no public REST. Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. qPublic Sales Search / Sales List / Yearly
+      Sales HTML App=HancockCountyGA only (bot 403 automated). Rejected paid
+      Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Hancock County GA Euclidean zoning FeatureServer on AGOL/CSRA (2026-09-24).
+      Planning/zoning via county/city staff or PDF if adopted — not public REST.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Hancock County GA future land use FeatureServer found (2026-09-24). Comp Plan PDF / CSRA gap.
+    status: gap
+
+  - role: other
+    name: CSRARC_Counties Hancock boundary (context — NOT parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CSRARC_Counties/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      FIPS: countyFips3
+    notes: >
+      Filter NAME='HANCOCK' / FIPS='141' for Hancock County GA outline (count=1).
+      Geo-verify / clip only — zero parcel/owner/tax/sale fields. Same shared org
+      Ug5xGQbHsD8zuZzM as other GA CSRA RC layers. Confirms Georgia (not MS/IL/IN).
+    status: partial
+
+municipalities:
+  - name: Sparta
+    level: city
+    parentFips: "13141"
+    joinToCountyParcels: >
+      County seat / primary incorporated place. Soft spatial ~-82.97,33.28 (Census place)
+      when parcels become available. No separate city parcel REST — county qPublic HTML only.
+      White Plains GA is Greene County (reject as Hancock municipality). Culverton / Linton /
+      Mayfield / Devereux are unincorporated communities — not first-class city cards.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Sparta zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sparta FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic App=HancockCountyGA HTML only.
+        status: gap
+    gaps:
+      - "No Sparta city-owned GIS REST; county qPublic HTML only."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Hancock County GA — qPublic App=HancockCountyGA HTML only (numeric AppID/LayerID not recovered automated)."
+  - "HancockCountyGA_WFS 404/403; no CSRA/HOGARC/county AGOL Hancock GA parcel FeatureServer."
+  - "CSRARC_Counties boundary only (NAME=HANCOCK FIPS=141) — not parcels."
+  - "REJECT Hancock MS arcsrv.mfc.ms.gov Parcels/20; REJECT Hancock IL Hancock_Parcel (BN5dINZZvv0oeIev); REJECT Hancock IN / IndianaMap parcels; REJECT Maine addisonhcpc parcels; REJECT Hancock MA."
+  - "Rejected paid Regrid/ATTOM Hancock GA extracts."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/hancock + App=HancockCountyGA Search/Maps public for humans."
+  - "RedClay hancock.app.redclayservices.com is meeting/gov SPA — not parcel CAMA REST."
+  - "GMASS revaluation 2025–2026 may refresh HTML digest values — still no public REST."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Hancock County Tax Assessor qPublic/Beacon App=HancockCountyGA (qpublic.net/ga/hancock;
+  Sparta GA 31087; hancockcountyga.gov/tax-assessor). CSRA RC CSRARC_Counties boundary on
+  Ug5xGQbHsD8zuZzM (filter HANCOCK). No public ArcGIS parcel service discovered 2026-09-24.
+  Attribution Hancock County Tax Assessor. Public HTML only; no emails/phones; no paid
+  vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HancockCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HancockCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Sparta city"
+      level: city
+      parentFips: "13141"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Hancock' AND aadt>0
+    altFilter: name LIKE '141-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 141-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 74
+    maxAadt: 8740
+    geoCheck: 73/74 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=HancockCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=HancockCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Sparta city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

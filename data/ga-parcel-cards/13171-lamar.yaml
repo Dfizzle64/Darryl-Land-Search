@@ -1,0 +1,270 @@
+state: GA
+jurisdiction: Lamar County
+fips: "13171"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY INTENT — no live public county parcel polygons
+  - role: parcels
+    name: null — no live public county parcel FeatureServer/MapServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No live public Lamar County GA cadastral polygon REST recovered (2026-09-24).
+      OpenAddresses us/ga/lamar pointed at services2.arcgis.com/EN0aHtzWcUlVk3ny Map1
+      FeatureServer/37 — LIVE returns Token Required 499 (auth blocked). AECOM
+      Bridge_PTIP/qpublic_parcel1 FeatureServer/77 "lamar (qpublic) (static)" and
+      MapServer twin return 500 Service not started (same Bridge_PTIP dead pattern as
+      Haralson/Heard/Pickens). No Schneider WFS LamarCountyGA_WFS on
+      wfs.schneidercorp.com. No AGOL org Feature Service for Lamar County GA parcels
+      (search total 0). Official human parcel viewer = qPublic App=LamarCountyGA
+      (qpublic.net/ga/lamar → qpublic.schneidercorp.com; bot 403 automated). Deep-link:
+      Application.aspx?App=LamarCountyGA&Layer=Parcels&PageType=Search and
+      PageType=Report&KeyValue={PARCEL_ID}. County sites lamarcountyga.com /
+      lamarcountyga.org Tax Assessors + Building/Zoning (zoning PDF only). Commercial
+      mirrors (Regrid/ATTOM) advertise extracts — do NOT wire paid vendors. Georgia GIS
+      Clearinghouse paid shapefile rejected. Geo target Lamar County GA south of Atlanta
+      — Barnesville ~-84.16,33.05 (NOT Lamar County TX Paris; NOT Lamar County AL;
+      NOT Lamar CO). Until a public FeatureServer restores, county geometry+CAMA =
+      HTML-only gap for land-search polygons.
+    status: gap
+
+  - role: parcels
+    name: OA Map1/37 (EN0aHtzWcUlVk3ny) — TOKEN REQUIRED
+    restUrl: https://services2.arcgis.com/EN0aHtzWcUlVk3ny/arcgis/rest/services/Map1/FeatureServer/37
+    layerId: 37
+    geometry: polygon
+    auth: token
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      OpenAddresses us/ga/lamar harvest target (conform pid=Parcel_No; also listed as
+      addresses). Live 2026-09-24: Token Required 499 — blocked. Do not prefer; re-check
+      if org publishes public view.
+    status: blocked
+
+  - role: parcels
+    name: AECOM Bridge_PTIP lamar (qpublic) (static) — NOT STARTED
+    restUrl: https://solutions.aecomonline.net/arcgis/rest/services/Bridge_PTIP/qpublic_parcel1/FeatureServer/77
+    layerId: 77
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Indexed AECOM qPublic static parcel mirror. Live 2026-09-24: FeatureServer and
+      MapServer return 500 / not started. Document discovered but unusable.
+    status: blocked
+
+  - role: tax
+    name: null — no public REST CAMA values
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public FeatureServer with market/assessed values. Assessor HTML qPublic
+      App=LamarCountyGA only (bot 403).
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Lamar GA multi-sale FeatureServer recovered. Prefer qPublic Sales Search HTML.
+      Rejected paid vendors.
+    status: gap
+
+  - role: zoning
+    name: null — county zoning PDF only (no FeatureServer)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No Lamar County zoning FeatureServer recovered. Static zoning map PDF:
+      https://www.lamarcountyga.com/wp-content/uploads/2020/02/Lamar_Zoning_2018.pdf
+      (Building/Zoning Dept). Certify sites via PDF / staff — status gap on REST.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Lamar County Future Land Use FeatureServer recovered (2026-09-24).
+    status: gap
+
+municipalities:
+  - name: Barnesville
+    level: city
+    parentFips: "13171"
+    joinToCountyParcels: >
+      No public county/city parcel REST — cannot spatial-join until parcels restore.
+      City seat ~-84.16,33.05 soft.
+    layers:
+      - role: zoning
+        name: null — no city zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Barnesville zoning FeatureServer recovered; county 2018 zoning PDF only.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Barnesville FLU REST.
+        status: gap
+      - role: parcels
+        name: null — no city CAMA REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Barnesville parcel FeatureServer; qPublic HTML countywide only.
+        status: gap
+    gaps:
+      - "No Barnesville city GIS REST; county parcels also gap/blocked."
+    status: gap
+
+  - name: Milner
+    level: city
+    parentFips: "13171"
+    joinToCountyParcels: >
+      No public parcel REST for spatial join until county restores.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Milner zoning FeatureServer recovered.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Milner FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Milner parcel REST.
+        status: gap
+    gaps:
+      - "No Milner city GIS REST."
+    status: gap
+
+  - name: Aldora
+    level: city
+    parentFips: "13171"
+    joinToCountyParcels: >
+      No public parcel REST for spatial join until county restores.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Aldora zoning FeatureServer recovered.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Aldora FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Aldora parcel REST.
+        status: gap
+    gaps:
+      - "No Aldora city GIS REST."
+    status: gap
+
+gaps:
+  - "No live public county parcel polygons — OA Map1/37 token-blocked; AECOM Bridge_PTIP/77 not started; no Schneider WFS; AGOL parcel FS search empty."
+  - "Zoning REST gap — 2018 PDF only (lamarcountyga.com Building/Zoning)."
+  - "No FLU / sales / tax REST; CAMA via qPublic App=LamarCountyGA HTML only (bot 403)."
+  - "Barnesville / Milner / Aldora: no city zoning/FLU/parcel FeatureServers."
+  - "Rejected Regrid/ATTOM/Georgia GIS Clearinghouse paid; rejected Lamar TX/AL/CO lookalikes."
+  - "No emails/phones collected; no paid vendors."
+
+license: >
+  Lamar County Tax Assessors / Building & Zoning (lamarcountyga.com; lamarcountyga.org)
+  — public map via qPublic SchneiderCorp App=LamarCountyGA (qpublic.net/ga/lamar).
+  Zoning map PDF 2018 on county Building/Zoning page. No public ArcGIS FeatureServer
+  attributed at verification. Attribution to Lamar County. Public fields only; no
+  emails/phones; no paid vendors (Regrid/ATTOM).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LamarCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

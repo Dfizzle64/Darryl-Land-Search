@@ -1,0 +1,641 @@
+state: GA
+jurisdiction: Walton County
+fips: "13297"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY county-wide — parcel polygons + PIN + character-area FLU (NO owner/tax/sale/Euclidean zoning)
+  - role: parcels
+    name: Walton County Zoning (choosewalton — parcel landbase + FLU attrs; misnamed)
+    restUrl: https://services.arcgis.com/ftUt0Vfnzfo0Cs96/arcgis/rest/services/Walton_County_Zoning/FeatureServer/29
+    layerId: 29
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      Map: mapSheet
+      Block: block
+      Parcel: parcelNumberShort
+      SubParcel: subParcel
+      Par_Label: parcelLabel
+      FLU: flu
+      Description: fluDescription
+      Shape__Area: shapeAreaSqM
+      Comments: notes
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + Parcel_No landbase (public choosewalton /
+      Development Authority AGOL org ftUt0Vfnzfo0Cs96 / shane@choosewalton.com). Live
+      count 32397 (2026-09-23); Parcel_No filled 32382; UTILITY=39. SR NAD 1983 UTM
+      Zone 17N (26917 meters); GIS acres = Shape__Area/4046.8564224 (avg ≈5.87 ac;
+      Shape__Area 5–150 ac ≈6187). Geo-verified WGS84 extent ~-83.987–-83.500,
+      33.590–33.936 and samples ~-83.927,33.829 (C004… / Loganville fringe),
+      ~-83.712,33.759 (N135… / Monroe area), ~-83.729,33.814 (C092… Monroe) —
+      Walton County GA, Atlanta MSA east (NOT Walton FL ~-86.1,30.4 / SR 102660;
+      Walton County FL Beacon AppID=835; any non-GA Walton). IMPORTANT: service title
+      says "Zoning" but attributes are FUTURE LAND USE / character areas (FLU domain:
+      Suburban≈14771, Neighborhood Residential≈6206, Conservation≈5030, Rural
+      Residential and Agriculture≈4615, Highway Corridor≈964, Employment Center≈670,
+      Village Center≈134) — NOT Euclidean A-1/R-1/B-1 codes. No ownerName, mailing*,
+      situs*, tax.*, lastSale.*, or Euclidean zoning on this layer. Duplicate
+      OBJECTIDs for same Parcel_No observed (e.g. C0920002 ×2 identical rings) —
+      dissolve/group by Parcel_No. Parcel_No formats C###… / N###… / LG###… / SC###…
+      / UTILITY; join to Monroe City Parcels on Parcel_No; to Loganville/Social Circle
+      zoning prefer spatial intersect (Name LG*/SC* schemes do not reliably equal
+      Parcel_No). Official county assessor CAMA org waltongis RtJQnMkoH9LGs7n0
+      walton_parcels_view is Token Required / subscription disabled (499/403) — not
+      public. monroega.gov org jzF6lkyxSyP3GLBQ WinGAP Parcel Regions also
+      subscription-canceled 403. Enrichment vs thin in-app: county outlines + PIN +
+      character FLU + GIS acres; owner/mailing/situs/tax/sale/Euclidean zoning remain
+      gap outside Monroe city REST.
+    status: usable   # pass1 2026-09-28: was partial; upgraded for Pass 1 (polygon + parcel ID). See pass1_2026-09-28 block.
+
+  - role: flu
+    name: Walton County Zoning FLU field (county character areas 2022-era)
+    restUrl: https://services.arcgis.com/ftUt0Vfnzfo0Cs96/arcgis/rest/services/Walton_County_Zoning/FeatureServer/29
+    layerId: 29
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      FLU: flu
+      Description: fluDescription
+    notes: >
+      Same layer as preferred parcels — use FLU / Description as county Future Land
+      Use / character area (matches NEGRC CA - Walton County - 2022 class names).
+      PIN-join on Parcel_No or spatial. Prefer city FLU/character inside municipalities
+      when available (Monroe Character DIST CD-3/4/5; NEGRC city FLU/CA layers).
+      Official FLU also published as PDF only:
+      waltoncountyga.gov/DocumentCenter/View/6565/Walton-County-Future-Land-Use-Map-2022
+      and Comp Plan June 2022 View/5997. NEGRC twin CA - Walton County - 2022
+      FeatureServer/472 (898 dissolved polygons; FDM_Long same class set) is
+      spatial-join FLU without Parcel_No — prefer this parcel-tied layer for search.
+    status: usable
+
+  - role: flu
+    name: NEGRC CA - Walton County - 2022 (dissolved character areas)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/472
+    layerId: 472
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FDM_Short: fluCode
+      FDM_Long: flu
+      ID: fluFeatureId
+    notes: >
+      Live count 898 dissolved. Domain Suburban≈325, Neighborhood Residential≈171,
+      Highway Corridor≈134, Conservation≈120, Employment Center≈50, Village Center≈50,
+      Rural Residential and Agriculture≈48. Spatial-join only (no Parcel_No). Prefer
+      choosewalton parcel-tied FLU for PIN search; this for regional inventory /
+      dissolved coverage. Geo-verified ~-83.66,33.63 Walton GA. Org Ug5xGQbHsD8zuZzM
+      (NEGRC) — same org hosts LandPro_2012 (reject as cadastral).
+    status: partial
+
+  - role: zoning
+    name: null — no public Euclidean county zoning REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer with Euclidean Walton County zoning districts
+      (A-1/R-1/R-2/R-3/B-1/B-2/B-3/M-1/M-2/O-I/TC/MHP/… per 2018 WCLDO) found
+      (2026-09-23). County Zoning page directs to qPublic HTML for zoning info.
+      choosewalton "Walton County Zoning" is FLU/character (see flu role) — do NOT
+      treat FLU values as zoning codes. Inside cities prefer city zoning layers.
+    status: gap
+
+  - role: tax
+    name: null — no county-wide public tax REST (Monroe city-only)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      County-wide tax/CAMA REST blocked (waltongis subscription disabled). Monroe
+      City Parcels exposes curr_val / prev_val / a_value / fmvres/fmvcom/fmvacc
+      (city-only). Assessor HTML: qPublic App=waltonCountyGA (CDN/bot 403 from
+      research box; public for humans). Deep-link pattern from Monroe layer
+      qPub_Link: Application.aspx?App=waltonCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_No}.
+      Do NOT use Walton FL Beacon AppID=835 LayerID=15172.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Walton multi-sale FeatureServer/MapServer found (2026-09-23). Monroe City
+      Parcels sale_val/saleland*/saleimp* are unused (sale_val=0 on all 6043). Use
+      qPublic HTML for humans. Rejected ARC LandPro_2012 (Ug5xGQbHsD8zuZzM) and
+      disabled Parcels_Walton_2019 stub.
+    status: gap
+
+  - role: other
+    name: City Limits of Monroe
+    restUrl: https://services9.arcgis.com/tX7O9qMhrJRPSGto/ArcGIS/rest/services/Monroe_Zoning___Character_Districts_Map_WFL1/FeatureServer/17
+    layerId: 17
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      NAME: municipality
+      NAMELSAD: municipalityFull
+      PLACEFP: placeFips
+      SQ_MILES: areaSqMi
+    notes: >
+      Live count 1 Monroe city-limit polygon. Parcel↔Monroe join = spatial City
+      Limits OR Monroe City Parcels presence OR taxdistric on City Parcels (01≈5945
+      city core samples). monroega All_City_Limit_Polygons (jzF6lkyxSyP3GLBQ) is
+      subscription-canceled 403 — not usable.
+    status: usable
+
+municipalities:
+  - name: Monroe
+    level: city
+    parentFips: "13297"
+    joinToCountyParcels: >
+      Attribute: Monroe City Parcels Parcel_No = county landbase Parcel_No (verified
+      C0920002 / C0920003 / C09300070DP present on both). Spatial City Limits of
+      Monroe FeatureServer/17 (~-83.71,33.79). taxdistric on City Parcels mostly '01'.
+    layers:
+      - role: parcels
+        name: City of Monroe City Parcels (WinGAP CAMA + zoningcode)
+        restUrl: https://services9.arcgis.com/tX7O9qMhrJRPSGto/ArcGIS/rest/services/Monroe_Zoning___Character_Districts_Map_WFL1/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: totalacres
+        coverage: city-only
+        fieldMap:
+          Parcel_No: parcelId
+          Realkey: ownerKey
+          Ownkey: ownerKey2
+          lastname: ownerName
+          firstname: ownerNameFirst
+          middle: ownerNameMiddle
+          address1: mailingAddress
+          address2: mailingAddress2
+          address3: mailingAddress3
+          city: mailingCity
+          state: mailingState
+          zip_code: mailingZip
+          house_no: situsNumber
+          stdirect: situsStreetDir
+          street_nam: situsStreet
+          sttype: situsStreetType
+          unit: situsUnit
+          zip: situsZip
+          taxdistric: taxDistrict
+          zoningcode: zoning
+          zoning: zoningCodeAlt
+          totalacres: acreage
+          Deed_Acres: acreageDeed
+          Draw_Acres: acreageDraw
+          curr_val: tax.marketValue
+          prev_val: tax.priorMarketValue
+          a_value: tax.landValue
+          fmvres: tax.fmvResidential
+          fmvcom: tax.fmvCommercial
+          fmvacc: tax.fmvAccessory
+          legal_desc: legalDescription
+          subd_name: subdivision
+          neighbhood: neighborhood
+          qPub_Link: appraiserDeepLink
+        notes: >
+          Preferred Monroe-local CAMA + geometry (standing order: city over county
+          stubs). Live count 6043; owner lastname filled ≈6015; curr_val>0 ≈6015;
+          totalacres 5–150 ≈195; Draw_Acres 5–150 ≈200; house_no>0 ≈5765;
+          zoningcode filled ≈6013. Domain zoningcode R1≈2495, R1A≈1218, R2≈762,
+          PRD≈633, B3≈299, B2≈222, M1≈131, P≈81, B1≈55, plus PCD/MIX/MH/split
+          codes. SR Web Mercator 102100. Geo-verified ~-83.729,33.814 / ~-83.749,33.793
+          Monroe GA (NOT Monroe LA/MI/NC lookalikes). Org tX7O9qMhrJRPSGto
+          (bcallender_monroe / monroe-gis.maps.arcgis.com). Twin service
+          Zoning___Character_Districts_Map_WFL1 same layers. Official viewer:
+          monroe-gis.maps.arcgis.com/apps/instant/atlas/index.html?appid=8d259a58956a4fada9e1739aca30a3ef
+          and monroega.com Planning Zoning Ordinance Maps & GIS. qPub_Link deep-links
+          App=waltonCountyGA KeyValue=Parcel_No. Prefer this for Monroe search;
+          county landbase for county-wide outlines.
+        status: usable
+      - role: zoning
+        name: Monroe Current Zoning
+        restUrl: https://services9.arcgis.com/tX7O9qMhrJRPSGto/ArcGIS/rest/services/Monroe_Zoning___Character_Districts_Map_WFL1/FeatureServer/15
+        layerId: 15
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          PARCELNO: parcelId
+          ADDRESS: situsAddress
+          RZNEDATE: zoningDate
+          RZCNDTNS: zoningConditions
+          PERMTNBR: zoningPermit
+          SPLITZND: zoningSplit
+          CUP: zoningCup
+          COMMENT: zoningComments
+        notes: >
+          Preferred Monroe Euclidean zoning polygons (spatial or PARCELNO join).
+          Live count 2141. Domain R-1≈937, R-1A≈539, R-2≈235, B-3≈188, M-1≈103,
+          B-1≈41, B-2≈36, PRD≈23, P≈19, PCD≈10, MH≈9, PID≈1. Geo-verified
+          ~-83.724,33.763 Monroe GA. choosewalton Monroe_Zoning/29 (3231) is an
+          older/alternate export — prefer this official city layer. City Parcels
+          zoningcode is a CAMA code crosswalk (R1 vs R-1) — prefer ZONING here for
+          district label.
+        status: usable
+      - role: other
+        name: Character & Special Districts (form-based / character code)
+        restUrl: https://services9.arcgis.com/tX7O9qMhrJRPSGto/ArcGIS/rest/services/Monroe_Zoning___Character_Districts_Map_WFL1/FeatureServer/13
+        layerId: 13
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          DIST: characterDistrict
+          PLND_DST: plannedDistrict
+          PD_ZNG: plannedDistrictZoning
+        notes: >
+          Live count 1111. Domain CD-4≈487, CD-3≈454, CD-5≈129, CD-CV≈24, SD-M≈17.
+          Character Based Code (adopted Dec 2024) for core form-based areas —
+          spatial join alongside Euclidean ZONING. Overlay layer 12 Existing Planned
+          Districts Overlay count 14 (PLND_DST).
+        status: usable
+      - role: flu
+        name: NEGRC CA - Monroe - 2023 (coarse character areas)
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/470
+        layerId: 470
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 9 coarse areas (Downtown/East/North/Northeast/Northwest/South/
+          Way West/West). Prefer Monroe Character DIST + county parcel-tied FLU for
+          parcel-scale; this is regional inventory only.
+        status: partial
+    gaps:
+      - "No Monroe multi-sale REST — sale_* fields unused on City Parcels; use qPublic HTML."
+      - "County landbase FLU inside Monroe is character FLU, not Euclidean zoning — prefer Monroe Current Zoning ZONING / City Parcels zoningcode."
+      - "monroega.gov WinGAP Parcel Regions / All City Limit Polygons FeatureServers subscription-canceled 403 (2026-09-23)."
+    status: usable
+
+  - name: Loganville
+    level: city
+    parentFips: "13297"
+    joinToCountyParcels: >
+      Spatial intersect Loganville Zoning polygons (~-83.90,33.84) with county
+      landbase. Name field (LG050026…) does NOT reliably equal Parcel_No (C*/N*
+      dominant in Loganville box; only ~21 LG% on county landbase). City spans
+      Gwinnett + Walton — Gwinnett card JURISDICTION=LOGANVILLE for Gwinnett-side.
+    layers:
+      - role: zoning
+        name: Loganville Zoning (choosewalton)
+        restUrl: https://services.arcgis.com/ftUt0Vfnzfo0Cs96/arcgis/rest/services/Loganville_Zoning/FeatureServer/38
+        layerId: 38
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Name: parcelIdAlt
+          Zoning: zoning
+          Description: zoningDescription
+          FolderPath: zoningFolder
+          SymbolID: zoningSymbolId
+          Shape__Area: shapeAreaSqM
+        notes: >
+          Preferred Loganville-local zoning (parcel-scale polygons from KMZ-style
+          export). Live count 3543; Shape__Area 5–150 ac ≈89. Domain R-16≈1225,
+          CSO≈1010, R-22≈643, CH≈262, R-44≈166, RM-8≈129, CBD≈42, IO≈32, L-1≈11,
+          RM-4≈8, CN≈5, RM-6≈4, MPH≈3, PUV≈3. SR UTM 26917. Geo-verified
+          ~-83.901,33.839 Loganville GA (Walton/Gwinnett). Join = spatial default
+          (Name ≠ county Parcel_No). No owner/tax/FLU on this layer. No official
+          City of Loganville AGOL org FeatureServer found beyond choosewalton
+          export (2026-09-23).
+        status: usable
+      - role: flu
+        name: NEGRC FLU - Loganville - 2022
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/468
+        layerId: 468
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 319. Domain Residential≈128, Commercial≈83, Forestry≈38,
+          Public/Institutional≈32, Multi-Family Residential≈12, Park/Recreation/
+          Conservation≈9, Agriculture≈5, Government≈4, Industrial≈4, TCU≈1.
+          Spatial-join. Geo-verified ~-83.91,33.85.
+        status: usable
+    gaps:
+      - "No Loganville parcel CAMA REST (owner/tax/sale) — county landbase PIN+FLU only; qPublic HTML for CAMA."
+      - "Name LG* join to Parcel_No unreliable — use spatial intersect."
+      - "City straddles Gwinnett/Walton — do not treat as Walton-only."
+    status: usable
+
+  - name: Social Circle
+    level: city
+    parentFips: "13297"
+    joinToCountyParcels: >
+      Spatial intersect Social Circle Zoning (~-83.73,33.65) with county landbase.
+      Name SC090012-style may match some Parcel_No (SC% ≈20 on county landbase) —
+      prefer spatial. City website GIS page bot/CDN 403 from research box.
+    layers:
+      - role: zoning
+        name: Social Circle Zoning (choosewalton)
+        restUrl: https://services.arcgis.com/ftUt0Vfnzfo0Cs96/arcgis/rest/services/Social_Circle_Zoning/FeatureServer/35
+        layerId: 35
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Name: parcelIdAlt
+          Zoning: zoning
+          Description: zoningDescription
+          FolderPath: zoningFolder
+          Shape__Area: shapeAreaSqM
+        notes: >
+          Preferred Social Circle-local zoning. Live count 2298; Shape__Area 5–150 ac
+          ≈207. Domain R-15≈832, RMD≈537, PUD≈250, R-25≈213, AG≈212, IO≈69, I-1≈68,
+          GC≈51, CBD≈40, I-2≈10, AG-2≈6, NC≈5, RHD≈4, SSBP-T1≈1. SR UTM 26917.
+          Geo-verified ~-83.731,33.645 Social Circle GA. Official city GIS page
+          socialcirclega.gov/.../gis advertises interactive FLU/Zoning/Historic map
+          (fetch 403 from research box); PDF Zoning + FLU maps linked there. Prefer
+          this REST over PDF. Webmap 2b6f806fe6914c078dbf9ccf38345f0f references
+          per-district layers 36–51 on same service (layer list currently exposes
+          combined 35 only via REST root — query 35).
+        status: usable
+      - role: flu
+        name: NEGRC CA - Social Circle - 2025
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/469
+        layerId: 469
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 189 character areas (e.g. AESFRA Agricultural and Estate
+          Residential). Spatial-join. Geo-verified ~-83.73,33.68. City also
+          publishes PDF Future Land Use Map.
+        status: usable
+    gaps:
+      - "No Social Circle parcel CAMA REST — owner/tax/sale via qPublic HTML only."
+      - "socialcirclega.gov GIS page CDN/bot 403 from research box; Experience lookalike 9fa3a153ee6145d1955ea0512971f6a8 is City of Marathon FL — REJECTED."
+    status: usable
+
+  - name: Walnut Grove
+    level: city
+    parentFips: "13297"
+    joinToCountyParcels: >
+      Spatial NEGRC FLU - Walnut Grove - 2022 (~-83.86,33.76) OR county landbase
+      Parcel_No spatial within city; no city limit REST found.
+    layers:
+      - role: flu
+        name: NEGRC FLU - Walnut Grove - 2022
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/471
+        layerId: 471
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 97. Domain Residential≈21, Agriculture≈11, Public/Institutional≈10,
+          Commercial≈9, Park/Recreation/Conservation≈6, plus TCU/Forestry/Government/
+          Industrial/Mixed Use; ~28 null FDM_Long. Spatial-join. No city zoning REST
+          found (2026-09-23); DCA Walnut Grove plan update PDF only.
+        status: partial
+    notes: >
+      No official City of Walnut Grove zoning/parcels FeatureServer found
+      (2026-09-23). Geography via NEGRC FLU + county landbase spatial; Euclidean
+      zoning certification is a gap.
+    status: partial
+
+  - name: Between
+    level: city
+    parentFips: "13297"
+    joinToCountyParcels: >
+      Spatial only — no city REST. County landbase FLU / Comp Plan joint coverage
+      (Between listed in Walton County w/ Cities Comp Plan via DCA). Approximate
+      centroid east-central Walton near ~-83.81,33.82 (verify before use).
+    layers: []
+    notes: >
+      No official Town of Between zoning/FLU/parcels REST found (2026-09-23).
+      Covered under joint Walton County Comprehensive Plan (PDF); choosewalton
+      Sites webmap labels a "City of Between" site polygon (industrial inventory,
+      not zoning). Geography via county landbase spatial only.
+    status: gap
+
+  - name: Good Hope
+    level: city
+    parentFips: "13297"
+    joinToCountyParcels: >
+      Spatial only — no city REST. Joint Comp Plan coverage via DCA.
+    layers: []
+    notes: >
+      No official City of Good Hope zoning/FLU REST found (2026-09-23). Geography
+      via county landbase spatial; PDF plan via DCA.
+    status: gap
+
+  - name: Jersey
+    level: city
+    parentFips: "13297"
+    joinToCountyParcels: >
+      Spatial only — no city REST. Joint Comp Plan coverage via DCA.
+    layers: []
+    notes: >
+      No official Town of Jersey zoning/FLU REST found (2026-09-23). Geography via
+      county landbase spatial; PDF plan via DCA. NOT Jersey Channel Islands / NJ.
+    status: gap
+
+gaps:
+  - "County-wide CAMA REST blocked — waltongis org RtJQnMkoH9LGs7n0 walton_parcels_view / Walton_Addresses / Walton_Streets return Token Required (499) and item subscription disabled (403). monroega.gov WinGAP Parcel Regions / city-limits FeatureServers subscription-canceled 403. No on-prem gis.waltoncountyga.gov / maps.waltoncountyga.gov hosts resolve."
+  - "Preferred county landbase (choosewalton Walton_County_Zoning/29) has Parcel_No+geometry+FLU only — NO ownerName, mailing*, situs*, tax.*, lastSale.*, or Euclidean zoning. GIS acres via Shape__Area/4046.86 (UTM 26917); 5–150 ≈6187. Duplicate Parcel_No rows — dissolve/group."
+  - "No public REST Euclidean county zoning (A-1/R-1/…) — county Zoning page points to qPublic HTML; choosewalton layer titled Zoning is FLU/character only."
+  - "No public REST lastSale.price/date/qualified county-wide or on Monroe City Parcels (sale_* unused)."
+  - "No county-wide tax.marketValue/assessedValue REST — Monroe City Parcels curr_val city-only; qPublic HTML for humans (CDN/bot 403)."
+  - "Official FLU also PDF-only (DocumentCenter/View/6565 and Comp Plan View/5997); 2027 Comp Plan Update hub is engagement-only (surveys/docs), not parcel REST."
+  - "City zoning REST usable for Monroe / Loganville / Social Circle; Walnut Grove FLU-only (NEGRC); Between / Good Hope / Jersey geography-only gaps."
+  - "Loganville and Social Circle zoning Name (LG*/SC*) are not reliable Parcel_No joins — spatial intersect default."
+  - "qPublic App=waltonCountyGA may CDN/bot-403 automated clients; public for humans. Numeric AppID not recovered (AppID=835 is Walton FL — REJECT). Deep-link: Application.aspx?App=waltonCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_No}."
+  - "Rejected lookalikes: Walton County FL (org TaXHPwWfIMuzJ7Ov / WCGIS66 Planning Interactive Map experience 9ec6ea2db6424876ac7ba73a85b6fede tagged florida; WaltonCountyPropeties FeatureServer; Beacon AppID=835 LayerID=15172; SR 102660 Florida); City of Marathon FL Zoning/FLU experience 9fa3a153ee6145d1955ea0512971f6a8 (sheab_marathon — mis-hit for Social Circle); Zoning_Parcels org chm8U7s7j8mKxk28 extent ~-74.5 NJ — wrong geography; ARC LandPro_2012 + disabled Parcels_Walton_2019 (Ug5xGQbHsD8zuZzM); Regrid/USLandGrid/paid vendors; token-locked waltongis / canceled monroega subscription stubs."
+  - "Enrichment vs thin in-app: county 32397 geometry+Parcel_No+character FLU+GIS acres; Monroe full WinGAP CAMA+zoning+character (~6043); Loganville/Social Circle zoning; NEGRC city/county FLU/CA; sales/county-Euclidean-zoning/county-CAMA/small-town zoning remain gap/HTML/PDF."
+
+license: >
+  Walton County Development Authority / choosewalton.com AGOL org ftUt0Vfnzfo0Cs96
+  (shane@choosewalton.com) — Walton_County_Zoning, Loganville_Zoning,
+  Social_Circle_Zoning, Monroe_Zoning. City of Monroe AGOL org tX7O9qMhrJRPSGto
+  (bcallender_monroe / monroe-gis.maps.arcgis.com) —
+  Monroe_Zoning___Character_Districts_Map_WFL1 (City Parcels, Monroe Current Zoning,
+  Character & Special Districts, City Limits). Northeast Georgia Regional Commission
+  (NEGRC / Ug5xGQbHsD8zuZzM / NEGARC_ELA) —
+  NEGRC_Future_Development_Map_Inventory_WFL1 layers 468–472. County Comp Plan /
+  FLU PDFs via waltoncountyga.gov DocumentCenter. Assessor HTML: qPublic
+  SchneiderCorp App=waltonCountyGA (qpublic.net/ga/walton). Attribution to Walton
+  County / City of Monroe / choosewalton / NEGRC. Public fields only; no
+  emails/phones; no paid vendors (Regrid/ATTOM/CoreLogic/USLandGrid).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=waltonCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: partial
+  parcelStatusAfter: usable
+  summary: >
+    Walton choosewalton Walton_County_Zoning/29 has county-wide polygons + Parcel_No (32382 non-null of
+    32397) - meets Pass 1 (polygon + parcel ID; acres = Shape__Area/4046.86, UTM 26917). Status upgraded
+    partial->usable for Pass 1 only; CAMA (owner/values) still blocked (waltongis org token-locked) ->
+    Pass 2. Not Walton FL (experience 9ec6ea2d... is Walton FL - rejected). REST https://services.arcgis
+    .com/ftUt0Vfnzfo0Cs96/arcgis/rest/services/Walton_County_Zoning/FeatureServer/29 live count 32397
+    (5-150 ac: None); parcel ID field Parcel_No.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Between town"
+      level: city
+      parentFips: "13297"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Good Hope city"
+      level: city
+      parentFips: "13297"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Jersey city"
+      level: city
+      parentFips: "13297"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Loganville city"
+      level: city
+      parentFips: "13297"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Monroe city"
+      level: city
+      parentFips: "13297"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Social Circle city"
+      level: city
+      parentFips: "13297"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Walnut Grove city"
+      level: city
+      parentFips: "13297"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Walton' AND aadt>0
+    altFilter: name LIKE '297-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 297-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 228
+    maxAadt: 40800
+    geoCheck: 227/228 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=waltonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: C0040004
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=waltonCountyGA&Layer=Parcels&PageType=Report&KeyValue=C0040004
+    verification: 'pattern-tested: real sample ID from Parcel_No; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=waltonCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Between town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Good Hope city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Jersey city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Loganville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Monroe city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Social Circle city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Walnut Grove city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

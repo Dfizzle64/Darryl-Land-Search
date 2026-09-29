@@ -1,0 +1,348 @@
+state: GA
+jurisdiction: Peach County
+fips: "13225"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "PeachParcels (MGRC Peach County web map)"
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Peach_County_Web_Map_WFL1/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: "Acres"
+    coverage: county-wide
+    parcelIdField: "PARCELS"
+    liveCount: 14497
+    liveCount5to150ac: null
+    geoCheck: "extent center [['13225', 'Peach County']]; sample [['13225', 'Peach County']]; extent WGS84 [-84.0179, 32.4393, -83.7009, 32.6936]"
+    fieldMap:
+      PARCELS: "parcelId"
+      Acres: "acreageText"
+    notes: >
+      pass1 2026-09-28: County-wide Peach GA parcels (14497) on shared RC org Ug5xGQbHsD8zuZzM
+      (Peach_County_Web_Map_WFL1 layer 14). PARCELS id + Acres (text) - compute acres from geometry.
+      Houston-county layers on the same org are NOT Peach.
+    status: usable
+    verifiedAt: 2026-09-28
+
+  # PRIMARY geometry — thin/stale Sept 2019 AGOL; CAMA via qPublic HTML
+  - role: parcels
+    name: Parcels_Sept_2019 (Peach County GA AGOL / JillianBowenPCworks) — geometry-only
+    restUrl: https://services7.arcgis.com/y3bjA2Cr20lW0mwX/arcgis/rest/services/Parcels_Sept_2019/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCELS: parcelId
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Peach County GA AGOL org y3bjA2Cr20lW0mwX /
+      owner JillianBowenPCworks — Parcels_Sept_2019 FeatureServer/0; also in "Base Map"
+      webmap 3981dd55e62e42e3aef73b5d32def8af). Live count 14099 (2026-09-24); assessor
+      site claims ~14185. Schema THIN — PARCELS + Shape__Area/Length + geometry ONLY
+      (NO owner / mailing / situs / CURR_VAL / SALE_* / acreage deed fields). Snapshot
+      labeled Sept 2019 — treat as geometry aid; join live CAMA via qPublic
+      App=PeachCountyGA KeyValue={PARCELS} (format e.g. '052A   082' / '051    048' —
+      preserve spaces). maxRecordCount 2000 — page via resultOffset / envelopes. SR Web
+      Mercator (102100/3857). No newer public Peach ParcelInformation / withOwner
+      FeatureServer on MGRC org Ug5xGQbHsD8zuZzM (has Peach_MunicipalBoundaries /
+      Peach_CountyBoundary / Byron Zoning / buildings/broadband only — NOT tax parcels).
+      peachcountymaps.com / southfire GIS County Mapping redirect to qPublic HTML.
+      Official assessor HTML: qpublic.net/ga/peach → App=PeachCountyGA / AppID=783
+      LayerID=11819. Deep-link KeyValue={PARCELS}:
+      Application.aspx?App=PeachCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCELS}
+      (also AppID=783&LayerID=11819). GEO-VERIFY GEORGIA: WGS84 samples
+      ~-83.771,32.605 / ~-83.738,32.587; CountyBoundary STCOFIPS=13225 tip
+      ~-83.701,32.692; Byron zoning tip ~-83.759,32.611; Fort Valley tip ~-83.748,32.606 —
+      Peach County GA / Fort Valley seat (Warner Robins–Macon ring). REJECT Peachtree
+      Corners Gwinnett (PTC_Parcels) lookalikes; REJECT paid Regrid/ATTOM/DynamoSpatial.
+      Skip utilities+AADT; no emails/phones.
+    status: partial
+
+  - role: tax
+    name: null — no CURR_VAL on Parcels_Sept_2019; qPublic AppID=783 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on Parcels_Sept_2019. Assessor HTML
+      qpublic.net/ga/peach → App=PeachCountyGA / AppID=783 LayerID=11819
+      (Cloudflare/bot 403 automated; public for humans). Deep-link KeyValue={PARCELS}.
+      Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/lastSale on Parcels_Sept_2019. Prefer qPublic Sales Search / Sales List
+      HTML App=PeachCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean; City of Byron Zoning only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Peach County-wide Euclidean zoning FeatureServer recovered (2026-09-24). Prefer
+      city Euclidean City_of_Byron_Zoning/1 (see municipalities). Fort Valley zoning REST
+      gap. County zoning/planning via Chief Marshal / qPublic map layers HTML — not REST.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU/CharacterAreas FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: No Peach County FutureLandUse / CharacterAreas FeatureServer recovered (2026-09-24).
+    status: gap
+
+  - role: other
+    name: Peach_MunicipalBoundaries + Peach_CountyBoundary (MGRC)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Peach_MunicipalBoundaries/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipalityName
+      LOCALFIPS: placeFips
+    notes: >
+      Municipal Boundaries NAME=Byron (LOCALFIPS=12260 tip ~-83.756,32.633) + Fort Valley
+      (LOCALFIPS=31096 tip ~-83.748,32.606). Companion Peach_CountyBoundary/0 STCOFIPS=13225
+      tip ~-83.701,32.692 — preferred spatial county mask. Twin Byron_Municipal_Boundary/2.
+      Skip Peach_* buildings/broadband/sidewalk utilities-adjacent.
+    status: usable
+
+municipalities:
+  - name: Fort Valley
+    level: city
+    parentFips: "13225"
+    joinToCountyParcels: >
+      Spatial Peach_MunicipalBoundaries/0 NAME='Fort Valley' (~-83.748,32.606;
+      LOCALFIPS='31096') ∩ Parcels_Sept_2019. Mailing city never sole filter.
+    layers:
+      - role: zoning
+        name: null — no Fort Valley zoning FeatureServer recovered
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Fort Valley Euclidean zoning FS on MGRC / county AGOL (2026-09-24).
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Fort Valley FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Parcels_Sept_2019 + spatial Fort Valley
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Fort Valley-only CAMA — county /0 + MunicipalBoundaries. Tax/sale qPublic HTML.
+        status: gap
+    gaps:
+      - "No Fort Valley city-owned parcel/zoning/FLU REST — county Parcels_Sept_2019 + spatial limits."
+      - "Owner/tax/sale via qPublic App=PeachCountyGA HTML even inside city."
+    status: partial
+
+  - name: Byron
+    level: city
+    parentFips: "13225"
+    joinToCountyParcels: >
+      Spatial Peach_MunicipalBoundaries/0 NAME='Byron' (~-83.756,32.633; LOCALFIPS='12260')
+      or Byron_Municipal_Boundary/2 ∩ Parcels_Sept_2019; soft join ZoningClass layer PARCELS
+      ↔ county PARCELS (normalize spaces).
+    layers:
+      - role: zoning
+        name: City_of_Byron_Zoning (MGRC)
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/City_of_Byron_Zoning/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCELS: parcelId
+          ZoningClass: zoning
+          Description: zoningDescriptionOrLegal
+        notes: >
+          City Euclidean ZoningClass (count 2935). Distinct: A-1 / C-1 / C-2 / C-3 / C3-PUD /
+          I-1 / R-1 / R-2 / R-3 / R-MH / R-PUD. PARCELS id on polygons (e.g. '052A 289') —
+          join to county Parcels_Sept_2019.PARCELS. Geo-verified tip ~-83.759,32.611 Byron GA.
+          Skip Byron Public Utilities / Storm Water / Fire Hydrant maps per tranche-3.
+        status: usable
+      - role: flu
+        name: null — no Byron FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Byron FLU FeatureServer recovered.
+        status: gap
+      - role: parcels
+        name: null — county Parcels_Sept_2019 + spatial Byron
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Byron-only CAMA — county geometry + City_of_Byron_Zoning PARCELS join aid.
+        status: gap
+    gaps:
+      - "No Byron city-owned parcel/FLU REST — county layers + spatial Byron limits + ZoningClass."
+    status: usable
+
+gaps:
+  - "Parcels_Sept_2019 is geometry+PARCELS only (Sept 2019 snapshot) — no owner/mailing/situs/CURR_VAL/MAV*/SALE_*/deed acres on REST; tax/owner/sale via qPublic App=PeachCountyGA / AppID=783 LayerID=11819 HTML."
+  - "No county-wide Euclidean zoning FS — Byron ZoningClass only; Fort Valley zoning REST gap."
+  - "No public FLU/CharacterAreas FeatureServer for Peach County GA."
+  - "No live MGRC/SGRC ParcelInformation MapServer for Peach (MGRC has boundaries/Byron zoning/buildings only)."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/peach public for humans."
+  - "Skip utilities+AADT; skip emails/phones; REJECT Peachtree Corners / paid Regrid/ATTOM."
+
+license: >
+  Peach County GA GIS / Assessor — Parcels_Sept_2019 (AGOL org y3bjA2Cr20lW0mwX /
+  JillianBowenPCworks); Middle Georgia Regional Commission (MGRC AGOL Ug5xGQbHsD8zuZzM)
+  Peach_MunicipalBoundaries, Peach_CountyBoundary, City_of_Byron_Zoning,
+  Byron_Municipal_Boundary. Assessor qPublic App=PeachCountyGA / AppID=783 LayerID=11819
+  (qpublic.net/ga/peach; peachcounty.net / peachcounty.gov). Attribution Peach County Tax
+  Assessor / MGRC / county GIS. Public fields only; no emails/phones; no paid vendors; skip
+  utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=PeachCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?layers=https://services7.arcgis.com/y3bjA2Cr20lW0mwX/arcgis/rest/services/Parcels_Sept_2019/FeatureServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: partial
+  parcelStatusAfter: usable
+  summary: >
+    PeachParcels (MGRC Peach County web map): https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/
+    services/Peach_County_Web_Map_WFL1/FeatureServer/14 - live count 14497 (5-150 ac: {'code': 400,
+    'message': '', 'details': ['Unable to perform query. Please check your parameters.']}), parcel ID
+    field PARCELS. Geography verified against TIGER county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Byron city"
+      level: city
+      parentFips: "13225"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Fort Valley city"
+      level: city
+      parentFips: "13225"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Peach' AND aadt>0
+    altFilter: name LIKE '225-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 225-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 158
+    maxAadt: 95400
+    geoCheck: 157/158 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=PeachCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=783&LayerID=11819&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCELS
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 064C   001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=PeachCountyGA&Layer=Parcels&PageType=Report&KeyValue=064C%20%20%20001
+    verification: 'pattern-tested: real sample ID from PARCELS; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?layers=https://services7.arcgis.com/y3bjA2Cr20lW0mwX/arcgis/rest/services/Parcels_Sept_2019/FeatureServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Byron city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Fort Valley city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

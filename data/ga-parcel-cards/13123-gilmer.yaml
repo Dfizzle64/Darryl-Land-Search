@@ -1,0 +1,317 @@
+state: GA
+jurisdiction: Gilmer County
+fips: "13123"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "Cartecay watershed parcels (UTC conservation scoring)"
+    restUrl: https://services.arcgis.com/UnTXoPXBYERF0OH6/arcgis/rest/services/Cartecay_Parcels_Con_Score_NLCD/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: "GIS_ACRES"
+    coverage: sample
+    parcelIdField: "PARCEL_NO"
+    liveCount: 7837
+    liveCount5to150ac: 2010
+    geoCheck: "extent center [['13123', 'Gilmer County']]; sample [['13123', 'Gilmer County']]; extent WGS84 [-84.4885, 34.5426, -84.19, 34.7362]"
+    fieldMap:
+      PARCEL_NO: "parcelId"
+      MAP_PARCEL: "parcelIdAlt"
+      GIS_ACRES: "acreage"
+    notes: >
+      pass1 2026-09-28: Cartecay River watershed clip only (7837 parcels, ~east/central Gilmer) on UTC org
+      UnTXoPXBYERF0OH6; PARCEL_NO + GIS_ACRES. Not county-wide.
+    status: partial
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Gilmer County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. Official human cadastral + CAMA path =
+      qPublic/Beacon App=GilmerCountyGA / AppID=672 LayerID=11357 (gilmerassessors.com
+      Real Property → qpublic.schneidercorp.com Application.aspx; county seat Ellijay GA
+      30540). Cloudflare/bot 403 blocks automated Application.aspx / gilmerassessors.com
+      from research box; public for humans. Deep-link KeyValue={parcelId}:
+      Application.aspx?App=GilmerCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+      (also AppID=672&LayerID=11357&PageTypeID=4&KeyValue=). GilmerCountyGA_WFS on
+      wfs.schneidercorp.com → 404. No GMRC / county AGOL Gilmer GA parcel FS (GMRC
+      gmrc.ga.gov/digitaldata lists parcels among fee-for-service digital datasets —
+      labor/mileage schedule, NOT a public REST substitute). Commercial vendors advertise
+      ~35k Gilmer parcels (DynamoSpatial/Regrid/USLandGrid) — rejected (paid).
+      GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13123 CENTLAT +34.6911566 CENTLON
+      -084.4556101 — Gilmer County GA / Ellijay–East Ellijay (North Georgia mountains;
+      Appalachian / Blue Ridge fringe). REJECT Gilmer County WV / other Gilmer lookalikes;
+      REJECT paid Regrid/ATTOM/DynamoSpatial/USLandGrid. No emails/phones collected.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic App=GilmerCountyGA /
+      AppID=672 LayerID=11357 (gilmerassessors.com; Tax Estimator link confirms
+      AppID=672&LayerID=11357&PageTypeID=2&PageID=5837). Tax Commissioner
+      tax.gilmercountypay.com — bills/pay only, not CAMA REST. Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. qPublic Sales Search HTML confirmed
+      AppID=672&LayerID=11357&PageTypeID=2&PageID=5330 (gilmerassessors.com Real Property
+      Sales Search quick link). Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Gilmer County GA Euclidean zoning FeatureServer on AGOL/GMRC (2026-09-24).
+      Planning & Zoning gilmercounty-ga.gov/planning-zoning + Code of Ordinances
+      library.municode.com/ga/gilmer_county — PDF/staff / Municode text, not public REST.
+      Zoning established 2005 per county planning page; districts available from staff —
+      not a FeatureServer.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Gilmer County GA future land use FeatureServer found (2026-09-24). Joint Comp Plan
+      2025-2029 (Gilmer + Ellijay + East Ellijay) linked from planning page — PDF/external,
+      not REST.
+    status: gap
+
+municipalities:
+  - name: Ellijay
+    level: city
+    parentFips: "13123"
+    joinToCountyParcels: >
+      County seat. Soft spatial ~-84.48,34.69 (Census place) when parcels become available.
+      No separate city parcel REST; Joint Comp Plan covers city + county.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Ellijay zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ellijay-only FLU REST — Joint Comp Plan PDF with county.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic AppID=672 HTML only.
+        status: gap
+    gaps:
+      - "No Ellijay city-owned GIS REST."
+    status: gap
+
+  - name: East Ellijay
+    level: city
+    parentFips: "13123"
+    joinToCountyParcels: Soft spatial East Ellijay GA (~-84.47,34.68) when county parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No East Ellijay zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No East Ellijay FLU REST — Joint Comp Plan PDF with county.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No East Ellijay city-owned GIS REST."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Gilmer County GA — qPublic App=GilmerCountyGA / AppID=672 LayerID=11357 HTML only."
+  - "GilmerCountyGA_WFS 404; GMRC digital parcels are fee-for-service — not public REST; no county AGOL Gilmer GA parcel FeatureServer."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial/USLandGrid Gilmer GA parcel downloads (~35k ads)."
+  - "qPublic Application.aspx + gilmerassessors.com Cloudflare/bot 403 automated; App=GilmerCountyGA Search + AppID=672 Maps PageTypeID=1 public for humans."
+  - "Planning/zoning Municode + Comp Plan PDF only — no Euclidean zoning / FLU FeatureServer."
+  - "Tax Commissioner tax.gilmercountypay.com — bills/pay only, not CAMA REST."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Gilmer County Board of Tax Assessors qPublic/Beacon App=GilmerCountyGA / AppID=672
+  LayerID=11357 (gilmerassessors.com; Ellijay GA). Tax Commissioner tax.gilmercountypay.com.
+  Planning gilmercounty-ga.gov/planning-zoning; Municode gilmer_county; GMRC fee GIS
+  gmrc.ga.gov/digitaldata. No public ArcGIS parcel service discovered 2026-09-24.
+  Attribution Gilmer County Tax Assessor. Public HTML only; no emails/phones; no paid
+  vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=GilmerCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=672&LayerID=11357&PageTypeID=1
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: partial
+  summary: >
+    No county-wide public parcel layer found; best partial: Cartecay watershed parcels (UTC conservation
+    scoring) https://services.arcgis.com/UnTXoPXBYERF0OH6/arcgis/rest/services/Cartecay_Parcels_Con_Scor
+    e_NLCD/FeatureServer/0 (7837). Cartecay River watershed clip only (7837 parcels, ~east/central
+    Gilmer) on UTC org UnTXoPXBYERF0OH6; PARCEL_NO + GIS_ACRES. Not county-wide.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+    - "qPublic viewer (Schneider) is HTML/Cloudflare only - no public REST"
+  cities:
+    - name: "East Ellijay city"
+      level: city
+      parentFips: "13123"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Ellijay city"
+      level: city
+      parentFips: "13123"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: partial
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Gilmer' AND aadt>0
+    altFilter: name LIKE '123-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 123-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 77
+    maxAadt: 22600
+    geoCheck: 77/77 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=GilmerCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=672&LayerID=11357&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 3114   009E
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=GilmerCountyGA&Layer=Parcels&PageType=Report&KeyValue=3114%20%20%20009E
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?AppID=672&LayerID=11357&PageTypeID=1
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: East Ellijay city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Ellijay city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

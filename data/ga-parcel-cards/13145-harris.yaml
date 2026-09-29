@@ -1,0 +1,393 @@
+state: GA
+jurisdiction: Harris County
+fips: "13145"
+level: county
+markets: [Columbus]
+
+layers:
+  # PRIMARY — county-wide parcels + owner / mailing / situs / acres / Value (RVRC GARC hub)
+  - role: parcels
+    name: Parcels4_2026_HUB (RVRC_ELA / Harris County Data Hub)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels4_2026_HUB/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      Owner: ownerName
+      LASTNAME: ownerLastName
+      FIRSTNAME: ownerFirstName
+      MIDDLE: ownerMiddle
+      MailAddress: mailingAddress
+      ADDRESS1: mailingAddress1
+      ADDRESS2: mailingAddress2
+      ADDRESS3: mailingAddress3
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP: mailingZip
+      PhisicalAddress: situsAddress
+      TOTALACRES: acreage
+      Acres: acreageLabel
+      Value: tax.marketValue
+      FLBASEVAL: tax.landBaseValue
+      FMVRES: tax.marketValueResidential
+      FMVACC: tax.marketValueAccessory
+      TaxDistrict: taxDistrict
+      TAXDISTRIC: taxDistrictCode
+      SUBD_NAME: subdivision
+      Shape__Area: acreageGisSqFt
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + owner/mailing/situs/acres/Value (River Valley
+      Regional Commission RVRC_ELA AGOL org Ug5xGQbHsD8zuZzM — Parcels4_2026_HUB FeatureServer
+      layer 0; service used by hub web map "Parcels and Legal Boundaries"). Live count 21044
+      (2026-09-24). Owner filled ≈20954; Value filled 21044; PARCEL_NO filled 21044;
+      TOTALACRES>0 ≈20460; TOTALACRES 5–150 ≈5166. SR NAD 1983 StatePlane Georgia West
+      FIPS 1002 Feet (102667/2240). maxRecordCount 2000 — page via resultOffset / spatial
+      envelopes. Value is digest market string/number (e.g. "1383785"); FLBASEVAL / FMVRES /
+      FMVACC companion market components. Acres is labeled text ("400.55 Ac.") — prefer
+      TOTALACRES numeric. CITY/STATE/ZIP are OWNER mailing (e.g. MIDLAND/ATLANTA) — never
+      municipality filter; use TaxDistrict soft (Harris County≈17905, Hamilton≈619,
+      West Point≈517, Waverly Hall≈429, Shiloh≈256, West Point Annex≈110) OR spatial
+      City_LimitsH / CityLimits_Harris. PhisicalAddress (sic) is situs when filled.
+      Companion Parcels4_2025 (count 20836; AssessedValue + Parcel_no) and Parcels9_2025HUB2
+      (count 20867; DIGCLASS) — prefer Parcels4_2026_HUB as newest hub layer. Thin geometry
+      Parcels4_2024 (count 20692; FID/Lines only) — NOT preferred. OA ParcelsWithOwners /
+      Buildings Invalid URL 400 (2026-09-24). Official human GIS: Harris County Data Hub
+      harris-county-data-hub-garc.hub.arcgis.com; viewer garc.maps.arcgis.com webappviewer
+      id=1efb396c42bf4080a37be70b72cbb2c4 ("Parcels and Legal Boundaries"). Assessor qPublic
+      App=HarrisCountyGA Layer=Parcels (qpublic.net/ga/harris; Cloudflare/bot 403 automated;
+      numeric AppID not recovered automated 2026-09-24). GEO-VERIFY GEORGIA: WGS84 samples
+      ~-85.161,32.866 (West Point / Old West Point Rd) / ~-85.164,32.867 — Census TIGERweb
+      GEOID 13145 CENTLAT +32.7355 CENTLON -084.908 (Columbus GA MSA / Pine Mountain).
+      REJECT Harris County TX HCAD (services.arcgis.com/su8ic9KbA7PYVxPS Harris_County_Parcels;
+      SR 102740 Houston; hctx.net) — wrong state. REJECT GDITAdmin Harris_County_Parcels
+      Invalid URL. REJECT paid Regrid/ATTOM/USLandGrid. Skip utilities/Water System hub
+      category + AADT; no emails/phones (Chief Appraiser contact on qPublic site — do not
+      scrape into schema).
+    status: usable
+
+  - role: tax
+    name: Parcels4_2026_HUB Value / FLBASEVAL / FMVRES / FMVACC (same layer)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels4_2026_HUB/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      Owner: ownerName
+      Value: tax.marketValue
+      FLBASEVAL: tax.landBaseValue
+      FMVRES: tax.marketValueResidential
+      FMVACC: tax.marketValueAccessory
+      TOTALACRES: acreage
+    notes: >
+      Preferred tax/CAMA values live on Parcels4_2026_HUB (Value filled 21044). No separate
+      assessed/taxable REST field on 2026 hub layer — Parcels4_2025 exposes AssessedValue
+      (~20836) as secondary. Assessor HTML deep-link KeyValue={PARCEL_NO}: Application.aspx?
+      App=HarrisCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCEL_NO} (or PageType=Search).
+      qPublic search App=HarrisCountyGA Layer=Parcels PageType=Search (qpublic.net/ga/harris).
+    status: usable
+
+  - role: sales
+    name: null — no public REST sale history on Parcels4_2026_HUB
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/saledate fields on Parcels4_2026_HUB / Parcels4_2025 / Parcels9_2025HUB2.
+      Prefer qPublic Sales Search / Sales List HTML App=HarrisCountyGA. Rejected paid
+      Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Zones / Zones1 (RVRC_ELA — Harris Euclidean + city labels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Zones/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Zone: zoning
+      ZoneType: zoningType
+      Parcel_no: parcelId
+    notes: >
+      Preferred Euclidean zoning polygons (Zones FeatureServer layer 1 count 21172; twin
+      Zones1/0 count 21173 with ZoneMay5/Notes). Zone domain includes A-1, R-1/R-2/R-3,
+      R-R, C-1..C-4, M-1/M-2, MHU-1/2, PRD/PUD/CUPD, Resort, Special Use / SUP, plus city
+      labels City of Hamilton / Shiloh / West Point, Town of Pine Mountain / Waverly Hall,
+      West Point Annex — confirms Harris GA. Join on Parcel_no≈PARCEL_NO when filled, else
+      spatial. REJECT generic org Zoning FeatureServer a011245960c04d4bb4cbcac250cd0532
+      (~-84.66,32.53 Sumter/Macon-area WinGAP parcels; NOT Harris). Human Zoning web map
+      uses Zones1 + Addresses4_2025. Geo samples ~-84.88,32.87 / hub extent matches
+      Parcels4_* Harris GA.
+    status: usable
+
+  - role: flu
+    name: null — no public FLU FeatureServer for Harris GA confirmed
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Future Land Use / character-area FeatureServer confirmed for Harris GA on RVRC_ELA
+      hub (2026-09-24). Hub lists Zoning / Parcels / Water / Elevation / ACS — not FLU.
+      Honest gap.
+    status: gap
+
+  - role: other
+    name: Addresses4_2025 (situs points — FIPS 13145)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Addresses4_2025/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Address: situsAddress
+      St_Number: situsNumber
+      St_Name: situsStreet
+      Incorporat: situsCity
+      County: countyName
+      FIPS_Code: fips
+      State: situsState
+    notes: >
+      Live count 15582. FIPS_Code='13145' County='Harris County' State=GA — geo-verified
+      samples ~-85.164,32.865 (1594 Old West Point Road). Soft situs join; no Parcel_NO on
+      this layer — spatial join to Parcels4_2026_HUB. Companion OA Addresses FS (count
+      13447; thinner schema) — prefer Addresses4_2025.
+    status: usable
+
+  - role: other
+    name: City_LimitsH / CityLimits_Harris municipal boundaries
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/City_LimitsH/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      NAME: cityName
+      NAMELSAD: cityNameFull
+      COUNTYFP: countyFips3
+      PLACEFP: placeFips
+    notes: >
+      Preferred spatial municipality filter (City_LimitsH count 5: Shiloh, West Point,
+      Hamilton, Pine Mountain, Waverly Hall; COUNTYFP=145). Companion CityLimits_Harris
+      count 9 adds CDPs Antioch/Cataula/Ellerslie/Piney Grove. Soft TaxDistrict attribute
+      fallback on parcels. STATEFP=13 Georgia.
+    status: usable
+
+municipalities:
+  - name: Hamilton
+    level: city
+    parentFips: "13145"
+    joinToCountyParcels: >
+      Spatial City_LimitsH / CityLimits_Harris NAME='Hamilton' (~-84.875,32.765) OR soft
+      TaxDistrict='Hamilton' (~619). County seat.
+    layers:
+      - role: zoning
+        name: Zones spatial Hamilton + Zone label City of Hamilton
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Zones/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zone: zoning
+        notes: County Zones clipped to Hamilton; Zone also has 'City of Hamilton' polygons.
+        status: usable
+      - role: parcels
+        name: Parcels4_2026_HUB spatial Hamilton
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels4_2026_HUB/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          Owner: ownerName
+          Value: tax.marketValue
+          TOTALACRES: acreage
+        notes: No Hamilton-only CAMA — county Parcels4_2026_HUB + City_LimitsH clip.
+        status: partial
+    gaps:
+      - "No Hamilton-owned separate parcel/CAMA FeatureServer — county layers + city limits."
+    status: usable
+
+  - name: West Point
+    level: city
+    parentFips: "13145"
+    joinToCountyParcels: >
+      Spatial City_LimitsH NAME='West Point' (~-85.14,32.90; PARTFLG=Y — city spans Troup
+      too) OR soft TaxDistrict IN ('West Point','West Point Annex') (~517+110). Prefer
+      spatial Harris COUNTYFP=145 portion.
+    layers:
+      - role: zoning
+        name: Zones spatial West Point
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Zones/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zone: zoning
+        notes: County Zones + City of West Point / West Point Annex labels.
+        status: usable
+      - role: parcels
+        name: Parcels4_2026_HUB spatial West Point (Harris portion)
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels4_2026_HUB/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          Owner: ownerName
+          Value: tax.marketValue
+        notes: County parcels only (Harris side); Troup County portion not on this FS.
+        status: partial
+    gaps:
+      - "West Point spans Harris+Troup — this card is Harris FIPS 13145 portion only."
+    status: usable
+
+  - name: Waverly Hall
+    level: city
+    parentFips: "13145"
+    joinToCountyParcels: >
+      Spatial City_LimitsH NAMELSAD~'Waverly Hall' OR soft TaxDistrict='Waverly Hall' (~429).
+    layers:
+      - role: zoning
+        name: Zones spatial Waverly Hall
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Zones/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zone: zoning
+        notes: County Zones + Town of Waverly Hall label.
+        status: usable
+      - role: parcels
+        name: Parcels4_2026_HUB spatial Waverly Hall
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels4_2026_HUB/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+        notes: County parcels + city limits clip.
+        status: partial
+    gaps:
+      - "No Waverly Hall-owned CAMA REST — county layers only."
+    status: partial
+
+  - name: Pine Mountain
+    level: city
+    parentFips: "13145"
+    joinToCountyParcels: >
+      Spatial City_LimitsH / CityLimits_Harris NAME='Pine Mountain' (~-84.85,32.85). Soft
+      TaxDistrict='Pine Mountain' count 0 on Parcels4_2026_HUB — prefer spatial. Town also
+      touches Meriwether — Harris portion only.
+    layers:
+      - role: zoning
+        name: Zones spatial Pine Mountain
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Zones/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zone: zoning
+        notes: County Zones + Town of Pine Mountain label.
+        status: usable
+      - role: parcels
+        name: Parcels4_2026_HUB spatial Pine Mountain
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels4_2026_HUB/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+        notes: Spatial clip only — TaxDistrict soft unused (0 rows).
+        status: partial
+    gaps:
+      - "Pine Mountain TaxDistrict unused on parcels; spatial city limits required."
+    status: partial
+
+  - name: Shiloh
+    level: city
+    parentFips: "13145"
+    joinToCountyParcels: >
+      Spatial City_LimitsH NAME='Shiloh' (~-84.70,32.81) OR soft TaxDistrict='Shiloh' (~256).
+    layers:
+      - role: zoning
+        name: Zones spatial Shiloh
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Zones/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zone: zoning
+        notes: County Zones + City of Shiloh label.
+        status: usable
+      - role: parcels
+        name: Parcels4_2026_HUB spatial Shiloh
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels4_2026_HUB/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+        notes: County parcels + city limits.
+        status: partial
+    gaps:
+      - "No Shiloh-owned CAMA REST — county layers only."
+    status: partial
+
+gaps:
+  - "No SALE_*/sale date on Parcels4_2026_HUB REST — sales via qPublic App=HarrisCountyGA HTML only."
+  - "No assessed/taxable on 2026 hub layer — Value=market; AssessedValue on companion Parcels4_2025 only."
+  - "No FLU FeatureServer confirmed on Harris Data Hub."
+  - "Numeric qPublic AppID/LayerID not recovered automated (Cloudflare 403) — use App=HarrisCountyGA KeyValue={PARCEL_NO}."
+  - "Parcels4_2026_HUB maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "CITY/ZIP mailing fields — do NOT use as municipality filter; prefer TaxDistrict / City_LimitsH."
+  - "REJECT Harris TX HCAD su8ic9KbA7PYVxPS / hctx.net; REJECT paid Regrid/ATTOM/USLandGrid."
+  - "Skip Water System / utilities hub layers + AADT; no emails/phones collected."
+
+license: >
+  Harris County Data Hub (RVRC_ELA / GARC org Ug5xGQbHsD8zuZzM) — Parcels4_2026_HUB,
+  Zones / Zones1, Addresses4_2025, City_LimitsH / CityLimits_Harris. Human GIS
+  harris-county-data-hub-garc.hub.arcgis.com; viewer garc.maps.arcgis.com webappviewer
+  id=1efb396c42bf4080a37be70b72cbb2c4. Assessor qPublic App=HarrisCountyGA
+  (qpublic.net/ga/harris). Attribution Harris County / River Valley Regional Commission
+  GIS. Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HarrisCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://harris-county-data-hub-garc.hub.arcgis.com/
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

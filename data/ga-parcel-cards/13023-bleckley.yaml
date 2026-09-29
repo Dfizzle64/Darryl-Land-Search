@@ -1,0 +1,284 @@
+state: GA
+jurisdiction: Bleckley County
+fips: "13023"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "Bleckley TaxParcels_25 (HOGARC)"
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Bleckley_County_Wide_View/FeatureServer/39
+    layerId: 39
+    geometry: polygon
+    auth: none
+    acreageField: "Calc_Acres"
+    coverage: county-wide
+    parcelIdField: "Parcel_No"
+    liveCount: 7273
+    liveCount5to150ac: 1780
+    geoCheck: "extent center [['13023', 'Bleckley County']]; sample [['13023', 'Bleckley County']]; extent WGS84 [-83.4994, 32.2724, -83.1374, 32.585]"
+    fieldMap:
+      Parcel_No: "parcelId"
+      Calc_Acres: "acreage"
+    notes: >
+      pass1 2026-09-28: County-wide Bleckley GA 2025 tax parcels (7273) on HOGARC
+      Bleckley_County_Wide_View layer 39 (2021 twin layer 36). Parcel_No + Calc_Acres only (Pass 2 qPublic
+      for owner/values).
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — no public county-wide ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Bleckley County GA county-wide public parcel
+      FeatureServer/MapServer recovered. Official human cadastral + CAMA path = qPublic
+      App=BleckleyCountyGA (qpublic.net/ga/bleckley → qpublic.schneidercorp.com). County
+      seat Cochran GA (~-83.35,32.39). BleckleyCountyGA_WFS → 404. AGOL catalog item
+      GDITAdmin "Parcels - GA - Bleckley County" (Bleckley_Parcels FeatureServer) returns
+      subscription-canceled / Invalid URL — dead, do not wire. City of Cochran HOGARC
+      City_of_Cochran_View has thin CITY-ONLY parcel-ish layers (CityParcelsCodedCounty/19
+      count 10; ExistingTaxParIslands16/15 count 72) — NOT county-wide; see municipalities.
+      Cloudflare/bot 403 on Application.aspx automated; public for humans. REJECT paid
+      Regrid (~7332) / DynamoSpatial / USLandGrid Bleckley extracts. Geo: Middle Georgia
+      Cochran / Ocmulgee corridor (NOT lookalike counties).
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only (county-wide)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No county-wide public REST market/assessed values. Assessor HTML: qPublic
+      App=BleckleyCountyGA (also AppID=727 LayerID=11768 Estimate Taxes). Deep-link:
+      Application.aspx?App=BleckleyCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}.
+      CityParcelsCodedCounty exposes curr_val/mavcurr on 10 city sample polys only —
+      not county digest.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST multi-sale history. qPublic Sales Search HTML App=BleckleyCountyGA.
+      CityParcelsCodedCounty sale_val sparsely 0 on sample — not a sales ledger.
+    status: gap
+
+  - role: zoning
+    name: null — no public COUNTY zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Bleckley County unincorporated zoning FeatureServer. City of Cochran zoning is
+      public (see municipalities CochranZoning /26). County Comp Plan / PDF gap outside
+      city.
+    status: gap
+
+  - role: flu
+    name: null — no public county FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Bleckley County GA FLU FeatureServer recovered — Comp Plan PDF gap.
+    status: gap
+
+municipalities:
+  - name: Cochran
+    level: city
+    parentFips: "13023"
+    joinToCountyParcels: >
+      No county-wide parcel REST. City-only HOGARC City_of_Cochran_View layers; spatial
+      CochranCityLimits/9 (CITY='Cochran'). Centroid ~-83.35,32.39 — Bleckley GA.
+    layers:
+      - role: zoning
+        name: City_of_Cochran_View CochranZoning (HOGARC)
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Cochran_View/FeatureServer/26
+        layerId: 26
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Parcel_No: parcelId
+          Zoning: zoning
+          ZoningOld: zoningPrevious
+        notes: >
+          Preferred Cochran city zoning polygons (HOGARC / hogagis City_of_Cochran_View).
+          Live count 3199 (2026-09-24); Zoning non-blank ≈2127. Domain top: R-1≈774,
+          R-2≈652, R-3≈372, DC≈98, B-2≈94, B-1≈71, M-1≈20, RM≈18, P-1≈12, A-1≈8 (+ P/RV/M-2
+          sparse; blank≈1068). Official viewer: HOGARC webappviewer
+          id=3d71d6f3dfbc4f2fa02e867d25d9138f (cityofcochran.com Cochran GIS Information;
+          older garc id fd2ec2ef… inaccessible). Geo-verified ~-83.37,32.39 Cochran GA —
+          Middle Georgia (NOT lookalikes). Spatial-only to county parcels until county
+          geometry exists. maxRecordCount 2000 — page.
+        status: usable
+      - role: flu
+        name: null — no city FLU FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cochran FLU REST — gap beyond zoning.
+        status: gap
+      - role: parcels
+        name: City_of_Cochran_View CityParcelsCodedCounty (thin city sample — NOT county-wide)
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Cochran_View/FeatureServer/19
+        layerId: 19
+        geometry: polygon
+        auth: none
+        acreageField: totalacres
+        coverage: sample
+        fieldMap:
+          Parcel_No: parcelId
+          lastname: ownerName
+          house_no: situsNumber
+          street_nam: situsStreet
+          totalacres: acreage
+          Deed_Acres: acreageDeed
+          curr_val: tax.marketValue
+          mavcurr: tax.assessedValue
+          sale_val: lastSale.price
+          zoning: zoning
+          qPub_Link: appraiserSearchUrl
+        notes: >
+          Thin CITY sample only (live count 10). Has owner/curr_val/mavcurr/qPub_Link
+          (legacy qpublic7 ga_display county=ga_bleckley&KEY=). Geo ~-83.358,32.404
+          Cochran GA verified. DO NOT treat as county landbase. Companion
+          ExistingTaxParIslands16/15 count 72 — still city islands, not county-wide.
+          Prefer qPublic HTML for county CAMA; prefer CochranZoning/26 for city zoning
+          coverage. Skip water/sewer utility layers on same service (tranche-3).
+        status: partial
+    gaps:
+      - "Cochran zoning REST usable city-only; no Cochran FLU REST."
+      - "City parcel layers are tiny samples (10 / 72) — not Bleckley county-wide CAMA."
+      - "cityofcochran.com legacy webapp id fd2ec2ef… inaccessible; use HOGARC zoning viewer."
+    status: partial
+
+gaps:
+  - "No public county-wide REST parcels/tax/sales/zoning/FLU for Bleckley County GA — qPublic App=BleckleyCountyGA HTML only."
+  - "BleckleyCountyGA_WFS 404; GDITAdmin Bleckley_Parcels AGOL item subscription-canceled / Invalid URL."
+  - "City of Cochran HOGARC zoning (3199) is city-only; city parcel samples 10–72 only."
+  - "Rejected paid Regrid/DynamoSpatial/USLandGrid Bleckley extracts."
+  - "No emails/phones; no paid vendors; utilities + AADT skipped (tranche-3)."
+
+license: >
+  Bleckley County Board of Assessors qPublic/Beacon App=BleckleyCountyGA
+  (qpublic.net/ga/bleckley; Application.aspx App=BleckleyCountyGA / AppID=727).
+  City of Cochran / HOGARC City_of_Cochran_View FeatureServer (org HHvUPZ2XuLOAJxjR;
+  zoning webapp 3d71d6f3dfbc4f2fa02e867d25d9138f; cityofcochran.com GIS page).
+  Attribution Bleckley County Tax Assessor / City of Cochran / HOGARC. Public fields
+  only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BleckleyCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BleckleyCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: usable
+  summary: >
+    Bleckley TaxParcels_25 (HOGARC): https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/
+    Bleckley_County_Wide_View/FeatureServer/39 - live count 7273 (5-150 ac: 1780), parcel ID field
+    Parcel_No. Geography verified against TIGER county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Cochran city"
+      level: city
+      parentFips: "13023"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Bleckley' AND aadt>0
+    altFilter: name LIKE '023-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 023-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 103
+    maxAadt: 26900
+    geoCheck: 103/103 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=BleckleyCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: A01    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BleckleyCountyGA&Layer=Parcels&PageType=Report&KeyValue=A01%20%20%20%20001
+    verification: 'pattern-tested: real sample ID from Parcel_No; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=BleckleyCountyGA&Layer=Parcels&PageType=Search
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Cochran city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

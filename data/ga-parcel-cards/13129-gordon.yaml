@@ -1,0 +1,482 @@
+state: GA
+jurisdiction: Gordon County
+fips: "13129"
+level: county
+markets: [Atlanta]
+
+layers:
+  - role: parcels
+    name: "GC Parcels (Gordon County OpenGov)"
+    restUrl: https://services3.arcgis.com/VVvJP2fdheq4kcpy/arcgis/rest/services/OpenGov/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: "Calc_Acres"
+    coverage: county-wide
+    parcelIdField: "PIN"
+    liveCount: 28878
+    liveCount5to150ac: 5569
+    geoCheck: "extent center [['13129', 'Gordon County']]; sample [['13129', 'Gordon County']]; extent WGS84 [-85.1142, 34.3831, -84.645, 34.6314]"
+    fieldMap:
+      PIN: "parcelId"
+      Calc_Acres: "acreage"
+      DIGCLASS: "dorCode"
+      City: "municipality"
+    notes: >
+      pass1 2026-09-28: County-wide Gordon GA parcels (28878) in AGOL org VVvJP2fdheq4kcpy (OpenGov
+      FeatureServer layer 3, edits 2025). PIN + Calc_Acres + DIGCLASS + City. Upgrades the 2026-09-24
+      partial (Calhoun-hosted Roads_and_Parcels/5 kept as alternate). No owner/situs (Pass 2 qPublic).
+    status: usable
+    verifiedAt: 2026-09-28
+
+  # PRIMARY — county-wide polygons hosted on City of Calhoun GIS (acres+zoning+PIN; thin CAMA)
+  - role: parcels
+    name: Roads_and_Parcels Parcels (City of Calhoun GIS — county-wide host)
+    restUrl: https://gis.cityofcalhoun-ga.com/arcgis/rest/services/Roads_and_Parcels/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: DACRE
+    coverage: county-wide
+    fieldMap:
+      CNTY_PIN: parcelId
+      Parcel_Num: parcelIdAlt
+      REALKEY: parcelKey
+      DACRE: acreage
+      ZONING: zoning
+      House_No: situsNumber
+      Street_Nam: situsStreet
+      Sttype: situsStreetType
+      Tax_Distri: taxDistrictName
+      City_St_Zi: situsCityStateZip
+      Subd_Name: subdivision
+      Landlot: landLot
+      Map_No: mapSheet
+      Lot_No: lotNumber
+      FLOOD: floodFlag
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (hosted on City of Calhoun ArcGIS Server
+      gis.cityofcalhoun-ga.com — OpenAddresses us/ga/gordon parcels target). Live count
+      28487 (2026-09-24). Tax_Distri CALHOUN≈7110 / COUNTY≈21377 — layer covers
+      unincorporated Gordon + Calhoun, not city-only. DACRE 5–150 ≈5503. ZONING domain:
+      COUNTY≈21370 (unincorporated stub), R-1≈2217, R-2≈1591, PRD≈1424, C-2≈903,
+      R-1B≈363, IND-G≈361, C-1≈85, R-3≈78, R-2A≈33, C-N≈21, A-1≈18, O&I≈16 (+ R2/R1-B
+      typos). House_No filled ≈0 live — situs thin/GAP on REST; owner/mailing/tax values
+      absent — CAMA via qPublic App=GordonCountyGA HTML. Geo-verified WGS84 samples
+      ~-84.915,34.504 (CNTY_PIN 056A 017 Calhoun R-2) — Gordon County GA / Calhoun
+      (~-84.95,34.50) (NOT Gordon County AL; NOT Calhoun lookalikes outside GA).
+      Official assessor GIS page gordonassessors.com/gis + gordoncountyga.gov GIS fee
+      schedule (shapefile purchase — not a public REST substitute). Rejected paid GIS
+      fee extracts as app landbase; rejected Regrid/ATTOM.
+    status: partial
+
+  - role: tax
+    name: null — no public REST CAMA values
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No CURR_VAL / FMV / assessed on Calhoun Roads_and_Parcels/5. Tax via qPublic
+      App=GordonCountyGA / AppID=629 LayerID=12715 HTML (gordonassessors.com; bot 403).
+      Deep-link: Application.aspx?App=GordonCountyGA&Layer=Parcels&PageType=Report&KeyValue={CNTY_PIN}.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Gordon GA multi-sale FeatureServer recovered. Prefer qPublic Sales Search HTML.
+      Rejected paid vendors.
+    status: gap
+
+  - role: zoning
+    name: Zoning MapServer CITY OF CALHOUN ZONING (+ parcel ZONING attr)
+    restUrl: https://gis.cityofcalhoun-ga.com/arcgis/rest/services/Zoning/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: DACRE
+    coverage: county-wide
+    fieldMap:
+      CNTY_PIN: parcelId
+      ZONING: zoning
+      Parcel_Num: parcelIdAlt
+      Tax_Distri: taxDistrictName
+      DACRE: acreage
+    notes: >
+      Live count 28487 — same parcel universe as Roads_and_Parcels/5 with ZONING attr.
+      Inside Calhoun prefer city codes (R-1/R-2/C-2/PRD/IND-G…). Unincorporated
+      ZONING='COUNTY' ≈21370 is a stub NOT a Euclidean district — county zoning polygon
+      REST beyond this stub = GAP (PDF/staff / fee shapefile per gordoncountyga.gov).
+      Downtown Historic District = Zoning/MapServer/0 overlay.
+    status: partial
+
+  - role: flu
+    name: null — no public county FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Gordon County Future Land Use FeatureServer recovered (2026-09-24). Certify via
+      Comp Plan PDF / Planning.
+    status: gap
+
+municipalities:
+  - name: Calhoun
+    level: city
+    parentFips: "13129"
+    joinToCountyParcels: >
+      Soft Tax_Distri='CALHOUN' (~7110) OR ZONING not in ('COUNTY') spatial to city.
+      Centroid ~-84.95,34.50. Prefer city Zoning/1 codes over COUNTY stub.
+    layers:
+      - role: zoning
+        name: Zoning MapServer CITY OF CALHOUN ZONING (city extract)
+        restUrl: https://gis.cityofcalhoun-ga.com/arcgis/rest/services/Zoning/MapServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: DACRE
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          CNTY_PIN: parcelId
+        notes: >
+          Preferred Calhoun-local zoning = filter Tax_Distri='CALHOUN' / exclude
+          ZONING='COUNTY'. City hosts the countywide service.
+        status: usable
+      - role: flu
+        name: null — no city FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Calhoun city FLU FeatureServer recovered.
+        status: gap
+      - role: parcels
+        name: Roads_and_Parcels filtered Tax_Distri='CALHOUN'
+        restUrl: https://gis.cityofcalhoun-ga.com/arcgis/rest/services/Roads_and_Parcels/MapServer/5
+        layerId: 5
+        geometry: polygon
+        auth: none
+        acreageField: DACRE
+        coverage: city-only
+        fieldMap:
+          CNTY_PIN: parcelId
+          DACRE: acreage
+        notes: Same county host layer filtered to Calhoun tax district.
+        status: partial
+    gaps:
+      - "Owner/mailing/situs/tax REST gap — qPublic HTML for CAMA."
+    status: partial
+
+  - name: Fairmount
+    level: city
+    parentFips: "13129"
+    joinToCountyParcels: >
+      Spatial TIGER/city limits (no dedicated Fairmount poly on Calhoun REST recovered)
+      OR assessor tax district when documented. Soft only until city boundary layer found.
+    layers:
+      - role: zoning
+        name: null — no city FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Fairmount zoning FeatureServer; county ZONING='COUNTY' stub in area.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Fairmount FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county parcels spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Roads_and_Parcels + city boundary spatial.
+        status: gap
+    gaps:
+      - "No Fairmount city GIS REST recovered."
+    status: partial
+
+  - name: Resaca
+    level: city
+    parentFips: "13129"
+    joinToCountyParcels: >
+      Spatial city limits (no dedicated Resaca poly on Calhoun REST) — soft.
+    layers:
+      - role: zoning
+        name: null — no city FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Resaca zoning FeatureServer recovered.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Resaca FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county parcels spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County parcels + Resaca boundary spatial.
+        status: gap
+    gaps:
+      - "No Resaca city GIS REST recovered."
+    status: partial
+
+  - name: Plainville
+    level: city
+    parentFips: "13129"
+    joinToCountyParcels: >
+      Spatial city limits soft — no Plainville poly on Calhoun REST.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Plainville zoning FeatureServer.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Plainville FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county parcels spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County parcels + Plainville boundary.
+        status: gap
+    gaps:
+      - "No Plainville city GIS REST recovered."
+    status: partial
+
+  - name: Ranger
+    level: city
+    parentFips: "13129"
+    joinToCountyParcels: >
+      Spatial city limits soft — no Ranger poly on Calhoun REST.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ranger zoning FeatureServer.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ranger FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county parcels spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County parcels + Ranger boundary.
+        status: gap
+    gaps:
+      - "No Ranger city GIS REST recovered."
+    status: partial
+
+gaps:
+  - "Owner/mailing/situs/tax.marketValue/lastSale REST gap on Calhoun-hosted parcels (House_No≈0) — qPublic App=GordonCountyGA HTML only."
+  - "Unincorporated ZONING='COUNTY' ≈21370 is stub — no public Euclidean county zoning polygon REST; fee shapefile per county GIS schedule rejected as paid path."
+  - "No county FLU FeatureServer."
+  - "Fairmount/Resaca/Plainville/Ranger: no city zoning/FLU FeatureServers recovered."
+  - "Gordon County sells GIS shapefiles (fee schedule) — not a substitute public REST; do not wire paid extracts."
+  - "Rejected Regrid/ATTOM; rejected Gordon AL / Calhoun non-GA lookalikes."
+  - "No emails/phones collected; no paid vendors."
+
+license: >
+  City of Calhoun GIS (gis.cityofcalhoun-ga.com — Roads_and_Parcels/MapServer/5,
+  Zoning/MapServer). Gordon County Board of Assessors / GIS (gordonassessors.com;
+  gordoncountyga.gov GIS). Assessor HTML qPublic SchneiderCorp App=GordonCountyGA /
+  AppID=629 LayerID=12715. Attribution to City of Calhoun / Gordon County. Public
+  fields only; no emails/phones; no paid vendors (Regrid/ATTOM); county fee shapefiles
+  not used.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=GordonCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: partial
+  parcelStatusAfter: usable
+  summary: >
+    GC Parcels (Gordon County OpenGov):
+    https://services3.arcgis.com/VVvJP2fdheq4kcpy/arcgis/rest/services/OpenGov/FeatureServer/3 - live
+    count 28878 (5-150 ac: 5569), parcel ID field PIN. Geography verified against TIGER county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Calhoun city"
+      level: city
+      parentFips: "13129"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Fairmount city"
+      level: city
+      parentFips: "13129"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Plainville city"
+      level: city
+      parentFips: "13129"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Resaca town"
+      level: city
+      parentFips: "13129"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Gordon' AND aadt>0
+    altFilter: name LIKE '129-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 129-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 212
+    maxAadt: 79800
+    geoCheck: 212/212 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=GordonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PIN
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001       001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=GordonCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20%20%20%20001
+    verification: 'pattern-tested: real sample ID from PIN; box test HTTP 403 Cloudflare challenge (expected; pattern
+      follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=GordonCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Calhoun city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Fairmount city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Plainville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Resaca town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

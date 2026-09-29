@@ -1,0 +1,531 @@
+state: GA
+jurisdiction: Coffee County
+fips: "13069"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: CoffeeBackgroundLayers Parcels (SGRC)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeBackgroundLayers/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      PARCEL_NO_1: parcelIdAlt
+      PARCEL_NO2: parcelIdAlt2
+      REALKEY: ownerKey
+      OWNKEY: ownerKeyAlt
+      HOUSE_NO: situsNumber
+      STDIRECT: situsStreetDir
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      UNIT: situsUnit
+      EXTENSION: situsExtension
+      TOTALACRES: acreage
+      Calc_Acres: acreageGis
+      WOODACRES: acreageWoodland
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      SALE_VAL: lastSale.price
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      DIGSTRAT: dorStrata
+      LAND_TYPE: landType
+      LEGAL_DESC: legalDescription
+      SUBD_NAME: subdivision
+      HOMEEXEMPT: homesteadExempt
+      LANDGMD: georgiaMilitiaDistrict
+      LANDLOT: landLot
+      LANDDIST: landDistrict
+      NEIGHBHOOD: neighborhood
+      HISTYR1: tax.histYear1
+      HISTVAL1: tax.histValue1
+      HISTYR2: tax.histYear2
+      HISTVAL2: tax.histValue2
+      HISTYR3: tax.histYear3
+      HISTVAL3: tax.histValue3
+      LAT: latitude
+      LON: longitude
+      Shape.STArea(): shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA landbase (Southern Georgia Regional
+      Commission SGRC alma — Coffee/CoffeeBackgroundLayers MapServer layer 2 "Parcels").
+      Live count 21364 (2026-09-24). Companion Coffee/CoffeeMainLayers has addresses/0 +
+      Roads/1 only (no parcels). SR NAD 1983 StatePlane Georgia East FIPS 1001 Feet
+      (wkid 102666 / latestWkid 2239). maxRecordCount 1000 — page via resultOffset /
+      spatial envelopes. TOTALACRES 5–150 = 4929; CURR_VAL>0 = 21046; PREV_VAL>0 = 20872;
+      FMVRES>0 = 10937; HOUSE_NO>0 = 15219; ZONINGCODE non-null = 19319; MAVCURR>0 = 0
+      (assessed REST gap); SALE_VAL/SALELAND1/SALEIMP1 >0 = 0 (sales REST gap).
+      OWNER NAME / MAILING ADDRESS fields (LASTNAME/FIRSTNAME/ADDRESS1/CITY/STATE/ZIP)
+      are ABSENT on this layer — owner REST gap; use qPublic AppID=737 HTML for owner/
+      mailing. Compose situsAddress from HOUSE_NO + STDIRECT + STREET_NAM + STTYPE when
+      HOUSE_NO>0. TAXDISTRIC soft (geo-checked): 01≈unincorporated/AG (~14425;
+      ~-82.82,31.38), 02≈Douglas (~5174; ~-82.85,31.53), 03≈Nicholls (~668;
+      ~-82.63,31.51), 04≈Broxton (~624; ~-82.90,31.63), 05≈Ambrose (~189;
+      ~-83.02,31.60), 06≈Douglas special (~12) — prefer spatial Cities/4 ANPSADPI for
+      municipality. DIGCLASS: R≈15461, V≈2840, C≈1213, E≈744, A≈605, I≈108, P≈44, J≈43,
+      U≈1. ZONINGCODE top: AG≈9184, DOUG≈4595, R2≈2142, RM≈918, BROX≈583, NICH≈574,
+      R1≈463, R3≈354, C≈274, AMBR≈180, W-LI≈44 (+ sparse AMBROSE/DOUGLAS/COM/COMM/
+      COUNTY/PD). WATER/SEWER/GAS/ELECTRICTY/ROADSTREET present — SKIP per tranche-3.
+      Parcel_No format e.g. '0116  026' / 'D015  083' / 'N009  041' / 'B002  066'.
+      Official assessor HTML: qPublic AppID=737 LayerID=11775 (coffeecounty-ga.gov
+      assessor → Application.aspx; also App=CoffeeCountyGA; bot 403 automated).
+      CoffeeCountyGA_WFS 404. Geo-verified WGS84 samples ~-82.850,31.530 (Parcel_No
+      '0116  026' Douglas), ~-82.849,31.499 (D014 Pearl Ave), ~-82.827,31.499
+      (0117B Waldroup) — Coffee County GA / Douglas (FIPS 13069; county poly INTPT
+      ~-82.851,31.547). REJECT lookalikes: Coffee County AL (Enterprise ~-85.9,31.3);
+      Coffee County TN parcels/zoning (kpruitt2638 PARCELS ~-86.15,35.66; RCSPlanners
+      Coffee_Zoning ~-85.92,35.45); paid Regrid/ATTOM/DynamoSpatial. No emails/phones.
+    status: usable
+
+  - role: tax
+    name: CoffeeBackgroundLayers CURR_VAL / FMV* / MAV* (on polygons)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeBackgroundLayers/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      HOMEEXEMPT: homesteadExempt
+      HISTYR1: tax.histYear1
+      HISTVAL1: tax.histValue1
+      HISTYR2: tax.histYear2
+      HISTVAL2: tax.histValue2
+      HISTYR3: tax.histYear3
+      HISTVAL3: tax.histValue3
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. CURR_VAL>0 = 21046; MAVCURR>0 = 0
+      (assessed REST gap — use qPublic HTML). Assessor HTML: AppID=737 LayerID=11775
+      PageTypeID=2 PageID=5474 (search). Deep-link KeyValue={Parcel_No}:
+      Application.aspx?AppID=737&LayerID=11775&PageTypeID=4&KeyValue={Parcel_No}
+      (also App=CoffeeCountyGA&Layer=Parcels&PageType=Report&KeyValue=). HISTYR*/HISTVAL*
+      are assessment value-year history — NOT sales. Tax Commissioner coffeecountypay.com
+      is payments — not CAMA REST.
+    status: usable
+
+  - role: sales
+    name: null — SALE_VAL zero-filled; qPublic Sales Search HTML only
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeBackgroundLayers/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      SALE_VAL / SALELAND1 / SALELAND2 / SALEIMP1 / SALEIMP2 fields exist but all >0
+      count = 0 live (2026-09-24). No public REST multi-sale / property_sales year layers
+      for Coffee. qPublic Sales Search / Sales List HTML AppID=737. Rejected paid
+      Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: CoffeeBackgroundLayers ZONINGCODE (parcel-attributed)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeBackgroundLayers/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+    notes: >
+      Parcel-attributed zoning (ZONINGCODE non-null ≈19319). Domain mix of county + city
+      labels: AG≈9184, DOUG≈4595, R2≈2142, RM≈918, BROX≈583, NICH≈574, R1≈463, R3≈354,
+      C≈274, AMBR≈180, W-LI≈44. No separate Euclidean zoning FeatureServer on SGRC Coffee
+      folder (2026-09-24). County zoning PDF on coffeecounty-ga.gov/community/maps.php
+      (Zoning_Color_Composite2.pdf) — not REST. REJECT Coffee County TN Coffee_Zoning
+      (RCSPlanners ~-85.92,35.45) and kpruitt2638 ZONING_Coffee (TN).
+    status: usable
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Coffee County GA future land use / character-area FeatureServer on SGRC Coffee
+      folder or rstrom_sgrc AGOL (2026-09-24; CoffeeTracts/Blocks are Census only). Comp
+      Plan PDF gap.
+    status: gap
+
+  - role: other
+    name: CoffeeBackgroundLayers Cities (incorporated)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeBackgroundLayers/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ANPSADPI: municipality
+      STATEFP: stateFips
+    notes: >
+      Preferred spatial municipality filter. Live count 4: Ambrose, Broxton, Douglas,
+      Nicholls. ANPSADPI is the city name. Companion layer/5 County boundary (CNTY=069
+      STATEFP=13 ANPSADPI='Coffee County'; INTPT ~-82.851,31.547). Join = spatial
+      intersect (default). Do NOT filter by owner mailing (mailing fields absent on
+      parcels anyway). Soft TAXDISTRIC as attribute fallback only.
+    status: usable
+
+  - role: other
+    name: CoffeeMainLayers addresses
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeMainLayers/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ADDR: situsAddress
+      NUMBER: situsNumber
+      ROADNAME: situsStreetName
+      STREET: situsStreet
+      COMM: community
+    notes: >
+      Live count 21017 address points. RESIDENT field may carry occupant labels — treat
+      as non-authoritative; DO NOT collect phones/emails if present. Prefer parcel
+      HOUSE_NO+STREET for situs when filled; addresses for gap-fill. Companion SGRC
+      Coffee County 911 Roads & Addresses App
+      sgrc.maps.arcgis.com/apps/webappviewer/index.html?id=01ec6364cdb34634a32d313c8e412b58
+      (addresses/roads — not CAMA parcels). Geo Coffee GA.
+    status: usable
+
+municipalities:
+  - name: Douglas
+    level: city
+    parentFips: "13069"
+    joinToCountyParcels: >
+      Spatial Cities/4 ANPSADPI='Douglas' (~-82.85,31.51) OR soft TAXDISTRIC='02'
+      (~5174) / ZONINGCODE in ('DOUG','DOUGLAS').
+    layers:
+      - role: zoning
+        name: Parcel ZONINGCODE Douglas extract (DOUG*)
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeBackgroundLayers/MapServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          ZONINGCODE: zoning
+          Parcel_No: parcelId
+        notes: >
+          Prefer spatial Douglas poly + ZONINGCODE DOUG/DOUGLAS / city R1/R2/R3/RM/C
+          labels inside city. No separate City-of-Douglas FeatureServer on SGRC.
+          Municode coffee_county codes for ordinance text.
+        status: usable
+      - role: flu
+        name: null — no city FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Douglas city FLU FeatureServer — Comp Plan PDF gap.
+        status: gap
+      - role: parcels
+        name: null — use county Parcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Douglas-only CAMA — county BackgroundLayers/2 + spatial Douglas / TAXDISTRIC=02.
+        status: gap
+    gaps:
+      - "No Douglas-owned separate zoning/FLU/parcel FeatureServer — SGRC county layers + spatial."
+    status: usable
+
+  - name: Broxton
+    level: city
+    parentFips: "13069"
+    joinToCountyParcels: >
+      Spatial Cities/4 ANPSADPI='Broxton' (~-82.89,31.63) OR soft TAXDISTRIC='04' (~624)
+      / ZONINGCODE='BROX'.
+    layers:
+      - role: zoning
+        name: Parcel ZONINGCODE Broxton extract
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeBackgroundLayers/MapServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          ZONINGCODE: zoning
+        notes: Prefer spatial Broxton + ZONINGCODE BROX. No Broxton-owned GIS folder.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Broxton FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Parcels + spatial Broxton
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County BackgroundLayers/2 + spatial Broxton / TAXDISTRIC=04.
+        status: gap
+    gaps:
+      - "No Broxton city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Nicholls
+    level: city
+    parentFips: "13069"
+    joinToCountyParcels: >
+      Spatial Cities/4 ANPSADPI='Nicholls' (~-82.63,31.52) OR soft TAXDISTRIC='03' (~668)
+      / ZONINGCODE='NICH'.
+    layers:
+      - role: zoning
+        name: Parcel ZONINGCODE Nicholls extract
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeBackgroundLayers/MapServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          ZONINGCODE: zoning
+        notes: Prefer spatial Nicholls + ZONINGCODE NICH. No Nicholls-owned GIS.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Nicholls FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Parcels + spatial Nicholls
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County BackgroundLayers/2 + spatial Nicholls / TAXDISTRIC=03.
+        status: gap
+    gaps:
+      - "No Nicholls city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Ambrose
+    level: city
+    parentFips: "13069"
+    joinToCountyParcels: >
+      Spatial Cities/4 ANPSADPI='Ambrose' (~-83.01,31.59) OR soft TAXDISTRIC='05' (~189)
+      / ZONINGCODE in ('AMBR','AMBROSE').
+    layers:
+      - role: zoning
+        name: Parcel ZONINGCODE Ambrose extract
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeBackgroundLayers/MapServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          ZONINGCODE: zoning
+        notes: Prefer spatial Ambrose + ZONINGCODE AMBR/AMBROSE. No Ambrose-owned GIS.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ambrose FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Parcels + spatial Ambrose
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County BackgroundLayers/2 + spatial Ambrose / TAXDISTRIC=05.
+        status: gap
+    gaps:
+      - "No Ambrose city-owned zoning/FLU/parcel REST."
+    status: partial
+
+gaps:
+  - "Owner name / mailing ADDRESS1/CITY/STATE/ZIP fields ABSENT on CoffeeBackgroundLayers/2 — owner REST gap; qPublic AppID=737 HTML for owner/mailing."
+  - "SALE_VAL/SALELAND*/SALEIMP*>0 = 0 — no REST lastSale.price/date; qPublic AppID=737 Sales Search HTML only."
+  - "MAVCURR>0 = 0 — no usable assessedValue on REST; prefer CURR_VAL market + qPublic HTML for assessed/taxable."
+  - "No Euclidean zoning FeatureServer — parcel ZONINGCODE only; county zoning PDF on coffeecounty-ga.gov."
+  - "No public FLU / character-area FeatureServer on SGRC Coffee folder."
+  - "BackgroundLayers/2 maxRecordCount 1000 — page via resultOffset / spatial envelopes."
+  - "TAXDISTRIC codes lack published REST name legend — soft map 01=unincorp / 02=Douglas / 03=Nicholls / 04=Broxton / 05=Ambrose / 06=Douglas-special; prefer Cities/4 spatial."
+  - "CoffeeCountyGA_WFS 404; qPublic Application.aspx Cloudflare/bot 403 automated."
+  - "Rejected lookalikes: Coffee County AL GIS; Coffee County TN kpruitt2638 PARCELS/ZONING_Coffee + RCSPlanners Coffee_Zoning; paid Regrid/ATTOM/DynamoSpatial."
+  - "Schema WATER/SEWER/GAS/ELECTRICTY/ROAD* — DO NOT collect (skip utilities+AADT); no emails/phones."
+
+license: >
+  Southern Georgia Regional Commission GIS sgrcmaps.com — Coffee/CoffeeBackgroundLayers
+  (Parcels/2, Cities/4, County/5), Coffee/CoffeeMainLayers (addresses/0, Roads/1). SGRC
+  AGOL Coffee County 911 Roads & Addresses App 01ec6364cdb34634a32d313c8e412b58 (owner
+  rstrom_sgrc). Assessor qPublic AppID=737 LayerID=11775 (coffeecounty-ga.gov/departments/
+  assessor; qpublic.net/ga/coffee → county assessor). Tax Commissioner coffeecountypay.com.
+  Attribution SGRC / Coffee County Tax Assessor. Public fields only; no emails/phones;
+  no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=737&LayerID=11775&PageTypeID=2&PageID=5474
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?url=https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeBackgroundLayers/MapServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeBackgroundLayers/MapServer/2 count 21364;
+    extent center [['13069', 'Coffee County']]; sample [['13069', 'Coffee County']]. No change to field
+    map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Ambrose city"
+      level: city
+      parentFips: "13069"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Broxton city"
+      level: city
+      parentFips: "13069"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Douglas city"
+      level: city
+      parentFips: "13069"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Nicholls city"
+      level: city
+      parentFips: "13069"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Coffee' AND aadt>0
+    altFilter: name LIKE '069-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 069-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 187
+    maxAadt: 19000
+    geoCheck: 187/187 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - A_VALUE
+    - FMVRES
+    filledCount: 21046
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeBackgroundLayers/MapServer/2
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: SALE_VAL=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=CoffeeCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=737&LayerID=11775&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0116  026
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=CoffeeCountyGA&Layer=Parcels&PageType=Report&KeyValue=0116%20%20026
+    verification: 'pattern-tested: real sample ID from Parcel_No; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?url=https://www.sgrcmaps.com/alma/rest/services/Coffee/CoffeeBackgroundLayers/MapServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Ambrose city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Broxton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Douglas city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Nicholls city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

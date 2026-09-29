@@ -1,0 +1,261 @@
+state: GA
+jurisdiction: Murray County
+fips: "13213"
+level: county
+markets: [Chattanooga]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer/MapServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest REST gap. Murray County publishes parcels only via Schneider qPublic
+      HTML/map (qpublic.net/ga/murray; App=MurrayCountyGA AppID=756 LayerID=11792
+      PageID=5559). County Online Maps (murraycountyga.org/488) links Q-Public as the
+      parcel viewer — no gis.murraycountyga.org ArcGIS Server and no public
+      FeatureServer for Murray parcels on AGOL (2026-09-24). NWGRC linked from Land
+      Use page; no Murray parcel REST found. Paid USLandGrid/MappingSolutionsGIS/
+      Regrid/ATTOM rejected. Geo-context: Census TIGERweb GEOID 13213 CENTLAT
+      +34.7883275 CENTLON -084.7481503 (Chatsworth seat ~-84.78,34.77; NW Georgia /
+      Chattanooga MSA ring; NOT Murray KY / NOT Chatsworth CA). CAMA via qPublic
+      KeyValue={parcel id} HTML only.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only (no CURR_VAL REST)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No public REST market/assessed/taxable fields. Assessor CAMA via qPublic
+      AppID=756 LayerID=11792 HTML (Cloudflare/bot 403 automated; public for humans).
+      Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=756&LayerID=11792&PageTypeID=4&KeyValue={parcelId}.
+      Search PageTypeID=2&PageID=5559. Office: murraycountyga.org Assessors
+      (Chatsworth GA 30705). Rejected paid vendor tax extracts.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_PRICE/SALE_DATE on any public REST. Prefer qPublic Sales Search HTML
+      AppID=756. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — Land Use District map PDF only (no Euclidean REST)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Land Use / Zoning publishes Land Use Map PDF
+      (murraycountyga.org/DocumentCenter/View/1817) and Land Use District Ordinance —
+      no public Zoning FeatureServer/MapServer. Honest REST zoning gap.
+    status: gap
+
+  - role: flu
+    name: null — no public Future Land Use FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Comp-plan / character-area REST not found. Land Use pages are ordinance/PDF
+      oriented (murraycountyga.org/141). Honest gap.
+    status: gap
+
+municipalities:
+  - name: Chatsworth
+    level: city
+    parentFips: "13213"
+    joinToCountyParcels: >
+      County seat (~-84.78,34.77). No city-owned parcel/zoning FeatureServer — use
+      county qPublic AppID=756; soft situs city Chatsworth is mailing aid only.
+    layers:
+      - role: parcels
+        name: null — county qPublic only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Chatsworth city CAMA REST — county qPublic HTML.
+        status: gap
+      - role: zoning
+        name: null — no city zoning FS
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Chatsworth zoning FeatureServer found.
+        status: gap
+    gaps:
+      - "No City of Chatsworth parcel/zoning REST — county qPublic AppID=756 HTML only."
+    status: partial
+
+  - name: Eton
+    level: city
+    parentFips: "13213"
+    joinToCountyParcels: >
+      Incorporated city north of Chatsworth (~-84.76,34.82). No city GIS REST — county
+      qPublic AppID=756 only; mailing city soft.
+    layers:
+      - role: parcels
+        name: null — county qPublic only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Eton city CAMA REST.
+        status: gap
+      - role: zoning
+        name: null — no city zoning FS
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Eton zoning FeatureServer found.
+        status: gap
+    gaps:
+      - "No City of Eton parcel/zoning REST — county qPublic only."
+    status: partial
+
+gaps:
+  - "No public ArcGIS FeatureServer/MapServer for Murray parcels — geometry+CAMA via qPublic AppID=756 LayerID=11792 HTML only."
+  - "No REST owner/mailing/situs/tax/sale/acreage fields — honest tax+sale+owner gap on REST."
+  - "No Euclidean zoning or FLU FeatureServer — Land Use Map PDF DocumentCenter/View/1817 only."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/murray + AppID=756 public for humans."
+  - "Skip utilities+AADT; no emails/phones; rejected paid Regrid/ATTOM/USLandGrid/MappingSolutionsGIS."
+
+license: >
+  Murray County Tax Assessors / Schneider qPublic App=MurrayCountyGA AppID=756
+  LayerID=11792 (qpublic.net/ga/murray; murraycountyga.org Assessors + Online Maps /488).
+  Land Use Map PDF murraycountyga.org/DocumentCenter/View/1817. Attribution Murray
+  County Tax Assessors / Land Use. Public fields only; no emails/phones; no paid
+  vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=756&LayerID=11792&PageTypeID=2&PageID=5559
+jurisdictionGisUrl: https://murraycountyga.org/488/Murray-County-Online-Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap. Only UTC
+    riparian subsets (MurrayRiparian ~608) - not county-wide.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Chatsworth city"
+      level: city
+      parentFips: "13213"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Eton city"
+      level: city
+      parentFips: "13213"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Murray' AND aadt>0
+    altFilter: name LIKE '213-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 213-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 75
+    maxAadt: 24800
+    geoCheck: 74/75 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=MurrayCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=756&LayerID=11792&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://murraycountyga.org/488/Murray-County-Online-Maps
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Chatsworth city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Eton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

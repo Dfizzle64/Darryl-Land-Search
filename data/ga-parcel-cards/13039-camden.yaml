@@ -1,0 +1,427 @@
+state: GA
+jurisdiction: Camden County
+fips: "13039"
+level: county
+markets: [Jacksonville]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner (2025 tax-year landbase; AGOL CCBOC)
+  - role: parcels
+    name: 2025 Tax Parcels OwnerParcels06042026 (CCBOC AGOL)
+    restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/2025_Tax_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Calculated
+    coverage: county-wide
+    fieldMap:
+      parcel_no: parcelId
+      GISParcel: parcelIdCompact
+      Name: parcelIdAlt
+      RealKey: ownerKey
+      lastname: ownerName
+      Calculated: acreage
+      StatedArea: acreageStated
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + owner (Camden County BOC / CCBOC AGOL org
+      feUM6sTOP0Mfde8s; service "2025 Tax Parcels" item updated ownership/legal 06/04/2026
+      per service description). Live count 33177 (2026-09-24). SR NAD83 Georgia East ft
+      (custom WKT NAD83_Georgia_East_ft). parcel_no filled ≈33056; lastname ≈33056;
+      Calculated 5–150 ≈3241 (preferred acreage band); StatedArea>0 sparse ≈1705 —
+      prefer Calculated for GIS acres. Schema is THIN on this layer (no CURR_VAL /
+      mailing / situs / sale). Join richer CAMA via Juvare_Parcels (same parcel_no /
+      GISParcel / RealKey) or qPublic AppID=641 HTML KeyValue={parcel_no}. Geo-verified
+      WGS84 samples ~-81.661,30.767 / ~-81.565,31.019 / ~-81.557,31.025 / ~-81.622,30.820
+      — Camden County GA (Kingsland ~-81.67,30.80; St Marys ~-81.55,30.72; Woodbine
+      ~-81.72,30.96). Official hub gishub-ccboc.hub.arcgis.com. REJECTED NJ lookalike
+      services7 …/Camden_Parcels (PAMS_PIN / extent ~Camden NJ); rejected paid
+      Regrid/USLandGrid/MappingSolutions Camden extracts.
+    status: usable
+
+  - role: tax
+    name: Juvare_Parcels CURR_VAL / FMV* (partial CAMA companion)
+    restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/Juvare_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Calculated
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      GISParcel: parcelIdCompact
+      LASTNAME: ownerName
+      HOUSE_NO: situsNumber
+      STREET_NAM: situsStreet
+      MAILING_AD: mailingAddressOrCoOwner
+      MAILING_CI: mailingCity
+      MAILING_ST: mailingState
+      MAILING_ZI: mailingZip
+      CURR_VAL: tax.marketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      DIGCLASS: dorCode
+      TAXDISTRIC: taxDistrict
+      YR_BUILT: yearBuilt
+      HEATEDAREA: heatedArea
+      Calculated: acreage
+    notes: >
+      Same-count twin polygons (33177) with WinGAP-style CAMA on a PARTIAL subset:
+      LASTNAME/CURR_VAL/FMVRES/DIGCLASS filled ≈19504; HOUSE_NO>0 ≈19434; MAILING_AD
+      ≈19305; FMVCOM>0 sparse ≈23. Prefer CURR_VAL as market; no MAV/assessed on REST —
+      assessed/taxable via qPublic AppID=641 HTML. DIGCLASS top R≈19154, blank≈13673,
+      V≈217, A≈63, E≈43, C≈18. Compose situs HOUSE_NO+STREET_NAM when HOUSE_NO>0.
+      MAILING_AD sometimes co-owner/DBA (e.g. "FARRA JAMES LEVERETTE") — not always street.
+      Geo extent Web Mercator matches Camden GA. Companion Acre_Info/0 TOTALACRES +
+      A_VALUE (land $; A_VALUE>0 ≈32117; TOTALACRES 5–150 ≈2518) — land-value aid, not
+      full digest. Prefer 2025_Tax_Parcels for complete owner coverage; use this layer
+      when CURR_VAL needed.
+    status: partial
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No SALEPRICE/SALEDATE on 2025_Tax_Parcels or Juvare_Parcels. qPublic Sales Search /
+      Yearly Sales map layer AppID=641 HTML only (bot/CDN may 403 automated). Rejected
+      paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Approved_Zoning zoning (landusecod)
+    restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/Approved_Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      parcel_inf: parcelId
+      gis_parcel: parcelIdCompact
+      landusecod: zoning
+      landusedes: zoningDescription
+      taxdistric: taxDistrict
+      hyperlink: appraiserSearchUrl
+      sq_acs: acreageText
+      real_key: ownerKey
+    notes: >
+      Preferred Euclidean / land-use zoning polygons (count 32030; parcel-tied). Domain
+      landusecod: City≈17968 (city-limit stub — prefer spatial St_Marys/Kingsland/Woodbine
+      for municipality), A-F≈3764, R-1≈3737, A-R≈2373, PD≈1749, R-2≈1204, C-P≈850,
+      LCI≈105, C-G≈103, I-G≈52, C-I≈38, I-R≈25, MHP≈24, C-N≈22, RVD≈5, R-3≈4.
+      hyperlink embeds qPublic AppID=641 LayerID=11309 PageTypeID=4 PageID=4644
+      KeyValue={parcel_inf}. Twin CamdenCounty_Zoning_532022/32 (count 31785) older —
+      prefer Approved_Zoning. Geo Camden GA.
+    status: usable
+
+  - role: flu
+    name: Future_Lane_Use_Current Future Land Use
+    restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/Future_Lane_Use_Current/FeatureServer/29
+    layerId: 29
+    geometry: polygon
+    auth: none
+    acreageField: acres
+    coverage: county-wide
+    fieldMap:
+      parcel_no: parcelId
+      flu: flu
+      description: fluDescription
+      acres: acreage
+    notes: >
+      Preferred Future Land Use polygons (count 31810; parcel-tied). Domain flu:
+      St Marys≈9508, Kingsland≈7569, Residential≈5755, Rural Residential≈2970,
+      Rural≈1607, Mixed Use≈1584, Woodbine≈907, Conservation≈749, Commercial≈410,
+      Multi-Family Res≈380, Industrial≈139, Public/Inst≈125, LCI≈105. City-name FLU
+      values are municipality stubs — combine with Euclidean Residential/Rural* codes
+      and spatial city limits. Layer id 29 (not 0).
+    status: usable
+
+  - role: other
+    name: TaxDistrictParcels TAXDISTRIC (soft municipality)
+    restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/TaxDistrictParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Calculated
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      GISParcel: parcelIdCompact
+      TAXDISTRIC: taxDistrict
+      Calculated: acreage
+    notes: >
+      Count 32765. Soft TAXDISTRIC geo-checked: 1≈9463 St Marys-leaning (~-81.51,30.73),
+      2≈8600 Kingsland-leaning (~-81.65,30.81), 3≈903 Woodbine-leaning (~-81.73,30.97),
+      43≈7994 / 42≈4298 / 41≈852 unincorp-leaning — prefer spatial City of St_Marys /
+      Kingsland / Woodbine FeatureServers over TAXDISTRIC alone.
+    status: partial
+
+municipalities:
+  - name: St. Marys
+    level: city
+    parentFips: "13039"
+    joinToCountyParcels: >
+      Spatial St_Marys/1 onto 2025_Tax_Parcels; soft TAXDISTRIC=1; FLU flu='St Marys'.
+    layers:
+      - role: zoning
+        name: Approved_Zoning spatial St Marys (or landusecod City + limits)
+        restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/Approved_Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          landusecod: zoning
+          parcel_inf: parcelId
+        notes: Filter spatial to St_Marys/1; certify vs city ordinance. landusecod='City' is stub.
+        status: partial
+      - role: flu
+        name: Future Land Use flu='St Marys'
+        restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/Future_Lane_Use_Current/FeatureServer/29
+        layerId: 29
+        geometry: polygon
+        auth: none
+        acreageField: acres
+        coverage: city-only
+        fieldMap:
+          flu: flu
+          parcel_no: parcelId
+        notes: Filter flu='St Marys' or spatial St_Marys limits.
+        status: usable
+      - role: parcels
+        name: County 2025_Tax_Parcels spatial St Marys
+        restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/2025_Tax_Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Calculated
+        coverage: city-only
+        fieldMap:
+          parcel_no: parcelId
+          lastname: ownerName
+        notes: No city-owned parcel CAMA — county parcels + St_Marys/1.
+        status: partial
+    gaps:
+      - "No St. Marys-owned separate parcel CAMA FeatureServer."
+    status: partial
+
+  - name: Kingsland
+    level: city
+    parentFips: "13039"
+    joinToCountyParcels: >
+      Spatial City_of_Kingsland/1 onto 2025_Tax_Parcels; soft TAXDISTRIC=2; FLU flu='Kingsland'.
+    layers:
+      - role: zoning
+        name: Approved_Zoning spatial Kingsland
+        restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/Approved_Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          landusecod: zoning
+          parcel_inf: parcelId
+        notes: Spatial City_of_Kingsland/1; landusecod City stub common inside limits.
+        status: partial
+      - role: flu
+        name: Future Land Use flu='Kingsland'
+        restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/Future_Lane_Use_Current/FeatureServer/29
+        layerId: 29
+        geometry: polygon
+        auth: none
+        acreageField: acres
+        coverage: city-only
+        fieldMap:
+          flu: flu
+        notes: Filter flu='Kingsland'.
+        status: usable
+      - role: parcels
+        name: County 2025_Tax_Parcels spatial Kingsland
+        restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/2025_Tax_Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Calculated
+        coverage: city-only
+        fieldMap:
+          parcel_no: parcelId
+        notes: County parcels + City_of_Kingsland/1.
+        status: partial
+    gaps:
+      - "No Kingsland-owned separate parcel CAMA FeatureServer."
+    status: partial
+
+  - name: Woodbine
+    level: city
+    parentFips: "13039"
+    joinToCountyParcels: >
+      Spatial City_of_Woodbine/1 onto 2025_Tax_Parcels; soft TAXDISTRIC=3; FLU flu='Woodbine'.
+    layers:
+      - role: zoning
+        name: Approved_Zoning spatial Woodbine
+        restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/Approved_Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          landusecod: zoning
+        notes: Spatial City_of_Woodbine/1.
+        status: partial
+      - role: flu
+        name: Future Land Use flu='Woodbine'
+        restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/Future_Lane_Use_Current/FeatureServer/29
+        layerId: 29
+        geometry: polygon
+        auth: none
+        acreageField: acres
+        coverage: city-only
+        fieldMap:
+          flu: flu
+        notes: Filter flu='Woodbine' (~907).
+        status: usable
+      - role: parcels
+        name: County 2025_Tax_Parcels spatial Woodbine
+        restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/2025_Tax_Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Calculated
+        coverage: city-only
+        fieldMap:
+          parcel_no: parcelId
+        notes: County parcels + City_of_Woodbine/1.
+        status: partial
+    gaps:
+      - "No Woodbine-owned separate parcel CAMA FeatureServer."
+    status: partial
+
+gaps:
+  - "2025_Tax_Parcels is geometry+owner+acres only — no CURR_VAL/mailing/situs/sale on preferred layer."
+  - "Juvare_Parcels CURR_VAL/owner/mailing filled only ≈19504/33177 (partial) — qPublic AppID=641 for full digest/assessed."
+  - "No public REST lastSale.price/date — qPublic Sales Search / Yearly Sales HTML AppID=641."
+  - "No MAV/assessedValue on REST — assessed/taxable via qPublic HTML."
+  - "Approved_Zoning landusecod='City' ≈17968 stubs — use spatial city limits for municipality; Euclidean A-F/R-1/A-R/PD/… for districts."
+  - "FLU city-name values (St Marys/Kingsland/Woodbine) are municipality stubs mixed with Residential/Rural* codes."
+  - "TAXDISTRIC soft only — prefer St_Marys / City_of_Kingsland / City_of_Woodbine spatial."
+  - "Rejected NJ Camden_Parcels (wrong geography); rejected paid Regrid/USLandGrid/MappingSolutions."
+  - "Skip WaterDistributionSystem / utilities; no AADT; no emails/phones collected."
+  - "Site_Addresses_1 is NG911 address points — situs aid only; do not treat as parcel CAMA."
+
+license: >
+  Camden County Board of Commissioners GIS (CCBOC AGOL org feUM6sTOP0Mfde8s) —
+  2025 Tax Parcels, Juvare_Parcels, Approved_Zoning, Future_Lane_Use_Current,
+  TaxDistrictParcels, Acre_Info, city limits. Hub gishub-ccboc.hub.arcgis.com.
+  Assessor HTML qpublic.net/ga/camden AppID=641 LayerID=11309 App=CamdenCountyGA.
+  Attribution Camden County GIS / Tax Assessors. Public fields only; no emails/phones;
+  no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=641&LayerID=11309&PageTypeID=4&PageID=4644&KeyValue=
+jurisdictionGisUrl: https://gishub-ccboc.hub.arcgis.com
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/2025_Tax_Parcels/FeatureServer/0
+    count 33177; extent center [['13039', 'Camden County']]; sample [['13039', 'Camden County']]. No
+    change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Kingsland city"
+      level: city
+      parentFips: "13039"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "St. Marys city"
+      level: city
+      parentFips: "13039"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Woodbine city"
+      level: city
+      parentFips: "13039"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Camden' AND aadt>0
+    altFilter: name LIKE '039-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 039-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 135
+    maxAadt: 74200
+    geoCheck: 135/135 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - FMVACC
+    - FMVCOM
+    - FMVRES
+    filledCount: null
+    restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/Juvare_Parcels/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 33056
+    restUrl: https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/2025_Tax_Parcels/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=CamdenCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=641&LayerID=11309&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: parcel_no
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 108A   006A
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=CamdenCountyGA&Layer=Parcels&PageType=Report&KeyValue=108A%20%20%20006A
+    verification: 'pattern-tested: real sample ID from parcel_no; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://gishub-ccboc.hub.arcgis.com
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Kingsland city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: St. Marys city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Woodbine city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

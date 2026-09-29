@@ -1,0 +1,372 @@
+state: GA
+jurisdiction: Wayne County
+fips: "13305"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "Wayne Tax Parcels (HOGARC Wayne_2026_test)"
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wayne_2026_test/FeatureServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: "TOTALACRES"
+    coverage: county-wide
+    parcelIdField: "PARCEL_NO"
+    liveCount: 17629
+    liveCount5to150ac: 4141
+    geoCheck: "extent center [['13305', 'Wayne County']]; sample [['13305', 'Wayne County']]; extent WGS84 [-82.148, 31.3267, -81.6112, 31.8292]"
+    fieldMap:
+      PARCEL_NO: "parcelId"
+      REALKEY: "ownerKey"
+      HouAddress: "situsAddress"
+      TOTALACRES: "acreage"
+      Parcel_Acr: "acreageGis"
+      TAXDISTRIC: "taxDistrict"
+      DESCRIP: "municipality"
+      EXTLU: "landUseExisting"
+      FLULU: "flu"
+    notes: >
+      pass1 2026-09-28: County-wide Wayne GA tax parcels (17629) on HOGARC org HHvUPZ2XuLOAJxjR
+      (Wayne_2026_test layer 7). Service name says test - may be renamed; HOGARC Wayne_County_Wide_View/14
+      TaxParcels25 currently returns 0 features. Alternate land-use parcel layers
+      Wayne_County_Wide_gdb/1,2,8 (~17-18.7k). No owner (Pass 2 qPublic).
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Wayne County GA public parcel FeatureServer/MapServer with cadastral
+      polygons recovered (2026-09-24). Official human viewer = qPublic/Beacon
+      App=WayneCountyGA / AppID=850 LayerID=15800 PageID=7069 (qpublic.net/ga/wayne
+      topmenu.html → qpublic.schneidercorp.com Application.aspx; linked from
+      waynecountyga.us Tax Assessor structureid=30; county seat Jesup GA 31545/31546/
+      31598). Cloudflare/bot 403 blocks automated Application.aspx from research box;
+      public for humans. WayneCountyGA_WFS not listed on wfs.schneidercorp.com. No SGRC
+      (sgrcmaps.com/alma) Wayne folder; CRC maps.crc.ga.gov has no Wayne/Jesup/Odum
+      folder (Screven folder is Screven County ~-81.57,32.55 — NOT Screven city in Wayne;
+      sample parcel lonlat confirms Screven County). No county AGOL parcel org recovered.
+      GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13305 NAME=Wayne County STATE=13
+      COUNTY=305 CENTLAT +31.5513848 CENTLON -081.9166580 — SE coastal GA (Jesup seat
+      ~-81.878,31.604). REJECT data-wayne.opendata.arcgis.com / waynecounty.com gisserver
+      ParcelViewer (Wayne County MI Detroit). REJECT experience.arcgis.com
+      ecb23aace6b84ca2ae5e61f1bc55fcdd (Wayne County PA; owner jzarnowski; PASDA /
+      waynecopa.civilsolutions.biz). REJECT Wayne County NC (WayneCountyNC-GIS AGOL /
+      Goldsboro ~-77.99,35.38). Rejected paid Regrid/ATTOM/USLandGrid. Skip utilities+AADT;
+      no emails/phones (waynecountyga.us staff directory / assessor emails are PII — skip).
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via qPublic App=WayneCountyGA /
+      AppID=850 LayerID=15800 HTML only. Deep-link KeyValue={parcelId}:
+      Application.aspx?App=WayneCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+      (also AppID=850&LayerID=15800&PageTypeID=4&KeyValue=). Estimate Taxes
+      AppID=850&LayerID=15800&PageTypeID=2&PageID=7069. Tax bills/payments:
+      waynegatax.com (Tax Commissioner — not assessor CAMA).
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer qPublic Sales Search / Sales List HTML
+      App=WayneCountyGA / AppID=850. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Wayne County GA Euclidean zoning FeatureServer found (2026-09-24). County
+      Planning / Building Inspections (waynecountyga.us) HTML; City of Jesup Building
+      Inspection & Zoning (jesupga.gov/151) HTML — not REST.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Wayne County GA Future Land Use FeatureServer found (2026-09-24). Comp-plan /
+      CRC planning PDF gap.
+    status: gap
+
+  - role: other
+    name: null — no Jesup/Odum/Screven city-limits FeatureServer confirmed
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No dedicated Jesup / Odum / Screven (city) city-limits FeatureServer confirmed
+      (2026-09-24). Soft spatial Census places when parcels exist. Do NOT confuse CRC
+      Screven/* MapServers (Screven County) with Screven city inside Wayne. Do NOT filter
+      by owner mailing city alone.
+    status: gap
+
+municipalities:
+  - name: Jesup
+    level: city
+    parentFips: "13305"
+    joinToCountyParcels: >
+      County seat / primary incorporated place (~-81.878,31.604; ZIP 31545/31546) when
+      parcels become available. No separate city parcel REST — county qPublic AppID=850
+      HTML only. jesupga.gov Building Inspection & Zoning is HTML/ordinance — not FS.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Jesup zoning FeatureServer — jesupga.gov Building Inspection & Zoning HTML only.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Jesup FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic AppID=850 HTML only; no city-owned CAMA FS.
+        status: gap
+    gaps:
+      - "No Jesup city-owned parcel/zoning/FLU REST — county qPublic App=WayneCountyGA HTML only."
+    status: partial
+
+  - name: Odum
+    level: city
+    parentFips: "13305"
+    joinToCountyParcels: >
+      Soft spatial Odum GA (Wayne FIPS 13305) when parcels exist; county qPublic AppID=850.
+      County Building Inspections covers Odum per assessorsearch notes.
+    layers:
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Odum-only CAMA REST.
+        status: gap
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Odum zoning FS.
+        status: gap
+    gaps:
+      - "Odum city limits soft only; parcel/tax/sale via county qPublic."
+    status: partial
+
+  - name: Screven
+    level: city
+    parentFips: "13305"
+    joinToCountyParcels: >
+      Soft spatial Screven city GA inside Wayne FIPS 13305 when parcels exist. REJECT CRC
+      maps.crc.ga.gov Screven/* (Screven County ~-81.57,32.55) as this municipality.
+    layers:
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Screven-city CAMA REST; do not use Screven County CRC Parcels.
+        status: gap
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Screven-city zoning FS.
+        status: gap
+    gaps:
+      - "Screven city (Wayne) ≠ Screven County CRC MapServers — use county qPublic AppID=850."
+    status: partial
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Wayne County GA — qPublic App=WayneCountyGA / AppID=850 LayerID=15800 PageID=7069 HTML only."
+  - "WayneCountyGA_WFS absent; no SGRC/CRC/Wayne GA AGOL parcel FeatureServer."
+  - "REJECT data-wayne.opendata.arcgis.com + waynecounty.com ParcelViewer (Wayne MI); REJECT experience ecb23aace6b84ca2ae5e61f1bc55fcdd (Wayne PA); REJECT WayneCountyNC-GIS AGOL."
+  - "REJECT CRC Screven/* as Wayne Screven city — Screven County geometry (~-81.57,32.55)."
+  - "Rejected paid Regrid/ATTOM/USLandGrid Wayne GA extracts."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/wayne + AppID=850 Search/Maps public for humans."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Wayne County Tax Assessor qPublic/Beacon App=WayneCountyGA / AppID=850 LayerID=15800
+  PageID=7069 (qpublic.net/ga/wayne; waynecountyga.us Tax Assessor; Jesup GA 31545/31546).
+  Tax Commissioner waynegatax.com for bills/payments. No public ArcGIS parcel service
+  discovered 2026-09-24. Attribution Wayne County Board of Tax Assessors. Public HTML
+  only; no emails/phones; no paid vendors; skip utilities+AADT. REJECT Wayne County
+  MI/PA/NC lookalikes and Screven County CRC as Screven city.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WayneCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=850&LayerID=15800&PageTypeID=1
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: usable
+  summary: >
+    Wayne Tax Parcels (HOGARC Wayne_2026_test):
+    https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wayne_2026_test/FeatureServer/7 -
+    live count 17629 (5-150 ac: 4141), parcel ID field PARCEL_NO. Geography verified against TIGER
+    county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Jesup city"
+      level: city
+      parentFips: "13305"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Odum city"
+      level: city
+      parentFips: "13305"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Screven city"
+      level: city
+      parentFips: "13305"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Wayne' AND aadt>0
+    altFilter: name LIKE '305-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 305-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 156
+    maxAadt: 17800
+    geoCheck: 156/156 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=WayneCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=850&LayerID=15800&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 149A-19
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WayneCountyGA&Layer=Parcels&PageType=Report&KeyValue=149A-19
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?AppID=850&LayerID=15800&PageTypeID=1
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Jesup city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Odum city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Screven city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

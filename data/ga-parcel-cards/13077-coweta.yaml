@@ -1,0 +1,480 @@
+state: GA
+jurisdiction: Coweta County
+fips: "13077"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons + WinGAP CAMA (owner, mailing, situs parts, acres, FMV)
+  - role: parcels
+    name: WinGapParcels (on-prem MapServer)
+    restUrl: https://coweta-gis-web.coweta.ga.us/arcgis/rest/services/WinGapParcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TotalAcres
+    coverage: county-wide
+    fieldMap:
+      ParcelNumber: parcelId
+      PID: parcelIdAlt
+      ParentPIN: parentParcelId
+      RealKey: ownerKey
+      OwnerName: ownerName
+      AdditionalOwnerInfo: ownerName2
+      StreetAddress: mailingAddress
+      City: mailingCity
+      State: mailingState
+      Zip: mailingZip
+      HouseNumber: situsNumber
+      StreetDirection: situsStreetDir
+      StreetName: situsStreet
+      StreetType: situsStreetType
+      Unit: situsUnit
+      TaxDistrict: taxDistrict
+      Neighborhood: neighborhood
+      TotalAcres: acreage
+      SubdivisionName: subdivision
+      CurrentValue: tax.marketValue
+      PreviousValue: tax.priorMarketValue
+      ImprovementValue: tax.improvementValue
+      LegalDescription: legalDescription
+      YearBuilt: yearBuilt
+    notes: >
+      Preferred county-wide parcel GEOMETRY + CAMA source (on-prem MapServer). Live
+      count 65382 (2026-09-23). SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet
+      (102667/2240); maxRecordCount default. Geo-verified WGS84 samples from twin
+      TaxParcels ~-84.855,33.191 (LL 2059 / south-central), zoning samples
+      ~-84.979,33.339 and ~-84.930,33.294 — Coweta County GA, Atlanta MSA southwest
+      (NOT Coweta OK ~-97.0,36.0; any non-GA Coweta). OwnerName filled 65382;
+      CurrentValue>0 ≈65381; TotalAcres>0 = 27695; TotalAcres 5–150 = 8591 (sparse
+      deeded acres — derive GIS acres = Shape.STArea()/43560 when TotalAcres null/0).
+      StreetAddress/City/State/Zip are MAILING (P.O. BOX / out-of-county samples);
+      situs = HouseNumber + StreetName + StreetType (HouseNumber=0 common on vacant).
+      TaxDistrict decode live (via PPV twin groupBy): COUNTY 01 (UNINCORPORATED)≈43749,
+      NEWNAN 08 (ANNEX)≈8096, NEWNAN 02≈6734, SENOIA 09 (ANNEX)≈1853, GRANTVILLE 04≈1444,
+      SENOIA 03≈818, TURIN 11≈315, PALMETTO 06≈217, MORELAND 05≈210, SHARPSBURG 10≈201,
+      HARALSON 07≈153, GRANTVILLE 12 (ANNEX)≈130, CHATT HILLS 16≈124, PALMETTO 14
+      (ANNEX)≈16. Join keys: ParcelNumber/PID = TaxParcels PAR_ID = PPV parcel_id =
+      Newnan City_Parcels PID (formats '001  4156 001', '056  2059 009A'). AGOL mirror
+      WeeklyUpdate_WinGapParcels FeatureServer/0 count 65382 (org AaPyNbrJpNGryRqh /
+      cowetamaps.maps.arcgis.com / tforeman_coweta_county). Thin TaxParcels MapServer/0
+      (65354; PAR_ID+geometry only) is landbase twin — prefer this for CAMA. No sale
+      fields on this layer. Enrichment vs thin in-app: full-county outlines + PIN +
+      owner/mailing + situs parts + FMV + tax district + sparse acres.
+    status: usable
+
+  - role: parcels
+    name: ParcelPropertyValues (Hosted — GIS acres + municipality)
+    restUrl: https://coweta-gis-web.coweta.ga.us/arcgis/rest/services/Hosted/ParcelPropertyValues/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: acres
+    coverage: county-wide
+    fieldMap:
+      parcel_id: parcelId
+      parcelnumber: parcelIdAlt
+      pid: parcelIdAlt2
+      realkey: ownerKey
+      ownername: ownerName
+      additionalownerinfo: ownerName2
+      streetaddress: mailingAddress
+      city: mailingCity
+      state: mailingState
+      zip: mailingZip
+      housenumber: situsNumber
+      streetdirection: situsStreetDir
+      streetname: situsStreet
+      streettype: situsStreetType
+      unit: situsUnit
+      municipality: municipality
+      taxdistrict: taxDistrict
+      neighborhood: neighborhood
+      acres: acreage
+      totalacres: acreageDeed
+      currentvalue: tax.marketValue
+      current_val: tax.marketValueAlt
+      previousvalue: tax.priorMarketValue
+      improvementvalue: tax.improvementValue
+      subdivisionname: subdivision
+      legaldescription: legalDescription
+    notes: >
+      Live count 64060 — Hosted FeatureServer twin of WinGap with extras: GIS acres
+      (acres>0 = 64060; acres 5–150 = 8114) and municipality codedomain (COUNTY≈43749,
+      NEWNAN≈14830, SENOIA≈2671, GRANTVILLE≈1574, TURIN≈315, PALMETTO≈233, MORELAND≈210,
+      SHARPSBURG≈201, HARALSON≈153, CHATTAHOOCHEE HILLS≈124). Prefer WinGap for full
+      geometry count (65382); this for municipality attribute + filled GIS acres join
+      on parcel_id = ParcelNumber. currentvalue == current_val on samples. totalacres
+      filled only ≈27093 (same sparse deeded pattern as WinGap). Slightly fewer rows
+      than WinGap — do not prefer as sole county-wide search geometry.
+    status: partial
+
+  - role: parcels
+    name: TaxParcels (thin geometry landbase)
+    restUrl: https://coweta-gis-web.coweta.ga.us/arcgis/rest/services/TaxParcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PAR_ID: parcelId
+      PARCEL_NO: parcelNumberShort
+      MAP_NO: mapNumber
+      DIST: landDistrict
+      SUBPAR: subParcel
+      ParentPIN: parentParcelId
+    notes: >
+      Live count 65354 — PIN + geometry only (no owner/acres/tax). Prefer WinGapParcels
+      for attributes; this is the cadastral landbase twin if a geometry-only URL is
+      needed. Geo-verified ~-84.855,33.191 Coweta GA.
+    status: partial
+
+  - role: tax
+    name: WinGapParcels CurrentValue (FMV on polygons)
+    restUrl: https://coweta-gis-web.coweta.ga.us/arcgis/rest/services/WinGapParcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TotalAcres
+    coverage: county-wide
+    fieldMap:
+      ParcelNumber: parcelId
+      CurrentValue: tax.marketValue
+      PreviousValue: tax.priorMarketValue
+      ImprovementValue: tax.improvementValue
+      TaxDistrict: taxDistrict
+    notes: >
+      Tax/CAMA market values live on preferred parcel polygons (CurrentValue>0
+      ≈65381). No public REST tax.assessedValue / taxableValue on WinGap or PPV
+      (Newnan City_Parcels has AV — city-only). Assessor HTML: qPublic AppID=704
+      LayerID=11412 (CDN/bot 403 from research box; public for humans).
+    status: usable
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Coweta multi-sale FeatureServer/MapServer found (2026-09-23). WinGap/PPV/
+      TaxParcels expose no saleamnt/saledate/qualified fields. Newnan City_Parcels
+      Sale_Notes is a free-text note field, not lastSale.price/date. Use qPublic HTML
+      for humans. Rejected ARC LandPro_2012 third-party (Ug5xGQbHsD8zuZzM).
+    status: gap
+
+  - role: zoning
+    name: Zoning (county dissolved districts)
+    restUrl: https://coweta-gis-web.coweta.ga.us/arcgis/rest/services/Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      BaseZoning: zoning
+      ZoningLabel: zoningLabel
+      Petition__: zoningPetition
+      Date_: zoningDate
+      Zoning_Map: zoningMapSheet
+      Comments: zoningComments
+    notes: >
+      Preferred unincorporated / county zoning district polygons (spatial-join; not
+      parcel-tied). Live count 669. Area sum ≈11.39B sq ft vs county boundary
+      ≈12.43B (~92% coverage — residual is largely city interiors / water).
+      BaseZoning domain: C≈187, M≈120, RC≈84, C-6≈53, LM≈44, O-I≈35, C-8≈29, C-7≈22,
+      R-2≈17, C-3≈15, RRCC≈14, C-4≈13, C-2≈11, C-5≈6, CC≈4, NC≈4, MHD≈3, C-1≈2,
+      C-9≈2, CUP≈2, LUH≈1, RI-B≈1. ZoningLabel adds conditioned suffixes (C-cond,
+      M-cond, LMc, RC (R-160), …). Prefer ZoningLabel when present else BaseZoning.
+      Inside Newnan prefer City_Parcels zoning (PDR/RU-7/RS-15/…) over county C/M/RC
+      stubs. Official viewer: experience.arcgis.com/experience/e8babf121f09469da6b711b18312bbca
+      (Zoning Information). CUP/MapServer/0 (217) and SUP/MapServer/0 (42) are
+      overlay petition polygons — spatial join when conditioned. Geo-verified
+      ~-84.979,33.339 / ~-84.930,33.294 Coweta GA.
+    status: usable
+
+  - role: other
+    name: Municipalities (incorporated limits)
+    restUrl: https://coweta-gis-web.coweta.ga.us/arcgis/rest/services/Hosted/Municipalities/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      taxdistric: municipality
+    notes: >
+      Live count 9 polygons (taxdistric): NEWNAN (~-84.816,33.402), SENOIA
+      (~-84.544,33.311), GRANTVILLE (~-84.825,33.238), TURIN (~-84.637,33.328),
+      SHARPSBURG (~-84.650,33.339), MORELAND (~-84.772,33.284), HARALSON
+      (~-84.569,33.230), PALMETTO (~-84.663,33.508 — Fulton-primary city with Coweta
+      fringe), CHATTAHOOCHEE HILLS (~-84.740,33.505 — Fulton-primary with Coweta
+      fringe). MapServer twin Municipalities/MapServer/0 same 9. Parcel↔city join =
+      spatial intersect OR WinGap/PPV TaxDistrict prefix (NEWNAN/SENOIA/…) OR
+      PPV municipality. Hosted/Tax_Districts (14 polygons) carries annex vs core
+      codes (NEWNAN 02 vs 08 ANNEX, etc.). Addresses city field is postal (NEWNAN
+      ≈47163 includes unincorporated postal Newnan) — NOT municipality filter.
+    status: usable
+
+  - role: other
+    name: Site Address Points / Hosted Addresses
+    restUrl: https://coweta-gis-web.coweta.ga.us/arcgis/rest/services/SiteAddressPoints/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ADDRESS: situsAddress
+      ADD_NUMBER: situsNumber
+      ST_NAME: situsStreet
+      ST_TYPE: situsStreetType
+      CITY: postalCommunity
+      ZIP: situsZip
+      STATE: situsState
+      PARCEL_ID: parcelId
+      ZONE: addressZone
+    notes: >
+      Live count 70175 (MapServer); Hosted/Addresses FeatureServer/0 count 69887.
+      CITY is postal (NEWNAN≈47163, SHARPSBURG≈8886, SENOIA≈8184, GRANTVILLE≈2015,
+      MORELAND≈1725, PALMETTO≈1423, TURIN≈256, CHATTAHOOCHEE HILLS≈123, plus fringe
+      HOGANSVILLE/LUTHERSVILLE/FRANKLIN). Municipality = TaxDistrict / Municipalities
+      spatial only. Join on PARCEL_ID ≈ ParcelNumber when filled.
+    status: usable
+
+municipalities:
+  - name: Newnan
+    level: city
+    parentFips: "13077"
+    joinToCountyParcels: >
+      Attribute: City_Parcels / Future_Land_Use PID ≈ county ParcelNumber / PAR_ID
+      (verified 075  2025 007). Also PPV municipality='NEWNAN' ≈14830; TaxDistrict
+      LIKE 'NEWNAN%' (02 + 08 ANNEX ≈14830); spatial Municipalities taxdistric='NEWNAN'.
+    layers:
+      - role: zoning
+        name: City of Newnan City_Parcels (zoning + FLU attrs)
+        restUrl: https://services6.arcgis.com/tjTJgu5ZqqixGP2v/arcgis/rest/services/City_Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TotalAcres
+        coverage: city-only
+        fieldMap:
+          PID: parcelId
+          ParcelNumber: parcelIdAlt
+          RealKey: ownerKey
+          zoning: zoning
+          PreviousZoning: zoningPrevious
+          FLU: flu
+          Prev_FLU_21: fluPrevious
+          Overlay: zoningOverlay
+          OwnerName: ownerName
+          Additional: ownerName2
+          StreetAddress: mailingAddress
+          City: mailingCity
+          State: mailingState
+          Zip: mailingZip
+          HouseNumber: situsNumber
+          StreetName: situsStreet
+          StreetType: situsStreetType
+          TaxDistric: taxDistrict
+          TotalAcres: acreage
+          CurrentValue: tax.marketValue
+          PreviousValue: tax.priorMarketValue
+          ImprovementValue: tax.improvementValue
+          AV: tax.assessedValue
+          Land_Use: landUse
+          LegalDescription: legalDescription
+        notes: >
+          Preferred Newnan-local zoning (standing order: city over county C/M/RC
+          stubs). Live count 15201; zoning filled ≈15195; PID filled ≈15000;
+          TotalAcres 5–150 ≈351. Domain PDR≈5532, RU-7≈3096, RS-15≈2591, RU-I≈1695,
+          RU-2≈655, CGN≈315, RML≈270, CBD≈216, IHV≈132, CUN≈126, CCS≈111, RMH≈110,
+          CHV≈97, OI-1≈80, PDC≈57, ILT≈49, OCR≈45, MXD≈10, PDO≈7, OI-2≈1. FLU also
+          on this layer (prefer dedicated Future_Land_Use twin). Geo-verified
+          ~-84.788,33.352 / ~-84.790,33.354 Newnan GA (NOT Newnan TX / Newnan GA
+          lookalikes out of Coweta). Org tjTJgu5ZqqixGP2v (rwhill /
+          cityofnewnan.maps.arcgis.com). Official Zoning Map webmap
+          1d6abb16e96547aa86fb7ffd5a5a4f63 / dashboard bbca347e458647729773106d453bd336
+          / experience c8b4586763514891b07fea7fa32c0af9. Overlay package QDC
+          FeatureServer layers 0–4 (BEQ/BuildingHeight/DDO/LFR/QDC). Prefer county
+          WinGap for county-wide search; this for Newnan-scoped zoning/FLU/AV.
+        status: usable
+      - role: flu
+        name: City of Newnan Future_Land_Use
+        restUrl: https://services6.arcgis.com/tjTJgu5ZqqixGP2v/arcgis/rest/services/Future_Land_Use/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: TotalAcres
+        coverage: city-only
+        fieldMap:
+          PID: parcelId
+          ParcelNumb: parcelIdAlt
+          FLU: flu
+          zoning: zoning
+          OwnerName: ownerName
+          TotalAcres: acreage
+          CurrentVal: tax.marketValue
+          AV: tax.assessedValue
+          TaxDistric: taxDistrict
+        notes: >
+          Live count 14362 parcel-tied. FLU domain Planned Development≈5603, Built
+          Community≈5598, Historic Neighborhood≈2035, Business/Office≈549, Historic
+          Downtown≈217, Industrial≈133, Redevelopment Opportunity Areas≈90, Public
+          and Institutional≈57, Parks Recreation and Conservation≈32, Mixed Use≈20,
+          Emerging Suburban≈17, Emerging Missing Middle Residential≈11. PIN-join.
+          Viewer: experience.arcgis.com/experience/d2dab3219ad64af991ec25b2168ac424.
+          Draft FLU Proposed Changes / Comp Plan Draft exist as separate items —
+          prefer this adopted Future_Land_Use.
+        status: usable
+      - role: other
+        name: NEWNAN_CITY_LIMITS
+        restUrl: https://services6.arcgis.com/tjTJgu5ZqqixGP2v/arcgis/rest/services/NEWNAN_CITY_LIMITS/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City limit polygon(s) for spatial join when TaxDistrict/municipality
+          insufficient. Mirrors county Municipalities taxdistric='NEWNAN'.
+        status: usable
+    gaps:
+      - "No Newnan multi-sale REST; Sale_Notes is free text only — use qPublic HTML."
+      - "County Zoning BaseZoning C/M/RC inside Newnan are stubs vs City_Parcels zoning (PDR/RU-7/RS-15) — must prefer city layer."
+      - "maps.newnanutilities.org Landbase/Parcels/9 is a county-wide WinGap extract (62274; truncated field names) — utility landbase, not Newnan-local zoning; do not prefer over City_Parcels inside city."
+    status: usable
+
+  - name: Senoia
+    level: city
+    parentFips: "13077"
+    joinToCountyParcels: >
+      PPV municipality='SENOIA' ≈2671; TaxDistrict LIKE 'SENOIA%' (03 + 09 ANNEX);
+      spatial Municipalities taxdistric='SENOIA' (~-84.544,33.311).
+    layers: []
+    notes: >
+      No official City of Senoia ArcGIS FeatureServer/MapServer for zoning/FLU found
+      (2026-09-23). senoia.com bot-walled; no public city REST recovered. County
+      Zoning spatial + WinGap TaxDistrict for geography/CAMA only. City zoning
+      certification is a gap vs Newnan.
+    status: gap
+
+  - name: Grantville
+    level: city
+    parentFips: "13077"
+    joinToCountyParcels: >
+      PPV municipality='GRANTVILLE' ≈1574; TaxDistrict LIKE 'GRANTVILLE%' (04 + 12
+      ANNEX); spatial Municipalities taxdistric='GRANTVILLE' (~-84.825,33.238).
+    layers: []
+    notes: >
+      No official City of Grantville zoning/FLU REST found (2026-09-23). Geography
+      via Municipalities / TaxDistrict only; county Zoning for unincorporated-style
+      districts near city.
+    status: gap
+
+  - name: Moreland
+    level: city
+    parentFips: "13077"
+    joinToCountyParcels: >
+      PPV municipality='MORELAND' ≈210; TaxDistrict='MORELAND 05'; spatial
+      Municipalities taxdistric='MORELAND' (~-84.772,33.284).
+    layers: []
+    notes: >
+      No official Town of Moreland GIS REST found (2026-09-23). Geography only.
+    status: gap
+
+  - name: Turin
+    level: city
+    parentFips: "13077"
+    joinToCountyParcels: >
+      PPV municipality='TURIN' ≈315; TaxDistrict='TURIN 11'; spatial Municipalities
+      taxdistric='TURIN' (~-84.637,33.328).
+    layers: []
+    notes: >
+      No official Town of Turin GIS REST found (2026-09-23). Geography only.
+    status: gap
+
+  - name: Sharpsburg
+    level: city
+    parentFips: "13077"
+    joinToCountyParcels: >
+      PPV municipality='SHARPSBURG' ≈201; TaxDistrict='SHARPSBURG 10'; spatial
+      Municipalities taxdistric='SHARPSBURG' (~-84.650,33.339).
+    layers: []
+    notes: >
+      No official Town of Sharpsburg GIS REST found (2026-09-23). Geography only.
+      Note: Addresses CITY='SHARPSBURG' ≈8886 is postal (includes unincorporated) —
+      do not equate to incorporated municipality count (≈201).
+    status: gap
+
+  - name: Haralson
+    level: city
+    parentFips: "13077"
+    joinToCountyParcels: >
+      PPV municipality='HARALSON' ≈153; TaxDistrict='HARALSON 07'; spatial
+      Municipalities taxdistric='HARALSON' (~-84.569,33.230).
+    layers: []
+    notes: >
+      Town of Haralson (Coweta County) — NOT Haralson County GA (FIPS 13143). No
+      official town GIS REST found (2026-09-23). Geography only.
+    status: gap
+
+  - name: Palmetto
+    level: city
+    parentFips: "13077"
+    joinToCountyParcels: >
+      PPV municipality='PALMETTO' ≈233 (Coweta-side only); TaxDistrict LIKE
+      'PALMETTO%'; spatial Municipalities taxdistric='PALMETTO' (~-84.663,33.508).
+    layers: []
+    notes: >
+      City of Palmetto is primarily Fulton County with a Coweta fringe. No
+      Palmetto-local zoning REST wired here (2026-09-23). Coweta-side geography via
+      TaxDistrict / Municipalities; prefer Fulton card for primary Palmetto zoning
+      if needed.
+    status: gap
+
+  - name: Chattahoochee Hills
+    level: city
+    parentFips: "13077"
+    joinToCountyParcels: >
+      PPV municipality='CHATTAHOOCHEE HILLS' ≈124; TaxDistrict LIKE 'CHATT HILLS%';
+      spatial Municipalities taxdistric='CHATTAHOOCHEE HILLS' (~-84.740,33.505).
+    layers: []
+    notes: >
+      City of Chattahoochee Hills is primarily Fulton County with a Coweta fringe.
+      No city REST wired on this Coweta card (2026-09-23). Geography only.
+    status: gap
+
+gaps:
+  - "Preferred WinGapParcels TotalAcres filled on only 27695 / 65382 (5–150 = 8591). Prefer PPV acres (GIS; filled 64060) join on parcel_id, or derive Shape.STArea()/43560 (wkid 102667 feet) when deeded acres null."
+  - "No public REST lastSale.price/date/qualified — WinGap/PPV/TaxParcels have no sale fields; Newnan Sale_Notes is free text only."
+  - "No public REST tax.assessedValue/taxableValue county-wide — CurrentValue is FMV; Newnan City_Parcels AV is city-only assessed."
+  - "County FLU REST gap — LandDevelopmentGuidanceSystem2020 is an LDGS scoring layer (Service/Major_Rd/Employment/Retail points), NOT future land use. Newnan Future_Land_Use is city-only."
+  - "County Zoning (~92% area, 669 dissolved) is spatial-join; inside Newnan must prefer City_Parcels zoning. Senoia/Grantville/Moreland/Turin/Sharpsburg/Haralson/Palmetto/Chattahoochee Hills official city zoning REST gap."
+  - "Addresses/SiteAddress CITY and PPV streetaddress City are postal — municipality filter = TaxDistrict / PPV municipality / Municipalities spatial only (SHARPSBURG postal ≈8886 vs incorporated ≈201)."
+  - "Hub and Editable folders on coweta-gis-web.coweta.ga.us return Token Required (499) — public path is root MapServers + Hosted FeatureServers + AGOL AaPyNbrJpNGryRqh."
+  - "qPublic AppID=704 LayerID=11412 may CDN/bot-403 automated clients; public for humans. Do not collect emails/phones."
+  - "Rejected lookalikes: Coweta County OK (~-97.0,36.0); Haralson County GA (FIPS 13143) vs Town of Haralson in Coweta; Atlanta Regional Commission LandPro_2012 (Ug5xGQbHsD8zuZzM); Regrid/paid statewide extracts; token-locked Hub/Editable stubs; Newnan Utilities Landbase as 'city zoning' (it is county-wide CAMA extract)."
+  - "Palmetto and Chattahoochee Hills are Fulton-primary cities with Coweta fringe — do not treat as full Coweta municipalities for zoning."
+  - "Enrichment vs thin in-app: full county 65382 geometry+PIN+owner/mailing/situs parts+FMV+taxDist; GIS acres via PPV; county Zoning districts; Newnan city zoning+FLU+AV; other cities geography-only; sales/county-FLU/county-assessed remain gap/HTML."
+
+license: >
+  Coweta County GIS public ArcGIS Server (coweta-gis-web.coweta.ga.us) —
+  WinGapParcels, TaxParcels, Zoning, Municipalities, SiteAddressPoints, CUP, SUP,
+  Hosted/ParcelPropertyValues, Hosted/Municipalities, Hosted/Tax_Districts,
+  Hosted/Addresses. County AGOL org AaPyNbrJpNGryRqh (cowetamaps.maps.arcgis.com /
+  tforeman_coweta_county) — WeeklyUpdate_WinGapParcels, Municipalities, Tax_Districts,
+  Addresses. Hub: coweta-county-gis-cowetamaps.hub.arcgis.com. City of Newnan AGOL
+  org tjTJgu5ZqqixGP2v (rwhill / cityofnewnan.maps.arcgis.com) — City_Parcels,
+  Future_Land_Use, NEWNAN_CITY_LIMITS, QDC overlays. Assessor HTML: qPublic
+  SchneiderCorp AppID=704 LayerID=11412. Attribution to Coweta County GIS / City of
+  Newnan. Public fields only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=704&LayerID=11412&PageTypeID=2&PageID=5600
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"

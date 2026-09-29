@@ -1,0 +1,253 @@
+state: GA
+jurisdiction: Glascock County
+fips: "13125"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Glascock County GA public parcel FeatureServer/MapServer with
+      cadastral polygons recovered (2026-09-24). Official human viewer = qPublic/Beacon
+      App=GlascockCountyGA / AppID=669 LayerID=11353 (qpublic.net/ga/glascock linked from
+      glascockcountyga.com Tax Assessors Search Records; county seat Gibson GA 30810).
+      Cloudflare/bot 403 blocks automated Application.aspx from research box; public for
+      humans. GlascockCountyGA_WFS on wfs.schneidercorp.com returns 404. No CSRA RC
+      (nlong_CSRARC) / SGRC / HOGARC / AGOL county parcel org found for Glascock GA —
+      CSRARC_Counties boundary only (NAME=GLASCOCK FIPS=125). Parcel_Regions_w_WinGAP
+      (services9…/x9uoDq5JB3OouaRv) spatial envelope around Gibson returned 0 features
+      (dataset ~7.3k other-county only). Commercial vendors advertise Glascock extracts —
+      rejected (Regrid/ATTOM/DynamoSpatial). GEO-VERIFY GEORGIA: Census TIGERweb GEOID
+      13125 CENTLAT +33.2292730 CENTLON -082.6107331; CSRARC_Counties centroid
+      ~-82.660,33.205 — east-central GA CSRA / Augusta ring (Gibson). REJECT NC/other
+      "Glass*" lookalikes; reject paid vendors; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via qPublic App=GlascockCountyGA
+      / AppID=669 LayerID=11353 HTML only. Deep-link KeyValue={parcelId}:
+      Application.aspx?App=GlascockCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+      (or AppID=669&LayerID=11353&PageTypeID=4&KeyValue=). Tax Records search
+      PageTypeID=2&PageID=5834 on same AppID.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer qPublic Sales Search / Sales List HTML
+      (App=GlascockCountyGA / AppID=669). Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Glascock County GA Euclidean zoning REST found — planning PDF/staff gap
+      (glascockcountyga.com / CSRA RC planning).
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Glascock County GA future land use REST found — Comp Plan PDF / CSRA gap.
+    status: gap
+
+  - role: other
+    name: CSRARC_Counties Glascock boundary (context — NOT parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CSRARC_Counties/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      FIPS: countyFips3
+    notes: >
+      Filter NAME='GLASCOCK' / FIPS='125' for Glascock County GA outline (count=1;
+      centroid ~-82.66,33.20). Geo-verify / clip only — zero parcel/owner/tax/sale fields.
+      Same shared org Ug5xGQbHsD8zuZzM as other GA RC layers.
+    status: partial
+
+municipalities:
+  - name: Gibson
+    level: city
+    parentFips: "13125"
+    joinToCountyParcels: >
+      No county parcel REST to join — city filter blocked until geometry source exists.
+      County seat Gibson GA (~-82.60,33.23).
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Gibson zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Gibson FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Gibson-only CAMA — county qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Gibson-owned parcel/zoning/FLU REST; county qPublic HTML only."
+    status: gap
+
+  - name: Mitchell
+    level: city
+    parentFips: "13125"
+    joinToCountyParcels: No county parcel REST — spatial join blocked. Mitchell GA (~-82.70,33.22).
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Mitchell zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Mitchell FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Mitchell city-owned zoning/FLU/parcel REST."
+    status: gap
+
+  - name: Edge Hill
+    level: city
+    parentFips: "13125"
+    joinToCountyParcels: No county parcel REST — spatial join blocked. Edge Hill GA (tiny incorporated place in Glascock).
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Edge Hill zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Edge Hill FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Edge Hill city-owned zoning/FLU/parcel REST."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Glascock County GA — qPublic App=GlascockCountyGA (AppID=669 LayerID=11353) HTML only."
+  - "GlascockCountyGA_WFS 404; qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/glascock HTML path public for humans."
+  - "CSRARC_Counties boundary only — not parcels; Parcel_Regions_w_WinGAP spatial Gibson envelope = 0."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial; no emails/phones collected."
+  - "Skipped utilities+AADT per tranche-3."
+
+license: >
+  Glascock County Tax Assessor qPublic/Beacon App=GlascockCountyGA / AppID=669
+  LayerID=11353 (qpublic.net/ga/glascock; glascockcountyga.com Tax Assessors). CSRA RC
+  CSRARC_Counties boundary on Ug5xGQbHsD8zuZzM. No public ArcGIS parcel service
+  discovered 2026-09-24. Attribution Glascock County Tax Assessors. Public HTML only;
+  no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=GlascockCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=669&LayerID=11353&PageTypeID=1
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

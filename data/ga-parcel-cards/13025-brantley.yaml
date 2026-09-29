@@ -1,0 +1,379 @@
+state: GA
+jurisdiction: Brantley County
+fips: "13025"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: Brantley_Parcels view (county AGOL / bcgis100)
+    restUrl: https://services3.arcgis.com/86pyA5PND5NdokIc/arcgis/rest/services/Brantley_Parcels_view/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      Realkey: parcelKey
+      Ownkey: ownerKey
+      Map: mapSheet
+      Block: mapBlock
+      Parcel: mapParcel
+      SubParcel: mapSubParcel
+      lastname: ownerName
+      firstname: ownerFirstName
+      middle: ownerMiddleName
+      address1: mailingAddressLine1OrCoOwner
+      address2: mailingAddress
+      address3: mailingAddress2
+      city: mailingCity
+      state: mailingState
+      zip_code: mailingZip
+      house_no: situsNumber
+      stdirect: situsStreetDir
+      street_nam: situsStreet
+      sttype: situsStreetType
+      unit: situsUnit
+      totalacres: acreage
+      Deed_Acres: acreageDeed
+      Draw_Acres: acreageGis
+      woodacres: acreageWoodland
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      sale_val: lastSale.price
+      zoningcode: zoning
+      zoning: zoningAlt
+      taxdistric: taxDistrict
+      digclass: dorCode
+      digstrat: dorStrata
+      land_type: landType
+      legal_desc: legalDescription
+      subd_name: subdivision
+      homeexempt: homesteadExempt
+      landgmd: georgiaMilitiaDistrict
+      landlot: landLot
+      landdist: landDistrict
+      neighbhood: neighborhood
+      qPub_Link: appraiserReportUrl
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (public AGOL FeatureServer view
+      Brantley_Parcels_view, owner planning3_bcgis100 / org 86pyA5PND5NdokIc). Live count
+      13301 (2026-09-24); assessor site claims ~13406 real parcels. SR Web Mercator
+      (102100/3857). totalacres 5–150 = 2980 (Deed_Acres 5–150 = 2980; Draw_Acres 5–150
+      ≈2928) — prefer totalacres / Deed_Acres when filled. curr_val>0 = 13092;
+      lastname filled = 13094; house_no>0 = 6625; fmvres>0 = 5525; fmvcom>0 = 413;
+      mavcurr>0 = 0 (assessed REST gap); sale_val>0 = 0 (sales REST gap); zoningcode
+      non-blank = 0 (zoning attr gap). digclass: R≈10026, V≈1088, E≈1083, A≈461, C≈279,
+      J≈140 (+ blank/Q/I/U/P). Compose situsAddress from house_no + stdirect + street_nam
+      + sttype when house_no>0. city/state/zip_code are OWNER mailing (e.g. WAYNESVILLE /
+      BLACKSHEAR / HOBOKEN / WAYCROSS / out-of-county) — never municipality filter.
+      taxdistric soft (geo-checked, no published REST legend): 01≈Nahunta (~663; NA*
+      parcels ~-81.98,31.21), 02≈Hoboken (~301; HN* ~-82.13,31.18), 03/04/05≈unincorporated
+      / appraisal districts (~5402/1091/5637; county-wide extents) — soft only; no public
+      city-limits FeatureServer recovered. Every feature carries qPub_Link deep-link
+      App=brantleyCountyGA Layer=Parcels PageType=Report KeyValue={Parcel_No}.
+      Companion stale AGOL Brantley_County_Parcels_2022 (org fYt1jp3hqamxgSvI FS/6 count
+      13107) is geometry+Parcel_No only — do NOT prefer. Rejected paid
+      Regrid/GetParcelData/AssessorSearch extracts; BrantleyCountyGA_WFS 404; no SGRC
+      alma Brantley folder. Geo-verified WGS84 samples ~-81.848,31.196 (Waynesville /
+      Old Hwy 259), ~-81.983,31.211 (Nahunta NA05), ~-82.133,31.180 (Hoboken) —
+      Brantley County GA SE (Nahunta seat; NOT Brantley lookalikes outside GA). Schema
+      may expose utility attr (water/sewer/gas/electricty) — DO NOT collect (standing
+      order skip utilities). Skip fei if sensitive. No emails/phones collected.
+    status: usable
+
+  - role: tax
+    name: Brantley_Parcels CAMA values (same layer as preferred parcels)
+    restUrl: https://services3.arcgis.com/86pyA5PND5NdokIc/arcgis/rest/services/Brantley_Parcels_view/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      taxdistric: taxDistrict
+      digclass: dorCode
+      homeexempt: homesteadExempt
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. curr_val>0 = 13092; mavcurr>0 = 0
+      (assessed REST gap — use qPublic HTML for assessed/taxable). Assessor HTML:
+      qpublic.net/ga/brantley → Application.aspx?App=brantleyCountyGA (Cloudflare/bot 403
+      on Application.aspx from research box; public for humans). Deep-link KeyValue={Parcel_No}:
+      Application.aspx?App=brantleyCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_No}
+      (also AppID=899 LayerID=17021 cited by third-party indexes — prefer App= name from
+      live qPub_Link). Tax Commissioner brantleytax.com (payments — not CAMA).
+    status: usable
+
+  - role: sales
+    name: null — sale_val zero-filled; qPublic Sales Search HTML only
+    restUrl: https://services3.arcgis.com/86pyA5PND5NdokIc/arcgis/rest/services/Brantley_Parcels_view/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      sale_val / saleland1 / saleimp1 fields exist but sale_val>0 = 0 live (2026-09-24).
+      No public REST multi-sale history. qPublic Yearly Sales / Sales Search HTML
+      App=brantleyCountyGA. Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — zoningcode blank county-wide; no Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      zoningcode / zoning on Brantley_Parcels_view are blank county-wide (non-blank
+      zoningcode = 0). No Brantley County Zoning FeatureServer / MapServer recovered on
+      AGOL owner planning3_bcgis100 or SGRC. Comp Plan PDF (DCA joint Brantley / Hoboken /
+      Nahunta) only — honest Euclidean zoning REST gap.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Brantley County future land use / character-area FeatureServer found (2026-09-24).
+      Comp Plan PDF character/land-use maps only — FLU REST gap.
+    status: gap
+
+  - role: other
+    name: Brantley_Roads view (context — NOT parcels)
+    restUrl: https://services3.arcgis.com/86pyA5PND5NdokIc/arcgis/rest/services/Brantley_Roads_view/FeatureServer/0
+    layerId: 0
+    geometry: polyline
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Companion public roads view from same AGOL owner. Context only — zero
+      parcel/owner/tax/sale fields. Do not wire as parcels.
+    status: partial
+
+municipalities:
+  - name: Nahunta
+    level: city
+    parentFips: "13025"
+    joinToCountyParcels: >
+      Soft TAXDISTRIC/taxdistric='01' (~663; NA* map sheets ~-81.98,31.21). No public
+      city-limits FeatureServer recovered — soft only; certify with county/city staff.
+      mailing city='NAHUNTA' is postal — never sole filter.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Nahunta zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Nahunta FLU REST — Comp Plan PDF only.
+        status: gap
+      - role: parcels
+        name: null — use county Brantley_Parcels_view filtered soft taxdistric=01
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Nahunta-owned CAMA — county FeatureServer/0 + soft taxdistric=01.
+        status: gap
+    gaps:
+      - "No Nahunta city-limits / zoning / FLU / parcel REST; soft taxdistric=01 only."
+    status: gap
+
+  - name: Hoboken
+    level: city
+    parentFips: "13025"
+    joinToCountyParcels: >
+      Soft taxdistric='02' (~301; HN* ~-82.13,31.18). No public city-limits FeatureServer.
+      mailing city='HOBOKEN' postal — prefer soft taxdistric when needed.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Hoboken zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Hoboken FLU REST.
+        status: gap
+      - role: parcels
+        name: null — use county Brantley_Parcels_view filtered soft taxdistric=02
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Hoboken-owned CAMA — county FS/0 + soft taxdistric=02.
+        status: gap
+    gaps:
+      - "No Hoboken city-limits / zoning / FLU / parcel REST; soft taxdistric=02 only."
+    status: gap
+
+gaps:
+  - "sale_val>0 = 0 on preferred parcels — no REST lastSale.price/date; qPublic App=brantleyCountyGA Sales Search HTML only."
+  - "mavcurr>0 = 0 — no usable assessedValue on REST; prefer curr_val market + qPublic HTML for assessed/taxable."
+  - "zoningcode/zoning blank county-wide; no Euclidean zoning FeatureServer — Comp Plan PDF gap."
+  - "No public FLU / character-area FeatureServer."
+  - "No public city-limits FeatureServer for Nahunta/Hoboken — taxdistric 01/02 soft only."
+  - "mailing city/state/zip_code nationwide/postal — never municipality filter."
+  - "Brantley_County_Parcels_2022 AGOL FS/6 is geometry+Parcel_No only (stale) — do not prefer over Brantley_Parcels_view."
+  - "No SGRC alma Brantley folder; BrantleyCountyGA_WFS 404."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/brantley HTML 200."
+  - "Rejected paid Regrid/ATTOM/GetParcelData/AssessorSearch; skip utilities+AADT; no emails/phones."
+
+license: >
+  Brantley County Tax Assessor qPublic/Beacon App=brantleyCountyGA (qpublic.net/ga/brantley;
+  AppID=899 cited). Public AGOL Brantley_Parcels_view / Brantley_Roads_view (owner
+  planning3_bcgis100, org 86pyA5PND5NdokIc). Tax Commissioner brantleytax.com. Comp Plan
+  DCA joint Brantley / Hoboken / Nahunta PDFs. Attribution Brantley County Tax Assessor /
+  county GIS. Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=brantleyCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=brantleyCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services3.arcgis.com/86pyA5PND5Ndo
+    kIc/arcgis/rest/services/Brantley_Parcels_view/FeatureServer/0 count 13301; extent center [['13025',
+    'Brantley County']]; sample [['13025', 'Brantley County']]. No change to field map (see layer
+    above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Hoboken city"
+      level: city
+      parentFips: "13025"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Nahunta city"
+      level: city
+      parentFips: "13025"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Brantley' AND aadt>0
+    altFilter: name LIKE '025-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 025-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 54
+    maxAadt: 11800
+    geoCheck: 52/54 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 13092
+    restUrl: https://services3.arcgis.com/86pyA5PND5NdokIc/arcgis/rest/services/Brantley_Parcels_view/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: sale_val=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 13094
+    restUrl: https://services3.arcgis.com/86pyA5PND5NdokIc/arcgis/rest/services/Brantley_Parcels_view/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=brantleyCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0096E  001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=brantleyCountyGA&Layer=Parcels&PageType=Report&KeyValue=0096E%20%20001
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=brantleyCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Hoboken city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Nahunta city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

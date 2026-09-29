@@ -1,0 +1,445 @@
+state: GA
+jurisdiction: Toombs County
+fips: "13279"
+level: county
+markets: [Savannah]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + RICH CAMA (owner / tax / situs / mailing)
+  - role: parcels
+    name: Toombs_County_Wide_View TaxParcels_25 (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Toombs_County_Wide_View/FeatureServer/19
+    layerId: 19
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      Realkey: ownerKey
+      Ownkey: ownerKeyAlt
+      lastname: ownerName
+      firstname: ownerNameFirst
+      middle: ownerNameMiddle
+      address1: mailingAddressAlt
+      address2: mailingAddress
+      address3: mailingAddress2
+      city: mailingCity
+      state: mailingState
+      zip_code: mailingZip
+      house_no: situsNumber
+      stdirect: situsStreetDir
+      street_nam: situsStreet
+      sttype: situsStreetType
+      unit: situsUnit
+      totalacres: acreage
+      Draw_Acres: acreageGis
+      Deed_Acres: acreageDeed
+      woodacres: acreageWoodland
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      a_value: tax.landValue
+      p_value: tax.improvementValue
+      sale_val: lastSale.price
+      saleland1: lastSale.landPrice1
+      saleland2: lastSale.landPrice2
+      saleimp1: lastSale.impPrice1
+      saleimp2: lastSale.impPrice2
+      zoning: zoningCode
+      zoningcode: zoningAlt
+      taxdistric: taxDistrict
+      digclass: dorCode
+      digstrat: dorStrata
+      land_type: landType
+      legal_desc: legalDescription
+      subd_name: subdivision
+      homeexempt: homesteadExempt
+      landgmd: georgiaMilitiaDistrict
+      landlot: landLot
+      landdist: landDistrict
+      neighbhood: neighborhood
+      histyr1: tax.histYear1
+      histval1: tax.histValue1
+      histyr2: tax.histYear2
+      histval2: tax.histValue2
+      histyr3: tax.histYear3
+      histval3: tax.histValue3
+      lat: latitude
+      lon: longitude
+      qPub_Link: appraiserSearchUrl
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (Heart of Georgia Altamaha RC /
+      hogagis org HHvUPZ2XuLOAJxjR — Toombs_County_Wide_View FeatureServer/19
+      TaxParcels_25). Live count 16359 (2026-09-24). maxRecordCount 2000 — page via
+      resultOffset / spatial envelopes. totalacres 5–150 = 3545; Draw_Acres 5–150 =
+      3497; curr_val>0 = 16258; mavcurr>0 = 0 (assessed REST gap); sale_val>0 = 0;
+      lastname ≈16270; house_no>0 ≈11158; fmvres>0 ≈8701; a_value>0 ≈15434;
+      p_value>0 ≈1164; qPub_Link filled (embeds App=toombsCountyGA&Layer=Parcels&
+      PageType=Report&KeyValue=). Compose situs from house_no+stdirect+street_nam+
+      sttype when house_no>0. Prefer totalacres for acreage band; Draw_Acres GIS aid.
+      Coalesce mailing street: prefer non-blank address1 else address2 (sample shows
+      address1=street when house present; vacant often address2). zoning coded
+      001≈7925 / 007≈5814 / blank≈1622 / 002≈779 / 004≈190… — NOT Euclidean city
+      ZONE text; prefer LyonsZoning / VidaliaZoning FeatureServers. digclass:
+      R≈12042 / C≈1231 / A≈1177 / V≈1113 / E≈612 / J≈52 / U≈22 / I≈21. Schema
+      water/sewer/gas/electricty/roadstreet + appraiser/apprname/land_appr present —
+      SKIP utilities+AADT; DO NOT collect staff names/emails/phones as PII.
+      Parcel_No format e.g. 'C01    001' / 'C01    001A' (preserve spaces for
+      KeyValue; qPub_Link already URL-encodes). Official assessor HTML: qPublic
+      App=toombsCountyGA (qpublic.net/ga/toombs; toombscountyga.gov). CountyBoundary/10
+      CNTYIDFP=13279 NAME=Toombs STATEFP=13 RDC=Heart of Georgia-Altamaha geo-verified.
+      WGS84 samples ~-82.446,32.198 / ~-82.444,32.195 — Toombs County GA / Lyons seat
+      (~-82.32,32.20) / Vidalia (~-82.41,32.22) SE GA (Census CENTLAT +32.1216235
+      CENTLON -082.3312913). Open data explore hogarc-hogarc.opendata.arcgis.com
+      datasets …toombs-county-wide-view. Rejected paid Regrid/USLandGrid/ATTOM/
+      MappingSolutions.
+    status: usable
+
+  - role: tax
+    name: TaxParcels_25 curr_val / fmv* / mav* / a_value / p_value (on polygons)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Toombs_County_Wide_View/FeatureServer/19
+    layerId: 19
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      a_value: tax.landValue
+      p_value: tax.improvementValue
+      taxdistric: taxDistrict
+      digclass: dorCode
+      homeexempt: homesteadExempt
+      histyr1: tax.histYear1
+      histval1: tax.histValue1
+      histyr2: tax.histYear2
+      histval2: tax.histValue2
+      histyr3: tax.histYear3
+      histval3: tax.histValue3
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. curr_val>0 = 16258;
+      mavcurr>0 = 0 (assessed REST gap — use qPublic HTML for MAV when needed);
+      a_value>0 ≈15434; p_value>0 ≈1164; histval* = assessment history NOT sales.
+      Assessor HTML: App=toombsCountyGA (Cloudflare/bot 403 automated; public for
+      humans). Deep-link KeyValue={Parcel_No}:
+      Application.aspx?App=toombsCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_No}
+      (qPub_Link embeds same). Numeric AppID/LayerID not recovered (Cloudflare).
+    status: usable
+
+  - role: sales
+    name: TaxParcels_25 sale_val/saleland*/saleimp* zero-filled — qPublic HTML
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Toombs_County_Wide_View/FeatureServer/19
+    layerId: 19
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      sale_val: lastSale.price
+      saleland1: lastSale.landPrice1
+      saleland2: lastSale.landPrice2
+      saleimp1: lastSale.impPrice1
+      saleimp2: lastSale.impPrice2
+    notes: >
+      sale_val>0 = 0 live (no usable REST sale components / no lastSale.date field).
+      Prefer qPublic Sales Search / Sales List HTML App=toombsCountyGA. Rejected paid
+      Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean; city zoning only + opaque parcel zoning
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Toombs County-wide Euclidean zoning FeatureServer on Toombs_County_Wide_View
+      (2026-09-24). Parcel TaxParcels_25.zoning opaque codes only (001/007/002…). Prefer
+      city Euclidean: LyonsZoning / VidaliaZoning (see municipalities). Comp-plan
+      CharacterAreas/4 — planning character only, not Euclidean zoning.
+    status: gap
+
+  - role: flu
+    name: Toombs_County_Wide_View Landuse (FLULU / EXTLU)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Toombs_County_Wide_View/FeatureServer/18
+    layerId: 18
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      FLULU: flu
+      FLUDCA: fluDca
+      EXTLU: existingLandUse
+      EXTLUDCA: existingLandUseDca
+      Acres: acreage
+      City: cityName
+    notes: >
+      Comp-plan / existing+future land-use polygons (count 16758). FLULU top:
+      Residential≈11501 / Forestry≈2223 / Commercial≈1498 / Agriculture≈1178 /
+      Industrial≈284 / Public/Institutional≈53 / Park/Recreation/Conservation≈12 /
+      Transportation/Communication/Utilities≈8. Companion CharacterAreas/4 for named
+      corridors. Not a substitute for Euclidean zoning. Prefer FLULU as flu; EXTLU as
+      existing.
+    status: usable
+
+  - role: other
+    name: Toombs_County_Wide_View CountyBoundary (GA FIPS 13279)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Toombs_County_Wide_View/FeatureServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      CNTYIDFP: countyFips
+      STATEFP: stateFips
+      COUNTYFP: countyFp
+    notes: >
+      Layer 10 CountyBoundary NAME=Toombs CNTYIDFP=13279 STATEFP=13 COUNTYFP=279
+      RDC=Heart of Georgia-Altamaha. Preferred spatial county mask. Companion
+      CensusCountyBoundary/21 / CharacterAreas/4 / Roads/11 — not parcels. Skip
+      FloodZones/Soils/Wetlands unless needed for site context (not CAMA). Companion
+      MontgomeryToombsBoundary service exists for shared county line — not parcels.
+    status: usable
+
+municipalities:
+  - name: Lyons
+    level: city
+    parentFips: "13279"
+    joinToCountyParcels: >
+      Spatial City_of_Lyons_View/0 LyonsCityLimits (~-82.325,32.250; City='LYONS'
+      NAME='Lyons' FIPS='279' ACRES≈5344) ∩ TaxParcels_25. County seat. Mailing city
+      never sole filter.
+    layers:
+      - role: zoning
+        name: City_of_Lyons_View LyonsZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Lyons_View/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+        notes: >
+          City Euclidean Zoning (count 2694). Distinct filled: A-1: Agriculture /
+          C-1: Central Business / C-2: Highway Business / I-1: Light Industrial /
+          I-2: Heavy Industrial / R-1: Single Family Residential / R-2: Multi Family
+          Residential / R-2A: Multi Family Residential / R-3: Multi Family Residential
+          (+ blanks). Skip LyonsWaterSDS/SewerSDS/WaterMeters + paved roads per
+          tranche-3.
+        status: usable
+      - role: flu
+        name: null — use county Landuse ∩ Lyons limits
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city-owned FLU — county Landuse/18 ∩ LyonsCityLimits/0.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial Lyons
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Lyons-only CAMA — county /19 + CityLimits/0. Tax/owner on county REST; sale qPublic HTML.
+        status: gap
+    gaps:
+      - "No Lyons city-owned parcel/FLU REST — county TaxParcels_25 + spatial limits."
+      - "Skip Lyons Water/Sewer SDS + meters per tranche-3."
+    status: usable
+
+  - name: Vidalia
+    level: city
+    parentFips: "13279"
+    joinToCountyParcels: >
+      Spatial City_of_Vidalia_View/0 VidaliaCityLimits (~-82.352,32.219; CITY='VIDALIA'
+      NAME='VIDALIA' FIPS='279' ACRES≈11294) ∩ TaxParcels_25. Note Vidalia spans
+      Toombs + Montgomery fringe — prefer spatial limits ∩ Toombs TaxParcels_25 for
+      this card.
+    layers:
+      - role: zoning
+        name: City_of_Vidalia_View VidaliaZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Vidalia_View/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          CITY: cityName
+          ELU_ID: existingLandUseId
+        notes: >
+          City Euclidean ZONING (count 639). Distinct: A-1 / C-1 / C-2 / C-3 / I-1 /
+          I-2 / OR / R-1 / R-1A / R-2 / R-3 / R-4 / R-M3. Skip VidaliaWaterSDS/
+          SewerSDS per tranche-3.
+        status: usable
+      - role: flu
+        name: null — county Landuse ∩ Vidalia limits
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Vidalia FLU REST — county Landuse/18 ∩ VidaliaCityLimits. ELU_ID on zoning is opaque id only.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial Vidalia
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Vidalia-only CAMA — county /19 + CityLimits/0.
+        status: gap
+    gaps:
+      - "No Vidalia city-owned parcel/FLU REST — county layers + spatial Vidalia City Limits."
+      - "Vidalia city limits may extend into Montgomery County — filter Toombs TaxParcels_25 spatially."
+    status: usable
+
+gaps:
+  - "sale_val/saleland*/saleimp* all zero on TaxParcels_25 — no usable REST lastSale; prefer qPublic Sales Search App=toombsCountyGA HTML."
+  - "mavcurr>0 = 0 on REST — assessed/MAV via qPublic HTML; curr_val/fmv*/a_value usable."
+  - "No county-wide Euclidean zoning FS — prefer Lyons Zoning / Vidalia ZONING; parcel zoning opaque codes only."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/toombs + App=toombsCountyGA public for humans."
+  - "Numeric AppID/LayerID not recovered (Cloudflare) — use App=toombsCountyGA&Layer=Parcels&KeyValue={Parcel_No}."
+  - "Skip city Water/Sewer SDS/meters + AADT + schema utility codes; skip appraiser/apprname/emails/phones as PII."
+  - "Rejected paid Regrid/USLandGrid/ATTOM/MappingSolutions."
+
+license: >
+  Heart of Georgia Altamaha RC GIS (hogagis / services5.arcgis.com/HHvUPZ2XuLOAJxjR) —
+  Toombs_County_Wide_View TaxParcels_25/19, Landuse/18, CountyBoundary/10,
+  CharacterAreas/4; City_of_Lyons_View, City_of_Vidalia_View. Assessor qPublic
+  App=toombsCountyGA (qpublic.net/ga/toombs; toombscountyga.gov). Attribution HOGARC /
+  Toombs County Tax Assessor. Public fields only; no emails/phones; no paid vendors;
+  skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=toombsCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://hogarc-hogarc.opendata.arcgis.com/datasets/HHvUPZ2XuLOAJxjR::toombs-county-wide-view/explore
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/HHvUPZ2XuLOAJ
+    xjR/arcgis/rest/services/Toombs_County_Wide_View/FeatureServer/19 count 16359; extent center
+    [['13279', 'Toombs County']]; sample [['13209', 'Montgomery County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Lyons city"
+      level: city
+      parentFips: "13279"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Santa Claus city"
+      level: city
+      parentFips: "13279"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Vidalia city"
+      level: city
+      parentFips: "13279"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Toombs' AND aadt>0
+    altFilter: name LIKE '279-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 279-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 144
+    maxAadt: 19500
+    geoCheck: 143/144 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 16258
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Toombs_County_Wide_View/FeatureServer/19
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: sale_val=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 16270
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Toombs_County_Wide_View/FeatureServer/19
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=toombsCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: C01    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=toombsCountyGA&Layer=Parcels&PageType=Report&KeyValue=C01%20%20%20%20001
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://hogarc-hogarc.opendata.arcgis.com/datasets/HHvUPZ2XuLOAJxjR::toombs-county-wide-view/explore
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Lyons city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Santa Claus city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Vidalia city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,332 @@
+state: GA
+jurisdiction: Walker County
+fips: "13295"
+level: county
+markets: [Chattanooga]
+
+layers:
+  - role: parcels
+    name: "Walker County Parcel_Regions_w_WinGAP (Walker Fire ISO gdb)"
+    restUrl: https://services7.arcgis.com/tzrZqCyu9DgupjuD/arcgis/rest/services/Walker_Fire_ISO_gdb/FeatureServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: "totalacres"
+    coverage: county-wide
+    parcelIdField: "Parcel_No"
+    liveCount: 34199
+    liveCount5to150ac: 6575
+    geoCheck: "extent center [['13295', 'Walker County']]; sample [['13295', 'Walker County']]; extent WGS84 [-85.5352, 34.5819, -85.0508, 34.985]"
+    fieldMap:
+      Parcel_No: "parcelId"
+      Realkey: "ownerKey"
+      lastname: "ownerName"
+      address1: "mailingAddress"
+      house_no: "situsNumber"
+      street_nam: "situsStreet"
+      sttype: "situsStreetType"
+      totalacres: "acreage"
+      Draw_Acres: "acreageGis"
+      Deed_Acres: "acreageDeed"
+      curr_val: "tax.marketValue"
+      sale_val: "lastSale.price"
+      zoningcode: "zoning"
+      qPub_Link: "appraiserDeepLink"
+    notes: >
+      pass1 2026-09-28: County-wide Walker GA WinGAP-joined parcels (34199) in AGOL org tzrZqCyu9DgupjuD
+      (Walker_Fire_ISO_gdb FeatureServer layer 5). Full WinGAP schema incl owner, mailing, situs,
+      totalacres, curr_val, sale_val, qPub_Link. Supersedes 2026-09-24 gap (LLLT AOI clips only). Vintage
+      unknown (fire ISO project) - Pass 2 verify currency. Alternate:
+      services5.arcgis.com/Rf1oxfEdjEqPSdxo LLLT__Geodatabase_gdb/FeatureServer/10 Walker_CO_Tax_2010
+      (34849, 2010 vintage).
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — no county-wide public parcel REST (qPublic HTML + LLLT AOI clip only)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No official Walker County GA ArcGIS FeatureServer/MapServer for county-wide
+      parcels found (2026-09-24). walkercountyga.gov Assessors Office points solely
+      to qPublic.net (App=walkerCountyGA). DNS dead / empty: gis.walkercountyga.gov,
+      maps.walkercountyga.gov, gis.walkerga.us. Walker AGOL community empty. Academic
+      IGT LLLT clip Walker_Parcels_2026LLLT (services.arcgis.com/UnTXoPXBYERF0OH6/…
+      /Walker_Parcels_2026LLLT/FeatureServer/4) is NOT county-wide — live count 7811
+      clipped to Lookout Mountain / LLLT AOI only (geo ~-85.43,34.86 Durham Rd /
+      Lookout Mtn GA — correct Walker GA geography but AOI sample). Fields: Parcel_No,
+      totalacres, ownerName, parcelAddress, ownerAddress, qPub_Link, apprname +
+      conservation scores. Prefer as optional AOI enrichment only; do NOT treat as
+      county landbase. Twin 2021LLLT same 7811. Rejected moonassoc Walker_County_Parcels
+      (token-required); rejected Vincent_Properties Walker_parcels (2 features ~
+      -81.54,36.34 — North Carolina, wrong state); rejected GDITAdmin Walker_Parcels
+      (Invalid URL / gone); rejected Hamilton TN CHCRPA; rejected Walker County AL
+      ALGeoHub hydro/roads.
+    status: gap
+
+  - role: parcels
+    name: Walker_Parcels_2026LLLT (IGT academic AOI clip — NOT county-wide)
+    restUrl: https://services.arcgis.com/UnTXoPXBYERF0OH6/arcgis/rest/services/Walker_Parcels_2026LLLT/FeatureServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: sample
+    fieldMap:
+      Parcel_No: parcelId
+      ownerName: ownerName
+      ownerAddress: mailingAddress
+      parcelAddress: situsAddress
+      totalacres: acreage
+      qPub_Link: appraiserSearchUrl
+      apprname: appraiserName
+    notes: >
+      Academic Lookout Mountain / LLLT AOI clip only (7811). Geo-verified Walker GA
+      ~-85.43,34.86. qPub_Link deep-links App=walkerCountyGA&Layer=Parcels&PageType=
+      Report&KeyValue={Parcel_No}. Use only when AOI coverage is acceptable; primary
+      county-wide path remains qPublic HTML.
+    status: partial
+
+  - role: tax
+    name: null — no public REST CAMA values county-wide
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No county tax/marketValue FeatureServer. qPublic App=walkerCountyGA HTML reports
+      for FMV/assessed. LLLT clip has no value fields.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Walker GA multi-sale FeatureServer found. qPublic Sales Search HTML only.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Walker County or LaFayette / Chickamauga / Rossville / Lookout Mountain
+      zoning FeatureServer found (2026-09-24). Zoning ordinance / map PDF via county
+      or city Planning; staff certification.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Walker Comp Plan FLU FeatureServer found. Rejected CHCRPA TPO land-use
+      (Hamilton-centric). PDF / DCA joint plan if any.
+    status: gap
+
+municipalities:
+  - name: LaFayette
+    level: city
+    parentFips: "13295"
+    joinToCountyParcels: >
+      No public county parcel REST — cannot attribute-join. Spatial against future
+      county landbase / qPublic map near LaFayette (~-85.25,34.70).
+    layers: []
+    notes: >
+      No City of LaFayette GA zoning/parcel FeatureServer found. Assessor office
+      physically in Rock Spring; city is county seat.
+    status: gap
+
+  - name: Chickamauga
+    level: city
+    parentFips: "13295"
+    joinToCountyParcels: >
+      Spatial near Chickamauga (~-85.29,34.87) when county geometry available.
+    layers: []
+    notes: >
+      No city GIS REST found. Not Chickamauga Battlefield NPS layers as cadastral.
+    status: gap
+
+  - name: Rossville
+    level: city
+    parentFips: "13295"
+    joinToCountyParcels: >
+      Spatial near Rossville (~-85.29,34.98) on GA/TN line — reject Hamilton TN
+      parcels as Rossville GA substitute.
+    layers: []
+    notes: >
+      Border city; no Rossville GA FeatureServer found. Do not use Hamilton TN
+      CHCRPA / county parcels.
+    status: gap
+
+  - name: Lookout Mountain
+    level: city
+    parentFips: "13295"
+    joinToCountyParcels: >
+      LLLT Walker_Parcels_2026LLLT covers Lookout Mountain AOI (~7811) — soft AOI
+      filter only. Town also has TN Lookout Mountain — reject TN lookalikes.
+    layers: []
+    notes: >
+      GA Town of Lookout Mountain — LLLT clip useful for AOI only. No town-only
+      zoning REST. NOT Lookout Mountain TN.
+    status: partial
+
+  - name: Fort Oglethorpe
+    level: city
+    parentFips: "13295"
+    joinToCountyParcels: >
+      Multi-county Catoosa+Walker — Walker-side only here; see Catoosa 13047 for
+      Catoosa-side zoning polygons.
+    layers: []
+    notes: >
+      No Walker-side city FeatureServer. Catoosa card has county zoning geometry for
+      Catoosa portion.
+    status: gap
+
+gaps:
+  - "PRIMARY GAP: no county-wide public parcel geometry/CAMA REST — assessor is qPublic App=walkerCountyGA HTML only (walkercountyga.gov Assessors Office)."
+  - "LLLT Walker_Parcels_2026LLLT (7811) is Lookout Mountain AOI academic clip — not county-wide landbase (~full county expected >>7811)."
+  - "No public REST zoning / FLU / sales / tax values."
+  - "No municipality boundary FeatureServer."
+  - "Rejected lookalikes: Walker County AL (ALGeoHub); Vincent_Properties Walker_parcels NC (~-81.54,36.34); moonassoc token-locked; GDITAdmin dead URL; Hamilton TN CHCRPA LandUse_SF / TPO; Lookout Mountain TN; DeKalb GA / Pike PA / Sumter / Glynn as parcel sources; paid Regrid/ATTOM."
+  - "Enrichment vs thin in-app: optional LLLT AOI 7811 owner+acres+situs+qPub deep-link; county-wide parcels/zoning/FLU/sales remain gap/HTML/PDF."
+
+license: >
+  Walker County Board of Assessors — qPublic SchneiderCorp App=walkerCountyGA
+  (qpublic.net/ga/walker; walkercountyga.gov/government/departments/assessors-office/).
+  Optional academic AOI: UGA/IGT lab bgn313_igtlab Walker_Parcels_2026LLLT on org
+  UnTXoPXBYERF0OH6 (not county-official landbase). Attribution to Walker County
+  Assessors / stated academic source. Public fields only; no emails/phones; no paid
+  vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=walkerCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: partial
+  parcelStatusAfter: usable
+  summary: >
+    Walker County Parcel_Regions_w_WinGAP (Walker Fire ISO gdb): https://services7.arcgis.com/tzrZqCyu9D
+    gupjuD/arcgis/rest/services/Walker_Fire_ISO_gdb/FeatureServer/5 - live count 34199 (5-150 ac: 6575),
+    parcel ID field Parcel_No. Geography verified against TIGER county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Chickamauga city"
+      level: city
+      parentFips: "13295"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "LaFayette city"
+      level: city
+      parentFips: "13295"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Lookout Mountain city"
+      level: city
+      parentFips: "13295"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Rossville city"
+      level: city
+      parentFips: "13295"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Walker' AND aadt>0
+    altFilter: name LIKE '295-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 295-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 263
+    maxAadt: 28800
+    geoCheck: 261/263 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 33976
+    restUrl: https://services7.arcgis.com/tzrZqCyu9DgupjuD/arcgis/rest/services/Walker_Fire_ISO_gdb/FeatureServer/5
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: sale_val=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 34044
+    restUrl: https://services7.arcgis.com/tzrZqCyu9DgupjuD/arcgis/rest/services/Walker_Fire_ISO_gdb/FeatureServer/5
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=walkerCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0001     001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=walkerCountyGA&Layer=Parcels&PageType=Report&KeyValue=0001%20%20%20%20%20001
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=walkerCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Chickamauga city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: LaFayette city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Lookout Mountain city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Rossville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

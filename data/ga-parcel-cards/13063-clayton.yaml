@@ -1,0 +1,548 @@
+state: GA
+jurisdiction: Clayton County
+fips: "13063"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide parcels with owner, mailing, situs, acreage, zoning, tax, last sale
+  - role: parcels
+    name: TaxAssessor Tax Parcels
+    restUrl: https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACERAGE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      PIN2: parcelIdAlt
+      ACERAGE: acreage
+      OWNERNME: ownerName
+      PSTLADDRES: mailingAddress
+      PSTLCITY: mailingCity
+      PSTLSTATE: mailingState
+      PSTLZIP5: mailingZip
+      SITEADDRES: situsAddress
+      SITECITY: situsCity
+      SITEZIP5: situsZip
+      STREETNO: situsStreetNo
+      STREETNAME: situsStreetName
+      ZONE: zoning
+      OVERLAY: zoningOverlay
+      APPRVAL: tax.marketValue
+      ASSESSVAL: tax.assessedValue
+      LANDFMV: tax.landMarketValue
+      DWELLINGFMV: tax.improvementMarketValue
+      BLDGSFMV: tax.buildingMarketValue
+      OTHERBLDGSFMV: tax.otherBuildingMarketValue
+      IMPROVEMNT: tax.improvementValue
+      SALEDATE: lastSale.date
+      SALEPRICE: lastSale.price
+      CURRENTDEEDBOOK: lastSale.deedBook
+      CURRENTDEEDPAGE: lastSale.deedPage
+      DEEDYEAR: lastSale.deedYear
+      LANDUSEC: dorCode
+      LANDUSED: dorCodeDescription
+      BUSCODE1DESC: propertyClassDescription
+      CVTTXCD: taxDistrict
+      PROPCARD: appraiserDeepLink
+    notes: >
+      Preferred county-wide parcel source. Live count 92100 (2026-09-23).
+      Spatial reference NAD 1983 StatePlane Georgia West FIPS 1002 Feet (wkid 102667 / latestWkid 2240).
+      maxRecordCount 2000. Rich polygon CAMA: PARCELID (e.g. "04204 205001"), OWNERNME, mailing
+      street/city/state/zip, situs address/city/zip, ACERAGE (source spelling typo), ZONE (county +
+      municipal codes), tax market/assessed (APPRVAL/ASSESSVAL — string fields; CUVA/preferential
+      parcels may not show 40% ratio), LANDFMV/DWELLINGFMV/BLDGSFMV, SALEDATE (YYYYMMDD string) +
+      SALEPRICE (string; ~61450 with SALEPRICE>'0'), deed book/page. NO lastSale.qualified.
+      CVTTXCD tax-district codes: 8/1=COUNTY, 3=FOREST PARK, 4=JONESBORO, 5=MORROW, 6=RIVERDALE,
+      7=LAKE CITY, 9=LOVEJOY, 2=COLLEGE PARK (Fulton-side city with Clayton footprint). Description
+      labels live on TylerTaxParcels CVTTXDSCRP. PROPCARD deep-links to publicaccess iCare by pin.
+      Equivalent full-CAMA mirrors: TaxAssessor/TylerTaxParcels/MapServer/0 (count 92100 +
+      CVTTXDSCRP); TYLER/DISPLAY/FeatureServer/17 is thinner attribute set (same count). Prefer this
+      MapServer/0 for single-layer parcel+attributes. Hub: clayton-county-gis-data-portal-cccd-gis.hub.arcgis.com.
+    status: usable
+
+  - role: parcels
+    name: TaxAssessor TylerTaxParcels (CVTTXDSCRP tax-district labels)
+    restUrl: https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/TylerTaxParcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACERAGE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      ACERAGE: acreage
+      OWNERNME: ownerName
+      PSTLADDRES: mailingAddress
+      PSTLCITY: mailingCity
+      PSTLSTATE: mailingState
+      PSTLZIP5: mailingZip
+      SITEADDRES: situsAddress
+      SITECITY: situsCity
+      SITEZIP5: situsZip
+      ZONE: zoning
+      APPRVAL: tax.marketValue
+      ASSESSVAL: tax.assessedValue
+      SALEDATE: lastSale.date
+      SALEPRICE: lastSale.price
+      CVTTXCD: taxDistrict
+      CVTTXDSCRP: taxDistrictName
+    notes: >
+      Same live count 92100 as TaxAssessor/Parcels/0 with CVTTXDSCRP (COUNTY / FOREST PARK /
+      JONESBORO / MORROW / RIVERDALE / LAKE CITY / LOVEJOY / COLLEGE PARK). Prefer Parcels/0 unless
+      tax-district name needed without a code lookup. Live district counts (2026-09-23): COUNTY
+      ~72608 (CVTTXCD 8+1), FOREST PARK 6001, RIVERDALE 4392, LOVEJOY 3997, MORROW 1915,
+      JONESBORO 1750, LAKE CITY 1072, COLLEGE PARK 364.
+    status: usable
+
+  - role: parcels
+    name: TYLER DISPLAY Parcel Polygons (thinner attributes)
+    restUrl: https://gis.claytoncountyga.gov/server/rest/services/TYLER/DISPLAY/FeatureServer/17
+    layerId: 17
+    geometry: polygon
+    auth: none
+    acreageField: ACERAGE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      ACERAGE: acreage
+      OWNERNME: ownerName
+      SITEADDRES: situsAddress
+      SITECITY: situsCity
+      SITEZIP5: situsZip
+      PSTLADDRES: mailingAddress
+      PSTLCITY: mailingCity
+      PSTLSTATE: mailingState
+      PSTLZIP5: mailingZip
+      ZONE: zoning
+      APPRVAL: tax.marketValue
+      CVTTXCD: taxDistrict
+    notes: >
+      Live count 92100. FeatureServer mirror with fewer CAMA fields than TaxAssessor/Parcels/0
+      (no SALEPRICE/SALEDATE/ASSESSVAL/LANDFMV on this layer schema subset). Prefer TaxAssessor/Parcels/0.
+    status: partial
+
+  - role: tax
+    name: TaxAssessor Tax Parcels (CAMA values on polygons)
+    restUrl: https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACERAGE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      APPRVAL: tax.marketValue
+      ASSESSVAL: tax.assessedValue
+      LANDFMV: tax.landMarketValue
+      DWELLINGFMV: tax.improvementMarketValue
+      BLDGSFMV: tax.buildingMarketValue
+      OTHERBLDGSFMV: tax.otherBuildingMarketValue
+      IMPROVEMNT: tax.improvementValue
+      CVTTXCD: taxDistrict
+      HOMESTEADEXEMPTCDE: exemptionCode
+    notes: >
+      Tax/CAMA values live on the same parcel polygons as role=parcels. Value fields are strings.
+      GA assessed typically ~40% of FMV for standard residential; CUVA/preferential parcels often
+      diverge. No distinct tax.taxableValue field. Prefer publicaccess iCare for full assessment cards.
+    status: usable
+
+  - role: zoning
+    name: TaxAssessor Tax Parcels ZONE attribute (county + cities)
+    restUrl: https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACERAGE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      ZONE: zoning
+      OVERLAY: zoningOverlay
+      CVTTXCD: taxDistrict
+      ZONINGURL: zoningUrl
+    notes: >
+      Preferred county-wide zoning ATTRIBUTE on parcel polygons (no separate district-boundary
+      dissolve required for parcel apps). Live count 92100. Unincorporated codes include RS110,
+      RS180, PUD, RG75, RTH, RMTSF, ER, AG, GB, HI, MX, RM, OI, CS, LI, MV-* Mountain View overlays,
+      OD-* overlays. Municipal ZONE values also present on the same field — filter CVTTXCD for city
+      extracts (Forest Park richer RS/GC/RT/DM/LI/…; Jonesboro/Morrow/Riverdale/Lake City/Lovejoy
+      mostly coarse R/C/I). OVERLAY carries neighborhood/overlay labels (e.g. THE PANHANDLE).
+      Polygon zoning layers below are unincorporated-focused supplements.
+    status: usable
+
+  - role: zoning
+    name: Hosted PEZ Zoning2025 (unincorporated parcel zoning + futurelu)
+    restUrl: https://gis.claytoncountyga.gov/server/rest/services/Hosted/PEZ_CurrentZoningProCached/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: acres
+    coverage: county-wide
+    fieldMap:
+      parcelid: parcelId
+      zoning: zoning
+      zoningoverlay: zoningOverlay
+      futurelu: flu
+      currentlu: fluExisting
+      acres: acreage
+      ownernme: ownerName
+      siteaddres: situsAddress
+      sitecity: situsCity
+      sitezip5: situsZip
+      pstladdres: mailingAddress
+      pstlcity: mailingCity
+      pstlstate: mailingState
+      pstlzip5: mailingZip
+      taxassessorlanduse: dorCodeDescription
+    notes: >
+      Preferred formal PEZ zoning POLYGON layer for unincorporated county. Live count 72481
+      (2026-09-23) ≈ COUNTY tax-district footprint (excludes municipal parcels). Zoning codes use
+      hyphenated forms (RS-110, RS-180, RG-75, MV-MME, OD-MUR) vs parcel ZONE without hyphens.
+      Includes futurelu (e.g. Low Density Residential, PUD, Medium Density Residential, Agriculture)
+      — usable as unincorporated FLU join on parcelid. Attribute-join to TaxAssessor/Parcels on
+      PARCELID≈parcelid. Equivalent MapServer: PlanningZoning/PEZ_CurrentZoning/0 and
+      PlanningZoning/ZoningData/0 (count 72608). Zoning Viewer 2.0 experience uses this family.
+    status: usable
+
+  - role: zoning
+    name: CCCD_GIS Zoning_2023 (AGOL older snapshot)
+    restUrl: https://services5.arcgis.com/m528W8U8YDYeMPrQ/arcgis/rest/services/Zoning/FeatureServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: acerage
+    coverage: county-wide
+    fieldMap:
+      parcelid: parcelId
+      zone: zoning
+      zoning: zoningAlt
+      futurelu: flu
+      currentlu: fluExisting
+      acerage: acreage
+      ownernme: ownerName
+      apprval: tax.marketValue
+      assessval: tax.assessedValue
+      saledate: lastSale.date
+      saleprice: lastSale.price
+    notes: >
+      Hosted AGOL zoning snapshot. Live count 71779 (2026-09-23) — behind TaxAssessor/Parcels and
+      PEZ Zoning2025. Carries zone + planning zoning/futurelu/currentlu. Prefer TaxAssessor ZONE /
+      PEZ Zoning2025 for freshness; treat this as partial/backup. Org m528W8U8YDYeMPrQ (CCCD_GIS).
+    status: partial
+
+  - role: flu
+    name: Hosted PEZ Zoning2025 futurelu (unincorporated)
+    restUrl: https://gis.claytoncountyga.gov/server/rest/services/Hosted/PEZ_CurrentZoningProCached/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: acres
+    coverage: county-wide
+    fieldMap:
+      parcelid: parcelId
+      futurelu: flu
+      flucasenum: fluCaseNumber
+    notes: >
+      Preferred current unincorporated FLU attribute (same layer as PEZ zoning). Live count 72481.
+      Join on parcelid. Does not cover municipal parcels — for city FLU use Comp Plan / city
+      documents or older Future_Land_Use_2034 countywide layer.
+    status: usable
+
+  - role: flu
+    name: Comp Plan Deliverables 2039 FLUM (unincorporated)
+    restUrl: https://services5.arcgis.com/m528W8U8YDYeMPrQ/arcgis/rest/services/Comp_Plan_Deliverables_06202024/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      F2039_FLUM: flu
+      F2024_Exis: fluExisting
+      F2024_CODE: fluExistingCode
+      ZONING: zoning
+    notes: >
+      Comp Plan 2039 Future Land Use Map (2024 deliverable). Live count 71809. Parcel-tied;
+      attribute-join on PARCELID. Domain mirrors PEZ futurelu (Low/Medium/High Density Residential,
+      PUD, Agriculture, Mixed Use, General Commercial, etc.). Related Character Area layer /3
+      (~71773) is mostly blank Character (~67892 empty) — only ~3881 labeled; treat Character as
+      partial. Suggested LU layers /1 and /2 are plan alternatives, not adopted FLU.
+    status: usable
+
+  - role: flu
+    name: Hosted Future Land Use 2034 (2014 countywide)
+    restUrl: https://gis.claytoncountyga.gov/server/rest/services/Hosted/Future_Land_Use_2034/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: acreage
+    coverage: county-wide
+    fieldMap:
+      name: parcelId
+      updated_pa: parcelIdAlt
+      flu_code: fluCode
+      flu_descri: flu
+      flu_code2014: fluCode2014
+      land_use_s: fluExistingStatus
+      acreage: acreage
+    notes: >
+      Older 2014 FLU polygons. Live count 91511 (near full parcel universe; includes municipal
+      footprint). Join name/updated_pa ≈ PARCELID. Many flu_descri blank (~19855) or CITY (~68);
+      prefer PEZ/Comp Plan 2039 for unincorporated currency; use this only when a countywide
+      (incl. cities) historic FLU join is needed. Land Use Viewer web app references this layer.
+    status: partial
+
+  - role: flu
+    name: FLUM_Composite_04122024 (AGOL — NOT full-county)
+    restUrl: https://services5.arcgis.com/m528W8U8YDYeMPrQ/arcgis/rest/services/FLUM_Composite_04122024/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACERAGE
+    coverage: sample
+    fieldMap:
+      PARCELID: parcelId
+      FUTURELU: flu
+      ZONE: zoning
+    notes: >
+      AGOL composite sample only. Live count 15 (2026-09-23) — NOT county-wide. Do not wire as
+      primary FLU; flag as partial/sample. Prefer PEZ futurelu or Comp Plan 2039 FLUM.
+    status: partial
+
+  - role: sales
+    name: TaxAssessor Tax Parcels SALEDATE/SALEPRICE
+    restUrl: https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACERAGE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      SALEDATE: lastSale.date
+      SALEPRICE: lastSale.price
+      CURRENTDEEDBOOK: lastSale.deedBook
+      CURRENTDEEDPAGE: lastSale.deedPage
+      DEEDYEAR: lastSale.deedYear
+    notes: >
+      Sale fields live on parcel polygons (not a separate sales table). Live ~61450 with
+      SALEPRICE>'0' (2026-09-23). SALEDATE is YYYYMMDD string; SALEPRICE string. NO
+      lastSale.qualified / validity flag — many zeros and non-arms-length possible. For multi-sale
+      history use publicaccess Sales Search HTML (not GIS join).
+    status: usable
+
+municipalities:
+  - name: Forest Park
+    level: city
+    parentFips: "13063"
+    joinToCountyParcels: "PARCELID attribute join (ZONE already on county TaxAssessor/Parcels); filter CVTTXCD='3' or TylerTaxParcels CVTTXDSCRP='FOREST PARK'; spatial intersect MunicipalBoundary NAME='FOREST PARK' also works"
+    layers:
+      - role: zoning
+        name: TaxAssessor Tax Parcels ZONE (Forest Park extract)
+        restUrl: https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/Parcels/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACERAGE
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          ZONE: zoning
+          OVERLAY: zoningOverlay
+          CVTTXCD: taxDistrict
+        notes: >
+          Filter CVTTXCD='3'. Live city parcel count 6001 (2026-09-23). Forest Park ZONE codes
+          include RS, GC, RT, RM, DM, LI, IC, PI, HI, GZ, UV — richer than other Clayton cities.
+          County Forest Park Zoning Viewer experience
+          (experience.arcgis.com/experience/8b16df8dd06b4ae28296ab11eb227d9a) is a filtered view of
+          the same Tax Parcels; TYLER/Forest_Park_Georgia_Base_Map/MapServer/4 Tax Parcels count
+          6001 is the city clip. No independent Forest Park zoning FeatureServer with different
+          district polygons found — parcel ZONE is the public REST source.
+        status: usable
+      - role: parcels
+        name: TYLER Forest Park Tax Parcels (city clip)
+        restUrl: https://gis.claytoncountyga.gov/server/rest/services/TYLER/Forest_Park_Georgia_Base_Map/MapServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: ACERAGE
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          ACERAGE: acreage
+          OWNERNME: ownerName
+          SITEADDRES: situsAddress
+          ZONE: zoning
+          APPRVAL: tax.marketValue
+        notes: >
+          Live count 6001 city-subset parcels. Prefer county TaxAssessor/Parcels/0 filtered by
+          CVTTXCD for county-wide search; use this for Forest Park-scoped apps only.
+        status: partial
+    gaps:
+      - "No Forest Park-owned independent zoning/FLU FeatureServer; FLU for city parcels not on PEZ Zoning2025 (unincorporated-only). City posts Zoning Map / Future Land Use Map as static maps/PDFs on forestparkga.gov."
+      - "ForestPark_Draft_2023 AGOL layer is wards, not zoning districts."
+    status: usable
+
+  - name: Morrow
+    level: city
+    parentFips: "13063"
+    joinToCountyParcels: "PARCELID; filter CVTTXCD='5' / CVTTXDSCRP='MORROW'; or spatial intersect MunicipalBoundary NAME='MORROW'"
+    layers:
+      - role: zoning
+        name: TaxAssessor Tax Parcels ZONE (Morrow extract)
+        restUrl: https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/Parcels/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACERAGE
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          ZONE: zoning
+          CVTTXCD: taxDistrict
+        notes: >
+          Filter CVTTXCD='5'. Live count 1915. ZONE mostly coarse R (~1605) / C (~290) / I (~13) —
+          usable as high-level city district attribute, not fine-grained subdistricts. No Morrow
+          city-owned public zoning/FLU FeatureServer found (2026-09-23).
+        status: usable
+    gaps:
+      - "No independent Morrow zoning/FLU REST; city ZONE codes on county parcels are coarse R/C/I only."
+    status: usable
+
+  - name: Jonesboro
+    level: city
+    parentFips: "13063"
+    joinToCountyParcels: "PARCELID; filter CVTTXCD='4' / CVTTXDSCRP='JONESBORO'; or spatial intersect MunicipalBoundary NAME='JONESBORO'"
+    layers:
+      - role: zoning
+        name: TaxAssessor Tax Parcels ZONE (Jonesboro extract)
+        restUrl: https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/Parcels/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACERAGE
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          ZONE: zoning
+          CVTTXCD: taxDistrict
+        notes: >
+          Filter CVTTXCD='4'. Live count 1750. ZONE mostly R (~1243) / C (~449) / I (~35). No
+          Jonesboro city-owned public zoning/FLU FeatureServer found (2026-09-23).
+        status: usable
+    gaps:
+      - "No independent Jonesboro zoning/FLU REST; coarse R/C/I on county parcels only."
+    status: usable
+
+  - name: Riverdale
+    level: city
+    parentFips: "13063"
+    joinToCountyParcels: "PARCELID; filter CVTTXCD='6' / CVTTXDSCRP='RIVERDALE'; or spatial intersect MunicipalBoundary NAME='RIVERDALE'"
+    layers:
+      - role: zoning
+        name: TaxAssessor Tax Parcels ZONE (Riverdale extract)
+        restUrl: https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/Parcels/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACERAGE
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          ZONE: zoning
+          CVTTXCD: taxDistrict
+        notes: >
+          Filter CVTTXCD='6'. Live count 4392. ZONE mostly R (~3911) / C (~463) / I (~12). County
+          AGOL Riverdale_Wards is wards only — not zoning. No Riverdale city zoning/FLU
+          FeatureServer found (2026-09-23).
+        status: usable
+    gaps:
+      - "No independent Riverdale zoning/FLU REST; coarse R/C/I on county parcels. Riverdale_Wards is not zoning."
+    status: usable
+
+  - name: Lake City
+    level: city
+    parentFips: "13063"
+    joinToCountyParcels: "PARCELID; filter CVTTXCD='7' / CVTTXDSCRP='LAKE CITY'; or spatial intersect MunicipalBoundary NAME='LAKE CITY'"
+    layers:
+      - role: zoning
+        name: TaxAssessor Tax Parcels ZONE (Lake City extract)
+        restUrl: https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/Parcels/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACERAGE
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          ZONE: zoning
+          CVTTXCD: taxDistrict
+        notes: >
+          Filter CVTTXCD='7'. Live count 1072. ZONE mostly R (~767) / C (~162) / I (~130). No Lake
+          City city-owned public zoning/FLU FeatureServer found (2026-09-23).
+        status: usable
+    gaps:
+      - "No independent Lake City zoning/FLU REST; coarse R/C/I on county parcels."
+    status: usable
+
+  - name: Lovejoy
+    level: city
+    parentFips: "13063"
+    joinToCountyParcels: "PARCELID; filter CVTTXCD='9' / CVTTXDSCRP='LOVEJOY'; or spatial intersect MunicipalBoundary NAME='LOVEJOY'"
+    layers:
+      - role: zoning
+        name: TaxAssessor Tax Parcels ZONE (Lovejoy extract)
+        restUrl: https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/Parcels/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACERAGE
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          ZONE: zoning
+          CVTTXCD: taxDistrict
+        notes: >
+          Filter CVTTXCD='9'. Live count 3997. ZONE mostly R (~3764) / C (~122) / CPUD (~50) / I
+          (~17). No Lovejoy city-owned public zoning/FLU FeatureServer found (2026-09-23).
+        status: usable
+    gaps:
+      - "No independent Lovejoy zoning/FLU REST; coarse R/C/I/CPUD on county parcels."
+    status: usable
+
+  - name: Rex
+    level: city
+    parentFips: "13063"
+    joinToCountyParcels: "Spatial join / SITECITY='REX' (~6519 parcels); Rex is unincorporated — use county PEZ Zoning2025 / TaxAssessor ZONE (CVTTXCD COUNTY), not a municipal tax district"
+    layers: []
+    notes: >
+      Rex is an unincorporated community / postal place in Clayton County, not an incorporated
+      municipality (no MunicipalBoundary NAME=REX; no CVTTXDSCRP=REX). ~6519 parcels with
+      SITECITY='REX' fall under COUNTY zoning (RS110/RS180/PUD/…). No separate Rex zoning/FLU REST.
+      Wire county PEZ Zoning2025 + TaxAssessor/Parcels; do not expect city district codes.
+    status: gap
+
+gaps:
+  - "No lastSale.qualified / deed-validity flag on parcel SALEPRICE/SALEDATE; parse strings; many SALEPRICE 0."
+  - "PEZ Zoning2025 / Comp Plan 2039 FLUM cover unincorporated (~72k) only — municipal FLU not on those layers. Older Future_Land_Use_2034 is countywide but dated (2014) with many blank flu_descri."
+  - "FLUM_Composite_04122024 AGOL is count 15 sample only — not county-wide; do not use as primary FLU."
+  - "Municipal zoning for Morrow/Jonesboro/Riverdale/Lake City/Lovejoy on county ZONE is coarse R/C/I only; no independent city FeatureServers found. Forest Park has richer codes on the same county parcel layer."
+  - "Rex is unincorporated — no city zoning REST; use county layers filtered by SITECITY or spatial place name."
+  - "College Park has a small Clayton tax-district footprint (CVTTXCD=2, ~364) — prefer Fulton County sources for College Park core (out of this card's municipality list)."
+  - "Character Area Comp Plan layer is mostly blank (~67k empty); only ~3.8k labeled — partial."
+  - "ACERAGE field name is misspelled on source; values are doubles. Tax/sale value fields are strings."
+  - "No emails/phones collected; no paid vendor (Regrid/Zoneomics/etc.) wired."
+  - "Legacy internal host weba.co.clayton.ga.us:5443 / weba.claytoncountyga.gov:5443 appears in some webmap configs — prefer public https://gis.claytoncountyga.gov/ URLs."
+
+license: >
+  Clayton County GIS public MapServer/FeatureServer endpoints (gis.claytoncountyga.gov);
+  Clayton County GIS Data Portal / CCCD_GIS AGOL org m528W8U8YDYeMPrQ
+  (clayton-county-gis-data-portal-cccd-gis.hub.arcgis.com). Attribution to Clayton County GIS.
+  Public CAMA fields only; do not scrape emails/phones. No paid vendors.
+appraiserSearchUrl: https://publicaccess.claytoncountyga.gov/search/commonsearch.aspx?mode=realprop
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"

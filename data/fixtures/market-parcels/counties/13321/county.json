@@ -1,0 +1,34 @@
+{
+  "name": "Worth",
+  "fips": "13321",
+  "state": "Georgia",
+  "markets": [
+    "Valdosta"
+  ],
+  "featureCount": 3219,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-worth-parcels-13321",
+  "queryUrl": "https://services2.arcgis.com/PYn6bWCjT6bhw1z3/arcgis/rest/services/Worth_Heirs_Concentration_Census_Block_WFL1/FeatureServer/4/query",
+  "gaps": [
+    "Parcels are Worth County parcels (UGA heirs-property project copy of county WinGAP landbase) (https://services2.arcgis.com/PYn6bWCjT6bhw1z3/arcgis/rest/services/Worth_Heirs_Concentration_Census_Block_WFL1/FeatureServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+    "Source query returned 3244 rows; 3219 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+    "Counted 3219 distinct parcel ids.",
+    "Pass 2 tax is HTML-only, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+    "Pass 2 tax is HTML-only. Assessed value and tax bills were not copied off qPublic.",
+    "Pass 2 sale date and price are HTML-only and were not copied.",
+    "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13321/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13321/lookup.json",
+  "sourceCount": 3244,
+  "dropped": 2,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=WorthCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://www.qpublic.net/ga/worth/",
+  "pulledOn": "2026-09-29"
+}

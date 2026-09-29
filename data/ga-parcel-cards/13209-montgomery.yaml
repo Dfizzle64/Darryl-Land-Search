@@ -1,0 +1,551 @@
+state: GA
+jurisdiction: Montgomery County
+fips: "13209"
+level: county
+markets: [Savannah]
+
+layers:
+  # PRIMARY — county-wide parcel polygons (THIN schema: Parcel_No + Draw_Acres + opaque zoning + qPub_Link)
+  - role: parcels
+    name: Montgomery_County_Wide_View TaxParcels_25 (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Montgomery_County_Wide_View/FeatureServer/34
+    layerId: 34
+    geometry: polygon
+    auth: none
+    acreageField: Draw_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      Draw_Acres: acreage
+      zoning: zoningOpaque
+      qPub_Link: appraiserSearchUrl
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Heart of Georgia Altamaha RC / hogagis org
+      HHvUPZ2XuLOAJxjR — Montgomery_County_Wide_View item 9786c6bca1f94ac68c11e24aaa69dd51
+      FeatureServer/34 TaxParcels_25). Live count 6265 (2026-09-24). Schema THIN —
+      Parcel_No + Draw_Acres + numeric zoning + qPub_Link + geometry only (NO owner /
+      mailing / situs / CURR_VAL / sale on this layer). Draw_Acres 5–150 = 1967.
+      maxRecordCount 2000 — page via resultOffset / spatial envelopes. Parcel_No format
+      e.g. '002    001' (preserve spaces for KeyValue; qPub_Link already URL-encodes).
+      Parcel zoning opaque codes: 001≈3217 / 004≈1707 / blank≈1108 / 002≈174 / 007≈31 /
+      005≈21 / 003≈7 — NOT Euclidean city ZONE text; prefer city zoning FeatureServers
+      for Ailey/Uvalda/Higgston/Mt Vernon. GEO-VERIFY GEORGIA: WGS84 samples
+      ~-82.644,32.284 / ~-82.634,32.262 — Montgomery County GA / Mount Vernon seat
+      (~-82.59,32.18). CensusCountyBoundary/0 includes BOTH FIPS=13209 Georgia AND
+      FIPS=01101 Alabama rows — FILTER STATE_FIPS=13 / FIPS=13209 only; REJECT
+      Montgomery AL (~-86.3,32.4) gis.montgomeryal.gov Parcels MapServer and
+      montcopa.org PA lookalikes. Join CAMA via qPublic AppID=776 LayerID=11812 HTML
+      (KeyValue={Parcel_No}). Skip city water/sewer/hydrant layers + AADT; schema may
+      expose appraiser on other bloated SpecialAreas — DO NOT collect PII/emails/phones.
+      Rejected paid Regrid/ATTOM/DynamoSpatial.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on TaxParcels_25; qPublic AppID=776 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on TaxParcels_25. Assessor HTML
+      qpublic.net/ga/montgomery → App=MontgomeryCountyGA / AppID=776 LayerID=11812
+      (Cloudflare/bot 403 automated; public for humans). Deep-link KeyValue={Parcel_No}:
+      Application.aspx?AppID=776&LayerID=11812&PageTypeID=4&PageID=5659&KeyValue={Parcel_No}
+      (also App=MontgomeryCountyGA&Layer=Parcels&PageType=Report&KeyValue=; qPub_Link on
+      polygons already builds this). Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/lastSale on TaxParcels_25. Prefer qPublic Sales Search / Sales List HTML
+      AppID=776. Rejected paid Regrid/ATTOM sales. (Montgomery AL / PA sale layers are
+      WRONG geography — do not use.)
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean; city zoning only + opaque parcel zoning
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Montgomery County-wide Euclidean zoning FeatureServer on Montgomery_County_Wide_View
+      (2026-09-24). Parcel-attributed zoning on TaxParcels_25 is opaque 001–007 — usable
+      secondary only. Prefer city Euclidean: Ailey ZONE / Uvalda ZONING_COD / Higgston
+      ZoningID / Mt Vernon ZONING (see municipalities). Alston / Tarrytown lack zoning
+      layers. Comp-plan SpecialAreas/32 (count 22; Oconee River / Altamaha River / Long
+      Pond / Alston to Altamaha…) — planning character only, not Euclidean zoning.
+    status: gap
+
+  - role: flu
+    name: Montgomery_County_Wide_View Landuse (FLULU / EXTLU)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Montgomery_County_Wide_View/FeatureServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FLULU: flu
+      FLUDCA: fluDca
+      EXTLU: existingLandUse
+      EXTLUDCA: existingLandUseDca
+    notes: >
+      Comp-plan / existing+future land-use polygons (count 6341). FLULU top:
+      Residential≈3713 / Forestry≈2017 / Public/Institutional≈257 / Commercial≈191 /
+      Agriculture≈118 / Industrial≈35 / Park/Recreation/Conservation≈9 /
+      Transportation/Communication/Utilities≈1. Companion SpecialAreas/32 for named
+      corridors. Not a substitute for Euclidean zoning.
+    status: usable
+
+  - role: other
+    name: Montgomery_County_Wide_View CountyBoundary + CensusCountyBoundary (GA only)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Montgomery_County_Wide_View/FeatureServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      ACREAGE: acreage
+    notes: >
+      Layer 4 CountyBoundary NAME=Montgomery ACREAGE≈247. Layer 0 CensusCountyBoundary
+      has BOTH Georgia FIPS=13209 AND Alabama FIPS=01101 — always filter STATE_FIPS='13'
+      / FIPS='13209'. Preferred spatial county mask. Companion MilitiaDistricts/19 /
+      FireDistricts/12 — not parcels.
+    status: usable
+
+municipalities:
+  - name: Mount Vernon
+    level: city
+    parentFips: "13209"
+    joinToCountyParcels: >
+      Spatial City_of_Mt_View/3 MtVernonCityLimits (~-82.60,32.19; CITY='MT. VERNON'
+      FIPS='209') ∩ TaxParcels_25. Mailing city never sole filter.
+    layers:
+      - role: zoning
+        name: City_of_Mt_View MtVernonZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Mt_View/FeatureServer/11
+        layerId: 11
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          CITY: cityName
+        notes: >
+          City Euclidean ZONING (count 1147). Distinct: C1/C2/R1/R1A/R2. Schema also has
+          FIRST_NAME/LAST_NAME (cemetery/plot context on related layers) — DO NOT collect
+          as PII. Skip MtVernonWaterLines/SewerLines/Hydrants per tranche-3. Service URL
+          is City_of_Mt_View (item title City of Mt_Vernon_View) — not City_of_Mt_Vernon_View.
+        status: usable
+      - role: flu
+        name: null — use county Landuse ∩ Mt Vernon limits
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city-owned FLU — county Landuse/16 ∩ MtVernonCityLimits/3.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial Mt Vernon
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Mount Vernon-only CAMA — county /34 + CityLimits/3. Tax/sale qPublic HTML.
+        status: gap
+    gaps:
+      - "No Mount Vernon city-owned parcel/FLU REST — county TaxParcels_25 + spatial limits."
+      - "Owner/tax/sale via qPublic AppID=776 HTML even inside city."
+    status: usable
+
+  - name: Ailey
+    level: city
+    parentFips: "13209"
+    joinToCountyParcels: >
+      Spatial City_of_Ailey_View/1 AileyCityLimits (~-82.56,32.18; CITY='AILEY' FIPS='209')
+      ∩ TaxParcels_25.
+    layers:
+      - role: zoning
+        name: City_of_Ailey_View AileyZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Ailey_View/FeatureServer/7
+        layerId: 7
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE: zoning
+          CITY: cityName
+        notes: >
+          City Euclidean ZONE (count 12). Distinct: A-1 / C-1 / I-1 / I-2 / R-1. Skip
+          AileyWaterLines/Sewerlines/Hydrant/Manholes per tranche-3.
+        status: usable
+      - role: flu
+        name: null — county Landuse ∩ Ailey limits
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ailey FLU REST — county Landuse/16 ∩ AileyCityLimits.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial Ailey
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ailey-only CAMA.
+        status: gap
+    gaps:
+      - "No Ailey city-owned parcel/FLU REST — county layers + spatial Ailey City Limits."
+    status: usable
+
+  - name: Uvalda
+    level: city
+    parentFips: "13209"
+    joinToCountyParcels: >
+      Spatial City_of_Uvalda_View/1 UvaldaCityLimits ∩ TaxParcels_25.
+    layers:
+      - role: zoning
+        name: City_of_Uvalda_View UvaldaZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Uvalda_View/FeatureServer/7
+        layerId: 7
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING_COD: zoning
+          DESCRIPTIO: zoningDescription
+          CITY: cityName
+        notes: >
+          City Euclidean ZONING_COD: Ag / C-1 / R-1 / R-1A / R-1B / R-2. Skip
+          UvaldaWaterLines/SewerLines per tranche-3. Companion UvaldaPropertyLines/3 —
+          property lines only, not CAMA.
+        status: usable
+      - role: flu
+        name: null — county Landuse ∩ Uvalda
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Uvalda FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels_25 + spatial Uvalda
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Uvalda-only CAMA.
+        status: gap
+    gaps:
+      - "No Uvalda city-owned parcel/FLU REST."
+    status: usable
+
+  - name: Higgston
+    level: city
+    parentFips: "13209"
+    joinToCountyParcels: >
+      Spatial City_of_Higgston_View/1 HiggstonCityLimits ∩ TaxParcels_25.
+    layers:
+      - role: zoning
+        name: City_of_Higgston_View HiggstonZoningMap
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Higgston_View/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          ZoningID: zoning
+          ZoningDescription: zoningDescription
+          Labeling: zoningLabel
+          CITY: cityName
+        notes: >
+          City Euclidean ZoningID: AG / B1 / B2 / I / R-20 / R-40 / R2-20 / RM-15.
+        status: usable
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Higgston FLU REST — county Landuse ∩ limits.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels_25 + HiggstonCityLimits.
+        status: gap
+    gaps:
+      - "No Higgston city-owned parcel/FLU REST."
+    status: usable
+
+  - name: Alston
+    level: city
+    parentFips: "13209"
+    joinToCountyParcels: >
+      Spatial City_of_Alston_View/1 AlstonCityLimits ∩ TaxParcels_25.
+    layers:
+      - role: zoning
+        name: null — no AlstonZoning layer published
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: City_of_Alston_View has limits/special areas/water only — no zoning FS.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Alston FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels_25 + AlstonCityLimits. Skip AlstonWaterLines/Hydrants.
+        status: gap
+    gaps:
+      - "No Alston zoning/parcel/FLU REST — city limits only + county parcels."
+    status: partial
+
+  - name: Tarrytown
+    level: city
+    parentFips: "13209"
+    joinToCountyParcels: >
+      Spatial City_of_Tarrytown_View/1 TarrytownCityLimits ∩ TaxParcels_25.
+    layers:
+      - role: zoning
+        name: null — no TarrytownZoning layer published
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: City_of_Tarrytown_View has limits/special areas/water only — no zoning FS.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Tarrytown FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels_25 + TarrytownCityLimits. Skip TarrytownWaterLines.
+        status: gap
+    gaps:
+      - "No Tarrytown zoning/parcel/FLU REST — city limits only + county parcels."
+    status: partial
+
+gaps:
+  - "No owner/mailing/situs/CURR_VAL/MAV*/SALE_* on TaxParcels_25 REST — tax/owner/sale via qPublic AppID=776 LayerID=11812 HTML only."
+  - "Parcel zoning opaque 001–007 — prefer city Euclidean ZONE/ZONING_COD/ZoningID/ZONING; no county-wide Euclidean zoning FS."
+  - "CensusCountyBoundary/0 includes Montgomery AL FIPS 01101 — always filter FIPS=13209 / STATE_FIPS=13; REJECT gis.montgomeryal.gov + montcopa.org PA."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/montgomery + qpublicaux public for humans."
+  - "Skip city Water/Sewer/Hydrant/Manhole + AADT per tranche-3; skip FIRST_NAME/LAST_NAME/Email/Phone on city schemas as PII."
+  - "Rejected paid Regrid/ATTOM; rejected Montgomery AL/PA/TX lookalikes."
+
+license: >
+  Heart of Georgia Altamaha RC GIS (hogagis / services5.arcgis.com/HHvUPZ2XuLOAJxjR) —
+  Montgomery_County_Wide_View TaxParcels_25/34, Landuse/16, CountyBoundary; City_of_Mt_View,
+  City_of_Ailey_View, City_of_Uvalda_View, City_of_Higgston_View, City_of_Alston_View,
+  City_of_Tarrytown_View. Assessor qPublic App=MontgomeryCountyGA / AppID=776 LayerID=11812
+  (qpublic.net/ga/montgomery; montcoga.gov Tax Assessors). Attribution HOGARC / Montgomery
+  County Tax Assessor. Public fields only; no emails/phones; no paid vendors; skip
+  utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=776&LayerID=11812&PageTypeID=2&PageID=5658
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Montgomery_County_Wide_View/FeatureServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/HHvUPZ2XuLOAJ
+    xjR/arcgis/rest/services/Montgomery_County_Wide_View/FeatureServer/34 count 6265; extent center
+    [['13209', 'Montgomery County']]; sample [['13209', 'Montgomery County']]. No change to field map
+    (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Ailey city"
+      level: city
+      parentFips: "13209"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Alston town"
+      level: city
+      parentFips: "13209"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Higgston town"
+      level: city
+      parentFips: "13209"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Mount Vernon city"
+      level: city
+      parentFips: "13209"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Tarrytown town"
+      level: city
+      parentFips: "13209"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Uvalda city"
+      level: city
+      parentFips: "13209"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Montgomery' AND aadt>0
+    altFilter: name LIKE '209-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 209-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 76
+    maxAadt: 6660
+    geoCheck: 76/76 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=montgomeryCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=776&LayerID=11812&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 002    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=montgomeryCountyGA&Layer=Parcels&PageType=Report&KeyValue=002%20%20%20%20001
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Montgomery_County_Wide_View/FeatureServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Ailey city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Alston town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Higgston town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Mount Vernon city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Tarrytown town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Uvalda city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

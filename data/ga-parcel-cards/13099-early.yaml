@@ -1,0 +1,404 @@
+state: GA
+jurisdiction: Early County
+fips: "13099"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "Early County Parcels (aYlIod9kh71mtnDG)"
+    restUrl: https://services3.arcgis.com/aYlIod9kh71mtnDG/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: "CALC_ACRES"
+    coverage: county-wide
+    parcelIdField: "Parcel_No"
+    liveCount: 8701
+    liveCount5to150ac: 2792
+    geoCheck: "extent center [['13099', 'Early County']]; sample [['13099', 'Early County']]; extent WGS84 [-85.1151, 31.0726, -84.6275, 31.5188]"
+    fieldMap:
+      Parcel_No: "parcelId"
+      PIN: "parcelPin"
+      REALKEY: "ownerKey"
+      HOUSE_NO: "situsNumber"
+      STREET_NAM: "situsStreet"
+      STTYPE: "situsStreetType"
+      CALC_ACRES: "acreage"
+      TOTAL_ACRE: "acreageDeed"
+      DIG_CLASS: "dorCode"
+      DISTRICT_D: "taxDistrictName"
+      LEGAL_DESC: "legalDescription"
+    notes: >
+      pass1 2026-09-28: County-wide Early GA parcel landbase (8701) in AGOL org aYlIod9kh71mtnDG; last
+      edit 2023-11 (HPENNY). Parcel_No, PIN, CALC_ACRES, situs, DIG_CLASS. No owner name (Pass 2 qPublic).
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Early County GA public parcel FeatureServer/MapServer with cadastral
+      polygons recovered (2026-09-24). Official human viewer = qPublic/Beacon AppID=741
+      LayerID=11778 (qpublic.net/ga/early Search Records → Application.aspx?AppID=741&
+      LayerID=11778&PageTypeID=2&PageID=5489; also App=EarlyCountyGA name pattern). County
+      seat Blakely GA (182 Court Square, Blakely GA 39823). Cloudflare/bot 403 blocks
+      automated Application.aspx from research box; public for humans. EarlyCountyGA_WFS
+      on wfs.schneidercorp.com returns 404. No SWGRC / RVRC_ELA / SGRC AGOL county parcel
+      org found for Early GA (RVRC Clay_County_Parcels_10_23 is Clay 13061 only — do not
+      reuse). Commercial vendors (Regrid ~8752 parcels / USLandGrid / DynamoSpatial)
+      rejected. GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13099 CENTLAT +31.3227852
+      CENTLON -084.9037121 — SW Georgia Blakely / Chattahoochee ring (NOT Early County TX
+      ~Brownfield; NOT Early IA; NOT Early County lookalikes outside GA). Reject paid
+      Regrid/ATTOM. Skip utilities+AADT; no emails/phones collected.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via qPublic AppID=741 /
+      App=EarlyCountyGA HTML only. Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=741&LayerID=11778&PageTypeID=4&KeyValue={parcelId}
+      (or App=EarlyCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}). Tax
+      estimator qpublic7.qpublic.net/ga_tax_estimator.php?county=ga_early — billing estimate
+      only, not CAMA GIS.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer qPublic Sales Search / Sales List HTML
+      (AppID=741 / App=EarlyCountyGA). Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Early County GA Euclidean zoning REST found — planning PDF/staff gap.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Early County GA Future Land Use FeatureServer found — Comp Plan PDF / SWGRC staff gap.
+    status: gap
+
+municipalities:
+  - name: Blakely
+    level: city
+    parentFips: "13099"
+    joinToCountyParcels: >
+      No county parcel REST to join — city filter blocked until geometry source exists.
+      County seat Blakely GA (~-84.93,31.38).
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Blakely city zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Blakely FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only — no Blakely-owned parcel REST.
+        status: gap
+    gaps:
+      - "No Blakely-owned parcel/zoning/FLU REST separate from county qPublic HTML."
+    status: gap
+
+  - name: Arlington
+    level: city
+    parentFips: "13099"
+    joinToCountyParcels: >
+      No county parcel REST. CAUTION: Arlington straddles Calhoun (13037) and Early (13099)
+      — prefer spatial county poly once parcels exist; do not treat as Early-only.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Arlington zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Arlington FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Multi-county city — Early + Calhoun qPublic HTML only.
+        status: gap
+    gaps:
+      - "Arlington multi-county (Calhoun/Early) — no city-owned REST; do not assign all parcels to Early."
+    status: gap
+
+  - name: Damascus
+    level: city
+    parentFips: "13099"
+    joinToCountyParcels: No county parcel REST — spatial join blocked.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Damascus zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Damascus FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Damascus-owned zoning/FLU/parcel REST."
+    status: gap
+
+  - name: Jakin
+    level: city
+    parentFips: "13099"
+    joinToCountyParcels: No county parcel REST — spatial join blocked.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Jakin zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Jakin FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Jakin-owned zoning/FLU/parcel REST."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Early County GA — qPublic AppID=741 LayerID=11778 (App=EarlyCountyGA) HTML only."
+  - "EarlyCountyGA_WFS 404."
+  - "No RVRC_ELA/SWGRC Early parcel FeatureServer (Clay_County_Parcels_10_23 is Clay 13061 — do not reuse)."
+  - "REJECT Early County TX / Early IA lookalikes; paid Regrid/ATTOM/USLandGrid/DynamoSpatial."
+  - "Arlington straddles Calhoun+Early — multi-county caution."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Early County Tax Assessor qPublic/Beacon AppID=741 LayerID=11778 /
+  App=EarlyCountyGA (qpublic.net/ga/early; Blakely GA). No public ArcGIS parcel service
+  discovered 2026-09-24. Attribution Early County Tax Assessor. Public HTML only;
+  no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=741&LayerID=11778&PageTypeID=2&PageID=5489
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=EarlyCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: usable
+  summary: >
+    Early County Parcels (aYlIod9kh71mtnDG):
+    https://services3.arcgis.com/aYlIod9kh71mtnDG/arcgis/rest/services/Parcels/FeatureServer/0 - live
+    count 8701 (5-150 ac: 2792), parcel ID field Parcel_No. Geography verified against TIGER county
+    polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Blakely city"
+      level: city
+      parentFips: "13099"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Damascus city"
+      level: city
+      parentFips: "13099"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Jakin city"
+      level: city
+      parentFips: "13099"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Early' AND aadt>0
+    altFilter: name LIKE '099-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 099-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 145
+    maxAadt: 6540
+    geoCheck: 144/145 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: PB_PGE=19'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=EarlyCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=741&LayerID=11778&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0086   046
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=EarlyCountyGA&Layer=Parcels&PageType=Report&KeyValue=0086%20%20%20046
+    verification: 'pattern-tested: real sample ID from Parcel_No; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=EarlyCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Blakely city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Damascus city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Jakin city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

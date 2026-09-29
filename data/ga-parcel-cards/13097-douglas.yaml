@@ -1,0 +1,453 @@
+state: GA
+jurisdiction: Douglas County
+fips: "13097"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide land-records parcels (owner, mailing, situs, acres, FMV, zoning, FLU, last sale)
+  - role: parcels
+    name: LandRecords Land Records
+    restUrl: https://maps.douglascountyga.gov/arcgis/rest/services/LandRecords/LandRecords/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE_GIS
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PIN_WG: parcelIdAlt
+      OWNER: ownerName
+      ADDRESS: situsAddress
+      CITY: situsCity
+      STATE: situsState
+      ZIPCODE: situsZip
+      MAILADD1: mailingAddress
+      MAILADD2: mailingAddress2
+      MAILADD3: mailingAddress3
+      MCITY: mailingCity
+      MSTATE: mailingState
+      MZIP: mailingZip
+      ACREAGE_GIS: acreage
+      TOTAL_ACRES: acreageDeeded
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      TAX_DISTRICT: taxDistrict
+      DESCRIP: taxDistrictDescription
+      DIGCLASS: dorCode
+      DC_CURR_ZONING: zoning
+      DV_ZONING_CODE: zoningCity
+      DV_ZONING_DESC: zoningCityDescription
+      SZ_GIS: zoningSplit
+      DC_CURR_FLU: flu
+      DV_FLU_CODE: fluCity
+      DV_FLU_DESC: fluCityDescription
+      SALEPRICE: lastSale.price
+      DEED_DATE: lastSale.date
+      CAD_CITY: postalCommunity
+      OWNKEY: ownerKey
+    notes: >
+      Preferred county-wide parcel+CAMA source for land-search enrichment. Live count 57451
+      (2026-09-23); ACREAGE_GIS 5–150 band = 4254; ACREAGE_GIS>0 = 57451; CURR_VAL>0 ≈57126;
+      SALEPRICE>0 ≈34192 on polygons (single last-sale attrs — multi-sale history on role=sales).
+      SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet (102667/2240); maxRecordCount 1000.
+      Geo-verified WGS84 samples ~-84.834,33.597 (unincorporated south / Waterview Cove),
+      ~-84.650,33.790 (Lithia Springs postal), ~-84.757,33.773 (Douglasville city) — Douglas
+      County GA, Atlanta MSA west (NOT Douglas County CO ~-104.85,39.4; KS ~-95.3,38.9;
+      MN ~-95.7,45.9; WI ~-91.9,46.5; OR ~-123.3,43.1; IL ~-89.3,39.8; NE/NV/SD/WA lookalikes).
+      Rich CAMA on polygons: OWNER, MAILADD*, ADDRESS/CITY/ZIP situs, ACREAGE_GIS (prefer over
+      TOTAL_ACRES string — non-zero TOTAL_ACRES only ≈16509), CURR_VAL/PREV_VAL fair-market
+      (matches thinner-layer mavcurr family; ACC is NOT assessed value — live ACC mostly 0/tiny),
+      DIGCLASS, TAX_DISTRICT+DESCRIP municipality proxy, DC_CURR_ZONING + DC_CURR_FLU for
+      unincorporated, DV_* city fields when inside Douglasville (DV_ZONING_CODE filled = 12454).
+      DC_CURR_ZONING='city' ≈16099 and DC_CURR_FLU='city' ≈16084 — county stubs inside
+      municipalities; prefer city REST / DV_* / Villa Rica Proposed_Z (see municipalities).
+      CAD_CITY is postal/CAD (DOUG≈38610, LS≈7578, VR≈4627, WINS≈4381, AUST≈472) — NOT
+      incorporated municipality; use TAX_DISTRICT/DESCRIP or City Limits spatial join.
+      Fresher than CountyLayers/Parcels/15 (count 55100; sample PIN 07000130033 mavcurr=173700
+      vs LandRecords CURR_VAL=270000). Mirror rich schema: PIW_QueryLayers/MapServer/6 Parcel
+      Polygon (count 57451). Prefer this LandRecords URL as primary.
+      Enrichment vs thin in-app (~4.3k in 5–150ac): full county 57451 with owner/mailing/situs,
+      FMV, acreage, tax district, zoning/FLU attrs, lastSale on polygon + sales table join.
+    status: usable
+
+  - role: parcels
+    name: CountyLayers Parcels (thinner / slightly stale CAMA)
+    restUrl: https://maps.douglascountyga.gov/arcgis/rest/services/CountyLayers/Parcels/MapServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      ParcelNo: parcelId
+      Owner: ownerName
+      PropertyAddress: situsAddress
+      totalacres: acreage
+      address1: mailingAddress
+      MailingAddressCity: mailingCity
+      MailingAddressState: mailingState
+      MailingAddressZipCode: mailingZip
+      mavcurr: tax.marketValue
+      mavprev: tax.priorMarketValue
+      taxdistrict: taxDistrict
+      digclass: dorCode
+      ZONING_GIS: zoning
+      FLU_GIS: flu
+      SZ_GIS: zoningSplit
+    notes: >
+      Live count 55100; totalacres 5–150 ≈4391. Same host family; field aliases still say
+      "2023 Digest". Sample FMV lags LandRecords — prefer LandRecords/0 as primary. Useful if
+      already querying CountyLayers folder. maxRecordCount 2000; SR 102667/2240.
+    status: partial
+
+  - role: tax
+    name: LandRecords Land Records (CAMA FMV on polygons)
+    restUrl: https://maps.douglascountyga.gov/arcgis/rest/services/LandRecords/LandRecords/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE_GIS
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      TAX_DISTRICT: taxDistrict
+      DESCRIP: taxDistrictDescription
+      DIGCLASS: dorCode
+      HOME_EXEMPT: tax.homesteadExempt
+    notes: >
+      Tax/CAMA market values live on preferred parcel polygons (not a separate service).
+      CURR_VAL>0 ≈57126. No public REST tax.assessedValue / taxableValue — ACC field is not
+      GA 40% ASV (live samples ACC≈0). Assessor HTML: qPublic AppID=988 (research-box CDN/bot
+      403). TAX_DISTRICT decode: 01=COUNTY ≈40886, 03=DOUGLASVILLE ≈10934, 3A=DOUGLASVILLE TAD
+      ≈1511, 04=VILLA RICA ≈3548, 06=AUSTELL ≈89, 1A=COUNTY TAD ≈374.
+    status: usable
+
+  - role: sales
+    name: PIW_Sales All Property Sales
+    restUrl: https://maps.douglascountyga.gov/image/rest/services/PropertyInformation/PIW_Sales/MapServer/41
+    layerId: 41
+    geometry: point
+    auth: none
+    acreageField: ACREAGE_GIS
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      SALEPRICE: lastSale.price
+      SALEDATE: lastSale.date
+      SALEVAL: lastSale.qualified
+      REASON: lastSale.saleReason
+      CLASS: lastSale.saleClass
+      GRANTEE: lastSale.grantee
+      GRANTOR: lastSale.grantor
+      DEEDBOOK: lastSale.deedBook
+      DEEDPAGE: lastSale.deedPage
+      ADDRESS: situsAddress
+      CITY: situsCity
+      ZIPCODE: situsZip
+      ACREAGE_GIS: acreage
+      NEIGHBHOOD: neighborhood
+    notes: >
+      Point sales history (also class-filtered layers 42–49). Live count 242685; SALEPRICE>0
+      ≈141141; SALEPRICE>0 AND SALEVAL='0' (REASON='VALID SALE') ≈82714 — prefer SALEVAL='0'
+      as arms-length / lastSale.qualified signal. SALEVAL='M' = MULTIPLE PARCELS (NOT market);
+      'NM'=NON-MARKET; 'RE'=REO/BANK; 'GV'=GOVERNMENT; 'FC'=FORECLOSURE; 'RP'=RELATED PARTIES.
+      Join to parcels on PIN; take latest SALEDATE per PIN. Mirror: CountyLayers/Sales_Points/0
+      (count 242685) and non-spatial PIW_QueryLayers SALESDATA table/4 (count 245533).
+      maxRecordCount 2000; SR 102667/2240. Major enrichment vs thin feed.
+    status: usable
+
+  - role: zoning
+    name: Zoning Zoning_Designations / Zoning (parcel-tied attrs + dissolved districts)
+    restUrl: https://maps.douglascountyga.gov/arcgis/rest/services/Zoning/Zoning_Designations/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE_GIS
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      DC_CURR_ZONING: zoning
+      DV_ZONING_CODE: zoningCity
+      DV_ZONING_DESC: zoningCityDescription
+      SZ_GIS: zoningSplit
+      DC_CURR_FLU: flu
+      DV_FLU_CODE: fluCity
+      OWNER: ownerName
+      ADDRESS: situsAddress
+      ACREAGE_GIS: acreage
+      TAX_DISTRICT: taxDistrict
+      DESCRIP: taxDistrictDescription
+    notes: >
+      Parcel-tied zoning/FLU attribute polygons (same rich landbase family as LandRecords;
+      live count 57451). Prefer DC_CURR_ZONING for unincorporated (R-LD≈22129, R-A≈8157,
+      PUD-C≈3795, PUD≈2515, …); DC_CURR_ZONING='city' ≈16099 — use city layers / DV_* inside
+      Douglasville and Villa Rica Proposed_Z inside Villa Rica. Dissolved district polygons
+      (true zoning areas, no PIN): Zoning/Zoning/MapServer/7 count 29 (ZONING_GIS only;
+      pagination unsupported — query without resultRecordCount); codes include AG, C-G, C-H,
+      HI, LI, OI, PRD, PUD, R-A, R-LD, R-MD, R-HD, R-MH, city, state park — spatial-join
+      alternate. Mirrors: image/Zoning/MapServer/33; PIW_PlanningZoning/MapServer/35.
+      Prefer LandRecords DC_CURR_ZONING when already loading parcels; this service when
+      querying Zoning folder alone.
+    status: usable
+
+  - role: flu
+    name: PIW_PlanningZoning Future Land Use (parcel-tied)
+    restUrl: https://maps.douglascountyga.gov/image/rest/services/PropertyInformation/PIW_PlanningZoning/MapServer/36
+    layerId: 36
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE_GIS
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      DC_CURR_FLU: flu
+      DV_FLU_CODE: fluCity
+      DV_FLU_DESC: fluCityDescription
+      SFLU_GIS: fluSplit
+      DC_CURR_ZONING: zoning
+      DV_ZONING_CODE: zoningCity
+      ACREAGE_GIS: acreage
+    notes: >
+      Parcel-tied FLU (live count 57451). Prefer DC_CURR_FLU character areas for
+      unincorporated: Suburban Living ≈18959, Rural Places ≈10674, Urban Residential ≈8083,
+      Mixed Use Corridor, Workplace Center, Commerce Center, …. DC_CURR_FLU='city' ≈16084 —
+      prefer Douglasville DV_FLU_* / Community Character Areas and Villa Rica FLU inside
+      cities. Same attrs also on LandRecords polygons.
+    status: usable
+
+  - role: other
+    name: Site Address Points
+    restUrl: https://maps.douglascountyga.gov/arcgis/rest/services/CountyLayers/Site_Address_Points/MapServer/7
+    layerId: 7
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FULLADDR: situsAddress
+      ADDRNUM: situsNumber
+      FULLNAME: situsStreet
+      MUNICIPALITY: postalCommunity
+      CAD_CITY: postalCommunityCode
+      PLACENAME: placeName
+    notes: >
+      Live count 67310 E911/site address points. Mirror: PIW_PropertyLayers FeatureServer/13
+      (same count; FS query intermittently errors — prefer CountyLayers MapServer).
+      MUNICIPALITY is postal/CDP (DOUGLASVILLE≈44224, LITHIA SPRINGS≈12114, VILLA RICA≈5048,
+      WINSTON≈4325, AUSTELL≈1419) — NOT reliable incorporated filter (Lithia Springs/Winston
+      are CDPs). Municipality = TAX_DISTRICT/DESCRIP or City Limits spatial join.
+    status: usable
+
+  - role: other
+    name: City Limits
+    restUrl: https://maps.douglascountyga.gov/image/rest/services/PropertyInformation/Property_Information_Layers/MapServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+    notes: >
+      Live count 42 multiparts: DOUGLASVILLE, AUSTELL, VILLA RICA only (incorporated).
+      Mirror: PIW_PropertyLayers FeatureServer/15. Parcel↔city join = spatial intersect OR
+      TAX_DISTRICT decode (03/3A Douglasville, 04 Villa Rica, 06 Austell) OR DESCRIP.
+      Geo-verified centroids ~-84.79,33.77 (Douglasville), ~-84.62,33.80 (Austell),
+      ~-84.88,33.74 (Villa Rica) — all Douglas GA.
+    status: usable
+
+municipalities:
+  - name: Douglasville
+    level: city
+    parentFips: "13097"
+    joinToCountyParcels: >
+      Attribute: CityOfDouglasville / LandRecords PIN ≈ county PIN (verified 07000130033).
+      TAX_DISTRICT IN ('03','3A') ≈12445; DV_ZONING_CODE IS NOT NULL ≈12454; spatial City
+      Limits NAME='DOUGLASVILLE'.
+    layers:
+      - role: zoning
+        name: City of Douglasville Zoning (AGOL district polygons)
+        restUrl: https://services3.arcgis.com/MvLJ3KHgohvvDRhi/arcgis/rest/services/Zoning/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          DV_ZONING_CODE: zoning
+          DV_ZONING_DESC: zoningDescription
+          CaseID: zoningCase
+          Zoning_URL: zoningOrdinanceUrl
+        notes: >
+          Preferred Douglasville-local zoning district polygons (standing order: city over
+          county stub). Live count 22 dissolved districts (CBD, DCD, R-2, R-3, PUD, GC, LI,
+          …). Spatial-join to parcels (no PIN). Geo-verified ~-84.75,33.75 Douglasville GA.
+          Org MvLJ3KHgohvvDRhi (CommDevDirector_Douglasville / douglasville.maps.arcgis.com).
+          Parcel-tied alternate: LandRecords / CityOfDouglasville MapServer DV_ZONING_CODE
+          (12454) — use when PIN join preferred over spatial.
+        status: usable
+      - role: flu
+        name: City of Douglasville Community Character Areas
+        restUrl: https://services3.arcgis.com/MvLJ3KHgohvvDRhi/arcgis/rest/services/Community_Character_Areas/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          DV_FLU_CODE: flu
+          DV_FLU_DESC: fluDescription
+          CCA_Description: fluNarrative
+          CaseID: fluCase
+        notes: >
+          Live count 357 character-area polygons (MUD, TN, CAC, RAC, MDR, LI, HI, HDR, REC,
+          DAC, LDR). Prefer over Land_Use/FeatureServer/0 (475 polys; many null DV_FLU_CODE
+          "Not in 2018 City Comprehensive Plan"). Spatial-join. Parcel-tied DV_FLU_CODE also
+          on LandRecords (≈12328).
+        status: usable
+      - role: parcels
+        name: CityOfDouglasville Douglasville Parcel Polygon (county-hosted city extract)
+        restUrl: https://maps.douglascountyga.gov/arcgis/rest/services/CityOfDouglasville/Douglasville/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACREAGE_GIS
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          OWNER: ownerName
+          ADDRESS: situsAddress
+          ACREAGE_GIS: acreage
+          CURR_VAL: tax.marketValue
+          DV_ZONING_CODE: zoning
+          DV_ZONING_DESC: zoningDescription
+          DV_FLU_CODE: flu
+          DV_FLU_DESC: fluDescription
+          DC_CURR_ZONING: zoningCountyStub
+          TAX_DISTRICT: taxDistrict
+          SALEPRICE: lastSale.price
+          DEED_DATE: lastSale.date
+        notes: >
+          Live count 12454 city extract — same rich schema as county LandRecords with DV_*
+          filled and DC_CURR_ZONING='city'. Prefer county LandRecords for county-wide search;
+          use this or PIN-join DV_* for Douglasville-scoped apps. maxRecordCount 1000.
+        status: usable
+    gaps:
+      - "No separate Douglasville multi-sale REST beyond county PIW_Sales; use county sales on PIN."
+      - "City Land_Use/FeatureServer/0 has many null FLU codes — prefer Community_Character_Areas."
+    status: usable
+
+  - name: Villa Rica
+    level: city
+    parentFips: "13097"
+    joinToCountyParcels: >
+      Attribute: city Zoning Districts PIN ≈ county PIN (verified 01430250003, 01150250221 —
+      TAX_DISTRICT=04). Also TAX_DISTRICT='04' ≈3548; spatial City Limits NAME='VILLA RICA'.
+      Multi-county (Douglas+Carroll) — this card is Douglas-side only; Carroll PINs often
+      'V##' pattern on city zoning layer.
+    layers:
+      - role: zoning
+        name: Villa Rica Interactive Map Zoning Districts
+        restUrl: https://services2.arcgis.com/dW3WG2w9z33TTLpl/arcgis/rest/services/Map/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          Proposed_Z: zoning
+        notes: >
+          Preferred Villa Rica-local zoning (standing order: city over county DC_CURR_ZONING
+          ='city' stub). Live count 10576 parcel-tied polygons; Proposed_Z domain PUD, C2,
+          R2, R1, AG, CMU, SFA, C1, I2, CBD, OMI, I1, MF1/MF2, TPOD. Non-blank non-V PIN
+          ≈2595 join to Douglas LandRecords (TAX_DISTRICT=04); V* PINs ≈4103 are Carroll-side.
+          Geo-verified Douglas samples ~-84.90,33.72; Carroll samples ~-84.95,33.69. Org
+          dW3WG2w9z33TTLpl (smyers_villarica). Viewer:
+          experience.arcgis.com/experience/fd285d189e4c4bb0bccaf3ed80d82cab.
+        status: usable
+      - role: flu
+        name: Villa Rica Interactive Map Future Land Use
+        restUrl: https://services2.arcgis.com/dW3WG2w9z33TTLpl/arcgis/rest/services/Map/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          District: flu
+        notes: >
+          Live count 29 FLU district polygons (e.g. Suburban Village). Spatial-join (no PIN).
+          Citywide (Carroll+Douglas); filter spatially to Douglas card footprint.
+        status: usable
+      - role: parcels
+        name: Villa Rica Interactive Map Douglas County Parcels (city extract)
+        restUrl: https://services2.arcgis.com/dW3WG2w9z33TTLpl/arcgis/rest/services/Map/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          ADDRESS: situsAddress
+          OWNER: ownerName
+        notes: >
+          Live count 3392 Douglas-side city parcel extract (thin — prefer county LandRecords
+          for CAMA). PIN joins verified to TAX_DISTRICT=04.
+        status: partial
+    gaps:
+      - "Villa Rica spans Douglas+Carroll — Douglas card covers Douglas-side only (TAX_DISTRICT=04 / non-V PIN)."
+      - "City zoning field is named Proposed_Z — treat as current published zoning on interactive map; confirm against official map if critical."
+    status: usable
+
+  - name: Austell
+    level: city
+    parentFips: "13097"
+    joinToCountyParcels: >
+      TAX_DISTRICT='06' ≈89; spatial City Limits NAME='AUSTELL'. Multi-county (Cobb+Douglas)
+      — this card is Douglas-side only; Cobb card covers Cobb-side.
+    layers: []
+    notes: >
+      No official City of Austell ArcGIS FeatureServer/MapServer for zoning/FLU found
+      (2026-09-23). austellga.gov has no public zoning REST. County DC_CURR_ZONING='city'
+      stub inside city. Third-party Austell_Parcels_Combined (Scott_Sixis /
+      services3 jlVr3cAu49DkX9ri) compiles Cobb+Douglas parcels with Zoning/Zoning_Code/
+      future_land_use (Douglas subset ≈105; Zoning_Code filled ≈96) — NOT official city GIS;
+      do not prefer over county LandRecords for geometry/CAMA; cite only as unofficial
+      enrichment hint. Use county parcels + City Limits / TAX_DISTRICT=06 for geography;
+      city zoning certification remains a gap vs Douglasville/Villa Rica.
+    status: gap
+
+gaps:
+  - "No public REST tax.assessedValue/taxableValue — CURR_VAL is FMV; ACC is not GA 40% ASV."
+  - "CountyLayers/Parcels (55100) CAMA lags LandRecords (57451) — always prefer LandRecords for values/acreage."
+  - "DC_CURR_ZONING/FLU='city' stubs (~16k) inside municipalities — must join city layers (Douglasville AGOL / Villa Rica Proposed_Z); Austell official city zoning REST gap."
+  - "CAD_CITY and Address Points MUNICIPALITY are postal/CDP (Lithia Springs, Winston, Whitesburg) — municipality filter = TAX_DISTRICT/DESCRIP or City Limits only."
+  - "Parcel SALEPRICE/DEED_DATE is single last sale; multi-sale history on PIW_Sales/41 — SALEVAL='0' (VALID SALE) is qualified filter; SALEVAL='M' is MULTIPLE PARCELS not market."
+  - "PIW_PropertyLayers FeatureServer/14 parcel query returned Unable to complete operation (2026-09-23) — use LandRecords MapServer or CountyLayers/Parcels instead."
+  - "Zoning/Zoning/MapServer/7 (29 dissolved districts) does not support pagination — query full set without resultRecordCount."
+  - "Austell official city zoning/FLU REST gap; third-party Scott_Sixis Austell_Parcels_Combined is unofficial."
+  - "Villa Rica and Austell are multi-county — this card is Douglas FIPS 13097 side only."
+  - "County sells countywide parcel shapefile commercially ($500 GIS price sheet) — REST used here is free public query; do not wire paid downloads."
+  - "qPublic AppID=988 may CDN/bot-403 automated clients; public for humans. Do not collect emails/phones."
+  - "Rejected lookalikes: Douglas County CO/KS/MN/WI/OR/IL/NE/NV/SD/WA parcel hubs; UofMD/Regrid-style third-party statewide extracts; Equator/paid parcel downloads; Paulding/Cobb wrong-county services."
+  - "Enrichment vs thin in-app (~4.3k ACREAGE_GIS 5–150): full county 57451 geometry+acreage+owner+mailing+situs+FMV+taxDistrict+zoning/FLU+lastSale; sales history table; Douglasville+Villa Rica city zoning/FLU; Austell geography-only."
+
+license: >
+  Douglas County GIS public ArcGIS Server (maps.douglascountyga.gov) — LandRecords/LandRecords,
+  CountyLayers/Parcels + Sales_Points + Site_Address_Points, Zoning/Zoning + Zoning_Designations,
+  PropertyInformation/PIW_Sales + PIW_PlanningZoning + Property_Information_Layers +
+  PIW_QueryLayers, CityOfDouglasville/Douglasville. Hub/KPI:
+  key-performance-indicators-douglasgis.hub.arcgis.com. City of Douglasville AGOL
+  (MvLJ3KHgohvvDRhi / CommDevDirector_Douglasville) — Zoning, Community_Character_Areas,
+  Land_Use. City of Villa Rica AGOL (dW3WG2w9z33TTLpl / smyers_villarica) — Map FeatureServer
+  Zoning Districts + Future Land Use. Assessor HTML: qPublic SchneiderCorp AppID=988
+  LayerID=20162. Attribution to Douglas County GIS / City of Douglasville / City of Villa Rica.
+  Public fields only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=988&LayerID=20162&PageTypeID=2&PageID=8760
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"

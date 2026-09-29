@@ -1,0 +1,256 @@
+state: GA
+jurisdiction: Muscogee County
+fips: "13215"
+level: county
+markets: [Columbus]
+
+layers:
+  - role: parcels
+    name: TaxAssessors/CurrentYearCAMA_Internal MapServer Parcels & CAMA (CCG)
+    restUrl: https://ccggisprod.columbusga.org/server/rest/services/TaxAssessors/CurrentYearCAMA_Internal/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: DeededAcreage
+    coverage: county-wide
+    fieldMap:
+      TaxPIN: parcelId
+      Owner_Name: ownerName
+      CoOwner_Name: ownerName2
+      Owner_Number: mailingNumber
+      Owner_SubNumber: mailingSubNumber
+      Owner_Direction1: mailingStreetDir
+      Owner_StreetName: mailingStreet
+      Owner_StreetType: mailingStreetType
+      Owner_Direction2: mailingStreetDir2
+      Owner_Apartment: mailingUnit
+      Owner_City: mailingCity
+      Owner_State: mailingState
+      Owner_ZIP: mailingZip
+      Property_Number: situsNumber
+      Property_SubNumber: situsSubNumber
+      Property_Direction1: situsStreetDir
+      Property_StreetName: situsStreet
+      Property_StreetType: situsStreetType
+      Property_Direction2: situsStreetDir2
+      Property_Apartment: situsUnit
+      Property_CityCode: situsCity
+      Property_Class: dorCode
+      LandUseCode: landUseCode
+      Neighborhood: neighborhood
+      Zoning: zoning
+      TaxDistrict: taxDistrict
+      SubdivisionName: subdivision
+      LegalDescription: legalDescription
+      GISAcreage: acreageGis
+      DeededAcreage: acreage
+      DeedBook: deedBook
+      DeedPage: deedPage
+      Shape.STArea(): shapeArea
+    notes: >
+      Preferred CONSOLIDATED Columbus–Muscogee parcel GEOMETRY + CAMA-lite (Columbus
+      Consolidated Government ccggisprod.columbusga.org; service name
+      CurrentYearCAMA_Internal is PUBLICLY queryable auth=none despite "Internal").
+      Live count ≈70372 (2026-09-24). maxRecordCount 2000 — page via resultOffset /
+      envelopes. SR StatePlane Georgia West FIPS 1002 Feet. Owner_Name filled ≈69878;
+      DeededAcreage 5–150 ≈1309; GISAcreage 5–150 ≈1957 — prefer DeededAcreage for
+      acreage band. Compose situs from Property_Number+Direction1+StreetName+StreetType;
+      Property_CityCode top COLUMBUS/MIDLAND/FORTSON/UPATOI are postal/community labels
+      inside consolidated city-county — NOT separate municipalities. Parcel Zoning
+      secondary to Planning Euclidean ZoneCode. NO market/assessed/taxable/sale fields —
+      values via publicaccess.columbusga.gov HTML (iasWorld mode=parid TaxPIN). Companion
+      thin TaxAssessors/Base TaxParcels_2026/301 (count ≈71785; TaxPIN+GISAcreage).
+      REJECT gis.columbus.gov CSIR_Public (Columbus OH — wrong state). Geo-verify GA:
+      WGS84 samples ~-84.987,32.452 / ~-84.974,32.411 / Midland ~-84.91,32.60 — Census
+      TIGERweb GEOID 13215 CENTLAT +32.5099571 CENTLON -084.8770366. Skip
+      created_user/last_edited_user PII; skip utilities+AADT; rejected paid
+      Regrid/ATTOM; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL/FMV/assessed on public REST; publicaccess HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      CurrentYearCAMA_Internal/1 has owner+acres+zoning but no market/assessed/taxable
+      value fields. Tax/CAMA values via publicaccess.columbusga.gov iasWorld HTML —
+      search mode=parid with TaxPIN (e.g. '059 017 006'). Stable GET pin deep-link not
+      verified — use commonsearch.aspx?mode=parid form. Rejected paid vendor tax extracts.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_PRICE/SALE_DATE on CAMA or TaxParcels_2026 REST. Prefer publicaccess
+      Columbus GA sales/history HTML by TaxPIN. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Planning/Base MapServer Zoning (Euclidean) + parcel Zoning
+    restUrl: https://ccggisprod.columbusga.org/server/rest/services/Planning/Base/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TaxPIN: parcelId
+      ZoneCode: zoning
+      Zone: zoningName
+      Description: zoningDescription
+      Ordinance: zoningOrdinance
+      OldZoneCode: zoningPrior
+    notes: >
+      Preferred Euclidean zoning polygons (count ≈70849; TaxPIN-keyed). ZoneCode top:
+      SFR3≈22558 / SFR2≈21946 / RMF1≈7236 / RE1≈3864 / GC≈3445 / SFR1≈2807 / RMF2≈2144
+      / SFR4≈1394 / NC≈1282 / LMI≈1107 / RO≈1055 / HIST≈467 / PMUD≈386 / PUD≈323.
+      Parcel-attributed Zoning on CAMA/1 is usable secondary. Official Zoning Map Portal
+      experience.arcgis.com/experience/a9b935d318634f6a8eb8f2def70b5cd9. Skip overlay
+      districts as Euclidean substitute; skip utilities+AADT.
+    status: usable
+
+  - role: flu
+    name: Planning/Base Existing Land Use + Future Land Use
+    restUrl: https://ccggisprod.columbusga.org/server/rest/services/Planning/Base/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TaxPIN: parcelId
+      FutureLandUseCode: flu
+      FutureLandUse: fluName
+    notes: >
+      Preferred Future Land Use on TaxPIN polygons (count ≈70939). Sample codes MU /
+      SFR. Companion Existing Land Use MapServer/1 (ExistingLandUseCode /
+      ExistingLandUse). Planning character — not Euclidean zoning substitute. Join
+      TaxPIN onto CAMA/1.
+    status: usable
+
+  - role: other
+    name: TaxAssessors/Base TaxParcels_2026 (thin geometry)
+    restUrl: https://ccggisprod.columbusga.org/server/rest/services/TaxAssessors/Base/MapServer/301
+    layerId: 301
+    geometry: polygon
+    auth: none
+    acreageField: GISAcreage
+    coverage: county-wide
+    fieldMap:
+      TaxPIN: parcelId
+      GISAcreage: acreage
+      ParcelType: parcelType
+    notes: >
+      Thin cadastral polygons Tax Year 2026 (count ≈71785; TaxPIN + GISAcreage +
+      ParcelType). Prefer CurrentYearCAMA_Internal/1 when owner/situs/zoning needed;
+      use /301 when newest geometry year label required. Auth none; maxRecordCount 2000.
+    status: usable
+
+  - role: other
+    name: Base/MapServer City Limits (Columbus consolidated)
+    restUrl: https://ccggisprod.columbusga.org/server/rest/services/Base/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: cityName
+    notes: >
+      Live NAME='City of Columbus' — consolidated city-county boundary. Preferred
+      spatial filter ≈ county extent. Soft Property_CityCode MIDLAND/FORTSON/UPATOI
+      are NOT separate city limits.
+    status: usable
+
+municipalities:
+  - name: Columbus (consolidated Columbus–Muscogee)
+    level: city
+    parentFips: "13215"
+    joinToCountyParcels: >
+      Columbus Consolidated Government = Muscogee County (city-county consolidation).
+      Entire CurrentYearCAMA_Internal/1 IS the consolidated jurisdiction. Spatial
+      Base/MapServer/4 City Limits NAME='City of Columbus' ≈ countywide. Do NOT treat
+      Property_CityCode MIDLAND/FORTSON/UPATOI as separate municipalities — postal/
+      community labels only.
+    layers:
+      - role: parcels
+        name: Same as county CurrentYearCAMA_Internal/1
+        restUrl: https://ccggisprod.columbusga.org/server/rest/services/TaxAssessors/CurrentYearCAMA_Internal/MapServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: DeededAcreage
+        coverage: city-only
+        fieldMap:
+          TaxPIN: parcelId
+          Owner_Name: ownerName
+          DeededAcreage: acreage
+          Zoning: zoning
+        notes: >
+          No separate city CAMA — consolidated county layer is the parcel source.
+          Standing city-over-county order satisfied by same REST.
+        status: usable
+      - role: zoning
+        name: Planning/Base Zoning (consolidated)
+        restUrl: https://ccggisprod.columbusga.org/server/rest/services/Planning/Base/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoneCode: zoning
+          Zone: zoningName
+        notes: Consolidated Euclidean zoning IS local zoning — CCG Zoning App experience a9b935d318634f6a8eb8f2def70b5cd9.
+        status: usable
+      - role: flu
+        name: Planning/Base Future Land Use
+        restUrl: https://ccggisprod.columbusga.org/server/rest/services/Planning/Base/MapServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FutureLandUseCode: flu
+          FutureLandUse: fluName
+        notes: Consolidated FLU on TaxPIN polygons.
+        status: usable
+    gaps:
+      - "Tax/sale values HTML-only (publicaccess.columbusga.gov) even inside city — no REST CURR_VAL/sale."
+      - "MIDLAND/FORTSON/UPATOI are Property_CityCode labels only — not incorporated cities."
+    status: usable
+
+gaps:
+  - "No market/assessed/taxable or SALE_* on CurrentYearCAMA_Internal REST — tax/sale via publicaccess.columbusga.gov iasWorld HTML (mode=parid TaxPIN)."
+  - "Service title CurrentYearCAMA_Internal is public (auth none) — do not treat as blocked; still no value fields."
+  - "TaxParcels_2026/301 and CurrentYear thin layers are TaxPIN+acres — prefer CAMA/1 for owner/situs/zoning."
+  - "maxRecordCount 2000 on CAMA/zoning — page via resultOffset / envelopes."
+  - "REJECT gis.columbus.gov Applications/CSIR_Public (Columbus OH / wrong geography)."
+  - "Property_CityCode MIDLAND/FORTSON/UPATOI soft only — never municipality filter; use City Limits/4."
+  - "Skip Utilities folders + AADT per tranche-3; schema editor usernames — DO NOT collect as PII."
+  - "Rejected paid Regrid/ATTOM/USLandGrid; no emails/phones."
+
+license: >
+  Columbus Consolidated Government GIS (ccggisprod.columbusga.org) — TaxAssessors/
+  CurrentYearCAMA_Internal MapServer/1 Parcels & CAMA; TaxAssessors/Base TaxParcels_2026/301;
+  Planning/Base Zoning/0 + Existing Land Use/1 + Future Land Use/2; Base City Limits/4.
+  Zoning Map Portal experience.arcgis.com/experience/a9b935d318634f6a8eb8f2def70b5cd9;
+  Assessor Public Access publicaccess.columbusga.gov. Attribution CCG GIS / Board of
+  Tax Assessors. Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://publicaccess.columbusga.gov/search/commonsearch.aspx?mode=parid
+jurisdictionGisUrl: https://experience.arcgis.com/experience/a9b935d318634f6a8eb8f2def70b5cd9
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

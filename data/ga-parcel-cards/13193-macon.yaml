@@ -1,0 +1,427 @@
+state: GA
+jurisdiction: Macon County
+fips: "13193"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel GEOMETRY + thin CAMA (owner/Curr_Val/Ac1) — RVRC 2018 vintage
+  - role: parcels
+    name: Parcels12_2018 — Macon County Parcels (RVRC / GARC AGOL)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels12_2018/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Ac1
+    coverage: county-wide
+    fieldMap:
+      Parcel_Num: parcelId
+      Owner: ownerName
+      Address: situsAddress
+      Ac1: acreage
+      Curr_Val: tax.marketValue
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + thin CAMA (River Valley RC / GARC AGOL org
+      Ug5xGQbHsD8zuZzM — owner RVRC_ELA; FeatureServer/0 "Parcels12_2018" titled Macon County
+      Parcels in Macon County Data Viewer webmap 7568bf672b7e4c15acdd0f1519cabb5a). Live count
+      8798 (2026-09-24). SR Web Mercator 102100/3857. maxRecordCount 2000 — page via
+      resultOffset / envelopes. Schema thin vs full WinGAP: Parcel_Num / Owner / Address /
+      Ac1 (text e.g. "139.28 Ac." — parse numeric) / Curr_Val only; NO SALE_*/mailing split /
+      FMV*/MAV*/TAXDISTRIC/ZONINGCODE. Owner filled ≈8618; Curr_Val>0 ≈8614; Parcel_Num
+      ≈8789; Address ≈7453; Ac1 nonzero ≈6938. Official live assessor HTML: qPublic/Beacon
+      App=MaconCountyGA / AppID=747 LayerID=11783 PageID=5890 (qpublic.net/ga/macon →
+      qpublic.schneidercorp.com; Cloudflare/bot 403 automated; public for humans). Deep-link
+      KeyValue={Parcel_Num}:
+      Application.aspx?App=MaconCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_Num}
+      (also AppID=747&LayerID=11783&PageTypeID=4&PageID=5890&KeyValue={Parcel_Num}).
+      GEO-VERIFY GEORGIA Macon County FIPS 13193 (REJECT Bibb / Macon-Bibb FIPS 13021 already
+      carded 13021-bibb; REJECT Macon County AL isv.kcsgis.com; REJECT Macon County IL
+      macongis.co.macon.il.us / a3k0qIja5SolIRYR; REJECT Macon County NC gis2.maconnc.org;
+      REJECT Macon-Bibb AGOL zPFLSOZ5HzUzzTQb Parcels/TaxParcels): WGS84 samples
+      ~-84.203,32.281 (1009O 0004P) / ~-84.003,32.293 (1061O 0011B SR 26) / Census TIGER
+      CENTLON -084.0425197 CENTLAT +32.3583533 — Oglethorpe/Montezuma seat area (~-84.06,
+      32.29). No newer public Macon GA parcel FS than Parcels12_2018 recovered on RVRC_ELA
+      (2018 vintage — prefer qPublic for live owner/tax/sale). Rejected paid
+      Regrid/ATTOM/DynamoSpatial. Skip utilities+AADT; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: Parcels12_2018 Curr_Val (on polygons)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels12_2018/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Ac1
+    coverage: county-wide
+    fieldMap:
+      Parcel_Num: parcelId
+      Curr_Val: tax.marketValue
+    notes: >
+      Market value on preferred parcels (Curr_Val>0 ≈8614; 2018 vintage). No MAV/assessed/
+      FMV* on this REST — assessed/taxable via qPublic App=MaconCountyGA / AppID=747 HTML.
+    status: partial
+
+  - role: sales
+    name: null — no SALE_* on public REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/saledate on Parcels12_2018. Prefer qPublic Sales Search HTML
+      App=MaconCountyGA / AppID=747. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Zones_RVMacon (county Euclidean) + city zone FS
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Zones_RVMacon/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZoneType: zoning
+      Proposed: flu
+    notes: >
+      Preferred county Euclidean zoning polygons (count 144). ZoneType domain sample:
+      AG-1 / AG-2 / C-2 / CH / I / R-1 / R-3 / RP (blanks present). Proposed field carries
+      proposed/FLU-leaning codes (twin ProposedLandUse_RV). Spatial join onto Parcels12_2018.
+      City Euclidean: Montezuma_Zones/0 ZoneType (A-1/C-1/C-2/C-3/FR-1R/I-1/I-2/R-1/R-2/R-3/
+      R-3R; count 37); Oglethorpe_Zones/0 Zone_Type (A-1/C-1/C-2/I-1/R-1/R-2; count 26);
+      Marshallville_Zones/0 Zone_ (Commercial/Industrial/Public/R-1 Single Residential/
+      R-2 Multi Family; count 35). No Ideal city zoning FS recovered. Prefer city layers
+      inside city limits over county ZoneType.
+    status: usable
+
+  - role: flu
+    name: ProposedLandUse_RV (county proposed / character)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/ProposedLandUse_RV/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Proposed: flu
+      ZoneType: zoning
+    notes: >
+      Twin of Zones_RVMacon (count 144; same extent ~-84.24–-83.84, 32.17–32.51). Use
+      Proposed as FLU/character; ZoneType is Euclidean. Not a substitute for city zoning
+      inside Montezuma/Oglethorpe/Marshallville limits.
+    status: usable
+
+  - role: other
+    name: AddressesE911Macon2022 (situs points)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/AddressesE911Macon2022/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Address: situsAddress
+      AN: situsNumber
+      FullStreet: situsStreet
+      StreetName: situsStreetName
+      StreetType: situsStreetType
+      PreDir: situsStreetDir
+      CityCode: situsCityCode
+      Latitude: latitude
+      Longitude: longitude
+    notes: >
+      Live count 7242. Soft CityCode: MTZ≈2049 Montezuma, OGL≈747 Oglethorpe, IDL≈242 Ideal,
+      MRV≈725 Marshallville (blanks common). Geo sample ~-84.090,32.261 (2728 HIGHWAY 49 S).
+      Prefer spatial CityLimits_RVMacon for municipality filter over CityCode. DO NOT collect
+      contact fields if present.
+    status: usable
+
+  - role: other
+    name: CityLimits_RVMacon
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CityLimits_RVMacon/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Live count 5 polygons — NO name attribute on REST (identify by centroid / soft
+      Addresses CityCode): ~-84.063,32.294 Oglethorpe (seat); ~-84.027,32.300 Montezuma;
+      ~-84.191,32.377 Ideal; ~-83.944,32.457 Marshallville; small ~-84.076,32.285
+      (Oglethorpe fringe). Twin Macon_CityLimits / CityLimits_Macon same geography.
+      Preferred spatial municipality filter.
+    status: usable
+
+municipalities:
+  - name: Oglethorpe
+    level: city
+    parentFips: "13193"
+    joinToCountyParcels: >
+      Spatial CityLimits_RVMacon centroid ~-84.063,32.294 OR soft Addresses CityCode='OGL'
+      (~747) OR Parcel Address near Oglethorpe. County seat.
+    layers:
+      - role: zoning
+        name: Oglethorpe_Zones
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Oglethorpe_Zones/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zone_Type: zoning
+        notes: City Euclidean (count 26). Domain A-1/C-1/C-2/I-1/R-1/R-2. Prefer over county ZoneType inside limits.
+        status: usable
+      - role: parcels
+        name: Parcels12_2018 spatial Oglethorpe
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels12_2018/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Ac1
+        coverage: city-only
+        fieldMap:
+          Parcel_Num: parcelId
+          Owner: ownerName
+          Curr_Val: tax.marketValue
+        notes: No Oglethorpe-only CAMA FS — county parcels + spatial city limits.
+        status: partial
+    gaps:
+      - "No Oglethorpe-owned parcel CAMA FeatureServer — county Parcels12_2018 + city zoning."
+    status: usable
+
+  - name: Montezuma
+    level: city
+    parentFips: "13193"
+    joinToCountyParcels: >
+      Spatial CityLimits_RVMacon centroid ~-84.027,32.300 OR soft Addresses CityCode='MTZ'
+      (~2049).
+    layers:
+      - role: zoning
+        name: Montezuma_Zones
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Montezuma_Zones/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoneType: zoning
+        notes: >
+          City Euclidean (count 37). Domain A-1/C-1/C-2/C-3/FR-1R/I-1/I-2/R-1/R-2/R-3/R-3R.
+          Geo sample ~-84.039,32.286.
+        status: usable
+      - role: parcels
+        name: Parcels12_2018 spatial Montezuma
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels12_2018/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Ac1
+        coverage: city-only
+        fieldMap:
+          Parcel_Num: parcelId
+        notes: County parcels + spatial Montezuma limits.
+        status: partial
+    gaps:
+      - "No Montezuma-owned parcel CAMA FS — county layers + city zoning."
+    status: usable
+
+  - name: Marshallville
+    level: city
+    parentFips: "13193"
+    joinToCountyParcels: >
+      Spatial CityLimits_RVMacon centroid ~-83.944,32.457 OR soft Addresses CityCode='MRV'
+      (~725).
+    layers:
+      - role: zoning
+        name: Marshallville_Zones
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Marshallville_Zones/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zone_: zoning
+        notes: City Euclidean (count 35). Domain Commercial/Industrial/Public/R-1 Single Residential/R-2 Multi Family.
+        status: usable
+      - role: parcels
+        name: Parcels12_2018 spatial Marshallville
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels12_2018/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Ac1
+        coverage: city-only
+        fieldMap:
+          Parcel_Num: parcelId
+        notes: County parcels + spatial Marshallville.
+        status: partial
+    gaps:
+      - "No Marshallville-owned parcel CAMA FS."
+    status: usable
+
+  - name: Ideal
+    level: city
+    parentFips: "13193"
+    joinToCountyParcels: >
+      Spatial CityLimits_RVMacon centroid ~-84.191,32.377 OR soft Addresses CityCode='IDL'
+      (~242).
+    layers:
+      - role: zoning
+        name: null — no Ideal zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ideal_Zones FS on RVRC_ELA — use county Zones_RVMacon spatial clip.
+        status: gap
+      - role: parcels
+        name: Parcels12_2018 spatial Ideal
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels12_2018/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Ac1
+        coverage: city-only
+        fieldMap:
+          Parcel_Num: parcelId
+        notes: County parcels + spatial Ideal.
+        status: partial
+    gaps:
+      - "No Ideal city zoning or parcel CAMA FeatureServer — county layers + spatial limits."
+    status: partial
+
+gaps:
+  - "Parcels12_2018 is 2018 vintage thin CAMA (Owner/Curr_Val/Ac1 text) — live owner/tax/sale via qPublic App=MaconCountyGA / AppID=747 LayerID=11783 HTML."
+  - "No SALE_* on public REST — qPublic Sales Search HTML only."
+  - "No MAV/assessed/FMV* on Parcels12_2018 — Curr_Val market only."
+  - "Ac1 is text ('N Ac.') — parse numeric for acreage filters."
+  - "CityLimits_RVMacon has no NAME field — identify by centroid or Addresses CityCode (MTZ/OGL/IDL/MRV)."
+  - "No Ideal city zoning FS."
+  - "MaconCountyGA_WFS on wfs.schneidercorp.com → 404."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; public for humans (qpublic.net/ga/macon)."
+  - "REJECT Bibb/Macon-Bibb FIPS 13021 (zPFLSOZ5HzUzzTQb); REJECT Macon County AL/IL/NC lookalikes; REJECT paid Regrid/ATTOM; skip utilities+AADT; no emails/phones."
+
+license: >
+  River Valley Regional Commission / GARC AGOL org Ug5xGQbHsD8zuZzM (RVRC_ELA) —
+  Parcels12_2018; Zones_RVMacon; ProposedLandUse_RV; CityLimits_RVMacon; Montezuma_Zones;
+  Oglethorpe_Zones; Marshallville_Zones; AddressesE911Macon2022. Assessor qPublic/Beacon
+  App=MaconCountyGA / AppID=747 LayerID=11783 (qpublic.net/ga/macon; maconcountyga.gov
+  Oglethorpe GA). Attribution Macon County Tax Assessors / RVRC GIS. Public fields only;
+  no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=MaconCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://garc.maps.arcgis.com/apps/webappviewer/index.html?id=3cd0257d900244738f30223999a11445
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels12_2018/FeatureServer/0
+    count 8798; extent center [['13193', 'Macon County']]; sample [['13193', 'Macon County']]. No change
+    to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Ideal city"
+      level: city
+      parentFips: "13193"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Marshallville city"
+      level: city
+      parentFips: "13193"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Montezuma city"
+      level: city
+      parentFips: "13193"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Oglethorpe city"
+      level: city
+      parentFips: "13193"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Macon' AND aadt>0
+    altFilter: name LIKE '193-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 193-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 77
+    maxAadt: 7250
+    geoCheck: 76/77 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - Curr_Val
+    filledCount: 8614
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels12_2018/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: Owner
+    filledCount: 8618
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Parcels12_2018/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=MaconCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=747&LayerID=11783&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_Num
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 1009O  0004P
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=MaconCountyGA&Layer=Parcels&PageType=Report&KeyValue=1009O%20%200004P
+    verification: 'pattern-tested: real sample ID from Parcel_Num; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://garc.maps.arcgis.com/apps/webappviewer/index.html?id=3cd0257d900244738f30223999a11445
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Ideal city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Marshallville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Montezuma city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Oglethorpe city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

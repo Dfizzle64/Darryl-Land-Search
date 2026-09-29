@@ -1,0 +1,164 @@
+state: SC
+jurisdiction: Georgetown County
+fips: "45043"
+level: county
+markets: [Charleston]
+
+layers:
+  - role: parcels
+    name: Parcels (GCGIS_OpenData)
+    restUrl: https://gis1.georgetowncountysc.org/portal/rest/services/GCGIS_OpenData/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      Zone: zoning
+    notes: 'Verified 2026-09-24: public FeatureServer, count 47907, no token. Geo-verified sample centroid
+      ≈ (-79.46, 33.31) in Georgetown County. Parcel polygons carry TMS + Zone; owner/tax/sale attributes
+      live on related table FS/7 (join TMS = ParcelID / GisLookUpKey). Acreage not on polygon layer — use
+      TotalLandArea from FS/7.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=47912; 1-feature outSR=4326 sample TMS=''01-0442-031-03-00''
+      vertex (-79.463,33.307) inside Georgetown County SC bbox; parcel ID field TMS present.'
+    count: 47912
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Parcel Assessment Table (PARCELATTRIBUTES)
+    restUrl: https://gis1.georgetowncountysc.org/portal/rest/services/GCGIS_OpenData/FeatureServer/7
+    layerId: 7
+    geometry: none
+    auth: none
+    acreageField: TotalLandArea
+    coverage: county-wide
+    fieldMap:
+      ParcelID: parcelId
+      GisLookUpKey: parcelIdJoin
+      Owner1: ownerName
+      Owner2: ownerName2
+      BillingAddress: mailingAddress.street
+      City: mailingAddress.city
+      State: mailingAddress.state
+      ZipCode: mailingAddress.zip
+      StreetNumber: situsAddress.number
+      StreetName: situsAddress.street
+      TotalLandArea: acreage
+      SaleDate: lastSale.date
+      SalePrice: lastSale.price
+      LandUseCode: dorCode
+      LegalDescription: legalDescription
+      LegalReference: lastSale.deedRef
+    notes: >
+      Verified 2026-09-24: table layer count 57530. Join to parcels FS/2 on
+      TMS = ParcelID (or GisLookUpKey). SaleDate epoch ms; YearID present (sample 2026).
+    status: usable
+
+  - role: zoning
+    name: Zoning on parcels (Zone field) + Zoning Splits
+    restUrl: https://gis1.georgetowncountysc.org/portal/rest/services/GCGIS_OpenData/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Zone: zoning
+      TMS: parcelId
+    notes: >
+      Primary zoning code is Zone on parcels FS/2 (sample VR-10). Zoning Splits FS/4
+      (count 726) holds split-zone polygons; field Zone; join on TMS when present.
+      Prefer parcel Zone for countywide; use FS/4 for split cases.
+    status: usable
+
+  - role: zoning
+    name: Zoning Splits
+    restUrl: https://gis1.georgetowncountysc.org/portal/rest/services/GCGIS_OpenData/FeatureServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: partial
+    fieldMap:
+      Zone: zoning
+      TMS: parcelId
+    notes: Split-zone polygons only (count 726), not full county coverage.
+    status: partial
+
+gaps:
+  - "qPublic portal https://qpublic.net/sc/georgetown/ live; AppID/KeyValue deep-link pattern not confirmed in this dig (403 on schneidercorp Application.aspx)."
+  - "No separate countywide FLU FeatureServer found on dig day; FLU gap unless published later on hub."
+  - "Polygon layer lacks owner/tax/sale — must join FS/7 assessment table."
+  - "Municipality zoning (Georgetown city, Pawleys Island, etc.) not separately carded yet."
+
+license: "Georgetown County open GIS (gis1.georgetowncountysc.org portal / hub). Attribute to Georgetown County. Confirm redistribution before bulk republish."
+appraiserSearchUrl: https://qpublic.net/sc/georgetown/
+publicGisUrl: https://georgetown-county-south-carolina-Georgetown.hub.arcgis.com
+jurisdictionGisUrl: https://georgetown-county-south-carolina-Georgetown.hub.arcgis.com
+appraiserDeepLink: https://qpublic.schneidercorp.com/Application.aspx?App=GeorgetownCountySC&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: gap
+    reason: No value fields on GCGIS_OpenData parcels (2) or PARCELATTRIBUTES table (7); RFA statewide + RFA Georgetown_Williamsburg
+      layer 5 have M_Value/L_Value null for Georgetown. Values only in qPublic.
+  sale:
+    status: usable
+    reason: PARCELATTRIBUTES table 7 (join ParcelID/GisLookUpKey = parcels TMS) has SaleDate + SalePrice + LegalReference
+      (deed book-page).
+    source: https://gis1.georgetowncountysc.org/portal/rest/services/GCGIS_OpenData/FeatureServer/7
+    fieldMap:
+      SaleDate: lastSale.date
+      SalePrice: lastSale.price
+      LegalReference: lastSale.deedBookPage
+    format: SaleDate esri Date epoch ms (1764633600000 = 2025-12-02); SalePrice Double; LegalReference "4939-113".
+      YearID = roll year (2026). Table has no geometry - join.
+  owner:
+    status: usable
+    mailingStatus: usable
+    source: https://gis1.georgetowncountysc.org/portal/rest/services/GCGIS_OpenData/FeatureServer/7
+    fieldMap:
+      Owner1: ownerName
+      Owner2: ownerName2
+      BillingAddress: mailingAddress.street
+      BillingAddress2: mailingAddress.street2
+      City: mailingAddress.city
+      State: mailingAddress.state
+      ZipCode: mailingAddress.zip
+  paLink:
+    status: partial
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?App=GeorgetownCountySC&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    testedParcelId: 01-0101-007-01-00
+    idTransform: KeyValue = TMS / ParcelID dashed as-is (dd-dddd-ddd-dd-dd).
+    reason: qpublic.net/sc/georgetown search page links qPublic App=GeorgetownCountySC; report deep link on Schneider
+      named-app pattern; Cloudflare 403 from box - not machine-confirmed.
+  publicGis:
+    status: usable
+    url: https://georgetown-county-south-carolina-Georgetown.hub.arcgis.com
+    reason: County GIS hub (HTTP 200) - already on card; verified.
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) - SCDOT 2025 Statewide Traffic Points, CountyName=GEORGETOWN
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28);
+      not re-dug.

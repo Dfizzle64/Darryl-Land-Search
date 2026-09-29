@@ -1,0 +1,189 @@
+state: SC
+jurisdiction: Horry County
+fips: "45051"
+level: county
+markets: [Charleston]
+
+layers:
+  - role: parcels
+    name: Parcels (HorryCountyGIS_GS)
+    restUrl: https://www.horrycounty.org/gispublic/rest/services/Public/HorryCountyGIS_GS/MapServer/24
+    layerId: 24
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      PIN: parcelIdAlt
+      OwnerName: ownerName
+      OwnerStreet: mailingAddress.street
+      OwnerCity: mailingAddress.city
+      OwnerState: mailingAddress.state
+      OwnerZipCode: mailingAddress.zip
+      TaxDistrict: tax.district
+      LandUseCode: dorCode
+      Acreage: acreage
+      LegalDescr: legalDescription
+      SaleDate: lastSale.date
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      AssessedLand: tax.assessedLand
+      MarketLand: tax.landValue
+      AssessedImprv: tax.assessedImprovement
+      MarketImprv: tax.improvementValue
+      AssessedProp: tax.assessedValue
+      MarketProp: tax.marketValue
+      TaxableLand: tax.taxableLand
+      TaxableImprv: tax.taxableImprovement
+      TaxableProp: tax.taxableValue
+    notes: 'Verified 2026-09-24: public MapServer, count 301567, no token. SC State Plane HARN intl feet.
+      Geo-verified WGS84 sample centroid ≈ (-78.78, 33.77) in Horry (Myrtle Beach / Conway corridor). Same
+      CAMA attrs on Public/Parcels/MapServer/1 (count 301567). Prefer GS/24. SaleDate is epoch ms. No situs
+      street on this layer (mailing Owner* only); legal/lot fields present.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=301631; 1-feature outSR=4326 sample TMS=''1668037030'' vertex
+      (-78.784,33.766) inside Horry County SC bbox; parcel ID field TMS present.'
+    count: 301631
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Parcels (HorryCountyGIS_GS) — tax / sale attributes
+    restUrl: https://www.horrycounty.org/gispublic/rest/services/Public/HorryCountyGIS_GS/MapServer/24
+    layerId: 24
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      MarketProp: tax.marketValue
+      AssessedProp: tax.assessedValue
+      MarketLand: tax.landValue
+      MarketImprv: tax.improvementValue
+      TaxableProp: tax.taxableValue
+      SaleDate: lastSale.date
+    notes: Same layer as primary parcels. Last-sale fields only (no multi-sale history table).
+    status: usable
+
+  - role: zoning
+    name: Zoning (HorryCountyGIS_GS)
+    restUrl: https://www.horrycounty.org/gispublic/rest/services/Public/HorryCountyGIS_GS/MapServer/30
+    layerId: 30
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZoningCode: zoning
+      Ordinance: zoningOrdinance
+      EffectiveDate: zoningEffectiveDate
+    notes: >
+      Verified 2026-09-24: public, count 9697. Geo-verified centroid ≈ (-78.97, 33.69)
+      in Horry. Same layer mirrored on parcelapp/HorryCountyGISApp/MapServer/30.
+      Does not replace City of Myrtle Beach municipal zoning (companion 45051-myrtle-beach.yaml).
+    status: usable
+
+  - role: flu
+    name: Future Land Use (HorryCountyGISApp)
+    restUrl: https://www.horrycounty.org/parcelapp/rest/services/HorryCountyGISApp/MapServer/36
+    layerId: 36
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      FLU_MAP: flu
+      Acres: acreage
+      SqMiles: areaSqMiles
+    notes: >
+      Verified 2026-09-24: public, count 1269. FLU_MAP values include COMMERCIAL CORRIDOR
+      and other plan categories. On parcelapp host (not gispublic GS service).
+    status: usable
+
+gaps:
+  - "No situs street/city fields on public parcel layer (Owner* mailing only); join addresses from Addresses layer (GS/22) spatially if needed."
+  - "City of Myrtle Beach has its own zoning REST — use companion 45051-myrtle-beach.yaml inside city limits."
+  - "Assessor/Land Records online access requires free Horry County account as of 2026-03-16 notice; GIS REST remains public."
+  - "Sale history is last-sale fields only (SaleDate / DeedBook / DeedPage), not multi-sale table."
+  - "Rejected wrong-geography sources: none for Horry on dig day."
+  - '2026-09-28 Pass 2: publicGisUrl/jurisdictionGisUrl added (Horry GIS parcel app; login-gated for humans). PA deep link = Land Records ?PIN={PINtext} (login).'
+
+license: "Public Horry County GIS REST (horrycounty.org/gispublic and parcelapp); attribute to Horry County. Confirm redistribution terms before bulk republish. Do not scrape assessor emails/phones."
+appraiserSearchUrl: https://www.horrycounty.org/gis/parcels/
+publicGisUrl: https://www.horrycounty.org/gis/parcels/
+jurisdictionGisUrl: https://www.horrycounty.org/gis/parcels/
+appraiserDeepLink: https://www.horrycountysc.gov/apps/LandRecords/?PIN={parcelId}
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: usable
+    reason: GS/24 carries market, assessed and taxable (land/improvement/total), countywide 301,631.
+    fieldMap:
+      MarketProp: tax.marketValue
+      AssessedProp: tax.assessedValue
+      TaxableProp: tax.taxableValue
+      MarketLand: tax.landValue
+      MarketImprv: tax.improvementValue
+      AssessedLand: tax.assessedLand
+      AssessedImprv: tax.assessedImprovement
+    note: 'Sample TMS 1668037030: MarketProp 123,282 / AssessedProp 4,930 (4%).'
+  sale:
+    status: partial
+    reason: SaleDate + DeedBook/DeedPage only - NO sale price field on any public Horry parcel layer (GS/24, Public/Parcels/1).
+      Price only behind login-gated Land Records.
+    fieldMap:
+      SaleDate: lastSale.date
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+    format: SaleDate esri Date epoch ms (1677196800000 = 2023-02-24). DeedBook may carry instrument-style codes
+      (CG2302 / 270858).
+  owner:
+    status: usable
+    mailingStatus: usable
+    fieldMap:
+      OwnerName: ownerName
+      OwnerStreet: mailingAddress.street
+      OwnerCity: mailingAddress.city
+      OwnerState: mailingAddress.state
+      OwnerZipCode: mailingAddress.zip
+    note: OwnerName has trailing spaces - trim.
+  paLink:
+    status: partial
+    pattern: https://www.horrycountysc.gov/apps/LandRecords/?PIN={parcelId}
+    testedParcelId: 39308040324 (TMS 1668037030)
+    idTransform: PIN = 11-digit PIN (use PINtext string; PIN field is Double) - NOT TMS.
+    reason: Land Records honors ?PIN= (302 to /apps/LandRecords/Account/Login?ReturnUrl=...&PIN=39308040324) but
+      since 2026-03-16 requires a free Horry County account; unauthenticated users land on sign-in.
+  publicGis:
+    status: partial
+    url: https://www.horrycounty.org/gis/parcels/
+    reason: Horry County GIS parcel app (HTTP 200); per county 2026-03-09 notice, GIS/Land Records/Tax apps that
+      show property addresses require a free login from 2026-03-16. REST (gispublic) remains open.
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) - SCDOT 2025 Statewide Traffic Points, filter CountyName=HORRY
+  gaps:
+  - No public sale price (GIS has date/deed only).
+  - Human PA + viewer login-gated (free account) since 2026-03-16.
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28);
+      not re-dug.

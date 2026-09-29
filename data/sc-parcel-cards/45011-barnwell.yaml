@@ -1,0 +1,155 @@
+state: SC
+jurisdiction: Barnwell County
+fips: "45011"
+level: county
+markets: [Charleston]
+
+layers:
+  - role: parcels
+    name: Barnwell County ParcelData_ExportFeatures (parcels joined to CAMA, county AGOL BarnwellCountySC)
+    restUrl: https://services8.arcgis.com/qqnlHdXochyJPfSY/arcgis/rest/services/ParcelData_ExportFeatures/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: Tot_Number_Acres
+    coverage: county-wide
+    count: 16734
+    parcelIdField: TaxPIN
+    fieldMap:
+      TaxPIN: parcelId
+      Map_Number: parcelIdAlt
+      Tot_Number_Acres: acreage
+      DeedAc: deedAcres
+      Name: ownerName
+      Address_1: mailingAddress
+      Address_2: mailingCityState
+      Zip_Code: mailingZip
+      Street_Number_E911: situsNumber
+      Street_Name_E911: situsStreet
+      Zip_Code_E911: situsZip
+      Tot_Assesd_Value: tax.assessedValue
+      Tot_Market_Acres: tax.marketValueLand
+      Tot_Market_Bldgs: tax.marketValueBldgs
+      Instrmnt_Dt_YYYYMMDD: lastSale.date
+      Consideration__: lastSale.price
+      True_Sale_Code: lastSale.qualified
+      Prev_Owner: priorOwner
+      Class_1: dorCode
+      District: taxDistrict
+    notes: 'Verified 2026-09-28: NEW source via ArcGIS Online. Org services8 qqnlHdXochyJPfSY owned by BarnwellCountySC
+      (county). Item dcd2cb845f5a43eead4e31e677ccbdc3, public, Query only, dataLastEditDate 2026-09-28 11:26
+      ET. count=16734 (16181 distinct TaxPIN; multipart/condo duplicates); SR 102100; 4326 extent -81.769,33.093
+      to -81.194,33.491 (= Barnwell County SC); sample TaxPIN 032-00-00-062 at (-81.454,33.353). maxRecordCount
+      2000. Sale date is numeric YYYYMMDD (max 20261031 is a bad/future CAMA value — validate). Alternates
+      same org: PARCELS072626/FeatureServer/0 (geometry-only "PARCEL LINES AS OF 07-26-2026", 16733) and
+      Parcel_Data/FeatureServer/0 (33451 rows = duplicated features, AND publicly editable — do not use/write).
+      Zoning_2017/FeatureServer/0 also present in org (not verified here).'
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Assessor / PA public search
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: Public PA/viewer links documented under appraiserSearchUrl / publicGisUrl; owner/tax/sale not REST-verified.
+    status: partial
+
+gaps:
+  - "SCDOT statewide SC_Parcels requires token — not usable as primary."
+  - "Zoning/FLU REST not verified."
+  - "qPublic portal live (2026-09-28: county AGOL parcel layer found — see parcels layer)."
+
+license: "Public county portals where linked; confirm redistribution before bulk republish. Do not scrape emails/phones."
+
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=898&LayerID=16996&PageTypeID=4&PageID=7646&KeyValue={parcelId}
+publicGisUrl: https://barnwellcountysc.maps.arcgis.com/apps/instant/sidebar/index.html?appid=41016e97f0ba46e09561a0420dc45fb0
+jurisdictionGisUrl: https://barnwellcountysc.maps.arcgis.com
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference added in Pass 2 (was missing
+      on card); not re-dug.
+
+fullSuite:
+  tax:
+    status: usable
+    restUrl: https://services8.arcgis.com/qqnlHdXochyJPfSY/arcgis/rest/services/ParcelData_ExportFeatures/FeatureServer/2
+    fieldMap:
+      Tot_Assesd_Value: tax.assessedValue (Integer $)
+      Tot_Tax_Cap_Appr: tax.taxableValue (capped taxable appraisal, Integer $)
+      Tot_Market_Acres + Tot_Market_Lots + Tot_Market_Bldgs (+ MH_Fair_Mkt_Val): tax.marketValue (sum; components
+        are $ despite names)
+      Tot_Agri_Use_Value: tax.agUseValue
+      Tot_Number_Acres: acreage (CAMA deed acres)
+    populated:
+      Tot_Assesd_Value: 16704
+      total: 16734
+    reason: County-published CAMA join on parcel polygons (Barnwell County AGOL, edited 2026-09). No single total-market
+      field — sum components.
+  sale:
+    status: usable
+    restUrl: https://services8.arcgis.com/qqnlHdXochyJPfSY/arcgis/rest/services/ParcelData_ExportFeatures/FeatureServer/2
+    fieldMap:
+      Consideration__: lastSale.price (Integer $; 0/1 = nominal/non-sale)
+      Instrmnt_Dt_YYYYMMDD: lastSale.date (Integer YYYYMMDD, e.g. 20141016)
+      Deed_Ref_Dt_YYYYMMDD: lastSale.deedRefDate (Integer YYYYMMDD)
+      True_Sale_Code: lastSale.qualified (code)
+      Deed_Book: deedBook
+      Deed_Page: deedPage
+      Prev_Owner: previousOwner
+    populated:
+      Consideration__: 16712
+      Instrmnt_Dt_YYYYMMDD: 16712
+    reason: 'Format: integer YYYYMMDD — parse with strptime(str(v),"%Y%m%d"); filter Consideration__>100 for arm-length
+      prices.'
+  owner:
+    status: usable
+    restUrl: https://services8.arcgis.com/qqnlHdXochyJPfSY/arcgis/rest/services/ParcelData_ExportFeatures/FeatureServer/2
+    fieldMap:
+      Name: ownerName
+      Name_2: ownerName2
+      Address_1: mailingAddress.street
+      Address_2: mailingAddress.cityState (e.g. "Meldrim GA")
+      Zip_Code: mailingAddress.zip (9 digits, no dash)
+    populated:
+      Name: 16712
+      Address_1: 16542
+    reason: Owner + mailing address public on county layer.
+  paDeepLink:
+    status: usable
+    template: https://qpublic.schneidercorp.com/Application.aspx?AppID=898&LayerID=16996&PageTypeID=4&PageID=7646&KeyValue={parcelId}
+    searchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BarnwellCountySC&Layer=Parcels&PageType=Search
+    testedParcelId: 121-00-00-030
+    testedUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=898&LayerID=16996&PageTypeID=4&PageID=7646&KeyValue=121-00-00-030
+    httpStatus: 403 from box (Cloudflare); URL confirmed live via search-engine index (qPublic - Barnwell County,
+      SC report page)
+    contentVerified: false
+    reason: 'ID transform: none — county TaxPIN / Map_Number dashed form (e.g. 032-00-00-062) matches qPublic KeyValue
+      form (121-00-00-030).'
+  publicGisUrl:
+    status: usable
+    reason: Barnwell County AGOL org urlKey is barnwellcountysc (card had barnwellcounty — wrong). Public app Barnwell_GIS
+      (instant sidebar, item 41016e97f0ba46e09561a0420dc45fb0).
+  gaps:
+  - No single market-value total field (sum components).
+  - PA content not loadable from box (Cloudflare).
+  aadtReference: added 2026-09-28 (enrichment.aadt)
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher

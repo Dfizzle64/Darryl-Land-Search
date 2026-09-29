@@ -5,19 +5,29 @@
   "markets": [
     "Charleston"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 3963,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-georgetown-parcels-45043",
+  "queryUrl": "https://gis1.georgetowncountysc.org/portal/rest/services/GCGIS_OpenData/FeatureServer/2/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Source query returned 4168 rows; 3963 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcels (GCGIS_OpenData) (https://gis1.georgetowncountysc.org/portal/rest/services/GCGIS_OpenData/FeatureServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "qPublic portal https://qpublic.net/sc/georgetown/ live; AppID/KeyValue deep-link pattern not confirmed in this dig (403 on schneidercorp Application.aspx).",
+    "No separate countywide FLU FeatureServer found on dig day; FLU gap unless published later on hub.",
+    "Polygon layer lacks owner/tax/sale — must join FS/7 assessment table.",
+    "Municipality zoning (Georgetown city, Pawleys Island, etc.) not separately carded yet."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45043/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45043/lookup.json",
+  "sourceCount": 4168,
+  "dropped": 205,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=GeorgetownCountySC&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://georgetown-county-south-carolina-Georgetown.hub.arcgis.com"
 }

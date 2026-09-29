@@ -1,0 +1,365 @@
+state: SC
+jurisdiction: Richland County
+fips: "45079"
+level: county
+markets: [Columbia]
+
+layers:
+  - role: parcels
+    name: SC RFA Richland Parcels (county-wide w/ CAMA, Lexington-Richland boundary program map)
+    restUrl: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: acreage
+    coverage: county-wide
+    count: 183685
+    parcelIdField: TMS
+    fieldMap:
+      TMS: parcelId
+      LOC: situsAddress
+      NAME1: ownerName
+      NAME2: ownerName2
+      ADDRESS1: mailingAddress
+      CITY: mailingCity
+      STATE: mailingState
+      ZIPCODE: mailingZip
+      ZONINGCODE: zoning
+      acreage: acreage
+      SALEPRICE: lastSale.price
+      SALEDATE: lastSale.date
+      Qual_Code: lastSale.qualified
+      I_V: improvedVacant
+      L_Value: tax.landValue
+      M_Value: tax.marketValue
+      Ag_Use_Val: tax.agUseValue
+      Land_Use: landUse
+    notes: 'Verified 2026-09-28: NEW countywide public polygon source. SC Revenue and Fiscal Affairs Office
+      (state) item 0eb57066abc0403b8e2bdf760b6aae7d (owner RFA_Administrator, public, Query,Extract, no
+      token; RFA as-is disclaimer). count=183685 (7 blank TMS); 5-150 ac by acreage=8689; 4326 extent -81.388,33.742
+      to -80.544,34.309 (= Richland County SC); sample TMS R18000-03-66 vertex (-80.935,34.252) near Blythewood.
+      dataLastEditDate 2026-09-09. SR wkid 3600 — request outSR=4326; maxRecordCount 2000. SALEDATE is text
+      (M/D/YYYY) — parse before sorting. Alternates: same service layer 18 Statewide_Parcels where County=''Richland
+      County'' (184916, 13545 blank T_Map_Number) and Fairfield_Kershaw_Richland_Map_WFL1/FeatureServer/6
+      Richland_Parcels (184916, 2025-10-23, fuller CAMA incl. Total_Mkt_Val/Taxable_Value/AssessmentValue).
+      FRAGILITY: hosted inside a county-boundary project map, not an open-data item — snapshot extracts.
+      County richlandmaps.com still has no ArcGIS REST; its GeoServer WFS is disabled (per 9/23 dig).'
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: parcels
+    name: Dataviewer PHP parcel APIs (GetParcelData / GetParcels / RCGeoGetParcelAtLatLon)
+    restUrl: https://richlandmaps.com/apps/api/GetParcelData.php
+    layerId: null
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      Owner_Name: ownerName
+      Owner_Addr: mailingAddress
+      Owner_Ad_1: mailingAddress2
+      Owner_City: mailingAddress.city
+      Owner_Stat: mailingAddress.state
+      Owner_Zip: mailingAddress.zip
+      Address: situsAddress
+      Address_Nu: situsAddress.number
+      Address_Na: situsAddress.street
+      Zoning_Pri: zoning
+      Zoning_Sec: zoningAlt
+      Acreage: acreage
+      Market_Val: tax.marketValue
+      Building_V: tax.improvementValue
+      Land_Value: tax.landValue
+      Taxable_Va: tax.taxableValue
+      TaxDistric: tax.district
+      Last_Sale_: lastSale.date
+      Last_Sale1: lastSale.price
+      Last_Sal_2: lastSale.qualified
+      Keynum: taxAccount
+      WKT_Geom: geometryWkt
+    notes: >
+      Verified 2026-09-23: HTTP 200 single-parcel lookup, no token.
+      RCGeoGetParcelAtLatLon.php?lat=&lon= returns JSON with Parcel.* including WKT polygon
+      + owner/situs/zoning/tax/last-sale (sample TMS R08916-04-01).
+      GetParcelData.php?taxId={TMS}&addWktGeom=1 returns XML with same fields.
+      GetParcels.php?where=tms%3D{TMS} returns JSON + wkt_geom; open where/acreage filters
+      return {"data":[{"error":"LIMIT REACHED!"}]} or HTTP 500 — NOT bulk FeatureServer-class.
+      Browser CORS Access-Control-Allow-Origin is https://richlandmaps.com only; server-side
+      ingest still works. Companion: RCGeoSearchData.php for address search.
+      Dataviewer: https://richlandmaps.com/apps/dataviewer/
+    status: partial
+
+  - role: zoning
+    name: Richland County zoning (GeoServer WMS rcgeo_zoning_wgs84)
+    restUrl: https://geoserver.richlandmaps.com/geoserver/wms
+    layerId: null
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Verified 2026-09-23: WMS GetCapabilities lists postgisworkspace:rcgeo_zoning_wgs84
+      and rcgeo_zoning_overlay_districts. Dataviewer utfgrid hover uses zoning_pri / zoning_sec.
+      WFS disabled — no queryable FeatureServer field map. Tile/WMS visual only for bots
+      unless using GetFeatureInfo (point-in-time, not bulk). Prefer City of Columbia zoning
+      REST inside city; county zoning for unincorporated remains a FeatureServer gap.
+    status: gap
+
+  - role: flu
+    name: Richland oppzones future land use (GeoServer WMS)
+    restUrl: https://geoserver.richlandmaps.com/geoserver/wms
+    layerId: null
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap: {}
+    notes: >
+      WMS lists postgisworkspace:rcgeo_oppzones_future_land_use_wgs84 (opportunity-zone
+      focused FLU overlay, not countywide comprehensive-plan FLU REST). No WFS/FeatureServer.
+    status: gap
+
+  - role: tax
+    name: Richland CAMA values via PHP GetParcelData
+    restUrl: https://richlandmaps.com/apps/api/GetParcelData.php
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      Market_Val: tax.marketValue
+      Building_V: tax.improvementValue
+      Land_Value: tax.landValue
+      Taxable_Va: tax.taxableValue
+      TaxDistric: tax.district
+    notes: >
+      Same single-TMS PHP path as parcels role. Values are comma-formatted strings in samples
+      (e.g. "99,457,500") — parse before numeric filters. Not a bulk REST layer.
+    status: partial
+
+  - role: sales
+    name: Richland last-sale fields via PHP GetParcelData
+    restUrl: https://richlandmaps.com/apps/api/GetParcelData.php
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      Last_Sale_: lastSale.date
+      Last_Sale1: lastSale.price
+      Last_Sal_2: lastSale.qualified
+    notes: >
+      Last-sale only on parcel record (not multi-sale history table). Comp Sales app exists
+      on richlandmaps.com but no separate public FeatureServer verified this pass.
+    status: partial
+
+  - role: ownership
+    name: Richland ownership via PHP GetParcelData
+    restUrl: https://richlandmaps.com/apps/api/GetParcelData.php
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      Owner_Name: ownerName
+      Owner_Addr: mailingAddress
+      Owner_City: mailingAddress.city
+      Owner_Stat: mailingAddress.state
+      Owner_Zip: mailingAddress.zip
+    notes: Embedded on GetParcelData response; not a separate ownership service.
+    status: partial
+
+  # --- Municipalities (first-class) ---
+  - role: parcels
+    name: City of Columbia Tax Parcel (LandRecords)
+    restUrl: https://gis.columbiasc.gov/cola/rest/services/InnercityMap/LandRecords/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TMS: parcelId
+      RCTMSJoin: parcelIdAlt
+      Owner: ownerName
+      Address1: mailingAddress
+      Address2: mailingAddress2
+      City: mailingAddress.city
+      ST: mailingAddress.state
+      Zip: mailingAddress.zip
+      Loc: situsAddress
+      ZoningDistrict: zoning
+      Address3: dorCode
+      County: jurisdictionCounty
+      CityLimit: cityLimitFlag
+    notes: >
+      Verified 2026-09-23 via WebFetch pjson + count query: 210535 features, no token.
+      Description: property in City of Columbia water/sewer customer service area; Lexington
+      County provides a copy for verification; Richland provides no direct assistance.
+      Filter CityLimit='Y' (and/or County) for true municipal footprint — count is larger
+      than Columbia city limits alone. No acreage/sale/market-value fields on this layer.
+      JOIN KEY to Richland PHP CAMA: TMS (Richland-style R#####-##-##) or RCTMSJoin.
+      Same schema family also on EnerGov/EnergovInformationPublic/MapServer/13 (count 210579).
+    status: usable
+
+  - role: zoning
+    name: City of Columbia Zoning Districts (ZoningInfo)
+    restUrl: https://gis.columbiasc.gov/cola/rest/services/InnercityMap/ZoningInfo/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZoningDistrict: zoning
+      TMS: parcelId
+      Owner: ownerName
+      Address1: mailingAddress
+      City: mailingAddress.city
+      Zip: mailingAddress.zip
+      County: jurisdictionCounty
+      CityLimit: cityLimitFlag
+      Address3: dorCode
+    notes: >
+      Verified 2026-09-23: public, count 210579. Parcel-grain zoning polygons (not sparse
+      district outlines). City-only municipal zoning — JOIN to county parcels on TMS.
+      Alternate: EnerGov/EnergovInformationPublic/MapServer/20 (Zoning District, count 210579)
+      with fields ZoningDistrict, CityLimit, CouncilDistrict, SFHA.
+      curl SSL to gis.columbiasc.gov often EOF from research box; WebFetch/HTTP clients succeed.
+    status: usable
+
+  - role: flu
+    name: City of Columbia Future Land Use (EnerGov)
+    restUrl: https://gis.columbiasc.gov/cola/rest/services/EnerGov/EnergovInformationPublic/MapServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      DevType: flu
+      Name: fluName
+    notes: >
+      Verified 2026-09-23: public, count 464 FLU polygons. Same theme on
+      Public/CoCInfoPDS/MapServer/1 (DevType, Name, LABEL). City-only; spatial join to
+      parcels (no TMS on FLU layer). UCMF/UEMF codes are multifamily-relevant FLU types.
+    status: usable
+
+  - role: zoning
+    name: Forest Acres / Blythewood / Arcadia Lakes / Eastover / Irmo (Richland side) municipal zoning
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      No separate public municipal FeatureServer/MapServer verified for Forest Acres,
+      Blythewood, Arcadia Lakes, Eastover, or Town of Irmo (Richland portion) this pass.
+      AGOL title searches returned no SC municipal parcel/zoning services. Treat as gap;
+      may fall under Richland county zoning WMS (non-queryable) or require data purchase.
+    status: gap
+
+gaps:
+  - "2026-09-28: countywide public parcel polygons found — SC RFA Lexington_Richland_Web_Map_WFL1/FeatureServer/8 (183,685). The PHP dataviewer API remains a single-parcel fallback."
+  - "No county-published Richland County ArcGIS FeatureServer/MapServer for parcels (state RFA layer above is the countywide REST source)."
+  - "GeoServer WFS is disabled; WMS tiles + Dataviewer PHP single-TMS APIs only (bulk GetParcels hits LIMIT REACHED)."
+  - "County GIS data is sold under a licensing agreement (GIS@richlandcountysc.gov) — confirm ToS before bulk republish."
+  - "County zoning/FLU lack queryable REST field maps; City of Columbia fills municipal zoning/FLU only inside city / utility footprint."
+  - "Forest Acres, Blythewood, Arcadia Lakes, Eastover, Irmo: no verified public municipal zoning REST URLs."
+  - "Sale history is last-sale fields on PHP parcel payload, not a multi-transaction FeatureServer."
+  - "SCDOT SC_Parcels MapServer token-walled (499); statewide RFA parcel centroid is points-only (wrong geometry for outlines)."
+  - "City of Columbia LandRecords/ZoningInfo layers are water-sewer service area scale (~210k features) — filter CityLimit/County before treating as Columbia-only."
+
+license: "Richland County GIS viewer/APIs and City of Columbia GIS (gis.columbiasc.gov). Attribute source agencies. County shapefile downloads require purchase/license; confirm redistribution before bulk republish."
+appraiserSearchUrl: https://property.spatialest.com/sc/richland#/
+parcelSourceLicense: "SC Revenue and Fiscal Affairs Office public layer, provided as-is without warranty (RFA disclaimer on item 0eb57066abc0403b8e2bdf760b6aae7d)."
+publicGisUrl: https://www.richlandcountysc.gov/Property-Business/Mapping-and-Records/Geographic-Information-Systems
+jurisdictionGisUrl: https://www.richlandcountysc.gov/Property-Business/Mapping-and-Records/Geographic-Information-Systems
+appraiserDeepLink: https://property.spatialest.com/sc/richland/#/property/{parcelId}
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: partial
+    reason: RFA Richland layer 8 has M_Value (market) + L_Value (land) + Ag_Use_Val (String) - 170,258/184,916 M_Value>0.
+      No assessed/taxable on the RFA layer (richlandmaps PHP API had Taxable_Va but returns 403 to box).
+    source: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/8
+    fieldMap:
+      M_Value: tax.marketValue
+      L_Value: tax.landValue
+      Ag_Use_Val: tax.agUseValue (String)
+      Exemption1-3: tax.exemptions
+      PCA: tax.propertyClass
+    note: 'Sample R00200-01-04: M_Value 285,700 / L_Value 14,600 / Ag 172,000.'
+  sale:
+    status: usable
+    reason: SALEPRICE + SALEDATE + Qual_Code + Deed_Bk/Deed_Pg/Deed_Type on RFA layer 8.
+    fieldMap:
+      SALEPRICE: lastSale.price
+      SALEDATE: lastSale.date
+      Qual_Code: lastSale.qualified
+      Deed_Bk: lastSale.deedBook
+      Deed_Pg: lastSale.deedPage
+      Deed_Type: lastSale.deedType
+    format: SALEDATE is a STRING "M/D/YYYY 12:00:00 AM" ("8/3/2015 12:00:00 AM") - parse; SALEPRICE Double. Deed_Bk
+      like "R2047".
+  owner:
+    status: usable
+    mailingStatus: usable
+    fieldMap:
+      NAME1: ownerName
+      NAME2: ownerName2
+      ADDRESS1: mailingAddress.street
+      ADDRESS2: mailingAddress.street2
+      CITY: mailingAddress.city (may carry trailing comma "LITTLE MOUNTAIN,")
+      STATE: mailingAddress.state
+      ZIPCODE: mailingAddress.zip (ZIP+4 "29075-0000")
+      Ownership: ownerName (RFA normalized)
+  paLink:
+    status: partial
+    pattern: https://property.spatialest.com/sc/richland/#/property/{parcelId}
+    testedParcelId: R00200-01-04
+    idTransform: 'TMS as-is incl. leading R and dashes (indexed example #/property/R11204-02-01).'
+    reason: Spatialest SPA (hash route, client-rendered) - pattern search-indexed; box cannot render the SPA to
+      confirm the record.
+  publicGis:
+    status: partial
+    url: https://www.richlandcountysc.gov/Property-Business/Mapping-and-Records/Geographic-Information-Systems
+    reason: 'County Maps (GIS) page lists Dataviewer / Comp Sales / GeoInfo apps (fetched externally); richlandmaps.com
+      and county site return Akamai 403 to the box, so direct Dataviewer URL not captured. Public WMS: https://geoserver.richlandmaps.com/geoserver/wms'
+  aadt:
+    status: usable
+    reason: enrichment.aadt already present; confirmed, not re-dug.
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "South Carolina Public Info Researcher"
+  aadt:
+    source: "SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points)"
+    restUrl: "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0"
+    layerId: 0
+    field: "FactoredAA"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "South Carolina Public Info Researcher"
+    notes: "SCDOT-published 2025 statewide points (~11570); FactoredAA=factored AADT; FactoredA1 companion; filter CountyName (stored UPPERCASE; AGOL queries case-insensitive). smpesri.scdot.org EGIS has roads but no AADT layer. Sibling 2025_Statewide_Traffic_Lines also exists (~11575) — points are the stamped source."

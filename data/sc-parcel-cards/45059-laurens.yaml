@@ -1,0 +1,132 @@
+state: SC
+jurisdiction: Laurens County
+fips: "45059"
+level: county
+markets: [Greenville]
+
+layers:
+  - role: parcels
+    name: Parcel (Pebble TaxParcel)
+    restUrl: https://www.laurenscountygis.org/arcgis/rest/services/Pebble/TaxParcel/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      Owner: ownerName
+      Name1: ownerName1
+      Name2: ownerName2
+      Mailing_Address: mailingAddress.street
+      Mailing_City_State_ZIP: mailingAddress.cityStateZip
+      Property_Address: situsAddress
+      Acres: acreage
+      Sale_Price: lastSale.price
+      Sale_Date: lastSale.date
+      Deed_Book: lastSale.deedBook
+      Deed_Page: lastSale.deedPage
+      District: tax.district
+      Neighborhood: neighborhood
+    notes: 'Verified 2026-09-24: public MapServer, count 44989, no token. Geo-verified sample centroid ≈
+      (-82.14, 34.75) in Laurens County (Fountain Inn / county north). Sale_Date is YYYYMMDD string; Sale_Price
+      may be low/token values — validate against PA.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=44991; 1-feature outSR=4326 sample TMS=''148-00-00-006'' vertex
+      (-82.136,34.752) inside Laurens County SC bbox; parcel ID field TMS present.'
+    count: 44991
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Parcel — tax / sale attributes
+    restUrl: https://www.laurenscountygis.org/arcgis/rest/services/Pebble/TaxParcel/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      TMS: parcelId
+      Sale_Price: lastSale.price
+      Sale_Date: lastSale.date
+      Deed_Book: lastSale.deedBook
+      Deed_Page: lastSale.deedPage
+      Owner: ownerName
+    notes: Last-sale fields on parcel layer; assessed/market values not present on reviewed fields.
+    status: partial
+
+gaps:
+  - "No public zoning FeatureServer verified on dig day; LaurensGIS viewer is parcels/base data."
+  - "Assessed/market tax values not on MapServer/5 fields reviewed."
+  - "Reject SCDOT SC_Parcels (token required) as primary."
+
+license: "Laurens County GIS (laurenscountygis.org). Attribute to Laurens County."
+appraiserSearchUrl: https://beacon.schneidercorp.com/Application.aspx?AppID=1228&LayerID=39077&PageTypeID=2&PageID=14511
+publicGisUrl: https://www.laurenscountygis.org/LaurensGIS/
+jurisdictionGisUrl: https://www.laurenscountygis.org/LaurensGIS/
+appraiserDeepLink: https://beacon.schneidercorp.com/Application.aspx?AppID=1228&LayerID=39077&PageTypeID=4&KeyValue={parcelId}
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: partial
+    reason: County Pebble/TaxParcel/5 has NO value fields. RFA Statewide_Parcels (County='Laurens County') M_Value
+      populated for 23,790 of 43,549 (55%); T_Map_Number = TMS as-is (263-00-00-059).
+    source: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18
+    fieldMap:
+      M_Value: tax.marketValue (RFA, partial)
+  sale:
+    status: usable
+    reason: Sale_Price + Sale_Date + Deed_Book/Page on county layer.
+    fieldMap:
+      Sale_Price: lastSale.price
+      Sale_Date: lastSale.date
+      Deed_Book: lastSale.deedBook
+      Deed_Page: lastSale.deedPage
+    format: Sale_Date is a STRING "YYYYMMDD" ("20260113"); Sale_Price is a STRING ("15" - nominal) - cast; numeric
+      where-clauses fail (400).
+  owner:
+    status: usable
+    mailingStatus: usable
+    fieldMap:
+      Owner: ownerName
+      Name1: ownerName1
+      Name2: ownerName2
+      Mailing_Address: mailingAddress.street
+      Mailing_City_State_ZIP: mailingAddress.cityStateZip (single string)
+  paLink:
+    status: partial
+    pattern: https://beacon.schneidercorp.com/Application.aspx?AppID=1228&LayerID=39077&PageTypeID=4&KeyValue={parcelId}
+    searchUrl: https://beacon.schneidercorp.com/Application.aspx?AppID=1228&LayerID=39077&PageTypeID=2&PageID=14511
+    testedParcelId: 148-00-00-006
+    idTransform: KeyValue = TMS as-is (ddd-dd-dd-ddd).
+    reason: County-published short link schneidergis.co/laurenscosc -> Beacon AppID=1228 LayerID=39077 (search PageID=14511).
+      Report PageID not confirmed (Cloudflare 403 from box) - pattern omits PageID; confirm in browser and add PageID
+      if Beacon requires it.
+  publicGis:
+    status: usable
+    url: https://www.laurenscountygis.org/LaurensGIS/
+    reason: County GIS viewer (already on card; http->https 200).
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) - SCDOT 2025 Statewide Traffic Points, CountyName=LAURENS
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28);
+      not re-dug.

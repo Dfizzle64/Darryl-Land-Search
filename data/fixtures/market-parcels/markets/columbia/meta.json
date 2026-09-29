@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T01:35:40Z",
+  "generatedAt": "2026-09-29T01:37:15Z",
   "market": "Columbia",
   "tier": "other",
-  "parcelCount": 14613,
+  "parcelCount": 49244,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -16,6 +16,30 @@
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
+    {
+      "name": "Aiken",
+      "fips": "45003",
+      "state": "South Carolina",
+      "featureCount": 15502,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "sc-aiken-parcels-45003",
+      "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18/query",
+      "gaps": [
+        "Parcels are SC RFA Statewide_Parcels filtered to Aiken County (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "2026-09-28 correction: North Augusta Parcel_Service/0 is NOT county-wide (39,005 parcels, west Aiken only; RFA shows 101,173 countywide). Primary switched to SC RFA Statewide_Parcels where County='Aiken County' (fragile state-hosted layer). No Aiken County-published parcel REST found.",
+        "SalePrice/SaleDate are exposed, but the layer has no separate sale-qualified flag.",
+        "Aiken qPublic deep-link detail page was not confirmed; qPublic portal is available."
+      ],
+      "path": "data/fixtures/market-parcels/counties/45003/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45003/lookup.json",
+      "tileCount": 10,
+      "sourceCount": 15502
+    },
     {
       "name": "Calhoun",
       "fips": "45017",
@@ -36,23 +60,82 @@
       "sourceCount": null
     },
     {
+      "name": "Chesterfield",
+      "fips": "45025",
+      "state": "South Carolina",
+      "featureCount": 8287,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "sc-chesterfield-parcels-45025",
+      "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18/query",
+      "gaps": [
+        "Source query returned 8356 rows; 8287 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are SC RFA Statewide_Parcels filtered to Chesterfield County (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "tax partial: Only on third-party-hosted alt layer (evolvesoftware ChesterFieldParcels/2, last edit 2025-07-22; WTH-derived CAMA). No assessed/taxable field. RFA layer 18 L_Value (15046 populated) appears to carry BUILDING value for Chesterfield (086 000 000 085: L_Value 72000 = taxTotBldg 72000) — do not treat as land value.",
+        "sale partial: Sale fields only on third-party alt layer (stale ~2025-07); parse string date with %m/%d/%Y %I:%M:%S %p.",
+        "owner usable: Owner name on state RFA layer; mailing address only on third-party alt layer (partial currency).",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "Primary parcels now SC RFA Statewide_Parcels (layer 18, where County='Chesterfield County'), state-hosted inside a boundary-program map — fragile; alt source retained."
+      ],
+      "path": "data/fixtures/market-parcels/counties/45025/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45025/lookup.json",
+      "tileCount": 11,
+      "sourceCount": 8356
+    },
+    {
+      "name": "Edgefield",
+      "fips": "45037",
+      "state": "South Carolina",
+      "featureCount": 5811,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "sc-edgefield-parcels-45037",
+      "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Edgefield_McCormick_Greenwood_Web_Map_WFL1/FeatureServer/9/query",
+      "gaps": [
+        "Source query returned 5818 rows; 5811 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are SC RFA Edgefield Parcels (county CAMA join) — Edgefield_McCormick_Greenwood_Web_Map_WFL1 layer 9 (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Edgefield_McCormick_Greenwood_Web_Map_WFL1/FeatureServer/9). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "tax usable: RFA Edgefield Parcels layer 9 (new this pass) carries county CAMA; 2025-11 vintage. RFA/18 M_Value = Tot_Market only (acres component).",
+        "sale usable: Parse Instrmnt_D with %Y%m%d; Considerat is a String. Stale ~2025-11.",
+        "owner usable: Owner + mailing public on RFA layer 9 (also Ownership on RFA/18, 19438).",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "SCDOT statewide SC_Parcels requires token — not usable as primary."
+      ],
+      "path": "data/fixtures/market-parcels/counties/45037/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45037/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 5818
+    },
+    {
       "name": "Fairfield",
       "fips": "45039",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 5031,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-fairfield-parcels-45039",
+      "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Source query returned 5061 rows; 5031 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are SC RFA Statewide_Parcels filtered to Fairfield County (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "tax gap: Both RFA layers (Statewide/18 and Fairfield_Kershaw_Richland_Map_WFL1/8) have value fields but 0 populated for Fairfield; no county value REST found. Values only via Beacon PA.",
+        "sale gap: RFA Statewide_Parcels has no sale date/price fields; no county sale REST found. Sales visible only on PA parcel page (HTML).",
+        "owner gap: Ownership empty for Fairfield on both RFA layers; no public owner REST found. Owner only via Beacon PA page.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "Parcel polygons now loadable from SC RFA Statewide_Parcels (layer 18, where County='Fairfield County') plus RFA county-specific layer; state-hosted inside boundary-program maps — fragile, snapshot extracts. No county-published parcel REST found 2026-09-28."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45039/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45039/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 5061
     },
     {
       "name": "Kershaw",

@@ -1,0 +1,256 @@
+state: SC
+jurisdiction: Berkeley County
+fips: "45015"
+level: county
+markets: [Charleston]
+
+layers:
+  - role: parcels
+    name: Parcels (custom/Addr_muni)
+    restUrl: https://gis.berkeleycountysc.gov/arcgis/rest/services/custom/Addr_muni/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: TotalAcres
+    coverage: county-wide
+    fieldMap:
+      ParcelID: parcelId
+      O_TMS: parcelIdAlt
+      OwnerName: ownerName
+      StreetAddress1: mailingAddress
+      City: mailingAddress.city
+      StateProvince: mailingAddress.state
+      Zip: mailingAddress.zip
+      GIS_Address: situsAddress
+      GIS_Num: situsAddress.number
+      GIS_Street: situsAddress.street
+      TotalAcres: acreage
+      SalePrice: lastSale.price
+      SaleDate: lastSale.date
+      Validity: lastSale.qualified
+      LandMarket: tax.landValue
+      BuildingMarket: tax.improvementValue
+      TotalTaxValue: tax.assessedValue
+      UseType: dorCode
+      Jurisdiction: jurisdiction
+    notes: 'Verified 2026-09-23: HTTP 200 pjson + count query returned 104915 features, no token. Rich CAMA
+      attributes. StreetAddress1/City/Zip appear to be owner mailing in samples; use GIS_Address / GIS_Num
+      / GIS_Street for situs when populated. Validity field may indicate sale qualification — do not invent
+      meanings beyond source codes.
+
+      '
+    status: partial
+    staleness: 'Pass 2 2026-09-28: CAMA attributes frozen at 2021-10-27 (DateGenerated); geometry OK. Demoted usable->partial; use layer 4 for owner/sale/value.'
+    liveness: '2026-09-28 OK: returnCountOnly=104915; 1-feature outSR=4326 sample ParcelID=''021-00-01-003''
+      vertex (-80.137,33.421) inside Berkeley County SC bbox; parcel ID field ParcelID present.'
+    count: 104915
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: parcels
+    name: Parcel Lines (API internet_map_with_api)
+    restUrl: https://gis.berkeleycountysc.gov/arcgis/rest/services/API/internet_map_with_api/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: TotalAcres
+    coverage: county-wide
+    fieldMap:
+      ParcelID: parcelId
+      O_TMS: parcelIdAlt
+      OwnerName: ownerName
+      StreetAddress1: mailingAddress
+      City: mailingAddress.city
+      Zip: mailingAddress.zip
+      GIS_Address: situsAddress
+      TotalAcres: acreage
+      SalePrice: lastSale.price
+      SaleDate: lastSale.date
+      TotalTaxValue: tax.assessedValue
+    notes: >
+      Verified 2026-09-23: public, count 123050. Used by Advanced Mapping API service.
+      Slightly higher parcel count than Addr_muni; fewer tax breakdown fields.
+      Prefer Addr_muni when attribute completeness matters; use this if broader geometry coverage needed.
+    status: usable
+
+  - role: zoning
+    name: Zoning (Berkeley County) — API internet_map_with_api
+    restUrl: https://gis.berkeleycountysc.gov/arcgis/rest/services/API/internet_map_with_api/MapServer/33
+    layerId: 33
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONE: zoning
+      ZONE_ORDINANCE: zoningOrdinance
+      ZONE_DATE: zoningDate
+      O_TMS: parcelIdAlt
+    notes: >
+      Verified 2026-09-23: public, count 78624. County zoning polygons.
+      Same theme also on internet/MapServer/46 and custom/New_Parcel_Zoning/MapServer/5.
+      Municipal zoning also present on same MapServer: Goose Creek (37), Hanahan (38),
+      Moncks Corner (45) — city-only overlays, not county-wide substitutes.
+    status: usable
+
+  - role: zoning
+    name: Zoning (Goose Creek) — API internet_map_with_api
+    restUrl: https://gis.berkeleycountysc.gov/arcgis/rest/services/API/internet_map_with_api/MapServer/37
+    layerId: 37
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+      ZONE_ORDINANCE: zoningOrdinance
+      ZONE_DATE: zoningDate
+      O_TMS: parcelIdAlt
+    notes: >
+      Verified 2026-09-23: public MapServer/37, count 18563, no token. City-only
+      zoning polygons hosted on Berkeley County GIS. JOIN KEY: O_TMS to county parcel
+      O_TMS / spatial intersect. Schema matches county Zoning/33. Geo extent WKID 2273
+      over Goose Creek. Prefer this over county Zoning/33 inside city limits.
+    status: usable
+
+  - role: zoning
+    name: Zoning (Hanahan) — API internet_map_with_api
+    restUrl: https://gis.berkeleycountysc.gov/arcgis/rest/services/API/internet_map_with_api/MapServer/38
+    layerId: 38
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+      ZONE_ORDINANCE: zoningOrdinance
+      ZONE_DATE: zoningDate
+      O_TMS: parcelIdAlt
+    notes: >
+      Verified 2026-09-23: public MapServer/38, count 6970, no token. City-only
+      zoning polygons hosted on Berkeley County GIS. JOIN KEY: O_TMS to county parcel
+      O_TMS / spatial intersect. Schema matches county Zoning/33. Geo extent WKID 2273
+      over Hanahan. Prefer this over county Zoning/33 inside city limits.
+    status: usable
+
+  - role: zoning
+    name: Zoning (Moncks Corner) — API internet_map_with_api
+    restUrl: https://gis.berkeleycountysc.gov/arcgis/rest/services/API/internet_map_with_api/MapServer/45
+    layerId: 45
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+      ZONE_ORDINANCE: zoningOrdinance
+      ZONE_DATE: zoningDate
+      O_TMS: parcelIdAlt
+    notes: >
+      Verified 2026-09-23: public MapServer/45, count 8647, no token. City-only
+      zoning polygons hosted on Berkeley County GIS. JOIN KEY: O_TMS to county parcel
+      O_TMS / spatial intersect. Schema matches county Zoning/33. Geo extent WKID 2273
+      over Moncks Corner. Prefer this over county Zoning/33 inside city limits.
+    status: usable
+
+  - role: parcels
+    name: parcels_berkeley_county (ArcGIS Online FeatureServer)
+    restUrl: https://services7.arcgis.com/bXXSr0Lm29B0aD4l/ArcGIS/rest/services/parcels_berkeley_county/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: token
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Verified 2026-09-23: ?f=pjson and count query return error 499 Token Required (GWM_0003).
+      Do not use for unauthenticated ingest; prefer gis.berkeleycountysc.gov MapServer layers.
+    status: blocked
+
+gaps:
+  - "AGOL hosted parcels_berkeley_county FeatureServer is token-walled (499)."
+  - "Goose Creek / Hanahan / Moncks Corner municipal zoning fieldMaps enumerated 2026-09-23 (ZONE/ZONE_ORDINANCE/ZONE_DATE/O_TMS) — status usable; still hosted on county MapServer (no separate city REST found)."
+  - "No separate multi-sale history FeatureServer found; SaleDate/SalePrice are last-sale style fields on parcel layers."
+  - "Future land use exists on New_Parcel_Zoning and internet_map group layers — not fully field-mapped this pass."
+  - '2026-09-28 Pass 2: Addr_muni/1 attributes are a 2021-10-27 CAMA snapshot (max SaleDate 2021-11-06) - owner/sale/value STALE. Use internet_map_with_api/4 (current, max SaleDate 2026-09-11) for owner/sale/TotalTaxValue.'
+
+license: "Public Berkeley County GIS REST services (gis.berkeleycountysc.gov). Attribute Berkeley County GIS. Confirm any hub/open-data license before bulk republish."
+appraiserSearchUrl: https://assessor.berkeleycountysc.gov/prop_card_search.php
+publicGisUrl: https://gis.berkeleycountysc.gov/maps/cloud_map
+jurisdictionGisUrl: https://gis.berkeleycountysc.gov/
+appraiserDeepLink: https://assessor.berkeleycountysc.gov/property_card.php?tms={parcelId}
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  staleSourceWarning: custom/Addr_muni/MapServer/1 (current primary) is a CAMA SNAPSHOT from 2021-10-27 (DateGenerated
+    1635372257000; max SaleDate 2021-11-06). Its owner/sale/value fields are ~5 years stale (e.g. 021-00-02-051
+    owner BRAZIER ALLEN E & MARTHA L on Addr_muni vs BRAZIER MARTHA L LIFE ESTATE on live property card + layer
+    4). USE internet_map_with_api/MapServer/4 (count 123,119, max SaleDate 2026-09-11) for owner/sale/tax; keep
+    Addr_muni only for its richer land-use/district breakdown with a staleness flag.
+  tax:
+    status: partial
+    reason: Current layer 4 has TotalTaxValue only (taxable/assessed-base; sample 144,555). Land/building market
+      split exists only on stale Addr_muni (LandMarket/BuildingMarket, 2021).
+    source: https://gis.berkeleycountysc.gov/arcgis/rest/services/API/internet_map_with_api/MapServer/4
+    fieldMap:
+      TotalTaxValue: tax.taxableValue (layer 4, current)
+      LandMarket: tax.landValue (Addr_muni, 2021 snapshot)
+      BuildingMarket: tax.improvementValue (Addr_muni, 2021 snapshot)
+  sale:
+    status: usable
+    reason: Layer 4 current SalePrice + SaleDate + DeedBook/DeedPage (max SaleDate 2026-09-11). No qualified flag
+      on layer 4 (Validity only on stale Addr_muni).
+    source: https://gis.berkeleycountysc.gov/arcgis/rest/services/API/internet_map_with_api/MapServer/4
+    fieldMap:
+      SalePrice: lastSale.price
+      SaleDate: lastSale.date
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      Plat: platReference
+    format: SaleDate esri Date epoch ms (1761782400000 = 2025-10-30); SalePrice Double, nominal values (5.0) = non-arms-length.
+  owner:
+    status: usable
+    mailingStatus: usable
+    source: https://gis.berkeleycountysc.gov/arcgis/rest/services/API/internet_map_with_api/MapServer/4
+    fieldMap:
+      OwnerName: ownerName
+      StreetAddress1: mailingAddress.street
+      StreetAddress2: mailingAddress.street2
+      City: mailingAddress.city
+      StateProvince: mailingAddress.state
+      Zip: mailingAddress.zip
+  paLink:
+    status: usable
+    pattern: https://assessor.berkeleycountysc.gov/property_card.php?tms={parcelId}
+    testedParcelId: 0210002051 (also 021-00-02-051)
+    idTransform: tms accepts O_TMS (10-digit, no dashes) or dashed ParcelID - both returned the same card (HTTP
+      200, owner BRAZIER MARTHA L LIFE ESTATE).
+    reason: Live-tested 2026-09-28 from box.
+  publicGis:
+    status: usable
+    url: https://gis.berkeleycountysc.gov/maps/cloud_map
+    reason: Berkeley County GIS "cloud map" linked from gis.berkeleycountysc.gov home (also /maps/advanced_map).
+  aadt:
+    status: usable
+    reason: enrichment.aadt already present; confirmed, not re-dug.
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "Public Information Researcher"
+  aadt:
+    source: "SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points)"
+    restUrl: "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0"
+    layerId: 0
+    field: "FactoredAA"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Public Information Researcher"
+    notes: "SCDOT-published 2025 statewide points (~11570); FactoredAA=factored AADT; FactoredA1 companion; filter CountyName. smpesri.scdot.org EGIS has roads but no AADT layer."

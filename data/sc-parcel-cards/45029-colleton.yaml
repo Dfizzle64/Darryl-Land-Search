@@ -1,0 +1,151 @@
+state: SC
+jurisdiction: Colleton County
+fips: "45029"
+level: county
+markets: [Charleston]
+
+layers:
+  - role: parcels
+    name: parcels (Colleton WebDataLayers)
+    restUrl: https://services1.arcgis.com/m0cnLGKdhwao8WvM/arcgis/rest/services/WebDataLayers/FeatureServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Acreage: acreage
+      LegalAcres: acreageDeed
+      PropertyAddress: situsAddress
+      PropertyCity: situsCity
+      PropertyState: situsState
+      PropertyZip: situsZip
+      OwnerName1: ownerName
+      OwnerName2: ownerName2
+      OwnerAddress1: mailingAddress.street
+      OwnerCity: mailingAddress.city
+      OwnerState: mailingAddress.state
+      OwnerZip: mailingAddress.zip
+      PropertyClass: dorCode
+      TaxDistrict: tax.district
+      ZoningName: zoning
+      ZoningCode: zoningCode
+      ZoningAuthority: zoningAuthority
+    notes: 'Verified 2026-09-24: Colleton County public ArcGIS org service, no token; count 34,407. Polygon
+      sample returned WGS84 coordinates around (-80.39, 32.48) and (-80.30, 32.50), in Colleton County,
+      SC. Public fields include PIN, acreage, situs, owner/mailing address, property class, tax district,
+      and zoning fields. WebDataStaticLayers was checked through the county''s current Experience configuration
+      and has no parcel layer; this is the countywide parcel layer in WebDataLayers/11.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=34407; 1-feature outSR=4326 sample PIN=''353-00-00-002.000''
+      vertex (-80.390,32.476) inside Colleton County SC bbox; parcel ID field PIN present.'
+    count: 34407
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: zoning
+    name: Zoning (Colleton WebDataLayers)
+    restUrl: https://services1.arcgis.com/m0cnLGKdhwao8WvM/arcgis/rest/services/WebDataLayers/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONING_CLA: zoningCode
+      Zoning_Des: zoning
+    notes: Public county zoning polygons; parcel layer's ZoningName/ZoningCode should be preferred for parcel joins where populated.
+    status: usable
+
+  - role: other
+    name: qPublic assessor search (HTML; no REST)
+    restUrl: https://www.qpublic.net/sc/colleton/search.html
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      County GIS page links the Colleton qPublic assessor portal. It is a public
+      interactive HTML search, not a verified public REST endpoint; use for tax
+      values and sale history lookup by PIN.
+    status: gap
+
+gaps:
+  - "No assessed/market/taxable value or sale price/date fields were present in the verified WebDataLayers/11 parcel schema; qPublic is available for interactive tax/sale lookup but no public REST was verified."
+  - "Current ColletonGIS WebDataStaticLayers has no parcels; do not use it as a parcel source."
+  - "Rejected wrong-geography search result: services.arcgis.com/KkJhFbLnXVqahKz2/Assessor_Parcels_Public1 sampled Santa Maria, California, not Colleton County SC."
+  - "Owner and address fields are public in WebDataLayers/11; normalize padded strings before use."
+
+license: "Colleton County GIS public services (services1.arcgis.com/m0cnLGKdhwao8WvM); attribution required."
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=1046&LayerID=23500&PageTypeID=4&PageID=9800&KeyValue={parcelId}
+publicGisUrl: https://experience.arcgis.com/experience/c3ed5805c6fa4ca5bbaf650fb91cd728
+jurisdictionGisUrl: https://www.colletoncounty.org/gis-mapping/parcel-mapping
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: gap
+    reason: WebDataLayers/11 parcels and /10 parcelTemp schemas (checked 2026-09-28) have PropertyClass/TaxDistrict
+      but no assessed/market/taxable values; RFA Statewide_Parcels Colleton rows have Ownership but no M_Value. Values
+      only via qPublic HTML.
+    fieldMap:
+      TaxDistrict: tax.district
+      PropertyClass: dorCode (text, padded)
+  sale:
+    status: gap
+    reason: No sale date/price/deed fields on any WebDataLayers layer or RFA layer. qPublic report only.
+    fieldMap: {}
+    format: n/a
+  owner:
+    status: usable
+    mailingStatus: usable
+    reason: Owner + mailing on WebDataLayers/11 (34,407); strings space-padded (trim).
+    source: https://services1.arcgis.com/m0cnLGKdhwao8WvM/arcgis/rest/services/WebDataLayers/FeatureServer/11
+    fieldMap:
+      OwnerName1: ownerName
+      OwnerName2: ownerName2
+      OwnerAddress1: mailingAddress.street
+      OwnerCity: mailingAddress.city
+      OwnerState: mailingAddress.state
+      OwnerZip: mailingAddress.zip (String, padded)
+    notes: Layer 10 parcelTemp also carries ContractOwner1/2 + contract mailing (land-contract purchasers).
+  paLink:
+    status: partial
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?AppID=1046&LayerID=23500&PageTypeID=4&PageID=9800&KeyValue={parcelId}
+    testedParcelId: 123-00-00-002.000
+    idTransform: KeyValue = PIN as-is incl. ".000" suffix (###-##-##-###.###); ALTPin (13 digits, no punctuation)
+      is NOT the key.
+    reason: AppID=1046/LayerID=23500 confirmed; indexed URLs show search PageID=9798 (type 2) and results PageID=9799
+      (type 3) with KeyValue=123-00-00-002.000, so report PageID=9800 (type 4) by qPublic sequence. Card had PageTypeID=4
+      with search PageID 9798 - corrected. Report not loaded directly (Cloudflare 403).
+  publicGis:
+    status: usable
+    reason: Experience item c3ed5805c6fa4ca5bbaf650fb91cd728 = "Colleton County Parcel Viewer", public, owner bill.addison.ccg
+      (county GIS); county parcel-mapping page 200.
+  gaps:
+  - No tax value or sale fields in public REST; qPublic HTML only.
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) — SCDOT 2025 Statewide Traffic Points, filter CountyName
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28); not
+      re-dug.

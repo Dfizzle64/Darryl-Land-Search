@@ -1,0 +1,145 @@
+state: SC
+jurisdiction: Hampton County
+fips: "45049"
+level: county
+markets: [Charleston]
+
+layers:
+  - role: parcels
+    name: Parcels_Published
+    restUrl: https://services8.arcgis.com/6eabNhFouHU5vuYk/arcgis/rest/services/Parcels_Published_view/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Tot_Number_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_polygons_TMS: parcelId
+      Map_Number: parcelIdAlt
+      Name1: ownerName
+      Name2: ownerName2
+      Address1: mailingAddress.street
+      Address2: mailingAddress.cityState
+      ZIP_Code: mailingAddress.zip
+      Street_Number_E911: situsAddress.number
+      Street_Name_E911: situsAddress.street
+      Tot_Number_Acres: acreage
+      Tot_Market_Appr: tax.marketValue
+      Tot_Assesd_Value: tax.assessedValue
+      Consideration: lastSale.price
+      Instrmnt_Dt: lastSale.date
+      Deed_Book: lastSale.deedBook
+      Deed_Page: lastSale.deedPage
+      District: tax.district
+    notes: 'Verified 2026-09-24: public AGOL view (owner hamptoncountyscgis), count 14871, no token. Geo-verified
+      sample centroid ≈ (-81.40, 32.73) in Hampton County. Acreage/value fields often comma-formatted strings
+      — parse before numeric use. Instrmnt_Dt is YYYYMMDD.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=14871; 1-feature outSR=4326 sample Parcel_polygons_TMS=''009-00-00-001.''
+      vertex (-81.365,32.746) inside Hampton County SC bbox; parcel ID field Parcel_polygons_TMS present.'
+    count: 14871
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Parcels_Published — tax / sale
+    restUrl: https://services8.arcgis.com/6eabNhFouHU5vuYk/arcgis/rest/services/Parcels_Published_view/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Tot_Number_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_polygons_TMS: parcelId
+      Tot_Market_Appr: tax.marketValue
+      Tot_Assesd_Value: tax.assessedValue
+      Consideration: lastSale.price
+      Instrmnt_Dt: lastSale.date
+      Name1: ownerName
+    notes: Same layer. Values may be string with commas.
+    status: usable
+
+gaps:
+  - "No public zoning FeatureServer verified on dig day."
+  - "Parcel Lines FS/0 is lines only — use FS/1 polygons."
+  - "Rejected SCDOT SC_Parcels (token required)."
+
+license: "Hampton County GIS AGOL (6eabNhFouHU5vuYk). Attribute to Hampton County."
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=902&LayerID=17042&PageTypeID=4&PageID=7674&KeyValue={parcelId}
+publicGisUrl: https://hamptoncountysc.maps.arcgis.com/apps/webappviewer/index.html?id=bf76cad67d1a48449fb7f9a316c4185e
+jurisdictionGisUrl: https://hamptoncountysc.maps.arcgis.com/
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: usable
+    reason: Market + assessed on county layer (14,871); values are comma-formatted STRINGS.
+    source: https://services8.arcgis.com/6eabNhFouHU5vuYk/arcgis/rest/services/Parcels_Published_view/FeatureServer/1
+    fieldMap:
+      Tot_Market_Appr: tax.marketValue (String "4,229,310" -> strip commas)
+      Tot_Assesd_Value: tax.assessedValue (String w/ commas)
+      District: tax.district
+      Class1: dorCode (SC class code, e.g. 800/820)
+      Exempt_Parcel: tax.exempt (Y/N)
+      Hmstd_Code: tax.homestead
+  sale:
+    status: usable
+    reason: Last instrument date, consideration, deed ref and true-sale flag on layer.
+    source: https://services8.arcgis.com/6eabNhFouHU5vuYk/arcgis/rest/services/Parcels_Published_view/FeatureServer/1
+    fieldMap:
+      Instrmnt_Dt: lastSale.date
+      Consideration: lastSale.price
+      True_Sale: lastSale.qualified (Y/N/blank)
+      Deed_Book: lastSale.deedBook
+      Deed_Page: lastSale.deedPage
+    format: Instrmnt_Dt String YYYYMMDD (e.g. "20130501"); Consideration String, may be "0"/"1" nominal - treat <=100
+      as non-market; True_Sale "N"/"Y"/"" (blank = unknown).
+  owner:
+    status: usable
+    mailingStatus: usable
+    reason: Name1/Name2 + mailing on layer.
+    source: https://services8.arcgis.com/6eabNhFouHU5vuYk/arcgis/rest/services/Parcels_Published_view/FeatureServer/1
+    fieldMap:
+      Name1: ownerName
+      Name2: ownerName2 (often C/O line)
+      Address1: mailingAddress.street
+      Address2: mailingAddress.cityState ("LURAY SC")
+      ZIP_Code: mailingAddress.zip (String)
+  paLink:
+    status: partial
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?AppID=902&LayerID=17042&PageTypeID=4&PageID=7674&KeyValue={parcelId}
+    testedParcelId: 197-00-00-049.
+    idTransform: KeyValue = Parcel_polygons_TMS as-is INCLUDING trailing period (e.g. "197-00-00-049.") - qPublic
+      report titles show the same trailing-dot form.
+    reason: 'AppID=902/LayerID=17042 and search PageID=7672 from qpublic.net/sc/hampton/search.html; Town of Yemassee
+      agenda packets contain printed qPublic "Hampton County, SC - Report: 197-00-00-049." pages (ID format confirmed).
+      Report PageID=7674 INFERRED (+2 convention verified on Aiken/Darlington). Not directly loaded (Cloudflare 403).
+      Previous card value was an AGOL mapviewer find URL, not a PA link.'
+  publicGis:
+    status: usable
+    reason: publicGisUrl -> county app "Hampton SC Parcels" (hamptoncountysc.maps.arcgis.com, owner hamptoncountyscgis,
+      public, 23k views); jurisdictionGisUrl -> county AGOL org home. Replaces raw mapviewer layer URL.
+  gaps:
+  - qPublic report PageID inferred, not directly loaded.
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) — SCDOT 2025 Statewide Traffic Points, filter CountyName
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28); not
+      re-dug.

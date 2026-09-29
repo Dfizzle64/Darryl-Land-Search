@@ -1,0 +1,31 @@
+{
+  "name": "Gates",
+  "fips": "37073",
+  "state": "North Carolina",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "featureCount": 2326,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-gates-parcels-37073",
+  "queryUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GatesParcelService/FeatureServer/5/query",
+  "gaps": [
+    "Parcels are GatesParcelService parcels (PRIMARY) (https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GatesParcelService/FeatureServer/5). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 2331 rows; 2326 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 187 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "This county is not on the rural Opportunity Zone pass-1 table. It fills the batch after Rutherford through Wilkes.",
+    "Non-OZ fill. Usable county parcel card; not on the rural Opportunity Zone pass-1 table.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37073/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37073/lookup.json",
+  "sourceCount": 2331,
+  "dropped": 0,
+  "tileCount": 5,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://www.bttaxpayerportal.com/itspublicgt/AppraisalCard.aspx?id={pclnbr}",
+  "gisViewerUrl": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=5140b9aee17143cda7e51801b085f10d"
+}

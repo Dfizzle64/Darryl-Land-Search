@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T04:49:50Z",
+  "generatedAt": "2026-09-29T04:52:13Z",
   "market": "Asheville",
   "tier": "other",
-  "parcelCount": 89533,
+  "parcelCount": 121232,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -159,6 +159,31 @@
       "lookup": "data/fixtures/market-parcels/counties/37039/lookup.json",
       "tileCount": 9,
       "sourceCount": 6510
+    },
+    {
+      "name": "Clay",
+      "fips": "37043",
+      "state": "North Carolina",
+      "featureCount": 2425,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-clay-parcels-37043",
+      "queryUrl": "https://services1.arcgis.com/H71paQpWhqUBnyO1/arcgis/rest/services/Parcels04162026/FeatureServer/0/query",
+      "gaps": [
+        "Parcels are Parcels04162026 (CAMA + polygons) (https://services1.arcgis.com/H71paQpWhqUBnyO1/arcgis/rest/services/Parcels04162026/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 2907 rows; 2425 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 123 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Clay keeps LegalLandT='AC' so a square-foot legal unit is not treated as acres.",
+        "This county is not on the rural Opportunity Zone pass-1 table. It fills the batch after Rutherford through Wilkes.",
+        "Non-OZ fill. Usable county parcel card; not on the rural Opportunity Zone pass-1 table.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37043/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37043/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 2907
     },
     {
       "name": "Graham",
@@ -472,6 +497,121 @@
       "lookup": "data/fixtures/market-parcels/counties/37149/lookup.json",
       "tileCount": 6,
       "sourceCount": 4702
+    },
+    {
+      "name": "Rutherford",
+      "fips": "37161",
+      "state": "North Carolina",
+      "featureCount": 11190,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-rutherford-parcels-37161",
+      "queryUrl": "https://gis.rutherfordcountync.gov/server/rest/services/Addressing/MapServer/2/query",
+      "gaps": [
+        "Parcels are Addressing Parcels (CAMA + polygons) (https://gis.rutherfordcountync.gov/server/rest/services/Addressing/MapServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 11199 rows; 11190 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 558 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37161/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37161/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 11199
+    },
+    {
+      "name": "Swain",
+      "fips": "37173",
+      "state": "North Carolina",
+      "featureCount": 2521,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-swain-parcels-37173",
+      "queryUrl": "https://maps.swaincountync.gov/server/rest/services/OperationalLayers/MapServer/4/query",
+      "gaps": [
+        "Parcels are OperationalLayers Tax Parcels (CAMA + polygons) (https://maps.swaincountync.gov/server/rest/services/OperationalLayers/MapServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale partial). Pass 2 counted 142 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Pass 2 sale: No sale fields on OperationalLayers/4. AGOL Swain_County_Parcels/0 Deed_Date non-null = 12,316 of 13,551 (live 2026-09-28); price only on ITSPublicSW AppraisalCard PDF.",
+        "Swain acreage is a string. The filter uses CAST AS FLOAT and LegalLandType='AC'. PIN is empty, so the parcel id is PARCEL_ID.",
+        "PIN is null everywhere, so use PARCEL_ID (the card md/yaml already say so; the JSON layer has no fieldMap). The acreage field is a string and needs CAST. Numeric alternate: AGOL Swain_County_Parcels/0 Acreage (13,551; 5–150 = 2906).",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37173/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37173/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 2521
+    },
+    {
+      "name": "Transylvania",
+      "fips": "37175",
+      "state": "North Carolina",
+      "featureCount": 3926,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-transylvania-parcels-37175",
+      "queryUrl": "https://gis.transylvaniacounty.org/server/rest/services/Parcels/FeatureServer/2/query",
+      "gaps": [
+        "Parcels are Parcels (CAMA + polygons) (https://gis.transylvaniacounty.org/server/rest/services/Parcels/FeatureServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 5188 rows; 3926 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 225 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37175/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37175/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 5188
+    },
+    {
+      "name": "Watauga",
+      "fips": "37189",
+      "state": "North Carolina",
+      "featureCount": 7120,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-watauga-parcels-37189",
+      "queryUrl": "https://gissvr.watgov.org/arcgis/rest/services/TaxParcels/parcelsdbf/FeatureServer/0/query",
+      "gaps": [
+        "Parcels are TaxParcels parcelsdbf (https://gissvr.watgov.org/arcgis/rest/services/TaxParcels/parcelsdbf/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 7472 rows; 7120 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 196 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37189/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37189/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 7472
+    },
+    {
+      "name": "Yancey",
+      "fips": "37199",
+      "state": "North Carolina",
+      "featureCount": 4517,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-yancey-parcels-37199",
+      "queryUrl": "https://gis.yanceycountync.org/server/rest/services/OperationalLayers2025/MapServer/0/query",
+      "gaps": [
+        "Parcels are OperationalLayers2025 TaxParcels (PRIMARY CAMA) (https://gis.yanceycountync.org/server/rest/services/OperationalLayers2025/MapServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 4555 rows; 4517 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 152 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Yancey STAMPS is excise tax, not a sale price, and is not stored as last-sale price. The property-appraiser pattern needs a two-digit card suffix the parcel layer does not publish, so parcel rows do not carry a filled appraiser URL.",
+        "This county is not on the rural Opportunity Zone pass-1 table. It fills the batch after Rutherford through Wilkes.",
+        "Non-OZ fill. Usable county parcel card; not on the rural Opportunity Zone pass-1 table.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37199/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37199/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 4555
     }
   ]
 }

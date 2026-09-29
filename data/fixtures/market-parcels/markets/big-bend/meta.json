@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T04:52:13Z",
+  "generatedAt": "2026-09-29T05:02:25Z",
   "market": "Big Bend",
   "tier": "other",
-  "parcelCount": 53214,
+  "parcelCount": 55317,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -59,6 +59,27 @@
       "sourceCount": 3252
     },
     {
+      "name": "Franklin",
+      "fips": "12037",
+      "state": "Florida",
+      "featureCount": 779,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-franklin-parcels-2023-12037",
+      "queryUrl": "https://gis.arpc.org/server/rest/services/Hosted/Parcels_2023/FeatureServer/0/query",
+      "gaps": [
+        "989 rows matched the acreage filter; 779 kept after the parcel-id and geometry checks.",
+        "Franklin polygons are ARPC Hosted/Parcels_2023. Acreage is the geodesic shape area, 5.0–150.0 inclusive. FDOR LND_SQFOOT is zero on most coastal parcels and is not the acreage.",
+        "FDOR joins need CO_NO=29 and parcelno exactly. Owner, tax, and the roll sale come from that FDOR row. MIL1 2023 is not the polygon source. No Opportunity Zone status is stored."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12037/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12037/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 989
+    },
+    {
       "name": "Gadsden",
       "fips": "12039",
       "state": "Florida",
@@ -78,6 +99,27 @@
       "lookup": "data/fixtures/market-parcels/counties/12039/lookup.json",
       "tileCount": 6,
       "sourceCount": 6170
+    },
+    {
+      "name": "Gulf",
+      "fips": "12045",
+      "state": "Florida",
+      "featureCount": 1245,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-gulf-gomaps4-12045",
+      "queryUrl": "https://arcgis5.roktech.net/arcgis/rest/services/gulf/GoMaps4/MapServer/12/query",
+      "gaps": [
+        "1253 rows matched the acreage filter; 1245 kept after the parcel-id and geometry checks.",
+        "Gulf parcels are GoMaps4/MapServer/12. Acreage is ACREAGE, 5.0–150.0 inclusive. The property-appraiser pattern is stored and was not health-checked.",
+        "FDOR joins need CO_NO=33 and PIN_NODELIM exactly. MIL1 2023 is not the polygon source. No Opportunity Zone status is stored."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12045/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12045/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 1253
     },
     {
       "name": "Jackson",
@@ -103,45 +145,46 @@
       "name": "Jefferson",
       "fips": "12065",
       "state": "Florida",
-      "featureCount": 5165,
-      "coverage": "sample",
+      "featureCount": 5163,
+      "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
       "source": "fl-jefferson-pa-parcels-12065",
       "queryUrl": "https://services5.arcgis.com/vFMp1Ly1q6rKKp0o/arcgis/rest/services/JC__PARCELS_view/FeatureServer/0/query",
       "gaps": [
-        "Partial. Jefferson County Property Appraiser parcels have COGO_ACRES and a parcel id. No owner or situs.",
-        "Monticello city zoning and city future land use are joined inside the city outline. Unincorporated Jefferson County has no public zoning FeatureServer. Eligible tracts in this county stay eligible and are not designated QOZs.",
-        "Property appraiser search is https://jeffersonpa.net/. Null COGO_ACRES rows are omitted.",
-        "Join counts: monticello=48, county=5117, zoning=48, flu=48"
+        "5382 rows matched the acreage filter; 5163 kept after the parcel-id and geometry checks.",
+        "Jefferson parcels are JC__PARCELS_view/FeatureServer/0. Acreage is COGO_ACRES, 5.0–150.0 inclusive. Road placeholder 00-00-00-0000-0RDS-0000 is dropped.",
+        "OwnerPhone and OwnerEmail are present on the Jefferson roll and are not ingested.",
+        "FDOR joins need CO_NO=43 and the dashed PARCELID. Owner, tax, and the roll sale come from that FDOR row. The property-appraiser pattern is stored and was not health-checked. MIL1 2023 is not the polygon source. No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 5163 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12065/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12065/lookup.json",
       "tileCount": 8,
-      "sourceCount": 5383
+      "sourceCount": 5382
     },
     {
       "name": "Leon",
       "fips": "12073",
       "state": "Florida",
-      "featureCount": 5685,
+      "featureCount": 5684,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
       "source": "fl-leon-overlay-parcel-12073",
-      "queryUrl": "https://intervector.leoncountyfl.gov/intervector/rest/services/MapServices/TLC_OverlayParcel_D_WM/MapServer/0/query",
+      "queryUrl": "https://intervector.leoncountyfl.gov/intervector/rest/services/MapServices/TLC_OverlayParnal_D_WM/MapServer/0/query",
       "gaps": [
-        "Usable countywide 5–150 acre extract from TLC_OverlayParcel_D_WM/MapServer/0 (TAXID and CALC_ACREA). Property Appraiser link is https://search.leonpa.gov/Property/Details/{TAXID}. Eligible tracts in this county stay eligible and are not designated QOZs.",
-        "Tallahassee and unincorporated Leon County are separate jurisdictions. The city-limits polygon sets Tallahassee. Zoning polygons keep City versus County. PropInfo supplies situs, future land use, and tax. AccelaXAPO supplies owner and mailing address.",
-        "The overlay parcel layer has no owner or value. PropInfo has no sale date, no situs ZIP, and no DOR use code.",
-        "Join counts: tallahassee=1101, leonCounty=4584, zoning=5595, flu=5586, owners=5685, propinfo=5596"
+        "Leon parcels are TLC_OverlayParnal_D_WM/MapServer/0. Acreage is CALC_ACREA, 5.0–150.0 inclusive. Phone columns are not requested.",
+        "Where SECURE='S', owner and mailing address are suppressed.",
+        "FDOR joins need CO_NO=47 and TAXID exactly. The property-appraiser pattern is stored and was not health-checked. No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 5683 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12073/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12073/lookup.json",
       "tileCount": 6,
-      "sourceCount": 5685
+      "sourceCount": 5684
     },
     {
       "name": "Liberty",
@@ -210,23 +253,23 @@
       "name": "Wakulla",
       "fips": "12129",
       "state": "Florida",
-      "featureCount": 4784,
-      "coverage": "sample",
+      "featureCount": 4866,
+      "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-wakulla-county-parcels-12129",
-      "queryUrl": "https://services9.arcgis.com/vAltLjtfYIJc7pDt/arcgis/rest/services/Wakulla_County_Parcels/FeatureServer/0/query",
+      "source": "fl-wakulla-parcelm-12129",
+      "queryUrl": "https://services9.arcgis.com/vAltLjtfYIJc7pDt/arcgis/rest/services/ParcelM/FeatureServer/0/query",
       "gaps": [
-        "Partial. The county parcel layer has MAP_ACRES and PARCEL_ID only. No owner, situs, or county zoning.",
-        "County future land use is joined from the planning Future Land Use layer. Sopchoppy zoning (ZoningCat on Sopchoppy_FLUM_WFL1) is joined when the centroid falls inside it. St. Marks has no public zoning FeatureServer. Eligible tracts in this county stay eligible and are not designated QOZs.",
-        "Property appraiser search is https://mywakullapa.com/.",
-        "Join counts: flu=4776, sopchoppy=35, county=4749"
+        "4880 rows matched the acreage filter; 4866 kept after the parcel-id and geometry checks.",
+        "Wakulla parcels are ParcelM/FeatureServer/0. Acreage is MAP_ACRES, 5.0–150.0 inclusive. MIL1 2023 is not the polygon source.",
+        "FDOR joins need CO_NO=75 and PARCEL_ID with '-' removed. Owner, tax, and the roll sale come from that FDOR row. The property-appraiser pattern is stored and was not health-checked. No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 4675 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12129/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12129/lookup.json",
       "tileCount": 8,
-      "sourceCount": 4801
+      "sourceCount": 4880
     }
   ]
 }

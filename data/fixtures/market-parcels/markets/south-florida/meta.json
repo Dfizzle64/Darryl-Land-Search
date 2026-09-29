@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T04:52:13Z",
+  "generatedAt": "2026-09-29T05:02:25Z",
   "market": "South Florida",
   "tier": "shelf",
-  "parcelCount": 41693,
+  "parcelCount": 40322,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -44,7 +44,7 @@
       "name": "Miami-Dade",
       "fips": "12086",
       "state": "Florida",
-      "featureCount": 15563,
+      "featureCount": 14192,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
@@ -52,17 +52,16 @@
       "source": "fl-miami-dade-landinformation-26",
       "queryUrl": "https://gisweb.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/26/query",
       "gaps": [
-        "Wave 0 is South Florida only. Miami-Dade parcels are MD_LandInformation MapServer/26. Acreage is LOT_SIZE square feet divided by 43560, 5.0–150.0 inclusive.",
-        "PRIMARY_ZONE is a property-appraiser neighborhood code, not a zoning district. Zoning is Zone_Poly_U (unincorporated) or MunicipalZone. It is not copied from PRIMARY_ZONE.",
-        "Last sale is not on the parcel layer. The property-appraiser folio API is the sales source and is not copied onto the row. Assessed and taxable value are richer on that API than TOTAL_VAL_CUR.",
-        "Land and improvement amounts are published on the layer. This shelf stores market value from TOTAL_VAL_CUR. It does not invent a separate land or improvement column.",
-        "GDSC mdc_parcels, MapServer/24 points, and CAD911/22 were not used.",
-        "Miami-Dade zoning joined 13461/15563. CDMP future land use joined 14852/15563."
+        "15268 rows matched the acreage filter; 14192 kept after the parcel-id and geometry checks.",
+        "Miami-Dade parcels are MD_LandInformation/MapServer/26. Acreage is LOT_SIZE square feet / 43560, 5.0–150.0 inclusive. Multipart rows are deduped on FOLIO. Condo units do not inherit parent acreage, so there is no condo filter.",
+        "PRIMARY_ZONE is a property-appraiser neighborhood code, not a zoning district. The parcel layer has no sale. The roll sale comes from FDOR.",
+        "FDOR joins need CO_NO=23 and FOLIO exactly. No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 14063 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12086/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12086/lookup.json",
       "tileCount": 12,
-      "sourceCount": 15563
+      "sourceCount": 15268
     },
     {
       "name": "Monroe",

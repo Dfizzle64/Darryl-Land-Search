@@ -64,7 +64,7 @@ def test_cards_are_the_source_urls() -> None:
 
 def test_deep_links_and_rejected_hosts() -> None:
     miami = appraiser_url("12086", "30-4131-053-0060")
-    assert miami == "https://apps.miamidadepa.gov/ComparableSales/#/?folio=3041310530060"
+    assert miami == "https://apps.miamidadepa.gov/PropertySearch/#/?folio=3041310530060"
     assert "PropertySearch" not in miami
     monroe = appraiser_url("12087", "00000010-000200")
     assert "AppID=605" in monroe and "KeyValue=00000010-000200" in monroe

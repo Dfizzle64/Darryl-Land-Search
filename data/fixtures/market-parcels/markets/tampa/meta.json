@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-29T04:52:13Z",
+  "generatedAt": "2026-09-29T05:02:25Z",
   "market": "Tampa",
   "tier": "primary",
   "parcelCount": 127713,
@@ -99,20 +99,17 @@
       "minAcres": 5.0,
       "maxAcres": 150.0,
       "source": "fl-hillsborough-parcelpublishing-12",
-      "queryUrl": "https://maps.hillsboroughcounty.org/arcgis1a/rest/services/SDEMapServices/ParcelPublishing/FeatureServer/12/query",
+      "queryUrl": "https://maps.hillsboroughcounty.org/arcgis1a/rest/services/SDEMapServices/ParcelPublishing/MapServer/12/query",
       "gaps": [
-        "Hillsborough sale flag VI is vacant/improved, not an FDOR qualified (Q/U) sale.",
-        "Unincorporated zoning is RegulatoryZoning/8. Tampa, Temple Terrace, and Plant City zoning are city layers joined onto county parcels.",
-        "Temple Terrace zoning joins on FOLIO. Tampa and Plant City zoning are spatial. Future land use is Planning/4 filtered by JURISDICTION.",
-        "MUNI letters were verified from the PIN prefix: A is Tampa, T is Temple Terrace, P is Plant City, U is unincorporated."
+        "Hillsborough parcels are ParcelPublishing/MapServer/12. The FeatureServer advertises public edits and is queried read-only through the MapServer twin. Acreage is ACREAGE, 5.0–150.0 inclusive. The stored parcel id is FOLIO.",
+        "Mailing address is suppressed where OWNER contains 'Confidential'. Owner phone and email are not ingested.",
+        "FDOR joins need CO_NO=39 and STRAP exactly. FOLIO is ALT_KEY, not PARCEL_ID. No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 13838 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12057/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12057/lookup.json",
       "tileCount": 10,
-      "sourceCount": 13838,
-      "zoningJoinedCount": 13786,
-      "fluJoinedCount": 13785,
-      "rejected": []
+      "sourceCount": 13838
     },
     {
       "name": "Manatee",

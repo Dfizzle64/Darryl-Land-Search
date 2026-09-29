@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T04:52:13Z",
+  "generatedAt": "2026-09-29T05:02:25Z",
   "market": "Vero Beach",
   "tier": "other",
-  "parcelCount": 23480,
+  "parcelCount": 23470,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -337,85 +337,15 @@
       "source": "fl-martin-geoweb-12085",
       "queryUrl": "https://geoweb.martin.fl.us/arcgis/rest/services/Administrative_Areas/base_map/MapServer/10/query",
       "gaps": [
-        "Rejected a thin Martin AGOL clip as the county roll. Parcels are geoweb.martin.fl.us base_map layer 10, which covers the county, not an Indiantown-sized extract.",
-        "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
-        "Jupiter Island, Sewall's Point, and Ocean Breeze have no public zoning or FLU service. County polygons that only name the town are not used as their districts.",
-        "Stuart FLU was not on the city zoning service. Indiantown publishes zoning and not a separate FLU layer. County FLU is unincorporated only.",
-        "The parcel layer has owner, situs, mailing, and AREA_ACRES. It has no sale price, sale date, or tax values.",
-        "No owner phone or email is copied."
+        "3796 rows matched the acreage filter; 3790 kept after the parcel-id and geometry checks.",
+        "Martin parcels are geoweb base_map/MapServer/10. Acreage is AREA_ACRES, 5.0–150.0 inclusive. The stored parcel id is PCN.",
+        "FDOR joins need CO_NO=53 and PCN re-dashed 2-2-2-3-3-5-1. The raw 18-digit PCN does not match PARCEL_ID. ALT_KEY is ACCOUNT. Tax and the roll sale come from that FDOR row. No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 3765 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12085/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12085/lookup.json",
       "tileCount": 8,
-      "sourceCount": 3790,
-      "municipalities": [
-        {
-          "name": "Indiantown",
-          "independentGis": true,
-          "zoningUrl": "https://services6.arcgis.com/fwjLUNzkr85qH0zV/arcgis/rest/services/voi_zoning_public/FeatureServer/0",
-          "fluUrl": null,
-          "fluGap": "No public FLU layer for this municipality.",
-          "join": "spatial",
-          "zoningJoined": 110,
-          "fluJoined": 0,
-          "note": null
-        },
-        {
-          "name": "Jupiter Island",
-          "independentGis": false,
-          "zoningUrl": null,
-          "fluUrl": null,
-          "fluGap": null,
-          "join": null,
-          "zoningJoined": 0,
-          "fluJoined": 0,
-          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
-        },
-        {
-          "name": "Ocean Breeze",
-          "independentGis": false,
-          "zoningUrl": null,
-          "fluUrl": null,
-          "fluGap": null,
-          "join": null,
-          "zoningJoined": 0,
-          "fluJoined": 0,
-          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
-        },
-        {
-          "name": "Sewall's Point",
-          "independentGis": false,
-          "zoningUrl": null,
-          "fluUrl": null,
-          "fluGap": null,
-          "join": null,
-          "zoningJoined": 0,
-          "fluJoined": 0,
-          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
-        },
-        {
-          "name": "Stuart",
-          "independentGis": true,
-          "zoningUrl": "https://services.arcgis.com/RyoFD3Lw9KSERnvQ/arcgis/rest/services/COS_Zoning/FeatureServer/0",
-          "fluUrl": null,
-          "fluGap": "No public FLU layer for this municipality.",
-          "join": "spatial",
-          "zoningJoined": 139,
-          "fluJoined": 0,
-          "note": null
-        }
-      ],
-      "unincorporated": {
-        "zoningUrl": "https://geoweb.martin.fl.us/arcgis/rest/services/Administrative_Areas/Future_Landuse_Zoning/MapServer/1",
-        "fluUrl": "https://geoweb.martin.fl.us/arcgis/rest/services/Administrative_Areas/Future_Landuse_Zoning/MapServer/0",
-        "zoningFeatures": 3432,
-        "fluFeatures": 2820,
-        "zoningJoined": 3463,
-        "fluJoined": 3461,
-        "note": "County zoning values that are only a municipality name (STUART and the other towns) are stubs and are not joined. Stuart uses the city zoning service. Indiantown uses the village zoning service."
-      },
-      "zoningJoinedCount": 3712,
-      "fluJoinedCount": 3461
+      "sourceCount": 3796
     },
     {
       "name": "Okeechobee",
@@ -443,71 +373,23 @@
       "name": "St. Lucie",
       "fips": "12111",
       "state": "Florida",
-      "featureCount": 5585,
+      "featureCount": 5575,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
       "source": "fl-slc-parcels-12111",
-      "queryUrl": "https://slcgis.stlucieco.gov/hosting/rest/services/Parcel_Boundaries/MapServer/0/query",
+      "queryUrl": "https://slcgis.stlucieco.gov/hosting/rest/services/Parcel_Boundaries/FeatureServer/0/query",
       "gaps": [
-        "Rejected Fort Pierce Zoning FeatureServer/0. That layer is Current Project Development (projects), not zoning. City zoning is FeatureServer/7.",
-        "Eligible is not designated. Layers named Opportunity Zone, including Fort Pierce Zoning layer 9 and the Okeechobee 2019 opportunity-zone service, are not joined. OZ 2.0 eligibility stays a census-tract overlay.",
-        "St. Lucie Village is on the municipal boundary layer and has no public zoning or FLU service. Those parcels are not given county districts.",
-        "Fort Pierce and Port St. Lucie zoning are the city layers. County zoning is unincorporated only.",
-        "The parcel service has no sale date or price. TotalAppraisedValue is stored as tax.marketValue. Assessed, taxable, and a separate tax amount are not on this layer.",
-        "Confidential owner flags blank the owner name. No phone or email is copied."
+        "5590 rows matched the acreage filter; 5575 kept after the parcel-id and geometry checks.",
+        "St. Lucie parcels are Parcel_Boundaries/FeatureServer/0. Acreage is TOTAL_ACRE, 5.0–150.0 inclusive. The parcel id is the dashed ParcelID. Null ParcelIDs are dropped. PARCEL_NUMBER does not match FDOR.",
+        "Where IsConfidential is set, CuO owner and mailing fields are suppressed.",
+        "FDOR joins need CO_NO=66 and the dashed ParcelID. The property-appraiser pattern uses AccountNumber and was not health-checked. No Opportunity Zone status is stored."
       ],
       "path": "data/fixtures/market-parcels/counties/12111/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12111/lookup.json",
       "tileCount": 7,
-      "sourceCount": 5585,
-      "municipalities": [
-        {
-          "name": "Fort Pierce",
-          "independentGis": true,
-          "zoningUrl": "https://services1.arcgis.com/oDRzuf2MGmdEHAbQ/arcgis/rest/services/Zoning/FeatureServer/7",
-          "fluUrl": "https://services1.arcgis.com/oDRzuf2MGmdEHAbQ/arcgis/rest/services/FutureLandUse/FeatureServer/0",
-          "fluGap": null,
-          "join": "spatial",
-          "zoningJoined": 397,
-          "fluJoined": 397,
-          "note": null
-        },
-        {
-          "name": "Port St. Lucie",
-          "independentGis": true,
-          "zoningUrl": "https://services1.arcgis.com/YdUP5V6WwzeG8T8r/arcgis/rest/services/Zoning/FeatureServer/1",
-          "fluUrl": "https://services1.arcgis.com/YdUP5V6WwzeG8T8r/arcgis/rest/services/LandUse/FeatureServer/0",
-          "fluGap": null,
-          "join": "spatial",
-          "zoningJoined": 1439,
-          "fluJoined": 1442,
-          "note": null
-        },
-        {
-          "name": "St. Lucie Village",
-          "independentGis": false,
-          "zoningUrl": null,
-          "fluUrl": null,
-          "fluGap": null,
-          "join": null,
-          "zoningJoined": 0,
-          "fluJoined": 0,
-          "note": "No public zoning or FLU service. County districts are not copied onto this municipality."
-        }
-      ],
-      "unincorporated": {
-        "zoningUrl": "https://slcgis.stlucieco.gov/hosting/rest/services/LandUse/Zoning/MapServer/0",
-        "fluUrl": "https://slcgis.stlucieco.gov/hosting/rest/services/LandUse/FutureLandUse/MapServer/0",
-        "zoningFeatures": 3809,
-        "fluFeatures": 3791,
-        "zoningJoined": 3484,
-        "fluJoined": 3560,
-        "note": "County zoning and FLU are the parcel-level MapServer, limited to the 5–150 acre band. The dissolved AGOL ZoningDistrictsCombined layer is not the zoning source."
-      },
-      "zoningJoinedCount": 5320,
-      "fluJoinedCount": 5399
+      "sourceCount": 5590
     }
   ]
 }

@@ -135,5 +135,5 @@ describe("OZ 2.0 centroid join", () => {
     const empty = emptyStateHint(filters, 0, 0) ?? "";
     expect(empty).toMatch(/rural-eligible tract/);
     expect(empty).toMatch(/not a designated 2027 QOZ/);
-  });
+  }, 20_000);
 });

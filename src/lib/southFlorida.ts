@@ -9,7 +9,7 @@ export const SOUTH_FLORIDA_FIPS = ["12086", "12087", "12011", "12099"] as const;
 
 export type SouthFloridaFips = (typeof SOUTH_FLORIDA_FIPS)[number];
 
-const MIAMI_PA = "https://apps.miamidadepa.gov/ComparableSales/#/?folio=";
+const MIAMI_PA = "https://apps.miamidadepa.gov/PropertySearch/#/?folio=";
 const MONROE_PA =
   "https://qpublic.schneidercorp.com/Application.aspx?AppID=605&LayerID=9946&PageTypeID=4&PageID=7635&KeyValue=";
 const BROWARD_PA = "https://bcpa.net/RecInfo.asp?URL_Folio=";
@@ -29,7 +29,7 @@ export function southFloridaAppraiserLink(
     const folio = parcelId.replace(/\D/g, "") || parcelId;
     return {
       href: `${MIAMI_PA}${encodeURIComponent(folio)}`,
-      label: "Open Miami-Dade comparable sales for this folio",
+      label: "Open Miami-Dade property search for this folio",
     };
   }
   if (fips === "12087") {

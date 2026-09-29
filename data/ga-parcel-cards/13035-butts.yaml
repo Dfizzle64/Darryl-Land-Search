@@ -1,0 +1,586 @@
+state: GA
+jurisdiction: Butts County
+fips: "13035"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons + WinGAP-style CAMA (owner/mailing/situs/acres/FMV/zoning)
+  - role: parcels
+    name: ButtsCountyGA_WFS Parcels (SchneiderCorp MapServer — official qPublic GIS)
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      GSI_PIN: parcelPin
+      _REALKEY: ownerKey
+      _v_ON: ownerName
+      OwnerAddr: mailingAddress
+      OwnerCity: mailingCity
+      OwnerState: mailingState
+      OwnerZip: mailingZip
+      PropAddr: situsAddress
+      PropCity: municipalityFlag
+      PropState: situsState
+      PropZip: situsZip
+      _v_HN: situsNumber
+      TOTALACRES: acreage
+      DEED_ACRES: acreageDeed
+      CURR_VAL: tax.marketValue
+      ESTTAX: tax.estimatedTax
+      Zoning_01: zoning
+      Zoning_02: zoningSecondary
+      Zoning_03: zoningTertiary
+      Zoning_04: zoningQuaternary
+      DIGCLASS: dorCode
+      PropClass: propertyClass
+      LegalDesc: legalDescription
+      NEIGHBHOOD_CODE: neighborhood
+      SALES_AREA: salesNeighborhood
+      HOMEEXEMPT: homesteadExempt
+      YR_BUILT: yearBuilt
+      HEATEDAREA: heatedArea
+      SHAPE_Area: shapeAreaSqFt
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA landbase (SchneiderCorp WFS host for
+      Butts County GA qPublic / Tax Assessor; MapServer ButtsCountyGA_WFS layer 0; no
+      FeatureServer SOE — query MapServer/0). Live count 13595 (2026-09-23). SR StatePlane
+      GA West FIPS 1002 Feet 102667/2240. TOTALACRES filled ≈13481; TOTALACRES 5–150 ≈2752
+      (preferred acreage filter); DEED_ACRES filled ≈13387; DEED_ACRES 5–150 ≈2800.
+      _v_ON owner filled ≈13443; PARCEL_NO filled ≈13481; GSI_PIN filled ≈13592; PropAddr
+      filled ≈13080; OwnerAddr filled ≈13443; CURR_VAL>0 ≈13474; Zoning_01 filled ≈13591;
+      ESTTAX>0 ≈12876; _v_HN>0 ≈10681. PropCity domain: County≈10022, Jackson≈2858,
+      Flovilla≈386, Jenkinsburg≈215 — preferred municipality attribute filter (NOT mailing
+      OwnerCity). PropZip sparsely filled ≈83 — situs zip via Site Structure Address
+      Post_Code spatial (filled 12592). Compose situsAddress from PropAddr (often includes
+      house# + street); _v_HN is house number when >0. CURR_VAL is fair-market-style
+      current value (no separate assessedValue/taxableValue REST field). Zoning_01 carries
+      Euclidean codes for ALL jurisdictions (county + cities) — prefer this attribute over
+      dissolved County Zoning/3 when PIN-tied; inside cities also prefer city zoning layers
+      4/5/6 for jurisdiction-scoped polygons (standing order). Zoning_02 filled ≈2749 /
+      Zoning_03 ≈389 (split zoning). SALES_AREA is sales-neighborhood code 1–6 — NOT
+      lastSale.price. DIGCLASS: R≈10127, V≈1167, A≈1009, C≈598, E≈419, I≈113, plus T/J/P/U.
+      Geo-verified WGS84 samples ~-84.099,33.299 (PARCEL_NO 00010001 Hosannah Rd County),
+      ~-83.985,33.308 (00310001 Jackson), ~-83.913,33.251 (Flovilla), ~-84.043,33.322
+      (Jenkinsburg) — Butts County GA SE of Atlanta (~-83.95,33.25) (NOT Butte County CA
+      services9 xVyQcG5socEBv1Ip; NOT City of Jackson MS cmpdd.org Hosted/City_of_Jackson;
+      NOT Jackson County GA 13157; NOT paid USLandGrid/MappingSolutions/Regrid/ATTOM;
+      NOT ARC LandPro_2012 Ug5xGQbHsD8zuZzM as cadastral). Official assessor HTML:
+      qpublic.net/ga/butts → App=ButtsCountyGA (Cloudflare/bot 403 automated). Rejected
+      stale ARC LandPro as preferred parcels.
+    status: usable
+
+  - role: tax
+    name: ButtsCountyGA_WFS Parcels CURR_VAL / ESTTAX (same layer as preferred parcels)
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      GSI_PIN: parcelPin
+      CURR_VAL: tax.marketValue
+      ESTTAX: tax.estimatedTax
+      HOMEEXEMPT: homesteadExempt
+      DIGCLASS: dorCode
+      PropClass: propertyClass
+    notes: >
+      Market-style CURR_VAL + estimated tax ESTTAX on preferred parcels (no separate
+      assessedValue/taxableValue REST). Assessor HTML: qPublic/Beacon SchneiderCorp
+      App=ButtsCountyGA Layer=Parcels (qpublic.net/ga/butts/search.html). CDN/bot
+      Cloudflare 403 from research box on Application.aspx; public for humans. Deep-link:
+      Application.aspx?App=ButtsCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCEL_NO}
+      or KeyValue={GSI_PIN} (dashed PIN e.g. 00310-001-000). Numeric AppID/LayerID not
+      recovered from public pages (2026-09-23) — App= name form works.
+    status: usable
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Butts multi-sale FeatureServer/MapServer found (2026-09-23). Preferred parcels
+      expose SALES_AREA (neighborhood codes 1–6) only — NOT lastSale.price/date/qualified.
+      Prefer qPublic App=ButtsCountyGA Sales Search HTML. Rejected ARC LandPro_2012 and
+      paid Regrid/USLandGrid/ATTOM/MappingSolutions as sales substitutes.
+    status: gap
+
+  - role: zoning
+    name: ButtsCountyGA_WFS County Zoning (dissolved Euclidean — unincorporated)
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Zoning: zoning
+      Jurisdiction: jurisdictionCode
+      Shape_Area: shapeAreaSqFt
+    notes: >
+      Dissolved unincorporated district polygons (NOT parcel-tied — spatial intersect).
+      Live count 696. Jurisdiction=0 on all rows (county). Domain Zoning: A-R≈257, R-3≈146,
+      C-2≈68, R-2≈38, C-1≈31, R-1≈28, P-M≈20, R-1C≈19, M-1≈18, M-2≈17, R-4≈16, P-R≈14,
+      M-3≈9, O-1≈4, plus R-20C/M-1C/R-M/M-2C/C-2C/M-3C rare. Aligns with Comp Plan Table
+      A2 codes (A-R, R-1..R-4, R-MF/R-M, P-M/P-R, O-I/O-1, C-1/C-2, M-1..M-3). IMPORTANT:
+      does NOT replace city Euclidean — inside Jackson/Flovilla/Jenkinsburg prefer city
+      layers 4/5/6 OR parcels.Zoning_01 with PropCity filter. Geo-verified ~-83.83,33.20 /
+      ~-84.05,33.20 Butts GA. County Planning & Development staffs zoning for county +
+      three cities (buttscountyga.com/planning-and-development).
+    status: usable
+
+  - role: zoning
+    name: ButtsCountyGA_WFS City of Jackson Zoning (parcel-shaped polygons)
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      Jurisdiction: jurisdictionCode
+      Shape_Area: shapeAreaSqFt
+    notes: >
+      Preferred City of Jackson GA Euclidean (standing order: city over county stub).
+      Live count 2544 parcel-shaped polygons (no PIN field — spatial join to parcels OR
+      filter parcels PropCity='Jackson' / Zoning_01). Jurisdiction=2. Domain: R-15≈608,
+      R-20≈602, R-M≈430, R-30≈302, C-1≈268, P-R≈117, C-2≈90, R-P≈64, M-2≈50, M-1≈5,
+      MHC≈4, P-C≈3, A-R≈1 — aligns with City of Jackson Zoning Map PDF Oct 2023
+      (cityofjacksonga.com/DocumentCenter/View/272; TRRC-produced). Geo-verified
+      ~-83.985,33.308 Jackson GA Butts (NOT Jackson County GA; NOT Jackson MS cmpdd.org
+      ~-90.4,32.2; NOT Jackson FL/MI/MO/MS). Twin attribute already on parcels.Zoning_01
+      for PropCity=Jackson (≈2858).
+    status: usable
+
+  - role: zoning
+    name: ButtsCountyGA_WFS City of Flowvilla Zoning (Flovilla — layer name typo)
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      Jurisdiction: jurisdictionCode
+      Shape_Area: shapeAreaSqFt
+    notes: >
+      Preferred City of Flovilla Euclidean (layer display name misspells Flowvilla).
+      Live count 381. Jurisdiction=1. Domain: R-2≈301, A-R≈41, C-2≈23, O-1≈15, C-1≈1.
+      No PIN — spatial or parcels PropCity='Flovilla' (≈386). Geo-verified ~-83.913,33.251
+      Flovilla GA. County Planning administers Flovilla zoning.
+    status: usable
+
+  - role: zoning
+    name: ButtsCountyGA_WFS City of Jenkinsburg Zoning
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      Jurisdiction: jurisdictionCode
+      Shape_Area: shapeAreaSqFt
+    notes: >
+      Preferred City of Jenkinsburg Euclidean. Live count 218. Jurisdiction=3. Domain:
+      A-R≈59, SR-C≈35, RR-2C≈30, RR-2≈30, SR≈24, HB≈20, M-1≈7, RR-1≈4, O-I≈3, M-1C≈3,
+      O-I-C/HB-C/NC rare. No PIN — spatial or parcels PropCity='Jenkinsburg' (≈215).
+      Geo-verified ~-84.043,33.322 Jenkinsburg GA. County Planning administers Jenkinsburg
+      zoning.
+    status: usable
+
+  - role: flu
+    name: null — Comp Plan Character Areas / Future Development Map PDF only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer Future Land Use / character areas for Butts found
+      (2026-09-23). Official FLU/character in Butts County Comprehensive Plan 2022–2042
+      (adopted 2022-02-28; DCA download butts-county-plan-update-2022; county Planning
+      page). Character areas include Agricultural, Parks/Recreation, Conservation, Rural/
+      Suburban/Lake/Village Residential, Rural/Highway Activity Centers, Industrial,
+      Institutional. Three Rivers Regional Commission (TRRC) assists mapping — no public
+      TRRC Butts FLU FeatureServer recovered (UK/MN Three Rivers AGOL lookalikes rejected).
+      NEGRC Ug5xGQbHsD8zuZzM inventory has Butts waste sites only — not FLU; reject
+      LandPro_2012 as FLU/cadastral. City of Jackson Comp Plan 2023–2043 working draft
+      (DCA) likewise PDF. Certify FLU with Planning staff / Comp Plan maps.
+    status: gap
+
+  - role: other
+    name: Site Structure Address (situs points + Inc_Muni)
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/1
+    layerId: 1
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Add_Number: situsNumber
+      St_PreDir: situsStreetDir
+      St_Name: situsStreet
+      St_PosTyp: situsStreetType
+      St_PosDir: situsStreetDirSuffix
+      Unit: situsUnit
+      Post_Code: situsZip
+      Post_Comm: postalCommunity
+      Inc_Muni: municipality
+      MSAGComm: msagCommunity
+      County: county
+      State: state
+    notes: >
+      Live count 12592 NENA-style address points. Inc_Muni: Unincorporated≈8674,
+      Jackson≈3311, Flovilla≈407, Jenkinsburg≈200 — preferred spatial/attribute municipality
+      join alongside parcels.PropCity. Post_Comm is POSTAL (JACKSON≈10412, FLOVILLA≈1277,
+      JENKINSBURG≈771, LOCUST GROVE≈110, FORSYTH≈17, GRIFFIIN≈5 typo) — soft only; Locust
+      Grove/Forsyth/Griffin postal spill from adjacent counties. Lat/Long attribute fields
+      store StatePlane feet — use geometry outSR=4326 for WGS84 (samples ~-83.96,33.30
+      Jackson). Compose situsAddress from Add_Number + St_PreDir + St_Name + St_PosTyp.
+      No parcel PIN join key — spatial default. Geo-verified Butts GA.
+    status: usable
+
+  - role: other
+    name: Road Centerlines
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/2
+    layerId: 2
+    geometry: polyline
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FullStName: streetName
+      St_Name: streetNameAlt
+      IncMuni_L: municipalityLeft
+      IncMuni_R: municipalityRight
+      PostComm_L: postalCommunityLeft
+      PostComm_R: postalCommunityRight
+    notes: >
+      Live count 1824 centerlines. Context / geocode support only — not parcels.
+    status: partial
+
+municipalities:
+  - name: Jackson
+    level: city
+    parentFips: "13035"
+    joinToCountyParcels: >
+      parcels PropCity='Jackson' (≈2858) OR spatial City of Jackson Zoning/4 (2544
+      parcel-shaped polys, Jurisdiction=2) OR Addresses Inc_Muni='Jackson' (≈3311).
+      Post_Comm='JACKSON' soft only (~10412 postal including unincorporated). County seat.
+      CAUTION: City of Jackson GA (Butts) ≠ Jackson County GA (FIPS 13157) ≠ Jackson MS.
+    layers:
+      - role: zoning
+        name: City of Jackson Zoning (county-hosted Schneider WFS)
+        restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+          Jurisdiction: jurisdictionCode
+        notes: >
+          Preferred Jackson-local Euclidean (standing order). Live count 2544. Domain
+          R-15/R-20/R-30/R-M/R-P/C-1/C-2/P-R/P-C/M-1/M-2/MHC/A-R. Official Zoning Map PDF
+          Oct 23 2023 (cityofjacksonga.com/DocumentCenter/View/272) by Three Rivers RC —
+          REST codes align. Attribute twin: parcels.Zoning_01 where PropCity='Jackson'.
+          Rejected gis.cmpdd.org Hosted/City_of_Jackson_Feature_Layer (Central MS PDD —
+          Jackson Mississippi ~-90.4,32.2 — wrong geography).
+        status: usable
+      - role: flu
+        name: null — City of Jackson Comp Plan / Character Areas PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City Comp Plan 2023–2043 working draft (DCA jackson-city-plan-update-2023) PDF;
+          no city FLU FeatureServer found. Prefer city/staff PDF over county Comp Plan
+          stubs inside city limits.
+        status: gap
+      - role: parcels
+        name: null — use county Parcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Jackson-only CAMA FeatureServer — county ButtsCountyGA_WFS/0 + PropCity='Jackson'
+          / spatial zoning/4. City partners with county GIS per Comp Plan strategy.
+        status: gap
+      - role: other
+        name: null — no dedicated city-limits FeatureServer (use zoning/4 footprint)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No separate city corporate-limits polygon on ButtsCountyGA_WFS. Approximate
+          footprint = dissolve of layer 4 OR Addresses Inc_Muni='Jackson' OR Census TIGER
+          place (Jackson city, Butts). Soft PropCity/Inc_Muni sufficient for join.
+        status: partial
+    gaps:
+      - "No Jackson-only parcel CAMA REST — county landbase + PropCity/spatial zoning/4."
+      - "No Jackson FLU FeatureServer — Comp Plan PDF only."
+      - "No dedicated city-limits polygon layer — use zoning/4 dissolve / Inc_Muni / PropCity."
+      - "Rejected Jackson MS cmpdd.org City_of_Jackson_Feature_Layer (wrong geography)."
+      - "Do not confuse with Jackson County GA card 13157."
+    status: usable
+
+  - name: Flovilla
+    level: city
+    parentFips: "13035"
+    joinToCountyParcels: >
+      parcels PropCity='Flovilla' (≈386) OR spatial City of Flowvilla Zoning/5 (381,
+      Jurisdiction=1) OR Addresses Inc_Muni='Flovilla' (≈407). Post_Comm='FLOVILLA' soft
+      (~1277).
+    layers:
+      - role: zoning
+        name: City of Flowvilla Zoning (Flovilla — Schneider WFS/5)
+        restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/5
+        layerId: 5
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+          Jurisdiction: jurisdictionCode
+        notes: >
+          Preferred Flovilla Euclidean. Live count 381. Domain R-2/A-R/C-2/O-1/C-1.
+          Layer title typo Flowvilla. County Planning administers. Attribute twin
+          parcels.Zoning_01 PropCity='Flovilla'. Geo-verified ~-83.913,33.251.
+        status: usable
+      - role: flu
+        name: null — joint/county Comp Plan PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Flovilla-only FLU FeatureServer. County Comp Plan 2022–2042 character map
+          covers Flovilla — PDF certification.
+        status: gap
+      - role: parcels
+        name: null — use county Parcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          County parcels + PropCity='Flovilla' / spatial zoning/5.
+        status: gap
+    gaps:
+      - "No Flovilla-only parcel CAMA or FLU REST — county + zoning/5."
+      - "Layer name misspells Flowvilla — treat as Flovilla city."
+    status: usable
+
+  - name: Jenkinsburg
+    level: city
+    parentFips: "13035"
+    joinToCountyParcels: >
+      parcels PropCity='Jenkinsburg' (≈215) OR spatial City of Jenkinsburg Zoning/6 (218,
+      Jurisdiction=3) OR Addresses Inc_Muni='Jenkinsburg' (≈200). Post_Comm='JENKINSBURG'
+      soft (~771).
+    layers:
+      - role: zoning
+        name: City of Jenkinsburg Zoning (Schneider WFS/6)
+        restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/6
+        layerId: 6
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+          Jurisdiction: jurisdictionCode
+        notes: >
+          Preferred Jenkinsburg Euclidean. Live count 218. Domain A-R/SR/SR-C/RR-1/RR-2/
+          RR-2C/HB/HB-C/NC/O-I/O-I-C/M-1/M-1C. Attribute twin parcels.Zoning_01
+          PropCity='Jenkinsburg'. Geo-verified ~-84.043,33.322. County Planning administers.
+        status: usable
+      - role: flu
+        name: null — county Comp Plan PDF only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Jenkinsburg FLU FeatureServer — Comp Plan PDF / staff.
+        status: gap
+      - role: parcels
+        name: null — use county Parcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          County parcels + PropCity='Jenkinsburg' / spatial zoning/6.
+        status: gap
+    gaps:
+      - "No Jenkinsburg-only parcel CAMA or FLU REST — county + zoning/6."
+    status: usable
+
+gaps:
+  - "No public REST lastSale.price/date/qualified — SALES_AREA is neighborhood code 1–6 only; qPublic App=ButtsCountyGA Sales Search HTML (Cloudflare/bot 403 automated)."
+  - "No tax.assessedValue / taxableValue REST field — CURR_VAL market-style + ESTTAX only; digest on qPublic HTML."
+  - "PropZip on parcels ≈83 filled — situs zip via Addresses Post_Code spatial (12592); mailing OwnerZip ≈13438."
+  - "No public REST Future Land Use / character areas — Butts Comp Plan 2022–2042 PDF (DCA / county Planning); City of Jackson Comp Plan 2023–2043 PDF."
+  - "City zoning layers 4/5/6 have no PARCEL_NO/GSI_PIN — spatial intersect OR use parcels.Zoning_01 + PropCity (preferred PIN path)."
+  - "No dedicated municipal corporate-limits FeatureServer — PropCity / Inc_Muni / dissolve city zoning polys."
+  - "Numeric qPublic AppID/LayerID not published on open pages — use App=ButtsCountyGA name form for deep links."
+  - "ButtsCountyGA_WFS has MapServer+WFS only (FeatureServer SOE 500) — query MapServer REST."
+  - "Address Lat/Long attributes are StatePlane feet mislabeled — use geometry outSR=4326."
+  - "Mailing OwnerCity is owner mailing (nationwide) — never municipality filter; use PropCity / Inc_Muni."
+  - "Post_Comm postal includes LOCUST GROVE/FORSYTH/GRIFFIIN spill — soft only."
+  - "Rejected lookalikes / non-preferred: Butte County CA AGOL (ButteGISAdmin xVyQcG5socEBv1Ip Parcels/Zoning — wrong state); City of Jackson MS (gis.cmpdd.org Hosted/City_of_Jackson_Feature_Layer ~-90.4,32.2 Central Mississippi PDD); Jackson County GA (FIPS 13157 / bcbi4lYRFOsss0F5 — different county NE of Atlanta); UK/MN Three Rivers AGOL orgs (andrew.blake_TRGIS / trpd) mistaken for Georgia TRRC; ARC LandPro_2012 (Ug5xGQbHsD8zuZzM) stale regional land-cover as cadastral; paid USLandGrid / MappingSolutionsGIS / Equator / Regrid / ATTOM / CoreLogic Butts extracts; NEGRC Butts_County_Waste_and_Recycling_Sites only (not parcels)."
+  - "Enrichment vs thin in-app: official 13595 geometry+PARCEL_NO/GSI_PIN+owner/mailing/situs+TOTALACRES+CURR_VAL+ESTTAX+Zoning_01 (all jurisdictions)+DIGCLASS; county dissolved zoning 696; city Euclidean Jackson 2544 / Flovilla 381 / Jenkinsburg 218; Addresses 12592 w/ Inc_Muni; sales + FLU + assessed/taxable + city-limits polygon remain gap/HTML/PDF."
+
+license: >
+  Butts County Tax Assessor / SchneiderCorp qPublic GIS (wfs.schneidercorp.com
+  ButtsCountyGA_WFS MapServer layers 0–6 — Parcels, Site Structure Address, Road
+  Centerlines, County Zoning, City of Jackson Zoning, City of Flowvilla Zoning,
+  City of Jenkinsburg Zoning). Assessor HTML: qpublic.net/ga/butts →
+  qpublic.schneidercorp.com Application.aspx?App=ButtsCountyGA&Layer=Parcels.
+  County site buttscountyga.com (Planning and Development staffs zoning for county +
+  Jackson/Flovilla/Jenkinsburg; Comp Plan 2022–2042). City of Jackson Zoning Map PDF
+  Oct 2023 (cityofjacksonga.com/DocumentCenter/View/272; Three Rivers Regional
+  Commission). DCA Comp Plan packages (Butts County; City of Jackson). Attribution to
+  Butts County / SchneiderCorp / partner cities / TRRC. Public fields only; no
+  emails/phones; no paid vendors (Regrid/ATTOM/CoreLogic/USLandGrid/MappingSolutions).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=ButtsCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/0 count 13595; extent
+    center [['13035', 'Butts County']]; sample [['13035', 'Butts County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Flovilla city"
+      level: city
+      parentFips: "13035"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Jackson city"
+      level: city
+      parentFips: "13035"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Jenkinsburg city"
+      level: city
+      parentFips: "13035"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Butts' AND aadt>0
+    altFilter: name LIKE '035-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 035-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 84
+    maxAadt: 95300
+    geoCheck: 83/84 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    filledCount: 13474
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: rest (ESTTAX, estimated tax; ButtsCountyGA_WFS/MapServer/0; 12876/13595 >0)
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: _v_ON
+    filledCount: null
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/ButtsCountyGA_WFS/MapServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner field on another REST layer already on this card
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=ButtsCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: '00010001'
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=ButtsCountyGA&Layer=Parcels&PageType=Report&KeyValue=00010001
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=ButtsCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Flovilla city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Jackson city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Jenkinsburg city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

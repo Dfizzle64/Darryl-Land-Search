@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T04:25:22Z",
+  "generatedAt": "2026-09-29T05:24:55Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 93811,
+  "parcelCount": 97868,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,20 +20,26 @@
       "name": "Banks",
       "fips": "13011",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 4057,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-banks-parcels-13011",
+      "queryUrl": "https://services1.arcgis.com/BOifiQ6QbqCddc32/arcgis/rest/services/Zoning_Base_WFL1/FeatureServer/10/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Parcels are Zoning_Base_WFL1 Parcels (Banks County GIS / banksgis) (https://services1.arcgis.com/BOifiQ6QbqCddc32/arcgis/rest/services/Zoning_Base_WFL1/FeatureServer/10). Published acreage is filtered to 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 4399 rows; 4057 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Pass 2 enrichment is from rural-oz-pass2 csv (tax HTML-only, sale HTML-only, owner HTML-only). GDOT AADT stays the query-time statewide join.",
+        "Pass 2 tax is HTML-only. qPublic was not requested, and no tax value was copied from an HTML report.",
+        "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+        "Pass 2 owner is HTML-only. Owner and mailing were not copied from an HTML report.",
+        "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13011/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13011/lookup.json",
+      "tileCount": 3,
+      "sourceCount": 4399
     },
     {
       "name": "Barrow",

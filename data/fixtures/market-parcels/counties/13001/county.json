@@ -1,0 +1,32 @@
+{
+  "name": "Appling",
+  "fips": "13001",
+  "state": "Georgia",
+  "markets": [
+    "Savannah"
+  ],
+  "featureCount": 4215,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-appling-parcels-13001",
+  "queryUrl": "https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Appling_County_Wide_View/FeatureServer/19/query",
+  "gaps": [
+    "Parcels are Appling_County_Wide_View TaxParcels25 (HOGARC) (https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Appling_County_Wide_View/FeatureServer/19). The parcel layer has no usable acre field, so acreage is geodesic polygon area, 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 12828 rows; 4215 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+    "Pass 2 enrichment is from rural-oz-pass2 csv (tax HTML-only, sale HTML-only, owner HTML-only). GDOT AADT stays the query-time statewide join.",
+    "Pass 2 tax is HTML-only. qPublic was not requested, and no tax value was copied from an HTML report.",
+    "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+    "Pass 2 owner is HTML-only. Owner and mailing were not copied from an HTML report.",
+    "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13001/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13001/lookup.json",
+  "sourceCount": 12828,
+  "dropped": 8601,
+  "tileCount": 7,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=ApplingCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://hogarc-hogarc.opendata.arcgis.com/datasets/HHvUPZ2XuLOAJxjR::appling-county-wide-view/explore"
+}

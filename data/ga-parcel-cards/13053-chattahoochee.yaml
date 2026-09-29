@@ -1,0 +1,270 @@
+state: GA
+jurisdiction: Chattahoochee County
+fips: "13053"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner / acreage (RVRC); tax/sale via qPublic HTML
+  - role: parcels
+    name: ParcelsChattCo (RVRC_ELA)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/ParcelsChattCo/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Total_acre
+    coverage: county-wide
+    fieldMap:
+      Parcel_num: parcelId
+      Owner_name: ownerName
+      Total_acre: acreage
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + owner/acres (River Valley Regional
+      Commission RVRC_ELA AGOL org Ug5xGQbHsD8zuZzM — ParcelsChattCo FeatureServer/0).
+      Live count 1785 (2026-09-24); Parcel_num filled 1785; Owner_name filled ≈1781;
+      Total_acre filled 1785 (string with " Ac" suffix e.g. "75 Ac" / "0.41 Ac" —
+      parse numeric before acreage filters). No mailing/situs/CURR_VAL/sale on this
+      layer. Join tax/sale via qPublic AppID=788 LayerID=11820 HTML
+      (KeyValue={Parcel_num}; normalize whitespace e.g. "001    0001"). Geo-verified
+      WGS84 centroids ~-84.892,32.254 / ~-84.896,32.246 / ~-84.899,32.245 /
+      ~-84.907,32.244 / ~-84.721,32.296 — Chattahoochee County GA / Cusseta /
+      Fort Moore (Benning) fringe (~Cusseta -84.78,32.31). Samples include
+      UNIFIED GOV'T OF CUSSETA-CHATT COUNTY and U S CORP OF ENGINEERS — consolidated
+      Cusseta-Chattahoochee County GA (NOT Chattahoochee River corridor parcels in
+      Forsyth/Peachtree Corners/Johns Creek metro Atlanta; NOT AL Chattahoochee
+      lookalikes). Rejected paid Regrid/ATTOM/DynamoSpatial. ChattahoocheeCountyGA_WFS
+      404. Companion RVRC layers: Chattahoochee_Tracts/Blocks/Roads, RailChattCo,
+      StreamsChattCo (skip utilities/AADT). County boundary stub
+      ChattahoocheeCounty (PYn6bWCjT6bhw1z3) census poly GEOID=13053.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on ParcelsChattCo; qPublic AppID=788 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on ParcelsChattCo. Assessor HTML
+      qpublic.net/ga/chattahoochee → AppID=788 LayerID=11820 PageID=5699
+      (Cloudflare/bot 403 automated; public for humans). Deep-link KeyValue={Parcel_num}.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No SALEPRICE/SALEDATE on ParcelsChattCo. Prefer qPublic Sales Search HTML
+      AppID=788. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Cusseta-Chattahoochee County Euclidean zoning REST found (2026-09-24).
+      RVRC has Zoning FS for other counties in org — not wired to this county.
+      Comp Plan / Impact Planning PDF gap (RVRC_ELA "Chattahoochee County Impact
+      Planning" PDF item only).
+    status: gap
+
+  - role: flu
+    name: null — no public county FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Chattahoochee County Future Land Use / Character Areas FeatureServer
+      recovered (2026-09-24). Comp Plan PDF / staff gap.
+    status: gap
+
+  - role: other
+    name: ChattahoocheeCounty county boundary (census poly)
+    restUrl: https://services2.arcgis.com/PYn6bWCjT6bhw1z3/arcgis/rest/services/ChattahoocheeCounty/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      GEOID: fips
+      NAME: countyName
+      INTPTLAT: latitude
+      INTPTLON: longitude
+    notes: >
+      Count 1 census county polygon GEOID=13053 NAME=Chattahoochee — geo/extent
+      context only (not parcels). Useful reject filter vs metro Chattahoochee River
+      corridor layers.
+    status: usable
+
+municipalities:
+  - name: Cusseta
+    level: city
+    parentFips: "13053"
+    joinToCountyParcels: >
+      Consolidated Cusseta-Chattahoochee County (unified government) — city and county
+      share ParcelsChattCo. Soft attribute: Owner_name LIKE '%CUSSETA-CHATT%' for
+      government-owned; no separate city-limits FeatureServer recovered. Prefer full
+      county parcel layer for site search.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cusseta Euclidean zoning REST found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cusseta FLU REST found.
+        status: gap
+      - role: parcels
+        name: ParcelsChattCo (consolidated county)
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/ParcelsChattCo/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Total_acre
+        coverage: city-only
+        fieldMap:
+          Parcel_num: parcelId
+          Owner_name: ownerName
+        notes: >
+          Consolidated gov — use county ParcelsChattCo; no separate Cusseta parcel
+          CAMA FeatureServer.
+        status: usable
+    gaps:
+      - "Consolidated city-county — no separate Cusseta city-limits/zoning/FLU REST."
+    status: partial
+
+gaps:
+  - "ParcelsChattCo has owner+acres but no mailing/situs/CURR_VAL/sale REST — tax/sale via qPublic AppID=788 HTML (bot/CDN may 403)."
+  - "Total_acre is string with ' Ac' suffix — parse before numeric acreage filters."
+  - "No county Euclidean zoning REST; no FLU/CharacterAreas REST."
+  - "ChattahoocheeCountyGA_WFS 404."
+  - "Reject metro Atlanta Chattahoochee River corridor / Forsyth / Peachtree Corners / Johns Creek parcel lookalikes."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial; no emails/phones; skip utilities/AADT / StreamsChattCo as hydro only."
+
+license: >
+  River Valley Regional Commission (RVRC_ELA AGOL org Ug5xGQbHsD8zuZzM) —
+  ParcelsChattCo FeatureServer/0 (owner/acres/parcel id). Companion Tracts/Blocks/Roads
+  /Rail/Streams. County boundary ChattahoocheeCounty on PYn6bWCjT6bhw1z3. Human GIS
+  web map arcgis.com/apps/mapviewer/index.html?webmap=1ec384d3885644ad8a701cb4e095ef3b
+  (RVRC_ELA Chattahoochee County) and River Valley CCD StoryMap
+  storymaps.arcgis.com/stories/9c22cfd0e3534f5c932eadc0c77959fb. Assessor
+  qpublic.net/ga/chattahoochee AppID=788 LayerID=11820. Attribution RVRC /
+  Cusseta-Chattahoochee County Tax Assessors. Public fields only; no emails/phones;
+  no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=788&LayerID=11820&PageTypeID=2&PageID=5699
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?webmap=1ec384d3885644ad8a701cb4e095ef3b
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/ParcelsChattCo/FeatureServer/0
+    count 1785; extent center [['13053', 'Chattahoochee County']]; sample [['13053', 'Chattahoochee
+    County']]. No change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Cusseta-Chattahoochee County unified government"
+      level: city
+      parentFips: "13053"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Chattahoochee' AND aadt>0
+    altFilter: name LIKE '053-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 053-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 26
+    maxAadt: 14900
+    geoCheck: 26/26 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: thin coverage (26 stations); mostly state routes
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: Owner_name
+    filledCount: 1781
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/ParcelsChattCo/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=ChattahoocheeCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=788&LayerID=11820&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_num
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    0001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=ChattahoocheeCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%200001
+    verification: 'pattern-tested: real sample ID from Parcel_num; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: inferred {County}CountyGA convention
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?webmap=1ec384d3885644ad8a701cb4e095ef3b
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Cusseta-Chattahoochee County unified government
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

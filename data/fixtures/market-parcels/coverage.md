@@ -6,7 +6,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 93,811 | 17 | 0 | 18 |
+| Atlanta | primary | 97,868 | 18 | 0 | 17 |
 | Tampa | primary | 127,713 | 10 | 0 | 0 |
 | Charleston | primary | 86,151 | 14 | 0 | 1 |
 | Nashville | primary | 202,510 | 34 | 0 | 0 |
@@ -22,7 +22,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Birmingham | other | 101,123 | 9 | 0 | 3 |
 | Mobile | other | 51,658 | 4 | 0 | 2 |
 | Huntsville | other | 132,496 | 16 | 0 | 0 |
-| Savannah | other | 19,987 | 5 | 0 | 3 |
+| Savannah | other | 38,540 | 9 | 0 | 2 |
 | Columbia | other | 49,244 | 5 | 1 | 7 |
 | Greenville | other | 48,073 | 5 | 0 | 4 |
 | Chattanooga | other | 51,467 | 10 | 0 | 4 |
@@ -36,8 +36,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Asheville | other | 121,232 | 21 | 0 | 0 |
 | Tuscaloosa | other | 27,452 | 4 | 0 | 1 |
 | Montgomery | other | 85,425 | 13 | 0 | 1 |
-| Valdosta | other | 5,815 | 1 | 0 | 0 |
-| Macon | other | 3,257 | 1 | 0 | 0 |
+| Valdosta | other | 27,750 | 9 | 0 | 0 |
+| Macon | other | 15,909 | 7 | 0 | 0 |
 | Athens | other | 2,039 | 1 | 0 | 0 |
 | Hilton Head | other | 4,756 | 1 | 0 | 0 |
 | Jackson MS | other | 57,020 | 7 | 0 | 0 |
@@ -48,7 +48,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Banks | Georgia | 13011 | gap | 0 | unavailable |
+| Banks | Georgia | 13011 | complete-gte-5ac | 4,057 | ga-banks-parcels-13011 |
 | Barrow | Georgia | 13013 | complete-gte-5ac | 4,251 | ga-barrow-parcels |
 | Bartow | Georgia | 13015 | complete-gte-5ac | 7,077 | ga-bartow-land |
 | Butts | Georgia | 13035 | gap | 0 | unavailable |
@@ -355,9 +355,12 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Appling | Georgia | 13001 | complete-gte-5ac | 4,215 | ga-appling-parcels-13001 |
 | Beaufort | South Carolina | 45013 | complete-gte-5ac | 4,756 | sc-beaufort-energov-parcels |
 | Bryan | Georgia | 13029 | complete-gte-5ac | 2,138 | ga-bryan-property-details |
-| Bulloch | Georgia | 13031 | gap | 0 | unavailable |
+| Bulloch | Georgia | 13031 | complete-gte-5ac | 8,833 | ga-bulloch-parcels-13031 |
+| Camden | Georgia | 13039 | complete-gte-5ac | 3,218 | ga-camden-parcels-13039 |
+| Candler | Georgia | 13043 | complete-gte-5ac | 2,287 | ga-candler-parcels-13043 |
 | Chatham | Georgia | 13051 | complete-gte-5ac | 3,283 | sagis-chatham-ga-parcel-digest |
 | Effingham | Georgia | 13103 | complete-gte-5ac | 6,128 | ga-effingham-parcels-2024 |
 | Jasper | South Carolina | 45053 | complete-gte-5ac | 3,682 | sc-jasper-parcels-45053 |
@@ -608,13 +611,27 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Atkinson | Georgia | 13003 | complete-gte-5ac | 1,400 | ga-atkinson-parcels-13003 |
+| Ben Hill | Georgia | 13017 | complete-gte-5ac | 1,962 | ga-ben-hill-parcels-13017 |
+| Brantley | Georgia | 13025 | complete-gte-5ac | 2,980 | ga-brantley-parcels-13025 |
+| Brooks | Georgia | 13027 | complete-gte-5ac | 3,009 | ga-brooks-parcels-13027 |
+| Charlton | Georgia | 13049 | complete-gte-5ac | 1,704 | ga-charlton-parcels-13049 |
+| Coffee | Georgia | 13069 | complete-gte-5ac | 4,923 | ga-coffee-parcels-13069 |
+| Cook | Georgia | 13075 | complete-gte-5ac | 2,437 | ga-cook-parcels-13075 |
+| Decatur | Georgia | 13087 | complete-gte-5ac | 3,520 | ga-decatur-parcels-13087 |
 | Lowndes | Georgia | 13185 | complete-gte-5ac | 5,815 | ga-lowndes-valor-taxparcels |
 
 ### Macon
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Baldwin | Georgia | 13009 | complete-gte-5ac | 3,062 | ga-baldwin-parcels-13009 |
 | Bibb | Georgia | 13021 | complete-gte-5ac | 3,257 | ga-bibb-parcelcama-2025 |
+| Chattahoochee | Georgia | 13053 | complete-gte-5ac | 322 | ga-chattahoochee-parcels-13053 |
+| Clay | Georgia | 13061 | complete-gte-5ac | 729 | ga-clay-parcels-13061 |
+| Crawford | Georgia | 13079 | complete-gte-5ac | 2,933 | ga-crawford-parcels-13079 |
+| Crisp | Georgia | 13081 | complete-gte-5ac | 1,873 | ga-crisp-parcels-13081 |
+| Dodge | Georgia | 13091 | complete-gte-5ac | 3,733 | ga-dodge-parcels-13091 |
 
 ### Athens
 

@@ -967,6 +967,26 @@ def al_batch2_shipped(fips: str) -> dict | None:
     }
 
 
+def ga_batch2_shipped(fips: str) -> dict | None:
+    """Rural OZ batch 2 writes county GIS tiles. A later market reseed must not replace them with a gap."""
+    manifest = ROOT / "data" / "ga-parcel-cards" / "batch2-result.json"
+    if not manifest.exists():
+        return None
+    try:
+        report = json.loads(manifest.read_text())
+    except json.JSONDecodeError:
+        return None
+    pulled = {str(item.get("fips") or "").zfill(5) for item in report.get("pulled") or []}
+    if fips not in pulled:
+        return None
+    return {
+        "kind": "shipped",
+        "source": "ga-rural-oz-batch2",
+        "url": None,
+        "coverage": "complete-gte-5ac",
+    }
+
+
 def spec_for(county: dict) -> dict:
     fips = county["fips"]
     if fips in ORLANDO_REUSE:
@@ -974,6 +994,9 @@ def spec_for(county: dict) -> dict:
     shipped_al = al_batch2_shipped(fips)
     if shipped_al:
         return shipped_al
+    shipped_ga = ga_batch2_shipped(fips)
+    if shipped_ga:
+        return shipped_ga
     override = county_override(fips)
     if override:
         return override
@@ -1247,6 +1270,8 @@ Alabama rural Opportunity Zone batch 2 loads 5.0–150.0 acre parcels for the re
 North Carolina rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for the first 20 pass-1 counties that were verified or fixed, were not already a complete extract, and whose card endpoint answered: Alexander, Alleghany, Ashe, Avery, Beaufort, Bertie, Bladen, Burke, Caldwell, Carteret, Caswell, Cherokee, Chowan, Craven, Dare, Edgecombe, Graham, Greene, Halifax, and Haywood. Buncombe and Henderson were already complete and were not re-pulled. No endpoint in that stretch was unreachable. Alexander pages with orderByFields because the MapServer has no object id; its returnCountOnly figure repeats PROPERTY 99999 rows, so the stored count is the distinct parcel ids that page. Ashe pages with resultRecordCount. Counties already on a shelf stayed there. The others were added to the nearest existing North Carolina shelf: Asheville, Charlotte, Raleigh-Durham, Wilmington, or Winston-Salem. No new market shelf was added. Pass 2 tax, sale, owner, property-appraiser, and county GIS attributes are stored where the card or rural-oz-pass2 result published them. Chowan tax values were scrubbed on the layer and were not copied. Alleghany tax is the NC OneMap fallback join. Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested. Sale dates after the pull date are cleared. No Opportunity Zone status was added. NCDOT AADT stays the query-time statewide join. Household income stays ACS B19013_001E. Tract display was not changed.
 
 North Carolina rural Opportunity Zone batch 2 loads 5.0–150.0 acre parcels for the next 20 pass-1 counties starting at Hertford that were verified or fixed, were not already a complete extract, and whose card endpoint answered: Hertford, Hoke, Hyde, Jackson, Jones, Lenoir, McDowell, Macon, Madison, Martin, Mitchell, Montgomery, Moore, Northampton, Pamlico, Pasquotank, Pitt, Polk, Richmond, and Robeson. No county in that stretch was already a complete extract, and no endpoint was unreachable. Rutherford was the next verified row and was not loaded because the batch of 20 was already filled. Jackson pages with resultRecordCount, and AssessedAcres is filtered with CAST AS FLOAT. Hoke uses the county AGOL June2025 layer, which has geometry, parcel id, and acreage only. Hoke, Mitchell, and Robeson repeat a parcel id across rows; the extract keeps one geometry per parcel id. Madison tax is the NC OneMap fallback join, and that county has no sale date on the public layer. Hyde has no sale price or date on the public layer. Robeson tax fields are land and improvement assessed values and are not summed into a total. Counties were added to the nearest existing North Carolina shelf: Asheville, Charlotte, Raleigh-Durham, Wilmington, or Winston-Salem. No new market shelf was added. Pass 2 tax, sale, owner, property-appraiser, and county GIS attributes are stored where the card or rural-oz-pass2 result published them. Property-appraiser links are stored from the card or pass-2 pattern and were not requested. A pass-2 sample account id is not copied onto every parcel. Owner phone and email are not ingested. A confidential-owner flag suppresses owner and mailing fields. Sale dates after the pull date are cleared. No Opportunity Zone status was added. NCDOT AADT stays the query-time statewide join. Household income stays ACS B19013_001E. Tract display was not changed.
+
+Georgia rural Opportunity Zone batch 2 loads 5.0–150.0 acre parcels for pass-2 orders 26 through 47 whose pass-1 status is usable and that were not already a complete extract: Appling, Atkinson, Baldwin, Banks, Ben Hill, Brantley, Brooks, Bulloch, Camden, Candler, Charlton, Chattahoochee, Clay, Coffee, Cook, Crawford, Crisp, Decatur, and Dodge (57,197 distinct parcel ids). Barrow (4,251) and Bartow (7,077) were already complete extracts and were not re-pulled. Butts County's public Schneider WFS returned a 503 wait timeout and stays the existing gap. Orders 25 and below were not loaded. Appling and Dodge publish a parcel id and geometry only, so acreage is geodesic polygon area. Chattahoochee Total_acre is text such as "75 Ac"; the number is parsed, and 322 parcels fall in the 5.0–150.0 band. Camden tax values are joined from Juvare_Parcels on PARCEL_NO, and 805 of 3,218 parcels matched a current value. The other REST tax counties store CURR_VAL from the parcel layer as market value. Sale history is HTML-only, or for Crawford and Crisp a deed-book reference or component price that is not stored as a last-sale price or date. Counties already on a shelf stayed there: Banks on Atlanta and Bulloch on Savannah. The others were added to the nearest existing shelf: Appling, Camden, and Candler on Savannah; Atkinson, Ben Hill, Brantley, Brooks, Charlton, Coffee, Cook, and Decatur on Valdosta; Baldwin, Chattahoochee, Clay, Crawford, Crisp, and Dodge on Macon. No new market shelf was added. Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. A pass-2 sample id is not copied onto every parcel. Owner phone and email are not ingested. Sale dates after the pull date are cleared. No Opportunity Zone status, school grade, or base flood elevation was added. GDOT AADT stays the query-time statewide join. Household income stays ACS B19013_001E. Tract display was not changed.
 
 North Carolina rural Opportunity Zone batch 3 loads 5.0–150.0 acre parcels for the remaining pass-1 counties starting at Rutherford that were verified or fixed and were not already a complete extract, then fills the batch from the remaining non-OZ North Carolina counties that have a usable public parcel card: Rutherford, Scotland, Swain, Transylvania, Tyrrell, Washington, Watauga, Wilkes, Camden, Clay, Cumberland, Currituck, Gates, Perquimans, and Yancey. No endpoint in that set was unreachable. Every other North Carolina county was already a complete extract and was not re-pulled. No North Carolina county remains unloaded. Swain acreage is a string and the filter uses CAST AS FLOAT plus LegalLandType='AC'. Clay keeps LegalLandT='AC' so a square-foot legal unit is not treated as acres. Transylvania, Clay, Watauga, and Wilkes repeat a parcel id across rows; the extract keeps one geometry per parcel id. Scotland's public price field is DeedStamps, and Yancey's STAMPS field is excise tax; neither is stored as a sale price. Yancey's property-appraiser pattern needs a two-digit card suffix the parcel layer does not publish, so parcel rows do not carry a filled appraiser URL. Swain has no sale date on the public operational layer. Camden has no tax values on the public layer, and a SaleDate of the literal text NULL is not stored. Perquimans stores TAX_VAL as taxable value. Counties were placed on the nearest existing North Carolina shelf: Rutherford, Swain, Transylvania, Watauga, Clay, and Yancey on Asheville; Scotland on Charlotte; Wilkes on Winston-Salem; Tyrrell, Washington, Camden, Cumberland, Currituck, Gates, and Perquimans on Raleigh-Durham. No new market shelf was added. Pass 2 tax, sale, owner, property-appraiser, and county GIS attributes are stored where the card or rural-oz-pass2 result published them. Property-appraiser links are stored from the card or pass-2 pattern and were not requested. A pass-2 sample account id is not copied onto every parcel. Owner phone and email are not ingested. A confidential-owner flag suppresses owner and mailing fields. Sale dates after the pull date are cleared. No Opportunity Zone status was added. NCDOT AADT stays the query-time statewide join. Household income stays ACS B19013_001E. Tract display was not changed.
 

@@ -1,0 +1,511 @@
+state: GA
+jurisdiction: Banks County
+fips: "13011"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + zoning/acres/situs (no owner/tax on REST)
+  - role: parcels
+    name: Zoning_Base_WFL1 Parcels (Banks County GIS / banksgis)
+    restUrl: https://services1.arcgis.com/BOifiQ6QbqCddc32/arcgis/rest/services/Zoning_Base_WFL1/FeatureServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: Deed_AC
+    coverage: county-wide
+    fieldMap:
+      Parcel_Id: parcelId
+      Map: mapSheet
+      Parcel: mapParcel
+      Sub_Parcel: mapSubParcel
+      Zoning: zoning
+      City_Zoning: zoningCity
+      Zoning_Notes: zoningNotes
+      House_No_1: situsNumber
+      Street_Nam: situsStreet
+      Deed_AC: acreage
+      CALC_AC: acreageGis
+      Shape__Area: shapeAreaSqM
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + zoning/acreage/situs landbase (Banks County
+      GIS AGOL org BOifiQ6QbqCddc32 / banksgis.maps.arcgis.com Zoning Base_WFL1; Instant
+      App e0f2c6b19d8b4bef9ee3c89ae343cb79). Live count 11351 (2026-09-24). Deed_AC 5–150
+      ≈4399; CALC_AC 5–150 ≈4123 — prefer Deed_AC when non-null else CALC_AC. Zoning
+      domain top: ARR≈8152, Homer≈995, Maysville≈501, Baldwin≈431, R1≈335, C2≈245,
+      CAD≈215, Lula≈176, Alto≈114, Gillsville≈93, M1≈55, C1≈22 (+ R2/USFS/PUD sparse).
+      City names in Zoning field mark city-limit stubs (Homer/Alto/Baldwin/Gillsville/
+      Lula/Maysville) — prefer spatial City Limit L9 AREANAME for municipality filter;
+      City_Zoning sparsely filled (≈12). NO ownerName / mailing / tax.marketValue /
+      lastSale on this layer — CAMA via qPublic HTML App=BanksCountyGA. Compose situs
+      from House_No_1 + Street_Nam when House_No_1>0. Geo-verified WGS84 samples
+      ~-83.368,34.240 (Parcel_Id B86 046B Hwy 326), ~-83.550,34.451 / ~-83.550,34.453
+      (B23 027A / B23 027 Apple Valley Rd) — Banks County GA NE of Atlanta / Homer
+      (~-83.50,34.35) (NOT Banks OR; NOT Banks AL). Official human viewer: qPublic
+      SchneiderCorp App=BanksCountyGA (bankscountyga.org Parcel Mapping →
+      Application.aspx?App=BanksCountyGA&Layer=Parcels&PageType=Search; bot 403).
+      Rejected Regrid/ATTOM paid; rejected ARC LandPro_2012.
+    status: usable
+
+  - role: tax
+    name: null — no public REST CAMA values
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No CURR_VAL / FMV / assessed on Zoning_Base_WFL1/10. Tax/CAMA via qPublic
+      App=BanksCountyGA HTML only (cloudflare/bot 403 automated). Deep-link:
+      Application.aspx?App=BanksCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_Id}.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Banks GA multi-sale FeatureServer recovered. Prefer qPublic Sales Search HTML.
+      Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Zoning_Base_WFL1 Parcels.Zoning (parcel-attributed county + city stubs)
+    restUrl: https://services1.arcgis.com/BOifiQ6QbqCddc32/arcgis/rest/services/Zoning_Base_WFL1/FeatureServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: Deed_AC
+    coverage: county-wide
+    fieldMap:
+      Parcel_Id: parcelId
+      Zoning: zoning
+      City_Zoning: zoningCity
+    notes: >
+      Preferred public REST zoning = parcel-attributed Zoning on preferred parcels
+      (same layer). Euclidean districts ARR/R1/R2/C1/C2/CAD/M1/PUD; city-name codes
+      are jurisdiction stubs not district codes — for city limits use City Limit L9
+      spatial + city ordinance/PDF. No separate county Zoning FeatureServer polygon
+      set beyond this parcel layer.
+    status: usable
+
+  - role: flu
+    name: null — no public county FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Banks County Future Land Use / Character Areas FeatureServer recovered
+      (2026-09-24). Certify via Comp Plan PDF / Planning staff if adopted.
+    status: gap
+
+  - role: other
+    name: Zoning_Base_WFL1 City Limit (incorporated places)
+    restUrl: https://services1.arcgis.com/BOifiQ6QbqCddc32/arcgis/rest/services/Zoning_Base_WFL1/FeatureServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      AREANAME: municipality
+      CLASS: placeClass
+      PLACEFIP: placeFips
+      POPULATION: population
+    notes: >
+      Live count 6 polys: Alto, Gillsville, Maysville, Baldwin, Lula, Homer. Spatial
+      intersect default municipality filter. Sibling city polys also on layers 6–8
+      (Maysville/Lula/Gillsville dedicated). Do NOT filter by parcel mailing (no mailing
+      on parcels layer).
+    status: usable
+
+municipalities:
+  - name: Homer
+    level: city
+    parentFips: "13011"
+    joinToCountyParcels: >
+      Spatial City Limit AREANAME='Homer' OR soft Zoning='Homer' (~995 parcel attrs).
+      County seat ~-83.50,34.35.
+    layers:
+      - role: zoning
+        name: null — city zoning via county Zoning stubs / city ordinance (no city FS)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Homer-owned zoning FeatureServer. Parcel Zoning='Homer' is city-limit stub
+          not district code — certify via City of Homer Planning / zoning map PDF.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Homer city FLU REST.
+        status: gap
+      - role: parcels
+        name: null — use county Zoning_Base Parcels filtered to Homer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County parcels + spatial Homer poly / Zoning='Homer' soft.
+        status: gap
+    gaps:
+      - "No Homer city zoning/FLU FeatureServer; Zoning='Homer' is stub only."
+    status: partial
+
+  - name: Alto
+    level: city
+    parentFips: "13011"
+    joinToCountyParcels: >
+      Spatial City Limit AREANAME='Alto' OR soft Zoning='Alto' (~114). Note: Alto also
+      straddles Habersham — this card is Banks FIPS 13011 portion only.
+    layers:
+      - role: zoning
+        name: null — no city FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Zoning='Alto' stub only; certify via City of Alto.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Alto city FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county parcels spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County parcels + spatial Alto.
+        status: gap
+    gaps:
+      - "Alto straddles Banks + Habersham; only Banks portion in this card."
+    status: partial
+
+  - name: Baldwin
+    level: city
+    parentFips: "13011"
+    joinToCountyParcels: >
+      Spatial City Limit AREANAME='Baldwin' OR soft Zoning='Baldwin' (~431). Baldwin
+      also straddles Habersham — Banks portion only here.
+    layers:
+      - role: zoning
+        name: null — no city FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Zoning='Baldwin' stub; certify via City of Baldwin.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Baldwin city FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county parcels spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County parcels + spatial Baldwin.
+        status: gap
+    gaps:
+      - "Baldwin straddles Banks + Habersham; Banks portion only."
+    status: partial
+
+  - name: Maysville
+    level: city
+    parentFips: "13011"
+    joinToCountyParcels: >
+      Spatial City Limit AREANAME='Maysville' OR layer 6 Maysville poly OR soft
+      Zoning='Maysville' (~501). Maysville straddles Banks + Jackson — Banks portion only.
+    layers:
+      - role: zoning
+        name: null — no city FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Zoning='Maysville' stub only.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Maysville city FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county parcels spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County parcels + spatial Maysville.
+        status: gap
+    gaps:
+      - "Maysville straddles Banks + Jackson; Banks portion only."
+    status: partial
+
+  - name: Lula
+    level: city
+    parentFips: "13011"
+    joinToCountyParcels: >
+      Spatial City Limit AREANAME='Lula' OR layer 7 Lula OR soft Zoning='Lula' (~176).
+      Lula straddles Banks + Hall — Banks portion only.
+    layers:
+      - role: zoning
+        name: null — no city FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Zoning='Lula' stub only.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Lula city FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county parcels spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County parcels + spatial Lula.
+        status: gap
+    gaps:
+      - "Lula straddles Banks + Hall; Banks portion only."
+    status: partial
+
+  - name: Gillsville
+    level: city
+    parentFips: "13011"
+    joinToCountyParcels: >
+      Spatial City Limit AREANAME='Gillsville' OR layer 8 Gillsville OR soft
+      Zoning='Gillsville' (~93). Gillsville straddles Banks + Hall — Banks portion only.
+    layers:
+      - role: zoning
+        name: null — no city FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Zoning='Gillsville' stub only.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Gillsville city FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county parcels spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County parcels + spatial Gillsville.
+        status: gap
+    gaps:
+      - "Gillsville straddles Banks + Hall; Banks portion only."
+    status: partial
+
+gaps:
+  - "No ownerName / mailingAddress / tax.marketValue / lastSale on Zoning_Base_WFL1/10 — CAMA via qPublic App=BanksCountyGA HTML only (bot 403)."
+  - "No separate Euclidean zoning polygon FeatureServer beyond parcel-attributed Zoning; city-name Zoning values are jurisdiction stubs."
+  - "No county FLU / Character Areas REST."
+  - "City_Zoning field nearly empty (≈12) — do not prefer over Zoning or city ordinance."
+  - "Alto / Baldwin / Maysville / Lula / Gillsville straddle neighboring counties — filter to Banks FIPS 13011 spatial."
+  - "Rejected Regrid/ATTOM/paid vendors; rejected wrong-state Banks lookalikes; rejected ARC LandPro_2012 as cadastral."
+  - "No emails/phones collected; no paid vendors."
+
+license: >
+  Banks County GIS (banksgis.maps.arcgis.com / AGOL org BOifiQ6QbqCddc32 —
+  Zoning_Base_WFL1 FeatureServer). Zoning Instant App
+  e0f2c6b19d8b4bef9ee3c89ae343cb79. Assessor HTML qPublic SchneiderCorp
+  App=BanksCountyGA (qpublic.net/ga/banks; bankscountyga.org Parcel Mapping).
+  Attribution to Banks County GIS / Tax Assessors. Public fields only; no
+  emails/phones; no paid vendors (Regrid/ATTOM/CoreLogic).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BanksCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services1.arcgis.com/BOifiQ6QbqCddc32/arcgis/rest/services/Zoning_Base_WFL1/FeatureServer/10
+    count 11351; extent center [['13011', 'Banks County']]; sample [['13011', 'Banks County']]. No
+    change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Alto town"
+      level: city
+      parentFips: "13011"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Gillsville city"
+      level: city
+      parentFips: "13011"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Homer town"
+      level: city
+      parentFips: "13011"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Banks' AND aadt>0
+    altFilter: name LIKE '011-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 011-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 105
+    maxAadt: 50000
+    geoCheck: 100/105 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=BanksCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: '46'
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BanksCountyGA&Layer=Parcels&PageType=Report&KeyValue=46
+    verification: 'pattern-tested: real sample ID from Parcel; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=BanksCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Alto town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Gillsville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Homer town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

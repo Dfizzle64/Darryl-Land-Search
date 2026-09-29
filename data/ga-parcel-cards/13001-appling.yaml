@@ -1,0 +1,368 @@
+state: GA
+jurisdiction: Appling County
+fips: "13001"
+level: county
+markets: [Savannah]
+
+layers:
+  - role: parcels
+    name: Appling_County_Wide_View TaxParcels25 (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Appling_County_Wide_View/FeatureServer/19
+    layerId: 19
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Heart of Georgia Altamaha RC / hogagis org
+      HHvUPZ2XuLOAJxjR; Appling_County_Wide_View item bae362b24b0f4a8d85d7b53436f49c76;
+      open data hogarc-hogarc.opendata.arcgis.com datasets …appling-county-wide-view).
+      Live count 12828 (2026-09-24); PIN filled ≈12826. Schema is THIN — PIN + geometry
+      only (no owner/mailing/situs/acres/CURR_VAL/sale on this layer). Geo-verified WGS84
+      samples ~-82.384,31.897 / ~-82.366,31.896 / ~-82.362,31.899 — Appling County GA
+      north of Baxley (~-82.35,31.78). Join CAMA via qPublic AppID=715 HTML
+      (KeyValue={PIN}). No ApplingCountyGA_WFS (404). Rejected paid Regrid/USLandGrid/
+      DynamoSpatial/MappingSolutions Appling extracts; rejected Apple Valley CA / other
+      Appling lookalikes.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on TaxParcels25; qPublic AppID=715 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on TaxParcels25. Assessor HTML
+      qpublic.net/ga/appling → App=ApplingCountyGA / AppID=715 LayerID=11428
+      (Cloudflare/bot 403 automated; public for humans). Deep-link KeyValue={PIN}.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No SALEPRICE/SALEDATE on TaxParcels25; qPublic Sales Search AppID=715 HTML only.
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Appling County-wide zoning REST. City of Baxley Euclidean published separately
+      (City_of_Baxley_View/5). County Landuse (layer 14) is FLU/existing land-use polygons,
+      not zoning codes. Comp Plan character areas (layer 8) are planning character — not
+      Euclidean zoning.
+    status: gap
+
+  - role: flu
+    name: Appling_County_Wide_View Landuse (EXTLU / FLULU)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Appling_County_Wide_View/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      FLULU: flu
+      FLULUDCA: fluDca
+      EXTLU: existingLandUse
+      EXTLUDCA: existingLandUseDca
+      Acreage: acreage
+    notes: >
+      Preferred Future / existing land-use polygons (NOT parcel-tied — spatial intersect).
+      Live count 14174. FLULU domain: Residential≈8403, Agriculture≈3104, Forestry≈1673,
+      Commercial≈585, Public/Institutional≈334, Transportation/Communication/Utilities≈33,
+      Park/Recreation/Conservation≈27, Industrial≈15. Prefer FLULU as flu; EXTLU as
+      existing. Geo extent matches Appling TaxParcels25. Comp Plan character companion
+      CharacterAreas/8 (count 26; Greater Baxley / Surrency / Graham / Altamaha River /
+      corridors) — planning character only.
+    status: usable
+
+  - role: other
+    name: Appling_County_Wide_View CharacterAreas
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Appling_County_Wide_View/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY: characterCityGroup
+      CHARACTER: characterArea
+    notes: >
+      Count 26 Comp Plan character polygons (Greater Baxley neighborhoods/entranceways,
+      Surrency, Graham, Altamaha River, U.S 341 West Corridor, County). Not Euclidean
+      zoning; use for planning context / spatial join only.
+    status: usable
+
+municipalities:
+  - name: Baxley
+    level: city
+    parentFips: "13001"
+    joinToCountyParcels: >
+      Spatial City_of_Baxley_View BaxleyCityLimits/0 onto TaxParcels25; or attribute join
+      BaxleyZoning PIN → TaxParcels25 PIN (city zoning parcels ≈4256).
+    layers:
+      - role: zoning
+        name: City_of_Baxley_View BaxleyZoning (HOGARC)
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Baxley_View/FeatureServer/5
+        layerId: 5
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          Code: zoning
+          Description: zoningDescription
+        notes: >
+          Preferred City of Baxley Euclidean zoning (parcel-tied PIN). Live count 4256;
+          Code filled ≈2818. Domain: R-12 Single Family Residential, R-15/R-20 low-density
+          SF, RD-12 single/dual-family, RM-10 multi-family, BR-1 Business Residential,
+          B-1 Central Business, B-2 Local Business, P-1 Professional, I-1 Industrial,
+          A-1 Agriculture. Geo-verified ~-82.355,31.749 Baxley GA. Public viewer
+          hogarc.maps.arcgis.com/apps/webappviewer/index.html?id=3888f782573747a9bd21865abbb66d4e.
+          Skip Water/Sewer utility layers on same FeatureServer.
+        status: usable
+      - role: flu
+        name: County Landuse spatial Baxley
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Appling_County_Wide_View/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: Acreage
+        coverage: city-only
+        fieldMap:
+          FLULU: flu
+        notes: County FLU spatial intersect BaxleyCityLimits; CharacterAreas Greater Baxley stubs.
+        status: usable
+      - role: parcels
+        name: County TaxParcels25 spatial Baxley
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Appling_County_Wide_View/FeatureServer/19
+        layerId: 19
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+        notes: No Baxley-owned parcel CAMA — county TaxParcels25 + city limits / zoning PIN.
+        status: partial
+    gaps:
+      - "No Baxley-owned parcel CAMA FeatureServer — thin county PIN geometry + qPublic HTML."
+    status: usable
+
+  - name: Surrency
+    level: city
+    parentFips: "13001"
+    joinToCountyParcels: "Spatial CharacterAreas CITY/CHARACTER='Surrency' or municipal boundary when available onto TaxParcels25."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Surrency zoning REST found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Landuse / CharacterAreas spatial if coverage reaches.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels25 spatial.
+        status: gap
+    gaps:
+      - "No Surrency-owned zoning/FLU/parcel REST."
+    status: gap
+
+  - name: Graham
+    level: city
+    parentFips: "13001"
+    joinToCountyParcels: "Spatial CharacterAreas CITY/CHARACTER='Graham' onto TaxParcels25."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Graham zoning REST found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Landuse spatial if coverage reaches.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels25 spatial.
+        status: gap
+    gaps:
+      - "No Graham-owned zoning/FLU/parcel REST."
+    status: gap
+
+gaps:
+  - "TaxParcels25 is geometry+PIN only — no owner/mailing/situs/acres/CURR_VAL/sale REST; qPublic AppID=715 HTML for CAMA (bot/CDN may 403)."
+  - "No county-wide Euclidean zoning REST — Baxley city zoning only (City_of_Baxley_View/5)."
+  - "No public REST lastSale.price/date — qPublic Sales Search HTML."
+  - "ApplingCountyGA_WFS 404; NG911 Appling Edit Map is roads/edit — not parcel CAMA."
+  - "No Surrency/Graham city zoning/FLU REST."
+  - "Rejected paid Regrid/USLandGrid/DynamoSpatial/MappingSolutions; Apple Valley CA lookalikes."
+  - "No emails/phones; skip HOGARC water/sewer utility layers; no paid vendors."
+
+license: >
+  Heart of Georgia Altamaha Regional Commission GIS (hogagis org HHvUPZ2XuLOAJxjR) —
+  Appling_County_Wide_View (TaxParcels25/19, Landuse/14, CharacterAreas/8), City of
+  Baxley View (BaxleyZoning/5, BaxleyCityLimits/0). Hub/open data
+  hogarc-hogarc.opendata.arcgis.com. Assessor qpublic.net/ga/appling AppID=715
+  App=ApplingCountyGA. Attribution HOGARC / Appling County Tax Assessor / City of Baxley.
+  Public fields only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=715&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://hogarc-hogarc.opendata.arcgis.com/datasets/HHvUPZ2XuLOAJxjR::appling-county-wide-view/explore
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/HHvUPZ2XuLOAJ
+    xjR/arcgis/rest/services/Appling_County_Wide_View/FeatureServer/19 count 12828; extent center
+    [['13001', 'Appling County']]; sample [['13001', 'Appling County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Baxley city"
+      level: city
+      parentFips: "13001"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Graham city"
+      level: city
+      parentFips: "13001"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Surrency town"
+      level: city
+      parentFips: "13001"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Appling' AND aadt>0
+    altFilter: name LIKE '001-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 001-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 80
+    maxAadt: 15100
+    geoCheck: 80/80 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=ApplingCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PIN
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0030 201
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=ApplingCountyGA&Layer=Parcels&PageType=Report&KeyValue=0030%20201
+    verification: 'pattern-tested: real sample ID from PIN; box test HTTP 403 Cloudflare challenge (expected; pattern
+      follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://hogarc-hogarc.opendata.arcgis.com/datasets/HHvUPZ2XuLOAJxjR::appling-county-wide-view/explore
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Baxley city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Graham city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Surrency town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

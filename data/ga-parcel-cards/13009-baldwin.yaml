@@ -1,0 +1,315 @@
+state: GA
+jurisdiction: Baldwin County
+fips: "13009"
+level: county
+markets: [Macon]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner/mailing/situs/acres/zoning attr (no FMV/sale on REST)
+  - role: parcels
+    name: Parcels_Feb2026 (Baldwin County BOC / bhegler_baldwinboc)
+    restUrl: https://services7.arcgis.com/Da8HZMsU25Hzzob3/arcgis/rest/services/Parcels_Feb2026/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Deeded_Acr
+    coverage: county-wide
+    fieldMap:
+      Parcel_ID: parcelId
+      Parcel_No: parcelIdAlt
+      Alternate_: parcelPinAlt
+      Owner_Name: ownerName
+      Owner_2_Na: ownerName2
+      Mailing_Ad: mailingAddress
+      Mailing__1: mailingAddress2
+      Mailing__2: mailingAddress3
+      City: mailingCity
+      State: mailingState
+      Zipcode: mailingZip
+      Zip_4: mailingZip4
+      Address_Li: situsAddress
+      Address__1: situsAddressAlt
+      Deeded_Acr: acreage
+      Draw_Acres: acreageGis
+      Zoning: zoning
+      Land_Use_C: landUse
+      Class: dorClass
+      Tax_Distri: taxDistrict
+      Neighborho: neighborhood
+      LEGDESC: legalDescription
+      Shape__Area: shapeAreaSqM
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA landbase (Baldwin County Board of
+      Commissioners AGOL org Da8HZMsU25Hzzob3 / BaldwinBOC; hosted Parcels_Feb2026 item
+      662593052a674852890112e62b8d0b41; editor bhegler_baldwinboc; "up to date as of Feb
+      2026 / GIS1"). Live count 21876 (2026-09-24). maxRecordCount 2000. SR Web Mercator
+      (102100/3857). Deeded_Acr>0 ≈20868; Deeded_Acr 5–150 ≈3077; Draw_Acres 5–150 ≈2944 —
+      prefer Deeded_Acr when non-null else Draw_Acres. Owner_Name filled ≈21864;
+      Address_Li situs filled ≈21850; Zoning filled ≈20777. Parcel_ID format e.g.
+      '023 014B', '001 001'. Tax_Distri soft: BALDWIN COUNTY≈16456, CITY OF
+      MILLEDGEVILLE≈5408 — prefer spatial Milledgeville_City_Limits_Update for
+      municipality. Zoning here is CAMA descriptive (Residential≈14690, Unzoned
+      Rural≈5605, Commercial≈226, Rural≈131, Unzoned Urban≈59, …) — prefer Euclidean
+      Zoning Districts (Baldwin_County_Zoning_Map_WFL1/3) for district codes. Land_Use_C:
+      Residential≈15996, Rural≈4951, CUVA≈593, Real Prop≈51, FLPA≈37. Class top:
+      Residential Lots≈16128, Residential Small Tracts≈1370, Commercial Lots≈1176,
+      Conservation - Large Tract≈644. NO CURR_VAL / FMV / assessed / SALEPRICE /
+      SALEDATE on this layer — tax/sale via qPublic App=BaldwinCountyGA HTML. Compose
+      situs from Address_Li when present. City/State/Zipcode are OWNER mailing
+      (nationwide — State≠GA ≈1242) — never municipality filter. Utility_*/Road_*
+      present — SKIP per tranche-3 (no utilities). Thinner twins: Parcel_Regions_With_CAMA
+      (Baldwin_County_Zoning_Map_WFL1/5; count 21805; older 8/19/2025; no Zoning field) —
+      do not prefer; QPublic_Parcels (Map_WFL1/4; PARID+ACRES only); basemap baldwin_parcels
+      (Baldwin_GA_BaseMap_WFL1/2; parcel keys only). Geo-verified WGS84 samples
+      ~-83.317,32.989 (023 014B Pancras Rd Milledgeville), ~-83.282,32.975 /
+      ~-83.282,32.975 (025A 032/033 Gordon fringe) — Baldwin County GA / Milledgeville
+      (~-83.23,33.08) Mid-Georgia (NOT Baldwin County AL ~-87.75,30.6 Gulf Coast; NOT
+      Baldwin city in Banks/Habersham; NOT AL ISV kcsgis / al-baldwincounty.hub).
+      Official human viewers: Zoning Instant App 399a13d55b8047018b8ea26e5470a4a3;
+      qPublic App=BaldwinCountyGA (qpublic.net/ga/baldwin; bot 403 automated).
+      BaldwinCountyGA_WFS 404. Rejected paid Regrid/ATTOM; rejected AL Baldwin lookalikes.
+    status: usable
+
+  - role: tax
+    name: null — no public REST market/assessed values
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL / FMV / assessed / esttax on Parcels_Feb2026. Assessor HTML
+      qpublic.net/ga/baldwin → qpublic.schneidercorp.com Application.aspx?App=BaldwinCountyGA
+      (Cloudflare/bot 403 automated; public for humans). Deep-link
+      PageType=Report&KeyValue={Parcel_ID}.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No SALEPRICE/SALEDATE/SALE_VAL FeatureServer recovered (2026-09-24). Prefer qPublic
+      Sales Search HTML App=BaldwinCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Baldwin_County_Zoning_Map_WFL1 Zoning Districts (Euclidean)
+    restUrl: https://services7.arcgis.com/Da8HZMsU25Hzzob3/arcgis/rest/services/Baldwin_County_Zoning_Map_WFL1/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZoningClassification: zoning
+      ZoningDescription: zoningNotes
+    notes: >
+      Preferred Euclidean zoning polygons (count 911). Domain ZoningClassification:
+      R2-AG≈294, R-1R≈242, R1-AG≈128, R-1≈78, C-2≈48, R-2≈45, PUD≈38, C-1≈24, RM≈8,
+      I-M≈3, MHP≈3. Twin Baldwin_County_Zoning_WFL1/0 (same schema + GlobalID; item
+      1ef7ec61d79a48efa707bd965be6f92a) — either OK; prefer Map_WFL1/3 as paired with
+      parcel CAMA companion layers. Parcel-attributed Zoning on Parcels_Feb2026 is
+      descriptive CAMA (Residential/Unzoned Rural/…) — spatial-join this layer for
+      district codes. Viewer: Instant interactivelegend appid=399a13d55b8047018b8ea26e5470a4a3.
+      Geo-verified Baldwin GA (same extent as parcels).
+    status: usable
+
+  - role: zoning
+    name: Parcels_Feb2026.Zoning (parcel-attributed CAMA descriptive)
+    restUrl: https://services7.arcgis.com/Da8HZMsU25Hzzob3/arcgis/rest/services/Parcels_Feb2026/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Deeded_Acr
+    coverage: county-wide
+    fieldMap:
+      Parcel_ID: parcelId
+      Zoning: zoning
+    notes: >
+      Secondary parcel-attributed zoning (descriptive). Prefer Euclidean Zoning Districts
+      for district codes; keep this for parcel join convenience.
+    status: partial
+
+  - role: flu
+    name: null — no public county FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Baldwin County GA Future Land Use / Character Areas FeatureServer recovered
+      (2026-09-24). Certify via Comp Plan PDF / Planning staff if adopted.
+    status: gap
+
+  - role: other
+    name: Milledgeville_City_Limits_Update (incorporated place)
+    restUrl: https://services7.arcgis.com/Da8HZMsU25Hzzob3/arcgis/rest/services/Milledgeville_City_Limits_Update/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+      MUNITYP: municipalityType
+      LOCALFIPS: localFips
+    notes: >
+      Count 1 polygon — City of Milledgeville. Preferred spatial municipality filter
+      over Tax_Distri string. Also mirrored as Zoning_Map_WFL1/0 and Zoning_WFL1/3.
+    status: usable
+
+municipalities:
+  - name: Milledgeville
+    level: city
+    parentFips: "13009"
+    joinToCountyParcels: "Spatial Milledgeville_City_Limits_Update onto Parcels_Feb2026; soft Tax_Distri='CITY OF MILLEDGEVILLE'."
+    layers:
+      - role: zoning
+        name: Zoning Districts spatial Milledgeville
+        restUrl: https://services7.arcgis.com/Da8HZMsU25Hzzob3/arcgis/rest/services/Baldwin_County_Zoning_Map_WFL1/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoningClassification: zoning
+        notes: County Euclidean zoning spatial-clipped to Milledgeville limits; certify vs city ordinance/PDF when diverges.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Milledgeville FLU REST found.
+        status: gap
+      - role: parcels
+        name: null — county Parcels_Feb2026 spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Parcels_Feb2026 + Milledgeville poly.
+        status: gap
+    gaps:
+      - "No Milledgeville-owned parcel/zoning/FLU FeatureServer separate from county."
+    status: partial
+
+gaps:
+  - "No CURR_VAL/FMV/assessed/SALEPRICE on Parcels_Feb2026 — qPublic App=BaldwinCountyGA HTML only (bot 403)."
+  - "No public REST multi-sale history."
+  - "No county FLU / Character Areas REST."
+  - "Parcel Zoning is CAMA descriptive — prefer Euclidean Zoning Districts for codes."
+  - "BaldwinCountyGA_WFS 404."
+  - "REJECT Baldwin County AL (FIPS 01003; kcsgis ISV; al-baldwincounty.hub); REJECT Baldwin city (Banks/Habersham); REJECT paid Regrid/ATTOM."
+  - "Utility_*/Road_* on CAMA — skipped per tranche-3 (no utilities/AADT)."
+  - "No emails/phones collected; no paid vendors."
+
+license: >
+  Baldwin County Board of Commissioners GIS AGOL (org Da8HZMsU25Hzzob3 BaldwinBOC /
+  baldwinboc.maps.arcgis.com — Parcels_Feb2026; Baldwin_County_Zoning_Map_WFL1;
+  Milledgeville_City_Limits_Update; Zoning Instant App 399a13d55b8047018b8ea26e5470a4a3).
+  Assessor HTML qPublic SchneiderCorp App=BaldwinCountyGA (qpublic.net/ga/baldwin).
+  Attribution Baldwin County GIS / Tax Assessors. Public fields only; no emails/phones;
+  no paid vendors (Regrid/ATTOM/CoreLogic).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BaldwinCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://baldwinboc.maps.arcgis.com/apps/instant/interactivelegend/index.html?appid=399a13d55b8047018b8ea26e5470a4a3
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://services7.arcgis.com/Da8HZMsU25Hzzob3/arcgis/rest/services/Parcels_Feb2026/FeatureServer/0
+    count 21876; extent center [['13009', 'Baldwin County']]; sample [['13009', 'Baldwin County']]. No
+    change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Milledgeville city"
+      level: city
+      parentFips: "13009"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Baldwin' AND aadt>0
+    altFilter: name LIKE '009-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 009-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 162
+    maxAadt: 38100
+    geoCheck: 161/162 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: Owner_Name
+    filledCount: 21864
+    restUrl: https://services7.arcgis.com/Da8HZMsU25Hzzob3/arcgis/rest/services/Parcels_Feb2026/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=BaldwinCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 023 014B
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BaldwinCountyGA&Layer=Parcels&PageType=Report&KeyValue=023%20014B
+    verification: 'pattern-tested: real sample ID from Parcel_No; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://baldwinboc.maps.arcgis.com/apps/instant/interactivelegend/index.html?appid=399a13d55b8047018b8ea26e5470a4a3
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Milledgeville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

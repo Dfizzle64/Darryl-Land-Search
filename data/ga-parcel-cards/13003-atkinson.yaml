@@ -1,0 +1,382 @@
+state: GA
+jurisdiction: Atkinson County
+fips: "13003"
+level: county
+markets: [Valdosta]
+
+layers:
+  - role: parcels
+    name: Atkinson PropertyInformation Tax Parcels (SGRC)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Atkinson/PropertyInformation/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PARCELNUM: parcelIdAlt
+      PARCEL_NO2: parcelPinAlt
+      LASTNAME: ownerName
+      FIRSTNAME: ownerFirstName
+      ADDRESS1: mailingAddress
+      ADDRESS2: mailingAddress2
+      ADDRESS3: mailingAddress3
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP_1: mailingZip
+      HOUSE_NO: situsNumber
+      STDIRECT: situsStreetDir
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      UNIT: situsUnit
+      EXTENSION: situsExtension
+      TOTALACRES: acreage
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.fmvResidential
+      FMVCOM: tax.fmvCommercial
+      FMVACC: tax.fmvAccessory
+      MAVCURR: tax.assessedValue
+      TAXDISTRIC: taxDistrict
+      LEGAL_DESC: legalDescription
+      LAND_TYPE: dorCode
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+      SUBD_NAME: subdivision
+      REALKEY_1: ownerKey
+      OWNKEY: ownerKeyAlt
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (Southern Georgia Regional Commission
+      GIS; sgrcmaps.com/alma Atkinson/PropertyInformation; public viewer
+      sgrcmaps.com/AtkinsonCounty → webappviewer id=077f5a7925e54c5889d95272005e57a9;
+      owner rstrom_sgrc org HA2thkMWRBDb77XN). Live count 4716 (2026-09-24). SR StatePlane
+      GA East FIPS 1001 Feet (102666/2239). TOTALACRES 5–150 = 1419; CURR_VAL>0 = 4612;
+      LASTNAME filled = 4660; HOUSE_NO>0 = 2567; ADDRESS1 = 3437. Geo-verified WGS84
+      samples ~-82.752,31.184 (PARCEL_NO '0081  018003' Pearson fringe) and
+      ~-83.018,31.184 / ~-83.023,31.185 — Atkinson County GA NW of Waycross / Valdosta MSA
+      ring (NOT Fort Atkinson WI; NOT Atkinson NE). PARCEL_NO format e.g. '0081  018003'
+      / '0075  002'. Situs = HOUSE_NO + STDIRECT + STREET_NAM + STTYPE (+ UNIT);
+      CITY/STATE/ZIP_1 are MAILING (postal PEARSON/WILLACOOCHEE/VALDOSTA/…). TAXDISTRIC
+      soft decode: 01 County≈3113, 02 Pearson≈829, 03 Willacoochee≈718 — prefer spatial
+      MunicipalBoundaries City Limits for municipality. ZONINGCODE/ZONING fields exist but
+      are NULL county-wide (distinct ZONINGCODE = none) — not usable zoning. SALE_VAL /
+      SALELAND1 / SALEIMP1 all zero-filled — no REST sale price. Twin Land Lots layer/0 is
+      PLSS points only. Rejected paid Regrid/USLandGrid/MappingSolutions; AtkinsonCountyGA_WFS 404.
+    status: usable
+
+  - role: tax
+    name: PropertyInformation CURR_VAL / MAVCURR / FMV* (on polygons)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Atkinson/PropertyInformation/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.fmvResidential
+      FMVCOM: tax.fmvCommercial
+      FMVACC: tax.fmvAccessory
+      MAVCURR: tax.assessedValue
+      MAVORIG: tax.assessedValueOriginal
+      TAXDISTRIC: taxDistrict
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons (CURR_VAL>0 = 4612). Prefer
+      CURR_VAL as published market; MAVCURR as assessed/digest when needed. Assessor HTML
+      qPublic AppID=634 LayerID=11214 (qpublic.net/ga/atkinson; bot/CDN may 403) —
+      prefer live MapServer/1 over HTML.
+    status: usable
+
+  - role: sales
+    name: null — SALE_* fields present but zero-filled
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Atkinson/PropertyInformation/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      SALE_VAL / SALELAND1 / SALEIMP1 / SALEIMP2 fields exist on Tax Parcels but live
+      counts SALE_VAL>0 / SALELAND1>0 / SALEIMP1>0 = 0 (2026-09-24). Treat as REST gap for
+      lastSale.price/date — qPublic Sales Search AppID=634 HTML for sale history.
+    status: gap
+
+  - role: zoning
+    name: null — ZONINGCODE/ZONING null on parcels; no Euclidean zoning MapServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Atkinson/PropertyInformation Tax Parcels exposes ZONINGCODE and ZONING but both are
+      entirely null (distinct ZONINGCODE = [None]). No Atkinson/Zoning MapServer in SGRC
+      alma folder (Addresses, Contours, MunicipalBoundaries, PropertyInformation, Soils,
+      Transportation, WaterFeatures only). No Pearson / Willacoochee city zoning FeatureServer
+      found. Honest county zoning gap — Comp Plan PDF/staff.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Atkinson County FLU / Future Development REST on SGRC alma or AGOL (2026-09-24).
+    status: gap
+
+  - role: other
+    name: MunicipalBoundaries City Limits
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Atkinson/MunicipalBoundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY: municipality
+    notes: >
+      Live count 2 municipality polygons: PEARSON, WILLACOOCHEE. Preferred spatial join
+      target for municipality filter. Soft attribute via TAXDISTRIC 02 Pearson / 03
+      Willacoochee (01 County unincorp). Layer/1 County Boundary companion.
+    status: usable
+
+  - role: other
+    name: Addresses Address Points
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Atkinson/Addresses/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ADDRESS: situsAddress
+      STNUM: situsNumber
+      FULLNAME: situsStreetFull
+      NAME: situsStreet
+      TYPE: situsStreetType
+      PREDIR: situsStreetDir
+      CITY: postalCity
+      ZIP: situsZip
+      GISLINK: parcelGisLink
+      LAT: latitude
+      LON: longitude
+    notes: >
+      Live count 7318 address points. CITY/ZIP are postal — NOT municipality filter;
+      prefer MunicipalBoundaries / TAXDISTRIC. GISLINK may join to parcels when populated.
+      Skip PHONE1 and other PII if present. Geo Atkinson GA.
+    status: usable
+
+municipalities:
+  - name: Pearson
+    level: city
+    parentFips: "13003"
+    joinToCountyParcels: >
+      Spatial MunicipalBoundaries City Limits CITY='PEARSON' OR TAXDISTRIC='02' (≈829 soft).
+      mailing CITY='PEARSON' is postal — prefer spatial / taxdistric.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Pearson zoning REST found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Pearson FLU REST.
+        status: gap
+      - role: parcels
+        name: County Tax Parcels spatial Pearson
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Atkinson/PropertyInformation/MapServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          CURR_VAL: tax.marketValue
+          TOTALACRES: acreage
+        notes: No Pearson-owned parcel CAMA — county PropertyInformation/1 + City Limits.
+        status: partial
+    gaps:
+      - "No Pearson-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Willacoochee
+    level: city
+    parentFips: "13003"
+    joinToCountyParcels: >
+      Spatial CITY='WILLACOOCHEE' OR TAXDISTRIC='03' (≈718 soft).
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Willacoochee zoning REST found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Willacoochee FLU REST.
+        status: gap
+      - role: parcels
+        name: County Tax Parcels spatial Willacoochee
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Atkinson/PropertyInformation/MapServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          CURR_VAL: tax.marketValue
+          TOTALACRES: acreage
+        notes: County PropertyInformation/1 + City Limits.
+        status: partial
+    gaps:
+      - "No Willacoochee-owned zoning/FLU/parcel REST."
+    status: partial
+
+gaps:
+  - "ZONINGCODE/ZONING on Tax Parcels are entirely null; no Atkinson/Zoning MapServer — county + city Euclidean zoning REST gap."
+  - "No public FLU / Future Development FeatureServer."
+  - "SALE_VAL/SALELAND1/SALEIMP1 zero-filled — no REST lastSale.price/date; qPublic AppID=634 Sales Search HTML."
+  - "No Pearson / Willacoochee city-only parcel CAMA — county MapServer/1 + MunicipalBoundaries / TAXDISTRIC."
+  - "Addresses CITY is postal — municipality filter = City Limits spatial or TAXDISTRIC only."
+  - "AtkinsonCountyGA_WFS 404; qpublic.net/ga/atkinson may 403 from research box (public for humans)."
+  - "Rejected Fort Atkinson WI zoning lookalikes; paid Regrid/USLandGrid/MappingSolutions."
+  - "No emails/phones; skip soils/utilities/AADT; no paid vendors."
+
+license: >
+  Southern Georgia Regional Commission GIS sgrcmaps.com — Atkinson/PropertyInformation
+  (Tax Parcels/1, Land Lots/0), MunicipalBoundaries, Addresses, Transportation,
+  WaterFeatures, Soils, Contours; Election_Layers on arcgis path. Public viewer
+  sgrcmaps.com/AtkinsonCounty (webappviewer 077f5a7925e54c5889d95272005e57a9). Assessor
+  qpublic.net/ga/atkinson AppID=634. Attribution SGRC / Atkinson County Tax Assessor.
+  Public fields only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=634&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://www.sgrcmaps.com/AtkinsonCounty/
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://www.sgrcmaps.com/alma/rest/services/Atkinson/PropertyInformation/MapServer/1 count 4716;
+    extent center [['13003', 'Atkinson County']]; sample [['13003', 'Atkinson County']]. No change to
+    field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Pearson city"
+      level: city
+      parentFips: "13003"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Willacoochee city"
+      level: city
+      parentFips: "13003"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Atkinson' AND aadt>0
+    altFilter: name LIKE '003-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 003-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 56
+    maxAadt: 8000
+    geoCheck: 56/56 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - A_VALUE
+    - FMVRES
+    filledCount: 4612
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Atkinson/PropertyInformation/MapServer/1
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: SALE_VAL=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 4660
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Atkinson/PropertyInformation/MapServer/1
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=AtkinsonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0081  018003
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=AtkinsonCountyGA&Layer=Parcels&PageType=Report&KeyValue=0081%20%20018003
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: inferred {County}CountyGA convention
+  jurisdictionGisUrl:
+    county: https://www.sgrcmaps.com/AtkinsonCounty/
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Pearson city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Willacoochee city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

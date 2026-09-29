@@ -1,0 +1,357 @@
+state: GA
+jurisdiction: Candler County
+fips: "13043"
+level: county
+markets: [Savannah]
+
+layers:
+  # PRIMARY — county-wide parcel polygons (HOGARC Candler_County_Wide_View)
+  - role: parcels
+    name: Candler_County_Wide_View TaxParcel_26 (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Candler_County_Wide_View/FeatureServer/18
+    layerId: 18
+    geometry: polygon
+    auth: none
+    acreageField: STATEDAREA
+    coverage: county-wide
+    fieldMap:
+      NAME: parcelId
+      PARCELLABEL: parcelIdAlt
+      MAP: mapSheet
+      BLOCK: block
+      PARCEL: parcelNumber
+      SUBPARCEL: subParcel
+      SEIPARCELSTREETADDRESS: situsAddress
+      STATEDAREA: acreage
+      CALCULATEDAREA: acreageCalculated
+      CLASSIFICATION: dorCode
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Heart of Georgia Altamaha RC / hogagis org
+      HHvUPZ2XuLOAJxjR; Candler_County_Wide_View item d5beeecf6f0646368ed8263fa845bd5c;
+      open data hogarc-hogarc.opendata.arcgis.com datasets …candler-county-wide-view).
+      Live count 7151 (2026-09-24). Schema is THIN — NAME/PARCELLABEL + map/block/parcel
+      parts + STATEDAREA acres + SEIPARCELSTREETADDRESS (mostly 'TBD') + geometry; NO
+      owner/mailing/CURR_VAL/sale on this layer. STATEDAREA>0 ≈6610; STATEDAREA 5–150
+      ≈2287 (preferred acreage band); CALCULATEDAREA unused (null on samples). Parcel id
+      format e.g. "066    001" / "011    009 001" (padded NAME) — use as qPublic
+      KeyValue. CountyBoundary/0 CNTYIDFP=13043 / NAME=Candler geo-verified. WGS84
+      samples ~-82.222,32.385 / ~-82.243,32.376 / ~-82.228,32.367 — Candler County GA
+      around Metter (~-82.06,32.40). Join CAMA via qPublic AppID=799 HTML
+      KeyValue={NAME}. No CandlerCountyGA_WFS recovered. Rejected paid
+      Regrid/USLandGrid/DynamoSpatial Candler extracts.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on TaxParcel_26; qPublic AppID=799 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on TaxParcel_26. Assessor HTML
+      qpublic.net/ga/candler → App=CandlerCountyGA / AppID=799 LayerID=11965
+      (Cloudflare/bot 403 automated; public for humans). Deep-link KeyValue={NAME}.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No SALEPRICE/SALEDATE on TaxParcel_26. qPublic Sales Search AppID=799 HTML only.
+      Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Candler_County_Wide_View Proposed_Zoning
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Candler_County_Wide_View/FeatureServer/19
+    layerId: 19
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      MapPIN: parcelIdPin
+      Zone: zoning
+      ZoneType: zoningDescription
+    notes: >
+      Preferred county zoning polygons labeled Proposed_Zoning (count 7609; parcel-tied
+      MapPIN e.g. 029-007-001 — different dash format from TaxParcel NAME "029A   015";
+      prefer spatial join over string join). Domain Zone: AG-3≈4750, ME≈2253, R-1≈307,
+      PU≈123, GC≈113, NC≈53, LI≈9, MHP≈1. ZoneType samples Agriculture. Title says
+      "Proposed" — certify against adopted Candler zoning ordinance / PDF map before
+      treating as final Euclidean; honest partial until staff confirms adoption.
+      Geo-verified ~-82.11,32.35 Candler GA. City of Metter / Town of Pulaski have
+      separate zoning layers.
+    status: partial
+
+  - role: flu
+    name: Candler_County_Wide_View Landuse (EXTLU / FLULU)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Candler_County_Wide_View/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      FLULU: flu
+      FLUDCA: fluDca
+      EXTLU: existingLandUse
+      EXTLUDCA: existingLandUseDca
+      Acreage: acreage
+    notes: >
+      Preferred Future / existing land-use polygons (NOT parcel-tied — spatial intersect).
+      Live count 7693. FLULU domain: Residential≈3639, Agriculture≈2620, Forestry≈1030,
+      Commercial≈298, Public/Institutional≈53, Industrial≈42,
+      Transportation/Communication/Utilities≈6, Park/Recreation/Conservation≈5. Prefer
+      FLULU as flu; EXTLU as existing. Comp Plan character companion CharacterAreas/4
+      (count 30; Urban Metter / Greater Metter / Rural Candler / Downtown Metter /
+      Pulaski Fringe / Old Pulaski / corridors / Conservation / Industrial Park/Airport
+      etc.) — planning character only.
+    status: usable
+
+  - role: other
+    name: Candler_County_Wide_View CharacterAreas
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Candler_County_Wide_View/FeatureServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CHARACTER: characterArea
+      FUTURE_CHA: characterAreaFuture
+    notes: >
+      Count 30 Comp Plan character polygons (Urban Metter, Greater Metter, Downtown
+      Metter, Rural Candler, Pulaski Fringe, Old Pulaski, East Candler Growth Area,
+      Conservation Areas, Industrial Park/Airport, Hwy corridors, Interstate
+      Interchange, Crossroad Nodes, Historic Areas). Not Euclidean zoning; planning
+      context / spatial join only.
+    status: usable
+
+municipalities:
+  - name: Metter
+    level: city
+    parentFips: "13043"
+    joinToCountyParcels: >
+      Spatial Metter_GeoData_View MetterCityLimits/4 onto TaxParcel_26; CharacterAreas
+      Urban Metter / Greater Metter / Downtown Metter.
+    layers:
+      - role: zoning
+        name: Metter_GeoData_View MetterZoning_CharacterArea
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Metter_GeoData_View/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+          CharaterArea: characterArea
+        notes: >
+          Preferred City of Metter zoning+character polygons (count 2844). Domain Zoning:
+          R-2 Single-Family≈694, R-4 Multi-Family≈481, R-3 Two-Family≈409, L-1 Light
+          Industrial≈147, R-5M Manufactured/Modular≈127, CBD≈124, CR Neighborhood/
+          General Commercial≈103, PEH Public/Health/Education≈63, HOC≈56, plus
+          HOC-1A/PW/R-0/PUD sparse. Older MetterZoning_Old/0 CODE numeric opaque
+          (count 365) — prefer layer 3. Skip Pulaski/Metter water utility layers per
+          tranche-3. Geo Metter GA.
+        status: usable
+      - role: flu
+        name: County Landuse / CharacterAreas spatial Metter
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Candler_County_Wide_View/FeatureServer/8
+        layerId: 8
+        geometry: polygon
+        auth: none
+        acreageField: Acreage
+        coverage: city-only
+        fieldMap:
+          FLULU: flu
+        notes: County FLU spatial intersect MetterCityLimits; CharacterAreas Urban/
+          Greater/Downtown Metter stubs.
+        status: usable
+      - role: parcels
+        name: County TaxParcel_26 spatial Metter
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Candler_County_Wide_View/FeatureServer/18
+        layerId: 18
+        geometry: polygon
+        auth: none
+        acreageField: STATEDAREA
+        coverage: city-only
+        fieldMap:
+          NAME: parcelId
+        notes: No Metter-owned parcel CAMA — county TaxParcel_26 + MetterCityLimits/4.
+        status: partial
+    gaps:
+      - "No Metter-owned parcel CAMA FeatureServer — thin county NAME geometry + qPublic HTML."
+      - "Skip Metter water/hydrants utility layers (Pulaski/Metter GeoData)."
+    status: usable
+
+  - name: Pulaski
+    level: city
+    parentFips: "13043"
+    joinToCountyParcels: >
+      Spatial Pulaski_GeoData_View PulaskiTownLimits/0 onto TaxParcel_26; CharacterAreas
+      Pulaski Fringe / Old Pulaski.
+    layers:
+      - role: zoning
+        name: Pulaski_GeoData_View PulaskiZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Pulaski_GeoData_View/FeatureServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoneType: zoning
+          ZoneDescr: zoningDescription
+          CODE: zoningCode
+        notes: >
+          Town of Pulaski Euclidean zoning (count 33). ZoneType samples AG Agricultural,
+          R-40 Single-Family Residential Estate. Skip PulaskiWaterLines/Valves/Hydrants
+          utilities per tranche-3.
+        status: usable
+      - role: flu
+        name: County Landuse / CharacterAreas spatial Pulaski
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Candler_County_Wide_View/FeatureServer/8
+        layerId: 8
+        geometry: polygon
+        auth: none
+        acreageField: Acreage
+        coverage: city-only
+        fieldMap:
+          FLULU: flu
+        notes: County FLU spatial PulaskiTownLimits; CharacterAreas Old Pulaski / Pulaski Fringe.
+        status: usable
+      - role: parcels
+        name: County TaxParcel_26 spatial Pulaski
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Candler_County_Wide_View/FeatureServer/18
+        layerId: 18
+        geometry: polygon
+        auth: none
+        acreageField: STATEDAREA
+        coverage: city-only
+        fieldMap:
+          NAME: parcelId
+        notes: County TaxParcel_26 + PulaskiTownLimits/0.
+        status: partial
+    gaps:
+      - "No Pulaski-owned parcel CAMA; skip water utility layers on Pulaski_GeoData_View."
+    status: usable
+
+gaps:
+  - "TaxParcel_26 is geometry+NAME/acres only — no owner/mailing/CURR_VAL/sale REST; qPublic AppID=799 HTML for CAMA (bot/CDN may 403)."
+  - "SEIPARCELSTREETADDRESS mostly 'TBD' — weak situs on REST."
+  - "No public REST lastSale.price/date — qPublic Sales Search HTML AppID=799."
+  - "Proposed_Zoning title implies proposed — certify vs adopted ordinance; MapPIN dash format ≠ TaxParcel NAME padding (spatial join)."
+  - "CALCULATEDAREA unused/null — use STATEDAREA for acres."
+  - "No CandlerCountyGA_WFS recovered."
+  - "Rejected paid Regrid/USLandGrid/DynamoSpatial; no emails/phones; skip water/utilities + AADT per tranche-3."
+
+license: >
+  Heart of Georgia Altamaha Regional Commission GIS (hogagis org HHvUPZ2XuLOAJxjR) —
+  Candler_County_Wide_View (TaxParcel_26/18, Landuse/8, Proposed_Zoning/19,
+  CharacterAreas/4), Metter_GeoData_View (MetterZoning_CharacterArea/3,
+  MetterCityLimits/4), Pulaski_GeoData_View (PulaskiZoning/4, PulaskiTownLimits/0).
+  Hub/open data hogarc-hogarc.opendata.arcgis.com. Assessor qpublic.net/ga/candler
+  AppID=799 LayerID=11965 App=CandlerCountyGA. Attribution HOGARC / Candler County
+  Tax Assessor / City of Metter / Town of Pulaski. Public fields only; no emails/
+  phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=799&LayerID=11965&PageTypeID=4&KeyValue=
+jurisdictionGisUrl: https://hogarc-hogarc.opendata.arcgis.com/datasets/HHvUPZ2XuLOAJxjR::candler-county-wide-view/explore
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/HHvUPZ2XuLOAJ
+    xjR/arcgis/rest/services/Candler_County_Wide_View/FeatureServer/18 count 7151; extent center
+    [['13043', 'Candler County']]; sample [['13043', 'Candler County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Metter city"
+      level: city
+      parentFips: "13043"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Pulaski town"
+      level: city
+      parentFips: "13043"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Candler' AND aadt>0
+    altFilter: name LIKE '043-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 043-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 69
+    maxAadt: 27200
+    geoCheck: 69/69 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=CandlerCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=799&LayerID=11965&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: '1'
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=CandlerCountyGA&Layer=Parcels&PageType=Report&KeyValue=1
+    verification: 'pattern-tested: real sample ID from PARCEL; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://hogarc-hogarc.opendata.arcgis.com/datasets/HHvUPZ2XuLOAJxjR::candler-county-wide-view/explore
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Metter city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Pulaski town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

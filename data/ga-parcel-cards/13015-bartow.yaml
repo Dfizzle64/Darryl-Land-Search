@@ -1,0 +1,553 @@
+state: GA
+jurisdiction: Bartow County
+fips: "13015"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons + CAMA (owner, mailing, situs parts, acres, FMV)
+  - role: parcels
+    name: BartowLand Tax Parcels (on-prem FeatureServer)
+    restUrl: https://www.bartowgis.org/arcgis/rest/services/AGOServices/BartowLand/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      Owner1: ownerName
+      Owner2: ownerName2
+      Mailing_Address_1: mailingAddress
+      Mailing_Address_2: mailingAddress2
+      Mailing_City: mailingCity
+      Mailing_State: mailingState
+      Mailing_Zip: mailingZip
+      HOUSE_NO: situsNumber
+      STREET_NAM: situsStreet
+      UNIT: situsUnit
+      Property_Zip: situsZip
+      Tax_District: taxDistrict
+      Tax_District_Desc: municipality
+      TOTALACRES: acreage
+      Subdivision_Name: subdivision
+      LandValue: tax.landValue
+      BuildingValue: tax.improvementValue
+      AccessoryValue: tax.accessoryValue
+      Total_Taxable_FMV: tax.marketValue
+      YearBuilt: yearBuilt
+      FinishedArea: finishedArea
+      NEIGHBORHOOD: neighborhood
+      NBC: neighborhoodCode
+      LandStrata: landStrata
+      ImprvStrata: improvementStrata
+    notes: >
+      Preferred county-wide parcel GEOMETRY + CAMA source (on-prem bartowgis.org
+      FeatureServer). Live count 63688 (2026-09-23). SR Web Mercator (102100/3857);
+      maxRecordCount 2000 (standardMax 4000). Geo-verified WGS84 samples
+      ~-85.016,34.320 (Wayside Rd / northwest unincorporated), Cartersville tax-dist
+      samples ~-84.795,34.169 — Bartow County GA, Atlanta MSA northwest (NOT City of
+      Bartow FL ~-81.92,27.96; any non-GA Bartow). Owner1 filled 63328;
+      Total_Taxable_FMV>0 = 63328; TOTALACRES>0 = 59159; TOTALACRES 5–150 = 13412
+      (good deeded-acre fill for site search). HOUSE_NO>0 = 59143; situs =
+      HOUSE_NO + STREET_NAM (+ UNIT); Property_Zip is situs zip. Mailing_* are
+      MAILING. Tax_District / Tax_District_Desc live decode: 06 Bartow County
+      (UNINCORPORATED)≈44233, 01 Cartersville≈11163, 02 Adairsville≈3172,
+      07 Euharlee≈2008, 03 Emerson≈889, 04 Kingston≈736, 05 White≈330,
+      08 Taylorsville≈187, plus TAD/CID/DDA overlays (Etowah-Allatoona TAD Emerson
+      ≈215, Downtown Development Authority≈156, Red Top Mtn CID≈71, Hwy 411 TAD,
+      E Main Street TAD, etc.). PARCELID format e.g. '0002-0059-002',
+      'C001-0003-001' (Cartersville C-prefix). Multipart common (same PARCELID can
+      have multiple OBJECTIDs — dissolve/group by PARCELID for search). No sale
+      fields on this layer. MapServer twin AGOServices/BartowLand/MapServer/2 same
+      schema. AGOL mirrors: ParcelInfo FeatureServer/11 (57516 — thinner/staler;
+      has Shape__Area feet for GIS-acres = Shape__Area/43560) and thin Parcels
+      FeatureServer/12 (47223; PIN+geometry landbase). Prefer this BartowLand/2 for
+      full CAMA + highest count. Official viewers: experience.arcgis.com/experience/
+      82ab06bb439347a482c551431ef0b784 (Bartow County Online Map) and deprecated
+      webappviewer baef84e2cf524176aee5491f187b2b5a (BartowPublicMap → webmap
+      0a183eb91a47498dbbb5b6eb5d24e320). Enrichment vs thin in-app: full-county
+      outlines + PARCELID + owner/mailing + situs parts + FMV + tax district + acres.
+    status: usable
+
+  - role: parcels
+    name: ParcelInfo (AGOL hosted — GIS Shape__Area)
+    restUrl: https://services.arcgis.com/0tQ9yX5b2VG5RHei/arcgis/rest/services/ParcelInfo/FeatureServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      PARCEL_NO: parcelIdAlt
+      REALKEY: ownerKey
+      Owner1: ownerName
+      Owner2: ownerName2
+      Mailing_Address_1: mailingAddress
+      Mailing_Address_2: mailingAddress2
+      Mailing_City: mailingCity
+      Mailing_State: mailingState
+      Mailing_Zip: mailingZip
+      HOUSE_NO: situsNumber
+      STREET_NAM: situsStreet
+      UNIT: situsUnit
+      Property_Zip: situsZip
+      Tax_District: taxDistrict
+      Tax_District_Desc: municipality
+      TOTALACRES: acreage
+      Shape__Area: shapeAreaSqFt
+      Total_Taxable_FMV: tax.marketValue
+      LandValue: tax.landValue
+      BuildingValue: tax.improvementValue
+      Subdivision_Name: subdivision
+    notes: >
+      Live count 57516 — AGOL hosted twin of BartowLand CAMA with Shape__Area in
+      StatePlane GA West feet (102667/2240). TOTALACRES>0 = 52929; TOTALACRES 5–150
+      = 12057. Prefer BartowLand/2 for geometry count (63688); this for GIS-acres
+      join on PARCELID when TOTALACRES null (Shape__Area/43560). Sample
+      0002-0059-002: TOTALACRES 10.23 vs Shape__Area/43560 ≈10.01.
+    status: partial
+
+  - role: parcels
+    name: Parcels (thin geometry landbase)
+    restUrl: https://services.arcgis.com/0tQ9yX5b2VG5RHei/arcgis/rest/services/Parcels/FeatureServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      PIN: parcelIdAlt
+      PAR_PARCEL_ID: parentParcelId
+      OLDPARCELID: parcelIdOld
+      D_LOT_SIZE: acreageDeed
+      C_LOT_SIZE: acreageCalc
+      STATUS: parcelStatus
+    notes: >
+      Live count 47223 — PIN + geometry + lot-size ints (no owner/FMV). Prefer
+      BartowLand for attributes; this is a thinner cadastral landbase if a
+      geometry-only AGOL URL is needed. SR 102667 feet. Geo-verified Bartow GA.
+    status: partial
+
+  - role: tax
+    name: BartowLand Total_Taxable_FMV (on polygons)
+    restUrl: https://www.bartowgis.org/arcgis/rest/services/AGOServices/BartowLand/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      Total_Taxable_FMV: tax.marketValue
+      LandValue: tax.landValue
+      BuildingValue: tax.improvementValue
+      AccessoryValue: tax.accessoryValue
+      Tax_District: taxDistrict
+    notes: >
+      Tax/CAMA market values live on preferred parcel polygons
+      (Total_Taxable_FMV>0 = 63328). No public REST tax.assessedValue /
+      taxableValue split beyond Total_Taxable_FMV naming. Assessor HTML: qPublic
+      AppID=791 LayerID=14444 (CDN/bot 403 from research box; public for humans).
+    status: usable
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Bartow multi-sale FeatureServer/MapServer found (2026-09-23). BartowLand /
+      ParcelInfo / Parcels expose no saleamnt/saledate/qualified fields. qPublic
+      Beacon UI has Sales Search / Sales List / Yearly Sales layer (AppID=791) —
+      HTML only; CDN/bot 403 from research box. Rejected ARC LandPro_2012
+      third-party (Ug5xGQbHsD8zuZzM) as sales/CAMA substitute.
+    status: gap
+
+  - role: zoning
+    name: BartowZoning Zoning Districts
+    restUrl: https://www.bartowgis.org/arcgis/rest/services/AGOServices/BartowZoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      STZONECODE: zoning
+      ZONINGTEXT: zoningNotes
+      REZONING: zoningCase
+      MAPNUMBER: zoningMapSheet
+      USECODE: zoningUseCode
+    notes: >
+      Preferred unincorporated / county zoning district polygons (spatial-join;
+      parcel-scale polygons, not dissolved). Live count 31627. SR StatePlane GA
+      West FIPS 1002 Feet (102667/2240). Use STZONECODE as zoning (USECODE almost
+      entirely blank). Domain: A-1≈16325, Incorporated≈9146, R-1≈2289, R-3≈773,
+      R-2≈730, C-1≈698, R-4≈309, R1 (wC)≈211, R3 (wC)≈201, I-1≈151, RE-1≈104,
+      A1CU≈84, M-1≈53, plus C1 (wC)/R4 (wC)/CN/PUD/BPD/I-2/O/I/R-8/R-7 and
+      conditioned CU / (wC) variants. STZONECODE='Incorporated' (~9146) is a CITY
+      STUB — inside city limits prefer city zoning certification (qPublic Beacon
+      layers Cartersville/Adairsville/Emerson/Euharlee Zoning are viewer-only;
+      no public city FeatureServer found 2026-09-23). ZONINGTEXT sparsely filled
+      (~377) with case notes (A-1902, AZC-1909, 'one home only'); REZONING holds
+      RZ/V case ids when present. MAPNUMBER is zoning map sheet (C### for
+      Cartersville sheets; not a stable parcel join — use spatial intersect).
+      Housing_Inventory_WFL1/FeatureServer/7 is an AGOL zoning mirror (~31608).
+      Geo-verified ~-84.80,34.16 / ~-85.00,34.31 Bartow GA. Official guidance:
+      county zoning ordinance + qPublic map layers per Planning handout.
+    status: usable
+
+  - role: flu
+    name: null — no county-wide public FLU REST (PDF only)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public Future Land Use FeatureServer/MapServer found (2026-09-23). County
+      publishes "2018 Future Land Use Map" as PDF only (AGOL item
+      3c2f76d2227643c392c24600163cfbda / 2018_Future_Land_Use_Map_Final-1.pdf) and
+      a Joint Comprehensive Plan Update 2023-2028 (Bartow + cities) via DCA —
+      both PDF/document, not REST. ExistingLandUse/FeatureServer/1 CurrentLandUse
+      (58224) exposes LandUse EXISTING classes (Low Density Residential≈44147,
+      Agricultural≈2979, Med Density Residential≈2307, Industrial≈2064, Public
+      Site or Recreation≈1971, Commercial≈1936, High Density Residential≈1172,
+      Vacant≈873, …) — catalog as existing LU enrichment, NOT FLU. qPublic Beacon
+      lists "Future Landuse 2018" as a map layer (viewer-only / bot-walled).
+    status: gap
+
+  - role: other
+    name: ExistingLandUse CurrentLandUse (existing LU, not FLU)
+    restUrl: https://services.arcgis.com/0tQ9yX5b2VG5RHei/arcgis/rest/services/ExistingLandUse/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      LandUse: existingLandUse
+      OCCUPANCY: occupancy
+      Owner1: ownerName
+      TOTALACRES: acreage
+      Total_Taxable_FMV: tax.marketValue
+      Tax_District: taxDistrict
+      Tax_District_Desc: municipality
+    notes: >
+      Live count 58224 parcel-tied EXISTING land use (not future). PIN-join on
+      PARCELID. Do not treat as FLU. Twin TaxParcels layer 0 on same service has
+      count 0 (empty).
+    status: partial
+
+  - role: other
+    name: CityLimits / Administrative Boundaries (municipalities)
+    restUrl: https://www.bartowgis.org/arcgis/rest/services/AGOServices/BartowBoundary/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      E911_ID: municipalityCode
+      ADMIN_TYPE: adminType
+      STADMINBOUNDARY: adminBoundaryCode
+    notes: >
+      Live count 12 multipart municipality polygons (ADMIN_TYPE=MUNICIPALITY).
+      No name attribute — decode E911_ID via centroids / Tax_District:
+      E911 2≈Cartersville (~-84.80,34.12–34.20), 3≈Adairsville (~-84.91,34.36),
+      4≈Emerson (~-84.75,34.12), 5≈Euharlee (~-84.96,34.15), 6≈Kingston
+      (~-84.95,34.24), 7≈White north fringe (~-84.74,34.34), 8≈Taylorsville
+      (~-84.99,34.09), 9≈White (~-84.75,34.28). Prefer Tax_District /
+      Tax_District_Desc on BartowLand for municipality filter (stable codedomain).
+      AGOL twin Administrative_Boundaries FeatureServer/16 (9 features incl.
+      COUNTY). Parcel↔city join = Tax_District IN (01,02,03,04,05,07,08,…) OR
+      spatial CityLimits OR Tax_District_Desc. MapServer twin BartowBoundary/1.
+    status: usable
+
+  - role: other
+    name: StructuralNumbers (site address points)
+    restUrl: https://www.bartowgis.org/arcgis/rest/services/AGOServices/BartowLand/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ADDRESS: situsAddress
+      STREETNO: situsNumber
+      STREET: situsStreet
+      UNITNO: situsUnit
+      CITY: postalCommunity
+      ZIP: situsZip
+      STATE: situsState
+    notes: >
+      Live count 64760 address points. CITY is postal (CARTERSVILLE samples
+      include unincorporated postal Cartersville) — NOT municipality filter.
+      No PARCELID on this layer — spatial join to Tax Parcels. Geo-verified
+      ~-84.77,34.20 Cartersville GA.
+    status: usable
+
+municipalities:
+  - name: Cartersville
+    level: city
+    parentFips: "13015"
+    joinToCountyParcels: >
+      Attribute: Tax_District='01' (≈11163) OR Tax_District_Desc LIKE 'Cartersville%'
+      OR Tax_District IN ('11','12') for Downtown Development Authority / E Main
+      Street TAD overlays inside city. Spatial CityLimits E911_ID=2
+      (~-84.80,34.12–34.20). PARCELID often C-prefix (C001-…).
+    layers: []
+    notes: >
+      No official City of Cartersville ArcGIS FeatureServer/MapServer for
+      zoning/FLU found (2026-09-23). cartersvillega.gov Planning has ordinance PDF
+      only; gis.cartersvillega.gov / maps.cartersvillega.gov do not resolve. County
+      BartowZoning STZONECODE='Incorporated' stubs city interiors — do NOT treat
+      as city zoning code. qPublic Beacon lists "Cartersville Zoning" +
+      "Cartersville Overlay Districts" + "Cartersville Voting Ward" as viewer
+      layers (HTML/bot-walled). Geography/CAMA via Tax_District + BartowLand;
+      city zoning certification is a gap vs county A-1/R-1/….
+    status: gap
+
+  - name: Adairsville
+    level: city
+    parentFips: "13015"
+    joinToCountyParcels: >
+      Tax_District='02' ≈3172; Tax_District_Desc='Adairsville'; spatial CityLimits
+      E911_ID=3 (~-84.91,34.36).
+    layers: []
+    notes: >
+      No official City of Adairsville zoning/FLU REST found (2026-09-23).
+      adairsvillega.net / adairsville.org are civic sites without public ArcGIS
+      catalog. qPublic Beacon lists "Adairsville Zoning" viewer layer only.
+      Geography via Tax_District / CityLimits; county Zoning for unincorporated-
+      style districts near city (Incorporated stub inside).
+    status: gap
+
+  - name: Emerson
+    level: city
+    parentFips: "13015"
+    joinToCountyParcels: >
+      Tax_District='03' ≈889 plus TAD/CID overlays 13/15/16/17 (Red Top Mtn CID,
+      Etowah-Allatoona TAD Emerson variants). Spatial CityLimits E911_ID=4
+      (~-84.75,34.12).
+    layers: []
+    notes: >
+      No official City of Emerson zoning/FLU REST found (2026-09-23). qPublic
+      Beacon lists "Emerson Zoning" viewer layer. Geography/CAMA via Tax_District;
+      note Emerson hosts Etowah-Allatoona TAD and Red Top Mtn CID tax overlays.
+    status: gap
+
+  - name: Euharlee
+    level: city
+    parentFips: "13015"
+    joinToCountyParcels: >
+      Tax_District='07' ≈2008; Tax_District_Desc='Euharlee'; spatial CityLimits
+      E911_ID=5 (~-84.96,34.15).
+    layers: []
+    notes: >
+      No official City of Euharlee zoning/FLU REST found (2026-09-23). qPublic
+      Beacon lists "Euharlee Zoning" + historic/corridor design viewer layers.
+      Geography only via Tax_District / CityLimits.
+    status: gap
+
+  - name: Kingston
+    level: city
+    parentFips: "13015"
+    joinToCountyParcels: >
+      Tax_District='04' ≈736; Tax_District_Desc='Kingston'; spatial CityLimits
+      E911_ID=6 (~-84.95,34.24).
+    layers: []
+    notes: >
+      No official City of Kingston zoning/FLU REST found (2026-09-23). Geography
+      only. NOT Kingston (Ontario) or other Kingston lookalikes.
+    status: gap
+
+  - name: White
+    level: city
+    parentFips: "13015"
+    joinToCountyParcels: >
+      Tax_District='05' ≈330 plus Tax_District='20' Hwy 411 Corridor TAD 3 (White)
+      ≈21; spatial CityLimits E911_ID=9 (~-84.75,34.28) and E911_ID=7 north fringe
+      (~-84.74,34.34).
+    layers: []
+    notes: >
+      No official City of White zoning/FLU REST found (2026-09-23). Geography
+      only. Note: StructuralNumbers CITY='CARTERSVILLE' postal is NOT White
+      municipality.
+    status: gap
+
+  - name: Taylorsville
+    level: city
+    parentFips: "13015"
+    joinToCountyParcels: >
+      Tax_District='08' ≈187; Tax_District_Desc='Taylorsville'; spatial CityLimits
+      E911_ID=8 (~-84.99,34.09).
+    layers: []
+    notes: >
+      No official Town of Taylorsville zoning/FLU REST found (2026-09-23).
+      Geography only. Town straddles Bartow/Polk fringe — this card covers
+      Bartow-side tax district only.
+    status: gap
+
+gaps:
+  - "No public REST lastSale.price/date/qualified — BartowLand/ParcelInfo/Parcels have no sale fields; qPublic AppID=791 Sales Search / Yearly Sales are HTML/Beacon-only (CDN/bot 403)."
+  - "No public REST tax.assessedValue/taxableValue beyond Total_Taxable_FMV (labeled Total Taxable FMV) — land/building/accessory components available."
+  - "County FLU REST gap — 2018 Future Land Use Map is PDF (AGOL item 3c2f76d2227643c392c24600163cfbda); Joint Comp Plan 2023-2028 PDF via DCA. ExistingLandUse CurrentLandUse is EXISTING LU only, not FLU. qPublic 'Future Landuse 2018' viewer layer is not queryable REST."
+  - "City zoning REST gap for Cartersville/Adairsville/Emerson/Euharlee/Kingston/White/Taylorsville — county BartowZoning STZONECODE='Incorporated' (~9146) stubs city interiors; qPublic Beacon city zoning layers are viewer-only."
+  - "CityLimits / Administrative_Boundaries lack municipality NAME — use Tax_District / Tax_District_Desc (preferred) or E911_ID centroid decode."
+  - "StructuralNumbers CITY and postal community are postal — municipality filter = Tax_District / CityLimits spatial only."
+  - "PARCELID multipart common (e.g. 0002-0059-001 → 3 rings) — dissolve/group by PARCELID for unique parcel search."
+  - "Assessor / Cartersville / Development / Production / Pictometry folders on www.bartowgis.org/arcgis return empty service lists (likely token-locked internal) — public path is AGOServices + Imagery + Roads + AGOL org 0tQ9yX5b2VG5RHei."
+  - "Downloadable parcels/zoning sold by Bartow GIS ($500 countywide / $50/tile) — do not treat paid download as public REST; free REST above is preferred."
+  - "qPublic AppID=791 LayerID=14444 may CDN/bot-403 automated clients; public for humans. Do not collect emails/phones."
+  - "Rejected lookalikes: City of Bartow FL General Information (services8.arcgis.com/1wJDvJrOmH0GVxt1 — SR 2882 Florida, sample ~-81.92,27.96); AcworthParcels/AcworthZoning in Bartow org 0tQ9yX5b2VG5RHei (436/566 features near SE Bartow/Allatoona fringe ~-84.67,34.08 — misnamed subset, NOT City of Acworth Cobb primary zoning); Atlanta Regional Commission LandPro_2012 (Ug5xGQbHsD8zuZzM — stale regional land-cover/use, not cadastral); Regrid/paid statewide extracts; EVHS historic org 3QuY14XixnaLNBmr (cemeteries/historic only)."
+  - "Enrichment vs thin in-app: full county 63688 geometry+PARCELID+owner/mailing/situs parts+FMV+taxDist+TOTALACRES (5–150=13412); county Zoning STZONECODE (Incorporated stub in cities); CityLimits/Tax_District municipality; existing LU optional; sales/FLU/city-zoning/assessed remain gap/HTML/PDF."
+
+license: >
+  Bartow County GIS public ArcGIS Server (www.bartowgis.org) — AGOServices/
+  BartowLand, BartowZoning, BartowBoundary, BartowFacilities, BartowElections,
+  BartowRoadways; Imagery/Bartow2024Imagery; Roads/BartowRoadways. County AGOL
+  org 0tQ9yX5b2VG5RHei (bartowgis.maps.arcgis.com / BartowGIS) — ParcelInfo,
+  Parcels, ExistingLandUse, Administrative_Boundaries, Landlots, Subdivisions,
+  Housing_Inventory_WFL1, Cemeteries, elections, trails. Viewers: experience
+  82ab06bb439347a482c551431ef0b784; webmap 0a183eb91a47498dbbb5b6eb5d24e320;
+  deprecated webappviewer baef84e2cf524176aee5491f187b2b5a. Assessor HTML:
+  qPublic SchneiderCorp AppID=791 LayerID=14444
+  (qpublic.schneidercorp.com / qpublic.net/ga/bartow). FLU PDF AGOL item
+  3c2f76d2227643c392c24600163cfbda. Attribution to Bartow County GIS. Public
+  fields only; no emails/phones; no paid vendors (Regrid/ATTOM/CoreLogic) and
+  no paid county tile downloads as primary.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=791&LayerID=14444&PageTypeID=2&PageID=0
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://www.bartowgis.org/arcgis/rest/services/AGOServices/BartowLand/FeatureServer/2 count 63687;
+    extent center [['13015', 'Bartow County']]; sample [['13015', 'Bartow County']]. No change to field
+    map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Adairsville city"
+      level: city
+      parentFips: "13015"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Cartersville city"
+      level: city
+      parentFips: "13015"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Emerson city"
+      level: city
+      parentFips: "13015"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Euharlee city"
+      level: city
+      parentFips: "13015"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Kingston city"
+      level: city
+      parentFips: "13015"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Taylorsville town"
+      level: city
+      parentFips: "13015"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "White city"
+      level: city
+      parentFips: "13015"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Bartow' AND aadt>0
+    altFilter: name LIKE '015-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 015-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 315
+    maxAadt: 119000
+    geoCheck: 315/315 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - LandValue
+    filledCount: 63327
+    restUrl: https://www.bartowgis.org/arcgis/rest/services/AGOServices/BartowLand/FeatureServer/2
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: Owner1
+    filledCount: 63327
+    restUrl: https://www.bartowgis.org/arcgis/rest/services/AGOServices/BartowLand/FeatureServer/2
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=BartowCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=791&LayerID=14444&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCELID
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0002-0059-001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BartowCountyGA&Layer=Parcels&PageType=Report&KeyValue=0002-0059-001
+    verification: 'pattern-tested: real sample ID from PARCELID; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: inferred {County}CountyGA convention
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=BartowCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Adairsville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Cartersville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Emerson city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Euharlee city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Kingston city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Taylorsville town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: White city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

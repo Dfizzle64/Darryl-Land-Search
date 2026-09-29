@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T04:25:22Z",
+  "generatedAt": "2026-09-29T05:24:55Z",
   "market": "Savannah",
   "tier": "other",
-  "parcelCount": 19987,
+  "parcelCount": 38540,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -16,6 +16,31 @@
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
+    {
+      "name": "Appling",
+      "fips": "13001",
+      "state": "Georgia",
+      "featureCount": 4215,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "ga-appling-parcels-13001",
+      "queryUrl": "https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Appling_County_Wide_View/FeatureServer/19/query",
+      "gaps": [
+        "Parcels are Appling_County_Wide_View TaxParcels25 (HOGARC) (https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Appling_County_Wide_View/FeatureServer/19). The parcel layer has no usable acre field, so acreage is geodesic polygon area, 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 12828 rows; 4215 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Pass 2 enrichment is from rural-oz-pass2 csv (tax HTML-only, sale HTML-only, owner HTML-only). GDOT AADT stays the query-time statewide join.",
+        "Pass 2 tax is HTML-only. qPublic was not requested, and no tax value was copied from an HTML report.",
+        "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+        "Pass 2 owner is HTML-only. Owner and mailing were not copied from an HTML report.",
+        "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/13001/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13001/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 12828
+    },
     {
       "name": "Beaufort",
       "fips": "45013",
@@ -75,20 +100,73 @@
       "name": "Bulloch",
       "fips": "13031",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 8833,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-bulloch-parcels-13031",
+      "queryUrl": "https://services6.arcgis.com/XxfLDid4CNOqpdhy/arcgis/rest/services/Bullochparcels_CAMA/FeatureServer/1189/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Parcels are Bullochparcels_CAMA (official Bulloch GIS AGOL — owner cbrown72) (https://services6.arcgis.com/XxfLDid4CNOqpdhy/arcgis/rest/services/Bullochparcels_CAMA/FeatureServer/1189). Published acreage is filtered to 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 9617 rows; 8833 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Pass 2 enrichment is from rural-oz-pass2 csv (tax HTML-only, sale HTML-only, owner REST). GDOT AADT stays the query-time statewide join.",
+        "Pass 2 tax is HTML-only. qPublic was not requested, and no tax value was copied from an HTML report.",
+        "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+        "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13031/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13031/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 9617
+    },
+    {
+      "name": "Camden",
+      "fips": "13039",
+      "state": "Georgia",
+      "featureCount": 3218,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "ga-camden-parcels-13039",
+      "queryUrl": "https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/2025_Tax_Parcels/FeatureServer/0/query",
+      "gaps": [
+        "Parcels are 2025 Tax Parcels OwnerParcels06042026 (CCBOC AGOL) (https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/2025_Tax_Parcels/FeatureServer/0). Published acreage is filtered to 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 3241 rows; 3218 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Pass 2 enrichment is from rural-oz-pass2 csv (tax REST, sale HTML-only, owner REST). GDOT AADT stays the query-time statewide join.",
+        "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+        "Tax values joined from https://services3.arcgis.com/feUM6sTOP0Mfde8s/arcgis/rest/services/Juvare_Parcels/FeatureServer/0 on PARCEL_NO: 805 parcel ids matched, 805 value fields filled.",
+        "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/13039/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13039/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 3241
+    },
+    {
+      "name": "Candler",
+      "fips": "13043",
+      "state": "Georgia",
+      "featureCount": 2287,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "ga-candler-parcels-13043",
+      "queryUrl": "https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Candler_County_Wide_View/FeatureServer/18/query",
+      "gaps": [
+        "Parcels are Candler_County_Wide_View TaxParcel_26 (HOGARC) (https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Candler_County_Wide_View/FeatureServer/18). Published acreage is filtered to 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Pass 2 enrichment is from rural-oz-pass2 csv (tax HTML-only, sale HTML-only, owner HTML-only). GDOT AADT stays the query-time statewide join.",
+        "Pass 2 tax is HTML-only. qPublic was not requested, and no tax value was copied from an HTML report.",
+        "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+        "Pass 2 owner is HTML-only. Owner and mailing were not copied from an HTML report.",
+        "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/13043/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13043/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 2287
     },
     {
       "name": "Chatham",

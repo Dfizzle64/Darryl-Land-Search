@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T06:13:38Z",
+  "generatedAt": "2026-09-29T06:19:42Z",
   "market": "Athens",
   "tier": "other",
-  "parcelCount": 9569,
+  "parcelCount": 15216,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -44,6 +44,30 @@
       "fluJoinedCount": 1942
     },
     {
+      "name": "Greene",
+      "fips": "13133",
+      "state": "Georgia",
+      "featureCount": 3009,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "ga-greene-parcels-13133",
+      "queryUrl": "https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Parcel_Regions_w_WinGAP_view/FeatureServer/0/query",
+      "gaps": [
+        "Parcels are Parcel_Regions_w_WinGAP_view (GreeneBOC) (https://services7.arcgis.com/QbbsWI5nIfBp4cMB/arcgis/rest/services/Parcel_Regions_w_WinGAP_view/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "WinGAP a_value is stored as land value. It is not the 40 percent assessed amount, and mavcurr is empty, so assessed value stays blank.",
+        "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/13133/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13133/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 3009
+    },
+    {
       "name": "Hart",
       "fips": "13147",
       "state": "Georgia",
@@ -68,6 +92,32 @@
       "lookup": "data/fixtures/market-parcels/counties/13147/lookup.json",
       "tileCount": 4,
       "sourceCount": 18340
+    },
+    {
+      "name": "McDuffie",
+      "fips": "13189",
+      "state": "Georgia",
+      "featureCount": 2638,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "ga-mcduffie-parcels-13189",
+      "queryUrl": "https://gis.thomson-mcduffie.net/portal/sharing/servers/e75fa80580074db48b7b3e468993d96b/rest/services/Public/MapServer/10/query",
+      "gaps": [
+        "Parcels are Public/MapServer Tax Parcels (Thomson-McDuffie Enterprise portal proxy) (https://gis.thomson-mcduffie.net/portal/sharing/servers/e75fa80580074db48b7b3e468993d96b/rest/services/Public/MapServer/10). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Source query returned 2641 rows; 2638 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Counted 2638 distinct parcel ids.",
+        "Pass 2 tax is HTML-only, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+        "Pass 2 tax is HTML-only. Assessed value and tax bills were not copied off qPublic.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/13189/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13189/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 2641
     },
     {
       "name": "White",

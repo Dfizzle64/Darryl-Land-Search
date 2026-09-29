@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T06:13:38Z",
+  "generatedAt": "2026-09-29T06:19:42Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 111131,
+  "parcelCount": 128566,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -676,20 +676,27 @@
       "name": "Hall",
       "fips": "13139",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 6904,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-hall-parcels-13139",
+      "queryUrl": "https://hallgis.hallcounty.org/arcgis/rest/services/HallCo_Addr_Pcl_Rds/MapServer/1/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Parcels are HallCo_Addr_Pcl_Rds Parcel Boundary (official GHCGIS) (https://hallgis.hallcounty.org/arcgis/rest/services/HallCo_Addr_Pcl_Rds/MapServer/1). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "A NO_RELEASE flag suppresses owner and mailing fields.",
+        "Source query returned 6905 rows; 6904 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Counted 6904 distinct parcel ids.",
+        "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13139/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13139/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 6905
     },
     {
       "name": "Haralson",
@@ -760,20 +767,27 @@
       "name": "Jackson",
       "fips": "13157",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 6659,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-jackson-parcels-13157",
+      "queryUrl": "https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/Tax_Parcels/FeatureServer/9/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Parcels are Tax_Parcels Tax Parcels (official Jackson County GA AGOL) (https://services8.arcgis.com/bcbi4lYRFOsss0F5/arcgis/rest/services/Tax_Parcels/FeatureServer/9). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Market value is the sum of FMVRES, FMVCOM, and FMVACC. The total stays empty when those components are zero.",
+        "Source query returned 6661 rows; 6659 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Counted 6659 distinct parcel ids.",
+        "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13157/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13157/lookup.json",
+      "tileCount": 7,
+      "sourceCount": 6661
     },
     {
       "name": "Jasper",
@@ -823,20 +837,25 @@
       "name": "Lumpkin",
       "fips": "13187",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 3872,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-lumpkin-parcels-13187",
+      "queryUrl": "https://services6.arcgis.com/BAJNi3EgCdtQ1BCG/arcgis/rest/services/Lumpkin_2025Parcels/FeatureServer/0/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Parcels are Lumpkin_2025Parcels LD_2025parcels (layermanager / county CAMA) (https://services6.arcgis.com/BAJNi3EgCdtQ1BCG/arcgis/rest/services/Lumpkin_2025Parcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Pass 2 tax is HTML-only, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+        "Pass 2 tax is HTML-only. Assessed value and tax bills were not copied off qPublic.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13187/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13187/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 3872
     },
     {
       "name": "Meriwether",

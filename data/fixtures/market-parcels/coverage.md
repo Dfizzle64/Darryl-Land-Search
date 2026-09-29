@@ -6,7 +6,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 111,131 | 21 | 0 | 14 |
+| Atlanta | primary | 128,566 | 24 | 0 | 11 |
 | Tampa | primary | 127,713 | 10 | 0 | 0 |
 | Charleston | primary | 113,262 | 18 | 0 | 0 |
 | Nashville | primary | 202,510 | 34 | 0 | 0 |
@@ -22,10 +22,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Birmingham | other | 101,123 | 9 | 0 | 3 |
 | Mobile | other | 51,658 | 4 | 0 | 2 |
 | Huntsville | other | 132,496 | 16 | 0 | 0 |
-| Savannah | other | 45,995 | 11 | 0 | 1 |
+| Savannah | other | 53,765 | 15 | 0 | 0 |
 | Columbia | other | 96,799 | 12 | 0 | 2 |
 | Greenville | other | 91,872 | 10 | 0 | 0 |
-| Chattanooga | other | 64,057 | 13 | 0 | 2 |
+| Chattanooga | other | 71,632 | 14 | 0 | 2 |
 | Knoxville | other | 146,507 | 26 | 0 | 0 |
 | Memphis | other | 102,576 | 20 | 0 | 0 |
 | Jackson | other | 38,676 | 8 | 0 | 0 |
@@ -36,9 +36,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Asheville | other | 121,232 | 21 | 0 | 0 |
 | Tuscaloosa | other | 27,452 | 4 | 0 | 1 |
 | Montgomery | other | 85,425 | 13 | 0 | 1 |
-| Valdosta | other | 33,745 | 11 | 0 | 0 |
-| Macon | other | 31,513 | 14 | 0 | 0 |
-| Athens | other | 9,569 | 3 | 0 | 0 |
+| Valdosta | other | 40,329 | 15 | 0 | 0 |
+| Macon | other | 48,828 | 18 | 0 | 0 |
+| Athens | other | 15,216 | 5 | 0 | 0 |
 | Hilton Head | other | 4,756 | 1 | 0 | 0 |
 | Jackson MS | other | 57,020 | 7 | 0 | 0 |
 
@@ -65,14 +65,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Fulton | Georgia | 13121 | complete-gte-5ac | 8,274 | ga-fulton-pmv-mapserver-11 |
 | Gordon | Georgia | 13129 | complete-gte-5ac | 5,542 | ga-gordon-parcels-13129 |
 | Gwinnett | Georgia | 13135 | complete-gte-5ac | 6,653 | ga-gwinnett-gc-parcel |
-| Hall | Georgia | 13139 | gap | 0 | unavailable |
+| Hall | Georgia | 13139 | complete-gte-5ac | 6,904 | ga-hall-parcels-13139 |
 | Haralson | Georgia | 13143 | gap | 0 | unavailable |
 | Heard | Georgia | 13149 | gap | 0 | unavailable |
 | Henry | Georgia | 13151 | complete-gte-5ac | 7,418 | ga-henry-parcels |
-| Jackson | Georgia | 13157 | gap | 0 | unavailable |
+| Jackson | Georgia | 13157 | complete-gte-5ac | 6,659 | ga-jackson-parcels-13157 |
 | Jasper | Georgia | 13159 | complete-gte-5ac | 3,211 | ga-jasper-parcels-13159 |
 | Lamar | Georgia | 13171 | gap | 0 | unavailable |
-| Lumpkin | Georgia | 13187 | gap | 0 | unavailable |
+| Lumpkin | Georgia | 13187 | complete-gte-5ac | 3,872 | ga-lumpkin-parcels-13187 |
 | Meriwether | Georgia | 13199 | gap | 0 | unavailable |
 | Monroe | Georgia | 13207 | complete-gte-5ac | 4,510 | ga-monroe-parcels-13207 |
 | Morgan | Georgia | 13211 | gap | 0 | unavailable |
@@ -366,8 +366,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Candler | Georgia | 13043 | complete-gte-5ac | 2,287 | ga-candler-parcels-13043 |
 | Chatham | Georgia | 13051 | complete-gte-5ac | 3,283 | sagis-chatham-ga-parcel-digest |
 | Effingham | Georgia | 13103 | complete-gte-5ac | 6,128 | ga-effingham-parcels-2024 |
+| Evans | Georgia | 13109 | complete-gte-5ac | 1,740 | ga-evans-parcels-13109 |
+| Glynn | Georgia | 13127 | complete-gte-5ac | 2,099 | ga-glynn-parcels-13127 |
 | Jasper | South Carolina | 45053 | complete-gte-5ac | 3,682 | sc-jasper-parcels-45053 |
-| Liberty | Georgia | 13179 | gap | 0 | unavailable |
+| Liberty | Georgia | 13179 | complete-gte-5ac | 2,269 | ga-liberty-parcels-13179 |
+| Long | Georgia | 13183 | complete-gte-5ac | 1,662 | ga-long-parcels-13183 |
 | Screven | Georgia | 13251 | complete-gte-5ac | 3,680 | ga-screven-parcels-13251 |
 | Wayne | Georgia | 13305 | complete-gte-5ac | 3,775 | ga-wayne-parcels-13305 |
 
@@ -414,6 +417,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Catoosa | Georgia | 13047 | gap | 0 | unavailable |
 | Chattooga | Georgia | 13055 | complete-gte-5ac | 3,315 | ga-chattooga-parcels-13055 |
 | Dade | Georgia | 13083 | complete-gte-5ac | 2,700 | ga-dade-parcels-13083 |
+| Floyd | Georgia | 13115 | complete-gte-5ac | 7,575 | ga-floyd-parcels-13115 |
 | Grundy | Tennessee | 47061 | complete-gte-5ac | 3,732 | tn-oir-public-use-47061 |
 | Hamilton | Tennessee | 47065 | complete-gte-5ac | 9,162 | tn-hamilton-live-parcels |
 | Marion | Tennessee | 47115 | complete-gte-5ac | 4,903 | tn-oir-public-use-47115 |
@@ -627,6 +631,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Cook | Georgia | 13075 | complete-gte-5ac | 2,437 | ga-cook-parcels-13075 |
 | Decatur | Georgia | 13087 | complete-gte-5ac | 3,520 | ga-decatur-parcels-13087 |
 | Early | Georgia | 13099 | complete-gte-5ac | 2,776 | ga-early-parcels-13099 |
+| Echols | Georgia | 13101 | complete-gte-5ac | 630 | ga-echols-parcels-13101 |
+| Irwin | Georgia | 13155 | complete-gte-5ac | 2,088 | ga-irwin-parcels-13155 |
+| Jeff Davis | Georgia | 13161 | complete-gte-5ac | 2,603 | ga-jeff-davis-parcels-13161 |
+| Lanier | Georgia | 13173 | complete-gte-5ac | 1,263 | ga-lanier-parcels-13173 |
 | Lowndes | Georgia | 13185 | complete-gte-5ac | 5,815 | ga-lowndes-valor-taxparcels |
 | Worth | Georgia | 13321 | complete-gte-5ac | 3,219 | ga-worth-parcels-13321 |
 
@@ -642,8 +650,12 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Crawford | Georgia | 13079 | complete-gte-5ac | 2,933 | ga-crawford-parcels-13079 |
 | Crisp | Georgia | 13081 | complete-gte-5ac | 1,873 | ga-crisp-parcels-13081 |
 | Dodge | Georgia | 13091 | complete-gte-5ac | 3,733 | ga-dodge-parcels-13091 |
+| Dooly | Georgia | 13093 | complete-gte-5ac | 2,140 | ga-dooly-parcels-13093 |
+| Emanuel | Georgia | 13107 | complete-gte-5ac | 4,498 | ga-emanuel-parcels-13107 |
+| Houston | Georgia | 13153 | complete-gte-5ac | 3,691 | ga-houston-parcels-13153 |
 | Jefferson | Georgia | 13163 | complete-gte-5ac | 2,987 | ga-jefferson-parcels-13163 |
 | Johnson | Georgia | 13167 | complete-gte-5ac | 2,193 | ga-johnson-parcels-13167 |
+| Laurens | Georgia | 13175 | complete-gte-5ac | 6,986 | ga-laurens-parcels-13175 |
 | Peach | Georgia | 13225 | complete-gte-5ac | 2,052 | ga-peach-parcels-13225 |
 | Stewart | Georgia | 13259 | complete-gte-5ac | 875 | ga-stewart-parcels-13259 |
 | Taylor | Georgia | 13269 | complete-gte-5ac | 2,404 | ga-taylor-parcels-13269 |
@@ -654,7 +666,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Clarke | Georgia | 13059 | complete-gte-5ac | 2,039 | ga-clarke-acc-parcels |
+| Greene | Georgia | 13133 | complete-gte-5ac | 3,009 | ga-greene-parcels-13133 |
 | Hart | Georgia | 13147 | complete-gte-5ac | 3,746 | ga-hart-parcels-13147 |
+| McDuffie | Georgia | 13189 | complete-gte-5ac | 2,638 | ga-mcduffie-parcels-13189 |
 | White | Georgia | 13311 | complete-gte-5ac | 3,784 | ga-white-parcels-13311 |
 
 ### Hilton Head

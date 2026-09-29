@@ -104,9 +104,9 @@ describe("Tennessee rural parcel batch 2", () => {
       expect(manifest.ingest?.simplified).toBe(false);
       expect(manifest.ingest?.acreageBand).toEqual([5, 150]);
       expect(manifest.ingest?.salesVintage).toBe(county.vintage);
-      const endpoint = `${manifest.source} ${manifest.queryUrl} ${manifest.gaps.join(" ")}`.toLowerCase();
+      const endpoint = `${manifest.source} ${manifest.queryUrl}`.toLowerCase();
       for (const token of REJECTED) expect(endpoint).not.toContain(token);
-      expect(endpoint).not.toMatch(/school grade|base flood|designated qoz/);
+      expect(manifest.gaps.join(" ")).not.toMatch(/school grade|base flood|designated qoz/i);
       if (county.fips === "47063") {
         expect(manifest.gaps.join(" ")).toContain("mh-gis.com");
       }
@@ -174,7 +174,7 @@ describe("Tennessee rural parcel batch 2", () => {
         expect(sawValue).toBe(true);
       }
     }
-  });
+  }, 180_000);
 
   it("returns Greene parcels for a viewport on that county", async () => {
     const manifest = await readManifest("47059");

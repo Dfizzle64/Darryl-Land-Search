@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import time
 import urllib.parse
 import urllib.request
@@ -43,7 +44,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
-from parcel_geometry import esri_rings_to_geojson, geodesic_acres, representative_point
+from parcel_geometry import esri_rings_to_geojson, geodesic_acres, point_in_geometry, representative_point
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES_PATH = ROOT / "data" / "tn-rural-parcel-sources.json"
@@ -513,6 +514,14 @@ def oir_gaps(row: dict) -> list[str]:
             f"Pass 2 records {row['missingMarketValueField']} as missing on the sale/value layer. "
             "Market value stays empty. Land market value is not copied in its place. Sale date and sale price are still joined."
         )
+    if row.get("spatialParentFallback"):
+        notes.append(
+            "Perry GISLINK match on TN_County_Parcel_Map layer 24 is flagged below 90 percent. "
+            "OIR has parcels that 2023 layer does not. Unmatched parcels use a spatial fallback: "
+            "the representative point must intersect a layer-24 polygon. Sale and value copied that way "
+            "are the pre-split parent parcel's 2023 record, stamped joinMethod spatial-parent-2023, "
+            "and are not this parcel's own sale. Parcels_GISLINK2 and Assessment_Data_68_GISLINK recover nothing."
+        )
     return notes
 
 
@@ -730,11 +739,122 @@ def load_tncpm(layer_id: int, explicit: dict | None = None) -> tuple[dict[str, d
     return index, fields_map
 
 
+def control_map(parcel_id: str | None) -> str:
+    """First six characters of a collapsed GISLINK, the Comptroller control map."""
+    return "".join(str(parcel_id or "").split())[:6]
+
+
+def choose_spatial_parent(hits: list[dict], parcel_id: str) -> dict | None:
+    """Prefer the parent on the same control map when several polygons contain the point."""
+    if not hits:
+        return None
+    wanted = control_map(parcel_id)
+    same = [hit for hit in hits if hit.get("gis") and control_map(str(hit["gis"])) == wanted]
+    return (same or hits)[0]
+
+
+def _geometry_bbox(geometry: dict) -> tuple[float, float, float, float]:
+    xs: list[float] = []
+    ys: list[float] = []
+    coords = geometry.get("coordinates") or []
+    parts = [coords] if geometry.get("type") == "Polygon" else coords
+    for poly in parts:
+        for ring in poly:
+            for x, y in ring:
+                xs.append(x)
+                ys.append(y)
+    if not xs:
+        return (0.0, 0.0, 0.0, 0.0)
+    return (min(xs), min(ys), max(xs), max(ys))
+
+
+def load_tncpm_polygons(layer_id: int, explicit: dict | None = None) -> list[dict]:
+    """Layer polygons for the Perry spatial parent fallback. Attributes stay the 2023 CAMA."""
+    fields_map = tncpm_field_map(layer_id, explicit)
+    fields = [name for name in (fields_map["gis"], fields_map["price"], fields_map["date"], fields_map["value"]) if name]
+    url = f"{TNCPM_ROOT}/{layer_id}/query"
+    ids = fetch_object_ids(url, "1=1")
+    print(f"  TNCPM spatial polygons layer {layer_id} rows {len(ids)}", flush=True)
+    items: list[dict] = []
+    for page in iter_by_ids(url, ids, fields, geometry=True, batch=30):
+        for raw in page:
+            rings = (raw.get("geometry") or {}).get("rings")
+            geometry = esri_rings_to_geojson(rings or [], simplify=False)
+            if not geometry:
+                continue
+            attrs = raw.get("attributes") or {}
+            gis = clean(attrs.get(fields_map["gis"]))
+            if not gis:
+                continue
+            items.append(
+                {
+                    "geometry": geometry,
+                    "bbox": _geometry_bbox(geometry),
+                    "gis": gis,
+                    "price": num(attrs.get(fields_map["price"])) if fields_map["price"] else None,
+                    "date": attrs.get(fields_map["date"]) if fields_map["date"] else None,
+                    "value": num(attrs.get(fields_map["value"])) if fields_map["value"] else None,
+                }
+            )
+    return items
+
+
+def stamp_spatial_parent_sales(
+    features: list[dict],
+    polygons: list[dict],
+    vintage: str,
+) -> dict:
+    """Copy the 2023 parent sale and value onto GISLINK misses and flag the join."""
+    from seed_market_parcels import epoch_to_iso
+
+    cell = 0.05
+    buckets: dict[tuple[int, int], list[dict]] = {}
+    for item in polygons:
+        minx, miny, maxx, maxy = item["bbox"]
+        for ix in range(math.floor(minx / cell), math.floor(maxx / cell) + 1):
+            for iy in range(math.floor(miny / cell), math.floor(maxy / cell) + 1):
+                buckets.setdefault((ix, iy), []).append(item)
+    matched = sales = values = 0
+    for feature in features:
+        props = feature["properties"]
+        lon, lat = props["centroid"]
+        hits: list[dict] = []
+        for item in buckets.get((math.floor(lon / cell), math.floor(lat / cell)), []):
+            minx, miny, maxx, maxy = item["bbox"]
+            if not (minx <= lon <= maxx and miny <= lat <= maxy):
+                continue
+            if point_in_geometry(lon, lat, item["geometry"]):
+                hits.append(item)
+        parent = choose_spatial_parent(hits, str(props.get("parcelId") or ""))
+        if not parent:
+            continue
+        matched += 1
+        props["joinMethod"] = "spatial-parent-2023"
+        props["parentParcelId"] = parent["gis"]
+        price = parent["price"] if parent["price"] is not None and parent["price"] > 0 else None
+        sold = acceptable_sale_date(epoch_to_iso(parent["date"]))
+        appraisal = parent["value"] if parent["value"] is not None and parent["value"] > 0 else None
+        if price is not None or sold is not None:
+            props["lastSale"] = {"date": sold, "price": price, "qualified": None, "vintage": vintage}
+            sales += 1
+        if appraisal is not None:
+            props["tax"]["marketValue"] = appraisal
+            props["tax"]["vintage"] = vintage
+            values += 1
+    return {
+        "spatialParentMatched": matched,
+        "spatialParentSaleCount": sales,
+        "spatialParentAppraisalCount": values,
+    }
+
+
 def apply_2023_join(
     features: list[dict],
     layer_id: int | None,
     vintage: str = VINTAGE_2023,
     explicit_fields: dict | None = None,
+    *,
+    spatial_parent: bool = False,
 ) -> dict:
     from seed_market_parcels import epoch_to_iso
 
@@ -746,6 +866,7 @@ def apply_2023_join(
             feature["properties"].pop("_gislink", None)
         return {"tncpmLayer": None, "tncpmMatched": 0, "saleCount": 0, "appraisalCount": 0, "gislinkMatchRate": None}
     index, _fields = load_tncpm(layer_id, explicit_fields)
+    unmatched: list[dict] = []
     for feature in features:
         props = feature["properties"]
         gislink = props.pop("_gislink", None)
@@ -755,6 +876,7 @@ def apply_2023_join(
             if row:
                 break
         if not row:
+            unmatched.append(feature)
             continue
         matched += 1
         price = row["price"] if row["price"] is not None and row["price"] > 0 else None
@@ -767,6 +889,14 @@ def apply_2023_join(
             props["tax"]["marketValue"] = appraisal
             props["tax"]["vintage"] = vintage
             values += 1
+    spatial: dict = {}
+    if spatial_parent and unmatched:
+        polygons = load_tncpm_polygons(layer_id, explicit_fields)
+        spatial = stamp_spatial_parent_sales(unmatched, polygons, vintage)
+        print(
+            f"  spatial parent fallback {spatial.get('spatialParentMatched', 0)} of {len(unmatched)}",
+            flush=True,
+        )
     rate = (matched / len(features)) if features else None
     return {
         "tncpmLayer": layer_id,
@@ -775,6 +905,7 @@ def apply_2023_join(
         "appraisalCount": values,
         "gislinkMatchRate": round(rate, 4) if rate is not None else None,
         "salesVintage": vintage,
+        **spatial,
     }
 
 
@@ -1165,13 +1296,14 @@ def download_tn_oir(county: dict, markets: list[str], spec: dict) -> dict:
         if row["mode"] == "oir":
             features, stats = load_oir(row, county, markets, source)
             stats.update(
-                apply_2023_join(
-                    features,
-                    row.get("tncpmLayer"),
-                    str(row.get("salesVintage") or VINTAGE_2023),
-                    row.get("tncpmFields"),
-                )
+            apply_2023_join(
+                features,
+                row.get("tncpmLayer"),
+                str(row.get("salesVintage") or VINTAGE_2023),
+                row.get("tncpmFields"),
+                spatial_parent=bool(row.get("spatialParentFallback")),
             )
+        )
         elif row["mode"] == "hickman":
             features, stats = load_hickman(row, county, markets, source)
         elif row["mode"] == "chester":
@@ -1196,7 +1328,14 @@ def download_tn_oir(county: dict, markets: list[str], spec: dict) -> dict:
     if "salesVintage" not in stats:
         stats["salesVintage"] = row.get("salesVintage")
     rate = stats.get("gislinkMatchRate")
-    if isinstance(rate, float) and rate < 0.9:
+    spatial_matched = stats.get("spatialParentMatched") or 0
+    if spatial_matched:
+        gap_notes.append(
+            f"Spatial parent fallback stamped {spatial_matched} parcels "
+            "(joinMethod spatial-parent-2023). Those sale and value fields are the pre-split parent record, "
+            "not this parcel's own sale."
+        )
+    elif isinstance(rate, float) and rate < 0.9:
         gap_notes.append(
             f"GISLINK matched {rate:.1%} of kept parcels on the sale/value layer. "
             "Unmatched parcels are published without sale or value."

@@ -1,0 +1,51 @@
+{
+  "name": "Stewart",
+  "fips": "47161",
+  "state": "Tennessee",
+  "markets": [
+    "Nashville"
+  ],
+  "featureCount": 3837,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "tn-oir-public-use-47161",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+  "gaps": [
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used.",
+    "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty.",
+    "GISLINK matched 83.5% of kept parcels on the sale/value layer. Unmatched parcels are published without sale or value."
+  ],
+  "path": "data/fixtures/market-parcels/counties/47161/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47161/lookup.json",
+  "sourceCount": 12508,
+  "dropped": 0,
+  "tileCount": 5,
+  "ingest": {
+    "sourceRows": 12508,
+    "deedAcresInBand": 2821,
+    "droppedGeometry": 0,
+    "droppedOutsideBand": 8670,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 1,
+    "tncpmLayer": 13,
+    "tncpmMatched": 3202,
+    "saleCount": 3189,
+    "appraisalCount": 3186,
+    "gislinkMatchRate": 0.8345,
+    "salesVintage": "2023",
+    "kept": 3837,
+    "ownerCount": 3832,
+    "tpadCount": 3837,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
+}

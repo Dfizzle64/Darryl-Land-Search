@@ -1,0 +1,412 @@
+state: TN
+jurisdiction: Marshall County
+fips: '47117'
+level: county
+markets:
+- Nashville
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=59)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 19,513; DEEDAC 5–150 → 4499; id GISLINK populated=True; geo PASS
+    (5/5 centroids in county, 5/5 polys touch county) (35.68895,-86.81241)→Marshall; (35.60765,-86.67004)→Marshall;
+    (35.49399,-86.72637)→Marshall (where COUNTY_ID=59). Service lastEditDate 2026-09-10 (PARCELID suffix
+    2026) — freshest public owner/geometry; no sale/value/CALC_ACRE (DEEDAC often 0 — derive geodesic
+    acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 5568
+- role: parcels
+  name: TN County Parcel Map — Marshall_Parcels (Assessment_Data_59 join)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/34
+  layerId: 34
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Assessment_Data_59_GISLINK: parcelIdAlt
+    Assessment_Data_59_ID: parcelIdDisplay
+    Assessment_Data_59_PARCELID: parcelIdFull
+    Parcels_CALC_ACRE: acreage
+    Assessment_Data_59_DEEDAC: acreageDeed
+    Assessment_Data_59_OWNER: ownerName
+    Assessment_Data_59_OWNER2: ownerName2
+    Assessment_Data_59_ADDRESS: situsAddress
+    Assessment_Data_59_DISTRICT: taxDistrict
+    Assessment_Data_59_SALEDATE: lastSale.date
+    Assessment_Data_59_PRICE: lastSale.price
+    Assessment_Data_59_VI: lastSale.qualified
+    Assessment_Data_59_DEED_BOOK: lastSale.deedBook
+    Assessment_Data_59_DEED_PAGE: lastSale.deedPage
+    Assessment_Data_59_LANDMKTVAL: tax.landValue
+    Assessment_Data_59_APPRAISAL: tax.marketValue
+    Assessment_Data_59_LANDUSE: dorCode
+    Assessment_Data_59_CLASS: propType
+    County_Name: countyName
+  notes: 'Preferred countywide joined CAMA over bare IMPACT. Live count 18,160; CALC_ACRE 5–150 → 5,406
+    (2026-09-24 ET). Geo-verify PASS: sample centroids (−86.80596, 35.69514) / (−86.80835, 35.69666) WGS84
+    in northern Marshall (~17 mi of Lewisburg); GISLINK prefix 059. publicGisUrl: https://tnmap.tn.gov/Assessment/
+    and Lewisburg Online Zoning Map https://experience.arcgis.com/experience/213a6b844d3b401e885f4f645b9714af
+    . Assessor hub: https://marshallcountytn.gov/assessor-of-property . No MAIL* on AGOL join — use Lewisburg
+    city joined parcels or IMPACT Themes when needed. Skip utilities. 2026-09-28 ET TN PIR re-verify:
+    count 18,160; Parcels_CALC_ACRE 5–150 → 5406; id Parcels_GISLINK populated=True; geo PASS (5/5 centroids
+    in county, 5/5 polys touch county) (35.69642,-86.80475)→Marshall; (35.512,-86.82806)→Marshall; (35.36567,-86.8204)→Marshall.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: Parcels_GISLINK
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: Lewisburg 2025 Parcels Joined (city CAMA)
+  restUrl: https://services8.arcgis.com/E68Q0SbRw4wetYwA/arcgis/rest/services/2025_Lewisburg_Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: city-only
+  fieldMap:
+    GISLINK: parcelId
+    ID: parcelIdDisplay
+    PARCELID: parcelIdFull
+    CALC_ACRE: acreage
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    LANDMKTVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    ASSESSMENT: tax.assessedValue
+    LANDUSE: dorCode
+    ZONING: zoning
+    TAXYR: taxYear
+    COUNTY_ID: countyId
+  notes: 'City of Lewisburg only (~5,956; 5–150 → 313). COUNTY_ID=59; GISLINK 059…. Richer mail/IMPVAL/ASSESSMENT
+    than county AGOL twin — use inside city limits. Geo-verify PASS (−86.79889, 35.44751). 2026-09-28
+    ET TN PIR re-verify: count 5,956; CALC_ACRE 5–150 → 313; id GISLINK populated=True; geo PASS (5/5
+    centroids in county, 5/5 polys touch county) (35.46259,-86.76816)→Marshall; (35.45107,-86.78272)→Marshall;
+    (35.47964,-86.78669)→Marshall.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: Marshall Co. Parcels view (Lewisburg AGOL — geometry)
+  restUrl: https://services8.arcgis.com/E68Q0SbRw4wetYwA/arcgis/rest/services/Marshall_Co._Parcels_view/FeatureServer/11
+  layerId: 11
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    CALC_ACRE: acreage
+    PARCELWP: parcelIdDisplay
+    COUNTY_ID: countyId
+    PARCEL_TYP: parcelType
+  notes: 'Geometry-heavy countywide view (~19,758; 5–150 → 5,714). COUNTY_ID=59 confirmed. Prefer TN County
+    Parcel Map layer 34 for ownership/sale/tax attrs. 2026-09-28 ET TN PIR re-verify: count 19,758; CALC_ACRE
+    5–150 → 5714; id GISLINK populated=True; geo PASS (5/5 centroids in county, 5/5 polys touch county)
+    (35.69282,-86.80922)→Marshall; (35.4929,-86.77679)→Marshall; (35.3494,-86.75218)→Marshall.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcels sibling (COUNTY_ID=59)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+  notes: 'Filter COUNTY_ID=59 AND PARCEL_TYPE=1. Egress-sensitive (403 common). 2026-09-28 ET TN PIR:
+    maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes sibling (JUR=059)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    CALC_ACRE: acreage
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    LANDUSE: dorCode
+    ZONING: zoning
+    TAXYR: taxYear
+  notes: 'Filter JUR=''059''; prefer latest TAXYR. Query-only. Prefer AGOL when Themes 403. 2026-09-28
+    ET TN PIR: maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: zoning
+  name: Lewisburg Zoning (2021 regular / Master Copy view)
+  restUrl: https://services8.arcgis.com/E68Q0SbRw4wetYwA/arcgis/rest/services/ZONING_2021_LB_Reverted_to_Regular_Zoning/FeatureServer/0
+  layerId: 0
+  coverage: city-only
+  fieldMap:
+    Zone_Curre: zoning
+    Ord_ResNo: zoningOrdinance
+    Last_Chng: zoningEffective
+    ApproxAC: acreage
+  notes: 'City of Lewisburg only (~636). Codes BP/C1–C4/HDPUD/I1/I2/LDRPUD/MHP/PUD/R1/R2/R3. Multifamily-relevant
+    R3/PUD — confirm ordinance. Twin Master Copy view also public. publicGisUrl twin: https://experience.arcgis.com/experience/213a6b844d3b401e885f4f645b9714af'
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: other
+  name: Lewisburg City Limits / UGB (growth context)
+  restUrl: https://services8.arcgis.com/E68Q0SbRw4wetYwA/arcgis/rest/services/Lewisburg_City_Limits_view/FeatureServer/0
+  layerId: 0
+  coverage: city-only
+  fieldMap: {}
+  notes: Jurisdiction QA for city-only zoning. UGB view sibling Urban_Growth_Boundary_view — growth context,
+    not FLU entitlement.
+  status: usable
+  auth: none
+  geometry: polygon
+  acreageField: null
+- role: other
+  name: TDOT Traffic Lines (AADT statewide)
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: state-wide (filter county)
+  fieldMap:
+    AADT: aadt
+    AADTYEAR: aadtYear
+    COUNTY_NUMBER: countyNumberTdot
+    ROUTE_ID: routeId
+    FUNCTIONAL_CLASS: functionalClass
+  notes: >-
+    Added 2026-09-28 ET TN PIR Pass 2. Filter COUNTY_NUMBER='59' AND AADTYEAR='2025' → 1,129 segments
+    (all years 1,300). COUNTY_NUMBER = TDOT alphabetical county no. (NOT FIPS).
+  status: usable
+  auth: none
+  geometry: polyline
+  use: aadt-screening
+gaps:
+- Unincorporated Marshall countywide zoning FeatureServer not found (Lewisburg city only)
+- Chapel Hill / Cornersville / Petersburg municipal zoning REST not found
+- Adopted FLU FeatureServer not found (UGB growth context only)
+- IMPACT Themes often 403 from datacenter egress
+- AGOL Assessment_Data_59 has no MAIL* fields
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: City of Lewisburg / Marshall County TN / Comptroller IMPACT-TPAD public records; AGOL TN County
+  Parcel Map republish — attribution required. No paid GIS purchase channel.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+jurisdictionGisUrl: https://tnmap.tn.gov/Assessment/
+zoningOverall: partial
+packagingNote: 'Digged 2026-09-24 ET full-suite TRANCHE-3; prefer AGOL joined parcels; REJECTED Marshall
+  WV webapp (a84daaa…) and Marshall IL Experience (542ad240…) as wrong-state; geo-verify PASS; skip utilities/AADT.
+  RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added OIR. LSB-approved parcel setup
+  applied 2026-09-28 (see parcelSetup).'
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=59
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/34
+  joinKey: OIR.GISLINK = Parcels_GISLINK
+  salesValueVintage: 2023
+  salesValueSourceEditDate: '2023-11-22'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 5568
+  gislinkJoinSample: 10/10 (100%)
+aadt:
+  source: TDOT Traffic Lines
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  field: AADT
+  yearField: AADTYEAR
+  preferredYear: '2025'
+  countyFilterField: COUNTY_NUMBER
+  countyNumberTdot: '59'
+  where: COUNTY_NUMBER='59' AND AADTYEAR='2025'
+  count2025: 1129
+  countAllYears: 1300
+  maxAADT2025: 33132
+  segments2025AADTge5000: 57
+  status: usable
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+ownerEntityTypeRule:
+  appliesTo: OWNER + ' ' + OWNER2 (upper-cased; OWNER2 dropped when it starts with C/O, ATTN, %, CARE
+    OF); first match wins
+  order:
+  - type: church
+    regex: \b(CHURCH|BAPTIST|METHODIST|PRESBYTERIAN|LUTHERAN|EPISCOPAL|CATHOLIC|DIOCESE|MINISTR(Y|IES)|CONGREGATION|FELLOWSHIP|TABERNACLE|TEMPLE|CHAPEL|ASSEMBLY
+      OF GOD|CHURCH OF CHRIST|CEMETERY)\b
+  - type: government
+    regex: \b(UNITED STATES|U ?S ?A|USA|STATE OF (TENNESSEE|TN)|TENNESSEE (STATE|DEPT|DEPARTMENT)|DEPT
+      OF|DEPARTMENT OF|COUNTY OF|CITY OF|TOWN OF|BOARD OF EDUCATION|TENNESSEE VALLEY AUTHORITY|TVA|UTILITY
+      DISTRICT|HOUSING AUTHORITY|WILDLIFE RESOURCES|TWRA|CORPS OF ENGINEERS|NATIONAL PARK)\b|\b[A-Z]+
+      COUNTY( GOVERNMENT| BOARD| COMMISSION| SCHOOLS?| HIGHWAY( DEPT)?)?\s*$
+  - type: LLC
+    regex: \b(L\.?\s?L\.?\s?C|P\.?L\.?L\.?C)\b\.?|LIMITED LIABILITY (COMPANY|CO)
+  - type: LP
+    regex: \b(L\.?L\.?L\.?P|L\.?L\.?P|L\.?P|LTD|LIMITED PARTNERSHIP|PARTNERSHIP|PARTNERS)\b
+  - type: INC
+    regex: \b(INC|INCORPORATED)\b\.?
+  - type: CORP
+    regex: \b(CORP|CORPORATION|COMPANY|CO)\b\.?\s*$|\bCORP\b|\bCORPORATION\b
+  - type: TRUST
+    regex: \b(TRUST|TRUSTS|TRUSTEE|TRUSTEES|TRSTE|TR|TRS|RLT|REV(OCABLE)? (LIVING )?TR(UST)?)\b|\(TR\)
+  - type: individual
+    regex: .*
+  noContactInfo: true
+  contactFieldsExcluded: []
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+  status:
+    a: verified
+    b: verified
+    c: verified
+    d: verified
+    e: verified
+    f: verified
+  a_aadt:
+    countyNumberTdot: '59'
+    where: COUNTY_NUMBER='59' AND AADTYEAR='2025'
+    count2025: 1129
+    countAllYears: 1300
+    maxAADT2025: 33132
+    segments2025AADTge5000: 57
+  b_value:
+    source: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/34
+    fields:
+      Assessment_Data_59_LANDMKTVAL: tax.landValue
+      Assessment_Data_59_APPRAISAL: tax.marketValue
+    populatedCounts:
+      Assessment_Data_59_LANDMKTVAL: 18130
+      Assessment_Data_59_APPRAISAL: 18142
+    layerTotal: 18160
+    missingMappedFields: []
+  c_sale:
+    source: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/34
+    fields:
+      Assessment_Data_59_SALEDATE: lastSale.date
+      Assessment_Data_59_PRICE: lastSale.price
+      Assessment_Data_59_VI: lastSale.qualified
+      Assessment_Data_59_DEED_BOOK: lastSale.deedBook
+      Assessment_Data_59_DEED_PAGE: lastSale.deedPage
+    populatedCounts:
+      Assessment_Data_59_SALEDATE: 18031
+      Assessment_Data_59_PRICE: 11940
+      Assessment_Data_59_VI: 14652
+      Assessment_Data_59_DEED_BOOK: 18031
+      Assessment_Data_59_DEED_PAGE: 18030
+    dateField: Assessment_Data_59_SALEDATE
+    priceFields:
+    - Assessment_Data_59_PRICE
+    liveMaxSaleDate: '2023-05-26'
+    joinedSample5to150:
+      sampleIds: 10
+      matched: 10
+      valuePopulated: 10
+      saleDatePopulated: 10
+    saleHistory: 'Public per-parcel only: TPAD Parcel Details "Sale Information" table (date, price, book/page,
+      vacant/improved, instrument, qualification) via PA deep link; no bulk sale-history layer on public
+      GIS'
+  d_owner:
+    source: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+    filter: COUNTY_ID=59
+    ownerField: OWNER
+    owner2Field: OWNER2
+    total: 19513
+    ownerPopulated: 19510
+    entitySampleN: 2000
+    entityDist:
+      individual: 1795
+      TRUST: 95
+      LLC: 36
+      church: 36
+      INC: 27
+      LP: 7
+      government: 4
+  e_paDeepLink:
+    template: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+    placeholder: GISLINK
+    testUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink=059055%20%20%20%2002500
+    testGislink: 059055    02500
+    httpBox: '403'
+    httpExternal: 200 details
+    taxYearShown: '2026'
+    saleHistoryRows: 5
+    note: null
+    perParcelFieldOnOIR: LINK_TPAD
+  f_viewer:
+    url: https://tnmap.tn.gov/Assessment/
+    http: '200'
+    arcgisItem: null
+    statewideTPV: https://tnmap.tn.gov/assessment/#/parcel/{GISLINK} (OIR LINK_TPV) HTTP 200
+    isStatewideFallback: true
+  vintage:
+    salesValueVintage: 2023
+    salesValueSourceEditDate: '2023-11-22'
+    liveMaxSaleDate: '2023-05-26'
+    serviceLastEdit: '2023-11-22'
+  notes: []

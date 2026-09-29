@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T02:23:41Z",
+  "generatedAt": "2026-09-29T03:21:53Z",
   "market": "Knoxville",
   "tier": "other",
-  "parcelCount": 130277,
+  "parcelCount": 146507,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -380,21 +380,24 @@
       "name": "Loudon",
       "fips": "47105",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 4332,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47105",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-oir-public-use-47105",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47105/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47105/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 36399
     },
     {
       "name": "Monroe",
@@ -535,24 +538,73 @@
       "sourceCount": 78811
     },
     {
+      "name": "Unicoi",
+      "fips": "47171",
+      "state": "Tennessee",
+      "featureCount": 1713,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "tn-oir-public-use-47171",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "gaps": [
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined from the card sales-value layer (https://gis.johnsoncitytn.org/arcgis/rest/services/ParcelPublishing/TaxParcels/MapServer/0/query) on GISLINK and labeled 2026 when a value is present. A GISLINK with no match is left without sale or value. The 2023 TN_County_Parcel_Map sibling is not the sale source. Owner phone and email are not ingested.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "No usable zoning polygon layer is on the research card. A non-blank ZONING value on the sales layer is kept. Future land use stays empty."
+      ],
+      "path": "data/fixtures/market-parcels/counties/47171/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47171/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 10301
+    },
+    {
       "name": "Union",
       "fips": "47173",
       "state": "Tennessee",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 3500,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "tn-impact-47173",
-      "queryUrl": "https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0/query",
+      "source": "tn-oir-public-use-47173",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
       "gaps": [
-        "Tennessee IMPACT Parcels returned no 5–150 acre features for this county. Davidson-scale counties are sometimes hosted only by the county, and several Nashville-ring counties are absent from this statewide layer.",
-        "Tennessee Comptroller IMPACT parcel layer has calculated acres and a GIS link. Owner, situs, and zoning are not on this layer."
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": 0
+      "path": "data/fixtures/market-parcels/counties/47173/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47173/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 14722
+    },
+    {
+      "name": "Washington",
+      "fips": "47179",
+      "state": "Tennessee",
+      "featureCount": 6685,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "tn-oir-public-use-47179",
+      "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+      "gaps": [
+        "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+        "Sale date, sale price, and appraisal are joined from the card sales-value layer (https://services3.arcgis.com/nLnrKGwI08veJ5uu/arcgis/rest/services/Parcels/FeatureServer/0/query) on GISLINK and labeled 2026 when a value is present. A GISLINK with no match is left without sale or value. The 2023 TN_County_Parcel_Map sibling is not the sale source. Owner phone and email are not ingested.",
+        "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+        "Regrid and other paid parcel vendors were not used.",
+        "Zoning comes from the card's usable zoning layers. A parcel-id layer is joined on that id. Polygon layers are stamped by centroid, and a later city layer replaces an earlier code only inside that city. Outside those layers zoning stays empty."
+      ],
+      "path": "data/fixtures/market-parcels/counties/47179/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/47179/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 60962
     }
   ]
 }

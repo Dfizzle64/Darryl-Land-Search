@@ -6,19 +6,29 @@
     "Charleston",
     "Columbia"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 12608,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-orangeburg-parcels-45075",
+  "queryUrl": "https://services2.arcgis.com/bUKn95BqgpYYTnx3/arcgis/rest/services/Main_Public_Tax_Parcel_Map_WFL1/FeatureServer/0/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Source query returned 12735 rows; 12608 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Tax Parcels (Public Tax Parcel Map) (https://services2.arcgis.com/bUKn95BqgpYYTnx3/arcgis/rest/services/Main_Public_Tax_Parcel_Map_WFL1/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "Zoning layer FS/33 is effectively empty/unusable (null codes); county zoning REST gap.",
+    "No sale price/date fields on public Tax Parcels layer; use FriendlyLink / assessor for sales.",
+    "Market/assessed tax values not on public parcel fields reviewed.",
+    "Rejected SCDOT SC_Parcels MapServer (token required)."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45075/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45075/lookup.json",
+  "sourceCount": 12735,
+  "dropped": 127,
+  "tileCount": 13,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=OrangeburgCountySC&PageType=Search",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/02a8eeae9f074df9a0821ae7e1125c86"
 }

@@ -5,19 +5,28 @@
   "markets": [
     "Columbia"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 8685,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-kershaw-parcels-45055",
+  "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Fairfield_Kershaw_Richland_Map_WFL1/FeatureServer/7/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Parcels are SC RFA Kershaw_Parcels (county-specific layer w/ CAMA, boundary program map) (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Fairfield_Kershaw_Richland_Map_WFL1/FeatureServer/7). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "Owner, market/assessed/taxable values, and sale history are not present in the public Parcels_view REST layer; use qPublic / county deed search for PA verification.",
+    "No stable parcel-specific qPublic deep-link pattern verified; official search URL supports parcelId/TMS lookup.",
+    "Camden is within Kershaw County and is covered by the countywide sources above; no separate Camden county card is needed.",
+    "Reject SCDOT SC_Parcels token-walled services as a primary source; KershawGIS Parcels_view is public and preferred."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45055/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45055/lookup.json",
+  "sourceCount": 8685,
+  "dropped": 0,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=KershawCountySC&PageType=Search",
+  "gisViewerUrl": "https://kershawcountydataportal-kershawcounty.hub.arcgis.com/"
 }

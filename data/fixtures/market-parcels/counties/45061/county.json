@@ -5,19 +5,29 @@
   "markets": [
     "Columbia"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 3908,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-lee-parcels-45061",
+  "queryUrl": "https://services5.arcgis.com/zg6ovB2KKN8L0zFv/arcgis/rest/services/Web_Parcels/FeatureServer/0/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Source query returned 3945 rows; 3908 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Lee County Web Parcels (Parcel_Polygons joined to CAMA, county AGOL) (https://services5.arcgis.com/zg6ovB2KKN8L0zFv/arcgis/rest/services/Web_Parcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "tax usable: County-published daily CAMA join (Lee County AGOL, data edit 2026-09-24). No single total market/assessed field — sum components.",
+    "sale usable: Date is a string YYYYMMDD (not epoch) — parse %Y%m%d.",
+    "owner usable: Owner + mailing public; no separate zip field (zip may be embedded or absent).",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "SCDOT statewide SC_Parcels requires token — not usable as primary."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45061/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45061/lookup.json",
+  "sourceCount": 3945,
+  "dropped": 1,
+  "tileCount": 5,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=913&LayerID=17622&PageTypeID=4&PageID=7896&KeyValue={parcelId}",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/3aa9a4d5a5094058912da9ebe788e8b8"
 }

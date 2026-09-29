@@ -5,19 +5,29 @@
   "markets": [
     "Greenville"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 9257,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-pickens-parcels-45077",
+  "queryUrl": "https://services1.arcgis.com/59960rq18IxUcAVI/arcgis/rest/services/Pickens_Open_data/FeatureServer/6/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Parcels are Parcels (Pickens_Open_data — county AGOL GISpickens) (https://services1.arcgis.com/59960rq18IxUcAVI/arcgis/rest/services/Pickens_Open_data/FeatureServer/6). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "MUNICIPALITY INVENTORY: Easley (city zoning+FLU REST — companion 45077-easley.yaml), Clemson, Liberty, Pickens, Central, Norris, Six Mile. Clemson/Liberty/Pickens/Central — no separate city zoning FeatureServer verified 2026-09-24; use parcel ZONINGCODE where populated or UDSO rules.",
+    "County UDSO applies to unincorporated land; no dissolved countywide zoning polygon layer found — parcel ZONINGCODE partial.",
+    "Market/assessed values not reliable on public open-data/ArcReader layers — use qPublic AppID=927.",
+    "pcgis-pickenscosc.opendata.arcgis.com Hub search returns unrelated datasets — use GISpickens FeatureServer URLs directly.",
+    "EasleyZoningMap/7 is a ~16k subset — wrong-geography for county ingest."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45077/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45077/lookup.json",
+  "sourceCount": 9257,
+  "dropped": 0,
+  "tileCount": 7,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=927&LayerID=18058&PageTypeID=2&PageID=8075",
+  "gisViewerUrl": null
 }

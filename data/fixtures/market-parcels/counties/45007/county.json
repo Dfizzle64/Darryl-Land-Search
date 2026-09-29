@@ -5,19 +5,29 @@
   "markets": [
     "Greenville"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 12288,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-anderson-parcels-45007",
+  "queryUrl": "https://propertyviewer.andersoncountysc.org/arcgis/rest/services/NewPropertyViewer/MapServer/5/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Source query returned 12592 rows; 12288 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcels (NewPropertyViewer MapServer) (https://propertyviewer.andersoncountysc.org/arcgis/rest/services/NewPropertyViewer/MapServer/5). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "Owner name / mailing not on public parcel REST — use ACPASS Real Property (QryMapNo=TMS / ACPASS_LOOKUP).",
+    "TAXOWNSTR is ownership-structure code, NOT ownerName.",
+    "No dedicated acreage field — parse DESCRIPTIO or Shape.STArea()/43560.",
+    "Zoning Opengov/MAT/6 covers ~33k/120k parcels (zoned areas); unincorporated often unzoned."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45007/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45007/lookup.json",
+  "sourceCount": 12592,
+  "dropped": 89,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://acpass.andersoncountysc.org/asrdetails.cgi?mapno={parcelId}",
+  "gisViewerUrl": "https://propertyviewer.andersoncountysc.org/mapsjs/"
 }

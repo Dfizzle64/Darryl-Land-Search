@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T04:03:44Z",
+  "generatedAt": "2026-09-29T04:49:50Z",
   "market": "Charlotte",
   "tier": "primary",
-  "parcelCount": 129191,
+  "parcelCount": 154356,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -311,20 +311,27 @@
       "name": "Lancaster",
       "fips": "45057",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 13416,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-lancaster-parcels-45057",
+      "queryUrl": "https://services3.arcgis.com/rJcpRneDUBgTeCT3/arcgis/rest/services/LC_Parcels/FeatureServer/0/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Source query returned 13483 rows; 13416 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are LC_Parcels (countywide polygons + owner/sale) (https://services3.arcgis.com/rJcpRneDUBgTeCT3/arcgis/rest/services/LC_Parcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "Patriot View (~31436) is CAMA-rich but incomplete vs LC_Parcels (~56493) — do not use Patriot alone as countywide parcels.",
+        "No countywide FLU FeatureServer found; only Small_Area_Plan_Recommended_Land_Use (23 polys).",
+        "Municipal zoning companions (Kershaw, Heath Springs, Van Wyck) exist on LANCOGIS org — dig separately if city grain needed.",
+        "Assessor HTML: county departments + lancastersctax.qpaybill.com tax portal; qPublic App=LancasterCountySC 403 from research egress (may work in browser)."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45057/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45057/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 13483
     },
     {
       "name": "Lincoln",
@@ -481,20 +488,27 @@
       "name": "York",
       "fips": "45091",
       "state": "South Carolina",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 11749,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "sc-york-parcels-45091",
+      "queryUrl": "https://services1.arcgis.com/2AGLxyiJoNiVHKwq/arcgis/rest/services/Parcels/FeatureServer/0/query",
       "gaps": [
-        "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+        "Source query returned 11750 rows; 11749 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are Parcels (York County SC AGOL CAMA) (https://services1.arcgis.com/2AGLxyiJoNiVHKwq/arcgis/rest/services/Parcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+        "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+        "REJECT maps.yorkcounty.gov AGOservices/Landrecords_Service — York County VIRGINIA (wrong-geography).",
+        "Municipal zoning beyond Rock Hill (Fort Mill, Tega Cay, York city, Clover, etc.) not separately carded — use county Zoning (regions) or dig city REST.",
+        "Sale history beyond last sale not on parcel FeatureServer.",
+        "Skip utilities / AADT per full-suite scope."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/45091/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/45091/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 11750
     }
   ]
 }

@@ -1,0 +1,33 @@
+{
+  "name": "Marion",
+  "fips": "45067",
+  "state": "South Carolina",
+  "markets": [
+    "Charleston"
+  ],
+  "featureCount": 3697,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "sc-marion-parcels-45067",
+  "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18/query",
+  "gaps": [
+    "Source query returned 3793 rows; 3697 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are SC RFA Statewide_Parcels filtered to Marion County (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "tax gap: RFA value fields (L_Value/M_Value/B_Value) are empty for this county; no county value REST found. Values only via PA (HTML, not bulk).",
+    "sale gap: No sale fields on RFA/18; WTH viewer sale search in-app only.",
+    "owner partial: Owner name public on RFA layer; no mailing address on any public REST found.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "Parcel polygons now loadable from SC RFA Statewide_Parcels (layer 18, where County='Marion County'); state-hosted inside a boundary-program map — fragile, snapshot extracts. No county-published parcel REST found 2026-09-28."
+  ],
+  "path": "data/fixtures/market-parcels/counties/45067/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45067/lookup.json",
+  "sourceCount": 3793,
+  "dropped": 25,
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://marionsc.wthgis.com/?overlay=tgis/custom.aspx?DSID=1064&RequestType=CustomSearchRequest&SearchType=Name&SearchCriteria={ownerLastName}|",
+  "gisViewerUrl": "https://marionsc.wthgis.com/"
+}

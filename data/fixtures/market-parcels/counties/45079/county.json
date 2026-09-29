@@ -5,22 +5,29 @@
   "markets": [
     "Columbia"
   ],
-  "featureCount": 638,
-  "coverage": "sample",
+  "featureCount": 8677,
+  "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "sc-columbia-city-landrecords",
-  "queryUrl": "https://gis.columbiasc.gov/cola/rest/services/InnercityMap/LandRecords/MapServer/2/query",
+  "source": "sc-richland-parcels-45079",
+  "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/8/query",
   "gaps": [
-    "City of Columbia only (CityLimit=Y on the Richland side of LandRecords). This is not a Richland County-wide parcel roll. Richland County has no public ArcGIS FeatureServer or MapServer for countywide parcels; GeoServer WFS is disabled and county GIS is sold under license. This pull does not use richlandmaps.com PHP parcel endpoints.",
-    "City LandRecords has no sale or tax fields. Acreage is Shape_Area in South Carolina State Plane feet divided by 43560, limited to 5.0\u2013150.0. Forest Acres, Blythewood, Arcadia Lakes, Eastover, and Irmo have no verified public municipal parcel service. Lexington-side city parcels stay on the Lexington County extract, which carries CAMA.",
-    "City of Columbia FLU centroids 636. Zoning stays the parcel ZoningDistrict.",
-    "641 source rows collapsed to 638 parcel ids (duplicate ids, stacked units, or rings that failed the WGS84 check). The acreage query covered the county."
+    "Source query returned 8689 rows; 8677 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are SC RFA Richland Parcels (county-wide w/ CAMA, Lexington-Richland boundary program map) (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/8). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "2026-09-28: countywide public parcel polygons found — SC RFA Lexington_Richland_Web_Map_WFL1/FeatureServer/8 (183,685). The PHP dataviewer API remains a single-parcel fallback.",
+    "No county-published Richland County ArcGIS FeatureServer/MapServer for parcels (state RFA layer above is the countywide REST source).",
+    "GeoServer WFS is disabled; WMS tiles + Dataviewer PHP single-TMS APIs only (bulk GetParcels hits LIMIT REACHED).",
+    "County GIS data is sold under a licensing agreement (GIS@richlandcountysc.gov) — confirm ToS before bulk republish."
   ],
   "path": "data/fixtures/market-parcels/counties/45079/tiles",
   "lookup": "data/fixtures/market-parcels/counties/45079/lookup.json",
-  "sourceCount": 641,
+  "sourceCount": 8689,
   "dropped": 0,
-  "tileCount": 4
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://property.spatialest.com/sc/richland/#/property/{parcelId}",
+  "gisViewerUrl": "https://www.richlandcountysc.gov/Property-Business/Mapping-and-Records/Geographic-Information-Systems"
 }

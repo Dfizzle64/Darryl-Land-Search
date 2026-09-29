@@ -1,0 +1,347 @@
+state: TN
+jurisdiction: Jackson County
+fips: '47087'
+level: county
+markets:
+- Nashville
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=44)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 9,020; DEEDAC 5–150 → 2456; id GISLINK populated=True; geo PASS
+    (5/5 centroids in county, 5/5 polys touch county) (36.50231,-85.80595)→Jackson; (36.41254,-85.77796)→Jackson;
+    (36.3312,-85.75014)→Jackson (where COUNTY_ID=44). Service lastEditDate 2026-09-10 (PARCELID suffix
+    2026) — freshest public owner/geometry; no sale/value/CALC_ACRE (DEEDAC often 0 — derive geodesic
+    acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 3606
+- role: parcels
+  name: TN County Parcel Map — Jackson_Parcels (Assessment_Data_44 join)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/45
+  layerId: 45
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Parcels_GISLINK2: parcelIdAlt
+    Assessment_Data_44_GISLINK: parcelIdJoin
+    Assessment_Data_44_ID: parcelIdDisplay
+    Assessment_Data_44_PARCELID: parcelIdFull
+    Assessment_Data_44_OWNER: ownerName
+    Assessment_Data_44_OWNER2: ownerName2
+    Assessment_Data_44_ADDRESS: situsAddress
+    Parcels_CALC_ACRE: acreage
+    Assessment_Data_44_DEEDAC: acreageDeed
+    Assessment_Data_44_LANDMKTVAL: tax.landValue
+    Assessment_Data_44_APPRAISAL: tax.marketValue
+    Assessment_Data_44_SALEDATE: lastSale.date
+    Assessment_Data_44_PRICE: lastSale.price
+    Assessment_Data_44_VI: lastSale.qualified
+    Assessment_Data_44_DEED_BOOK: lastSale.deedBook
+    Assessment_Data_44_DEED_PAGE: lastSale.deedPage
+    Assessment_Data_44_LANDUSE: dorCode
+    Assessment_Data_44_CLASS: propType
+    County_Name: countyName
+  notes: 'Preferred CAMA/AGOL over bare IMPACT (maps.cot.tn.gov often 403 from datacenter egress). Live
+    2026-09-24 ET: 8,845 polys; CALC_ACRE 5–150 → 3,535. Geo-verify PASS — sample centroids ~36.51N, 85.8W
+    WGS84 (Jackson TN). GISLINK/JUR prefix 044. Owner / sale / land market / appraisal on join. No IMPVAL/mailing
+    on this extract. OZ 2.0: join national Opportunity Zone 2.0 / rural-eligible tracts by centroid. 2026-09-28
+    ET TN PIR re-verify: count 8,845; Parcels_CALC_ACRE 5–150 → 3535; id Parcels_GISLINK populated=True;
+    geo PASS (4/5 centroids in county, 5/5 polys touch county) (36.50709,-85.79859)→Clay; (36.30227,-85.73168)→Jackson;
+    (36.29278,-85.75676)→Jackson.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: Parcels_GISLINK
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: IMPACT Parcels (COUNTY_ID=44) — egress-sensitive sibling
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+  notes: 'Filter COUNTY_ID=44 AND PARCEL_TYPE=1. Prefer TN_County_Parcel_Map when IMPACT blocked. 2026-09-28
+    ET TN PIR: maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes (JUR='044') — CAMA when IMPACT reachable
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    CALC_ACRE: acreage
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    LANDUSE: dorCode
+    ZONING: zoning
+    TAXYR: taxYear
+  notes: 'Filter JUR=''044''; prefer latest TAXYR. Adds IMPVAL/mailing when reachable. 2026-09-28 ET TN
+    PIR: maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: zoning
+  name: null — no public countywide zoning REST found
+  restUrl: null
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: unknown
+  fieldMap: {}
+  notes: No countywide zoning FeatureServer located (2026-09-24). City/town zoning may exist as PDF/hardcopy
+    only — do not invent districts.
+  status: gap
+- role: flu
+  name: null — no public FLU FeatureServer
+  restUrl: null
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: unknown
+  fieldMap: {}
+  notes: No adopted FLU FeatureServer found (2026-09-24).
+  status: gap
+- role: other
+  name: TDOT Traffic Lines (AADT statewide)
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: state-wide (filter county)
+  fieldMap:
+    AADT: aadt
+    AADTYEAR: aadtYear
+    COUNTY_NUMBER: countyNumberTdot
+    ROUTE_ID: routeId
+    FUNCTIONAL_CLASS: functionalClass
+  notes: >-
+    Added 2026-09-28 ET TN PIR Pass 2. Filter COUNTY_NUMBER='44' AND AADTYEAR='2025' → 751 segments (all
+    years 833). COUNTY_NUMBER = TDOT alphabetical county no. (NOT FIPS).
+  status: usable
+  auth: none
+  geometry: polyline
+  use: aadt-screening
+gaps:
+- No countywide zoning FeatureServer found (2026-09-24)
+- No adopted FLU FeatureServer found
+- TN_County_Parcel_Map join lacks IMPVAL / mailing columns
+- IMPACT maps.cot.tn.gov egress-sensitive (403 common)
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: TN Comptroller Geographic Services / IMPACT-TPAD / Jackson County public records; AGOL TN County
+  Parcel Map republish — attribution required. No paid GIS purchase channel.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+publicGisUrl: https://tnmap.tn.gov/Assessment/
+jurisdictionGisUrl: https://tnmap.tn.gov/Assessment/
+zoningOverall: gap
+packagingNote: 'Wave 3C TRANCHE-3 dig 2026-09-24. Primary parcels = TN_County_Parcel_Map/45 (Assessment_Data_44).
+  TPAD deep-link {GISLINK}. Public GIS = tnmap Assessment viewer. Skip utilities + AADT. OZ 2.0 = national
+  tract join. RURAL-OZ PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added OIR. LSB-approved
+  parcel setup applied 2026-09-28 (see parcelSetup).'
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=44
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/45
+  joinKey: OIR.GISLINK = Parcels_GISLINK
+  salesValueVintage: 2023
+  salesValueSourceEditDate: '2023-11-22'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 3606
+  gislinkJoinSample: 10/10 (100%)
+aadt:
+  source: TDOT Traffic Lines
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  field: AADT
+  yearField: AADTYEAR
+  preferredYear: '2025'
+  countyFilterField: COUNTY_NUMBER
+  countyNumberTdot: '44'
+  where: COUNTY_NUMBER='44' AND AADTYEAR='2025'
+  count2025: 751
+  countAllYears: 833
+  maxAADT2025: 7362
+  segments2025AADTge5000: 11
+  status: usable
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+ownerEntityTypeRule:
+  appliesTo: OWNER + ' ' + OWNER2 (upper-cased; OWNER2 dropped when it starts with C/O, ATTN, %, CARE
+    OF); first match wins
+  order:
+  - type: church
+    regex: \b(CHURCH|BAPTIST|METHODIST|PRESBYTERIAN|LUTHERAN|EPISCOPAL|CATHOLIC|DIOCESE|MINISTR(Y|IES)|CONGREGATION|FELLOWSHIP|TABERNACLE|TEMPLE|CHAPEL|ASSEMBLY
+      OF GOD|CHURCH OF CHRIST|CEMETERY)\b
+  - type: government
+    regex: \b(UNITED STATES|U ?S ?A|USA|STATE OF (TENNESSEE|TN)|TENNESSEE (STATE|DEPT|DEPARTMENT)|DEPT
+      OF|DEPARTMENT OF|COUNTY OF|CITY OF|TOWN OF|BOARD OF EDUCATION|TENNESSEE VALLEY AUTHORITY|TVA|UTILITY
+      DISTRICT|HOUSING AUTHORITY|WILDLIFE RESOURCES|TWRA|CORPS OF ENGINEERS|NATIONAL PARK)\b|\b[A-Z]+
+      COUNTY( GOVERNMENT| BOARD| COMMISSION| SCHOOLS?| HIGHWAY( DEPT)?)?\s*$
+  - type: LLC
+    regex: \b(L\.?\s?L\.?\s?C|P\.?L\.?L\.?C)\b\.?|LIMITED LIABILITY (COMPANY|CO)
+  - type: LP
+    regex: \b(L\.?L\.?L\.?P|L\.?L\.?P|L\.?P|LTD|LIMITED PARTNERSHIP|PARTNERSHIP|PARTNERS)\b
+  - type: INC
+    regex: \b(INC|INCORPORATED)\b\.?
+  - type: CORP
+    regex: \b(CORP|CORPORATION|COMPANY|CO)\b\.?\s*$|\bCORP\b|\bCORPORATION\b
+  - type: TRUST
+    regex: \b(TRUST|TRUSTS|TRUSTEE|TRUSTEES|TRSTE|TR|TRS|RLT|REV(OCABLE)? (LIVING )?TR(UST)?)\b|\(TR\)
+  - type: individual
+    regex: .*
+  noContactInfo: true
+  contactFieldsExcluded: []
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+  status:
+    a: verified
+    b: verified
+    c: verified
+    d: verified
+    e: verified
+    f: verified
+  a_aadt:
+    countyNumberTdot: '44'
+    where: COUNTY_NUMBER='44' AND AADTYEAR='2025'
+    count2025: 751
+    countAllYears: 833
+    maxAADT2025: 7362
+    segments2025AADTge5000: 11
+  b_value:
+    source: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/45
+    fields:
+      Assessment_Data_44_LANDMKTVAL: tax.landValue
+      Assessment_Data_44_APPRAISAL: tax.marketValue
+    populatedCounts:
+      Assessment_Data_44_LANDMKTVAL: 8770
+      Assessment_Data_44_APPRAISAL: 8772
+    layerTotal: 8845
+    missingMappedFields: []
+  c_sale:
+    source: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/45
+    fields:
+      Assessment_Data_44_SALEDATE: lastSale.date
+      Assessment_Data_44_PRICE: lastSale.price
+      Assessment_Data_44_VI: lastSale.qualified
+      Assessment_Data_44_DEED_BOOK: lastSale.deedBook
+      Assessment_Data_44_DEED_PAGE: lastSale.deedPage
+    populatedCounts:
+      Assessment_Data_44_SALEDATE: 8590
+      Assessment_Data_44_PRICE: 5016
+      Assessment_Data_44_VI: 5054
+      Assessment_Data_44_DEED_BOOK: 8585
+      Assessment_Data_44_DEED_PAGE: 8585
+    dateField: Assessment_Data_44_SALEDATE
+    priceFields:
+    - Assessment_Data_44_PRICE
+    liveMaxSaleDate: '2023-05-22'
+    joinedSample5to150:
+      sampleIds: 10
+      matched: 10
+      valuePopulated: 10
+      saleDatePopulated: 10
+    saleHistory: 'Public per-parcel only: TPAD Parcel Details "Sale Information" table (date, price, book/page,
+      vacant/improved, instrument, qualification) via PA deep link; no bulk sale-history layer on public
+      GIS'
+  d_owner:
+    source: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+    filter: COUNTY_ID=44
+    ownerField: OWNER
+    owner2Field: OWNER2
+    total: 9020
+    ownerPopulated: 9009
+    entitySampleN: 2000
+    entityDist:
+      individual: 1772
+      church: 111
+      TRUST: 73
+      LLC: 29
+      INC: 6
+      LP: 3
+      CORP: 3
+      government: 3
+  e_paDeepLink:
+    template: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+    testUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink=044059%20%20%20%2003910
+    testGislink: 044059    03910
+    httpBox: '403'
+    httpExternal: 200 details
+    taxYearShown: '2026'
+    saleHistoryRows: 3
+    note: null
+    perParcelFieldOnOIR: LINK_TPAD
+  f_viewer:
+    url: https://tnmap.tn.gov/Assessment/
+    http: '200'
+    arcgisItem: null
+    statewideTPV: https://tnmap.tn.gov/assessment/#/parcel/{GISLINK} (OIR LINK_TPV) HTTP 200
+    isStatewideFallback: true
+  vintage:
+    salesValueVintage: 2023
+    salesValueSourceEditDate: '2023-11-22'
+    liveMaxSaleDate: '2023-05-22'
+    serviceLastEdit: '2023-11-22'
+  notes: []

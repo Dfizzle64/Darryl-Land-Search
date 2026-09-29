@@ -1,0 +1,54 @@
+{
+  "name": "Lawrence",
+  "fips": "47099",
+  "state": "Tennessee",
+  "markets": [
+    "Nashville"
+  ],
+  "featureCount": 7697,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "tn-oir-public-use-47099",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+  "gaps": [
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Sale date, sale price, and appraisal are joined from the card sales-value layer (https://services9.arcgis.com/5SWQTB2G8AH9RQYE/arcgis/rest/services/Parcels/FeatureServer/0/query) on GISLINK and labeled 2025 when a value is present. A GISLINK with no match is left without sale or value. The 2023 TN_County_Parcel_Map sibling is not the sale source. Owner phone and email are not ingested.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used.",
+    "No usable zoning polygon layer is on the research card. A non-blank ZONING value on the sales layer is kept. Future land use stays empty."
+  ],
+  "path": "data/fixtures/market-parcels/counties/47099/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47099/lookup.json",
+  "sourceCount": 25786,
+  "dropped": 0,
+  "tileCount": 6,
+  "ingest": {
+    "sourceRows": 25786,
+    "deedAcresInBand": 6540,
+    "droppedGeometry": 0,
+    "droppedOutsideBand": 18087,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 2,
+    "tncpmLayer": null,
+    "tncpmMatched": 0,
+    "saleCount": 3164,
+    "appraisalCount": 7507,
+    "gislinkMatchRate": 0.9877,
+    "cardSalesMatched": 7602,
+    "assessedCount": 0,
+    "cardMailCount": 7599,
+    "cardZoningCount": 81,
+    "salesVintage": "2025",
+    "kept": 7697,
+    "ownerCount": 7693,
+    "tpadCount": 7697,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
+}

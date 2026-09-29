@@ -495,8 +495,15 @@ def oir_gaps(row: dict) -> list[str]:
         notes[1] = (
             "Sevier sale date, sale price, appraisal, assessed value, and mailing are joined from the Sevierville countywide CAMA (GIS_Department_Layers MapServer/57) on GISLINK. That CAMA is labeled 2025. The 2023 TN_County_Parcel_Map layer is not the sale source. Owner and geometry stay on the 2026 OIR layer. An unmatched GISLINK is left without sale or value."
         )
+    if row.get("salesGap"):
+        notes[1] = (
+            "Sale date, sale price, and appraisal stay empty. "
+            "The card's sales-value source is a gap: TN_County_Parcel_Map does not publish this county, "
+            "and the only bulk CAMA is IMPACT, which returns HTTP 403 from this network. "
+            "The TPAD link is stored and not requested. Owner phone and email are not ingested."
+        )
     sales_url = ((row.get("salesJoin") or {}).get("url")) or ""
-    if row.get("tncpmLayer") is None and sales_url and "tn_county_parcel_map" not in sales_url.lower():
+    if row.get("tncpmLayer") is None and sales_url and "tn_county_parcel_map" not in sales_url.lower() and not row.get("salesGap"):
         notes[1] = (
             f"Sale date, sale price, and appraisal are joined from the card sales-value layer ({sales_url}) on GISLINK and labeled {vintage} when a value is present. "
             "A GISLINK with no match is left without sale or value. The 2023 TN_County_Parcel_Map sibling is not the sale source. Owner phone and email are not ingested."
@@ -1186,6 +1193,8 @@ def download_tn_oir(county: dict, markets: list[str], spec: dict) -> dict:
     join_stats = apply_card_details(features, row)
     gap_notes = list(join_stats.pop("gapNotes", []))
     stats = {**stats, **join_stats}
+    if "salesVintage" not in stats:
+        stats["salesVintage"] = row.get("salesVintage")
     rate = stats.get("gislinkMatchRate")
     if isinstance(rate, float) and rate < 0.9:
         gap_notes.append(

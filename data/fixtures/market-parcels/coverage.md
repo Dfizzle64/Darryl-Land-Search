@@ -9,7 +9,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Atlanta | primary | 93,811 | 17 | 0 | 18 |
 | Tampa | primary | 127,713 | 10 | 0 | 0 |
 | Charleston | primary | 86,151 | 14 | 0 | 1 |
-| Nashville | primary | 144,027 | 19 | 0 | 3 |
+| Nashville | primary | 169,243 | 25 | 0 | 3 |
 | Charlotte | primary | 112,019 | 13 | 0 | 2 |
 | Raleigh-Durham | primary | 151,530 | 17 | 0 | 0 |
 | South Florida | shelf | 41,693 | 3 | 1 | 0 |
@@ -21,14 +21,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Pensacola | other | 66,437 | 7 | 0 | 0 |
 | Birmingham | other | 94,992 | 8 | 0 | 3 |
 | Mobile | other | 51,658 | 4 | 0 | 2 |
-| Huntsville | other | 102,965 | 11 | 0 | 1 |
+| Huntsville | other | 108,448 | 12 | 0 | 1 |
 | Savannah | other | 19,987 | 5 | 0 | 3 |
 | Columbia | other | 49,244 | 5 | 1 | 7 |
 | Greenville | other | 48,073 | 5 | 0 | 4 |
-| Chattanooga | other | 30,999 | 6 | 0 | 6 |
-| Knoxville | other | 93,815 | 15 | 0 | 2 |
-| Memphis | other | 85,241 | 16 | 0 | 2 |
-| Jackson | other | 31,172 | 6 | 0 | 0 |
+| Chattanooga | other | 43,972 | 8 | 0 | 5 |
+| Knoxville | other | 130,277 | 22 | 0 | 2 |
+| Memphis | other | 95,916 | 19 | 0 | 1 |
+| Jackson | other | 35,353 | 7 | 0 | 0 |
 | Winston-Salem | other | 92,199 | 9 | 0 | 0 |
 | Wilmington | other | 47,320 | 6 | 0 | 0 |
 | Heartland | shelf | 21,163 | 4 | 1 | 0 |
@@ -126,16 +126,21 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Bedford | Tennessee | 47003 | complete-gte-5ac | 6,686 | tn-oir-public-use-47003 |
 | Cannon | Tennessee | 47015 | complete-gte-5ac | 3,863 | tn-oir-public-use-47015 |
 | Cheatham | Tennessee | 47021 | complete-gte-5ac | 5,426 | apsu-cheatgis-47021 |
+| Clay | Tennessee | 47027 | complete-gte-5ac | 2,455 | tn-oir-public-use-47027 |
 | Coffee | Tennessee | 47031 | complete-gte-5ac | 5,715 | tn-oir-public-use-47031 |
 | Davidson | Tennessee | 47037 | complete-gte-5ac | 9,478 | tn-metro-davidson-parcels |
 | DeKalb | Tennessee | 47041 | complete-gte-5ac | 3,787 | tn-oir-public-use-47041 |
 | Dickson | Tennessee | 47043 | complete-gte-5ac | 8,477 | tn-oir-public-use-47043 |
 | Hickman | Tennessee | 47081 | complete-gte-5ac | 5,445 | tn-hickman-capturecama-202305 |
+| Humphreys | Tennessee | 47085 | complete-gte-5ac | 4,798 | tn-oir-public-use-47085 |
+| Jackson | Tennessee | 47087 | complete-gte-5ac | 3,604 | tn-oir-public-use-47087 |
+| Lawrence | Tennessee | 47099 | complete-gte-5ac | 7,697 | tn-oir-public-use-47099 |
 | Macon | Tennessee | 47111 | complete-gte-5ac | 5,064 | tn-oir-public-use-47111 |
 | Marshall | Tennessee | 47117 | gap | 0 | tn-impact-47117 |
 | Maury | Tennessee | 47119 | complete-gte-5ac | 9,033 | tn-columbia-agol-47119 |
 | Montgomery | Tennessee | 47125 | complete-gte-5ac | 7,038 | tn-mcgtn-cama-47125 |
 | Overton | Tennessee | 47133 | complete-gte-5ac | 5,557 | tn-oir-public-use-47133 |
+| Pickett | Tennessee | 47137 | complete-gte-5ac | 1,737 | tn-oir-public-use-47137 |
 | Putnam | Tennessee | 47141 | complete-gte-5ac | 6,089 | tn-oir-public-use-47141 |
 | Robertson | Tennessee | 47147 | complete-gte-5ac | 8,606 | tn-oir-public-use-47147 |
 | Rutherford | Tennessee | 47149 | complete-gte-5ac | 9,677 | tn-rutherford-agol-parcels |
@@ -143,6 +148,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Sumner | Tennessee | 47165 | complete-gte-5ac | 15,982 | tn-sumner-911-parcels-cama |
 | Trousdale | Tennessee | 47169 | gap | 0 | tn-impact-47169 |
 | Warren | Tennessee | 47177 | complete-gte-5ac | 6,578 | tn-oir-public-use-47177 |
+| Wayne | Tennessee | 47181 | complete-gte-5ac | 4,925 | tn-oir-public-use-47181 |
 | Williamson | Tennessee | 47187 | complete-gte-5ac | 10,760 | tn-williamson-datapull-47187 |
 | Wilson | Tennessee | 47189 | complete-gte-5ac | 10,766 | tn-oir-public-use-47189 |
 
@@ -297,6 +303,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Cherokee | Alabama | 01019 | complete-gte-5ac | 8,068 | al-cherokee-parcels-01019 |
 | Cullman | Alabama | 01043 | complete-gte-5ac | 14,885 | al-cullman-parcels-01043 |
 | DeKalb | Alabama | 01049 | complete-gte-5ac | 16,704 | al-dekalb-parcels-01049 |
+| Franklin | Tennessee | 47051 | complete-gte-5ac | 5,483 | tn-oir-public-use-47051 |
 | Franklin | Alabama | 01059 | complete-gte-5ac | 7,927 | al-franklin-parcels-01059 |
 | Jackson | Alabama | 01071 | complete-gte-5ac | 13,862 | al-jackson-parcels-01071 |
 | Lauderdale | Alabama | 01077 | complete-gte-5ac | 3,840 | al-lauderdale-parcels-01077 |
@@ -362,7 +369,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Dade | Georgia | 13083 | gap | 0 | unavailable |
 | Grundy | Tennessee | 47061 | complete-gte-5ac | 3,732 | tn-oir-public-use-47061 |
 | Hamilton | Tennessee | 47065 | complete-gte-5ac | 9,162 | tn-hamilton-live-parcels |
-| Marion | Tennessee | 47115 | gap | 0 | tn-impact-47115 |
+| Marion | Tennessee | 47115 | complete-gte-5ac | 4,903 | tn-oir-public-use-47115 |
+| McMinn | Tennessee | 47107 | complete-gte-5ac | 8,070 | tn-oir-public-use-47107 |
 | Meigs | Tennessee | 47121 | gap | 0 | tn-impact-47121 |
 | Rhea | Tennessee | 47143 | complete-gte-5ac | 3,977 | tn-oir-public-use-47143 |
 | Sequatchie | Tennessee | 47153 | complete-gte-5ac | 3,342 | tn-oir-public-use-47153 |
@@ -376,19 +384,26 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Anderson | Tennessee | 47001 | complete-gte-5ac | 4,310 | tn-oir-public-use-47001 |
 | Blount | Tennessee | 47009 | complete-gte-5ac | 8,183 | tn-blount-agol-47009 |
 | Campbell | Tennessee | 47013 | complete-gte-5ac | 3,613 | tn-oir-public-use-47013 |
+| Carter | Tennessee | 47019 | complete-gte-5ac | 4,589 | tn-oir-public-use-47019 |
 | Claiborne | Tennessee | 47025 | complete-gte-5ac | 5,456 | tn-oir-public-use-47025 |
 | Cocke | Tennessee | 47029 | complete-gte-5ac | 6,377 | tn-oir-public-use-47029 |
 | Cumberland | Tennessee | 47035 | complete-gte-5ac | 8,540 | tn-oir-public-use-47035 |
+| Fentress | Tennessee | 47049 | complete-gte-5ac | 5,166 | tn-oir-public-use-47049 |
 | Grainger | Tennessee | 47057 | complete-gte-5ac | 6,406 | tn-impact-47057 |
 | Greene | Tennessee | 47059 | complete-gte-5ac | 10,925 | tn-oir-public-use-47059 |
 | Hamblen | Tennessee | 47063 | complete-gte-5ac | 3,024 | tn-oir-public-use-47063 |
+| Hancock | Tennessee | 47067 | complete-gte-5ac | 3,058 | tn-oir-public-use-47067 |
+| Hawkins | Tennessee | 47073 | complete-gte-5ac | 8,287 | tn-oir-public-use-47073 |
 | Jefferson | Tennessee | 47089 | complete-gte-5ac | 6,586 | tn-impact-47089 |
+| Johnson | Tennessee | 47091 | complete-gte-5ac | 3,886 | tn-oir-public-use-47091 |
 | Knox | Tennessee | 47093 | complete-gte-5ac | 4,569 | kgis-parcel-search |
 | Loudon | Tennessee | 47105 | gap | 0 | tn-impact-47105 |
 | Monroe | Tennessee | 47123 | complete-gte-5ac | 7,395 | tn-oir-public-use-47123 |
 | Morgan | Tennessee | 47129 | complete-gte-5ac | 5,113 | tn-oir-public-use-47129 |
 | Roane | Tennessee | 47145 | complete-gte-5ac | 5,731 | tn-oir-public-use-47145 |
+| Scott | Tennessee | 47151 | complete-gte-5ac | 4,340 | tn-oir-public-use-47151 |
 | Sevier | Tennessee | 47155 | complete-gte-5ac | 7,587 | tn-oir-public-use-47155 |
+| Sullivan | Tennessee | 47163 | complete-gte-5ac | 7,136 | tn-oir-public-use-47163 |
 | Union | Tennessee | 47173 | gap | 0 | tn-impact-47173 |
 
 ### Memphis
@@ -405,19 +420,22 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Haywood | Tennessee | 47075 | complete-gte-5ac | 3,168 | tn-oir-public-use-47075 |
 | Henderson | Tennessee | 47077 | complete-gte-5ac | 5,413 | tn-oir-public-use-47077 |
 | Henry | Tennessee | 47079 | complete-gte-5ac | 6,064 | tn-oir-public-use-47079 |
+| Lake | Tennessee | 47095 | complete-gte-5ac | 721 | tn-oir-public-use-47095 |
 | Lauderdale | Tennessee | 47097 | complete-gte-5ac | 3,256 | tn-oir-public-use-47097 |
 | Marshall | Mississippi | 28093 | complete-gte-5ac | 7,984 | ms-mdeq-2023-28093 |
 | McNairy | Tennessee | 47109 | complete-gte-5ac | 6,291 | tn-oir-public-use-47109 |
 | Mississippi | Arkansas | 05093 | complete-gte-5ac | 6,585 | ar-cadastre-05093 |
+| Obion | Tennessee | 47131 | complete-gte-5ac | 4,424 | tn-oir-public-use-47131 |
 | Shelby | Tennessee | 47157 | complete-gte-5ac | 9,667 | tn-shelby-current-parcels |
 | Tate | Mississippi | 28137 | complete-gte-5ac | 5,758 | ms-mdeq-2023-28137 |
-| Tipton | Tennessee | 47167 | gap | 0 | tn-impact-47167 |
+| Tipton | Tennessee | 47167 | complete-gte-5ac | 5,530 | tn-oir-public-use-47167 |
 | Tunica | Mississippi | 28143 | complete-gte-5ac | 1,842 | ms-mdeq-2023-28143 |
 
 ### Jackson
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Benton | Tennessee | 47005 | complete-gte-5ac | 4,181 | tn-oir-public-use-47005 |
 | Carroll | Tennessee | 47017 | complete-gte-5ac | 6,160 | tn-oir-public-use-47017 |
 | Chester | Tennessee | 47023 | complete-gte-5ac | 3,333 | tn-chester-capturecama-parcels12 |
 | Decatur | Tennessee | 47039 | complete-gte-5ac | 3,472 | tn-oir-public-use-47039 |

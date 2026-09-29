@@ -84,7 +84,26 @@ class TnOirParcelTests(unittest.TestCase):
         self.assertIn("Tennessee_Property_Boundaries_Public_Use", macon["queryUrl"])
         self.assertEqual(BY_FIPS["47081"]["mode"], "hickman")
         self.assertEqual(BY_FIPS["47023"]["mode"], "chester")
-        self.assertEqual(len(BY_FIPS), 20)
+        self.assertEqual(len(BY_FIPS), 60)
+        fentress = BY_FIPS["47049"]
+        self.assertTrue(fentress["salesGap"])
+        self.assertIsNone(fentress["salesVintage"])
+        self.assertIsNone(fentress["tncpmLayer"])
+        self.assertNotIn("salesJoin", fentress)
+        lawrence = BY_FIPS["47099"]
+        self.assertEqual(lawrence["salesVintage"], "2025")
+        self.assertIsNone(lawrence["tncpmLayer"])
+        self.assertIn("5SWQTB2G8AH9RQYE", lawrence["salesJoin"]["url"])
+        self.assertTrue(lawrence["stampSalesZoning"])
+        self.assertEqual(lawrence["zoningLayers"], [])
+        self.assertEqual(BY_FIPS["47163"]["zoningLayers"][0]["idField"], "GISLINK")
+        self.assertEqual(BY_FIPS["47163"]["zoningLayers"][0]["codeField"], "Zoning")
+        self.assertEqual(BY_FIPS["47167"]["salesVintage"], "2026")
+        self.assertEqual(BY_FIPS["47167"]["zoningLayers"][0]["codeField"], "ZONING")
+        self.assertEqual(BY_FIPS["47167"]["zoningLayers"][1]["codeField"], "Con_Zone")
+        self.assertEqual(len(BY_FIPS["47115"]["zoningLayers"]), 5)
+        self.assertEqual(len(BY_FIPS["47107"]["zoningLayers"]), 3)
+        self.assertEqual(BY_FIPS["47107"]["salesVintage"], "2025")
 
     def test_cards_match_published_endpoints_and_ignore_layer_order(self) -> None:
         overlay = {

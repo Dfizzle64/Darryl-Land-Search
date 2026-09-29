@@ -31,7 +31,7 @@ describe("Wave 0 South Florida registration", () => {
     expect(parcelIdLabel("12011")).toBe("Folio");
     expect(parcelIdLabel("12087")).toBe("RE Number");
     const miami = parcelAppraiserUrl({ parcelId: "30-4131-053-0060", countyFips: "12086" });
-    expect(miami.href).toBe("https://apps.miamidadepa.gov/ComparableSales/#/?folio=3041310530060");
+    expect(miami.href).toBe("https://apps.miamidadepa.gov/PropertySearch/#/?folio=3041310530060");
     expect(miami.href).not.toContain("papa");
     const monroe = southFloridaAppraiserLink("12087", "00000010-000200", null);
     expect(monroe?.href).toContain("AppID=605");

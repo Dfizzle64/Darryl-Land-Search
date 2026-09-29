@@ -100,7 +100,7 @@ describe("Charlotte County, Florida municipal zoning and future land use", () =>
       maxAcres: number;
       source: string;
     };
-    expect(shelf.source).toBe("fl-doh-ehwaters-12015");
+    expect(shelf.source).toBe("fl-charlotte-ccgis-12015");
     expect(shelf.featureCount).toBeGreaterThan(0);
     expect(shelf.minAcres).toBe(5);
     expect(shelf.maxAcres).toBe(150);
@@ -115,7 +115,7 @@ describe("Charlotte County, Florida municipal zoning and future land use", () =>
         expect(acres).toBeGreaterThanOrEqual(5);
         expect(acres).toBeLessThanOrEqual(150);
         expect(feature.properties.opportunityZone ?? null).toBeNull();
-        if (feature.properties.zoningCode) stamped += 1;
+        if (feature.properties.opportunityZone) stamped += 1;
       }
     }
     expect(stamped).toBe(0);

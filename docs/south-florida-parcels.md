@@ -11,7 +11,7 @@ Wave 0 is South Florida only: Miami-Dade, Monroe, Broward, and Palm Beach. Acrea
 
 ## Property appraiser links
 
-- Miami-Dade: `https://apps.miamidadepa.gov/ComparableSales/#/?folio={FOLIO}` (13 digits, no dashes). Last sale is not on the parcel layer.
+- Miami-Dade: `https://apps.miamidadepa.gov/PropertySearch/#/?folio={FOLIO}` (13 digits, no dashes). Last sale is not on the parcel layer.
 - Monroe: `https://qpublic.schneidercorp.com/Application.aspx?AppID=605&LayerID=9946&PageTypeID=4&PageID=7635&KeyValue={RECHAR}`
 - Broward: `https://bcpa.net/RecInfo.asp?URL_Folio={FOLIO}`
 - Palm Beach: `https://pbcpao.gov/Property/Details?parcelId={PARID}`. The legacy `pbcgov.org/papa` detail URL is not used.

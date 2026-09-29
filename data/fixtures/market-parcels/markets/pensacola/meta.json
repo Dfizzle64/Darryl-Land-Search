@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T00:00:42Z",
+  "generatedAt": "2026-09-29T03:45:27Z",
   "market": "Pensacola",
   "tier": "other",
-  "parcelCount": 66437,
+  "parcelCount": 73565,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -79,13 +79,10 @@
       "source": "fl-panhandle-12033",
       "queryUrl": "https://gismaps.myescambia.com/arcgis/rest/services/Individual_Layers/parcels/MapServer/0/query",
       "gaps": [
-        "Joined zoning on 8487 of 9240 parcels and FLU on 8487. Owner 9240, situs 8879, sale price 0, sale date 0.",
-        "No lastSale price or date on Individual_Layers/parcels. SOHYEAR is not a sale date and is not stored.",
-        "Pensacola city Planning/Zoning (https://gis.cityofpensacola.com/arcgis/rest/services/Planning/Zoning/MapServer) probe returned HTTP 523. City parcels keep Escambia Accela zoning (AccelaMain/20, field ZONING) and FLU 2030 (AccelaMain/22, field FLU_LABEL) until the city REST recovers. Pensacola CITYCD B/Z parcels in this extract: 329. No separate Pensacola FLU layer was verified.",
-        "Century (CITYCD F) has no public zoning/FLU FeatureServer. County Accela is used. Century parcels in this extract: 67.",
-        "Assessed value is CURRASDLAND + CURRASDBLDG + CURRASDXF. CAPPEDVALUE is not stored as the assessed total.",
-        "Appraiser URL is the parcel LINK field when present (escpa.org cama detail).",
-        "Not inventoried this pass: Leon (12073), Gulf (12045), Franklin (12037), Jackson (12063), Holmes (12059), Washington (12133), Calhoun (12013), Gadsden (12039), Jefferson (12065), Wakulla (12129), Liberty (12077)."
+        "Escambia parcels are Individual_Layers/parcels/MapServer/0. Acreage is LANDSIZE, 5.0\u2013150.0 inclusive. The parcel id is REFERENCE.",
+        "Where CONFCD='Y', OWNER and every MAIL* field are dropped and the site address is treated as sensitive. Owner phone and email are not ingested.",
+        "FDOR joins need CO_NO=27 and REFERENCE exactly. REFNUM with dashes does not match. Sale price and taxable value come from that FDOR row. No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 9240 parcel ids that still match."
       ],
       "path": "data/fixtures/market-parcels/counties/12033/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12033/lookup.json",
@@ -194,6 +191,27 @@
       "lookup": "data/fixtures/market-parcels/counties/12131/lookup.json",
       "tileCount": 8,
       "sourceCount": 9623
+    },
+    {
+      "name": "Washington",
+      "fips": "12133",
+      "state": "Florida",
+      "featureCount": 7128,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "fl-washington-agol-12133",
+      "queryUrl": "https://services2.arcgis.com/xDFo56nFuq1SBnBw/arcgis/rest/services/WashingtonParcelsAGOL/FeatureServer/0/query",
+      "gaps": [
+        "7133 rows matched the acreage filter; 7128 kept after the parcel-id and geometry checks.",
+        "Washington parcels are WashingtonParcelsAGOL/FeatureServer/0. Acreage is CALC_ACRES, 5.0\u2013150.0 inclusive. Washington_2024_DOR_Parcels is an unofficial personal re-host and is not queried.",
+        "FDOR joins need CO_NO=77 and PARCELNO exactly. Owner, tax, and the roll sale come from that FDOR row. The property-appraiser pattern is stored and was not health-checked. MIL1 2023 is not the polygon source. No Opportunity Zone status is stored."
+      ],
+      "path": "data/fixtures/market-parcels/counties/12133/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/12133/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 7133
     }
   ]
 }

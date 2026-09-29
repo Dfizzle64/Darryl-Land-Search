@@ -13,16 +13,17 @@
   "source": "fl-baker-parcels-web2-12003",
   "queryUrl": "https://services6.arcgis.com/HSWu3dhzHf7nZfIa/arcgis/rest/services/parcels_web2/FeatureServer/0/query",
   "gaps": [
-    "Baker 2024_sales requires a token and was not joined.",
-    "Tax values on parcels_web2 use unlabeled cama0827 columns and were not mapped.",
-    "Macclenny and Glen St. Mary have no separate public zoning service. County zoning and FLU are applied countywide.",
-    "Zoning joined on 3312 of 3314 parcels.",
-    "FLU joined on 3301 of 3314 parcels.",
-    "Sales joined on 238 of 3314 parcels from the public year sales layers."
+    "3331 rows matched the acreage filter; 3314 kept after the parcel-id and geometry checks.",
+    "Baker parcels are parcels_web2/FeatureServer/0. Acreage is GIS_Acreag, 5.0–150.0 inclusive. MIL1 2023 is not the polygon source.",
+    "FDOR joins need CO_NO=12 and PIN with '-' removed. The property-appraiser link uses that undashed id. No Opportunity Zone status is stored.",
+    "Zoning or future land use carried forward for 3314 parcel ids that still match."
   ],
   "path": "data/fixtures/market-parcels/counties/12003/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12003/lookup.json",
   "sourceCount": 3331,
   "dropped": 5,
-  "tileCount": 6
+  "tileCount": 6,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://bakerpa.com/propertydetails.php?parcel={id}",
+  "gisViewerUrl": "https://bakerpa.com/map2/"
 }

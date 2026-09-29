@@ -183,7 +183,7 @@ export function parcelAppraiserUrl(options: {
   if (fips === "12097") {
     const stored = options.appraiserUrl;
     return {
-      href: stored && stored.includes("Pin=") ? stored : osceolaParcelUrl(options.parcelId),
+      href: stored && /[?&]pin=/i.test(stored) ? stored : osceolaParcelUrl(options.parcelId),
       label: "Open Osceola Property Appraiser map",
     };
   }

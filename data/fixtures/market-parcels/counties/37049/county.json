@@ -1,0 +1,28 @@
+{
+  "name": "Craven",
+  "fips": "37049",
+  "state": "North Carolina",
+  "markets": [
+    "Wilmington"
+  ],
+  "featureCount": 5945,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-craven-parcels-37049",
+  "queryUrl": "https://gis.cravencountync.gov/arcgis/rest/services/JustParcels/MapServer/0/query",
+  "gaps": [
+    "Parcels are JustParcels Parcels (PRIMARY county ArcGIS CAMA + sale price) (https://gis.cravencountync.gov/arcgis/rest/services/JustParcels/MapServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 345 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37049/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37049/lookup.json",
+  "sourceCount": 5945,
+  "dropped": 0,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/craven/parcel-detail/{PID}",
+  "gisViewerUrl": "https://gis.cravencountync.gov/maps/default.aspx"
+}

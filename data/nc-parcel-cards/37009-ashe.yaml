@@ -1,0 +1,238 @@
+state: NC
+jurisdiction: Ashe County
+fips: '37009'
+level: county
+markets:
+- Boone
+- Asheville
+slug: ashe
+cntyfips: '009'
+municipalities:
+- name: Jefferson
+  role: county seat; city-first zoning
+  incorporated: true
+  localGis: false
+  zoningPrefer: AsheED_Zoning/FeatureServer/0 Zoning_Lab
+  zoningUrl: https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/AsheED_Zoning/FeatureServer/0
+  zoningCount: 6
+  zoneCodes: [D-B, H-B, M-1, R-A10, R-A15, R-A8]
+  cityLimitsUrl: https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/25
+  cityLimitsParcelCount: 907
+  notes: Official district polygons via HCCOG AsheED_Zoning; town zoning ordinance PDF on townofjefferson.org
+- name: West Jefferson
+  role: city-first zoning + ETJ
+  incorporated: true
+  localGis: false
+  zoningPrefer: AsheED_Zoning/1 town limits + /2 ETJ; WJZon secondary
+  zoningUrls:
+  - https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/AsheED_Zoning/FeatureServer/1
+  - https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/AsheED_Zoning/FeatureServer/2
+  zoningCounts:
+    townLimits: 250
+    etj: 1970
+  alternateZoningUrl: https://services1.arcgis.com/Wz3RgwtkgJCGuhMd/arcgis/rest/services/WJZon/FeatureServer/0
+  cityLimitsUrl: https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/27
+  cityLimitsParcelCount: 1257
+  etjBoundaryUrl: https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/28
+  notes: Primary commercial center; ETJ zoned on AsheED_Zoning/2
+- name: Lansing
+  role: incorporated; zoning REST gap
+  incorporated: true
+  localGis: false
+  zoningPrefer: null
+  cityLimitsUrl: https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/26
+  cityLimitsParcelCount: 141
+  townLimitsUrl: https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Lansing_Town_Limits/FeatureServer/0
+  notes: Town limits only — no public zoning FeatureServer found
+layers:
+- role: parcels
+  name: OpenData TaxParcel (PRIMARY CAMA)
+  restUrl: https://gis.ashecountygov.com/arcgis/rest/services/OpenData/TaxParcel/MapServer/0
+  layerId: 0
+  geometry: polygon
+  auth: none
+  acreageField: TotalCalculatedAcres
+  coverage: county-wide
+  fieldMap:
+    ParcelNumber: parcelId
+    GPIN: parcelIdAlt
+    TotalCalculatedAcres: acreage
+    LegalLandUnits: acreage
+    Name1: ownerName
+    Address1: mailingAddress
+    Address2: mailingAddress
+    Address3: mailingAddress
+    City: mailingAddress
+    State: mailingAddress
+    ZipCode: mailingAddress
+    ParcelPropertyAddress: situsAddress
+    SalePrice: lastSale.price
+    SaleYear: lastSale.date
+    DeedDate: lastSale.date
+    TotalMarketValue: tax.marketValue
+    TotalAssessedValue: tax.assessedValue
+    ParcelLandValue: tax.landValue
+    ParcelBuildingValue: tax.improvementValue
+    ParcelObxfValue: tax.otherValue
+    ParcelDeferredValue: tax.deferredValue
+    DeedBook: other
+    DeedPage: other
+  notes: PRIMARY wire-first. MaxRecordCount 30000. CRS 102719/2264. Sample 012090918722 / GPIN 01365293 centroid ≈ -81.38, 36.48 (Ashe). Counts total 38839; acres 5–150 → 9061; SalePrice>0 → 18077 (in-range 3505); TotalMarketValue>0 → 38420.
+  status: usable
+  primary: true
+  alternateUrls:
+  - https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/16
+  - https://gis.ashecountygov.com/arcgis/rest/services/Parcels/MapServer/0
+- role: parcels
+  name: Web_Map_2026 Parcels (viewer twin)
+  restUrl: https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/16
+  layerId: 16
+  geometry: polygon
+  auth: none
+  acreageField: LegalLandUnits
+  coverage: county-wide
+  fieldMap:
+    ParcelNumber: parcelId
+    GPIN: parcelIdAlt
+    LegalLandUnits: acreage
+    Name1: ownerName
+    ParcelPropertyAddress: situsAddress
+    SalePrice: lastSale.price
+    SaleYear: lastSale.date
+    TotalMarketValue: tax.marketValue
+    TotalAssessedValue: tax.assessedValue
+  notes: Viewer operational layer. No TotalCalculatedAcres on schema — prefer OpenData. Count 38842.
+  status: usable
+- role: sales
+  name: Parcels rp_sale table
+  restUrl: https://gis.ashecountygov.com/arcgis/rest/services/Parcels/MapServer/1
+  layerId: 1
+  geometry: none
+  auth: none
+  coverage: county-wide
+  fieldMap:
+    ParcelNumber: parcelId
+    SalePrice: lastSale.price
+    DeedDate: lastSale.date
+    DeedDateRaw: lastSale.date
+    SaleYear: lastSale.date
+    QualifiedCode: lastSale.qualified
+    IsQualified: lastSale.qualified
+  notes: Multi-sale history. SalePrice>0 → 31083. Also on Web_Map_2026/37.
+  status: usable
+- role: parcels
+  name: NC OneMap Parcels (polys)
+  restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: gisacres
+  coverage: county-wide
+  filter: cntyfips='009'
+  fieldMap:
+    parno: parcelId
+    altparno: parcelIdAlt
+    ownname: ownerName
+    mailadd: mailingAddress
+    siteadd: situsAddress
+    gisacres: acreage
+    parval: tax.marketValue
+    landval: tax.landValue
+    improvval: tax.improvementValue
+    saledatetx: lastSale.date
+  notes: Count 38836; gisacres 5–150 → 8996; saledate null; no sale price. Prefer county TaxParcel.
+  status: partial
+  alternateUrls:
+  - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+- role: zoning
+  name: AsheED_Zoning — Town of Jefferson
+  restUrl: https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/AsheED_Zoning/FeatureServer/0
+  layerId: 0
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  fieldMap:
+    Zoning_Lab: zoning
+    Zone_Descr: zoning
+  notes: Cities-first. 6 district polys. Codes D-B/H-B/M-1/R-A10/R-A15/R-A8.
+  status: usable
+- role: zoning
+  name: AsheED_Zoning — West Jefferson Town Limits
+  restUrl: https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/AsheED_Zoning/FeatureServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  fieldMap:
+    Zone_Code: zoning
+    Zone_Descr: zoning
+  notes: Cities-first. 250 polys. Codes C-S/H-C/M-1/M-1 C/M-H/N-S/R-15/R-7/R-A.
+  status: usable
+- role: zoning
+  name: AsheED_Zoning — West Jefferson ETJ
+  restUrl: https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/AsheED_Zoning/FeatureServer/2
+  layerId: 2
+  geometry: polygon
+  auth: none
+  coverage: etj
+  fieldMap:
+    ZoneCode: zoning
+    Zone: zoning
+  notes: Cities-first ETJ. 1970 polys.
+  status: usable
+- role: zoning
+  name: WJZon (West Jefferson alternate)
+  restUrl: https://services1.arcgis.com/Wz3RgwtkgJCGuhMd/arcgis/rest/services/WJZon/FeatureServer/0
+  layerId: 0
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  fieldMap:
+    ZONING: zoning
+    ZONE_DESC: zoning
+    TAXPIN: parcelId
+  notes: Parcel-attributed mirror (2208). Prefer AsheED_Zoning polygons.
+  status: partial
+- role: other
+  name: Web_Map_2026 CityLimits (muni routing)
+  restUrl: https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/25
+  geometry: polygon
+  auth: none
+  coverage: municipal
+  fieldMap:
+    ParcelID: parcelId
+    CityCode: other
+    CityDescri: other
+  notes: '25 Jefferson 907; 26 Lansing 141; 27 West Jefferson 1257 (parcel-clipped); 28 WJ ETJ 36 boundary.'
+  status: usable
+  alternateUrls:
+  - https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/26
+  - https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/27
+  - https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/28
+- role: flu
+  name: Ashe County Comprehensive Plan 2022 (PDF)
+  restUrl: null
+  geometry: none
+  auth: none
+  coverage: county-wide
+  documentUrl: https://nmcdn.io/e186d21f8c7946a19faed23c3da2f0da/9daed2ecce2a4df2845caa12db947e3d/files/Ashe-County-Comprehensive-Plan-2022_Final.pdf
+  notes: No public FLU FeatureServer. Unincorporated land use is ordinance-based, not cadastral zoning.
+  status: gap
+gaps:
+- FLU REST gap — Comp Plan 2022 PDF only; no county FLU FeatureServer
+- Unincorporated Ashe has no countywide zoning REST (ordinance-based land-use only); cities-first Jefferson/WJ (+ WJ ETJ)
+- Lansing zoning REST gap — town limits only
+- OneMap saledate empty for cntyfips='009'; no sale price on OneMap — use TaxParcel SalePrice
+- Web_Map_2026/16 lacks TotalCalculatedAcres — prefer OpenData TaxParcel
+- County website HTML (ashecountygov.com) often 403 from datacenter egress — REST + maps + AppraisalCard verified live
+- Utilities / AADT / emails / phones / paid vendors intentionally excluded
+license: Ashe County GIS / Tax Administration; Town of Jefferson; Town of West Jefferson; High Country COG (AsheED_Zoning). Not survey quality. Commercial resale subject to NCGS 132-10.
+appraiserSearchUrl: https://gis.ashecountygov.com/ITSPublic/AppraisalCard.aspx?id={ParcelNumber}
+jurisdictionGisUrl: https://gis.ashecountygov.com/maps/
+gisDeepLinkTemplate: https://gis.ashecountygov.com/maps/?pin={ParcelNumber}
+ncptsDeepLinkTemplate: https://lrcpwa.ncptscloud.com/ashe/parcel-detail/{ParcelNumber}
+oneMapFilter: cntyfips='009'
+verifiedAt: '2026-09-24'
+verifiedBy: North Carolina Public Info Researcher
+verifiedLayerCount: 12
+tranche: 3

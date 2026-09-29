@@ -1,0 +1,747 @@
+{
+  "county": "Iredell",
+  "state": "NC",
+  "msa": "Charlotte MSA",
+  "fips": "37097",
+  "cntyfips": "097",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "viewerLinkTemplate": "https://iredellcountync.mapgeo.io/datasets/properties?query={PIN}",
+  "appraiserSearchUrl": "https://taxweb.iredellcountync.gov/PublicAccess/BasicSearch.aspx",
+  "joinKeys": [
+    "PIN",
+    "ACCOUNT",
+    "parno"
+  ],
+  "joinNotes": {
+    "parcels": "County TaxSQL_Parcels are county-wide (incorporated + unincorporated).",
+    "zoningFlu": "Municipal zoning/FLU are city-only polygons; spatial-join to county parcels in WKID 102719/2264. Prefer Mooresville town host over county mirror.",
+    "pinNormalize": "REST PIN often ends with .000 — strip for MapGeo/taxweb search.",
+    "cityLimits": "https://maps.iredellcountync.gov/server/rest/services/Data/CityLimits/FeatureServer/0 field NAME"
+  },
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "ACCOUNT",
+        "parno"
+      ],
+      "bestLayer": "TaxSQL_Parcels"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "TaxSQL_Parcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "TaxAcres",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 10768,
+      "bestLayer": "TaxSQL_Parcels"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Jan1Own1+Jan1Own2",
+        "Name",
+        "ownname"
+      ],
+      "bestLayer": "TaxSQL_Parcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "ADD1",
+        "ADD2",
+        "ADD3",
+        "CITY",
+        "STATE",
+        "ZIP",
+        "mailadd"
+      ],
+      "bestLayer": "TaxSQL_Parcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "HouseNumber",
+        "SDIR",
+        "STREET",
+        "STYPE",
+        "ST_SUFFIX",
+        "CityLocationDescription",
+        "siteadd"
+      ],
+      "bestLayer": "TaxSQL_Parcels",
+      "caveat": "No dedicated situs city/ZIP; mailing CITY may be out-of-county"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "Sale_Date",
+        "Sales_Price",
+        "QualifiedCode",
+        "Sale_Is_Improved"
+      ],
+      "historyLayer": "Sales_2024",
+      "bestLayer": "TaxSQL_Parcels",
+      "caveat": "Last sale on parcels; Sales_2024 is single-year extract not multi-year history"
+    },
+    "taxValues": {
+      "present": true,
+      "fields": [
+        "Land_Value",
+        "Bldg_Value",
+        "OBXF_Value",
+        "Total_Value",
+        "landval",
+        "improvval",
+        "parval"
+      ],
+      "bestLayer": "TaxSQL_Parcels",
+      "caveat": "Market field is adjustment factor not dollar market value; tax.marketValue unknown"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "Zoning",
+        "ZONING",
+        "ZDISPLAY",
+        "ZoningTax"
+      ],
+      "bestLayer": "Mooresville Town Zoning (city) / Data/Zoning layers 0-6",
+      "split": "Unincorporated vs Mooresville vs Statesville vs Troutman vs Harmony vs Love Valley vs Davidson"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "F2019_LU_1",
+        "FUTURE_LANDUSE"
+      ],
+      "bestLayer": "Mooresville FCLU inside Mooresville; Horizon Plan 2030 unincorporated",
+      "caveat": "Statesville/Troutman/Harmony/Love Valley/Davidson Iredell tip lack verified FLU REST"
+    },
+    "viewerLink": {
+      "present": true,
+      "template": "https://iredellcountync.mapgeo.io/datasets/properties?query={PIN}",
+      "keyField": "PIN",
+      "appraiserSearchUrl": "https://taxweb.iredellcountync.gov/PublicAccess/BasicSearch.aspx"
+    }
+  },
+  "portals": [
+    {
+      "name": "Iredell County GIS Mapping",
+      "url": "https://iredellcountync.gov/554/GIS-Mapping",
+      "notes": "County GIS index"
+    },
+    {
+      "name": "MapGeo",
+      "url": "https://iredellcountync.mapgeo.io/",
+      "notes": "Interactive parcels/zoning; query={PIN}"
+    },
+    {
+      "name": "Tax Administration Property Access",
+      "url": "https://taxweb.iredellcountync.gov/PublicAccess/BasicSearch.aspx",
+      "notes": "Owner/PIN/address/sales search; PRC from results"
+    },
+    {
+      "name": "Real Estate Search",
+      "url": "https://taxweb.iredellcountync.gov/PublicAccess/RealEstate.aspx",
+      "notes": "Advanced real-estate criteria"
+    },
+    {
+      "name": "maps.iredellcountync.gov ArcGIS REST",
+      "url": "https://maps.iredellcountync.gov/server/rest/services",
+      "notes": "Primary county REST host"
+    },
+    {
+      "name": "Town of Mooresville GIS REST",
+      "url": "https://gis.mooresvillenc.gov/gisadmin/rest/services",
+      "notes": "First-class municipal zoning + FCLU"
+    },
+    {
+      "name": "NC OneMap",
+      "url": "https://www.nconemap.gov",
+      "notes": "Statewide parcels FeatureServer"
+    },
+    {
+      "name": "Statesville Planning",
+      "url": "https://www.statesvillenc.net/planning/",
+      "notes": "Points to county zoning map; LDP 2045 PDF FLU"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Mooresville",
+      "level": "city",
+      "independentGis": true,
+      "restRoot": "https://gis.mooresvillenc.gov/gisadmin/rest/services",
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "joinToCountyParcels": {
+        "method": "spatial",
+        "countyParcelUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/TaxSQL_Parcels/FeatureServer/0",
+        "joinKeyOptional": "PIN",
+        "crsMatch": true,
+        "note": "city-only zoning/FLU + county-wide parcels"
+      },
+      "layers": [
+        {
+          "purpose": [
+            "zoning"
+          ],
+          "name": "Town Zoning",
+          "id": 1,
+          "url": "https://gis.mooresvillenc.gov/gisadmin/rest/services/PlanningServices/MapServer/1",
+          "alternateUrls": [
+            "https://gis.mooresvillenc.gov/gisadmin/rest/services/ZoningMap/MooresvilleZoning/FeatureServer/3"
+          ],
+          "geometry": "esriGeometryPolygon",
+          "featureCount": 594,
+          "verified": true,
+          "fields": {
+            "ZDISPLAY": "Zoning display code",
+            "ZoningTax": "Zoning tax/CAMA code",
+            "CaseNumber": "Case number",
+            "ApprovalDate": "Approval date",
+            "OLDZONING": "Prior zoning"
+          },
+          "notes": "PRIMARY Mooresville zoning. Prefer over county Data/Zoning/3 mirror (~590)."
+        },
+        {
+          "purpose": [
+            "flu"
+          ],
+          "name": "FCLU / Future Character",
+          "id": 0,
+          "url": "https://gis.mooresvillenc.gov/gisadmin/rest/services/Planning/FCLU/FeatureServer/0",
+          "alternateUrls": [
+            "https://gis.mooresvillenc.gov/gisadmin/rest/services/PlanningServices/MapServer/25"
+          ],
+          "geometry": "esriGeometryPolygon",
+          "featureCount": 15,
+          "verified": true,
+          "fields": {
+            "F2019_LU_1": "Future character / land use code (FLU)"
+          },
+          "notes": "Observed codes: DTC DTE EMC FDCR IND MUC MUD MVIL NRES PRES RRES TR. Preferred FLU inside Mooresville."
+        },
+        {
+          "purpose": [
+            "flu"
+          ],
+          "name": "MooresvilleTomorrow Conservation and Development",
+          "id": 2,
+          "url": "https://gis.mooresvillenc.gov/gisadmin/rest/services/Planning/MooresvilleTomorrow/MapServer/2",
+          "geometry": "esriGeometryPolygon",
+          "featureCount": 14,
+          "verified": true,
+          "fields": {
+            "Name": "Plan character class"
+          },
+          "notes": "Secondary plan overlay; prefer FCLU for primary flu."
+        }
+      ],
+      "gaps": []
+    },
+    {
+      "name": "Statesville",
+      "level": "city",
+      "independentGis": false,
+      "restRoot": null,
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "joinToCountyParcels": {
+        "method": "spatial",
+        "countyParcelUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/TaxSQL_Parcels/FeatureServer/0",
+        "crsMatch": true,
+        "note": "city-only zoning + county parcels; no independent Statesville REST host verified"
+      },
+      "layers": [
+        {
+          "purpose": [
+            "zoning"
+          ],
+          "name": "Statesville Zoning",
+          "id": 1,
+          "url": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/1",
+          "geometry": "esriGeometryPolygon",
+          "featureCount": 363,
+          "verified": true,
+          "fields": {
+            "ZONING": "Zoning code",
+            "ZDISPLAY": "Zoning display",
+            "JURISDIC": "Jurisdiction",
+            "CUD": "Conditional use",
+            "PRD": "PRD"
+          },
+          "notes": "County-hosted but first-class Statesville zoning."
+        }
+      ],
+      "gaps": [
+        "No independent city GIS REST host verified",
+        "Land Development Plan 2045 FLU is PDF/plan docs only — no public FLU FeatureServer verified"
+      ]
+    },
+    {
+      "name": "Troutman",
+      "level": "city",
+      "independentGis": false,
+      "joinToCountyParcels": {
+        "method": "spatial",
+        "countyParcelUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/TaxSQL_Parcels/FeatureServer/0",
+        "crsMatch": true,
+        "note": "city-only zoning + county parcels"
+      },
+      "layers": [
+        {
+          "purpose": [
+            "zoning"
+          ],
+          "name": "Troutman Zoning",
+          "id": 2,
+          "url": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/2",
+          "geometry": "esriGeometryPolygon",
+          "featureCount": 200,
+          "verified": true,
+          "fields": {
+            "ZONING": "Zoning code",
+            "ZDISPLAY": "Zoning display",
+            "JURISDIC": "Jurisdiction"
+          },
+          "notes": "County-hosted first-class Troutman zoning."
+        }
+      ],
+      "gaps": [
+        "No independent town GIS REST; no town FLU REST (Horizon MPA stub only)"
+      ]
+    },
+    {
+      "name": "Harmony",
+      "level": "city",
+      "independentGis": false,
+      "joinToCountyParcels": {
+        "method": "spatial",
+        "countyParcelUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/TaxSQL_Parcels/FeatureServer/0",
+        "crsMatch": true,
+        "note": "city-only zoning + county parcels"
+      },
+      "layers": [
+        {
+          "purpose": [
+            "zoning"
+          ],
+          "name": "Harmony Zoning",
+          "id": 4,
+          "url": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/4",
+          "geometry": "esriGeometryPolygon",
+          "featureCount": 14,
+          "verified": true,
+          "fields": {
+            "ZONING": "Zoning code",
+            "ZDISPLAY": "Zoning display",
+            "JURISDIC": "Jurisdiction"
+          }
+        }
+      ],
+      "gaps": [
+        "No town FLU REST"
+      ]
+    },
+    {
+      "name": "Love Valley",
+      "level": "city",
+      "independentGis": false,
+      "joinToCountyParcels": {
+        "method": "spatial",
+        "countyParcelUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/TaxSQL_Parcels/FeatureServer/0",
+        "crsMatch": true,
+        "note": "city-only zoning + county parcels"
+      },
+      "layers": [
+        {
+          "purpose": [
+            "zoning"
+          ],
+          "name": "Love Valley Zoning",
+          "id": 5,
+          "url": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/5",
+          "geometry": "esriGeometryPolygon",
+          "featureCount": 3,
+          "verified": true,
+          "fields": {
+            "ZONING": "Zoning code",
+            "ZDISPLAY": "Zoning display",
+            "JURISDIC": "Jurisdiction"
+          }
+        }
+      ],
+      "gaps": [
+        "No town FLU REST"
+      ]
+    },
+    {
+      "name": "Davidson",
+      "level": "city",
+      "notes": "Straddles Mecklenburg + Iredell. Davidson GIS page points to Meck POLARIS and Iredell MapGeo.",
+      "independentGis": false,
+      "joinToCountyParcels": {
+        "method": "spatial",
+        "countyParcelUrl": "https://maps.iredellcountync.gov/server/rest/services/Data/TaxSQL_Parcels/FeatureServer/0",
+        "crsMatch": true,
+        "note": "Iredell tip only on county Zoning/6 (count 3). Mecklenburg munic=DAVIDSON zoning does not automatically apply to Iredell PINs."
+      },
+      "layers": [
+        {
+          "purpose": [
+            "zoning"
+          ],
+          "name": "Davidson Zoning (Iredell portion)",
+          "id": 6,
+          "url": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/6",
+          "geometry": "esriGeometryPolygon",
+          "featureCount": 3,
+          "verified": true,
+          "fields": {
+            "ZONING": "Zoning code",
+            "ZDISPLAY": "Zoning display",
+            "JURISDIC": "Jurisdiction"
+          },
+          "notes": "Tiny Iredell footprint."
+        },
+        {
+          "purpose": [
+            "zoning"
+          ],
+          "name": "Mecklenburg towns zoning (Davidson filter)",
+          "id": 0,
+          "url": "https://meckgis.mecklenburgcountync.gov/server/rest/services/UnincorporatedCountyandTownsZoning/MapServer/0",
+          "featureCountFilter": "munic='DAVIDSON'",
+          "featureCount": 76,
+          "verified": true,
+          "fields": {
+            "zone_des": "Zone / planning area",
+            "munic": "Municipality"
+          },
+          "notes": "Mostly Mecklenburg-side Davidson; use with Mecklenburg parcels for Meck side."
+        }
+      ],
+      "gaps": [
+        "No standalone Davidson FeatureServer",
+        "Iredell-side FLU REST not verified",
+        "Cross-county parcel/zoning join must be spatial-tested"
+      ]
+    }
+  ],
+  "layers": [
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales",
+        "zoning"
+      ],
+      "name": "TaxSQL_Parcels",
+      "id": 0,
+      "url": "https://maps.iredellcountync.gov/server/rest/services/Data/TaxSQL_Parcels/FeatureServer/0",
+      "alternateUrls": [
+        "https://maps.iredellcountync.gov/server/rest/services/Data/TaxSQL_Parcels/MapServer/0",
+        "https://icgis.co.iredell.nc.us/arcgis/rest/services/Data/TaxSQL_Parcels/FeatureServer/0"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 110201,
+      "verified": true,
+      "verifiedHow": "returnCountOnly; TaxAcres BETWEEN 5 AND 150 -> 10768; sample attrs",
+      "fields": {
+        "PIN": "Parcel ID (often ##########.###)",
+        "ACCOUNT": "Tax account",
+        "TaxAcres": "Tax acres",
+        "Jan1Own1": "Owner 1",
+        "Jan1Own2": "Owner 2",
+        "Name": "Owner display name",
+        "ADD1": "Mailing address 1",
+        "CITY": "Mailing city",
+        "STATE": "Mailing state",
+        "ZIP": "Mailing ZIP",
+        "HouseNumber": "Situs house number",
+        "STREET": "Situs street",
+        "STYPE": "Situs street type",
+        "Sale_Date": "Last sale date",
+        "Sales_Price": "Last sale price",
+        "QualifiedCode": "Sale qualification (Q=qualified)",
+        "Land_Value": "Assessed land value",
+        "Bldg_Value": "Assessed building value",
+        "Total_Value": "Total assessed value",
+        "Zoning": "Parcel-attributed zoning",
+        "Land_Use_Code": "Land use code",
+        "Market": "Market adjustment FACTOR — not market $"
+      },
+      "notes": "PRIMARY countywide parcels+CAMA. MaxRecordCount 2000 on maps host (icgis=1000). Prefer maps host."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Iredell Zoning (unincorporated)",
+      "id": 0,
+      "url": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 961,
+      "verified": true,
+      "fields": {
+        "ZONING": "Zoning",
+        "ZDISPLAY": "Display",
+        "JURISDIC": "Jurisdiction",
+        "CUD": "CUD",
+        "PRD": "PRD"
+      },
+      "notes": "Unincorporated county zoning only — not a substitute for municipal layers."
+    },
+    {
+      "purpose": [
+        "flu"
+      ],
+      "name": "Iredell Landuse Horizon Plan 2030",
+      "id": 7,
+      "url": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/7",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 219,
+      "verified": true,
+      "fields": {
+        "FUTURE_LANDUSE": "Future land use"
+      },
+      "notes": "Unincorporated FLU. Town MPA values are stubs — use Mooresville FCLU inside Mooresville."
+    },
+    {
+      "purpose": [
+        "sales"
+      ],
+      "name": "Sales 2024",
+      "id": 0,
+      "url": "https://maps.iredellcountync.gov/server/rest/services/Tax/Sales_2024/MapServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 6343,
+      "verified": true,
+      "fields": {
+        "PIN": "Join to TaxSQL_Parcels.PIN",
+        "Sale_Date": "Sale date",
+        "Sales_Price": "Sale price",
+        "QualifiedCode": "Qualification"
+      },
+      "notes": "Single-year extract; not multi-year history. Expect annual rename."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales"
+      ],
+      "name": "NC1Map_Parcels polys",
+      "id": 1,
+      "url": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 109254,
+      "featureCountFilter": "cntyfips='097'",
+      "verified": true,
+      "verifiedHow": "cntyfips=097 returnCountOnly + sample; 5-150 ac -> 10771",
+      "fields": {
+        "parno": "Parcel number",
+        "ownname": "Owner",
+        "mailadd": "Mailing",
+        "siteadd": "Situs",
+        "gisacres": "GIS acres",
+        "saledate": "Sale date",
+        "parval": "Parcel value",
+        "landval": "Land value",
+        "improvval": "Improvement value",
+        "cntyfips": "097=Iredell"
+      },
+      "notes": "Statewide fallback. Prefer TaxSQL_Parcels when up."
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "City Limits",
+      "id": 0,
+      "url": "https://maps.iredellcountync.gov/server/rest/services/Data/CityLimits/FeatureServer/0",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 6,
+      "verified": true,
+      "fields": {
+        "NAME": "City name",
+        "CODE": "Code",
+        "GISCAD": "Short code"
+      },
+      "notes": "Helper for city vs unincorporated filters: STATESVILLE MOORESVILLE TROUTMAN HARMONY LOVE VALLEY DAVIDSON"
+    }
+  ],
+  "gaps": [
+    "No multi-year sale history FeatureServer (last sale + Sales_2024 only).",
+    "Market field is adjustment factor not tax.marketValue dollars.",
+    "Situs city/ZIP incomplete on TaxSQL.",
+    "Municipal FLU: only Mooresville has verified public FCLU REST; Statesville LDP 2045 PDF-only; Troutman/Harmony/Love Valley/Davidson tip gap.",
+    "Statesville/Troutman/small towns lack independent GIS hosts (county-hosted town zoning still required).",
+    "Davidson straddles counties — Iredell Zoning/6 is tiny; Mecklenburg Davidson zoning not automatic for Iredell PINs.",
+    "No stable taxweb deep-link (form search); MapGeo ?query={PIN} practical viewer wire.",
+    "PIN trailing .000 normalization required for some joins.",
+    "MaxRecordCount 2000 (maps) / 1000 (legacy icgis) — paginate.",
+    "Owner phones/emails not in public REST (do not scrape)."
+  ],
+  "handOff": {
+    "wireFirst": "https://maps.iredellcountync.gov/server/rest/services/Data/TaxSQL_Parcels/FeatureServer/0",
+    "zoningUnincorporated": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/0",
+    "zoningMooresville": "https://gis.mooresvillenc.gov/gisadmin/rest/services/PlanningServices/MapServer/1",
+    "zoningStatesville": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/1",
+    "zoningTroutman": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/2",
+    "fluMooresville": "https://gis.mooresvillenc.gov/gisadmin/rest/services/Planning/FCLU/FeatureServer/0",
+    "fluUnincorporated": "https://maps.iredellcountync.gov/server/rest/services/Data/Zoning/MapServer/7",
+    "salesYearExtract": "https://maps.iredellcountync.gov/server/rest/services/Tax/Sales_2024/MapServer/0",
+    "fallback": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1?where=cntyfips='097'",
+    "auth": "none observed on listed public query endpoints",
+    "rateLimits": "MaxRecordCount 2000 on maps.iredellcountync.gov and Mooresville; OneMap 5000; paginate with resultOffset"
+  },
+  "verifiedAt": "2026-09-23",
+  "verifiedBy": "Grok Bot GIS researcher",
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://maps.iredellcountync.gov/server/rest/services/Data/TaxSQL_Parcels/FeatureServer/0",
+    "parcelIdField": "PIN",
+    "acreageFilter": "TaxAcres >= 5 AND TaxAcres <= 150",
+    "acres5to150Live": 10768,
+    "parcelCountLive": 110203,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='IREDELL'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27IREDELL%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27IREDELL%27&returnCountOnly=true&f=json",
+        "liveStationCount": 819,
+        "stationsWithAADT2022": 358
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Iredell'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Iredell%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Iredell%27&returnCountOnly=true&f=json",
+        "liveStationCount": 826,
+        "stationsWithAADT2025": 491,
+        "stationsWithAADT2024": 514,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "stations2024CountyFilter": "County='Iredell'",
+        "stations2024LiveCount": 826,
+        "stations2024WithAADT2024": 826,
+        "stations2024Note": "AADT_2024 string field populated on every station in this release",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "Total_Value",
+        "Land_Value"
+      ],
+      "liveNonZero": {
+        "Total_Value": 107802,
+        "Land_Value": 107712
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "Sales_Price"
+      ],
+      "dateFields": [
+        "Sale_Date"
+      ],
+      "livePriceNonZero": {
+        "Sales_Price": 83028
+      },
+      "liveDateNonNull": {
+        "Sale_Date": 107921
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Jan1Own1",
+        "Jan1Own2"
+      ],
+      "rule": "Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).",
+      "regex": "\\b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "regexExtended": "\\b(LLC|L\\s?L\\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\\b|\\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\\s+OF\\b|\\bOF\\s+(EDUCATION|TRANSPORTATION)\\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\\b",
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "liveEntityCount5to150ac": 2638,
+      "liveEntityCount5to150acExtended": 2921,
+      "countNote": "Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.",
+      "sampleMatches": [
+        "KELLY RAYMOND SCOTT REVOCABLE TRUST",
+        "MOUNTAIN VIEW METHODIST CHURCH",
+        "BELL FARM HOMEOWNERS ASSOCIATION INC",
+        "LACKEY FAMILY TRUST"
+      ]
+    },
+    "paDeepLink": {
+      "template": "https://iredellcountync.mapgeo.io/datasets/properties?query={PIN}",
+      "testedParcelId": "4851140068.000",
+      "testedUrl": "https://iredellcountync.mapgeo.io/datasets/properties?query=4851140068",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": false,
+      "note": "MapGeo SPA returns 200 shell; parcel resolves client-side (unverified). taxweb RealEstate.aspx?PIN= did not resolve the owner — no durable GET on PublicAccess."
+    },
+    "gisViewer": {
+      "url": "https://iredellcountync.mapgeo.io/",
+      "httpStatus": 200,
+      "pageTitle": "MapGeo"
+    },
+    "gaps": [
+      "No durable GET PA deep link — MapGeo SPA (?query={PIN}) unverified; taxweb PublicAccess requires search session",
+      "PIN trailing .000 normalization"
+    ]
+  }
+}

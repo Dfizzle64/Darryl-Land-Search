@@ -1,0 +1,30 @@
+{
+  "name": "Chowan",
+  "fips": "37041",
+  "state": "North Carolina",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "featureCount": 2130,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-chowan-parcels-37041",
+  "queryUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Chowan_Feature_Service/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are Chowan_Feature_Service Parcels_Polygon (PRIMARY county AGOL CAMA + SALE_PRICE) (https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Chowan_Feature_Service/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 2153 rows; 2130 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax scrubbed, sale ok). Pass 2 counted 170 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Pass 2 tax status is scrubbed. Scrubbed or missing tax values were not copied off the parcel layer.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37041/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37041/lookup.json",
+  "sourceCount": 2153,
+  "dropped": 0,
+  "tileCount": 3,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "http://taxonline.chowancountync.email/itspubliccw/AppraisalCard.aspx?id={PIN}",
+  "gisViewerUrl": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=dc1c3a48141744c1a123bcad4e5cef50"
+}

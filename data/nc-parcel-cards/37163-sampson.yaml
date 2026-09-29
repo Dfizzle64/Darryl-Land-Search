@@ -1,0 +1,309 @@
+state: NC
+jurisdiction: Sampson County
+fips: "37163"
+level: county
+markets: [Raleigh-Durham]
+
+layers:
+  - role: parcels
+    name: Parcels (PRIMARY)
+    restUrl: https://services3.arcgis.com/fM4kjZmPOS4ay2Ff/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      GEO_PIN: parcelIdGeo
+      GIS_APN: parcelIdApn
+      APN: parcelIdApnAlt
+      UNIQUE_ID: parcelIdUnique
+      CALC_ACRES: acreage
+      ACREAGE: acreageDeed
+      CURRENT_OW: ownerName
+      CURRENT_AD: mailingAddress.street
+      CURRENT_CI: mailingAddress.city
+      CURRENT_ST: mailingAddress.state
+      CURRENT_ZI: mailingAddress.zip
+      PARCEL_ADD: situsAddress
+      SALE_PRICE: lastSale.price
+      DATE_RECOR: lastSale.date
+      BK_PG: lastSale.deedBookPage
+      DEED: lastSale.deed
+      MB_PG: lastSale.platBookPage
+      ASSESSED_V: tax.assessedValue
+      TOTAL_TAX_: tax.taxableValue
+      LAND_TAX_D: tax.deferredLandValue
+      APPRAISED: tax.appraisedSegmentsText
+      PARCEL_CLA: landClass
+      USE_DESC: landUse
+      TAX_CODE: taxDistrictCode
+      TWP_CODE: township
+      LIVING_ARE: livingArea
+      YEAR_BUILT: yearBuilt
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 50665;
+      CALC_ACRES 5–150 → 14195; LIVING_ARE=0/null in range → 11515;
+      SALE_PRICE>0 in range → 5004; ASSESSED_V>0 → 49885; CURRENT_OW non-blank → 49889;
+      PARCEL_ADD non-blank → 49501. CRS 102719/2264. MaxRecordCount 2000 — paginate.
+      Rich CAMA on polygons: owner, mailing parts, situs PARCEL_ADD, assessed/total tax,
+      last sale price/date, deed/plat refs, living area / year built. Field names truncated
+      (10-char). APPRAISED often pipe-delimited segment text — prefer ASSESSED_V/TOTAL_TAX_.
+      TAX_CODE is fire/tax district (F06/F19/…), not municipality — route cities via
+      Municipal_Limits / Address_Points Inc_Muni. PIN joins OneMap parno (verified 14020913106).
+      Geo-check centroid ≈ -78.54475, 35.31163 (Plain View / Sampson).
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-24: cntyfips='163' count 50538; gisacres 5–150 → 14177;
+      improvval=0/null in range → 14177 (improvval sparse for Sampson extract).
+      scity blank. PIN↔parno verified. Fallback when AGOL flaky. MaxRecordCount 5000.
+      Alternate host services.gis.nc.gov. No sale price.
+    status: usable
+
+  - role: zoning
+    name: City of Clinton Zoning (PRIMARY city-first)
+    restUrl: https://services3.arcgis.com/fM4kjZmPOS4ay2Ff/arcgis/rest/services/City_of_Clinton_Zoning/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      LABEL_2: zoning
+      LABEL: zoningLabel
+      ZONING_LBL: zoningLabelLong
+    notes: >
+      PRIMARY Clinton zoning. Verified count 62. CRS 2264.
+      LABEL_2: RA-20 13, OI 12, R-8 11, NS 5, HC 5, I-1/R-15/R-6 3 each, CB/PC 2, PID/PRD/I-2 1.
+      Mirror: Clinton_Data/FeatureServer/0. No separate Clinton city GIS host —
+      county City_of_Clinton_Zoning IS the public city zoning REST.
+    status: usable
+
+  - role: zoning
+    name: Zoning (county / unincorporated + municipal stubs)
+    restUrl: https://services3.arcgis.com/fM4kjZmPOS4ay2Ff/arcgis/rest/services/Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      CLASS: zoning
+      ZONING_CLASS: zoningLabel
+      ZONING_TYPE: planningJurisdiction
+      Acres: acreage
+    notes: >
+      Verified count 412 (County 395 + Municipal 17). CRS 2264.
+      County CLASS: C 171, MRD 74, R 60, I 55, RA 23, CONDITIONAL COMMERCIAL 4, I-1 3,
+      AUTRYVILLE 4, I-40 ROW 1. Municipal stubs: CLINTON/ROSEBORO/GARLAND/SALEMBURG/
+      NEWTON GROVE/TURKEY/FAISON ETJ, HARRELLS, AUTRYVILLE — ETJ envelopes, NOT full
+      town zoning maps. Prefer City_of_Clinton_Zoning inside Clinton limits.
+    status: usable
+
+  - role: zoning
+    name: Zoning Overlays
+    restUrl: https://services3.arcgis.com/fM4kjZmPOS4ay2Ff/arcgis/rest/services/Zoning_Overlays/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      LABEL: overlayLabel
+      ID: overlayId
+    notes: >
+      Verified count 43 (Airport Height Restrictions, MHB-O, …). Optional overlay stack.
+    status: usable
+
+  - role: flu
+    name: Future Land Use (PRIMARY)
+    restUrl: https://services3.arcgis.com/fM4kjZmPOS4ay2Ff/arcgis/rest/services/Future_Land_Use/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      Label: flu
+    notes: >
+      Verified count 697. Labels: Rural Residential Agricultural 514, Residential Growth 87,
+      Conservation 60, Industrial Growth Corridor 18, Commercial Industrial Growth Node 18.
+      County Land Use Plan 2022 — covers city+county; no municipal FLU FS.
+    status: usable
+
+  - role: other
+    name: Municipal Limits
+    restUrl: https://services3.arcgis.com/fM4kjZmPOS4ay2Ff/arcgis/rest/services/Municipal_Limits/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: municipalities
+    fieldMap:
+      CITY: municipality
+      FIPS: placeFips
+    notes: >
+      Verified 11 polys: Newton Grove, Roseboro, Falcon, Garland, Clinton (2), Salemburg (2),
+      Autryville, Turkey, Harrells. Cities-first router.
+    status: usable
+
+  - role: other
+    name: Address Points
+    restUrl: https://services3.arcgis.com/fM4kjZmPOS4ay2Ff/arcgis/rest/services/Address_Points/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      ADDRESS: situsAddress
+      Inc_Muni: municipality
+      COMMUNITY: community
+      Post_Code: situsZip
+    notes: >
+      Verified count 34539. No PIN — spatial join only. Prefer parcel PARCEL_ADD.
+      Inc_Muni top: Unincorporated 27307, CLINTON 4678, ROSEBORO 792, GARLAND 509,
+      SALEMBURG 390, NEWTON GROVE 361, AUTRYVILLE 196, TURKEY 167, HARRELLS 135.
+    status: usable
+
+portals:
+  publicGisUrl: https://experience.arcgis.com/experience/6ceb46567480458387fcd2e9ad156d3b
+  gisHubUrl: https://gis-sampsoncounty.hub.arcgis.com
+  agolOrg: https://sampson.maps.arcgis.com
+  agolOrgId: fM4kjZmPOS4ay2Ff
+  countyGisPage: https://www.sampsoncountync.gov/My-Property/GIS-Maps-Property-Records
+  countyViewerPage: https://www.sampsoncountync.gov/My-Property/GIS-Maps-Property-Records/GIS-Data-Viewer
+  appraiserSearchUrl: https://sampsonlandrecords.com/PT/Search/commonsearch.aspx?mode=parid
+  appraiserHomeUrl: https://sampsonlandrecords.com/
+  appraiserDeepLinkTemplate: "https://sampsonlandrecords.com/PT/Datalets/Datalet.aspx?mode=profileall&UseSearch=no&pin={PIN}&jur=000&ownseq=0&card=1&roll=REAL"
+  ncptsSearchUrl: https://lrcpwa.ncptscloud.com/sampson/parcel-search
+  ncptsDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/sampson/parcel-detail/{PIN}"
+  oneMapParcels: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+
+gaps:
+  - Detailed zoning REST only for Clinton — other towns ETJ stubs / Autryville coarse only
+  - No municipal FLU FeatureServer
+  - Truncated 10-char field names on Parcels
+  - APPRAISED often pipe-delimited segment text — prefer ASSESSED_V/TOTAL_TAX_
+  - TAX_CODE is fire/tax district not municipality
+  - "~776 blank CURRENT_OW"
+  - No multi-transfer sales history REST; no sale qualification code
+  - OneMap scity blank; improvval sparse for Sampson
+  - sampsoncountync.gov often 403 to automated fetchers
+  - sampsonlandrecords.com intermittent maintenance banner
+  - Address_Points lack PIN
+  - No paid vendor data; no phones/emails scraped; no AADT/utilities dig
+
+license: "Sampson County public GIS / AGOL; NC OneMap; attribution recommended; no paid vendors"
+verifiedAt: "2026-09-24"
+verifiedBy: "North Carolina Public Info Researcher"
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://services3.arcgis.com/fM4kjZmPOS4ay2Ff/arcgis/rest/services/Parcels/FeatureServer/0
+  parcelIdField: PIN
+  acreageFilter: CALC_ACRES >= 5 AND CALC_ACRES <= 150
+  acres5to150Live: 14195
+  parcelCountLive: 50665
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='SAMPSON'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27SAMPSON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27SAMPSON%27&returnCountOnly=true&f=json
+      liveStationCount: 669
+      stationsWithAADT2022: 250
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Sampson'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Sampson%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Sampson%27&returnCountOnly=true&f=json
+      liveStationCount: 677
+      stationsWithAADT2025: 423
+      stationsWithAADT2024: 385
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Sampson'
+      stations2024LiveCount: 670
+      stations2024WithAADT2024: 670
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - ASSESSED_V
+    - TOTAL_TAX_
+    liveNonZero:
+      ASSESSED_V: 49885
+      TOTAL_TAX_: 48212
+    status: ok
+  sale:
+    priceFields:
+    - SALE_PRICE
+    dateFields:
+    - DATE_RECOR
+    livePriceNonZero:
+      SALE_PRICE: 21542
+    liveDateNonNull:
+      DATE_RECOR: 47206
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - CURRENT_OW
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 2501
+    liveEntityCount5to150acExtended: 2784
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - HERRING BUILDERS, INC.
+    - WISECO & ASSOCIATES, LLC
+    - TMC BENSON, LLC
+    - STONEY RUN PENTECOSTAL FWB CHURCH, INC.
+  paDeepLink:
+    template: https://sampsonlandrecords.com/PT/Datalets/Datalet.aspx?mode=profileall&UseSearch=no&pin={PIN}&jur=000&ownseq=0&card=1&roll=REAL
+    testedParcelId: 08069212009
+    testedUrl: https://sampsonlandrecords.com/PT/Datalets/Datalet.aspx?mode=profileall&UseSearch=no&pin=08069212009&jur=000&ownseq=0&card=1&roll=REAL
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: true
+    note: Prefer iasWorld datalet (200, parcel resolved). NCPTS parcel-detail/{PIN} returns 200 SPA shell only; headless render shows app-level 404 (even for tenant search page) — unverified.
+  gisViewer:
+    url: https://experience.arcgis.com/experience/6ceb46567480458387fcd2e9ad156d3b
+    httpStatus: 200
+    pageTitle: Experience
+  gaps: []

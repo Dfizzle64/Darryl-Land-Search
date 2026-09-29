@@ -1,0 +1,31 @@
+{
+  "name": "Dare",
+  "fips": "37055",
+  "state": "North Carolina",
+  "markets": [
+    "Wilmington"
+  ],
+  "featureCount": 2066,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-dare-parcels-37055",
+  "queryUrl": "https://services1.arcgis.com/ozZJ6IIlcOT869Kx/arcgis/rest/services/gis_polygons/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are gis_polygons (PRIMARY CAMA ArcGIS REST) (https://services1.arcgis.com/ozZJ6IIlcOT869Kx/arcgis/rest/services/gis_polygons/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 2222 rows; 2066 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale partial). Pass 2 counted 132 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Pass 2 sale: Date: NC OneMap saledate non-null 40,483 of 40,483 for cntyfips='055' (live 2026-09-28; join parcel). Price not on REST; public on Dare PA (property.spatialest.com/nc/dare or tax.darecountync.gov/landtransfer/parcel.php?parcel={parcel}).",
+    "Pass 2 sale join matched 882 of 2066 parcel ids.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37055/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37055/lookup.json",
+  "sourceCount": 2222,
+  "dropped": 0,
+  "tileCount": 9,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://tax.darecountync.gov/taxbill_view.php?parcel={parcel}",
+  "gisViewerUrl": "https://maps.darecountync.gov/"
+}

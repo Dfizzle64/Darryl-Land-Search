@@ -1,0 +1,600 @@
+{
+  "county": "Harnett",
+  "state": "NC",
+  "msa": "Raleigh-Durham footprint",
+  "fips": "37085",
+  "cntyfips": "085",
+  "slug": "harnett",
+  "level": "county",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "publicGisUrl": "https://gis.harnett.org/gisviewer/",
+  "gisDepartmentUrl": "https://www.harnett.org/gis/default.asp",
+  "countyRestRoot": "https://gis.harnett.org/arcgis/rest/services",
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/harnett/parcel-search",
+  "viewerLinkTemplate": "https://lrcpwa.ncptscloud.com/harnett/parcel-detail/{AccountNumber}",
+  "viewerLinkTemplateAlt": "https://lrcpwa.ncptscloud.com/harnett/parcel-detail/{PIN}",
+  "camaSearchUrl": "https://cama.harnett.org/ITSPublicHT/",
+  "gisViewerUrl": "https://gis.harnett.org/gisviewer/",
+  "joinKeys": [
+    "PIN",
+    "AccountNumber",
+    "ParcelID",
+    "PID",
+    "parno"
+  ],
+  "parcelIdPreferred": "PIN",
+  "paDeepLinkKey": "AccountNumber",
+  "municipalities": {
+    "Dunn": {
+      "zoningJurisdictionParcelCount": 6429,
+      "cityTaxDistrictCount": 5310,
+      "zoningDistrictsCount": 5880,
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.harnett.org/arcgis/rest/services/Planning/Zoning/MapServer/1 filter Jurisdiction='Dunn'",
+      "fluPrefer": "county Future LandUse (Municipal/ETJ inside)",
+      "publicGisUrl": "https://gis.harnett.org/gisviewer/",
+      "notes": "No dedicated city FeatureServer — county ZoningDistricts is public muni zoning"
+    },
+    "Lillington": {
+      "zoningJurisdictionParcelCount": 5190,
+      "cityTaxDistrictCount": 4576,
+      "zoningDistrictsCount": 2330,
+      "hasLocalGis": false,
+      "zoningPrefer": "ZoningDistricts Jurisdiction='Lillington'",
+      "fluPrefer": "county Future LandUse",
+      "publicGisUrl": "https://gis.harnett.org/gisviewer/",
+      "notes": "County seat; town site lillingtonnc.org has no public zoning REST"
+    },
+    "Angier": {
+      "zoningJurisdictionParcelCount": 5245,
+      "cityTaxDistrictCount": 4372,
+      "zoningDistrictsCount": 97,
+      "hasLocalGis": false,
+      "zoningPrefer": "parcel Zoning attr + ZoningDistricts Jurisdiction='Angier' (sparse 97)",
+      "wakeEdgeZoning": "https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/15",
+      "fluPrefer": "county Future LandUse",
+      "publicGisUrl": "https://gis.harnett.org/gisviewer/",
+      "notes": "Spans Harnett+Wake; Wake MapServer/15 for Wake-side edge only"
+    },
+    "Erwin": {
+      "zoningJurisdictionParcelCount": 4291,
+      "cityTaxDistrictCount": 2697,
+      "zoningDistrictsCount": 106,
+      "hasLocalGis": false,
+      "zoningPrefer": "ZoningDistricts Jurisdiction='Erwin'",
+      "zoningAlternatePartial": "https://services2.arcgis.com/qO6xd1V1VbSyViir/arcgis/rest/services/Erwin_Town_Zoning_Map/FeatureServer/3",
+      "fluPrefer": "county Future LandUse",
+      "publicGisUrl": "https://gis.harnett.org/gisviewer/",
+      "notes": "AGOL ErwinZoning_2005 count 28 only — prefer county stack"
+    },
+    "Coats": {
+      "zoningJurisdictionParcelCount": 1783,
+      "cityTaxDistrictCount": 1249,
+      "zoningDistrictsCount": 338,
+      "hasLocalGis": false,
+      "zoningPrefer": "ZoningDistricts Jurisdiction='Coats'",
+      "fluPrefer": "county Future LandUse",
+      "publicGisUrl": "https://gis.harnett.org/gisviewer/"
+    },
+    "Broadway": {
+      "zoningJurisdictionParcelCount": 63,
+      "zoningDistrictsCount": 2,
+      "notes": "Lee County tip — prefer Lee/Broadway card for core"
+    },
+    "Benson": {
+      "cityTaxDistrictCount": 1,
+      "zoningDistrictsCount": 1,
+      "notes": "Johnston tip — prefer Johnston/Benson card"
+    },
+    "Fuquay-Varina": {
+      "zoningDistrictsCount": 1,
+      "notes": "Wake tip — prefer Wake/Fuquay-Varina card"
+    },
+    "Unincorporated": {
+      "zoningJurisdictionParcelCount": 62132,
+      "cityTaxDistrictNull": 67526,
+      "zoningDistrictsCount": 634,
+      "zoningPrefer": "ZoningDistricts Jurisdiction='Harnett County'",
+      "fluPrefer": "Planning/Planning/MapServer/9 Future LandUse"
+    }
+  },
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "AccountNumber",
+        "ParcelID",
+        "PID",
+        "parno"
+      ],
+      "bestLayer": "Tax/Parcels",
+      "caveat": "REID often 'Retired' — do not use"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Tax/Parcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CalculatedLandArea",
+        "LegalLandUnits"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 11663,
+      "approxCountLegalAcAcres": 11240,
+      "bestLayer": "Tax/Parcels"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Owners",
+        "Owner1",
+        "Owner2",
+        "ownname"
+      ],
+      "bestLayer": "Tax/Parcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "OwnerAddress1",
+        "OwnerCity",
+        "OwnerState",
+        "OwnerZipCode",
+        "MailingAddress"
+      ],
+      "bestLayer": "Tax/Parcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": false,
+      "fields": [
+        "PhysicalAddress",
+        "ParAddress",
+        "ParCity",
+        "ParZipCode",
+        "HouseNumber",
+        "StreetName",
+        "siteadd",
+        "scity"
+      ],
+      "bestLayer": "Tax/Parcels"
+    },
+    "lastSale": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "SalePrice",
+        "SaleYear",
+        "SaleMonth",
+        "DeedDate",
+        "DeedBook",
+        "DeedPage",
+        "QualifiedCode",
+        "SaleVacantOrImproved"
+      ],
+      "bestLayer": "Tax/Parcels",
+      "caveat": "Last sale on parcel; SalePrice>0 in ~4710 of 5–150; Sales MS (~20k) + QualifiedSales_2024_2025 (~9k) complement; no multi-transfer history"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "TotalMarketValue",
+        "TotalAssessedValue",
+        "ParcelLandValue",
+        "ParcelBuildingValue",
+        "ParcelDeferredValue",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "Tax/Parcels",
+      "notes": "Primary has market + assessed + land/bldg split"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "Zoning",
+        "ZoningJurisdiction",
+        "ZoneClass",
+        "Jurisdiction"
+      ],
+      "bestLayer": "Planning ZoningDistricts",
+      "parcelAttrField": "Zoning",
+      "caveat": "No city FeatureServers; filter ZoningDistricts by Jurisdiction. Angier polygons sparse (97)."
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "FLU",
+        "OverlayName"
+      ],
+      "bestLayer": "Planning Future LandUse",
+      "caveat": "No city FLU FS; Municipal/ETJ placeholder inside towns; Jetport/Military overlays separate"
+    },
+    "appraiserLink": {
+      "present": true,
+      "template": "https://lrcpwa.ncptscloud.com/harnett/parcel-detail/{AccountNumber}",
+      "templateAlt": "https://lrcpwa.ncptscloud.com/harnett/parcel-detail/{PIN}",
+      "searchUrl": "https://lrcpwa.ncptscloud.com/harnett/parcel-search",
+      "camaSearchUrl": "https://cama.harnett.org/ITSPublicHT/",
+      "fieldOnParcel": "AccountNumber"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Tax/Parcels",
+      "restUrl": "https://gis.harnett.org/arcgis/rest/services/Tax/Parcels/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "CalculatedLandArea",
+      "count": 85736,
+      "countAcres5to150": 11663,
+      "countLegalAcAcres5to150": 11240,
+      "countVacantIshAcres5to150": 7659,
+      "countSalePriceGt0Acres5to150": 4710,
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "maxRecordCount": 2000,
+      "wireFirst": true,
+      "status": "usable",
+      "notes": "MapServer only (no FeatureServer SOE). Owner/tax/sale/situs/zoning attr on polygons.",
+      "fieldMap": {
+        "PIN": "parcelId",
+        "AccountNumber": "parcelIdAccount",
+        "ParcelID": "parcelIdPk",
+        "Owners": "ownerName",
+        "OwnerAddress1": "mailingAddress.street",
+        "OwnerCity": "mailingAddress.city",
+        "OwnerState": "mailingAddress.state",
+        "OwnerZipCode": "mailingAddress.zip",
+        "PhysicalAddress": "situsAddress",
+        "ParCity": "situsCity",
+        "ParZipCode": "situsZip",
+        "CalculatedLandArea": "acreage",
+        "SalePrice": "lastSale.price",
+        "SaleYear": "lastSale.year",
+        "DeedDate": "lastSale.deedDate",
+        "TotalMarketValue": "tax.marketValue",
+        "TotalAssessedValue": "tax.assessedValue",
+        "ParcelLandValue": "tax.landValue",
+        "ParcelBuildingValue": "tax.improvementValue",
+        "Zoning": "zoning",
+        "ZoningJurisdiction": "planningJurisdiction"
+      }
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "gisacres",
+      "filter": "cntyfips='085'",
+      "count": 84508,
+      "countAcres5to150": 11657,
+      "countImprovZeroAcres5to150": 5686,
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "maxRecordCount": 5000,
+      "status": "usable",
+      "notes": "Fallback; land/improve split; no sale price; PIN↔parno verified",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ]
+    },
+    {
+      "role": "zoning",
+      "name": "Planning ZoningDistricts",
+      "restUrl": "https://gis.harnett.org/arcgis/rest/services/Planning/Zoning/MapServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 9389,
+      "countsByJurisdiction": {
+        "Dunn": 5880,
+        "Lillington": 2330,
+        "Harnett County": 634,
+        "Coats": 338,
+        "Erwin": 106,
+        "Angier": 97,
+        "Broadway": 2,
+        "Fuquay_Varina": 1,
+        "Benson": 1
+      },
+      "zoningFields": [
+        "ZoneClass",
+        "ZoneDescription",
+        "ZoneDefinition",
+        "Jurisdiction"
+      ],
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "status": "usable",
+      "notes": "PRIMARY multi-jurisdiction stack; public REST for all Harnett munis"
+    },
+    {
+      "role": "zoning",
+      "name": "Planning ETJ",
+      "restUrl": "https://gis.harnett.org/arcgis/rest/services/Planning/Zoning/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 8,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Erwin Town Zoning Map (AGOL 2005)",
+      "restUrl": "https://services2.arcgis.com/qO6xd1V1VbSyViir/arcgis/rest/services/Erwin_Town_Zoning_Map/FeatureServer/3",
+      "layerId": 3,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 28,
+      "crs": {
+        "wkid": 102716,
+        "latestWkid": 2261
+      },
+      "status": "partial",
+      "notes": "Legacy — prefer county ZoningDistricts Erwin=106"
+    },
+    {
+      "role": "zoning",
+      "name": "Wake Angier Zoning (edge)",
+      "restUrl": "https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/15",
+      "layerId": 15,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 96,
+      "status": "usable",
+      "notes": "Wake-side Angier only"
+    },
+    {
+      "role": "flu",
+      "name": "Planning Future LandUse",
+      "restUrl": "https://gis.harnett.org/arcgis/rest/services/Planning/Planning/MapServer/9",
+      "layerId": 9,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 718,
+      "fluFields": [
+        "FLU"
+      ],
+      "fluCategories": {
+        "Rural / Agriculture": 204,
+        "Low Density Residential": 136,
+        "Municipal / ETJ": 92,
+        "Conservation": 85,
+        "Medium Density Residential": 75,
+        "Employment": 46,
+        "Parks and Open Space": 23,
+        "Rural Center": 22,
+        "Commercial Mixed-use": 15,
+        "Agricultural Protection Area": 7,
+        "Historic Community": 7,
+        "Village": 3,
+        "Village Center": 3
+      },
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "status": "usable",
+      "notes": "No city FLU FeatureServers; Municipal/ETJ placeholder inside towns"
+    },
+    {
+      "role": "flu",
+      "name": "Future LandUse Overlay",
+      "restUrl": "https://gis.harnett.org/arcgis/rest/services/Planning/Planning/MapServer/10",
+      "layerId": 10,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "sample",
+      "count": 6,
+      "status": "partial",
+      "notes": "Jetport Overlay + Military Overlay Buffer"
+    },
+    {
+      "role": "sales",
+      "name": "Tax/Sales",
+      "restUrl": "https://gis.harnett.org/arcgis/rest/services/Tax/Sales/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "sample",
+      "count": 20199,
+      "status": "partial",
+      "notes": "Sale-subset; prefer last Sale* on Tax/Parcels"
+    },
+    {
+      "role": "sales",
+      "name": "QualifiedSales_2024_2025",
+      "restUrl": "https://gis.harnett.org/arcgis/rest/services/Tax/QualifiedSales_2024_2025/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "sample",
+      "count": 9140,
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "City Limits",
+      "restUrl": "https://gis.harnett.org/arcgis/rest/services/Boundaries/HC_Boundaries/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 8,
+      "status": "usable",
+      "cities": [
+        "Angier",
+        "Benson",
+        "Broadway",
+        "Coats",
+        "Dunn",
+        "Erwin",
+        "Fuquay Varina",
+        "Lillington"
+      ]
+    }
+  ],
+  "gaps": [
+    "No dedicated public city FeatureServers for Dunn, Lillington, Angier, Coats — county ZoningDistricts is the public muni zoning REST",
+    "Angier ZoningDistricts only 97 polygons vs ~5.2k Angier-jurisdiction parcels — prefer parcel Zoning attribute",
+    "Erwin AGOL town zoning is 2005 vintage (28) — prefer county ZoningDistricts Erwin=106",
+    "No city FLU FeatureServers — county Future LandUse uses Municipal/ETJ placeholder inside towns",
+    "Trakit/Trakit MapServer/1 advertises LinktoPropertyCard / FutureLandUse but live queries return 400 — do not wire",
+    "Tax/Parcels is MapServer only (FeatureServer SOE missing)",
+    "REID field often Retired — do not use as join key",
+    "No multi-transfer sales history REST — last sale on parcel + Sales/QualifiedSales subsets",
+    "Zoning Source URL field QA-noisy — route by Jurisdiction",
+    "Broadway / Benson / Fuquay Varina tips are edge fragments",
+    "No paid vendor data; no phones/emails; no AADT/utilities dig"
+  ],
+  "license": "Harnett County public GIS; NCGS disclaimer; attribution recommended; no paid vendors",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "tranche3": {
+    "taxSaleOwnerMapped": true,
+    "paDeepLink": "https://lrcpwa.ncptscloud.com/harnett/parcel-detail/{AccountNumber}",
+    "publicGisUrl": "https://gis.harnett.org/gisviewer/"
+  },
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://gis.harnett.org/arcgis/rest/services/Tax/Parcels/MapServer/0",
+    "parcelIdField": "AccountNumber",
+    "acreageFilter": "CalculatedLandArea >= 5 AND CalculatedLandArea <= 150",
+    "acres5to150Live": 11661,
+    "parcelCountLive": 85776,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='HARNETT'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27HARNETT%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27HARNETT%27&returnCountOnly=true&f=json",
+        "liveStationCount": 510,
+        "stationsWithAADT2022": 174
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Harnett'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Harnett%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Harnett%27&returnCountOnly=true&f=json",
+        "liveStationCount": 510,
+        "stationsWithAADT2025": 328,
+        "stationsWithAADT2024": 294,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "stations2024CountyFilter": "County='Harnett'",
+        "stations2024LiveCount": 510,
+        "stations2024WithAADT2024": 510,
+        "stations2024Note": "AADT_2024 string field populated on every station in this release",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TotalMarketValue",
+        "TotalAssessedValue"
+      ],
+      "liveNonZero": {
+        "TotalMarketValue": 80682,
+        "TotalAssessedValue": 80682
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SalePrice"
+      ],
+      "dateFields": [
+        "DeedDate"
+      ],
+      "livePriceNonZero": {
+        "SalePrice": 52332
+      },
+      "liveDateNonNull": {
+        "DeedDate": 82408
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Owner1",
+        "Owner2",
+        "Owners"
+      ],
+      "rule": "Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).",
+      "regex": "\\b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "regexExtended": "\\b(LLC|L\\s?L\\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\\b|\\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\\s+OF\\b|\\bOF\\s+(EDUCATION|TRANSPORTATION)\\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\\b",
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "liveEntityCount5to150ac": 2130,
+      "liveEntityCount5to150acExtended": 2905,
+      "countNote": "Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.",
+      "sampleMatches": [
+        "NC DEPARTMENT OF TRANSPORTATION |  | NC DEPARTMENT OF TRANSPORTATION",
+        "NC DEPARTMENT OF TRANSPORTATION |  | NC DEPARTMENT OF TRANSPORTATION",
+        "NC DEPARTMENT OF TRANSPORTATION |  | NC DEPARTMENT OF TRANSPORTATION",
+        "NC DEPARTMENT OF TRANSPORTATION |  | NC DEPARTMENT OF TRANSPORTATION"
+      ]
+    },
+    "paDeepLink": {
+      "template": "https://cama.harnett.org/ITSPublicHT/RealEstateSearch/Parcel/{AccountNumber}",
+      "testedParcelId": "1500007930",
+      "testedUrl": "https://cama.harnett.org/ITSPublicHT/RealEstateSearch/Parcel/1500007930",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": true,
+      "note": "ITSPublic RealEstateSearch/Parcel 200 with ID in page. NCPTS parcel-detail/{AccountNumber} 200 SPA shell only (headless shows app 404) — keep as alt, unverified."
+    },
+    "gisViewer": {
+      "url": "https://gis.harnett.org/gisviewer/",
+      "httpStatus": 200,
+      "pageTitle": "Harnett County GIS Viewer"
+    },
+    "gaps": []
+  }
+}

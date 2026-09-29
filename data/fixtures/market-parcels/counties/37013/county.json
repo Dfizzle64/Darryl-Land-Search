@@ -1,0 +1,28 @@
+{
+  "name": "Beaufort",
+  "fips": "37013",
+  "state": "North Carolina",
+  "markets": [
+    "Wilmington"
+  ],
+  "featureCount": 8050,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-beaufort-parcels-37013",
+  "queryUrl": "https://services1.arcgis.com/oXsk9nimtmSEU8Ko/arcgis/rest/services/Beaufort_Service/FeatureServer/4/query",
+  "gaps": [
+    "Parcels are Beaufort_Service Parcels (PRIMARY county AGOL CAMA + sale) (https://services1.arcgis.com/oXsk9nimtmSEU8Ko/arcgis/rest/services/Beaufort_Service/FeatureServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 356 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37013/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37013/lookup.json",
+  "sourceCount": 8050,
+  "dropped": 0,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/Beaufort/parcel-detail?reid={parcelId}",
+  "gisViewerUrl": "https://beaufortnc.maps.arcgis.com/apps/webappviewer/index.html?id=e97b027e0d7d49ca8849e716662628f8"
+}

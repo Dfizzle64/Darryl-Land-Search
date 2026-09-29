@@ -1,0 +1,607 @@
+state: NC
+jurisdiction: Brunswick County
+fips: "37019"
+level: county
+markets: [Wilmington]
+
+layers:
+  - role: parcels
+    name: SeamlessParcels (PRIMARY)
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/SeamlessParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALCAC
+    coverage: county-wide
+    fieldMap:
+      ParcelNumber: parcelId
+      PIN: parcelIdAlt
+      CALCAC: acreage
+      DeedAcreage: acreageDeed
+      Name1: ownerName
+      Name2: ownerName2
+      Address1: mailingAddress.street
+      Address2: mailingAddress.street2
+      Address3: mailingAddress.street3
+      City: mailingAddress.city
+      State: mailingAddress.state
+      ZipCode: mailingAddress.zip
+      HouseNumber: situsAddress.number
+      StreetName: situsAddress.street
+      StreetType: situsAddress.streetType
+      StreetDirection: situsAddress.suffix
+      Zoning: zoning
+      DeedDate: lastSale.date
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      UseCode: dorCode
+      TaxCard: appraiserSearchUrl
+    notes: >
+      PRIMARY verified 2026-09-23: count 174258; CALCAC 5–150 → 7610;
+      Zoning non-empty ~165784; TaxCard on all features. CRS 102719/2264.
+      No market/assessed values — join NC1MAP. No sale price (DeedDate only).
+      MaxRecordCount 2000. MapServer mirror available.
+    status: usable
+
+  - role: parcels
+    name: TaxParcels
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/TaxParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALCAC
+    coverage: county-wide
+    fieldMap:
+      ParcelNumber: parcelId
+      PIN: parcelIdAlt
+      CALCAC: acreage
+      DeedAcreage: acreageDeed
+      Name1: ownerName
+      Name2: ownerName2
+      Address1: mailingAddress.street
+      City: mailingAddress.city
+      State: mailingAddress.state
+      ZipCode: mailingAddress.zip
+      HouseNumber: situsAddress.number
+      StreetName: situsAddress.street
+      StreetType: situsAddress.streetType
+      Zoning: zoning
+      DeedDate: lastSale.date
+      UseCode: dorCode
+    notes: >
+      Verified count 172636; CALCAC 5–150 → 7549. Same CAMA family as Seamless
+      but no TaxCard field — build AppraisalCard URL from ParcelNumber.
+    status: usable
+
+  - role: parcels
+    name: DataViewerLive Parcels
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Mapping/DataViewerLive/MapServer/26
+    layerId: 26
+    geometry: polygon
+    auth: none
+    acreageField: CALCAC
+    coverage: county-wide
+    fieldMap:
+      ParcelNumber: parcelId
+      PIN: parcelIdAlt
+      CALCAC: acreage
+      Name1: ownerName
+      Address1: mailingAddress.street
+      HouseNumber: situsAddress.number
+      StreetName: situsAddress.street
+      Zoning: zoning
+      DeedDate: lastSale.date
+      TaxCard: appraiserSearchUrl
+    notes: >
+      Verified count 165508. Viewer backend; prefer SeamlessParcels for extract.
+    status: usable
+
+  - role: tax
+    name: NC1MAP_SEAMLESSPARCELS (county host tax join)
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/NC1MAP_SEAMLESSPARCELS/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GISACRES
+    coverage: county-wide
+    fieldMap:
+      PARNO: parcelId
+      ALTPARNO: parcelIdAlt
+      OWNNAME: ownerName
+      OWNNAME2: ownerName2
+      MAILADD: mailingAddress.street
+      MCITY: mailingAddress.city
+      MSTATE: mailingAddress.state
+      MZIP: mailingAddress.zip
+      SITEADD: situsAddress
+      SCITY: situsCity
+      SZIP: situsZip
+      GISACRES: acreage
+      PARVAL: tax.marketValue
+      LANDVAL: tax.landValue
+      IMPROVVAL: tax.improvementValue
+      CNTYFIPS: countyFips
+    notes: >
+      Verified CNTYFIPS='37019' count 174071; GISACRES 5–150 → 7575;
+      PARVAL>0 → 171020. Join PARNO=ParcelNumber. Sale date fields empty.
+      Filter uses 5-digit 37019 (not 019).
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdAlt
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified cntyfips='019' count 151753; gisacres 5–150 → 7020.
+      saledate empty for Brunswick. MaxRecordCount 5000. Alternate host
+      services.gis.nc.gov. Prefer county NC1MAP when available.
+    status: usable
+
+  - role: zoning
+    name: Zoning (unified county+muni)
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZCODE: zoning
+      CaseNum: zoningCase
+    notes: >
+      Verified count 11505. Prefixed codes CO-/LE-/SH-/SP-/… Spatial join in 2264.
+      Mirrors: Mapping/AllZoning/0, DataViewerLive/37.
+    status: usable
+
+  - role: zoning
+    name: parcelZonings (parcel attribute join)
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/parcelZonings/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      ZCODE: zoning
+      ZONE_LID_VALUE: floodOrLid
+    notes: >
+      Verified count 166875; ZCODE non-null 166817. Join on ParcelNumber.
+      ZCODE may be comma-separated multi-zone.
+    status: usable
+
+  - role: flu
+    name: Future Land Use
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FLU: flu
+      LAND_USE: fluCurrentUse
+      PIN: parcelIdAlt
+      AMENDED: fluAmended
+      CASE_: fluCase
+    notes: >
+      Verified count 65856. FLU values LDR/MDR/HDR/COMMERCIAL/MIXED USE/
+      CONSERVATION/INDUSTRIAL/COMMUNITY COMMERCIAL/…. Join by cleaned PIN or spatial.
+    status: usable
+
+  - role: other
+    name: Municipalities
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/Municipalities/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TYPE: municipalityCode
+      STATUS: municipalityStatus
+    notes: >
+      Verified count 26 (CITY + ETJ). TYPE codes LEL/SHL/SPT/OIB/BOL/… Route MuniZoning.
+    status: usable
+
+  - role: other
+    name: Addresses
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/Addresses/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ST_ADDR: situsAddress
+      ST_NUMB: situsAddress.number
+      ST_NAME: situsAddress.street
+      POSTAL: situsCity
+      ZIPCODE: situsZip
+      TAX_PRIMARY: situsPrimary
+    notes: >
+      Verified count 164535. No parcel id — spatial join only. Prefer parcel situs fields.
+    status: partial
+
+  - role: zoning
+    name: Leland Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+      CaseNum: zoningCase
+    notes: >
+      Verified count 1362. Preferred local zoning for Leland; spatial join to county parcels (2264).
+    status: usable
+
+  - role: zoning
+    name: Shallotte Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 595. Town zoning + county parcels.
+    status: usable
+
+  - role: zoning
+    name: Southport Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 442. City zoning + county parcels.
+    status: usable
+
+  - role: zoning
+    name: Oak Island Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 716. Town zoning + county parcels.
+    status: usable
+
+  - role: zoning
+    name: Bolivia Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 56. Town zoning + county parcels.
+    status: usable
+
+  - role: zoning
+    name: Belville Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 928.
+    status: usable
+
+  - role: zoning
+    name: Boiling Spring Lakes Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 431.
+    status: usable
+
+  - role: zoning
+    name: Navassa Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 296.
+    status: usable
+
+  - role: zoning
+    name: Sunset Beach Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/17
+    layerId: 17
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 320.
+    status: usable
+
+  - role: zoning
+    name: St. James Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 392.
+    status: usable
+
+  - role: zoning
+    name: Calabash Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 222.
+    status: usable
+
+  - role: zoning
+    name: Holden Beach Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 130.
+    status: usable
+
+  - role: zoning
+    name: Ocean Isle Beach Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 104.
+    status: usable
+
+  - role: zoning
+    name: Bald Head Island Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 91.
+    status: usable
+
+  - role: zoning
+    name: Carolina Shores Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 71.
+    status: usable
+
+  - role: zoning
+    name: Caswell Beach Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 71.
+    status: usable
+
+  - role: zoning
+    name: Northwest Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 22.
+    status: usable
+
+  - role: zoning
+    name: Sandy Creek Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 17.
+    status: usable
+
+  - role: zoning
+    name: Varnamtown Zoning
+    restUrl: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/18
+    layerId: 18
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+    notes: Verified count 10.
+    status: usable
+
+gaps:
+  - No lastSale.price on public ArcGIS REST — DeedDate only; OneMap/NC1MAP saledate empty; Sales.aspx is HTML
+  - Tax market values not on SeamlessParcels/TaxParcels — join NC1MAP_SEAMLESSPARCELS or OneMap
+  - Addresses points lack parcel id — spatial join only
+  - No separate municipal FLU FeatureServers (use county FutureLandUse)
+  - DV2 Municipal FLU (~6405) has TOTALMARKE but is not countywide tax
+  - MaxRecordCount 2000 on county layers — paginate
+  - Owner phones/emails not collected
+
+license: "County open GIS / public records; attribution to Brunswick County GIS; municipal zoning via county host"
+appraiserSearchUrl: https://tax.brunsco.net/ITSNet/BasicSearch.aspx
+viewerUrl: https://experience.arcgis.com/experience/0201d27723244840aea67c9f85892953
+appraisalCardTemplate: "https://tax.brunsco.net/ITSNet/AppraisalCard.aspx?parcel={ParcelNumber}"
+openDataUrl: https://data-brunsco.opendata.arcgis.com/
+verifiedAt: 2026-09-23
+verifiedBy: Grok Bot GIS researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/SeamlessParcels/FeatureServer/0
+  parcelIdField: ParcelNumber
+  acreageFilter: CALCAC >= 5 AND CALCAC <= 150
+  acres5to150Live: 7610
+  parcelCountLive: 174258
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='BRUNSWICK'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27BRUNSWICK%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27BRUNSWICK%27&returnCountOnly=true&f=json
+      liveStationCount: 380
+      stationsWithAADT2022: 99
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Brunswick'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Brunswick%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Brunswick%27&returnCountOnly=true&f=json
+      liveStationCount: 373
+      stationsWithAADT2025: 239
+      stationsWithAADT2024: 188
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Brunswick'
+      stations2024LiveCount: 378
+      stations2024WithAADT2024: 378
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - PARVAL
+    - LANDVAL
+    - IMPROVVAL
+    liveNonZero:
+      PARVAL: 171020
+    status: ok-alt-layer
+    note: SeamlessParcels has no value fields. Use county-host NC1MAP_SEAMLESSPARCELS FS/0 (PARVAL/LANDVAL/IMPROVVAL; join PARNO/ALTPARNO→ParcelNumber/PIN).
+    altLayer: https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/NC1MAP_SEAMLESSPARCELS/FeatureServer/0
+    altLive:
+      total: 174071
+      PARVAL_gt0: 171020
+  sale:
+    priceFields: []
+    dateFields:
+    - DeedDate
+    livePriceNonZero: {}
+    liveDateNonNull:
+      DeedDate: 172003
+    status: partial-date-only
+    note: DeedDate (string) on SeamlessParcels; no sale price on any public REST layer; NC1MAP SALEDATE empty. Price/date via AppraisalCard PDF 'SALES DATA' section (see paDeepLink).
+  ownerEntity:
+    ownerFields:
+    - Name1
+    - Name2
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 2899
+    liveEntityCount5to150acExtended: 3140
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - VILLAGE POINTE HOLDINGS LLC
+    - RIVER OF LIFE BAPTIST OF SUNSET BCH NC INC
+    - OCEAN RIDGE PLANTATION GOLF INC
+    - HAWTHORNE MIDWAY OCEAN ISLE LLC
+  paDeepLink:
+    template: https://tax.brunsco.net/ITSNet/AppraisalCard.aspx?id={ParcelNumber}
+    testedParcelId: '15600067'
+    testedUrl: https://tax.brunsco.net/ITSNet/AppraisalCard.aspx?id=15600067
+    httpStatus: 200
+    contentType: application/pdf
+    contentVerified: true
+    note: 'FIX: existing card template ?parcel= returns HTTP 500 (''Object reference not set''); ?id= returns 200 application/pdf appraisal card with parcel ID + SALES DATA. Existing appraiserSearchUrl ITSNet/BasicSearch.aspx now 404 — search home is https://tax.brunsco.net/ITSNet/ (200).'
+  gisViewer:
+    url: https://experience.arcgis.com/experience/0201d27723244840aea67c9f85892953
+    httpStatus: 200
+    pageTitle: Experience
+  gaps:
+  - No sale price on public REST (PA PDF only)
+  - Tax values on companion NC1MAP_SEAMLESSPARCELS layer, not SeamlessParcels
+  - Card-level appraisalCardTemplate (?parcel=) returns HTTP 500 — use ?id=; ITSNet/BasicSearch.aspx 404 (use /ITSNet/)

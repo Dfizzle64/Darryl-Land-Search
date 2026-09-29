@@ -1,0 +1,586 @@
+{
+  "county": "Wayne",
+  "state": "NC",
+  "msa": "Raleigh-Durham footprint",
+  "fips": "37191",
+  "cntyfips": "191",
+  "slug": "wayne",
+  "level": "county",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "publicGisUrl": "https://experience.arcgis.com/experience/d01a6a5741ae41a2b4f0d3c8f61afa12",
+  "jurisdictionGisUrl": "https://experience.arcgis.com/experience/d01a6a5741ae41a2b4f0d3c8f61afa12",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/d01a6a5741ae41a2b4f0d3c8f61afa12",
+  "gisDepartmentUrl": "https://wayne-county-gis-waynecountync.hub.arcgis.com/",
+  "zoningMapUrl": "https://waynecountync.maps.arcgis.com/apps/webappviewer/index.html?id=14282090708a4a3e9e674d294aab9778",
+  "goldsboroHubUrl": "https://nc-goldsboro.hub.arcgis.com/",
+  "goldsboroZoningViewerUrl": "https://gis.goldsboronc.gov/portal/apps/webappviewer/index.html?id=3dd72a816ced455c9408626f62802509",
+  "countyRestRoot": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services",
+  "goldsboroRestRoot": "https://gis.goldsboronc.gov/arcgis/rest/services",
+  "appraiserSearchUrl": "https://realestate.waynegov.com/ITSPublic/",
+  "camaSearchUrl": "https://realestate.waynegov.com/ITSNet/",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/wayne/parcel-search",
+  "viewerLinkTemplate": "https://realestate.waynegov.com/ITSPublic/TaxBillSearch/Parcel/{PIN}",
+  "viewerLinkTemplateAlt": "https://lrcpwa.ncptscloud.com/wayne/parcel-detail/{parcelId}",
+  "paDeepLinkKey": "PIN",
+  "paDeepLinkKeyAlt": "REID",
+  "parcelIdPreferred": "PIN",
+  "joinKeys": [
+    "PIN",
+    "REID",
+    "parno"
+  ],
+  "municipalities": {
+    "Goldsboro": {
+      "parcelCityCount": 15303,
+      "hasLocalGis": true,
+      "zoningPrefer": "https://gis.goldsboronc.gov/arcgis/rest/services/Planning/Zoning/FeatureServer/0",
+      "zoningAlternate": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Goldsboro_Zoning/FeatureServer/43",
+      "zoningCount": 3379,
+      "fluPrefer": "https://gis.goldsboronc.gov/arcgis/rest/services/Planning/Proposed_Land_Use/FeatureServer/0",
+      "fluCount": 2989,
+      "publicGisUrl": "https://nc-goldsboro.hub.arcgis.com/",
+      "cityLimitsCode": "GLB",
+      "notes": "City REST + hub; FLU Proposed_Land_Use covers planning area"
+    },
+    "Mount Olive": {
+      "parcelCityCount": 2769,
+      "hasLocalGis": false,
+      "zoningPrefer": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Mount_Olive_Zoning/FeatureServer/44",
+      "zoningCount": 315,
+      "fluPrefer": null,
+      "cityLimitsCode": "MTO",
+      "notes": "County AGOL publishes town zoning; no town FLU REST"
+    },
+    "Fremont": {
+      "parcelCityCount": 981,
+      "hasLocalGis": false,
+      "zoningPrefer": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Fremont_Zoning/FeatureServer/42",
+      "zoningCount": 138,
+      "fluPrefer": null,
+      "cityLimitsCode": "FRE",
+      "notes": "County AGOL host"
+    },
+    "Pikeville": {
+      "parcelCityCount": 449,
+      "hasLocalGis": false,
+      "zoningPrefer": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Pikeville_Zoning/FeatureServer/45",
+      "zoningCount": 94,
+      "fluPrefer": null,
+      "cityLimitsCode": "PIK",
+      "notes": "County AGOL host"
+    },
+    "Eureka": {
+      "parcelCityCount": 193,
+      "hasLocalGis": false,
+      "zoningPrefer": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Eureka_Zoning/FeatureServer/41",
+      "zoningCount": 50,
+      "zoningField": "ZONE_ID",
+      "fluPrefer": null,
+      "cityLimitsCode": "EUR",
+      "notes": "County AGOL host; use ZONE_ID not ZONE"
+    },
+    "Seven Springs": {
+      "parcelCityCount": 142,
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "fluPrefer": null,
+      "cityLimitsCode": "SSP",
+      "notes": "No zoning REST found — gap"
+    },
+    "Walnut Creek": {
+      "parcelCityCount": 647,
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "fluPrefer": null,
+      "cityLimitsCode": "WAL",
+      "municipalityType": "Village",
+      "notes": "No zoning REST found — gap"
+    },
+    "Unincorporated": {
+      "parcelCityCountApprox": 48600,
+      "hasLocalGis": false,
+      "zoningPrefer": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Wayne_County_Zoning/FeatureServer/130",
+      "zoningCount": 1198,
+      "fluPrefer": null,
+      "notes": "Wayne County Zoning primary; no countywide FLU"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "TaxParcels Property Lines (PRIMARY)",
+      "restUrl": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Parcels/FeatureServer/14",
+      "layerId": 14,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "GIS_Acres",
+      "coverage": "county-wide",
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "maxRecordCount": 2000,
+      "counts": {
+        "total": 70919,
+        "gisAcres_5_150": 9822,
+        "legalAc_5_150": 10210,
+        "bldgZeroOrNull_in_5_150": 6982,
+        "salePriceGt0_in_5_150": 3866,
+        "vacantImproved_V": 17538,
+        "vacantImproved_I": 52423
+      },
+      "fieldMap": {
+        "PIN": "parcelId",
+        "REID": "parcelIdAccount",
+        "GIS_Acres": "acreage",
+        "LegalLandUnits": "acreageDeed",
+        "LegalLandType": "acreageDeedUnit",
+        "Name1": "ownerName1",
+        "Name2": "ownerName2",
+        "Address1": "mailingAddress.street",
+        "Address2": "mailingAddress.street2",
+        "Address3": "mailingAddress.street3",
+        "City": "mailingAddress.city",
+        "State": "mailingAddress.state",
+        "ZipCode": "mailingAddress.zip",
+        "PropertyAddress": "situsAddress",
+        "SalePrice": "lastSale.price",
+        "SaleYear": "lastSale.year",
+        "SaleMonth": "lastSale.month",
+        "DeedDate": "lastSale.deedDate",
+        "DeedBook": "lastSale.deedBook",
+        "DeedPage": "lastSale.deedPage",
+        "TotalMarketValue": "tax.marketValue",
+        "TotalAssessedValue": "tax.assessedValue",
+        "ParcelLandValue": "tax.landValue",
+        "ParcelBuildingValue": "tax.improvementValue",
+        "ParcelObxfValue": "tax.obxfValue",
+        "PropUse": "dorCode",
+        "UseModel": "landUseModel",
+        "VacantImproved": "vacantOrImproved"
+      },
+      "geoCheck": {
+        "PIN": "3508590179",
+        "REID": "0067479",
+        "lon": -77.977,
+        "lat": 35.364
+      },
+      "status": "usable",
+      "primary": true
+    },
+    {
+      "role": "parcels",
+      "name": "Goldsboro Parcels VIEW (alternate)",
+      "restUrl": "https://gis.goldsboronc.gov/arcgis/rest/services/Parcels/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "GIS_Acres",
+      "coverage": "county-wide",
+      "maxRecordCount": 4000,
+      "counts": {
+        "total": 69076,
+        "gisAcres_5_150": 9711,
+        "bldgZero_in_5_150": 7233,
+        "salePriceGt0_countywide": 38838
+      },
+      "cityFieldStats": {
+        "Goldsboro": 15303,
+        "Mount Olive": 2769,
+        "Fremont": 981,
+        "Walnut Creek": 647,
+        "Pikeville": 449,
+        "Eureka": 193,
+        "Seven Springs": 142,
+        "00_or_null_unincorp_approx": 48600
+      },
+      "status": "usable",
+      "primary": false
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateRestUrl": "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "filter": "cntyfips='191'",
+      "maxRecordCount": 5000,
+      "counts": {
+        "total": 70711,
+        "gisacres_5_150": 15180,
+        "improvvalZeroOrNull_in_5_150": 4004
+      },
+      "status": "usable",
+      "notes": "Fallback; has situs; no sale price; acreage band differs from county GIS_Acres"
+    },
+    {
+      "role": "other",
+      "name": "Address Points",
+      "restUrl": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Address_Points/FeatureServer/132",
+      "layerId": 132,
+      "geometry": "point",
+      "coverage": "county-wide",
+      "counts": {
+        "total": 71876
+      },
+      "joinKey": "PIN",
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Goldsboro Zoning (city-first)",
+      "restUrl": "https://gis.goldsboronc.gov/arcgis/rest/services/Planning/Zoning/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "coverage": "city-only",
+      "counts": {
+        "total": 3379
+      },
+      "zoningField": "CURRENT_ZONING",
+      "status": "usable",
+      "cityFirst": true
+    },
+    {
+      "role": "zoning",
+      "name": "Goldsboro Zoning AGOL mirror",
+      "restUrl": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Goldsboro_Zoning/FeatureServer/43",
+      "layerId": 43,
+      "counts": {
+        "total": 3360
+      },
+      "status": "usable",
+      "cityFirst": true
+    },
+    {
+      "role": "zoning",
+      "name": "Mount Olive Zoning",
+      "restUrl": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Mount_Olive_Zoning/FeatureServer/44",
+      "layerId": 44,
+      "counts": {
+        "total": 315
+      },
+      "zoningField": "ZONE",
+      "codes": [
+        "A",
+        "AR",
+        "C-1",
+        "C-2",
+        "C-3",
+        "I-1",
+        "I-2",
+        "O&I",
+        "R-10",
+        "R-15",
+        "R-20",
+        "R-6",
+        "R-8",
+        "UC"
+      ],
+      "status": "usable",
+      "cityFirst": true
+    },
+    {
+      "role": "zoning",
+      "name": "Fremont Zoning",
+      "restUrl": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Fremont_Zoning/FeatureServer/42",
+      "layerId": 42,
+      "counts": {
+        "total": 138
+      },
+      "zoningField": "ZONE",
+      "codes": [
+        "GB",
+        "HB",
+        "LI",
+        "MH",
+        "R10",
+        "R15",
+        "R6",
+        "RA"
+      ],
+      "status": "usable",
+      "cityFirst": true
+    },
+    {
+      "role": "zoning",
+      "name": "Pikeville Zoning",
+      "restUrl": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Pikeville_Zoning/FeatureServer/45",
+      "layerId": 45,
+      "counts": {
+        "total": 94
+      },
+      "zoningField": "ZONE",
+      "codes": [
+        "B",
+        "CS",
+        "I",
+        "R5",
+        "R6",
+        "R8",
+        "RA20"
+      ],
+      "status": "usable",
+      "cityFirst": true
+    },
+    {
+      "role": "zoning",
+      "name": "Eureka Zoning",
+      "restUrl": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Eureka_Zoning/FeatureServer/41",
+      "layerId": 41,
+      "counts": {
+        "total": 50
+      },
+      "zoningField": "ZONE_ID",
+      "codes": [
+        "C-1",
+        "I-1",
+        "R-12",
+        "R-20A"
+      ],
+      "status": "usable",
+      "cityFirst": true
+    },
+    {
+      "role": "zoning",
+      "name": "Wayne County Zoning (unincorporated PRIMARY)",
+      "restUrl": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Wayne_County_Zoning/FeatureServer/130",
+      "layerId": 130,
+      "counts": {
+        "total": 1198
+      },
+      "zoningField": "ZONE",
+      "codes": [
+        "AA",
+        "AI",
+        "AIRPORT",
+        "CA",
+        "CS",
+        "HEAVY-IND",
+        "IH",
+        "LIGHT-IND",
+        "OH",
+        "R-10",
+        "R-15",
+        "RA-20",
+        "RA-30",
+        "Unzoned",
+        "VILLAGE-DIST"
+      ],
+      "status": "usable",
+      "primary": true
+    },
+    {
+      "role": "flu",
+      "name": "Goldsboro Proposed Land Use",
+      "restUrl": "https://gis.goldsboronc.gov/arcgis/rest/services/Planning/Proposed_Land_Use/FeatureServer/0",
+      "layerId": 0,
+      "counts": {
+        "total": 2989
+      },
+      "fluField": "LANDUSEDESC",
+      "classCounts": {
+        "Conservation": 628,
+        "MDR": 548,
+        "HDR": 465,
+        "RR_Ag": 373,
+        "Commercial": 224,
+        "Industrial": 210,
+        "LDR": 177,
+        "MU": 117,
+        "OI": 107,
+        "MU DT": 102,
+        "MU 2": 37,
+        "Military": 1
+      },
+      "coverage": "city-only",
+      "status": "usable",
+      "notes": "No countywide FLU REST"
+    },
+    {
+      "role": "other",
+      "name": "City Limits",
+      "restUrl": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/City_Limits/FeatureServer/115",
+      "layerId": 115,
+      "counts": {
+        "total": 7
+      },
+      "codes": {
+        "EUR": "Eureka",
+        "FRE": "Fremont",
+        "MTO": "Mount Olive",
+        "PIK": "Pikeville",
+        "SSP": "Seven Springs",
+        "WAL": "Walnut Creek",
+        "GLB": "Goldsboro"
+      },
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "ETJ Boundary",
+      "restUrl": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Extra_Territorial_Jurisdiction/FeatureServer/113",
+      "layerId": 113,
+      "counts": {
+        "total": 7
+      },
+      "etjOwners": [
+        "FREMONT",
+        "EUREKA",
+        "MOUNT OLIVE",
+        "GOLDSBORO",
+        "PIKEVILLE"
+      ],
+      "status": "usable"
+    }
+  ],
+  "doNotWire": [
+    {
+      "url": "https://gis.goldsboronc.gov/arcgis/rest/services/PARCEL2/FeatureServer",
+      "reason": "Token Required"
+    },
+    {
+      "url": "https://services1.arcgis.com/b6rkZNtCd6Mx2gvB/arcgis/rest/services/Wayne_County_Parcel_Shape_File/FeatureServer/0",
+      "reason": "Wayne County MI (Harper Woods/Inkster) — wrong geography"
+    },
+    {
+      "url": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/EnerGov_Zoning/FeatureServer/0",
+      "reason": "Stub 53 features mixing muni names as ZONE — prefer Wayne_County_Zoning/130"
+    }
+  ],
+  "gaps": [
+    "No countywide FLU — Goldsboro Proposed_Land_Use only",
+    "No zoning REST for Seven Springs or Walnut Creek",
+    "No dedicated city GIS hosts for Mount Olive / Fremont / Pikeville / Eureka — county AGOL publishes their zoning",
+    "NCPTS parcel-detail is SPA-routed (internal parcelId); TaxBillSearch/Parcel/{PIN} is durable GET deep-link",
+    "ITSNet full property card is POST/session-oriented",
+    "OneMap vs county GIS_Acres 5–150 band differs (~15.2k vs ~9.8k) — prefer county LegalLandUnits/GIS_Acres",
+    "Goldsboro Planning/Addresses incomplete vs county Address Points",
+    "PARCEL2 token-gated; MI Wayne AGOL parcel shape wrong geography",
+    "EnerGov_Zoning stub — do not prefer",
+    "Last-sale only; no multi-transfer sales history REST",
+    "MaxRecordCount 2000 (AGOL) / 4000 (Goldsboro Parcels) — paginate",
+    "No phones/emails; no AADT/utilities; no paid vendors"
+  ],
+  "license": "Wayne County + City of Goldsboro public GIS; NCGS-style PA disclaimers; attribution required; no paid vendors",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "tranche": 3,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Parcels/FeatureServer/14",
+    "parcelIdField": "PIN",
+    "acreageFilter": "GIS_Acres >= 5 AND GIS_Acres <= 150",
+    "acres5to150Live": 9822,
+    "parcelCountLive": 70926,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='WAYNE'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WAYNE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WAYNE%27&returnCountOnly=true&f=json",
+        "liveStationCount": 787,
+        "stationsWithAADT2022": 649
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Wayne'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Wayne%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Wayne%27&returnCountOnly=true&f=json",
+        "liveStationCount": 790,
+        "stationsWithAADT2025": 215,
+        "stationsWithAADT2024": 641,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "stations2024CountyFilter": "County='Wayne'",
+        "stations2024LiveCount": 783,
+        "stations2024WithAADT2024": 783,
+        "stations2024Note": "AADT_2024 string field populated on every station in this release",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TotalMarketValue",
+        "TotalAssessedValue"
+      ],
+      "liveNonZero": {
+        "TotalMarketValue": 68390,
+        "TotalAssessedValue": 68390
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SalePrice"
+      ],
+      "dateFields": [
+        "DeedDate"
+      ],
+      "livePriceNonZero": {
+        "SalePrice": 40836
+      },
+      "liveDateNonNull": {
+        "DeedDate": 69961
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Name1",
+        "Name2"
+      ],
+      "rule": "Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).",
+      "regex": "\\b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "regexExtended": "\\b(LLC|L\\s?L\\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\\b|\\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\\s+OF\\b|\\bOF\\s+(EDUCATION|TRANSPORTATION)\\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\\b",
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "liveEntityCount5to150ac": 2410,
+      "liveEntityCount5to150acExtended": 2778,
+      "countNote": "Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.",
+      "sampleMatches": [
+        "TRS OF WAYNE COMMUNITY COLLEGE",
+        "PEPSI BOTTLING VENTURES LLC",
+        "EWT 48 LLC",
+        "AMPLE STORAGE GOLDSBORO LLC"
+      ]
+    },
+    "paDeepLink": {
+      "template": "https://realestate.waynegov.com/ITSPublic/TaxBillSearch/Parcel/{PIN}",
+      "testedParcelId": "2533752649",
+      "testedUrl": "https://realestate.waynegov.com/ITSPublic/TaxBillSearch/Parcel/2533752649",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": true,
+      "note": "Parcel id found in the response body."
+    },
+    "gisViewer": {
+      "url": "https://experience.arcgis.com/experience/d01a6a5741ae41a2b4f0d3c8f61afa12",
+      "httpStatus": 200,
+      "pageTitle": "Experience"
+    },
+    "gaps": []
+  }
+}

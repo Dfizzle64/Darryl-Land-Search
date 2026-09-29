@@ -1,0 +1,545 @@
+{
+  "state": "NC",
+  "jurisdiction": "Pasquotank County",
+  "county": "Pasquotank",
+  "fips": "37139",
+  "cntyfips": "139",
+  "slug": "pasquotank",
+  "level": "county",
+  "markets": [
+    "Outer Banks",
+    "Eastern NC"
+  ],
+  "msa": "Outer Banks / Eastern NC",
+  "crs_preferred": {
+    "wkid": 102100,
+    "latestWkid": 3857,
+    "name": "WGS 1984 Web Mercator Auxiliary Sphere"
+  },
+  "jurisdictionGisUrl": "https://pasquotankcounty.maps.arcgis.com/apps/instant/basic/index.html?appid=38fc8f0292b04ba0a300f801f17ae902",
+  "jurisdictionGisUrlAlternates": [
+    "https://pasquotankcounty.maps.arcgis.com/apps/Viewer/index.html?appid=7155a34043534443aaaa3fed8f8a492e",
+    "https://pasquotankcounty.maps.arcgis.com/apps/webappviewer/index.html?id=7c28d4e794d64a329c826a61575d0559",
+    "https://pasquotankcounty.maps.arcgis.com/apps/webappviewer/index.html?id=8ef50e079f984cabbef43edf27a5d953"
+  ],
+  "countyRestRoot": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services",
+  "agolOrgId": "0sC2n3LxYOcxBOg0",
+  "agolOrgUrl": "https://pasquotankcounty.maps.arcgis.com/",
+  "appraiserSearchUrl": "https://link.co.pasquotank.nc.us/taxcard/taxcard.cfm?PP2={PPN_2}",
+  "appraiserSearchUrlNotes": "PP2 parameter is layer field PPN_2 (NOT PID). Verified PP2=72145 \u2192 PIN 891311763298 / PID 11249; PP2=64277 \u2192 PIN 7968  063483 / PID 2044. Tax card HTML includes owner, values, sales history.",
+  "paSearchForms": {
+    "PIN": "https://link.co.pasquotank.nc.us/taxcard/DisplayTax.cfm?SEARCH=PIN",
+    "PID": "https://link.co.pasquotank.nc.us/taxcard/DisplayTax.cfm?SEARCH=PID",
+    "ADDRESS": "https://link.co.pasquotank.nc.us/taxcard/DisplayTax.cfm?SEARCH=ADDRESS",
+    "MAP": "https://link.co.pasquotank.nc.us/taxcard/DisplayTax.cfm?SEARCH=MAP",
+    "Owner": "https://link.co.pasquotank.nc.us/taxcard/DisplayTax.cfm?SEARCH=Owner",
+    "DEED": "https://link.co.pasquotank.nc.us/taxcard/DisplayTax.cfm?SEARCH=DEED"
+  },
+  "paDeepLinkKey": "PPN_2",
+  "parcelIdPreferred": "PARCEL_ID",
+  "joinKeys": [
+    "PARCEL_ID",
+    "PIN",
+    "PPN_2",
+    "PID",
+    "parno"
+  ],
+  "parcelSearchUrl": "https://www.pasquotankcountync.org/tcs",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/pasquotank/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/pasquotank/parcel-detail/{PIN}",
+  "taxOfficeUrl": "https://www.pasquotankcountync.org/tax-office",
+  "gisDeptUrl": "https://www.pasquotankcountync.org/gis-office",
+  "countyPlanningUrl": "https://www.pasquotankcountync.org/planning",
+  "officialPlansUrl": "https://www.pasquotankcountync.org/official-plans-and-documents",
+  "countyZoningOrdinancePdf": "https://www.pasquotankcountync.org/s/Official-Zoning-Ordinance-adopted-June-21-2021-amended-Jan20th2026.pdf",
+  "fluPlanPdf": "https://www.pasquotankcountync.org/s/Pasquotank_LUP_draftF7_FINAL_20230831.pdf",
+  "camaLandUsePlanPdf": "https://www.pasquotankcountync.org/s/Feb-82012-revised-LUP-ecac.pdf",
+  "deqCertifiedLupUrl": "https://www.deq.nc.gov/about/divisions/coastal-management/coastal-management-land-use-planning/certified-lups/pasquotank-county",
+  "deqPlanPdf": "https://www.deq.nc.gov/documents/pdf/land-use-plans/pasquotankplan/download",
+  "draftUdoUrl": "https://wsc.konveio.com/pasquotank-county-udo",
+  "elizabethCityDevelopmentServicesUrl": "https://elizabethcitync.gov/development-services",
+  "elizabethCityUdoUrl": "https://elizabethcitync.gov/index.asp?SEC=FBC83C29-03EF-4FA1-9177-AE938C78FEF2&DE=2E73BB9B-E239-4C0C-8AC0-846E26B19469",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='139'",
+  "rejectLayers": [
+    {
+      "name": "zoning_toh (Town of Hertford)",
+      "url": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/zoning_toh/FeatureServer/0",
+      "reason": "Town of Hertford zoning (Perquimans County) hosted on Pasquotank AGOL \u2014 wrong geography"
+    },
+    {
+      "name": "Paid GIS parcel download ($200)",
+      "url": "https://www.pasquotankcountync.org/gis-office",
+      "reason": "Paid shapefile offer; free public AGOL CAMA FeatureServers supersede \u2014 do not purchase/scrape"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Elizabeth City",
+      "role": "county seat; cities-first zoning PRIMARY",
+      "incorporated": true,
+      "localGis": true,
+      "zoningPrefer": "CityZoning",
+      "zoningUrl": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/CityZoning/FeatureServer/0",
+      "zoningCount": 329,
+      "zoningTwinUrl": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/Elizabeth_City_Zoning/FeatureServer/0",
+      "zoningTwinCount": 317,
+      "cityLimitsUrl": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/City_of_Elizabeth_City/FeatureServer/0",
+      "cityLimitsCount": 74,
+      "zoneCodes": [
+        "GB",
+        "R-15",
+        "O&I",
+        "I-2",
+        "AD",
+        "R-8",
+        "RMH",
+        "R-10",
+        "HB",
+        "R-6",
+        "CB",
+        "I-1",
+        "NB",
+        "PUD-PDR",
+        "CMU",
+        "GB-CZ",
+        "RMH-CZ",
+        "I-1 CZ",
+        "O&I-CZ",
+        "PUD-PDM",
+        "R-8 CZ"
+      ],
+      "planningUrl": "https://elizabethcitync.gov/development-services",
+      "udoUrl": "https://elizabethcitync.gov/index.asp?SEC=FBC83C29-03EF-4FA1-9177-AE938C78FEF2&DE=2E73BB9B-E239-4C0C-8AC0-846E26B19469",
+      "notes": "Only incorporated city substantially in Pasquotank; small area also in Camden. Prefer CityZoning over county zoning inside city/ETJ."
+    },
+    {
+      "name": "Unincorporated (Weeksville / Nixonton / Newland / Salem / Providence)",
+      "role": "county zoning",
+      "incorporated": false,
+      "localGis": false,
+      "zoningPrefer": "County_Zoning_2026",
+      "notes": "CDPs/townships \u2014 County_Zoning_2026 + 2023 FLU PDF"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "PasquotankCountyNC_20260101 (PRIMARY CAMA)",
+      "restUrl": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/PasquotankCountyNC_20260101/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "TAXACRES",
+      "acreageFieldAlt": [
+        "DEED_ACRE",
+        "Shape_Area"
+      ],
+      "coverage": "county-wide",
+      "primary": true,
+      "fieldMap": {
+        "PARCEL_ID": "parcelId",
+        "PIN": "parcelId",
+        "PID": "parcelIdAlt",
+        "PPN_2": "appraiserDeepLinkKey",
+        "ACCOUNT": "accountNumber",
+        "OWNER1": "ownerName",
+        "OWNER2": "ownerName",
+        "MAILING1": "mailingAddress",
+        "MAILING2": "mailingAddress",
+        "CITY": "mailingAddress",
+        "STATE": "mailingAddress",
+        "ZIP": "mailingAddress",
+        "LOCATION": "situsAddress",
+        "TAXACRES": "acreage",
+        "DEED_ACRE": "acreage",
+        "Shape_Area": "acreage",
+        "CURLAND": "tax.landValue",
+        "CURBLDG": "tax.improvementValue",
+        "CURTOTAL": "tax.marketValue",
+        "TOTASSD": "tax.assessedValue",
+        "PRLAND": "tax.priorLandValue",
+        "PRBLDG": "tax.priorImprovementValue",
+        "PRTOTAL": "tax.priorMarketValue",
+        "DEEDDATE": "lastSale.date",
+        "DEEDBOOK": "lastSale.deedBook",
+        "DEEDPAGE": "lastSale.deedPage",
+        "CLASS": "dorCode",
+        "MAP": "mapReference"
+      },
+      "counts": {
+        "total": 22788,
+        "acres5to150_TAXACRES": 2814,
+        "acres5to150_Shape_Area": 3145,
+        "curtotalGt0": 22661,
+        "ownerNonEmpty": 22664,
+        "deedDateGt0": 16626,
+        "ppn2Gt0": 22665
+      },
+      "notes": "PRIMARY as-of 2026-01-01 CAMA. Sale price via sales2025 join on PARCEL_ID. MaxRecordCount 2000. Sample 7959  112410 \u2248 -76.446, 36.447.",
+      "status": "usable"
+    },
+    {
+      "role": "parcels",
+      "name": "Parcels_2024 (CAMA twin)",
+      "restUrl": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/Parcels_2024/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "TAXACRES",
+      "coverage": "county-wide",
+      "counts": {
+        "total": 22575
+      },
+      "notes": "Slightly stale twin of 20260101; prefer primary.",
+      "status": "partial"
+    },
+    {
+      "role": "parcels",
+      "name": "Parcels_Current (geometry-lean)",
+      "restUrl": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/Parcels_Current/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "DEED_ACRE",
+      "coverage": "county-wide",
+      "counts": {
+        "total": 22530
+      },
+      "notes": "No owner/tax \u2014 geometry fallback only.",
+      "status": "partial"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "filter": "cntyfips='139'",
+      "fieldMap": {
+        "parno": "parcelId",
+        "altparno": "parcelIdAlt",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress",
+        "mcity": "mailingAddress",
+        "mstate": "mailingAddress",
+        "mzip": "mailingAddress",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "recareano": "acreage",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "saledate": "lastSale.date",
+        "saledatetx": "lastSale.date"
+      },
+      "counts": {
+        "total": 22788,
+        "acres5to150_gisacres": 3145,
+        "acres5to150_recareano": 2814,
+        "parvalGt0": 22661,
+        "saledateNotNull": 0,
+        "saledatetxNonEmpty": 0
+      },
+      "notes": "Matches county count. Sale date/price empty \u2014 use county sales FS.",
+      "status": "usable"
+    },
+    {
+      "role": "sales",
+      "name": "sales2025 (PRIMARY sale-price join)",
+      "restUrl": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/sales2025/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "PARCEL_ID": "parcelId",
+        "SALE_PRICE": "lastSale.price",
+        "SALE_DATE_": "lastSale.date",
+        "SALE_TYPE_": "lastSale.type",
+        "Type": "lastSale.propertyType",
+        "OWNER1": "ownerName"
+      },
+      "counts": {
+        "total": 1201,
+        "salePriceGt0": 1201
+      },
+      "join": "PARCEL_ID = PasquotankCountyNC_20260101.PARCEL_ID",
+      "notes": "PRIMARY sale price. Historical Sales_2024 (2146) and earlier year layers also on org.",
+      "status": "usable"
+    },
+    {
+      "role": "sales",
+      "name": "Sales_2024",
+      "restUrl": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/Sales_2024/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "PARCEL_ID": "parcelId",
+        "SalePric": "lastSale.price",
+        "Date": "lastSale.date",
+        "Type": "lastSale.propertyType",
+        "OWNER1": "ownerName"
+      },
+      "counts": {
+        "total": 2146,
+        "salePriceGt0": 2146
+      },
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "CityZoning (Elizabeth City \u2014 cities-first PRIMARY)",
+      "restUrl": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/CityZoning/FeatureServer/0",
+      "alternateUrls": [
+        "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/Elizabeth_City_Zoning/FeatureServer/0"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "municipality": "Elizabeth City",
+      "fieldMap": {
+        "ZONING": "zoning"
+      },
+      "counts": {
+        "total": 329,
+        "twinElizabeth_City_Zoning": 317
+      },
+      "zoneCodesSample": [
+        "GB",
+        "R-15",
+        "O&I",
+        "I-2",
+        "AD",
+        "R-8",
+        "RMH",
+        "R-10",
+        "HB",
+        "R-6",
+        "CB",
+        "I-1",
+        "NB",
+        "PUD-PDR",
+        "CMU"
+      ],
+      "notes": "Cities-first PRIMARY. Prefer over County_Zoning inside city/ETJ.",
+      "status": "usable",
+      "primary": true
+    },
+    {
+      "role": "zoning",
+      "name": "County_Zoning_2026 (unincorporated)",
+      "restUrl": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/County_Zoning_2026/FeatureServer/0",
+      "alternateUrls": [
+        "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/County_Zoning/FeatureServer/0"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "ZONING": "zoning",
+        "NAME": "township"
+      },
+      "counts": {
+        "total": 778,
+        "legacyCounty_Zoning": 772
+      },
+      "zoneCodesSample": [
+        "A-1",
+        "C-1",
+        "R-15",
+        "R-25",
+        "I-1",
+        "RMH-15",
+        "EC",
+        "R-35A",
+        "A-2",
+        "R-15A",
+        "I-2",
+        "O&I",
+        "RMH-25",
+        "P-1"
+      ],
+      "notes": "Use outside Elizabeth City zoning polys. Draft UDO may consolidate residential districts.",
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "City_of_Elizabeth_City (annexation / limits router)",
+      "restUrl": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/City_of_Elizabeth_City/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "counts": {
+        "total": 74
+      },
+      "notes": "Annexation history polys for cities-first routing \u2014 not zoning districts.",
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "2023 Future Land Use Plan (PDF)",
+      "restUrl": null,
+      "pdfUrl": "https://www.pasquotankcountync.org/s/Pasquotank_LUP_draftF7_FINAL_20230831.pdf",
+      "alternatePdfs": [
+        "https://www.pasquotankcountync.org/s/Feb-82012-revised-LUP-ecac.pdf",
+        "https://www.deq.nc.gov/documents/pdf/land-use-plans/pasquotankplan/download"
+      ],
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "county-wide",
+      "notes": "No public FLU FeatureServer. Use county 2023 FLU Plan + joint CAMA/DEQ LUP PDFs.",
+      "status": "gap"
+    }
+  ],
+  "gaps": [
+    "No public FLU FeatureServer \u2014 PDF only (2023 FLU Plan + CAMA/DEQ LUP)",
+    "Sale price not on primary CAMA \u2014 join sales2025/Sales_2024 on PARCEL_ID",
+    "OneMap saledate/saledatetx empty for cntyfips='139'",
+    "Paid $200 parcel download on GIS Office page \u2014 ignore; use free AGOL",
+    "zoning_toh on this AGOL is Town of Hertford (Perquimans) \u2014 reject",
+    "Utilities/water FeatureServers on org excluded by scope",
+    "Elizabeth City extends into Camden County \u2014 do not over-assign EC zoning to Pasquotank-only"
+  ],
+  "license": "Pasquotank County GIS/Tax public AGOL; NC OneMap; Elizabeth City Development Services \u2014 attribution required",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "tranche": 3,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://services2.arcgis.com/0sC2n3LxYOcxBOg0/arcgis/rest/services/PasquotankCountyNC_20260101/FeatureServer/0",
+    "parcelIdField": "PARCEL_ID",
+    "acreageFilter": "TAXACRES >= 5 AND TAXACRES <= 150",
+    "acres5to150Live": 2814,
+    "parcelCountLive": 22788,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='PASQUOTANK'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27PASQUOTANK%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27PASQUOTANK%27&returnCountOnly=true&f=json",
+        "liveStationCount": 213,
+        "stationsWithAADT2022": 112
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Pasquotank'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Pasquotank%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Pasquotank%27&returnCountOnly=true&f=json",
+        "liveStationCount": 202,
+        "stationsWithAADT2025": 134,
+        "stationsWithAADT2024": 122,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "CURTOTAL",
+        "TOTASSD"
+      ],
+      "allTaxFieldsOnLayer": [
+        "CURLAND",
+        "CURBLDG",
+        "CURTOTAL",
+        "TOTASSD",
+        "PRLAND",
+        "PRBLDG",
+        "PRTOTAL"
+      ],
+      "liveNonZero": {
+        "CURTOTAL": 22661,
+        "TOTASSD": 22660
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [],
+      "dateFields": [
+        "DEEDDATE"
+      ],
+      "livePriceNonZero": {},
+      "liveDateNonNull": {
+        "DEEDDATE": 16626
+      },
+      "status": "partial",
+      "note": "Price not on REST; Pasquotank taxcard.cfm?PP2= page is the public sale source."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "OWNER1",
+        "OWNER2"
+      ],
+      "primaryOwnerField": "OWNER1",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(OWNER1) LIKE '% LLC%' OR UPPER(OWNER1) LIKE '% INC%' OR UPPER(OWNER1) LIKE '% LP%' OR UPPER(OWNER1) LIKE '% LLP%' OR UPPER(OWNER1) LIKE '% LTD%' OR UPPER(OWNER1) LIKE '% TRUST%' OR UPPER(OWNER1) LIKE '% CHURCH%' OR UPPER(OWNER1) LIKE '% COMPANY%' OR UPPER(OWNER1) LIKE '% PARTNERSHIP%' OR UPPER(OWNER1) LIKE '% HOLDINGS%' OR UPPER(OWNER1) LIKE '% PROPERTIES%' OR UPPER(OWNER1) LIKE '% CORP%' OR UPPER(OWNER1) LIKE '%,LLC%' OR UPPER(OWNER1) LIKE '%,INC%' OR UPPER(OWNER1) LIKE 'CITY OF %' OR UPPER(OWNER1) LIKE 'COUNTY OF %' OR UPPER(OWNER1) LIKE 'STATE OF %' OR UPPER(OWNER1) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 3254,
+      "liveEntityCount5to150ac": 520,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://link.co.pasquotank.nc.us/taxcard/taxcard.cfm?PP2={PPN_2}",
+      "testedParcelId": "65022",
+      "testedUrl": "https://link.co.pasquotank.nc.us/taxcard/taxcard.cfm?PP2=65022",
+      "httpStatus": 200,
+      "contentType": "text/html;charset=UTF-8",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://pasquotankcounty.maps.arcgis.com/apps/instant/basic/index.html?appid=38fc8f0292b04ba0a300f801f17ae902",
+      "httpStatus": 200,
+      "pageTitle": "Basic",
+      "arcgisItem": {
+        "access": "public",
+        "title": "Pasquotank County New",
+        "type": "Web Mapping Application",
+        "err": null
+      }
+    },
+    "gaps": [
+      "sale partial"
+    ]
+  }
+}

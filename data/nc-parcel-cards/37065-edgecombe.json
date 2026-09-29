@@ -1,0 +1,537 @@
+{
+  "county": "Edgecombe",
+  "state": "NC",
+  "msa": "Rocky Mount / RDU shed",
+  "fips": "37065",
+  "cntyfips": "065",
+  "slug": "edgecombe",
+  "level": "county",
+  "markets": [
+    "Rocky Mount",
+    "Raleigh-Durham"
+  ],
+  "crsPreferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "publicGisUrl": "https://gis.edgecombecountync.gov/maps/default.htm",
+  "jurisdictionGisUrl": "https://gis.edgecombecountync.gov/maps/default.htm",
+  "gisViewerUrl": "https://gis.edgecombecountync.gov/maps/default.htm",
+  "viewerLinkTemplate": "https://gis.edgecombecountync.gov/maps/default.htm?PIN={linkpin}",
+  "gisDepartmentUrl": "https://www.edgecombecountync.gov/departments/planning_inspections_and_e-911/",
+  "countyRestRoot": "https://gis.edgecombecountync.gov/arcgis/rest/services",
+  "appraiserSearchUrl": "https://taxpa.edgecombecountync.gov/paas/?DEST=pSearch",
+  "paDeepLinkTemplate": "https://taxpa.edgecombecountync.gov/paas/?DEST=pDetail&pKEY={linkpin}",
+  "paDeepLinkMethod": "POST preferred (Keystone WebPAAS); GET may return empty shell",
+  "paDeepLinkKey": "linkpin",
+  "paSearchPinFormat": "####-##-####-## ({parcel}-{pinsuf})",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/edgecombe/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/edgecombe/parcel-detail/{parcel}",
+  "ncptsDeepLinkTemplateAlt": "https://lrcpwa.ncptscloud.com/edgecombe/parcel-detail/{linkpin}",
+  "taxAssessorUrl": "https://www.edgecombecountync.gov/businesses/tax_assessor/",
+  "taxAdministrationUrl": "https://www.edgecombecountync.gov/departments/tax_administration/",
+  "rockyMountViewerUrl": "https://map.viewprogis.com/vp/rockymount-nc",
+  "oneMapFilter": "cntyfips='065'",
+  "joinKeys": [
+    "linkpin",
+    "parcel",
+    "pin",
+    "account",
+    "parno",
+    "altparno"
+  ],
+  "parcelIdPreferred": "linkpin",
+  "municipalities": {
+    "Tarboro": {
+      "role": "county seat",
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/15",
+      "zoningCount": 96,
+      "zoningField": "ALPHA",
+      "fluPrefer": null,
+      "notes": "CITY-FIRST. Codes HB/GR10/HI/GR3/O&I/NB/GR5/RD/LI/MHP/CBD/HO."
+    },
+    "Rocky Mount": {
+      "role": "tip / shared with Nash",
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/16",
+      "zoningCount": 144,
+      "zoningField": "ZONING",
+      "zoningNashSidePrefer": "https://gis.nashcountync.gov/nashmaps/rest/services/PUBLIC/Avineon_WebTemplate/MapServer/72",
+      "zoningNashSideCount": 2972,
+      "publicGisUrl": "https://map.viewprogis.com/vp/rockymount-nc",
+      "fluPrefer": null,
+      "notes": "CITY-FIRST Edgecombe tip only (144). Prefer Nash Avineon_WebTemplate/72 (2972) for Nash-side. No city ArcGIS REST \u2014 ViewPro only."
+    },
+    "Sharpsburg": {
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/13",
+      "zoningCount": 167,
+      "zoningField": "Zone",
+      "notes": "CITY-FIRST. Spans Nash/Wilson/Edgecombe \u2014 clip. Codes R-10/B-1/R-6M/R-6/MHP/R-8/I/R-12."
+    },
+    "Leggett": {
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/14",
+      "zoningCount": 82,
+      "zoningField": "ALPHA"
+    },
+    "Pinetops": {
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/17",
+      "zoningCount": 21,
+      "zoningField": "ALPHA"
+    },
+    "Princeville": {
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/18",
+      "zoningCount": 7,
+      "zoningField": "ALPHA",
+      "notes": "Thin district layer (7)."
+    },
+    "Macclesfield": {
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/19",
+      "zoningCount": 10,
+      "zoningField": "ALPHA"
+    },
+    "Conetoe": {
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/20",
+      "zoningCount": 12,
+      "zoningField": "ALPHA"
+    },
+    "Whitakers": {
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "zoningNashSidePrefer": "https://gis.nashcountync.gov/nashmaps/rest/services/PUBLIC/Avineon_WebTemplate/MapServer/75",
+      "notes": "City limits present; no Edgecombe zoning layer \u2014 use Nash Avineon_WebTemplate/75 for Nash-side tip."
+    },
+    "Speed": {
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "overlayPrefer": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/57",
+      "notes": "ETJ + Speed Community Overlay only; no town zoning polygons."
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "webmap/Parcels (PRIMARY CAMA)",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/10",
+      "layerId": 10,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "coverage": "county-wide",
+      "acreageField": "acreage",
+      "count": 31606,
+      "countAcres5to150": 4259,
+      "countSalePriceInBand": 1445,
+      "countVacantishInBand": 2559,
+      "maxRecordCount": 1000,
+      "fieldMap": {
+        "linkpin": "parcelId",
+        "parcel": "parcelIdDisplay",
+        "pin": "parcelIdPin",
+        "pinsuf": "parcelIdPinSuffix",
+        "account": "parcelIdAccount",
+        "altpin": "parcelIdAlt",
+        "acreage": "acreage",
+        "owner": "ownerName",
+        "address": "mailingAddress.street",
+        "city": "mailingAddress.city",
+        "st": "mailingAddress.state",
+        "zip": "mailingAddress.zip",
+        "location": "situsAddress",
+        "deeddate": "lastSale.date",
+        "deeddatestr": "lastSale.dateText",
+        "salepr": "lastSale.price",
+        "bk_pg": "lastSale.deedBookPage",
+        "landval": "tax.landValue",
+        "bldgval": "tax.improvementValue",
+        "netval": "tax.taxableValue",
+        "deferred": "tax.deferredValue",
+        "zone": "zoning",
+        "taxcodes": "taxDistricts",
+        "pclass": "propClass",
+        "propdescr": "legalDescription",
+        "subdivisio": "subdivision",
+        "map": "mapSheet",
+        "nbhd": "neighborhood"
+      },
+      "notes": "PRIMARY. Paginate max 1000. Sample linkpin 374772365000. Geo-check 374783367400 \u2248 -77.824, 35.870. FeatureServer twin not queryable."
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (fallback)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "coverage": "county-wide",
+      "acreageField": "gisacres",
+      "filter": "cntyfips='065'",
+      "count": 31591,
+      "countAcres5to150": 4249,
+      "fieldMap": {
+        "parno": "parcelId",
+        "altparno": "parcelIdPin",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress.street",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "saledate": "lastSale.date"
+      },
+      "notes": "parno\u2194parcel; altparno\u2194pin. No sale price. Alternate services.gis.nc.gov."
+    },
+    {
+      "role": "zoning",
+      "name": "Tarboro Zoning (city-first PRIMARY seat)",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/15",
+      "layerId": 15,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "coverage": "city-only",
+      "count": 96,
+      "zoningField": "ALPHA",
+      "fieldMap": {
+        "ALPHA": "zoning"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Rocky Mount Zoning (Edgecombe tip)",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/16",
+      "layerId": 16,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "partial",
+      "coverage": "city-only",
+      "count": 144,
+      "zoningField": "ZONING",
+      "fieldMap": {
+        "ZONING": "zoning"
+      },
+      "notes": "Edgecombe-side only. Prefer Nash Avineon_WebTemplate/72 (2972) for Nash-side RM."
+    },
+    {
+      "role": "zoning",
+      "name": "Sharpsburg Zoning",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/13",
+      "layerId": 13,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "coverage": "city-only",
+      "count": 167,
+      "zoningField": "Zone",
+      "fieldMap": {
+        "Zone": "zoning"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Leggett Zoning",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/14",
+      "layerId": 14,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "coverage": "city-only",
+      "count": 82,
+      "zoningField": "ALPHA",
+      "fieldMap": {
+        "ALPHA": "zoning"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Pinetops Zoning",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/17",
+      "layerId": 17,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "coverage": "city-only",
+      "count": 21,
+      "zoningField": "ALPHA",
+      "fieldMap": {
+        "ALPHA": "zoning"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Princeville Zoning",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/18",
+      "layerId": 18,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "partial",
+      "coverage": "city-only",
+      "count": 7,
+      "zoningField": "ALPHA",
+      "fieldMap": {
+        "ALPHA": "zoning"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Macclesfield Zoning",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/19",
+      "layerId": 19,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "coverage": "city-only",
+      "count": 10,
+      "zoningField": "ALPHA",
+      "fieldMap": {
+        "ALPHA": "zoning"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Conetoe Zoning",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/20",
+      "layerId": 20,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "coverage": "city-only",
+      "count": 12,
+      "zoningField": "ALPHA",
+      "fieldMap": {
+        "ALPHA": "zoning"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "County Zoning (unincorporated PRIMARY)",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/23",
+      "layerId": 23,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "coverage": "county-wide",
+      "count": 175,
+      "zoningField": "ALPHA",
+      "fieldMap": {
+        "ALPHA": "zoning"
+      },
+      "notes": "Under County Zoning group/21 with ETJ/22. Top: B-1, R-20, R-30, M-2, B-2."
+    },
+    {
+      "role": "flu",
+      "name": "Land Use Districts (coarse UA/UB only)",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/45",
+      "layerId": 45,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "partial",
+      "coverage": "county-wide",
+      "count": 2,
+      "fieldMap": {
+        "ALPHA": "flu"
+      },
+      "notes": "FLU GAP \u2014 only UA and UB. No detailed FLUM or city FLU FeatureServers."
+    },
+    {
+      "role": "other",
+      "name": "Address Points",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/5",
+      "layerId": 5,
+      "geometry": "point",
+      "auth": "none",
+      "status": "partial",
+      "coverage": "county-wide",
+      "count": 33175,
+      "fieldMap": {
+        "FULLADD": "situsAddress",
+        "CITY": "situsCity",
+        "ZIP": "situsZip"
+      },
+      "notes": "No PIN join key \u2014 spatial only. Prefer parcel location / OneMap siteadd."
+    },
+    {
+      "role": "other",
+      "name": "City Limits",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/35",
+      "layerId": 35,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "count": 80,
+      "fieldMap": {
+        "ALPHA": "municipality"
+      }
+    },
+    {
+      "role": "other",
+      "name": "ETJ",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/22",
+      "layerId": 22,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "count": 7,
+      "fieldMap": {
+        "ALPHA": "etjName"
+      }
+    },
+    {
+      "role": "other",
+      "name": "Speed Community Overlay",
+      "restUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/57",
+      "layerId": 57,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "count": 1,
+      "fieldMap": {
+        "ALPHA": "overlay"
+      }
+    }
+  ],
+  "gaps": [
+    "No independent city ArcGIS FeatureServers \u2014 county-host + Rocky Mount ViewPro only",
+    "Rocky Mount Edgecombe tip (144) incomplete vs Nash-side Avineon_WebTemplate/72 (2972)",
+    "Whitakers city_limits without Edgecombe zoning layer \u2014 use Nash Avineon_WebTemplate/75",
+    "FLU gap: Land Use Districts only UA/UB (2 polys); no detailed FLUM",
+    "Parcel zone attribute noisy/partial (~36%); prefer spatial join to zoning layers",
+    "Address Points lack PIN \u2014 spatial join only",
+    "Keystone PA detail prefers POST pKEY={linkpin}; bare GET may be empty",
+    "Last-sale only; no multi-transfer history layer",
+    "Sharpsburg/Whitakers/Rocky Mount span adjacent counties \u2014 clip",
+    "MaxRecordCount 1000 \u2014 paginate; ParcelFabric/Hosted token-required; no phones/emails/AADT/utilities/paid vendors"
+  ],
+  "license": "Edgecombe County public GIS; NC OneMap; attribution recommended; no paid vendors",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/10",
+    "parcelIdField": "linkpin",
+    "acreageFilter": "acreage >= 5 AND acreage <= 150",
+    "acres5to150Live": 4257,
+    "parcelCountLive": 31608,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='EDGECOMBE'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27EDGECOMBE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27EDGECOMBE%27&returnCountOnly=true&f=json",
+        "liveStationCount": 498,
+        "stationsWithAADT2022": 56
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Edgecombe'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Edgecombe%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Edgecombe%27&returnCountOnly=true&f=json",
+        "liveStationCount": 495,
+        "stationsWithAADT2025": 401,
+        "stationsWithAADT2024": 229,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "netval",
+        "landval",
+        "bldgval"
+      ],
+      "allTaxFieldsOnLayer": [
+        "landval",
+        "bldgval",
+        "netval",
+        "deferred",
+        "taxcodes"
+      ],
+      "liveNonZero": {
+        "netval": 31541,
+        "landval": 31105,
+        "bldgval": 22278
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "salepr"
+      ],
+      "dateFields": [
+        "deeddate"
+      ],
+      "livePriceNonZero": {
+        "salepr": 14564
+      },
+      "liveDateNonNull": {
+        "deeddate": 31543
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "owner"
+      ],
+      "primaryOwnerField": "owner",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(owner) LIKE '% LLC%' OR UPPER(owner) LIKE '% INC%' OR UPPER(owner) LIKE '% LP%' OR UPPER(owner) LIKE '% LLP%' OR UPPER(owner) LIKE '% LTD%' OR UPPER(owner) LIKE '% TRUST%' OR UPPER(owner) LIKE '% CHURCH%' OR UPPER(owner) LIKE '% COMPANY%' OR UPPER(owner) LIKE '% PARTNERSHIP%' OR UPPER(owner) LIKE '% HOLDINGS%' OR UPPER(owner) LIKE '% PROPERTIES%' OR UPPER(owner) LIKE '% CORP%' OR UPPER(owner) LIKE '%,LLC%' OR UPPER(owner) LIKE '%,INC%' OR UPPER(owner) LIKE 'CITY OF %' OR UPPER(owner) LIKE 'COUNTY OF %' OR UPPER(owner) LIKE 'STATE OF %' OR UPPER(owner) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 6623,
+      "liveEntityCount5to150ac": 1251,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://taxpa.edgecombecountync.gov/paas/?DEST=pDetail&pKEY={linkpin}",
+      "testedParcelId": "374783367400",
+      "testedUrl": "https://taxpa.edgecombecountync.gov/paas/?DEST=pDetail&pKEY=374783367400",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": false,
+      "note": "GET returns 200 but an empty Keystone shell; POST pKEY={linkpin} to ?DEST=pDetail returns the owner (verified via curl POST). LSB: open via form POST, or fall back to NCPTS / map ?PIN=."
+    },
+    "gisViewer": {
+      "url": "https://gis.edgecombecountync.gov/maps/default.htm",
+      "httpStatus": 200,
+      "pageTitle": "Avineon Web Map Template"
+    },
+    "gaps": []
+  }
+}

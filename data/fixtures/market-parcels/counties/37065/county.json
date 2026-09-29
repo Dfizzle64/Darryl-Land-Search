@@ -1,0 +1,28 @@
+{
+  "name": "Edgecombe",
+  "fips": "37065",
+  "state": "North Carolina",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "featureCount": 4257,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-edgecombe-parcels-37065",
+  "queryUrl": "https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/10/query",
+  "gaps": [
+    "Parcels are webmap/Parcels (PRIMARY CAMA) (https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/10). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 498 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37065/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37065/lookup.json",
+  "sourceCount": 4257,
+  "dropped": 0,
+  "tileCount": 7,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://taxpa.edgecombecountync.gov/paas/?DEST=pDetail&pKEY={linkpin}",
+  "gisViewerUrl": "https://gis.edgecombecountync.gov/maps/default.htm"
+}

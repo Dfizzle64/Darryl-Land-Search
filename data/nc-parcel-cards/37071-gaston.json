@@ -1,0 +1,797 @@
+{
+  "county": "Gaston",
+  "state": "NC",
+  "msa": "Charlotte MSA",
+  "fips": "37071",
+  "cntyfips": "071",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "crs_notes": "City of Gastonia cogserver uses WKID 103122 / latestWkid 6543 (NAD 1983 2011 StatePlane NC Feet). Reproject when mixing with county PublicGIS (2264).",
+  "viewerLinkTemplate": "https://gastonnc.devnetwedge.com/parcel/view/{AKPAR}",
+  "viewerLinkTemplates": [
+    "https://gastonnc.devnetwedge.com/parcel/view/{AKPAR}",
+    "https://gis.gastoncountync.gov/Map/Default.aspx?AKPAR={AKPAR}",
+    "https://gis.gastoncountync.gov/Map/Index/{AKPAR}"
+  ],
+  "joinKeys": [
+    "AKPAR",
+    "PIN",
+    "PID"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "AKPAR",
+        "PIN",
+        "PID",
+        "parno"
+      ],
+      "bestLayer": "PublicGIS/Parcels"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "PublicGIS/Parcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CALCAC",
+        "DEEDAC",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 6818,
+      "bestLayer": "PublicGIS/Parcels"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "CURR_NAME1+CURR_NAME2",
+        "ownname"
+      ],
+      "bestLayer": "PublicGIS/Parcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "CURR_ADDR1",
+        "CURR_ADDR2",
+        "CURR_CITY",
+        "CURR_STATE",
+        "CURR_ZIPCODE",
+        "mailadd"
+      ],
+      "bestLayer": "PublicGIS/Parcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "WHOLE_ADDRESS",
+        "POSTAL",
+        "STATE",
+        "ZIP",
+        "PHYSSTRADD",
+        "siteadd"
+      ],
+      "bestLayer": "PublicGIS/Parcels"
+    },
+    "lastSale": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "SALEDATE",
+        "SALESAMT",
+        "saledate"
+      ],
+      "bestLayer": "PublicGIS/Parcels",
+      "caveat": "Many SALESAMT=0; OneMap has date only (no price). ~2457 of 5-150ac parcels have SALESAMT>0."
+    },
+    "taxValues": {
+      "present": true,
+      "fields": [
+        "FMV_LAND",
+        "FMV_IMPRV",
+        "FMV_TOTAL",
+        "TOTVAL",
+        "landval",
+        "improvval",
+        "parval"
+      ],
+      "bestLayer": "PublicGIS/Parcels"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "TYPE",
+        "NAME",
+        "ZONING",
+        "ZONE_",
+        "Zone_Abbv"
+      ],
+      "bestLayer": "PublicGIS/Zoning (per-municipality layers)",
+      "split": "Municipal layers on county Zoning MapServer + Gastonia/Mount Holly city-native services",
+      "join": "spatial join to county parcels; no parcel-joined zoning attribute"
+    },
+    "flu": {
+      "present": false,
+      "partial": false,
+      "fields": [],
+      "bestLayer": null,
+      "caveat": "No public FLU FeatureServer; Envision Gaston 2050 and city comprehensive plans are PDF-only"
+    },
+    "viewerLink": {
+      "present": true,
+      "template": "https://gastonnc.devnetwedge.com/parcel/view/{AKPAR}",
+      "keyField": "AKPAR"
+    }
+  },
+  "portals": [
+    {
+      "name": "Gaston County GIS",
+      "url": "https://gis.gastoncountync.gov/",
+      "notes": "Map / Search / Mobile apps"
+    },
+    {
+      "name": "Interactive map",
+      "url": "https://gis.gastoncountync.gov/Map/Index",
+      "notes": "Deep link AKPAR query param or /Map/Index/{AKPAR}"
+    },
+    {
+      "name": "PublicGIS REST",
+      "url": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS",
+      "notes": "Primary county ArcGIS Server folder"
+    },
+    {
+      "name": "wEdge Property Tax Inquiry",
+      "url": "https://gastonnc.devnetwedge.com/",
+      "notes": "Assessor deep link /parcel/view/{AKPAR}"
+    },
+    {
+      "name": "Tax Mapping / GIS",
+      "url": "https://www.gastongov.com/677/Tax-Mapping-GIS",
+      "notes": "County tax GIS division"
+    },
+    {
+      "name": "City of Gastonia GIS REST",
+      "url": "https://cogserver.gastonianc.gov/serverweb/rest/services",
+      "notes": "Zoning_UDO + parcel mirror; CRS 6543"
+    },
+    {
+      "name": "Mount Holly GIS Hub",
+      "url": "https://city-of-mount-holly-gis-mapping-comh.hub.arcgis.com/",
+      "notes": "City AGOL org R3hvotzf6HmfdzVd"
+    },
+    {
+      "name": "NC OneMap",
+      "url": "https://www.nconemap.gov",
+      "notes": "Statewide parcels FeatureServer"
+    },
+    {
+      "name": "Envision Gaston 2050",
+      "url": "https://engagegaston.com/envision-gaston",
+      "notes": "FLU policy PDF \u2014 not REST"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Unincorporated Gaston County",
+      "zoningUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/1",
+      "overlayUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/0",
+      "zoningField": "TYPE",
+      "featureCount": 2057,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "County UDO; overlays layer 0 (38)"
+    },
+    {
+      "name": "Gastonia",
+      "zoningUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/2",
+      "cityNativeZoningUrl": "https://cogserver.gastonianc.gov/serverweb/rest/services/Planning/Zoning_UDO/MapServer/0",
+      "zoningField": "ZONING",
+      "featureCount": 801,
+      "ownGis": true,
+      "ownGisRoot": "https://cogserver.gastonianc.gov/serverweb/rest/services",
+      "crsCityNative": {
+        "wkid": 103122,
+        "latestWkid": 6543
+      },
+      "fluRest": false,
+      "notes": "Prefer county Zoning/2 for 2264 joins; cogserver Zoning_UDO equivalent count 801"
+    },
+    {
+      "name": "Belmont",
+      "zoningUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/11",
+      "overlayUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/3",
+      "zoningField": "TYPE",
+      "featureCount": 677,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "Defers to county GIS; Comp Plan FLU is PDF only"
+    },
+    {
+      "name": "Bessemer City",
+      "zoningUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/7",
+      "overlayUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/4",
+      "zoningField": "TYPE",
+      "featureCount": 346,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "Land Development Code layer"
+    },
+    {
+      "name": "Cherryville",
+      "zoningUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/13",
+      "zoningField": "TYPE",
+      "featureCount": 519,
+      "ownGis": false,
+      "fluRest": false
+    },
+    {
+      "name": "Cramerton",
+      "zoningUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/14",
+      "overlayUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/18",
+      "zoningField": "TYPE",
+      "featureCount": 225,
+      "ownGis": false,
+      "fluRest": false
+    },
+    {
+      "name": "Dallas",
+      "zoningUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/15",
+      "zoningField": "TYPE",
+      "featureCount": 257,
+      "ownGis": false,
+      "fluRest": false
+    },
+    {
+      "name": "Kings Mountain",
+      "zoningUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/19",
+      "zoningField": "TYPE",
+      "featureCount": 88,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "Gaston-side only; city also in Cleveland County"
+    },
+    {
+      "name": "Lowell",
+      "zoningUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/9",
+      "zoningField": "TYPE",
+      "featureCount": 249,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "Layer titled Land Use Code \u2014 zoning polygons"
+    },
+    {
+      "name": "McAdenville",
+      "zoningUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/10",
+      "zoningField": "TYPE",
+      "featureCount": 64,
+      "ownGis": false,
+      "fluRest": false
+    },
+    {
+      "name": "Mount Holly",
+      "zoningUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/16",
+      "overlayUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/5",
+      "cityNativeZoningUrl": "https://services7.arcgis.com/R3hvotzf6HmfdzVd/arcgis/rest/services/Zoning_Auth/FeatureServer/0",
+      "zoningField": "TYPE",
+      "cityNativeZoningField": "Zone_Abbv",
+      "featureCount": 461,
+      "cityNativeFeatureCount": 387,
+      "ownGis": true,
+      "ownGisHub": "https://city-of-mount-holly-gis-mapping-comh.hub.arcgis.com/",
+      "fluRest": false,
+      "notes": "AGOL Zoning_Auth richer attrs; county layer may include ETJ"
+    },
+    {
+      "name": "Ranlo",
+      "zoningUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/20",
+      "zoningField": "TYPE",
+      "featureCount": 210,
+      "ownGis": false,
+      "fluRest": false
+    },
+    {
+      "name": "Stanley",
+      "zoningUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/17",
+      "zoningField": "TYPE",
+      "featureCount": 244,
+      "ownGis": false,
+      "fluRest": false
+    },
+    {
+      "name": "High Shoals",
+      "zoningUrl": null,
+      "zoningField": null,
+      "featureCount": null,
+      "ownGis": false,
+      "fluRest": false,
+      "status": "gap",
+      "notes": "Boundary on Municipalities/18; no Zoning MapServer layer"
+    },
+    {
+      "name": "Spencer Mountain",
+      "zoningUrl": null,
+      "zoningField": null,
+      "featureCount": null,
+      "ownGis": false,
+      "fluRest": false,
+      "status": "gap",
+      "notes": "Boundary on Municipalities/18; no Zoning MapServer layer"
+    },
+    {
+      "name": "Dellview",
+      "zoningUrl": null,
+      "zoningField": null,
+      "featureCount": null,
+      "ownGis": false,
+      "fluRest": false,
+      "status": "gap",
+      "notes": "Boundary on Municipalities/18; no Zoning MapServer layer"
+    }
+  ],
+  "layers": [
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales"
+      ],
+      "name": "PublicGIS/Parcels",
+      "id": 11,
+      "url": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Parcels/MapServer/11",
+      "alternateUrls": [
+        "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Parcels/FeatureServer/11"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 118045,
+      "acreageRangeCount": 6818,
+      "verified": true,
+      "verifiedHow": "returnCountOnly; CALCAC 5-150 count; sample attribute query",
+      "fields": {
+        "AKPAR": "Tax account / parcelId (map + wEdge key)",
+        "PIN": "NC PIN",
+        "PID": "Parcel id (often = AKPAR)",
+        "CALCAC": "GIS acreage",
+        "DEEDAC": "Deed acres",
+        "CURR_NAME1": "Owner name 1",
+        "CURR_NAME2": "Owner name 2",
+        "CURR_ADDR1": "Mailing address 1",
+        "CURR_ADDR2": "Mailing address 2",
+        "CURR_CITY": "Mailing city",
+        "CURR_STATE": "Mailing state",
+        "CURR_ZIPCODE": "Mailing ZIP (often 9-digit)",
+        "WHOLE_ADDRESS": "Situs address",
+        "POSTAL": "Situs city",
+        "STATE": "Situs state",
+        "ZIP": "Situs ZIP",
+        "SALEDATE": "Last sale date",
+        "SALESAMT": "Last sale price",
+        "FMV_LAND": "Fair market land value",
+        "FMV_IMPRV": "Fair market improvement value",
+        "FMV_TOTAL": "Fair market total",
+        "TOTVAL": "Taxable/total value",
+        "property_use": "Property use code/desc",
+        "VacantImpro": "Vacant | Improved",
+        "DEEDQUAL_CODEDESC": "Deed qualification"
+      },
+      "notes": "PRIMARY. No zoning on layer \u2014 spatial join PublicGIS/Zoning. MaxRecordCount 10000."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales"
+      ],
+      "name": "Parcels/GastonCountyParcels (Gastonia host)",
+      "id": 0,
+      "url": "https://cogserver.gastonianc.gov/serverweb/rest/services/Parcels/GastonCountyParcels/MapServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 103122,
+      "latestWkid": 6543,
+      "featureCount": 115066,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + field metadata",
+      "fields": {
+        "AKPAR": "Tax account",
+        "PIN": "NC PIN",
+        "CALCAC": "GIS acres",
+        "CURR_NAME1": "Owner",
+        "SALESAMT": "Sale price",
+        "FMV_TOTAL": "FMV total",
+        "TOTVAL": "Total value"
+      },
+      "notes": "City-hosted county mirror. CRS 6543 \u2014 reproject vs county zoning 2264. Prefer PublicGIS/Parcels/11."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales"
+      ],
+      "name": "NC1Map_Parcels polys",
+      "id": 1,
+      "url": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 117252,
+      "featureCountFilter": "cntyfips='071'",
+      "acreageRangeCount": 6819,
+      "verified": true,
+      "verifiedHow": "cntyfips=071 returnCountOnly + sample; gisacres 5-150 count",
+      "fields": {
+        "parno": "Parcel number (PIN-style)",
+        "ownname": "Owner name",
+        "mailadd": "Mailing address",
+        "siteadd": "Situs address",
+        "gisacres": "GIS acres",
+        "saledate": "Last sale date",
+        "parval": "Parcel value",
+        "landval": "Land value",
+        "improvval": "Improvement value",
+        "cntyfips": "County FIPS (071=Gaston)",
+        "cntyname": "County name"
+      },
+      "notes": "Statewide fallback. No sale price field. May lag county CAMA."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "PublicGIS/Zoning (multi-municipality MapServer)",
+      "id": null,
+      "url": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "verified": true,
+      "verifiedHow": "per-layer returnCountOnly + field metadata for all 18 layers",
+      "layerIndex": {
+        "0": {
+          "name": "Gaston County UDO Overlays",
+          "count": 38
+        },
+        "1": {
+          "name": "Gaston County UDO",
+          "count": 2057
+        },
+        "2": {
+          "name": "Gastonia Zoning",
+          "count": 801
+        },
+        "3": {
+          "name": "Belmont Overlays",
+          "count": 3
+        },
+        "4": {
+          "name": "Bessemer City Overlays",
+          "count": 10
+        },
+        "5": {
+          "name": "Mount Holly Overlays",
+          "count": 2
+        },
+        "7": {
+          "name": "Bessemer City Land Development Code",
+          "count": 346
+        },
+        "9": {
+          "name": "Lowell Land Use Code",
+          "count": 249
+        },
+        "10": {
+          "name": "McAdenville UDO",
+          "count": 64
+        },
+        "11": {
+          "name": "Belmont Zoning",
+          "count": 677
+        },
+        "13": {
+          "name": "Cherryville Zoning",
+          "count": 519
+        },
+        "14": {
+          "name": "Cramerton Zoning",
+          "count": 225
+        },
+        "15": {
+          "name": "Dallas Zoning",
+          "count": 257
+        },
+        "16": {
+          "name": "Mount Holly Zoning",
+          "count": 461
+        },
+        "17": {
+          "name": "Stanley Zoning",
+          "count": 244
+        },
+        "18": {
+          "name": "Cramerton Overlays",
+          "count": 3
+        },
+        "19": {
+          "name": "Kings Mountain Zoning",
+          "count": 88
+        },
+        "20": {
+          "name": "Ranlo Zoning",
+          "count": 210
+        }
+      },
+      "notes": "Primary city zoning source. Spatial join to parcels. MaxRecordCount 2000."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Planning/Zoning_UDO (Gastonia)",
+      "id": 0,
+      "url": "https://cogserver.gastonianc.gov/serverweb/rest/services/Planning/Zoning_UDO/MapServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 103122,
+      "latestWkid": 6543,
+      "featureCount": 801,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample ZONING codes",
+      "fields": {
+        "ZONING": "Zoning code",
+        "ZONE_": "Zone code",
+        "MODIFIER": "Modifier",
+        "ACRES": "Acres",
+        "APPR_DATE": "Approval date"
+      },
+      "notes": "Gastonia city-native; CRS 6543."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Zoning_Auth (Mount Holly AGOL)",
+      "id": 0,
+      "url": "https://services7.arcgis.com/R3hvotzf6HmfdzVd/arcgis/rest/services/Zoning_Auth/FeatureServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 387,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample Zone_Abbv/Zone_Name",
+      "fields": {
+        "Zone_Abbv": "Zoning abbreviation",
+        "Zone_Name": "Zoning district name",
+        "Min_Lot_Area": "Min lot area",
+        "Area_ac": "Area acres"
+      },
+      "notes": "Mount Holly city-native AGOL."
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "PublicGIS/Municipalities",
+      "id": 18,
+      "url": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Municipalities/MapServer/18",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "verified": true,
+      "verifiedHow": "distinct NAME query",
+      "fields": {
+        "NAME": "Municipality name",
+        "AREANAME": "Area/label",
+        "ACRES": "Acres"
+      },
+      "notes": "Jurisdiction aid for choosing zoning layer."
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "PublicGIS/DevelopmentArea",
+      "id": 4,
+      "url": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/DevelopmentArea/FeatureServer/4",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 219,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + field metadata",
+      "fields": {
+        "NAME": "Development name",
+        "STATUS": "Status",
+        "JURISDICTION": "Jurisdiction",
+        "ACREAGE": "Acreage",
+        "TOTALMFUNITS": "MF units",
+        "DEV_TYPE": "Development type"
+      },
+      "notes": "Approved/proposed developments \u2014 NOT future land use policy."
+    }
+  ],
+  "gaps": [
+    "No public countywide FLU FeatureServer \u2014 Envision Gaston 2050 and city comprehensive plans are PDF-only.",
+    "High Shoals, Spencer Mountain, Dellview: municipal boundaries present but no Zoning MapServer layer.",
+    "No parcel-joined zoning attribute \u2014 must spatial join (unlike Mecklenburg ParcelsZoningZipcode).",
+    "Sale price sparsity (many SALESAMT=0); OneMap has sale date only.",
+    "CRS split: county PublicGIS 2264 vs Gastonia cogserver 6543.",
+    "Kings Mountain straddles Cleveland County \u2014 layer 19 is Gaston-side only.",
+    "Owner phones/emails not in public REST (do not scrape).",
+    "Zoning MaxRecordCount 2000 \u2014 pagination required.",
+    "NCGS 132-10 commercial resale limits; attribution to Gaston County required."
+  ],
+  "handOff": {
+    "wireFirst": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Parcels/MapServer/11",
+    "wireFirstFeatureServer": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Parcels/FeatureServer/11",
+    "zoningCatalog": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer",
+    "zoningJoin": "spatial join county parcels (2264) to per-municipality Zoning layer; Gastonia cogserver requires 6543 reprojection",
+    "flu": null,
+    "fallback": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1?where=cntyfips='071'",
+    "auth": "none observed on listed public query endpoints",
+    "rateLimits": "Parcels MaxRecordCount 10000; Zoning 2000; paginate with resultOffset"
+  },
+  "verifiedAt": "2026-09-23",
+  "verifiedLayerCount": 25,
+  "pass2": {
+    "label": "PASS2 full-suite upgrade \u2014 rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "aadtScreening": {
+      "source": "NCDOT Traffic Survey Group (public AGOL)",
+      "layer": "NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)",
+      "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+      "countyField": "COUNTY",
+      "countyValue": "GASTON",
+      "valueField": "AADT_2022",
+      "valueType": "string (trim; blank = no count that year)",
+      "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GASTON%27&returnCountOnly=true&f=json",
+      "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GASTON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+      "liveStationCount": 905,
+      "stationsWithAADT2022": 873,
+      "newerYearAvailable": {
+        "available": true,
+        "layer": "NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)",
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "countyField": "County",
+        "countyValue": "Gaston",
+        "valueField": "AADT_2025",
+        "valueType": "integer (null = no count)",
+        "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Gaston%27&returnCountOnly=true&f=json",
+        "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Gaston%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+        "liveStationCount": 900,
+        "stationsWithAADT2025": 114,
+        "stationsWithAADT2024": 824,
+        "segmentsLayer": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide \u2014 spatial filter by county envelope)",
+        "also": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)"
+      },
+      "recommendation": "Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025\u2192AADT_2024\u2192AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title)."
+    },
+    "primaryParcelLayer": {
+      "restUrl": "https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Parcels/MapServer/11",
+      "acreageField": "CALCAC",
+      "range5to150Where": "CALCAC>=5 AND CALCAC<=150",
+      "liveTotalParcels": 118056,
+      "liveParcels5to150": 6820
+    },
+    "taxValues": {
+      "status": "ok",
+      "fields": {
+        "FMV_LAND": "tax.marketValue",
+        "FMV_IMPRV": "tax.marketValue",
+        "FMV_TOTAL": "tax.marketValue",
+        "TOTVAL": "tax.taxableValue"
+      },
+      "liveNonZeroCounty": {
+        "FMV_LAND": 112727,
+        "FMV_IMPRV": 95717,
+        "FMV_TOTAL": 114236,
+        "TOTVAL": 111020
+      },
+      "liveNonZero5to150": {
+        "TOTVAL": 5915
+      },
+      "notes": "Numeric Double fields; FMV_* = market, TOTVAL = taxable.",
+      "publicFallback": "https://gastonnc.devnetwedge.com/parcel/view/{AKPAR}"
+    },
+    "saleHistory": {
+      "status": "ok",
+      "priceFields": [
+        "SALESAMT"
+      ],
+      "dateFields": [
+        "SALEDATE"
+      ],
+      "livePriceGt0County": {
+        "SALESAMT": 69395
+      },
+      "livePriceGt0_5to150": {
+        "SALESAMT": 2461
+      },
+      "liveDateNonNullCounty": {
+        "SALEDATE": 113342
+      },
+      "notes": "SALEDATE esriDate (epoch ms); SALESAMT numeric; DEEDQUAL_CODEDESC = qualified flag. Last sale only."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "CURR_NAME1",
+        "CURR_NAME2"
+      ],
+      "primaryOwnerField": "CURR_NAME1",
+      "rule": {
+        "apply": "Uppercase + trim CURR_NAME1 (optionally also CURR_NAME2)",
+        "regex": "(?i)(\\bL\\.?\\s?L\\.?\\s?C\\b|\\bINC\\b|\\bCORP|\\bL\\.?\\s?P\\b|\\bLLP\\b|\\bLLLP\\b|\\bLTD\\b|TRUST|CHURCH|MINISTR|\\bCOMPANY\\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\\bHOA\\b|FOUNDATION|AUTHORITY|\\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\\b|^UNITED STATES|^NORTH CAROLINA\\b|\\bCOUNTY$)",
+        "sqlLikeTokens": [
+          "% LLC%",
+          "%,LLC%",
+          "% L L C%",
+          "% INC",
+          "% INC %",
+          "% INC.%",
+          "%,INC%",
+          "% CORP%",
+          "%CORPORATION%",
+          "% LP",
+          "% LP %",
+          "% L P",
+          "% LLP%",
+          "% LTD%",
+          "%TRUST%",
+          "%CHURCH%",
+          "%MINISTR%",
+          "% COMPANY%",
+          "%PARTNERSHIP%",
+          "%HOLDINGS%",
+          "%PROPERTIES%",
+          "%INVESTMENT%",
+          "%ASSOCIATION%",
+          "%FOUNDATION%",
+          "%AUTHORITY%",
+          "CITY OF %",
+          "COUNTY OF %",
+          "STATE OF %",
+          "TOWN OF %",
+          "% COUNTY",
+          "%BOARD OF EDUCATION%",
+          "UNITED STATES%",
+          "NORTH CAROLINA %",
+          "% DEVELOPMENT%"
+        ],
+        "caveats": "TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); \"% COUNTY\" suffix catches e.g. \"PERSON COUNTY\"; bare \"CO\" and \"ESTATE\" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) \u2014 normalize first."
+      },
+      "liveEntityCount5to150": 1869,
+      "liveOwnerNonNull5to150": 6820,
+      "entityQuery": "where=CALCAC>=5 AND CALCAC<=150 AND (CURR_NAME1 LIKE '% LLC%' OR CURR_NAME1 LIKE '%,LLC%' OR CURR_NAME1 LIKE '% L L C%' OR CURR_NAME1 LIKE '% INC' OR CURR_NAME1 LIKE '% INC %' OR CURR_NAME1 LIKE '% INC.%' OR CURR_NAME1 LIKE '%,INC%' OR CURR_NAME1 LIKE '% CORP%' OR CURR_NAME1 LIKE '%CORPORATION%' OR CURR_NAME1 LIKE '% LP' OR CURR_NAME1 LIKE '% LP %' OR CURR_NAME1 LIKE '% L P' OR CURR_NAME1 LIKE '% LLP%' OR CURR_NAME1 LIKE '% LTD%' OR CURR_NAME1 LIKE '%TRUST%' OR CURR_NAME1 LIKE '%CHURCH%' OR CURR_NAME1 LIKE '%MINISTR%' OR CURR_NAME1 LIKE '% COMPANY%' OR CURR_NAME1 LIKE '%PARTNERSHIP%' OR CURR_NAME1 LIKE '%HOLDINGS%' OR CURR_NAME1 LIKE '%PROPERTIES%' OR CURR_NAME1 LIKE '%INVESTMENT%' OR CURR_NAME1 LIKE '%ASSOCIATION%' OR CURR_NAME1 LIKE '%FOUNDATION%' OR CURR_NAME1 LIKE '%AUTHORITY%' OR CURR_NAME1 LIKE 'CITY OF %' OR CURR_NAME1 LIKE 'COUNTY OF %' OR CURR_NAME1 LIKE 'STATE OF %' OR CURR_NAME1 LIKE 'TOWN OF %' OR CURR_NAME1 LIKE '% COUNTY' OR CURR_NAME1 LIKE '%BOARD OF EDUCATION%' OR CURR_NAME1 LIKE 'UNITED STATES%' OR CURR_NAME1 LIKE 'NORTH CAROLINA %' OR CURR_NAME1 LIKE '% DEVELOPMENT%')"
+    },
+    "paDeepLink": {
+      "template": "https://gastonnc.devnetwedge.com/parcel/view/{AKPAR}",
+      "testedUrl": "https://gastonnc.devnetwedge.com/parcel/view/100066",
+      "httpStatus": 200,
+      "notes": "HTTP 200 \u2192 redirects to /parcel/view/100066/2027; parcel id present in server HTML."
+    },
+    "jurisdictionGisViewer": {
+      "url": "https://gis.gastoncountync.gov/Map/Index",
+      "httpStatus": 200,
+      "notes": "Gaston County public GIS map"
+    },
+    "gaps": [
+      "AADT_2022 blank at 32 of 905 stations on the 2022 layer (NCDOT counts on a cycle) \u2014 prefer 2025 layer / latest non-blank year",
+      "No multi-transfer sale history on primary layer (last sale only)"
+    ]
+  }
+}

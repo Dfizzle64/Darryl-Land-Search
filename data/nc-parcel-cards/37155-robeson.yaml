@@ -1,0 +1,349 @@
+state: NC
+jurisdiction: Robeson County
+fips: '37155'
+level: county
+markets:
+- Fayetteville
+slug: robeson
+cntyfips: '155'
+municipalities:
+- name: Lumberton
+  role: city-first-zoning
+  citycode: LUMB
+  zonePrefix: Lmbr
+  notes: County seat; CITYCODE=LUMB (~2902 parcels); ZONE_CODE Lmbr* (~405 polys) + Lbrg* Lumber Bridge
+    edge
+- name: Pembroke
+  role: city-first-zoning
+  citycode: PEMB
+  zonePrefix: Pmbr
+  notes: CITYCODE=PEMB (~1249); ZONE_CODE Pmbr* (~63)
+- name: Red Springs
+  role: city-first-zoning
+  citycode: REDS
+  zonePrefix: Rdsp
+  notes: CITYCODE=REDS (~456); ZONE_CODE Rdsp* (~23)
+- name: Fairmont
+  role: city-first-zoning
+  citycode: FAIR
+  zonePrefix: Frmt
+  notes: CITYCODE=FAIR (~738); ZONE_CODE Frmt* (~67)
+- name: Maxton
+  role: city-first-zoning
+  citycode: MAXT
+  zonePrefix: Mxtn
+  notes: CITYCODE=MAXT (~973); ZONE_CODE Mxtn* (~42)
+- name: St. Pauls
+  role: city-first-zoning
+  citycode: STPL
+  zonePrefix: Stpl
+  notes: CITYCODE=STPL (~564); ZONE_CODE Stpl* (~49)
+- name: Rowland
+  role: city-first-zoning
+  citycode: ROWL
+  zonePrefix: Rlnd
+  notes: CITYCODE=ROWL (~542); ZONE_CODE Rlnd* (~22)
+- name: Parkton
+  role: city-first-zoning
+  citycode: PARK
+  zonePrefix: Prkt
+  notes: CITYCODE=PARK (~203); ZONE_CODE Prkt* (~6)
+- name: Lumber Bridge
+  role: city-first-zoning
+  citycode: LBRG
+  zonePrefix: Lbrg
+  notes: CITYCODE=LBRG (~144); ZONE_CODE Lbrg* (~5)
+- name: Shannon
+  role: city-code-only
+  citycode: SHAN
+  notes: CITYCODE=SHAN (~312); no distinct ZONE_CODE prefix on county zoning layer
+- name: Orrum
+  role: partial-zoning
+  citycode: ORRM
+  zonePrefix: Orrm
+  notes: CITYCODE=ORRM (~215); OrrmUNKNOWN stub only
+- name: Rennert
+  role: city-code-only
+  citycode: RENN
+  notes: CITYCODE=RENN (~26); City Limits polygon; no ZONE_CODE prefix
+- name: Proctorville
+  role: partial-zoning
+  citycode: PROC
+  zonePrefix: Prtv
+  notes: CITYCODE=PROC (~9); PrtvUNKNOWN stub
+- name: Marietta
+  role: city-code-only
+  citycode: MARE
+  notes: CITYCODE=MARE (~2); City Limits only
+- name: McDonald
+  role: boundary-only
+  notes: City Limits polygon; no CITYCODE/ZONE_CODE on verified layers
+- name: Raynham
+  role: boundary-only
+  notes: City Limits polygon only
+layers:
+- role: parcels
+  name: AGOL Robeson County Parcels (PRIMARY CAMA)
+  restUrl: https://services7.arcgis.com/miWUVbMhSUq6a8y1/arcgis/rest/services/Robeson_County_Parcels/FeatureServer/0
+  layerId: 0
+  geometry: polygon
+  auth: none
+  acreageField: MAPACRE
+  coverage: county-wide
+  fieldMap:
+    PIN_NUMBER: parcelId
+    MAPNO: parcelIdMap
+    OWNERID: parcelIdAccount
+    CUROWNID: parcelIdAccountAlt
+    OWNAM1: ownerName
+    OWNAM2: ownerName2
+    OWNAM3: ownerName3
+    OWADR1: mailingAddress.street
+    OWADR2: mailingAddress.street2
+    OWCITY: mailingAddress.city
+    OWSTATE: mailingAddress.state
+    OWZIP: mailingAddress.zip
+    PHYSTRADR: situsAddress
+    STNUM: situsAddress.number
+    STDIR: situsAddress.prefix
+    STNAME: situsAddress.street
+    STTYPE: situsAddress.streetType
+    STDIRSUF: situsAddress.suffix
+    UNITNO: situsAddress.unit
+    MAPACRE: acreage
+    DEEDACRE: acreageDeed
+    DEEDEDACRE: acreageDeeded
+    CALCULATED: acreageCalculated
+    LNDASVCUR: tax.landValue
+    IMPASVCUR: tax.improvementValue
+    DATESOLD: lastSale.date
+    DEEDBOOK: lastSale.deedBook
+    DEEDPAGE: lastSale.deedPage
+    DEEDYEAR: lastSale.deedYear
+    CITYCODE: municipalityCode
+    TOWNCODE: township
+    PARDESC1: dorCode
+    NBHCODE: neighborhood
+    LEGDESC1: legalDescription
+  notes: 'PRIMARY wire-first CAMA verified 2026-09-24 (county AGOL owner tanisha.ryans_robeson). Count
+    76928; MAPACRE 5–150 → 14307; DEEDACRE 5–150 → 14300; DEEDEDACRE 5–150 → 14387; CALCULATED 5–150 →
+    13449; OWNAM1/PIN_NUMBER/OWNERID/PHYSTRADR all 76928; LNDASVCUR>0 76887; IMPASVCUR>0 45376; IMP=0/null
+    in 5–150 → 8282; DATESOLD populated 76928 (YYYYMMDD integer, often first-of-year). NO SALEAMT field
+    on this FeatureServer — sale price REST gap (use ustaxdata HTML Sold Amount / robesonsales.cfm). CRS
+    102100/3857. MaxRecordCount 1000 — paginate. Market total ≈ LNDASVCUR+IMPASVCUR. PA key MAPNO (=OneMap
+    altparno). Geo-check PIN 929603877500 ≈ -79.030, 34.475 (Proctorville); 925355398900 ≈ -79.148, 34.397
+    (Fairmont). CITYCODE: blank unincorp 68593, LUMB 2902, PEMB 1249, MAXT 973, FAIR 738, STPL 564, ROWL
+    542, REDS 456, SHAN 312, ORRM 215, PARK 203, LBRG 144, RENN 26, PROC 9, MARE 2.'
+  status: usable
+- role: parcels
+  name: ROKMAPS_v2 Parcels (geometry; CAMA stripped)
+  restUrl: https://arcgis4.roktech.net/arcgis/rest/services/robeson/ROKMAPS_v2/MapServer/15
+  layerId: 15
+  geometry: polygon
+  auth: none
+  acreageField: DEEDEDACRES
+  coverage: county-wide
+  fieldMap:
+    PIN_NUMBER: parcelId
+    MAPNO: parcelIdMap
+    DEEDEDACRES: acreage
+  notes: Official jurisdiction GIS geometry twin. Count 80343 (newer than AGOL). DEEDEDACRES 5–150 → 13616.
+    Schema lists OWNAM1/SALEAMT/LNDASVCUR/etc. but public MapServer returns them NULL — do not wire CAMA
+    from this layer. Prefer AGOL for attributes; RokMaps/OneMap for fresher outlines if needed. CRS 102100/3857.
+    MaxRecordCount 1000.
+  status: partial
+- role: parcels
+  name: NC OneMap Parcels (fallback)
+  restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  alternateUrls:
+  - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  - https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: recareano
+  coverage: county-wide
+  filter: cntyfips='155'
+  fieldMap:
+    parno: parcelId
+    altparno: parcelIdMap
+    nparno: parcelIdNational
+    ownname: ownerName
+    mailadd: mailingAddress.street
+    mcity: mailingAddress.city
+    mstate: mailingAddress.state
+    mzip: mailingAddress.zip
+    siteadd: situsAddress
+    scity: situsCity
+    szip: situsZip
+    gisacres: acreageBroken
+    recareano: acreage
+    Shape__Area: acreageSqFt
+    landval: tax.landValue
+    improvval: tax.improvementValue
+    parval: tax.marketValue
+    saledate: lastSale.dateEmpty
+    sourceref: lastSale.deedRef
+    parusecode: dorCode
+    cntyfips: countyFips
+  notes: 'Filter cntyfips=''155''. Verified 2026-09-24: count 80391; ownname/siteadd/altparno 80391; landval>0/parval>0
+    78345; improvval>0 47859; recareano>0 78339; recareano 5–150 → 13122; Shape__Area 5–150 ac (217800–6534000
+    sqft) → 12749. CRITICAL: gisacres all 0 — use recareano or Shape__Area/43560 (CRS 102719/2264). saledate
+    empty. Join parno=PIN_NUMBER; altparno=MAPNO for PA. MaxRecordCount 5000. Sample parno 929603877500
+    → altparno 12050602502 matches AGOL MAPNO.'
+  status: usable
+- role: zoning
+  name: ROKMAPS Zoning (cities-first ZONE_CODE) PRIMARY
+  restUrl: https://arcgis4.roktech.net/arcgis/rest/services/robeson/ROKMAPS_v2/MapServer/9
+  layerId: 9
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    ZONE_CODE: zoning
+  notes: 'PRIMARY cities-first zoning. Count 1148. ZONE_CODE prefixes: Lmbr (Lumberton ~405), Cnty (county
+    districts ~274), Frmt Fairmont ~67, Pmbr Pembroke ~63, Stpl St.Pauls ~49, Mxtn Maxton ~42, Rdsp Red
+    Springs ~23, Rlnd Rowland ~22, Prkt Parkton ~6, Lbrg Lumber Bridge ~5, Orrm/Prtv stubs. ~188 null
+    ZONE_CODE. Join spatially to parcels; route by CITYCODE / City Limits / prefix. Mirror AGOL Robeson_County_Zoning
+    FS/0 (720, thinner).'
+  status: usable
+- role: zoning
+  name: AGOL Robeson County Zoning (mirror)
+  restUrl: https://services7.arcgis.com/miWUVbMhSUq6a8y1/arcgis/rest/services/Robeson_County_Zoning/FeatureServer/0
+  layerId: 0
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    ZONE_CODE: zoning
+    ZONE__DESC: zoningDescription
+  notes: Count 720 — prefer RokMaps/9 (1148). ZONE__DESC often duplicates ZONE_CODE.
+  status: partial
+- role: zoning
+  name: ROKMAPS Zoning ETJ
+  restUrl: https://arcgis4.roktech.net/arcgis/rest/services/robeson/ROKMAPS_v2/MapServer/10
+  layerId: 10
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: sample
+  fieldMap:
+    ZONINGCODE: zoningEtjFlag
+  notes: Count 7; all ZONINGCODE=ETJ. Flag only — use with City Limits / town zoning prefixes for ETJ
+    routing.
+  status: partial
+- role: other
+  name: ROKMAPS City Limits
+  restUrl: https://arcgis4.roktech.net/arcgis/rest/services/robeson/ROKMAPS_v2/MapServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    CITYNAME: municipality
+    CITYFIPS: placeFips
+  notes: 'Count 85 multipart polys. Names: St. Pauls, Lumberton, Pembroke, Rowland, Parkton, Fairmont,
+    Lumber Bridge, Maxton, Rennert, Raynham, Proctorville, Orrum, Marietta, Red Springs, McDonald. Pair
+    with CITYCODE / ZONE_CODE prefix for city-first router.'
+  status: usable
+- role: other
+  name: ROKMAPS Address Points (situs join)
+  restUrl: https://arcgis4.roktech.net/arcgis/rest/services/robeson/ROKMAPS_v2/MapServer/30
+  layerId: 30
+  geometry: point
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    FULL_STREE: situsAddress
+    ST_NUMBER: situsAddress.number
+    STREET: situsAddress.street
+    ST_TYPE: situsAddress.streetType
+    CITY: situsCity
+    ZIPCODE: situsZip
+    PARCEL_NUM: parcelIdMap
+    CityCode: municipalityCode
+  notes: Count 75105. Optional situs join when PHYSTRADR thin; PARCEL_NUM may align to MAPNO.
+  status: usable
+- role: flu
+  name: Comprehensive Plan — PDF only
+  restUrl: https://www.robesoncountync.gov/_files/ugd/269399_9170f96cf6d04acd883408c282a990a9.pdf
+  alternateUrls:
+  - https://www.robesoncountync.gov/communitydev
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  fieldMap: {}
+  notes: No public FLU FeatureServer on RokMaps/AGOL/OneMap verified 2026-09-24. Comprehensive Plan PDF
+    (~20 MB) on Community Development — FLU gap.
+  status: gap
+- role: sales
+  name: ustaxdata account / sales HTML (sale price)
+  restUrl: https://www.ustaxdata.com/nc/robeson/account.cfm?parcelID={MAPNO}
+  alternateUrls:
+  - https://www.ustaxdata.com/nc/robeson/robesonsales.cfm?parcelID={MAPNO}
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    Sold Amount: lastSale.price
+    Sold Date: lastSale.date
+  notes: Sale price not on AGOL/RokMaps/OneMap REST. Account card shows Sold Date + Sold Amount; Sales
+    tab neighborhood comps. Prefer AGOL DATESOLD for date when HTML scrape unwanted. Status partial (HTML
+    only).
+  status: partial
+gaps:
+- Sale price not on public ArcGIS REST (AGOL/RokMaps/OneMap) — HTML ustaxdata only
+- ROKMAPS MapServer/15 CAMA fields present in schema but NULL publicly — use AGOL for attributes
+- OneMap gisacres broken (all 0) — use recareano or Shape__Area/43560
+- FLU FeatureServer gap — Comprehensive Plan PDF only
+- AGOL parcel count (76928) lags RokMaps/OneMap (~80k) — geometry currency vs CAMA tradeoff
+- Shannon / Rennert / McDonald / Raynham / Marietta — thin or no ZONE_CODE prefixes
+- Orrum / Proctorville zoning stubs UNKNOWN only
+- No separate Lumberton/town independent zoning FeatureServers beyond county ZONE_CODE layer
+- Utilities / AADT / emails / phones / paid vendors out of scope
+license: Robeson County public GIS (ROKMAPS / county AGOL) + ustaxdata PA + NC OneMap; attribution as
+  required; not survey grade
+gisPortalUrl: https://maps2.roktech.net/ROKMAPS_Robeson/
+jurisdictionGisUrl: https://maps2.roktech.net/ROKMAPS_Robeson/
+viewerUrl: https://maps2.roktech.net/ROKMAPS_Robeson/
+viewerDeepLinkTemplate: https://maps2.roktech.net/ROKMAPS_Robeson/?mapno={MAPNO}
+appraiserSearchUrl: https://www.ustaxdata.com/nc/robeson/robesonsearch.cfm
+viewerLinkTemplate: https://www.ustaxdata.com/nc/robeson/account.cfm?parcelID={MAPNO}
+viewerLinkTemplateAlt: https://www.ustaxdata.com/nc/robeson/account.cfm?ownerID={OWNERID}&parcelID={MAPNO}&groupParcel=
+viewerLinkTemplateNcpts: https://lrcpwa.ncptscloud.com/robeson/parcel-detail/{PIN_NUMBER}
+taxBillSearchUrl: https://www.ustaxdata.com/nc/robeson/robesontaxSearch.cfm
+planningUrl: https://www.robesoncountync.gov/communitydev
+taxOfficeUrl: https://www.robesoncountync.gov/tax
+ordinancesUrl: https://www.robesoncountync.gov/ordinances
+deedsUrl: http://robeson.bislandrecords.com/
+onlineServicesUrl: https://www.robesoncountync.gov/online-services
+comprehensivePlanUrl: https://www.robesoncountync.gov/_files/ugd/269399_9170f96cf6d04acd883408c282a990a9.pdf
+countyRestRoot: https://arcgis4.roktech.net/arcgis/rest/services/robeson
+agolRestRoot: https://services7.arcgis.com/miWUVbMhSUq6a8y1/arcgis/rest/services
+oneMapFilter: cntyfips='155'
+joinKeys:
+- PIN_NUMBER
+- MAPNO
+- OWNERID
+- parno
+- altparno
+parcelIdPreferred: PIN_NUMBER
+paDeepLinkKey: MAPNO
+paDeepLinkKeyAlt: OWNERID
+tranche3:
+  taxSaleOwner: true
+  paDeepLinkWithParcelId: true
+  jurisdictionGisUrl: true
+  parcelsZoningFlu: true
+  notes: Tax/owner on AGOL+OneMap; sale date on AGOL DATESOLD; sale price HTML only; PA account.cfm?parcelID={MAPNO};
+    jurisdiction GIS ROKMAPS; cities-first ZONE_CODE; FLU PDF gap
+verifiedAt: '2026-09-24'
+verifiedBy: North Carolina Public Info Researcher

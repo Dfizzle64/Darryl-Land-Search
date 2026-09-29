@@ -1,0 +1,268 @@
+state: NC
+jurisdiction: Yancey County
+fips: '37199'
+level: county
+markets:
+- Asheville
+slug: yancey
+cntyfips: '199'
+municipalities:
+- name: Burnsville
+  role: county seat; city-first zoning (only incorporated town)
+  incorporated: true
+  localGis: false
+  zoningPrefer: Reference/MapServer/0 Zoning
+  zoningUrl: https://gis.yanceycountync.org/server/rest/services/Reference/MapServer/0
+  zoningCount: 10
+  zoneCodes: [C-1, C-2, C-3, I-1, R-10]
+  cityLimitsUrl: https://gis.yanceycountync.org/server/rest/services/Reference/MapServer/5
+  cityLimitsFilter: TOWNSHIP_N='Town of Burnsville'
+  fluDocumentUrl: https://townofburnsville.org/wp-content/uploads/Burnsville-Comprehensive-Land-Use-Plan-Draft.pdf
+  notes: County GIS page directs zoning questions to Burnsville Public Works; CLUP 2021 PDF includes Future Land Use Map (no FLU FS)
+layers:
+- role: parcels
+  name: OperationalLayers2025 TaxParcels (PRIMARY CAMA)
+  restUrl: https://gis.yanceycountync.org/server/rest/services/OperationalLayers2025/MapServer/0
+  layerId: 0
+  geometry: polygon
+  auth: none
+  acreageField: CALCULATED_ACREAGE
+  coverage: county-wide
+  fieldMap:
+    PIN: parcelId
+    CALCULATED_ACREAGE: acreage
+    ASSESSED_ACREAGE: acreage
+    OWNER_NAME: ownerName
+    OWNER: ownerName
+    GRANTOR: other
+    MAILING_ADDRESS1: mailingAddress
+    MAILING_ADDRESS2: mailingAddress
+    CITY: mailingAddress
+    STATE_OR_COUNTRY: mailingAddress
+    ZIP_CODE: mailingAddress
+    PROPERTY_LOCATION: situsAddress
+    STREET_NUMBER: situsAddress
+    STREET_NAME: situsAddress
+    DEED_DATE: lastSale.date
+    TRANSACTION_DATE: lastSale.date
+    STAMPS: lastSale.price
+    CURRENT_TOTAL_VALUE: tax.marketValue
+    CURRENT_LAND_VALUE: tax.landValue
+    CURRENT_BLDG_VALUE: tax.improvementValue
+    AG_LAND_VALUE: tax.otherValue
+    DEED_BOOK: other
+    DEED_PAGE: other
+    CLASS: other
+  notes: PRIMARY wire-first. MaxRecordCount 2000. CRS 102719/2264. Sample 070700019340000 OWNER_NAME MELTON centroid ≈ -82.37, 35.82 (Yancey). Counts total 17394; calc acres 5–150 → 4555; CURRENT_TOTAL_VALUE>0 → 17216; STAMPS>0 → 7581 (in-range 1576). STAMPS = NC deed-excise proxy (≈ consideration/500); can lag DEED_DATE — prefer IAS Sales History for last sale price. No dedicated SALE_PRICE field.
+  status: usable
+  primary: true
+  alternateUrls:
+  - https://gis.yanceycountync.org/server/rest/services/OperationalLayers/MapServer/6
+  - https://gis.yanceycountync.org/server/rest/services/QueryLayers/MapServer/2
+- role: parcels
+  name: OperationalLayers TaxParcels (legacy twin)
+  restUrl: https://gis.yanceycountync.org/server/rest/services/OperationalLayers/MapServer/6
+  layerId: 6
+  geometry: polygon
+  auth: none
+  acreageField: ASSESSED_ACREAGE
+  coverage: county-wide
+  fieldMap:
+    PIN: parcelId
+    ASSESSED_ACREAGE: acreage
+    OWNER_NAME: ownerName
+    PROPERTY_LOCATION: situsAddress
+    DEED_DATE: lastSale.date
+    STAMPS: lastSale.price
+    CURRENT_TOTAL_VALUE: tax.marketValue
+    CURRENT_LAND_VALUE: tax.landValue
+    CURRENT_BLDG_VALUE: tax.improvementValue
+  notes: Legacy twin. No CALCULATED_ACREAGE — prefer Op2025. Count 17306.
+  status: usable
+- role: parcels
+  name: NC OneMap Parcels (polys)
+  restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: gisacres
+  coverage: county-wide
+  filter: cntyfips='199'
+  fieldMap:
+    parno: parcelId
+    ownname: ownerName
+    mailadd: mailingAddress
+    siteadd: situsAddress
+    gisacres: acreage
+    parval: tax.marketValue
+    landval: tax.landValue
+    improvval: tax.improvementValue
+    saledatetx: lastSale.date
+  notes: Count 17378; gisacres 5–150 → 4552; parval>0 → 0; saledate null; no sale price. Prefer county TaxParcels. Join parno='070700019340000' ↔ PIN / OWNER_NAME MELTON.
+  status: partial
+  alternateUrls:
+  - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+- role: zoning
+  name: Reference Zoning — Town of Burnsville
+  restUrl: https://gis.yanceycountync.org/server/rest/services/Reference/MapServer/0
+  layerId: 0
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  fieldMap:
+    Zoning: zoning
+  notes: Cities-first. 10 district polys. Codes C-1/C-2/C-3/I-1/R-10. Centroids in Burnsville (~-82.30, 35.92). Unincorporated county unzoned on REST.
+  status: usable
+- role: other
+  name: Reference Townships (Burnsville limits routing)
+  restUrl: https://gis.yanceycountync.org/server/rest/services/Reference/MapServer/5
+  layerId: 5
+  geometry: polygon
+  auth: none
+  coverage: municipal
+  fieldMap:
+    TOWNSHIP_N: other
+    TOWN_CODE: other
+  notes: TOWN_CODE=12 'Town of Burnsville' = incorporated limits (1 poly). Also civil townships Burnsville/Ramseytown/Egypt/…
+  status: usable
+- role: flu
+  name: Burnsville Comprehensive Land Use Plan 2021 (PDF)
+  restUrl: null
+  geometry: none
+  auth: none
+  coverage: city-only
+  documentUrl: https://townofburnsville.org/wp-content/uploads/Burnsville-Comprehensive-Land-Use-Plan-Draft.pdf
+  notes: No public FLU FeatureServer. Town CLUP includes Future Land Use Map. County has CTP (transportation) not cadastral FLU. Unincorporated land use is ordinance-based, not zoning.
+  status: gap
+gaps:
+- No dedicated SALE_PRICE on REST — STAMPS is NC deed-excise proxy (≈ consideration/500) and can lag DEED_DATE; prefer IAS Sales History Price
+- FLU REST gap — Burnsville CLUP 2021 PDF only; no county FLU FeatureServer
+- Unincorporated Yancey has no countywide zoning REST (cities-first Burnsville only)
+- OneMap parval/saledate empty for cntyfips='199'; no sale price on OneMap — use county TaxParcels + IAS
+- OperationalLayers/6 lacks CALCULATED_ACREAGE — prefer Op2025 TaxParcels/0
+- IAS PA id requires PIN + 2-digit Card suffix (01 typical; 00 some vacant; 02+ multi-card); bare PIN fails
+- Utilities / AADT / emails / phones / paid vendors intentionally excluded
+license: Yancey County GIS / Tax Administration; Town of Burnsville; Tyler CLT / IAS. Not survey quality. Commercial resale subject to NCGS 132-10.
+appraiserSearchUrl: https://yancey.ias-clt.com/parcel.detail.php?id={PIN}{Card}
+appraiserSearchUrlNotes: 'IAS id = 15-digit PIN + 2-digit Card (01 typical improved; 00 some vacant). Example 07070001934000001. Search https://yancey.ias-clt.com/parcel.list.php parcel.search[p_parid]={PIN}'
+jurisdictionGisUrl: https://gis.yanceycountync.org/maps/
+gisDeepLinkTemplate: https://gis.yanceycountync.org/maps/?pin={PIN}
+ncptsDeepLinkTemplate: https://lrcpwa.ncptscloud.com/yancey/parcel-detail/{PIN}
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/yancey/parcel-search
+paBasicSearchUrl: https://yancey.ias-clt.com/parcel.list.php
+taxPortalUrl: https://secure.webtaxpay.com/?county=yancey&state=NC
+oneMapFilter: cntyfips='199'
+countyRestRoot: https://gis.yanceycountync.org/server/rest/services
+verifiedAt: '2026-09-24'
+verifiedBy: North Carolina Public Info Researcher
+verifiedLayerCount: 6
+tranche: 3
+
+# ---- PASS 2 full-suite upgrade (NC non-OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  pass1:
+    status: verified
+    parcelPolygonLayer: https://gis.yanceycountync.org/server/rest/services/OperationalLayers2025/MapServer/0
+    polygonCountLive: 17393
+    parcelIdField: PIN
+    parcelIdFilled: 17383
+    acreageField: CALCULATED_ACREAGE
+    acres5to150Live: 4555
+    sampleCentroidWgs84:
+    - -82.2116
+    - 35.9066
+  parcelLayer: https://gis.yanceycountync.org/server/rest/services/OperationalLayers2025/MapServer/0
+  parcelIdField: PIN
+  acreageFilter: CALCULATED_ACREAGE >= 5 AND CALCULATED_ACREAGE <= 150
+  acres5to150Live: 4555
+  parcelCountLive: 17393
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='YANCEY'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27YANCEY%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27YANCEY%27&returnCountOnly=true&f=json
+      liveStationCount: 152
+      stationsWithAADT2022: 103
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Yancey'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Yancey%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Yancey%27&returnCountOnly=true&f=json
+      liveStationCount: 148
+      stationsWithAADT2025: 100
+      stationsWithAADT2024: 101
+      stationsWith2025or2024: 146
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - CURRENT_TOTAL_VALUE
+    - CURRENT_LAND_VALUE
+    liveNonZero:
+      CURRENT_TOTAL_VALUE: 17226
+      CURRENT_LAND_VALUE: 17207
+    status: ok
+  sale:
+    priceFields:
+    - STAMPS
+    dateFields:
+    - DEED_DATE
+    - TRANSACTION_DATE
+    livePriceNonZero:
+      STAMPS: 7586
+    liveDateNonNull:
+      DEED_DATE: 16949
+      TRANSACTION_DATE: 17351
+    status: ok
+    note: 'STAMPS is NC excise stamps (string): price ≈ CAST(STAMPS AS FLOAT) × 500. Actual Sales History price is on the IAS-CLT parcel page.'
+  ownerEntity:
+    ownerFields:
+    - OWNER_NAME
+    primaryOwnerField: OWNER_NAME
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(OWNER_NAME) LIKE '% LLC%' OR UPPER(OWNER_NAME) LIKE '% INC%' OR UPPER(OWNER_NAME) LIKE '% LP%' OR UPPER(OWNER_NAME) LIKE '% LLP%' OR UPPER(OWNER_NAME) LIKE '% LTD%' OR UPPER(OWNER_NAME) LIKE '% TRUST%' OR UPPER(OWNER_NAME) LIKE '% CHURCH%' OR UPPER(OWNER_NAME) LIKE '% COMPANY%' OR UPPER(OWNER_NAME) LIKE '% PARTNERSHIP%' OR UPPER(OWNER_NAME) LIKE '% HOLDINGS%' OR UPPER(OWNER_NAME) LIKE '% PROPERTIES%' OR UPPER(OWNER_NAME) LIKE '% CORP%' OR UPPER(OWNER_NAME) LIKE '%,LLC%' OR UPPER(OWNER_NAME) LIKE '%,INC%' OR UPPER(OWNER_NAME) LIKE 'CITY OF %' OR UPPER(OWNER_NAME) LIKE 'COUNTY OF %' OR UPPER(OWNER_NAME) LIKE 'STATE OF %' OR UPPER(OWNER_NAME) LIKE 'TOWN OF %')
+    liveEntityCountAll: 2297
+    liveEntityCount5to150ac: 605
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above.
+  paDeepLink:
+    template: https://yancey.ias-clt.com/parcel.detail.php?id={PIN}{Card}
+    testedParcelId: 070800148426000
+    testedUrl: https://yancey.ias-clt.com/parcel.detail.php?id=07080014842600000
+    httpStatus: 200
+    contentType: text/html; charset=UTF-8
+    contentVerified: true
+    note: 'IAS id = 15-digit PIN + 2-digit card. Card 01 returned "Unable to select item" for this vacant parcel; card 00 returned the owner. LSB: try 01 then 00.'
+  gisViewer:
+    url: https://gis.yanceycountync.org/maps/
+    httpStatus: 200
+    pageTitle: Avineon Web Map Template
+  gaps: []

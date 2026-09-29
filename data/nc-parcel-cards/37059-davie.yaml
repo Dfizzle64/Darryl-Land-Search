@@ -1,0 +1,393 @@
+state: NC
+jurisdiction: Davie County
+fips: "37059"
+level: county
+markets: [Winston-Salem]
+
+layers:
+  - role: parcels
+    name: Parcels BITEK CAMA (PRIMARY)
+    restUrl: https://gis.daviecountync.gov/server/rest/services/Parcels/FeatureServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: TOTAL_ACRES
+    coverage: county-wide
+    fieldMap:
+      NCPIN: parcelId
+      AccountNumber: parcelIdAlt
+      COUNTYID: parcelIdAlt2
+      ParcelID: parcelIdInt
+      TOTAL_ACRES: acreage
+      ASSESSED_ACRES: acreageAssessed
+      DEEDED_ACRES: acreageDeeded
+      Name1: ownerName
+      Name2: ownerName2
+      Address1: mailingAddress.street
+      Address2: mailingAddress.street2
+      Address3: mailingAddress.street3
+      City: mailingAddress.city
+      State: mailingAddress.state
+      ZipCode: mailingAddress.zip
+      HouseNumber: situsAddress.number
+      StreetDirection: situsAddress.prefix
+      StreetName: situsAddress.streetName
+      StreetType: situsAddress.streetType
+      StreetSuffix: situsAddress.suffix
+      UnitNumber: situsAddress.unit
+      TotalMarketValue: tax.marketValue
+      TotalAssessedValue: tax.assessedValue
+      ParcelLandValue: tax.landValue
+      ParcelBuildingValue: tax.improvementValue
+      ParcelObxfValue: tax.obxfValue
+      ParcelDeferredValue: tax.deferredValue
+      CityCode: municipalityCode
+      TownshipCode: townshipCode
+      LegalDescription: legalDescription
+    notes: >
+      PRIMARY verified 2026-09-23: count 26678; TOTAL_ACRES 5–150 → 5786;
+      ASSESSED_ACRES 5–150 → 6041; StreetName non-null → 23381. CRS 102719/2264.
+      Auth none. MaxRecordCount 2000. No sale fields — join Parcel_Sales / WebTemplate/26.
+      CityCode 01=Cooleemee 02=Mocksville 03=Bermuda Run null=unincorporated.
+      Do not collect MortgageHolder/MortgageLoanNumber. Filter NCPIN stubs (ROAD/short/null).
+      MapServer/7 alternate also queryable.
+    status: usable
+
+  - role: sales
+    name: Parcel_Sales (last sale date join)
+    restUrl: https://gis.daviecountync.gov/server/rest/services/Parcel_Sales/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: total_acres
+    coverage: county-wide
+    fieldMap:
+      ncpin: parcelId
+      accountnumber: parcelIdAlt
+      name1: ownerName
+      address1: mailingAddress.street
+      city: mailingAddress.city
+      state: mailingAddress.state
+      zipcode: mailingAddress.zip
+      total_acres: acreage
+      saleyear: lastSale.year
+      salemonth: lastSale.month
+      totalmarketvalue: tax.marketValue
+      totalassessedvalue: tax.assessedValue
+      parcellandvalue: tax.landValue
+      parcelbuildingvalue: tax.improvementValue
+      deed_bk_pg: deedBookPage
+    notes: >
+      Verified count 26680; SaleYear>0 → 25635; acres 5–150 → 5786.
+      NO SalePrice field on REST — biggest schema gap. Join to primary on NCPIN.
+      Field names lowercase on FeatureServer; response may echo mixed case.
+    status: partial
+
+  - role: parcels
+    name: WebTemplate2026 Parcels (sale date + deed link)
+    restUrl: https://gis.daviecountync.gov/server/rest/services/WebTemplate2026/WebTemplate2026/MapServer/26
+    layerId: 26
+    geometry: polygon
+    auth: none
+    acreageField: TOTAL_ACRES
+    coverage: county-wide
+    fieldMap:
+      NCPIN: parcelId
+      AccountNumber: parcelIdAlt
+      Name1: ownerName
+      Address1: mailingAddress.street
+      City: mailingAddress.city
+      ZipCode: mailingAddress.zip
+      TOTAL_ACRES: acreage
+      SaleYear: lastSale.year
+      SaleMonth: lastSale.month
+      InstrumentType: lastSale.instrumentType
+      DEED_BK_PG: deedBookPage
+      DeedLinkInfo: deedLinkInfo
+      TotalMarketValue: tax.marketValue
+      TotalAssessedValue: tax.assessedValue
+    notes: >
+      Verified count 26680; SaleYear>0 ∩ acres 5–150 → 5609. No situs components;
+      no SalePrice. Prefer as sale-date join companion to Parcels/7.
+    status: partial
+
+  - role: parcels
+    name: parcel_polygons (geometry/acres only)
+    restUrl: https://gis.daviecountync.gov/server/rest/services/parcel_polygons/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTAL_ACRES
+    coverage: county-wide
+    fieldMap:
+      NCPIN: parcelId
+      TOTAL_ACRES: acreage
+      ASSESSED_ACRES: acreageAssessed
+      DEEDED_ACRES: acreageDeeded
+      CALCULATED_ACRES: acreageCalculated
+    notes: >
+      Verified count 27221. No ownership/tax/sale — prefer Parcels/7.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-23: cntyfips='059' count 26424; gisacres 5–150 → 5780.
+      parno aligns with NCPIN. saledate non-null count 0 for Davie; no sale price.
+      MaxRecordCount 5000. Alternate host services.gis.nc.gov.
+    status: usable
+
+  - role: zoning
+    name: Zoning_and_Development (county + munis)
+    restUrl: https://gis.daviecountync.gov/server/rest/services/Zoning_and_Development/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+      JURISDICTION: zoningJurisdiction
+      ACRES: zoningAcres
+    notes: >
+      Verified count 1160 — DAVIE COUNTY 807, MOCKSVILLE 322, BERMUDA RUN 20,
+      COOLEEMEE 11. Prefer FeatureServer (MapServer query not supported).
+      Spatial join to Parcels/7 in 2264. Mirror WebTemplate2026/54.
+    status: usable
+
+  - role: zoning
+    name: Zoning Overlay
+    restUrl: https://gis.daviecountync.gov/server/rest/services/Zoning_Overlay/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoningOverlay
+      JURISDICTION: zoningJurisdiction
+      PARCELNO: parcelIdLocal
+    notes: >
+      Verified count 15 (MF-O/MH-O etc.). Sparse; join after base zoning.
+      Mirror WebTemplate2026/53.
+    status: usable
+
+  - role: flu
+    name: County Land Use (Hosted)
+    restUrl: https://gis.daviecountync.gov/server/rest/services/Hosted/county_landuse/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: acres
+    coverage: county-wide
+    fieldMap:
+      code_use: flu
+      acres: fluAcres
+    notes: >
+      Verified count 105. Codes C/C-MU/CON/I/R/R-MU/R-R/TOWN. TOWN = municipal stub —
+      spatial-join Mocksville land use inside town. Mirror WebTemplate2026/50 CODE_USE.
+    status: usable
+
+  - role: flu
+    name: Mocksville Land Use Code
+    restUrl: https://gis.daviecountync.gov/server/rest/services/WebTemplate2026/WebTemplate2026/MapServer/51
+    layerId: 51
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      LANDUSECODE: flu
+    notes: >
+      Verified count 39. Codes CENTRAL BUSINESS, GENERAL COMMERCIAL, INDUSTRIAL,
+      MIXED USE, MODERATE RESIDENTIAL, RESIDENTIAL, RURAL RESIDENTIAL, PARKS…, I-40 ROW.
+      City-only — spatial join where CityCode='02' / JURISDICTION MOCKSVILLE.
+    status: usable
+
+  - role: other
+    name: Municipal City Limits
+    restUrl: https://gis.daviecountync.gov/server/rest/services/Municipal_City_Limits/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      CITY: municipality
+      JURISDICTION: municipality
+      MCD: mcdFlag
+    notes: >
+      Verified count 4: COOLEEMEE, MOCKSVILLE, BERMUDA RUN, DAVIE COUNTY (unincorporated).
+      Use to route zoning/FLU joins. ETJ on WebTemplate2026/38 (count 3).
+    status: usable
+
+  - role: other
+    name: Address Points
+    restUrl: https://gis.daviecountync.gov/server/rest/services/Addresses/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ADDR: situsAddress
+      HSNM: situsAddress.number
+      STREET: situsAddress.streetName
+      TYPE: situsAddress.streetType
+      MSAG_COMMUNITY: situsCity
+      UNIT: situsUnit
+    notes: >
+      Verified count 22742. No PIN — spatial join only. Prefer parcel situs components
+      or OneMap siteadd.
+    status: usable
+
+gaps:
+  - No SalePrice on public ArcGIS REST (ITS Basic Search Sales Date & Price is HTML-only)
+  - OneMap Davie saledate empty (count 0); no statewide sale price
+  - Bermuda Run and Cooleemee — no dedicated public FLU FeatureServer
+  - Zoning MapServer query not supported — use FeatureServer/0
+  - Address points lack PIN join key
+  - Rare NCPIN stubs (ROAD / short / null) — filter
+  - MortgageHolder / MortgageLoanNumber on Parcels/7 — do not collect
+  - Last-sale year/month only; no multi-transfer price history FeatureServer
+  - MaxRecordCount 2000 on county layers — paginate
+  - No independent municipal ArcGIS hosts; no paid vendor data; no phones/emails
+
+license: "Davie County GIS public REST + downloads; attribution expected"
+appraiserSearchUrl: https://maps.daviecountync.gov/itsnet/BasicSearch.aspx
+viewerUrl: https://gis.daviecountync.gov/portal/apps/webappviewer/index.html?id=94e9a343877d455db96a5bea6f2e8ca3
+verifiedAt: 2026-09-23
+verifiedBy: GIS Research Executor
+
+# ---- PASS 2 full-suite upgrade (NC non-OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  pass1:
+    status: verified
+    parcelPolygonLayer: https://gis.daviecountync.gov/server/rest/services/Parcels/FeatureServer/7
+    polygonCountLive: 26678
+    parcelIdField: NCPIN
+    parcelIdFilled: 26678
+    acreageField: TOTAL_ACRES
+    acres5to150Live: 5786
+    sampleCentroidWgs84:
+    - -80.7073
+    - 35.8547
+  parcelLayer: https://gis.daviecountync.gov/server/rest/services/Parcels/FeatureServer/7
+  parcelIdField: NCPIN
+  acreageFilter: TOTAL_ACRES >= 5 AND TOTAL_ACRES <= 150
+  acres5to150Live: 5786
+  parcelCountLive: 26678
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='DAVIE'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DAVIE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DAVIE%27&returnCountOnly=true&f=json
+      liveStationCount: 307
+      stationsWithAADT2022: 199
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Davie'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Davie%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Davie%27&returnCountOnly=true&f=json
+      liveStationCount: 303
+      stationsWithAADT2025: 191
+      stationsWithAADT2024: 196
+      stationsWith2025or2024: 296
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TotalMarketValue
+    - TotalAssessedValue
+    liveNonZero:
+      TotalMarketValue: 26668
+      TotalAssessedValue: 26668
+    status: ok
+  sale:
+    priceFields: []
+    dateFields: []
+    livePriceNonZero: {}
+    liveDateNonNull: {}
+    status: partial
+    note: No sale fields on Parcels/7. Parcel_Sales/FeatureServer/0 (and WebTemplate2026/MapServer/26) saleyear non-null 25,644 of 26,680 (year + month only, live 2026-09-28). Price on ITS Sales.aspx / BasicSearch.aspx (ASP.NET POST forms, no GET deep link).
+  ownerEntity:
+    ownerFields:
+    - Name1
+    primaryOwnerField: Name1
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(Name1) LIKE '% LLC%' OR UPPER(Name1) LIKE '% INC%' OR UPPER(Name1) LIKE '% LP%' OR UPPER(Name1) LIKE '% LLP%' OR UPPER(Name1) LIKE '% LTD%' OR UPPER(Name1) LIKE '% TRUST%' OR UPPER(Name1) LIKE '% CHURCH%' OR UPPER(Name1) LIKE '% COMPANY%' OR UPPER(Name1) LIKE '% PARTNERSHIP%' OR UPPER(Name1) LIKE '% HOLDINGS%' OR UPPER(Name1) LIKE '% PROPERTIES%' OR UPPER(Name1) LIKE '% CORP%' OR UPPER(Name1) LIKE '%,LLC%' OR UPPER(Name1) LIKE '%,INC%' OR UPPER(Name1) LIKE 'CITY OF %' OR UPPER(Name1) LIKE 'COUNTY OF %' OR UPPER(Name1) LIKE 'STATE OF %' OR UPPER(Name1) LIKE 'TOWN OF %')
+    liveEntityCountAll: 3414
+    liveEntityCount5to150ac: 714
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above.
+  paDeepLink:
+    template: null
+    testedParcelId: '5841133331'
+    testedUrl: https://maps.daviecountync.gov/itsnet/AppraisalCard.aspx?id=5841133331
+    httpStatus: 200
+    contentType: text/html; charset=utf-8
+    contentVerified: false
+    note: 'No GET deep link: AppraisalCard.aspx?id= returns 200 with an empty form for NCPIN, AccountNumber, COUNTYID and ParcelID; RealEstateDetail.aspx is 404. The ITS search (RealEstate.aspx / BasicSearch.aspx) is an ASP.NET WebForms POST with __VIEWSTATE. LSB: link to the search page, or submit a POST.'
+    searchUrl: https://maps.daviecountync.gov/itsnet/RealEstate.aspx
+    needsPost: true
+  gisViewer:
+    url: https://gis.daviecountync.gov/portal/apps/webappviewer/index.html?id=94e9a343877d455db96a5bea6f2e8ca3
+    httpStatus: 200
+    pageTitle: ArcGIS Web Application
+    arcgisItem:
+      access: public
+      title: Tax Parcel Viewer
+      type: Web Mapping Application
+  gaps:
+  - sale partial
+  - PA deep link needs POST (no GET template)

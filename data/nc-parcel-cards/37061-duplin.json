@@ -1,0 +1,482 @@
+{
+  "county": "Duplin",
+  "state": "NC",
+  "msa": "Wilmington footprint",
+  "fips": "37061",
+  "cntyfips": "061",
+  "slug": "duplin",
+  "level": "county",
+  "markets": [
+    "Wilmington"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "publicGisUrl": "https://gis.duplinnc.gov/maps/default.htm",
+  "jurisdictionGisUrl": "https://gis.duplinnc.gov/maps/default.htm",
+  "gisViewerUrl": "https://gis.duplinnc.gov/maps/default.htm",
+  "gisDepartmentUrl": "https://www.duplinnc.gov/277/GIS",
+  "gisLandingUrl": "https://gis.duplinnc.gov/",
+  "gisBetaUrl": "https://gis.duplinnc.gov/avineonbeta",
+  "countyRestRoot": "https://gis.duplinnc.gov/server/rest/services",
+  "taxAdministrationUrl": "https://www.duplinnc.gov/215/Tax-Administration",
+  "planningZoningUrl": "https://www.duplinnc.gov/206/Planning",
+  "udoPdfUrl": "https://www.duplinnc.gov/DocumentCenter/View/688/Duplin-County-Unified-Development-Ordinance-PDF",
+  "landUsePlanPdfUrl": "https://www.duplinnc.gov/DocumentCenter/View/292/Duplin-County-Land-Use-Plan-PDF",
+  "appraiserSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicDL/RealEstateSearch",
+  "viewerLinkTemplate": "https://www.bttaxpayerportal.com/ITSPublicDL/RealEstateSearch/Parcel/{PIN}",
+  "viewerLinkTemplateAlt": "https://www.bttaxpayerportal.com/ITSPublicDL/AppraisalCard.aspx?id={ParcelNumber}",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/duplin/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/duplin/parcel-detail/{PIN}",
+  "taxPayUrl": "https://www.bttaxpayerportal.com/ITSPublicDL",
+  "paDeepLinkKey": "PIN",
+  "paDeepLinkKeyAlt": "ParcelNumber",
+  "parcelIdPreferred": "PIN",
+  "joinKeys": [
+    "PIN",
+    "PinNumber",
+    "ParcelNumber",
+    "AccountNumber",
+    "parno"
+  ],
+  "oneMapFilter": "cntyfips='061'",
+  "municipalities": {
+    "Kenansville": {
+      "role": "county seat",
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.duplinnc.gov/server/rest/services/GISDB/PublicAccessMainGISDB/MapServer/50",
+      "zoningCount": 789,
+      "zoningField": "Zoning",
+      "fluPrefer": null,
+      "notes": "CITY-FIRST on county host. Codes R15/R10/GC/OI/CB/I/AG/R3. Parcel-join polygons (OneMap-style attrs + Zoning)."
+    },
+    "Wallace": {
+      "role": "largest town; straddles Duplin/Pender",
+      "hasLocalGis": false,
+      "townPlanningUrl": "https://www.wallacenc.gov/planning",
+      "townMapUrl": "https://www.wallacenc.gov/map",
+      "zoningPrefer": null,
+      "fluPrefer": null,
+      "notes": "GAP: no public zoning FeatureServer on county host or town site. Town maintains Zoning Map/Ordinance (AmLegal/planning page) — not wireable REST. Prefer Duplin parcels for Wallace-in-37061."
+    },
+    "Warsaw": {
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.duplinnc.gov/server/rest/services/GISDB/PublicAccessMainGISDB/MapServer/51",
+      "zoningCount": 240,
+      "zoningField": "ZONING",
+      "fluPrefer": null,
+      "notes": "CITY-FIRST. Codes R-8/HB/R-10/R-6/R-20/CB/I/L1/O & I/R-8 MH."
+    },
+    "Beulaville": {
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.duplinnc.gov/server/rest/services/GISDB/PublicAccessMainGISDB/MapServer/47",
+      "zoningCount": 115,
+      "zoningField": "Zone",
+      "fluPrefer": null,
+      "notes": "CITY-FIRST. Codes HB/R-85/R 15/R 5/CB/RA 20/I/RA-20MH/R 6."
+    },
+    "Calypso": {
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.duplinnc.gov/server/rest/services/GISDB/PublicAccessMainGISDB/MapServer/48",
+      "zoningCount": 97,
+      "zoningField": "Zone",
+      "fluPrefer": null,
+      "notes": "CITY-FIRST. Legacy numeric Zone codes 1/1A/1/1A/2/3/4/5/SPU/SOLAR."
+    },
+    "Faison": {
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.duplinnc.gov/server/rest/services/GISDB/PublicAccessMainGISDB/MapServer/49",
+      "zoningCount": 36,
+      "zoningField": null,
+      "fluPrefer": null,
+      "notes": "PARTIAL: zoning polygons present but attributes only Id — no Zone/code field. Geometry usable for presence; codes unknown on REST."
+    },
+    "Rose Hill": {
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "fluPrefer": null,
+      "notes": "GAP: town limits + ETJ on Aux; no zoning FS. Utilities on Main GISDB not used for land search."
+    },
+    "Magnolia": {
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "fluPrefer": null,
+      "notes": "GAP: town limits + Magnolia ETJ; no zoning FS."
+    },
+    "Greenevers": {
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "fluPrefer": null,
+      "notes": "GAP: town limits only; no zoning FS."
+    },
+    "Teachey": {
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "fluPrefer": null,
+      "notes": "GAP: town limits only; no zoning FS."
+    },
+    "Harrells": {
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "fluPrefer": null,
+      "notes": "Edge town (mostly Sampson); Duplin TownLimits includes small polygon. Prefer Sampson card for Harrells proper."
+    },
+    "Mount Olive": {
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "fluPrefer": null,
+      "notes": "Mostly Wayne County; Duplin holds tiny edge polygons + Mt Olive ETJ. Prefer Wayne Mount_Olive_Zoning for MO proper."
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "TaxMapping/Parcels (PRIMARY CAMA)",
+      "restUrl": "https://gis.duplinnc.gov/server/rest/services/TaxMapping/Parcels/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CALCULATED_ACRES",
+      "coverage": "county-wide",
+      "status": "usable",
+      "fieldMap": {
+        "PIN": "parcelId",
+        "PinNumber": "parcelIdAlt",
+        "ParcelNumber": "parcelIdPaKey",
+        "AccountNumber": "parcelIdAccount",
+        "CYPAR_NEW": "parcelIdLegacy",
+        "CALCULATED_ACRES": "acreage",
+        "TOTAL_ACRES": "acreageTotal",
+        "LegalLandUnits": "acreageDeed",
+        "LegalLandType": "acreageDeedUnit",
+        "Name1": "ownerName",
+        "Name2": "ownerName2",
+        "Address1": "mailingAddress.street",
+        "Address2": "mailingAddress.street2",
+        "Address3": "mailingAddress.street3",
+        "City": "mailingAddress.city",
+        "State": "mailingAddress.state",
+        "ZipCode": "mailingAddress.zip",
+        "FormattedPropertyAddress": "situsAddress",
+        "SalePrice": "lastSale.price",
+        "DeedDate": "lastSale.date",
+        "DeedBook": "lastSale.deedBook",
+        "DeedPage": "lastSale.deedPage",
+        "TotalMarketValue": "tax.marketValue",
+        "TotalAssessedValue": "tax.assessedValue",
+        "ParcelLandValue": "tax.landValue",
+        "ParcelBuildingValue": "tax.improvementValue",
+        "ParcelObxfValue": "tax.obxfValue",
+        "ParcelDeferredValue": "tax.deferredValue",
+        "ActualYearBuilt": "yearBuilt",
+        "HeatedAreaCard": "heatedArea",
+        "Neighborhood": "neighborhood",
+        "NeighborhoodName": "neighborhoodName"
+      },
+      "notes": "PRIMARY wire-first verified 2026-09-24: count 43733; CALCULATED_ACRES 5–150 → 12300; TOTAL_ACRES 5–150 → 13204; ParcelBuildingValue=0/null in band → 9707; SalePrice<>'0' in band → 5297. CRS 102719/2264. MaxRecordCount 2000 — paginate. Rich CAMA on polygons (owner/mail/situs/sale/tax). SalePrice/tax fields are strings. Geo-check PIN 248600627091 ≈ -78.042, 35.011 (Pink Hill area); PIN 246600208100 ≈ -78.125, 35.011 (Warsaw). PIN joins OneMap parno. MapServer twin: TaxMapping/Parcels/MapServer/0. Viewer also uses PublicAccess/ParcelAccessMainFGDB/MapServer/37 (same CAMA + CityTaxDistrict)."
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (fallback)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "status": "usable",
+      "fieldMap": {
+        "parno": "parcelId",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress.street",
+        "mcity": "mailingAddress.city",
+        "mstate": "mailingAddress.state",
+        "mzip": "mailingAddress.zip",
+        "siteadd": "situsAddress",
+        "scity": "situsCity",
+        "gisacres": "acreage",
+        "saledate": "lastSale.date",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "cntyfips": "countyFips"
+      },
+      "notes": "Filter cntyfips='061'. Verified count 43612; gisacres 5–150 → 12297. No sale price. scity/mcity often blank. Alternate host services.gis.nc.gov. MaxRecordCount 5000. PIN↔parno verified (247500941899)."
+    },
+    {
+      "role": "zoning",
+      "name": "Kenansville Zoning Districts (city-first)",
+      "restUrl": "https://gis.duplinnc.gov/server/rest/services/GISDB/PublicAccessMainGISDB/MapServer/50",
+      "layerId": 50,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "GISACRES",
+      "coverage": "city-only",
+      "status": "usable",
+      "fieldMap": {
+        "Zoning": "zoning",
+        "former_Zon": "zoningFormer",
+        "PARNO": "parcelId",
+        "OWNNAME": "ownerName",
+        "SITEADD": "situsAddress"
+      },
+      "notes": "PRIMARY city-first Kenansville. Count 789. Codes: R15 260, R10 176, GC 135, blank 104, OI 75, CB 16, I 11, AG 8, R3 3, R 1. Parcel-keyed polys. Mirror on PublicAccess/ParcelAccessMainFGDB/MapServer/51."
+    },
+    {
+      "role": "zoning",
+      "name": "Warsaw Zoning Districts (city-first)",
+      "restUrl": "https://gis.duplinnc.gov/server/rest/services/GISDB/PublicAccessMainGISDB/MapServer/51",
+      "layerId": 51,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ACREAGE",
+      "coverage": "city-only",
+      "status": "usable",
+      "fieldMap": {
+        "ZONING": "zoning",
+        "PIN": "parcelId",
+        "NAME": "ownerName",
+        "ADDRESS": "situsAddress"
+      },
+      "notes": "PRIMARY city-first Warsaw. Count 240. Codes: R-8 60, HB 41, R-10 40, R-6 33, R-20 28, CB 16, I 13, L1 6, O & I 2, R-8 MH 1. Mirror ParcelAccessMainFGDB/52."
+    },
+    {
+      "role": "zoning",
+      "name": "Beulaville Zoning (city-first)",
+      "restUrl": "https://gis.duplinnc.gov/server/rest/services/GISDB/PublicAccessMainGISDB/MapServer/47",
+      "layerId": 47,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "city-only",
+      "status": "usable",
+      "fieldMap": {
+        "Zone": "zoning"
+      },
+      "notes": "Count 115. Codes HB/R-85/R 15/R 5/CB/RA 20/I/RA-20MH/R 6. Mirror ParcelAccessMainFGDB/48."
+    },
+    {
+      "role": "zoning",
+      "name": "Calypso Zoning Districts (city-first)",
+      "restUrl": "https://gis.duplinnc.gov/server/rest/services/GISDB/PublicAccessMainGISDB/MapServer/48",
+      "layerId": 48,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "city-only",
+      "status": "usable",
+      "fieldMap": {
+        "Zone": "zoning"
+      },
+      "notes": "Count 97. Legacy numeric Zone codes. Mirror ParcelAccessMainFGDB/49."
+    },
+    {
+      "role": "zoning",
+      "name": "Faison Zoning (partial attrs)",
+      "restUrl": "https://gis.duplinnc.gov/server/rest/services/GISDB/PublicAccessMainGISDB/MapServer/49",
+      "layerId": 49,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "city-only",
+      "status": "partial",
+      "fieldMap": {
+        "Id": "zoningId"
+      },
+      "notes": "Count 36 polygons; no Zone/code attribute — geometry-only. Codes unknown on REST."
+    },
+    {
+      "role": "other",
+      "name": "TownLimits",
+      "restUrl": "https://gis.duplinnc.gov/server/rest/services/TaxMapping/TownLimits/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "TOTAL_ACRES",
+      "coverage": "county-wide",
+      "status": "usable",
+      "fieldMap": {
+        "MUNICIPALITY_NAME": "municipality",
+        "TOWN_TYPE": "townTypeCode",
+        "TOTAL_ACRES": "acreage"
+      },
+      "notes": "Count 21 multi-part. Names present for Greenevers/Beulaville/Harrells/Wallace/Faison/Mount Olive/Calypso; others keyed by TOWN_TYPE (5 Kenansville, 6 Magnolia, 8 Rose Hill, 9 Teachey, 10 Wallace, 11 Warsaw). Also PublicAccessAux/MapServer/23 City Limits (Shaded)."
+    },
+    {
+      "role": "other",
+      "name": "ETJ (Shaded)",
+      "restUrl": "https://gis.duplinnc.gov/server/rest/services/PublicAccessAux/MapServer/21",
+      "layerId": 21,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ACRES",
+      "coverage": "county-wide",
+      "status": "usable",
+      "fieldMap": {
+        "SOURCETHM": "etjName",
+        "ACRES": "acreage"
+      },
+      "notes": "Count 9: Mt Olive, Calypso, Kenansville, Magnolia, Rose Hill, Warsaw, Faison, Beulaville, Wallace ETJs. Route zoning inside ETJ to that town's layer when present."
+    },
+    {
+      "role": "other",
+      "name": "911 Address Points",
+      "restUrl": "https://gis.duplinnc.gov/server/rest/services/TaxMapping/911AddressPoints/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "point",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "status": "usable",
+      "fieldMap": {
+        "FullAddress": "situsAddress",
+        "Post_Comm": "situsCity",
+        "Post_Code": "situsZip"
+      },
+      "notes": "Count 34036. Situs join when FormattedPropertyAddress thin. Do not harvest PII beyond public address fields."
+    },
+    {
+      "role": "flu",
+      "name": "Duplin County Land Use Plan (PDF only)",
+      "restUrl": null,
+      "layerId": null,
+      "geometry": "none",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "status": "gap",
+      "fieldMap": {},
+      "notes": "No public FLU FeatureServer. County Land Use Plan PDF only. Official: unincorporated Duplin is unzoned (UDO governs subdivisions/solar/MHP etc., not district zoning)."
+    }
+  ],
+  "gaps": [
+    "No countywide zoning REST — unincorporated Duplin is officially unzoned (county Planning page).",
+    "No public FLU FeatureServer — Land Use Plan PDF only.",
+    "Wallace / Rose Hill / Magnolia / Greenevers / Teachey: no public zoning FeatureServer.",
+    "Faison zoning polys lack Zone/code attributes.",
+    "Sale history is last-sale only on parcel layer (SalePrice/DeedDate strings); no multi-transfer FS.",
+    "TownLimits MUNICIPALITY_NAME null on many parts — use TOWN_TYPE map or Aux City Limits.",
+    "Situs FormattedPropertyAddress often sparse on acreage tracts — join 911 points or OneMap siteadd."
+  ],
+  "license": "County GIS disclaimer: assessment/mapping reference only; verify with deeds/plats/surveyor. Public REST auth: none.",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "tranche": 3,
+  "suite": [
+    "parcels",
+    "zoning",
+    "flu",
+    "tax",
+    "sales",
+    "owner"
+  ],
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://gis.duplinnc.gov/server/rest/services/TaxMapping/Parcels/FeatureServer/0",
+    "parcelIdField": "PIN",
+    "acreageFilter": "CALCULATED_ACRES >= 5 AND CALCULATED_ACRES <= 150",
+    "acres5to150Live": 12301,
+    "parcelCountLive": 43735,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='DUPLIN'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DUPLIN%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DUPLIN%27&returnCountOnly=true&f=json",
+        "liveStationCount": 584,
+        "stationsWithAADT2022": 345
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Duplin'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Duplin%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Duplin%27&returnCountOnly=true&f=json",
+        "liveStationCount": 564,
+        "stationsWithAADT2025": 334,
+        "stationsWithAADT2024": 348,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "stations2024CountyFilter": "County='Duplin'",
+        "stations2024LiveCount": 564,
+        "stations2024WithAADT2024": 564,
+        "stations2024Note": "AADT_2024 string field populated on every station in this release",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TotalMarketValue",
+        "TotalAssessedValue"
+      ],
+      "liveNonZero": {
+        "TotalMarketValue": 43203,
+        "TotalAssessedValue": 43201
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SalePrice"
+      ],
+      "dateFields": [
+        "DeedDate"
+      ],
+      "livePriceNonZero": {
+        "SalePrice": 21482
+      },
+      "liveDateNonNull": {
+        "DeedDate": 37874
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Name1",
+        "Name2"
+      ],
+      "rule": "Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).",
+      "regex": "\\b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "regexExtended": "\\b(LLC|L\\s?L\\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\\b|\\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\\s+OF\\b|\\bOF\\s+(EDUCATION|TRANSPORTATION)\\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\\b",
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "liveEntityCount5to150ac": 1859,
+      "liveEntityCount5to150acExtended": 2427,
+      "countNote": "Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.",
+      "sampleMatches": [
+        "TURNER FARMS LLC",
+        "TURNER FARMS LLC",
+        "RSJ PROPERTIES, LLC",
+        "CARBON CYCLE NORTH CAROLINA LLC"
+      ]
+    },
+    "paDeepLink": {
+      "template": "https://www.bttaxpayerportal.com/ITSPublicDL/RealEstateSearch/Parcel/{PIN}",
+      "testedParcelId": "348200398658",
+      "testedUrl": "https://www.bttaxpayerportal.com/ITSPublicDL/RealEstateSearch/Parcel/348200398658",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": true,
+      "note": "Parcel id found in the response body."
+    },
+    "gisViewer": {
+      "url": "https://gis.duplinnc.gov/maps/default.htm",
+      "httpStatus": 200,
+      "pageTitle": null
+    },
+    "gaps": []
+  }
+}

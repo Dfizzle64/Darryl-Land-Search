@@ -1,0 +1,29 @@
+{
+  "name": "Avery",
+  "fips": "37011",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 3925,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-avery-parcels-37011",
+  "queryUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Avery_AGOL/FeatureServer/21/query",
+  "gaps": [
+    "Parcels are Avery_AGOL Parcels_Reval (PRIMARY CAMA) (https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Avery_AGOL/FeatureServer/21). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 4043 rows; 3925 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 132 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37011/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37011/lookup.json",
+  "sourceCount": 4043,
+  "dropped": 47,
+  "tileCount": 6,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "http://webtax.averycountync.gov/ITSPublic/AppraisalCard.aspx?id={PARNUM}",
+  "gisViewerUrl": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=7c399996997242bdbf2a0bf5c18e3a2a"
+}

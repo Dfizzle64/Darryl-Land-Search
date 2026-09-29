@@ -1,0 +1,395 @@
+{
+  "county": "Lenoir",
+  "state": "NC",
+  "msa": "Greenville / Eastern NC",
+  "fips": "37107",
+  "cntyfips": "107",
+  "slug": "lenoir",
+  "level": "county",
+  "markets": [
+    "Greenville/Eastern NC"
+  ],
+  "crsPreferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "publicGisUrl": "https://lenoirco.maps.arcgis.com/apps/webappviewer/index.html?id=68c0618065d04f1182fb86cb5b6647de",
+  "jurisdictionGisUrl": "https://lenoirco.maps.arcgis.com/apps/webappviewer/index.html?id=68c0618065d04f1182fb86cb5b6647de",
+  "gisViewerUrl": "https://lenoirco.maps.arcgis.com/apps/webappviewer/index.html?id=68c0618065d04f1182fb86cb5b6647de",
+  "experienceGisUrl": "https://experience.arcgis.com/experience/9f9e1c23a7124bd2961e83861c747b84/",
+  "gisDepartmentUrl": "https://lenoircountync.gov/planning-inspections-department/",
+  "countyRestRoot": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services",
+  "taxAssessorUrl": "https://lenoircountync.gov/tax-department/",
+  "appraiserSearchUrl": "https://property.spatialest.com/nc/lenoir/",
+  "paDeepLinkTemplate": "https://property.spatialest.com/nc/lenoir/#/property/{Record_Num}",
+  "paDeepLinkKey": "Record_Num",
+  "paDeepLinkKeyAlt": "record_number",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/lenoir/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/lenoir/parcel-detail/{NC_PIN}",
+  "spatialestAppealsUrl": "https://appeals.spatialest.com/nc-lenoir/",
+  "taxBillsUrl": "https://www.lenoircountytaxes.com/",
+  "oneMapFilter": "cntyfips='107'",
+  "parcelIdPreferred": "NC_PIN",
+  "joinKeys": [
+    "NC_PIN",
+    "NCPIN",
+    "Record_Num",
+    "record_number",
+    "ParcelNum",
+    "parno",
+    "altparno"
+  ],
+  "municipalities": {
+    "Kinston": {
+      "role": "county seat / largest",
+      "hasLocalGis": false,
+      "zoningPrefer": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/3",
+      "zoningCount": 1285,
+      "zoningField": "ZONING",
+      "zoningAlternate": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/OpenGov/FeatureServer/4",
+      "zoningAlternateCount": 1301,
+      "fluPrefer": null,
+      "fluPdf": "https://www.kinstonnc.gov/DocumentCenter/View/777/Kinston-Comprehensive-Land-Use-Plan",
+      "planningUrl": "https://kinstonnc.gov/152/Planning-and-Development-Services",
+      "taxDistrictParcelsApprox": 11523,
+      "notes": "CITY-FIRST. Top ZONING RA-6/RA-5/B-1/RA-8/I-1. FLU Comp Plan PDF only."
+    },
+    "La Grange": {
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "zoningPdf": "https://www.lagrangenc.com/DocumentCenter/View/104/LaGrange-Official-Zoning-Map-Revised-December-12-2011-PDF",
+      "zoningCodesPdf": [
+        "AR",
+        "R-18",
+        "R-12",
+        "R-10",
+        "R-5",
+        "HC",
+        "DD",
+        "LI"
+      ],
+      "fluPrefer": null,
+      "taxDistrictParcelsApprox": 1888,
+      "notes": "REST gap. ConnectGIS lenoir.connectgis.com HTTP 504 at verify. PDF zoning only."
+    },
+    "Pink Hill": {
+      "hasLocalGis": false,
+      "zoningPrefer": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/7",
+      "zoningCount": 39,
+      "zoningField": "Zoning",
+      "fluPrefer": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/7",
+      "fluField": "Future_LU",
+      "taxDistrictParcelsApprox": 387,
+      "notes": "CITY-FIRST. Zoning HC/RA/R-10/RM/DC. Only municipal FLU REST in county."
+    },
+    "Grifton": {
+      "role": "tip / shared with Pitt",
+      "hasLocalGis": false,
+      "zoningPrefer": "https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/23",
+      "zoningCount": 104,
+      "zoningField": "ZONE",
+      "taxDistrictParcelsApprox": 156,
+      "notes": "Prefer Pitt card for full town zoning. Clip Lenoir-side parcels."
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Parcels_Zoning_Addressing / Parcels (PRIMARY)",
+      "restUrl": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/6",
+      "layerId": 6,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "GIS_ACRE",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 36474,
+        "gisAcre_5_150": 5326,
+        "mapAcres_5_150": 5326,
+        "deedAcres_5_150": 5392,
+        "improveFmv0orNull_inBand": 3090,
+        "salesAmtGt0": 10286,
+        "salesAmtGt0_inBand": 1225,
+        "physStrAddPresent": 36115
+      },
+      "geoCheck": {
+        "NC_PIN": "4525-31-5293",
+        "Record_Num": 5084,
+        "lon": -77.581,
+        "lat": 35.256,
+        "place": "Kinston Queen St"
+      },
+      "fieldMap": {
+        "NC_PIN": "parcelId",
+        "NCPIN": "parcelIdPin",
+        "Record_Num": "parcelIdAccount",
+        "ParcelNum": "parcelIdDisplay",
+        "GIS_ACRE": "acreage",
+        "MapAcres": "acreageMap",
+        "DeedAcres": "acreageDeed",
+        "Name1": "ownerName",
+        "Name2": "ownerName2",
+        "Addr1": "mailingAddress.street",
+        "City": "mailingAddress.city",
+        "State": "mailingAddress.state",
+        "Zip": "mailingAddress.zip",
+        "PhysStrAdd": "situsAddress",
+        "SalesAmt": "lastSale.price",
+        "DateSold": "lastSale.date",
+        "DeedBook": "lastSale.deedBook",
+        "DeedPage": "lastSale.deedPage",
+        "LandFMVCur": "tax.landValue",
+        "ImproveFMV": "tax.improvementValue",
+        "TotalFMVCu": "tax.marketValue",
+        "PRC": "appraiserSearchUrl"
+      },
+      "maxRecordCount": 2000,
+      "notes": "PRIMARY wire-first. PRC embeds Spatialest deep-link by Record_Num."
+    },
+    {
+      "role": "parcels",
+      "name": "OpenGov / Parcels (CAMA enrichment twin)",
+      "restUrl": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/OpenGov/FeatureServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "MAP_ACRES",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 36474,
+        "zonePopulated": 12548,
+        "salesAmtGt0": 10286,
+        "mapAcres_5_150": 5326,
+        "improveFmv0orNull_inBand": 3090
+      },
+      "maxRecordCount": 1000,
+      "notes": "Adds ZONE (~12.5k), QUALIFY_CODE*, ASV/taxable. Prefer city zoning polygons inside munis."
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (fallback)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "status": "usable",
+      "filter": "cntyfips='107'",
+      "verifiedCounts": {
+        "total": 36463,
+        "gisacres_5_150": 5318,
+        "improvval0orNull_inBand": 3093
+      },
+      "join": {
+        "parno": "NC_PIN",
+        "altparno": "Record_Num"
+      },
+      "maxRecordCount": 5000,
+      "notes": "Situs on polys. No sale price. Alternate host services.gis.nc.gov."
+    },
+    {
+      "role": "zoning",
+      "name": "Kinston Zoning Dec23 (city-first PRIMARY)",
+      "restUrl": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/3",
+      "layerId": 3,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "zoningField": "ZONING",
+      "verifiedCounts": {
+        "total": 1285
+      },
+      "topCodes": {
+        "RA-6": 319,
+        "RA-5": 263,
+        "B-1": 180,
+        "RA-8": 163,
+        "I-1": 91,
+        "B-2": 55,
+        "I-B": 52,
+        "O&I": 47,
+        "RA-20": 38,
+        "RO": 32
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Pink Hill Zoning + Future_LU",
+      "restUrl": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/7",
+      "layerId": 7,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "zoningField": "Zoning",
+      "fluField": "Future_LU",
+      "verifiedCounts": {
+        "total": 39
+      },
+      "zoningTop": {
+        "HC": 15,
+        "RA": 12,
+        "R-10": 8,
+        "RM": 2,
+        "DC": 2
+      },
+      "fluTop": {
+        "Residential": 16,
+        "Commercial": 13,
+        "Open Space/Recreation": 8,
+        "Agricultural/Residential": 2
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "County Zoning (coarse unincorporated / GTP)",
+      "restUrl": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "partial",
+      "zoningField": "Zoning",
+      "verifiedCounts": {
+        "total": 8
+      },
+      "codes": [
+        "Agricultural",
+        "Commercial",
+        "Industrial",
+        "Residential",
+        "GTP-AR",
+        "GTP-C",
+        "GTP-I",
+        "GTP-RE"
+      ]
+    },
+    {
+      "role": "zoning",
+      "name": "Proposed Lenoir County Zoning 2023-10-05",
+      "restUrl": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/OpenGov/FeatureServer/23",
+      "layerId": 23,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "partial",
+      "zoningField": "Proposed_Z",
+      "verifiedCounts": {
+        "total": 35841
+      },
+      "proposedZTop": {
+        "Municipality": 13876,
+        "Agricultural": 11344,
+        "Residential": 5257,
+        "ETJ": 3781,
+        "GTP-AR": 742,
+        "GTP-I": 308,
+        "Commercial": 254,
+        "GTP-RE": 198,
+        "Industrial": 41,
+        "GTP-C": 37
+      },
+      "notes": "Proposed parcel-class; clarify adoption with Planning."
+    },
+    {
+      "role": "flu",
+      "name": "Kinston Comprehensive Land Use Plan (PDF)",
+      "restUrl": null,
+      "status": "gap",
+      "coverage": "city-only",
+      "pdfUrl": "https://www.kinstonnc.gov/DocumentCenter/View/777/Kinston-Comprehensive-Land-Use-Plan"
+    },
+    {
+      "role": "zoning",
+      "name": "La Grange Official Zoning Map (PDF)",
+      "restUrl": null,
+      "status": "gap",
+      "coverage": "city-only",
+      "pdfUrl": "https://www.lagrangenc.com/DocumentCenter/View/104/LaGrange-Official-Zoning-Map-Revised-December-12-2011-PDF"
+    },
+    {
+      "role": "zoning",
+      "name": "Grifton Zoning via Pitt",
+      "restUrl": "https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/23",
+      "layerId": 23,
+      "status": "usable",
+      "coverage": "city-only",
+      "zoningField": "ZONE",
+      "verifiedCounts": {
+        "total": 104
+      },
+      "notes": "Prefer Pitt card; clip Lenoir tip."
+    },
+    {
+      "role": "other",
+      "name": "Address Points",
+      "restUrl": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/9",
+      "layerId": 9,
+      "geometry": "point",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 41413
+      },
+      "notes": "No PIN join \u2014 spatial join."
+    },
+    {
+      "role": "other",
+      "name": "Municipal Areas",
+      "restUrl": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Lenoir_County_Municipal_Areas/FeatureServer/0",
+      "layerId": 0,
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 6
+      }
+    },
+    {
+      "role": "other",
+      "name": "ETJ",
+      "restUrl": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Lenoir_Static/FeatureServer/6",
+      "layerId": 6,
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 6
+      },
+      "etjMunicipalities": [
+        "City of Kinston",
+        "Town of La Grange",
+        "Town of Pink Hill",
+        "Town of Grifton"
+      ]
+    }
+  ],
+  "doNotWire": [
+    {
+      "url": "https://services2.arcgis.com/HfsHDBmkGwb1UtID/ArcGIS/rest/services/ParcelViewer_Layers/FeatureServer",
+      "reason": "Norwalk CT wrong geography"
+    },
+    {
+      "url": "https://lenoir.connectgis.com/Map.aspx",
+      "reason": "HTTP 504 at verify; La Grange community map unreachable"
+    },
+    {
+      "note": "Caldwell County City of Lenoir zoning is FIPS 37027 \u2014 different jurisdiction"
+    }
+  ],
+  "gaps": [
+    "La Grange zoning REST gap \u2014 PDF only; ConnectGIS 504",
+    "Kinston / countywide FLU REST gap \u2014 Comp Plan PDF; only Pink Hill Future_LU",
+    "County_Zoning only 8 coarse polys",
+    "Proposed_Z parcel-class proposed \u2014 clarify adoption",
+    "OpenGov ZONE ~34% populated \u2014 prefer city zoning spatial join",
+    "AddrPts lack PIN",
+    "Last-sale only; no multi-transfer history FS",
+    "Grifton straddles Pitt \u2014 prefer Pitt host",
+    "No phones/emails; no AADT/utilities; no paid vendors"
+  ],
+  "license": "Lenoir County / LenoirCoGIS public AGOL; NC OneMap; attribution recommended; no paid vendors",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "method": "Live ArcGIS REST counts + field samples + WGS84 geo-check; Spatialest PRC + NCPTS SPA shells; OneMap cntyfips='107'; municipal PDF/homepage GIS absence check; wrong-org Norwalk reject"
+}

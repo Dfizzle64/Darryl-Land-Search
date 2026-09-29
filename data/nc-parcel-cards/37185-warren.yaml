@@ -1,0 +1,355 @@
+state: NC
+jurisdiction: Warren County
+fips: "37185"
+level: county
+markets: [Raleigh-Durham]
+
+layers:
+  - role: parcels
+    name: RokMap Parcels - Large Scale (PRIMARY CAMA polygons)
+    restUrl: https://arcgis4.roktech.net/arcgis/rest/services/Warren/RokMap/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: ASSESSED_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      NEWPIN: parcelId
+      MAPN: parcelIdMap
+      RECN: parcelIdRecn
+      ASSESSED_ACREAGE: acreage
+      NAME1: ownerName
+      NAME2: ownerName2
+      ADDR: mailingAddress.street
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIP: mailingAddress.zip
+      SITUS_ADDRESS: situsAddress
+      LAND_VAL: tax.landValue
+      BLDG_VAL: tax.improvementValue
+      OTHER_VAL: tax.obxfValue
+      ASSESSED_VAL: tax.assessedValue
+      SALE_PRICE: lastSale.price
+      DEEDDATE: lastSale.date
+      DEEDBOOK: lastSale.deedBook
+      DEEDPAGE: lastSale.deedPage
+      IMP_CODE: dorCode
+      PLAT_REFERENCE: platReference
+      DESCRIPTION: legalDescription
+      TSHP: township
+      FIREDIST: fireDistrict
+      NBHD: neighborhood
+      HEATED_AREA: heatedArea
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 23585; ASSESSED_ACREAGE 5–150 → 5949;
+      SALE_PRICE>0 → 11948; BLDG_VAL=0/null in 5–150 → 4533; NAME1 IS NOT NULL → 23526;
+      SITUS_ADDRESS populated → 19450. CRS 102100/3857. MaxRecordCount 1000 — paginate.
+      Rich CAMA on polygon: owner, mailing, situs, land/bldg/other/assessed, last sale,
+      NEWPIN (10-digit, matches OneMap parno). Layer 3 (Small Scale) is the same feature
+      set with inverse display scales (L3 maxScale 24000; L4 minScale 24000) — query either.
+      Geo-verify sample centroids ~-78.27/36.33 and ~-78.20/36.31 (Warren). Sample NEWPIN
+      2914119156 (MUDHEN FAMILY FARMS LLC) returned owner, values, SALE_PRICE, DEEDDATE.
+    status: usable
+
+  - role: parcels
+    name: RokMap Parcels - Small Scale (same CAMA; zoomed-out display)
+    restUrl: https://arcgis4.roktech.net/arcgis/rest/services/Warren/RokMap/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: ASSESSED_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      NEWPIN: parcelId
+      MAPN: parcelIdMap
+      ASSESSED_ACREAGE: acreage
+      NAME1: ownerName
+      SITUS_ADDRESS: situsAddress
+      LAND_VAL: tax.landValue
+      BLDG_VAL: tax.improvementValue
+      ASSESSED_VAL: tax.assessedValue
+      SALE_PRICE: lastSale.price
+      DEEDDATE: lastSale.date
+    notes: >
+      Identical attribute schema and count (23585) to Large Scale/4. Prefer /4 for queries;
+      /3 is display-scale companion only.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (statewide fallback)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: recareano
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      nparno: parcelIdPrefixed
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      recareano: acreage
+      gisacres: acreageGisEmpty
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      parval: tax.assessedValue
+      sourceref: lastSale.deedRef
+      sourcedate: lastSale.date
+      parusecode: dorCode
+      cntyfips: countyFips
+    notes: >
+      Filter cntyfips='185'. Verified count 23477; recareano 5–150 → 5942;
+      improvval 0/null in range → 3981; siteadd populated → 19319; parval>0 → 23413.
+      gisacres is entirely 0 for Warren — use recareano (matches county ASSESSED_ACREAGE).
+      No sale price field; saledate empty. parno ≈ county NEWPIN. Alternate host:
+      https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+      MaxRecordCount 5000. OneMap improvval can lag county BLDG_VAL.
+    status: partial
+
+  - role: zoning
+    name: RokMap Zoning (parcelized countywide; cities-first via Town Limits)
+    restUrl: https://arcgis4.roktech.net/arcgis/rest/services/Warren/RokMap/MapServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+    notes: >
+      Verified count 24069 parcel-sized polygons (not coarse district blobs). Districts:
+      AR 14805, R 5075, RL 3605, NB 483, LB 53, LI 20, HB 20, GC 5, TC 2 (+ 1 blank).
+      No independent municipal zoning FeatureServer found for Warrenton/Norlina/Macon
+      (AGOL search empty 2026-09-24). Route cities-first with Town Limits/8 + this layer.
+      Spatial counts inside towns: Warrenton 791 (AR/NB/R/HB), Norlina 701 (AR/NB/R),
+      Macon 142 (AR/NB), Littleton tip 19 (AR). Pair with Zoning Ordinance PDF.
+    status: usable
+
+  - role: zoning
+    name: Interstate Overlay District
+    restUrl: https://arcgis4.roktech.net/arcgis/rest/services/Warren/RokMap/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: ACRE
+    coverage: sample
+    fieldMap:
+      ZONING: zoningOverlay
+      NEWPIN: parcelId
+      NAME1: ownerName
+      ACRE: acreage
+      SALE_PRICE: lastSale.price
+    notes: >
+      Verified count 1 multipart overlay. ZONING=IO. Overlay on base Zoning/6 along I-85
+      corridor — not a substitute for base district.
+    status: usable
+
+  - role: flu
+    name: Future Land Use
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      GAP — no public FLU FeatureServer/MapServer polygon layer. County Comprehensive
+      Development Plan (2022) and Appendix are PDF-only (DocumentCenter/View/5281 and
+      /5279). Do not invent a polygon REST URL.
+    status: gap
+
+  - role: other
+    name: Addresses (E-911 / situs points)
+    restUrl: https://arcgis4.roktech.net/arcgis/rest/services/Warren/RokMap/MapServer/1
+    layerId: 1
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NEW_ADDR: situsAddress
+      ADD_NUM: situs.number
+      PREDIR: situs.prefix
+      ST_NAME: situs.street
+      ST_TYPE: situs.streetType
+      POSTDIR: situs.suffix
+      FULLNAME: situs.streetFull
+      COMMUN: community
+      NEWUNIT: situs.unit
+    notes: >
+      Verified count 15857. COMMUN values include WARRENTON, NORLINA, MACON, LITTLETON,
+      MANSON, HENRICO, HOLLISTER, EBONY, HENDERSON. Primary parcels already carry
+      SITUS_ADDRESS — use points for NG911/community join when needed.
+    status: usable
+
+  - role: other
+    name: Town Limits
+    restUrl: https://arcgis4.roktech.net/arcgis/rest/services/Warren/RokMap/MapServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      MB_NAME: municipality
+    notes: >
+      Verified 4 polygons: Warrenton, Norlina, Macon, Littleton. Use for cities-first
+      routing. Littleton is mostly Halifax County — only a small Warren tip (~19 parcels).
+    status: usable
+
+  - role: other
+    name: Town ETJs
+    restUrl: https://arcgis4.roktech.net/arcgis/rest/services/Warren/RokMap/MapServer/18
+    layerId: 18
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ETJMUNNM: municipality
+      ETJLABEL: etjLabel
+    notes: >
+      Verified 2 features: Town of Warrenton ETJ, Town of Norlina ETJ. Pair with Town
+      Limits for planning-jurisdiction routing. Macon/Littleton have no ETJ polys here.
+    status: usable
+
+  - role: other
+    name: Subdivisions
+    restUrl: https://arcgis4.roktech.net/arcgis/rest/services/Warren/RokMap/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      SubName: subdivision
+      NEWPIN: parcelId
+    notes: >
+      Verified count 227. Optional context; not required for parcel/zoning wire.
+    status: usable
+
+gaps:
+  - No public FLU polygon REST — Comp Plan 2022 + Appendix are PDF-only (DocumentCenter/View/5281, /5279)
+  - No independent municipal zoning FeatureServers for Warrenton / Norlina / Macon — use county Zoning/6 + Town Limits/8
+  - Littleton mostly Halifax; Warren tip only (~19 parcels / AR zoning)
+  - NC OneMap gisacres entirely 0 for Warren — use recareano; OneMap has no sale price and empty saledate
+  - OneMap improvval can lag county BLDG_VAL (e.g. sample 2914119156)
+  - Layers 3 and 4 are scale-dependent duplicates of the same CAMA set — prefer /4
+  - MaxRecordCount 1000 on RokMap — paginate
+  - ITSPublic RealEstateSearch path not configured for Warren (HTTP 500); use NCPTS parcel-detail + AppraisalCard / TaxBillSearch
+  - AppraisalCard.aspx is a thin ASP shell (JS loads card) — deep-link still keyed by NEWPIN
+  - warren.webtaxpay.com / secure.webtaxpay.com behind bot challenge — not a REST source
+  - No multi-transfer sales history beyond last deed on parcel polygons
+  - No paid vendor data; no phones/emails; no AADT/utilities dig
+
+license: "Warren County public GIS (Roktech RokMap / ROKMAPS); NC OneMap; NCGS disclaimer; attribution recommended"
+
+appraiserSearchUrl: https://lrcpwa.ncptscloud.com/warren/parcel-search
+appraiserDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/warren/parcel-detail/{NEWPIN}"
+appraiserDeepLinkTemplateAlt: "https://www.bttaxpayerportal.com/ITSPublicWN/AppraisalCard.aspx?id={NEWPIN}"
+taxBillDeepLinkTemplate: "https://www.bttaxpayerportal.com/ITSPublicWN/TaxBillSearch/Parcel/{NEWPIN}"
+camaSearchUrl: https://www.bttaxpayerportal.com/ITSPublicWN
+jurisdictionGisUrl: https://maps.roktech.net/ROKMAPS_Warren/
+publicGisUrl: https://www.warrencountync.com/162/GIS
+countyRestRoot: https://arcgis4.roktech.net/arcgis/rest/services/Warren
+zoningOrdinanceUrl: https://www.warrencountync.com/DocumentCenter/View/4443/Warren-County-Zoning-Ordinance-Updated-March-3-2022
+comprehensivePlanUrl: https://www.warrencountync.com/DocumentCenter/View/5281/Warren-County-Comprehensive-Development-Plan-2022
+planningUrl: https://www.warrencountync.com/346/Planning-Zoning-Code-Enforcement
+
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://arcgis4.roktech.net/arcgis/rest/services/Warren/RokMap/MapServer/4
+  parcelIdField: NEWPIN
+  acreageFilter: ASSESSED_ACREAGE >= 5 AND ASSESSED_ACREAGE <= 150
+  acres5to150Live: 5948
+  parcelCountLive: 23584
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='WARREN'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WARREN%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WARREN%27&returnCountOnly=true&f=json
+      liveStationCount: 274
+      stationsWithAADT2022: 116
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Warren'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Warren%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Warren%27&returnCountOnly=true&f=json
+      liveStationCount: 273
+      stationsWithAADT2025: 162
+      stationsWithAADT2024: 174
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Warren'
+      stations2024LiveCount: 273
+      stations2024WithAADT2024: 273
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - ASSESSED_VAL
+    - LAND_VAL
+    liveNonZero:
+      ASSESSED_VAL: 23525
+      LAND_VAL: 23525
+    status: ok
+  sale:
+    priceFields:
+    - SALE_PRICE
+    dateFields:
+    - DEEDDATE
+    livePriceNonZero:
+      SALE_PRICE: 11944
+    liveDateNonNull:
+      DEEDDATE: 21760
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - NAME1
+    - NAME2
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 716
+    liveEntityCount5to150acExtended: 877
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - MUDHEN FAMILY FARMS LLC
+    - HD FORESTRY LLC
+    - BAKER INDUSTRIES INC
+    - BAKER INDUSTRIES INC
+  paDeepLink:
+    template: https://www.bttaxpayerportal.com/ITSPublicWN/TaxBillSearch/Parcel/{NEWPIN}
+    testedParcelId: '2937483505'
+    testedUrl: https://www.bttaxpayerportal.com/ITSPublicWN/TaxBillSearch/Parcel/2937483505
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: true
+    note: bttaxpayerportal TaxBillSearch 200 with ID in page. NCPTS parcel-detail/{NEWPIN} 200 SPA shell only — unverified.
+  gisViewer:
+    url: https://maps.roktech.net/ROKMAPS_Warren/
+    httpStatus: 200
+    pageTitle: ROKMAPS&trade;
+  gaps: []

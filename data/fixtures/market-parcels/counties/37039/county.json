@@ -1,0 +1,29 @@
+{
+  "name": "Cherokee",
+  "fips": "37039",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 6293,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-cherokee-parcels-37039",
+  "queryUrl": "https://maps.cherokeecounty-nc.gov/ccgis/rest/services/OfficeView/MapServer/1/query",
+  "gaps": [
+    "Parcels are OfficeView Parcels (CAMA + polygons) (https://maps.cherokeecounty-nc.gov/ccgis/rest/services/OfficeView/MapServer/1). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 6510 rows; 6293 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 234 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37039/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37039/lookup.json",
+  "sourceCount": 6510,
+  "dropped": 0,
+  "tileCount": 9,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "http://www.cherokeecounty-nc.gov:8080/TaxNet/AppraisalCard.aspx?idP={parcelId}&Action=Auto",
+  "gisViewerUrl": "https://maps.cherokeecounty-nc.gov/GISweb/GISviewer/"
+}

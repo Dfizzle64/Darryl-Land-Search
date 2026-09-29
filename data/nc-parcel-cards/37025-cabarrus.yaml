@@ -1,0 +1,505 @@
+state: NC
+jurisdiction: Cabarrus County
+fips: "37025"
+level: county
+markets: [Charlotte]
+
+layers:
+  - role: parcels
+    name: OpenData Tax Parcels
+    restUrl: https://location.cabarruscounty.us/arcgisservices/rest/services/OpenData/Tax_Parcels/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN14: parcelId
+      PIN: parcelIdAlt
+      PARCEL: parcelIdAlt2
+      PropertyReal_ID: parcelIdReal
+      CALCULATED_ACREAGE: acreage
+      LandUnits: acreageDeed
+      UnitsType: acreageUnit
+      AcctName1: ownerName
+      AcctName2: ownerName2
+      MailAddr1: mailingAddress.street
+      MailAddr2: mailingAddress.street2
+      MailAddr3: mailingAddress.street3
+      MailCity: mailingAddress.city
+      MailState: mailingAddress.state
+      MailZipCode: mailingAddress.zip
+      SaleYear: lastSale.year
+      SaleMonth: lastSale.month
+      SalePrice: lastSale.price
+      QualifiedCode: lastSale.qualified
+      MarketValue: tax.marketValue
+      AssessedValue: tax.assessedValue
+      LandValue: tax.landValue
+      BuildingValue: tax.improvementValue
+      ObxfValue: tax.obxfValue
+      VacantOrImproved: vacantOrImproved
+    notes: >
+      PRIMARY verified 2026-09-23: count 107662; CALCULATED_ACREAGE 5–150 → 7144;
+      LandUnits AC 5–150 → 7351. CRS 102719/2264. No situs/zoning on this layer.
+      Value fields often strings — cast. MaxRecordCount 2000. Alternate same schema:
+      OpenData/Tax_Parcel/MapServer/0. Exclude PIN null/0.00000000 stubs.
+    status: usable
+
+  - role: other
+    name: AA ParcelAddresses (situs join)
+    restUrl: https://location.cabarruscounty.us/arcgishost/rest/services/AA/MapServer/1
+    layerId: 1
+    geometry: point
+    auth: none
+    acreageField: CALCULATED_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN14: parcelId
+      PIN: parcelIdAlt
+      Full_con_cat: situsAddress
+      addressnum: situsAddress.number
+      road_pre: situsAddress.prefix
+      road_name: situsAddress.street
+      road_type: situsAddress.streetType
+      road_suf: situsAddress.suffix
+      City: situsCity
+      Zip: situsZip
+      State: situsState
+    notes: >
+      Verified 2026-09-23: sample Full_con_cat+PIN14 returned. Many-to-one vs parcels.
+      Join on PIN14/PIN to Tax_Parcels. Do not scrape phone/contact fields.
+    status: usable
+
+  - role: parcels
+    name: MapCabarrusPropertyData12_NEW (joined zoning+situs)
+    restUrl: https://location.cabarruscounty.us/arcgishost/rest/services/Hosted/MapCabarrusPropertyData12_NEW/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: landunits
+    coverage: county-wide
+    fieldMap:
+      pin14: parcelId
+      propertyreal_id: parcelIdReal
+      acctname1: ownerName
+      mailaddr1: mailingAddress.street
+      mailcity: mailingAddress.city
+      mailstate: mailingAddress.state
+      mailzipcode: mailingAddress.zip
+      full_con_cat: situsAddress
+      landunits: acreage
+      unitstype: acreageUnit
+      saleyear: lastSale.year
+      saleprice: lastSale.price
+      marketvalue: tax.marketValue
+      assessedvalue: tax.assessedValue
+      landvalue: tax.landValue
+      buildingvalue: tax.improvementValue
+      zoningcode: zoning
+    notes: >
+      Verified count 163395 (address-inflated); zoningcode non-empty ~154k; situs ~100k.
+      Deduplicate by pin14 for land search. Prefer municipal zoning polygons when empty.
+    status: partial
+
+  - role: parcels
+    name: DataExplorerSearch WebParcels
+    restUrl: https://location.cabarruscounty.us/arcgisservices/rest/services/DataExplorerSearch/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN14: parcelId
+      PIN: parcelIdAlt
+      AcctName1: ownerName
+      MailAddr1: mailingAddress.street
+      MailCity: mailingAddress.city
+      MarketValue: tax.marketValue
+      AssessedValue: tax.assessedValue
+      LandValue: tax.landValue
+      BuildingValue: tax.improvementValue
+      CALCULATED_ACREAGE: acreage
+    notes: >
+      Verified count 107662. Numeric tax doubles (cleaner than OpenData strings). No sale fields.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-23: cntyfips='025' count 110009; gisacres 5–150 → 7516.
+      Best situs-on-polygon fallback. No sale price. MaxRecordCount 5000.
+      Alternate host services.gis.nc.gov.
+    status: usable
+
+  - role: zoning
+    name: Cabarrus County Zoning (unincorporated)
+    restUrl: https://location.cabarruscounty.us/arcgisservices/rest/services/Zoning/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONINGCODE: zoning
+      ZONING_GEN: zoningGeneral
+      CASE_NUMBE: zoningCase
+    notes: >
+      Verified count 295. Unincorporated only — NOT city coverage.
+      OpenData mirror: OpenData/Cabarrus_County_Zoning/MapServer/0.
+      Spatial join to Tax_Parcels in 2264.
+    status: usable
+
+  - role: zoning
+    name: Concord Zoning (county host)
+    restUrl: https://location.cabarruscounty.us/arcgisservices/rest/services/Zoning/MapServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONINGCODE: zoning
+      OLDZONING: zoningPrior
+      ETJ: etj
+    notes: >
+      Verified count 826. CRS 2264 — easiest join to county parcels.
+      City-only zoning + county parcels (spatial). Also OpenData Zoning_By_Municipalities/0.
+    status: usable
+
+  - role: zoning
+    name: Concord Zoning Districts (city AGOL)
+    restUrl: https://services2.arcgis.com/0esqB0FgvL32hAbY/arcgis/rest/services/GeocortexZoningStaff_WFL1/FeatureServer/60
+    layerId: 60
+    geometry: polygon
+    auth: none
+    acreageField: acres
+    coverage: city-only
+    fieldMap:
+      ZONINGCODE: zoning
+      ETJ: etj
+      OLDZONING: zoningPrior
+    notes: >
+      Verified count 828. CRS 103122/6543 — reproject before overlay with county 2264.
+      Alternate Zoning/FeatureServer/10 is 3857 count 814.
+    status: usable
+
+  - role: flu
+    name: Concord Land Use Plan 2030
+    restUrl: https://services2.arcgis.com/0esqB0FgvL32hAbY/arcgis/rest/services/GeocortexZoningStaff_WFL1/FeatureServer/63
+    layerId: 63
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Code: flu
+      Category: fluLabel
+      ApplicableZoning: fluCompatibleZoning
+    notes: >
+      Verified count 307. Categories: SN/UN/VC/MUAC/IE/C/CI/R/OS/AMS etc.
+      City-only FLU + county parcels — reproject 6543→2264 for spatial join.
+    status: usable
+
+  - role: zoning
+    name: Kannapolis Official City Zoning
+    restUrl: https://maps.kannapolisnc.gov/arcgis/rest/services/Official_City_Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONINGCODE: zoning
+      newzoning: zoningAlt
+      RezoneCase: zoningCase
+    notes: >
+      Verified count 1735. CRS 2264. Kannapolis spans Cabarrus+Rowan — filter to county parcels.
+      County host mirror Zoning/MapServer/4 count 1837.
+    status: usable
+
+  - role: flu
+    name: Kannapolis Character Areas
+    restUrl: https://services6.arcgis.com/U9SsvkRoA6RuruHj/arcgis/rest/services/CharacterUses/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Char_Dist: flu
+      LabelName: fluLabel
+    notes: >
+      Verified count 34. FLU-like character districts (e.g. Downtown Center, Cluster Residential).
+      CRS 2264 — spatial join to county parcels.
+    status: usable
+
+  - role: zoning
+    name: Harrisburg Zoning
+    restUrl: https://location.cabarruscounty.us/arcgisservices/rest/services/Zoning/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONINGCODE: zoning
+      ZONING_GEN: zoningGeneral
+    notes: >
+      Verified count 193. Town zoning + county parcels (spatial, 2264). FLU public REST gap.
+    status: usable
+
+  - role: zoning
+    name: Midland Zoning
+    restUrl: https://location.cabarruscounty.us/arcgisservices/rest/services/Zoning/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONINGCODE: zoning
+      Zoning_Typ: zoningType
+    notes: >
+      Verified count 110. Town zoning + county parcels. FLU gap.
+    status: usable
+
+  - role: zoning
+    name: Mt Pleasant Zoning
+    restUrl: https://location.cabarruscounty.us/arcgisservices/rest/services/Zoning/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONINGCODE: zoning
+    notes: >
+      Verified count 174. Town zoning + county parcels. FLU gap.
+    status: usable
+
+  - role: zoning
+    name: Locust Zoning
+    restUrl: https://location.cabarruscounty.us/arcgisservices/rest/services/Zoning/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+    notes: >
+      Verified count 8. Mostly Stanly; verify Cabarrus footprint via MunicipalDistrict.
+    status: partial
+
+  - role: other
+    name: MunicipalDistrict
+    restUrl: https://location.cabarruscounty.us/arcgisservices/rest/services/OpenData/MunicipalDistrict/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      DISTRICT: municipality
+    notes: >
+      Verified DISTRICT values: CITY OF CONCORD, CITY OF KANNAPOLIS, CITY OF LOCUST,
+      TOWN OF HARRISBURG, TOWN OF MIDLAND, TOWN OF MOUNT PLEASANT, TOWN OF HUNTERSVILLE.
+      Use to route which zoning/FLU layer to join.
+    status: usable
+
+  - role: parcels
+    name: HarrisburgParcels (town subset)
+    restUrl: https://location.cabarruscounty.us/arcgishost/rest/services/Hosted/HarrisburgParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: calculated_acreage
+    coverage: city-only
+    fieldMap:
+      pin14: parcelId
+      pin: parcelIdAlt
+      acctname1: ownerName
+      mailaddr1: mailingAddress.street
+      mailcity: mailingAddress.city
+      marketvalue: tax.marketValue
+      landvalue: tax.landValue
+      buildingvalue: tax.improvementValue
+      calculated_acreage: acreage
+    notes: >
+      Verified count 11280. Harrisburg subset; no sale fields. Prefer county Tax_Parcels.
+    status: partial
+
+gaps:
+  - Situs missing on primary Tax_Parcels polygons — join AA ParcelAddresses or OneMap siteadd
+  - No countywide FLU REST — Concord 2030 + Kannapolis Character Areas only; other towns gap
+  - Zoning split by municipality — spatial join / route via MunicipalDistrict
+  - Tax_Parcels_Full MapServer not started — use OpenData/Tax_Parcels
+  - No multi-transfer public sales history FeatureServer found
+  - Concord city layers CRS 6543/3857 vs county 2264 — reproject for joins
+  - MapCabarrusPropertyData address-inflated — dedupe by pin14
+  - Owner phones/emails not collected from public viewers
+  - MaxRecordCount 1000–2000 on county layers — pagination required
+
+license: "County / city open GIS; attribution to Cabarrus County and respective municipalities; public records"
+appraiserSearchUrl: https://tax.cabarruscounty.us/BasicSearch.aspx
+viewerUrl: https://location.cabarruscounty.us/mapcabarrus/
+clarisUrl: https://claris.cabarruscounty.us/
+verifiedAt: 2026-09-23
+verifiedBy: Grok Bot GIS researcher
+
+# ---- PASS2 full-suite upgrade (rural OZ) — verifiedAt 2026-09-28 ----
+pass2:
+  label: PASS2 full-suite upgrade — rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  aadtScreening:
+    source: NCDOT Traffic Survey Group (public AGOL)
+    layer: NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)
+    restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+    countyField: COUNTY
+    countyValue: CABARRUS
+    valueField: AADT_2022
+    valueType: string (trim; blank = no count that year)
+    countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CABARRUS%27&returnCountOnly=true&f=json
+    featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CABARRUS%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+    liveStationCount: 642
+    stationsWithAADT2022: 609
+    newerYearAvailable:
+      available: true
+      layer: NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      countyField: County
+      countyValue: Cabarrus
+      valueField: AADT_2025
+      valueType: integer (null = no count)
+      countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Cabarrus%27&returnCountOnly=true&f=json
+      featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Cabarrus%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+      liveStationCount: 636
+      stationsWithAADT2025: 30
+      stationsWithAADT2024: 595
+      segmentsLayer: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide — spatial filter by county envelope)
+      also: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)
+    recommendation: Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025→AADT_2024→AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title).
+  primaryParcelLayer:
+    restUrl: https://location.cabarruscounty.us/arcgisservices/rest/services/OpenData/Tax_Parcels/MapServer/1
+    acreageField: CALCULATED_ACREAGE
+    range5to150Where: CALCULATED_ACREAGE>=5 AND CALCULATED_ACREAGE<=150
+    liveTotalParcels: 107661
+    liveParcels5to150: 7144
+  taxValues:
+    status: ok
+    fields:
+      LandValue: tax.landValue
+      BuildingValue: tax.improvementValue
+      MarketValue: tax.marketValue
+      AssessedValue: tax.assessedValue
+    liveNonZeroCounty:
+      LandValue: 98023
+      BuildingValue: 83815
+      MarketValue: 98211
+      AssessedValue: 98211
+    liveNonZero5to150:
+      AssessedValue: 6791
+    notes: LandValue/BuildingValue/MarketValue/AssessedValue are STRING integers (e.g. '13149960') — cast to number.
+    publicFallback: https://tax.cabarruscounty.us/BasicSearch.aspx
+  saleHistory:
+    status: ok
+    priceFields:
+    - SalePrice
+    dateFields:
+    - SaleYear
+    - SaleMonth
+    livePriceGt0County:
+      SalePrice: 65422
+    livePriceGt0_5to150:
+      SalePrice: 3135
+    liveDateNonNullCounty:
+      SaleYear: 93246
+      SaleMonth: 93246
+    notes: 'No full sale date: SaleYear + SaleMonth integers only; SalePrice double (0 = non-arms-length/no price); QualifiedCode.'
+  ownerEntity:
+    ownerFields:
+    - AcctName1
+    - AcctName2
+    primaryOwnerField: AcctName1
+    rule:
+      apply: Uppercase + trim AcctName1 (optionally also AcctName2)
+      regex: (?i)(\bL\.?\s?L\.?\s?C\b|\bINC\b|\bCORP|\bL\.?\s?P\b|\bLLP\b|\bLLLP\b|\bLTD\b|TRUST|CHURCH|MINISTR|\bCOMPANY\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\bHOA\b|FOUNDATION|AUTHORITY|\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\b|^UNITED STATES|^NORTH CAROLINA\b|\bCOUNTY$)
+      sqlLikeTokens:
+      - '% LLC%'
+      - '%,LLC%'
+      - '% L L C%'
+      - '% INC'
+      - '% INC %'
+      - '% INC.%'
+      - '%,INC%'
+      - '% CORP%'
+      - '%CORPORATION%'
+      - '% LP'
+      - '% LP %'
+      - '% L P'
+      - '% LLP%'
+      - '% LTD%'
+      - '%TRUST%'
+      - '%CHURCH%'
+      - '%MINISTR%'
+      - '% COMPANY%'
+      - '%PARTNERSHIP%'
+      - '%HOLDINGS%'
+      - '%PROPERTIES%'
+      - '%INVESTMENT%'
+      - '%ASSOCIATION%'
+      - '%FOUNDATION%'
+      - '%AUTHORITY%'
+      - CITY OF %
+      - COUNTY OF %
+      - STATE OF %
+      - TOWN OF %
+      - '% COUNTY'
+      - '%BOARD OF EDUCATION%'
+      - UNITED STATES%
+      - NORTH CAROLINA %
+      - '% DEVELOPMENT%'
+      caveats: TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); "% COUNTY" suffix catches e.g. "PERSON COUNTY"; bare "CO" and "ESTATE" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) — normalize first.
+    liveEntityCount5to150: 2082
+    liveOwnerNonNull5to150: 7106
+    entityQuery: where=CALCULATED_ACREAGE>=5 AND CALCULATED_ACREAGE<=150 AND (AcctName1 LIKE '% LLC%' OR AcctName1 LIKE '%,LLC%' OR AcctName1 LIKE '% L L C%' OR AcctName1 LIKE '% INC' OR AcctName1 LIKE '% INC %' OR AcctName1 LIKE '% INC.%' OR AcctName1 LIKE '%,INC%' OR AcctName1 LIKE '% CORP%' OR AcctName1 LIKE '%CORPORATION%' OR AcctName1 LIKE '% LP' OR AcctName1 LIKE '% LP %' OR AcctName1 LIKE '% L P' OR AcctName1 LIKE '% LLP%' OR AcctName1 LIKE '% LTD%' OR AcctName1 LIKE '%TRUST%' OR AcctName1 LIKE '%CHURCH%' OR AcctName1 LIKE '%MINISTR%' OR AcctName1 LIKE '% COMPANY%' OR AcctName1 LIKE '%PARTNERSHIP%' OR AcctName1 LIKE '%HOLDINGS%' OR AcctName1 LIKE '%PROPERTIES%' OR AcctName1 LIKE '%INVESTMENT%' OR AcctName1 LIKE '%ASSOCIATION%' OR AcctName1 LIKE '%FOUNDATION%' OR AcctName1 LIKE '%AUTHORITY%' OR AcctName1 LIKE 'CITY OF %' OR AcctName1 LIKE 'COUNTY OF %' OR AcctName1 LIKE 'STATE OF %' OR AcctName1 LIKE 'TOWN OF %' OR AcctName1 LIKE '% COUNTY' OR AcctName1 LIKE '%BOARD OF EDUCATION%' OR AcctName1 LIKE 'UNITED STATES%' OR AcctName1 LIKE 'NORTH CAROLINA %' OR AcctName1 LIKE '% DEVELOPMENT%')
+  paDeepLink:
+    template: null
+    testedUrl: https://tax.cabarruscounty.us/BasicSearch.aspx
+    httpStatus: 200
+    notes: 'GAP: no GET deep link. Tax site is ASP.NET WebForms; parcel search + Property Record Card only via postback (GET params ?PIN= ignored, tested). Use search page + PIN14 split into Sheet/Block/Parcel/Interest (e.g. 4589-46-8277-0000). CLaRIS https://claris.cabarruscounty.us/ (200) also search-only.'
+  jurisdictionGisViewer:
+    url: https://location.cabarruscounty.us/mapcabarrus/
+    httpStatus: 200
+    notes: Map Cabarrus
+  gaps:
+  - 'PA deep link: no GET URL with parcel id (search page only) — no GET deep link. Tax site is ASP.NET WebForms; parcel search + Property Record Card only via postback (GET params ?PIN= ignored, tested). Use search page + PIN'
+  - Sale date is year+month only on parcel layer (no day)
+  - AADT_2022 blank at 33 of 642 stations on the 2022 layer (NCDOT counts on a cycle) — prefer 2025 layer / latest non-blank year
+  - No multi-transfer sale history on primary layer (last sale only)

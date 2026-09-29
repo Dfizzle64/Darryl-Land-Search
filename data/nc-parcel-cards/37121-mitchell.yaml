@@ -1,0 +1,355 @@
+state: NC
+jurisdiction: Mitchell County
+fips: '37121'
+level: county
+markets:
+- Asheville
+slug: mitchell
+cntyfips: '121'
+municipalities:
+- name: Spruce Pine
+  role: city-first-zoning
+  seat: false
+  zoningLayer: Spruce_Pine_Zoning/FeatureServer/0
+  zoningField: ZoneCode
+  zoningCount: 244
+  zoneCodes:
+  - R-1
+  - R-2
+  - R-3
+  - C-1
+  - C-1A
+  - C-2
+  - C-3
+  - I
+  - I-1
+  - I-2
+  - M-1
+  - PS-1
+  - T-1
+  - Not Zoned
+  fluRest: false
+  corpIdHint: '03'
+  planningUrl: https://www.sprucepine-nc.gov/buildingplanningzoning
+  municipalGisUrl: https://hccog.maps.arcgis.com/apps/instant/sidebar/index.html?appid=c1b54e0fc019490d9d89b7f04b7ca6ec
+  notes: Cities-first PRIMARY; county WebMapNew/8 Zoning_11 twin (242)
+- name: Bakersville
+  role: gap
+  seat: true
+  zoningLayer:
+  fluRest: false
+  corpIdHint: '02'
+  notes: County seat; City Limits only; zoning REST gap / unzoned per Mapping FAQ
+- name: Unincorporated
+  role: unzoned
+  zoningLayer:
+  fluRest: false
+  corpIdHint: '01'
+  notes: 'County Mapping: no zoning outside Spruce Pine city limits'
+layers:
+- role: parcels
+  name: WebMapNew Parcels (CAMA + polygons)
+  restUrl: https://mapping.mitchellcountync.gov/arcgis/rest/services/WebMapNew/MapServer/12
+  alternateUrls:
+  - https://mapping.mitchellcountync.gov/arcgis/rest/services/WebMapNew2023/MapServer/12
+  - https://mapping.mitchellcountync.gov/arcgis/rest/services/EnergovWebMap2/MapServer/1
+  - https://mapping.mitchellcountync.gov/arcgis/rest/services/WebMap/MapServer/24
+  layerId: 12
+  geometry: polygon
+  auth: none
+  acreageField: LegalAc
+  coverage: county-wide
+  fieldMap:
+    GISPIN: parcelId
+    PIN: parcelId
+    LRSN: parcelIdAlt
+    TaxAcct: parcelIdAccount
+    Owner1: ownerName
+    Owner2: ownerName
+    MailAddr: mailingAddress
+    MailCity: mailingAddress
+    MailState: mailingAddress
+    MailZip: mailingAddress
+    LocAddr: situsAddress
+    LocCity: situsCity
+    LocState: situsAddress
+    LegalAc: acreage
+    StatedArea: acreage
+    Land: tax.marketValue
+    Dwelling: tax.marketValue
+    Total: tax.marketValue
+    Deed_Date: lastSale.date
+    DeedBook: other
+    DeedPage: other
+    CorpId: other
+    PropClas: dorCode
+  notes: 'PRIMARY verified 2026-09-24: count 17664; LegalAc 5–150 → 4221; Total>0 → 17621; Deed_Date →
+    17352; Owner1 → 17634; vacant in-range → 1844. CRS 102719/2264. MaxRecordCount 1000. Sample GISPIN
+    0856-00-20-1077 ≈ -82.21/36.07. No SalePrice — join Sales/18 or PA.'
+  status: usable
+  count: 17664
+  countInRange5to150: 4221
+- role: sales
+  name: WebMap Sales (partial price)
+  restUrl: https://mapping.mitchellcountync.gov/arcgis/rest/services/WebMap/MapServer/18
+  layerId: 18
+  geometry: polygon
+  auth: none
+  coverage: sample
+  fieldMap:
+    PIN: parcelId
+    sale_date: lastSale.date
+    sale_price: lastSale.price
+  notes: Count 397; sale_price string; date window ~2021-02 to 2021-12 only. Partial overlay — not current
+    countywide.
+  status: partial
+  count: 397
+- role: parcels
+  name: NC OneMap Parcels (polys)
+  restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  alternateUrls:
+  - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: gisacres
+  coverage: county-wide
+  fieldMap:
+    parno: parcelId
+    ownname: ownerName
+    mailadd: mailingAddress
+    siteadd: situsAddress
+    gisacres: acreage
+    parval: tax.marketValue
+    landval: tax.marketValue
+    improvval: tax.marketValue
+    saledatetx: lastSale.date
+    cntyfips: other
+  notes: Filter cntyfips='121'. Count 17671; gisacres 5–150 → 3853; parval>0 → 17496; saledate null. No
+    sale price. Join parno↔GISPIN.
+  status: usable
+  count: 17671
+  countInRange5to150: 3853
+  filter: cntyfips='121'
+- role: zoning
+  name: HCCOG Spruce Pine Zoning (cities-first PRIMARY)
+  restUrl: https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Spruce_Pine_Zoning/FeatureServer/0
+  layerId: 0
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  fieldMap:
+    ZoneCode: zoning
+    ZoneDesc: zoning
+  notes: Cities-first PRIMARY inside Spruce Pine. Count 244. ZoneDesc present. Route by City Limits CityName='Spruce
+    Pine'.
+  status: usable
+  count: 244
+- role: zoning
+  name: WebMapNew Spruce Pine Zoning (county twin)
+  restUrl: https://mapping.mitchellcountync.gov/arcgis/rest/services/WebMapNew/MapServer/8
+  alternateUrls:
+  - https://mapping.mitchellcountync.gov/arcgis/rest/services/WebMap/MapServer/20
+  - https://mapping.mitchellcountync.gov/arcgis/rest/services/WebMapNew2023/MapServer/8
+  layerId: 8
+  geometry: polygon
+  auth: none
+  acreageField: ACREAGE
+  coverage: city-only
+  fieldMap:
+    Zoning_11: zoning
+    ACREAGE: acreage
+  notes: Count 242. Same districts as HCCOG without ZoneDesc. Prefer HCCOG when available.
+  status: usable
+  count: 242
+- role: zoning
+  name: Energov Zoning (coarse)
+  restUrl: https://mapping.mitchellcountync.gov/arcgis/rest/services/EnergovWebMap2/MapServer/3
+  layerId: 3
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  fieldMap:
+    ZONE_CODE: zoning
+  notes: Count 13 — one poly per code. Prefer HCCOG / WebMapNew/8 for joins.
+  status: partial
+  count: 13
+- role: other
+  name: City Limits
+  restUrl: https://mapping.mitchellcountync.gov/arcgis/rest/services/WebMapNew/MapServer/7
+  layerId: 7
+  geometry: polygon
+  auth: none
+  coverage: county-wide
+  fieldMap:
+    CityName: other
+  notes: Bakersville + Spruce Pine (+ tiny annex stub). Use for cities-first routing.
+  status: usable
+  count: 3
+- role: other
+  name: Addresses
+  restUrl: https://mapping.mitchellcountync.gov/arcgis/rest/services/WebMapNew/MapServer/1
+  layerId: 1
+  geometry: point
+  auth: none
+  coverage: county-wide
+  fieldMap:
+    FullAddress: situsAddress
+  notes: Count 11582. No PIN — spatial situs; prefer OneMap siteadd when joining by parno.
+  status: usable
+  count: 11582
+- role: parcels
+  name: HCCOG Mitchell_County_Parcels extract
+  restUrl: https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Mitchell_County_Parcels/FeatureServer/0
+  layerId: 0
+  geometry: polygon
+  auth: none
+  acreageField: GISACRES
+  coverage: sample
+  fieldMap:
+    PARNO: parcelId
+    OWNNAME: ownerName
+    PARVAL: tax.marketValue
+    GISACRES: acreage
+    SITEADD: situsAddress
+  notes: Count 4557 — Spruce Pine Instant-app extract, NOT countywide. Do not prefer over WebMapNew/12.
+  status: partial
+  count: 4557
+- role: flu
+  name: FLU / Comp Plan (no FeatureServer)
+  restUrl:
+  geometry: none
+  auth: none
+  coverage: unknown
+  fieldMap: {}
+  notes: Spruce Pine Comp Land Use Plan (2023) referenced on sprucepine-nc.gov/buildingplanningzoning;
+    HCCOG zoning rewrite in progress. No FLU FeatureServer. County unzoned outside SP — no county FLU
+    REST.
+  status: gap
+gaps:
+- Sale price not on primary Parcels REST — only partial WebMap Sales (~397, ~2021); use PA for current
+  price
+- 'Bakersville and unincorporated land unzoned on public REST (county policy: zoning only in Spruce Pine)'
+- FLU FeatureServer gap — Comp Land Use Plan referenced but no public FLU layer
+- OneMap saledate empty — use Deed_Date or Sales sale_date
+- PIN field space-padded — trim; prefer GISPIN
+- ITSPublicMT AppraisalCard miswired (Martin County) — do not use
+license: Mitchell County Mapping/Land Records / Tax Assessor; Town of Spruce Pine / HCCOG; NC OneMap.
+  NCGS 132-10. Attribution required. Not survey quality.
+appraiserSearchUrl: https://lrcpwa.ncptscloud.com/mitchell/parcel-detail/{GISPIN}
+appraiserSearchUrlAlternates:
+- https://esearch.mitchellcounty.tax/
+- https://nc-mitchell.publicaccessnow.com/Assessor/PropertySearch.aspx
+- https://lrcpwa.ncptscloud.com/mitchell/parcel-search
+jurisdictionGisUrl: https://mapping.mitchellcountync.gov/maps/
+openDataHub:
+pinEncoding: 'GISPIN / trimmed PIN as ####-##-##-#### (e.g. 0856-00-20-1077)'
+joinKeys:
+- GISPIN
+- PIN
+- parno
+- LRSN
+- TaxAcct
+verifiedAt: '2026-09-24'
+verifiedBy: North Carolina Public Info Researcher
+tranche: 3
+verifiedLayerCount: 10
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://mapping.mitchellcountync.gov/arcgis/rest/services/WebMapNew/MapServer/12
+  parcelIdField: GISPIN
+  acreageFilter: LegalAc >= 5 AND LegalAc <= 150
+  acres5to150Live: 4221
+  parcelCountLive: 17664
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='MITCHELL'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MITCHELL%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MITCHELL%27&returnCountOnly=true&f=json
+      liveStationCount: 123
+      stationsWithAADT2022: 78
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Mitchell'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Mitchell%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Mitchell%27&returnCountOnly=true&f=json
+      liveStationCount: 121
+      stationsWithAADT2025: 37
+      stationsWithAADT2024: 76
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - Total
+    - Land
+    allTaxFieldsOnLayer:
+    - Land
+    - Dwelling
+    - Total
+    liveNonZero:
+      Total: 17621
+      Land: 17619
+    status: ok
+  sale:
+    priceFields: []
+    dateFields:
+    - Deed_Date
+    livePriceNonZero: {}
+    liveDateNonNull:
+      Deed_Date: 17352
+    status: partial
+    note: Price not on REST; NCPTS Mitchell parcel-detail page is the public source.
+  ownerEntity:
+    ownerFields:
+    - Owner1
+    - Owner2
+    primaryOwnerField: Owner1
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(Owner1) LIKE '% LLC%' OR UPPER(Owner1) LIKE '% INC%' OR UPPER(Owner1) LIKE '% LP%' OR UPPER(Owner1) LIKE '% LLP%' OR UPPER(Owner1) LIKE '% LTD%' OR UPPER(Owner1) LIKE '% TRUST%' OR UPPER(Owner1) LIKE '% CHURCH%' OR UPPER(Owner1) LIKE '% COMPANY%' OR UPPER(Owner1) LIKE '% PARTNERSHIP%' OR UPPER(Owner1) LIKE '% HOLDINGS%' OR UPPER(Owner1) LIKE '% PROPERTIES%' OR UPPER(Owner1) LIKE '% CORP%' OR UPPER(Owner1) LIKE '%,LLC%' OR UPPER(Owner1) LIKE '%,INC%' OR UPPER(Owner1) LIKE 'CITY OF %' OR UPPER(Owner1) LIKE 'COUNTY OF %' OR UPPER(Owner1) LIKE 'STATE OF %' OR UPPER(Owner1) LIKE 'TOWN OF %')
+    liveEntityCountAll: 3391
+    liveEntityCount5to150ac: 753
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://lrcpwa.ncptscloud.com/mitchell/parcel-detail/{GISPIN}
+    testedParcelId: 0856-00-20-0431
+    testedUrl: https://lrcpwa.ncptscloud.com/mitchell/parcel-detail/0856-00-20-0431
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: false
+    note: 'NCPTS SPA shell (200, 496 B, client-rendered): parcel content cannot be checked server-side.'
+  gisViewer:
+    url: https://mapping.mitchellcountync.gov/maps/
+    httpStatus: 200
+    pageTitle: Avineon Web Map Template
+  gaps:
+  - sale partial

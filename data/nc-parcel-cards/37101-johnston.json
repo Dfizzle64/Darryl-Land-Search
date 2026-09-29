@@ -1,0 +1,549 @@
+{
+  "county": "Johnston",
+  "state": "NC",
+  "slug": "johnston",
+  "msa": "Raleigh-Durham",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "fips": "37101",
+  "cntyfips": "101",
+  "level": "county",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "crs_clayton_note": "Clayton Clariti layers use WKID 103122 / latestWkid 6543 — reproject vs county 2264 when joining",
+  "viewerUrl": "https://mapclick8.johnstonnc.com/mapclick6/index.html/",
+  "appraiserSearchUrl": "https://www.johnstonnc.gov/taxcards/",
+  "appraiserSearchUrlResolved": "https://www.bttaxpayerportal.com/itspublicjo",
+  "viewerLinkTemplate": "https://www.bttaxpayerportal.com/ITSPublicJO/TaxBillSearch/Parcel/{TAG}",
+  "salesSearchUrl": "https://www.bttaxpayerportal.com/TaxJO/Sales.aspx",
+  "gisDataDownloadUrl": "https://www.johnstonnc.gov/gis2/content.cfm?PD=data",
+  "gisRestRoot": "https://cityworks.johnstonnc.com/server/rest/services",
+  "claytonGisRestRoot": "https://cw2.townofclaytonnc.org/gis/rest/services",
+  "joinKeys": [
+    "TAG",
+    "PIN",
+    "ACCOUNT_NUMBER",
+    "parno"
+  ],
+  "parcelIdPreferred": "TAG",
+  "parcelIdCaveat": "Prefer TAG (tax parcel number; ~1 null). PIN is NC PIN (~470 null). OneMap parno tracks PIN — resolve TAG via county parcels for Brady/MapClick.",
+  "municipalities": [
+    {
+      "name": "Archer Lodge",
+      "localGis": null,
+      "zoning": "county town_zoning + city_limits"
+    },
+    {
+      "name": "Benson",
+      "localGis": null,
+      "zoning": "county town_zoning + city_limits"
+    },
+    {
+      "name": "Clayton",
+      "localGis": "https://cw2.townofclaytonnc.org/gis/rest/services",
+      "zoning": "Clariti/Clariti/FeatureServer/7",
+      "flu": "Clariti/Clariti/FeatureServer/9"
+    },
+    {
+      "name": "Four Oaks",
+      "localGis": null,
+      "zoning": "county town_zoning + city_limits"
+    },
+    {
+      "name": "Kenly",
+      "localGis": null,
+      "zoning": "county town_zoning + city_limits"
+    },
+    {
+      "name": "Micro",
+      "localGis": null,
+      "zoning": "county town_zoning + city_limits"
+    },
+    {
+      "name": "Pine Level",
+      "localGis": null,
+      "zoning": "county town_zoning + city_limits"
+    },
+    {
+      "name": "Princeton",
+      "localGis": null,
+      "zoning": "county town_zoning + city_limits"
+    },
+    {
+      "name": "Selma",
+      "localGis": "county-host republish only",
+      "zoning": "county town_zoning + city_limits"
+    },
+    {
+      "name": "Smithfield",
+      "localGis": "county-host republish only",
+      "zoning": "county town_zoning + city_limits"
+    },
+    {
+      "name": "Wilson's Mills",
+      "localGis": "county-host republish only",
+      "zoning": "county town_zoning + city_limits"
+    }
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "TAG",
+        "PIN",
+        "ACCOUNT_NUMBER",
+        "parno"
+      ],
+      "bestLayer": "TAX/ParcelMap/FeatureServer/0",
+      "caveat": "Prefer TAG"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "TAX/ParcelMap/FeatureServer/0"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CALC_ACREAGE",
+        "ASSESSED_ACREAGE",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 14287,
+      "approxCountAssessedAcres": 14243,
+      "bestLayer": "TAX/ParcelMap/FeatureServer/0"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Name1",
+        "Name2",
+        "ownname"
+      ],
+      "bestLayer": "TAX/ParcelMap/FeatureServer/0"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "Address1",
+        "Address2",
+        "City",
+        "State",
+        "ZipCode",
+        "mailadd",
+        "mcity",
+        "mstate",
+        "mzip"
+      ],
+      "bestLayer": "TAX/ParcelMap/FeatureServer/0"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": true,
+      "fields": [
+        "FULL_ADDRESS",
+        "ST_NUMBER",
+        "ST_NAME",
+        "ST_TYPE",
+        "Inc_Muni",
+        "MSAG_Comm",
+        "siteadd",
+        "scity"
+      ],
+      "bestLayer": "Public_Layers/PublicLayers/MapServer/0",
+      "joinKey": "TAG",
+      "caveat": "Not on county parcel polygons; OneMap siteadd is polygon alternate"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SALES_DATE",
+        "SALES_PRICE",
+        "QualifiedCode",
+        "saledate"
+      ],
+      "bestLayer": "TAX/ParcelMap/FeatureServer/0",
+      "caveat": "Last sale only; OneMap has date without price"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "MARKET_VALUE",
+        "LAND_VALUE",
+        "BUILDING_VALUE",
+        "OTHER_VALUE",
+        "TOTAL_VALUE",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "TAX/ParcelMap/FeatureServer/0"
+    },
+    "zoning": {
+      "present": true,
+      "split": true,
+      "fields": [
+        "ZONING",
+        "Abreviation"
+      ],
+      "bestLayers": [
+        "Planning/Land_Use/FeatureServer/7",
+        "Planning/Land_Use/FeatureServer/9",
+        "Clariti/Clariti/FeatureServer/7"
+      ]
+    },
+    "flu": {
+      "present": "partial",
+      "fields": [
+        "FLU"
+      ],
+      "bestLayer": "Clariti/Clariti/FeatureServer/9",
+      "caveat": "Clayton only on public REST"
+    },
+    "dorCode": {
+      "present": true,
+      "fields": [
+        "LAND_CLASSIFICATION",
+        "USE_CODE"
+      ],
+      "bestLayer": "TAX/ParcelMap/FeatureServer/0"
+    },
+    "appraiserLink": {
+      "present": "partial",
+      "searchUrl": "https://www.johnstonnc.gov/taxcards/",
+      "taxBillTemplate": "https://www.bttaxpayerportal.com/ITSPublicJO/TaxBillSearch/Parcel/{TAG}",
+      "caveat": "Full property card ViewParcel is POST-only; no durable GET deep-link verified"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "TAX ParcelMap Parcels (PRIMARY)",
+      "restUrl": "https://cityworks.johnstonnc.com/server/rest/services/TAX/ParcelMap/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CALC_ACREAGE",
+      "coverage": "county-wide",
+      "count": 126846,
+      "countAcreage5to150": 14287,
+      "countAssessedAcreage5to150": 14243,
+      "countBuildingValue0InCalc5to150": 9042,
+      "maxRecordCount": 5000,
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "fieldMap": {
+        "TAG": "parcelId",
+        "PIN": "parcelIdPin",
+        "ACCOUNT_NUMBER": "parcelIdAccount",
+        "CALC_ACREAGE": "acreage",
+        "ASSESSED_ACREAGE": "acreageAssessed",
+        "Name1": "ownerName",
+        "Name2": "ownerName2",
+        "Address1": "mailingAddress.street",
+        "Address2": "mailingAddress.street2",
+        "City": "mailingAddress.city",
+        "State": "mailingAddress.state",
+        "ZipCode": "mailingAddress.zip",
+        "SALES_DATE": "lastSale.date",
+        "SALES_PRICE": "lastSale.price",
+        "QualifiedCode": "lastSale.qualified",
+        "MARKET_VALUE": "tax.marketValue",
+        "LAND_VALUE": "tax.landValue",
+        "BUILDING_VALUE": "tax.improvementValue",
+        "OTHER_VALUE": "tax.otherValue",
+        "TOTAL_VALUE": "tax.assessedValue",
+        "LAND_CLASSIFICATION": "dorCode",
+        "USE_CODE": "landUseDesc"
+      },
+      "mirrors": [
+        "https://cityworks.johnstonnc.com/server/rest/services/Public_Layers/PublicLayers/MapServer/1",
+        "https://cityworks.johnstonnc.com/server/rest/services/Planning/Land_Use/FeatureServer/3"
+      ],
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Address Points (situs join)",
+      "restUrl": "https://cityworks.johnstonnc.com/server/rest/services/Public_Layers/PublicLayers/MapServer/0",
+      "layerId": 0,
+      "geometry": "point",
+      "count": 124576,
+      "joinKey": "TAG",
+      "fieldMap": {
+        "TAG": "parcelId",
+        "FULL_ADDRESS": "situsAddress",
+        "ST_NUMBER": "situsAddress.number",
+        "ST_PREFIXDIR": "situsAddress.prefix",
+        "ST_NAME": "situsAddress.street",
+        "ST_TYPE": "situsAddress.streetType",
+        "Inc_Muni": "municipality",
+        "ETJ": "planningJurisdiction",
+        "MSAG_Comm": "situsCity",
+        "ZIPCODE": "situsZip"
+      },
+      "status": "usable"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "filter": "cntyfips='101'",
+      "count": 125583,
+      "countAcreage5to150": 14291,
+      "maxRecordCount": 5000,
+      "fieldMap": {
+        "parno": "parcelIdPin",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress.street",
+        "mcity": "mailingAddress.city",
+        "mstate": "mailingAddress.state",
+        "mzip": "mailingAddress.zip",
+        "siteadd": "situsAddress",
+        "scity": "situsCity",
+        "gisacres": "acreage",
+        "saledate": "lastSale.date",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "cntyfips": "countyFips"
+      },
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "County Zoning (unincorporated)",
+      "restUrl": "https://cityworks.johnstonnc.com/server/rest/services/Planning/Land_Use/FeatureServer/7",
+      "layerId": 7,
+      "count": 2168,
+      "fieldMap": {
+        "ZONING": "zoning",
+        "CASE_NO": "zoningCase"
+      },
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Town Zoning (aggregate)",
+      "restUrl": "https://cityworks.johnstonnc.com/server/rest/services/Planning/Land_Use/FeatureServer/9",
+      "layerId": 9,
+      "count": 4042,
+      "fieldMap": {
+        "ZONING": "zoning",
+        "CASE_NO": "zoningCase"
+      },
+      "notes": "No municipality attribute; spatial clip with city_limits. County-host muni Town_Zoning layers are republishes of this layer.",
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Clayton Zoning (Clariti)",
+      "restUrl": "https://cw2.townofclaytonnc.org/gis/rest/services/Clariti/Clariti/FeatureServer/7",
+      "layerId": 7,
+      "coverage": "city-only",
+      "count": 1349,
+      "crs": {
+        "wkid": 103122,
+        "latestWkid": 6543
+      },
+      "fieldMap": {
+        "Abreviation": "zoning",
+        "Zoning": "zoningLabel",
+        "Acreage": "acreage"
+      },
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "Clayton Future Land Use (Clariti)",
+      "restUrl": "https://cw2.townofclaytonnc.org/gis/rest/services/Clariti/Clariti/FeatureServer/9",
+      "layerId": 9,
+      "coverage": "city-only",
+      "count": 71,
+      "fieldMap": {
+        "FLU": "flu",
+        "Last_Change": "fluUpdated"
+      },
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "IHI Overlay",
+      "restUrl": "https://cityworks.johnstonnc.com/server/rest/services/Planning/Land_Use/FeatureServer/8",
+      "layerId": 8,
+      "count": 54,
+      "fieldMap": {
+        "ZONING": "zoningOverlay",
+        "DISTRICT": "zoningOverlayDistrict"
+      },
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "City Limits",
+      "restUrl": "https://cityworks.johnstonnc.com/server/rest/services/Planning/Land_Use/FeatureServer/6",
+      "layerId": 6,
+      "count": 335,
+      "fieldMap": {
+        "NAME": "municipality",
+        "Inc_Muni": "municipalityAlt",
+        "TAXCODE": "taxCode"
+      },
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "ETJ",
+      "restUrl": "https://cityworks.johnstonnc.com/server/rest/services/Planning/Land_Use/FeatureServer/0",
+      "layerId": 0,
+      "count": 10,
+      "fieldMap": {
+        "ETJ_NAME": "planningJurisdiction"
+      },
+      "status": "usable"
+    }
+  ],
+  "gaps": [
+    "No situs on county parcel polygons — join Address Points on TAG (or OneMap siteadd)",
+    "No countywide FLU FeatureServer — Clayton only",
+    "Municipal Transition Districts shapefile-only (no public REST)",
+    "town_zoning has no municipality field — spatial join to city_limits",
+    "County-host Clayton/Selma/Smithfield/WilsonsMills folders republish countywide layers; only Clayton Clariti is true local GIS",
+    "No independent public ArcGIS REST for Archer Lodge, Benson, Four Oaks, Kenly, Micro, Pine Level, Princeton",
+    "Last-sale only; Brady property card ViewParcel is POST-only",
+    "MaxRecordCount 2000/5000 — paginate",
+    "Do not scrape phones/emails; AADT/utilities omitted from this card"
+  ],
+  "license": "Johnston County open GIS + Town of Clayton Clariti/Planning; attribution required; public query endpoints; no paid vendors",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "enrichment": {
+    "householdIncome": {
+      "defaultSource": "Census ACS B19013 tract medians (national join)",
+      "localException": null,
+      "checkedAt": "2026-09-24",
+      "checkedBy": "North Carolina Public Info Researcher"
+    }
+  },
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://cityworks.johnstonnc.com/server/rest/services/TAX/ParcelMap/FeatureServer/0",
+    "parcelIdField": "TAG",
+    "acreageFilter": "CALC_ACREAGE >= 5 AND CALC_ACREAGE <= 150",
+    "acres5to150Live": 14285,
+    "parcelCountLive": 126850,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='JOHNSTON'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27JOHNSTON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27JOHNSTON%27&returnCountOnly=true&f=json",
+        "liveStationCount": 793,
+        "stationsWithAADT2022": 302
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Johnston'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Johnston%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Johnston%27&returnCountOnly=true&f=json",
+        "liveStationCount": 803,
+        "stationsWithAADT2025": 562,
+        "stationsWithAADT2024": 400,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "stations2024CountyFilter": "County='Johnston'",
+        "stations2024LiveCount": 794,
+        "stations2024WithAADT2024": 794,
+        "stations2024Note": "AADT_2024 string field populated on every station in this release",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "MARKET_VALUE",
+        "TOTAL_VALUE",
+        "LAND_VALUE"
+      ],
+      "liveNonZero": {
+        "MARKET_VALUE": 123978,
+        "TOTAL_VALUE": 123978,
+        "LAND_VALUE": 123741
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SALES_PRICE"
+      ],
+      "dateFields": [
+        "SALES_DATE"
+      ],
+      "livePriceNonZero": {
+        "SALES_PRICE": 77052
+      },
+      "liveDateNonNull": {
+        "SALES_DATE": 124270
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Name1",
+        "Name2"
+      ],
+      "rule": "Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).",
+      "regex": "\\b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "regexExtended": "\\b(LLC|L\\s?L\\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\\b|\\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\\s+OF\\b|\\bOF\\s+(EDUCATION|TRANSPORTATION)\\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\\b",
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "liveEntityCount5to150ac": 3594,
+      "liveEntityCount5to150acExtended": 3773,
+      "countNote": "Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.",
+      "sampleMatches": [
+        "HOLLY TREE GROVE NC LLC",
+        "TOWN OF BENSON",
+        "JOJEN PROPERTIES, LLC",
+        "HAMLIN FAMILY LLC"
+      ]
+    },
+    "paDeepLink": {
+      "template": "https://www.bttaxpayerportal.com/ITSPublicJO/TaxBillSearch/Parcel/{TAG}",
+      "testedParcelId": "05I05020L",
+      "testedUrl": "https://www.bttaxpayerportal.com/ITSPublicJO/TaxBillSearch/Parcel/05I05020L",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": true,
+      "note": "Parcel id found in the response body."
+    },
+    "gisViewer": {
+      "url": "https://mapclick8.johnstonnc.com/mapclick6/index.html/",
+      "httpStatus": 200,
+      "pageTitle": "MapClick"
+    },
+    "gaps": [
+      "Brady property card is POST-only; deep link is the tax-bill page (TaxBillSearch/Parcel/{TAG}), not the full appraisal card"
+    ]
+  }
+}

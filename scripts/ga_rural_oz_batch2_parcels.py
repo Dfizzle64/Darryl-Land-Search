@@ -7,11 +7,13 @@ Camden, Candler, Charlton, Chattahoochee, Clay, Coffee, Cook, Crawford, Crisp,
 Decatur, and Dodge. A county that already has a complete 5.0–150.0 acre extract
 is not re-pulled. Orders 25 and below belong to batch 1 and are not loaded.
 
-Reuses the North Carolina rural-OZ parcel loader (paging, acre filter, field
-map, appraiser template, confidential-owner suppression, tile writer) and the
-market catalog shelf assignment. Counties already on a shelf stay there. Others
-go on the nearest existing Georgia shelf (Atlanta, Savannah, Chattanooga,
-Valdosta, Macon, or Athens). No new market shelf is added.
+Reuses the Georgia loader in ga_rural_oz_batch1_parcels (shelf assignment,
+Census county shapes, field map, feature builder, appraiser template, and tile
+writer). Counties already on a shelf stay there. Others go on the nearest
+existing Georgia shelf (Atlanta, Savannah, Chattanooga, Valdosta, Macon, or
+Athens). No new market shelf is added. A county that batch 1 already shipped,
+including Appling, is not replaced. Schneider WFS hosts get a longer timeout
+and are skipped when the server still returns a wait timeout.
 
 Public GIS only. qPublic and Beacon pages are not requested. Tax, sale, and
 owner are stamped only from the public REST fields pass 2 published. A
@@ -35,6 +37,7 @@ from typing import Any
 
 import yaml
 
+import ga_rural_oz_batch1_parcels as ga
 import nc_rural_oz_batch3_parcels as nc
 import seed_market_parcels as seed
 
@@ -46,17 +49,12 @@ PASS2_CSV = CARDS / "_rural-oz2-pass2-results-2026-09-28.csv"
 CACHE_DIR = Path("/tmp/dls-ga-rural-oz-batch2")
 ORDER_MIN = 26
 ORDER_MAX = 47
-# West, south, east, north. Drops a service that returns polygons outside Georgia.
-GA_BBOX = (-85.70, 30.20, -80.65, 35.10)
-# Existing shelves that already carry Georgia counties. City coordinates.
-GA_SHELVES = {
-    "Atlanta": (-84.3880, 33.7490),
-    "Savannah": (-81.0912, 32.0809),
-    "Chattanooga": (-85.3097, 35.0456),
-    "Valdosta": (-83.2785, 30.8327),
-    "Macon": (-83.6324, 32.8407),
-    "Athens": (-83.3576, 33.9519),
-}
+# Same Georgia extent and shelf cities as batch 1.
+GA_BBOX = ga.GA_BBOX
+GA_SHELVES = ga.GA_SHELVES
+nearest_shelf = ga.nearest_shelf
+planned_markets = ga.planned_markets
+commit_markets = ga.commit_markets
 COUNT_HINT = re.compile(r"5\s*[–-]\s*150[^0-9]{0,12}([\d,]{3,})", re.I)
 PAID_VENDOR = nc.PAID_VENDOR
 
@@ -267,55 +265,6 @@ def fully_loaded(row: dict | None) -> bool:
 
 def existing_row(fips: str) -> dict | None:
     return nc.existing_row(fips)
-
-
-_GA_CENTERS: dict[str, tuple[float, float]] | None = None
-
-
-def georgia_centers() -> dict[str, tuple[float, float]]:
-    global _GA_CENTERS
-    if _GA_CENTERS is not None:
-        return _GA_CENTERS
-    data = json.loads(nc.CENSUS_COUNTIES.read_text())
-    found: dict[str, tuple[float, float]] = {}
-    for feature in data.get("features") or []:
-        geoid = str((feature.get("properties") or {}).get("GEOID") or "")
-        if not geoid.startswith("13"):
-            continue
-        center = nc.ring_centroid(feature.get("geometry") or {})
-        if center:
-            found[geoid] = center
-    _GA_CENTERS = found
-    return found
-
-
-def nearest_shelf(fips: str) -> str:
-    center = georgia_centers().get(fips)
-    if not center:
-        raise RuntimeError(f"{fips} has no Census county shape")
-    return min(GA_SHELVES, key=lambda name: nc.haversine_km(center, GA_SHELVES[name]))
-
-
-def markets_for(catalog: dict, fips: str) -> list[str]:
-    return nc.markets_for(catalog, fips)
-
-
-def planned_markets(catalog: dict, fips: str) -> list[str]:
-    existing = markets_for(catalog, fips)
-    if existing:
-        return existing
-    shelf = nearest_shelf(fips)
-    if shelf not in {market["id"] for market in catalog["markets"]}:
-        raise RuntimeError(f"{fips} nearest shelf {shelf} is not in the catalog")
-    return [shelf]
-
-
-def commit_markets(catalog: dict, fips: str, name: str, markets: list[str]) -> None:
-    if markets_for(catalog, fips):
-        return
-    by_market = {market["id"]: market for market in catalog["markets"]}
-    for market_id in markets:
-        by_market[market_id]["counties"].append({"name": name, "state": "Georgia", "fips": fips})
 
 
 def gap_notes(item: dict, layer: dict, pass2: dict, source_count: int, kept: int, join_note: str | None) -> list[str]:
@@ -646,6 +595,54 @@ def download_county(item: dict, markets: list[str], refresh: bool) -> dict:
     }
 
 
+def install_patient_schneider() -> None:
+    """Schneider WFS queries often die on the server's own 60s wait. Wait that out."""
+    original = ga.nc.fast_json
+
+    def fast_json(url: str, params: dict | None = None, timeout: int = 40, retries: int = 2) -> dict:
+        if "schneidercorp.com" in url:
+            return seed.fetch_json(url, params, timeout=max(int(timeout), 150), retries=max(int(retries), 2))
+        return original(url, params, timeout=timeout, retries=retries)
+
+    ga.nc.fast_json = fast_json
+
+
+def batch_window(cards: dict[str, dict]) -> tuple[list[dict], list[dict]]:
+    """Orders 26–47, pass-1 usable, using batch 1's Georgia classifier."""
+    eligible, skipped = ga.classify(cards, ga.pass1_index())
+
+    def order_of(item: dict) -> int:
+        return int(item.get("order") or 0)
+
+    eligible = [
+        item
+        for item in eligible
+        if ORDER_MIN <= order_of(item) <= ORDER_MAX and str(item.get("pass1Status") or "").lower().startswith("usable")
+    ]
+    skipped = [item for item in skipped if ORDER_MIN <= order_of(item) <= ORDER_MAX]
+    return eligible, skipped
+
+
+def merge_report(pulled: list[dict], skipped: list[dict]) -> None:
+    path = CARDS / "batch2-result.json"
+    current = json.loads(path.read_text()) if path.exists() else {"pulled": [], "skipped": []}
+    by_fips = {item["fips"]: item for item in current.get("pulled") or [] if item.get("fips") != "13001"}
+    for item in pulled:
+        if item.get("fips") == "13001":
+            continue
+        by_fips[item["fips"]] = item
+    pulled_rows = sorted(by_fips.values(), key=lambda item: int(item.get("order") or 0))
+    pulled_ids = {item["fips"] for item in pulled_rows}
+    skip_by = {item["fips"]: item for item in current.get("skipped") or [] if item.get("fips") not in pulled_ids}
+    for item in skipped:
+        if item.get("fips") in pulled_ids:
+            continue
+        # Keep the Appling / Barrow / Bartow reasons already recorded, and replace Butts.
+        if item.get("fips") == "13035" or item.get("fips") not in skip_by:
+            skip_by[item["fips"]] = item
+    path.write_text(json.dumps({"pulled": pulled_rows, "skipped": list(skip_by.values())}, indent=2) + "\n")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--probe-only", action="store_true")
@@ -659,8 +656,9 @@ def main() -> None:
         catalog = json.loads(CATALOG_PATH.read_text())
         seed.rebuild_indexes(catalog)
         return
+    install_patient_schneider()
     cards = load_cards()
-    eligible, skipped = classify(cards)
+    eligible, skipped = batch_window(cards)
     log(f"Eligible before probe: {len(eligible)}")
     wanted = {item.lower() for item in args.county}
     if wanted:
@@ -671,7 +669,7 @@ def main() -> None:
         window = eligible[cursor : cursor + max(1, args.workers)]
         cursor += len(window)
         with ThreadPoolExecutor(max_workers=max(1, len(window))) as pool:
-            futures = {pool.submit(probe_one, item): item for item in window}
+            futures = {pool.submit(ga.probe_one, item): item for item in window}
             done = []
             for future in as_completed(futures):
                 done.append(future.result())
@@ -707,11 +705,14 @@ def main() -> None:
     }
     print(json.dumps(summary, indent=2))
     if args.probe_only:
-        if not reachable:
-            raise SystemExit("No reachable counties")
+        merge_report([], skipped)
         return
     if not reachable:
-        raise SystemExit("No reachable counties")
+        merge_report([], skipped)
+        log("No new counties. Incomplete endpoints stayed skipped.")
+        if not args.skip_index:
+            seed.rebuild_indexes(json.loads(CATALOG_PATH.read_text()))
+        return
     catalog = json.loads(CATALOG_PATH.read_text())
     for item in reachable:
         item["markets"] = planned_markets(catalog, item["fips"])
@@ -723,13 +724,13 @@ def main() -> None:
         index += len(batch)
         results: dict[str, dict] = {}
         with ThreadPoolExecutor(max_workers=max(1, len(batch))) as pool:
-            futures = {pool.submit(download_county, item, item["markets"], args.refresh): item for item in batch}
+            futures = {pool.submit(ga.download_county, item, item["markets"], args.refresh): item for item in batch}
             for future in as_completed(futures):
                 item = futures[future]
                 try:
                     results[item["fips"]] = {"ok": True, "pulled": future.result()}
                 except Exception as exc:  # noqa: BLE001
-                    nc.restore_county(item["fips"])
+                    ga.restore_county(item["fips"])
                     log(f"FAILED {item['fips']}: {exc}")
                     results[item["fips"]] = {"ok": False, "error": str(exc)}
         for item in batch:
@@ -746,12 +747,15 @@ def main() -> None:
                 continue
             kept.append(result["pulled"])
     if not kept:
-        raise SystemExit("No counties downloaded")
+        merge_report([], skipped)
+        log("No new counties. Incomplete endpoints stayed skipped.")
+        if not args.skip_index:
+            seed.rebuild_indexes(catalog)
+        return
     for item in kept:
         commit_markets(catalog, item["fips"], item["name"], item["markets"])
     CATALOG_PATH.write_text(json.dumps(catalog, indent=2) + "\n")
-    report = {"pulled": kept, "skipped": skipped}
-    (CARDS / "batch2-result.json").write_text(json.dumps(report, indent=2) + "\n")
+    merge_report(kept, skipped)
     if not args.skip_index:
         seed.rebuild_indexes(catalog)
     log("Done " + json.dumps([{k: item[k] for k in ("fips", "name", "featureCount", "markets")} for item in kept], indent=2))

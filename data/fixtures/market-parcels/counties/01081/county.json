@@ -1,0 +1,31 @@
+{
+  "name": "Lee",
+  "fips": "01081",
+  "state": "Alabama",
+  "markets": [
+    "Montgomery"
+  ],
+  "featureCount": 8747,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "al-lee-parcels-01081",
+  "queryUrl": "https://services5.arcgis.com/swomwLs3iGyK80EW/arcgis/rest/services/LeeCountyTaxParcels/FeatureServer/9/query",
+  "gaps": [
+    "Source query returned 9153 rows; 8747 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are LeeCountyTaxParcels (Lee County AL hosted feature layer, CAMA join) (https://services5.arcgis.com/swomwLs3iGyK80EW/arcgis/rest/services/LeeCountyTaxParcels/FeatureServer/9). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "No assessed value or tax due in the parcel layer",
+    "Deep link (altags Lee PropertyPage) is login-gated"
+  ],
+  "path": "data/fixtures/market-parcels/counties/01081/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01081/lookup.json",
+  "sourceCount": 9153,
+  "dropped": 338,
+  "tileCount": 5,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://www.altags.com/lee/PropertyPage.aspx?parcelnum={PIN}&taxyear=2027&autologin=true",
+  "gisViewerUrl": "https://lee.alabamagis.com/lee/"
+}

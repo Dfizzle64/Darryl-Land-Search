@@ -39,6 +39,8 @@ Alabama rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for the fi
 
 Tennessee parcel batch 4 loads the remaining rural Opportunity Zone counties after Carter (pass1 order 65) that were not already a complete extract, then fills the batch from the rest-of-state list in rest order: Marshall, Perry, Polk, Smith, Stewart, Union, White, Crockett, Fayette, Giles, Houston, Lewis, Lincoln, Loudon, Meigs, Moore, Trousdale, Unicoi, Van Buren, and Washington. Jefferson and Knox were already complete, as were Blount, Cheatham, Davidson, Hamilton, Madison, Montgomery, Rutherford, and Williamson, and those extracts were not replaced. No Tennessee county without a complete extract remains for a later batch. Geometry and owner stay on Tennessee Property Boundaries Public Use, filtered by the card's Comptroller COUNTY_ID. Acreage is geodesic polygon area, 5.0 through 150.0 inclusive. Sale date, sale price, and appraisal are joined on GISLINK from the card's sales-value layer. Meigs is labeled 2025. Unicoi and Washington are labeled 2026. The other seventeen use TN_County_Parcel_Map and are labeled 2023. A sale date later than the pull date is left blank. Perry GISLINK coverage is flagged below 90 percent, so unmatched parcels use a spatial fallback onto the 2023 layer and are stamped joinMethod spatial-parent-2023. That sale and value are the pre-split parent record, not the parcel's own sale. Marshall zoning is Lewisburg district polygons by centroid. Fayette and Lincoln zoning join on GISLINK. Meigs and Decatur zoning polygons are stamped by centroid, with the later city layer replacing the county code only inside that city. Washington zoning polygons are stamped by centroid. Unicoi keeps a non-blank ZONING value from the sales layer. The other counties leave zoning empty. The TPAD link is stored and not requested. Owner phone and email are not ingested. Counties whose card market was empty were placed on the nearest existing shelf: Stewart, White, and Van Buren on Nashville; Crockett on Jackson; Unicoi and Washington on Knoxville. No new market shelf was added. No Opportunity Zone designation, school grade, or base flood elevation was added. AADT and tract-income wiring were not changed.
 
+Alabama rural Opportunity Zone batch 2 loads 5.0–150.0 acre parcels for the remaining counties that had a public parcel layer, were not already a complete extract, and whose card endpoint answered: Henry, Lawrence, Coosa, Cleburne, Houston, Lee, and Russell. Colbert's KCS service was still not started and was skipped after one retry. Tuscaloosa was already a complete extract and was not re-pulled. The 26 Flagship counties with no public parcel REST were not requested. Henry has no acreage field, so acreage is geodesic polygon area, and the shapefile is paged by object id because result offsets are rejected. Henry sale dates are the trailing date on the deed book/page field. Coosa, Cleburne, and Russell public layers have no owner, value, or sale attributes. Cleburne's empty owner-phone column is not ingested. Lee property-appraiser links use each parcel's own 16-digit id from the card pattern; a sample account is not copied onto every parcel, and the page was not requested. Counties already on a shelf stayed there. The others were added to the nearest existing Alabama shelf: Henry, Coosa, Houston, Lee, and Russell on Montgomery; Lawrence on Huntsville; Cleburne on Birmingham. Atlanta is a fraction of a mile closer to Heflin, and an Alabama shelf is preferred. No new market shelf was added. Property-appraiser links are stored from the card pattern and were not requested. Owner phone and email are not ingested. Sale dates after the pull date are cleared. No Opportunity Zone status was added. AADT wiring and tract eligibility were not changed.
+
 North Carolina rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for the first 20 pass-1 counties that were verified or fixed, were not already a complete extract, and whose card endpoint answered: Alexander, Alleghany, Ashe, Avery, Beaufort, Bertie, Bladen, Burke, Caldwell, Carteret, Caswell, Cherokee, Chowan, Craven, Dare, Edgecombe, Graham, Greene, Halifax, and Haywood. Buncombe and Henderson were already complete and were not re-pulled. No endpoint in that stretch was unreachable. Alexander pages with orderByFields because the MapServer has no object id; its returnCountOnly figure repeats PROPERTY 99999 rows, so the stored count is the distinct parcel ids that page. Ashe pages with resultRecordCount. Counties already on a shelf stayed there. The others were added to the nearest existing North Carolina shelf: Asheville, Charlotte, Raleigh-Durham, Wilmington, or Winston-Salem. No new market shelf was added. Pass 2 tax, sale, owner, property-appraiser, and county GIS attributes are stored where the card or rural-oz-pass2 result published them. Chowan tax values were scrubbed on the layer and were not copied. Alleghany tax is the NC OneMap fallback join. Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested. Sale dates after the pull date are cleared. No Opportunity Zone status was added. NCDOT AADT stays the query-time statewide join. Household income stays ACS B19013_001E. Tract display was not changed.
 
 North Carolina rural Opportunity Zone batch 2 loads 5.0–150.0 acre parcels for the next 20 pass-1 counties starting at Hertford that were verified or fixed, were not already a complete extract, and whose card endpoint answered: Hertford, Hoke, Hyde, Jackson, Jones, Lenoir, McDowell, Macon, Madison, Martin, Mitchell, Montgomery, Moore, Northampton, Pamlico, Pasquotank, Pitt, Polk, Richmond, and Robeson. No county in that stretch was already a complete extract, and no endpoint was unreachable. Rutherford was the next verified row and was not loaded because the batch of 20 was already filled. Jackson pages with resultRecordCount, and AssessedAcres is filtered with CAST AS FLOAT. Hoke uses the county AGOL June2025 layer, which has geometry, parcel id, and acreage only. Hoke, Mitchell, and Robeson repeat a parcel id across rows; the extract keeps one geometry per parcel id. Madison tax is the NC OneMap fallback join, and that county has no sale date on the public layer. Hyde has no sale price or date on the public layer. Robeson tax fields are land and improvement assessed values and are not summed into a total. Counties were added to the nearest existing North Carolina shelf: Asheville, Charlotte, Raleigh-Durham, Wilmington, or Winston-Salem. No new market shelf was added. Pass 2 tax, sale, owner, property-appraiser, and county GIS attributes are stored where the card or rural-oz-pass2 result published them. Property-appraiser links are stored from the card or pass-2 pattern and were not requested. A pass-2 sample account id is not copied onto every parcel. Owner phone and email are not ingested. A confidential-owner flag suppresses owner and mailing fields. Sale dates after the pull date are cleared. No Opportunity Zone status was added. NCDOT AADT stays the query-time statewide join. Household income stays ACS B19013_001E. Tract display was not changed.
@@ -72,9 +74,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Jacksonville | other | 26,878 | 5 | 0 | 0 |
 | Big Bend | other | 53,214 | 8 | 2 | 0 |
 | Pensacola | other | 66,437 | 7 | 0 | 0 |
-| Birmingham | other | 94,992 | 8 | 0 | 3 |
+| Birmingham | other | 101,123 | 9 | 0 | 3 |
 | Mobile | other | 51,658 | 4 | 0 | 2 |
-| Huntsville | other | 123,857 | 15 | 0 | 0 |
+| Huntsville | other | 132,496 | 16 | 0 | 0 |
 | Savannah | other | 19,987 | 5 | 0 | 3 |
 | Columbia | other | 49,244 | 5 | 1 | 7 |
 | Greenville | other | 48,073 | 5 | 0 | 4 |
@@ -88,7 +90,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | North-Central Florida | other | 103,358 | 13 | 0 | 0 |
 | Asheville | other | 89,533 | 15 | 0 | 0 |
 | Tuscaloosa | other | 27,452 | 4 | 0 | 1 |
-| Montgomery | other | 56,134 | 8 | 0 | 1 |
+| Montgomery | other | 85,425 | 13 | 0 | 1 |
 | Valdosta | other | 5,815 | 1 | 0 | 0 |
 | Macon | other | 3,257 | 1 | 0 | 0 |
 | Athens | other | 2,039 | 1 | 0 | 0 |
@@ -352,6 +354,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Blount | Alabama | 01009 | complete-gte-5ac | 11,515 | al-blount-parcels-01009 |
 | Calhoun | Alabama | 01015 | complete-gte-5ac | 9,768 | al-calhoun-parcels-01015 |
 | Chilton | Alabama | 01021 | gap | 0 | unavailable |
+| Cleburne | Alabama | 01029 | complete-gte-5ac | 6,131 | al-cleburne-parcels-01029 |
 | Cullman | Alabama | 01043 | complete-gte-5ac | 14,885 | al-cullman-parcels-01043 |
 | Etowah | Alabama | 01055 | complete-gte-5ac | 11,021 | al-etowah-parcels-01055 |
 | Jefferson | Alabama | 01073 | complete-gte-5ac | 15,641 | al-jefferson-parcels |
@@ -383,6 +386,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Giles | Tennessee | 47055 | complete-gte-5ac | 7,028 | tn-oir-public-use-47055 |
 | Jackson | Alabama | 01071 | complete-gte-5ac | 13,862 | al-jackson-parcels-01071 |
 | Lauderdale | Alabama | 01077 | complete-gte-5ac | 3,840 | al-lauderdale-parcels-01077 |
+| Lawrence | Alabama | 01079 | complete-gte-5ac | 8,639 | al-lawrence-parcels-01079 |
 | Limestone | Alabama | 01083 | complete-gte-5ac | 5,445 | al-limestone-remap-1 |
 | Lincoln | Tennessee | 47103 | complete-gte-5ac | 6,630 | tn-oir-public-use-47103 |
 | Madison | Alabama | 01089 | complete-gte-5ac | 12,312 | al-madison-public-isv-185 |
@@ -625,11 +629,16 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Autauga | Alabama | 01001 | complete-gte-5ac | 7,047 | al-autauga-parcels |
 | Barbour | Alabama | 01005 | complete-gte-5ac | 7,226 | al-barbour-parcels-01005 |
 | Bullock | Alabama | 01011 | complete-gte-5ac | 3,579 | al-bullock-parcels-01011 |
+| Coosa | Alabama | 01037 | complete-gte-5ac | 5,947 | al-coosa-parcels-01037 |
 | Dallas | Alabama | 01047 | complete-gte-5ac | 6,351 | al-dallas-parcels-01047 |
 | Elmore | Alabama | 01051 | complete-gte-5ac | 9,758 | al-elmore-parcels |
+| Henry | Alabama | 01067 | complete-gte-5ac | 6,275 | al-henry-parcels-01067 |
+| Houston | Alabama | 01069 | complete-gte-5ac | 2,734 | al-houston-parcels-01069 |
+| Lee | Alabama | 01081 | complete-gte-5ac | 8,747 | al-lee-parcels-01081 |
 | Lowndes | Alabama | 01085 | gap | 0 | unavailable |
 | Macon | Alabama | 01087 | complete-gte-5ac | 5,757 | al-macon-parcels-01087 |
 | Montgomery | Alabama | 01101 | complete-gte-5ac | 9,954 | al-montgomery-parcels |
+| Russell | Alabama | 01113 | complete-gte-5ac | 5,588 | al-russell-parcels-01113 |
 | Wilcox | Alabama | 01131 | complete-gte-5ac | 6,462 | al-wilcox-parcels-01131 |
 
 ### Valdosta

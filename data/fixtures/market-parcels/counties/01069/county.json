@@ -1,0 +1,31 @@
+{
+  "name": "Houston",
+  "fips": "01069",
+  "state": "Alabama",
+  "markets": [
+    "Montgomery"
+  ],
+  "featureCount": 2734,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "al-houston-parcels-01069",
+  "queryUrl": "https://web6.kcsgis.com/kcsgis/rest/services/Houston/Houston_Public_ISV/MapServer/29/query",
+  "gaps": [
+    "Source query returned 3269 rows; 2734 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcels (Houston Public ISV, CAMA join) (https://web6.kcsgis.com/kcsgis/rest/services/Houston/Houston_Public_ISV/MapServer/29). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "No county (unincorporated) zoning layer seen",
+    "SalePrice often 0 or null"
+  ],
+  "path": "data/fixtures/market-parcels/counties/01069/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01069/lookup.json",
+  "sourceCount": 3269,
+  "dropped": 0,
+  "tileCount": 7,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://www.ingproperty.com/Houston_Revenue/PropertyDetails.aspx?taxyear=2026&ppin={PIN}",
+  "gisViewerUrl": "https://isv.kcsgis.com/al.houston_revenue/"
+}

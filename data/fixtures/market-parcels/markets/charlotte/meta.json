@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T03:21:53Z",
+  "generatedAt": "2026-09-29T03:26:29Z",
   "market": "Charlotte",
   "tier": "primary",
-  "parcelCount": 112019,
+  "parcelCount": 118015,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -16,6 +16,30 @@
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
+    {
+      "name": "Alexander",
+      "fips": "37003",
+      "state": "North Carolina",
+      "featureCount": 5996,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-alexander-parcels-37003",
+      "queryUrl": "https://maps.alexandercountync.gov/arcgis/rest/services/Website_map/MapServer/26/query",
+      "gaps": [
+        "Parcels are Website_map Parcels (PRIMARY CAMA) (https://maps.alexandercountync.gov/arcgis/rest/services/Website_map/MapServer/26). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 7305 rows; 5996 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Alexander pages with orderByFields because the MapServer has no object id. returnCountOnly repeats PROPERTY 99999 rows, so that raw count is higher than the distinct parcel ids that page.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 291 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "resultRecordCount is rejected unless orderByFields is set (the MapServer exposes no OID for paging). An unpaged sample query works.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37003/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37003/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 7305
+    },
     {
       "name": "Anson",
       "fips": "37007",

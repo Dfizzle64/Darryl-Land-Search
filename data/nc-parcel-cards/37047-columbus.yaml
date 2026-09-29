@@ -1,0 +1,349 @@
+state: NC
+jurisdiction: Columbus County
+fips: "37047"
+level: county
+markets: [Wilmington]
+slug: columbus
+
+municipalities:
+  - name: Whiteville
+    role: city-first-zoning
+    gcicod: WH
+    notes: County seat; ~4047 parcels; zoning jurisdicti=Whiteville
+  - name: Tabor City
+    role: city-first-zoning
+    gcicod: SW
+    notes: GCICOD=SW (~2691); zoning jurisdicti=Tabor City
+  - name: Lake Waccamaw
+    role: city-first-zoning
+    gcicod: WA
+  - name: Chadbourn
+    role: city-first-zoning
+    gcicod: CH
+  - name: Fair Bluff
+    role: city-first-zoning
+    gcicod: FB
+  - name: Bolton
+    role: city-first-zoning
+    gcicod: BO
+  - name: Sandyfield
+    role: city-first-zoning
+    gcicod: SF
+    notes: Riegelwood PO common
+  - name: Brunswick
+    role: city-first-zoning
+    gcicod: BR
+    notes: Town in Columbus County (not Brunswick County)
+  - name: Boardman
+    role: city-first-zoning
+    gcicod: BD
+  - name: Cerro Gordo
+    role: city-first-zoning
+    gcicod: CG
+
+layers:
+  - role: parcels
+    name: NC OneMap Parcels (PRIMARY ArcGIS REST geometry)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+      - https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Shape__Area
+    coverage: county-wide
+    filter: "cntyfips='047'"
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdProp
+      nparno: parcelIdNational
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      szip: situsZip
+      gisacres: acreageBroken
+      Shape__Area: acreageSqFt
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      parval: tax.marketValuePartial
+      saledate: lastSale.date
+      parusecode: dorCode
+      parusedesc: landUseDescription
+      sourceref: lastSale.deedBookPage
+      cntyfips: countyFips
+    notes: >
+      PRIMARY public ArcGIS REST. Filter cntyfips='047'. Verified 2026-09-24:
+      count 51709; Shape__Area 5–150 ac → 12081; ownname/siteadd/altparno ~51091;
+      landval>0 51080; improvval>0 24914; parval>0 only 18709 (prefer taxdata GTOTVL).
+      CRITICAL: gisacres broken for Columbus — derive acres as Shape__Area/43560
+      (CRS 102719/2264). Join parno=GPIN; altparno=GSEQ for PRC deep-link.
+      No sale price. MaxRecordCount 5000. Sample centroid ~-78.767, 34.397.
+    status: usable
+
+  - role: tax
+    name: Columbus County taxdata CAMA export (PRIMARY attributes)
+    restUrl: https://www2.columbusco.org/gisdata/taxdata.xls
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: GACRE
+    coverage: county-wide
+    fieldMap:
+      GPIN: parcelId
+      GSEQ: parcelIdProp
+      GACCT: parcelIdAccount
+      GNAME: ownerName
+      GADD1: mailingAddress.street
+      GADD2: mailingAddress.street2
+      GCTYST: mailingAddress.cityState
+      GZIPCD: mailingAddress.zip
+      TXSADD: situsAddress
+      TXSCTY: situsCity
+      TXSZIP: situsZip
+      GACRE: acreage
+      GTOTVL: tax.marketValue
+      TVLAND: tax.landValue
+      GTLUVL: tax.landUseValue
+      GSLAMT: lastSale.price
+      GSLDTE: lastSale.date
+      GDBOOK: lastSale.deedBook
+      GDPAGE: lastSale.deedPage
+      GCICOD: municipalityCode
+      GTWNSH: township
+      GCLASS: dorCode
+      GAREA: buildingSqFt
+      GYEARB: yearBuilt
+      GPURL: appraiserCardUrl
+      GDURL: deedUrl
+      GSURL: taxStatementUrl
+    notes: >
+      TABLE-format export (not OLE xls). Verified 2026-09-24: 53516 rows.
+      GACRE 5–150 → 12238; GSLAMT>0 19025; GTOTVL>0 53478; TVLAND>0 51495;
+      GPURL on every row. Join GPIN=parno. Prefer GACRE + GTOTVL + GSLAMT over OneMap.
+      GCICOD: blank unincorp 40172, WH 4047, SW 2691, WA 2026, CH 1660, FB 973,
+      BO 622, SF 517, BR 352, BD 243, CG 213.
+      PRC: https://www2.columbusco.org/prc/pid{GSEQ:06d}.pdf
+    status: usable
+
+  - role: parcels
+    name: MangoMap Land Records — Parcels (viewer)
+    restUrl: https://mangomap.com/columbusmis/maps/16952/land-records-
+    alternateUrls:
+      - https://mangomap.com/maps/708eb278-82aa-11e3-b624-12313d220285/map_config
+      - https://mgo.ms/s/vzt2l
+    layerId: "83a6893c-d6aa-11e7-af3f-06765ea3034e"
+    geometry: polygon
+    auth: none
+    acreageField: acres
+    coverage: county-wide
+    fieldMap:
+      pin: parcelId
+      propid: parcelIdProp
+      acct: parcelIdAccount
+      owner: ownerName
+      addr1: mailingAddress.street
+      acres: acreage
+      gpurl: appraiserCardUrl
+      gdurl: deedUrl
+      gsurl: taxStatementUrl
+    notes: >
+      Jurisdiction GIS (not ArcGIS FS). Count 57075. Popup mirrors taxdata CAMA.
+      Per-feature GeoJSON available; no bulk FeatureServer — wire via OneMap+taxdata.
+    status: partial
+
+  - role: zoning
+    name: MangoMap Zoning (cities-first jurisdicti)
+    restUrl: https://mangomap.com/columbusmis/maps/20702/zoning
+    alternateUrls:
+      - https://mangomap.com/maps/d50ad20a-e276-11e3-b0cd-22000b2f8216/map_config
+    layerId: "20bb7174-16f3-11ec-a73c-027d7e0bb32b"
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      jurisdicti: municipality
+      zoning: zoning
+    notes: >
+      Cities-first. SLD jurisdicti: Whiteville, Tabor City, Chadbourn, Lake Waccamaw,
+      Fair Bluff, Bolton, SandyField, Brunswick, Boardman, Cerro Gordo,
+      Columbus County, General Use. Count 1619. No ArcGIS zoning FS.
+      Ordinance PDF on planning site.
+    status: partial
+
+  - role: other
+    name: MangoMap City and Town Limits
+    restUrl: https://mangomap.com/columbusmis/maps/22030/cities-and-districts
+    layerId: "e8861cc0-9d95-11ed-b542-027d7e0bb32b"
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      name: municipality
+    notes: Verified count 28. Pair with GCICOD / zoning jurisdicti for city-first router.
+    status: usable
+
+  - role: flu
+    name: Comprehensive Land Use Plan (CLUP) — PDF only
+    restUrl: https://www.columbusco.org/sites/default/files/uploads/planning/clup.pdf
+    alternateUrls:
+      - https://www.columbusco.org/sites/default/files/uploads/planning/clup-hwa.pdf
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: No public FLU FeatureServer found 2026-09-24. CLUP PDF only — FLU gap.
+    status: gap
+
+  - role: sales
+    name: MangoMap annual Sales overlays (2019–2024)
+    restUrl: https://mangomap.com/columbusmis/maps/16952/land-records-
+    layerId: "a6818e98-35bb-11f0-a68e-02af6ed49e2d"
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap: {}
+    notes: >
+      Sales 2024 count 2527. Prefer taxdata GSLAMT/GSLDTE for countywide last-sale.
+    status: partial
+
+gaps:
+  - No county ArcGIS FeatureServer for parcels/zoning — OneMap + taxdata + MangoMap
+  - OneMap gisacres broken — use Shape__Area/43560
+  - OneMap parval incomplete — prefer taxdata GTOTVL
+  - No sale price on OneMap — use taxdata GSLAMT
+  - FLU FeatureServer gap — CLUP PDF only
+  - No separate city zoning/FLU FeatureServers
+  - MangoMap identify/GeoJSON only (no bulk ArcGIS REST)
+  - Utilities / AADT / emails / phones / paid vendors out of scope
+
+license: "Columbus County public GIS (MangoMap) + taxdata export; NC OneMap; attribution as required"
+gisPortalUrl: https://www.columbusco.org/gis
+viewerUrl: https://mangomap.com/columbusmis/maps/16952/land-records-
+zoningViewerUrl: https://mangomap.com/columbusmis/maps/20702/zoning
+mapsPortalUrl: https://mangomap.com/columbusmis/maps
+planningUrl: https://www.columbusco.org/planning-department
+taxOfficeUrl: https://www.columbusco.org/tax-office
+taxDataUrl: https://www2.columbusco.org/gisdata/taxdata.xls
+jurisdictionGisUrl: https://mangomap.com/columbusmis/maps/16952/land-records-
+appraiserSearchUrl: https://www.columbusco.org/gis
+appraiserDeepLinkTemplate: "https://www2.columbusco.org/prc/pid{GSEQ:06d}.pdf"
+appraiserDeepLinkNotes: >
+  Property card PDF: zero-pad GSEQ/altparno to 6 digits.
+  Example GSEQ 102 → https://www2.columbusco.org/prc/pid000102.pdf (200 PDF verified).
+  Statement: https://www2.columbusco.org/statements/{GACCT compact}.txt
+  Deed via GDURL on columbusdeeds.com. No NCPTS/ITSPublic host — PRC is the parcel-ID deep-link.
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  parcelIdField: altparno
+  acreageFilter: Shape__Area BETWEEN 217800 AND 6534000
+  countyWhere: cntyfips='047'
+  acres5to150Live: 12081
+  parcelCountLive: 51709
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='COLUMBUS'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27COLUMBUS%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27COLUMBUS%27&returnCountOnly=true&f=json
+      liveStationCount: 589
+      stationsWithAADT2022: 325
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Columbus'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Columbus%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Columbus%27&returnCountOnly=true&f=json
+      liveStationCount: 596
+      stationsWithAADT2025: 404
+      stationsWithAADT2024: 316
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Columbus'
+      stations2024LiveCount: 592
+      stations2024WithAADT2024: 592
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - parval
+    - landval
+    - improvval
+    liveNonZero:
+      parval: 18709
+      landval: 51080
+      improvval: 24914
+    status: ok-via-download
+    note: 'OneMap parval only partial (landval near-complete). Authoritative values in county taxdata export (DIF format despite .xls): GTOTVL>0 53482 / TVLAND; join GPIN↔OneMap parno.'
+    altLayer: https://www2.columbusco.org/gisdata/taxdata.xls
+    altLive:
+      rows: 53520
+      GTOTVL_gt0: 53482
+  sale:
+    priceFields: []
+    dateFields:
+    - saledate
+    livePriceNonZero: {}
+    liveDateNonNull:
+      saledate: 51709
+    status: ok-via-download
+    note: 'Not on REST except OneMap saledate (populated but unreliable as sale). Use taxdata export GSLAMT (price) / GSLDTE (date MM/DD/YYYY): GSLAMT>0 19027, GSLDTE non-blank 53520. Deed image GDURL.'
+    supplementalSource:
+      url: https://www2.columbusco.org/gisdata/taxdata.xls
+      rows: 53520
+      GSLAMT_gt0: 19027
+      GSLDTE_nonblank: 53520
+  ownerEntity:
+    ownerFields:
+    - ownname
+    - ownname2
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 1826
+    liveEntityCount5to150acExtended: 2028
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - RSPD-MARLOWE LLC
+    - RSPD-MARLOWE LLC
+    - RSPD-MARLOWE LLC
+    - JHC FARMS LLC
+  paDeepLink:
+    template: https://www2.columbusco.org/prc/pid{GSEQ6}.pdf
+    testedParcelId: 099803
+    testedUrl: https://www2.columbusco.org/prc/pid099803.pdf
+    httpStatus: 200
+    contentType: application/pdf
+    contentVerified: true
+    note: Returns application/pdf property/appraisal card; parcel verified in PDF text. {GSEQ6} = taxdata GSEQ (≈ OneMap altparno) zero-padded to 6.
+  gisViewer:
+    url: https://mangomap.com/columbusmis/maps/16952/land-records-
+    httpStatus: 200
+    pageTitle: Land Records  - Interactive Web Map
+  gaps:
+  - Parcel REST is NC OneMap only (gisacres broken → Shape__Area/43560); sale price and full values from taxdata DIF export, not REST

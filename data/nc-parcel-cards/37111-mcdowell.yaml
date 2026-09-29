@@ -1,0 +1,302 @@
+state: NC
+jurisdiction: McDowell County
+fips: "37111"
+level: county
+markets: [Asheville]
+slug: mcdowell
+cntyfips: "111"
+
+municipalities:
+  - name: Marion
+    role: city-first-zoning
+    zoningLayer: OfficialZoningDistricts/FeatureServer/0
+    cityCode: C1
+    parcelCountApprox: 3637
+    zoningCount: 168
+    notes: County seat; prefer city AGOL OfficialZoningDistricts; Current_Zoning_WFL1 PIN join ~3956; county MapServer/7 mirror
+  - name: Old Fort
+    role: gap
+    cityCode: C2
+    parcelCountApprox: 619
+    notes: Municipal boundary MapServer/230 only; no public zoning REST — contact townofoldfort.org
+  - name: Unincorporated McDowell
+    role: partial
+    zoningLayer: NC/McDowell/MapServer/236
+    count: 669
+    notes: Limited county Zoning districts (Open/R-A*/R1/R2/G-B); most unincorp unzoned on REST
+
+layers:
+  - role: parcels
+    name: NC/McDowell Parcels (CAMA + polygons)
+    restUrl: https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/2
+    alternateUrls:
+      - https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/4
+      - https://services3.arcgis.com/q5DjgI77eZ9vJ4mD/arcgis/rest/services/City_Tax_Parcel/FeatureServer/0
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      ParcelNumber: parcelId
+      AccountNumber: parcelIdAccount
+      MDFormattedFirst13: parcelIdAlt
+      PinNumber: parcelIdAlt
+      CALCULATED_ACREAGE: acreage
+      TOTAL_ACREAGE: acreage
+      Name1: ownerName
+      Name2: ownerName
+      Address1: mailingAddress
+      Address2: mailingAddress
+      City: mailingAddress
+      State: mailingAddress
+      ZipCode: mailingAddress
+      HouseNumber: situsAddress
+      StreetName: situsAddress
+      StreetType: situsAddress
+      SaleYear1: lastSale.date
+      SaleMonth1: lastSale.date
+      SaleDay1: lastSale.date
+      DeedDate: lastSale.date
+      DeedBook1: other
+      DeedPage1: other
+      TotalMarketValue: tax.marketValue
+      TotalAssessedValue: tax.assessedValue
+      ParcelLandValue: tax.marketValue
+      ParcelBuildingValue: tax.marketValue
+      ParcelObxfValue: tax.marketValue
+      CityCode: other
+      TownshipCode: other
+      TaxCode2: other
+    notes: >
+      PRIMARY verified 2026-09-24: count 33500; Shape.STArea()/43560 BETWEEN 5 AND 150 → 5638;
+      CALCULATED_ACREAGE 5–150 → 1789 (CALC null → 26519); TotalMarketValue>0 → 33112;
+      SaleYear1>0 → 32912. CRS 102719/2264. MaxRecordCount 1000 — paginate. No SalePrice field.
+      Prefer shape acres or OneMap gisacres when CALC null. Geo-check PIN 161600711511.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      altparno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress
+      mcity: mailingAddress
+      mstate: mailingAddress
+      mzip: mailingAddress
+      siteadd: situsAddress
+      gisacres: acreage
+      saledatetx: lastSale.date
+      parval: tax.marketValue
+      landval: tax.marketValue
+      improvval: tax.marketValue
+      cntyfips: other
+    notes: >
+      Filter cntyfips='111'. Count 33449; gisacres 5–150 → 5638; parval>0 → 33074;
+      saledate epoch empty (0); saledatetx populated. No sale price. Join parno↔PIN.
+      Best acreage fallback when county CALC null.
+    status: usable
+
+  - role: zoning
+    name: City of Marion OfficialZoningDistricts
+    restUrl: https://services3.arcgis.com/q5DjgI77eZ9vJ4mD/arcgis/rest/services/OfficialZoningDistricts/FeatureServer/0
+    alternateUrls:
+      - https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/7
+      - https://services3.arcgis.com/q5DjgI77eZ9vJ4mD/arcgis/rest/services/Current_Zoning_WFL1/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+      District_N: zoning
+      URL: other
+      Acres: acreage
+    notes: >
+      PRIMARY Marion zoning verified 2026-09-24: count 168. Codes R2/C2/M1/R3/R4/OI/R1/PR/B1/C1/DO.
+      Prefer city host; county MapServer/7 mirror count 167. Current_Zoning_WFL1 (~3956) is
+      parcel polygons with ZONE_ID for PIN join. Route CityCode=C1 / Marion limits.
+    status: usable
+
+  - role: zoning
+    name: McDowell Co Zoning
+    restUrl: https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/236
+    layerId: 236
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      PIN: parcelId
+      Zoning: zoning
+    notes: >
+      Count 669 PIN-attributed polys — Open/R-A1/R2/R1/R-A3/R-A2/G-B/Utility. Not countywide;
+      most unincorporated land unzoned on public REST. Use only where feature exists.
+    status: partial
+
+  - role: other
+    name: Municipal Boundaries (Marion / Old Fort)
+    restUrl: https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/5
+    alternateUrls:
+      - https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/230
+      - https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/229
+      - https://services3.arcgis.com/q5DjgI77eZ9vJ4mD/arcgis/rest/services/MarionMunicipalBoundary/FeatureServer
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: city-only
+    fieldMap:
+      Name: other
+      Acres: acreage
+    notes: >
+      Marion Limits/5 count 1; Old Fort/230 count 1; Marion Municipal Boundary/229 count 43.
+      Use with CityCode C1/C2 for municipality routing.
+    status: usable
+
+  - role: flu
+    name: McDowell County Land Use Plan (PDF)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      FLU PDF only — https://mcdowellnc.gov/county/plans/McDowell%20County%20Land%20Use%20Plan-2.pdf ;
+      adopted plan https://mcdowellnc.gov/county/plans/McDowellCountyadoptedplan11-18-24.pdf .
+      No public FLU FeatureServer (county or Marion/Old Fort).
+    status: gap
+
+gaps:
+  - Sale price not on public REST (sale date/deed only) — PA AppraisalCard for price QA
+  - CALCULATED_ACREAGE null on ~79% of parcels — use Shape.STArea()/43560 or OneMap gisacres
+  - County Zoning only 669 polys — most unincorporated unzoned on REST
+  - Old Fort zoning REST gap (boundary only)
+  - FLU PDF-only — no FeatureServer
+  - OneMap saledate epoch empty — use saledatetx or county SaleYear/Month/Day
+  - MapServer-only parcels (no FeatureServer twin)
+  - Utilities / AADT / emails / phones / paid vendors excluded by design
+
+license: "McDowell County GIS / Land Records / Tax Administration (HandP WebGIS); City of Marion GIS; NC OneMap; NCGS 132-10 commercial resale limits; attribute McDowell County GIS (+ City of Marion where used)"
+appraiserSearchUrl: "https://www.bttaxpayerportal.com/ITSPublicMD/AppraisalCard.aspx?id={PIN}"
+appraiserSearchUrlNotes: "WebGIS siteCustom.js wires Tax Card to AppraisalCard.aspx?id= + atts.PIN (12-digit). Verified HTTP 200 large card for PIN 161600711511 and 065600977426. RealEstateSearch/Parcel/{PIN} returns 404 — use AppraisalCard. NCPTS alt parcel-detail/{PIN}."
+jurisdictionGisUrl: "https://www.webgis.net/nc/McDowell/"
+viewerLinkTemplate: "https://www.webgis.net/nc/McDowell/"
+verifiedAt: "2026-09-24"
+verifiedBy: "North Carolina Public Info Researcher"
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/2
+  parcelIdField: PIN
+  acreageFilter: CALCULATED_ACREAGE >= 5 AND CALCULATED_ACREAGE <= 150
+  acres5to150Live: 1789
+  parcelCountLive: 33500
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='MCDOWELL'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MCDOWELL%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MCDOWELL%27&returnCountOnly=true&f=json
+      liveStationCount: 317
+      stationsWithAADT2022: 208
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='McDowell'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27McDowell%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27McDowell%27&returnCountOnly=true&f=json
+      liveStationCount: 318
+      stationsWithAADT2025: 196
+      stationsWithAADT2024: 155
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TotalMarketValue
+    - TotalAssessedValue
+    allTaxFieldsOnLayer:
+    - TotalMarketValue
+    - TotalAssessedValue
+    - ParcelLandValue
+    - ParcelBuildingValue
+    - ParcelObxfValue
+    liveNonZero:
+      TotalMarketValue: 33112
+      TotalAssessedValue: 33112
+    status: ok
+  sale:
+    priceFields: []
+    dateFields:
+    - DeedDate
+    - SaleYear1
+    livePriceNonZero: {}
+    liveDateNonNull:
+      DeedDate: 32912
+      SaleYear1: 32912
+    status: partial
+    note: Price not on REST; ITSPublicMD AppraisalCard PDF has SALES DATA grid (BOOK/PAGE/MO/YR/SALES PRICE).
+  ownerEntity:
+    ownerFields:
+    - Name1
+    - Name2
+    primaryOwnerField: Name1
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(Name1) LIKE '% LLC%' OR UPPER(Name1) LIKE '% INC%' OR UPPER(Name1) LIKE '% LP%' OR UPPER(Name1) LIKE '% LLP%' OR UPPER(Name1) LIKE '% LTD%' OR UPPER(Name1) LIKE '% TRUST%' OR UPPER(Name1) LIKE '% CHURCH%' OR UPPER(Name1) LIKE '% COMPANY%' OR UPPER(Name1) LIKE '% PARTNERSHIP%' OR UPPER(Name1) LIKE '% HOLDINGS%' OR UPPER(Name1) LIKE '% PROPERTIES%' OR UPPER(Name1) LIKE '% CORP%' OR UPPER(Name1) LIKE '%,LLC%' OR UPPER(Name1) LIKE '%,INC%' OR UPPER(Name1) LIKE 'CITY OF %' OR UPPER(Name1) LIKE 'COUNTY OF %' OR UPPER(Name1) LIKE 'STATE OF %' OR UPPER(Name1) LIKE 'TOWN OF %')
+    liveEntityCountAll: 4391
+    liveEntityCount5to150ac: 284
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://www.bttaxpayerportal.com/ITSPublicMD/AppraisalCard.aspx?id={PIN}
+    testedParcelId: 068600758106
+    testedUrl: https://www.bttaxpayerportal.com/ITSPublicMD/AppraisalCard.aspx?id=068600758106
+    httpStatus: 200
+    contentType: application/pdf
+    contentVerified: true
+    note: Owner and parcel id verified in the response.
+  gisViewer:
+    url: https://www.webgis.net/nc/McDowell/
+    httpStatus: 200
+    pageTitle: McDowell County NC WebGIS
+  gaps:
+  - sale partial

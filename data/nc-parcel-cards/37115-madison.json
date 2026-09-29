@@ -1,0 +1,468 @@
+{
+  "county": "Madison",
+  "state": "NC",
+  "msa": "Asheville MSA",
+  "fips": "37115",
+  "cntyfips": "115",
+  "slug": "madison",
+  "level": "county",
+  "markets": [
+    "Asheville"
+  ],
+  "crs_preferred": {
+    "wkid": 6543,
+    "latestWkid": 6543,
+    "name": "NAD 1983 (2011) StatePlane North Carolina FIPS 3200 Ft US"
+  },
+  "crs_notes": "County AGOL parcels/CAMA use 6543. Zoning/town layers often Web Mercator 3857. OneMap uses its service SR.",
+  "viewerLinkTemplate": "https://experience.arcgis.com/experience/2333843dc4584e648a98fb9542dc75fe",
+  "viewerLinkTemplates": [
+    "https://experience.arcgis.com/experience/2333843dc4584e648a98fb9542dc75fe",
+    "https://madison-county-nc-open-data-madcotax.hub.arcgis.com/",
+    "http://lrcpwa.ncptscloud.com/Madison",
+    "https://lrcpwa.ncptscloud.com/Madison/PropertySummary.aspx?PIN={PIN_DASHED}"
+  ],
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/Madison/PropertySummary.aspx?PARCELPK={PARCEL_PK}",
+  "appraiserSearchUrlNotes": "Preferred PARCELPK when known from NCPTS. Alternates: ?PIN={PIN_DASHED} (####-##-#### from 10-digit PIN) and ?REID={REID}. Search hub: http://lrcpwa.ncptscloud.com/Madison. Indexed card PARCELPK=23301 / PIN 8754-96-2857 showed Package Sale 2024-11-06 @ 1200000.",
+  "jurisdictionGisUrl": "https://experience.arcgis.com/experience/2333843dc4584e648a98fb9542dc75fe",
+  "joinKeys": [
+    "PIN",
+    "parno",
+    "REID",
+    "PARCEL_PK"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "parno",
+        "REID"
+      ],
+      "bestLayer": "2025_Parcels",
+      "notes": "PIN 10-digit no dashes; NCPTS ####-##-####; join OneMap parno"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "2025_Parcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CACRES",
+        "TACRES",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 7134,
+      "bestLayer": "2025_Parcels"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "OWNER",
+        "ownname"
+      ],
+      "bestLayer": "2025_Parcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "ADDRESS",
+        "CITY",
+        "STATE",
+        "ZIP",
+        "mailadd",
+        "mcity",
+        "mstate",
+        "mzip"
+      ],
+      "bestLayer": "2025_Parcels"
+    },
+    "situsAddress": {
+      "present": "partial",
+      "fields": [
+        "siteadd",
+        "FullAddress"
+      ],
+      "bestLayer": "NC OneMap or 2025_Addresses/32",
+      "notes": "Parcel ADDRESS is mailing; OneMap siteadd by parno; Addresses spatial"
+    },
+    "lastSale": {
+      "present": "partial",
+      "fields": [
+        "DB",
+        "DP",
+        "NCPTS Package/Land Sale"
+      ],
+      "bestLayer": "NCPTS PropertySummary",
+      "notes": "Sale price/date REST gap on county+OneMap (saledate 0); NCPTS has Package Sale Price/Date"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "NC OneMap cntyfips=115",
+      "notes": "County parcel REST lacks value fields; OneMap parval>0 \u2192 19810; NCPTS for full appraisal split"
+    },
+    "zoning": {
+      "present": true,
+      "coverage": "city-first-plus-county",
+      "fields": [
+        "ZoningCode",
+        "CLASSIFICA",
+        "Zoning",
+        "ZONING"
+      ],
+      "bestLayer": "Mars_Hill_Zoning / Marshall_Zoning2023v2 / CtyZoningWO_MH_Marsh",
+      "notes": "Cities-first MH+Marshall; county zoning outside; Hot Springs REST gap"
+    },
+    "flu": {
+      "present": false,
+      "coverage": "pdf-only",
+      "notes": "Comp Plan 2022 + Map 3 Current Zoning & Land Use PDF; no FLU FeatureServer"
+    }
+  },
+  "municipalities": [
+    {
+      "name": "Marshall",
+      "role": "city-first-zoning",
+      "seat": true,
+      "zoningLayer": "Marshall_Zoning2023v2/FeatureServer/0",
+      "zoningField": "CLASSIFICA",
+      "zoningCount": 82,
+      "zoneCodes": [
+        "R1",
+        "R2",
+        "R3",
+        "HB",
+        "MU",
+        "CB",
+        "OSR",
+        "I"
+      ],
+      "fluRest": false,
+      "notes": "County seat; county-hosted AGOL"
+    },
+    {
+      "name": "Mars Hill",
+      "role": "city-first-zoning",
+      "zoningLayer": "Mars_Hill_Zoning/FeatureServer/0",
+      "zoningField": "ZoningCode",
+      "zoningCount": 39,
+      "zoneCodes": [
+        "R1",
+        "R2",
+        "R2A",
+        "R3",
+        "R4",
+        "C1",
+        "C2",
+        "Industrial",
+        "Institutional",
+        "T"
+      ],
+      "etjLayer": "MarsHillETJ/FeatureServer/0",
+      "fluRest": false,
+      "ordinancePdf": "https://townofmarshill.org/Documents/Services/ZONING%20ORDINANCE%20-%20Town%20of%20Mars%20Hill%20-%202021.pdf",
+      "zoningMapPage": "https://townofmarshill.org/_services/planning_zoning/zoning_map.php"
+    },
+    {
+      "name": "Hot Springs",
+      "role": "gap",
+      "zoningLayer": null,
+      "fluRest": false,
+      "planningUrl": "https://townofhotsprings.org/zoning/",
+      "notes": "Zoning REST gap; town Planning & Zoning page"
+    },
+    {
+      "name": "Unincorporated",
+      "role": "county-zoning",
+      "zoningLayer": "CtyZoningWO_MH_Marsh/FeatureServer/0",
+      "zoningCount": 20167,
+      "notes": "County-wide zoning excluding MH/Marshall footprints"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "2025_Parcels",
+      "restUrl": "https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/2025_Parcels/FeatureServer/19",
+      "layerId": 19,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CACRES",
+      "coverage": "county-wide",
+      "count": 21753,
+      "acres5to150": 7134,
+      "ownerNotNull": 20081,
+      "status": "usable",
+      "primary": true,
+      "notes": "OWNER+mailing+ZONING+CACRES/TACRES+DB/DP; no sale/tax values \u2014 join OneMap"
+    },
+    {
+      "role": "parcels",
+      "name": "ParcelCAMAInfo",
+      "restUrl": "https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/ParcelCAMAInfo/FeatureServer/9",
+      "layerId": 9,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CACRES",
+      "coverage": "county-wide",
+      "count": 21549,
+      "status": "usable",
+      "notes": "CAMA mirror; also on 2025_Madison_County_Tax_Parcel_Update/9"
+    },
+    {
+      "role": "parcels",
+      "name": "2023_Madison_County_Tax_Parcels",
+      "restUrl": "https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/2023_Madison_County_Tax_Parcels/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CACRES",
+      "coverage": "county-wide",
+      "count": 21535,
+      "status": "usable",
+      "notes": "Prior-year mirror; prefer 2025_Parcels"
+    },
+    {
+      "role": "parcels",
+      "name": "2025_Tax_Layer Tax",
+      "restUrl": "https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/2025_Tax_Layer/FeatureServer/43",
+      "layerId": 43,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CACRES",
+      "coverage": "county-wide",
+      "count": 21756,
+      "status": "partial",
+      "notes": "Geometry+Zoning; no OWNER/values"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "count": 21381,
+      "acres5to150": 7157,
+      "parvalPositive": 19810,
+      "filter": "cntyfips='115'",
+      "status": "usable",
+      "notes": "PRIMARY tax values; saledate empty for Madison; join parno\u2194PIN"
+    },
+    {
+      "role": "zoning",
+      "name": "Mars_Hill_Zoning",
+      "restUrl": "https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/Mars_Hill_Zoning/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 39,
+      "status": "usable",
+      "primary": true,
+      "notes": "Cities-first Mars Hill; field ZoningCode"
+    },
+    {
+      "role": "zoning",
+      "name": "Marshall_Zoning2023v2",
+      "restUrl": "https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/Marshall_Zoning2023v2/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 82,
+      "status": "usable",
+      "primary": true,
+      "notes": "Cities-first Marshall; use CLASSIFICA only (CAMA stubs empty)"
+    },
+    {
+      "role": "zoning",
+      "name": "CtyZoningWO_MH_Marsh",
+      "restUrl": "https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/CtyZoningWO_MH_Marsh/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-minus-MH-Marshall",
+      "count": 20167,
+      "status": "usable",
+      "notes": "County zoning R-A/R-2/R-B/MHP/I-D/C"
+    },
+    {
+      "role": "boundaries",
+      "name": "Town_Limits",
+      "restUrl": "https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/Town_Limits/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "count": 3,
+      "status": "usable",
+      "notes": "Mars Hill, Hot Springs, Marshall"
+    },
+    {
+      "role": "addresses",
+      "name": "2025_Addresses SiteStructureAddressPoints",
+      "restUrl": "https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/2025_Addresses/FeatureServer/32",
+      "layerId": 32,
+      "geometry": "point",
+      "auth": "none",
+      "count": 18612,
+      "status": "usable",
+      "notes": "Situs supplement; no PIN \u2014 spatial join"
+    },
+    {
+      "role": "flu",
+      "name": "Comp Plan / Map 3 Zoning & Land Use PDF",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "gap",
+      "notes": "PDF only \u2014 comprehensive_plan_2022.pdf + map_3_-_current_zoning___land_use.pdf"
+    }
+  ],
+  "gaps": [
+    "Sale price/date REST gap on county AGOL and OneMap (use NCPTS PA)",
+    "Tax values absent on county parcel REST (join OneMap parval/landval/improvval)",
+    "Hot Springs municipal zoning FeatureServer gap",
+    "FLU FeatureServer gap (Comp Plan + Map 3 PDF only)",
+    "Parcel ADDRESS is mailing not situs",
+    "Marshall_Zoning2023v2 CAMA sale/tax columns empty stubs"
+  ],
+  "license": "Madison County Tax/GIS/Planning; NC OneMap. NCGS 132-10. Attribution required. Not survey quality.",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "tranche": 3,
+  "verifiedLayerCount": 12,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/2025_Parcels/FeatureServer/19",
+    "parcelIdField": "PIN",
+    "acreageFilter": "CACRES >= 5 AND CACRES <= 150",
+    "acres5to150Live": 7134,
+    "parcelCountLive": 21753,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='MADISON'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MADISON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MADISON%27&returnCountOnly=true&f=json",
+        "liveStationCount": 205,
+        "stationsWithAADT2022": 136
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Madison'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Madison%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Madison%27&returnCountOnly=true&f=json",
+        "liveStationCount": 198,
+        "stationsWithAADT2025": 75,
+        "stationsWithAADT2024": 118,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [],
+      "allTaxFieldsOnLayer": [],
+      "liveNonZero": {},
+      "status": "gap",
+      "fallback": {
+        "source": "NC OneMap parcels (join altparno/parno to PIN)",
+        "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+        "where": "cntyfips='115' AND parval>0",
+        "liveCount": 19810,
+        "fields": [
+          "parval",
+          "landval",
+          "improvval"
+        ],
+        "pa": "NCPTS Madison PropertySummary (appraised values)"
+      }
+    },
+    "sale": {
+      "priceFields": [],
+      "dateFields": [],
+      "livePriceNonZero": {},
+      "liveDateNonNull": {},
+      "status": "gap",
+      "note": "No sale price/date on county REST or NC OneMap (saledate null). NCPTS Madison PropertySummary carries Package/Land Sale."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "OWNER"
+      ],
+      "primaryOwnerField": "OWNER",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(OWNER) LIKE '% LLC%' OR UPPER(OWNER) LIKE '% INC%' OR UPPER(OWNER) LIKE '% LP%' OR UPPER(OWNER) LIKE '% LLP%' OR UPPER(OWNER) LIKE '% LTD%' OR UPPER(OWNER) LIKE '% TRUST%' OR UPPER(OWNER) LIKE '% CHURCH%' OR UPPER(OWNER) LIKE '% COMPANY%' OR UPPER(OWNER) LIKE '% PARTNERSHIP%' OR UPPER(OWNER) LIKE '% HOLDINGS%' OR UPPER(OWNER) LIKE '% PROPERTIES%' OR UPPER(OWNER) LIKE '% CORP%' OR UPPER(OWNER) LIKE '%,LLC%' OR UPPER(OWNER) LIKE '%,INC%' OR UPPER(OWNER) LIKE 'CITY OF %' OR UPPER(OWNER) LIKE 'COUNTY OF %' OR UPPER(OWNER) LIKE 'STATE OF %' OR UPPER(OWNER) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 3414,
+      "liveEntityCount5to150ac": 986,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://lrcpwa.ncptscloud.com/Madison/PropertySummary.aspx?PIN={PIN}",
+      "testedParcelId": "9834-28-4018",
+      "testedUrl": "https://lrcpwa.ncptscloud.com/Madison/PropertySummary.aspx?PIN=9834-28-4018",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": false,
+      "note": "NCPTS SPA shell (200, 496 B, client-rendered): parcel content cannot be checked server-side. Card-preferred form ?PARCELPK={PARCEL_PK} needs a key that is not on the REST layer; ?PIN={PIN dashed ####-##-####} was tested."
+    },
+    "gisViewer": {
+      "url": "https://experience.arcgis.com/experience/2333843dc4584e648a98fb9542dc75fe",
+      "httpStatus": 200,
+      "pageTitle": "Experience",
+      "arcgisItem": {
+        "access": "public",
+        "title": "Madison County, NC GIS",
+        "type": "Web Experience",
+        "err": null
+      }
+    },
+    "gaps": [
+      "tax gap",
+      "sale gap"
+    ]
+  }
+}

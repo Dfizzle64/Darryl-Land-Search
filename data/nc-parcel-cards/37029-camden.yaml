@@ -1,0 +1,266 @@
+state: NC
+jurisdiction: Camden County
+fips: "37029"
+level: county
+markets: [Outer Banks, Eastern NC]
+slug: camden
+cntyfips: "029"
+
+jurisdictionGisUrl: https://experience.arcgis.com/experience/60ecb9b737384e7dbd1ad3f1f20b27b2/
+jurisdictionGisUrlAlt: https://ccnc.maps.arcgis.com/apps/instant/sidebar/index.html?appid=0b5925a5657e45c5937aada475ca76a7
+jurisdictionGisUrlTax: https://experience.arcgis.com/experience/bd5bdcafa3164d2faf02b74558510a12/
+gisMapsLandingUrl: https://www.camdencountync.gov/260/GIS-Maps
+countyRestRoot: https://services7.arcgis.com/f8vjF7CsMeTPBIVC/arcgis/rest/services
+countyAgolOrgId: f8vjF7CsMeTPBIVC
+appraiserSearchUrl: https://lrcpwa.ncptscloud.com/camden/parcel-search
+paDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/camden/parcel-detail/{PIN}"
+paDeepLinkTemplateAlt: "https://ccnc.maps.arcgis.com/apps/instant/sidebar/index.html?appid=0b5925a5657e45c5937aada475ca76a7&find={PIN}"
+paDeepLinkKey: PIN
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/camden/
+ncptsDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/camden/parcel-detail/{PIN}"
+viewerDeepLinkTemplate: "https://ccnc.maps.arcgis.com/apps/instant/sidebar/index.html?appid=0b5925a5657e45c5937aada475ca76a7&find={PIN}"
+udoPdfUrl: https://www.camdencountync.gov/DocumentCenter/View/454/Unified-Development-Ordinance-Chapter-151-PDF
+fluMapPdfUrl: https://www.camdencountync.gov/DocumentCenter/View/443/Camden-County-Future-Land-Use-Map-PDF
+southMillsSapPdfUrl: https://www.camdencountync.gov/DocumentCenter/View/449/South-Mills-Small-Area-Plan-PDF
+comprehensivePlanPdfUrl: https://www.camdencountync.gov/DocumentCenter/View/480/Comprehensive-Plan-Final-Document-October-1-2012-PDF
+deqLupHubUrl: https://www.deq.nc.gov/about/divisions/coastal-management/coastal-management-land-use-planning/certified-lups/camden-county
+deqLupPdfUrl: https://www.deq.nc.gov/documents/pdf/land-use-plans/camdenplan/download
+oneMapFilter: "cntyfips='029'"
+parcelIdPreferred: PIN
+joinKeys: [PIN, ParcelID, parno, MatchTablePIN]
+incorporatedMunicipalities: []
+
+layers:
+  - role: parcels
+    name: Parcels FeatureServer/1 (PRIMARY county AGOL CAMA + owner/sale-date/zoning attr)
+    restUrl: "https://services7.arcgis.com/f8vjF7CsMeTPBIVC/arcgis/rest/services/Parcels/FeatureServer/1"
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: ACRES_GIS
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      ParcelID: parcelIdDotted
+      MatchTablePIN: parcelIdMatch
+      Old_PIN: parcelIdLegacy
+      GIS_ParcelID: parcelIdNumeric
+      Name1: ownerName
+      Name2: ownerName2
+      Address: mailingAddress.street
+      CityStZip: mailingAddress.cityStateZip
+      E911_Numbe: situsAddress
+      F911HouseNumber: situsHouse
+      F911Street: situsStreet
+      ACRES_GIS: acreage
+      Acres: acreageAlt
+      ACRES_DEED: acreageDeed
+      SaleDate: lastSale.date
+      SaleQualified: lastSale.qualified
+      DeedBkPg: lastSale.deedBookPage
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      Zoning: zoning
+      Zone: zoningName
+      ExistingLa: landUseExisting
+      TOWNSHIP: township
+      Township_1: townshipAlt
+      TownshipCode: townshipCode
+    notes: >
+      PRIMARY wire-first. Verified 2026-09-24: count 7959; ACRES_GIS 5–150 → 1997; Acres 5–150 → 2016; Name1 → 7917; SaleDate real (<>NULL) → 2642; SaleQualified Q→1231 C→521 V→21 U→857; Q+band → 164; vacant-ish band → 1423; Zoning attr → 7919. NO sale price / NO tax value fields on public REST (gap). CRS 102719/2264. MaxRecordCount 2000. Auth none. Geo-check Shiloh PIN 038973000882760000 ≈ -76.047,36.293; Marlas Way Q-sale 038953033241370000 ≈ -76.104,36.277. Prefer PIN for NCPTS + Instant find=.
+    status: usable
+
+  - role: parcels
+    name: "NC OneMap Parcels (cntyfips='029')"
+    restUrl: "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+    layerId: 1
+    filter: "cntyfips='029'"
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdAlt
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      recareano: acreageRecorded
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      saledate: lastSale.date
+      cntyfips: countyFips
+    notes: >
+      Filter cntyfips='029'. Count 7955; gisacres 5–150 → 1999; recareano 5–150 → 1983; ownname → 7899; saledate present countywide (epoch; saledatetx empty); parval/landval/improvval all 0 (tax scrubbed). parno ↔ county PIN. Prefer county Parcels for SaleQualified + Zoning attr + ParcelID. MaxRecordCount 5000.
+    status: partial
+
+  - role: zoning
+    name: Zoning FeatureServer/1 (countywide UDO districts)
+    restUrl: "https://services7.arcgis.com/f8vjF7CsMeTPBIVC/arcgis/rest/services/Zoning/FeatureServer/1"
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+      ZONE: zoningName
+      Acreage: acreage
+      Date_Chang: dateChanged
+      Approved: approved
+    notes: >
+      Countywide zoning (no city FS — no munis). Count 224. Codes: NR 102, WL 21, RR 17, SR 17, VR 17, HC 17, LI 10, MC 7, VC 5, PD 5, CC 3, HI 1, CP 1. Spatial-join parcels → ZONING; parcel attr Zoning/Zone is backup (note swapped naming vs FS). UDO Ch.151.
+    status: usable
+
+  - role: flu
+    name: Future Land Use / CAMA LUP (PDF only — no FeatureServer)
+    restUrl: null
+    geometry: none
+    auth: n/a
+    coverage: county-wide
+    notes: >
+      No public FLU FeatureServer. Cities-first: South Mills SAP PDF for South Mills township; else County Future Land Use Map PDF + 2035 Comp Plan PDF + DEQ certified CAMA LUP plan+maps PDFs.
+    status: gap
+
+  - role: other
+    name: Townships FeatureServer/1 (community router)
+    restUrl: "https://services7.arcgis.com/f8vjF7CsMeTPBIVC/arcgis/rest/services/Townships/FeatureServer/1"
+    layerId: 1
+    geometry: polygon
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      Name: township
+      T_NAME: townshipAlt
+      TownshipID: townshipCode
+      Acreage: acreage
+    notes: >
+      3 townships: South Mills (01), Courthouse (02), Shiloh (03). Use for cities-first community routing with parcel TOWNSHIP.
+    status: usable
+
+gaps:
+  - No public sale price on county Parcels / Tax_Property_Information_view / OneMap REST — SaleDate + SaleQualified only; use NCPTS interactively for price
+  - Tax assessed/market values scrubbed from public REST (OneMap parval/landval/improvval all 0; no CURTOTAL-style fields on county layers)
+  - No FLU FeatureServer — PDF only (South Mills SAP + County FLU Map + Comp Plan + DEQ CAMA)
+  - No incorporated municipalities — no city zoning FeatureServers by definition
+  - "Do not collect emails, phones, AADT, utilities, or paid-vendor data"
+license: Camden County GIS / Tax; NC OneMap Integrated Cadastral. Public ArcGIS REST — attribution required. GIS maps are not surveys.
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (NC non-OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  pass1:
+    status: verified
+    parcelPolygonLayer: https://services7.arcgis.com/f8vjF7CsMeTPBIVC/arcgis/rest/services/Parcels/FeatureServer/1
+    polygonCountLive: 7959
+    parcelIdField: PIN
+    parcelIdFilled: 7959
+    acreageField: ACRES_GIS
+    acres5to150Live: 1997
+    sampleCentroidWgs84:
+    - -76.0227
+    - 36.3126
+  parcelLayer: https://services7.arcgis.com/f8vjF7CsMeTPBIVC/arcgis/rest/services/Parcels/FeatureServer/1
+  parcelIdField: PIN
+  acreageFilter: ACRES_GIS >= 5 AND ACRES_GIS <= 150
+  acres5to150Live: 1997
+  parcelCountLive: 7959
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='CAMDEN'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CAMDEN%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CAMDEN%27&returnCountOnly=true&f=json
+      liveStationCount: 102
+      stationsWithAADT2022: 31
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Camden'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Camden%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Camden%27&returnCountOnly=true&f=json
+      liveStationCount: 99
+      stationsWithAADT2025: 69
+      stationsWithAADT2024: 58
+      stationsWith2025or2024: 99
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields: []
+    liveNonZero: {}
+    status: gap
+    fallback:
+      source: none on public REST
+      note: Parcels/1 and Tax_Property_Information_view carry no value fields; NC OneMap parval>0 for cntyfips='029' = 0 of 7,955 (live 2026-09-28). Values only on NCPTS Camden parcel-detail (script-rendered).
+  sale:
+    priceFields: []
+    dateFields:
+    - SaleDate
+    livePriceNonZero: {}
+    liveDateNonNull:
+      SaleDate: 7584
+    status: partial
+    note: SaleDate (string) on layer; no price on REST. Price only on NCPTS https://lrcpwa.ncptscloud.com/camden/parcel-detail/{PIN} (script-rendered SPA).
+  ownerEntity:
+    ownerFields:
+    - Name1
+    primaryOwnerField: Name1
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(Name1) LIKE '% LLC%' OR UPPER(Name1) LIKE '% INC%' OR UPPER(Name1) LIKE '% LP%' OR UPPER(Name1) LIKE '% LLP%' OR UPPER(Name1) LIKE '% LTD%' OR UPPER(Name1) LIKE '% TRUST%' OR UPPER(Name1) LIKE '% CHURCH%' OR UPPER(Name1) LIKE '% COMPANY%' OR UPPER(Name1) LIKE '% PARTNERSHIP%' OR UPPER(Name1) LIKE '% HOLDINGS%' OR UPPER(Name1) LIKE '% PROPERTIES%' OR UPPER(Name1) LIKE '% CORP%' OR UPPER(Name1) LIKE '%,LLC%' OR UPPER(Name1) LIKE '%,INC%' OR UPPER(Name1) LIKE 'CITY OF %' OR UPPER(Name1) LIKE 'COUNTY OF %' OR UPPER(Name1) LIKE 'STATE OF %' OR UPPER(Name1) LIKE 'TOWN OF %')
+    liveEntityCountAll: 1070
+    liveEntityCount5to150ac: 360
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above.
+  paDeepLink:
+    template: https://lrcpwa.ncptscloud.com/camden/parcel-detail/{PIN}
+    testedParcelId: 038964009270040000
+    testedUrl: https://lrcpwa.ncptscloud.com/camden/parcel-detail/038964009270040000
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: false
+    note: 'NCPTS SPA shell (200, 496 B, client-rendered): parcel content cannot be checked server-side.'
+  gisViewer:
+    url: https://experience.arcgis.com/experience/60ecb9b737384e7dbd1ad3f1f20b27b2/
+    httpStatus: 200
+    pageTitle: Experience
+    arcgisItem:
+      access: public
+      title: County Web Site
+      type: Web Experience
+  gaps:
+  - tax gap
+  - sale partial
+  - PA content not verifiable (SPA)

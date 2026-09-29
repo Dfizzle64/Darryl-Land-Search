@@ -1,0 +1,212 @@
+state: NC
+jurisdiction: Carteret County
+fips: "37031"
+level: county
+markets: [Eastern NC, Crystal Coast]
+slug: carteret
+cntyfips: "031"
+
+jurisdictionGisUrl: https://arcgisweb.carteretcountync.gov/maps/
+publicGisUrl: https://arcgisweb.carteretcountync.gov/maps/
+gisViewerUrl: https://arcgisweb.carteretcountync.gov/maps/
+gisDepartmentUrl: https://www.carteretcountync.gov/469/GIS-Services
+mappingGisDataUrl: https://www.carteretcountync.gov/2405/Mapping-GIS-Data
+openDataUrl: https://gisdata-cc-gis.opendata.arcgis.com/
+countyRestRoot: https://arcgisweb.carteretcountync.gov/arcgis/rest/services
+taxAdministrationUrl: https://www.carteretcountync.gov/158/Tax-Administration
+reappraisalUrl: https://www.carteretcountync.gov/1150/2025-General-Reappraisal
+appraiserSearchUrl: https://bttaxpayerportal.com/ITSPublicCE/BasicSearch
+paDeepLinkTemplate: "https://bttaxpayerportal.com/ITSPublicCE/AppraisalCard.aspx?id={PIN15}"
+paDeepLinkTemplateAlt: "https://bttaxpayerportal.com/ITSPublicCE/BasicSearch/Parcel?id={PIN15}"
+paDeepLinkKey: PIN15
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/carteret/
+ncptsDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/carteret/parcel-detail/{PIN15}"
+moreheadZoningExperienceUrl: https://experience.arcgis.com/experience/97c1a63a2169477c9541581a4045342a
+moreheadFluExperienceUrl: https://experience.arcgis.com/experience/cbe053a9adbe4dfc81acf1ff328f2576
+beaufortZoningMapUrl: https://www.beaufortnc.org/planninginspections/page/town-beaufort-zoning-map
+camaLupFluPdfUrl: https://www.carteretcountync.gov/DocumentCenter/View/137/MAP-81B-62207
+oneMapFilter: "cntyfips='031'"
+parcelIdPreferred: PIN15
+joinKeys: [PIN15, GISPIN, parno, altparno]
+
+layers:
+  - role: parcels
+    name: Layers/Parceldata (PRIMARY CAMA)
+    restUrl: https://arcgisweb.carteretcountync.gov/arcgis/rest/services/Layers/Parceldata/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GISacres
+    coverage: county-wide
+    fieldMap:
+      PIN15: parcelId
+      GISPIN: parcelIdAlt
+      GISacres: acreage
+      DeededAcres: acreageDeed
+      LegalAcres: acreageLegal
+      CalculatedLandUnits: acreageCalcUnits
+      OWNER: ownerName
+      OWNER2: ownerName2
+      MAIL_ADDRESS1: mailingAddress.street
+      MAIL_ADDRESS2: mailingAddress.street2
+      MAIL_CITY: mailingAddress.city
+      MAIL_STATE: mailingAddress.state
+      MAIL_ZI5: mailingAddress.zip
+      FullMailingAddress: mailingAddress.full
+      PropertyAddress: situsAddress
+      SITE_HOUSE: situsHouse
+      SITE_DIR: situsDir
+      SITE_ST: situsStreet
+      SITE_STTYP: situsStreetType
+      SITE_CITY: situsCity
+      SALE_PRICE: lastSale.price
+      SaleDate: lastSale.date
+      IsQualified: lastSale.qualified
+      SaleImprovedOrVacant: lastSale.improvedOrVacant
+      DBOOK: lastSale.deedBook
+      DPAGE: lastSale.deedPage
+      DeedDate_2: lastSale.deedDate
+      Total_EMV: tax.marketValue
+      LAND_VALUE: tax.landValue
+      STRUC_VAL: tax.improvementValue
+      OTHER_VAL: tax.otherValue
+      MUNICIPALITY: municipality
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 64284; GISacres 5–150 → 3466;
+      SALE_PRICE>0 → 31794 (band 931); Total_EMV>0 → 62455; OWNER → 63648;
+      STRUC_VAL 0/null in band → 2253; IsQualified=1 in band → 426.
+      CRS 102719/2264. MaxRecordCount 10000. MapServer twin + Website/Parcel_Map_Beta FS/0 mirror.
+      Geo-check Stella PIN15 535701477729000 ≈ -77.152,34.774; MHC 635605195721000 ≈ -76.831,34.747;
+      Beaufort 639500992754000 ≈ -76.672,34.717.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (fallback)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdAlt
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      gisacres: acreage
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      saledate: lastSale.date
+      cntyfips: countyFips
+    notes: >
+      Filter cntyfips='031'. Count 64151; gisacres 5–150 → 3722; parval>0 → 62389;
+      saledate empty. Prefer county Parceldata for sale price. Alt host services.gis.nc.gov.
+    status: usable
+
+  - role: zoning
+    name: Morehead City Zoning (city-first)
+    restUrl: https://services1.arcgis.com/S43FtmdNwd7ad0P0/arcgis/rest/services/Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      ZONE_NAME_: zoningName
+      ORDINANCE_: ordinance
+      YEAR: year
+      PREVIOUSZO: zoningPrevious
+    notes: >
+      PRIMARY city-first MHC. Count 8584. Alt Morehead_City_Zoning FS/0 count 8582.
+      Codes R5/R5S/R7/R10/R15/R15M/R15SM/R20/RMF, CD/CH/CM/CN/DB, FP, I/IC, MA, OP, PD, PM (+ -CZ).
+    status: usable
+
+  - role: zoning
+    name: Newport Zoning (city-first)
+    restUrl: https://arcgisweb.carteretcountync.gov/arcgis/rest/services/Layers/Newport_Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+    notes: >
+      Count 205. Codes R-8/R-10/R-15/R-15D/R-20/R-20A/R-20MH/RO/NB-1/CD/CH/IW/LI/PUD (+ -CD).
+    status: usable
+
+  - role: zoning
+    name: Emerald Isle Zoning (city-first coarse)
+    restUrl: https://arcgisweb.carteretcountync.gov/arcgis/rest/services/Layers/Emerald_Isle_Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      Zone: zoning
+    notes: >
+      Count 8 district polys only (B/G/MH1/MV/R2/RMF/VE/VW) — not parcel-grain.
+    status: partial
+
+  - role: zoning
+    name: County Zoning (unincorporated)
+    restUrl: https://arcgisweb.carteretcountync.gov/arcgis/rest/services/Layers/Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      Zone: zoning
+      Zone_Description: zoningDescription
+    notes: >
+      Count 466. Use where no city FS. Open data CC-GIS::carteret-county-zoning.
+    status: usable
+
+  - role: flu
+    name: Morehead City Future Land Use
+    restUrl: https://services1.arcgis.com/S43FtmdNwd7ad0P0/arcgis/rest/services/Future_Land_Use/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      PIN15: parcelId
+      FLU: flu
+      F_LandUse: fluName
+      PreviousLU: fluPrevious
+      DateChange: fluDateChange
+    notes: >
+      Count 10393. Join on PIN15. Codes NR/CR/RR/DR/DT/DC/COM/MUC/PMU/IND/CIV/ESA.
+      County FLU = CAMA LUP PDF gap (DocumentCenter/View/137/MAP-81B-62207).
+    status: usable
+
+  - role: other
+    name: City Limit/ETJ Boundaries (router)
+    restUrl: https://arcgisweb.carteretcountync.gov/arcgis/rest/services/Layers/City_ETJ_Limits/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      FEATURE: featureType
+      INCORP_MUN: municipalityIncorp
+      UNINCORP_MUN: municipalityEtj
+      Rel_Key: relKey
+    notes: Count 24. Route which zoning layer to spatial-join.
+    status: usable
+
+gaps:
+  - Beaufort zoning FeatureServer missing (PDF/map page only)
+  - Atlantic Beach / Pine Knoll Shores / Indian Beach / Cape Carteret / Cedar Point / Bogue / Peletier zoning REST missing
+  - Countywide FLU FeatureServer missing (CAMA LUP PDF only; MHC FLU covers city)
+  - Emerald Isle zoning only 8 coarse district polygons
+  - OneMap saledate empty for Carteret — use county SALE_PRICE/SaleDate
+
+license: "County/city public GIS; attribution requested where stated on open data portal"
+verifiedAt: "2026-09-24"
+verifiedBy: North Carolina Public Info Researcher
+tranche: 3

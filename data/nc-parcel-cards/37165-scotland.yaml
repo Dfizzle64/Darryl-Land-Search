@@ -1,0 +1,304 @@
+state: NC
+jurisdiction: Scotland County
+fips: '37165'
+level: county
+markets:
+- Fayetteville
+slug: scotland
+municipalities:
+- name: Laurinburg
+  role: city-first-zoning
+  cityCode: L
+  notes: 'County seat; CityCode=L (~7883 parcels); Zoning_Laurinburg FS/14 City Parcel
+    Zoning PRIMARY (~9705 ZONING polys: R-15/R-6/GB/R-20/R-6-MH/O-I/…); ETJ FS present;
+    limits ~8118 ac'
+- name: Wagram
+  role: city-limits-only
+  cityCode: W
+  notes: CityCode=W (~627); City Limits Wagram (~895 ac); no dedicated town zoning
+    FeatureServer — county Zoning FS or ordinance PDF
+- name: Gibson
+  role: city-limits-only
+  cityCode: G
+  notes: CityCode=G (~313); City Limits Gibson (~640 ac); no dedicated town zoning
+    FeatureServer
+- name: East Laurinburg
+  role: city-limits-only
+  cityCode: E
+  notes: CityCode=E (~184); town adjacent to Laurinburg (Waverly Mills area); no dedicated
+    zoning FeatureServer
+- name: Maxton
+  role: city-limits-only
+  cityCode: M
+  notes: CityCode=M (~130 Scotland tip); Maxton mostly Robeson County — prefer Robeson
+    card for Maxton zoning (Mxtn*); City Limits includes Maxton poly (~1498 ac)
+layers:
+- role: parcels
+  name: Tax Parcels Scotland County - Public View (PRIMARY AGOL CAMA)
+  restUrl: https://services3.arcgis.com/bgKigTDifCMNj8OU/arcgis/rest/services/Tax_Parcels_Scotland_County_view/FeatureServer/6
+  alternateUrls:
+  - https://services3.arcgis.com/bgKigTDifCMNj8OU/arcgis/rest/services/Tax_Parcels_Scotland_County_view/FeatureServer
+  - https://laurinburg.maps.arcgis.com/home/item.html?id=6dc6810a3b65445d8f57533e5fb92b14
+  layerId: 6
+  geometry: polygon
+  auth: none
+  acreageField: ACRES
+  coverage: county-wide
+  fieldMap:
+    PIN: parcelId
+    PINID: parcelIdCompact
+    ParcelNumb: parcelIdDisplay
+    AccountNum: parcelIdAccount
+    RECNO: parcelIdRecno
+    Name: ownerName
+    Address1: mailingAddress.street
+    Address2: mailingAddress.street2
+    Address3: mailingAddress.street3
+    City: mailingAddress.city
+    State: mailingAddress.state
+    ZipCode: mailingAddress.zip
+    PropertyAd: situsAddress
+    ACRES: acreage
+    MarketValu: tax.marketValue
+    MarketLand: tax.landValue
+    BuildingVa: tax.improvementValue
+    AssessedVa: tax.assessedValue
+    DeferredVa: tax.deferredValue
+    ObxfValue: tax.obxfValue
+    DeedBook: lastSale.deedBook
+    DeedPage: lastSale.deedPage
+    DeedDate: lastSale.date
+    DeedStamps: lastSale.stampsUnreliable
+    SaleInstru: lastSale.instrument
+    CityCode: municipalityCode
+    LegalDescr: legalDescription
+    LegalLandU: landUseAcres
+    LegalLan_1: landUseUnit
+    FireTaxCod: fireTaxCode
+    SchoolTaxC: schoolTaxCode
+    CountyTaxC: countyTaxCode
+  notes: 'PRIMARY wire-first Laurinburg/Scotland AGOL CAMA. Verified 2026-09-24: count
+    22022; ACRES 5-150 -> 3361; MarketValu>0 21898; MarketLand>0 21895; BuildingVa>0
+    12105; AssessedVa>0 1467 (prefer MarketValu); Name ~22019; DeedDate>0 21422; situs
+    PropertyAd nonblank 18878. CityCode router: blank unincorp 12869, L Laurinburg
+    7883, W Wagram 627, G Gibson 313, E East Laurinburg 184, M Maxton tip 130, C 2.
+    No sale PRICE — DeedStamps unreliable. Prefer PIN (space form) for AppraisalCard;
+    PINID compact for NCPTS. Join OneMap parno=PIN; altparno=RECNO. CRS 102719/2264.
+    MaxRecordCount 2000.'
+  status: usable
+  verifiedCounts:
+    total: 22022
+    acres_5_150: 3361
+    marketvalu_gt0: 21898
+    marketland_gt0: 21895
+    buildingva_gt0: 12105
+    owner_nonnull: 22019
+    deeddate_gt0: 21422
+    situs_nonblank: 18878
+- role: sales
+  name: Parcel Sales Scotland County - Public View
+  restUrl: https://services3.arcgis.com/bgKigTDifCMNj8OU/arcgis/rest/services/Parcel_Sales_Scotland_County_view/FeatureServer/7
+  alternateUrls:
+  - https://laurinburg.maps.arcgis.com/home/item.html?id=42d1d7e26adf4543a174c8e1160d64ad
+  layerId: 7
+  geometry: polygon
+  auth: none
+  acreageField: ACRES
+  coverage: county-wide
+  fieldMap:
+    PIN: parcelId
+    PINID: parcelIdCompact
+    Name: ownerName
+    ACRES: acreage
+    DeedDate: lastSale.date
+    DeedBook: lastSale.deedBook
+    DeedPage: lastSale.deedPage
+    SaleInstru: lastSale.instrument
+    MarketValu: tax.marketValue
+    year: lastSale.yearEmpty
+  notes: Sales subset ~3378 polys; DeedDate present; DeedStamps all 0 — NO sale price
+    on REST. year field blank. Use as sale-date/instrument overlay.
+  status: partial
+  verifiedCounts:
+    total: 3378
+    deedstamps_gt0: 0
+- role: parcels
+  name: NC OneMap Parcels (statewide REST fallback)
+  restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  alternateUrls:
+  - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  - https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: gisacres
+  coverage: county-wide
+  filter: cntyfips='165'
+  fieldMap:
+    parno: parcelId
+    altparno: parcelIdRecno
+    nparno: parcelIdNational
+    ownname: ownerName
+    mailadd: mailingAddress.street
+    mcity: mailingAddress.city
+    mstate: mailingAddress.state
+    mzip: mailingAddress.zip
+    siteadd: situsAddress
+    scity: situsCity
+    szip: situsZip
+    gisacres: acreage
+    Shape__Area: acreageSqFt
+    landval: tax.landValue
+    improvval: tax.improvementValue
+    parval: tax.marketValue
+    saledate: lastSale.dateEmpty
+    saledatetx: lastSale.dateTextEmpty
+    sourceref: lastSale.deedRef
+    cntyfips: countyFips
+  notes: 'Filter cntyfips=''165''. Verified 2026-09-24: count 21992; gisacres 5-150
+    -> 3345; Shape__Area 5-150 -> 3320; landval>0 21866; parval>0 21871; saledate
+    0. gisacres MATCHES county ACRES for Scotland (usable). Join parno=PIN; altparno=RECNO.
+    Prefer county AGOL for CityCode/DeedDate/BuildingVa. MaxRecordCount 5000.'
+  status: usable
+  verifiedCounts:
+    total: 21992
+    gisacres_5_150: 3345
+    shape_area_5_150: 3320
+    landval_gt0: 21866
+    parval_gt0: 21871
+    ownname_nonnull: 21992
+    saledate_nonnull: 0
+- role: zoning
+  name: Zoning Laurinburg - Public View (cities-first PRIMARY)
+  restUrl: https://services3.arcgis.com/bgKigTDifCMNj8OU/arcgis/rest/services/Zoning_Laurinburg_-_Public_View/FeatureServer/14
+  alternateUrls:
+  - https://laurinburg.maps.arcgis.com/home/item.html?id=1d12cdd4ab324b7ab0800ef113ffa136
+  layerId: 14
+  geometry: polygon
+  auth: none
+  acreageField: ACRES
+  coverage: city-only
+  fieldMap:
+    ZONING: zoning
+    ADDRESS: situsAddress
+    ACRES: acreage
+    CU_PERMIT: conditionalUsePermit
+    GROUPHOME: groupHomeFlag
+    RecNo: recordId
+  notes: 'PRIMARY city-first zoning for Laurinburg (CityCode=L). Count 9705. ZONING:
+    R-15 3792, R-6 3157, GB 656, R-20 575, R-6-MH 434, O-I 399, R-20-MH 227, East
+    LBG 187, I 156, CB 122. Wins over county Zoning inside city.'
+  status: usable
+  verifiedCounts:
+    total: 9705
+- role: zoning
+  name: Zoning Scotland County - Public View (unincorporated)
+  restUrl: https://services3.arcgis.com/bgKigTDifCMNj8OU/arcgis/rest/services/Zoning_Scotland_County_view/FeatureServer/9
+  alternateUrls:
+  - https://laurinburg.maps.arcgis.com/home/item.html?id=1f091c9a401047029d4824ddd79dce6c
+  - https://www.scotlandcounty.org/DocumentCenter/View/3743/20220627122202scan
+  layerId: 9
+  geometry: polygon
+  auth: none
+  acreageField: ACRES
+  coverage: county-wide
+  fieldMap:
+    Zoning: zoning
+    ZoningDesc: zoningDescription
+    PIN: parcelId
+    PINID: parcelIdCompact
+    ACRES: acreage
+  notes: 'County/unincorporated parcel zoning (~10632). Districts: RA 8826, R1 1133,
+    R1MHA 154, C1 93, HC 81, RAMHA 80, I2 80, OS 77, I1 51, R2 34. Outside Laurinburg
+    city zoning; Wagram/Gibson/East Laurinburg lack town FS.'
+  status: usable
+  verifiedCounts:
+    total: 10632
+- role: other
+  name: City Limits Near Scotland County
+  restUrl: https://services3.arcgis.com/bgKigTDifCMNj8OU/arcgis/rest/services/City_Limits_Near_Scotland_County_view/FeatureServer/5
+  layerId: 5
+  geometry: polygon
+  auth: none
+  acreageField: ACRES
+  coverage: county-wide
+  fieldMap:
+    Laurinburg: municipality
+    LAYER: limitsLayer
+    ACRES: acreage
+    RecNo: recordId
+  notes: 'Count 7. Names: Gibson, Maxton, Wagram, McColl (SC), Hole(LBG), Laurinburg
+    (~8118 ac).'
+  status: usable
+  verifiedCounts:
+    total: 7
+- role: other
+  name: Extraterritorial Jurisdictions ETJ
+  restUrl: https://services3.arcgis.com/bgKigTDifCMNj8OU/arcgis/rest/services/Extraterritorial_Jurisdictions_ETJ_view/FeatureServer/8
+  layerId: 8
+  geometry: polygon
+  auth: none
+  acreageField: ACRES
+  coverage: sample
+  fieldMap:
+    MAP_KEY: etjKey
+    ACRES: acreage
+  notes: Laurinburg ETJ polygons — pair with city zoning for ETJ routing.
+  status: partial
+- role: other
+  name: Addresses City of Laurinburg
+  restUrl: https://services3.arcgis.com/bgKigTDifCMNj8OU/arcgis/rest/services/Addresses_City_of_Laurinburg_view/FeatureServer/0
+  layerId: 0
+  geometry: point
+  auth: none
+  acreageField: null
+  coverage: city-only
+  fieldMap: {}
+  notes: Laurinburg address points — optional situs enrich inside city.
+  status: usable
+- role: flu
+  name: Scotland County Comprehensive Land Use Plan — PDF only
+  restUrl: https://www.scotlandcounty.org/DocumentCenter/View/4523/Scotland-County-Comprehensive-Land-Use-Plan-
+  alternateUrls:
+  - https://www.scotlandcounty.org/DocumentCenter/View/3729/Land-Use-2022
+  - https://www.scotlandcounty.org/848/Scotland-County-Zoning-Ordinance-and-Lan
+  - https://www.scotlandcounty.org/DocumentCenter/View/3918/Zoning-Ordinance-2022-signed-2-2
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  fieldMap: {}
+  notes: No public FLU FeatureServer on Laurinburg AGOL/OneMap verified 2026-09-24.
+    Comp Land Use Plan adopted 2025-03-10 (PDF); Land Use Plan 2022 PDF; Zoning Ordinance
+    2022 PDF. FLU gap.
+  status: gap
+gaps:
+- Sale price not on public ArcGIS REST (Tax Parcels / Parcel Sales / OneMap) — DeedDate
+  + SaleInstru only; DeedStamps unreliable
+- FLU FeatureServer gap — Comprehensive Land Use Plan + Land Use 2022 PDFs only
+- Wagram / Gibson / East Laurinburg — no dedicated municipal zoning FeatureServer
+  (city-limits + county Zoning / ordinance PDF)
+- Maxton primary zoning on Robeson card (Mxtn*); Scotland CityCode=M is tip only
+- ITSPublicSC RealEstateSearch not configured (HTTP 500) — use AppraisalCard + TaxBillSearch
+  + NCPTS
+- AssessedVa sparsely populated (~1467) — prefer MarketValu for market total
+- Utilities / AADT / emails / phones / paid vendors intentionally out of scope
+appraiserSearchUrl: https://www.bttaxpayerportal.com/ITSPublicSC/AppraisalCard.aspx?id={PIN}
+appraiserSearchUrlNotes: PIN must retain internal SPACE URL-encoded as %20 (e.g. id=040169%2001013).
+  Compact PINID returns empty BI-Tek shell. Verified application/pdf 2026-09-24.
+appraiserSearchUrlAlternates:
+- https://lrcpwa.ncptscloud.com/scotland/parcel-detail/{PINID}
+- https://lrcpwa.ncptscloud.com/scotland/parcel-search
+- https://www.bttaxpayerportal.com/ITSPublicSC/TaxBillSearch
+- https://www.bttaxpayerportal.com/ITSPublicSC/BasicSearch
+jurisdictionGisUrl: https://laurinburg.maps.arcgis.com/apps/webappviewer/index.html?id=889f012d9e2645278a18addbedd03d74
+jurisdictionGisUrlAlternates:
+- https://scotland-laurinburg.hub.arcgis.com/
+- https://www.scotlandcounty.org/456/GIS-Maps
+- https://laurinburg.maps.arcgis.com/apps/instant/basic/index.html?appid=d9ec1327e84a4cf48eeeb538c9bfbfa2
+license: Scotland County / City of Laurinburg GIS public AGOL views; NC OneMap cadastral;
+  BI-Tek ITSPublicSC; NCPTS. NC GS 153A-463 disclaimer on county GIS portal. Attribution
+  required; not a legal survey.
+verifiedAt: '2026-09-24'
+verifiedBy: North Carolina Public Info Researcher

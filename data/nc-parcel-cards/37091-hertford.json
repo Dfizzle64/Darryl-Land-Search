@@ -1,0 +1,407 @@
+{
+  "state": "NC",
+  "jurisdiction": "Hertford County",
+  "fips": "37091",
+  "level": "county",
+  "markets": [
+    "Eastern NC"
+  ],
+  "slug": "hertford",
+  "municipalities": [
+    {
+      "name": "Ahoskie",
+      "role": "city-first-zoning",
+      "cityCode": "C01",
+      "notes": "Largest town; Municipalities NAME=AHOSKIE (C01); Zoning/MapServer/2 Ahoskie Zoning PRIMARY (340 polys, ZONING_COD R-6/R-10/B-2/O-I/\u2026); AHOSKIE ETJ present; parcel ETJ~3220"
+    },
+    {
+      "name": "Murfreesboro",
+      "role": "city-first-zoning",
+      "cityCode": "C04",
+      "notes": "Municipalities MURFREESBORO (C04); Zoning/5 Murfreesboro Zoning PRIMARY (239, R-10/R-20/O-I/C-2/\u2026); MURFREESBORO ETJ present; parcel ETJ~2194"
+    },
+    {
+      "name": "Winton",
+      "role": "city-first-zoning",
+      "cityCode": "C06",
+      "notes": "County seat; Municipalities WINTON (C06); Zoning/6 Winton Zoning PRIMARY (103, R-9/B-2/R-15/O-I/\u2026); parcel ETJ~485"
+    },
+    {
+      "name": "Cofield",
+      "role": "city-first-zoning",
+      "cityCode": "C07",
+      "notes": "Village; Municipalities COFIELD (C07); Zoning/3 Cofield Zoning PRIMARY (37, R-C/C-V/A-R/I); parcel ETJ~348"
+    },
+    {
+      "name": "Como",
+      "role": "city-first-zoning",
+      "cityCode": "C03",
+      "notes": "Municipalities COMO (C03); Zoning/4 Como Zoning PRIMARY (5, CTD/A-R); parcel ETJ~75"
+    },
+    {
+      "name": "Harrellsville",
+      "role": "city-limits-only",
+      "cityCode": "C02",
+      "notes": "Municipalities HARRELLSVILLE (C02); Planning_Jurisdictions DISTRICT=HARRELLSVILLE is explicit NO ZONING (1 poly ZONING_COD=NONE); no Zoning/MapServer layer; parcel ETJ~96"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "TaxParcels Parcels (PRIMARY county ArcGIS CAMA + sale)",
+      "restUrl": "https://gis.hertfordcounty.org/server/rest/services/TaxParcels/MapServer/2",
+      "alternateUrls": [
+        "https://gis.hertfordcounty.org/server/rest/services/Parcels/MapServer/0",
+        "https://services.arcgis.com/MOvVToSDbOGFaHPk/arcgis/rest/services/GrowthMap_WFL1/FeatureServer/0"
+      ],
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ACREAGE",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "REID": "parcelId",
+        "Tax_REID": "parcelIdAcct",
+        "PIN": "parcelIdPin",
+        "PIN83": "parcelIdDisplay",
+        "PIN27": "parcelIdAlt",
+        "PARCEL_PK": "parcelIdPk",
+        "PROPERTY_OWNER": "ownerName",
+        "OWNER_MAIL_1": "mailingAddress.street",
+        "OWNER_MAIL_2": "mailingAddress.street2",
+        "OWNER_MAIL_3": "mailingAddress.street3",
+        "OWNER_MAIL_CITY": "mailingAddress.city",
+        "OWNER_MAIL_STATE": "mailingAddress.state",
+        "OWNER_MAIL_ZIP": "mailingAddress.zip",
+        "LOCATION_ADDR": "situsAddress",
+        "PHYADDR_STR_NUM": "situsAddress.number",
+        "PHYADDR_STR": "situsAddress.street",
+        "PHYADDR_CITY": "situsCity",
+        "PHYADDR_ZIP": "situsZip",
+        "ACREAGE": "acreage",
+        "ASSESSED_ACREAGE": "acreageAssessed",
+        "CALCULATED_ACRES": "acreageCalculated",
+        "DEEDED_ACREAGE": "acreageDeeded",
+        "PKG_SALE_PRICE": "lastSale.price",
+        "PKG_SALE_DATE": "lastSale.date",
+        "LAND_SALE_PRICE": "lastSale.landPrice",
+        "LAND_SALE_DATE": "lastSale.landDate",
+        "DEED_DATE": "lastSale.deedDate",
+        "DEED_BOOK": "lastSale.deedBook",
+        "DEED_PAGE": "lastSale.deedPage",
+        "REVENUE_STAMP": "lastSale.stamps",
+        "TOTAL_LAND_ASSESSED": "tax.landValue",
+        "TOTAL_BLDG_ASSESSED": "tax.improvementValue",
+        "TOTAL_PROP_VALUE": "tax.marketValue",
+        "COST_TOTAL_VALUE": "tax.costValue",
+        "TOTAL_DEFERRED_VALUE": "tax.deferredValue",
+        "LAND_USE_VALUE": "tax.useValue",
+        "ZONING": "zoning",
+        "LAND_CLASS": "dorCode",
+        "ETJ": "etjJurisdiction",
+        "CITY": "taxCityDistrict",
+        "PROPERTY_DESCR": "legalDescription",
+        "TOWNSHIP": "township"
+      },
+      "notes": "PRIMARY wire-first. Verified 2026-09-24: count 16106; ACREAGE 5\u2013150 \u2192 2711; PKG_SALE_PRICE>0 \u2192 5165; sale+band \u2192 305; TOTAL_PROP_VALUE>0 \u2192 15029; TOTAL_LAND_ASSESSED>0 \u2192 15624; TOTAL_BLDG_ASSESSED>0 \u2192 10155; vacant band (bldg 0/null) \u2192 1962; PROPERTY_OWNER \u2192 15994; LOCATION_ADDR \u2192 15994; ZONING attr \u2192 15668; REID \u2192 16100. Prefer PKG_SALE_* for package sale; LAND_SALE_* for land-only. CITY is tax-city district (AHOSKIE/MURFREESBORO/\u2026) not mailing \u2014 mailing is OWNER_MAIL_*; situs muni via Municipalities/ETJ spatial join or ETJ field. Geo sample PIN 6926024860 / REID 6926024860000 \u2248 -76.892, 36.377 (Winton area). MaxRecordCount 2000. CRS 102719/2264. Parcels/0 is geometry/ids twin without CAMA sale/tax/owner (~15764). GrowthMap_WFL1/0 AGOL taxparcels mirror (~16112) thinner attrs.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 16106,
+        "acreage_5_150": 2711,
+        "pkg_sale_price_gt0": 5165,
+        "pkg_sale_in_5_150": 305,
+        "total_prop_value_gt0": 15029,
+        "land_assessed_gt0": 15624,
+        "bldg_assessed_gt0": 10155,
+        "vacant_band": 1962,
+        "owner_nonnull": 15994,
+        "zoning_attr_nonnull": 15668
+      }
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (statewide REST fallback)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "filter": "cntyfips='091'",
+      "fieldMap": {
+        "parno": "parcelId",
+        "altparno": "parcelIdDisplay",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress",
+        "mcity": "mailingAddress.city",
+        "mstate": "mailingAddress.state",
+        "mzip": "mailingAddress.zip",
+        "siteadd": "situsAddress",
+        "scity": "situsCity",
+        "szip": "situsZip",
+        "gisacres": "acreage",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "saledatetx": "lastSale.dateText",
+        "parusecode": "dorCode",
+        "parusedesc": "zoning"
+      },
+      "notes": "Filter cntyfips='091'. Verified 2026-09-24: count 16102; gisacres 5\u2013150 \u2192 2709; parval>0 \u2192 15060; landval>0 \u2192 15647; improvval>0 \u2192 10175; siteadd \u2192 15984; saledatetx present 16102 (many placeholder 12/30/1899 \u2014 ~15910 non-placeholder); saledate date field null (0). Join parno\u2194REID / altparno\u2194PIN83. Prefer county TaxParcels for PKG_SALE_PRICE + typed dates. MaxRecordCount 5000. CRS 102719/2264.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 16102,
+        "gisacres_5_150": 2709,
+        "parval_gt0": 15060,
+        "landval_gt0": 15647,
+        "improvval_gt0": 10175,
+        "saledate_typed": 0,
+        "saledatetx_present": 16102
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Ahoskie Zoning (city-first PRIMARY)",
+      "restUrl": "https://gis.hertfordcounty.org/server/rest/services/Zoning/MapServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "city-only",
+      "fieldMap": {
+        "ZONING_COD": "zoning",
+        "ZONING": "zoningDescription",
+        "DISTRICT": "jurisdiction"
+      },
+      "notes": "City-first PRIMARY for Ahoskie. Count 340. Top ZONING_COD: R-6 124, R-10 41, B-2 40, O-I 35, R-15 25, I-L 21, B-1 21, R-20 19, B-3 8, I-H 5. DISTRICT=AHOSKIE. Spatial-join inside Ahoskie limits / AHOSKIE ETJ.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 340
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Murfreesboro Zoning (city-first PRIMARY)",
+      "restUrl": "https://gis.hertfordcounty.org/server/rest/services/Zoning/MapServer/5",
+      "layerId": 5,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "city-only",
+      "fieldMap": {
+        "ZONING_COD": "zoning",
+        "ZONING": "zoningDescription",
+        "DISTRICT": "jurisdiction"
+      },
+      "notes": "City-first PRIMARY for Murfreesboro. Count 239. Top: R-10 57, R-20 41, O-I 26, R-15 24, C-2 23, R-20 MH 18, C-1 10, R-6 9, H-R 6, H-C/MHP/R-15 MH/I-L 5, I-H 4. DISTRICT=MURFREESBORO.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 239
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Winton Zoning (city-first PRIMARY)",
+      "restUrl": "https://gis.hertfordcounty.org/server/rest/services/Zoning/MapServer/6",
+      "layerId": 6,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "city-only",
+      "fieldMap": {
+        "ZONING_COD": "zoning",
+        "ZONING": "zoningDescription",
+        "DISTRICT": "jurisdiction"
+      },
+      "notes": "City-first PRIMARY for Winton (county seat). Count 103. Top: R-9 47, B-2 12, R-15 11, O-I 10, R-5 MH 7, B-1/I-H 6, I-L 3, R-3 MF 1. DISTRICT=WINTON.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 103
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Cofield Zoning (city-first)",
+      "restUrl": "https://gis.hertfordcounty.org/server/rest/services/Zoning/MapServer/3",
+      "layerId": 3,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "city-only",
+      "fieldMap": {
+        "ZONING_COD": "zoning",
+        "ZONING": "zoningDescription",
+        "DISTRICT": "jurisdiction"
+      },
+      "notes": "Village of Cofield. Count 37: R-C 14, C-V 13, A-R 7, I 3. DISTRICT=COFIELD.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 37
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Como Zoning (city-first)",
+      "restUrl": "https://gis.hertfordcounty.org/server/rest/services/Zoning/MapServer/4",
+      "layerId": 4,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "city-only",
+      "fieldMap": {
+        "ZONING_COD": "zoning",
+        "ZONING": "zoningDescription",
+        "DISTRICT": "jurisdiction"
+      },
+      "notes": "Town of Como. Count 5: CTD 3, A-R 2. DISTRICT=COMO. Coarse district polys.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 5
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Hertford County Zoning (unincorporated / county)",
+      "restUrl": "https://gis.hertfordcounty.org/server/rest/services/Zoning/MapServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "fieldMap": {
+        "ZONING_COD": "zoning",
+        "ZONING": "zoningDescription",
+        "DISTRICT": "jurisdiction"
+      },
+      "notes": "County base zoning outside city-first layers. Count 413. Top: RA-30 244, CH 86, IH 31, IL 31, RR&C 16, RB 4. DISTRICT=COUNTY. Prefer city Zoning/2\u20136 inside muni/ETJ; use this for unincorporated. Parcel attr ZONING also densely populated (~15668) as attribute backup.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 413
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Planning Jurisdictions (combined zoning stack mirror)",
+      "restUrl": "https://gis.hertfordcounty.org/server/rest/services/Planning_Jurisdictions/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "fieldMap": {
+        "ZONING_COD": "zoning",
+        "ZONING": "zoningDescription",
+        "DISTRICT": "jurisdiction"
+      },
+      "notes": "Combined stack ~1172 polys by DISTRICT: COUNTY 432, AHOSKIE 348, MURFREESBORO 240, WINTON 107, COFIELD 37, COMO 5, HARRELLSVILLE 1 (explicit NO ZONING). Prefer dedicated Zoning/MapServer city layers; use this for Harrellsville gap confirmation and DISTRICTS router.",
+      "status": "partial",
+      "verifiedCounts": {
+        "total": 1172
+      }
+    },
+    {
+      "role": "other",
+      "name": "Municipalities + ETJ",
+      "restUrl": "https://gis.hertfordcounty.org/server/rest/services/Jurisdictional_Boundaries/MapServer/0",
+      "alternateUrls": [
+        "https://gis.hertfordcounty.org/server/rest/services/Jurisdictional_Boundaries/MapServer/2"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "fieldMap": {
+        "NAME": "municipality",
+        "CCODE": "cityCode",
+        "CITY_CODE": "cityCode"
+      },
+      "notes": "Municipalities/0: 6 real munis (AHOSKIE C01, HARRELLSVILLE C02, COMO C03, MURFREESBORO C04, WINTON C06, COFIELD C07) + COUNTY stubs. ETJ/2: AHOSKIE ETJ + MURFREESBORO ETJ only (2 polys). Use for city-first spatial router \u2014 do not use parcel CITY or PHYADDR_CITY as situs muni.",
+      "status": "usable",
+      "verifiedCounts": {
+        "municipalities_named": 6,
+        "etj": 2
+      }
+    },
+    {
+      "role": "flu",
+      "name": "FLU / CAMA LUP (PDF gap \u2014 no FLU FeatureServer)",
+      "restUrl": null,
+      "alternateUrls": [
+        "https://www.hertfordcountync.gov/Document%20Center/Department/County%20Administration/Planning%20and%20Zoning/Hertford%20Co%20CAMA%20LUP%20JAN2011.pdf",
+        "https://www.deq.nc.gov/documents/pdf/land-use-plans/hertfordcountycertiflup-022411/download",
+        "https://www.ahoskienc.gov/media/NewsImages/Ahoskie%20Comprehensive%20Plan%20-%20Draft_4.20.pdf",
+        "https://gis.hertfordcounty.org/server/rest/services/LandUse/MapServer/0"
+      ],
+      "layerId": null,
+      "geometry": "none",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "fieldMap": {},
+      "notes": "No public FLU FeatureServer found 2026-09-24. County CAMA LUP Jan 2011 PDF (DEQ certified 2011-02-24) + Ahoskie Draft Comp Plan FLU map PDF. LandUse/MapServer/0 (~5865) is current land-cover LU_FEAT_CODE (CREP-related) \u2014 NOT future land use; do not wire as FLU. Growth_Map_WFL1 is zoning/boundary, not FLU.",
+      "status": "gap"
+    },
+    {
+      "role": "other",
+      "name": "Zoning Overlay Districts (Floodplain + Airport)",
+      "restUrl": "https://gis.hertfordcounty.org/server/rest/services/Zoning_Overlay_Districts/MapServer",
+      "alternateUrls": [
+        "https://gis.hertfordcounty.org/server/rest/services/Airport_Overlay_District/MapServer/0"
+      ],
+      "layerId": null,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "fieldMap": {},
+      "notes": "Overlay only \u2014 not base zoning. Floodplain_Overlay_District/0 + Airport_Overlay_District/1.",
+      "status": "usable"
+    }
+  ],
+  "gaps": [
+    "Harrellsville has no base zoning FeatureServer (Planning_Jurisdictions explicitly NO ZONING)",
+    "No public FLU FeatureServer \u2014 CAMA LUP Jan 2011 PDF + Ahoskie Draft Comp Plan FLU PDF only; LandUse/0 is current cover not FLU",
+    "OneMap saledate date field null for cntyfips='091' \u2014 prefer county PKG_SALE_DATE / LAND_SALE_DATE; OneMap saledatetx often placeholder 12/30/1899",
+    "Parcel CITY is tax-city district; PHYADDR_CITY is postal city (includes Aulander/Woodland/Colerain outside county munis) \u2014 situs municipality requires Municipalities/ETJ spatial join",
+    "Como zoning is coarse (5 district polys)",
+    "ETJ FS only publishes Ahoskie + Murfreesboro (other towns use parcel ETJ attr)",
+    "AGOL Tax_Parcels FeatureServer URL from older webmap config is Invalid URL (400) \u2014 use gis.hertfordcounty.org TaxParcels/MapServer/2",
+    "Utilities / AADT / emails / phones / paid vendors intentionally out of scope"
+  ],
+  "license": "Hertford County public GIS / NCPTS; NC OneMap cadastral; attribution required",
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/Hertford/PropertySummary.aspx?PIN={Tax_REID}",
+  "appraiserSearchUrlAlternates": [
+    "https://lrcpwa.ncptscloud.com/Hertford/parcel-detail?reid={REID}",
+    "https://lrcpwa.ncptscloud.com/Hertford/parcel-detail/{REID}",
+    "https://lrcpwa.ncptscloud.com/Hertford/Parcel-detail/{PARCEL_PK}",
+    "https://lrcpwa.ncptscloud.com/hertford/parcel-search"
+  ],
+  "jurisdictionGisUrl": "https://hertfordcountync.maps.arcgis.com/apps/instant/sidebar/index.html?appid=26b28f8a51164fc89431eedd61072339",
+  "jurisdictionGisUrlAlternates": [
+    "https://hertfordcountync.maps.arcgis.com/home/index.html",
+    "https://www.arcgis.com/apps/webappviewer/index.html?id=53620a0b6458437aa82bd5e91d8cc47b",
+    "https://www.hertfordcountync.gov/departments/county_administration/gis___land_records/index.php",
+    "https://gis.hertfordcounty.org/server/rest/services"
+  ],
+  "portals": {
+    "taxParcelViewer": "https://hertfordcountync.maps.arcgis.com/apps/instant/sidebar/index.html?appid=26b28f8a51164fc89431eedd61072339",
+    "agolHome": "https://hertfordcountync.maps.arcgis.com/home/index.html",
+    "gisLandRecords": "https://www.hertfordcountync.gov/departments/county_administration/gis___land_records/index.php",
+    "planningZoning": "https://www.hertfordcountync.gov/departments/county_administration/planning_and_zoning.php",
+    "ncptsSearch": "https://lrcpwa.ncptscloud.com/hertford/parcel-search",
+    "ncptsPropertySummary": "https://lrcpwa.ncptscloud.com/Hertford/PropertySummary.aspx?PIN={Tax_REID}",
+    "taxPay": "https://www.hertfordtax.com/",
+    "rod": "https://www.hertfordrod.net/",
+    "udo": "https://www.hertfordcountync.gov/Revised%20UDO%2012012025.pdf",
+    "camaLupPdf": "https://www.hertfordcountync.gov/Document%20Center/Department/County%20Administration/Planning%20and%20Zoning/Hertford%20Co%20CAMA%20LUP%20JAN2011.pdf",
+    "deqCertifiedLup": "https://www.deq.nc.gov/documents/pdf/land-use-plans/hertfordcountycertiflup-022411/download",
+    "ahoskieCompPlanPdf": "https://www.ahoskienc.gov/media/NewsImages/Ahoskie%20Comprehensive%20Plan%20-%20Draft_4.20.pdf",
+    "oneMap": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+  },
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher"
+}

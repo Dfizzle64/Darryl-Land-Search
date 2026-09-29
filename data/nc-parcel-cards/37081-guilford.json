@@ -1,0 +1,615 @@
+{
+  "county": "Guilford",
+  "state": "NC",
+  "msa": "Greensboro / Winston-Salem MSA footprint",
+  "fips": "37081",
+  "cntyfips": "081",
+  "slug": "guilford",
+  "level": "county",
+  "markets": ["Winston-Salem", "Greensboro"],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "viewerLinkTemplate": "https://lrcpwa.ncptscloud.com/guilford/parcel-detail/{PARCEL_PK}",
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/guilford/parcel-search",
+  "whiteCardUrlTemplate": "https://lrcpwa.ncptscloud.com/guilford/CustomAttachmentsResource.ashx?parcelPk={PARCEL_PK}",
+  "gisDataViewerUrl": "https://gisdv.guilfordcountync.gov/Guilford/",
+  "countyRestRoot": "https://gcgis.guilfordcountync.gov/arcgis/rest/services",
+  "taxCamaUrl": "https://taxcama.guilfordcountync.gov/",
+  "joinKeys": [
+    "PIN",
+    "PIN_PLUS_EXT",
+    "PARCEL_PK",
+    "REID",
+    "GEOPIN",
+    "parno"
+  ],
+  "parcelIdPreferred": "PIN",
+  "municipalities": {
+    "Greensboro": {
+      "parcelCityCount": 106284,
+      "combinedZoningCount": 2949,
+      "hasLocalGis": true,
+      "zoningPrefer": "https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/Zoning_MS/MapServer/7",
+      "fluPrefer": "https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/CompPlan2040_MS/MapServer/1"
+    },
+    "High Point": {
+      "parcelCityCount": 43919,
+      "combinedZoningCount": 746,
+      "hasLocalGis": true,
+      "zoningPrefer": "https://gisentapp01.highpointnc.gov/server/rest/services/Zoning/MapServer/0",
+      "fluPrefer": "https://gisentapp01.highpointnc.gov/server/rest/services/Planning/MapServer/29",
+      "notes": "Spans Guilford + Forsyth tip; clip as needed"
+    },
+    "Summerfield": {
+      "parcelCityCount": 4975,
+      "combinedZoningCount": 242,
+      "hasLocalGis": false,
+      "zoningPrefer": "Combined_Zoning JURISDICTION='SUMMERFIELD'",
+      "notes": "Town PDF zoning map only; county viewer"
+    },
+    "Oak Ridge": {
+      "parcelCityCount": 4016,
+      "combinedZoningCount": 179,
+      "hasLocalGis": false,
+      "zoningPrefer": "Combined_Zoning JURISDICTION='OAK RIDGE'"
+    },
+    "Stokesdale": {
+      "parcelCityCount": 3564,
+      "combinedZoningCount": 117,
+      "gisdvZoningCount": 127,
+      "hasLocalGis": false,
+      "zoningPrefer": "Combined_Zoning or GISDV Zoning; county planning services"
+    },
+    "Gibsonville": {
+      "parcelCityCount": 3183,
+      "combinedZoningCount": 206,
+      "hasLocalGis": false,
+      "notes": "Independent planning; Alamance edge; county Combined stub"
+    },
+    "Pleasant Garden": {
+      "parcelCityCount": 2351,
+      "combinedZoningCount": 62,
+      "gisdvZoningCount": 62,
+      "hasLocalGis": false,
+      "zoningPrefer": "GISDV/Combined; county planning services"
+    },
+    "Jamestown": {
+      "parcelCityCount": 2081,
+      "combinedZoningCount": 50,
+      "combinedZoningEtjCount": 22,
+      "hasLocalGis": false,
+      "zoningPrefer": "Combined_Zoning JURISDICTION in ('JAMESTOWN','JAMESTOWN ETJ')"
+    },
+    "Burlington": {
+      "parcelCityCount": 836,
+      "combinedZoningCount": 33,
+      "hasLocalGis": false,
+      "notes": "Alamance tip only — prefer Alamance/Burlington city card for core"
+    },
+    "Sedalia": {
+      "parcelCityCount": 587,
+      "combinedZoningCount": 22,
+      "gisdvZoningCount": 28,
+      "hasLocalGis": false,
+      "zoningPrefer": "GISDV/Combined; county planning services"
+    },
+    "Whitsett": {
+      "parcelCityCount": 449,
+      "combinedZoningCount": 1,
+      "gisdvZoningCount": 43,
+      "hasLocalGis": false,
+      "zoningPrefer": "GISDV Zoning WHITSETT (Combined only 1)"
+    },
+    "Archdale": {
+      "parcelCityCount": 216,
+      "combinedZoningCount": 25,
+      "notes": "Randolph tip"
+    },
+    "Kernersville": {
+      "parcelCityCount": 81,
+      "combinedZoningCount": 25,
+      "notes": "Forsyth tip — prefer Forsyth/Kernersville card"
+    },
+    "PTI Airport": {
+      "parcelCityCount": 312,
+      "notes": "Piedmont Triad International Airport Authority"
+    },
+    "Unincorporated": {
+      "parcelCityCount": 50370,
+      "combinedZoningCount": 1720,
+      "notes": "CITY null on parcels; Combined JURISDICTION='GUILFORD COUNTY'"
+    }
+  },
+  "zoningJurisdictionCodes": {
+    "GREENSBORO": "City of Greensboro",
+    "GUILFORD COUNTY": "Unincorporated Guilford",
+    "HIGH POINT": "City of High Point",
+    "SUMMERFIELD": "Town of Summerfield",
+    "GIBSONVILLE": "Town of Gibsonville",
+    "OAK RIDGE": "Town of Oak Ridge",
+    "STOKESDALE": "Town of Stokesdale",
+    "PLEASANT GARDEN": "Town of Pleasant Garden",
+    "JAMESTOWN": "Town of Jamestown",
+    "JAMESTOWN ETJ": "Jamestown ETJ",
+    "BURLINGTON": "City of Burlington (tip)",
+    "ARCHDALE": "City of Archdale (tip)",
+    "KERNERSVILLE": "Town of Kernersville (tip)",
+    "SEDALIA": "Town of Sedalia",
+    "WHITSETT": "Town of Whitsett"
+  },
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": ["PIN", "PIN_PLUS_EXT", "PARCEL_PK", "REID", "GEOPIN", "parno"],
+      "bestLayer": "GC_Parcels"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "GC_Parcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": ["CALCULATED_ACRES", "ACREAGE", "TOTAL_ACRES", "DEEDED_ACRES"],
+      "usefulRangeAcres": [5, 150],
+      "approxCountInRange": 12978,
+      "approxCountDeedAcres": 12973,
+      "approxCountTotalAcres": 12820,
+      "bestLayer": "GC_Parcels"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": ["PROPERTY_OWNER", "PROP_OWNER1_FULLNAME", "PROP_OWNER2_FULLNAME", "ownname"],
+      "bestLayer": "GC_Parcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": ["OWNER_MAIL_1", "OWNER_MAIL_CITY", "OWNER_MAIL_STATE", "OWNER_MAIL_ZIP"],
+      "bestLayer": "GC_Parcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": false,
+      "fields": ["LOCATION_ADDR", "PHYADDR_*", "CITY", "siteadd", "scity"],
+      "bestLayer": "GC_Parcels"
+    },
+    "lastSale": {
+      "present": true,
+      "partial": true,
+      "fields": ["PKG_SALE_DATE", "PKG_SALE_PRICE", "LAND_SALE_DATE", "LAND_SALE_PRICE", "DEED_DATE"],
+      "bestLayer": "GC_Parcels",
+      "caveat": "Last package/land sale on parcel only; PKG_SALE_PRICE>0 in ~3588 of 5–150; no multi-transfer SalesApp"
+    },
+    "tax": {
+      "present": true,
+      "fields": ["TOTAL_PROP_VALUE", "TOTAL_LAND_VALUE_ASSESSED", "TOTAL_BLDG_VALUE_ASSESSED", "LAND_USE_VALUE", "parval", "landval", "improvval"],
+      "bestLayer": "GC_Parcels",
+      "notes": "Primary has land/bldg split (unlike Forsyth TOTALVALUE-only)"
+    },
+    "zoning": {
+      "present": true,
+      "fields": ["ZONING", "ZONINGDISTRICT", "ZONE", "BASE_ZONING"],
+      "bestLayer": "Combined_Zoning",
+      "parcelAttrField": "ZONING",
+      "caveat": "Prefer GSO/HP city hosts inside city limits; Combined for other munis"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": ["FLUM_New", "DW_FLUM", "DISTRICT", "PlaceTypes"],
+      "bestLayer": "Planning_Zoning FLUM",
+      "caveat": "GSO CompPlan Map7/PlaceTypes; HP Place Types; county FLUM REID-join for rest"
+    },
+    "appraiserLink": {
+      "present": true,
+      "template": "https://lrcpwa.ncptscloud.com/guilford/parcel-detail/{PARCEL_PK}",
+      "whiteCardTemplate": "https://lrcpwa.ncptscloud.com/guilford/CustomAttachmentsResource.ashx?parcelPk={PARCEL_PK}",
+      "fieldOnParcel": "WHITE_CARD_URL"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "GC_Parcels",
+      "restUrl": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/GC_Cadastral_Current/GC_Parcels/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "CALCULATED_ACRES",
+      "count": 223245,
+      "countAcres5to150": 12978,
+      "countVacantIshAcres5to150": 5523,
+      "countPkgSalePriceGt0Acres5to150": 3588,
+      "crs": {"wkid": 102719, "latestWkid": 2264},
+      "maxRecordCount": 2000,
+      "wireFirst": true,
+      "status": "usable",
+      "alternateUrls": [
+        "https://gcgis.guilfordcountync.gov/arcgis/rest/services/GC_Cadastral_Current/Parcels_Ownership/FeatureServer/0"
+      ]
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "gisacres",
+      "filter": "cntyfips='081'",
+      "count": 222443,
+      "countAcres5to150": 12953,
+      "countImprovZeroAcres5to150": 5491,
+      "crs": {"wkid": 102719, "latestWkid": 2264},
+      "maxRecordCount": 5000,
+      "status": "usable",
+      "notes": "Fallback; land/improve split; no sale price"
+    },
+    {
+      "role": "zoning",
+      "name": "Combined_Zoning",
+      "restUrl": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/Planning_Zoning/Combined_Zoning/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 6569,
+      "countsByJurisdiction": {
+        "GREENSBORO": 2949,
+        "GUILFORD COUNTY": 1720,
+        "HIGH POINT": 746,
+        "SUMMERFIELD": 242,
+        "GIBSONVILLE": 206,
+        "OAK RIDGE": 179,
+        "null": 165,
+        "STOKESDALE": 117,
+        "PLEASANT GARDEN": 62,
+        "JAMESTOWN": 50,
+        "BURLINGTON": 33,
+        "ARCHDALE": 25,
+        "KERNERSVILLE": 25,
+        "SEDALIA": 22,
+        "JAMESTOWN ETJ": 22,
+        "WHITSETT": 1
+      },
+      "zoningFields": ["ZONING", "BASE_ZONING", "CLASSIFICATION", "JURISDICTION"],
+      "crs": {"wkid": 102719, "latestWkid": 2264},
+      "wireFirst": true,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "GISDV Zoning",
+      "restUrl": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/GISDV/Zoning/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 2079,
+      "countsByJurisdiction": {
+        "GUILFORD": 1819,
+        "STOKESDALE": 127,
+        "PLEASANT GARDEN": 62,
+        "WHITSETT": 43,
+        "SEDALIA": 28
+      },
+      "status": "usable",
+      "notes": "County + small towns only; prefer for Whitsett"
+    },
+    {
+      "role": "zoning",
+      "name": "Greensboro Zoning Districts",
+      "restUrl": "https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/Zoning_MS/MapServer/7",
+      "layerId": 7,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 3248,
+      "zoningFields": ["ZONINGDISTRICT", "ZONINGDISTRICTTITLE", "CATEGORY"],
+      "crs": {"wkid": 102100, "latestWkid": 3857},
+      "preferMostLocal": true,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "High Point Zoning",
+      "restUrl": "https://gisentapp01.highpointnc.gov/server/rest/services/Zoning/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 781,
+      "zoningFields": ["ZONE", "DIST"],
+      "crs": {"wkid": 102719, "latestWkid": 2264},
+      "preferMostLocal": true,
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "Planning_Zoning FLUM",
+      "restUrl": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/Planning_Zoning/FLUM/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "DW_Acres",
+      "count": 50097,
+      "countAcres5to150": 5414,
+      "fluFields": ["FLUM_New", "DW_FLUM", "REID", "PIN_PLUS_E"],
+      "crs": {"wkid": 102719, "latestWkid": 2264},
+      "wireFirst": true,
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "Greensboro CompPlan2040 Future Land Use",
+      "restUrl": "https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/CompPlan2040_MS/MapServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 761,
+      "fluFields": ["DISTRICT", "Acres"],
+      "crs": {"wkid": 102100, "latestWkid": 3857},
+      "preferMostLocal": true,
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "Greensboro CompPlan2040 Place Types",
+      "restUrl": "https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/CompPlan2040_MS/MapServer/9",
+      "layerId": 9,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 998,
+      "fluFields": ["DISTRICT", "TAG", "Acres"],
+      "preferMostLocal": true,
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "High Point Place Types",
+      "restUrl": "https://gisentapp01.highpointnc.gov/server/rest/services/Planning/MapServer/29",
+      "layerId": 29,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 68,
+      "fluFields": ["PlaceTypes", "PT_All", "ACRES"],
+      "preferMostLocal": true,
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "City Limits",
+      "restUrl": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/CityLimits/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Extra Territorial Jurisdictions",
+      "restUrl": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/GISDV/Extra_Territorial_Jurisdictions/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable"
+    },
+    {
+      "role": "sales",
+      "name": "Hosted CommercialSales",
+      "restUrl": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/Hosted/Sales_gdb/FeatureServer/0",
+      "layerId": 0,
+      "auth": "none",
+      "coverage": "sample",
+      "count": 7344,
+      "status": "partial",
+      "notes": "Commercial-only; prefer parcel PKG_SALE_* / LAND_SALE_*"
+    }
+  ],
+  "gaps": [
+    "Small towns lack dedicated public city FeatureServers — Combined_Zoning / GISDV Zoning stubs",
+    "Summerfield PDF zoning only (no town REST)",
+    "Combined_Zoning WHITSETT=1 — use GISDV Zoning Whitsett 43",
+    "Burlington/Archdale/Kernersville tips only — prefer home-county city cards",
+    "No multi-transfer SalesApp REST; last sale fields only on parcel",
+    "Greensboro zoning/FLU CRS 3857 vs county parcels 2264",
+    "GISDV Zoning excludes GSO/HP/Summerfield/Oak Ridge/Jamestown",
+    "No phones/emails; no paid vendors; no AADT/utilities dig"
+  ],
+  "license": "Guilford County / City of Greensboro / City of High Point public GIS; NCGS disclaimer; attribution recommended",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "pass1": {
+      "status": "verified",
+      "parcelPolygonLayer": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/GC_Cadastral_Current/GC_Parcels/FeatureServer/0",
+      "polygonCountLive": 223244,
+      "parcelIdField": "PIN",
+      "parcelIdFilled": 223240,
+      "acreageField": "CALCULATED_ACRES",
+      "acres5to150Live": 12978,
+      "sampleCentroidWgs84": [
+        -80.0456,
+        35.921
+      ]
+    },
+    "parcelLayer": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/GC_Cadastral_Current/GC_Parcels/FeatureServer/0",
+    "parcelIdField": "PIN",
+    "acreageFilter": "CALCULATED_ACRES >= 5 AND CALCULATED_ACRES <= 150",
+    "acres5to150Live": 12978,
+    "parcelCountLive": 223244,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='GUILFORD'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GUILFORD%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GUILFORD%27&returnCountOnly=true&f=json",
+        "liveStationCount": 1995,
+        "stationsWithAADT2022": 297
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Guilford'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Guilford%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Guilford%27&returnCountOnly=true&f=json",
+        "liveStationCount": 2053,
+        "stationsWithAADT2025": 1799,
+        "stationsWithAADT2024": 381,
+        "stationsWith2025or2024": 1856,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TOTAL_PROP_VALUE",
+        "TOTAL_LAND_VALUE_ASSESSED"
+      ],
+      "liveNonZero": {
+        "TOTAL_PROP_VALUE": 207940,
+        "TOTAL_LAND_VALUE_ASSESSED": 214758
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "PKG_SALE_PRICE"
+      ],
+      "dateFields": [
+        "PKG_SALE_DATE"
+      ],
+      "livePriceNonZero": {
+        "PKG_SALE_PRICE": 158908
+      },
+      "liveDateNonNull": {
+        "PKG_SALE_DATE": 158992
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "PROPERTY_OWNER"
+      ],
+      "primaryOwnerField": "PROPERTY_OWNER",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(PROPERTY_OWNER) LIKE '% LLC%' OR UPPER(PROPERTY_OWNER) LIKE '% INC%' OR UPPER(PROPERTY_OWNER) LIKE '% LP%' OR UPPER(PROPERTY_OWNER) LIKE '% LLP%' OR UPPER(PROPERTY_OWNER) LIKE '% LTD%' OR UPPER(PROPERTY_OWNER) LIKE '% TRUST%' OR UPPER(PROPERTY_OWNER) LIKE '% CHURCH%' OR UPPER(PROPERTY_OWNER) LIKE '% COMPANY%' OR UPPER(PROPERTY_OWNER) LIKE '% PARTNERSHIP%' OR UPPER(PROPERTY_OWNER) LIKE '% HOLDINGS%' OR UPPER(PROPERTY_OWNER) LIKE '% PROPERTIES%' OR UPPER(PROPERTY_OWNER) LIKE '% CORP%' OR UPPER(PROPERTY_OWNER) LIKE '%,LLC%' OR UPPER(PROPERTY_OWNER) LIKE '%,INC%' OR UPPER(PROPERTY_OWNER) LIKE 'CITY OF %' OR UPPER(PROPERTY_OWNER) LIKE 'COUNTY OF %' OR UPPER(PROPERTY_OWNER) LIKE 'STATE OF %' OR UPPER(PROPERTY_OWNER) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 51482,
+      "liveEntityCount5to150ac": 4630,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://lrcpwa.ncptscloud.com/guilford/parcel-detail/{PARCEL_PK}",
+      "testedParcelId": "99842",
+      "testedUrl": "https://lrcpwa.ncptscloud.com/guilford/parcel-detail/99842",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": false,
+      "note": "NCPTS SPA shell (200, 496 B, client-rendered): parcel content cannot be checked server-side. WHITE_CARD_URL (CustomAttachmentsResource.ashx?parcelPk=) also returns the 496 B shell."
+    },
+    "gisViewer": {
+      "url": "https://gisdv.guilfordcountync.gov/Guilford/",
+      "httpStatus": 200,
+      "pageTitle": "GIS Data Viewer"
+    },
+    "municipalLayerCheck": {
+      "checked": 10,
+      "answering": 10,
+      "layers": [
+        {
+          "url": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/CityLimits/FeatureServer/0",
+          "name": "City Limits",
+          "liveCount": 56
+        },
+        {
+          "url": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/GISDV/Extra_Territorial_Jurisdictions/FeatureServer/0",
+          "name": "Extra Territorial Jurisdictions",
+          "liveCount": 16
+        },
+        {
+          "url": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/GISDV/Zoning/FeatureServer/0",
+          "name": "Zoning",
+          "liveCount": 2081
+        },
+        {
+          "url": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/Planning_Zoning/Combined_Zoning/FeatureServer/0",
+          "name": "Combined Zoning",
+          "liveCount": 6573
+        },
+        {
+          "url": "https://gcgis.guilfordcountync.gov/arcgis/rest/services/Planning_Zoning/FLUM/FeatureServer/0",
+          "name": "FLUM",
+          "liveCount": 50097
+        },
+        {
+          "url": "https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/CompPlan2040_MS/MapServer/1",
+          "name": "Map 7 - Future Land Use",
+          "liveCount": 761
+        },
+        {
+          "url": "https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/CompPlan2040_MS/MapServer/9",
+          "name": "Place Types",
+          "liveCount": 998
+        },
+        {
+          "url": "https://gis.greensboro-nc.gov/arcgis/rest/services/Planning/Zoning_MS/MapServer/7",
+          "name": "Greensboro Zoning Districts",
+          "liveCount": 3248
+        },
+        {
+          "url": "https://gisentapp01.highpointnc.gov/server/rest/services/Planning/MapServer/29",
+          "name": "Place Types",
+          "liveCount": 68
+        },
+        {
+          "url": "https://gisentapp01.highpointnc.gov/server/rest/services/Zoning/MapServer/0",
+          "name": "Zoning",
+          "liveCount": 781
+        }
+      ]
+    },
+    "gaps": [
+      "PA content not verifiable (SPA)"
+    ]
+  }
+}

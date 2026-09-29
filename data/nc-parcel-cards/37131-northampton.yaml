@@ -1,0 +1,295 @@
+state: NC
+jurisdiction: Northampton County
+fips: '37131'
+level: county
+markets:
+- Eastern NC
+- Rocky Mount
+slug: northampton
+cntyfips: '131'
+jurisdictionGisUrl: https://webapp.agdmaps.com/nc/northampton/
+publicGisUrl: https://webapp.agdmaps.com/nc/northampton/
+gisViewerUrl: https://webapp.agdmaps.com/nc/northampton/
+viewerLinkTemplate: https://webapp.agdmaps.com/nc/northampton/?find={PIN}
+appraiserSearchUrl: https://lrcpwa.ncptscloud.com/northampton/parcel-search
+paDeepLinkTemplate: https://dl.agd.cc/prc/nc/northampton/pin{PIN}.pdf
+paDeepLinkKey: PIN
+paDeepLinkTemplateAlt: https://lrcpwa.ncptscloud.com/northampton/parcel-detail/{PARCELNBR}
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/northampton/parcel-search
+ncptsDeepLinkTemplate: https://lrcpwa.ncptscloud.com/northampton/parcel-detail/{PARCELNBR}
+countyRestRoot: https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services
+gisDepartmentUrl: https://www.northamptonnc.com/213/GIS-Maps
+taxAssessorUrl: https://www.northamptonnc.com/179/Tax-Department
+planningZoningUrl: https://www.northamptonnc.com/167/Planning-Zoning
+zoningOrdinanceUrl: https://www.northamptonnc.com/DocumentCenter/View/330/Zoning-Ordinance-12-20-16-PDF
+comprehensivePlanUrl: https://www.northamptonnc.com/DocumentCenter/View/135/Northampton-County-Comprehensive-Plan-Adopted-PDF
+salesSpreadsheetZipUrl: https://dl.agd.cc/northampton/nhsales.zip
+oneMapFilter: cntyfips='131'
+parcelIdPreferred: PIN
+joinKeys:
+- PIN
+- PARCELNBR
+- Parcel_Number
+- parno
+- altparno
+- Account
+municipalities:
+- name: Rich Square
+  role: cities-first PRIMARY zoning + FLU
+  hasLocalGis: true
+  zoningPrefer: https://services8.arcgis.com/eJ9GuQwMsO1iIOw1/arcgis/rest/services/Town_of_Rich_Square_WFL1/FeatureServer/4
+  zoningAlternate: https://services8.arcgis.com/eJ9GuQwMsO1iIOw1/arcgis/rest/services/Zoning/FeatureServer/0
+  zoningCount: 25
+  zoningField: Type
+  zoningCodes:
+  - R-20
+  - C-1
+  - A-0
+  - C-2
+  - R-10
+  - R-40
+  - I-1
+  - R-MH
+  fluPrefer: https://services8.arcgis.com/eJ9GuQwMsO1iIOw1/arcgis/rest/services/Land_Use/FeatureServer/0
+  fluCount: 830
+  fluField: Land_Use
+  notes: UCPCOG contractor layers. Official Zoning twin Zoning/0 (02.14.25 parcel-aligned).
+    FLU codes 01–12/14. Do NOT wire water/sewer utility sublayers 0–3.
+- name: Jackson
+  role: county seat town
+  hasLocalGis: false
+  zoningPrefer: null
+  fluPrefer: null
+  notes: City_Polygon NAME=JACKSON. No public municipal zoning FeatureServer — city-first
+    gap; county zoning ordinance may apply.
+- name: Gaston
+  hasLocalGis: false
+  zoningPrefer: null
+  notes: Near Roanoke Rapids / Halifax. No public zoning REST — gap.
+- name: Conway
+  hasLocalGis: false
+  zoningPrefer: null
+  notes: No public zoning REST — gap.
+- name: Seaboard
+  hasLocalGis: false
+  zoningPrefer: null
+  notes: No public zoning REST — gap.
+- name: Woodland
+  hasLocalGis: false
+  zoningPrefer: null
+  notes: No public zoning REST — gap.
+- name: Severn
+  hasLocalGis: false
+  zoningPrefer: null
+  notes: No public zoning REST — gap.
+- name: Lasker
+  hasLocalGis: false
+  zoningPrefer: null
+  notes: No public zoning REST — gap.
+- name: Garysburg
+  hasLocalGis: false
+  zoningPrefer: null
+  notes: No public zoning REST — gap.
+layers:
+- role: parcels
+  name: NorthamptonService Parcels (PRIMARY CAMA)
+  restUrl: https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/NorthamptonService/FeatureServer/8
+  layerId: 8
+  geometry: polygon
+  auth: none
+  status: usable
+  coverage: county-wide
+  acreageField: Acreage
+  count: 20561
+  countAcres5to150: 4886
+  countSalePrice: 6719
+  countSalePriceInBand: 1423
+  countOwner: 20370
+  countSitus: 10809
+  countTaxValue: 20338
+  countPrc: 20538
+  maxRecordCount: 1000
+  fieldMap:
+    PIN: parcelId
+    PARCELNBR: parcelIdAccount
+    Parcel_Number: parcelIdNumeric
+    Parcel_Number_Str: parcelIdAccountStr
+    Account: accountId
+    Acreage: acreage
+    Owner: ownerName
+    Billing_Address: mailingAddress.street
+    Billing_Address2: mailingAddress.street2
+    Billing_City_ST: mailingAddress.cityState
+    Billing_Zip: mailingAddress.zip
+    Parcel_Address: situsAddress
+    Sale_Price: lastSale.price
+    Date_Recorded: lastSale.date
+    DateRecordedTxt: lastSale.dateText
+    Deed_Reference: lastSale.deedBookPage
+    Tax_Value: tax.assessedValue
+    Subdivision: subdivision
+    PRC: appraiserCardUrl
+    Percentage_Owned: ownershipPct
+  notes: PRIMARY wire-first AGD. CRS 102719/2264. Paginate max 1000. Sample PIN 5032-41-4749
+    / PARCELNBR 0302029 ≈ -77.185, 36.541. PRC field embeds deep-link PDF.
+  primary: true
+- role: parcels
+  name: NC OneMap Parcels (fallback)
+  restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  status: usable
+  coverage: county-wide
+  acreageField: gisacres
+  filter: cntyfips='131'
+  alternateHost: https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  count: 20504
+  countAcres5to150: 4874
+  countParval: 20256
+  countOwner: 20504
+  countSiteadd: 20504
+  countSaledate: 20504
+  maxRecordCount: 5000
+  fieldMap:
+    parno: parcelId
+    altparno: parcelIdAccount
+    ownname: ownerName
+    mailadd: mailingAddress
+    siteadd: situsAddress
+    gisacres: acreage
+    parval: tax.assessedValue
+    landval: tax.landValue
+    improvval: tax.improvementValue
+    saledate: lastSale.date
+    sourceref: lastSale.deedBookPage
+    parusecode: dorCode
+  notes: parno↔PIN; altparno↔PARCELNBR. siteadd fill stronger than AGD Parcel_Address.
+    No sale price — join NorthamptonService/8 Sale_Price. improvval often empty (sample
+    landval=parval).
+- role: zoning
+  name: Rich Square Official Zoning (cities-first PRIMARY)
+  restUrl: https://services8.arcgis.com/eJ9GuQwMsO1iIOw1/arcgis/rest/services/Town_of_Rich_Square_WFL1/FeatureServer/4
+  layerId: 4
+  geometry: polygon
+  auth: none
+  status: usable
+  coverage: city-only
+  municipality: Rich Square
+  count: 25
+  fieldMap:
+    Type: zoning
+    Description: zoningDescription
+  notes: CITY-FIRST. Codes R-20(5) C-1(4) A-0(4) C-2(3) R-10(3) R-40(2) I-1(2) R-MH(2).
+    Twin Zoning/0 Official_Zoning_ExportFeatures (parcel-aligned 02.14.25).
+- role: zoning
+  name: Rich Square Zoning twin (UCPCOG)
+  restUrl: https://services8.arcgis.com/eJ9GuQwMsO1iIOw1/arcgis/rest/services/Zoning/FeatureServer/0
+  layerId: 0
+  geometry: polygon
+  auth: none
+  status: usable
+  coverage: city-only
+  municipality: Rich Square
+  count: 25
+  fieldMap:
+    Type: zoning
+    Descriptio: zoningDescription
+  notes: Alternate to Town_of_Rich_Square_WFL1/4 — same districts, parcel-line edits
+    02.14.25.
+- role: flu
+  name: Rich Square Land Use (cities-first FLU)
+  restUrl: https://services8.arcgis.com/eJ9GuQwMsO1iIOw1/arcgis/rest/services/Land_Use/FeatureServer/0
+  layerId: 0
+  geometry: polygon
+  auth: none
+  status: usable
+  coverage: city-only
+  municipality: Rich Square
+  count: 830
+  fieldMap:
+    Land_Use: flu
+    ALTPARNO: parcelIdAccount
+    GISACRES: acreage
+    CNTYFIPS: countyFips
+  fluCodeMap:
+    '01': Single Manufactured Homes on Large Tract
+    '02': Agricultural
+    '03': Commercial
+    '04': Industrial
+    '05': Institutional-Other
+    '06': Institutional-Public
+    '07': Multi-Family Residential
+    08: Single Manufactured Homes
+    09: Single-Family Residential
+    '10': Two-Family Residential
+    '11': Utilities
+    '12': Vacant/Undeveloped
+    '14': Unclassified
+  notes: 'Rich Square only (CNTYFIPS=131). Top: 09 SFR 466, 12 Vacant 236, 03 Commercial
+    56. Countywide FLUM REST gap.'
+- role: other
+  name: City_Polygon (municipality router)
+  restUrl: https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/NorthamptonStatic/FeatureServer/4
+  layerId: 4
+  geometry: polygon
+  auth: none
+  status: usable
+  coverage: county-wide
+  count: 9
+  fieldMap:
+    NAME: municipality
+  notes: SEVERN, GASTON, SEABOARD, GARYSBURG, CONWAY, JACKSON, LASKER, WOODLAND, RICH
+    SQUARE
+- role: other
+  name: ETJ Polygon
+  restUrl: https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/NorthamptonStatic2/FeatureServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  status: partial
+  coverage: sample
+  count: 2
+  notes: Two ETJ polys; no muni name field — spatial join only.
+gaps:
+- No county-hosted ArcGIS Server root — AGD AGOL (services3…/nJbIFHiSnaX0z0hS) + OneMap
+  + UCPCOG Rich Square
+- County Official Zoning Map — ordinance PDF only; no public countywide zoning FeatureServer
+  (legacy MapJournal webmap inaccessible)
+- Jackson / Gaston / Conway / Seaboard / Woodland / Severn / Lasker / Garysburg —
+  zoning REST gaps
+- County FLU — Comp Plan PDF only; no countywide FLUM FeatureServer (Rich Square Land_Use
+  only)
+- OneMap has saledate but no sale price — prefer NorthamptonService/8 Sale_Price
+- AGD Parcel_Address situs ~53% fill — prefer OneMap siteadd when joining
+- AGD print apps.agdmaps.com/print/nc/northampton 404 — use PRC PDF + webappviewer
+- Do not use gis.northamptoncounty.org / northampton.maps.arcgis.com (Pennsylvania)
+- Rich Square WFL1 layers 0–3 are water/sewer utilities — excluded per card rules
+- Last-sale only on parcel (multi-year sales zip offline spreadsheet, not REST history)
+- MaxRecordCount 1000 on NorthamptonService — paginate; no phones/emails; no AADT/utilities;
+  no paid vendors
+license: Northampton County NC public GIS via AGD Maps; Town of Rich Square / UCPCOG
+  zoning+FLU; NC OneMap. Attribution recommended. Commercial resale subject to NCGS
+  132-10. No paid vendors.
+verifiedAt: '2026-09-24'
+verifiedBy: North Carolina Public Info Researcher
+rejectedSources:
+- url: https://gis.northamptoncounty.org/arcgisweb/rest/services
+  reason: Northampton County Pennsylvania (WKID 102729/2272) — NOT NC FIPS 37131
+- url: https://northampton.maps.arcgis.com/
+  reason: PA Northampton AGOL org (urlKey Northampton / orgid vCOU7ZX2laMT0ERW)
+- url: https://www.arcgis.com/apps/MapJournal/?appid=1d68c24c894c4f1d93303b211133b208
+  reason: Legacy 'Northampton County Zoning' MapJournal; nested webmap item inaccessible
+    (CONT_0001)
+liveChecks:
+- NorthamptonService/8 count 20561; Acreage 5–150 → 4886; Sale_Price>0 → 6719 / in-band
+  1423; Owner 20370; Tax_Value 20338; PRC 20538
+- OneMap cntyfips='131' count 20504; gisacres 5–150 → 4874; parval>0 → 20256; siteadd/ownname
+  20504
+- Rich Square Zoning/4 and Zoning/0 count 25 Type histogram; Land_Use/0 count 830
+  CNTYFIPS=131
+- PRC PDF pin5032-41-4749.pdf and pin5012-91-4563.pdf HTTP 200 application/pdf
+- NCPTS /northampton/parcel-search and parcel-detail/{PARCELNBR}|{PIN} SPA HTTP 200
+- jurisdictionGis webapp.agdmaps.com/nc/northampton/ 200; Comp Plan + Zoning Ordinance
+  PDFs 200
+- geo-check PIN 5032-41-4749 ≈ -77.185, 36.541; rejected PA gis.northamptoncounty.org

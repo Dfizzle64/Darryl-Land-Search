@@ -1,0 +1,560 @@
+{
+  "county": "Wilson",
+  "state": "NC",
+  "msa": "Raleigh-Durham footprint",
+  "fips": "37195",
+  "cntyfips": "195",
+  "slug": "wilson",
+  "level": "county",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "publicGisUrl": "https://gis.wilson-co.com/maps",
+  "gisDepartmentUrl": "https://www.wilsoncountync.gov/departments/technology-services/gis-services",
+  "countyRestRoot": "https://gis.wilson-co.com/arcgis/rest/services",
+  "cityRestRoot": "https://gis.wilsonnc.org/services/rest/services",
+  "cityGisViewerUrl": "https://gis.wilsonnc.org/communitymaps/",
+  "appraiserSearchUrl": "https://wilsonnc.devnetwedge.com/",
+  "viewerLinkTemplate": "https://wilsonnc.devnetwedge.com/parcel/view/{OwnerID}",
+  "viewerLinkTemplateAlt": "https://wilsonnc.devnetwedge.com/parcel/view/{ParcelNumberNoDecimal}",
+  "propertyReportUrl": "https://gis.wilson-co.com/maps/assets/wilson/PropertyReport.html?PIN={PIN}",
+  "gisViewerUrl": "https://gis.wilson-co.com/maps",
+  "joinKeys": [
+    "PIN",
+    "ParcelNumber",
+    "OwnerID",
+    "GISPIN",
+    "parno"
+  ],
+  "parcelIdPreferred": "PIN",
+  "paDeepLinkKey": "OwnerID",
+  "municipalities": {
+    "Wilson": {
+      "cityCodeDescParcels": 21609,
+      "hasLocalGis": true,
+      "zoningPrefer": "https://gis.wilsonnc.org/services/rest/services/publiclayers/Zoning/FeatureServer/1",
+      "fluPrefer": "https://gis.wilsonnc.org/services/rest/services/publiclayers/FutureLandUse_2043/FeatureServer/0",
+      "publicGisUrl": "https://gis.wilsonnc.org/communitymaps/",
+      "notes": "CITY-FIRST zoning (984) + FLU 2043 (93, CGF_CA). County Planning App mirrors zoning at FS/40."
+    },
+    "Elm City": {
+      "cityCodeDescParcels": 1015,
+      "hasLocalGis": false,
+      "zoningPrefer": "County Zoning + Municipal Boundaries Name='ELM CITY'",
+      "fluPrefer": "County FLU Plan 2045 (coarse)",
+      "publicGisUrl": "https://gis.wilson-co.com/maps",
+      "notes": "GAP — no public town zoning FeatureServer found"
+    },
+    "Lucama": {
+      "cityCodeDescParcels": 755,
+      "hasLocalGis": false,
+      "zoningPrefer": "Planning Application FS/33 Lucama Zoning (31)",
+      "fluPrefer": "County FLU Plan 2045 (coarse)",
+      "publicGisUrl": "https://gis.wilson-co.com/maps",
+      "notes": "Town zoning on county Planning Application stack"
+    },
+    "Stantonsburg": {
+      "cityCodeDescParcels": 657,
+      "hasLocalGis": false,
+      "zoningPrefer": "Planning Application FS/37 (15)",
+      "fluPrefer": "County FLU Plan 2045 (coarse)",
+      "publicGisUrl": "https://gis.wilson-co.com/maps",
+      "notes": "Town zoning on county stack"
+    },
+    "Sims": {
+      "cityCodeDescParcels": 606,
+      "hasLocalGis": false,
+      "zoningPrefer": "Planning Application FS/35 (12)",
+      "fluPrefer": "County FLU Plan 2045 (coarse)",
+      "publicGisUrl": "https://gis.wilson-co.com/maps",
+      "notes": "Town zoning on county stack; field ZONING_TYP"
+    },
+    "Black Creek": {
+      "cityCodeDescParcels": 332,
+      "hasLocalGis": false,
+      "zoningPrefer": "Planning Application FS/32 (13)",
+      "fluPrefer": "County FLU Plan 2045 (coarse)",
+      "publicGisUrl": "https://gis.wilson-co.com/maps",
+      "notes": "Town zoning on county stack"
+    },
+    "Saratoga": {
+      "cityCodeDescParcels": 267,
+      "hasLocalGis": false,
+      "zoningPrefer": "Planning Application FS/34 (20)",
+      "fluPrefer": "County FLU Plan 2045 (coarse)",
+      "publicGisUrl": "https://gis.wilson-co.com/maps",
+      "notes": "Town zoning on county stack"
+    },
+    "Sharpsburg": {
+      "cityCodeDescParcels": 194,
+      "hasLocalGis": false,
+      "zoningPrefer": "Planning Application FS/36 (32) clipped to Wilson",
+      "fluPrefer": "County FLU Plan 2045 (coarse)",
+      "publicGisUrl": "https://gis.wilson-co.com/maps",
+      "notes": "Multi-county town (Wilson/Nash/Edgecombe); clip with Municipal Boundaries"
+    },
+    "Kenly": {
+      "cityCodeDescParcels": 180,
+      "hasLocalGis": false,
+      "zoningPrefer": "Johnston County card (tip only)",
+      "fluPrefer": "n/a in Wilson card",
+      "publicGisUrl": "https://gis.wilson-co.com/maps",
+      "notes": "Primarily Johnston; Wilson tip only"
+    }
+  },
+  "targetAttributes": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "ParcelNumber",
+        "OwnerID",
+        "GISPIN",
+        "parno"
+      ],
+      "bestLayer": "Tax/Taxparcels",
+      "notes": "Prefer PIN; OwnerID (= ParcelNumber without '.') keys DevNet deep-link"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Tax/Taxparcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CACRES",
+        "DeedAcres",
+        "MapAcres",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 6144,
+      "bestLayer": "Tax/Taxparcels",
+      "notes": "CACRES preferred GIS acres"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Name1",
+        "Name2",
+        "Name3",
+        "ownname"
+      ],
+      "bestLayer": "Tax/Taxparcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "TaxpayerAddress1",
+        "TaxpayerAddress2",
+        "TaxpayerCity",
+        "State",
+        "ZIPCode"
+      ],
+      "bestLayer": "Tax/Taxparcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "PhysicalStreetAddress",
+        "PhysLcStreetNumber",
+        "PhysLcStreetName",
+        "PhysLcStrType",
+        "CityCodeDesc"
+      ],
+      "bestLayer": "Tax/Taxparcels",
+      "notes": "Join Master Addresses when PhysicalStreetAddress sparse"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SalesAmount",
+        "DateSold",
+        "SaleDate",
+        "QualifyCode",
+        "DeedBook",
+        "DeedPage"
+      ],
+      "bestLayer": "Tax/Taxparcels",
+      "notes": "DateSold=YYYYMMDD int; QualifyCode A ≈ arms-length; Three_Year_Sales_Beta supplements"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "TotalFMVCurrent",
+        "LandFMVCur",
+        "ImproveFMVCur",
+        "TotalASVCurrent",
+        "LandASVCur",
+        "ImproveASVCur",
+        "TaxableValue"
+      ],
+      "bestLayer": "Tax/Taxparcels",
+      "notes": "Market + assessed with land/improve split"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "CURRENTZONE",
+        "ZONENAME",
+        "ZONING",
+        "ZONES",
+        "ZONING_TYP",
+        "CODE"
+      ],
+      "bestLayer": "City Zoning FS/1 inside Wilson; town FS/32–37; County Zoning MapServer/0 unincorporated",
+      "caveat": "Elm City has no town zoning FS — use county zoning"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "CGF_CA",
+        "FLU_v3"
+      ],
+      "bestLayer": "City FutureLandUse_2043 inside Wilson; County FLU Plan 2045 (6 coarse polys) elsewhere",
+      "caveat": "No town FLU FS beyond City of Wilson; county FLU is coarse growth-area polygons"
+    },
+    "appraiserLink": {
+      "present": true,
+      "template": "https://wilsonnc.devnetwedge.com/parcel/view/{OwnerID}",
+      "templateAlt": "https://wilsonnc.devnetwedge.com/parcel/view/{ParcelNumberNoDecimal}",
+      "searchUrl": "https://wilsonnc.devnetwedge.com/",
+      "propertyReportUrl": "https://gis.wilson-co.com/maps/assets/wilson/PropertyReport.html?PIN={PIN}",
+      "fieldOnParcel": "OwnerID"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Tax/Taxparcels",
+      "restUrl": "https://gis.wilson-co.com/arcgis/rest/services/Tax/Taxparcels/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "CACRES",
+      "count": 43549,
+      "countAcres5to150": 6144,
+      "countVacantIshAcres5to150": 3213,
+      "countSalePriceGt0Acres5to150": 1798,
+      "countQualifiedAAcres5to150": 867,
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "maxRecordCount": 2000,
+      "wireFirst": true,
+      "status": "usable",
+      "notes": "Rich CAMA on polygon. OwnerID keys DevNet. City mirror publiclayers/Parcels FS/0 (maxRecordCount 200000).",
+      "fieldMap": {
+        "PIN": "parcelId",
+        "ParcelNumber": "parcelIdAlt",
+        "OwnerID": "parcelIdPaKey",
+        "GISPIN": "parcelIdGis",
+        "Name1": "ownerName",
+        "TaxpayerAddress1": "mailingAddress.street",
+        "TaxpayerCity": "mailingAddress.city",
+        "State": "mailingAddress.state",
+        "ZIPCode": "mailingAddress.zip",
+        "PhysicalStreetAddress": "situsAddress",
+        "CityCodeDesc": "situsCity",
+        "CACRES": "acreage",
+        "SalesAmount": "lastSale.price",
+        "DateSold": "lastSale.dateYmd",
+        "QualifyCode": "lastSale.qualified",
+        "TotalFMVCurrent": "tax.marketValue",
+        "LandFMVCur": "tax.landValue",
+        "ImproveFMVCur": "tax.improvementValue",
+        "TotalASVCurrent": "tax.assessedValue"
+      }
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "gisacres",
+      "filter": "cntyfips='195'",
+      "count": 43308,
+      "countAcres5to150": 6143,
+      "countImprovZeroOrNull": 10256,
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "maxRecordCount": 2000,
+      "status": "usable",
+      "notes": "Fallback; land/improve split; no sale price; parno ≈ ParcelNumber",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ]
+    },
+    {
+      "role": "sales",
+      "name": "Tax/Three_Year_Sales_Beta",
+      "restUrl": "https://gis.wilson-co.com/arcgis/rest/services/Tax/Three_Year_Sales_Beta/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "sample",
+      "count": 7673,
+      "status": "usable",
+      "notes": "Three-year sales subset with SalesTable* fields; parcel last-sale remains primary"
+    },
+    {
+      "role": "zoning",
+      "name": "City of Wilson Zoning",
+      "restUrl": "https://gis.wilsonnc.org/services/rest/services/publiclayers/Zoning/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 984,
+      "zoningFields": [
+        "CURRENTZONE",
+        "ZONENAME",
+        "OLDZONE",
+        "PREVZONE",
+        "CDZONE",
+        "CLASS"
+      ],
+      "status": "usable",
+      "notes": "CITY-FIRST inside Wilson; mirror Planning Application FS/40"
+    },
+    {
+      "role": "zoning",
+      "name": "County Zoning",
+      "restUrl": "https://gis.wilson-co.com/arcgis/rest/services/Planning/County_Zoning/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 12528,
+      "zoningFields": [
+        "ZONING",
+        "PIN",
+        "PREVIOUSZONE",
+        "DATE_ADOPTED",
+        "REZONE_NUM"
+      ],
+      "status": "usable",
+      "notes": "Unincorporated primary; AR dominant (~10162)"
+    },
+    {
+      "role": "zoning",
+      "name": "Town zoning stack (Lucama/Black Creek/Stantonsburg/Sims/Saratoga/Sharpsburg)",
+      "restUrl": "https://gis.wilson-co.com/arcgis/rest/services/Planning/Wilson_County_Planning_Application/FeatureServer",
+      "layerIds": {
+        "Lucama": 33,
+        "Black Creek": 32,
+        "Stantonsburg": 37,
+        "Sims": 35,
+        "Saratoga": 34,
+        "Sharpsburg": 36
+      },
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "counts": {
+        "Lucama": 31,
+        "Black Creek": 13,
+        "Stantonsburg": 15,
+        "Sims": 12,
+        "Saratoga": 20,
+        "Sharpsburg": 32
+      },
+      "status": "usable",
+      "notes": "CITY-FIRST per town; Elm City absent"
+    },
+    {
+      "role": "flu",
+      "name": "City FutureLandUse_2043",
+      "restUrl": "https://gis.wilsonnc.org/services/rest/services/publiclayers/FutureLandUse_2043/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 93,
+      "fluField": "CGF_CA",
+      "status": "usable",
+      "notes": "CITY-FIRST FLU; CGF_CA classes MEDIUM HIGH RESIDENTIAL / LOW DENSITY RESIDENTIAL / MIXED USE COMMERCIAL / INDUSTRIAL / INFRASTRUCTURE / INSTITUTIONAL / DOWNTOWN"
+    },
+    {
+      "role": "flu",
+      "name": "Future Land Use Plan 2045",
+      "restUrl": "https://gis.wilson-co.com/arcgis/rest/services/Planning/Wilson_County_Planning_Application/FeatureServer/43",
+      "layerId": 43,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 6,
+      "fluField": "FLU_v3",
+      "status": "partial",
+      "notes": "Coarse countywide growth areas only — not parcel-grain"
+    },
+    {
+      "role": "other",
+      "name": "Municipal Boundaries",
+      "restUrl": "https://gis.wilson-co.com/arcgis/rest/services/Planning/Wilson_County_Planning_Application/FeatureServer/18",
+      "layerId": 18,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 9,
+      "status": "usable",
+      "notes": "CITY OF WILSON, ELM CITY, LUCAMA, BLACK CREEK, STANTONSBURG, SIMS, SARATOGA, SHARPSBURG, KENLY"
+    },
+    {
+      "role": "other",
+      "name": "ETJ",
+      "restUrl": "https://gis.wilson-co.com/arcgis/rest/services/Planning/ETJ/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "count": 9,
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Master Addresses",
+      "restUrl": "https://gis.wilson-co.com/arcgis/rest/services/Base_Layers/Master_Addresses/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "point",
+      "auth": "none",
+      "count": 53140,
+      "status": "usable"
+    }
+  ],
+  "gaps": [
+    "Elm City — no public town zoning FeatureServer",
+    "County FLU Plan 2045 only 6 coarse polygons; no town FLU REST beyond City of Wilson",
+    "Edge tips (Kenly/Bailey/Macclesfield/etc.) zoning belongs on adjacent county cards",
+    "No multi-decade sales history beyond last sale + Three_Year_Sales",
+    "No paid vendor data; no phones/emails; no AADT/utilities dig"
+  ],
+  "license": "Wilson County + City of Wilson public GIS; NC OneMap; NCGS disclaimer; attribution recommended; no paid vendors",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://gis.wilson-co.com/arcgis/rest/services/Tax/Taxparcels/FeatureServer/0",
+    "parcelIdField": "OwnerID",
+    "acreageFilter": "CACRES >= 5 AND CACRES <= 150",
+    "acres5to150Live": 6144,
+    "parcelCountLive": 43549,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='WILSON'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WILSON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WILSON%27&returnCountOnly=true&f=json",
+        "liveStationCount": 606,
+        "stationsWithAADT2022": 316
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Wilson'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Wilson%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Wilson%27&returnCountOnly=true&f=json",
+        "liveStationCount": 606,
+        "stationsWithAADT2025": 378,
+        "stationsWithAADT2024": 324,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "stations2024CountyFilter": "County='Wilson'",
+        "stations2024LiveCount": 605,
+        "stations2024WithAADT2024": 605,
+        "stations2024Note": "AADT_2024 string field populated on every station in this release",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TotalFMVCurrent",
+        "TotalASVCurrent",
+        "TaxableValue"
+      ],
+      "liveNonZero": {
+        "TotalFMVCurrent": 42705,
+        "TotalASVCurrent": 40890,
+        "TaxableValue": 40890
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SalesAmount"
+      ],
+      "dateFields": [
+        "SaleDate"
+      ],
+      "livePriceNonZero": {
+        "SalesAmount": 23083
+      },
+      "liveDateNonNull": {
+        "SaleDate": 42548
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Name1",
+        "Name2",
+        "Name3"
+      ],
+      "rule": "Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).",
+      "regex": "\\b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "regexExtended": "\\b(LLC|L\\s?L\\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\\b|\\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\\s+OF\\b|\\bOF\\s+(EDUCATION|TRANSPORTATION)\\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\\b",
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "liveEntityCount5to150ac": 1806,
+      "liveEntityCount5to150acExtended": 1909,
+      "countNote": "Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.",
+      "sampleMatches": [
+        "J HOLLAND HOLDING LLC",
+        "J HOLLAND HOLDING LLC",
+        "J HOLLAND HOLDING LLC",
+        "JLLDC LLC"
+      ]
+    },
+    "paDeepLink": {
+      "template": "https://wilsonnc.devnetwedge.com/parcel/view/{OwnerID}",
+      "testedParcelId": "3637665541000",
+      "testedUrl": "https://wilsonnc.devnetwedge.com/parcel/view/3637665541000",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": true,
+      "note": "Parcel id found in the response body."
+    },
+    "gisViewer": {
+      "url": "https://gis.wilson-co.com/maps",
+      "httpStatus": 200,
+      "pageTitle": "Wilson County, North Carolina GIS"
+    },
+    "gaps": []
+  }
+}

@@ -1,0 +1,386 @@
+state: NC
+jurisdiction: Anson County
+fips: "37007"
+level: county
+markets: [Charlotte]
+
+layers:
+  - role: parcels
+    name: Vector Parcels (PRIMARY)
+    restUrl: https://ansoncountygis.com/arcgis/rest/services/Vector/MapServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: ASSESSEDACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      ACCTNUMBER: parcelIdAlt
+      ASSESSEDACREAGE: acreage
+      NAME1: ownerName
+      NAME2: ownerName2
+      MAILADDRESS: mailingAddress.street
+      MAILCITY: mailingAddress.city
+      MAILSTATE: mailingAddress.state
+      MAILZIP: mailingAddress.zip
+      SITUSADDRESS: situsAddress
+      PHYSADDRESS: situsAddressAlt
+      SALEPRICE: lastSale.price
+      DATEFLD: lastSale.date
+      TOTMKT: tax.marketValue
+      CURTOTLND: tax.landValue
+      CURTOTBLD: tax.improvementValue
+      CURTOTTOT: tax.assessedValue
+      DEFERVL: tax.deferredValue
+      CountyZoning: zoning
+      LandUsePlan: flu
+      DEEDBOOK: deedBook
+      DEEDPAGE: deedPage
+    notes: >
+      PRIMARY verified 2026-09-23: count 19153; ASSESSEDACREAGE 5–150 → 5820;
+      SALEPRICE>0 → 6610; SITUSADDRESS non-empty → 17381. CRS 102719/2264.
+      Auth none. MaxRecordCount 1000. CountyZoning='Mun.' (~6835) needs municipal
+      spatial join. LandUsePlan='MUN' is municipal FLU stub. DATEFLD is epoch ms UTC.
+      Alternate same schema: WebApp2026/MapServer/10.
+    status: usable
+
+  - role: parcels
+    name: WebApp2026 Parcels (mirror)
+    restUrl: https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: ASSESSEDACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      ACCTNUMBER: parcelIdAlt
+      NAME1: ownerName
+      ASSESSEDACREAGE: acreage
+      SALEPRICE: lastSale.price
+      DATEFLD: lastSale.date
+      TOTMKT: tax.marketValue
+      CountyZoning: zoning
+      LandUsePlan: flu
+      SITUSADDRESS: situsAddress
+    notes: >
+      Verified count 19153; same field family as Vector/Parcels. Prefer Vector for
+      wire-first; WebApp used by interactive maps app.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-23: cntyfips='007' count 19127; gisacres 5–150 → 5815;
+      ownname non-empty ~19070. Weak situs/sale for Anson. No sale price.
+      Filter stub parno ("Assessed in Union County"). MaxRecordCount 5000.
+      Alternate host services.gis.nc.gov.
+    status: usable
+
+  - role: zoning
+    name: Anson County Zoning (unincorporated)
+    restUrl: https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      ZONECODE: zoning
+      ZONECODE2: zoningPreferred
+      Acres: zoningAcres
+      Split_Zoning_Jur: zoningSplitJurisdiction
+    notes: >
+      Verified count 800. Prefer ZONECODE2 (hyphenated, matches parcel CountyZoning).
+      Includes Mun. polygons for municipal areas — still spatial-join town layers for
+      real town codes. Query quirk: use objectIds batches if where=1=1 returns empty.
+      WebApp2026/MapServer/5 mirror.
+    status: usable
+
+  - role: zoning
+    name: Wadesboro Zoning
+    restUrl: https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONECODE: zoning
+    notes: >
+      Verified count 78. Codes GB/LI/NB/R-6/HI/R0/R-20/CB/R-10/UK/R-8/R20-SU.
+      CRS 2264 — spatial join to Vector Parcels where CountyZoning='Mun.'.
+      Mirror WebApp2026/66. No independent city GIS host. ZIP download available.
+    status: usable
+
+  - role: zoning
+    name: Ansonville Zoning
+    restUrl: https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+    notes: >
+      Verified count 76. Codes R-1/R-A/R-2/G-B/M. Mirror WebApp2026/0.
+    status: usable
+
+  - role: zoning
+    name: Ansonville ETJ Zoning
+    restUrl: https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONECODE: zoning
+    notes: >
+      Verified count 26. Codes R20/LI/RA1/HB/I. Use with Municipal ETJ layer Vector/13.
+    status: usable
+
+  - role: zoning
+    name: Lilesville Zoning
+    restUrl: https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZoningDistrict: zoning
+      ZoningDistrictDef: zoningLabel
+    notes: >
+      Verified count 54. Codes R/TCD/GB-LI/RMH. Mirror WebApp2026/2.
+    status: usable
+
+  - role: zoning
+    name: Morven Zoning
+    restUrl: https://ansoncountygis.com/arcgis/rest/services/ZoningLayers/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TYPE: zoning
+    notes: >
+      Verified count 87. Codes SFR-3/CIV/AG/SFR-2/MU-1/C-52/RMST/MS/IND/VSR.
+      Mirror WebApp2026/65. ZIP download available.
+    status: usable
+
+  - role: zoning
+    name: Peachland Zoning (EMPTY)
+    restUrl: https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/63
+    layerId: 63
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+    notes: >
+      Verified count 0 — REST gap. Fallback ZIP:
+      https://www.co.anson.nc.us/DocumentCenter/View/222/Peachland-Zoning-Lines-ZIP
+    status: gap
+
+  - role: zoning
+    name: Polkton Zoning (EMPTY)
+    restUrl: https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/64
+    layerId: 64
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+    notes: >
+      Verified count 0 — REST gap. No ZIP in county downloads catalog; PDF/Vision 2040 only.
+    status: gap
+
+  - role: flu
+    name: Land Use Plan polygons
+    restUrl: https://ansoncountygis.com/arcgis/rest/services/Vector/MapServer/17
+    layerId: 17
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Land_use: fluExisting
+      CT_CAT: flu
+      FLU_20: fluAlt
+      DEV_STAT: developmentStatus
+    notes: >
+      Verified count 13322; FLU_20 non-empty only 246 (sparse). Prefer parcel
+      LandUsePlan attr for wire. Policy legend in Vision 2040 PDF. Mirror WebApp2026/17.
+    status: partial
+
+  - role: other
+    name: Address Points
+    restUrl: https://ansoncountygis.com/arcgis/rest/services/Vector/MapServer/3
+    layerId: 3
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ADDR: situsAddress
+      NUMBER: situsAddress.number
+      STREET: situsAddress.street
+      St_Name: situsAddress.streetName
+      Inc_Muni: situsCity
+      COMMUNITY: community
+      Unit: situsUnit
+    notes: >
+      Verified count 13907. No PIN — spatial join only. Prefer parcel SITUSADDRESS.
+    status: usable
+
+  - role: other
+    name: Municipal Boundaries
+    restUrl: https://ansoncountygis.com/arcgis/rest/services/WebApp2026/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+    notes: >
+      Verified count 8: ANSONVILLE, LILESVILLE, MCFARLAN, MORVEN, PEACHLAND, POLKTON,
+      WADESBORO. Use to route municipal zoning join.
+    status: usable
+
+gaps:
+  - Peachland and Polkton zoning MapServer layers empty (count 0); Peachland ZIP only
+  - McFarlan / White Store / Lanesboro — no public zoning REST (PDF maps)
+  - Municipal FLU is LandUsePlan='MUN' stub; no town FLU FeatureServers
+  - CountyZoning='Mun.' requires spatial join to town layers (~6835 parcels)
+  - ZoningLayers where=1=1 attribute query quirk — use objectIds batches
+  - Last-sale only; no multi-transfer sales FeatureServer
+  - Address points lack PIN join key
+  - OneMap Anson situs/sale sparse; stub out-of-county PINs
+  - MaxRecordCount 1000 on county layers — paginate
+  - NCGS 132-10 commercial resale limits on downloads
+  - No independent city GIS hosts; no paid vendor data; no phones/emails
+
+license: "Anson County GIS public REST + downloads; NCGS 132-10 commercial resale prohibited; attribution expected"
+appraiserSearchUrl: https://www.bttaxpayerportal.com/ITSPublicAN/
+viewerUrl: https://ansoncountygis.com/maps/
+verifiedAt: 2026-09-23
+verifiedBy: GIS Research Executor
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://ansoncountygis.com/arcgis/rest/services/Vector/MapServer/10
+  parcelIdField: PIN
+  acreageFilter: ASSESSEDACREAGE >= 5 AND ASSESSEDACREAGE <= 150
+  acres5to150Live: 5820
+  parcelCountLive: 19153
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='ANSON'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ANSON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ANSON%27&returnCountOnly=true&f=json
+      liveStationCount: 395
+      stationsWithAADT2022: 254
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Anson'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Anson%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Anson%27&returnCountOnly=true&f=json
+      liveStationCount: 390
+      stationsWithAADT2025: 71
+      stationsWithAADT2024: 249
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Anson'
+      stations2024LiveCount: 390
+      stations2024WithAADT2024: 390
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TOTMKT
+    - CURTOTTOT
+    liveNonZero:
+      TOTMKT: 19060
+      CURTOTTOT: 19060
+    status: ok
+  sale:
+    priceFields:
+    - SALEPRICE
+    dateFields:
+    - DATEFLD
+    livePriceNonZero:
+      SALEPRICE: 6610
+    liveDateNonNull:
+      DATEFLD: 18788
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - NAME1
+    - NAME2
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 1201
+    liveEntityCount5to150acExtended: 1263
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - STATE OF NORTH CAROLINA
+    - STATE OF NORTH CAROLINA
+    - WEYERHAEUSER FOREST HOLDINGS INC
+    - STATE OF NORTH CAROLINA
+  paDeepLink:
+    template: https://www.bttaxpayerportal.com/ITSPublicAN/TaxBillSearch/Parcel/{PIN}
+    testedParcelId: '646000707992'
+    testedUrl: https://www.bttaxpayerportal.com/ITSPublicAN/TaxBillSearch/Parcel/646000707992
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: true
+    note: Parcel id found in the response body.
+  gisViewer:
+    url: https://ansoncountygis.com/maps/
+    httpStatus: 200
+    pageTitle: Avineon Web Map Template
+  gaps: []

@@ -1,0 +1,418 @@
+state: NC
+jurisdiction: Edgecombe County
+fips: "37065"
+level: county
+markets: [Rocky Mount, Raleigh-Durham]
+slug: edgecombe
+cntyfips: "065"
+
+jurisdictionGisUrl: https://gis.edgecombecountync.gov/maps/default.htm
+publicGisUrl: https://gis.edgecombecountync.gov/maps/default.htm
+gisViewerUrl: https://gis.edgecombecountync.gov/maps/default.htm
+viewerLinkTemplate: "https://gis.edgecombecountync.gov/maps/default.htm?PIN={linkpin}"
+appraiserSearchUrl: https://taxpa.edgecombecountync.gov/paas/?DEST=pSearch
+paDeepLinkTemplate: "https://taxpa.edgecombecountync.gov/paas/?DEST=pDetail&pKEY={linkpin}"
+paDeepLinkKey: linkpin
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/edgecombe/parcel-search
+ncptsDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/edgecombe/parcel-detail/{parcel}"
+ncptsDeepLinkTemplateAlt: "https://lrcpwa.ncptscloud.com/edgecombe/parcel-detail/{linkpin}"
+countyRestRoot: https://gis.edgecombecountync.gov/arcgis/rest/services
+gisDepartmentUrl: https://www.edgecombecountync.gov/departments/planning_inspections_and_e-911/
+taxAssessorUrl: https://www.edgecombecountync.gov/businesses/tax_assessor/
+rockyMountViewerUrl: https://map.viewprogis.com/vp/rockymount-nc
+oneMapFilter: "cntyfips='065'"
+parcelIdPreferred: linkpin
+joinKeys: [linkpin, parcel, pin, account, parno, altparno]
+
+layers:
+  - role: parcels
+    name: webmap/Parcels (PRIMARY CAMA)
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: acreage
+    coverage: county-wide
+    fieldMap:
+      linkpin: parcelId
+      parcel: parcelIdDisplay
+      pin: parcelIdPin
+      pinsuf: parcelIdPinSuffix
+      account: parcelIdAccount
+      altpin: parcelIdAlt
+      acreage: acreage
+      owner: ownerName
+      address: mailingAddress.street
+      city: mailingAddress.city
+      st: mailingAddress.state
+      zip: mailingAddress.zip
+      location: situsAddress
+      deeddate: lastSale.date
+      deeddatestr: lastSale.dateText
+      salepr: lastSale.price
+      bk_pg: lastSale.deedBookPage
+      landval: tax.landValue
+      bldgval: tax.improvementValue
+      netval: tax.taxableValue
+      deferred: tax.deferredValue
+      zone: zoning
+      taxcodes: taxDistricts
+      pclass: propClass
+      propdescr: legalDescription
+      subdivisio: subdivision
+      map: mapSheet
+      nbhd: neighborhood
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 31606; acreage 5–150 → 4259;
+      salepr>0 → 14564; salepr>0 in band → 1445; bldgval 0/null in band → 2559;
+      location present 31540; zone not null 11504. CRS 102719/2264. MaxRecordCount 1000 — paginate.
+      Sample parcel 3747-72-3650 / pin 3747723650 / linkpin 374772365000 / account 168057.
+      Geo-check linkpin 374783367400 ≈ -77.824, 35.870 (Rocky Mount tip).
+      Prefer linkpin for PA pKEY and map ?PIN=. Display PIN = {parcel}-{pinsuf}.
+      webmap/FeatureServer not queryable — use MapServer. Auth: none.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (fallback)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdPin
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      siteadd: situsAddress
+      gisacres: acreage
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      saledate: lastSale.date
+    notes: >
+      Filter cntyfips='065'. Verified count 31591; gisacres 5–150 → 4249.
+      parno↔parcel; altparno↔pin. No sale price. Alternate host services.gis.nc.gov. MaxRecordCount 5000.
+    status: usable
+
+  - role: zoning
+    name: Tarboro Zoning (city-first PRIMARY seat)
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ALPHA: zoning
+    notes: >
+      PRIMARY city-first Tarboro (county seat). Verified count 96.
+      Codes HB 19, GR10 12, HI 12, GR3 11, O&I 11, NB 10, GR5 9, RD 6, LI 2, MHP 2, CBD 1, HO 1.
+    status: usable
+
+  - role: zoning
+    name: Rocky Mount Zoning (Edgecombe tip)
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+    notes: >
+      Edgecombe-side Rocky Mount only (verified count 144). Many split ZONING strings.
+      Prefer Nash Avineon_WebTemplate/72 (2972) for Nash-side Rocky Mount.
+      ViewPro https://map.viewprogis.com/vp/rockymount-nc — no city ArcGIS REST.
+    status: partial
+
+  - role: zoning
+    name: Sharpsburg Zoning
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zone: zoning
+    notes: Verified count 167. Codes R-10 42, B-1 40, R-6M 24, R-6 21, MHP 18, R-8 15, I 3, R-12 3. Spans Nash/Wilson — clip.
+    status: usable
+
+  - role: zoning
+    name: Leggett Zoning
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ALPHA: zoning
+    notes: Verified count 82. Codes R-30 37, R-20 24, B-2 15, B-1 5.
+    status: usable
+
+  - role: zoning
+    name: Pinetops Zoning
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/17
+    layerId: 17
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ALPHA: zoning
+    notes: Verified count 21. Codes R-7, AR-20, B-3, RMH-7, B-1, B-2, M-1, R-12.
+    status: usable
+
+  - role: zoning
+    name: Princeville Zoning
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/18
+    layerId: 18
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ALPHA: zoning
+    notes: Thin — verified count 7 (HP-DC, IND, MXU, R1, R2, R3).
+    status: partial
+
+  - role: zoning
+    name: Macclesfield Zoning
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/19
+    layerId: 19
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ALPHA: zoning
+    notes: Verified count 10. Codes AR, R-15, R-20, B-1, R-8.
+    status: usable
+
+  - role: zoning
+    name: Conetoe Zoning
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/20
+    layerId: 20
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ALPHA: zoning
+    notes: Verified count 12. Codes B-1, R-15, B-2, M-1, R-15 MH.
+    status: usable
+
+  - role: zoning
+    name: County Zoning (unincorporated PRIMARY)
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/23
+    layerId: 23
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ALPHA: zoning
+    notes: >
+      Unincorporated primary under group County Zoning/21 (with ETJ/22).
+      Verified count 175. Top ALPHA: B-1 53, R-20 29, R-30 29, M-2 17, B-2 14, M-1 8, AR-30 6, R-10 6, O-I 4, TCO 3.
+      Inside city limits prefer per-muni layers 13–20 / 15 / 16.
+    status: usable
+
+  - role: flu
+    name: Land Use Districts (coarse UA/UB)
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/45
+    layerId: 45
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ALPHA: flu
+    notes: >
+      FLU GAP — only 2 polys (UA, UB). Not a detailed FLUM. No city FLU FeatureServers found.
+    status: partial
+
+  - role: other
+    name: Address Points (situs spatial)
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/5
+    layerId: 5
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FULLADD: situsAddress
+      CITY: situsCity
+      ZIP: situsZip
+    notes: >
+      Verified count 33175. No PIN/parcel join key — spatial only.
+      Prefer parcel location (~31540) or OneMap siteadd.
+    status: partial
+
+  - role: other
+    name: City Limits
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/35
+    layerId: 35
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ALPHA: municipality
+    notes: >
+      Verified 80 features / 9 names: TARBORO 64, SHARPSBURG 4, ROCKY MOUNT 3, PINETOPS 2,
+      PRINCEVILLE 2, WHITAKERS 2, CONETOE 1, LEGGETT 1, MACCLESFIELD 1.
+    status: usable
+
+  - role: other
+    name: ETJ
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/22
+    layerId: 22
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ALPHA: etjName
+    notes: >
+      Verified 7: ROCKY MOUNT, TARBORO, LEGGETT, PINETOPS, SPEED, PRINCEVILLE, SHARPSBURG.
+    status: usable
+
+  - role: other
+    name: Speed Community Overlay
+    restUrl: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/57
+    layerId: 57
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ALPHA: overlay
+    notes: Verified count 1. Speed has no town zoning polygons on this host.
+    status: usable
+
+gaps:
+  - No independent city ArcGIS FeatureServers — county-host layers + Rocky Mount ViewPro only
+  - Rocky Mount Edgecombe tip (144) incomplete vs Nash-side Avineon_WebTemplate/72 (2972) — use Nash card inside Nash limits
+  - Whitakers city_limits without Edgecombe zoning layer — prefer Nash Avineon_WebTemplate/75
+  - FLU gap — Land Use Districts only UA/UB (2); no detailed FLUM REST
+  - Parcel zone attribute noisy/partial (~36%) — prefer spatial join to zoning layers
+  - Address Points lack PIN — spatial join only; prefer location / OneMap siteadd
+  - Keystone PA detail prefers POST pKEY={linkpin}; bare GET may show empty shell; search PIN ####-##-####-##
+  - Last-sale only on parcel; no multi-transfer history layer
+  - Sharpsburg / Whitakers / Rocky Mount span adjacent counties — clip to Edgecombe
+  - MaxRecordCount 1000 — paginate; ParcelFabric/Hosted token-required (499); no phones/emails; no AADT/utilities; no paid vendors
+license: "Edgecombe County public GIS; NC OneMap; attribution recommended; no paid vendors"
+appraiserSearchUrl: https://taxpa.edgecombecountync.gov/paas/?DEST=pSearch
+viewerLinkTemplate: "https://gis.edgecombecountync.gov/maps/default.htm?PIN={linkpin}"
+gisViewerUrl: https://gis.edgecombecountync.gov/maps/default.htm
+publicGisUrl: https://gis.edgecombecountync.gov/maps/default.htm
+gisDepartmentUrl: https://www.edgecombecountync.gov/departments/planning_inspections_and_e-911/
+countyRestRoot: https://gis.edgecombecountync.gov/arcgis/rest/services
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://gis.edgecombecountync.gov/arcgis/rest/services/webmap/MapServer/10
+  parcelIdField: linkpin
+  acreageFilter: acreage >= 5 AND acreage <= 150
+  acres5to150Live: 4257
+  parcelCountLive: 31608
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='EDGECOMBE'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27EDGECOMBE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27EDGECOMBE%27&returnCountOnly=true&f=json
+      liveStationCount: 498
+      stationsWithAADT2022: 56
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Edgecombe'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Edgecombe%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Edgecombe%27&returnCountOnly=true&f=json
+      liveStationCount: 495
+      stationsWithAADT2025: 401
+      stationsWithAADT2024: 229
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - netval
+    - landval
+    - bldgval
+    allTaxFieldsOnLayer:
+    - landval
+    - bldgval
+    - netval
+    - deferred
+    - taxcodes
+    liveNonZero:
+      netval: 31541
+      landval: 31105
+      bldgval: 22278
+    status: ok
+  sale:
+    priceFields:
+    - salepr
+    dateFields:
+    - deeddate
+    livePriceNonZero:
+      salepr: 14564
+    liveDateNonNull:
+      deeddate: 31543
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - owner
+    primaryOwnerField: owner
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(owner) LIKE '% LLC%' OR UPPER(owner) LIKE '% INC%' OR UPPER(owner) LIKE '% LP%' OR UPPER(owner) LIKE '% LLP%' OR UPPER(owner) LIKE '% LTD%' OR UPPER(owner) LIKE '% TRUST%' OR UPPER(owner) LIKE '% CHURCH%' OR UPPER(owner) LIKE '% COMPANY%' OR UPPER(owner) LIKE '% PARTNERSHIP%' OR UPPER(owner) LIKE '% HOLDINGS%' OR UPPER(owner) LIKE '% PROPERTIES%' OR UPPER(owner) LIKE '% CORP%' OR UPPER(owner) LIKE '%,LLC%' OR UPPER(owner) LIKE '%,INC%' OR UPPER(owner) LIKE 'CITY OF %' OR UPPER(owner) LIKE 'COUNTY OF %' OR UPPER(owner) LIKE 'STATE OF %' OR UPPER(owner) LIKE 'TOWN OF %')
+    liveEntityCountAll: 6623
+    liveEntityCount5to150ac: 1251
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://taxpa.edgecombecountync.gov/paas/?DEST=pDetail&pKEY={linkpin}
+    testedParcelId: '374783367400'
+    testedUrl: https://taxpa.edgecombecountync.gov/paas/?DEST=pDetail&pKEY=374783367400
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: false
+    note: 'GET returns 200 but an empty Keystone shell; POST pKEY={linkpin} to ?DEST=pDetail returns the owner (verified via curl POST). LSB: open via form POST, or fall back to NCPTS / map ?PIN=.'
+  gisViewer:
+    url: https://gis.edgecombecountync.gov/maps/default.htm
+    httpStatus: 200
+    pageTitle: Avineon Web Map Template
+  gaps: []

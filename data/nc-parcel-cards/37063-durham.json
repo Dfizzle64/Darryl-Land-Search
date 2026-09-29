@@ -1,0 +1,870 @@
+{
+  "county": "Durham",
+  "state": "NC",
+  "msa": "Raleigh-Durham MSA",
+  "fips": "37063",
+  "cntyfips": "063",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "viewerLinkTemplate": "https://maps.durhamnc.gov/",
+  "appraiserSearchUrl": "https://taxcama.dconc.gov/camapwa/",
+  "appraiserDeepLinkTemplate": "https://taxcama.dconc.gov/camapwa/PropertySummary.aspx?PARCELPK={PARCEL_PK}",
+  "appraiserDeepLinkReidTemplate": "https://taxcama.dconc.gov/camapwa/PropertySummary.aspx?REID={REID}",
+  "joinKeys": [
+    "REID",
+    "PARCEL_PK",
+    "PIN",
+    "parno"
+  ],
+  "parcelIdPreferred": "REID",
+  "parcelIdCaveat": "Durham Tax Office: do not use PIN as durable parcel reference; PIN algorithm rewritten 2022-01-31 and recalculates on boundary edits. Use six-digit REID (Parcel ID).",
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "REID",
+        "PARCEL_PK",
+        "PIN",
+        "parno"
+      ],
+      "bestLayer": "PublicServices/Property/MapServer/4",
+      "caveat": "Prefer REID; PIN/OneMap parno unstable"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "PublicServices/Property/MapServer/4"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "ACREAGE",
+        "CALCULATED_ACRES",
+        "DEEDED_ACRES"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 4940,
+      "approxCountCalculatedAcres": 4939,
+      "bestLayer": "PublicServices/Property/MapServer/4"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "PROPERTY_OWNER",
+        "ownname"
+      ],
+      "bestLayer": "PublicServices/Property/MapServer/4"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "OWNER_MAIL_1",
+        "OWNER_MAIL_2",
+        "OWNER_MAIL_3",
+        "OWNER_MAIL_CITY",
+        "OWNER_MAIL_STATE",
+        "OWNER_MAIL_ZIP",
+        "mailadd"
+      ],
+      "bestLayer": "PublicServices/Property/MapServer/4"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": false,
+      "fields": [
+        "LOCATION_ADDR",
+        "PHYADDR_*",
+        "SITE_ADDRE",
+        "siteadd"
+      ],
+      "bestLayer": "PublicServices/Property/MapServer/4",
+      "caveat": "On primary polygon layer; Address Points for unit-level"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "PKG_SALE_DATE",
+        "PKG_SALE_PRICE",
+        "LAND_SALE_DATE",
+        "LAND_SALE_PRICE",
+        "DEED_DATE"
+      ],
+      "bestLayer": "PublicServices/Property/MapServer/4",
+      "caveat": "Prefer package sale; last-sale only \u2014 no multi-transfer history layer; epoch ms"
+    },
+    "taxValues": {
+      "present": true,
+      "fields": [
+        "TOTAL_PROP_VALUE",
+        "TOTAL_LAND_VALUE_ASSESSED",
+        "TOTAL_BLDG_VALUE_ASSESSED",
+        "TOTAL_OBLDG_VALUE",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "PublicServices/Property/MapServer/4"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "ZONING",
+        "ZONE_CODE",
+        "UDO_LABEL",
+        "ZONE_GEN",
+        "CLASS",
+        "ZONE_TYPE"
+      ],
+      "bestLayer": "PublicServices/Planning/MapServer/12 (Durham UDO); tip munis separate",
+      "split": "Durham City+County UDO vs Chapel Hill / Morrisville / Raleigh / Cary tips"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "PlaceType",
+        "PlaceTypeName"
+      ],
+      "bestLayer": "Place Type Planning/MapServer/25",
+      "caveat": "Durham Comp Plan Place Types; tip FLU gap (Chapel Hill ImageServer-only)"
+    },
+    "dorCode": {
+      "present": true,
+      "fields": [
+        "LAND_CLASS"
+      ],
+      "bestLayer": "PublicServices/Property/MapServer/4",
+      "caveat": "Local land-class string, not NC DOR code"
+    },
+    "viewerLink": {
+      "present": true,
+      "template": "https://maps.durhamnc.gov/",
+      "taxSearch": "https://taxcama.dconc.gov/camapwa/",
+      "deepLinkParcelPk": "https://taxcama.dconc.gov/camapwa/PropertySummary.aspx?PARCELPK={PARCEL_PK}",
+      "deepLinkReid": "https://taxcama.dconc.gov/camapwa/PropertySummary.aspx?REID={REID}",
+      "keyField": "REID"
+    }
+  },
+  "portals": [
+    {
+      "name": "Durham Maps",
+      "url": "https://maps.durhamnc.gov/",
+      "notes": "City + County interactive viewer"
+    },
+    {
+      "name": "Open Data Hub",
+      "url": "https://live-durhamnc.opendata.arcgis.com/",
+      "notes": "Downloads / Hub datasets"
+    },
+    {
+      "name": "Planning Hub",
+      "url": "https://planning-durhamnc.hub.arcgis.com/",
+      "notes": "Planning / Place Type context"
+    },
+    {
+      "name": "webgis2 REST",
+      "url": "https://webgis2.durhamnc.gov/server/rest/services",
+      "notes": "PublicServices Property + Planning"
+    },
+    {
+      "name": "AGOL org G5vR3cOjh6g2Ed8E",
+      "url": "https://services2.arcgis.com/G5vR3cOjh6g2Ed8E/arcgis/rest/services",
+      "notes": "Parcels_NEW, Planning FeatureServer"
+    },
+    {
+      "name": "Tax CAMA Property Search",
+      "url": "https://taxcama.dconc.gov/camapwa/",
+      "notes": "Official Real Property Search; PropertySummary deep-links"
+    },
+    {
+      "name": "Land Record/GIS",
+      "url": "https://dconc.gov/Tax-Administration/Real-Property/Real-Property-Database/Land-Record-GIS",
+      "notes": "Tax Admin land records guidance (prefer REID)"
+    },
+    {
+      "name": "Chapel Hill GIS REST",
+      "url": "https://gis-portal.townofchapelhill.org/server/rest/services",
+      "notes": "OpenData Zoning_Districts; Future_Land_Uses ImageServer"
+    },
+    {
+      "name": "Raleigh/Wake Zoning REST",
+      "url": "https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer",
+      "notes": "Raleigh/0, Cary/3, Morrisville/9; Wake maps.wake.gov Zoning/22"
+    },
+    {
+      "name": "NC OneMap",
+      "url": "https://www.nconemap.gov",
+      "notes": "Statewide parcels FeatureServer"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "City of Durham",
+      "districtLabel": "DURHAM / DURHAM CITY",
+      "includesUnincorporatedCountyUdo": true,
+      "parcelCityCount": 110776,
+      "etjLabels": [
+        "DURHAM CITY",
+        "DURHAM COUNTY"
+      ],
+      "zoning": [
+        {
+          "name": "City-County UDO Zoning",
+          "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/12",
+          "alternateUrls": [
+            "https://services2.arcgis.com/G5vR3cOjh6g2Ed8E/arcgis/rest/services/Planning/FeatureServer/12"
+          ],
+          "field": "ZONE_CODE",
+          "altFields": [
+            "UDO_LABEL",
+            "ZONE_GEN",
+            "UDO_LEGEND"
+          ],
+          "featureCount": 2525,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "Place Type (Comprehensive Plan)",
+          "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/25",
+          "alternateUrls": [
+            "https://services2.arcgis.com/G5vR3cOjh6g2Ed8E/arcgis/rest/services/Planning/FeatureServer/25"
+          ],
+          "fields": [
+            "PlaceType",
+            "PlaceTypeName"
+          ],
+          "featureCount": 10288,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "boundary": {
+        "name": "City of Durham",
+        "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Administrative/MapServer/1",
+        "featureCount": 1,
+        "field": "LOCALGOV"
+      },
+      "joinNotes": "Joint City\u2013County UDO zoning + Place Type FLU + county parcels in 2264. Unincorporated (ETJ=DURHAM COUNTY) uses same UDO. Parcel ZONING attribute often populated \u2014 spatial join when null."
+    },
+    {
+      "name": "Town of Chapel Hill",
+      "districtLabel": "CHAPEL HILL / CHAPEL-HILL",
+      "notes": "Mostly Orange County; Durham tip ~1319 parcels (~17 in 5\u2013150 ac)",
+      "parcelCityCount": 1319,
+      "zoning": [
+        {
+          "name": "Zoning Districts",
+          "url": "https://gis-portal.townofchapelhill.org/server/rest/services/OpenData/Zoning_Districts/FeatureServer/0",
+          "alternateUrls": [
+            "https://gis-portal.townofchapelhill.org/server/rest/services/OpenData/Zoning_Districts/MapServer/0"
+          ],
+          "field": "ZONING",
+          "altFields": [
+            "NAME",
+            "OLD_ZONING"
+          ],
+          "featureCount": 313,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "Future_Land_Uses ImageServer",
+          "url": "https://gis-portal.townofchapelhill.org/server/rest/services/Future_Land_Uses/ImageServer",
+          "fields": [],
+          "featureCount": null,
+          "notes": "Raster only \u2014 no queryable polygon FLU found (gap)",
+          "status": "gap"
+        }
+      ],
+      "joinNotes": "Filter Durham parcels CITY='CHAPEL HILL' or ETJ like CHAPEL-HILL. Spatial join Chapel Hill zoning (2264). Do not use Durham UDO/Place Type alone."
+    },
+    {
+      "name": "Town of Morrisville",
+      "districtLabel": "MORRISVILLE",
+      "notes": "Mostly Wake; Durham tip ~65 parcels (~3 in 5\u2013150 ac)",
+      "parcelCityCount": 65,
+      "zoning": [
+        {
+          "name": "Morrisville Zoning (Wake)",
+          "url": "https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/22",
+          "field": "CLASS",
+          "altFields": [
+            "COND_USE"
+          ],
+          "featureCount": 32,
+          "wkid": 102719,
+          "latestWkid": 2264
+        },
+        {
+          "name": "Morrisville Zoning (Raleigh regional)",
+          "url": "https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/9",
+          "field": "CLASS",
+          "featureCount": 29,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Spatial join Morrisville zoning to Durham tip parcels. Parcel ZONING attrs may mix Morrisville and Durham-style codes \u2014 verify with polygons. FLU gap."
+    },
+    {
+      "name": "City of Raleigh",
+      "districtLabel": "RALEIGH",
+      "notes": "Durham tip ~1111 parcels (~7 in 5\u2013150 ac)",
+      "parcelCityCount": 1111,
+      "zoning": [
+        {
+          "name": "Raleigh Zoning",
+          "url": "https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/0",
+          "field": "ZONING",
+          "altFields": [
+            "ZONE_TYPE",
+            "ZONE_TYPE_DECODE"
+          ],
+          "featureCount": 3592,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Spatial join Raleigh Zoning; keep only Durham county parcels. FLU gap for Durham tip."
+    },
+    {
+      "name": "Town of Cary",
+      "districtLabel": "CARY",
+      "notes": "Tiny Durham tip \u2014 2 parcels",
+      "parcelCityCount": 2,
+      "zoning": [
+        {
+          "name": "Cary Zoning",
+          "url": "https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/3",
+          "field": "ZONING",
+          "featureCount": 2736,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Verify footprint before wiring; FLU gap."
+    }
+  ],
+  "layers": [
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales",
+        "other",
+        "zoning"
+      ],
+      "name": "PublicServices/Property Parcels",
+      "id": 4,
+      "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 133548,
+      "acreage5to150": 4940,
+      "calculatedAcres5to150": 4939,
+      "pkgSalePriceNonZero": 56637,
+      "zoningNullOrEmpty": 5231,
+      "maxRecordCount": 2000,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + ACREAGE/CALCULATED_ACRES 5-150 + sample attrs REID/owner/LOCATION_ADDR/PKG_SALE/TOTAL_PROP_VALUE/ZONING + CITY/ETJ groupByStats",
+      "fields": {
+        "REID": "Parcel ID (preferred durable id)",
+        "PARCEL_PK": "CAMA PropertySummary deep-link key",
+        "PIN": "Unstable \u2014 do not use as durable id",
+        "ACREAGE": "Primary acreage",
+        "CALCULATED_ACRES": "GIS calculated acres",
+        "DEEDED_ACRES": "Deed acres",
+        "PROPERTY_OWNER": "Owner name",
+        "OWNER_MAIL_1": "Mailing street",
+        "OWNER_MAIL_CITY": "Mailing city",
+        "OWNER_MAIL_STATE": "Mailing state",
+        "OWNER_MAIL_ZIP": "Mailing ZIP",
+        "LOCATION_ADDR": "Situs full address",
+        "PHYADDR_CITY": "Situs city",
+        "PHYADDR_ZIP": "Situs ZIP",
+        "PKG_SALE_DATE": "Package sale date (epoch ms)",
+        "PKG_SALE_PRICE": "Package sale price",
+        "LAND_SALE_DATE": "Land sale date",
+        "LAND_SALE_PRICE": "Land sale price",
+        "TOTAL_PROP_VALUE": "Total property / market value",
+        "TOTAL_LAND_VALUE_ASSESSED": "Land assessed",
+        "TOTAL_BLDG_VALUE_ASSESSED": "Building assessed",
+        "TOTAL_OBLDG_VALUE": "Other building value",
+        "ZONING": "Joined zoning attribute (may be null/tip-mixed)",
+        "LAND_CLASS": "Local land class",
+        "CITY": "Municipal city label",
+        "ETJ": "Planning jurisdiction / ETJ"
+      },
+      "notes": "PRIMARY wire-first. Situs+tax+sale on polygon. Prefer REID."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales"
+      ],
+      "name": "Parcels_NEW",
+      "id": 0,
+      "url": "https://services2.arcgis.com/G5vR3cOjh6g2Ed8E/arcgis/rest/services/Parcels_NEW/FeatureServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 133548,
+      "acreage5to150": 4940,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample attrs matching Property/4 schema",
+      "notes": "AGOL mirror of county CAMA parcels; slightly richer fields."
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "Property Address Points",
+      "id": 0,
+      "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/0",
+      "geometry": "esriGeometryPoint",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 196410,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + field metadata",
+      "fields": {
+        "SITE_ADDRE": "Full situs",
+        "PARCEL_ID": "Parcel join",
+        "PIN": "PIN join",
+        "CITY": "City",
+        "ZIPCODE": "ZIP"
+      },
+      "notes": "Many-to-one; primary situs already on parcels."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Planning Zoning (City-County UDO)",
+      "id": 12,
+      "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/12",
+      "alternateUrls": [
+        "https://services2.arcgis.com/G5vR3cOjh6g2Ed8E/arcgis/rest/services/Planning/FeatureServer/12"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 2525,
+      "verified": true,
+      "verifiedHow": "returnCountOnly both hosts + sample ZONE_CODE/UDO_LABEL/ZONE_GEN + ZONE_GEN groupByStats",
+      "fields": {
+        "ZONE_CODE": "Zoning code",
+        "UDO_LABEL": "UDO label",
+        "UDO_LEGEND": "Legend text",
+        "ZONE_GEN": "General category",
+        "PDR": "PDR flag",
+        "CASE_NO": "Case number"
+      },
+      "notes": "Durham City + unincorporated only \u2014 not tip cities."
+    },
+    {
+      "purpose": [
+        "flu"
+      ],
+      "name": "Place Type",
+      "id": 25,
+      "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/25",
+      "alternateUrls": [
+        "https://services2.arcgis.com/G5vR3cOjh6g2Ed8E/arcgis/rest/services/Planning/FeatureServer/25"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 10288,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + distinct PlaceType/PlaceTypeName",
+      "fields": {
+        "PlaceType": "FLU / place-type code",
+        "PlaceTypeName": "FLU label"
+      },
+      "notes": "Primary FLU for Durham Comp Plan area. Tip FLU gap."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "sales",
+        "other"
+      ],
+      "name": "NC OneMap Parcels",
+      "id": 1,
+      "url": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 133075,
+      "acreage5to150": 4934,
+      "filter": "cntyfips='063'",
+      "verified": true,
+      "verifiedHow": "returnCountOnly cntyfips=063 + gisacres 5-150 + sample attrs",
+      "fields": {
+        "parno": "Parcel no (= Durham PIN)",
+        "ownname": "Owner",
+        "mailadd": "Mailing",
+        "siteadd": "Situs",
+        "gisacres": "GIS acres",
+        "saledate": "Sale date (no price)",
+        "parval": "Parcel value",
+        "landval": "Land value",
+        "improvval": "Improvement value"
+      },
+      "notes": "Fallback; resolve REID via county PIN join. No sale price."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Chapel Hill Zoning Districts",
+      "id": 0,
+      "url": "https://gis-portal.townofchapelhill.org/server/rest/services/OpenData/Zoning_Districts/FeatureServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 313,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample ZONING/NAME",
+      "fields": {
+        "ZONING": "Zoning code",
+        "NAME": "District name"
+      },
+      "notes": "Tip municipality \u2014 spatial join to Durham parcels."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Morrisville Zoning",
+      "id": 22,
+      "url": "https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/22",
+      "alternateUrls": [
+        "https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/9"
+      ],
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 32,
+      "verified": true,
+      "verifiedHow": "returnCountOnly Wake/22 (32) + Raleigh/9 (29) + sample CLASS",
+      "fields": {
+        "CLASS": "Zoning class",
+        "COND_USE": "Conditional use"
+      },
+      "notes": "Durham tip only \u2014 filter CITY=MORRISVILLE."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Raleigh Zoning",
+      "id": 0,
+      "url": "https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/0",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 3592,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample ZONING/ZONE_TYPE",
+      "fields": {
+        "ZONING": "Zoning",
+        "ZONE_TYPE": "Zone type code",
+        "ZONE_TYPE_DECODE": "Zone type label"
+      },
+      "notes": "Durham tip \u2014 filter to Durham parcels."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Cary Zoning",
+      "id": 3,
+      "url": "https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/3",
+      "geometry": "esriGeometryPolygon",
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "featureCount": 2736,
+      "verified": true,
+      "verifiedHow": "returnCountOnly",
+      "notes": "Tiny Durham tip (2 parcels)."
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "City of Durham Boundary",
+      "id": 1,
+      "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Administrative/MapServer/1",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 1,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + field metadata",
+      "fields": {
+        "LOCALGOV": "Local government name"
+      }
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "Future Growth Areas",
+      "id": 16,
+      "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/16",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 8,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + field metadata",
+      "notes": "Secondary to Place Type"
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "Development Tiers",
+      "id": 5,
+      "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/5",
+      "geometry": "esriGeometryPolygon",
+      "featureCount": 14,
+      "verified": true,
+      "verifiedHow": "returnCountOnly + sample NAME/TYPE",
+      "notes": "Secondary planning context (URBAN/DOWNTOWN/CN)"
+    }
+  ],
+  "wireFirst": {
+    "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4",
+    "filter": "ACREAGE BETWEEN 5 AND 150",
+    "parcelIdField": "REID",
+    "steps": [
+      "Query Property/4 polygons with ACREAGE 5-150; map REID, owner, mail, LOCATION_ADDR, tax, PKG_SALE_*, CITY/ETJ, ZONING",
+      "Spatial join Planning Zoning/12 for Durham City/County when ZONING null; route tip CITY to Chapel Hill / Morrisville / Raleigh / Cary zoning",
+      "Spatial join Place Type/25 for FLU (Durham planning area); leave null for tips",
+      "Deep-link taxcama PropertySummary with PARCEL_PK or REID",
+      "Fallback NC OneMap cntyfips='063' then resolve REID via PIN"
+    ]
+  },
+  "gaps": [
+    "Tip-muni FLU polygons missing (Chapel Hill ImageServer-only; Morrisville/Raleigh/Cary tip FLU not verified)",
+    "Parcel ZONING ~5231 null/empty and tip-mixed \u2014 spatial-join municipal zoning",
+    "PIN unstable \u2014 use REID; OneMap parno tracks PIN",
+    "Last-sale only \u2014 no multi-transfer public sales FeatureServer",
+    "CachedServices/Future_Land_Use is tile cache \u2014 use Place Type",
+    "MaxRecordCount 2000 \u2014 paginate",
+    "No phones/emails collected; no paid vendors"
+  ],
+  "license": "City of Durham / Durham County open GIS; tip-muni layers per Chapel Hill / Wake / Raleigh attribution; public records",
+  "verifiedAt": "2026-09-23",
+  "verifiedBy": "Grok Bot GIS researcher",
+  "verifiedLayerCount": 13,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "pass1": {
+      "status": "verified",
+      "parcelPolygonLayer": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4",
+      "polygonCountLive": 133548,
+      "parcelIdField": "REID",
+      "parcelIdFilled": 133548,
+      "acreageField": "ACREAGE",
+      "acres5to150Live": 4940,
+      "sampleCentroidWgs84": [
+        -78.913,
+        36.0034
+      ]
+    },
+    "parcelLayer": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4",
+    "parcelIdField": "REID",
+    "acreageFilter": "ACREAGE >= 5 AND ACREAGE <= 150",
+    "acres5to150Live": 4940,
+    "parcelCountLive": 133548,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='DURHAM'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DURHAM%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DURHAM%27&returnCountOnly=true&f=json",
+        "liveStationCount": 946,
+        "stationsWithAADT2022": 111
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Durham'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Durham%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Durham%27&returnCountOnly=true&f=json",
+        "liveStationCount": 954,
+        "stationsWithAADT2025": 867,
+        "stationsWithAADT2024": 189,
+        "stationsWith2025or2024": 872,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TOTAL_PROP_VALUE",
+        "TOTAL_LAND_VALUE_ASSESSED"
+      ],
+      "liveNonZero": {
+        "TOTAL_PROP_VALUE": 131203,
+        "TOTAL_LAND_VALUE_ASSESSED": 126888
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "PKG_SALE_PRICE"
+      ],
+      "dateFields": [
+        "PKG_SALE_DATE"
+      ],
+      "livePriceNonZero": {
+        "PKG_SALE_PRICE": 56637
+      },
+      "liveDateNonNull": {
+        "PKG_SALE_DATE": 69913
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "PROPERTY_OWNER"
+      ],
+      "primaryOwnerField": "PROPERTY_OWNER",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(PROPERTY_OWNER) LIKE '% LLC%' OR UPPER(PROPERTY_OWNER) LIKE '% INC%' OR UPPER(PROPERTY_OWNER) LIKE '% LP%' OR UPPER(PROPERTY_OWNER) LIKE '% LLP%' OR UPPER(PROPERTY_OWNER) LIKE '% LTD%' OR UPPER(PROPERTY_OWNER) LIKE '% TRUST%' OR UPPER(PROPERTY_OWNER) LIKE '% CHURCH%' OR UPPER(PROPERTY_OWNER) LIKE '% COMPANY%' OR UPPER(PROPERTY_OWNER) LIKE '% PARTNERSHIP%' OR UPPER(PROPERTY_OWNER) LIKE '% HOLDINGS%' OR UPPER(PROPERTY_OWNER) LIKE '% PROPERTIES%' OR UPPER(PROPERTY_OWNER) LIKE '% CORP%' OR UPPER(PROPERTY_OWNER) LIKE '%,LLC%' OR UPPER(PROPERTY_OWNER) LIKE '%,INC%' OR UPPER(PROPERTY_OWNER) LIKE 'CITY OF %' OR UPPER(PROPERTY_OWNER) LIKE 'COUNTY OF %' OR UPPER(PROPERTY_OWNER) LIKE 'STATE OF %' OR UPPER(PROPERTY_OWNER) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 33569,
+      "liveEntityCount5to150ac": 2441,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://taxcama.dconc.gov/camapwa/PropertySummary.aspx?REID={REID}",
+      "testedParcelId": "100805",
+      "testedUrl": "https://taxcama.dconc.gov/camapwa/PropertySummary.aspx?REID=100805",
+      "httpStatus": 200,
+      "contentType": "text/html; charset=utf-8",
+      "contentVerified": true,
+      "note": "Server-rendered CAMA PropertySummary; owner and REID verified."
+    },
+    "gisViewer": {
+      "url": "https://maps.durhamnc.gov/",
+      "httpStatus": 200,
+      "pageTitle": "Durham Maps | City of Durham and Durham County"
+    },
+    "municipalLayerCheck": {
+      "checked": 11,
+      "answering": 10,
+      "layers": [
+        {
+          "url": "https://gis-portal.townofchapelhill.org/server/rest/services/OpenData/Zoning_Districts/FeatureServer/0",
+          "name": "Zoning Districts",
+          "liveCount": 313
+        },
+        {
+          "url": "https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/0",
+          "name": "Raleigh Zoning",
+          "liveCount": 3592
+        },
+        {
+          "url": "https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/3",
+          "name": "Cary Zoning",
+          "liveCount": 2736
+        },
+        {
+          "url": "https://maps.raleighnc.gov/arcgis/rest/services/Planning/Zoning/MapServer/9",
+          "name": "Morrisville Zoning",
+          "liveCount": 29
+        },
+        {
+          "url": "https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/22",
+          "ok": false,
+          "error": "EXC <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protoc",
+          "httpRetry": "32"
+        },
+        {
+          "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Administrative/MapServer/1",
+          "name": "City of Durham",
+          "liveCount": 1
+        },
+        {
+          "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/12",
+          "name": "Zoning",
+          "liveCount": 2527
+        },
+        {
+          "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/16",
+          "name": "Future Growth Areas",
+          "liveCount": 8
+        },
+        {
+          "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/25",
+          "name": "Place Type",
+          "liveCount": 10288
+        },
+        {
+          "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Planning/MapServer/5",
+          "name": "Development Tiers",
+          "liveCount": 14
+        },
+        {
+          "url": "https://webgis2.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/0",
+          "name": "Address Points",
+          "liveCount": 197386
+        }
+      ],
+      "note": "maps.wake.gov Planning/Zoning/MapServer/22 (Morrisville): https TLS EOF from this box, plain http answers (count 32). Morrisville is also on maps.raleighnc.gov Zoning/MapServer/9 (29)."
+    },
+    "gaps": []
+  }
+}

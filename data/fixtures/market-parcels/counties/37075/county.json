@@ -1,0 +1,29 @@
+{
+  "name": "Graham",
+  "fips": "37075",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 1920,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-graham-parcels-37075",
+  "queryUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer/6/query",
+  "gaps": [
+    "Parcels are GrahamAGOL Parcels (CAMA + polygons) (https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer/6). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 1963 rows; 1920 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 104 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37075/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37075/lookup.json",
+  "sourceCount": 1963,
+  "dropped": 40,
+  "tileCount": 5,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://bttaxpayerportal.com/itspublicgr/AppraisalCard.aspx?parcel={PARNUM}",
+  "gisViewerUrl": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=561a20cc33894cb98ff18aa6925af254"
+}

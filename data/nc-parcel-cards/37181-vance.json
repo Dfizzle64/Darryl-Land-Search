@@ -1,0 +1,497 @@
+{
+  "county": "Vance",
+  "state": "NC",
+  "msa": "Raleigh-Durham footprint",
+  "fips": "37181",
+  "cntyfips": "181",
+  "slug": "vance",
+  "level": "county",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "publicGisUrl": "https://vc-gis.maps.arcgis.com/apps/instant/sidebar/index.html?appid=b784ca1b2bd1462bbd4d7d0b01c4fcc9",
+  "gisViewerUrl": "https://vc-gis.maps.arcgis.com/apps/instant/sidebar/index.html?appid=b784ca1b2bd1462bbd4d7d0b01c4fcc9",
+  "gisDepartmentUrl": "https://www.vancecounty.org/departments/gis-geographic-information-system/",
+  "countyRestRoot": "https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services",
+  "agolOrgId": "pET3krhY1T0smsXf",
+  "appraiserSearchUrl": "https://vance.ustaxdata.com/Search.cfm",
+  "viewerLinkTemplate": "https://vance.ustaxdata.com/account.cfm?ownerID={OWNID}&parcelID={PIN}",
+  "viewerLinkTemplateAlt": "https://vance.ustaxdata.com/list.cfm?parcelNum={PIN}",
+  "viewerLinkTemplateNcpts": "https://lrcpwa.ncptscloud.com/vance/parcel-detail/{OWNID}",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/vance/parcel-search",
+  "rodBookPageTemplate": "https://www.vancencrod.org/BookAndPage.asp?Book={DBOOK}&Page={DPAGE}",
+  "joinKeys": [
+    "PIN",
+    "OWNID",
+    "GeoPIN",
+    "parno",
+    "nparno"
+  ],
+  "parcelIdPreferred": "PIN",
+  "paDeepLinkKey": "OWNID+PIN",
+  "municipalities": {
+    "Henderson": {
+      "hasLocalGis": true,
+      "zoningPrefer": "https://gis.henderson.nc.gov/arcgis/rest/services/Planning/Planning/FeatureServer/0",
+      "etjZoningPrefer": "https://gis.henderson.nc.gov/arcgis/rest/services/Planning/Planning/FeatureServer/1",
+      "zoningAlternateCombined": "https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/City_ETJ_Zoning_20260306/FeatureServer/0",
+      "cityZoningCount": 7521,
+      "etjZoningCount": 3129,
+      "publicGisUrl": "https://gis.henderson.nc.gov/arcgis/rest/services",
+      "notes": "City seat; city-first zoning + ETJ on city host; county AGOL combined mirror dated 20260306"
+    },
+    "Middleburg": {
+      "hasLocalGis": false,
+      "zoningPrefer": "Vance_County_Zoning + Municipal/ETJ boundaries Name=MDLBG",
+      "publicGisUrl": "https://vc-gis.maps.arcgis.com/apps/instant/sidebar/index.html?appid=b784ca1b2bd1462bbd4d7d0b01c4fcc9",
+      "notes": "No dedicated town zoning FeatureServer found"
+    },
+    "Kittrell": {
+      "hasLocalGis": false,
+      "zoningPrefer": "Vance_County_Zoning + Municipal/ETJ boundaries Name=KITT",
+      "publicGisUrl": "https://vc-gis.maps.arcgis.com/apps/instant/sidebar/index.html?appid=b784ca1b2bd1462bbd4d7d0b01c4fcc9",
+      "notes": "No dedicated town zoning FeatureServer found"
+    },
+    "Unincorporated": {
+      "zoningPrefer": "https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/Vance_County_Zoning/FeatureServer/0",
+      "zoningDistrictsCount": 15556,
+      "fluPrefer": "gap — Land Use Plan PDF only"
+    }
+  },
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "OWNID",
+        "GeoPIN",
+        "PARCEL_NUM",
+        "parno"
+      ],
+      "bestLayer": "Envirolink/FeatureServer/1",
+      "caveat": "Prefer PIN; OWNID required for ustaxdata account deep-link; GeoPIN for map index."
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Envirolink/FeatureServer/1"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CALC_ACRE",
+        "DEEDACRE",
+        "DEED_ACRE",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 3081,
+      "bestLayer": "Envirolink/FeatureServer/1",
+      "caveat": "Prefer CALC_ACRE for GIS filters; DEEDACRE/DEED_ACRE sparser."
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "OWNNAME",
+        "OWNNAME2",
+        "OWNNAME3",
+        "ownname"
+      ],
+      "bestLayer": "Envirolink/FeatureServer/1"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "OWNADD1",
+        "OWNADD2",
+        "OWNCITY",
+        "OWNSTATE",
+        "OWNZIP",
+        "mailadd",
+        "mcity",
+        "mstate",
+        "mzip"
+      ],
+      "bestLayer": "Envirolink/FeatureServer/1"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": false,
+      "fields": [
+        "PHYSADDRES",
+        "full_addre",
+        "siteadd"
+      ],
+      "bestLayer": "Envirolink/FeatureServer/1",
+      "caveat": "Join ADP_CTR/0 when PHYSADDRES incomplete."
+    },
+    "lastSale": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "DBOOK",
+        "DPAGE",
+        "BookPage",
+        "Sold Date (ustaxdata)",
+        "Sold Amount (ustaxdata)"
+      ],
+      "bestLayer": "ustaxdata account.cfm HTML",
+      "caveat": "No sale price/date on county or OneMap REST. Join ustaxdata via OWNID+PIN. Deed bk/pg on parcel for ROD."
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "ASSESSMENT",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "Envirolink/FeatureServer/1",
+      "notes": "County ASSESSMENT is single assessed total; OneMap provides land/improve split."
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "Zoning",
+        "zoning_dis"
+      ],
+      "bestLayer": "Henderson Planning/0 (city) + Vance_County_Zoning (unincorp)",
+      "caveat": "Cities-first: Henderson city/ETJ FS inside city; county zoning elsewhere; Middleburg/Kittrell no town FS."
+    },
+    "flu": {
+      "present": false,
+      "partial": false,
+      "fields": [],
+      "bestLayer": null,
+      "caveat": "GAP — Land Use Plan PDF 2010 only; no public FLU FeatureServer."
+    },
+    "appraiserLink": {
+      "present": true,
+      "template": "https://vance.ustaxdata.com/account.cfm?ownerID={OWNID}&parcelID={PIN}",
+      "templateAlt": "https://vance.ustaxdata.com/list.cfm?parcelNum={PIN}",
+      "templateNcpts": "https://lrcpwa.ncptscloud.com/vance/parcel-detail/{OWNID}",
+      "searchUrl": "https://vance.ustaxdata.com/Search.cfm",
+      "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/vance/parcel-search",
+      "fieldOnParcel": "OWNID+PIN"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Envirolink Parcels_AGS",
+      "restUrl": "https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/Envirolink/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "CALC_ACRE",
+      "count": 26557,
+      "countAcres5to150": 3081,
+      "countDeedAcres5to150": 2773,
+      "countOwnerOrAssessment": 26287,
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "maxRecordCount": 1000,
+      "wireFirst": true,
+      "status": "usable",
+      "notes": "PRIMARY CAMA polygons: owner/mailing/situs/assessment/deed; no sale price on REST.",
+      "fieldMap": {
+        "PIN": "parcelId",
+        "OWNID": "parcelIdOwner",
+        "GeoPIN": "parcelIdGeo",
+        "OWNNAME": "ownerName",
+        "OWNADD1": "mailingAddress.street",
+        "OWNCITY": "mailingAddress.city",
+        "OWNSTATE": "mailingAddress.state",
+        "OWNZIP": "mailingAddress.zip",
+        "PHYSADDRES": "situsAddress",
+        "CALC_ACRE": "acreage",
+        "ASSESSMENT": "tax.assessedValue",
+        "DBOOK": "lastSale.deedBook",
+        "DPAGE": "lastSale.deedPage",
+        "BookPage": "lastSale.deedUrl"
+      }
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "acreageField": "gisacres",
+      "filter": "cntyfips='181'",
+      "count": 26547,
+      "countAcres5to150": 3208,
+      "countImprovZeroAcres5to150": 1670,
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "maxRecordCount": 5000,
+      "status": "usable",
+      "notes": "Fallback; land/improve split; saledate null for Vance; parno≈PIN",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ]
+    },
+    {
+      "role": "zoning",
+      "name": "City of Henderson Zoning",
+      "restUrl": "https://gis.henderson.nc.gov/arcgis/rest/services/Planning/Planning/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 7521,
+      "zoningFields": [
+        "Zoning"
+      ],
+      "crs": {
+        "wkid": 102100,
+        "latestWkid": 3857
+      },
+      "status": "usable",
+      "notes": "City-first PRIMARY inside Henderson city limits"
+    },
+    {
+      "role": "zoning",
+      "name": "City of Henderson ETJ Zoning",
+      "restUrl": "https://gis.henderson.nc.gov/arcgis/rest/services/Planning/Planning/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 3129,
+      "zoningFields": [
+        "Zoning"
+      ],
+      "crs": {
+        "wkid": 102100,
+        "latestWkid": 3857
+      },
+      "status": "usable",
+      "notes": "City-first for Henderson ETJ"
+    },
+    {
+      "role": "zoning",
+      "name": "City_ETJ_Zoning_20260306 (county AGOL combined)",
+      "restUrl": "https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/City_ETJ_Zoning_20260306/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 10654,
+      "zoningFields": [
+        "Zoning"
+      ],
+      "crs": {
+        "wkid": 102100,
+        "latestWkid": 3857
+      },
+      "status": "usable",
+      "notes": "Convenience mirror of Henderson city+ETJ on county host"
+    },
+    {
+      "role": "zoning",
+      "name": "Vance County Zoning",
+      "restUrl": "https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/Vance_County_Zoning/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 15556,
+      "countsByDistrict": {
+        "R30": 10962,
+        "AR": 2704,
+        "R20": 1141,
+        "R10": 168,
+        "OI": 118,
+        "GC1": 92,
+        "HC": 89,
+        "RMHC": 86,
+        "OS": 69,
+        "LI": 68,
+        "IM": 23,
+        "EIA": 7,
+        "CZR10": 1
+      },
+      "zoningFields": [
+        "zoning_dis"
+      ],
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "status": "usable",
+      "notes": "Unincorporated / non-Henderson primary; parcel-attributed"
+    },
+    {
+      "role": "flu",
+      "name": "Future Land Use (public polygon REST)",
+      "restUrl": null,
+      "layerId": null,
+      "geometry": "none",
+      "auth": "n/a",
+      "coverage": "unknown",
+      "status": "gap",
+      "notes": "PDF only: https://www.vancecounty.org/wp-content/uploads/2020/07/LUMap_2010.pdf"
+    },
+    {
+      "role": "other",
+      "name": "Address Points ADP",
+      "restUrl": "https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/ADP_CTR/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "point",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 23898,
+      "status": "usable",
+      "notes": "911 situs; Inc_Muni Henderson/Kittrell/Middleburg/UNINCORPORATED"
+    },
+    {
+      "role": "other",
+      "name": "Municipal / ETJ Boundaries",
+      "restUrl": "https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/ETJHendersonZoning/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 5,
+      "status": "usable",
+      "notes": "Henderson, Middleburg, Kittrell, ETJ, Vance"
+    },
+    {
+      "role": "sales",
+      "name": "ustaxdata account card (HTML)",
+      "restUrl": null,
+      "status": "partial",
+      "notes": "Sale Date/Amount via account.cfm?ownerID={OWNID}&parcelID={PIN}; not a FeatureServer"
+    }
+  ],
+  "gaps": [
+    "No sale price/date on county or OneMap REST — join ustaxdata HTML via OWNID+PIN",
+    "No public FLU polygon REST (Land Use Plan PDF 2010 only)",
+    "Middleburg / Kittrell lack public zoning FeatureServers",
+    "NCPTS API 500 for Vance tenant on 2026-09-24 — SPA loads; prefer ustaxdata for verified PA/sale",
+    "YEAR_BUILT almost entirely 0/null on REST",
+    "County ASSESSMENT is single total — use OneMap for land/improve split",
+    "Envirolink MaxRecordCount 1000 — paginate",
+    "No paid vendor data; no phones/emails; no AADT/utilities dig"
+  ],
+  "license": "Vance County public GIS (vc-gis AGOL); City of Henderson GIS; NC OneMap; Vance County Tax (ustaxdata); NCGS disclaimer; attribution recommended",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://services6.arcgis.com/pET3krhY1T0smsXf/arcgis/rest/services/Envirolink/FeatureServer/1",
+    "parcelIdField": "PIN",
+    "acreageFilter": "CALC_ACRE >= 5 AND CALC_ACRE <= 150",
+    "acres5to150Live": 3081,
+    "parcelCountLive": 26557,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='VANCE'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27VANCE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27VANCE%27&returnCountOnly=true&f=json",
+        "liveStationCount": 379,
+        "stationsWithAADT2022": 149
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Vance'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Vance%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Vance%27&returnCountOnly=true&f=json",
+        "liveStationCount": 378,
+        "stationsWithAADT2025": 229,
+        "stationsWithAADT2024": 227,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "stations2024CountyFilter": "County='Vance'",
+        "stations2024LiveCount": 376,
+        "stations2024WithAADT2024": 376,
+        "stations2024Note": "AADT_2024 string field populated on every station in this release",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "ASSESSMENT"
+      ],
+      "liveNonZero": {
+        "ASSESSMENT": 26287
+      },
+      "status": "ok-assessed-only",
+      "note": "Only ASSESSMENT (total assessed) on REST; land/building split via OneMap landval/improvval (cntyfips='181') or ustaxdata card."
+    },
+    "sale": {
+      "priceFields": [],
+      "dateFields": [],
+      "livePriceNonZero": {},
+      "liveDateNonNull": {},
+      "status": "gap",
+      "note": "No sale price/date on Envirolink REST; OneMap saledate empty for 181. Only DBOOK/DPAGE/BookPage deed ref. Public fallback: ustaxdata list/account page (sales history HTML)."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "OWNNAME",
+        "OWNNAME2"
+      ],
+      "rule": "Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).",
+      "regex": "\\b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "regexExtended": "\\b(LLC|L\\s?L\\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\\b|\\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\\s+OF\\b|\\bOF\\s+(EDUCATION|TRANSPORTATION)\\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\\b",
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "liveEntityCount5to150ac": 449,
+      "liveEntityCount5to150acExtended": 546,
+      "countNote": "Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.",
+      "sampleMatches": [
+        "VANCE COMMONS LP | C/O EXCEL PROPERTY MGMT",
+        "NC DEPARTMENT OF TRANSPORTATIO",
+        "DABNEY EXCHANGE LLC",
+        "HENDERSON INVESTORS LLC"
+      ]
+    },
+    "paDeepLink": {
+      "template": "https://vance.ustaxdata.com/list.cfm?parcelNum={PIN}",
+      "testedParcelId": "0433 02014",
+      "testedUrl": "https://vance.ustaxdata.com/list.cfm?parcelNum=0433%2002014",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": true,
+      "note": "Parcel id found in the response body."
+    },
+    "gisViewer": {
+      "url": "https://vc-gis.maps.arcgis.com/apps/instant/sidebar/index.html?appid=b784ca1b2bd1462bbd4d7d0b01c4fcc9",
+      "httpStatus": 200,
+      "pageTitle": "Sidebar"
+    },
+    "gaps": [
+      "No sale price/date on REST — ustaxdata HTML only",
+      "CALC_ACRE null/0 on 2932 parcels — 5–150 count understated; DEEDACRE or OneMap gisacres as fallback"
+    ]
+  }
+}

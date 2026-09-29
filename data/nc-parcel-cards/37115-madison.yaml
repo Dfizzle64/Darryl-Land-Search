@@ -1,0 +1,334 @@
+state: NC
+jurisdiction: Madison County
+fips: "37115"
+level: county
+markets: [Asheville]
+slug: madison
+cntyfips: "115"
+
+municipalities:
+  - name: Marshall
+    role: city-first-zoning
+    seat: true
+    zoningLayer: Marshall_Zoning2023v2/FeatureServer/0
+    zoningField: CLASSIFICA
+    zoningCount: 82
+    zoneCodes: [R1, R2, R3, HB, MU, CB, OSR, I]
+    fluRest: false
+    notes: County seat; county-hosted AGOL; ignore empty CAMA stubs on this layer
+  - name: Mars Hill
+    role: city-first-zoning
+    zoningLayer: Mars_Hill_Zoning/FeatureServer/0
+    zoningField: ZoningCode
+    zoningCount: 39
+    zoneCodes: [R1, R2, R2A, R3, R4, C1, C2, Industrial, Institutional, T]
+    etjLayer: MarsHillETJ/FeatureServer/0
+    fluRest: false
+    ordinancePdf: https://townofmarshill.org/Documents/Services/ZONING%20ORDINANCE%20-%20Town%20of%20Mars%20Hill%20-%202021.pdf
+    zoningMapPage: https://townofmarshill.org/_services/planning_zoning/zoning_map.php
+  - name: Hot Springs
+    role: gap
+    zoningLayer: null
+    fluRest: false
+    planningUrl: https://townofhotsprings.org/zoning/
+    notes: Zoning REST gap; town Planning & Zoning page
+  - name: Unincorporated Madison
+    role: county-zoning
+    zoningLayer: CtyZoningWO_MH_Marsh/FeatureServer/0
+    zoningCount: 20167
+    notes: County zoning outside MH/Marshall (R-A/R-2/R-B/MHP/I-D/C)
+
+layers:
+  - role: parcels
+    name: 2025_Parcels (PRIMARY)
+    restUrl: https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/2025_Parcels/FeatureServer/19
+    layerId: 19
+    geometry: polygon
+    auth: none
+    acreageField: CACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      REID: parcelIdAlt
+      CACRES: acreage
+      TACRES: acreage
+      OWNER: ownerName
+      ADDRESS: mailingAddress
+      CITY: mailingAddress
+      STATE: mailingAddress
+      ZIP: mailingAddress
+      ZONING: zoning
+      DB: other
+      DP: other
+    notes: >
+      PRIMARY verified 2026-09-24: count 21753; CACRES 5–150 → 7134; TACRES 5–150 → 7426;
+      OWNER not null → 20081. CRS 6543. MaxRecordCount 2000 — paginate. Auth none.
+      Sample PIN 9834383846 SHELTON ≈ -82.61/36.03. No sale/tax values — join OneMap; NCPTS for sale.
+    status: usable
+
+  - role: parcels
+    name: ParcelCAMAInfo
+    restUrl: https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/ParcelCAMAInfo/FeatureServer/9
+    alternateUrls:
+      - https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/2025_Madison_County_Tax_Parcel_Update/FeatureServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: CACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      REID: parcelIdAlt
+      CACRES: acreage
+      OWNER: ownerName
+      ADDRESS: mailingAddress
+      ZONING: zoning
+    notes: CAMA mirror count 21549; same schema as 2025_Parcels.
+    status: usable
+
+  - role: parcels
+    name: 2023_Madison_County_Tax_Parcels
+    restUrl: https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/2023_Madison_County_Tax_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      OWNER: ownerName
+      CACRES: acreage
+      ZONING: zoning
+    notes: Prior-year mirror count 21535; prefer 2025_Parcels.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress
+      siteadd: situsAddress
+      gisacres: acreage
+      saledatetx: lastSale.date
+      parval: tax.marketValue
+      landval: tax.marketValue
+      improvval: tax.marketValue
+      cntyfips: other
+    notes: >
+      Filter cntyfips='115'. Count 21381; gisacres 5–150 → 7157; parval>0 → 19810;
+      saledate empty (0). PRIMARY for tax values. Join parno↔PIN. MaxRecordCount 5000.
+    status: usable
+
+  - role: zoning
+    name: Mars_Hill_Zoning
+    restUrl: https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/Mars_Hill_Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZoningCode: zoning
+    notes: Cities-first PRIMARY Mars Hill. Count 39. Codes R1/R2/R2A/R3/R4/C1/C2/Industrial/Institutional/T. ETJ MarsHillETJ/0.
+    status: usable
+
+  - role: zoning
+    name: Marshall_Zoning2023v2
+    restUrl: https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/Marshall_Zoning2023v2/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      CLASSIFICA: zoning
+    notes: Cities-first PRIMARY Marshall. Count 82. CLASSIFICA R1/R2/R3/HB/MU/CB/OSR/I. CAMA sale/tax columns empty — zoning only.
+    status: usable
+
+  - role: zoning
+    name: CtyZoningWO_MH_Marsh
+    restUrl: https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/CtyZoningWO_MH_Marsh/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: county-minus-MH-Marshall
+    fieldMap:
+      Zoning: zoning
+      PIN: parcelId
+      CACRES: acreage
+    notes: County zoning count 20167. Codes R-A 17856 / R-2 1731 / R-B 181 / MHP 27 / I-D 14 / C 3. Prefer muni layers inside MH/Marshall.
+    status: usable
+
+  - role: boundaries
+    name: Town_Limits
+    restUrl: https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/Town_Limits/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: municipalities
+    fieldMap:
+      NAME: other
+    notes: Mars Hill / Hot Springs / Marshall (count 3). Routing for cities-first.
+    status: usable
+
+  - role: addresses
+    name: 2025_Addresses SiteStructureAddressPoints
+    restUrl: https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/2025_Addresses/FeatureServer/32
+    layerId: 32
+    geometry: point
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      FullAddress: situsAddress
+    notes: Count 18612. No PIN — spatial situs join; prefer OneMap siteadd when joining by parno.
+    status: usable
+
+  - role: flu
+    name: Comp Plan / Map 3 PDF (no FeatureServer)
+    restUrl: null
+    geometry: none
+    auth: none
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      PDF only — comprehensive_plan_2022.pdf + map_3_-_current_zoning___land_use.pdf.
+      No FLU FeatureServer. Parcel ZONING is zoning not FLU.
+    status: gap
+
+gaps:
+  - Sale price/date REST gap on county AGOL + OneMap (use NCPTS PA Package/Land Sale)
+  - Tax values absent on county parcel REST (join OneMap parval/landval/improvval)
+  - Hot Springs municipal zoning FeatureServer gap
+  - FLU FeatureServer gap (Comp Plan + Map 3 PDF only)
+  - Parcel ADDRESS is mailing not situs
+  - Marshall_Zoning2023v2 CAMA sale/tax columns empty stubs
+
+license: >
+  Madison County Tax/GIS/Planning (gis_madcotax); NC OneMap. NCGS 132-10.
+  Attribution required. Not survey quality. Consult primary deed/plat sources.
+
+appraiserSearchUrl: https://lrcpwa.ncptscloud.com/Madison/PropertySummary.aspx?PARCELPK={PARCEL_PK}
+appraiserSearchUrlAlternates:
+  - https://lrcpwa.ncptscloud.com/Madison/PropertySummary.aspx?PIN={PIN_DASHED}
+  - https://lrcpwa.ncptscloud.com/Madison/PropertySummary.aspx?REID={REID}
+  - http://lrcpwa.ncptscloud.com/Madison
+jurisdictionGisUrl: https://experience.arcgis.com/experience/2333843dc4584e648a98fb9542dc75fe
+openDataHub: https://madison-county-nc-open-data-madcotax.hub.arcgis.com/
+pinEncoding: "10-digit PIN → ####-##-#### (9834383846 → 9834-38-3846)"
+
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+tranche: 3
+verifiedLayerCount: 12
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/2025_Parcels/FeatureServer/19
+  parcelIdField: PIN
+  acreageFilter: CACRES >= 5 AND CACRES <= 150
+  acres5to150Live: 7134
+  parcelCountLive: 21753
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='MADISON'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MADISON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MADISON%27&returnCountOnly=true&f=json
+      liveStationCount: 205
+      stationsWithAADT2022: 136
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Madison'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Madison%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Madison%27&returnCountOnly=true&f=json
+      liveStationCount: 198
+      stationsWithAADT2025: 75
+      stationsWithAADT2024: 118
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields: []
+    allTaxFieldsOnLayer: []
+    liveNonZero: {}
+    status: gap
+    fallback:
+      source: NC OneMap parcels (join altparno/parno to PIN)
+      restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+      where: cntyfips='115' AND parval>0
+      liveCount: 19810
+      fields:
+      - parval
+      - landval
+      - improvval
+      pa: NCPTS Madison PropertySummary (appraised values)
+  sale:
+    priceFields: []
+    dateFields: []
+    livePriceNonZero: {}
+    liveDateNonNull: {}
+    status: gap
+    note: No sale price/date on county REST or NC OneMap (saledate null). NCPTS Madison PropertySummary carries Package/Land Sale.
+  ownerEntity:
+    ownerFields:
+    - OWNER
+    primaryOwnerField: OWNER
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(OWNER) LIKE '% LLC%' OR UPPER(OWNER) LIKE '% INC%' OR UPPER(OWNER) LIKE '% LP%' OR UPPER(OWNER) LIKE '% LLP%' OR UPPER(OWNER) LIKE '% LTD%' OR UPPER(OWNER) LIKE '% TRUST%' OR UPPER(OWNER) LIKE '% CHURCH%' OR UPPER(OWNER) LIKE '% COMPANY%' OR UPPER(OWNER) LIKE '% PARTNERSHIP%' OR UPPER(OWNER) LIKE '% HOLDINGS%' OR UPPER(OWNER) LIKE '% PROPERTIES%' OR UPPER(OWNER) LIKE '% CORP%' OR UPPER(OWNER) LIKE '%,LLC%' OR UPPER(OWNER) LIKE '%,INC%' OR UPPER(OWNER) LIKE 'CITY OF %' OR UPPER(OWNER) LIKE 'COUNTY OF %' OR UPPER(OWNER) LIKE 'STATE OF %' OR UPPER(OWNER) LIKE 'TOWN OF %')
+    liveEntityCountAll: 3414
+    liveEntityCount5to150ac: 986
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://lrcpwa.ncptscloud.com/Madison/PropertySummary.aspx?PIN={PIN}
+    testedParcelId: 9834-28-4018
+    testedUrl: https://lrcpwa.ncptscloud.com/Madison/PropertySummary.aspx?PIN=9834-28-4018
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: false
+    note: 'NCPTS SPA shell (200, 496 B, client-rendered): parcel content cannot be checked server-side. Card-preferred form ?PARCELPK={PARCEL_PK} needs a key that is not on the REST layer; ?PIN={PIN dashed ####-##-####} was tested.'
+  gisViewer:
+    url: https://experience.arcgis.com/experience/2333843dc4584e648a98fb9542dc75fe
+    httpStatus: 200
+    pageTitle: Experience
+    arcgisItem:
+      access: public
+      title: Madison County, NC GIS
+      type: Web Experience
+      err: null
+  gaps:
+  - tax gap
+  - sale gap

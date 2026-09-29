@@ -1,0 +1,530 @@
+state: NC
+jurisdiction: New Hanover County
+fips: "37129"
+level: county
+markets: [Wilmington]
+
+layers:
+  - role: parcels
+    name: Parcels / IASTAX Parcel_Polygon (PRIMARY geometry)
+    restUrl: https://gis.nhcgov.com/server/rest/services/Layers/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PID: parcelId
+      PIN: parcelIdPin
+      MAPID: parcelIdMap
+      MAPIDKEY: joinKey
+      ACRES: acreage
+    notes: >
+      PRIMARY geometry verified 2026-09-23: count 103967; ACRES 5–150 → 2286.
+      CRS 103122/6543. No owner/tax/situs on this layer — join IASTAX table/1
+      or PropertyOwners on MAPIDKEY (PID↔PARID). Alternate:
+      Layers/IASTAX/FeatureServer/0 (same schema/count). MaxRecordCount 10000.
+    status: usable
+
+  - role: tax
+    name: IASTAX attribute table (PRIMARY attributes)
+    restUrl: https://gis.nhcgov.com/server/rest/services/Layers/IASTAX/FeatureServer/1
+    layerId: 1
+    geometry: none
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PARID: parcelId
+      MAPIDKEY: joinKey
+      OWN1: ownerName
+      OWNER_NUM: mailingAddress.num
+      OWNER_STREET: mailingAddress.street
+      OWNER_STREETTYPE: mailingAddress.streetType
+      OWNER_CITY: mailingAddress.city
+      OWNER_STATE: mailingAddress.state
+      OWNER_ZIP: mailingAddress.zip
+      OWNER_ADDR1: mailingAddress.line1
+      OWNER_ADDR2: mailingAddress.line2
+      OWNER_ADDR3: mailingAddress.line3
+      ADRNO: situsAddress.num
+      ADRSTR: situsAddress.street
+      ADRSUF: situsAddress.suffix
+      ADRDIR: situsAddress.dir
+      CITYNAME: situsCity
+      ACRES: acreage
+      SALE_DATE: lastSale.date
+      SALE_PRICE: lastSale.price
+      APRLAND: tax.landValue
+      APRBLDG: tax.improvementValue
+      APRTOT: tax.assessedValue
+      ZONING: zoning
+      MUNI: planningJurisdiction
+      LUC: dorCode
+      CLASS: landUseClass
+    notes: >
+      Verified 2026-09-23: count 115876; ACRES 5–150 → 2285; APRBLDG=0 in
+      5–150 → 1247. Table only — attribute-join to polygons on MAPIDKEY.
+      REST relationships empty. Deduplicate multi-interest rows by PARID.
+      MaxRecordCount 10000.
+    status: usable
+
+  - role: tax
+    name: PropertyOwners (points)
+    restUrl: https://gis.nhcgov.com/server/rest/services/Layers/PropertyOwners/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PARID: parcelId
+      MAPIDKEY: joinKey
+      OWN1: ownerName
+      OWNER_CITY: mailingAddress.city
+      OWNER_STATE: mailingAddress.state
+      OWNER_ZIP: mailingAddress.zip
+      ADRNO: situsAddress.num
+      ADRSTR: situsAddress.street
+      CITYNAME: situsCity
+      ACRES: acreage
+      SALE_DATE: lastSale.date
+      SALE_PRICE: lastSale.price
+      APRLAND: tax.landValue
+      APRBLDG: tax.improvementValue
+      APRTOT: tax.assessedValue
+      ZONING: zoning
+      MUNI: planningJurisdiction
+    notes: >
+      Verified count 115876; ACRES 5–150 → 2285. Same CAMA fields as IASTAX
+      table; point geometry. Join to Parcels polys on MAPIDKEY for outlines.
+      MaxRecordCount 2000.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-23: cntyfips='129' count 103489; gisacres 5–150 → 2281.
+      No sale price. CRS 102719/2264 — reproject vs county 6543.
+      MaxRecordCount 5000. Alternate host services.gis.nc.gov.
+    status: usable
+
+  - role: zoning
+    name: County Zoning (unincorporated)
+    restUrl: https://gis.nhcgov.com/server/rest/services/Layers/Zoning/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-unincorporated
+    fieldMap:
+      ZONING: zoning
+      ZONINGTXT: zoningLabel
+      CDFLAG: zoningConditionalFlag
+      CDCASE: zoningCase
+      WEBSITE: zoningInfoUrl
+    notes: >
+      Verified count 1832. CRS 6543. Includes CITY/WB/CB placeholder polygons —
+      not authoritative inside municipalities. Mirrors: Zoning_base/3,
+      PlanNHC_Zoning/2, LandDevChar/12. Conditional Zoning layer 0. MaxRecordCount 1000.
+    status: usable
+
+  - role: flu
+    name: PlanNHC Place Types (unincorporated FLU)
+    restUrl: https://gis.nhcgov.com/server/rest/services/Thematic/PlanNHC_FLUM/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-unincorporated
+    fieldMap:
+      PlaceType: flu
+      Acres: acreage
+      URL: fluSheetPdf
+    notes: >
+      Verified count 88. PlaceType includes GENERAL RESIDENTIAL, RURAL RESIDENTIAL,
+      COMMUNITY/URBAN MIXED USE, COMMERCE ZONE, EMPLOYMENT CENTER, CONSERVATION.
+      Not a Wilmington city FLU substitute. CRS 6543.
+    status: usable
+
+  - role: other
+    name: Municipal Limits
+    restUrl: https://gis.nhcgov.com/server/rest/services/Layers/MuniLimits/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY: municipalityName
+      JURIS: municipalityCode
+      POSTAL: postalAbbr
+    notes: >
+      Verified JURIS codes WM, CB, WB, KB, NHC. Use with parcel MUNI to route
+      zoning/FLU.
+    status: usable
+
+  - role: zoning
+    name: Wilmington Zoning (city host)
+    restUrl: https://gis.wilmingtonnc.gov/arcgis/rest/services/Planning/Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      CaseNumber: zoningCase
+      CaseType: zoningCaseType
+      Legacy: zoningLegacy
+    notes: >
+      Verified count 328 dissolved. CRS 6543. PRIMARY for MUNI=WM/BD.
+      Also FS layers 1 Zoning Cases, 2 Historic District Overlay.
+      geohub.wilmingtonnc.gov was TLS-down at verify — use gis.wilmingtonnc.gov.
+    status: usable
+
+  - role: flu
+    name: Wilmington Existing Land Use
+    restUrl: https://gis.wilmingtonnc.gov/arcgis/rest/services/Planning/LandUse/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      LandUse: existingLandUse
+      PID: parcelId
+      PIN: parcelIdPin
+      ACRES: acreage
+    notes: >
+      Verified count 44000. Existing land-use classes (Single Family, Vacant, …)
+      — NOT Create Wilmington Growth Strategies FLU. FLU REST = gap (portfolio
+      app only). CRS 6543. Prefer spatial or PID join for MUNI=WM.
+    status: partial
+
+  - role: parcels
+    name: Wilmington ParcelOwners (enrichment)
+    restUrl: https://gis.wilmingtonnc.gov/arcgis/rest/services/BaseLayers/ParcelOwners/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PID: parcelId
+      PIN: parcelIdPin
+      OWN1: ownerName
+      OWNER_CITY: mailingAddress.city
+      OWNER_STATE: mailingAddress.state
+      OWNER_ZIP: mailingAddress.zip
+      ADRNO: situsAddress.num
+      ADRSTR: situsAddress.street
+      CITYNAME: situsCity
+      ZONING: zoning
+      MUNI: planningJurisdiction
+      APRLAND: tax.landValue
+      APRBLDG: tax.improvementValue
+      APRTOT: tax.assessedValue
+      SALE_DATE: lastSale.date
+      SALE_PRICE: lastSale.price
+    notes: >
+      Verified count ~115857; multi-owner rows per PID. Acreage via
+      Shape__Area/43560 only — 5–150 Shape__Area counts inflate vs county ACRES;
+      prefer county Parcels.ACRES for site filter. Useful enrichment when city
+      host preferred.
+    status: partial
+
+  - role: zoning
+    name: Carolina Beach Zoning
+    restUrl: https://cw.carolinabeach.org/arcgis/rest/services/GISViewer/GIS_Viewer/FeatureServer/21
+    layerId: 21
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+      NH_Codes: zoningNeighborhoodCode
+      Perm_Uses: zoningPermittedUses
+      MinLotSize: zoningMinLotSize
+    notes: >
+      Verified count 29. CRS 6543. PRIMARY for MUNI=CB. OverlayDistrict layer 20.
+      Town parcels with CAMA join: GISViewer/CB_Parcels/FeatureServer/2
+      (count 8100; ACRES 5–150 → 21).
+    status: usable
+
+  - role: parcels
+    name: Carolina Beach Parcels (town host)
+    restUrl: https://cw.carolinabeach.org/arcgis/rest/services/GISViewer/CB_Parcels/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      PARID: parcelId
+      PIN: parcelIdPin
+      OWN1: ownerName
+      CB_Address: situsAddress
+      ZONING: zoning
+      ACRES: acreage
+      APRTOT: tax.assessedValue
+      SALE_DATE: lastSale.date
+      SALE_PRICE: lastSale.price
+      MUNI: planningJurisdiction
+    notes: >
+      Verified count 8100; ACRES 5–150 → 21. Full CAMA attributes on polygons.
+      CRS 6543. Prefer for CB-local enrichment; county stack remains primary
+      countywide.
+    status: usable
+
+  - role: zoning
+    name: Wrightsville Beach Zoning
+    restUrl: https://services3.arcgis.com/XyPkMiF0OxEhc77I/arcgis/rest/services/WrightsvilleBeachZoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Name: zoning
+      PopupInfo: zoningDescription
+    notes: >
+      Verified count 256. CRS 3857 — reproject to 6543 before overlay with
+      county parcels, or use IASTAX ZONING attribute for WB. PRIMARY polygon
+      zoning for MUNI=WB. Parse district code from Name (e.g. R-1 Zoning District).
+    status: usable
+
+  - role: zoning
+    name: Kure Beach Zoning
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      No public zoning FeatureServer found 2026-09-23. Use IASTAX/PropertyOwners
+      ZONING where MUNI='KB'. Town zoning map is PDF/viewer-only.
+    status: gap
+
+  - role: other
+    name: LandUse 2014 (legacy existing)
+    restUrl: https://gis.nhcgov.com/server/rest/services/Layers/Landuse2014/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      LANDUSE: existingLandUse
+      LUCLASS: existingLandUseClass
+      LUCODE: dorCode
+    notes: Verified count 119 aggregated polygons (2014). Not FLU.
+    status: partial
+
+  - role: other
+    name: CAMA Land Classes
+    restUrl: https://gis.nhcgov.com/server/rest/services/Thematic/CAMALandUse/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      camaclass: camaClassCode
+      CL_LABEL: camaClassLabel
+    notes: Verified count 2600. Coastal CAMA classes — not comprehensive plan FLU.
+    status: partial
+
+gaps:
+  - Wilmington Create Wilmington Growth Strategies FLU has no public FeatureServer (portfolio app only) — biggest city FLU gap
+  - Kure Beach zoning polygons not on public REST (CAMA attribute only)
+  - Carolina Beach / Wrightsville Beach / Kure Beach FLU REST not found
+  - County Zoning not countywide (CITY/WB/CB punch-outs)
+  - Bare Parcels layer requires IASTAX/PropertyOwners join for owner/tax/situs
+  - IASTAX row count exceeds polygon count (condo/multi-interest) — dedupe
+  - Last sale only; many SALE_PRICE=0; assessed tax only
+  - OneMap CRS 2264 vs county 6543; Wrightsville zoning CRS 3857
+  - geohub.wilmingtonnc.gov hosting TLS unavailable at verification
+  - No phones/emails collected; no paid vendors
+
+license: "County and municipal public GIS/open data; attribution requested where stated"
+appraiserSearchUrl: https://etax.nhcgov.com/pt/search/commonsearch.aspx?mode=parid
+verifiedAt: 2026-09-23
+verifiedBy: Grok Bot GIS Researcher
+
+# ---- PASS 2 full-suite upgrade (NC non-OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  pass1:
+    status: verified
+    parcelPolygonLayer: https://gis.nhcgov.com/server/rest/services/Layers/Parcels/FeatureServer/0
+    polygonCountLive: 103969
+    parcelIdField: PID
+    parcelIdFilled: 103952
+    acreageField: ACRES
+    acres5to150Live: 2286
+    sampleCentroidWgs84:
+    - -77.9125
+    - 34.3669
+    note: Polygon layer Layers/Parcels/FeatureServer/0 (PID filled 103,952 of 103,969; ACRES 5-150 = 2,286). Owner/tax/sale live on the IASTAX/FeatureServer/1 table (no geometry; join MAPIDKEY or PID=PARID); pass2 counts below use that table (115,880 rows; ACRES 5-150 = 2,285).
+  parcelLayer: https://gis.nhcgov.com/server/rest/services/Layers/IASTAX/FeatureServer/1
+  parcelIdField: PARID
+  acreageFilter: ACRES >= 5 AND ACRES <= 150
+  acres5to150Live: 2285
+  parcelCountLive: 115880
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='NEW HANOVER'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27NEW+HANOVER%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27NEW+HANOVER%27&returnCountOnly=true&f=json
+      liveStationCount: 488
+      stationsWithAADT2022: 37
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='New Hanover'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27New+Hanover%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27New+Hanover%27&returnCountOnly=true&f=json
+      liveStationCount: 498
+      stationsWithAADT2025: 421
+      stationsWithAADT2024: 61
+      stationsWith2025or2024: 434
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - APRTOT
+    - APRLAND
+    liveNonZero:
+      APRTOT: 111800
+      APRLAND: 99589
+    status: ok
+  sale:
+    priceFields:
+    - SALE_PRICE
+    dateFields:
+    - SALE_DATE
+    livePriceNonZero:
+      SALE_PRICE: 70649
+    liveDateNonNull:
+      SALE_DATE: 114763
+    status: ok
+    note: 'SALE_PRICE and SALE_DATE are strings on the IASTAX table: CAST(SALE_PRICE AS FLOAT) > 0.'
+  ownerEntity:
+    ownerFields:
+    - OWN1
+    primaryOwnerField: OWN1
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(OWN1) LIKE '% LLC%' OR UPPER(OWN1) LIKE '% INC%' OR UPPER(OWN1) LIKE '% LP%' OR UPPER(OWN1) LIKE '% LLP%' OR UPPER(OWN1) LIKE '% LTD%' OR UPPER(OWN1) LIKE '% TRUST%' OR UPPER(OWN1) LIKE '% CHURCH%' OR UPPER(OWN1) LIKE '% COMPANY%' OR UPPER(OWN1) LIKE '% PARTNERSHIP%' OR UPPER(OWN1) LIKE '% HOLDINGS%' OR UPPER(OWN1) LIKE '% PROPERTIES%' OR UPPER(OWN1) LIKE '% CORP%' OR UPPER(OWN1) LIKE '%,LLC%' OR UPPER(OWN1) LIKE '%,INC%' OR UPPER(OWN1) LIKE 'CITY OF %' OR UPPER(OWN1) LIKE 'COUNTY OF %' OR UPPER(OWN1) LIKE 'STATE OF %' OR UPPER(OWN1) LIKE 'TOWN OF %')
+    liveEntityCountAll: 28346
+    liveEntityCount5to150ac: 1323
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above.
+  paDeepLink:
+    template: https://etax.nhcgov.com/pt/Datalets/Datalet.aspx?mode=profileall&UseSearch=no&pin={PARID}
+    testedParcelId: R06013-016-003-000
+    testedUrl: https://etax.nhcgov.com/pt/Datalets/Datalet.aspx?mode=profileall&UseSearch=no&pin=R06013-016-003-000
+    httpStatus: 200
+    contentType: text/html; charset=utf-8
+    contentVerified: true
+    note: iasWorld Datalet GET works without the disclaimer step (owner, PARID, acres, zoning shown). New template; the card previously listed only the mode=parid search page.
+  gisViewer:
+    url: https://nhcgov.maps.arcgis.com/apps/webappviewer/index.html?id=bf12527f385b4d2e8420d892863b31dd
+    httpStatus: 200
+    pageTitle: ArcGIS Web Application
+    arcgisItem:
+      access: public
+      title: Basic Map
+      type: Web Mapping Application
+  municipalLayerCheck:
+    checked: 12
+    answering: 12
+    layers:
+    - url: https://cw.carolinabeach.org/arcgis/rest/services/GISViewer/CB_Parcels/FeatureServer/2
+      name: CB_Parcels
+      liveCount: 8100
+    - url: https://cw.carolinabeach.org/arcgis/rest/services/GISViewer/GIS_Viewer/FeatureServer/21
+      name: Zoning
+      liveCount: 29
+    - url: https://gis.nhcgov.com/server/rest/services/Layers/Landuse2014/FeatureServer/0
+      name: Land Use 2014
+      liveCount: 119
+    - url: https://gis.nhcgov.com/server/rest/services/Layers/MuniLimits/FeatureServer/0
+      name: Municipal Boundaries
+      liveCount: 34
+    - url: https://gis.nhcgov.com/server/rest/services/Layers/Zoning/FeatureServer/1
+      name: Zoning
+      liveCount: 1832
+    - url: https://gis.nhcgov.com/server/rest/services/Thematic/CAMALandUse/FeatureServer/3
+      name: CAMA Land Classes
+      liveCount: 2600
+    - url: https://gis.nhcgov.com/server/rest/services/Thematic/PlanNHC_FLUM/FeatureServer/8
+      name: Place Types
+      liveCount: 88
+    - url: https://gis.wilmingtonnc.gov/arcgis/rest/services/BaseLayers/ParcelOwners/FeatureServer/0
+      name: Parcel Owners
+      liveCount: 115863
+    - url: https://gis.wilmingtonnc.gov/arcgis/rest/services/BaseLayers/Parcels/FeatureServer/0
+      name: Parcels
+      liveCount: 103954
+    - url: https://gis.wilmingtonnc.gov/arcgis/rest/services/Planning/LandUse/MapServer/0
+      name: Land Use
+      liveCount: 43999
+    - url: https://gis.wilmingtonnc.gov/arcgis/rest/services/Planning/Zoning/FeatureServer/0
+      name: Zoning (dissolved)
+      liveCount: 328
+    - url: https://services3.arcgis.com/XyPkMiF0OxEhc77I/arcgis/rest/services/WrightsvilleBeachZoning/FeatureServer/0
+      name: Wrightsville Beach Zoning
+      liveCount: 256
+  gaps: []

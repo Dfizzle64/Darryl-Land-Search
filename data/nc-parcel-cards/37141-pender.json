@@ -1,0 +1,672 @@
+{
+  "county": "Pender",
+  "state": "NC",
+  "msa": "Wilmington MSA",
+  "fips": "37141",
+  "cntyfips": "141",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "viewerLinkTemplate": "https://experience.arcgis.com/experience/3ef6176b28f644ecbeb43b88542f0e52/",
+  "viewerRedirect": "https://gis.pendercountync.gov/maps/",
+  "appraiserSearchUrl": "https://tax.pendercountync.gov/search/commonsearch.aspx?mode=realprop",
+  "appraiserDataletTemplate": "https://tax.pendercountync.gov/Datalets/Datalet.aspx?UseSearch=no&mode=&pin={PIN_NO_DASHES}",
+  "joinKeys": [
+    "PIN",
+    "ACCOUNT",
+    "ALT_PIN",
+    "parno"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "ACCOUNT",
+        "ALT_PIN",
+        "parno"
+      ],
+      "bestLayer": "Energov/Parcels"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Energov/Parcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CALCACRES",
+        "ACRES",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 7466,
+      "approxCountAcresField": 7493,
+      "bestLayer": "Energov/Parcels"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "NAME",
+        "ownname"
+      ],
+      "bestLayer": "Energov/Parcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "ADDR",
+        "CITY",
+        "STATE",
+        "ZIP",
+        "mailadd",
+        "mcity",
+        "mstate",
+        "mzip"
+      ],
+      "bestLayer": "Energov/Parcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": "often",
+      "fields": [
+        "PROPERTY_ADDRESS",
+        "FULL_NAME",
+        "siteadd"
+      ],
+      "bestLayer": "Energov PROPERTY_ADDRESS; E911 FULL_NAME join; OneMap siteadd",
+      "caveat": "PROPERTY_ADDRESS null on many vacant/acreage tracts \u2014 join E911 by PIN"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "DATE",
+        "SALE_PRICE",
+        "saledate"
+      ],
+      "bestLayer": "Energov/Parcels",
+      "caveat": "Last sale only; OneMap has saledate without price; ~28655 with SALE_PRICE>0"
+    },
+    "taxValues": {
+      "present": true,
+      "fields": [
+        "LAND_VALUE",
+        "BUILDING_VALUE",
+        "TOTAL_VALUE",
+        "DEFERRED_VALUE",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "Energov/Parcels",
+      "caveat": "Absent on LayersPro/Op2026 Parcels; TOTAL_VALUE often pre-deferral"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "UDO_ZONING",
+        "Zoning_Dis",
+        "ZONE",
+        "ZONING",
+        "ZONING_"
+      ],
+      "bestLayer": "LayersPro zoning layers (per municipality + county)",
+      "split": "Unincorporated vs Burgaw/StHelena/SurfCity/TopsailBeach/Watha; Atkinson gap"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "CA_FLU_013",
+        "FLU",
+        "ELU"
+      ],
+      "bestLayer": "Imagine Pender 2050",
+      "caveat": "Municipal FLU REST thin; Imagine uses Municipal/ETJ for incorporated"
+    },
+    "viewerLink": {
+      "present": true,
+      "template": "https://experience.arcgis.com/experience/3ef6176b28f644ecbeb43b88542f0e52/",
+      "taxSearch": "https://tax.pendercountync.gov/search/commonsearch.aspx?mode=realprop",
+      "datalet": "https://tax.pendercountync.gov/Datalets/Datalet.aspx?UseSearch=no&mode=&pin={PIN_NO_DASHES}",
+      "keyField": "PIN"
+    }
+  },
+  "portals": [
+    {
+      "name": "Pender Parcel Viewer",
+      "url": "https://experience.arcgis.com/experience/3ef6176b28f644ecbeb43b88542f0e52/",
+      "notes": "Experience Builder; gis.pendercountync.gov/maps redirects here"
+    },
+    {
+      "name": "GIS & Addressing Services",
+      "url": "https://www.pendercountync.gov/246/GIS-Addressing-Services",
+      "notes": "County GIS landing"
+    },
+    {
+      "name": "County ArcGIS REST",
+      "url": "https://gis.pendercountync.gov/arcgis/rest/services",
+      "notes": "Energov, LayersPro, Op2026, ImaginePender"
+    },
+    {
+      "name": "Tax Property Information",
+      "url": "https://tax.pendercountync.gov/",
+      "notes": "Vision IAS; disclaimer then CommonSearch"
+    },
+    {
+      "name": "Surf City Maps & GIS",
+      "url": "https://surfcitync.gov/2511/Maps-and-GIS",
+      "notes": "Town StoryMaps collection; prefer for Surf City UI"
+    },
+    {
+      "name": "Surf City StoryMaps",
+      "url": "https://storymaps.arcgis.com/collections/703518609ac44d1fb01e7972c820a9c2",
+      "notes": "Town interactive maps"
+    },
+    {
+      "name": "NC OneMap",
+      "url": "https://www.nconemap.gov",
+      "notes": "Statewide parcels FeatureServer"
+    },
+    {
+      "name": "Pender Open Data Hub",
+      "url": "https://pender-opendata-pendercountync.hub.arcgis.com/",
+      "notes": "Present but Hub API unauthorized/private as of 2026-09-23"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Town of Burgaw",
+      "districtLabel": "BURGAW",
+      "zoning": [
+        {
+          "name": "Burgaw Zoning",
+          "url": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/39",
+          "field": "Zoning_Dis",
+          "featureCount": 82,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "overlays": [
+        {
+          "name": "Burgaw Overlay Zoning",
+          "url": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/38",
+          "featureCount": 2
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Most local: town Zoning_Dis + county Energov parcels (spatial, 2264). FLU REST gap \u2014 Imagine Municipal/ETJ."
+    },
+    {
+      "name": "Village of St Helena",
+      "districtLabel": "ST HELENA",
+      "zoning": [
+        {
+          "name": "St Helena Zoning",
+          "url": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/40",
+          "field": "ZONING",
+          "featureCount": 41,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Village zoning + county parcels. FLU REST gap."
+    },
+    {
+      "name": "Town of Surf City",
+      "districtLabel": "SURF CITY",
+      "notes": "Spans Pender + Onslow; filter to Pender parcels / cntyfips=141",
+      "zoning": [
+        {
+          "name": "Surf City Zoning (county host)",
+          "url": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/41",
+          "field": "ZONE",
+          "featureCount": 169,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "notes": "Preferred wire path; town StoryMaps for UI"
+        }
+      ],
+      "townGis": {
+        "mapsPage": "https://surfcitync.gov/2511/Maps-and-GIS",
+        "storyMaps": "https://storymaps.arcgis.com/collections/703518609ac44d1fb01e7972c820a9c2"
+      },
+      "flu": [],
+      "joinNotes": "Prefer Surf City LAYER over county UDO when Municipal_Boundaries=SURF CITY. Town GIS StoryMaps-first."
+    },
+    {
+      "name": "Town of Topsail Beach",
+      "districtLabel": "TOPSAIL BEACH",
+      "zoning": [
+        {
+          "name": "Topsail Beach Zoning",
+          "url": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/42",
+          "field": "ZONING_",
+          "featureCount": 10,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Town zoning + county parcels. FLU REST gap."
+    },
+    {
+      "name": "Town of Watha",
+      "districtLabel": "WATHA",
+      "zoning": [
+        {
+          "name": "Watha Zoning",
+          "url": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/43",
+          "field": "ZONING_",
+          "featureCount": 30,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [],
+      "joinNotes": "Town zoning + county parcels. FLU REST gap."
+    },
+    {
+      "name": "Town of Atkinson",
+      "districtLabel": "ATKINSON",
+      "zoning": [],
+      "flu": [],
+      "ordinance": "https://www.atkinsonnc.org/town-ordinances/zoning-ordinance/",
+      "joinNotes": "GAP: no public zoning FeatureServer. Ordinance/UDO only. Do not invent zoning from county UDO without confirming jurisdiction."
+    },
+    {
+      "name": "Town of Wallace",
+      "districtLabel": "WALLACE",
+      "notes": "Mostly Duplin County; Pender edge only",
+      "zoning": [],
+      "flu": [],
+      "joinNotes": "Prefer Duplin GIS for Wallace proper; Pender card covers 37141 edge parcels only."
+    },
+    {
+      "name": "Hampstead (unincorporated CDP)",
+      "districtLabel": null,
+      "incorporated": false,
+      "zoning": [
+        {
+          "name": "Pender County Zoning",
+          "url": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/36",
+          "field": "UDO_ZONING",
+          "featureCount": 1912,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "Imagine Pender 2050",
+          "url": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/35",
+          "field": "CA_FLU_013",
+          "featureCount": 54137,
+          "notes": "Includes Hampstead Bypass category"
+        }
+      ],
+      "joinNotes": "Not a municipality \u2014 county UDO + Imagine 2050. No town zoning layer."
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Energov Parcels",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/Energov/MapServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CALCACRES",
+      "coverage": "county-wide",
+      "featureCount": 55487,
+      "acreageRangeCount": 7466,
+      "maxRecordCount": 1000,
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "primary": true,
+      "fieldMap": {
+        "PIN": "parcelId",
+        "CALCACRES": "acreage",
+        "ACRES": "acreageDeed",
+        "NAME": "ownerName",
+        "ADDR": "mailingAddress.street",
+        "CITY": "mailingAddress.city",
+        "STATE": "mailingAddress.state",
+        "ZIP": "mailingAddress.zip",
+        "PROPERTY_ADDRESS": "situsAddress",
+        "DATE": "lastSale.date",
+        "SALE_PRICE": "lastSale.price",
+        "LAND_VALUE": "tax.landValue",
+        "BUILDING_VALUE": "tax.improvementValue",
+        "TOTAL_VALUE": "tax.marketValue",
+        "DEFERRED_VALUE": "tax.deferredValue",
+        "ZONE": "zoning"
+      },
+      "status": "usable",
+      "notes": "PRIMARY wire-first: polygons+owner+mail+situs+sale+tax+CAMA ZONE"
+    },
+    {
+      "role": "parcels",
+      "name": "LayersPro Parcels",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/4",
+      "layerId": 4,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 55487,
+      "acreageRangeCount": 7466,
+      "maxRecordCount": 2000,
+      "status": "partial",
+      "notes": "No tax fields \u2014 join Energov by PIN"
+    },
+    {
+      "role": "parcels",
+      "name": "OperationalLayers2026 Parcels",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/OperationalLayers2026/MapServer/4",
+      "layerId": 4,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 55487,
+      "status": "partial",
+      "notes": "Viewer 2026 stack; no tax fields"
+    },
+    {
+      "role": "parcels",
+      "name": "LayersMapIASLink Parcels",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/LayersMapIASLink/MapServer/4",
+      "layerId": 4,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 52748,
+      "acreageRangeCount": 7359,
+      "status": "partial",
+      "notes": "Has tax but count lags Energov"
+    },
+    {
+      "role": "other",
+      "name": "E911 Address Points",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/1",
+      "layerId": 1,
+      "geometry": "point",
+      "auth": "none",
+      "featureCount": 42690,
+      "status": "usable",
+      "notes": "Situs join by PIN; 41691 with PIN"
+    },
+    {
+      "role": "zoning",
+      "name": "Pender County Zoning",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/36",
+      "layerId": 36,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 1912,
+      "zoningField": "UDO_ZONING",
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Burgaw Zoning",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/39",
+      "layerId": 39,
+      "featureCount": 82,
+      "zoningField": "Zoning_Dis",
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "St Helena Zoning",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/40",
+      "layerId": 40,
+      "featureCount": 41,
+      "zoningField": "ZONING",
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Surf City Zoning",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/41",
+      "layerId": 41,
+      "featureCount": 169,
+      "zoningField": "ZONE",
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Topsail Beach Zoning",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/42",
+      "layerId": 42,
+      "featureCount": 10,
+      "zoningField": "ZONING_",
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Watha Zoning",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/43",
+      "layerId": 43,
+      "featureCount": 30,
+      "zoningField": "ZONING_",
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "Imagine Pender 2050",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/35",
+      "layerId": 35,
+      "alternateUrl": "https://gis.pendercountync.gov/arcgis/rest/services/ImaginePender/MapServer/53",
+      "featureCount": 54137,
+      "fluField": "CA_FLU_013",
+      "status": "usable",
+      "primary": true
+    },
+    {
+      "role": "flu",
+      "name": "Pender 2.0 FLUM",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/34",
+      "layerId": 34,
+      "featureCount": 49408,
+      "fluField": "FLU",
+      "status": "partial",
+      "notes": "Legacy parcel join with tax snapshot"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrl": "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "filter": "cntyfips='141'",
+      "featureCount": 55025,
+      "acreageRangeCount": 7437,
+      "maxRecordCount": 5000,
+      "status": "usable",
+      "notes": "Fallback situs+tax; no sale price"
+    },
+    {
+      "role": "other",
+      "name": "Municipal_Boundaries",
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/9",
+      "layerId": 9,
+      "featureCount": 26,
+      "field": "ALPHA",
+      "status": "usable"
+    }
+  ],
+  "wireFirst": [
+    "https://gis.pendercountync.gov/arcgis/rest/services/Energov/MapServer/1",
+    "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/36",
+    "https://gis.pendercountync.gov/arcgis/rest/services/LayersPro/MapServer/35",
+    "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+  ],
+  "gaps": [
+    "Tax values missing on LayersPro and OperationalLayers2026 Parcels \u2014 use Energov/1",
+    "Atkinson has no public zoning FeatureServer (ordinance/UDO only) \u2014 biggest municipal gap",
+    "Municipal FLU REST thin \u2014 Imagine 2050 uses Municipal/ETJ for incorporated areas",
+    "CAMA ZONE attribute incomplete/mixed \u2014 prefer spatial zoning joins",
+    "Situs often null on vacant tracts \u2014 join E911 or OneMap",
+    "Last-sale only; no multi-transfer sales layer",
+    "LayersMapIASLink parcel count lags Energov (52748 vs 55487)",
+    "Open data Hub API unauthorized/private",
+    "Surf City town GIS StoryMaps-first; wire via county host zoning",
+    "Wallace mostly Duplin \u2014 edge only"
+  ],
+  "biggestGap": "Atkinson has no public zoning REST (ordinance only); plus tax stripped from LayersPro/Op2026 viewer parcels (must use Energov). Municipal FLU REST also thin.",
+  "verifiedLayerCount": 15,
+  "verifiedAt": "2026-09-23",
+  "verifiedBy": "Grok Bot GIS Researcher",
+  "license": "County public ArcGIS REST; NC OneMap statewide parcels; attribution as required",
+  "publicOnly": true,
+  "noPaidVendors": true,
+  "pass2": {
+    "label": "PASS2 full-suite upgrade \u2014 rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "aadtScreening": {
+      "source": "NCDOT Traffic Survey Group (public AGOL)",
+      "layer": "NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)",
+      "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+      "countyField": "COUNTY",
+      "countyValue": "PENDER",
+      "valueField": "AADT_2022",
+      "valueType": "string (trim; blank = no count that year)",
+      "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27PENDER%27&returnCountOnly=true&f=json",
+      "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27PENDER%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+      "liveStationCount": 339,
+      "stationsWithAADT2022": 111,
+      "newerYearAvailable": {
+        "available": true,
+        "layer": "NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)",
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "countyField": "County",
+        "countyValue": "Pender",
+        "valueField": "AADT_2025",
+        "valueType": "integer (null = no count)",
+        "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Pender%27&returnCountOnly=true&f=json",
+        "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Pender%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+        "liveStationCount": 335,
+        "stationsWithAADT2025": 238,
+        "stationsWithAADT2024": 212,
+        "segmentsLayer": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide \u2014 spatial filter by county envelope)",
+        "also": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)"
+      },
+      "recommendation": "Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025\u2192AADT_2024\u2192AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title)."
+    },
+    "primaryParcelLayer": {
+      "restUrl": "https://gis.pendercountync.gov/arcgis/rest/services/Energov/MapServer/1",
+      "acreageField": "CALCACRES",
+      "range5to150Where": "CALCACRES>=5 AND CALCACRES<=150",
+      "liveTotalParcels": 55487,
+      "liveParcels5to150": 7466
+    },
+    "taxValues": {
+      "status": "ok",
+      "fields": {
+        "LAND_VALUE": "tax.landValue",
+        "BUILDING_VALUE": "tax.improvementValue",
+        "TOTAL_VALUE": "tax.marketValue"
+      },
+      "liveNonZeroCounty": {
+        "LAND_VALUE": 53600,
+        "BUILDING_VALUE": 34796,
+        "TOTAL_VALUE": 54613
+      },
+      "liveNonZero5to150": {
+        "TOTAL_VALUE": 7373
+      },
+      "notes": "Double fields LAND_VALUE/BUILDING_VALUE/TOTAL_VALUE/DEFERRED_VALUE.",
+      "publicFallback": "https://tax.pendercountync.gov/Datalets/Datalet.aspx?UseSearch=no&mode=&pin={PIN_NO_DASHES}"
+    },
+    "saleHistory": {
+      "status": "ok",
+      "priceFields": [
+        "SALE_PRICE"
+      ],
+      "dateFields": [
+        "DATE"
+      ],
+      "livePriceGt0County": {
+        "SALE_PRICE": 28657
+      },
+      "livePriceGt0_5to150": {
+        "SALE_PRICE": 2554
+      },
+      "liveDateNonNullCounty": {
+        "DATE": 46666
+      },
+      "notes": "DATE esriDate; SALE_PRICE double. Last sale only."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "NAME"
+      ],
+      "primaryOwnerField": "NAME",
+      "rule": {
+        "apply": "Uppercase + trim NAME",
+        "regex": "(?i)(\\bL\\.?\\s?L\\.?\\s?C\\b|\\bINC\\b|\\bCORP|\\bL\\.?\\s?P\\b|\\bLLP\\b|\\bLLLP\\b|\\bLTD\\b|TRUST|CHURCH|MINISTR|\\bCOMPANY\\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\\bHOA\\b|FOUNDATION|AUTHORITY|\\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\\b|^UNITED STATES|^NORTH CAROLINA\\b|\\bCOUNTY$)",
+        "sqlLikeTokens": [
+          "% LLC%",
+          "%,LLC%",
+          "% L L C%",
+          "% INC",
+          "% INC %",
+          "% INC.%",
+          "%,INC%",
+          "% CORP%",
+          "%CORPORATION%",
+          "% LP",
+          "% LP %",
+          "% L P",
+          "% LLP%",
+          "% LTD%",
+          "%TRUST%",
+          "%CHURCH%",
+          "%MINISTR%",
+          "% COMPANY%",
+          "%PARTNERSHIP%",
+          "%HOLDINGS%",
+          "%PROPERTIES%",
+          "%INVESTMENT%",
+          "%ASSOCIATION%",
+          "%FOUNDATION%",
+          "%AUTHORITY%",
+          "CITY OF %",
+          "COUNTY OF %",
+          "STATE OF %",
+          "TOWN OF %",
+          "% COUNTY",
+          "%BOARD OF EDUCATION%",
+          "UNITED STATES%",
+          "NORTH CAROLINA %",
+          "% DEVELOPMENT%"
+        ],
+        "caveats": "TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); \"% COUNTY\" suffix catches e.g. \"PERSON COUNTY\"; bare \"CO\" and \"ESTATE\" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) \u2014 normalize first."
+      },
+      "liveEntityCount5to150": 1777,
+      "liveOwnerNonNull5to150": null,
+      "entityQuery": "where=CALCACRES>=5 AND CALCACRES<=150 AND (NAME LIKE any sqlLikeTokens) [run via external fetch]"
+    },
+    "paDeepLink": {
+      "template": "https://tax.pendercountync.gov/Datalets/Datalet.aspx?UseSearch=no&mode=&pin={PIN_NO_DASHES}",
+      "testedUrl": "https://tax.pendercountync.gov/Datalets/Datalet.aspx?UseSearch=no&mode=&pin=22237878330000",
+      "httpStatus": "200 (external fetch)",
+      "notes": "Loaded with owner IVY LODGE TIMBER LLC via external fetcher. Box HTTPS to *.pendercountync.gov resets at TLS; REST counts for this card were run via external fetch."
+    },
+    "jurisdictionGisViewer": {
+      "url": "https://experience.arcgis.com/experience/3ef6176b28f644ecbeb43b88542f0e52/",
+      "httpStatus": 200,
+      "notes": "Pender ArcGIS Experience; https://gis.pendercountync.gov/maps/ loads it (external fetch)"
+    },
+    "gaps": [
+      "Box HTTPS to *.pendercountync.gov resets at TLS; all pass2 REST counts + PA test run via external fetch",
+      "AADT_2022 blank at 228 of 339 stations on the 2022 layer (NCDOT counts on a cycle) \u2014 prefer 2025 layer / latest non-blank year",
+      "No multi-transfer sale history on primary layer (last sale only)"
+    ]
+  }
+}

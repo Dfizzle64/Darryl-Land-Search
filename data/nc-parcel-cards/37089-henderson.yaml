@@ -1,0 +1,351 @@
+state: NC
+jurisdiction: Henderson County
+fips: "37089"
+level: county
+markets: [Asheville]
+
+layers:
+  - role: parcels
+    name: Parcels (gisweb FeatureServer)
+    restUrl: https://gisweb.hendersoncountync.gov/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      REID: parcelIdReid
+      PARCEL_PK: parcelIdPk
+      CALCULATED_ACRES: acreage
+      ACREAGE: acreageDeed
+      DEEDED_ACRES: acreageDeeded
+      PROPERTY_OWNER: ownerName
+      OWNER_MAIL_1: mailingAddress.street
+      OWNER_MAIL_2: mailingAddress.street2
+      OWNER_MAIL_3: mailingAddress.street3
+      OWNER_MAIL_CITY: mailingAddress.city
+      OWNER_MAIL_STATE: mailingAddress.state
+      OWNER_MAIL_ZIP: mailingAddress.zip
+      LOCATION_ADDR: situsAddress
+      PHYADDR_STR_NUM: situs.number
+      PHYADDR_DIR_PFX: situs.dirPrefix
+      PHYADDR_STR: situs.street
+      PHYADDR_STR_TYPE: situs.streetType
+      PHYADDR_CITY: situsCity
+      PHYADDR_ZIP: situsZip
+      PKG_SALE_DATE: lastSale.date
+      PKG_SALE_PRICE: lastSale.price
+      LAND_SALE_DATE: lastSale.landDate
+      LAND_SALE_PRICE: lastSale.landPrice
+      DEED_DATE: lastSale.deedDate
+      DEED_BOOK: lastSale.deedBook
+      DEED_PAGE: lastSale.deedPage
+      TOTAL_LAND_VALUE_ASSESSED: tax.landValue
+      TOTAL_BLDG_VALUE_ASSESSED: tax.improvementValue
+      TOTAL_PROP_VALUE: tax.marketValue
+      Zoning_aggregated: zoning
+      CITY: municipalityTaxCode
+      ETJ: planningJurisdiction
+      LAND_CLASS: dorCode
+      HEATED_AREA: improvementSqFt
+      DEED_URL: deedUrl
+    notes: >
+      PRIMARY wire-first verified 2026-09-23: count 71350;
+      CALCULATED_ACRES 5–150 → 6272; ACREAGE 5–150 → 6272;
+      HEATED_AREA null/0 in 5–150 → 3511. CRS 102100/3857.
+      MaxRecordCount 2000 — paginate. Rich CAMA: owner, mail, situs,
+      land/bldg/total values, package + land sale price/date, Zoning_aggregated.
+      CRITICAL: Zoning_aggregated is often stub "Cities" inside municipalities —
+      do NOT treat as authoritative city zoning; join muni zoning polygons.
+      CITY codes: HENDERSONVILLE (~7583), FLETCHER (~3735), MILLS RIVER (~4445),
+      LAUREL PARK (~1859), FLAT ROCK VH/BR/GR (~821/1781/214 tax subtypes),
+      SALUDA tip (~16), null≈unincorporated (~50896).
+      Mirror: Primary_GISWeb_Layers MapServer/19 (and /39).
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-23: cntyfips='089' count 75373; gisacres 5–150 → 8137;
+      improvval=0/null in range → 2573. No sale price. MaxRecordCount 5000.
+      Prefer county Parcels FS for sales + zoning attr; OneMap is fallback /
+      cross-check (acre counts differ — OneMap higher).
+    status: usable
+
+  - role: zoning
+    name: County Zoning (Primary_GISWeb)
+    restUrl: https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/85
+    layerId: 85
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoningName
+      ZONE_CODE: zoning
+      Prev_Zone: zoningPrevious
+      Conditional_Code: zoningConditional
+      Zone_Date: zoningDate
+      Rezoning: zoningCase
+    notes: >
+      Unincorporated districts + Cities stub (ZONE_CODE NO/Cities = municipal —
+      use city layers inside limits). Verified count 384. Codes: R1,R2,R2R,R3,R4,
+      R-40,WR,SW,O&I,LC,CC,RC,I,CD,Cities. MapMetrics mirror Tax/Data_for_MapMetrics/MapServer/23
+      (adds Acres). Spatial join for ETJ=COUNTY / CITY-null parcels.
+    status: usable
+
+  - role: zoning
+    name: City of Hendersonville Zoning (county host)
+    restUrl: https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/83
+    layerId: 83
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      Zoning_Cla: zoningDescription
+    notes: >
+      Prefer most-local for Hendersonville. Verified count 413. Same schema/count
+      as city AGOL COH_Zoning_Test. MapMetrics Tax/.../MapServer/22.
+    status: usable
+
+  - role: zoning
+    name: COH_Zoning_Test (Hendersonville AGOL — most local)
+    restUrl: https://services1.arcgis.com/UTZTmZoX2rsa9yFA/arcgis/rest/services/COH_Zoning_Test/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      Zoning_Cla: zoningDescription
+      ZONING_ID: zoningId
+    notes: >
+      City of Hendersonville AGOL org UTZTmZoX2rsa9yFA. Verified count 413
+      (layer display name COH_Zoning_082526). Prefer over county host when AGOL up.
+      Alt: COH_Zoning_3/FeatureServer/0 (~398). Experience viewer:
+      https://experience.arcgis.com/experience/06a21cbde3ff411ea59a6f594dab7e51
+    status: usable
+
+  - role: zoning
+    name: Town of Fletcher Zoning
+    restUrl: https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/80
+    layerId: 80
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+    notes: >
+      No independent town AGOL REST found — county hosts. Verified count 42.
+      Codes include R-1,R-1A,R-2,R-3,C-1,C-2,CBD,NBD,M-1,CZ,ETJ,HOF-O*.
+      MapMetrics Tax/.../MapServer/25 (adds ZoneNm,CodeOfOrd).
+    status: usable
+
+  - role: zoning
+    name: Town of Mills River Zoning
+    restUrl: https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/81
+    layerId: 81
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASSIFICA: zoning
+      AMEND: zoningAmendment
+    notes: >
+      County-hosted (no town AGOL). Verified count 32. Codes MR-30, MR-GB, MR-LI,
+      MR-MU, MR-NC. MapMetrics Tax/.../MapServer/26.
+    status: usable
+
+  - role: zoning
+    name: Village of Flat Rock Zoning
+    restUrl: https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/79
+    layerId: 79
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+    notes: >
+      County-hosted. Verified count 34. Codes R-10,R-20,R-20-MH,R-40,C-1,MF,RC,
+      RPUD-COD,NP,PA,HI,ML,GCPS. Parcel CITY codes FLAT ROCK VH/BR/GR are tax
+      subtypes — route via ETJ=FLAT ROCK or municipal boundary, not CITY alone.
+      MapMetrics Tax/.../MapServer/27.
+    status: usable
+
+  - role: zoning
+    name: Town of Laurel Park Zoning and ETJ
+    restUrl: https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/82
+    layerId: 82
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Zone: zoning
+    notes: >
+      County-hosted; includes ETJ districts (ETJ R-20, ETJ R-30, ETJ TC, ETJ MM,
+      ETJ I-1). Verified count 12. In-town: R-20,R-30,TC,OI,MM,SBO,WPO.
+      MapMetrics Tax/.../MapServer/24.
+    status: usable
+
+  - role: flu
+    name: Future Land Use Map (2024) — county Comprehensive Plan
+    restUrl: https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Planning_and_Development/MapServer/88
+    layerId: 88
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FLU: flu
+      Land_Use: fluName
+      AmendmentNumber: fluAmendment
+      AmendmentDate: fluAmendDate
+    notes: >
+      PRIMARY county FLU. Verified count 354 coarse place-type polygons.
+      Codes: AR Agriculture/Rural, TA Transitional Area, IA Infill Area,
+      OSC Open Space & Conservation, EMP Employment & Industry,
+      NEIGHBORHOOD Neighborhood Anchor, COMMUNITY Community Center.
+      Spatial join to parcels. Hendersonville has its own 2045 Comp Plan FLU
+      (prefer city inside limits).
+    status: usable
+
+  - role: flu
+    name: Future Land Use (Hendersonville 2045 Comp Plan)
+    restUrl: https://services1.arcgis.com/UTZTmZoX2rsa9yFA/arcgis/rest/services/Future_Land_Use/FeatureServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: city-only
+    fieldMap:
+      PIN: parcelId
+      FLU: flu
+      ACREAGE: fluAcres
+    notes: >
+      Prefer most-local FLU for Hendersonville. Verified count 13778 (parcel-keyed).
+      Attribute-join PIN↔PIN preferred. Categories: Downtown,
+      Family/Neighborhood Living, Multi-Generational Living, Neighborhood Center,
+      Institutional, Production, Innovation, Rural Residential,
+      Mixed Use - Commercial, Mixed Use - Employment,
+      Open Space - Conservation, Open Space - Conservation Restrictive,
+      Open Space - Recreation. Alt identical: Future_Land_Use_2/FeatureServer/171.
+    status: usable
+
+  - role: flu
+    name: HendersonCountyLandUse (existing / proposed LU on parcels)
+    restUrl: https://gisweb.hendersoncountync.gov/arcgis/rest/services/Planning/HendersonCountyLandUse/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      pin: parcelId
+      reid: parcelIdReid
+      lu_current: existingLandUse
+      proposedlu: fluProposed
+      prediction: fluPredicted
+    notes: >
+      Parcel-geometry LU classification / ML prediction stack — NOT Comp Plan FLU.
+      Verified count 70637. Join pin↔PIN. Use Future Land Use Map (2024) / city
+      FLU for planning FLU; this layer is existing-use enrichment.
+    status: partial
+
+  - role: other
+    name: MUNICIPAL BOUNDARIES
+    restUrl: https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Primary_GISWeb_Layers/MapServer/96
+    layerId: 96
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY: municipality
+      STATUS: annexationStatus
+      ORDINANCE_: annexationOrdinance
+      EFFECTIVE_DATE: annexationDate
+    notes: >
+      Verified count 312 annexation polygons. CITY values: HENDERSONVILLE,
+      FLETCHER, MILLS RIVER, LAUREL PARK, FLAT ROCK, SALUDA (Polk tip).
+      Use to route city-vs-county zoning/FLU joins.
+    status: usable
+
+  - role: other
+    name: Urban Growth Boundary
+    restUrl: https://gisweb.hendersoncountync.gov/arcgis/rest/services/GISWeb/Planning_and_Development/MapServer/87
+    layerId: 87
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Municipality: municipality
+    notes: >
+      Verified count 9. Municipalities labeled: Hendersonville, Laurel Park,
+      Mills River, Fletcher (multi), Flat Rock. FLU-adjacent growth policy.
+    status: usable
+
+  - role: sales
+    name: Parcel package/land sale fields (on Parcels FS)
+    restUrl: https://gisweb.hendersoncountync.gov/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PKG_SALE_DATE: lastSale.date
+      PKG_SALE_PRICE: lastSale.price
+      LAND_SALE_DATE: lastSale.landDate
+      LAND_SALE_PRICE: lastSale.landPrice
+      DEED_DATE: lastSale.deedDate
+    notes: >
+      Sale history is attribute-on-parcel (latest package + land sale), not a
+      multi-transfer point layer. County also publishes Sales TXT download
+      (not REST) — prefer REST fields for wire. No separate Sales FeatureServer verified.
+    status: usable
+
+gaps:
+  - Parcel Zoning_aggregated stub "Cities" inside munis — must spatial-join city zoning layers (Hendersonville AGOL or Primary layers 79–83)
+  - No dedicated public FLU REST for Fletcher, Mills River, Flat Rock, Laurel Park — use county Future Land Use Map (2024) as fallback inside those towns (verify locally)
+  - No multi-transfer sales FeatureServer; only latest PKG_/LAND_ sale on parcels (+ optional TXT download)
+  - OneMap acre 5–150 count (8137) differs from county CALCULATED_ACRES (6272) — prefer county acres for site filter
+  - Flat Rock parcel CITY codes VH/BR/GR are opaque tax subtypes — route via ETJ or municipal boundary, not CITY alone
+  - Saluda tip (~16 parcels) is mostly Polk County; Henderson Saluda zoning not inventoried separately
+  - HendersonCountyLandUse is existing-use / prediction, not Comp Plan FLU
+  - No paid vendor data; no phones/emails collected
+license: "Henderson County IT/GIS public ArcGIS REST; City of Hendersonville AGOL; NC OneMap; NCGS disclaimer; attribution recommended"
+appraiserSearchUrl: https://lrcpwa.ncptscloud.com/henderson/parcel-search
+verifiedAt: 2026-09-23
+verifiedBy: North Carolina Public Info Researcher

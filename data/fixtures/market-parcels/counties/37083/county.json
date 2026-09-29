@@ -1,0 +1,29 @@
+{
+  "name": "Halifax",
+  "fips": "37083",
+  "state": "North Carolina",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "featureCount": 6433,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-halifax-parcels-37083",
+  "queryUrl": "https://services8.arcgis.com/0zS9csrI5fS6Bcym/arcgis/rest/services/OpenGov_RR_Layers/FeatureServer/22/query",
+  "gaps": [
+    "Parcels are OpenGov_RR_Layers/Halifax_County_Parcels (PRIMARY CAMA) (https://services8.arcgis.com/0zS9csrI5fS6Bcym/arcgis/rest/services/OpenGov_RR_Layers/FeatureServer/22). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 6461 rows; 6433 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 421 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37083/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37083/lookup.json",
+  "sourceCount": 6461,
+  "dropped": 0,
+  "tileCount": 7,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/halifax/parcel-detail/{parcelId}",
+  "gisViewerUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=872&LayerID=16488&PageTypeID=1&PageID=7289"
+}

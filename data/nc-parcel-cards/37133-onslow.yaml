@@ -1,0 +1,414 @@
+state: NC
+jurisdiction: Onslow County
+fips: "37133"
+level: county
+markets: [Wilmington]
+slug: onslow
+
+# Cities/towns first-class (prefer most-local zoning inside limits)
+municipalities:
+  - name: Jacksonville
+    role: city-first-zoning
+    notes: Separate Zoning (City of Jacksonville) layer UDO_Zone; county Zoning DATA=JACKSONVILLE also present
+  - name: Holly Ridge
+    role: town-zoning-on-county
+  - name: Swansboro
+    role: town-zoning-on-county
+  - name: North Topsail Beach
+    role: town-zoning-on-county
+  - name: Richlands
+    role: town-zoning-on-county
+  - name: Surf City
+    role: town-zoning-on-county
+    notes: Spans Onslow/Pender — filter to Onslow parcels; also on Pender card
+
+layers:
+  - role: parcels
+    name: Parcels - Full Data (PRIMARY CAMA + polygons)
+    restUrl: https://maps.onslowcountync.gov/arcgis/rest/services/WEB_PUBLICATIONS/County_Map_Layers/MapServer/0
+    alternateUrls:
+      - https://maps.onslowcountync.gov/arcgis/rest/services/EnerGov/Parcels/MapServer/10
+      - https://maps.onslowcountync.gov/arcgis/rest/services/GISWebsite/GISWebsiteLayers/MapServer/7
+      - https://gismaps.onslowcountync.gov/arcgis/rest/services/WEB_PUBLICATIONS/County_Map_Layers/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GISACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PARID: parcelIdAccount
+      ALTID: parcelIdAlt
+      GISACRES: acreage
+      LEGALACRES: acreageDeed
+      ADJACRES: acreage
+      ACRES: acreage
+      OWNER1: ownerName
+      OWNER2: ownerName
+      ADDRLINE1: mailingAddress.street
+      ADDRLINE2: mailingAddress.street2
+      ADDRLINE3: mailingAddress.street3
+      MAILCITY: mailingAddress.city
+      MAILSTATE: mailingAddress.state
+      MAILZIP: mailingAddress.zip
+      PHYSICALADDRESS: situsAddress
+      ADRNO: situsAddress.number
+      ADRSTR: situsAddress.street
+      PHYSICALCITY: situsCity
+      PHYSICALZIP: situsZip
+      UNIT: situsAddress.unit
+      CITY: municipality
+      TOWN: township
+      SALEDATE: lastSale.date
+      SALEPRICE: lastSale.price
+      SALECODE: lastSale.qualified
+      SALEBOOK: lastSale.deedBook
+      SALEPAGE: lastSale.deedPage
+      TAXMARKETVALUE: tax.marketValue
+      FINALFULLLANDVALUE: tax.landValue
+      FINALFULLBUILDINGVALUE: tax.improvementValue
+      TOTALTAXABLEVALUE: tax.taxableValue
+      DEFERREDVALUE: tax.deferredValue
+      MUNISTOT: tax.marketValue
+      MUNISLAND: tax.landValue
+      MUNISBLDG: tax.improvementValue
+      MUNISOBY: tax.otherValue
+      ZONING: zoning
+      LANDUSECODE: dorCode
+      LANDUSEDESCR: landUseDescription
+      PROPERTYTYPE: propertyType
+      VALUEYEAR: tax.valueYear
+    notes: >
+      PRIMARY verified 2026-09-24: count 96840; GISACRES 5–150 → 6770; LEGALACRES 5–150 → 6804;
+      SALEPRICE>0 → 61975 (in 5–150 → 2668); TAXMARKETVALUE>0 → 95818; ZONING non-null → 95132
+      (in 5–150 → 6737); OWNER1 → 96545; PHYSICALADDRESS → 96539;
+      FINALFULLBUILDINGVALUE=0 in 5–150 → 3464. CRS 102719/2264. MaxRecordCount 2000.
+      EnerGov/10 and GISWebsite/7 same count/schema. Prefer GISACRES for site search.
+      CITY router: UNINCORPORATED ONSLOW 68399, JACKSONVILLE 16099, NORTH TOPSAIL BEACH 4099,
+      HOLLY RIDGE 3422, SWANSBORO 2316, RICHLANDS 1301, SURF CITY 909. Geo-verify sample
+      PIN 542001284955 centroid ≈ -77.258, 34.861 (Onslow).
+    status: usable
+
+  - role: parcels
+    name: Parcels - North Topsail Beach Only
+    restUrl: https://maps.onslowcountync.gov/arcgis/rest/services/WEB_PUBLICATIONS/County_Map_Layers/MapServer/24
+    layerId: 24
+    geometry: polygon
+    auth: none
+    acreageField: GISACRES
+    coverage: city-only
+    fieldMap:
+      PIN: parcelId
+      PARID: parcelIdAccount
+      GISACRES: acreage
+      OWNER1: ownerName
+      PHYSICALADDRESS: situsAddress
+      SALEPRICE: lastSale.price
+      SALEDATE: lastSale.date
+      TAXMARKETVALUE: tax.marketValue
+      ZONING: zoning
+    notes: >
+      Verified count 4099. Same CAMA schema subset filtered to NTB. Prefer full county layer + CITY filter unless NTB-only extract needed.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (fallback)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdAlt
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+      cntyname: countyName
+    notes: >
+      Verified cntyfips='133' count 95297; gisacres 5–150 → 6765. No sale price on OneMap.
+      May lag county CAMA. MaxRecordCount 5000. CRS 102719/2264. Filter cntyfips='133'.
+    status: usable
+
+  - role: zoning
+    name: County Zoning (County & Towns polygons)
+    restUrl: https://maps.onslowcountync.gov/arcgis/rest/services/WEB_PUBLICATIONS/County_Map_Layers/MapServer/3
+    alternateUrls:
+      - https://maps.onslowcountync.gov/arcgis/rest/services/EnerGov/Parcels/MapServer/16
+      - https://maps.onslowcountync.gov/arcgis/rest/services/GISWebsite/GISWebsiteLayers/MapServer/32
+      - https://maps.onslowcountync.gov/arcgis/rest/services/TemplateSite/OperationalLayers/MapServer/33
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONECODE: zoning
+      DATA: zoningJurisdiction
+      URL: zoningOrdinanceUrl
+      RANK: zoningRank
+    notes: >
+      Verified WEB_PUB/3 count 1792 (prefer over GISWebsite/32 count 1563). DATA jurisdictions:
+      COUNTY/PHASE I–VII, JACKSONVILLE, HOLLY RIDGE, SWANSBORO, NORTH TOPSAIL BEACH,
+      RICHLANDS, SURF CITY, CAMP LEJEUNE. Inside Jacksonville prefer city UDO layer.
+      Spatial join in 2264. Parcel ZONING attribute is CAMA stub — polygon join authoritative.
+    status: usable
+
+  - role: zoning
+    name: Zoning (City of Jacksonville) — city-first
+    restUrl: https://maps.onslowcountync.gov/arcgis/rest/services/GISWebsite/GISWebsiteLayers/MapServer/33
+    alternateUrls:
+      - https://maps.onslowcountync.gov/arcgis/rest/services/TemplateSite/OperationalLayers/MapServer/34
+      - https://gismaps.onslowcountync.gov/server/rest/services/GISWebsite/GISWebsiteLayers/MapServer/33
+    layerId: 33
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      UDO_Zone: zoning
+      HTE_CODE: zoningLegacy
+      ORDINANCE: zoningOrdinance
+    notes: >
+      Verified count 1147; distinct UDO_Zone/HTE pairs ~76 (CC, DTB, DTR, IND, MR, NC, NB,
+      O&I, OMU, R-*, RA-*, RM-*, RD-*, TCA, …). SupportsAdvancedQueries false — pull all or
+      paginate carefully. Most local inside Jacksonville city limits.
+    status: usable
+
+  - role: flu
+    name: Future Land Use (county detailed)
+    restUrl: https://maps.onslowcountync.gov/arcgis/rest/services/WEB_PUBLICATIONS/County_Map_Layers/MapServer/20
+    layerId: 20
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      DISTRICT: flu
+      District_FullName: fluDescription
+      ACRES: acreage
+    notes: >
+      Verified count 3336. Districts: A/F, AWCAC, CG, CGAC, Conservation, HDR, HOLLY RIDGE,
+      Industrial, LCAC, MDR, Military, Non Participating, RICHLANDS, RR. Punch-outs for some
+      munis (HOLLY RIDGE/RICHLANDS labels). Prefer over Horizon 2040 for parcel FLU join.
+    status: usable
+
+  - role: flu
+    name: Horizon 2040 Future Land Use (broad categories)
+    restUrl: https://maps.onslowcountync.gov/arcgis/rest/services/GISWebsite/GISWebsiteLayers/MapServer/34
+    alternateUrls:
+      - https://maps.onslowcountync.gov/arcgis/rest/services/TemplateSite/OperationalLayers/MapServer/35
+    layerId: 34
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Category: flu
+    notes: >
+      Verified count 11 Category polygons only (Urban Growth, Conservation Lands, Economic
+      Development, Municipality, Infrastructure Energy Extraction, Airport Compatibility Area,
+      Waterside Community, Agriculture and Forestry, Rural Residential, Suburban Growth, Village).
+      Policy overview — not parcel-grain. Prefer Future Land Use /20 for joins.
+    status: partial
+
+  - role: other
+    name: City Limits
+    restUrl: https://maps.onslowcountync.gov/arcgis/rest/services/GISWebsite/GISWebsiteLayers/MapServer/66
+    alternateUrls:
+      - https://maps.onslowcountync.gov/arcgis/rest/services/WEB_PUBLICATIONS/County_Map_Layers/MapServer/9
+      - https://maps.onslowcountync.gov/arcgis/rest/services/EnerGov/Parcels/MapServer/18
+    layerId: 66
+    geometry: polygon
+    auth: none
+    acreageField: ACRE
+    coverage: county-wide
+    fieldMap:
+      CITY: municipality
+      DATA: municipality
+    notes: >
+      Verified 6 munis: JACKSONVILLE, HOLLY RIDGE, SWANSBORO, NORTH TOPSAIL BEACH, RICHLANDS,
+      SURF CITY. Route zoning/FLU with parcel CITY + spatial intersect.
+    status: usable
+
+  - role: other
+    name: PlanningJurisdiction (ETJ + town)
+    restUrl: https://maps.onslowcountync.gov/arcgis/rest/services/EnerGov/Parcels/MapServer/25
+    layerId: 25
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      DATA: planningJurisdiction
+    notes: >
+      Includes HOLLY RIDGE / HOLLY RIDGE ETJ, RICHLANDS / RICHLANDS ETJ, SWANSBORO / SWANSBORO ETJ,
+      NORTH TOPSAIL BEACH, SURF CITY. Use for ETJ zoning routing.
+    status: usable
+
+gaps:
+  - No public GET AppraisalCard/Datalet deep-link (AppraisalCard.aspx → 500/404); ViewParcel is POST-only after search
+  - Jacksonville city FLU REST gap — city uses county Horizon 2040 / Future Land Use; jacksonvillenc.gov Online Mapping is UI not separate FS
+  - Municipal FLU for Holly Ridge / Richlands appear as placeholder districts on county FLU layer — no separate town FLU FS
+  - Surf City spans Onslow/Pender — dual-county filter required
+  - Camp Lejeune / military lands largely non-participating on FLU; zoning DATA=CAMP LEJEUNE sparse
+  - CAMA ZONING attribute useful stub but prefer polygon spatial join
+  - OneMap has no sale price; prefer county SALEPRICE
+  - Last-sale only on parcel layer (no multi-transfer sales FS)
+  - Utilities / AADT out of scope for this card
+
+license: "Onslow County public ArcGIS REST; NC OneMap statewide parcels; attribution as required"
+gisPortalUrl: https://www.onslowcountync.gov/148/GIS
+viewerUrl: https://gismaps.onslowcountync.gov/maps/
+planningMapsUrl: https://www.onslowcountync.gov/1109/Maps
+restDirectoryUrl: https://maps.onslowcountync.gov/arcgis/rest/services
+appraiserSearchUrl: https://tax.onslowcountync.gov/ITSPublicON
+appraiserDeepLinkTemplate: "https://tax.onslowcountync.gov/ITSPublicON/TaxBillSearch/Parcel/{PARID}"
+appraiserDeepLinkNotes: >
+  ITSPublicON Basic Search supports Parcel Id (PARID), Property Address, Owner, Alternate Parcel ID.
+  Working GET deep-link: TaxBillSearch/Parcel/{PARID} (also accepts PIN). Property card ViewParcel
+  is AJAX POST only (parcelNumber+taxYear) — no public GET datalet verified 2026-09-24.
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS2 full-suite upgrade (rural OZ) — verifiedAt 2026-09-28 ----
+pass2:
+  label: PASS2 full-suite upgrade — rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  aadtScreening:
+    source: NCDOT Traffic Survey Group (public AGOL)
+    layer: NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)
+    restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+    countyField: COUNTY
+    countyValue: ONSLOW
+    valueField: AADT_2022
+    valueType: string (trim; blank = no count that year)
+    countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ONSLOW%27&returnCountOnly=true&f=json
+    featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ONSLOW%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+    liveStationCount: 423
+    stationsWithAADT2022: 232
+    newerYearAvailable:
+      available: true
+      layer: NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      countyField: County
+      countyValue: Onslow
+      valueField: AADT_2025
+      valueType: integer (null = no count)
+      countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Onslow%27&returnCountOnly=true&f=json
+      featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Onslow%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+      liveStationCount: 426
+      stationsWithAADT2025: 205
+      stationsWithAADT2024: 275
+      segmentsLayer: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide — spatial filter by county envelope)
+      also: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)
+    recommendation: Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025→AADT_2024→AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title).
+  primaryParcelLayer:
+    restUrl: https://maps.onslowcountync.gov/arcgis/rest/services/WEB_PUBLICATIONS/County_Map_Layers/MapServer/0
+    acreageField: GISACRES
+    range5to150Where: GISACRES>=5 AND GISACRES<=150
+    liveTotalParcels: 96843
+    liveParcels5to150: 6771
+  taxValues:
+    status: ok
+    fields:
+      FINALFULLLANDVALUE: tax.landValue
+      FINALFULLBUILDINGVALUE: tax.improvementValue
+      TAXMARKETVALUE: tax.marketValue
+      TOTALTAXABLEVALUE: tax.taxableValue
+    liveNonZeroCounty:
+      FINALFULLLANDVALUE: 93576
+      FINALFULLBUILDINGVALUE: 76784
+      TAXMARKETVALUE: 95821
+      TOTALTAXABLEVALUE: 95823
+    liveNonZero5to150:
+      TOTALTAXABLEVALUE: 6748
+    notes: Double fields; TAXMARKETVALUE market, TOTALTAXABLEVALUE taxable.
+    publicFallback: https://tax.onslowcountync.gov/ITSPublicON/TaxBillSearch/Parcel/{PARID}
+  saleHistory:
+    status: ok
+    priceFields:
+    - SALEPRICE
+    dateFields:
+    - SALEDATE
+    livePriceGt0County:
+      SALEPRICE: 61965
+    livePriceGt0_5to150:
+      SALEPRICE: 2662
+    liveDateNonNullCounty:
+      SALEDATE: 96527
+    notes: SALEDATE STRING DD-MON-YY (e.g. 28-FEB-25); SALEPRICE double; SALECODE qualified code.
+  ownerEntity:
+    ownerFields:
+    - OWNER1
+    - OWNER2
+    primaryOwnerField: OWNER1
+    rule:
+      apply: Uppercase + trim OWNER1 (optionally also OWNER2)
+      regex: (?i)(\bL\.?\s?L\.?\s?C\b|\bINC\b|\bCORP|\bL\.?\s?P\b|\bLLP\b|\bLLLP\b|\bLTD\b|TRUST|CHURCH|MINISTR|\bCOMPANY\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\bHOA\b|FOUNDATION|AUTHORITY|\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\b|^UNITED STATES|^NORTH CAROLINA\b|\bCOUNTY$)
+      sqlLikeTokens:
+      - '% LLC%'
+      - '%,LLC%'
+      - '% L L C%'
+      - '% INC'
+      - '% INC %'
+      - '% INC.%'
+      - '%,INC%'
+      - '% CORP%'
+      - '%CORPORATION%'
+      - '% LP'
+      - '% LP %'
+      - '% L P'
+      - '% LLP%'
+      - '% LTD%'
+      - '%TRUST%'
+      - '%CHURCH%'
+      - '%MINISTR%'
+      - '% COMPANY%'
+      - '%PARTNERSHIP%'
+      - '%HOLDINGS%'
+      - '%PROPERTIES%'
+      - '%INVESTMENT%'
+      - '%ASSOCIATION%'
+      - '%FOUNDATION%'
+      - '%AUTHORITY%'
+      - CITY OF %
+      - COUNTY OF %
+      - STATE OF %
+      - TOWN OF %
+      - '% COUNTY'
+      - '%BOARD OF EDUCATION%'
+      - UNITED STATES%
+      - NORTH CAROLINA %
+      - '% DEVELOPMENT%'
+      caveats: TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); "% COUNTY" suffix catches e.g. "PERSON COUNTY"; bare "CO" and "ESTATE" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) — normalize first.
+    liveEntityCount5to150: 1589
+    liveOwnerNonNull5to150: 6771
+    entityQuery: where=GISACRES>=5 AND GISACRES<=150 AND (OWNER1 LIKE '% LLC%' OR OWNER1 LIKE '%,LLC%' OR OWNER1 LIKE '% L L C%' OR OWNER1 LIKE '% INC' OR OWNER1 LIKE '% INC %' OR OWNER1 LIKE '% INC.%' OR OWNER1 LIKE '%,INC%' OR OWNER1 LIKE '% CORP%' OR OWNER1 LIKE '%CORPORATION%' OR OWNER1 LIKE '% LP' OR OWNER1 LIKE '% LP %' OR OWNER1 LIKE '% L P' OR OWNER1 LIKE '% LLP%' OR OWNER1 LIKE '% LTD%' OR OWNER1 LIKE '%TRUST%' OR OWNER1 LIKE '%CHURCH%' OR OWNER1 LIKE '%MINISTR%' OR OWNER1 LIKE '% COMPANY%' OR OWNER1 LIKE '%PARTNERSHIP%' OR OWNER1 LIKE '%HOLDINGS%' OR OWNER1 LIKE '%PROPERTIES%' OR OWNER1 LIKE '%INVESTMENT%' OR OWNER1 LIKE '%ASSOCIATION%' OR OWNER1 LIKE '%FOUNDATION%' OR OWNER1 LIKE '%AUTHORITY%' OR OWNER1 LIKE 'CITY OF %' OR OWNER1 LIKE 'COUNTY OF %' OR OWNER1 LIKE 'STATE OF %' OR OWNER1 LIKE 'TOWN OF %' OR OWNER1 LIKE '% COUNTY' OR OWNER1 LIKE '%BOARD OF EDUCATION%' OR OWNER1 LIKE 'UNITED STATES%' OR OWNER1 LIKE 'NORTH CAROLINA %' OR OWNER1 LIKE '% DEVELOPMENT%')
+  paDeepLink:
+    template: https://tax.onslowcountync.gov/ITSPublicON/TaxBillSearch/Parcel/{PARID}
+    testedUrl: https://tax.onslowcountync.gov/ITSPublicON/TaxBillSearch/Parcel/036798
+    httpStatus: 200
+    notes: HTTP 200; PARID present in server HTML.
+  jurisdictionGisViewer:
+    url: https://gismaps.onslowcountync.gov/maps/
+    httpStatus: 200
+    notes: Onslow County GIS map viewer
+  gaps:
+  - AADT_2022 blank at 191 of 423 stations on the 2022 layer (NCDOT counts on a cycle) — prefer 2025 layer / latest non-blank year
+  - No multi-transfer sale history on primary layer (last sale only)

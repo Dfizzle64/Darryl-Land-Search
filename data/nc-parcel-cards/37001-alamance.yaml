@@ -1,0 +1,496 @@
+state: NC
+jurisdiction: Alamance County
+fips: "37001"
+level: county
+markets: [Raleigh-Durham]
+
+layers:
+  - role: parcels
+    name: Tax AlamanceParcels
+    restUrl: https://apps.alamance-nc.com/arcgis/rest/services/Tax/AlamanceParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      GPIN: parcelIdGpin
+      AKPAR_: parcelIdAkpar
+      PID: parcelIdLegacy
+      ACRES: acreage
+      AKACRM: acreageMap
+      AKACRD: acreageDeed
+      OWNAM1: ownerName
+      OWNAM2: ownerName2
+      OWADR1: mailingAddress.street
+      OWADR2: mailingAddress.street2
+      OWCITY: mailingAddress.city
+      OWSTA: mailingAddress.state
+      OWZIPA: mailingAddress.zip
+      CAKPSAD: situsAddress
+      AKPST_: situsAddress.number
+      AKPSTN: situsAddress.street
+      AKPSTP: situsAddress.streetType
+      AKPDIR: situsAddress.prefix
+      AKPDSX: situsAddress.suffix
+      AKPUN_: situsAddress.unit
+      AMSLAM: lastSale.price
+      AMDTSL: lastSale.date
+      DateSold: lastSale.dateEpoch
+      DateSoldText: lastSale.dateText
+      AMQFCD: lastSale.qualified
+      XXQCDS: lastSale.qualifiedDesc
+      AMSALI: lastSale.instrument
+      XXSIDS: lastSale.instrumentDesc
+      JMTCTM: tax.marketValue
+      AKLCFM: tax.landValue
+      AKICFM: tax.improvementValue
+      XXTCAS: tax.assessedValue
+      XXTXVL: tax.taxableValue
+      AKLCPR: tax.landUseValue
+      AKCYCD: municipalityCode
+      XXCYDS: municipality
+      XXDDC1: dorCodeDesc
+      AKRDC1: dorCode
+      AMLCUC: landUseCode
+      XXCUDS: landUseDesc
+    notes: >
+      PRIMARY verified 2026-09-24: count 79848; ACRES 5–150 → 8885;
+      AKACRM 5–150 → 8861; AKACRD 5–150 → 8351. CRS 102719/2264.
+      Rich CAMA: owner, mailing, situs on polygon (CAKPSAD), sale amount
+      AMSLAM (44481 >0), qualify codes, FMV/ASV. No base zoning attribute —
+      route by AKCYCD/XXCYDS to municipal zoning. MaxRecordCount 9000.
+      Open Data mirror: alamancecounty-alamancectygis.opendata.arcgis.com.
+      MapServer twin: Tax/AlamanceParcels/MapServer/0.
+    status: usable
+
+  - role: sales
+    name: Tax Sales_History
+    restUrl: https://apps.alamance-nc.com/arcgis/rest/services/Tax/Sales_History/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      GPIN: parcelIdGpin
+      AMSLAM: lastSale.price
+      AMQFCD: lastSale.qualified
+      AMSALI: lastSale.instrument
+      OWNAM1: ownerName
+    notes: >
+      Verified SalesHistory_FC count shares AMSLAM>0 = 44481 with parcels;
+      layer 1 SalesQuery count 247828 (multi-sale query surface). Use for
+      sale history beyond current parcel snapshot. MaxRecordCount 9000.
+    status: usable
+
+  - role: other
+    name: Addresses (situs / NG911 join)
+    restUrl: https://apps.alamance-nc.com/arcgis/rest/services/Addresses/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARENTGPIN: parcelIdGpin
+      FULLADDRESS: situsAddress
+      NgFullAddress: situsAddressAlt
+      Add_Number: situsAddress.number
+      St_Name: situsAddress.street
+      St_PosTyp: situsAddress.streetType
+      St_PreDir: situsAddress.prefix
+      St_PosDir: situsAddress.suffix
+      Post_Comm: situsCity
+      Post_Code: situsZip
+      Inc_Muni: municipality
+      JURISDICTION: taxJurisdiction
+      CadCity: situsCityCad
+    notes: >
+      Verified count 113342. Join on PARENTGPIN = parcels.GPIN. Prefer when
+      unit/multi-point situs needed; parcels already carry CAKPSAD.
+    status: usable
+
+  - role: zoning
+    name: Burlington Zoning (ReGIS BurlZoningPublic)
+    restUrl: https://maps.regisnc.org/arcgis/rest/services/BurlZoningPublic/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      DIST_IDW: zoning
+      DIST_DESCW: zoningDescription
+      CITYZONE: zoningCityCode
+      ZONECITYCODE: municipalityCode
+      CCASE: zoningConditionalCase
+      DIST_SUBW: zoningSubtype
+    notes: >
+      Verified count 2328; ZONECITYCODE=12 (Burlington) only. Districts MDR,
+      HDR, GB, OI, LI, NB, CB, CR, HI, RMH, CI, MI, MX, CBD, PD, LDR, *-LU.
+      Overlays on same service (AOCD/AOHD/HOD/WCA/PDDEB). CRS 2264.
+      Alternate: BURL_BASE/BurlZoningOnline/MapServer/3; BurlZoningCounty/3.
+      Viewer: experience.arcgis.com BurlingtonZoning_Public; regisnc WebApp.
+    status: usable
+
+  - role: flu
+    name: Burlington Future Land Use
+    restUrl: https://maps.regisnc.org/arcgis/rest/services/BURL_BASE/BurlFutureLU_Online/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Future_Landuse: flu
+      FLU_Code: fluCode
+    notes: >
+      Verified count 121. Categories include Rural Residential/Agriculture
+      (RR) and other Burlington FLU codes. CRS 2264. Related ReGIS root
+      FutureLandUse/MapServer/0 (count 94, LU_TYPE/FLU_Desc) is Burlington-
+      area FLU with centroids in Burlington — prefer BurlFutureLU_Online.
+    status: usable
+
+  - role: zoning
+    name: Graham Zoning Districts (ReGIS)
+    restUrl: https://maps.regisnc.org/arcgis/rest/services/Graham/GrahZoningOnline/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONEID: zoning
+      DIST_DESC: zoningDescription
+      CITYZONE: zoningCityCode
+      CITYCODE: municipalityCode
+      TAXCITYCDE: taxCityCode
+      GZONES: zoningCodeNum
+      DIST_SUB: zoningSubtype
+    notes: >
+      Verified count 971; CITYCODE=11 (Graham). Districts R-12, R-7, R-MF,
+      O-I, etc. Overlays on layers 1–3. Twin: GrahZoningCounty/MapServer/0
+      (same count/schema). CRS 2264.
+    status: usable
+
+  - role: flu
+    name: Graham Future Land Use
+    restUrl: https://maps.regisnc.org/arcgis/rest/services/Graham/GrahFutureLandUse/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      FutureLU: flu
+      LU_Code: fluCode
+    notes: >
+      Verified count 27. Categories Low Density Residential (ResSuburb),
+      Rural Residential (ResRural), Focused Commercial (CommMixed), etc.
+      Annotation twin layer 0. CRS 2264.
+    status: usable
+
+  - role: zoning
+    name: Elon Zoning (ReGIS)
+    restUrl: https://maps.regisnc.org/arcgis/rest/services/Elon_Base/ElonZoning/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+      ZONE_DESC: zoningDescription
+      ZONE_CODE: zoningCodeNum
+      ZONE_SUB: zoningSubtype
+      COND_ORD: zoningConditionalOrd
+    notes: >
+      Verified count 257. Districts RUR, SBR, etc. Overlay layer 0 on same
+      FS. MapServer twin Elon_Base/ElonZoning; ElonZoningCounty/3.
+    status: usable
+
+  - role: flu
+    name: Elon Land Use Districts
+    restUrl: https://maps.regisnc.org/arcgis/rest/services/Elon/ElonLandUseOnline/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      LU_CODE: flu
+      LU_TYPE: fluDescription
+      LU_DESC: fluLabel
+      LU_SUB: fluSubtype
+    notes: >
+      Verified count 247. Types include Office and Institutional (O&I),
+      Neighborhood Residential (NR), etc. Prefer over zoning when Elon
+      publishes land-use districts as FLU-like categories.
+    status: usable
+
+  - role: zoning
+    name: Mebane Current Zoning
+    restUrl: https://services8.arcgis.com/pqfZyBvxpstAt1gO/arcgis/rest/services/Current_Zoning_Feature_Layer_(View)/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      PIN: parcelIdGpin
+      PID: parcelIdLegacy
+      Acreage: acreage
+      Previous_Zoning: zoningLegacy
+      Date_Approved: zoningDate
+    notes: >
+      Verified count 7446. CRS 3857 — reproject to 2264 before join to
+      county parcels. Join on PIN≈GPIN. Sample centroid in Mebane
+      (−79.30, 36.07). Alternate view_layer count 7322. Parcel-based
+      zoning polygons (not pure district shells). Special_Use_Districts
+      FS also public (count 51). Mebane spans Alamance+Orange — filter
+      spatially to Alamance when joining county parcels.
+    status: usable
+
+  - role: flu
+    name: Mebane 2045 Future Land Use Map (FLUM)
+    restUrl: https://services8.arcgis.com/pqfZyBvxpstAt1gO/arcgis/rest/services/Mebane_2045_Future_Land_Use_Map_WFL1/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      PLACETYPE: flu
+      PT_CAT: fluCode
+      PIN: parcelIdGpin
+      Parcel_ID: parcelIdAlt
+      ACRES: acreage
+    notes: >
+      Verified count 13159. Place types: Suburban Neighborhood, Urban
+      Neighborhood, Rural Living, Downtown, Industrial Light/Heavy,
+      Mixed Use, Neighborhood Center, Open Space, Agriculture, etc.
+      CRS 3857. Experience viewer: experience/e352db750fbb41e79ade108330cf74e6.
+      Parcel-keyed — join PIN to GPIN.
+    status: usable
+
+  - role: zoning
+    name: Watershed Overlay (county WCA/BOW)
+    restUrl: https://apps.alamance-nc.com/arcgis/rest/services/CountyWebsite/Combined/MapServer/86
+    layerId: 86
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      ZONINGTYPE: zoningOverlay
+      DIST_NAME: watershedName
+      DIST_NAME_FULL: zoningOverlayDescription
+      PID: parcelIdLegacy
+      ACRES: acreage
+    notes: >
+      Verified count 8883; ZONINGTYPE WCA=1848, BOW=7035. Watershed
+      overlay only — NOT base zoning districts. Mirror on GISWebsite/84.
+      Same schema name ZONINGTYPE is easy to misread as base zoning.
+    status: partial
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelIdGpin
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      recareano: acreageDeed
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Filter cntyfips='001'. Verified count 79495; gisacres 5–150 → 8871;
+      recareano 5–150 → 8345. For Alamance, gisacres and siteadd ARE
+      populated (unlike Orange). Prefer county Tax/AlamanceParcels for
+      AMSLAM sale price + richer CAMA. Alternate host services.gis.nc.gov.
+      MaxRecordCount 5000. Geo-verified sample centroid in Alamance.
+    status: partial
+
+  - role: other
+    name: Municipalities
+    restUrl: https://apps.alamance-nc.com/arcgis/rest/services/Municipalities/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+      PREFIX: municipalityPrefix
+      TAXCITYCOD: taxCityCode
+      ZONECITYCO: zoneCityCode
+    notes: >
+      Verified 15 multipart features: Burlington, Graham, Mebane, Elon,
+      Gibsonville, Haw River, Green Level, Swepsonville, Ossipee, Village
+      of Alamance, Whitsett (edge). Route zoning/FLU joins by NAME /
+      ZONECITYCO (11=Graham, 12=Burlington, 13=Elon, 14=Mebane, …).
+    status: usable
+
+  - role: other
+    name: ETJ
+    restUrl: https://apps.alamance-nc.com/arcgis/rest/services/ETJ/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Municipal ETJ polygons for routing city zoning/FLU outside limits.
+      Also on Combined/12 and ReGIS ALAM_ETJ.
+    status: usable
+
+gaps:
+  - No public countywide BASE zoning FeatureServer/MapServer for unincorporated Alamance — CountyGISMap/GISWebsite layers omit zoning; Planning issues zoning verification letters but no REST dig published
+  - BurlingtonGIS folder on apps.alamance-nc.com requires token (499) — use public ReGIS maps.regisnc.org instead
+  - Haw River, Gibsonville, Green Level, Swepsonville, Ossipee, Village of Alamance — no public municipal zoning/FLU REST found (city-first gap)
+  - Watershed Combined/86 ZONINGTYPE is overlay (WCA/BOW) only — not a substitute for base districts
+  - Mebane zoning + FLUM CRS 3857 vs county/ReGIS 2264 — reproject before spatial join
+  - Mebane spans Alamance + Orange — spatial-filter to Alamance parcels
+  - County FLU REST gap (Small Area Plan is NCDOT SAP regions North/Snow Camp/Rock Creek/Southeast — not FLU place types)
+  - NC OneMap lacks AMSLAM-quality sale price; use county parcels for lastSale.price
+  - No phones/emails collected; no paid vendors; utilities and AADT out of scope
+
+license: "County and municipal public GIS / ReGIS / Mebane AGOL / NC OneMap; attribution recommended; not survey grade"
+appraiserSearchUrl: https://property.spatialest.com/nc/alamance/#/
+appraiserDeepLinkTemplate: "https://property.spatialest.com/nc/alamance/#/property/{PIN}"
+viewerUrl: https://apps.alamance-nc.com/CountyGISMap/default.aspx
+openDataUrl: https://alamancecounty-alamancectygis.opendata.arcgis.com/
+gisFtpUrl: https://apps.alamance-nc.com/GISFTP/
+taxDeptUrl: https://tax.alamancecountync.gov/
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (NC non-OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  pass1:
+    status: verified
+    parcelPolygonLayer: https://apps.alamance-nc.com/arcgis/rest/services/Tax/AlamanceParcels/FeatureServer/0
+    polygonCountLive: 79854
+    parcelIdField: PIN
+    parcelIdFilled: 79799
+    acreageField: ACRES
+    acres5to150Live: 8884
+    sampleCentroidWgs84:
+    - -79.541
+    - 35.845
+  parcelLayer: https://apps.alamance-nc.com/arcgis/rest/services/Tax/AlamanceParcels/FeatureServer/0
+  parcelIdField: PIN
+  acreageFilter: ACRES >= 5 AND ACRES <= 150
+  acres5to150Live: 8884
+  parcelCountLive: 79854
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='ALAMANCE'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ALAMANCE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ALAMANCE%27&returnCountOnly=true&f=json
+      liveStationCount: 890
+      stationsWithAADT2022: 133
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Alamance'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Alamance%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Alamance%27&returnCountOnly=true&f=json
+      liveStationCount: 881
+      stationsWithAADT2025: 772
+      stationsWithAADT2024: 178
+      stationsWith2025or2024: 860
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - JMTCTM
+    - XXTCAS
+    liveNonZero:
+      JMTCTM: 78849
+      XXTCAS: 78597
+    status: ok
+  sale:
+    priceFields:
+    - AMSLAM
+    dateFields:
+    - DateSold
+    - AMDTSL
+    livePriceNonZero:
+      AMSLAM: 44480
+    liveDateNonNull:
+      DateSold: 73831
+      AMDTSL: 73831
+    status: ok
+    note: AMDTSL is a numeric yyyymmdd date; DateSold is the esri date version.
+  ownerEntity:
+    ownerFields:
+    - OWNAM1
+    primaryOwnerField: OWNAM1
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(OWNAM1) LIKE '% LLC%' OR UPPER(OWNAM1) LIKE '% INC%' OR UPPER(OWNAM1) LIKE '% LP%' OR UPPER(OWNAM1) LIKE '% LLP%' OR UPPER(OWNAM1) LIKE '% LTD%' OR UPPER(OWNAM1) LIKE '% TRUST%' OR UPPER(OWNAM1) LIKE '% CHURCH%' OR UPPER(OWNAM1) LIKE '% COMPANY%' OR UPPER(OWNAM1) LIKE '% PARTNERSHIP%' OR UPPER(OWNAM1) LIKE '% HOLDINGS%' OR UPPER(OWNAM1) LIKE '% PROPERTIES%' OR UPPER(OWNAM1) LIKE '% CORP%' OR UPPER(OWNAM1) LIKE '%,LLC%' OR UPPER(OWNAM1) LIKE '%,INC%' OR UPPER(OWNAM1) LIKE 'CITY OF %' OR UPPER(OWNAM1) LIKE 'COUNTY OF %' OR UPPER(OWNAM1) LIKE 'STATE OF %' OR UPPER(OWNAM1) LIKE 'TOWN OF %')
+    liveEntityCountAll: 12001
+    liveEntityCount5to150ac: 1633
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above.
+  paDeepLink:
+    template: https://property.spatialest.com/nc/alamance/#/property/{PIN}
+    testedParcelId: '100412'
+    testedUrl: https://property.spatialest.com/nc/alamance/#/property/100412
+    httpStatus: 200
+    contentType: text/html; charset=UTF-8
+    contentVerified: false
+    note: 'Spatialest SPA (hash route): 200 shell, parcel content cannot be checked server-side.'
+  gisViewer:
+    url: https://apps.alamance-nc.com/CountyGISMap/default.aspx
+    httpStatus: 200
+    pageTitle: Alamance County, North Carolina GIS
+  gaps:
+  - PA content not verifiable (SPA)

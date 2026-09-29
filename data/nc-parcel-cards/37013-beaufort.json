@@ -1,0 +1,344 @@
+{
+  "state": "NC",
+  "jurisdiction": "Beaufort County",
+  "fips": "37013",
+  "level": "county",
+  "markets": [
+    "Eastern NC"
+  ],
+  "slug": "beaufort",
+  "municipalities": [
+    {
+      "name": "Washington",
+      "role": "city-first-zoning",
+      "cityCode": "WAS",
+      "notes": "County seat; MunicipalLimits WAS (~65 annex polys, ~5569 ac); Beaufort_Static/16 WasingtonZoning2021 PRIMARY (556 ZONING polys); Washington ETJ present"
+    },
+    {
+      "name": "Belhaven",
+      "role": "city-first-zoning",
+      "cityCode": "BEL",
+      "notes": "MunicipalLimits BEL (~4 polys, ~1485 ac); Beaufort_Static/28 BelhavenZoning2024 PRIMARY (11 Zoning_District polys); Belhaven ETJ present"
+    },
+    {
+      "name": "Chocowinity",
+      "role": "city-limits-only",
+      "cityCode": "CHO",
+      "notes": "MunicipalLimits CHO (~13 polys); Chocowinity ETJ; no public zoning FS"
+    },
+    {
+      "name": "Aurora",
+      "role": "city-limits-only",
+      "cityCode": "AUR",
+      "notes": "MunicipalLimits AUR (~2 polys, ~696 ac); Aurora ETJ; no public zoning FS"
+    },
+    {
+      "name": "Bath",
+      "role": "city-limits-only",
+      "cityCode": "BAT",
+      "notes": "MunicipalLimits BAT (~1 poly, ~628 ac); Bath ETJ; no public zoning FS"
+    },
+    {
+      "name": "Pantego",
+      "role": "city-limits-only",
+      "cityCode": "PAN",
+      "notes": "MunicipalLimits PAN (~1 poly, ~421 ac); no public zoning FS"
+    },
+    {
+      "name": "Washington Park",
+      "role": "city-limits-only",
+      "cityCode": "WPK",
+      "notes": "MunicipalLimits WPK (~1 poly, ~170 ac); no public zoning FS"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Beaufort_Service Parcels (PRIMARY county AGOL CAMA + sale)",
+      "restUrl": "https://services1.arcgis.com/oXsk9nimtmSEU8Ko/arcgis/rest/services/Beaufort_Service/FeatureServer/4",
+      "alternateUrls": [
+        "https://services1.arcgis.com/oXsk9nimtmSEU8Ko/arcgis/rest/services/Condos_Leaseholds/FeatureServer/0",
+        "https://co.beaufort.nc.us/DocumentCenter/View/2591/Beaufort-County-Parcels-ZIP"
+      ],
+      "layerId": 4,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CalcAcres",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "ALPHA": "parcelId",
+        "GPIN": "parcelIdGpin",
+        "GPINLONG": "parcelIdGpinLong",
+        "REID": "parcelIdAcct",
+        "PIN_1": "parcelIdAlt",
+        "NAME1": "ownerName",
+        "NAME2": "ownerName2",
+        "ADDR1": "mailingAddress.street",
+        "ADDR2": "mailingAddress.street2",
+        "CITY": "mailingAddress.city",
+        "STATE": "mailingAddress.state",
+        "ZIP": "mailingAddress.zip",
+        "PROP_ADDR": "situsAddress",
+        "CalcAcres": "acreage",
+        "ACRES": "acreageText",
+        "SALE_PRICE": "lastSale.price",
+        "DATE": "lastSale.dateText",
+        "date_dt": "lastSale.date",
+        "LAND_VAL": "tax.landValue",
+        "BLDG_VAL": "tax.improvementValue",
+        "TOT_VAL": "tax.marketValue",
+        "TAXABLE_VAL": "tax.taxableValue",
+        "DEFR_VAL": "tax.deferredValue",
+        "PREV_ASSES": "tax.previousAssessed",
+        "USE_CDE": "dorCode",
+        "USE_DESC": "landUseDescription",
+        "LAND_USE": "presentUseCode",
+        "DEED_BOOK": "lastSale.deedBook",
+        "DEED_PAGE": "lastSale.deedPage",
+        "PROP_DESC": "legalDescription",
+        "TOWNSHIP": "township",
+        "MBL": "mapBlockLot",
+        "PRC": "appraiserDeepLink",
+        "Print_": "printCardUrl",
+        "deed_link": "deedImageUrl",
+        "NBR_BLDG": "buildingCount",
+        "YR_BUILT": "yearBuilt"
+      },
+      "notes": "PRIMARY wire-first county AGOL Rest. Verified 2026-09-24: count 45229; CalcAcres 5\u2013150 \u2192 8050; SALE_PRICE>0 19370; sale+band 2307; TOT_VAL>0 43776; LAND_VAL>0 43661; vacant band (BLDG_VAL 0/null) 5597; owner ~44888; PRC/date_dt ~44888. CITY is mailing city \u2014 situs muni via MunicipalLimits CityCode spatial join. Geo sample ALPHA 5657-09-8487 centroid ~-77.148, 35.602 (Washington). MaxRecordCount 2000. Condos_Leaseholds/0 adds ~1241 condo/leasehold polys with same CAMA schema. CRS 102719/2264.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 45229,
+        "calcacres_5_150": 8050,
+        "sale_price_gt0": 19370,
+        "sale_price_in_5_150": 2307,
+        "totval_gt0": 43776,
+        "landval_gt0": 43661,
+        "vacant_band": 5597,
+        "owner_nonnull": 44888,
+        "prc_nonnull": 44888,
+        "date_dt_nonnull": 44888
+      }
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (statewide REST + saledatetx backup)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+        "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "filter": "cntyfips='013'",
+      "fieldMap": {
+        "parno": "parcelId",
+        "altparno": "parcelIdAlt",
+        "nparno": "parcelIdNational",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress.street",
+        "mcity": "mailingAddress.city",
+        "mstate": "mailingAddress.state",
+        "mzip": "mailingAddress.zip",
+        "siteadd": "situsAddress",
+        "scity": "situsCity",
+        "szip": "situsZip",
+        "gisacres": "acreage",
+        "Shape__Area": "acreageSqFt",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "parval": "tax.marketValue",
+        "saledate": "lastSale.dateBroken",
+        "saledatetx": "lastSale.dateText",
+        "parusecode": "dorCode",
+        "parusedesc": "landUseDescription",
+        "cntyfips": "countyFips"
+      },
+      "notes": "Filter cntyfips='013'. Verified 2026-09-24: count 46322; gisacres 5\u2013150 \u2192 8401; Shape__Area 5\u2013150 \u2192 8402; ownname 46322; parval>0 44254; landval>0 43021; saledatetx present 46010; saledate date field NULL (0) \u2014 do not wire saledate; use county DATE/date_dt or saledatetx text. Prefer Beaufort_Service/4 for SALE_PRICE. Join parno=ALPHA. MaxRecordCount 5000.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 46322,
+        "gisacres_5_150": 8401,
+        "shape_area_5_150": 8402,
+        "ownname_nonnull": 46322,
+        "parval_gt0": 44254,
+        "landval_gt0": 43021,
+        "saledatetx_nonnull": 46010,
+        "saledate_nonnull": 0
+      }
+    },
+    {
+      "role": "sales",
+      "name": "Parcels_QS_2022_2024 (supplemental qualified sales)",
+      "restUrl": "https://services1.arcgis.com/oXsk9nimtmSEU8Ko/arcgis/rest/services/Beaufort_Static/FeatureServer/29",
+      "layerId": 29,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CalcAcres",
+      "coverage": "sample",
+      "fieldMap": {
+        "ALPHA": "parcelId",
+        "REID": "parcelIdAcct",
+        "SALE_PRICE1": "lastSale.price",
+        "SALE_DATE1": "lastSale.date",
+        "SALE_PRICE": "lastSale.priceLegacy",
+        "DATE": "lastSale.dateText",
+        "Year": "lastSale.year",
+        "NAME1": "ownerName",
+        "PROP_ADDR": "situsAddress",
+        "CalcAcres": "acreage",
+        "TOT_VAL": "tax.marketValue"
+      },
+      "notes": "Verified 2350 polys (2026-09-24). Year groups: 2022=1087, 2023=622, 2024=641. Prefer for recent QS join; countywide last-sale price/date still on Beaufort_Service/4.",
+      "status": "partial",
+      "verifiedCounts": {
+        "total": 2350,
+        "year_2022": 1087,
+        "year_2023": 622,
+        "year_2024": 641
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Washington Zoning 2021 (city-first PRIMARY)",
+      "restUrl": "https://services1.arcgis.com/oXsk9nimtmSEU8Ko/arcgis/rest/services/Beaufort_Static/FeatureServer/16",
+      "alternateUrls": [
+        "https://www.washingtonnc.gov/departments/planning___zoning/planning___zoning/map.php",
+        "https://library.municode.com/nc/washington/codes/code_of_ordinances"
+      ],
+      "layerId": 16,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ACRES_1",
+      "coverage": "city-only",
+      "fieldMap": {
+        "ZONING": "zoning",
+        "PREV_ZONE": "zoningPrevious",
+        "ACRES_1": "acreage",
+        "NOTES": "zoningNotes",
+        "RZONE_DATE": "rezoningDate",
+        "APPLICANT": "rezoningApplicant"
+      },
+      "notes": "PRIMARY zoning inside Washington. Verified count 556 (2026-09-24). Top: R6S 106, RA20 90, B2 87, O&I 47, R9S 46, R15S 38, RMF 29, RHD 22, I1 20, I2 19. Layer name typo WasingtonZoning2021. Spatial-join onto parcels where inside MunicipalLimits CityCode=WAS or Washington ETJ. LUP_COMP field blank.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 556
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Belhaven Zoning 2024 (city-first PRIMARY)",
+      "restUrl": "https://services1.arcgis.com/oXsk9nimtmSEU8Ko/arcgis/rest/services/Beaufort_Static/FeatureServer/28",
+      "layerId": 28,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CalcAcres",
+      "coverage": "city-only",
+      "fieldMap": {
+        "Zoning_District": "zoning",
+        "CalcAcres": "acreage",
+        "ACRES": "acreageText",
+        "GID": "zoningGid"
+      },
+      "notes": "PRIMARY zoning inside Belhaven (hosted on county Static service). Verified count 11 district polys (2026-09-24): R5, R5M, MB, GB, HB, Industrial, Commercial Overlay, RAW, RA. Coarse districts \u2014 not parcel fabric. Spatial-join Belhaven limits / Belhaven ETJ.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 11
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Agriculture Districts (overlay)",
+      "restUrl": "https://services1.arcgis.com/oXsk9nimtmSEU8Ko/arcgis/rest/services/Beaufort_Static/FeatureServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "sample",
+      "fieldMap": {
+        "MAPNAME": "overlayName",
+        "ALPHA": "overlayId"
+      },
+      "notes": "Voluntary Ag District / Ag overlay only \u2014 not municipal base zoning. Verified count 75.",
+      "status": "partial",
+      "verifiedCounts": {
+        "total": 75
+      }
+    },
+    {
+      "role": "other",
+      "name": "MunicipalLimits + Municipal_ETJs",
+      "restUrl": "https://services1.arcgis.com/oXsk9nimtmSEU8Ko/arcgis/rest/services/Beaufort_Static/FeatureServer/9",
+      "alternateUrls": [
+        "https://services1.arcgis.com/oXsk9nimtmSEU8Ko/arcgis/rest/services/Beaufort_Static/FeatureServer/30"
+      ],
+      "layerId": 9,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "Calc_Acres",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "CityCode": "municipalityCode",
+        "ALPHA": "municipality",
+        "MAPNAME": "mapName",
+        "Calc_Acres": "acreage"
+      },
+      "notes": "City Limits/9 count 87 annex polys \u2014 CityCode: WAS 65, CHO 13, BEL 4, AUR 2, BAT 1, PAN 1, WPK 1. ETJ/30 count 5 (Washington, Belhaven, Chocowinity, Bath, Aurora). Use CityCode for city-first router; do not use parcel mailing CITY.",
+      "status": "usable",
+      "verifiedCounts": {
+        "city_limits_polys": 87,
+        "etj": 5,
+        "municipalities": 7
+      }
+    },
+    {
+      "role": "flu",
+      "name": "Future land use \u2014 Washington Comp/CAMA LUP PDF only",
+      "restUrl": "https://www.washingtonnc.gov/residents/cama_land_use_plan.php",
+      "alternateUrls": [
+        "https://www.washingtonnc.gov/PLANNING/New%20node/LUP_Washington_20240213_FINAL.pdf",
+        "https://www.washingtonnc.gov/PLANNING/Planning%20%26%20Zoining/map/FLU%20Map%2024-02.pdf",
+        "https://www.washingtonnc.gov/departments/planning___zoning/planning___zoning/projects_and_plans.php"
+      ],
+      "layerId": null,
+      "geometry": "none",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "city-only",
+      "fieldMap": {},
+      "notes": "No public FLU FeatureServer/MapServer found 2026-09-24 for county or municipalities. Washington Comp/CAMA LUP adopted 2024-01-08, NCDCM certified 2024-02-08 \u2014 LUP PDF (~89MB) + FLU Map PDF (~3.6MB) only. Beaufort_Static/18 LandUse is NOT FLU (ALPHA mostly NC; no class field) \u2014 do not wire. FLU gap for wire ingest.",
+      "status": "gap"
+    }
+  ],
+  "gaps": [
+    "No public zoning FeatureServer for Aurora, Bath, Chocowinity, Pantego, Washington Park",
+    "Unincorporated Beaufort has no countywide base-zoning FeatureServer (Agriculture Districts overlay only)",
+    "FLU FeatureServer gap \u2014 Washington 2024 Comp/CAMA LUP + FLU Map PDFs only; Beaufort_Static/18 LandUse is not FLU",
+    "OneMap saledate date field is null for cntyfips='013' \u2014 use county DATE/date_dt or OneMap saledatetx",
+    "Parcel CITY is mailing city \u2014 situs municipality requires MunicipalLimits/ETJ spatial join",
+    "Belhaven zoning is coarse district polygons (11), not parcel fabric",
+    "Utilities / AADT / emails / phones / paid vendors intentionally out of scope"
+  ],
+  "license": "Beaufort County public GIS (AGOL BeaufortCoNC) + shapefile downloads unrestricted redistributable with preferred attribution to county GIS site; City of Washington planning docs; NC OneMap statewide parcels; attribution as required",
+  "gisPortalUrl": "https://co.beaufort.nc.us/239/GIS-Land-Records",
+  "viewerUrl": "https://beaufortnc.maps.arcgis.com/apps/webappviewer/index.html?id=e97b027e0d7d49ca8849e716662628f8",
+  "experienceViewerUrl": "https://experience.arcgis.com/experience/d291549628354e2aa3c0416439cd913f/",
+  "legacyGisRedirectUrl": "http://beaufortcountygis.com",
+  "downloadsUrl": "https://co.beaufort.nc.us/239/GIS-Land-Records",
+  "parcelsShapefileUrl": "https://co.beaufort.nc.us/DocumentCenter/View/2591/Beaufort-County-Parcels-ZIP",
+  "planningUrl": "https://www.washingtonnc.gov/departments/planning___zoning/planning___zoning/map.php",
+  "taxOfficeUrl": "https://co.beaufort.nc.us/238/Tax-Assessor",
+  "taxBillSearchUrl": "https://bcpwa.ncptscloud.com/beauforttax/BillSearchResults.aspx",
+  "washingtonCamaLupUrl": "https://www.washingtonnc.gov/residents/cama_land_use_plan.php",
+  "jurisdictionGisUrl": "https://beaufortnc.maps.arcgis.com/apps/webappviewer/index.html?id=e97b027e0d7d49ca8849e716662628f8",
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/beaufort/parcel-search",
+  "appraiserDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/Beaufort/parcel-detail?reid={REID}",
+  "appraiserDeepLinkNotes": "Primary parcel-ID deep-link is NCPTS: https://lrcpwa.ncptscloud.com/Beaufort/parcel-detail?reid={REID} (also path form /Beaufort/parcel-detail/{REID}; HTTP 200). Alternate print/property card: https://apps.agdmaps.com/print/nc/beaufort/index.html?GPIN={GPIN} where GPIN=ALPHA. Parcel layer PRC field already embeds the NCPTS reid URL. Jurisdiction GIS viewer: webappviewer id=e97b027e0d7d49ca8849e716662628f8. Tax bills: https://bcpwa.ncptscloud.com/beauforttax/BillSearchResults.aspx. ROD: https://us5.courthousecomputersystems.com/BeaufortNC2.",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/beaufort/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/Beaufort/parcel-detail?reid={REID}",
+  "printCardDeepLinkTemplate": "https://apps.agdmaps.com/print/nc/beaufort/index.html?GPIN={GPIN}",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher"
+}

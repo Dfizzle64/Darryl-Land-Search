@@ -1,0 +1,607 @@
+{
+  "county": "Stanly",
+  "state": "NC",
+  "msa": "Charlotte MSA",
+  "fips": "37167",
+  "cntyfips": "167",
+  "slug": "stanly",
+  "level": "county",
+  "markets": [
+    "Charlotte"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "crs_notes": "County AGOL services use 102719/2264 throughout \u2014 no CRS split for primary overlays.",
+  "viewerLinkTemplate": "https://stanlycounty.maps.arcgis.com/apps/webappviewer/index.html?id=195ae28fc5454875a5cc60eb8b28bbf6",
+  "viewerLinkTemplates": [
+    "https://stanlycounty.maps.arcgis.com/apps/webappviewer/index.html?id=195ae28fc5454875a5cc60eb8b28bbf6",
+    "https://www2.stanlycountync.gov/gisphotoviewer/propertyCard.ashx?pin={TAXRECORD}",
+    "https://www.stanlytax.com/#/"
+  ],
+  "appraiserSearchUrl": "https://www.stanlytax.com/#/",
+  "joinKeys": [
+    "PIN",
+    "TAXRECORD",
+    "parno",
+    "OLDPIN"
+  ],
+  "portals": {
+    "landRecordsApp": "https://stanlycounty.maps.arcgis.com/apps/webappviewer/index.html?id=195ae28fc5454875a5cc60eb8b28bbf6",
+    "stanlyGisHub": "https://www.stanlygis.net/",
+    "taxSearch": "https://www.stanlytax.com/#/",
+    "propertyCardPdf": "https://www2.stanlycountync.gov/gisphotoviewer/propertyCard.ashx?pin={TAXRECORD}",
+    "mappingLandRecords": "https://www.stanlycountync.gov/305/Mapping-Land-Records",
+    "taxAdministration": "https://www.stanlycountync.gov/157/Tax-Administration",
+    "albemarleMapsGis": "https://www.albemarlenc.gov/departments/planning-and-development-services/city-county-maps-gis",
+    "ncOneMap": "https://www.nconemap.gov"
+  },
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "TAXRECORD",
+        "parno",
+        "OLDPIN"
+      ],
+      "bestLayer": "parcel_records_base_2/Parcels"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "parcel_records_base_2/Parcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "ACRES",
+        "DeedAcres",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 8560,
+      "bestLayer": "parcel_records_base_2/Parcels"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Name1",
+        "Name2",
+        "Name3",
+        "ownname"
+      ],
+      "bestLayer": "parcel_records_base_2/Parcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "TaxPayerAddr1",
+        "TaxPayerAddr2",
+        "TaxPayerCity",
+        "State",
+        "Zip"
+      ],
+      "bestLayer": "parcel_records_base_2/Parcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "PhyStreetAddr",
+        "FullAddressLabel",
+        "siteadd"
+      ],
+      "bestLayer": "parcel_records_base_2/Parcels",
+      "notes": "Address Points lack PIN \u2014 spatial join; prefer PhyStreetAddr"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "DateSold",
+        "SaleAmount"
+      ],
+      "approxCountWithSaleInRange": 2084,
+      "bestLayer": "parcel_records_base_2/Parcels",
+      "notes": "DateSold epoch ms UTC; Sales/6 + OneTaxSales/20 for history"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "LandFMVCurrent",
+        "TotalFMVCurrent",
+        "LandASVCurrent",
+        "TotalASVCurrent",
+        "TotalMajorASVCurrent",
+        "LandLUVCurrent"
+      ],
+      "bestLayer": "parcel_records_base_2/Parcels"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "ZONING",
+        "Jurisdiction2",
+        "JURISDICTION"
+      ],
+      "bestLayer": "parcel_records_base_2/Zoning",
+      "cityFirst": true
+    },
+    "flu": {
+      "present": true,
+      "fields": [
+        "FLUM_Des",
+        "Comm_Type"
+      ],
+      "bestLayer": "land_records_base/Future Land Use Areas",
+      "notes": "FLUM attrs on parcel-like polygons; join by PIN"
+    },
+    "appraiserLink": {
+      "present": true,
+      "templates": [
+        "https://www.stanlytax.com/#/",
+        "https://www2.stanlycountync.gov/gisphotoviewer/propertyCard.ashx?pin={TAXRECORD}"
+      ]
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "parcel_records_base_2 Parcels (CAMA + polygons)",
+      "restUrl": "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/parcel_records_base_2/FeatureServer/3",
+      "alternateUrls": [
+        "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/parcel_records_base/FeatureServer/3",
+        "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/OpenGov2/FeatureServer/2"
+      ],
+      "layerId": 3,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ACRES",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": 44458,
+      "acreageRangeCount": 8560,
+      "saleInRangeCount": 2084,
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "maxRecordCount": 2000,
+      "fieldMap": {
+        "PIN": "parcelId",
+        "TAXRECORD": "parcelIdAccount",
+        "ACRES": "acreage",
+        "DeedAcres": "acreageDeed",
+        "Name1": "ownerName",
+        "Name2": "ownerName",
+        "TaxPayerAddr1": "mailingAddress",
+        "TaxPayerCity": "mailingAddress",
+        "State": "mailingAddress",
+        "Zip": "mailingAddress",
+        "PhyStreetAddr": "situsAddress",
+        "DateSold": "lastSale.date",
+        "SaleAmount": "lastSale.price",
+        "LandFMVCurrent": "tax.marketValue",
+        "TotalFMVCurrent": "tax.marketValue",
+        "TotalASVCurrent": "tax.assessedValue"
+      },
+      "primary": true
+    },
+    {
+      "role": "other",
+      "name": "Address Points (situs join)",
+      "restUrl": "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/parcel_records_base_2/FeatureServer/4",
+      "layerId": 4,
+      "geometry": "point",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": 36456,
+      "fieldMap": {
+        "FullAddressLabel": "situsAddress",
+        "City": "situsCity",
+        "ZipCode": "situsZip"
+      }
+    },
+    {
+      "role": "other",
+      "name": "Sales points (history)",
+      "restUrl": "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/parcel_records_base_2/FeatureServer/6",
+      "layerId": 6,
+      "geometry": "point",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": 34957,
+      "relatedTable": {
+        "name": "OneTaxSales",
+        "restUrl": "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/parcel_records_base_2/FeatureServer/20",
+        "verifiedCount": 43260
+      }
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "status": "usable",
+      "filter": "cntyfips='167'",
+      "verifiedCount": 44171,
+      "acreageRangeCount": 8533,
+      "maxRecordCount": 5000,
+      "fieldMap": {
+        "parno": "parcelId",
+        "ownname": "ownerName",
+        "gisacres": "acreage",
+        "siteadd": "situsAddress",
+        "parval": "tax.marketValue",
+        "saledate": "lastSale.date"
+      },
+      "notes": "No sale price; join parno to PIN"
+    },
+    {
+      "role": "zoning",
+      "name": "Zoning (all jurisdictions \u2014 city-first)",
+      "restUrl": "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/parcel_records_base_2/FeatureServer/14",
+      "alternateUrls": [
+        "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/parcel_records_base/FeatureServer/14",
+        "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/OpenGov2/FeatureServer/12"
+      ],
+      "layerId": 14,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": 895,
+      "jurisdiction2Counts": {
+        "County": 361,
+        "Albemarle": 203,
+        "Norwood": 76,
+        "Locust": 63,
+        "Oakboro": 49,
+        "Stanfield": 33,
+        "Richfield": 30,
+        "New London": 25,
+        "Red Cross": 24,
+        "Badin": 18,
+        "Misenheimer": 13
+      },
+      "fieldMap": {
+        "ZONING": "zoning",
+        "PENDINGZONING": "zoning",
+        "Jurisdiction2": "other",
+        "JURISDICTION": "other"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Zoning Overlay",
+      "restUrl": "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/parcel_records_base_2/FeatureServer/13",
+      "layerId": 13,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "partial",
+      "verifiedCount": 46
+    },
+    {
+      "role": "zoning",
+      "name": "Locust Zoning (Cabarrus OpenData \u2014 Cabarrus-side historic)",
+      "restUrl": "https://location.cabarruscounty.us/arcgisservices/rest/services/opendata/MapServer/39",
+      "layerId": 39,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "partial",
+      "verifiedCount": 8,
+      "notes": "Prefer Stanly Zoning Jurisdiction2='Locust' (63) for Stanly-side"
+    },
+    {
+      "role": "flu",
+      "name": "Future Land Use Areas (county FLUM on parcel polys)",
+      "restUrl": "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/land_records_base/FeatureServer/20",
+      "layerId": 20,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ACRES",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": 23116,
+      "maxRecordCount": 1000,
+      "flumDesCounts": {
+        "Rural Preservation": 14305,
+        "Secondary Growth": 5059,
+        "Primary Growth": 3271,
+        "Airport Overlay": 481
+      },
+      "fieldMap": {
+        "FLUM_Des": "flu",
+        "Comm_Type": "flu",
+        "PIN": "parcelId"
+      }
+    },
+    {
+      "role": "other",
+      "name": "City Limits (municipal boundaries)",
+      "restUrl": "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/parcel_records_base_2/FeatureServer/8",
+      "alternateUrls": [
+        "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/parcel_records_base_2/FeatureServer/7",
+        "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/OpenGov2/FeatureServer/13"
+      ],
+      "layerId": 8,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": 40,
+      "cityCodes": {
+        "ALB": "Albemarle",
+        "NOR": "Norwood",
+        "LOC": "Locust",
+        "OAK": "Oakboro",
+        "SFD": "Stanfield",
+        "RFD": "Richfield",
+        "NEW": "New London",
+        "RED": "Red Cross",
+        "BAD": "Badin",
+        "MIS": "Misenheimer"
+      }
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Unincorporated Stanly",
+      "zoningAllFilter": "Jurisdiction2='County'",
+      "zoningCount": 361,
+      "ownGis": false,
+      "fluRest": true
+    },
+    {
+      "name": "Albemarle",
+      "zoningAllFilter": "Jurisdiction2='Albemarle'",
+      "zoningCount": 203,
+      "ownGis": false,
+      "fluRest": true,
+      "notes": "City defers to Stanly County GIS"
+    },
+    {
+      "name": "Locust",
+      "zoningAllFilter": "Jurisdiction2='Locust'",
+      "zoningCount": 63,
+      "ownGis": false,
+      "fluRest": true,
+      "notes": "Spans Cabarrus+Stanly; Cabarrus OpenData Locust Zoning count 8 historic"
+    },
+    {
+      "name": "Norwood",
+      "zoningAllFilter": "Jurisdiction2='Norwood'",
+      "zoningCount": 76,
+      "ownGis": false,
+      "fluRest": true
+    },
+    {
+      "name": "Badin",
+      "zoningAllFilter": "Jurisdiction2='Badin'",
+      "zoningCount": 18,
+      "ownGis": false,
+      "fluRest": true
+    },
+    {
+      "name": "Oakboro",
+      "zoningAllFilter": "Jurisdiction2='Oakboro'",
+      "zoningCount": 49,
+      "ownGis": false,
+      "fluRest": true
+    },
+    {
+      "name": "New London",
+      "zoningAllFilter": "Jurisdiction2='New London'",
+      "zoningCount": 25,
+      "ownGis": false,
+      "fluRest": true
+    },
+    {
+      "name": "Richfield",
+      "zoningAllFilter": "Jurisdiction2='Richfield'",
+      "zoningCount": 30,
+      "ownGis": false,
+      "fluRest": true
+    },
+    {
+      "name": "Stanfield",
+      "zoningAllFilter": "Jurisdiction2='Stanfield'",
+      "zoningCount": 33,
+      "ownGis": false,
+      "fluRest": true
+    },
+    {
+      "name": "Red Cross",
+      "zoningAllFilter": "Jurisdiction2='Red Cross'",
+      "zoningCount": 24,
+      "ownGis": false,
+      "fluRest": true
+    },
+    {
+      "name": "Misenheimer",
+      "zoningAllFilter": "Jurisdiction2='Misenheimer'",
+      "zoningCount": 13,
+      "ownGis": false,
+      "fluRest": true
+    }
+  ],
+  "gaps": [
+    "No city-native ArcGIS for Albemarle / Locust / Norwood / Badin / Oakboro / New London / Richfield / Stanfield / Red Cross / Misenheimer \u2014 county Zoning Jurisdiction2 filter only",
+    "Locust Cabarrus OpenData zoning historic/sparse (8); Stanly Jurisdiction2='Locust' authoritative for Stanly-side",
+    "FLU is FLUM attrs on parcel-like polygons (not pure FLU district polygons); MaxRecordCount 1000",
+    "Address points lack PIN \u2014 spatial join; Sales ParcelID is TAXRECORD family not 12-digit PIN",
+    "Token-required Stanly_County_Data / StanlyCoParcels (services9) skipped",
+    "Owner phones/emails not collected; utilities / AADT / paid vendors excluded"
+  ],
+  "license": "Stanly County GIS (Paul Reynolds / stanlycounty.maps.arcgis.com); attribution required; independent verification recommended; NCGS 132-10 commercial resale limits",
+  "geoVerify": {
+    "sampleCentroidLonLat": [
+      -80.0916,
+      35.1637
+    ],
+    "samplePin": "657101368434",
+    "notes": "WGS84 centroid lands in Stanly County; OneMap samples likewise (~-80.08, 35.17)"
+  },
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 10,
+  "pass2": {
+    "label": "PASS2 full-suite upgrade \u2014 rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "aadtScreening": {
+      "source": "NCDOT Traffic Survey Group (public AGOL)",
+      "layer": "NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)",
+      "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+      "countyField": "COUNTY",
+      "countyValue": "STANLY",
+      "valueField": "AADT_2022",
+      "valueType": "string (trim; blank = no count that year)",
+      "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27STANLY%27&returnCountOnly=true&f=json",
+      "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27STANLY%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+      "liveStationCount": 534,
+      "stationsWithAADT2022": 272,
+      "newerYearAvailable": {
+        "available": true,
+        "layer": "NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)",
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "countyField": "County",
+        "countyValue": "Stanly",
+        "valueField": "AADT_2025",
+        "valueType": "integer (null = no count)",
+        "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Stanly%27&returnCountOnly=true&f=json",
+        "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Stanly%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+        "liveStationCount": 534,
+        "stationsWithAADT2025": 315,
+        "stationsWithAADT2024": 280,
+        "segmentsLayer": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide \u2014 spatial filter by county envelope)",
+        "also": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)"
+      },
+      "recommendation": "Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025\u2192AADT_2024\u2192AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title)."
+    },
+    "primaryParcelLayer": {
+      "restUrl": "https://services6.arcgis.com/w1igg0Q14weqYXUh/arcgis/rest/services/parcel_records_base_2/FeatureServer/3",
+      "acreageField": "ACRES",
+      "range5to150Where": "ACRES>=5 AND ACRES<=150",
+      "liveTotalParcels": 44458,
+      "liveParcels5to150": 8560
+    },
+    "taxValues": {
+      "status": "ok",
+      "fields": {
+        "LandFMVCurrent": "tax.marketValue",
+        "TotalFMVCurrent": "tax.marketValue",
+        "TotalASVCurrent": "tax.assessedValue"
+      },
+      "liveNonZeroCounty": {
+        "LandFMVCurrent": 44063,
+        "TotalFMVCurrent": 44079,
+        "TotalASVCurrent": 44079
+      },
+      "liveNonZero5to150": {
+        "TotalASVCurrent": 8512
+      },
+      "notes": "Integer fields; FMV = market, ASV = assessed.",
+      "publicFallback": "https://www2.stanlycountync.gov/gisphotoviewer/propertyCard.ashx?pin={TAXRECORD}"
+    },
+    "saleHistory": {
+      "status": "ok",
+      "priceFields": [
+        "SaleAmount"
+      ],
+      "dateFields": [
+        "DateSold"
+      ],
+      "livePriceGt0County": {
+        "SaleAmount": 15902
+      },
+      "livePriceGt0_5to150": {
+        "SaleAmount": 2084
+      },
+      "liveDateNonNullCounty": {
+        "DateSold": 30632
+      },
+      "notes": "DateSold esriDate; SaleAmount integer. Last sale only."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Name1",
+        "Name2"
+      ],
+      "primaryOwnerField": "Name1",
+      "rule": {
+        "apply": "Uppercase + trim Name1 (optionally also Name2)",
+        "regex": "(?i)(\\bL\\.?\\s?L\\.?\\s?C\\b|\\bINC\\b|\\bCORP|\\bL\\.?\\s?P\\b|\\bLLP\\b|\\bLLLP\\b|\\bLTD\\b|TRUST|CHURCH|MINISTR|\\bCOMPANY\\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\\bHOA\\b|FOUNDATION|AUTHORITY|\\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\\b|^UNITED STATES|^NORTH CAROLINA\\b|\\bCOUNTY$)",
+        "sqlLikeTokens": [
+          "% LLC%",
+          "%,LLC%",
+          "% L L C%",
+          "% INC",
+          "% INC %",
+          "% INC.%",
+          "%,INC%",
+          "% CORP%",
+          "%CORPORATION%",
+          "% LP",
+          "% LP %",
+          "% L P",
+          "% LLP%",
+          "% LTD%",
+          "%TRUST%",
+          "%CHURCH%",
+          "%MINISTR%",
+          "% COMPANY%",
+          "%PARTNERSHIP%",
+          "%HOLDINGS%",
+          "%PROPERTIES%",
+          "%INVESTMENT%",
+          "%ASSOCIATION%",
+          "%FOUNDATION%",
+          "%AUTHORITY%",
+          "CITY OF %",
+          "COUNTY OF %",
+          "STATE OF %",
+          "TOWN OF %",
+          "% COUNTY",
+          "%BOARD OF EDUCATION%",
+          "UNITED STATES%",
+          "NORTH CAROLINA %",
+          "% DEVELOPMENT%"
+        ],
+        "caveats": "TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); \"% COUNTY\" suffix catches e.g. \"PERSON COUNTY\"; bare \"CO\" and \"ESTATE\" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) \u2014 normalize first."
+      },
+      "liveEntityCount5to150": 1243,
+      "liveOwnerNonNull5to150": 8513,
+      "entityQuery": "where=ACRES>=5 AND ACRES<=150 AND (Name1 LIKE '% LLC%' OR Name1 LIKE '%,LLC%' OR Name1 LIKE '% L L C%' OR Name1 LIKE '% INC' OR Name1 LIKE '% INC %' OR Name1 LIKE '% INC.%' OR Name1 LIKE '%,INC%' OR Name1 LIKE '% CORP%' OR Name1 LIKE '%CORPORATION%' OR Name1 LIKE '% LP' OR Name1 LIKE '% LP %' OR Name1 LIKE '% L P' OR Name1 LIKE '% LLP%' OR Name1 LIKE '% LTD%' OR Name1 LIKE '%TRUST%' OR Name1 LIKE '%CHURCH%' OR Name1 LIKE '%MINISTR%' OR Name1 LIKE '% COMPANY%' OR Name1 LIKE '%PARTNERSHIP%' OR Name1 LIKE '%HOLDINGS%' OR Name1 LIKE '%PROPERTIES%' OR Name1 LIKE '%INVESTMENT%' OR Name1 LIKE '%ASSOCIATION%' OR Name1 LIKE '%FOUNDATION%' OR Name1 LIKE '%AUTHORITY%' OR Name1 LIKE 'CITY OF %' OR Name1 LIKE 'COUNTY OF %' OR Name1 LIKE 'STATE OF %' OR Name1 LIKE 'TOWN OF %' OR Name1 LIKE '% COUNTY' OR Name1 LIKE '%BOARD OF EDUCATION%' OR Name1 LIKE 'UNITED STATES%' OR Name1 LIKE 'NORTH CAROLINA %' OR Name1 LIKE '% DEVELOPMENT%')"
+    },
+    "paDeepLink": {
+      "template": "https://www2.stanlycountync.gov/gisphotoviewer/propertyCard.ashx?pin={TAXRECORD}",
+      "testedUrl": "https://www2.stanlycountync.gov/gisphotoviewer/propertyCard.ashx?pin=2453",
+      "httpStatus": 200,
+      "notes": "HTTP 200; owner name present in server HTML (verified). Tax portal (search only): https://www.stanlytax.com/#/"
+    },
+    "jurisdictionGisViewer": {
+      "url": "https://www.stanlygis.net/",
+      "httpStatus": 200,
+      "notes": "Stanly County GIS hub; AGOL viewer https://stanlycounty.maps.arcgis.com/apps/webappviewer/index.html?id=195ae28fc5454875a5cc60eb8b28bbf6 also 200"
+    },
+    "gaps": [
+      "AADT_2022 blank at 262 of 534 stations on the 2022 layer (NCDOT counts on a cycle) \u2014 prefer 2025 layer / latest non-blank year",
+      "No multi-transfer sale history on primary layer (last sale only)"
+    ]
+  }
+}

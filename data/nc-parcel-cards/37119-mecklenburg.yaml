@@ -1,0 +1,612 @@
+state: NC
+jurisdiction: Mecklenburg County
+fips: "37119"
+level: county
+markets: [Charlotte]
+
+crsPreferred:
+  wkid: 102719
+  latestWkid: 2264
+  name: NAD 1983 StatePlane North Carolina FIPS 3200 Feet
+joinKeys: [nc_pin, pid, parcelid]
+viewerLinkTemplate: "https://polaris3g.mecklenburgcountync.gov/pid/{pid}"
+
+# Municipalities are first-class routing targets for zoning and future land use.
+municipalities:
+  - name: Charlotte
+    type: city
+    coverage: city + ETJ/planning area
+    zoning:
+      restUrl: https://meckgis.mecklenburgcountync.gov/server/rest/services/CityofCharlotteZoning/MapServer/0
+      layerId: 0
+      fieldMap:
+        zoneclass: zoning
+        zonedes: zoningLabel
+        overlay: zoningOverlay
+    flu:
+      restUrl: https://services.arcgis.com/9Nl857LBlQVyzq54/arcgis/rest/services/Charlotte_Future_2040_Policy_Map/FeatureServer/0
+      layerId: 0
+      fieldMap:
+        PlaceTypeFullTxt: flu
+        PlaceTypeCde: fluCode
+    notes: Charlotte zoning and adopted 2040 Place Types cover the city planning area, not all Mecklenburg towns.
+  - name: Cornelius
+    type: town
+    coverage: city-only
+    zoning:
+      restUrl: https://meckgis.mecklenburgcountync.gov/server/rest/services/UnincorporatedCountyandTownsZoning/MapServer/0
+      layerId: 0
+      selectorField: munic
+      selectorValue: CORNELIUS
+      fieldMap:
+        zone_des: zoning
+    flu: null
+    notes: Route town features by munic; no separate town FLU source is identified in the source card.
+  - name: Davidson
+    type: town
+    coverage: city-only
+    zoning:
+      restUrl: https://meckgis.mecklenburgcountync.gov/server/rest/services/UnincorporatedCountyandTownsZoning/MapServer/0
+      layerId: 0
+      selectorField: munic
+      selectorValue: DAVIDSON
+      fieldMap:
+        zone_des: zoning
+    flu: null
+    notes: Route town features by munic; no separate town FLU source is identified in the source card.
+  - name: Huntersville
+    type: town
+    coverage: city-only
+    zoning:
+      restUrl: https://meckgis.mecklenburgcountync.gov/server/rest/services/UnincorporatedCountyandTownsZoning/MapServer/0
+      layerId: 0
+      selectorField: munic
+      selectorValue: HUNTERSVILL
+      fieldMap:
+        zone_des: zoning
+    flu: null
+    notes: Route town features by munic; no separate town FLU source is identified in the source card.
+  - name: Matthews
+    type: town
+    coverage: city-only
+    zoning:
+      restUrl: https://meckgis.mecklenburgcountync.gov/server/rest/services/UnincorporatedCountyandTownsZoning/MapServer/0
+      layerId: 0
+      selectorField: munic
+      selectorValue: MATTHEWS
+      fieldMap:
+        zone_des: zoning
+    flu: null
+    notes: Route town features by munic; no separate town FLU source is identified in the source card.
+  - name: Mint Hill
+    type: town
+    coverage: city-only
+    zoning:
+      restUrl: https://meckgis.mecklenburgcountync.gov/server/rest/services/UnincorporatedCountyandTownsZoning/MapServer/0
+      layerId: 0
+      selectorField: munic
+      selectorValue: MINT HILL
+      fieldMap:
+        zone_des: zoning
+    flu: null
+    notes: Route town features by munic; no separate town FLU source is identified in the source card.
+  - name: Pineville
+    type: town
+    coverage: city-only
+    zoning:
+      restUrl: https://meckgis.mecklenburgcountync.gov/server/rest/services/UnincorporatedCountyandTownsZoning/MapServer/0
+      layerId: 0
+      selectorField: munic
+      selectorValue: PINEVILLE
+      fieldMap:
+        zone_des: zoning
+    flu: null
+    notes: Route town features by munic; no separate town FLU source is identified in the source card.
+  - name: Stallings
+    type: town
+    coverage: city-only
+    zoning:
+      restUrl: https://meckgis.mecklenburgcountync.gov/server/rest/services/UnincorporatedCountyandTownsZoning/MapServer/0
+      layerId: 0
+      selectorField: munic
+      selectorValue: STALLINGS
+      fieldMap:
+        zone_des: zoning
+    flu: null
+    notes: Route town features by munic; no separate town FLU source is identified in the source card.
+
+# Wire first: use the primary county parcel layer, then attach parcel zoning,
+# sales history, municipal zoning, and FLU in that order.
+layers:
+  - role: parcels
+    name: TaxParcel_camadata (PRIMARY)
+    restUrl: https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/FeatureServer/0
+    # 2026-09-28: MapServer/0 returns null geometry on query; FeatureServer/0 returns polygons (MapServer kept as alternate below)
+    alternateUrlsPass1Fix: [https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/MapServer/0]
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      nc_pin: parcelId
+      pid: parcelIdPolaris
+      parcelid: parcelIdSalesJoin
+      gisacres: acreage
+      legalacres: acreageLegal
+      totalac: acreageTotal
+      ownrlstnme: ownerName.last
+      ownrfrstnme: ownerName.first
+      ownr2lstnme: ownerName2.last
+      ownr2frstnme: ownerName2.first
+      mailaddr1: mailingAddress.street
+      mailaddr2: mailingAddress.street2
+      zipcode: mailingAddress.zip
+      state: mailingAddress.state
+      address: situsAddress
+      streetnumber: situsAddress.number
+      streetname: situsAddress.street
+      loccity: situsCity
+      saledate: lastSale.date
+      saleprice: lastSale.price
+      totlandval: tax.landValue
+      totalbldgval: tax.improvementValue
+      totalvalue: tax.assessedValue
+      totmarkval: tax.marketValue
+      landuse_description: landUseDesc
+      lusecode: dorCode
+      vacorimprov: vacantOrImproved
+      resunits: residentialUnits
+      yearbuilt: yearBuilt
+    notes: >
+      PRIMARY county polygon and attribute source. Verified count 448526; gisacres
+      5–150 returned approximately 33567 parcels. CRS 102719/2264. No zoning field;
+      join ParcelsZoningZipcode or spatially join municipal zoning. MaxRecordCount 2000;
+      paginate. Keep nc_pin as the preferred county join key and pid for POLARIS.
+    status: usable
+
+  - role: parcels
+    name: Tax/ParcelsViewer Parcels
+    restUrl: https://meckags.mecklenburgcountync.gov/server/rest/services/Tax/ParcelsViewer/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      nc_pin: parcelId
+      pid: parcelIdPolaris
+      gisacres: acreage
+      map_book: mapBook
+      map_page: mapPage
+      map_block: mapBlock
+      lot_num: lotNumber
+    notes: Geometry-focused county alternate. Verified count 397300; no owner, tax, sale, or zoning fields.
+    status: usable
+
+  - role: parcels
+    name: CountyData/Parcels (Charlotte host alternate)
+    restUrl: https://gis.charlottenc.gov/arcgis/rest/services/CountyData/Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NC_PIN: parcelId
+      PID: parcelIdPolaris
+      MAP_BOOK: mapBook
+      MAP_PAGE: mapPage
+    notes: Verified count 397300. Thin attributes and WKID 102100/3857; prefer county State Plane layers.
+    status: partial
+
+  - role: parcels
+    name: PLN/AllParcelData (Charlotte host alternate)
+    restUrl: https://gis.charlottenc.gov/arcgis/rest/services/PLN/AllParcelData/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: legalacres
+    coverage: county-wide
+    fieldMap:
+      parcelid: parcelId
+      propertyid: parcelIdAlt
+      owner1lastname: ownerName.last
+      owner1firstname: ownerName.first
+      owner2lastname: ownerName2.last
+      owner2firstname: ownerName2.first
+      billingaddress: mailingAddress.street
+      billingaddress2: mailingAddress.street2
+      zipcode: mailingAddress.zip
+      state: mailingAddress.state
+      location_address: situsAddress
+      streetnumber: situsAddress.number
+      streetname: situsAddress.street
+      locationcity: situsCity
+      saleprice: lastSale.price
+      saledate: lastSale.date
+      totallandvalue: tax.landValue
+      totalbuildingvalue: tax.improvementValue
+      totalvalue: tax.assessedValue
+      totalmarketvalue: tax.marketValue
+      legalacres: acreage
+      landsize: acreageAlt
+    notes: Verified count 429007. Parallel rich CAMA source; prefer TaxParcel_camadata as county canonical.
+    status: usable
+
+  - role: zoning
+    name: ParcelsZoningZipcode (parcel-level zoning join)
+    restUrl: https://meckgis.mecklenburgcountync.gov/server/rest/services/ParcelsZoningZipcode/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      nc_pin: parcelId
+      pid: parcelIdPolaris
+      gisacres: acreage
+      zone_class: zoning
+      zip: situsZip
+      po_name: postOfficeName
+    notes: >
+      Fastest parcel-level zoning attachment without spatial overlay. Verified count 454837;
+      sample zone_class was N1-A. Combine with Charlotte/towns zoning polygons when overlays,
+      petitions, or jurisdiction detail are needed.
+    status: usable
+
+  - role: zoning
+    name: City of Charlotte Zoning
+    restUrl: https://meckgis.mecklenburgcountync.gov/server/rest/services/CityofCharlotteZoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      zoneclass: zoning
+      ZoneClass: zoning
+      zonedes: zoningLabel
+      ZoneDes: zoningLabel
+      overlay: zoningOverlay
+      Overlay: zoningOverlay
+      zonepetition: zoningPetition
+      rezonedate: zoningDate
+      hyperlink: zoningUrl
+    notes: >
+      Verified count 5689. Charlotte plus planning area only. City-host alternate is
+      https://gis.charlottenc.gov/arcgis/rest/services/PLN/Zoning/MapServer/0.
+    status: usable
+
+  - role: zoning
+    name: Unincorporated County and Towns Zoning
+    restUrl: https://meckgis.mecklenburgcountync.gov/server/rest/services/UnincorporatedCountyandTownsZoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      zone_des: zoning
+      munic: municipality
+    notes: >
+      Verified count 977. Distinct munic values are CORNELIUS, DAVIDSON, HUNTERSVILL,
+      MATTHEWS, MINT HILL, PINEVILLE, and STALLINGS. Despite the service name, verified
+      values are towns; combine with Charlotte zoning for countywide routing.
+    status: usable
+
+  - role: sales
+    name: TaxParcelSales (sale history)
+    restUrl: https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcelSales/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      parcelid: parcelIdSalesJoin
+      saledate: lastSale.date
+      saleprice: lastSale.price
+      grantor: sale.grantor
+      grantee: sale.grantee
+      salesvalidity: lastSale.qualified
+      soldasvacantflag: soldAsVacant
+      landuse: landUseDesc
+      deeddescription: deedDescription
+      legalreference: legalReference
+    notes: >
+      Verified count 1598048. True multi-transfer history; join on parcelid, not always nc_pin.
+      Filter salesvalidity for usable comps. Geometry is parcel footprint per sale record.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys) — statewide fallback
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      parusecode: dorCode
+      parusedesc: landUseDesc
+      cntyfips: countyFips
+      cntyname: countyName
+    notes: >
+      Filter cntyfips='119'. Verified Mecklenburg count 442287; sample returned owner,
+      site, mailing, values, and sale fields. MaxRecordCount 5000. Alternate host is
+      https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1.
+      May lag local CAMA; use only as fallback.
+    status: usable
+
+  - role: flu
+    name: Charlotte Future 2040 Policy Map (adopted Place Types)
+    restUrl: https://services.arcgis.com/9Nl857LBlQVyzq54/arcgis/rest/services/Charlotte_Future_2040_Policy_Map/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      PlaceTypeFullTxt: flu
+      PlaceTypeCde: fluCode
+      AdoptionType: fluAdoptionType
+      AdoptionDate: fluAdopted
+      CommunityPlanningArea: planningArea
+    notes: >
+      Verified count 5640. Preferred current FLU for Charlotte Place Types; spatial-join to
+      parcels. Does not cover all Mecklenburg towns.
+    status: usable
+
+  - role: flu
+    name: Revised Charlotte Future 2040 Policy Map (working/revision)
+    restUrl: https://services.arcgis.com/9Nl857LBlQVyzq54/arcgis/rest/services/Revised_Charlotte_Future_2040_Policy_Map/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      AdoptedPlaceTypeCde: fluAdoptedCode
+      AdoptedTypeFullTxt: fluAdopted
+      RevisedPlaceTypeCde: fluRevisedCode
+      RevisedPlaceTypeFullTxt: fluRevised
+    notes: >
+      Verified count 12092. Working/revision layer; use adopted Charlotte Future 2040 layer
+      for production unless draft revisions are explicitly desired.
+    status: partial
+
+  - role: flu
+    name: Future Land Use (area plans overlay)
+    restUrl: https://meckags.mecklenburgcountync.gov/server/rest/services/StormWater/FloodOverlaysTransparent/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      PropLuseTx: flu
+      PropLuseCd: fluCode
+      GenLuse: fluGeneral
+      LuDesc: fluDescription
+      PlanName: fluPlan
+    notes: >
+      Verified count 80313. Older neighborhood/area-plan FLU; use as secondary to adopted
+      2040 Place Types and do not treat it as current Charlotte policy alone.
+    status: partial
+
+gaps:
+  - No single countywide zoning FeatureServer; union Charlotte zoning with towns zoning, or use ParcelsZoningZipcode for parcel-level codes.
+  - Charlotte 2040 Place Types do not cover all Mecklenburg towns; town FLU may be missing or only in local plans.
+  - True unincorporated-only zoning polygons are not cleanly separated in the towns layer; verified munic values are towns only.
+  - Area-plan Future Land Use overlay is legacy/incomplete versus current policy.
+  - Owner phones/emails are not in public REST and are intentionally not collected.
+  - TaxParcel_camadata vacorimprov vacant filter returned 0 in a spot check; validate enum values and prefer land-use codes, building value, or sales vacant flag.
+  - NC OneMap parno versus county nc_pin/pid join needs careful validation.
+  - County layers commonly have MaxRecordCount 2000 (OneMap 5000); paginate with resultOffset/resultRecordCount.
+  - No paid vendor data used or required.
+
+license: "County and municipal open GIS; attribution required; public query endpoints; no paid vendors"
+appraiserSearchUrl: "https://polaris3g.mecklenburgcountync.gov/pid/{pid}"
+portals:
+  - name: Mecklenburg County GIS
+    url: https://gis.mecknc.gov/
+  - name: POLARIS
+    url: https://polaris3g.mecklenburgcountync.gov/
+  - name: Open Mapping data catalog
+    url: https://maps.mecklenburgcountync.gov/openmapping/data.html
+  - name: meckgis ArcGIS REST
+    url: https://meckgis.mecklenburgcountync.gov/server/rest/services
+  - name: meckags ArcGIS REST
+    url: https://meckags.mecklenburgcountync.gov/server/rest/services
+  - name: City of Charlotte GIS REST
+    url: https://gis.charlottenc.gov/arcgis/rest/services
+  - name: NC OneMap
+    url: https://www.nconemap.gov
+  - name: Charlotte 2040 Policy Map viewer
+    url: https://charlotte.maps.arcgis.com/apps/webappviewer/index.html?id=4dc02a1a85974085af7b36c33474efe0
+
+handOff:
+  wireFirst: https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/FeatureServer/0
+  zoningJoin: https://meckgis.mecklenburgcountync.gov/server/rest/services/ParcelsZoningZipcode/FeatureServer/0
+  municipalZoning: https://meckgis.mecklenburgcountync.gov/server/rest/services/CityofCharlotteZoning/MapServer/0
+  townsZoning: https://meckgis.mecklenburgcountync.gov/server/rest/services/UnincorporatedCountyandTownsZoning/MapServer/0
+  salesHistory: https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcelSales/FeatureServer/0
+  flu: https://services.arcgis.com/9Nl857LBlQVyzq54/arcgis/rest/services/Charlotte_Future_2040_Policy_Map/FeatureServer/0
+  fallback: "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1?where=cntyfips='119'"
+  auth: none observed on listed public query endpoints
+  rateLimits: MaxRecordCount typically 2000 (OneMap 5000); paginate with resultOffset
+
+verifiedAt: 2026-09-23
+verifiedBy: North Carolina Public Info Researcher
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException:
+      name: "Charlotte Quality of Life Explorer — Household Income (NPA)"
+      restUrl: "https://gis.charlottenc.gov/arcgis/rest/services/QOL/Quality_of_Life_Latest_Profile_Data/MapServer/17"
+      layerId: 17
+      geography: "Neighborhood Profile Area (NPA)"
+      field: "Val_Norm"
+      whyBetter: "Custom Charlotte NPA polygons with documented ACS-to-NPA median interpolation (QOL Explorer); not a republish of ACS tract/BG polygons."
+      verifiedAt: "2026-09-24"
+      verifiedBy: "Public Information Researcher"
+      notes: "Var_Name=HOUSEHOLD INCOME; Var_Desc=Median household income; Year e.g. 2023. Val_Raw often null; use Val_Norm. ~458 NPA features for Year=2023. Methodology: mcmap.org/qol (ACS B19001 range interpolation when NPA spans multiple block groups)."
+  aadt:
+    source: "NCDOT Traffic Survey Group"
+    restUrl: "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0"
+    layerId: 0
+    field: "AADT_2022"
+    geography: "state AADT station points (HPMS)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Public Information Researcher"
+    notes: "Official NCDOT AADT stations; annual fields AADT_2002–AADT_2022; filter COUNTY; companion Traffic Segmentation FS available."
+
+# ---- PASS 2 full-suite upgrade (NC non-OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  pass1:
+    status: fixed
+    parcelPolygonLayer: https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/FeatureServer/0
+    polygonCountLive: 448582
+    parcelIdField: nc_pin
+    parcelIdFilled: 448582
+    acreageField: gisacres
+    acres5to150Live: 33566
+    sampleCentroidWgs84:
+    - -80.6302
+    - 35.2286
+    note: TaxParcel_camadata/MapServer/0 answers counts and attributes but returns geometry=null on every query (json and geojson), so polygons do not load. The same service's FeatureServer/0 returns rings with identical fields and counts. Card primary switched to FeatureServer/0; MapServer/0 kept as an alternate. Row count 448,582 is CAMA rows; clean polygon count on Tax/ParcelsViewer/MapServer/0 is 397,384 (condo/multi-row parcels).
+  parcelLayer: https://meckgis.mecklenburgcountync.gov/server/rest/services/TaxParcel_camadata/FeatureServer/0
+  parcelIdField: nc_pin
+  acreageFilter: gisacres >= 5 AND gisacres <= 150
+  acres5to150Live: 33566
+  parcelCountLive: 448582
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='MECKLENBURG'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MECKLENBURG%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MECKLENBURG%27&returnCountOnly=true&f=json
+      liveStationCount: 1969
+      stationsWithAADT2022: 1793
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Mecklenburg'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Mecklenburg%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Mecklenburg%27&returnCountOnly=true&f=json
+      liveStationCount: 1951
+      stationsWithAADT2025: 434
+      stationsWithAADT2024: 1816
+      stationsWith2025or2024: 1833
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - totalvalue
+    - totmarkval
+    liveNonZero:
+      totalvalue: 432952
+      totmarkval: 432952
+    status: ok
+    note: Counts are CAMA rows (448,582 total), not distinct polygons.
+  sale:
+    priceFields:
+    - saleprice
+    dateFields:
+    - saledate
+    livePriceNonZero:
+      saleprice: 310264
+    liveDateNonNull:
+      saledate: 447317
+    status: ok
+    note: Full history on TaxParcelSales/FeatureServer/0 (join parcelid).
+  ownerEntity:
+    ownerFields:
+    - ownrlstnme
+    primaryOwnerField: ownrlstnme
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(ownrlstnme) LIKE '% LLC%' OR UPPER(ownrlstnme) LIKE '% INC%' OR UPPER(ownrlstnme) LIKE '% LP%' OR UPPER(ownrlstnme) LIKE '% LLP%' OR UPPER(ownrlstnme) LIKE '% LTD%' OR UPPER(ownrlstnme) LIKE '% TRUST%' OR UPPER(ownrlstnme) LIKE '% CHURCH%' OR UPPER(ownrlstnme) LIKE '% COMPANY%' OR UPPER(ownrlstnme) LIKE '% PARTNERSHIP%' OR UPPER(ownrlstnme) LIKE '% HOLDINGS%' OR UPPER(ownrlstnme) LIKE '% PROPERTIES%' OR UPPER(ownrlstnme) LIKE '% CORP%' OR UPPER(ownrlstnme) LIKE '%,LLC%' OR UPPER(ownrlstnme) LIKE '%,INC%' OR UPPER(ownrlstnme) LIKE 'CITY OF %' OR UPPER(ownrlstnme) LIKE 'COUNTY OF %' OR UPPER(ownrlstnme) LIKE 'STATE OF %' OR UPPER(ownrlstnme) LIKE 'TOWN OF %')
+    liveEntityCountAll: 107602
+    liveEntityCount5to150ac: 18762
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above. ownrlstnme holds the full entity name for non-person owners. Row-based (CAMA rows).
+  paDeepLink:
+    template: https://polaris3g.mecklenburgcountync.gov/pid/{pid}
+    testedParcelId: '10511290'
+    testedUrl: https://polaris3g.mecklenburgcountync.gov/pid/10511290
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: true
+    note: POLARIS page embeds parcel data in the server HTML (owner name and PID present in the response).
+  gisViewer:
+    url: https://polaris3g.mecklenburgcountync.gov/
+    httpStatus: 200
+    pageTitle: Polaris
+  municipalLayerCheck:
+    checked: 6
+    answering: 6
+    layers:
+    - url: https://meckags.mecklenburgcountync.gov/server/rest/services/StormWater/FloodOverlaysTransparent/MapServer/1
+      name: Future Land Use
+      liveCount: 80313
+    - url: https://meckgis.mecklenburgcountync.gov/server/rest/services/CityofCharlotteZoning/MapServer/0
+      name: City of Charlotte Zoning
+      liveCount: 5700
+    - url: https://meckgis.mecklenburgcountync.gov/server/rest/services/ParcelsZoningZipcode/FeatureServer/0
+      name: ParcelZoningZipcode
+      liveCount: 454872
+    - url: https://meckgis.mecklenburgcountync.gov/server/rest/services/UnincorporatedCountyandTownsZoning/MapServer/0
+      name: Unincorporated County and Towns Zoning
+      liveCount: 977
+    - url: https://services.arcgis.com/9Nl857LBlQVyzq54/arcgis/rest/services/Charlotte_Future_2040_Policy_Map/FeatureServer/0
+      name: Charlotte Future 2040 Policy Map
+      liveCount: 5640
+    - url: https://services.arcgis.com/9Nl857LBlQVyzq54/arcgis/rest/services/Revised_Charlotte_Future_2040_Policy_Map/FeatureServer/0
+      name: Revised Charlotte Future 2040 Policy Map
+      liveCount: 12092
+  gaps:
+  - 'pass1 fixed: MapServer/0 null geometry, switched to FeatureServer/0'

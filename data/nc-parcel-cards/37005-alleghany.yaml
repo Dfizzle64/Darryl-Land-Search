@@ -1,0 +1,302 @@
+state: NC
+jurisdiction: Alleghany County
+fips: '37005'
+level: county
+markets:
+- Boone
+- Winston-Salem
+slug: alleghany
+cntyfips: '005'
+municipalities:
+- name: Sparta
+  role: county seat; cities-first zoning intent; zoning REST gap
+  incorporated: true
+  localGis: false
+  zoningPrefer: null
+  zoneCodesOrdinance:
+  - RA
+  - R-20
+  - R-12
+  - R-8
+  - R-MF
+  - OI
+  - CB
+  - NB
+  - LI
+  cityLimitsUrl: https://www.webgis.net/arcgis/rest/services/NC/Alleghany/MapServer/16
+  cityLimitsCount: 1
+  etjBoundaryUrl: https://www.webgis.net/arcgis/rest/services/NC/Alleghany/MapServer/17
+  etjBoundaryCount: 1
+  zoningOrdinanceUrl: https://codelibrary.amlegal.com/codes/spartanc/latest/sparta_nc/0-0-0-3521
+  landUsePlanPdf: https://www.townofsparta.org/wp-content/uploads/2022/06/Sparta-Land-Use-Plan-Final.pdf
+  notes: Only incorporated muni. Zoning map in LUP PDF; no public zoning FeatureServer.
+layers:
+- role: parcels
+  name: NC/Alleghany Parcels (PRIMARY geometry + owner + deed)
+  restUrl: https://www.webgis.net/arcgis/rest/services/NC/Alleghany/MapServer/11
+  layerId: 11
+  geometry: polygon
+  auth: none
+  acreageField: TOTAL_CALCULATED
+  coverage: county-wide
+  fieldMap:
+    PIN: parcelId
+    OWNER: ownerName
+    OWNER2: ownerName
+    TOTAL_CALCULATED: acreage
+    DEEDED_ACREAGE: acreage
+    DEED_DATE: lastSale.date
+    DEED_BOOK: other
+    DEED_PAGE: other
+  notes: PRIMARY polygons/owner/deed. Count 14808; acres 5–150 → 3628. No tax/sale
+    price — join OneMap. MaxRecordCount 1000. CRS 102719/2264. Sample 3030369596 ≈
+    -81.262, 36.495.
+  status: usable
+  primary: true
+  alternateUrls:
+  - https://webgis.net/arcgis/rest/services/NC/Alleghany/MapServer/11
+  counts:
+    total: 14808
+    acres5to150: 3628
+    ownerNonEmpty: 14777
+    deedDateNonEmpty: 14729
+- role: parcels
+  name: NC OneMap Parcels (polys) — tax + mailing + situs
+  restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: gisacres
+  coverage: county-wide
+  filter: cntyfips='005'
+  fieldMap:
+    parno: parcelId
+    ownname: ownerName
+    mailadd: mailingAddress
+    mcity: mailingAddress
+    mstate: mailingAddress
+    mzip: mailingAddress
+    siteadd: situsAddress
+    gisacres: acreage
+    parval: tax.marketValue
+    landval: tax.landValue
+    improvval: tax.improvementValue
+    saledatetx: lastSale.date
+  notes: PRIMARY tax. Count 14795; gisacres 5–150 → 3628; parval>0 → 14591; saledate
+    0; no sale price. Join PIN=parno.
+  status: usable
+  primaryTax: true
+  alternateUrls:
+  - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  counts:
+    total: 14795
+    acres5to150: 3628
+    parvalGt0: 14591
+    saledateNotNull: 0
+    saledatetxNonEmpty: 14714
+- role: flu
+  name: Land Classifications (ACLDP FLU proxy)
+  restUrl: https://www.webgis.net/arcgis/rest/services/NC/Alleghany/MapServer/26
+  layerId: 26
+  geometry: polygon
+  auth: none
+  coverage: county-wide
+  fieldMap:
+    CLASSIFICA: flu
+  notes: '19 polys: Urban/Developed, Urban Transition, Rural Community. Coarse FLU
+    proxy.'
+  status: partial
+- role: other
+  name: Sparta Limits
+  restUrl: https://www.webgis.net/arcgis/rest/services/NC/Alleghany/MapServer/16
+  layerId: 16
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  fieldMap:
+    MB_NAME: other
+  notes: Count 1. Cities-first routing.
+  status: usable
+- role: other
+  name: Sparta ETJ
+  restUrl: https://www.webgis.net/arcgis/rest/services/NC/Alleghany/MapServer/17
+  layerId: 17
+  geometry: polygon
+  auth: none
+  coverage: city-only
+  fieldMap: {}
+  notes: Count 1. ETJ boundary.
+  status: usable
+- role: zoning
+  name: Sparta zoning (ordinance/LUP PDF — REST gap)
+  restUrl: null
+  layerId: null
+  geometry: none
+  auth: n/a
+  coverage: city-only
+  fieldMap: {}
+  notes: RA/R-20/R-12/R-8/R-MF/OI/CB/NB/LI. No public FS. Reject VA Alleghany_Zoning_2022.
+  status: gap
+gaps:
+- Sale price REST gap — WebGIS and OneMap lack sale price; use Bitek Sales Date &
+  Price search UI and/or AppraisalCard sales section
+- Sparta zoning REST gap — traditional zoning exists (ordinance + LUP PDF map) but
+  no public FeatureServer
+- Unincorporated zoning REST gap — county Open District (non-Euclidean LDP) — no cadastral
+  zone polygons
+- WebGIS parcels lack tax/mailing/situs — join OneMap cntyfips='005' on PIN=parno
+  for tax + addresses
+- FLU is coarse Land Classifications (19 polys) — not fine parcel FLUM; LDP/Sparta
+  LUP PDFs behind site bot-protection from datacenter egress
+- Utilities / AADT / emails / phones / paid vendors intentionally excluded
+license: Alleghany County GIS / Tax Office (HandP WebGIS); Town of Sparta zoning ordinance
+  where applicable; NC OneMap Integrated Cadastral Data Exchange. Map data from recorded
+  deeds/plats/public records; consult primary sources; not survey quality. Commercial
+  resale subject to NCGS 132-10. Attribute Alleghany County GIS.
+jurisdictionGisUrl: https://www.webgis.net/nc/alleghany/
+gisDeepLinkTemplate: https://www.webgis.net/nc/alleghany/?id=Parcels|PIN|{PIN}
+appraiserSearchUrl: https://www.bttaxpayerportal.com/ITSPublicAL/AppraisalCard.aspx?id={PIN}
+paBasicSearchUrl: https://www.bttaxpayerportal.com/ITSPublicAL/
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/alleghany/parcel-search
+ncptsDeepLinkTemplate: https://lrcpwa.ncptscloud.com/alleghany/parcel-detail/{PIN}
+oneMapUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+oneMapFilter: cntyfips='005'
+verifiedAt: '2026-09-24'
+verifiedBy: North Carolina Public Info Researcher
+verifiedLayerCount: 6
+tranche: 3
+msa: Boone / Winston-Salem shed
+crs_preferred:
+  wkid: 102719
+  latestWkid: 2264
+  name: NAD 1983 StatePlane North Carolina FIPS 3200 Feet
+gisDeepLinkNotes: modCmdLine id=Parcels|PIN|{PIN}; siteCustom → AppraisalCard?id={PIN}
+countyRestRoot: https://www.webgis.net/arcgis/rest/services/NC/Alleghany/MapServer
+paDeepLinkKey: PIN
+parcelIdPreferred: PIN
+joinKeys:
+- PIN
+- parno
+taxOfficeUrl: https://alleghanycounty-nc.gov/tax-office/
+gisDeptUrl: https://alleghanycounty-nc.gov/gis/
+spartaUrl: https://www.townofsparta.org/
+spartaZoningOrdinanceUrl: https://codelibrary.amlegal.com/codes/spartanc/latest/sparta_nc/0-0-0-3521
+countyLandDevelopmentOrdinancePdf: https://alleghanycounty-nc.gov/ordinances/1-324.pdf
+unincorporatedCommunities:
+- Laurel Springs
+- Roaring Gap
+- Piney Creek
+- Glade Creek
+- Ennice
+- Cherry Lane
+- Twin Oaks
+- Scottville
+rejectLayers:
+- name: Alleghany_Zoning_2022 (VA)
+  url: https://services6.arcgis.com/cGI8zn9Oo7U9dF6z/arcgis/rest/services/Alleghany_Zoning_2022/FeatureServer/0
+  reason: Virginia Alleghany
+trancheNotes: tax/owner public; sale price REST gap; PA AppraisalCard {PIN}; jurisdiction
+  GIS; parcels+FLU proxy+Sparta zoning intent
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://www.webgis.net/arcgis/rest/services/NC/Alleghany/MapServer/11
+  parcelIdField: PIN
+  acreageFilter: TOTAL_CALCULATED >= 5 AND TOTAL_CALCULATED <= 150
+  acres5to150Live: 3628
+  parcelCountLive: 14808
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='ALLEGHANY'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ALLEGHANY%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ALLEGHANY%27&returnCountOnly=true&f=json
+      liveStationCount: 173
+      stationsWithAADT2022: 119
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Alleghany'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Alleghany%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Alleghany%27&returnCountOnly=true&f=json
+      liveStationCount: 174
+      stationsWithAADT2025: 97
+      stationsWithAADT2024: 109
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields: []
+    allTaxFieldsOnLayer: []
+    liveNonZero: {}
+    status: gap
+    fallback:
+      source: NC OneMap parcels (join to PIN)
+      restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+      where: cntyfips='005' AND parval>0
+      liveCount: 14591
+      fields:
+      - parval
+      - landval
+      - improvval
+      pa: ITSPublicAL AppraisalCard PDF (values + sales grid)
+  sale:
+    priceFields: []
+    dateFields:
+    - DEED_DATE
+    livePriceNonZero: {}
+    liveDateNonNull:
+      DEED_DATE: 14729
+    status: partial
+    note: DEED_DATE (string) only; price on ITSPublicAL AppraisalCard PDF SALES DATA grid.
+  ownerEntity:
+    ownerFields:
+    - OWNER
+    - OWNER2
+    primaryOwnerField: OWNER
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(OWNER) LIKE '% LLC%' OR UPPER(OWNER) LIKE '% INC%' OR UPPER(OWNER) LIKE '% LP%' OR UPPER(OWNER) LIKE '% LLP%' OR UPPER(OWNER) LIKE '% LTD%' OR UPPER(OWNER) LIKE '% TRUST%' OR UPPER(OWNER) LIKE '% CHURCH%' OR UPPER(OWNER) LIKE '% COMPANY%' OR UPPER(OWNER) LIKE '% PARTNERSHIP%' OR UPPER(OWNER) LIKE '% HOLDINGS%' OR UPPER(OWNER) LIKE '% PROPERTIES%' OR UPPER(OWNER) LIKE '% CORP%' OR UPPER(OWNER) LIKE '%,LLC%' OR UPPER(OWNER) LIKE '%,INC%' OR UPPER(OWNER) LIKE 'CITY OF %' OR UPPER(OWNER) LIKE 'COUNTY OF %' OR UPPER(OWNER) LIKE 'STATE OF %' OR UPPER(OWNER) LIKE 'TOWN OF %')
+    liveEntityCountAll: 2722
+    liveEntityCount5to150ac: 677
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://www.bttaxpayerportal.com/ITSPublicAL/AppraisalCard.aspx?id={PIN}
+    testedParcelId: '3030369596'
+    testedUrl: https://www.bttaxpayerportal.com/ITSPublicAL/AppraisalCard.aspx?id=3030369596
+    httpStatus: 200
+    contentType: application/pdf
+    contentVerified: true
+    note: Owner and parcel id verified in the response.
+  gisViewer:
+    url: https://www.webgis.net/nc/alleghany/
+    httpStatus: 200
+    pageTitle: Alleghany County NC WebGIS
+  gaps:
+  - tax gap
+  - sale partial

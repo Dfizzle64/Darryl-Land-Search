@@ -1,0 +1,335 @@
+{
+  "county": "Richmond",
+  "state": "NC",
+  "msa": "Fayetteville / Charlotte shed",
+  "fips": "37153",
+  "cntyfips": "153",
+  "slug": "richmond",
+  "level": "county",
+  "markets": [
+    "Fayetteville",
+    "Charlotte"
+  ],
+  "crs_preferred": {
+    "wkid": 102100,
+    "latestWkid": 3857,
+    "name": "WGS 1984 Web Mercator Auxiliary Sphere"
+  },
+  "crs_notes": "GISWebsite/ParcelViewer MapServer uses 102100/3857. ParcelviewerShield companion uses 102719/2264 but has no Parcels layer.",
+  "viewerLinkTemplate": "https://gis.richmondnc.com/maps/",
+  "viewerLinkTemplates": [
+    "https://gis.richmondnc.com/maps/",
+    "https://gis.richmondnc.com/ITSPublic/AppraisalCard.aspx?id={PIN}",
+    "https://gis.richmondnc.com/ITSPublic/TaxBillSearch/Parcel/{PIN}",
+    "https://gis.richmondnc.com/ITSPublic/RealEstateSearch",
+    "https://gis.richmondnc.com/ITSPublic/"
+  ],
+  "appraiserSearchUrl": "https://gis.richmondnc.com/ITSPublic/AppraisalCard.aspx?id={PIN}",
+  "appraiserSearchUrlNotes": "ITSPublic AppraisalCard id={PIN} verified PDF. TaxBillSearch/Parcel/{PIN} prefills. RealEstateSearch/Parcel/{PIN} 404. NCPTS richmond tenant invalid.",
+  "jurisdictionGisUrl": "https://gis.richmondnc.com/maps/",
+  "joinKeys": [
+    "PIN",
+    "parno",
+    "PARCELNUM"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "parno",
+        "PARCELNUM"
+      ],
+      "bestLayer": "GISWebsite/ParcelViewer/MapServer/12",
+      "notes": "12-digit PIN for AppraisalCard / OneMap parno / AddressPoints PARCELNUM"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "GISWebsite/ParcelViewer/MapServer/12"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CalculatedAcres",
+        "AssessedAcreage",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 5403,
+      "bestLayer": "GISWebsite/ParcelViewer/MapServer/12",
+      "notes": "CalculatedAcres 5\u2013150 \u2192 5403; OneMap gisacres 5\u2013150 \u2192 5392; AssessedAcreage is text e.g. '18.100 AC'"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Name",
+        "ownname"
+      ],
+      "bestLayer": "GISWebsite/ParcelViewer/MapServer/12"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "MailingAddress",
+        "City",
+        "State",
+        "ZipCode",
+        "mailadd"
+      ],
+      "bestLayer": "GISWebsite/ParcelViewer/MapServer/12"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "FullAddress",
+        "Post_Comm",
+        "Post_Code"
+      ],
+      "bestLayer": "GISWebsite/ParcelViewer/MapServer/3",
+      "notes": "Join AddressPoints PARCELNUM=PIN; exclude PHONE/AREACODE"
+    },
+    "lastSale": {
+      "present": "partial",
+      "fields": [
+        "SaleDate",
+        "saledatetx",
+        "DeedBook",
+        "DeedPage"
+      ],
+      "bestLayer": "GISWebsite/ParcelViewer/MapServer/12",
+      "notes": "SaleDate strong (~32302); SalePrice REST gap \u2014 AppraisalCard PDF for price"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "TaxValue",
+        "LandValue",
+        "BuildingValue",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "GISWebsite/ParcelViewer/MapServer/12"
+    },
+    "zoning": {
+      "present": true,
+      "coverage": "county-unincorp-partial",
+      "fields": [
+        "DistrictCode",
+        "DistrictName",
+        "Jurisdiction"
+      ],
+      "bestLayer": "GISWebsite/ParcelViewer/MapServer/14",
+      "notes": "County Zoning 69 polys for unincorp; Rockingham/Hamlet/Ellerbe/Hoffman/Norman/Dobbins Heights municipal zoning REST gap"
+    },
+    "flu": {
+      "present": false,
+      "coverage": "pdf-only",
+      "fields": [],
+      "bestLayer": null,
+      "notes": "Strategic Land Use Plan 2022 PDF \u2014 DocumentCenter/View/6377; no FLU FeatureServer"
+    },
+    "appraiserSearchUrl": {
+      "present": true,
+      "template": "https://gis.richmondnc.com/ITSPublic/AppraisalCard.aspx?id={PIN}",
+      "notes": "TRANCHE-3 PA deep-link with parcel ID"
+    }
+  },
+  "municipalities": [
+    {
+      "name": "Rockingham",
+      "role": "gap",
+      "parcelCountApprox": null,
+      "addressCountApprox": 4559,
+      "zoningRest": null,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "County seat; City Limits+ETJ; municipal zoning REST gap"
+    },
+    {
+      "name": "Hamlet",
+      "role": "gap",
+      "addressCountApprox": 3012,
+      "zoningRest": null,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "City Limits+ETJ; municipal zoning REST gap"
+    },
+    {
+      "name": "Ellerbe",
+      "role": "gap",
+      "addressCountApprox": 554,
+      "zoningRest": null,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "Zoning REST gap"
+    },
+    {
+      "name": "Hoffman",
+      "role": "gap",
+      "addressCountApprox": 306,
+      "zoningRest": null,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "Zoning REST gap"
+    },
+    {
+      "name": "Dobbins Heights",
+      "role": "gap",
+      "addressCountApprox": 567,
+      "zoningRest": null,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "Zoning REST gap"
+    },
+    {
+      "name": "Norman",
+      "role": "gap",
+      "addressCountApprox": 100,
+      "zoningRest": null,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "Zoning REST gap"
+    },
+    {
+      "name": "Unincorporated Richmond",
+      "role": "county-zoning",
+      "addressCountApprox": 17487,
+      "zoningRest": "https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/14",
+      "zoningCount": 69,
+      "ownGis": true,
+      "fluRest": false,
+      "notes": "DistrictCode A-R/C-C/C-R/H-C/H-I/L-I/R-R/V-R"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "GISWebsite/ParcelViewer Parcels",
+      "restUrl": "https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/12",
+      "layerId": 12,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CalculatedAcres",
+      "coverage": "county-wide",
+      "status": "usable",
+      "count": 32662,
+      "countAcres5to150": 5403,
+      "fieldMap": {
+        "PIN": "parcelId",
+        "Name": "ownerName",
+        "MailingAddress": "mailingAddress",
+        "City": "mailingAddress",
+        "State": "mailingAddress",
+        "ZipCode": "mailingAddress",
+        "CalculatedAcres": "acreage",
+        "AssessedAcreage": "acreage",
+        "SaleDate": "lastSale.date",
+        "TaxValue": "tax.marketValue",
+        "LandValue": "tax.marketValue",
+        "BuildingValue": "tax.marketValue"
+      }
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "status": "usable",
+      "filter": "cntyfips='153'",
+      "count": 32625,
+      "countAcres5to150": 5392
+    },
+    {
+      "role": "zoning",
+      "name": "County Zoning",
+      "restUrl": "https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/14",
+      "layerId": 14,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "partial",
+      "count": 69,
+      "fieldMap": {
+        "DistrictCode": "zoning",
+        "DistrictName": "zoning",
+        "Jurisdiction": "other"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Highway Commercial Overlay",
+      "restUrl": "https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/13",
+      "layerId": 13,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "sample",
+      "status": "partial",
+      "count": 10
+    },
+    {
+      "role": "other",
+      "name": "City Limits",
+      "restUrl": "https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/11",
+      "layerId": 11,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "count": 14
+    },
+    {
+      "role": "other",
+      "name": "City_ETJ",
+      "restUrl": "https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/25",
+      "layerId": 25,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "count": 8
+    },
+    {
+      "role": "other",
+      "name": "AddressPoints",
+      "restUrl": "https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/3",
+      "layerId": 3,
+      "geometry": "point",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "count": 26585,
+      "notes": "Join PARCELNUM=PIN for situs; exclude PHONE/AREACODE"
+    },
+    {
+      "role": "flu",
+      "name": "Strategic Land Use Plan PDF",
+      "restUrl": null,
+      "pdfUrl": "https://www.richmondnc.com/DocumentCenter/View/6377",
+      "geometry": "none",
+      "coverage": "county-wide",
+      "status": "gap"
+    }
+  ],
+  "gaps": [
+    "Sale price not on public REST \u2014 AppraisalCard PDF for price",
+    "Municipal zoning REST gap: Rockingham, Hamlet, Ellerbe, Hoffman, Norman, Dobbins Heights",
+    "FLU PDF-only \u2014 no FeatureServer",
+    "Parcel situs via AddressPoints join only",
+    "OneMap siteadd empty; saledate epoch null",
+    "Legacy gis3 TLS unreliable",
+    "NCPTS richmond tenant invalid",
+    "RealEstateSearch/Parcel/{PIN} GET 404",
+    "Utilities / AADT / emails / phones / paid vendors excluded by design"
+  ],
+  "license": "Richmond County GIS / Tax / Land Records; NC OneMap; NCGS 132-10 commercial resale limits",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher"
+}

@@ -1,0 +1,304 @@
+state: NC
+jurisdiction: Bladen County
+fips: '37017'
+level: county
+markets:
+- Fayetteville
+- Wilmington
+slug: bladen
+municipalities:
+- name: Elizabethtown
+  role: city-limits-first
+  cityCode: '0615'
+  taxDistrict: TOWN OF ELIZABETHTOWN
+  notes: County seat; MunicipalBoundaries ~2816 ac / pop 3425; TaxDistric TOWN OF ELIZABETHTOWN ~2389
+    parcels (ZONING mostly UNK); ETJ poly present; Planning at elizabethtownnc.org — no public town zoning
+    FeatureServer verified
+- name: Bladenboro
+  role: city-limits-first
+  cityCode: '0603'
+  taxDistrict: TOWN OF BLADENBORO
+  notes: MunicipalBoundaries ~1392 ac / pop 1722; TaxDistric ~1233 parcels; ETJ poly; bladenboronc.org/planning
+    — no town zoning FS
+- name: White Lake
+  role: city-limits-first
+  cityCode: '0647'
+  taxDistrict: TOWN OF WHITE LAKE
+  notes: MunicipalBoundaries ~1732 ac / pop 874; TaxDistric ~1506 parcels; ETJ poly; no town zoning FS
+- name: Clarkton
+  role: city-limits-first
+  cityCode: 0609
+  taxDistrict: TOWN OF CLARKTON
+  notes: MunicipalBoundaries ~808 ac / pop 824; TaxDistric ~520; ETJ poly; no town zoning FS
+- name: East Arcadia
+  role: city-limits-first
+  cityCode: null
+  taxDistrict: TOWN OF EAST ARCADIA
+  notes: MunicipalBoundaries ~1414 ac; TaxDistric ~438; no TownCode on limits layer; no town zoning FS
+- name: Dublin
+  role: city-limits-first
+  cityCode: '0612'
+  taxDistrict: TOWN OF DUBLIN
+  notes: MunicipalBoundaries ~284 ac / pop 350; TaxDistric ~245; no town zoning FS
+- name: Tar Heel
+  role: city-limits-first
+  cityCode: 0648
+  taxDistrict: TOWN OF TAR HEEL
+  notes: MunicipalBoundaries ~132 ac / pop 124; TaxDistric ~168; no town zoning FS
+layers:
+- role: parcels
+  name: BladenCounty TaxParcels (PRIMARY CAMA)
+  restUrl: https://gis.bladenco.org/server/rest/services/BladenCounty/MapServer/1
+  alternateUrls:
+  - https://gis.bladenco.org/server/rest/services/BladenCounty/MapServer
+  - https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: MapAcres
+  coverage: county-wide
+  fieldMap:
+    PIN: parcelId
+    PID: parcelIdNumeric
+    ParcelId: parcelIdAccount
+    OwnerId: ownerId
+    Name1: ownerName
+    Name2: ownerName2
+    CurrOwnNam: ownerNameCurrent
+    OwnerAddre: mailingAddress.street
+    OwnerCity: mailingAddress.city
+    OwnerState: mailingAddress.state
+    OwnerZip: mailingAddress.zip
+    PhysicalSt: situsAddress.streetName
+    PhysStreet: situsAddress.streetSparse
+    MapAcres: acreage
+    DeedAcres: acreageDeed
+    calcacre: acreageCalcBroken
+    Shape_Area: acreageFromShape
+    TotalFMV_1: tax.marketValue
+    LandFMVCur: tax.landMarketValue
+    ImprovFMVC: tax.improvementMarketValue
+    TotalASVCu: tax.assessedValue
+    LandASVCur: tax.landAssessedValue
+    ImproveASV: tax.improvementAssessedValue
+    TaxableVal: tax.taxableValue
+    SalesAmoun: lastSale.price
+    SalesInstr: lastSale.instrument
+    DeedYear: lastSale.year
+    DeedBook: lastSale.deedBook
+    DeedPage: lastSale.deedPage
+    ZONING: zoning
+    TaxDistric: taxDistrict
+    MapNo: mapNumber
+    SubMap: subMap
+    Block: block
+    ParcelDesc: parcelNumberPart
+    LegalDescr: legalDescription
+  notes: 'PRIMARY wire-first county MapServer CAMA. Verified 2026-09-24: count 33335; MapAcres 5-150 ->
+    9242; DeedAcres 5-150 -> 9225; Shape_Area/43560 5-150 -> 8876; calcacre mostly 0 (only 4919 >0; 5-150
+    -> 1587) — prefer MapAcres or Shape_Area/43560. SalesAmoun>0 4138; DeedYear>0 31830; TotalFMV_1>0
+    29667; TotalASVCu>0 32625; ImproveASV>0 16622; Name1 33335; CurrOwnNam nonblank 32625; PhysicalSt
+    nonblank 32625 (street name; PhysStreet often blank). TaxDistric TOWN OF * router for cities-first
+    (~6499). Join OneMap parno=PIN; altparno=PID. CRS 102719/2264. MaxRecordCount 2000. No FeatureServer
+    twin.'
+  status: usable
+  verifiedCounts:
+    total: 33335
+    mapacres_5_150: 9242
+    deedacres_5_150: 9225
+    shape_acres_5_150: 8876
+    salesamoun_gt0: 4138
+    deedyear_gt0: 31830
+    totalfmv_gt0: 29667
+    totalasv_gt0: 32625
+    improveasv_gt0: 16622
+    owner_name1: 33335
+    physicalst_nonblank: 32625
+    town_taxdistric: 6499
+- role: parcels
+  name: NC OneMap Parcels (geometry + CAMA mirror)
+  restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  alternateUrls:
+  - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  - https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: recareano
+  coverage: county-wide
+  fieldMap:
+    parno: parcelId
+    altparno: parcelIdNumeric
+    nparno: parcelIdNational
+    ownname: ownerName
+    mailadd: mailingAddress.street
+    mcity: mailingAddress.city
+    mstate: mailingAddress.state
+    mzip: mailingAddress.zip
+    siteadd: situsAddress
+    recareano: acreage
+    gisacres: acreageBroken
+    landval: tax.landValue
+    improvval: tax.improvementValue
+    parval: tax.marketValue
+    saledatetx: lastSale.yearText
+    saledate: lastSale.dateNull
+  notes: 'Filter cntyfips=''017''. Verified 2026-09-24: count 34161; gisacres all 0 — DO NOT USE; recareano
+    5-150 -> 9258; Shape__Area 5-150 -> 9021; ownname 34161; landval>0 32767; parval>0 33070; saledate
+    null (saledatetx year text only; no sale price). Prefer county TaxParcels for SalesAmoun + FMV. Join
+    parno=PIN / altparno=PID.'
+  status: usable
+  verifiedCounts:
+    total: 34161
+    recareano_5_150: 9258
+    shape_acres_5_150: 9021
+    gisacres_gt0: 0
+    ownname: 34161
+    landval_gt0: 32767
+    parval_gt0: 33070
+    saledate_nonnull: 0
+- role: zoning
+  name: BladenCounty County_Zoning (unincorporated districts)
+  restUrl: https://gis.bladenco.org/server/rest/services/BladenCounty/MapServer/2
+  alternateUrls:
+  - https://library.municode.com/nc/bladen_county/codes/code_of_ordinances
+  - http://bladen-nc.elaws.us/code/coor_apxa_sects3
+  layerId: 2
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    ZONING: zoning
+  notes: '5 multipolygon district footprints (not parcel-level): RA ~502078 ac, CON ~39363, I ~3712, C
+    ~988, R ~466. Ordinance districts RA/R/C/I/CON (+ overlays AO/FPO/WSWO not on this layer). Cities-first:
+    inside MunicipalBoundaries / TaxDistric TOWN OF * prefer town ordinance (no town FS) over this layer;
+    parcel TaxParcels.ZONING attribute (RA 22945, UNK 8270, R 951, C 180, I 55, CON 24) is secondary attr
+    join.'
+  status: usable
+  verifiedCounts:
+    total: 5
+    RA_acres_approx: 502078
+    CON_acres_approx: 39363
+    I_acres_approx: 3712
+    C_acres_approx: 988
+    R_acres_approx: 466
+- role: zoning
+  name: TaxParcels.ZONING attribute (parcel-level zoning code)
+  restUrl: https://gis.bladenco.org/server/rest/services/BladenCounty/MapServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: MapAcres
+  coverage: county-wide
+  fieldMap:
+    PIN: parcelId
+    ZONING: zoning
+    TaxDistric: taxDistrict
+  notes: 'Parcel attribute zoning on PRIMARY CAMA. Counts: RA 22945, UNK 8270 (mostly inside towns), R
+    951, blank 901, C 180, I 55, CON 24. Town parcels mostly UNK — route city zoning via MunicipalBoundaries
+    + town ordinance (REST gap).'
+  status: partial
+  verifiedCounts:
+    RA: 22945
+    UNK: 8270
+    R: 951
+    C: 180
+    I: 55
+    CON: 24
+- role: other
+  name: MunicipalBoundaries
+  restUrl: https://gis.bladenco.org/server/rest/services/BladenCounty/MapServer/8
+  layerId: 8
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    MunicipalB: municipality
+    Municipa_1: municipalityUpper
+    TownCode: townCode
+    Population: population
+  notes: '7 munis: Elizabethtown, Bladenboro, White Lake, Clarkton, East Arcadia, Dublin, Tar Heel. Cities-first
+    gate.'
+  status: usable
+  verifiedCounts:
+    total: 7
+- role: other
+  name: ETJ
+  restUrl: https://gis.bladenco.org/server/rest/services/BladenCounty/MapServer/9
+  layerId: 9
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: sample
+  fieldMap:
+    NAME: etjName
+  notes: '4 ETJ polys: Elizabethtown, Bladenboro, White Lake, Clarkton.'
+  status: usable
+  verifiedCounts:
+    total: 4
+- role: other
+  name: Addresses
+  restUrl: https://gis.bladenco.org/server/rest/services/BladenCounty/MapServer/0
+  layerId: 0
+  geometry: point
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  fieldMap: {}
+  notes: Address points ~23799 — optional situs enrich (TaxParcels PhysStreet often blank; PhysicalSt
+    is street name only).
+  status: usable
+  verifiedCounts:
+    total: 23799
+- role: flu
+  name: Bladen County Future Land Use Plan 2014-2030 — PDF only
+  restUrl: https://bladennc.govoffice3.com/vertical/sites/%7B3428E8B4-BA8D-4BCE-9B92-0A719CB4C4FB%7D/uploads/Combined_Document_-_7-25-14_-_Bladen_Co_Future_Land_Use_Plan_.pdf
+  alternateUrls:
+  - https://bladennc.govoffice3.com/
+  layerId: null
+  geometry: none
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  fieldMap: {}
+  notes: No public FLU FeatureServer on county MapServer/AGOL/OneMap verified 2026-09-24. Combined Future
+    Land Use Plan PDF HTTP 200 (~11.9 MB). FLU gap.
+  status: gap
+gaps:
+- No dedicated municipal zoning FeatureServers for Elizabethtown / Bladenboro / White Lake / Clarkton
+  / Dublin / Tar Heel / East Arcadia — cities-first gate via MunicipalBoundaries + TaxDistric; town ordinance/planning
+  pages only
+- County_Zoning is 5 coarse district multipolygons (not parcel fabric) — pair with TaxParcels.ZONING attribute
+- FLU FeatureServer gap — Future Land Use Plan 2014-2030 PDF only
+- calcacre / OneMap gisacres broken — prefer MapAcres, DeedAcres, or Shape_Area/43560 / recareano
+- OneMap saledate null and no sale price — use county SalesAmoun + DeedYear (or ustaxdata sale history)
+- PhysStreet sparsely populated — situs often PhysicalSt street name only; join Addresses/0
+- ustaxdata PA requires zero-padded 7-digit OwnerId + ParcelId (unpadded returns No Parcel Data)
+- Legacy ConnectGIS bladen2.connectgis.com timed out 2026-09-24 — use Avineon bladenmap
+- NCPTS SPA shell only from curl (tenant routes load); prefer ustaxdata for verified PA
+- Utilities / AADT / emails / phones / paid vendors intentionally out of scope
+appraiserSearchUrl: https://bladen.ustaxdata.com/account.cfm?ownerID={OwnerId:07d}&parcelID={ParcelId:07d}&groupParcel={PIN}
+appraiserSearchUrlNotes: 'OwnerId and ParcelId (same as PID) MUST be zero-padded to 7 digits. Example:
+  OwnerId=539346 ParcelId=18189 PIN=033900353470 → https://bladen.ustaxdata.com/account.cfm?ownerID=0539346&parcelID=0018189&groupParcel=033900353470
+  (HTTP 200 Account Information with owner/tax/sale history verified 2026-09-24). Unpadded ownerID+parcelID
+  returns No Parcel Data.'
+appraiserSearchUrlAlternates:
+- https://bladen.ustaxdata.com/list.cfm?lastName={OWN_LAST}
+- https://bladen.ustaxdata.com/Search.cfm
+- https://bladen.ustaxdata.com/TaxSearch.cfm
+- https://www.ustaxdata.com/nc/bladen/account.cfm?ownerID={OwnerId:07d}&parcelID={ParcelId:07d}&groupParcel={PIN}
+- https://lrcpwa.ncptscloud.com/bladen/parcel-detail/{PIN}
+- https://lrcpwa.ncptscloud.com/bladen/parcel-search
+- https://gis.bladenco.org/bladenmap/?PIN={PIN}
+jurisdictionGisUrl: https://gis.bladenco.org/bladenmap/
+jurisdictionGisUrlAlternates:
+- https://gis.bladenco.org/maps/
+- https://gis.bladenco.org/
+- https://bladennc.govoffice3.com/?SEC=F9F2178F-3B79-4E70-AE2F-A58F58890D5C
+license: Bladen County GIS public MapServer; NC OneMap cadastral; ustaxdata/NexGen tax portal; NCPTS.
+  County GIS disclaimer (NC GS 132-10 / inventory of real property). Attribution required; not a legal
+  survey.
+verifiedAt: '2026-09-24'
+verifiedBy: North Carolina Public Info Researcher

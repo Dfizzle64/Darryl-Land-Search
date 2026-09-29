@@ -1,0 +1,336 @@
+state: NC
+jurisdiction: Lenoir County
+fips: "37107"
+level: county
+markets: ["Greenville/Eastern NC"]
+slug: lenoir
+cntyfips: "107"
+
+jurisdictionGisUrl: https://lenoirco.maps.arcgis.com/apps/webappviewer/index.html?id=68c0618065d04f1182fb86cb5b6647de
+publicGisUrl: https://lenoirco.maps.arcgis.com/apps/webappviewer/index.html?id=68c0618065d04f1182fb86cb5b6647de
+gisViewerUrl: https://lenoirco.maps.arcgis.com/apps/webappviewer/index.html?id=68c0618065d04f1182fb86cb5b6647de
+experienceGisUrl: https://experience.arcgis.com/experience/9f9e1c23a7124bd2961e83861c747b84/
+gisDepartmentUrl: https://lenoircountync.gov/planning-inspections-department/
+countyRestRoot: https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services
+taxAssessorUrl: https://lenoircountync.gov/tax-department/
+appraiserSearchUrl: https://property.spatialest.com/nc/lenoir/
+paDeepLinkTemplate: "https://property.spatialest.com/nc/lenoir/#/property/{Record_Num}"
+paDeepLinkKey: Record_Num
+paDeepLinkKeyAlt: record_number
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/lenoir/parcel-search
+ncptsDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/lenoir/parcel-detail/{NC_PIN}"
+spatialestAppealsUrl: https://appeals.spatialest.com/nc-lenoir/
+taxBillsUrl: https://www.lenoircountytaxes.com/
+oneMapFilter: "cntyfips='107'"
+parcelIdPreferred: NC_PIN
+joinKeys: [NC_PIN, NCPIN, Record_Num, record_number, ParcelNum, parno, altparno]
+
+layers:
+  - role: parcels
+    name: Parcels_Zoning_Addressing / Parcels (PRIMARY)
+    restUrl: https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: GIS_ACRE
+    coverage: county-wide
+    fieldMap:
+      NC_PIN: parcelId
+      NCPIN: parcelIdPin
+      Record_Num: parcelIdAccount
+      ParcelNum: parcelIdDisplay
+      GIS_ACRE: acreage
+      MapAcres: acreageMap
+      DeedAcres: acreageDeed
+      Calculated: acreageCalculated
+      Name1: ownerName
+      Name2: ownerName2
+      Addr1: mailingAddress.street
+      City: mailingAddress.city
+      State: mailingAddress.state
+      Zip: mailingAddress.zip
+      PhysStrAdd: situsAddress
+      SalesAmt: lastSale.price
+      DateSold: lastSale.date
+      DeedYear: lastSale.year
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      LandFMVCur: tax.landValue
+      ImproveFMV: tax.improvementValue
+      TotalFMVCu: tax.marketValue
+      LandLUVCur: tax.landUseValue
+      LandUseCur: presentUseFlag
+      TaxDistDes: taxDistrict
+      Township: township
+      YearBuilt: yearBuilt
+      FinishedAr: heatedSqFt
+      PRC: appraiserSearchUrl
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 36474; GIS_ACRE 5–150 → 5326;
+      MapAcres 5–150 → 5326; DeedAcres 5–150 → 5392; ImproveFMV 0/null in band → 3090;
+      SalesAmt>0 → 10286; SalesAmt>0 in band → 1225; PhysStrAdd present 36115.
+      CRS 102719/2264. MaxRecordCount 2000 — paginate.
+      Sample NC_PIN 4525-31-5293 / Record_Num 5084 / PRC Spatialest.
+      Geo-check ≈ -77.581, 35.256 (Kinston). Auth: none.
+    status: usable
+
+  - role: parcels
+    name: OpenGov / Parcels (CAMA enrichment twin)
+    restUrl: https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/OpenGov/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: MAP_ACRES
+    coverage: county-wide
+    fieldMap:
+      nc_pin: parcelId
+      record_number: parcelIdAccount
+      PARCEL_NUMBER: parcelIdDisplay
+      NAME_1: ownerName
+      NAME_2: ownerName2
+      CURRENT_OWNER_NAME_1: ownerNameCurrent
+      TAYPAYER_ADDRESS_1: mailingAddress.street
+      TAXPAYER_CITY: mailingAddress.city
+      ZIP_CODE: mailingAddress.zip
+      PHYSICAL_STREET_ADDRESS: situsAddress
+      MAP_ACRES: acreage
+      calculated_acreage: acreageCalculated
+      SALES_AMOUNT: lastSale.price
+      DATE_SOLD: lastSale.date
+      QUALIFY_CODE: lastSale.qualified
+      QUALIFY_CODE_DESC: lastSale.qualifiedDesc
+      LAND_FMV_CUR: tax.landValue
+      IMPROVE_FMV_CUR: tax.improvementValue
+      TOTAL_FMV_CURRENT: tax.marketValue
+      LAND_ASV_CUR: tax.assessedLand
+      IMPROVE_ASV_CUR: tax.assessedImprovement
+      TOTAL_ASV_CURRENT: tax.assessedValue
+      TAXABLE_VALUE: tax.taxableValue
+      ZONE: zoning
+      ZONE_DESCRIPTION: zoningDesc
+      TAX_DISTRICT_DESC: taxDistrict
+      VACANT_IMPROVED_CODE: vacantImproved
+      OWNER_ID: ownerId
+    notes: >
+      Same 36474 footprint as PZA/6. Extra ZONE (~12548), qualify codes, ASV/taxable.
+      MaxRecordCount 1000 — paginate. Prefer city zoning polygons over parcel ZONE inside munis.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (fallback)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdAccount
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      siteadd: situsAddress
+      gisacres: acreage
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      saledate: lastSale.date
+    notes: >
+      Filter cntyfips='107'. Verified count 36463; gisacres 5–150 → 5318;
+      improvval 0/null in band → 3093. parno↔NC_PIN; altparno↔Record_Num.
+      No sale price. Alternate host services.gis.nc.gov. MaxRecordCount 5000.
+    status: usable
+
+  - role: zoning
+    name: Kinston Zoning Dec23 (city-first PRIMARY seat)
+    restUrl: https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      OrdinanceN: ordinance
+      ApprovalDa: approvalDate
+    notes: >
+      PRIMARY city-first Kinston. Verified count 1285. OpenGov/4 mirror count 1301.
+      Top ZONING: RA-6 319, RA-5 263, B-1 180, RA-8 163, I-1 91, B-2 55, I-B 52, O&I 47,
+      RA-20 38, RO 32, SC 16, RA-12 13, I-2 7, RA-7 5.
+    status: usable
+
+  - role: zoning
+    name: Pink Hill Zoning (city-first)
+    restUrl: https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      Future_LU: flu
+      Acres: acreage
+    notes: >
+      Verified count 39. Zoning HC 15, RA 12, R-10 8, RM 2, DC 2.
+      Future_LU Residential 16, Commercial 13, Open Space/Recreation 8, Agricultural/Residential 2.
+      Only municipal FLU REST in county.
+    status: usable
+
+  - role: zoning
+    name: County Zoning (unincorporated / GTP coarse)
+    restUrl: https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Zoning: zoning
+    notes: >
+      Verified count 8 (1 each): Agricultural, Commercial, Industrial, Residential,
+      GTP-AR, GTP-C, GTP-I, GTP-RE. Coarse category polygons — not fine district fabric.
+      OpenGov/19 and /3 mirrors. Prefer city layers inside munis.
+    status: partial
+
+  - role: zoning
+    name: Proposed Lenoir County Zoning 2023-10-05 (parcel-class)
+    restUrl: https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/OpenGov/FeatureServer/23
+    layerId: 23
+    geometry: polygon
+    auth: none
+    acreageField: MapAcres
+    coverage: county-wide
+    fieldMap:
+      Proposed_Z: zoningProposed
+      Res_Distri: residentialDistrictFlag
+      NCPIN: parcelId
+      Record_Num: parcelIdAccount
+    notes: >
+      Verified 35841. Proposed_Z: Municipality 13876, Agricultural 11344, Residential 5257,
+      ETJ 3781, GTP-AR 742, GTP-I 308, Commercial 254, GTP-RE 198, Industrial 41, GTP-C 37.
+      Proposed parcel-class — clarify adoption with Planning; not a substitute for city district maps.
+    status: partial
+
+  - role: flu
+    name: Pink Hill Future_LU (on zoning layer)
+    restUrl: https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: city-only
+    fieldMap:
+      Future_LU: flu
+    notes: Only FLU REST verified in Lenoir County (Pink Hill). Kinston Comp Plan is PDF-only.
+    status: usable
+
+  - role: flu
+    name: Kinston Comprehensive Land Use Plan (PDF)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      https://www.kinstonnc.gov/DocumentCenter/View/777/Kinston-Comprehensive-Land-Use-Plan
+      No public FLU FeatureServer found for Kinston or countywide.
+    status: gap
+
+  - role: zoning
+    name: La Grange Official Zoning Map (PDF)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      https://www.lagrangenc.com/DocumentCenter/View/104/LaGrange-Official-Zoning-Map-Revised-December-12-2011-PDF
+      Codes AR/R-18/R-12/R-10/R-5/HC/DD/LI. ConnectGIS lenoir.connectgis.com returned 504.
+      No public zoning FeatureServer found.
+    status: gap
+
+  - role: zoning
+    name: Grifton Zoning via Pitt (cross-county)
+    restUrl: https://gis.pittcountync.gov/gis/rest/services/Permitting/PermitDisplayMap/MapServer/23
+    layerId: 23
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+    notes: >
+      Prefer Pitt card for Grifton. Verified count 104. Lenoir TaxDistDes TOWN OF GRIFTON ~156 parcels.
+      Clip to Lenoir for this card.
+    status: usable
+
+  - role: other
+    name: Address Points
+    restUrl: https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/9
+    layerId: 9
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      COMPLETE_A: situsAddress
+      ZIP: situsZip
+      COMMUNITY: community
+    notes: Verified ~41413. No PIN join key — spatial join. Prefer PhysStrAdd on parcels.
+    status: usable
+
+  - role: other
+    name: Municipal Areas
+    restUrl: https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Lenoir_County_Municipal_Areas/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      MUNNM: municipality
+      TEXTNM: municipalityLabel
+      PLACEFIPS: placeFips
+    notes: >
+      Verified 6 features: Grifton (multi-part Lenoir+Pitt), La Grange, Pink Hill, Kinston.
+    status: usable
+
+  - role: other
+    name: ETJ
+    restUrl: https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Lenoir_Static/FeatureServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ETJMUNNM: etjMunicipality
+      ETJLABEL: etjLabel
+    notes: >
+      Verified 6: City of Kinston (multi), Town of La Grange, Town of Pink Hill, Town of Grifton.
+    status: usable
+
+gaps:
+  - La Grange zoning REST gap — Official Zoning Map PDF only; ConnectGIS 504
+  - Kinston / countywide FLU REST gap — Comp Plan PDF; only Pink Hill Future_LU on REST
+  - County_Zoning only 8 coarse polys — not fine unincorporated district fabric
+  - Proposed_Z is parcel-class proposed — clarify adoption; not a substitute for city district maps
+  - OpenGov parcel ZONE ~34% populated — prefer spatial join to city zoning layers
+  - AddrPts lack PIN — spatial join; prefer PhysStrAdd
+  - Last-sale only on parcel; no multi-transfer history FeatureServer
+  - Grifton straddles Pitt — prefer Pitt zoning host; clip Lenoir tip
+  - Alternate nJbIFHiSnaX0z0hS mirror older/partial — prefer LenoirCoGIS bDx73HOFAO3oSeDq
+  - Wrong-org Norwalk CT HfsHDBmkGwb1UtID — never use; Caldwell City of Lenoir is different FIPS
+  - No phones/emails; no AADT/utilities; no paid vendors
+license: "Lenoir County / LenoirCoGIS public AGOL; NC OneMap; attribution recommended; no paid vendors"
+appraiserSearchUrl: https://property.spatialest.com/nc/lenoir/
+viewerLinkTemplate: "https://property.spatialest.com/nc/lenoir/#/property/{Record_Num}"
+gisViewerUrl: https://lenoirco.maps.arcgis.com/apps/webappviewer/index.html?id=68c0618065d04f1182fb86cb5b6647de
+publicGisUrl: https://lenoirco.maps.arcgis.com/apps/webappviewer/index.html?id=68c0618065d04f1182fb86cb5b6647de
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher

@@ -1,0 +1,633 @@
+state: NC
+jurisdiction: Wake County
+fips: "37183"
+level: county
+markets: [Raleigh-Durham]
+
+layers:
+  - role: parcels
+    name: Property Parcels (PRIMARY)
+    restUrl: https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALC_AREA
+    coverage: county-wide
+    fieldMap:
+      PIN_NUM: parcelId
+      REID: parcelIdReid
+      PARCEL_PK: parcelIdPk
+      CALC_AREA: acreage
+      DEED_ACRES: acreageDeed
+      OWNER: ownerName
+      ADDR1: mailingAddress.street
+      ADDR2: mailingAddress.street2
+      ADDR3: mailingAddress.cityStateZip
+      SITE_ADDRESS: situsAddress
+      FULL_STREET_NAME: situsAddress.street
+      CITY_DECODE: situsCity
+      ZIPNUM: situsZip
+      SALE_DATE: lastSale.date
+      TOTSALPRICE: lastSale.price
+      LAND_VAL: tax.landValue
+      BLDG_VAL: tax.improvementValue
+      TOTAL_VALUE_ASSD: tax.assessedValue
+      PLANNING_JURISDICTION: planningJurisdiction
+      LAND_CLASS_DECODE: dorCode
+      TYPE_USE_DECODE: landUseDesc
+    notes: >
+      PRIMARY verified 2026-09-23: count 438588; CALC_AREA 5–150 → 12436;
+      DEED_ACRES 5–150 → 12577; BLDG_VAL=0 in 5–150 → 5857. CRS 102719/2264.
+      Situs ON polygons. No zoning/FLU — spatial join by PLANNING_JURISDICTION.
+      MaxRecordCount 2000. Alternates: maps.wake.gov FeatureServer/0 and MapServer/0.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-23: cntyfips='183' count 435380; gisacres 5–150 → 12427.
+      No sale price. MaxRecordCount 5000. Alternate host services.gis.nc.gov.
+    status: usable
+
+  - role: zoning
+    name: Raleigh Zoning (county MapServer)
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/23
+    layerId: 23
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      ZONE_TYPE: zoningType
+      ZONE_TYPE_DECODE: zoningLabel
+      HEIGHT: zoningHeight
+      FRONTAGE_DECODE: zoningFrontage
+      COND_LINK: zoningConditionsUrl
+    notes: >
+      Verified count 3590. CRS 2264. NOT on Zoning FeatureServer — use MapServer
+      or city host maps.raleighnc.gov Planning/Zoning/MapServer/0 (count 3592).
+    status: usable
+
+  - role: zoning
+    name: Cary Zoning (county host)
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+      NAME: zoningName
+    notes: >
+      Verified count 2843. CRS 2264. City alternate:
+      maps-apis.carync.gov LandUse/Zoning/FeatureServer/11 (ZONECLASS, count 2831).
+    status: usable
+
+  - role: zoning
+    name: Apex Zoning
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+    notes: Verified count 740. CRS 2264.
+    status: usable
+
+  - role: zoning
+    name: Holly Springs Zoning
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/20
+    layerId: 20
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+      ZONING: zoningAlt
+    notes: >
+      Verified count 837. Town host FS/0 count 856 at
+      gis.hollyspringsnc.us/ths_arcserver/.../Planning/Zoning/FeatureServer/0.
+    status: usable
+
+  - role: zoning
+    name: Fuquay-Varina Zoning
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/18
+    layerId: 18
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+    notes: >
+      Verified count 860. Town host Public/Zoning/MapServer/0 count 876
+      (field class lowercase).
+    status: usable
+
+  - role: zoning
+    name: Garner Zoning
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/19
+    layerId: 19
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+    notes: >
+      Verified count 626. Town AGOL Garner_Zoning/0 count 608
+      (CLASS, BASE_ZONING).
+    status: usable
+
+  - role: zoning
+    name: Knightdale Zoning
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/21
+    layerId: 21
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+      DISTRICT: zoningDistrict
+      DISTNAME: zoningDistrictName
+    notes: Verified count 377. CRS 2264.
+    status: usable
+
+  - role: zoning
+    name: Morrisville Zoning
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/22
+    layerId: 22
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+      COND_USE: zoningConditional
+    notes: Verified count 32 — sparse; verify coverage before relying alone.
+    status: partial
+
+  - role: zoning
+    name: Rolesville Zoning
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/24
+    layerId: 24
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+    notes: Verified count 118. No public FLU REST found.
+    status: usable
+
+  - role: zoning
+    name: Wake Forest Zoning
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/25
+    layerId: 25
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONECLASS: zoning
+      CLASS: zoningAlt
+      ZONELABEL: zoningLabel
+    notes: >
+      Verified count 469. Town AGOL WFZoning/0 count 479 (ZoneClass).
+    status: usable
+
+  - role: zoning
+    name: Wendell Zoning
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/26
+    layerId: 26
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+    notes: Verified count 145. CRS 2264.
+    status: usable
+
+  - role: zoning
+    name: Zebulon Zoning
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/27
+    layerId: 27
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+    notes: Verified count 114. No public FLU REST found.
+    status: usable
+
+  - role: zoning
+    name: Wake County Zoning (unincorporated)
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/17
+    layerId: 17
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CLASS: zoning
+      ZON_NUM: zoningCase
+      DATE_ZONED: zoningDate
+    notes: >
+      Verified count 358. Unincorporated (PLANNING_JURISDICTION=WC) only —
+      NOT city coverage.
+    status: usable
+
+  - role: zoning
+    name: Angier Zoning (edge)
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+    notes: Verified count 96. Harnett/Wake edge.
+    status: usable
+
+  - role: zoning
+    name: Airport Zoning
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Planning/Zoning/MapServer/28
+    layerId: 28
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CLASS: zoning
+    notes: Verified count 17. PLAN_JURIS RD.
+    status: usable
+
+  - role: flu
+    name: Raleigh Future Land Use
+    restUrl: https://maps.raleighnc.gov/arcgis/rest/services/Planning/FutureLandUse/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      LAND_USE: flu
+      ADOPT_DATE: fluAdopted
+      CP_AMENDMENT: fluAmendment
+    notes: >
+      Verified count 1881. CRS 2264. Codes include PF, LR, NMU, HR, CMU, CBD,
+      MR, GI, RMU, INS, ORD, POS. Spatial join to county parcels.
+    status: usable
+
+  - role: flu
+    name: Cary Future Growth Framework
+    restUrl: https://maps-apis.carync.gov/server/rest/services/LandUse/LandUsePlanning/FeatureServer/18
+    layerId: 18
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      FRAMEWORKCODE: flu
+      FRAMEWORKDESC: fluDocUrl
+    notes: >
+      Verified count 1535. CRS 2264. FRAMEWORKCODE = FLU label (Suburban
+      Neighborhood, Destination Center, Downtown, …). FRAMEWORKDESC often
+      Uberflip doc URL — do not use as label.
+    status: usable
+
+  - role: flu
+    name: Apex 2045 Future Land Classifications
+    restUrl: https://services1.arcgis.com/nry3yyvaEfskMEXA/arcgis/rest/services/2045_Future_Land_Use/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      Class: flu
+      Special: fluSpecial
+      ACRES: acreage
+    notes: Verified count 97. CRS 2264. Coarse classifications.
+    status: usable
+
+  - role: flu
+    name: Holly Springs Future Land Use
+    restUrl: https://gis.hollyspringsnc.us/ths_arcserver/rest/services/Planning/Future_Land_Use/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      CODE: flu
+      NAME: fluLabel
+      ACRES: acreage
+    notes: Verified count 22. CRS 2264. Place-type polygons (CN, NA, BI, MAC, …).
+    status: usable
+
+  - role: flu
+    name: Fuquay-Varina Land Use Plan
+    restUrl: https://gis1.fuquay-varina.org/server/rest/services/Public/Land_Use_Plan/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      land_use: flu
+      adoption_date: fluAdopted
+    notes: Verified count 1110. CRS 2264.
+    status: usable
+
+  - role: flu
+    name: Garner Forward Character Typology
+    restUrl: https://services1.arcgis.com/o3ok0s2woZDh8Saq/arcgis/rest/services/Garner_Forward_Character_Typology/FeatureServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Use_: flu
+    notes: >
+      Verified count 8. CRS 2264. High-level character only (Employment Centers,
+      Floodplains, …) — partial FLU.
+    status: partial
+
+  - role: flu
+    name: Knightdale Future Land Use
+    restUrl: https://services1.arcgis.com/a7CWfuGP5ZnLYE7I/arcgis/rest/services/Knightdale_Future_Land_Use/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALC_AREA
+    coverage: city-only
+    fieldMap:
+      CATEGORY: flu
+      PT_CAT: fluAlt
+      PIN_NUM: parcelId
+      REID: parcelIdReid
+      PARCEL_PK: parcelIdPk
+    notes: >
+      Verified count 10128. CRS 3857 — reproject or attribute-join on PIN_NUM/REID
+      to county parcels (2264). Categories: Centers, Neighborhoods, Districts,
+      Open Space, Center.
+    status: usable
+
+  - role: flu
+    name: Morrisville Draft Future Land Use Designations
+    restUrl: https://services.arcgis.com/ud8kSLNkfBb9WX8U/arcgis/rest/services/Draft_Future_Land_Use_Base_Map/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      FutureUse2: flu
+      HLA_FLU: fluAlt
+      HLA_Label: fluLabel
+    notes: >
+      Verified count 7693. CRS 2264. Draft layer — best public FLU available.
+    status: partial
+
+  - role: flu
+    name: Wendell Future Land Use Map (place types)
+    restUrl: https://services5.arcgis.com/eqafRVo2WxMvxwGw/arcgis/rest/services/Future_Land_Use_Map/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALC_AREA
+    coverage: city-only
+    fieldMap:
+      PLACETYPE: flu
+      PIN_NUM: parcelId
+      REID: parcelIdReid
+    notes: >
+      Verified count 8753. CRS 2264. Parcel-attributed; prefer join on PIN_NUM.
+      Place types include Low-Density Estate, Activity Center, Downtown Core, etc.
+    status: usable
+
+  - role: flu
+    name: Wake Forest LandUse (coarse)
+    restUrl: https://services1.arcgis.com/gqTCvanrwF2z2HEu/arcgis/rest/services/LandUse/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      LandUseCat: flu
+      Name: fluLabel
+    notes: >
+      Verified count 576. CRS 2264. Categories Commercial/Residential/Recreation/School
+      only — existing/generalized, not detailed FLU. status partial.
+    status: partial
+
+  - role: other
+    name: Planning Jurisdictions
+    restUrl: https://maps.wake.gov/arcgis/rest/services/Jurisdictions/Jurisdictions/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PLAN_JURIS: planningJurisdiction
+      JURISDICTION: municipality
+    notes: >
+      Router for zoning/FLU. Codes RA,CA,AP,HS,FV,GA,KN,MO,RO,WF,WE,ZB,AN,CL,DU,RD,RP.
+      WC unincorporated on parcels may be null CITY with PLANNING_JURISDICTION=WC.
+    status: usable
+
+gaps:
+  - No countywide FLU FeatureServer — municipal FLU only; Rolesville and Zebulon FLU missing on public REST
+  - Zoning split by municipality (county MapServer helps; FeatureServer omits Raleigh layer 23)
+  - Morrisville zoning only 32 polygons — coverage risk
+  - Wake Forest LandUse coarse (4 categories); Garner character typology only 8 polygons
+  - Knightdale FLU in WKID 3857 — reproject or PIN-join
+  - Last-sale only (no multi-transfer sales history FeatureServer found)
+  - Tax values are assessed (TOTAL_VALUE_ASSD); no separate market field on parcels
+  - Do not scrape phones/emails from iMAPS or Real Estate pages
+  - MaxRecordCount 2000 (county) / 5000 (OneMap) — paginate
+license: "County and municipal open GIS; attribution required; public query endpoints; no paid vendors"
+appraiserSearchUrl: https://services.wakegov.com/realestate/
+viewerLinkTemplate: "https://services.wakegov.com/realestate/Account.asp?id={REID}"
+imapsUrl: https://maps.raleighnc.gov/iMAPS/
+verifiedAt: 2026-09-23
+verifiedBy: GIS Research Executor
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "Public Information Researcher"
+  aadt:
+    source: "NCDOT Traffic Survey Group"
+    restUrl: "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0"
+    layerId: 0
+    field: "AADT_2022"
+    geography: "state AADT station points (HPMS)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Public Information Researcher"
+    notes: "Official NCDOT AADT stations; annual fields AADT_2002–AADT_2022; filter COUNTY; companion Traffic Segmentation FS available."
+
+# ---- PASS2 full-suite upgrade (rural OZ) — verifiedAt 2026-09-28 ----
+pass2:
+  label: PASS2 full-suite upgrade — rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  aadtScreening:
+    source: NCDOT Traffic Survey Group (public AGOL)
+    layer: NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)
+    restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+    countyField: COUNTY
+    countyValue: WAKE
+    valueField: AADT_2022
+    valueType: string (trim; blank = no count that year)
+    countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WAKE%27&returnCountOnly=true&f=json
+    featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WAKE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+    liveStationCount: 2098
+    stationsWithAADT2022: 217
+    newerYearAvailable:
+      available: true
+      layer: NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      countyField: County
+      countyValue: Wake
+      valueField: AADT_2025
+      valueType: integer (null = no count)
+      countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Wake%27&returnCountOnly=true&f=json
+      featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Wake%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+      liveStationCount: 2194
+      stationsWithAADT2025: 1802
+      stationsWithAADT2024: 359
+      segmentsLayer: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide — spatial filter by county envelope)
+      also: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)
+    recommendation: Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025→AADT_2024→AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title).
+  primaryParcelLayer:
+    restUrl: https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0
+    acreageField: CALC_AREA
+    range5to150Where: CALC_AREA>=5 AND CALC_AREA<=150
+    liveTotalParcels: 438759
+    liveParcels5to150: 12436
+  taxValues:
+    status: ok
+    fields:
+      LAND_VAL: tax.landValue
+      BLDG_VAL: tax.improvementValue
+      TOTAL_VALUE_ASSD: tax.assessedValue
+    liveNonZeroCounty:
+      LAND_VAL: 420754
+      BLDG_VAL: 382270
+      TOTAL_VALUE_ASSD: 420783
+    liveNonZero5to150:
+      TOTAL_VALUE_ASSD: 10858
+    notes: Double fields LAND_VAL/BLDG_VAL/TOTAL_VALUE_ASSD (2024 reval).
+    publicFallback: https://services.wakegov.com/realestate/Account.asp?id={REID}
+  saleHistory:
+    status: ok
+    priceFields:
+    - TOTSALPRICE
+    dateFields:
+    - SALE_DATE
+    livePriceGt0County:
+      TOTSALPRICE: 357395
+    livePriceGt0_5to150:
+      TOTSALPRICE: 3340
+    liveDateNonNullCounty:
+      SALE_DATE: 358235
+    notes: SALE_DATE esriDate; TOTSALPRICE double (package sale price). Last sale only.
+  ownerEntity:
+    ownerFields:
+    - OWNER
+    primaryOwnerField: OWNER
+    rule:
+      apply: Uppercase + trim OWNER
+      regex: (?i)(\bL\.?\s?L\.?\s?C\b|\bINC\b|\bCORP|\bL\.?\s?P\b|\bLLP\b|\bLLLP\b|\bLTD\b|TRUST|CHURCH|MINISTR|\bCOMPANY\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\bHOA\b|FOUNDATION|AUTHORITY|\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\b|^UNITED STATES|^NORTH CAROLINA\b|\bCOUNTY$)
+      sqlLikeTokens:
+      - '% LLC%'
+      - '%,LLC%'
+      - '% L L C%'
+      - '% INC'
+      - '% INC %'
+      - '% INC.%'
+      - '%,INC%'
+      - '% CORP%'
+      - '%CORPORATION%'
+      - '% LP'
+      - '% LP %'
+      - '% L P'
+      - '% LLP%'
+      - '% LTD%'
+      - '%TRUST%'
+      - '%CHURCH%'
+      - '%MINISTR%'
+      - '% COMPANY%'
+      - '%PARTNERSHIP%'
+      - '%HOLDINGS%'
+      - '%PROPERTIES%'
+      - '%INVESTMENT%'
+      - '%ASSOCIATION%'
+      - '%FOUNDATION%'
+      - '%AUTHORITY%'
+      - CITY OF %
+      - COUNTY OF %
+      - STATE OF %
+      - TOWN OF %
+      - '% COUNTY'
+      - '%BOARD OF EDUCATION%'
+      - UNITED STATES%
+      - NORTH CAROLINA %
+      - '% DEVELOPMENT%'
+      caveats: TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); "% COUNTY" suffix catches e.g. "PERSON COUNTY"; bare "CO" and "ESTATE" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) — normalize first.
+    liveEntityCount5to150: 6821
+    liveOwnerNonNull5to150: 12428
+    entityQuery: where=CALC_AREA>=5 AND CALC_AREA<=150 AND (OWNER LIKE '% LLC%' OR OWNER LIKE '%,LLC%' OR OWNER LIKE '% L L C%' OR OWNER LIKE '% INC' OR OWNER LIKE '% INC %' OR OWNER LIKE '% INC.%' OR OWNER LIKE '%,INC%' OR OWNER LIKE '% CORP%' OR OWNER LIKE '%CORPORATION%' OR OWNER LIKE '% LP' OR OWNER LIKE '% LP %' OR OWNER LIKE '% L P' OR OWNER LIKE '% LLP%' OR OWNER LIKE '% LTD%' OR OWNER LIKE '%TRUST%' OR OWNER LIKE '%CHURCH%' OR OWNER LIKE '%MINISTR%' OR OWNER LIKE '% COMPANY%' OR OWNER LIKE '%PARTNERSHIP%' OR OWNER LIKE '%HOLDINGS%' OR OWNER LIKE '%PROPERTIES%' OR OWNER LIKE '%INVESTMENT%' OR OWNER LIKE '%ASSOCIATION%' OR OWNER LIKE '%FOUNDATION%' OR OWNER LIKE '%AUTHORITY%' OR OWNER LIKE 'CITY OF %' OR OWNER LIKE 'COUNTY OF %' OR OWNER LIKE 'STATE OF %' OR OWNER LIKE 'TOWN OF %' OR OWNER LIKE '% COUNTY' OR OWNER LIKE '%BOARD OF EDUCATION%' OR OWNER LIKE 'UNITED STATES%' OR OWNER LIKE 'NORTH CAROLINA %' OR OWNER LIKE '% DEVELOPMENT%')
+  paDeepLink:
+    template: https://services.wakegov.com/realestate/Account.asp?id={REID}
+    testedUrl: https://services.wakegov.com/realestate/Account.asp?id=0220202
+    httpStatus: 200 (external fetch)
+    notes: Loaded with owner/sale/assessed values via external fetcher. From the LSB box, HTTPS to *.wakegov.com resets at TLS (ssl EOF); REST works over plain http://maps.wakegov.com. Flag for LSB ingest host.
+  jurisdictionGisViewer:
+    url: https://maps.raleighnc.gov/iMAPS/
+    httpStatus: 200
+    notes: Wake/Raleigh iMAPS
+  gaps:
+  - Box HTTPS to *.wakegov.com resets at TLS; REST verified over http://maps.wakegov.com; Account.asp verified via external fetch
+  - AADT_2022 blank at 1881 of 2098 stations on the 2022 layer (NCDOT counts on a cycle) — prefer 2025 layer / latest non-blank year
+  - No multi-transfer sale history on primary layer (last sale only)

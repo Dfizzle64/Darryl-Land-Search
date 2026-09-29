@@ -1,0 +1,461 @@
+{
+  "county": "Caldwell",
+  "state": "NC",
+  "msa": "Hickory-Lenoir-Morganton MSA",
+  "fips": "37027",
+  "cntyfips": "027",
+  "slug": "caldwell",
+  "level": "county",
+  "markets": [
+    "Hickory"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "crs_notes": "County services use 102719/2264. Hickory city services also 2264 \u2014 no CRS split for fringe overlays.",
+  "viewerLinkTemplate": "https://gis.caldwellcountync.org/maps/default.htm?pid={NCPIN}",
+  "viewerLinkTemplates": [
+    "https://gis.caldwellcountync.org/maps/default.htm?pid={NCPIN}",
+    "https://gis.caldwellcountync.org/maps/default.htm",
+    "https://lrcpwa.ncptscloud.com/caldwell/parcel-detail/{NCPIN}",
+    "https://caldwellcountynctax.com/#/"
+  ],
+  "appraiserSearchUrl": "https://gis.caldwellcountync.org/itspublic/AppraisalCard.aspx?id={PID}",
+  "appraiserSearchUrlNotes": "Spaces in PID \u2192 +. Caldwell.js wires Tax Card to this template. Verified PDF for 05+26++1+16B = JOINER LONNIE R.",
+  "jurisdictionGisUrl": "https://gis.caldwellcountync.org/maps/default.htm",
+  "joinKeys": [
+    "PID",
+    "NCPIN",
+    "AcctNumber",
+    "parno",
+    "ParcelID"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PID",
+        "NCPIN",
+        "AcctNumber",
+        "parno"
+      ],
+      "bestLayer": "NCOnemap/NCOneMap/Parcels",
+      "notes": "PID for AppraisalCard; NCPIN for viewer/?pid= and OneMap parno"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "NCOnemap/NCOneMap/Parcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "TotalCalcAcres",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 8142,
+      "bestLayer": "NCOnemap/NCOneMap/Parcels"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "AcctName1+AcctName2",
+        "ownname"
+      ],
+      "bestLayer": "NCOnemap/NCOneMap/Parcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "MailAddr1",
+        "MailCity",
+        "MailState",
+        "MailZipCode",
+        "mailadd"
+      ],
+      "bestLayer": "NCOnemap/NCOneMap/Parcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "FullPropAddress",
+        "SitusCity",
+        "SitusZip",
+        "siteadd"
+      ],
+      "bestLayer": "NCOnemap/NCOneMap/Parcels",
+      "notes": "SmartGov_parcels has SitusCity/Zip join helper"
+    },
+    "lastSale": {
+      "present": false,
+      "partial": true,
+      "fields": [],
+      "bestLayer": "AppraisalCard PDF SALES DATA",
+      "caveat": "Sale price/date REST gap; OneMap saledate empty for Caldwell"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "MarketValue",
+        "AssessedValue",
+        "LandValue",
+        "BuildingValue",
+        "ObxfValue",
+        "parval"
+      ],
+      "bestLayer": "NCOnemap/NCOneMap/Parcels"
+    },
+    "zoning": {
+      "present": true,
+      "citiesFirst": true,
+      "fields": [
+        "ZONE_ID",
+        "ZoningInfo",
+        "Zoning"
+      ],
+      "bestLayer": "WarehouseServices/Zoning (per muni) + County Zoning"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "FLU",
+        "NAME"
+      ],
+      "bestLayer": "Hickory FLU REST + Comp Plan / Living Lenoir 2045 PDFs",
+      "caveat": "No county FLU FeatureServer"
+    }
+  },
+  "portals": {
+    "jurisdictionGis": "https://gis.caldwellcountync.org/maps/default.htm",
+    "arcgisRest": "https://gis.caldwellcountync.org/arcgis/rest/services",
+    "gisDept": "https://www.caldwellcountync.org/238/GIS-Mapping",
+    "appraisalCard": "https://gis.caldwellcountync.org/itspublic/AppraisalCard.aspx?id={PID}",
+    "ncptsSearch": "https://lrcpwa.ncptscloud.com/caldwell/parcel-search",
+    "ncptsDetail": "https://lrcpwa.ncptscloud.com/caldwell/parcel-detail/{NCPIN}",
+    "taxPortal": "https://caldwellcountynctax.com/#/",
+    "taxAdmin": "https://www.caldwellcountync.org/159/Tax-Administration",
+    "planning": "https://www.caldwellcountync.org/267/Planning-Department",
+    "comprehensivePlanPdf": "https://www.caldwellcountync.org/DocumentCenter/View/490/Comprehensive-Plan-PDF",
+    "zoningMapPdf": "https://www.caldwellcountync.org/DocumentCenter/View/519/Zoning-Map-PDF",
+    "livingLenoir2045": "https://www.cityoflenoir.com/233/Living-Lenoir-2045-Comprehensive-Plan",
+    "hickoryArcgis": "https://arcgis.hickorync.gov/server/rest/services",
+    "registerOfDeeds": "https://caldwellrod.org/real-estate-records",
+    "ncOneMap": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "NCOnemap NCOneMap Parcels",
+      "restUrl": "https://gis.caldwellcountync.org/arcgis/rest/services/NCOnemap/NCOneMap/FeatureServer/45",
+      "layerId": 45,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "TotalCalcAcres",
+      "coverage": "county-wide",
+      "status": "usable",
+      "primary": true,
+      "counts": {
+        "total": 52754,
+        "acres5to150": 8142,
+        "marketValueGt0": 52552,
+        "buildingValue0InRange": 4592
+      },
+      "fieldMap": {
+        "PID": "parcelId",
+        "NCPIN": "parcelId",
+        "AcctNumber": "parcelIdAccount",
+        "TotalCalcAcres": "acreage",
+        "AcctName1": "ownerName",
+        "AcctName2": "ownerName",
+        "MailAddr1": "mailingAddress",
+        "MailCity": "mailingAddress",
+        "MailState": "mailingAddress",
+        "MailZipCode": "mailingAddress",
+        "FullPropAddress": "situsAddress",
+        "MarketValue": "tax.marketValue",
+        "AssessedValue": "tax.assessedValue",
+        "LandValue": "tax.marketValue",
+        "BuildingValue": "tax.marketValue",
+        "ObxfValue": "tax.marketValue",
+        "ZoningInfo": "zoning",
+        "DeedBook": "other",
+        "DeedPage": "other"
+      },
+      "notes": "PRIMARY CAMA. Mirrors Public_Access/45 and OpenGov TaxParcels. MaxRecordCount 2000. CRS 102719/2264."
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "status": "partial",
+      "filter": "cntyfips='027'",
+      "counts": {
+        "total": 52777,
+        "acres5to150": 8136,
+        "saledateNotNull": 0
+      },
+      "fieldMap": {
+        "parno": "parcelId",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "saledatetx": "lastSale.date",
+        "parval": "tax.marketValue",
+        "landval": "tax.marketValue",
+        "improvval": "tax.marketValue",
+        "cntyfips": "other"
+      },
+      "notes": "Join parno\u2194NCPIN. No sale price; saledate empty."
+    },
+    {
+      "role": "zoning",
+      "name": "WarehouseServices Zoning (cities-first stack)",
+      "restUrl": "https://gis.caldwellcountync.org/arcgis/rest/services/WarehouseServices/Zoning/MapServer",
+      "auth": "none",
+      "coverage": "multi-jurisdiction",
+      "status": "usable",
+      "citiesFirst": true,
+      "muniLayers": [
+        {
+          "id": 8,
+          "name": "Lenoir",
+          "count": 1100
+        },
+        {
+          "id": 7,
+          "name": "Lenoir North Main overlay",
+          "count": 1
+        },
+        {
+          "id": 6,
+          "name": "Hudson",
+          "count": 2665
+        },
+        {
+          "id": 4,
+          "name": "Granite Falls",
+          "count": 344
+        },
+        {
+          "id": 3,
+          "name": "Gamewell",
+          "count": 1738
+        },
+        {
+          "id": 11,
+          "name": "Sawmills",
+          "count": 179
+        },
+        {
+          "id": 1,
+          "name": "Cajahs Mountain",
+          "count": 109
+        },
+        {
+          "id": 2,
+          "name": "Cedar Rock",
+          "count": 57
+        },
+        {
+          "id": 0,
+          "name": "Blowing Rock",
+          "count": 17
+        },
+        {
+          "id": 5,
+          "name": "Hickory (county copy)",
+          "count": 14,
+          "prefer": "arcgis.hickorync.gov Hickory_Zoning"
+        },
+        {
+          "id": 10,
+          "name": "Rutherford College",
+          "count": 1
+        },
+        {
+          "id": 9,
+          "name": "Rhodhiss",
+          "count": 663,
+          "status": "gap",
+          "notes": "MISWIRED \u2014 CITY_NAME null \u2248 COUNTY"
+        }
+      ],
+      "fieldMap": {
+        "ZONE_ID": "zoning",
+        "CITY_NAME": "other"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "County Zoning",
+      "restUrl": "https://gis.caldwellcountync.org/arcgis/rest/services/WarehouseServices/Planning/MapServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "counts": {
+        "total": 874,
+        "COUNTY": 663
+      },
+      "fieldMap": {
+        "ZONE_ID": "zoning",
+        "CITY_NAME": "other"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Hickory Zoning (city native)",
+      "restUrl": "https://arcgis.hickorync.gov/server/rest/services/Zoning_Overlays/Hickory_Zoning/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "fieldMap": {
+        "Zoning": "zoning",
+        "Description": "other",
+        "General_Zoning": "other"
+      }
+    },
+    {
+      "role": "flu",
+      "name": "Hickory Future Land Use",
+      "restUrl": "https://arcgis.hickorync.gov/server/rest/services/Zoning_Overlays/Hickory_Future_Land_Use/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "counts": {
+        "total": 142
+      },
+      "fieldMap": {
+        "FLU": "flu"
+      }
+    },
+    {
+      "role": "flu",
+      "name": "County / Lenoir FLU PDFs",
+      "restUrl": null,
+      "coverage": "county-wide",
+      "status": "gap",
+      "notes": "Comprehensive Plan PDF + Living Lenoir 2045 PDF; Yadkin Valley/Collettsville planning districts are proxies only"
+    },
+    {
+      "role": "parcels",
+      "name": "SmartGov_parcels",
+      "restUrl": "https://gis.caldwellcountync.org/arcgis/rest/services/SmartGov/SmartGovParcels/MapServer/16",
+      "layerId": 16,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "partial",
+      "counts": {
+        "total": 52754
+      },
+      "notes": "SitusCity/Zip join helper; no tax/sale"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Lenoir",
+      "role": "city-first-zoning",
+      "zoningCount": 1100,
+      "flu": "Living Lenoir 2045 PDF"
+    },
+    {
+      "name": "Hudson",
+      "role": "city-first-zoning",
+      "zoningCount": 2665
+    },
+    {
+      "name": "Granite Falls",
+      "role": "city-first-zoning",
+      "zoningCount": 344
+    },
+    {
+      "name": "Gamewell",
+      "role": "city-first-zoning",
+      "zoningCount": 1738
+    },
+    {
+      "name": "Sawmills",
+      "role": "city-first-zoning",
+      "zoningCount": 179
+    },
+    {
+      "name": "Cajahs Mountain",
+      "role": "city-first-zoning",
+      "zoningCount": 109
+    },
+    {
+      "name": "Cedar Rock",
+      "role": "city-first-zoning",
+      "zoningCount": 57
+    },
+    {
+      "name": "Blowing Rock",
+      "role": "city-first-zoning",
+      "zoningCount": 17,
+      "notes": "fringe"
+    },
+    {
+      "name": "Hickory",
+      "role": "city-first-zoning",
+      "ownGis": true,
+      "fluRest": true,
+      "notes": "prefer city native"
+    },
+    {
+      "name": "Rhodhiss",
+      "role": "gap",
+      "notes": "zoning layer miswired"
+    },
+    {
+      "name": "Rutherford College",
+      "role": "partial-zoning",
+      "zoningCount": 1
+    },
+    {
+      "name": "Unincorporated",
+      "role": "county-zoning",
+      "zoningCount": 663
+    }
+  ],
+  "gaps": [
+    "No public last-sale price/date on REST parcel layers (AppraisalCard PDF only)",
+    "Rhodhiss Zoning layer miswired",
+    "County and Lenoir FLU PDF-only; no county FLU FeatureServer",
+    "No independent city ArcGIS except Hickory",
+    "OneMap saledate empty for cntyfips='027'",
+    "Utilities/AADT/emails/phones/paid vendors excluded"
+  ],
+  "license": "Caldwell County GIS; NCGS 132-10 commercial resale limits; attribute Caldwell County GIS (+ Hickory/Lenoir where used)",
+  "tranche": 3,
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 14,
+  "geoCheck": {
+    "sampleNCPIN": "2871952916",
+    "samplePID": "05 26  1 16B",
+    "owner": "JOINER LONNIE R",
+    "centroidApprox": [
+      -81.436,
+      35.968
+    ],
+    "ok": true
+  }
+}

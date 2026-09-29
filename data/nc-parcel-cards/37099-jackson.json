@@ -1,0 +1,622 @@
+{
+  "state": "NC",
+  "jurisdiction": "Jackson County",
+  "county": "Jackson",
+  "fips": "37099",
+  "cntyfips": "099",
+  "slug": "jackson",
+  "level": "county",
+  "markets": [
+    "Asheville"
+  ],
+  "msa": "Asheville MSA",
+  "crs_preferred": {
+    "wkid": 102100,
+    "latestWkid": 3857,
+    "name": "WGS 1984 Web Mercator Auxiliary Sphere"
+  },
+  "crs_notes": "County Tax_Admin/Parcels & Zoning publish in 102100/3857. Reproject to 2264/102719 for NC StatePlane joins with OneMap.",
+  "jurisdictionGisUrl": "https://gis.jacksonnc.org/rpv/",
+  "gisDeepLinkTemplates": [
+    "https://gis.jacksonnc.org/rpv/",
+    "https://experience.arcgis.com/experience/dbad85f79dc0429d852bdd63c31aa2b9"
+  ],
+  "countyRestRoot": "https://gis.jacksonnc.org/jcgis/rest/services",
+  "openDataUrl": "https://data-jacksonnc.opendata.arcgis.com/",
+  "gisDepartmentUrl": "https://www.jacksonnc.org/336/Land-Records",
+  "taxAdminUrl": "https://www.jacksonnc.org/174/Tax-Administration",
+  "planningUrl": "https://www.jacksonnc.org/179/Planning",
+  "ordinancesMapsUrl": "https://www.jacksonnc.org/391/Ordinances-and-Maps",
+  "appraiserSearchUrl": "https://gis.jacksonnc.org/PRC/PRC/{No_Dash}.pdf",
+  "appraiserSearchUrlNotes": "No_Dash = PIN with hyphens stripped (7572-43-7478 \u2192 7572437478). Field Prc_Url on parcels already holds full URL. Verified PDF 200 for 7572437478 = STUDDARD, BOBBY J TRUSTEE; SalePrice 350000; TaxableValue 587388.",
+  "paDeepLinkKey": "No_Dash",
+  "parcelIdPreferred": "PIN",
+  "joinKeys": [
+    "PIN",
+    "No_Dash",
+    "CurrOwnerAcct",
+    "parno"
+  ],
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/jackson/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/jackson/parcel-detail/{PIN}",
+  "btTaxpayerPortalUrl": "https://bttaxpayerportal.com/taxpayerportalja/",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='099'",
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "No_Dash",
+        "CurrOwnerAcct",
+        "parno"
+      ],
+      "bestLayer": "Tax_Admin/Parcels/0",
+      "notes": "PIN for NCPTS/OneMap; No_Dash for PRC PDF"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Tax_Admin/Parcels/0"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "AssessedAcres",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 6754,
+      "bestLayer": "Tax_Admin/Parcels/0",
+      "notes": "AssessedAcres is string \u2014 CAST AS FLOAT"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "CurrentOwner1",
+        "CurrentOwner2",
+        "ownname"
+      ],
+      "bestLayer": "Tax_Admin/Parcels/0"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "MailingAddress1",
+        "MailingAddress2",
+        "MailingCityState",
+        "MailingZip",
+        "mailadd"
+      ],
+      "bestLayer": "Tax_Admin/Parcels/0"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "PropAddr",
+        "siteadd"
+      ],
+      "bestLayer": "Tax_Admin/Parcels/0"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SaleDate",
+        "SalePrice",
+        "VldSale"
+      ],
+      "bestLayer": "Tax_Admin/Parcels/0",
+      "notes": "SalePrice>0 \u2192 22006; Appraisal VldSale LIKE 'Q%' \u2192 9387; OneMap has saledate but weak/no price"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "TotLandValue",
+        "TotBldgValue",
+        "TaxableValue",
+        "MktValue"
+      ],
+      "bestLayer": "Tax_Admin/Parcels/0",
+      "notes": "Prefer Appraisal MktValue for market; Parcels TaxableValue/land/bldg always present"
+    },
+    "zoning": {
+      "present": true,
+      "coverage": "cities-first-plus-county-districts",
+      "fields": [
+        "Name",
+        "ZoningArea",
+        "Jurisdiction"
+      ],
+      "bestLayer": "Planning/* + Energov/6",
+      "notes": "Route Sylva/Dillsboro/Forest Hills/Webster first; then Cullowhee/Cashiers/US-441; else unzoned"
+    },
+    "flu": {
+      "present": false,
+      "coverage": "pdf-only",
+      "notes": "Cashiers/Cullowhee/US-441 Small Area Plan PDFs; no FLU FeatureServer"
+    }
+  },
+  "municipalities": [
+    {
+      "name": "Sylva",
+      "role": "city-first-zoning",
+      "zoningLayer": "Planning/Sylva_Zoning/FeatureServer/3",
+      "zoningCount": 11,
+      "fluRest": false,
+      "notes": "County seat"
+    },
+    {
+      "name": "Dillsboro",
+      "role": "city-first-zoning",
+      "zoningLayer": "Planning/Dillsboro_Zoning/FeatureServer/0",
+      "zoningCount": 9,
+      "fluRest": false
+    },
+    {
+      "name": "Forest Hills",
+      "role": "city-first-zoning",
+      "zoningLayer": "Planning/Forest_Hills_Zoning_Districts/FeatureServer/0",
+      "zoningCount": 8,
+      "fluRest": false,
+      "notes": "ETJ present"
+    },
+    {
+      "name": "Webster",
+      "role": "city-first-zoning",
+      "zoningLayer": "Planning/Webster_Zoning_Districts/FeatureServer/0",
+      "zoningCount": 3,
+      "fluRest": false,
+      "notes": "Energov Jurisdiction count 4 incl ETJ"
+    },
+    {
+      "name": "Cullowhee",
+      "role": "county-community-planning-area",
+      "zoningLayer": "Planning/Cullowhee_Zoning_District_Cached/FeatureServer/0",
+      "zoningCount": 8,
+      "fluRest": false,
+      "fluPdf": true,
+      "notes": "Unincorporated CPA (WCU)"
+    },
+    {
+      "name": "Cashiers",
+      "role": "county-commercial-district",
+      "zoningLayer": "Planning/Cashiers_Commercial_District/FeatureServer/0",
+      "zoningCount": 2,
+      "fluRest": false,
+      "fluPdf": true,
+      "notes": "Unincorporated commercial core"
+    },
+    {
+      "name": "US-441 Corridor",
+      "role": "county-corridor-zoning",
+      "zoningLayer": "Planning/US_441_Corridor/FeatureServer/0",
+      "zoningCount": 11,
+      "fluRest": false,
+      "fluPdf": true
+    },
+    {
+      "name": "Highlands",
+      "role": "gap",
+      "notes": "Cities_Poly tip only; zoning hosted by Macon County"
+    },
+    {
+      "name": "Unincorporated (other)",
+      "role": "gap",
+      "notes": "Largely unzoned on public REST outside Cullowhee/Cashiers/441/Scotts Creek WQPD"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Tax_Admin Parcels (CAMA + polygons)",
+      "restUrl": "https://gis.jacksonnc.org/jcgis/rest/services/Tax_Admin/Parcels/FeatureServer/0",
+      "alternateUrls": [
+        "https://gis.jacksonnc.org/jcgis/rest/services/Tax_Admin/Parcels/MapServer/0",
+        "https://gis.jacksonnc.org/jcgis/rest/services/OperationalLayers/MapServer/46"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "AssessedAcres",
+      "coverage": "county-wide",
+      "count": 41438,
+      "acres5to150": 6754,
+      "salePricePositive": 22006,
+      "taxableValuePositive": 39731,
+      "status": "usable",
+      "primary": true,
+      "fieldMap": {
+        "PIN": "parcelId",
+        "No_Dash": "parcelIdNoDash",
+        "CurrOwnerAcct": "parcelIdAccount",
+        "AssessedAcres": "acreage",
+        "CurrentOwner1": "ownerName",
+        "CurrentOwner2": "ownerName",
+        "MailingAddress1": "mailingAddress",
+        "MailingAddress2": "mailingAddress",
+        "MailingCityState": "mailingAddress",
+        "MailingZip": "mailingAddress",
+        "PropAddr": "situsAddress",
+        "PropDesc": "legalDescription",
+        "SaleDate": "lastSale.date",
+        "SalePrice": "lastSale.price",
+        "TotLandValue": "tax.marketValue",
+        "TotBldgValue": "tax.marketValue",
+        "TaxableValue": "tax.taxableValue",
+        "Prc_Url": "appraiserSearchUrl",
+        "Township": "other",
+        "TownCode": "other",
+        "NbrhdName": "other",
+        "FireDist": "other",
+        "TransferringRef": "other",
+        "PlatRef": "other"
+      },
+      "notes": "PRIMARY. MaxRecordCount 60000. CRS 102100/3857. Sample PIN 7572-43-7478 STUDDARD centroid \u2248 -83.10,35.12."
+    },
+    {
+      "role": "tax",
+      "name": "Tax_Admin Appraisal View",
+      "restUrl": "https://gis.jacksonnc.org/jcgis/rest/services/Tax_Admin/Appraisal/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 41438,
+      "mktValuePositive": 40747,
+      "vldSaleQualified": 9387,
+      "status": "usable",
+      "fieldMap": {
+        "PIN": "parcelId",
+        "CurrentOwner1": "ownerName",
+        "AssessedAcres": "acreage",
+        "MktValue": "tax.marketValue",
+        "TaxableValue": "tax.taxableValue",
+        "TotLandValue": "tax.marketValue",
+        "TotBldgValue": "tax.marketValue",
+        "TotDefValue": "tax.taxableValue",
+        "SaleDate": "lastSale.date",
+        "SalePrice": "lastSale.price",
+        "VldSale": "lastSale.qualified",
+        "PropAddr": "situsAddress"
+      },
+      "notes": "Best for MktValue + VldSale; Parcels preferred for Prc_Url + bulk geometry"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "count": 41375,
+      "acres5to150": 6743,
+      "filter": "cntyfips='099'",
+      "status": "usable",
+      "fieldMap": {
+        "parno": "parcelId",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "saledate": "lastSale.date",
+        "parval": "tax.marketValue",
+        "landval": "tax.marketValue",
+        "improvval": "tax.marketValue"
+      },
+      "notes": "Fallback; no sale price; prefer county AssessedAcres/SalePrice"
+    },
+    {
+      "role": "zoning",
+      "name": "Sylva Zoning (cities-first)",
+      "restUrl": "https://gis.jacksonnc.org/jcgis/rest/services/Planning/Sylva_Zoning/FeatureServer/3",
+      "layerId": 3,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 11,
+      "status": "usable",
+      "fieldMap": {
+        "Name": "zoning"
+      },
+      "notes": "Also Overlay Districts /1 (19), Municipal Limits /0"
+    },
+    {
+      "role": "zoning",
+      "name": "Dillsboro Zoning",
+      "restUrl": "https://gis.jacksonnc.org/jcgis/rest/services/Planning/Dillsboro_Zoning/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 9,
+      "status": "usable",
+      "fieldMap": {
+        "Name": "zoning",
+        "Jurisdiction": "other"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Forest Hills Zoning Districts",
+      "restUrl": "https://gis.jacksonnc.org/jcgis/rest/services/Planning/Forest_Hills_Zoning_Districts/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 8,
+      "status": "usable",
+      "fieldMap": {
+        "Name": "zoning",
+        "Jurisdiction": "other"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Webster Zoning Districts",
+      "restUrl": "https://gis.jacksonnc.org/jcgis/rest/services/Planning/Webster_Zoning_Districts/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 3,
+      "status": "usable",
+      "fieldMap": {
+        "Name": "zoning",
+        "Jurisdiction": "other"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Cullowhee Community Planning Area Zoning",
+      "restUrl": "https://gis.jacksonnc.org/jcgis/rest/services/Planning/Cullowhee_Zoning_District_Cached/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "community-planning-area",
+      "count": 8,
+      "status": "usable",
+      "fieldMap": {
+        "Name": "zoning",
+        "ZoningArea": "other",
+        "Jurisdiction": "other"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Cashiers Commercial District",
+      "restUrl": "https://gis.jacksonnc.org/jcgis/rest/services/Planning/Cashiers_Commercial_District/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "community-planning-area",
+      "count": 2,
+      "status": "usable",
+      "fieldMap": {
+        "Name": "zoning",
+        "ZoningArea": "other",
+        "Jurisdiction": "other"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "US-441 Corridor Zoning",
+      "restUrl": "https://gis.jacksonnc.org/jcgis/rest/services/Planning/US_441_Corridor/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "corridor",
+      "count": 11,
+      "status": "usable",
+      "fieldMap": {
+        "Name": "zoning",
+        "ZoningArea": "other",
+        "Jurisdiction": "other"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Energov / OperationalLayers Zoning (combined)",
+      "restUrl": "https://gis.jacksonnc.org/jcgis/rest/services/Energov/MapServer/6",
+      "alternateUrls": [
+        "https://gis.jacksonnc.org/jcgis/rest/services/OperationalLayers/MapServer/2"
+      ],
+      "layerId": 6,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-districts-plus-municipal",
+      "count": 55,
+      "status": "usable",
+      "fieldMap": {
+        "Name": "zoning",
+        "ZoningArea": "other",
+        "Jurisdiction": "other"
+      },
+      "notes": "Jurisdiction counts: County 22, Sylva 11, Dillsboro 9, Forest Hills 8, Webster 4, DOT 1. Includes Scotts Creek WQPD."
+    },
+    {
+      "role": "boundaries",
+      "name": "Cities_Poly / Municipalities",
+      "restUrl": "https://gis.jacksonnc.org/jcgis/rest/services/GIS/Cities_Poly/FeatureServer/0",
+      "alternateUrls": [
+        "https://gis.jacksonnc.org/jcgis/rest/services/OperationalLayers/MapServer/8"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "municipal",
+      "count": 9,
+      "status": "usable",
+      "notes": "CITY_NAME: SYLVA, DILLSBORO, FOREST HILLS, WEBSTER, HIGHLANDS (tip)"
+    },
+    {
+      "role": "boundaries",
+      "name": "ETJ_Cropped",
+      "restUrl": "https://gis.jacksonnc.org/jcgis/rest/services/Planning/ETJ_Cropped/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "municipal-etj",
+      "count": 3,
+      "status": "usable",
+      "notes": "Forest Hills, Sylva, Webster"
+    },
+    {
+      "role": "flu",
+      "name": "Small Area Plan / zoning map PDFs (no FeatureServer)",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "pdf-only",
+      "status": "partial",
+      "pdfUrls": [
+        "https://www.jacksonnc.org/DocumentCenter/View/628/Cashiers-Small-Area-Plan-Adopted-March-19-2019-PDF",
+        "https://www.jacksonnc.org/DocumentCenter/View/540/Cashiers-Area-Zoning-Map-PDF",
+        "https://www.jacksonnc.org/DocumentCenter/View/635/Cullowhee-Small-Area-Plan-PDF",
+        "https://www.jacksonnc.org/DocumentCenter/View/548/Cullowhee-Community-Planning-Area-Zoning-Map-PDF",
+        "https://www.jacksonnc.org/DocumentCenter/View/1346/US-441-Small-Area-Plan-Adopted-04-21-2008-PDF",
+        "https://www.jacksonnc.org/DocumentCenter/View/711/US-441-Gateway-Corridor-Zoning-Map-PDF",
+        "https://www.jacksonnc.org/DocumentCenter/View/1556/Jackson-County-Headwaters-District-Conservation-Plan-2025"
+      ],
+      "notes": "No public FLU FeatureServer"
+    }
+  ],
+  "gaps": [
+    "No countywide FLU FeatureServer \u2014 Cashiers/Cullowhee/US-441 Small Area Plan + zoning-map PDFs only",
+    "Unincorporated zoning REST gap outside Cullowhee CPA, Cashiers CD, US-441 corridor, Scotts Creek WQPD",
+    "Highlands tip in Cities_Poly but zoning not on Jackson REST (Macon County)",
+    "AssessedAcres is string \u2014 CAST required for numeric filters",
+    "OneMap saledate/price weak \u2014 prefer county SaleDate/SalePrice",
+    "Spatialest nc/jackson 404",
+    "Utilities / AADT / emails / phones / paid vendors intentionally excluded"
+  ],
+  "license": "Jackson County GIS / Land Records / Tax / Planning. Compiled from recorded deeds/plats/public records; not survey quality; County disclaims warranties. Commercial resale subject to NCGS 132-10. Attribute Jackson County GIS (and Sylva / Dillsboro / Forest Hills / Webster where municipal districts used).",
+  "tranche": 3,
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 14,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://gis.jacksonnc.org/jcgis/rest/services/Tax_Admin/Parcels/FeatureServer/0",
+    "parcelIdField": "PIN",
+    "acreageFilter": "CAST(AssessedAcres AS FLOAT) >= 5 AND CAST(AssessedAcres AS FLOAT) <= 150",
+    "acres5to150Live": 6754,
+    "parcelCountLive": 41439,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='JACKSON'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27JACKSON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27JACKSON%27&returnCountOnly=true&f=json",
+        "liveStationCount": 269,
+        "stationsWithAADT2022": 157
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Jackson'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Jackson%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Jackson%27&returnCountOnly=true&f=json",
+        "liveStationCount": 269,
+        "stationsWithAADT2025": 181,
+        "stationsWithAADT2024": 160,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TaxableValue",
+        "TotLandValue"
+      ],
+      "allTaxFieldsOnLayer": [
+        "TotLandValue",
+        "TotBldgValue",
+        "TaxableValue"
+      ],
+      "liveNonZero": {
+        "TaxableValue": 39730,
+        "TotLandValue": 40676
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SalePrice"
+      ],
+      "dateFields": [
+        "SaleDate"
+      ],
+      "livePriceNonZero": {
+        "SalePrice": 22013
+      },
+      "liveDateNonNull": {
+        "SaleDate": 41126
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "CurrentOwner1",
+        "CurrentOwner2"
+      ],
+      "primaryOwnerField": "CurrentOwner1",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(CurrentOwner1) LIKE '% LLC%' OR UPPER(CurrentOwner1) LIKE '% INC%' OR UPPER(CurrentOwner1) LIKE '% LP%' OR UPPER(CurrentOwner1) LIKE '% LLP%' OR UPPER(CurrentOwner1) LIKE '% LTD%' OR UPPER(CurrentOwner1) LIKE '% TRUST%' OR UPPER(CurrentOwner1) LIKE '% CHURCH%' OR UPPER(CurrentOwner1) LIKE '% COMPANY%' OR UPPER(CurrentOwner1) LIKE '% PARTNERSHIP%' OR UPPER(CurrentOwner1) LIKE '% HOLDINGS%' OR UPPER(CurrentOwner1) LIKE '% PROPERTIES%' OR UPPER(CurrentOwner1) LIKE '% CORP%' OR UPPER(CurrentOwner1) LIKE '%,LLC%' OR UPPER(CurrentOwner1) LIKE '%,INC%' OR UPPER(CurrentOwner1) LIKE 'CITY OF %' OR UPPER(CurrentOwner1) LIKE 'COUNTY OF %' OR UPPER(CurrentOwner1) LIKE 'STATE OF %' OR UPPER(CurrentOwner1) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 11590,
+      "liveEntityCount5to150ac": 1879,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://gis.jacksonnc.org/PRC/PRC/{No_Dash}.pdf",
+      "testedParcelId": "7650426623",
+      "testedUrl": "https://gis.jacksonnc.org/PRC/PRC/7650426623.pdf",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://gis.jacksonnc.org/rpv/",
+      "httpStatus": 200,
+      "pageTitle": "ArcGIS Web Application"
+    },
+    "acreageNote": "The acreage field is a string, so filters need CAST(... AS FLOAT).",
+    "gaps": []
+  }
+}

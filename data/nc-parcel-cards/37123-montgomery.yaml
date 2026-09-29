@@ -1,0 +1,249 @@
+state: NC
+jurisdiction: Montgomery County
+fips: "37123"
+level: county
+markets: [Charlotte]
+slug: montgomery
+cntyfips: "123"
+
+municipalities:
+  - name: Troy
+    role: city-first-zoning
+    taxDistDes: TROY
+    parcelCountApprox: 1689
+    zoningLayer: NC/Montgomery/MapServer/17
+    zoningField: New_Zoning
+    zoningCount: 769
+    notes: County seat; prefer Troy Zoning/17 New_Zoning; townoftroy.org
+  - name: Biscoe
+    role: city-first-zoning
+    taxDistDes: BISCOE
+    parcelCountApprox: 988
+    zoningLayer: NC/Montgomery/MapServer/16
+    zoningField: Type
+    zoningCount: 458
+    notes: Prefer Biscoe Zoning/16 Type; townofbiscoe.com
+  - name: Mount Gilead
+    role: gap
+    taxDistDes: MT GILEAD
+    parcelCountApprox: 1075
+    notes: Zoning REST gap — PTRC Zoning=City stub; Comp Plan PDF FLU; mtgileadnc.com
+  - name: Star
+    role: gap
+    taxDistDes: STAR
+    parcelCountApprox: 600
+    notes: Zoning REST gap; star-nc.com
+  - name: Candor
+    role: gap
+    taxDistDes: CANDOR
+    parcelCountApprox: 584
+    notes: Zoning REST gap; townofcandornc.com
+  - name: Unincorporated Montgomery
+    role: partial
+    taxDistDes: COUNTY ONLY
+    zoningLayer: NC/Montgomery/MapServer/18
+    count: 274
+    notes: County Zoning/18 + PTRC Existing ETJs parcel Zoning; fire dists Lake Tillery/Badin Lake/Wadeville also unincorp
+
+layers:
+  - role: parcels
+    name: NC/Montgomery Parcels (CAMA + polygons)
+    restUrl: https://www.webgis.net/arcgis/rest/services/NC/Montgomery/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Deed_Acre
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PinNoDash: parcelId
+      OwnerID1: parcelIdAccount
+      Deed_Acre: acreage
+      ACRES: acreage
+      Name_1: ownerName
+      Name_2: ownerName
+      Name_3: ownerName
+      Addr_1: mailingAddress
+      Addr_2: mailingAddress
+      City: mailingAddress
+      State: mailingAddress
+      Zip: mailingAddress
+      PhyAddress: situsAddress
+      HouseNum: situsAddress
+      StrName: situsAddress
+      StrType: situsAddress
+      TransDate: lastSale.date
+      SalesAmt: lastSale.price
+      SalesInstr: lastSale.qualified
+      QufiCode: lastSale.qualified
+      LandASVCur: tax.assessedValue
+      ImpMajASVC: tax.assessedValue
+      ImpMisASVC: tax.assessedValue
+      TotASVCur: tax.assessedValue
+      TaxDistDes: other
+      TownshipDs: other
+      DeedBook: other
+      DeedPage: other
+    notes: >
+      PRIMARY verified 2026-09-24: count 30316; Deed_Acre 5–150 → 6024;
+      Shape_Area band → 6085; SalesAmt>0 → 16339; SalesAmt>0 & Deed 5–150 → 2531;
+      TotASVCur>0 → 30125. CRS 3632. MaxRecordCount 1000 — paginate.
+      Geo-check PIN 6570 00 99 7814 ~-80.07, 35.15.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress
+      siteadd: situsAddress
+      gisacres: acreage
+      saledatetx: lastSale.date
+      parval: tax.marketValue
+      landval: tax.marketValue
+      improvval: tax.marketValue
+      cntyfips: other
+    notes: >
+      Filter cntyfips='123'. Count 30283; gisacres 5–150 → 6091; parval>0 → 30090;
+      saledate epoch empty (0); saledatetx populated. No sale price. Join parno↔PIN.
+    status: usable
+
+  - role: other
+    name: Address Points
+    restUrl: https://www.webgis.net/arcgis/rest/services/NC/Montgomery/MapServer/0
+    alternateUrls:
+      - https://services9.arcgis.com/omIyQysyaJipPNFR/arcgis/rest/services/Address_Points/FeatureServer
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FULL_ADRS: situsAddress
+      CITY: situsCity
+      ZIP: situsZip
+    notes: Count 20726. No PIN — spatial join. Prefer PhyAddress on parcels.
+    status: usable
+
+  - role: zoning
+    name: Troy Zoning
+    restUrl: https://www.webgis.net/arcgis/rest/services/NC/Montgomery/MapServer/17
+    layerId: 17
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      New_Zoning: zoning
+    notes: >
+      PRIMARY Troy city-first verified 2026-09-24: count 769.
+      Codes SFR-3/SFR-2/CIV/AG/SFR-1/C-24/27/IND/RMST/VSR/MU-2/MS/MU-1/C-134.
+      Route TaxDistDes=TROY / Troy Towns polygon.
+    status: usable
+
+  - role: zoning
+    name: Biscoe Zoning
+    restUrl: https://www.webgis.net/arcgis/rest/services/NC/Montgomery/MapServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Type: zoning
+    notes: >
+      PRIMARY Biscoe city-first: count 458. Codes RMST/AG/CIV/C-24/27/IND/SFR-*/C-220/MU-* + overlays.
+      Route TaxDistDes=BISCOE.
+    status: usable
+
+  - role: zoning
+    name: County Zoning (district polygons)
+    restUrl: https://www.webgis.net/arcgis/rest/services/NC/Montgomery/MapServer/18
+    layerId: 18
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: partial
+    fieldMap:
+      NAME: zoning
+      CITY: other
+    notes: >
+      Count 274. Commercial/Industrial/Residential 1–3/MHP/City/Campground/RV Park.
+      Unincorporated spatial join.
+    status: usable
+
+  - role: zoning
+    name: PTRC Parcel Based Zoning_Existing ETJs
+    restUrl: https://maps.ptrc.org/arcgis/rest/services/MontgomeryCounty/Zoning/MapServer/5
+    alternateUrls:
+      - https://maps.ptrc.org/arcgis/rest/services/MontgomeryCounty/Zoning/MapServer/1
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: Deed_Acre
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Zoning: zoning
+      PrevZoning: zoning
+      TaxDistDes: other
+      Deed_Acre: acreage
+    notes: >
+      Count 30829. Zoning City(8153)/R-1/R-3/R-2/Campground/RV/I/C/MHP.
+      Prefer Troy/Biscoe native layers where Zoning=City and TaxDistDes matches.
+    status: usable
+
+  - role: other
+    name: Towns (municipal boundaries)
+    restUrl: https://www.webgis.net/arcgis/rest/services/NC/Montgomery/MapServer/19
+    layerId: 19
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CITY: other
+    notes: Count 5 — STAR, TROY, CANDOR, MT GILEAD, BISCOE.
+    status: usable
+
+  - role: flu
+    name: Montgomery County Comp Land Use Plan (PDF)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      FLU PDF only — county 2010 LUP (nmcdn) + Mt Gilead Comp Plan Aug 2021.
+      No public FLU FeatureServer (county or towns).
+    status: gap
+
+gaps:
+  - Mt Gilead / Candor / Star zoning REST gap (TaxDistDes + PTRC City stub only)
+  - FLU PDF-only — no FeatureServer
+  - Tax REST is ASV (*ASVCur) — no separate FMV columns
+  - CRS 3632 vs common 102719/2264 — project carefully
+  - Address points lack PIN
+  - PTRC MontgomeryCounty_NFocus / MontgomeryCounty MapServers empty layer lists (2026-09-24)
+  - AGOL parcels shapefile download only — not live CAMA FS
+  - MapServer MaxRecordCount 1000 — paginate
+  - Utilities / AADT / emails / phones / paid vendors excluded by design
+
+license: "Montgomery County GIS / Tax Department (HandP WebGIS); PTRC zoning services; NC OneMap; NCGS 132-10 commercial resale limits; attribute Montgomery County GIS"
+appraiserSearchUrl: "https://www.webgis.net/nc/montgomery/PropertyCard.php?pid={PinNoDash}&card=0"
+appraiserSearchUrlNotes: "HandP siteCustom.js strips spaces from atts.PIN then PropertyCard.php?pid= + &card=-1/0. Use PinNoDash. Verified card HTML for 657000997814. NCPTS alt parcel-detail/{PinNoDash}."
+jurisdictionGisUrl: "https://www.webgis.net/nc/montgomery/"
+viewerLinkTemplate: "https://www.webgis.net/nc/montgomery/"
+verifiedAt: "2026-09-24"
+verifiedBy: "North Carolina Public Info Researcher"

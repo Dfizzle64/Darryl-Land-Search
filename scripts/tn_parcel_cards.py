@@ -267,11 +267,21 @@ def resolve_card(card: dict, overlay: dict | None = None) -> dict[str, Any]:
         row["joins"] = dict(overlay["joins"])
     if tncpm_layer is not None:
         fields = canonical_fields(sales)
+        missing_value = {
+            str(name)
+            for name in (((card.get("pass2") or {}).get("b_value") or {}).get("missingMappedFields") or [])
+        }
+        value_field = fields.get("tax.marketValue") or ""
+        if value_field and value_field in missing_value:
+            # Pass 2 recorded that this appraisal column is not on the layer.
+            # Land market value is a different field and is not used in its place.
+            value_field = ""
+            row["missingMarketValueField"] = value_field or fields.get("tax.marketValue")
         row["tncpmFields"] = {
             "gis": fields.get("parcelId") or "",
             "price": fields.get("lastSale.price") or "",
             "date": fields.get("lastSale.date") or "",
-            "value": fields.get("tax.marketValue") or "",
+            "value": value_field,
         }
         return row
     if mode in {"hickman", "chester"}:

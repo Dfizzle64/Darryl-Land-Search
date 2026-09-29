@@ -495,6 +495,17 @@ def oir_gaps(row: dict) -> list[str]:
         notes[1] = (
             "Sevier sale date, sale price, appraisal, assessed value, and mailing are joined from the Sevierville countywide CAMA (GIS_Department_Layers MapServer/57) on GISLINK. That CAMA is labeled 2025. The 2023 TN_County_Parcel_Map layer is not the sale source. Owner and geometry stay on the 2026 OIR layer. An unmatched GISLINK is left without sale or value."
         )
+    sales_url = ((row.get("salesJoin") or {}).get("url")) or ""
+    if row.get("tncpmLayer") is None and sales_url and "tn_county_parcel_map" not in sales_url.lower():
+        notes[1] = (
+            f"Sale date, sale price, and appraisal are joined from the card sales-value layer ({sales_url}) on GISLINK and labeled {vintage} when a value is present. "
+            "A GISLINK with no match is left without sale or value. The 2023 TN_County_Parcel_Map sibling is not the sale source. Owner phone and email are not ingested."
+        )
+    if row.get("missingMarketValueField"):
+        notes.append(
+            f"Pass 2 records {row['missingMarketValueField']} as missing on the sale/value layer. "
+            "Market value stays empty. Land market value is not copied in its place. Sale date and sale price are still joined."
+        )
     return notes
 
 
@@ -1014,6 +1025,14 @@ def finalize_features(features: list[dict]) -> list[dict]:
         props = feature["properties"]
         if props.get("opportunityZone") not in (None,):
             raise RuntimeError("Opportunity Zone status must stay unset")
+        for key in list(props):
+            if "phone" in key.lower() or "email" in key.lower():
+                raise RuntimeError(f"Refusing to keep owner contact field {key}")
+        mail = props.get("mailingAddress") or {}
+        if isinstance(mail, dict):
+            for key in mail:
+                if "phone" in key.lower() or "email" in key.lower():
+                    raise RuntimeError(f"Refusing to keep mailing contact field {key}")
         acres = props.get("acreage")
         if not in_band(acres):
             raise RuntimeError(f"Parcel {props.get('parcelId')} is outside 5–150 acres ({acres})")

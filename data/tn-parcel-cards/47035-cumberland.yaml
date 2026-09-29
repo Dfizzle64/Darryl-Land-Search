@@ -1,0 +1,328 @@
+state: TN
+jurisdiction: Cumberland County
+fips: '47035'
+level: county
+markets: []
+layers:
+- role: parcels
+  name: TN OIR Tennessee Property Boundaries Public Use (COUNTY_ID=18)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreageDeed
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+    SUBDIV: subdivision
+    LOT: lot
+    LINK_TPAD: appraiserSearchUrlPerParcel
+    LINK_TPV: tnPropertyViewerUrl
+    COUNTY_NAME: countyName
+  notes: '2026-09-28 ET TN PIR: count 65,771; DEEDAC 5–150 → 6208; id GISLINK populated=True; geo PASS
+    (5/5 centroids in county, 5/5 polys touch county) (36.1494,-85.05497)→Cumberland; (36.01756,-84.96116)→Cumberland;
+    (35.9288,-85.24643)→Cumberland (where COUNTY_ID=18). Service lastEditDate 2026-09-10 (PARCELID suffix
+    2026) — freshest public owner/geometry; no sale/value/CALC_ACRE (DEEDAC often 0 — derive geodesic
+    acres from polygon for the 5–150 filter).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 8543
+- role: parcels
+  name: TN County Parcel Map — Cumberland_Parcels (Assessment_Data_18 join)
+  restUrl: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/67
+  layerId: 67
+  acreageField: Parcels_CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    Parcels_GISLINK: parcelId
+    Assessment_Data_18_GISLINK: parcelIdAlt
+    Assessment_Data_18_ID: parcelIdDisplay
+    Assessment_Data_18_PARCELID: parcelIdFull
+    Parcels_CALC_ACRE: acreage
+    Assessment_Data_18_DEEDAC: acreageDeed
+    Assessment_Data_18_OWNER: ownerName
+    Assessment_Data_18_OWNER2: ownerName2
+    Assessment_Data_18_ADDRESS: situsAddress
+    Assessment_Data_18_SALEDATE: lastSale.date
+    Assessment_Data_18_PRICE: lastSale.price
+    Assessment_Data_18_VI: lastSale.qualified
+    Assessment_Data_18_DEED_BOOK: lastSale.deedBook
+    Assessment_Data_18_DEED_PAGE: lastSale.deedPage
+    Assessment_Data_18_LANDMKTVAL: tax.landValue
+    Assessment_Data_18_APPRAISAL: tax.marketValue
+    Assessment_Data_18_LANDUSE: dorCode
+    Assessment_Data_18_CLASS: propType
+    County_Name: countyName
+  notes: 'Preferred over bare IMPACT. Live count 65,424; CALC_ACRE 5–150 → 8,241; DEEDAC 5–150 → 5,978
+    (2026-09-24 ET). Geo-verify PASS: sample centroids (−85.05940, 36.14858) / (−85.06127, 36.14938) WGS84
+    in Cumberland (Crossville fringe); GISLINK prefix 018; Assessment_Data_18. SALEDATE epoch-ms. Skip
+    WATER/SEWER/ELEC/GAS. Rejected NC Cumberland / cumberlandgis.maps.arcgis.com twins. OZ 2.0: national
+    tract join. 2026-09-28 ET TN PIR re-verify: count 65,424; Parcels_CALC_ACRE 5–150 → 8241; id Parcels_GISLINK
+    populated=True; geo PASS (5/5 centroids in county, 5/5 polys touch county) (36.14907,-85.05947)→Cumberland;
+    (35.98542,-84.87441)→Cumberland; (35.82934,-85.12737)→Cumberland.'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: sales-value-join
+  joinKey:
+    primary: GISLINK
+    thisLayer: Parcels_GISLINK
+  salesValueVintage: 2023
+  sourceEditDate: '2023-11-22'
+- role: parcels
+  name: IMPACT Parcels sibling (COUNTY_ID=18)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+  notes: 'Filter COUNTY_ID=18 AND PARCEL_TYPE=1. Egress-sensitive (403 common). 2026-09-28 ET TN PIR:
+    maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes sibling (JUR=018)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    CALC_ACRE: acreage
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    LANDUSE: dorCode
+    ZONING: zoning
+    TAXYR: taxYear
+  notes: 'Filter JUR=''018''; prefer latest TAXYR. Prefer AGOL when Themes 403. 2026-09-28 ET TN PIR:
+    maps.cot.tn.gov HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: other
+  name: TDOT Traffic Lines (AADT statewide)
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: state-wide (filter county)
+  fieldMap:
+    AADT: aadt
+    AADTYEAR: aadtYear
+    COUNTY_NUMBER: countyNumberTdot
+    ROUTE_ID: routeId
+    FUNCTIONAL_CLASS: functionalClass
+  notes: >-
+    Added 2026-09-28 ET TN PIR Pass 2. Filter COUNTY_NUMBER='18' AND AADTYEAR='2025' → 2,944 segments
+    (all years 3,183). COUNTY_NUMBER = TDOT alphabetical county no. (NOT FIPS).
+  status: usable
+  auth: none
+  geometry: polyline
+  use: aadt-screening
+gaps:
+- No public countywide zoning FeatureServer found (Crossville city zoning REST not found)
+- No adopted FLU FeatureServer found
+- IMPACT Themes often 403 from datacenter egress
+- No IMPVAL/mailing on AGOL join
+- Do NOT use cumberlandgis.maps.arcgis.com (Cumberland NC)
+- TN_County_Parcel_Map (HNTB AGOL) data vintage 2023-11-22 — CAMA owner/sale/value may lag live TPAD (noted
+  2026-09-28).
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: Comptroller IMPACT-TPAD / AGOL TN County Parcel Map republish; attribution required. No paid
+  GIS purchase channel. Not Cumberland NC/PA/NJ.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+publicGisUrl: https://tnmap.tn.gov/Assessment/
+jurisdictionGisUrl: https://ucdd.maps.arcgis.com/apps/instant/minimalist/index.html?appid=beb9eb85eb334ea68d2d035fedba5dbf
+zoningOverall: gap
+packagingNote: 'Digged 2026-09-24 ET full-suite TRANCHE-3 wave3a2; prefer AGOL joined parcels over bare
+  IMPACT; geo-verify PASS; rejected NC Cumberland GIS; skip utilities/AADT. RURAL-OZ PASS 1 re-verify
+  2026-09-28 ET (TN PIR): parcels usable; added OIR. LSB-approved parcel setup applied 2026-09-28 (see
+  parcelSetup).'
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=18
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/67
+  joinKey: OIR.GISLINK = Parcels_GISLINK
+  salesValueVintage: 2023
+  salesValueSourceEditDate: '2023-11-22'
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 8543
+  gislinkJoinSample: 10/10 (100%)
+aadt:
+  source: TDOT Traffic Lines
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  field: AADT
+  yearField: AADTYEAR
+  preferredYear: '2025'
+  countyFilterField: COUNTY_NUMBER
+  countyNumberTdot: '18'
+  where: COUNTY_NUMBER='18' AND AADTYEAR='2025'
+  count2025: 2944
+  countAllYears: 3183
+  maxAADT2025: 47110
+  segments2025AADTge5000: 108
+  status: usable
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+ownerEntityTypeRule:
+  appliesTo: OWNER + ' ' + OWNER2 (upper-cased; OWNER2 dropped when it starts with C/O, ATTN, %, CARE
+    OF); first match wins
+  order:
+  - type: church
+    regex: \b(CHURCH|BAPTIST|METHODIST|PRESBYTERIAN|LUTHERAN|EPISCOPAL|CATHOLIC|DIOCESE|MINISTR(Y|IES)|CONGREGATION|FELLOWSHIP|TABERNACLE|TEMPLE|CHAPEL|ASSEMBLY
+      OF GOD|CHURCH OF CHRIST|CEMETERY)\b
+  - type: government
+    regex: \b(UNITED STATES|U ?S ?A|USA|STATE OF (TENNESSEE|TN)|TENNESSEE (STATE|DEPT|DEPARTMENT)|DEPT
+      OF|DEPARTMENT OF|COUNTY OF|CITY OF|TOWN OF|BOARD OF EDUCATION|TENNESSEE VALLEY AUTHORITY|TVA|UTILITY
+      DISTRICT|HOUSING AUTHORITY|WILDLIFE RESOURCES|TWRA|CORPS OF ENGINEERS|NATIONAL PARK)\b|\b[A-Z]+
+      COUNTY( GOVERNMENT| BOARD| COMMISSION| SCHOOLS?| HIGHWAY( DEPT)?)?\s*$
+  - type: LLC
+    regex: \b(L\.?\s?L\.?\s?C|P\.?L\.?L\.?C)\b\.?|LIMITED LIABILITY (COMPANY|CO)
+  - type: LP
+    regex: \b(L\.?L\.?L\.?P|L\.?L\.?P|L\.?P|LTD|LIMITED PARTNERSHIP|PARTNERSHIP|PARTNERS)\b
+  - type: INC
+    regex: \b(INC|INCORPORATED)\b\.?
+  - type: CORP
+    regex: \b(CORP|CORPORATION|COMPANY|CO)\b\.?\s*$|\bCORP\b|\bCORPORATION\b
+  - type: TRUST
+    regex: \b(TRUST|TRUSTS|TRUSTEE|TRUSTEES|TRSTE|TR|TRS|RLT|REV(OCABLE)? (LIVING )?TR(UST)?)\b|\(TR\)
+  - type: individual
+    regex: .*
+  noContactInfo: true
+  contactFieldsExcluded: []
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+  status:
+    a: verified
+    b: verified
+    c: verified
+    d: verified
+    e: verified
+    f: verified
+  a_aadt:
+    countyNumberTdot: '18'
+    where: COUNTY_NUMBER='18' AND AADTYEAR='2025'
+    count2025: 2944
+    countAllYears: 3183
+    maxAADT2025: 47110
+    segments2025AADTge5000: 108
+  b_value:
+    source: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/67
+    fields:
+      Assessment_Data_18_LANDMKTVAL: tax.landValue
+      Assessment_Data_18_APPRAISAL: tax.marketValue
+    populatedCounts:
+      Assessment_Data_18_LANDMKTVAL: 65238
+      Assessment_Data_18_APPRAISAL: 65291
+    layerTotal: 65424
+    missingMappedFields: []
+  c_sale:
+    source: https://services.arcgis.com/rD2ylXRs80UroD90/arcgis/rest/services/TN_County_Parcel_Map/FeatureServer/67
+    fields:
+      Assessment_Data_18_SALEDATE: lastSale.date
+      Assessment_Data_18_PRICE: lastSale.price
+      Assessment_Data_18_VI: lastSale.qualified
+      Assessment_Data_18_DEED_BOOK: lastSale.deedBook
+      Assessment_Data_18_DEED_PAGE: lastSale.deedPage
+    populatedCounts:
+      Assessment_Data_18_SALEDATE: 65402
+      Assessment_Data_18_PRICE: 34878
+      Assessment_Data_18_VI: 35364
+      Assessment_Data_18_DEED_BOOK: 65401
+      Assessment_Data_18_DEED_PAGE: 65402
+    dateField: Assessment_Data_18_SALEDATE
+    priceFields:
+    - Assessment_Data_18_PRICE
+    liveMaxSaleDate: '2023-05-31'
+    joinedSample5to150:
+      sampleIds: 10
+      matched: 10
+      valuePopulated: 10
+      saleDatePopulated: 10
+    saleHistory: 'Public per-parcel only: TPAD Parcel Details "Sale Information" table (date, price, book/page,
+      vacant/improved, instrument, qualification) via PA deep link; no bulk sale-history layer on public
+      GIS'
+  d_owner:
+    source: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+    filter: COUNTY_ID=18
+    ownerField: OWNER
+    owner2Field: OWNER2
+    total: 65771
+    ownerPopulated: 65728
+    entitySampleN: 2000
+    entityDist:
+      individual: 1786
+      TRUST: 109
+      LLC: 48
+      INC: 39
+      government: 8
+      church: 7
+      LP: 2
+      CORP: 1
+  e_paDeepLink:
+    template: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+    testUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink=018084%20%20%20%2002516
+    testGislink: 018084    02516
+    httpBox: '403'
+    httpExternal: 200 details
+    taxYearShown: '2026'
+    saleHistoryRows: 4
+    note: first sample 018113F C 02601 is a group/SI ID; used next parcel
+    perParcelFieldOnOIR: LINK_TPAD
+  f_viewer:
+    url: https://ucdd.maps.arcgis.com/apps/instant/minimalist/index.html?appid=beb9eb85eb334ea68d2d035fedba5dbf
+    http: '200'
+    arcgisItem:
+      id: beb9eb85eb334ea68d2d035fedba5dbf
+      access: public
+      type: Web Mapping Application
+      title: Cumberland County Community Resources
+      error: null
+    statewideTPV: https://tnmap.tn.gov/assessment/#/parcel/{GISLINK} (OIR LINK_TPV) HTTP 200
+    isStatewideFallback: false
+  vintage:
+    salesValueVintage: 2023
+    salesValueSourceEditDate: '2023-11-22'
+    liveMaxSaleDate: '2023-05-31'
+    serviceLastEdit: '2023-11-22'
+  notes: []

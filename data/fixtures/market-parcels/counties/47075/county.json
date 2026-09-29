@@ -1,0 +1,51 @@
+{
+  "name": "Haywood",
+  "fips": "47075",
+  "state": "Tennessee",
+  "markets": [
+    "Memphis"
+  ],
+  "featureCount": 3168,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "tn-oir-public-use-47075",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+  "gaps": [
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used.",
+    "Pass 2 records Assessment_Data_38_APPRAISAL as missing on the sale/value layer. Market value stays empty. Land market value is not copied in its place. Sale date and sale price are still joined.",
+    "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
+  ],
+  "path": "data/fixtures/market-parcels/counties/47075/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47075/lookup.json",
+  "sourceCount": 11388,
+  "dropped": 0,
+  "tileCount": 5,
+  "ingest": {
+    "sourceRows": 11388,
+    "deedAcresInBand": 2137,
+    "droppedGeometry": 0,
+    "droppedOutsideBand": 8220,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 0,
+    "tncpmLayer": 50,
+    "tncpmMatched": 3110,
+    "saleCount": 3016,
+    "appraisalCount": 0,
+    "gislinkMatchRate": 0.9817,
+    "salesVintage": "2023",
+    "kept": 3168,
+    "ownerCount": 3167,
+    "tpadCount": 3168,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
+}

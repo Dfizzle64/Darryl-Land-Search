@@ -35,6 +35,8 @@ Valdosta, Macon, Athens, Hilton Head, and Jackson MS are parcel shelves with no 
 
 South Carolina rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for the first 20 interim-list counties that were not already a complete extract and whose card endpoint answered: Abbeville, Aiken, Allendale, Bamberg, Barnwell, Cherokee, Chester, Chesterfield, Clarendon, Colleton, Darlington, Dillon, Edgefield, Fairfield, Florence, Georgetown, Greenwood, Hampton, Horry, and Jasper. Anderson's NewPropertyViewer service closed the TLS connection and was skipped. Beaufort, Charleston, Dorchester, and Greenville were already on the card endpoint. Berkeley stays the existing Addr_muni extract. Edgefield uses the new RFA Edgefield_McCormick_Greenwood layer 9. City cards (Hilton Head, Myrtle Beach, and the other municipalities) are not this batch. qPublic and Beacon property-appraiser patterns are stored and were not requested. Owner phone and email are not ingested. Sale dates after the pull date are cleared. No Opportunity Zone status was added. AADT wiring and tract eligibility were not changed.
 
+The next twenty Tennessee rural-OZ counties use the same public-GIS loader. Geometry and owner stay on Tennessee Property Boundaries Public Use, filtered by the card's Comptroller COUNTY_ID. Acreage is geodesic polygon area, 5.0 through 150.0 inclusive. Sale date, sale price, and appraisal are joined on GISLINK from the card's sales-value layer. Hamblen uses the MH-GIS assessor CAMA and is labeled 2026. The other nineteen use TN_County_Parcel_Map and are labeled 2023. A sale date later than the pull date is left blank. The TPAD link is stored and not requested. Owner phone and email are not ingested. Bradley and Grainger were already loaded and were not replaced. No new market shelf was added. No Opportunity Zone designation, school grade, or base flood elevation was added. AADT and tract-income wiring were not changed.
+
 Twenty Tennessee counties were loaded from public GIS only. Geometry and owner come from the Office of Information Resources layer Tennessee Property Boundaries Public Use (edited 2026-09-10), except Hickman and Chester, which that layer does not include. Acreage is the geodesic area of the polygon, because deeded acres are often 0. Sale date, sale price, and appraisal are joined from AGOL TN_County_Parcel_Map (edited 2023-11-22) on GISLINK and labeled 2023 in the popup. A GISLINK that does not match is left without sale or value. Overton is not on that service; its sale and value come from UCDD Overton_Parcels and are labeled 2019, that roll's latest tax year. Sevier geometry and owner stay on OIR; sale, value, assessed value, and mailing come from the Sevierville countywide CAMA and are labeled 2025. Hickman is the May 2023 CaptureCAMA snapshot, labeled 2020, and links to the county portal instead of TPAD. Chester is the county CaptureCAMA Parcels_12 layer: the parcel id is the CAMA GISLINK, a blank GISLINK falls back to the map id, rows with neither id are dropped, sale data stays empty because GPDATA__LA is the record's last-updated date, and market and assessed values are labeled 2026. A sale date later than the pull date is left blank. The TPAD GIS link is stored for browsers and is not requested during ingest, tests, or the build. Parcel layers are chosen from `data/tn-parcel-cards` by each layer's `use` label and the card's `parcelSetup` block, never by taking the first parcels layer. Acreage is geodesic polygon area because the OIR layer has no acreage field. Zoning join URLs stay in `data/tn-rural-parcel-sources.json`. Re-pull one county after a card changes with `python3 scripts/tn_oir_parcels.py --county <Name> --refresh`. Zoning is stamped only where that county's research card published a usable layer. Bedford County, Pennsylvania is not a source. Utah Sevier County parcels are not a source. Macon had been a shelf gap because the generic loader queried IMPACT COUNTY_ID 111; the Comptroller county number is 56 and the public layer was live. No Opportunity Zone designation was added. AADT wiring was not changed.
 
 ## Coverage
@@ -50,7 +52,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Atlanta | primary | 93,811 | 17 | 0 | 18 |
 | Tampa | primary | 127,713 | 10 | 0 | 0 |
 | Charleston | primary | 86,151 | 14 | 0 | 1 |
-| Nashville | primary | 127,947 | 16 | 0 | 3 |
+| Nashville | primary | 144,027 | 19 | 0 | 3 |
 | Charlotte | primary | 112,019 | 13 | 0 | 2 |
 | Raleigh-Durham | primary | 151,530 | 17 | 0 | 0 |
 | South Florida | shelf | 41,693 | 3 | 1 | 0 |
@@ -66,10 +68,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Savannah | other | 19,987 | 5 | 0 | 3 |
 | Columbia | other | 49,244 | 5 | 1 | 7 |
 | Greenville | other | 48,073 | 5 | 0 | 4 |
-| Chattanooga | other | 22,817 | 4 | 0 | 6 |
-| Knoxville | other | 58,475 | 10 | 0 | 3 |
-| Memphis | other | 45,278 | 8 | 0 | 3 |
-| Jackson | other | 21,540 | 4 | 0 | 0 |
+| Chattanooga | other | 30,999 | 6 | 0 | 6 |
+| Knoxville | other | 93,815 | 15 | 0 | 2 |
+| Memphis | other | 85,241 | 16 | 0 | 2 |
+| Jackson | other | 31,172 | 6 | 0 | 0 |
 | Winston-Salem | other | 92,199 | 9 | 0 | 0 |
 | Wilmington | other | 47,320 | 6 | 0 | 0 |
 | Heartland | shelf | 21,163 | 4 | 1 | 0 |
@@ -167,7 +169,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Bedford | Tennessee | 47003 | complete-gte-5ac | 6,686 | tn-oir-public-use-47003 |
 | Cannon | Tennessee | 47015 | complete-gte-5ac | 3,863 | tn-oir-public-use-47015 |
 | Cheatham | Tennessee | 47021 | complete-gte-5ac | 5,426 | apsu-cheatgis-47021 |
+| Coffee | Tennessee | 47031 | complete-gte-5ac | 5,715 | tn-oir-public-use-47031 |
 | Davidson | Tennessee | 47037 | complete-gte-5ac | 9,478 | tn-metro-davidson-parcels |
+| DeKalb | Tennessee | 47041 | complete-gte-5ac | 3,787 | tn-oir-public-use-47041 |
 | Dickson | Tennessee | 47043 | complete-gte-5ac | 8,477 | tn-oir-public-use-47043 |
 | Hickman | Tennessee | 47081 | complete-gte-5ac | 5,445 | tn-hickman-capturecama-202305 |
 | Macon | Tennessee | 47111 | complete-gte-5ac | 5,064 | tn-oir-public-use-47111 |
@@ -181,6 +185,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Smith | Tennessee | 47159 | gap | 0 | tn-impact-47159 |
 | Sumner | Tennessee | 47165 | complete-gte-5ac | 15,982 | tn-sumner-911-parcels-cama |
 | Trousdale | Tennessee | 47169 | gap | 0 | tn-impact-47169 |
+| Warren | Tennessee | 47177 | complete-gte-5ac | 6,578 | tn-oir-public-use-47177 |
 | Williamson | Tennessee | 47187 | complete-gte-5ac | 10,760 | tn-williamson-datapull-47187 |
 | Wilson | Tennessee | 47189 | complete-gte-5ac | 10,766 | tn-oir-public-use-47189 |
 
@@ -386,9 +391,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Bledsoe | Tennessee | 47007 | complete-gte-5ac | 4,450 | tn-oir-public-use-47007 |
 | Bradley | Tennessee | 47011 | complete-gte-5ac | 6,336 | tn-cleveland-parcels-impact-47011 |
 | Catoosa | Georgia | 13047 | gap | 0 | unavailable |
 | Dade | Georgia | 13083 | gap | 0 | unavailable |
+| Grundy | Tennessee | 47061 | complete-gte-5ac | 3,732 | tn-oir-public-use-47061 |
 | Hamilton | Tennessee | 47065 | complete-gte-5ac | 9,162 | tn-hamilton-live-parcels |
 | Marion | Tennessee | 47115 | gap | 0 | tn-impact-47115 |
 | Meigs | Tennessee | 47121 | gap | 0 | tn-impact-47121 |
@@ -404,12 +411,16 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Anderson | Tennessee | 47001 | complete-gte-5ac | 4,310 | tn-oir-public-use-47001 |
 | Blount | Tennessee | 47009 | complete-gte-5ac | 8,183 | tn-blount-agol-47009 |
 | Campbell | Tennessee | 47013 | complete-gte-5ac | 3,613 | tn-oir-public-use-47013 |
+| Claiborne | Tennessee | 47025 | complete-gte-5ac | 5,456 | tn-oir-public-use-47025 |
 | Cocke | Tennessee | 47029 | complete-gte-5ac | 6,377 | tn-oir-public-use-47029 |
+| Cumberland | Tennessee | 47035 | complete-gte-5ac | 8,540 | tn-oir-public-use-47035 |
 | Grainger | Tennessee | 47057 | complete-gte-5ac | 6,406 | tn-impact-47057 |
-| Hamblen | Tennessee | 47063 | gap | 0 | tn-impact-47063 |
+| Greene | Tennessee | 47059 | complete-gte-5ac | 10,925 | tn-oir-public-use-47059 |
+| Hamblen | Tennessee | 47063 | complete-gte-5ac | 3,024 | tn-oir-public-use-47063 |
 | Jefferson | Tennessee | 47089 | complete-gte-5ac | 6,586 | tn-impact-47089 |
 | Knox | Tennessee | 47093 | complete-gte-5ac | 4,569 | kgis-parcel-search |
 | Loudon | Tennessee | 47105 | gap | 0 | tn-impact-47105 |
+| Monroe | Tennessee | 47123 | complete-gte-5ac | 7,395 | tn-oir-public-use-47123 |
 | Morgan | Tennessee | 47129 | complete-gte-5ac | 5,113 | tn-oir-public-use-47129 |
 | Roane | Tennessee | 47145 | complete-gte-5ac | 5,731 | tn-oir-public-use-47145 |
 | Sevier | Tennessee | 47155 | complete-gte-5ac | 7,587 | tn-oir-public-use-47155 |
@@ -422,9 +433,16 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Benton | Mississippi | 28009 | complete-gte-5ac | 3,557 | ms-mdeq-2023-28009 |
 | Crittenden | Arkansas | 05035 | complete-gte-5ac | 3,666 | ar-cadastre-05035 |
 | DeSoto | Mississippi | 28033 | complete-gte-5ac | 6,219 | ms-mdeq-2023-28033 |
+| Dyer | Tennessee | 47045 | complete-gte-5ac | 3,871 | tn-oir-public-use-47045 |
 | Fayette | Tennessee | 47047 | gap | 0 | tn-impact-47047 |
-| Lauderdale | Tennessee | 47097 | gap | 0 | tn-impact-47097 |
+| Gibson | Tennessee | 47053 | complete-gte-5ac | 7,282 | tn-oir-public-use-47053 |
+| Hardeman | Tennessee | 47069 | complete-gte-5ac | 4,618 | tn-oir-public-use-47069 |
+| Haywood | Tennessee | 47075 | complete-gte-5ac | 3,168 | tn-oir-public-use-47075 |
+| Henderson | Tennessee | 47077 | complete-gte-5ac | 5,413 | tn-oir-public-use-47077 |
+| Henry | Tennessee | 47079 | complete-gte-5ac | 6,064 | tn-oir-public-use-47079 |
+| Lauderdale | Tennessee | 47097 | complete-gte-5ac | 3,256 | tn-oir-public-use-47097 |
 | Marshall | Mississippi | 28093 | complete-gte-5ac | 7,984 | ms-mdeq-2023-28093 |
+| McNairy | Tennessee | 47109 | complete-gte-5ac | 6,291 | tn-oir-public-use-47109 |
 | Mississippi | Arkansas | 05093 | complete-gte-5ac | 6,585 | ar-cadastre-05093 |
 | Shelby | Tennessee | 47157 | complete-gte-5ac | 9,667 | tn-shelby-current-parcels |
 | Tate | Mississippi | 28137 | complete-gte-5ac | 5,758 | ms-mdeq-2023-28137 |
@@ -435,7 +453,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Carroll | Tennessee | 47017 | complete-gte-5ac | 6,160 | tn-oir-public-use-47017 |
 | Chester | Tennessee | 47023 | complete-gte-5ac | 3,333 | tn-chester-capturecama-parcels12 |
+| Decatur | Tennessee | 47039 | complete-gte-5ac | 3,472 | tn-oir-public-use-47039 |
 | Hardin | Tennessee | 47071 | complete-gte-5ac | 5,438 | tn-oir-public-use-47071 |
 | Madison | Tennessee | 47113 | complete-gte-5ac | 6,384 | tn-impact-47113 |
 | Weakley | Tennessee | 47183 | complete-gte-5ac | 6,385 | tn-oir-public-use-47183 |

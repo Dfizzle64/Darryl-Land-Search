@@ -1,0 +1,55 @@
+{
+  "name": "Perry",
+  "fips": "47135",
+  "state": "Tennessee",
+  "markets": [
+    "Nashville"
+  ],
+  "featureCount": 3701,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "tn-oir-public-use-47135",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+  "gaps": [
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used.",
+    "Perry GISLINK match on TN_County_Parcel_Map layer 24 is flagged below 90 percent. OIR has parcels that 2023 layer does not. Unmatched parcels use a spatial fallback: the representative point must intersect a layer-24 polygon. Sale and value copied that way are the pre-split parent parcel's 2023 record, stamped joinMethod spatial-parent-2023, and are not this parcel's own sale. Parcels_GISLINK2 and Assessment_Data_68_GISLINK recover nothing.",
+    "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty.",
+    "Spatial parent fallback stamped 620 parcels (joinMethod spatial-parent-2023). Those sale and value fields are the pre-split parent record, not this parcel's own sale."
+  ],
+  "path": "data/fixtures/market-parcels/counties/47135/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47135/lookup.json",
+  "sourceCount": 9843,
+  "dropped": 0,
+  "tileCount": 8,
+  "ingest": {
+    "sourceRows": 9843,
+    "deedAcresInBand": 2183,
+    "droppedGeometry": 1,
+    "droppedOutsideBand": 6096,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 45,
+    "tncpmLayer": 24,
+    "tncpmMatched": 3079,
+    "saleCount": 2943,
+    "appraisalCount": 3030,
+    "gislinkMatchRate": 0.8319,
+    "salesVintage": "2023",
+    "spatialParentMatched": 620,
+    "spatialParentSaleCount": 580,
+    "spatialParentAppraisalCount": 617,
+    "kept": 3701,
+    "ownerCount": 3666,
+    "tpadCount": 3701,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
+}

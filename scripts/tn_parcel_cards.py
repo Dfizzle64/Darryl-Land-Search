@@ -329,6 +329,9 @@ def resolve_card(card: dict, overlay: dict | None = None) -> dict[str, Any]:
         "salesGap": sales_gap,
         "salesOnGeometry": False,
     }
+    secondary = str(setup.get("secondaryJoin") or "")
+    if "spatial-parent-2023" in secondary:
+        row["spatialParentFallback"] = True
     if mode == "oir":
         row["oirName"] = name.upper()
     portal = _portal(card, overlay)

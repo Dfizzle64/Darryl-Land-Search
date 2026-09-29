@@ -1,0 +1,50 @@
+{
+  "name": "Crockett",
+  "fips": "47033",
+  "state": "Tennessee",
+  "markets": [
+    "Jackson"
+  ],
+  "featureCount": 3323,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "tn-oir-public-use-47033",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+  "gaps": [
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Sale date, sale price, and appraisal are joined on GISLINK and labeled 2023 in the popup when a value is present. A GISLINK with no match is left without sale or value. Assessed value, taxable value, and tax amount are not on the TN_County_Parcel_Map join.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used.",
+    "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
+  ],
+  "path": "data/fixtures/market-parcels/counties/47033/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47033/lookup.json",
+  "sourceCount": 10163,
+  "dropped": 0,
+  "tileCount": 5,
+  "ingest": {
+    "sourceRows": 10163,
+    "deedAcresInBand": 2400,
+    "droppedGeometry": 0,
+    "droppedOutsideBand": 6840,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 0,
+    "tncpmLayer": 68,
+    "tncpmMatched": 3255,
+    "saleCount": 3205,
+    "appraisalCount": 3225,
+    "gislinkMatchRate": 0.9795,
+    "salesVintage": "2023",
+    "kept": 3323,
+    "ownerCount": 3323,
+    "tpadCount": 3323,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
+}
